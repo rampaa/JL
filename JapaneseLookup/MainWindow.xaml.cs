@@ -35,25 +35,27 @@ namespace JapaneseLookup
 
             var windowClipboardManager = new ClipboardManager(this);
             windowClipboardManager.ClipboardChanged += ClipboardChanged;
+
+            CopyFromClipboard();
         }
 
-        private void ClipboardChanged(object sender, EventArgs e)
+        private void CopyFromClipboard()
         {
-            // Clipboard.GetText() gives an exception.
-            // The following fixes the issue but it's ugly.
+            // Check for Japanese text?
             if (Clipboard.ContainsText())
             {
                 try
                 {
                     backlog += Clipboard.GetText();
-                    mainTextBox.Text = Clipboard.GetText()+"\n";
+                    mainTextBox.Text = Clipboard.GetText() + "\n";
                 }
-                catch
-                {
-                    backlog += Clipboard.GetText();
-                    mainTextBox.Text = Clipboard.GetText()+"\n";
-                }
+                catch { }
             }
+        }
+
+        private void ClipboardChanged(object sender, EventArgs e)
+        {
+            CopyFromClipboard();
         }
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
@@ -62,7 +64,7 @@ namespace JapaneseLookup
             this.DragMove();
         }
 
-        private void mainTextBox_MouseMove(object sender, MouseEventArgs e)
+        private void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
             int charPosition = mainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(mainTextBox), false);
             if (charPosition != -1)
@@ -82,10 +84,7 @@ namespace JapaneseLookup
                 PopupWindow.Instance.Hide();
             }
         }
-
-
-
-        private void mainTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void MainTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
 
         }

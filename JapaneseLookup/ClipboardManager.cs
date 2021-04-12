@@ -11,7 +11,7 @@ namespace JapaneseLookup
         {
             // See http://msdn.microsoft.com/en-us/library/ms649021%28v=vs.85%29.aspx
             public const int WM_CLIPBOARDUPDATE = 0x031D;
-            public static IntPtr HWND_MESSAGE = new IntPtr(-3);
+            public static IntPtr HWND_MESSAGE = new(-3);
 
             // See http://msdn.microsoft.com/en-us/library/ms632599%28VS.85%29.aspx#message_only
             [DllImport("user32.dll", SetLastError = true)]
@@ -22,8 +22,7 @@ namespace JapaneseLookup
         public event EventHandler ClipboardChanged;
         public ClipboardManager(Window windowSource)
         {
-            HwndSource source = PresentationSource.FromVisual(windowSource) as HwndSource;
-            if (source == null)
+            if (PresentationSource.FromVisual(windowSource) is not HwndSource source)
             {
                 throw new ArgumentException(
                     "Window source MUST be initialized first, such as in the Window's OnSourceInitialized handler."
