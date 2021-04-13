@@ -17,14 +17,14 @@ namespace JapaneseLookup
             {
                 // couldn't get this to work
                 // var response = await Client.PostAsJsonAsync(Uri, req);
-                
+
                 //AnkiConnect doesn't like "params":null, so we strip it
                 var payload = new StringContent(JsonSerializer.Serialize(req,
                     new JsonSerializerOptions {IgnoreNullValues = true}));
                 Console.WriteLine("Sending: " + await payload.ReadAsStringAsync());
-                var response = await Client.PostAsync(Uri, payload);
+                var postResponse = await Client.PostAsync(Uri, payload);
 
-                var json = await response.Content.ReadFromJsonAsync<Response>();
+                var json = await postResponse.Content.ReadFromJsonAsync<Response>();
                 Console.WriteLine("json result: " + json.result);
 
                 // TODO: we need a dedicated error logging/display mechanism
@@ -44,9 +44,10 @@ namespace JapaneseLookup
 
                 return json;
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException e)
             {
-                Console.WriteLine("Open Anki you noob");
+                Console.WriteLine("Communication error: Is Anki open?");
+                Console.WriteLine(e);
                 return null;
             }
             catch (Exception e)
