@@ -57,18 +57,19 @@ namespace JapaneseLookup
         private void ClipboardChanged(object sender, EventArgs e)
         {
             CopyFromClipboard();
-            Test();
         }
 
-        async void Test()
+        async void Mine(string word)
         {
-            var fields = new Dictionary<string, string> {{"Front", "front content"}, {"Back", "back content"}};
-            string[] tags = {"JL"}; 
-            var result_addnote = await Mining.AddNoteToDeck(new Note("JLDeck", "Basic", fields, tags));
-            // mainTextBox.Text = JsonSerializer.Serialize(result_addnote);
-            
-            var result_decknames = await Mining.GetDeckNames();
-            // Console.WriteLine(JsonSerializer.Serialize(result_decknames));
+            var front = word;
+            var back = "back content";
+            var fields = new Dictionary<string, string> {{"Front", front}, {"Back", back}};
+            string[] tags = {"JL"};
+            var result = await Mining.AddNoteToDeck(new Note("JLDeck", "Basic", fields, tags));
+            if (result == null)
+            {
+                Console.WriteLine($"Mining failed for {word}");
+            }
         }
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
@@ -84,6 +85,7 @@ namespace JapaneseLookup
             {
                 string parsedWord = parser.Parse(mainTextBox.Text[charPosition..]);
                 PopupWindow.Instance.cardTextBox.Text = parsedWord;
+                // Mine(parsedWord);
                 // TODO: ...lookup(parsedWord);
                 // TODO: Show result.
                 Point position = PointToScreen(Mouse.GetPosition(this));
