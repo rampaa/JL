@@ -6,17 +6,15 @@ using System.Threading.Tasks;
 
 namespace JapaneseLookup
 {
-    class Entry
+    abstract class IEntry
     {
         public List<KEle> KEleList { get; set; }
         public List<REle> REleList { get; set; }
-        public List<Sense> SenseList { get; set; }
 
-        public Entry()
+        public IEntry()
         {
             KEleList = new List<KEle>();
             REleList = new List<REle>();
-            SenseList = new List<Sense>();
         }
     }
 }
