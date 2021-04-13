@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -48,12 +49,20 @@ namespace JapaneseLookup
                     backlog += Clipboard.GetText();
                     mainTextBox.Text = Clipboard.GetText()+"\n";
                 }
-                catch
-                {
-                    backlog += Clipboard.GetText();
-                    mainTextBox.Text = Clipboard.GetText()+"\n";
-                }
+                catch {}
+                Test();
             }
+        }
+
+        async void Test()
+        {
+            var fields = new Dictionary<string, string> {{"Front", "front content"}, {"Back", "back content"}};
+            string[] tags = {"JL"}; 
+            var result_addnote = await Mining.AddNoteToDeck(new Note("JLDeck", "Basic", fields, tags));
+            // mainTextBox.Text = JsonSerializer.Serialize(result_addnote);
+            
+            var result_decknames = await Mining.GetDeckNames();
+            // Console.WriteLine(JsonSerializer.Serialize(result_decknames));
         }
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
