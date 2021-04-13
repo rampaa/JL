@@ -18,95 +18,98 @@ using System.Xml;
 
 namespace JapaneseLookup
 {
-  /// <summary>
-  /// Interaction logic for MainWindow.xaml
-  /// </summary>
-  public partial class MainWindow : Window
-  {
-    private string backlog = "";
-    private IParser parser = new Mecab();
-    public MainWindow()
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
     {
-      InitializeComponent();
-    }
+        private string backlog = "";
+        private IParser parser = new Mecab();
 
-    protected override void OnSourceInitialized(EventArgs e)
-    {
-      base.OnSourceInitialized(e);
-
-      var windowClipboardManager = new ClipboardManager(this);
-      windowClipboardManager.ClipboardChanged += ClipboardChanged;
-
-      CopyFromClipboard();
-    }
-
-    private void CopyFromClipboard()
-    {
-      // Check for Japanese text?
-      if (Clipboard.ContainsText())
-      {
-        try
+        public MainWindow()
         {
-          backlog += Clipboard.GetText();
-          mainTextBox.Text = Clipboard.GetText() + "\n";
+            InitializeComponent();
         }
-        catch { }
-      }
-    }
 
-    private void ClipboardChanged(object sender, EventArgs e)
-    {
-      CopyFromClipboard();
-    }
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
 
-    async void Mine(string word)
-    {
-      var front = word;
-      var back = "back content";
-      var fields = new Dictionary<string, string> { { "Front", front }, { "Back", back } };
-      string[] tags = { "JL" };
-      var result = await Mining.AddNoteToDeck(new Note("JLDeck", "Basic", fields, tags));
-      if (result == null)
-      {
-        Console.WriteLine($"Mining failed for {word}");
-      }
-    }
+            var windowClipboardManager = new ClipboardManager(this);
+            windowClipboardManager.ClipboardChanged += ClipboardChanged;
 
-    protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-    {
-      base.OnMouseLeftButtonDown(e);
-      this.DragMove();
-    }
+            CopyFromClipboard();
+        }
 
-    private void MainTextBox_MouseMove(object sender, MouseEventArgs e)
-    {
-      int charPosition = mainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(mainTextBox), false);
-      if (charPosition != -1)
-      {
-        string parsedWord = parser.Parse(mainTextBox.Text[charPosition..]);
-        PopupWindow.Instance.cardTextBox.Text = parsedWord;
-        // Mine(parsedWord);
-        // TODO: ...lookup(parsedWord);
-        // TODO: Show result.
-        Point position = PointToScreen(Mouse.GetPosition(this));
-        PopupWindow popUpWindow = PopupWindow.Instance;
-        popUpWindow.Left = position.X;
-        popUpWindow.Top = position.Y + 30;
-        popUpWindow.Show();
-      }
-      else
-      {
-        PopupWindow.Instance.Hide();
-      }
-    }
-    private void MainTextBox_TextChanged(object sender, TextChangedEventArgs e)
-    {
+        private void CopyFromClipboard()
+        {
+            // Check for Japanese text?
+            if (Clipboard.ContainsText())
+            {
+                try
+                {
+                    backlog += Clipboard.GetText();
+                    mainTextBox.Text = Clipboard.GetText() + "\n";
+                }
+                catch
+                {
+                }
+            }
+        }
 
-    }
+        private void ClipboardChanged(object sender, EventArgs e)
+        {
+            CopyFromClipboard();
+        }
 
-    private void Window_Closed(object sender, EventArgs e)
-    {
-      PopupWindow.Instance.Close();
+        async void Mine(string word)
+        {
+            var front = word;
+            var back = "back content";
+            var fields = new Dictionary<string, string> {{"Front", front}, {"Back", back}};
+            string[] tags = {"JL"};
+            var result = await Mining.AddNoteToDeck(new Note("JLDeck", "Basic", fields, tags));
+            if (result == null)
+            {
+                Console.WriteLine($"Mining failed for {word}");
+            }
+        }
+
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseLeftButtonDown(e);
+            this.DragMove();
+        }
+
+        private void MainTextBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            int charPosition = mainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(mainTextBox), false);
+            if (charPosition != -1)
+            {
+                string parsedWord = parser.Parse(mainTextBox.Text[charPosition..]);
+                PopupWindow.Instance.cardTextBox.Text = parsedWord;
+                // Mine(parsedWord);
+                // TODO: ...lookup(parsedWord);
+                // TODO: Show result.
+                Point position = PointToScreen(Mouse.GetPosition(this));
+                PopupWindow popUpWindow = PopupWindow.Instance;
+                popUpWindow.Left = position.X;
+                popUpWindow.Top = position.Y + 30;
+                popUpWindow.Show();
+            }
+            else
+            {
+                PopupWindow.Instance.Hide();
+            }
+        }
+
+        private void MainTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            PopupWindow.Instance.Close();
+        }
     }
-  }
 }
