@@ -8,10 +8,10 @@ namespace JapaneseLookup
 {
     class JMdictEntry : Entry
     {
-        public List<Sense> Sense { get; set; }
+        public List<Sense> SenseList { get; set; }
         public JMdictEntry() : base()
         {
-            Sense = new List<Sense>();
+            SenseList = new List<Sense>();
         }
     }
 }
