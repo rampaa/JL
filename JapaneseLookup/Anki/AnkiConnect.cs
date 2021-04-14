@@ -41,7 +41,7 @@ namespace JapaneseLookup.Anki
                 var json = await postResponse.Content.ReadFromJsonAsync<Response>();
                 Console.WriteLine("json result: " + json.result);
 
-                // TODO: we need a dedicated error logging/display mechanism
+                // TODO: Dedicated error logging/display mechanism
                 if (json.error == null) return json;
                 switch (json.error.ToString())
                 {

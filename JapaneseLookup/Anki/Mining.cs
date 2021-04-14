@@ -23,11 +23,11 @@ namespace JapaneseLookup.Anki
                 {
                     {
                         "url",
-                        $"https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={word}&kana={reading}"
+                        $"http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={word}&kana={reading}"
                     },
                     {
                         "filename",
-                        $"JL_{reading}_{word}.mp3"
+                        $"JL_{word}_{reading}.mp3"
                     },
                     {
                         "skipHash",
