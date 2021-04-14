@@ -11,6 +11,7 @@ namespace JapaneseLookup.Anki
 
         public string modelName { get; set; }
 
+        // might need to be Dictionary<string, object>
         public Dictionary<string, string> fields { get; set; }
 
         public Dictionary<string, object> options { get; set; }

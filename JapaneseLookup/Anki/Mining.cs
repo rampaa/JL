@@ -6,10 +6,11 @@ namespace JapaneseLookup.Anki
     public static class Mining
     {
         // TODO: Customizable fields
+        // TODO: HTML + CSS for notes
         public static async void Mine(string word, string reading, string gloss, string context)
         {
             var deckName = "JLDeck";
-            var modelName = "Basic";
+            var modelName = "JL-Basic";
 
             var front = word;
             var back = $"{reading}<br>{gloss}<br>{context}<br>";
@@ -17,6 +18,8 @@ namespace JapaneseLookup.Anki
 
             Dictionary<string, object> options = null;
             string[] tags = {"JL"};
+
+            var audioField = "Audio";
             Dictionary<string, object>[] audio =
             {
                 new()
@@ -31,24 +34,20 @@ namespace JapaneseLookup.Anki
                     },
                     {
                         "skipHash",
-                        null
+                        "7e2c2f954ef6051373ba916f000168dc"
                     },
                     {
                         "fields",
-                        new[] {"Back"}
+                        new[] {audioField}
                     },
                 }
             };
             Dictionary<string, object>[] video = null;
             Dictionary<string, object>[] picture = null;
 
-            var result =
-                await AnkiConnect.AddNoteToDeck(
-                    new Note(deckName, modelName, fields, options, tags, audio, video, picture));
-            if (result == null)
-            {
-                Console.WriteLine($"Mining failed for {word}");
-            }
+            var note = new Note(deckName, modelName, fields, options, tags, audio, video, picture);
+            var response = await AnkiConnect.AddNoteToDeck(note);
+            Console.WriteLine(response == null ? $"Mining failed for {word}" : $"Mined {word}");
         }
     }
 }

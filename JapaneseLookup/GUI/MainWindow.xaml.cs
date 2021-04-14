@@ -18,6 +18,11 @@ namespace JapaneseLookup.GUI
         public MainWindow()
         {
             InitializeComponent();
+
+            // init AnkiConnect so that it doesn't block later
+            #pragma warning disable 4014
+            AnkiConnect.GetDeckNames();
+            #pragma warning restore 4014
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -94,6 +99,7 @@ namespace JapaneseLookup.GUI
                     string parsedWord = parser.Parse(mainTextBox.Text[charPosition..]);
                     // Mining.Mine(parsedWord, "reading", "gloss", "context");
                     Mining.Mine("猫", "ねこ", "gloss", "context");
+                    Mining.Mine("流", "る", "gloss", "context");
                     break;
                 }
             }

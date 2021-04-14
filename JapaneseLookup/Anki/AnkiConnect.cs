@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -34,12 +35,12 @@ namespace JapaneseLookup.Anki
                 // AnkiConnect doesn't like null values
                 var payload = new StringContent(JsonSerializer.Serialize(req,
                     new JsonSerializerOptions {IgnoreNullValues = true}));
-                Console.WriteLine("Sending: " + await payload.ReadAsStringAsync());
+                Debug.WriteLine("Sending: " + await payload.ReadAsStringAsync());
 
                 var postResponse = await Client.PostAsync(Uri, payload);
 
                 var json = await postResponse.Content.ReadFromJsonAsync<Response>();
-                Console.WriteLine("json result: " + json.result);
+                Debug.WriteLine("json result: " + json.result);
 
                 // TODO: Dedicated error logging/display mechanism
                 if (json.error == null) return json;
