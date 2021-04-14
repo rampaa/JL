@@ -62,19 +62,6 @@ namespace JapaneseLookup
             CopyFromClipboard();
         }
 
-        async void Mine(string word)
-        {
-            var front = word;
-            var back = "back content";
-            var fields = new Dictionary<string, string> {{"Front", front}, {"Back", back}};
-            string[] tags = {"JL"};
-            var result = await Mining.AddNoteToDeck(new Note("JLDeck", "Basic", fields, tags));
-            if (result == null)
-            {
-                Console.WriteLine($"Mining failed for {word}");
-            }
-        }
-
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnMouseLeftButtonDown(e);
@@ -88,7 +75,6 @@ namespace JapaneseLookup
             {
                 string parsedWord = parser.Parse(mainTextBox.Text[charPosition..]);
                 PopupWindow.Instance.cardTextBox.Text = parsedWord;
-                // Mine(parsedWord);
                 // TODO: ...lookup(parsedWord);
                 // TODO: Show result.
                 Point position = PointToScreen(Mouse.GetPosition(this));
@@ -105,6 +91,23 @@ namespace JapaneseLookup
 
         private void MainTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+        }
+
+        private void MainTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.M:
+                {
+                    int charPosition = mainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(mainTextBox), false);
+                    if (charPosition == -1) return;
+
+                    string parsedWord = parser.Parse(mainTextBox.Text[charPosition..]);
+                    // Mining.Mine(parsedWord, "reading", "gloss", "context");
+                    Mining.Mine("猫", "ねこ", "gloss", "context");
+                    break;
+                }
+            }
         }
 
         private void Window_Closed(object sender, EventArgs e)

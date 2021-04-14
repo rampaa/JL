@@ -5,8 +5,12 @@ namespace JapaneseLookup
     public class Request
     {
         // camelCase property names because AnkiConnect
+        #pragma warning disable IDE1006
+
         public string action { get; set; }
+
         public int version { get; set; }
+
         // maybe Dictionary<string, Dictionary<string,object>>
         public Dictionary<string, object> @params { get; set; }
 
