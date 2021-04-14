@@ -5,21 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:JapaneseLookup"
         AllowsTransparency="True"
-        mc:Ignorable="d" Height="269" Width="800" WindowStyle="None" ResizeMode="CanResize" Topmost="True" Closed="Window_Closed">
+        mc:Ignorable="d" Height="269" Width="800" WindowStyle="None" ResizeMode="CanResize" Topmost="True"
+        Closed="Window_Closed">
     <Window.Background>
-        <SolidColorBrush Color="Black" Opacity="0.3"/>
+        <SolidColorBrush Color="Black" Opacity="0.3" />
     </Window.Background>
 
     <WindowChrome.WindowChrome>
-        <WindowChrome     
-        CaptionHeight="1"  
-        CornerRadius ="0"
-        ResizeBorderThickness="4"         
-        GlassFrameThickness="0">
-        </WindowChrome>
+        <WindowChrome
+            CaptionHeight="1"
+            CornerRadius="0"
+            ResizeBorderThickness="4"
+            GlassFrameThickness="0" />
     </WindowChrome.WindowChrome>
 
     <Grid>
-        <TextBox x:Name="mainTextBox" Margin="0,10,0,0" TextWrapping="Wrap" VerticalContentAlignment="Top" Background="Transparent" Opacity="1" FontSize="70" Foreground="White" SelectionTextBrush="Black" IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove" VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" TextChanged="MainTextBox_TextChanged"/>
+        <TextBox x:Name="mainTextBox" Margin="0,10,0,0" TextWrapping="Wrap" VerticalContentAlignment="Top"
+                 Background="Transparent" Opacity="1" FontSize="70" Foreground="White" SelectionTextBrush="Black"
+                 IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"
+                 VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
+                 TextChanged="MainTextBox_TextChanged" KeyDown="MainTextBox_KeyDown" />
     </Grid>
 </Window>

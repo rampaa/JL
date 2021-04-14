@@ -12,6 +12,7 @@
         //   an array of booleans
         // /shrug
         public object result { get; set; }
+
         public object error { get; set; }
     }
 }

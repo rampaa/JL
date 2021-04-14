@@ -1,20 +1,55 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace JapaneseLookup
 {
     public static class Mining
     {
-        public static async Task<Response> GetDeckNames()
+        // TODO: Customizable fields
+        public static async void Mine(string word, string reading, string gloss, string context)
         {
-            var req = new Request("deckNames", 6);
-            return await AnkiConnect.Send(req);
-        }
+            var deckName = "JLDeck";
+            var modelName = "Basic";
 
-        public static async Task<Response> AddNoteToDeck(Note note)
-        {
-            var req = new Request("addNote", 6, new Dictionary<string, object> {{"note", note}});
-            return await AnkiConnect.Send(req);
+            var front = word;
+            var back = $"{reading}<br>{gloss}<br>{context}<br>";
+            var fields = new Dictionary<string, string> {{"Front", front}, {"Back", back}};
+
+            Dictionary<string, object> options = null;
+            string[] tags = {"JL"};
+            Dictionary<string, object>[] audio =
+            {
+                new()
+                {
+                    {
+                        "url",
+                        $"https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={word}&kana={reading}"
+                    },
+                    {
+                        "filename",
+                        $"JL_{reading}_{word}.mp3"
+                    },
+                    {
+                        "skipHash",
+                        null
+                    },
+                    {
+                        "fields",
+                        new[] {"Back"}
+                    },
+                }
+            };
+            Dictionary<string, object>[] video = null;
+            Dictionary<string, object>[] picture = null;
+
+            var result =
+                await AnkiConnect.AddNoteToDeck(
+                    new Note(deckName, modelName, fields, options, tags, audio, video, picture));
+            if (result == null)
+            {
+                Console.WriteLine($"Mining failed for {word}");
+            }
         }
     }
 }
