@@ -72,12 +72,13 @@ namespace JapaneseLookup
                             break;
 
                         case "ke_inf":
-                            kEle.KeInfList.Add(jMDictXML.ReadString());
+                            kEle.KeInfList.Add(EntityReader(jMDictXML));
                             break;
 
                         case "ke_pri":
                             kEle.KePriList.Add(jMDictXML.ReadString());
                             break;
+                            
                     }
                 }
             }
@@ -105,7 +106,7 @@ namespace JapaneseLookup
                             break;
 
                         case "re_inf":
-                            rEle.ReInfList.Add(jMDictXML.ReadString());
+                            rEle.ReInfList.Add(EntityReader(jMDictXML));
                             break;
 
                         case "re_pri":
