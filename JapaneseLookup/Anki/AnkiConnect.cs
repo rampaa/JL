@@ -5,7 +5,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace JapaneseLookup
+namespace JapaneseLookup.Anki
 {
     public static class AnkiConnect
     {

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace JapaneseLookup
+namespace JapaneseLookup.Anki
 {
     public static class Mining
     {

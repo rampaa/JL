@@ -1,4 +1,4 @@
-﻿namespace JapaneseLookup
+﻿namespace JapaneseLookup.Anki
 {
     public class Response
     {

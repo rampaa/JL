@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace JapaneseLookup
+namespace JapaneseLookup.Anki
 {
     public class Request
     {
