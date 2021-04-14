@@ -3,6 +3,7 @@
     public class Response
     {
         // camelCase property names because AnkiConnect
+        #pragma warning disable IDE1006
 
         // result can be: 
         //   a number

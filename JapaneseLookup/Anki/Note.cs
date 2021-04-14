@@ -5,6 +5,7 @@ namespace JapaneseLookup
     public class Note
     {
         // camelCase property names because AnkiConnect
+        #pragma warning disable IDE1006
         public string deckName { get; set; }
         public string modelName { get; set; }
         public Dictionary<string, string> fields { get; set; }

@@ -9,12 +9,14 @@ namespace JapaneseLookup
 {
     // TODO: Create a Dictionary file for lookups.
     // Use 半平 and 半片 for testing.
+    // Need to handle xref better.
     class JMdictLoader
     {
-        public static List<JMdictEntry> jMdict;
+        // public static List<JMdictEntry> jMdict;
+        public static Dictionary<String, List<Results>> jMdictDictionary;
         public static void Loader()
         {
-            jMdict = new List<JMdictEntry>();
+            // jMdict = new List<JMdictEntry>();
             using XmlTextReader jMDictXML = new("../net5.0-windows/Resources/JMdict.xml");
             jMDictXML.DtdProcessing = DtdProcessing.Parse;
             jMDictXML.WhitespaceHandling = WhitespaceHandling.None;
@@ -50,7 +52,7 @@ namespace JapaneseLookup
                     }
                 }
             }
-            jMdict.Add(entry);
+            // jMdict.Add(entry);
             // Build the dictionary here?
 
         }
@@ -78,7 +80,6 @@ namespace JapaneseLookup
                         case "ke_pri":
                             kEle.KePriList.Add(jMDictXML.ReadString());
                             break;
-                            
                     }
                 }
             }
@@ -159,7 +160,7 @@ namespace JapaneseLookup
                             break;
 
                         case "s_inf":
-                            sense.SInfList.Add(jMDictXML.ReadString());
+                            sense.SInf = jMDictXML.ReadString();
                             break;
 
                         case "dial":
