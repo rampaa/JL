@@ -4,6 +4,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using JapaneseLookup.Anki;
 using JapaneseLookup.Parsers;
+using JapaneseLookup.EDICT;
+using System.Collections.Generic;
 
 namespace JapaneseLookup.GUI
 {
@@ -18,6 +20,7 @@ namespace JapaneseLookup.GUI
         public MainWindow()
         {
             InitializeComponent();
+            JMdictLoader.Loader();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -26,8 +29,7 @@ namespace JapaneseLookup.GUI
 
             var windowClipboardManager = new ClipboardManager(this);
             windowClipboardManager.ClipboardChanged += ClipboardChanged;
-
-            CopyFromClipboard();
+            //CopyFromClipboard();
         }
 
         private void CopyFromClipboard()
@@ -63,9 +65,9 @@ namespace JapaneseLookup.GUI
             if (charPosition != -1)
             {
                 string parsedWord = parser.Parse(mainTextBox.Text[charPosition..]);
-                PopupWindow.Instance.cardTextBox.Text = parsedWord;
-                // TODO: ...lookup(parsedWord);
-                // TODO: Show result.
+                // TODO: Lookafter and lookbehind.
+                // TODO: Show results correctly.
+                PopupWindow.Instance.cardTextBox.Text = LookUp(parsedWord);
                 Point position = PointToScreen(Mouse.GetPosition(this));
                 PopupWindow popUpWindow = PopupWindow.Instance;
                 popUpWindow.Left = position.X;
@@ -102,6 +104,40 @@ namespace JapaneseLookup.GUI
         private void Window_Closed(object sender, EventArgs e)
         {
             PopupWindow.Instance.Close();
+        }
+
+        private string LookUp(string parsedWord)
+        {
+            string result = "";
+            
+            
+
+            List<Results> temp;
+
+            if (JMdictLoader.jMdictDictionary.TryGetValue(parsedWord, out temp))
+            {
+                string id = temp[0].Id;
+                string def = "";
+                string reading = "";
+                string alternativeSpellings = "";
+                foreach (string d in temp[0].Definitions)
+                {
+                    def += d + "\t";
+                }
+
+                foreach (string r in temp[0].Readings)
+                {
+                    reading += r + "\t";
+                }
+
+                foreach (string s in temp[0].AlternativeSpellings)
+                {
+                    alternativeSpellings += s + "\t";
+                }
+                result += def + "\n" + reading + "\n" + alternativeSpellings;
+                
+            }
+            return result;
         }
     }
 }

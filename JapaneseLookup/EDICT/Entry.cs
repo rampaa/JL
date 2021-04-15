@@ -6,6 +6,7 @@ namespace JapaneseLookup.EDICT
     {
         public List<KEle> KEleList { get; set; }
         public List<REle> REleList { get; set; }
+        public string Id { get; set; }
 
         public Entry()
         {

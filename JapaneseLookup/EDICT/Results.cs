@@ -4,8 +4,10 @@ namespace JapaneseLookup.EDICT
 {
     class Results
     {
+        public string Id { get; set; }
         public List<string> AlternativeSpellings { get; set; }
         public List<string> Definitions { get; set; }
+        public List<string> Readings { get; set; }
         public List<string> OrthographyInfo { get; set; }
         public List<string> FrequencyList { get; set; }
         public List<string> WordClasses { get; set; }
@@ -18,8 +20,10 @@ namespace JapaneseLookup.EDICT
 
         public Results()
         {
+            Id = null;
             AlternativeSpellings = new List<string>();
             Definitions = new List<string>();
+            Readings = new List<string>();
             OrthographyInfo = new List<string>();
             FrequencyList = new List<string>();
             WordClasses = new List<string>();

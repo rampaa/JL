@@ -23,6 +23,7 @@ namespace JapaneseLookup.Anki
                 {
                     {
                         "url",
+                        //https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji
                         $"https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={word}&kana={reading}"
                     },
                     {
