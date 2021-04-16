@@ -6,6 +6,7 @@ using JapaneseLookup.Anki;
 using JapaneseLookup.Parsers;
 using JapaneseLookup.EDICT;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace JapaneseLookup.GUI
 {
@@ -29,18 +30,23 @@ namespace JapaneseLookup.GUI
 
             var windowClipboardManager = new ClipboardManager(this);
             windowClipboardManager.ClipboardChanged += ClipboardChanged;
-            //CopyFromClipboard();
+
+            CopyFromClipboard();
         }
 
         private void CopyFromClipboard()
         {
-            // Check for Japanese text?
             if (Clipboard.ContainsText())
             {
                 try
                 {
-                    backlog += Clipboard.GetText();
-                    mainTextBox.Text = Clipboard.GetText() + "\n";
+                    string text = Clipboard.GetText();
+                    Regex japaneseRegex = new Regex(@"[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]");
+                    if (japaneseRegex.IsMatch(text))
+                    {
+                        backlog += text;
+                        mainTextBox.Text = text + "\n";
+                    }
                 }
                 catch
                 {
@@ -67,6 +73,7 @@ namespace JapaneseLookup.GUI
                 string parsedWord = parser.Parse(mainTextBox.Text[charPosition..]);
                 // TODO: Lookafter and lookbehind.
                 // TODO: Show results correctly.
+                //PopupWindow.Instance.cardTextBox.Text = parsedWord;
                 PopupWindow.Instance.cardTextBox.Text = LookUp(parsedWord);
                 Point position = PointToScreen(Mouse.GetPosition(this));
                 PopupWindow popUpWindow = PopupWindow.Instance;
@@ -109,12 +116,8 @@ namespace JapaneseLookup.GUI
         private string LookUp(string parsedWord)
         {
             string result = "";
-            
-            
 
-            List<Results> temp;
-
-            if (JMdictLoader.jMdictDictionary.TryGetValue(parsedWord, out temp))
+            if (JMdictLoader.jMdictDictionary.TryGetValue(parsedWord, out List<Results> temp))
             {
                 string id = temp[0].Id;
                 string def = "";
@@ -134,8 +137,8 @@ namespace JapaneseLookup.GUI
                 {
                     alternativeSpellings += s + "\t";
                 }
-                result += def + "\n" + reading + "\n" + alternativeSpellings;
-                
+                result += id + "\n" + def + "\n" + reading + "\n" + alternativeSpellings;
+
             }
             return result;
         }

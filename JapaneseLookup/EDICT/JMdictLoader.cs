@@ -34,7 +34,6 @@ namespace JapaneseLookup.EDICT
 
             Dictionary<string, Results> resultList = new();
             List<string> alternativeSpellings = new();
-            string id = entry.Id;
 
             foreach (KEle kEle in entry.KEleList)
             {
@@ -112,18 +111,17 @@ namespace JapaneseLookup.EDICT
             foreach (KeyValuePair<String, Results> rl in resultList)
             {
                 rl.Value.Id = entry.Id;
-                List<Results> tempList;
 
-                if (jMdictDictionary.TryGetValue(rl.Key, out tempList))
+                if (jMdictDictionary.TryGetValue(rl.Key, out List<Results> tempList))
                 {
                     tempList.Add(rl.Value);
                     jMdictDictionary[rl.Key] = tempList;
                 }
                 else
                 {
-                    List<Results> tempList2 = new();
-                    tempList2.Add(rl.Value);
-                    jMdictDictionary.Add(rl.Key, tempList2);
+                    tempList = new();
+                    tempList.Add(rl.Value);
+                    jMdictDictionary.Add(rl.Key, tempList);
                 }
             }
         }
