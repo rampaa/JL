@@ -27,12 +27,10 @@ namespace JapaneseLookup.EDICT
 
             catch (WebException e)
             {
-                if (e.Response != null)
-                    if (((HttpWebResponse)e.Response).StatusCode == HttpStatusCode.NotModified)
-                        System.Diagnostics.Debug.WriteLine("Dictionary is up to date."); // Show this as a popup.
-
-                    else
-                        System.Diagnostics.Debug.WriteLine("Unexpected error while updating the dictionary."); // Show this as a popup.
+                if (e.Response != null && ((HttpWebResponse)e.Response).StatusCode == HttpStatusCode.NotModified)
+                    System.Diagnostics.Debug.WriteLine("Dictionary is up to date."); // Show this as a popup.
+                else
+                    System.Diagnostics.Debug.WriteLine("Unexpected error while updating the dictionary."); // Show this as a popup.
             }
         }
 
