@@ -11,8 +11,7 @@ namespace JapaneseLookup.Anki
 
         public string modelName { get; set; }
 
-        // might need to be Dictionary<string, object>
-        public Dictionary<string, string> fields { get; set; }
+        public Dictionary<string, object> fields { get; set; }
 
         public Dictionary<string, object> options { get; set; }
 
@@ -27,7 +26,7 @@ namespace JapaneseLookup.Anki
         public Note(
             string deckName,
             string modelName,
-            Dictionary<string, string> fields,
+            Dictionary<string, object> fields,
             Dictionary<string, object> options,
             string[] tags,
             Dictionary<string, object>[] audio,

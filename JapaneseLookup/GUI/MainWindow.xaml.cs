@@ -21,6 +21,7 @@ namespace JapaneseLookup.GUI
 
             // init AnkiConnect so that it doesn't block later
             #pragma warning disable 4014
+            // Mining.Mine(null, null, null, null);
             AnkiConnect.GetDeckNames();
             #pragma warning restore 4014
         }
@@ -98,8 +99,8 @@ namespace JapaneseLookup.GUI
 
                     string parsedWord = parser.Parse(mainTextBox.Text[charPosition..]);
                     // Mining.Mine(parsedWord, "reading", "gloss", "context");
-                    Mining.Mine("猫", "ねこ", "gloss", "context");
-                    Mining.Mine("流", "る", "gloss", "context");
+                    Mining.Mine("猫", "ねこ", "definitions", "context");
+                    Mining.Mine("流", "る", "definitions", "context");
                     break;
                 }
             }

@@ -25,6 +25,12 @@ namespace JapaneseLookup.Anki
             return await Send(req);
         }
 
+        public static async Task<Response> GetModelFieldNames(string modelName)
+        {
+            var req = new Request("modelFieldNames", 6, new Dictionary<string, object> {{"modelName", modelName}});
+            return await Send(req);
+        }
+
         private static async Task<Response> Send(Request req)
         {
             try
@@ -40,32 +46,25 @@ namespace JapaneseLookup.Anki
                 var postResponse = await Client.PostAsync(Uri, payload);
 
                 var json = await postResponse.Content.ReadFromJsonAsync<Response>();
-                Debug.WriteLine("json result: " + json.result);
+                Debug.WriteLine("json result: " + json!.result);
 
                 // TODO: Dedicated error logging/display mechanism
-                if (json.error == null) return json;
-                switch (json.error.ToString())
-                {
-                    case "cannot create note because it is a duplicate":
-                        Console.WriteLine("error: duplicate note");
-                        break;
-                    default:
-                        Console.WriteLine("error: unspecified, see below");
-                        Console.WriteLine(json.error);
-                        break;
-                }
+                // all console statements need to be converted to that ^
+                if (json!.error == null) return json;
 
+                Console.WriteLine(json.error.ToString());
                 return null;
             }
             catch (HttpRequestException e)
             {
                 Console.WriteLine("Communication error: Is Anki open?");
-                Console.WriteLine(e);
+                Debug.WriteLine(e);
                 return null;
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine("Communication error: Unknown error");
+                Console.WriteLine(e); // this should be Debug.WriteLine after we're done developing
                 return null;
             }
         }
