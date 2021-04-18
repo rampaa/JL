@@ -8,9 +8,9 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="10,10,10,10">
             <StackPanel Margin="10">
-                <ComboBox x:Name="ComboBoxDeckNames" Width="200" Margin="0,10,0,0" />
-                <Button x:Name="ButtonRefresh" Click="ButtonRefresh_Click" Width="100" Margin="0,10,0,0">Refresh</Button>
-                <ComboBox x:Name="ComboBoxModelNames" Width="200" Margin="0,10,0,0" />
+                <ComboBox x:Name="ComboBoxDeckNames" Width="200" Margin="0,10,30,0" />
+                <Button x:Name="ButtonRefresh" Click="ButtonRefresh_Click" Width="100" Margin="0,10,15,0" HorizontalAlignment="Right">Refresh</Button>
+                <ComboBox x:Name="ComboBoxModelNames" Width="200" Margin="0,10,30,0" />
 
                 <Separator Height="29" />
 
