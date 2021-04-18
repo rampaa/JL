@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+// ReSharper disable InconsistentNaming
+
 namespace JapaneseLookup.Anki
 {
     public class Note
@@ -11,7 +13,7 @@ namespace JapaneseLookup.Anki
 
         public string modelName { get; set; }
 
-        public Dictionary<string, string> fields { get; set; }
+        public Dictionary<string, object> fields { get; set; }
 
         public Dictionary<string, object> options { get; set; }
 
@@ -26,7 +28,7 @@ namespace JapaneseLookup.Anki
         public Note(
             string deckName,
             string modelName,
-            Dictionary<string, string> fields,
+            Dictionary<string, object> fields,
             Dictionary<string, object> options,
             string[] tags,
             Dictionary<string, object>[] audio,

@@ -22,6 +22,12 @@ namespace JapaneseLookup.GUI
         {
             InitializeComponent();
             JMdictLoader.Loader();
+
+            // init AnkiConnect so that it doesn't block later
+            #pragma warning disable 4014
+            // Mining.Mine(null, null, null, null);
+            AnkiConnect.GetDeckNames();
+            #pragma warning restore 4014
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -102,7 +108,32 @@ namespace JapaneseLookup.GUI
 
                     string parsedWord = parser.Parse(mainTextBox.Text[charPosition..]);
                     // Mining.Mine(parsedWord, "reading", "gloss", "context");
-                    Mining.Mine("猫", "ねこ", "gloss", "context");
+                    Mining.Mine(
+                        "猫",
+                        "ねこ",
+                        "definitions",
+                        "context",
+                        "definitionsRaw",
+                        "foundText",
+                        "jmdictID",
+                        "timeLocal"
+                    );
+                    Mining.Mine(
+                        "流",
+                        "る",
+                        "definitions",
+                        "context",
+                        "definitionsRaw",
+                        "foundText",
+                        "jmdictID",
+                        "timeLocal"
+                    );
+                    break;
+                }
+                case Key.C:
+                {
+                    var miningSetupWindow = new MiningSetupWindow();
+                    miningSetupWindow.Show();
                     break;
                 }
             }

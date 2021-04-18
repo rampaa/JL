@@ -1,4 +1,6 @@
-﻿namespace JapaneseLookup.Anki
+﻿// ReSharper disable InconsistentNaming
+
+namespace JapaneseLookup.Anki
 {
     public class Response
     {
