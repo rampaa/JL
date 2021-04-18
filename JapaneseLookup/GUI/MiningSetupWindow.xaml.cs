@@ -14,6 +14,7 @@ namespace JapaneseLookup.GUI
     public partial class MiningSetupWindow : Window
     {
         // TODO: Make this window close too if the MainWindow is closed
+        // TODO: Make sure that this window doesn't spawn under the MainWindow
         // TODO: Scrolling (test with like 100 fields)
         // maybe convert all the procedural GUI generation to xaml-based GUI generation
         public MiningSetupWindow()
