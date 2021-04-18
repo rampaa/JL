@@ -99,8 +99,26 @@ namespace JapaneseLookup.GUI
 
                     string parsedWord = parser.Parse(mainTextBox.Text[charPosition..]);
                     // Mining.Mine(parsedWord, "reading", "gloss", "context");
-                    Mining.Mine("猫", "ねこ", "definitions", "context");
-                    Mining.Mine("流", "る", "definitions", "context");
+                    Mining.Mine(
+                        "猫",
+                        "ねこ",
+                        "definitions",
+                        "context",
+                        "definitionsRaw",
+                        "foundText",
+                        "jmdictID",
+                        "timeLocal"
+                    );
+                    Mining.Mine(
+                        "流",
+                        "る",
+                        "definitions",
+                        "context",
+                        "definitionsRaw",
+                        "foundText",
+                        "jmdictID",
+                        "timeLocal"
+                    );
                     break;
                 }
                 case Key.C:

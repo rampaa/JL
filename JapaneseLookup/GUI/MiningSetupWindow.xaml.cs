@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using JapaneseLookup.Anki;
 
 namespace JapaneseLookup.GUI
@@ -81,6 +80,7 @@ namespace JapaneseLookup.GUI
         }
 
         // TODO: tags
+        // TODO: Make sure everything is filled before enabling the save button
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
             try

@@ -16,13 +16,25 @@ namespace JapaneseLookup.Anki
         // TODO: HTML + CSS for notes
         // TODO: Make sure that a word having multiple readings doesn't break grabbing audio
         // TODO: Check if audio was grabbed and tell the user if it was not
-        public static async void Mine(string foundSpelling, string readings, string definitions, string context)
+        public static async void Mine(string foundSpelling, string readings, string definitions, string context,
+            string definitionsRaw, string foundText, string jmdictID, string timeLocal)
         {
             var deckName = AnkiConfig.deckName;
             var modelName = AnkiConfig.modelName;
 
             var rawFields = AnkiConfig.fields;
-            var fields = ConvertFields(rawFields, foundSpelling, readings, definitions, context);
+            var fields =
+                ConvertFields(
+                    rawFields,
+                    foundSpelling,
+                    readings,
+                    definitions,
+                    context,
+                    definitionsRaw,
+                    foundText,
+                    jmdictID,
+                    timeLocal
+                );
 
             Dictionary<string, object> options = null;
             var tags = AnkiConfig.tags;
@@ -57,7 +69,8 @@ namespace JapaneseLookup.Anki
         }
 
         private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> fields,
-            string foundSpelling, string readings, string definitions, string context)
+            string foundSpelling, string readings, string definitions, string context, string definitionsRaw,
+            string foundText, string jmdictID, string timeLocal)
         {
             var dict = new Dictionary<string, object>();
             foreach (var (key, value) in fields)
@@ -76,10 +89,10 @@ namespace JapaneseLookup.Anki
                         dict.Add(key, definitions);
                         break;
                     case JLField.DefinitionsRaw:
-                        throw new NotImplementedException();
+                        dict.Add(key, definitionsRaw);
                         break;
                     case JLField.FoundText:
-                        throw new NotImplementedException();
+                        dict.Add(key, foundText);
                         break;
                     case JLField.Context:
                         dict.Add(key, context);
@@ -88,14 +101,13 @@ namespace JapaneseLookup.Anki
                         // needs to be handled separately (by FindAudioFields())
                         break;
                     case JLField.JMDictID:
-                        throw new NotImplementedException();
+                        dict.Add(key, jmdictID);
                         break;
                     case JLField.TimeLocal:
-                        throw new NotImplementedException();
+                        dict.Add(key, timeLocal);
                         break;
                     default:
-                        // throw new ArgumentOutOfRangeException(nameof(fields), "Unknown JLField name");
-                        // mining fails with "fields" error message if we return null here... should be fine, don't need to throw
+                        // we should never reach here, but just in case
                         return null;
                 }
             }
