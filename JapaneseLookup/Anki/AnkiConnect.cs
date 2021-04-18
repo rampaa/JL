@@ -13,6 +13,7 @@ namespace JapaneseLookup.Anki
         private static readonly HttpClient Client = new();
         private static readonly Uri Uri = new("http://127.0.0.1:8765");
 
+        // TODO: Put these methods in order
         public static async Task<Response> GetDeckNames()
         {
             var req = new Request("deckNames", 6);
@@ -22,6 +23,12 @@ namespace JapaneseLookup.Anki
         public static async Task<Response> AddNoteToDeck(Note note)
         {
             var req = new Request("addNote", 6, new Dictionary<string, object> {{"note", note}});
+            return await Send(req);
+        }
+
+        public static async Task<Response> GetModelNames()
+        {
+            var req = new Request("modelNames", 6);
             return await Send(req);
         }
 

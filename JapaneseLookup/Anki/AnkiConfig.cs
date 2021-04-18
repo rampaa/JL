@@ -1,12 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Text.Encodings.Web;
 using System.Text.Json;
+
+// ReSharper disable InconsistentNaming
 
 namespace JapaneseLookup.Anki
 {
     public class AnkiConfig
     {
+        // camelCase property names because AnkiConnect
+        #pragma warning disable IDE1006
+
         public string deckName { get; set; }
 
         public string modelName { get; set; }
@@ -56,6 +60,8 @@ namespace JapaneseLookup.Anki
             );
         }
 
+        // TODO: Exception handling
+        // TODO: Try to serialize the enums as strings
         public static void WriteConfig(AnkiConfig ankiConfig)
         {
             File.WriteAllText(@"../net5.0-windows/Config/AnkiConfig.json",
@@ -67,7 +73,5 @@ namespace JapaneseLookup.Anki
                     })
             );
         }
-
-        // await AnkiConnect.GetModelFieldNames(modelName);
     }
 }

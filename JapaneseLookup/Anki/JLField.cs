@@ -1,5 +1,6 @@
 ﻿namespace JapaneseLookup.Anki
 {
+    // shamelessly copied from nazeka
     public enum JLField
     {
         Nothing,

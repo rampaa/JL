@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+// ReSharper disable InconsistentNaming
+
 namespace JapaneseLookup.Anki
 {
     public class Note

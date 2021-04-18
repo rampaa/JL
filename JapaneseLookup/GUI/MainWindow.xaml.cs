@@ -103,6 +103,12 @@ namespace JapaneseLookup.GUI
                     Mining.Mine("流", "る", "definitions", "context");
                     break;
                 }
+                case Key.C:
+                {
+                    var miningSetupWindow = new MiningSetupWindow();
+                    miningSetupWindow.Show();
+                    break;
+                }
             }
         }
 

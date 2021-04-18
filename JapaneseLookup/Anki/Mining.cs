@@ -9,11 +9,10 @@ namespace JapaneseLookup.Anki
     // TODO: Exception handling
     public static class Mining
     {
-        // AnkiConfig.CreateDefaultConfig();
+        // TODO: this needs to be refreshed after the user changes the config
         private static readonly AnkiConfig AnkiConfig = JsonSerializer.Deserialize<AnkiConfig>(
             File.ReadAllText(@"../net5.0-windows/Config/AnkiConfig.json"));
 
-        // TODO: Customizable fields
         // TODO: HTML + CSS for notes
         // TODO: Make sure that a word having multiple readings doesn't break grabbing audio
         // TODO: Check if audio was grabbed and tell the user if it was not
@@ -87,7 +86,6 @@ namespace JapaneseLookup.Anki
                         break;
                     case JLField.Audio:
                         // needs to be handled separately (by FindAudioFields())
-                        // dict.Add(key, audio);
                         break;
                     case JLField.JMDictID:
                         throw new NotImplementedException();
