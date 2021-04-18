@@ -7,6 +7,8 @@ using JapaneseLookup.Parsers;
 using JapaneseLookup.EDICT;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace JapaneseLookup.GUI
 {
@@ -21,13 +23,10 @@ namespace JapaneseLookup.GUI
         public MainWindow()
         {
             InitializeComponent();
-            JMdictLoader.Loader();
-
+            Task.Run(() => JMdictLoader.Loader());
             // init AnkiConnect so that it doesn't block later
-            #pragma warning disable 4014
+            Task.Run(() => AnkiConnect.GetDeckNames());
             // Mining.Mine(null, null, null, null);
-            AnkiConnect.GetDeckNames();
-            #pragma warning restore 4014
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -80,7 +79,7 @@ namespace JapaneseLookup.GUI
                 // TODO: Lookafter and lookbehind.
                 // TODO: Show results correctly.
                 //PopupWindow.Instance.cardTextBox.Text = parsedWord;
-                PopupWindow.Instance.cardTextBox.Text = LookUp(parsedWord);
+                PopupWindow.Instance.cardTextBox.Text = LookUp(parsedWord);                    
                 Point position = PointToScreen(Mouse.GetPosition(this));
                 PopupWindow popUpWindow = PopupWindow.Instance;
                 popUpWindow.Left = position.X;
