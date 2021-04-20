@@ -167,6 +167,7 @@ namespace JapaneseLookup.GUI
         private static void FoundSpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             _miningMode = false;
+            PopupWindow.Instance.Hide();
 
             // doesn't work :(
             // string readings = stackPanel.FindName("readings").ToString();

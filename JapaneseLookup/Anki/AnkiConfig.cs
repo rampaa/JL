@@ -64,6 +64,7 @@ namespace JapaneseLookup.Anki
         // TODO: Try to serialize the enums as strings
         public static void WriteConfig(AnkiConfig ankiConfig)
         {
+            Directory.CreateDirectory(@"../net5.0-windows/Config");
             File.WriteAllText(@"../net5.0-windows/Config/AnkiConfig.json",
                 JsonSerializer.Serialize(ankiConfig,
                     new JsonSerializerOptions

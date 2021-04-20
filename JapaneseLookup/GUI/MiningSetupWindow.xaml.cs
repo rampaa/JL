@@ -67,7 +67,8 @@ namespace JapaneseLookup.GUI
                 {
                     var stackPanel = new StackPanel();
                     var textBlockField = new TextBlock {Text = field};
-                    var comboBoxJLFields = new ComboBox {ItemsSource = Enum.GetValues(typeof(JLField))};
+                    var comboBoxJLFields = new ComboBox
+                        {ItemsSource = Enum.GetValues(typeof(JLField)), SelectedIndex = 0};
 
                     stackPanel.Children.Add(textBlockField);
                     stackPanel.Children.Add(comboBoxJLFields);
