@@ -14,7 +14,7 @@
 
                 <Separator Height="29" />
 
-                <Button x:Name="ButtonGetFields" Click="ButtonGetFields_Click" Width="200" Content="Get Fields" />
+                <Button x:Name="ButtonGetFields" Click="ButtonGetFields_Click" Width="150" Content="Get Fields" />
                 <StackPanel x:Name="StackPanelFields" Margin="10" />
 
                 <Separator Height="29" />

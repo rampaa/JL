@@ -5,9 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:JapaneseLookup"
         mc:Ignorable="d"
-        Title="PopupWindow" Height="450" Width="800" Background="#FF2C2B2B" Foreground="#FF3C3783" Topmost="True" WindowStyle="None">
-    <Grid>
-        <TextBox x:Name="cardTextBox" HorizontalAlignment="Left" Margin="27,43,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="731" Height="262" Background="#FF2C2B2B" Foreground="White" FontSize="15"/>
+        Title="PopupWindow" MaxWidth="430" MaxHeight="620" Background="#FF2C2B2B" Foreground="#FF3C3783" Topmost="True"
+        WindowStyle="None" AllowsTransparency="true">
 
-    </Grid>
+    <!--TODO: Add option to hide the scrollbar-->
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid>
+            <StackPanel x:Name="StackPanel" KeyDown="StackPanel_KeyDown">
+                <!--<TextBox x:Name="CardTextBox" HorizontalAlignment="Left" Margin="27,43,0,0" TextWrapping="Wrap"
+                     VerticalAlignment="Top" Width="auto" Height="auto" Background="#FF2C2B2B" Foreground="White"
+                     FontSize="15" />-->
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
 </Window>

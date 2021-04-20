@@ -1,4 +1,8 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace JapaneseLookup.GUI
 {
@@ -8,23 +12,21 @@ namespace JapaneseLookup.GUI
     public partial class PopupWindow : Window
 
     {
-        private static PopupWindow instance;
+        private static PopupWindow _instance;
 
+        // TODO: ShowInTaskbar = false
         public static PopupWindow Instance
         {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new PopupWindow();
-                }
-                return instance;
-            }
+            get { return _instance ??= new PopupWindow(); }
         }
 
         public PopupWindow()
         {
             InitializeComponent();
+        }
+
+        private void StackPanel_KeyDown(object sender, KeyEventArgs e)
+        {
         }
     }
 }
