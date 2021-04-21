@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace JapaneseLookup.Anki
 {
@@ -11,7 +12,13 @@ namespace JapaneseLookup.Anki
     {
         // TODO: this needs to be refreshed after the user changes the config
         private static readonly AnkiConfig AnkiConfig = JsonSerializer.Deserialize<AnkiConfig>(
-            File.ReadAllText(@"../net5.0-windows/Config/AnkiConfig.json"));
+            File.ReadAllText(@"../net5.0-windows/Config/AnkiConfig.json"), new JsonSerializerOptions
+            {
+                Converters =
+                {
+                    new JsonStringEnumConverter()
+                }
+            });
 
         // TODO: HTML + CSS for notes
         // TODO: Check if audio was grabbed and tell the user if it was not

@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 // ReSharper disable InconsistentNaming
 
@@ -29,11 +32,15 @@ namespace JapaneseLookup.Anki
 
         public static void CreateDefaultConfig()
         {
-            WriteConfig(new AnkiConfig(
+            WriteAnkiConfig(new AnkiConfig(
                     "JLDeck",
-                    "JL-Basic",
+                    "Japanese JL-Basic",
                     new Dictionary<string, JLField>
                     {
+                        {
+                            "JMDict ID",
+                            JLField.JMDictID
+                        },
                         {
                             "Expression",
                             JLField.FoundSpelling
@@ -60,19 +67,32 @@ namespace JapaneseLookup.Anki
             );
         }
 
-        // TODO: Exception handling
-        // TODO: Try to serialize the enums as strings
-        public static void WriteConfig(AnkiConfig ankiConfig)
+        public static string WriteAnkiConfig(AnkiConfig ankiConfig)
         {
-            Directory.CreateDirectory(@"../net5.0-windows/Config");
-            File.WriteAllText(@"../net5.0-windows/Config/AnkiConfig.json",
-                JsonSerializer.Serialize(ankiConfig,
-                    new JsonSerializerOptions
-                    {
-                        // Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                        WriteIndented = true,
-                    })
-            );
+            try
+            {
+                Directory.CreateDirectory(@"../net5.0-windows/Config");
+                File.WriteAllText(@"../net5.0-windows/Config/AnkiConfig.json",
+                    JsonSerializer.Serialize(ankiConfig,
+                        new JsonSerializerOptions
+                        {
+                            // Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                            WriteIndented = true,
+                            Converters =
+                            {
+                                new JsonStringEnumConverter()
+                            }
+                        })
+                );
+
+                return "ok";
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+
+                return null;
+            }
         }
     }
 }

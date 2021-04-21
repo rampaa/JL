@@ -112,8 +112,10 @@ namespace JapaneseLookup.GUI
                 var tags = new[] {"JL"};
 
                 var ankiConfig = new AnkiConfig(deckName, modelName, fields, tags);
-                AnkiConfig.WriteConfig(ankiConfig);
-                Console.WriteLine("Saved config");
+
+                Console.WriteLine(AnkiConfig.WriteAnkiConfig(ankiConfig) != null
+                    ? "Saved config"
+                    : "Error saving config");
             }
             catch (Exception exception)
             {
