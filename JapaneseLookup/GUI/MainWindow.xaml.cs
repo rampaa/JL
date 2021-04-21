@@ -26,19 +26,26 @@ namespace JapaneseLookup.GUI
             new(@"[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]");
 
         private string _backlog = "";
+
         private readonly IParser _parser = new Mecab();
+
         // private string _lastWord = "";
+
         private static bool _miningMode = false;
+
         private static bool _isEverythingReady = false;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderVN = Task.Run(() => FrequencyLoader.LoadJSON("../net5.0-windows/Resources/freqlist_vns.json"));
-            Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderNovel = Task.Run(() => FrequencyLoader.LoadJSON("../net5.0-windows/Resources/freqlist_novels.json"));
-            Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderNarou = Task.Run(() => FrequencyLoader.LoadJSON("../net5.0-windows/Resources/freqlist_narou.json"));
-            Task taskJMDictLoader = Task.Run(JMdictLoader.Loader).ContinueWith(a =>
+            Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderVN = Task.Run(() =>
+                FrequencyLoader.LoadJSON("../net5.0-windows/Resources/freqlist_vns.json"));
+            Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderNovel = Task.Run(() =>
+                FrequencyLoader.LoadJSON("../net5.0-windows/Resources/freqlist_novels.json"));
+            Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderNarou = Task.Run(() =>
+                FrequencyLoader.LoadJSON("../net5.0-windows/Resources/freqlist_narou.json"));
+            Task.Run(JMdictLoader.Loader).ContinueWith(_ =>
             {
                 //Task.WaitAll(taskFreqLoaderVN, taskFreqLoaderNovel, taskFreqLoaderNarou);
                 FrequencyLoader.AddToJMdict("VN", taskFreqLoaderVN.Result);
@@ -290,8 +297,9 @@ namespace JapaneseLookup.GUI
                     renamethis.FrequencyDict.TryGetValue("VN", out var freq1);
                     renamethis.FrequencyDict.TryGetValue("Novel", out var freq2);
                     renamethis.FrequencyDict.TryGetValue("Narou", out var freq3);
-                    Debug.WriteLine(freq1.FrequencyRank + "\n" + freq2.FrequencyRank + "\n" + freq3.FrequencyRank);
+                    Debug.WriteLine(freq1?.FrequencyRank + "\n" + freq2?.FrequencyRank + "\n" + freq3?.FrequencyRank);
                 }
+
                 results.Add(result);
             }
 

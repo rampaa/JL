@@ -14,7 +14,7 @@ namespace JapaneseLookup.EDICT
     {
         public static async Task<Dictionary<string, List<List<JsonElement>>>> LoadJSON(string path)
         {
-            using FileStream openStream = File.OpenRead(path);
+            await using FileStream openStream = File.OpenRead(path);
             return await JsonSerializer.DeserializeAsync<Dictionary<string, List<List<JsonElement>>>>(openStream);
         }
 
