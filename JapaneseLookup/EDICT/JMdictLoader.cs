@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -203,8 +204,8 @@ namespace JapaneseLookup.EDICT
 
                 alternativeSpellings.Add(key);
 
-                result.OrthographyInfo = kEle.KeInfList;
-                result.FrequencyList = kEle.KePriList;
+                result.OrthographyInfoList = kEle.KeInfList;
+                result.PriorityList = kEle.KePriList;
 
                 foreach (REle rEle in entry.REleList)
                 {
@@ -269,7 +270,7 @@ namespace JapaneseLookup.EDICT
                 resultList.Add(key, result);
             }
 
-            foreach (KeyValuePair<String, Results> rl in resultList)
+            foreach (KeyValuePair<string, Results> rl in resultList)
             {
                 rl.Value.Id = entry.Id;
 

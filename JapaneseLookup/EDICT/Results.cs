@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace JapaneseLookup.EDICT
 {
@@ -8,8 +9,8 @@ namespace JapaneseLookup.EDICT
         public List<string> AlternativeSpellings { get; set; }
         public List<string> Definitions { get; set; }
         public List<string> Readings { get; set; }
-        public List<string> OrthographyInfo { get; set; }
-        public List<string> FrequencyList { get; set; }
+        public List<string> OrthographyInfoList { get; set; }
+        public List<string> PriorityList { get; set; }
         public List<string> WordClasses { get; set; }
         public List<string> RelatedTerms { get; set; }
         public List<string> Antonyms { get; set; }
@@ -17,6 +18,7 @@ namespace JapaneseLookup.EDICT
         public List<string> MiscList { get; set; }
         public string SpellingInfo { get; set; }
         public List<string> Dialects { get; set; }
+        public Dictionary<string, Frequency> FrequencyDict { get; set; }
 
         public Results()
         {
@@ -24,8 +26,8 @@ namespace JapaneseLookup.EDICT
             AlternativeSpellings = new List<string>();
             Definitions = new List<string>();
             Readings = new List<string>();
-            OrthographyInfo = new List<string>();
-            FrequencyList = new List<string>();
+            OrthographyInfoList = new List<string>();
+            PriorityList = new List<string>();
             WordClasses = new List<string>();
             RelatedTerms = new List<string>();
             Antonyms = new List<string>();
@@ -33,6 +35,7 @@ namespace JapaneseLookup.EDICT
             MiscList = new List<string>();
             SpellingInfo = null;
             Dialects = new List<string>();
+            FrequencyDict = new Dictionary<string, Frequency>();
         }
     }
 }

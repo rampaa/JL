@@ -12,6 +12,8 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Text.Json;
+using System.IO;
 
 namespace JapaneseLookup.GUI
 {
@@ -25,13 +27,26 @@ namespace JapaneseLookup.GUI
 
         private string _backlog = "";
         private readonly IParser _parser = new Mecab();
-        private string _lastWord = "";
-        public static bool _miningMode = false;
+        // private string _lastWord = "";
+        private static bool _miningMode = false;
+        private static bool _isEverythingReady = false;
 
         public MainWindow()
         {
             InitializeComponent();
-            Task.Run(JMdictLoader.Loader);
+
+            Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderVN = Task.Run(() => FrequencyLoader.LoadJSON("../net5.0-windows/Resources/freqlist_vns.json"));
+            Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderNovel = Task.Run(() => FrequencyLoader.LoadJSON("../net5.0-windows/Resources/freqlist_novels.json"));
+            Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderNarou = Task.Run(() => FrequencyLoader.LoadJSON("../net5.0-windows/Resources/freqlist_narou.json"));
+            Task taskJMDictLoader = Task.Run(JMdictLoader.Loader).ContinueWith(a =>
+            {
+                //Task.WaitAll(taskFreqLoaderVN, taskFreqLoaderNovel, taskFreqLoaderNarou);
+                FrequencyLoader.AddToJMdict("VN", taskFreqLoaderVN.Result);
+                FrequencyLoader.AddToJMdict("Novel", taskFreqLoaderNovel.Result);
+                FrequencyLoader.AddToJMdict("Narou", taskFreqLoaderNarou.Result);
+                _isEverythingReady = true;
+            });
+
             // init AnkiConnect so that it doesn't block later
             Task.Run(AnkiConnect.GetDeckNames);
             // Mining.Mine(null, null, null, null);
@@ -270,6 +285,13 @@ namespace JapaneseLookup.GUI
                 result.Add("readings", readings);
                 result.Add("alternativeSpellings", alternativeSpellings);
 
+                if (_isEverythingReady)
+                {
+                    renamethis.FrequencyDict.TryGetValue("VN", out var freq1);
+                    renamethis.FrequencyDict.TryGetValue("Novel", out var freq2);
+                    renamethis.FrequencyDict.TryGetValue("Narou", out var freq3);
+                    Debug.WriteLine(freq1.FrequencyRank + "\n" + freq2.FrequencyRank + "\n" + freq3.FrequencyRank);
+                }
                 results.Add(result);
             }
 
