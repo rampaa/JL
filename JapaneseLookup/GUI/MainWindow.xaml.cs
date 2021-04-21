@@ -27,7 +27,7 @@ namespace JapaneseLookup.GUI
 
         private readonly IParser _parser = new Mecab();
 
-        // private string _lastWord = "";
+        private string _lastWord = "";
 
         internal static bool MiningMode = false;
 
@@ -107,14 +107,16 @@ namespace JapaneseLookup.GUI
             if (charPosition != -1)
             {
                 string parsedWord = _parser.Parse(MainTextBox.Text[charPosition..]);
-                // if (parsedWord == _lastWord) return;
-                // _lastWord = parsedWord;
 
                 // TODO: Lookafter and lookbehind.
                 // TODO: Show results correctly.
 
-                Point position = PointToScreen(Mouse.GetPosition(this));
-                PopupWindow.Display(position, parsedWord);
+                PopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+
+                if (parsedWord == _lastWord) return;
+                _lastWord = parsedWord;
+
+                PopupWindow.Display(parsedWord);
             }
             else
             {
@@ -142,6 +144,12 @@ namespace JapaneseLookup.GUI
                 {
                     var miningSetupWindow = new MiningSetupWindow();
                     miningSetupWindow.Show();
+
+                    break;
+                }
+                case Key.P:
+                {
+                    // TODO: Play audio
 
                     break;
                 }
@@ -178,11 +186,10 @@ namespace JapaneseLookup.GUI
                 result.Add("alternativeSpellings", alternativeSpellings);
                 result.Add("frequency", frequency);
 
-
-                jMDictResult.FrequencyDict.TryGetValue("VN", out var freq1);
+                // jMDictResult.FrequencyDict.TryGetValue("VN", out var freq1);
                 // jMDictResult.FrequencyDict.TryGetValue("Novel", out var freq2);
                 // jMDictResult.FrequencyDict.TryGetValue("Narou", out var freq3);
-                Debug.WriteLine(freq1?.FrequencyRank);
+                // Debug.WriteLine(freq1?.FrequencyRank);
 
                 results.Add(result);
             }

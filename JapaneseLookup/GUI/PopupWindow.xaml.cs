@@ -27,15 +27,18 @@ namespace JapaneseLookup.GUI
             InitializeComponent();
         }
 
+        public static void UpdatePosition(Point position)
+        {
+            Instance.Left = position.X + 10;
+            Instance.Top = position.Y + 30;
+        }
+
         private void StackPanel_KeyDown(object sender, KeyEventArgs e)
         {
         }
 
-        internal static void Display(Point position, string parsedWord)
+        internal static void Display(string parsedWord)
         {
-            Instance.Left = position.X;
-            Instance.Top = position.Y + 30;
-
             Instance.StackPanel.Children.Clear();
             var results = MainWindow.LookUp(parsedWord);
             if (results == null)

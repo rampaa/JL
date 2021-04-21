@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 // ReSharper disable InconsistentNaming
 
@@ -30,9 +31,9 @@ namespace JapaneseLookup.Anki
             this.tags = tags;
         }
 
-        public static void CreateDefaultConfig()
+        public static async void CreateDefaultConfig()
         {
-            WriteAnkiConfig(new AnkiConfig(
+            await WriteAnkiConfig(new AnkiConfig(
                     "JLDeck",
                     "Japanese JL-Basic",
                     new Dictionary<string, JLField>
@@ -61,18 +62,22 @@ namespace JapaneseLookup.Anki
                             "Audio",
                             JLField.Audio
                         },
+                        {
+                            "Time",
+                            JLField.TimeLocal
+                        },
                     },
                     new[] {"JL"}
                 )
             );
         }
 
-        public static string WriteAnkiConfig(AnkiConfig ankiConfig)
+        public static async Task<string> WriteAnkiConfig(AnkiConfig ankiConfig)
         {
             try
             {
                 Directory.CreateDirectory(@"../net5.0-windows/Config");
-                File.WriteAllText(@"../net5.0-windows/Config/AnkiConfig.json",
+                await File.WriteAllTextAsync(@"../net5.0-windows/Config/AnkiConfig.json",
                     JsonSerializer.Serialize(ankiConfig,
                         new JsonSerializerOptions
                         {
@@ -89,6 +94,29 @@ namespace JapaneseLookup.Anki
             }
             catch (Exception e)
             {
+                Console.WriteLine("Couldn't write AnkiConfig");
+                Debug.WriteLine(e);
+
+                return null;
+            }
+        }
+
+        public static async Task<AnkiConfig> ReadAnkiConfig()
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<AnkiConfig>(
+                    await File.ReadAllTextAsync(@"../net5.0-windows/Config/AnkiConfig.json"), new JsonSerializerOptions
+                    {
+                        Converters =
+                        {
+                            new JsonStringEnumConverter()
+                        }
+                    });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Couldn't read AnkiConfig");
                 Debug.WriteLine(e);
 
                 return null;
