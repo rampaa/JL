@@ -165,12 +165,19 @@ namespace JapaneseLookup.GUI
                         Text = string.Join(",", result["alternativeSpellings"]),
                         Foreground = Brushes.White
                     };
+                    var textBlockFreq = new TextBlock
+                    {
+                        Name = "freq",
+                        Text = string.Join(",", result["freq"]),
+                        Foreground = Brushes.White
+                    };
 
                     stackPanel.Children.Add(textBlockFoundSpelling);
                     stackPanel.Children.Add(textBlockId);
                     stackPanel.Children.Add(textBlockDefinitions);
                     stackPanel.Children.Add(textBlockReadings);
                     stackPanel.Children.Add(textBlockAlternativeSpellings);
+                    stackPanel.Children.Add(textBlockFreq);
 
                     popUpWindow.StackPanel.Children.Add(stackPanel);
                     popUpWindow.StackPanel.Children.Add(new Separator());
@@ -287,18 +294,22 @@ namespace JapaneseLookup.GUI
                 var readings = renamethis.Readings.ToList();
                 var alternativeSpellings = renamethis.AlternativeSpellings.ToList();
 
+                renamethis.FrequencyDict.TryGetValue("VN", out var freq1);
+                var freqVn = new List<string> {freq1?.FrequencyRank.ToString()};
+
                 result.Add("id", id);
                 result.Add("definitions", definitions);
                 result.Add("readings", readings);
                 result.Add("alternativeSpellings", alternativeSpellings);
+                result.Add("freq", freqVn); // should be configurable
 
-                if (_isEverythingReady)
-                {
-                    renamethis.FrequencyDict.TryGetValue("VN", out var freq1);
-                    renamethis.FrequencyDict.TryGetValue("Novel", out var freq2);
-                    renamethis.FrequencyDict.TryGetValue("Narou", out var freq3);
-                    Debug.WriteLine(freq1?.FrequencyRank + "\n" + freq2?.FrequencyRank + "\n" + freq3?.FrequencyRank);
-                }
+                // if (_isEverythingReady)
+                // {
+                //     renamethis.FrequencyDict.TryGetValue("VN", out var freq1);
+                //     renamethis.FrequencyDict.TryGetValue("Novel", out var freq2);
+                //     renamethis.FrequencyDict.TryGetValue("Narou", out var freq3);
+                //     Debug.WriteLine(freq1?.FrequencyRank + "\n" + freq2?.FrequencyRank + "\n" + freq3?.FrequencyRank);
+                // }
 
                 results.Add(result);
             }
