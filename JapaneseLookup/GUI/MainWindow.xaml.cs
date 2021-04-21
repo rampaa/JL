@@ -33,6 +33,13 @@ namespace JapaneseLookup.GUI
 
         private static bool _ready = false;
 
+        // Consider making max search length configurable.
+        private static int _maxSearchLength = 15;
+
+        // Consider checking for \t, \r, "　", " ", ., !, ?, –, —, ―, ‒, ~, ‥, ♪, ～, ♡, ♥, ☆, ★
+        private static readonly List<string> japanesePunctuation = new(new string[]
+            {"。", "！", "？", "…", "―", "\n"});
+
         public MainWindow()
         {
             InitializeComponent();
@@ -106,7 +113,12 @@ namespace JapaneseLookup.GUI
             int charPosition = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
             if (charPosition != -1)
             {
-                string parsedWord = _parser.Parse(MainTextBox.Text[charPosition..]);
+                (string sentence, int endPosition) = FindSentence(MainTextBox.Text, charPosition);
+                string parsedWord;
+                if (endPosition - charPosition + 1 < _maxSearchLength)
+                    parsedWord = _parser.Parse(MainTextBox.Text[charPosition..endPosition]);
+                else
+                    parsedWord = _parser.Parse(MainTextBox.Text[charPosition..(charPosition + _maxSearchLength - 1)]);
 
                 // TODO: Lookafter and lookbehind.
                 // TODO: Show results correctly.
@@ -122,6 +134,33 @@ namespace JapaneseLookup.GUI
             {
                 PopupWindow.Instance.Hide();
             }
+        }
+
+        private static (string sentence, int endPosition) FindSentence(string text, int position)
+        {
+            int startPosition = -1;
+            int endPosition = -1;
+
+            foreach (string punctuation in japanesePunctuation)
+            {
+                int tempStartIndex = text.Substring(0, position).LastIndexOf(punctuation);
+                if (tempStartIndex != -1 && (endPosition == -1 || tempStartIndex > startPosition))
+                    startPosition = tempStartIndex + 1;
+
+                int tempEndIndex = text.IndexOf(punctuation, position);
+                if (tempEndIndex != -1 && (endPosition == -1 || tempEndIndex < endPosition))
+                    endPosition = tempEndIndex;
+            }
+
+            if (startPosition == -1)
+                startPosition = 0;
+
+            if (endPosition == -1)
+                endPosition = text.Length - 1;
+
+            // Consider trimming \t, \r, (, ), "　", " "
+            return (text.Substring(startPosition, endPosition - startPosition + 1).Trim('「', '」', '『', '』', '（', '）', '\n'), endPosition);
+            //text = text.Substring(startPosition, endPosition - startPosition + 1).TrimStart('「', '『', '（', '\n').TrimEnd('」', '』', '）', '\n');
         }
 
         private void MainTextBox_TextChanged(object sender, TextChangedEventArgs e)
