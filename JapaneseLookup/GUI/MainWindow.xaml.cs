@@ -8,10 +8,8 @@ using JapaneseLookup.EDICT;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Media;
 using System.Text.Json;
 using System.IO;
 
@@ -31,7 +29,7 @@ namespace JapaneseLookup.GUI
 
         // private string _lastWord = "";
 
-        private static bool _miningMode = false;
+        internal static bool MiningMode = false;
 
         private static bool _isEverythingReady = false;
 
@@ -103,7 +101,7 @@ namespace JapaneseLookup.GUI
 
         private void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_miningMode) return;
+            if (MiningMode) return;
 
             int charPosition = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
             if (charPosition != -1)
@@ -116,137 +114,12 @@ namespace JapaneseLookup.GUI
                 // TODO: Show results correctly.
 
                 Point position = PointToScreen(Mouse.GetPosition(this));
-                PopupWindow popUpWindow = PopupWindow.Instance;
-                popUpWindow.Left = position.X;
-                popUpWindow.Top = position.Y + 30;
-
-                popUpWindow.StackPanel.Children.Clear();
-                var results = LookUp(parsedWord);
-                if (results == null)
-                {
-                    popUpWindow.Hide();
-                    return;
-                }
-
-                foreach (var result in results)
-                {
-                    var stackPanel = new StackPanel();
-
-                    var textBlockFoundSpelling = new TextBlock
-                    {
-                        Name = "foundSpelling",
-                        Text = parsedWord,
-                        Foreground = Brushes.White,
-                    };
-                    textBlockFoundSpelling.PreviewMouseUp += FoundSpelling_PreviewMouseUp;
-
-                    var textBlockId = new TextBlock
-                    {
-                        Name = "id",
-                        Text = string.Join(",", result["id"]),
-                        Visibility = Visibility.Collapsed
-                    };
-                    var textBlockDefinitions = new TextBlock
-                    {
-                        Name = "definitions",
-                        Text = string.Join("", result["definitions"]),
-                        TextWrapping = TextWrapping.Wrap,
-                        Foreground = Brushes.White
-                    };
-                    var textBlockReadings = new TextBlock
-                    {
-                        Name = "readings",
-                        Text = string.Join(",", result["readings"]),
-                        Foreground = Brushes.White
-                    };
-                    var textBlockAlternativeSpellings = new TextBlock
-                    {
-                        Name = "alternativeSpellings",
-                        Text = string.Join(",", result["alternativeSpellings"]),
-                        Foreground = Brushes.White
-                    };
-                    var textBlockFreq = new TextBlock
-                    {
-                        Name = "freq",
-                        Text = string.Join(",", result["freq"]),
-                        Foreground = Brushes.White
-                    };
-
-                    stackPanel.Children.Add(textBlockFoundSpelling);
-                    stackPanel.Children.Add(textBlockId);
-                    stackPanel.Children.Add(textBlockDefinitions);
-                    stackPanel.Children.Add(textBlockReadings);
-                    stackPanel.Children.Add(textBlockAlternativeSpellings);
-                    stackPanel.Children.Add(textBlockFreq);
-
-                    popUpWindow.StackPanel.Children.Add(stackPanel);
-                    popUpWindow.StackPanel.Children.Add(new Separator());
-                }
-
-                popUpWindow.Show();
+                PopupWindow.Display(position, parsedWord);
             }
             else
             {
                 PopupWindow.Instance.Hide();
             }
-        }
-
-        // jmdictid or id
-        // pick one
-        private static void FoundSpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            _miningMode = false;
-            PopupWindow.Instance.Hide();
-
-            // doesn't work :(
-            // string readings = stackPanel.FindName("readings").ToString();
-
-            string foundSpelling = null;
-            string readings = null;
-            string definitions = null;
-            string context = null;
-            string definitionsRaw = null;
-            string foundText = null;
-            string jmdictID = null;
-
-            var textBlock = (TextBlock) sender;
-            var stackPanel = (StackPanel) textBlock.Parent;
-
-            foreach (TextBlock child in stackPanel.Children)
-            {
-                switch (child.Name)
-                {
-                    case "foundSpelling":
-                        foundSpelling = child.Text;
-                        break;
-                    case "id":
-                        jmdictID = child.Text;
-                        break;
-                    case "definitions":
-                        // definitions = html
-                        definitionsRaw = child.Text;
-                        break;
-                    case "readings":
-                        readings = child.Text;
-                        break;
-                    // case "alternativeSpellings":
-                    //     alternativeSpellings = child.Text;
-                    //     break;
-                }
-            }
-
-            string timeLocal = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
-
-            Mining.Mine(
-                foundSpelling,
-                readings,
-                definitions,
-                context,
-                definitionsRaw,
-                foundText,
-                jmdictID,
-                timeLocal
-            );
         }
 
         private void MainTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -259,7 +132,8 @@ namespace JapaneseLookup.GUI
             {
                 case Key.M:
                 {
-                    _miningMode = true;
+                    MiningMode = true;
+                    // TODO: Tell the user that they are in mining mode
                     PopupWindow.Instance.Focus();
 
                     break;
@@ -279,35 +153,36 @@ namespace JapaneseLookup.GUI
             PopupWindow.Instance.Close();
         }
 
-        private static List<Dictionary<string, List<string>>> LookUp(string parsedWord)
+        public static List<Dictionary<string, List<string>>> LookUp(string parsedWord)
         {
             var results = new List<Dictionary<string, List<string>>>();
 
-            if (!JMdictLoader.jMdictDictionary.TryGetValue(parsedWord, out List<Results> temp)) return null;
+            if (!JMdictLoader.jMdictDictionary.TryGetValue(parsedWord, out List<Results> jMDictResults)) return null;
 
-            foreach (var renamethis in temp)
+            foreach (var jMDictResult in jMDictResults)
             {
                 var result = new Dictionary<string, List<string>>();
 
-                var id = new List<string> {renamethis.Id};
-                var definitions = renamethis.Definitions.Select(definition => definition + "\n").ToList();
-                var readings = renamethis.Readings.ToList();
-                var alternativeSpellings = renamethis.AlternativeSpellings.ToList();
+                var jmdictID = new List<string> {jMDictResult.Id};
+                var definitions = jMDictResult.Definitions.Select(definition => definition + "\n").ToList();
+                var readings = jMDictResult.Readings.ToList();
+                var alternativeSpellings = jMDictResult.AlternativeSpellings.ToList();
 
-                renamethis.FrequencyDict.TryGetValue("VN", out var freq1);
-                var freqVn = new List<string> {freq1?.FrequencyRank.ToString()};
+                // TODO: Config.FrequencyList instead of "VN"
+                jMDictResult.FrequencyDict.TryGetValue("VN", out var freqList);
+                var frequency = new List<string> {freqList?.FrequencyRank.ToString()};
 
-                result.Add("id", id);
-                result.Add("definitions", definitions);
                 result.Add("readings", readings);
+                result.Add("definitions", definitions);
+                result.Add("jmdictID", jmdictID);
                 result.Add("alternativeSpellings", alternativeSpellings);
-                result.Add("freq", freqVn); // should be configurable
+                result.Add("frequency", frequency);
 
                 // if (_isEverythingReady)
                 // {
-                //     renamethis.FrequencyDict.TryGetValue("VN", out var freq1);
-                //     renamethis.FrequencyDict.TryGetValue("Novel", out var freq2);
-                //     renamethis.FrequencyDict.TryGetValue("Narou", out var freq3);
+                //     jMDictResult.FrequencyDict.TryGetValue("VN", out var freq1);
+                //     jMDictResult.FrequencyDict.TryGetValue("Novel", out var freq2);
+                //     jMDictResult.FrequencyDict.TryGetValue("Narou", out var freq3);
                 //     Debug.WriteLine(freq1?.FrequencyRank + "\n" + freq2?.FrequencyRank + "\n" + freq3?.FrequencyRank);
                 // }
 

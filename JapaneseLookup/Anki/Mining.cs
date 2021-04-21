@@ -23,7 +23,8 @@ namespace JapaneseLookup.Anki
         // TODO: HTML + CSS for notes
         // TODO: Check if audio was grabbed and tell the user if it was not
         public static async void Mine(string foundSpelling, string readings, string definitions, string context,
-            string definitionsRaw, string foundText, string jmdictID, string timeLocal)
+            string definitionsRaw, string foundText, string jmdictID, string timeLocal, string alternativeSpellings,
+            string frequency)
         {
             var note = MakeNote(
                 foundSpelling,
@@ -33,7 +34,9 @@ namespace JapaneseLookup.Anki
                 definitionsRaw,
                 foundText,
                 jmdictID,
-                timeLocal
+                timeLocal,
+                alternativeSpellings,
+                frequency
             );
 
             var response = await AnkiConnect.AddNoteToDeck(note);
@@ -42,7 +45,7 @@ namespace JapaneseLookup.Anki
 
         private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> fields,
             string foundSpelling, string readings, string definitions, string context, string definitionsRaw,
-            string foundText, string jmdictID, string timeLocal)
+            string foundText, string jmdictID, string timeLocal, string alternativeSpellings, string frequency)
         {
             var dict = new Dictionary<string, object>();
             foreach (var (key, value) in fields)
@@ -78,6 +81,12 @@ namespace JapaneseLookup.Anki
                     case JLField.TimeLocal:
                         dict.Add(key, timeLocal);
                         break;
+                    case JLField.AlternativeSpellings:
+                        dict.Add(key, alternativeSpellings);
+                        break;
+                    case JLField.Frequency:
+                        dict.Add(key, frequency);
+                        break;
                     default:
                         // we should never reach here, but just in case
                         return null;
@@ -99,7 +108,8 @@ namespace JapaneseLookup.Anki
         }
 
         private static Note MakeNote(string foundSpelling, string readings, string definitions, string context,
-            string definitionsRaw, string foundText, string jmdictID, string timeLocal)
+            string definitionsRaw, string foundText, string jmdictID, string timeLocal, string alternativeSpellings,
+            string frequency)
         {
             var deckName = AnkiConfig.deckName;
             var modelName = AnkiConfig.modelName;
@@ -115,7 +125,9 @@ namespace JapaneseLookup.Anki
                     definitionsRaw,
                     foundText,
                     jmdictID,
-                    timeLocal
+                    timeLocal,
+                    alternativeSpellings,
+                    frequency
                 );
 
             Dictionary<string, object> options = null;

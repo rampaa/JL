@@ -13,6 +13,8 @@
         Audio,
         JMDictID,
         TimeLocal,
+        AlternativeSpellings,
+        Frequency,
         // Source
     }
 }
