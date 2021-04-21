@@ -31,7 +31,7 @@ namespace JapaneseLookup.GUI
 
         internal static bool MiningMode = false;
 
-        private static bool _isEverythingReady = false;
+        private static bool _ready = false;
 
         public MainWindow()
         {
@@ -49,7 +49,7 @@ namespace JapaneseLookup.GUI
                 FrequencyLoader.AddToJMdict("VN", taskFreqLoaderVN.Result);
                 FrequencyLoader.AddToJMdict("Novel", taskFreqLoaderNovel.Result);
                 FrequencyLoader.AddToJMdict("Narou", taskFreqLoaderNarou.Result);
-                _isEverythingReady = true;
+                _ready = true;
             });
 
             // init AnkiConnect so that it doesn't block later
@@ -178,13 +178,11 @@ namespace JapaneseLookup.GUI
                 result.Add("alternativeSpellings", alternativeSpellings);
                 result.Add("frequency", frequency);
 
-                // if (_isEverythingReady)
-                // {
-                //     jMDictResult.FrequencyDict.TryGetValue("VN", out var freq1);
-                //     jMDictResult.FrequencyDict.TryGetValue("Novel", out var freq2);
-                //     jMDictResult.FrequencyDict.TryGetValue("Narou", out var freq3);
-                //     Debug.WriteLine(freq1?.FrequencyRank + "\n" + freq2?.FrequencyRank + "\n" + freq3?.FrequencyRank);
-                // }
+
+                jMDictResult.FrequencyDict.TryGetValue("VN", out var freq1);
+                // jMDictResult.FrequencyDict.TryGetValue("Novel", out var freq2);
+                // jMDictResult.FrequencyDict.TryGetValue("Narou", out var freq3);
+                Debug.WriteLine(freq1?.FrequencyRank);
 
                 results.Add(result);
             }
