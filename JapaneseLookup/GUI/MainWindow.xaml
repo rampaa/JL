@@ -20,6 +20,7 @@
     </WindowChrome.WindowChrome>
 
     <Grid>
+        <!--TODO: Add option to hide the scrollbar-->
         <TextBox x:Name="MainTextBox" Margin="0,10,0,0" TextWrapping="Wrap" VerticalContentAlignment="Top"
                  Background="Transparent" Opacity="1" FontSize="70" Foreground="White" SelectionTextBrush="Black"
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"

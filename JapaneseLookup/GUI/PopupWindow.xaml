@@ -8,8 +8,7 @@
         Title="PopupWindow" MaxWidth="430" MaxHeight="620" Background="#FF2C2B2B" Foreground="#FF3C3783" Topmost="True"
         WindowStyle="None" AllowsTransparency="true">
 
-    <!--TODO: Add option to hide the scrollbar-->
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <ScrollViewer x:Name="ScrollViewer" VerticalScrollBarVisibility="Auto">
         <Grid>
             <StackPanel x:Name="StackPanel" KeyDown="StackPanel_KeyDown">
                 <!--<TextBox x:Name="CardTextBox" HorizontalAlignment="Left" Margin="27,43,0,0" TextWrapping="Wrap"

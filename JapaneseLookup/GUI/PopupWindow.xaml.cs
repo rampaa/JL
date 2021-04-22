@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,24 +30,17 @@ namespace JapaneseLookup.GUI
 
         public static void UpdatePosition(Point position)
         {
-            Instance.Left = position.X + 10;
-            Instance.Top = position.Y + 30;
+            Instance.Left = position.X + 0;
+            Instance.Top = position.Y + 20;
         }
 
         private void StackPanel_KeyDown(object sender, KeyEventArgs e)
         {
         }
 
-        internal static void Display(string parsedWord)
+        internal static void DisplayResults(string parsedWord, string sentence,
+            List<Dictionary<string, List<string>>> results)
         {
-            Instance.StackPanel.Children.Clear();
-            var results = MainWindow.LookUp(parsedWord);
-            if (results == null)
-            {
-                Instance.Hide();
-                return;
-            }
-
             foreach (var result in results)
             {
                 var stackPanel = new StackPanel();
@@ -84,11 +78,13 @@ namespace JapaneseLookup.GUI
                     Text = string.Join(", ", result["alternativeSpellings"]),
                     Foreground = Brushes.White
                 };
+
+                var frequency = string.Join(", ", result["frequency"]);
                 var textBlockFrequency = new TextBlock
                 {
                     Name = "frequency",
-                    Text = string.Join(", ", result["frequency"]),
-                    Foreground = Brushes.White
+                    Text = frequency,
+                    Foreground = Brushes.White,
                 };
 
                 stackPanel.Children.Add(textBlockFoundSpelling);
@@ -96,19 +92,18 @@ namespace JapaneseLookup.GUI
                 stackPanel.Children.Add(textBlockDefinitions);
                 stackPanel.Children.Add(textBlockJmdictID);
                 stackPanel.Children.Add(textBlockAlternativeSpellings);
-                stackPanel.Children.Add(textBlockFrequency);
+                if (frequency != MainWindow.FakeFrequency)
+                    stackPanel.Children.Add(textBlockFrequency);
 
                 Instance.StackPanel.Children.Add(stackPanel);
                 Instance.StackPanel.Children.Add(new Separator());
             }
-
-            Instance.Show();
         }
 
         private static void FoundSpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             MainWindow.MiningMode = false;
-            PopupWindow.Instance.Hide();
+            Instance.Hide();
 
             // doesn't work :(
             // string readings = stackPanel.FindName("readings").ToString();
@@ -116,10 +111,11 @@ namespace JapaneseLookup.GUI
             string foundSpelling = null;
             string readings = null;
             string definitions = null;
-            string context = null;
+            var context = MainWindow.LastSentence;
             string definitionsRaw = null;
             string foundText = null;
             string jmdictID = null;
+            var timeLocal = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
             string alternativeSpellings = null;
             string frequency = null;
 
@@ -140,9 +136,9 @@ namespace JapaneseLookup.GUI
                         // TODO: definitions = html
                         definitionsRaw = child.Text;
                         break;
-                    case "context":
-                        // TODO: context = child.Text;
-                        break;
+                    // case "context":
+                    //
+                    //     break;
                     case "foundText":
                         // TODO: foundText = child.Text;
                         break;
@@ -157,8 +153,6 @@ namespace JapaneseLookup.GUI
                         break;
                 }
             }
-
-            string timeLocal = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
 
             Mining.Mine(
                 foundSpelling,

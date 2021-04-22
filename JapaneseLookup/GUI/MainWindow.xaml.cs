@@ -34,11 +34,15 @@ namespace JapaneseLookup.GUI
         private static bool _ready = false;
 
         // Consider making max search length configurable.
-        private static int _maxSearchLength = 15;
+        private const int MaxSearchLength = 15;
 
         // Consider checking for \t, \r, "　", " ", ., !, ?, –, —, ―, ‒, ~, ‥, ♪, ～, ♡, ♥, ☆, ★
-        private static readonly List<string> japanesePunctuation = new(new string[]
+        private static readonly List<string> JapanesePunctuation = new(new[]
             {"。", "！", "？", "…", "―", "\n"});
+
+        internal static string LastSentence;
+
+        internal const string FakeFrequency = "1000000";
 
         public MainWindow()
         {
@@ -115,21 +119,30 @@ namespace JapaneseLookup.GUI
             {
                 (string sentence, int endPosition) = FindSentence(MainTextBox.Text, charPosition);
                 string parsedWord;
-                // Debug.WriteLine(sentence);
-                if (endPosition - charPosition + 1 < _maxSearchLength)
+                if (endPosition - charPosition + 1 < MaxSearchLength)
                     parsedWord = _parser.Parse(MainTextBox.Text[charPosition..endPosition]);
                 else
-                    parsedWord = _parser.Parse(MainTextBox.Text[charPosition..(charPosition + _maxSearchLength - 1)]);
+                    parsedWord = _parser.Parse(MainTextBox.Text[charPosition..(charPosition + MaxSearchLength - 1)]);
+                LastSentence = sentence;
 
                 // TODO: Lookafter and lookbehind.
                 // TODO: Show results correctly.
 
+                // if (parsedWord == _lastWord) return;
+                // _lastWord = parsedWord;
+
+                PopupWindow.Instance.StackPanel.Children.Clear();
                 PopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
-                if (parsedWord == _lastWord) return;
-                _lastWord = parsedWord;
+                var results = LookUp(parsedWord);
+                if (results == null)
+                {
+                    PopupWindow.Instance.Hide();
+                    return;
+                }
 
-                PopupWindow.Display(parsedWord);
+                PopupWindow.Instance.Show();
+                PopupWindow.DisplayResults(parsedWord, sentence, results);
             }
             else
             {
@@ -142,14 +155,14 @@ namespace JapaneseLookup.GUI
             int startPosition = -1;
             int endPosition = -1;
 
-            foreach (string punctuation in japanesePunctuation)
+            foreach (string punctuation in JapanesePunctuation)
             {
-                int tempIndex = text.LastIndexOf(punctuation, position);
+                int tempIndex = text.LastIndexOf(punctuation, position, StringComparison.Ordinal);
 
                 if (tempIndex > startPosition)
                     startPosition = tempIndex;
 
-                tempIndex = text.IndexOf(punctuation, position);
+                tempIndex = text.IndexOf(punctuation, position, StringComparison.Ordinal);
                 if (tempIndex != -1 && (endPosition == -1 || tempIndex < endPosition))
                     endPosition = tempIndex;
             }
@@ -160,7 +173,11 @@ namespace JapaneseLookup.GUI
                 endPosition = text.Length - 1;
 
             // Consider trimming \t, \r, (, ), "　", " "
-            return (text.Substring(startPosition, endPosition - startPosition + 1).Trim('「', '」', '『', '』', '（', '）', '\n'), endPosition);
+            return (
+                text.Substring(startPosition, endPosition - startPosition + 1)
+                    .Trim('「', '」', '『', '』', '（', '）', '\n'),
+                endPosition
+            );
             //text = text.Substring(startPosition, endPosition - startPosition + 1).TrimStart('「', '『', '（', '\n').TrimEnd('」', '』', '）', '\n');
         }
 
@@ -176,6 +193,7 @@ namespace JapaneseLookup.GUI
                 {
                     MiningMode = true;
                     // TODO: Tell the user that they are in mining mode
+                    // PopupWindow.Instance.ScrollViewer.Visibility = Visibility.Visible;
                     PopupWindow.Instance.Focus();
 
                     break;
@@ -218,7 +236,11 @@ namespace JapaneseLookup.GUI
 
                 // TODO: Config.FrequencyList instead of "VN"
                 jMDictResult.FrequencyDict.TryGetValue("VN", out var freqList);
-                var frequency = new List<string> {freqList?.FrequencyRank.ToString()};
+
+                // causes OrderBy to put null values first :(
+                // var frequency = new List<string> {freqList?.FrequencyRank.ToString()};
+                var maybeFreq = freqList?.FrequencyRank;
+                var frequency = new List<string> {maybeFreq == null ? FakeFrequency : maybeFreq.ToString()};
 
                 result.Add("readings", readings);
                 result.Add("definitions", definitions);
@@ -234,6 +256,9 @@ namespace JapaneseLookup.GUI
                 results.Add(result);
             }
 
+            results = results
+                .OrderBy(dict => Convert.ToInt32(dict["frequency"][0]))
+                .ToList();
             return results;
         }
     }
