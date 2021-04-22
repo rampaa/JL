@@ -115,6 +115,7 @@ namespace JapaneseLookup.GUI
             {
                 (string sentence, int endPosition) = FindSentence(MainTextBox.Text, charPosition);
                 string parsedWord;
+                // Debug.WriteLine(sentence);
                 if (endPosition - charPosition + 1 < _maxSearchLength)
                     parsedWord = _parser.Parse(MainTextBox.Text[charPosition..endPosition]);
                 else
@@ -143,17 +144,17 @@ namespace JapaneseLookup.GUI
 
             foreach (string punctuation in japanesePunctuation)
             {
-                int tempStartIndex = text.LastIndexOf(punctuation, position);
-                if (tempStartIndex != -1 && (endPosition == -1 || tempStartIndex > startPosition))
-                    startPosition = tempStartIndex + 1;
+                int tempIndex = text.LastIndexOf(punctuation, position);
 
-                int tempEndIndex = text.IndexOf(punctuation, position);
-                if (tempEndIndex != -1 && (endPosition == -1 || tempEndIndex < endPosition))
-                    endPosition = tempEndIndex;
+                if (tempIndex > startPosition)
+                    startPosition = tempIndex;
+
+                tempIndex = text.IndexOf(punctuation, position);
+                if (tempIndex != -1 && (endPosition == -1 || tempIndex < endPosition))
+                    endPosition = tempIndex;
             }
 
-            if (startPosition == -1)
-                startPosition = 0;
+            ++startPosition;
 
             if (endPosition == -1)
                 endPosition = text.Length - 1;
