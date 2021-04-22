@@ -143,7 +143,7 @@ namespace JapaneseLookup.GUI
 
             foreach (string punctuation in japanesePunctuation)
             {
-                int tempStartIndex = text.Substring(0, position).LastIndexOf(punctuation);
+                int tempStartIndex = text.LastIndexOf(punctuation, position);
                 if (tempStartIndex != -1 && (endPosition == -1 || tempStartIndex > startPosition))
                     startPosition = tempStartIndex + 1;
 
