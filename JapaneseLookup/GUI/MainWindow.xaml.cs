@@ -64,10 +64,12 @@ namespace JapaneseLookup.GUI
             });
 
             // init AnkiConnect so that it doesn't block later
-            Task.Run(AnkiConnect.GetDeckNames);
+            // Task.Run(AnkiConnect.GetDeckNames);
             // Mining.Mine(null, null, null, null);
 
             CopyFromClipboard();
+
+            Deconjugation.Test();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
