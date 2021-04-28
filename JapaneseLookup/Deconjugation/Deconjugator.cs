@@ -13,7 +13,7 @@ namespace JapaneseLookup.Deconjugation
 
         private static readonly Rule[] Rules = JsonSerializer.Deserialize<Rule[]>(File);
 
-        private static Form stdrule_deconjugate_inner(Form myForm,
+        private static Form StdruleDeconjugateInner(Form myForm,
             Rule myRule)
         {
             // tag doesn't match
@@ -27,34 +27,34 @@ namespace JapaneseLookup.Deconjugation
             if (!myForm.Text.EndsWith(myRule.ConEnd.First()))
                 return null;
 
-            var newtext =
+            var newText =
                 myForm.Text.Substring(0, myForm.Text.Length - myRule.ConEnd.First().Length)
                 +
                 myRule.DecEnd.First();
 
             var clone = JsonSerializer.Deserialize<Form>(JsonSerializer.Serialize(myForm));
-            var newform = new Form(
-                newtext,
+            var newForm = new Form(
+                newText,
                 myForm.OriginalText,
                 clone?.Tags,
                 clone?.Seentext,
                 clone?.Process
             );
 
-            newform.Process.Add(myRule.Detail);
+            newForm.Process.Add(myRule.Detail);
 
-            if (newform.Tags.Count == 0)
-                newform.Tags.Add(myRule.ConTag.First());
-            newform.Tags.Add(myRule.DecTag.First());
+            if (newForm.Tags.Count == 0)
+                newForm.Tags.Add(myRule.ConTag.First());
+            newForm.Tags.Add(myRule.DecTag.First());
 
-            if (newform.Seentext.Count == 0)
-                newform.Seentext.Add(myForm.Text);
-            newform.Seentext.Add(newtext);
+            if (newForm.Seentext.Count == 0)
+                newForm.Seentext.Add(myForm.Text);
+            newForm.Seentext.Add(newText);
 
-            return newform;
+            return newForm;
         }
 
-        private static HashSet<Form> stdrule_deconjugate(Form myForm,
+        private static HashSet<Form> StdruleDeconjugate(Form myForm,
             Rule myRule)
         {
             // can't deconjugate nothingness
@@ -74,7 +74,7 @@ namespace JapaneseLookup.Deconjugation
 
             if (array.Count == 1)
             {
-                var result = stdrule_deconjugate_inner(myForm, myRule);
+                var result = StdruleDeconjugateInner(myForm, myRule);
                 return result == null ? null : new HashSet<Form> {result};
             }
             else if (array.Count > 1)
@@ -103,7 +103,7 @@ namespace JapaneseLookup.Deconjugation
                         new List<string> {maybeConTag},
                         myRule.Detail
                     );
-                    var ret = stdrule_deconjugate_inner(myForm, virtualRule);
+                    var ret = StdruleDeconjugateInner(myForm, virtualRule);
                     if (ret != null) collection.Add(ret);
                 }
 
@@ -113,31 +113,31 @@ namespace JapaneseLookup.Deconjugation
             return null;
         }
 
-        private static HashSet<Form> rewriterule_deconjugate(Form myForm,
+        private static HashSet<Form> RewriteruleDeconjugate(Form myForm,
             Rule myRule)
         {
             if (myForm.Text != myRule.ConEnd.First())
                 return null;
-            return stdrule_deconjugate(myForm, myRule);
+            return StdruleDeconjugate(myForm, myRule);
         }
 
-        private static HashSet<Form> onlyfinalrule_deconjugate(Form myForm,
+        private static HashSet<Form> OnlyfinalruleDeconjugate(Form myForm,
             Rule myRule)
         {
             if (myForm.Tags.Count != 0)
                 return null;
-            return stdrule_deconjugate(myForm, myRule);
+            return StdruleDeconjugate(myForm, myRule);
         }
 
-        private static HashSet<Form> neverfinalrule_deconjugate(Form myForm,
+        private static HashSet<Form> NeverfinalruleDeconjugate(Form myForm,
             Rule myRule)
         {
             if (myForm.Tags.Count == 0)
                 return null;
-            return stdrule_deconjugate(myForm, myRule);
+            return StdruleDeconjugate(myForm, myRule);
         }
 
-        private static HashSet<Form> contextrule_deconjugate(Form myForm,
+        private static HashSet<Form> ContextruleDeconjugate(Form myForm,
             Rule myRule)
         {
             var result = myRule.Detail switch
@@ -148,7 +148,7 @@ namespace JapaneseLookup.Deconjugation
             };
             if (!result)
                 return null;
-            return stdrule_deconjugate(myForm, myRule);
+            return StdruleDeconjugate(myForm, myRule);
         }
 
         private static Form substitution_inner(Form myForm,
@@ -156,25 +156,25 @@ namespace JapaneseLookup.Deconjugation
         {
             if (!myForm.Text.Contains(myRule.ConEnd.First()))
                 return null;
-            var newtext = new Regex(myRule.ConEnd.First())
+            var newText = new Regex(myRule.ConEnd.First())
                 .Replace(myForm.Text, myRule.DecEnd.First());
 
             var clone = JsonSerializer.Deserialize<Form>(JsonSerializer.Serialize(myForm));
-            var newform = new Form(
-                newtext,
+            var newForm = new Form(
+                newText,
                 myForm.OriginalText,
                 clone?.Tags,
                 clone?.Seentext,
                 clone?.Process
             );
 
-            newform.Process.Add(myRule.Detail);
+            newForm.Process.Add(myRule.Detail);
 
-            if (newform.Seentext.Count == 0)
-                newform.Seentext.Add(myForm.Text);
-            newform.Seentext.Add(newtext);
+            if (newForm.Seentext.Count == 0)
+                newForm.Seentext.Add(myForm.Text);
+            newForm.Seentext.Add(newText);
 
-            return newform;
+            return newForm;
         }
 
         private static HashSet<Form> substitution_deconjugate(Form myForm,
@@ -247,63 +247,61 @@ namespace JapaneseLookup.Deconjugation
             return true;
         }
 
-        internal static HashSet<Form> Deconjugate(string mytext)
+        internal static HashSet<Form> Deconjugate(string myText)
         {
             var processed = new HashSet<Form>();
             var novel = new HashSet<Form>();
 
             var startForm =
-                new Form(mytext,
-                    mytext,
+                new Form(myText,
+                    myText,
                     new List<string>(),
                     new HashSet<string>(),
                     new List<string>()
                 );
             novel.Add(startForm);
 
-            var myrules = Rules;
-
             while (novel.Count > 0)
             {
                 var newNovel = new HashSet<Form>();
                 foreach (Form form in novel)
                 {
-                    foreach (Rule rule in myrules)
+                    foreach (Rule rule in Rules)
                     {
-                        HashSet<Form> newform = null;
+                        HashSet<Form> newForm = null;
 
                         switch (rule.Type)
                         {
                             case "stdrule":
-                                newform = stdrule_deconjugate(form, rule);
+                                newForm = StdruleDeconjugate(form, rule);
                                 break;
                             case "rewriterule":
-                                newform = rewriterule_deconjugate(form, rule);
+                                newForm = RewriteruleDeconjugate(form, rule);
                                 break;
                             case "onlyfinalrule":
-                                newform = onlyfinalrule_deconjugate(form, rule);
+                                newForm = OnlyfinalruleDeconjugate(form, rule);
                                 break;
                             case "neverfinalrule":
-                                newform = neverfinalrule_deconjugate(form, rule);
+                                newForm = NeverfinalruleDeconjugate(form, rule);
                                 break;
                             case "contextrule":
-                                newform = contextrule_deconjugate(form, rule);
+                                newForm = ContextruleDeconjugate(form, rule);
                                 break;
                             case "substitution":
-                                newform = substitution_deconjugate(form, rule);
+                                newForm = substitution_deconjugate(form, rule);
                                 break;
                         }
 
-                        if (newform == null || newform.Count == 0) continue;
+                        if (newForm == null || newForm.Count == 0) continue;
 
-                        foreach (var myform in newform)
+                        foreach (var myForm in newForm)
                         {
-                            if (myform != null &&
-                                !processed.Contains(myform) &&
-                                !novel.Contains(myform) &&
-                                !newNovel.Contains(myform))
+                            if (myForm != null &&
+                                !processed.Contains(myForm) &&
+                                !novel.Contains(myForm) &&
+                                !newNovel.Contains(myForm))
                             {
-                                newNovel.Add(myform);
+                                newNovel.Add(myForm);
                             }
                         }
                     }
