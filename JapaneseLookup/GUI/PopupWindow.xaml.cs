@@ -34,11 +34,12 @@ namespace JapaneseLookup.GUI
             Instance.Top = position.Y + 20;
         }
 
+
         private void StackPanel_KeyDown(object sender, KeyEventArgs e)
         {
         }
 
-        internal static void DisplayResults(string parsedWord, string sentence,
+        internal static void DisplayResults(string sentence,
             List<Dictionary<string, List<string>>> results)
         {
             foreach (var result in results)
@@ -48,7 +49,7 @@ namespace JapaneseLookup.GUI
                 var textBlockFoundSpelling = new TextBlock
                 {
                     Name = "foundSpelling",
-                    Text = parsedWord,
+                    Text = result["foundSpelling"][0],
                     Foreground = Brushes.White,
                 };
                 textBlockFoundSpelling.PreviewMouseUp += FoundSpelling_PreviewMouseUp;
@@ -119,8 +120,8 @@ namespace JapaneseLookup.GUI
             string alternativeSpellings = null;
             string frequency = null;
 
-            var textBlock = (TextBlock) sender;
-            var stackPanel = (StackPanel) textBlock.Parent;
+            var textBlock = (TextBlock)sender;
+            var stackPanel = (StackPanel)textBlock.Parent;
 
             foreach (TextBlock child in stackPanel.Children)
             {
@@ -166,6 +167,42 @@ namespace JapaneseLookup.GUI
                 alternativeSpellings,
                 frequency
             );
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.M:
+                    {
+                        MainWindow.MiningMode = true;
+                        // TODO: Tell the user that they are in mining mode
+                        // PopupWindow.Instance.ScrollViewer.Visibility = Visibility.Visible;
+                        PopupWindow.Instance.Focus();
+
+                        break;
+                    }
+                case Key.C:
+                    {
+                        var miningSetupWindow = new MiningSetupWindow();
+                        miningSetupWindow.Show();
+
+                        break;
+                    }
+                case Key.P:
+                    {
+                        // TODO: Play audio
+
+                        break;
+                    }
+
+                case Key.Escape:
+                    {
+                        if (MainWindow.MiningMode)
+                            MainWindow.MiningMode = false;
+                        break;
+                    }
+            }
         }
     }
 }

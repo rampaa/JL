@@ -25,6 +25,6 @@
                  Background="Transparent" Opacity="1" FontSize="70" Foreground="White" SelectionTextBrush="Black"
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"
                  VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
-                 TextChanged="MainTextBox_TextChanged" KeyDown="MainTextBox_KeyDown" />
+                 TextChanged="MainTextBox_TextChanged" MouseLeave="MainTextBox_MouseLeave" />
     </Grid>
 </Window>

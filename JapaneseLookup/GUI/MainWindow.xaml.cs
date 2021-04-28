@@ -25,8 +25,6 @@ namespace JapaneseLookup.GUI
 
         private string _backlog = "";
 
-        private readonly IParser _parser = new Mecab();
-
         private string _lastWord = "";
 
         internal static bool MiningMode = false;
@@ -34,7 +32,7 @@ namespace JapaneseLookup.GUI
         private static bool _ready = false;
 
         // Consider making max search length configurable.
-        private const int MaxSearchLength = 15;
+        private const int MaxSearchLength = 37;
 
         // Consider checking for \t, \r, "　", " ", ., !, ?, –, —, ―, ‒, ~, ‥, ♪, ～, ♡, ♥, ☆, ★
         private static readonly List<string> JapanesePunctuation = new(new[]
@@ -92,11 +90,12 @@ namespace JapaneseLookup.GUI
                     if (JapaneseRegex.IsMatch(text))
                     {
                         _backlog += text + "\n";
-                        MainTextBox.Text = text + "\n";
+                        MainTextBox.Text = text;
                     }
                 }
                 catch
                 {
+
                 }
             }
         }
@@ -120,36 +119,33 @@ namespace JapaneseLookup.GUI
             if (charPosition != -1)
             {
                 (string sentence, int endPosition) = FindSentence(MainTextBox.Text, charPosition);
-                string parsedWord;
+                string text;
                 if (endPosition - charPosition + 1 < MaxSearchLength)
-                    parsedWord = _parser.Parse(MainTextBox.Text[charPosition..endPosition]);
+                    text = MainTextBox.Text[charPosition..endPosition];
                 else
-                    parsedWord = _parser.Parse(MainTextBox.Text[charPosition..(charPosition + MaxSearchLength - 1)]);
-                LastSentence = sentence;
-
-                // TODO: Lookafter and lookbehind.
-                // TODO: Show results correctly.
+                    text = MainTextBox.Text[charPosition..(charPosition + MaxSearchLength)];
 
                 // if (parsedWord == _lastWord) return;
                 // _lastWord = parsedWord;
 
-                PopupWindow.Instance.StackPanel.Children.Clear();
-                PopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+                var results = LookUp(text);
 
-                var results = LookUp(parsedWord);
-                if (results == null)
+                if (results != null)
                 {
-                    PopupWindow.Instance.Hide();
-                    return;
+                    PopupWindow.Instance.StackPanel.Children.Clear();
+                    PopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+
+                    PopupWindow.Instance.Show();
+                    PopupWindow.Instance.Activate();
+                    PopupWindow.Instance.Focus();
+                    PopupWindow.DisplayResults(sentence, results);
                 }
 
-                PopupWindow.Instance.Show();
-                PopupWindow.DisplayResults(parsedWord, sentence, results);
+                else
+                    PopupWindow.Instance.Hide();
             }
             else
-            {
                 PopupWindow.Instance.Hide();
-            }
         }
 
         private static (string sentence, int endPosition) FindSentence(string text, int position)
@@ -187,81 +183,106 @@ namespace JapaneseLookup.GUI
         {
         }
 
-        private void MainTextBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.M:
-                {
-                    MiningMode = true;
-                    // TODO: Tell the user that they are in mining mode
-                    // PopupWindow.Instance.ScrollViewer.Visibility = Visibility.Visible;
-                    PopupWindow.Instance.Focus();
-
-                    break;
-                }
-                case Key.C:
-                {
-                    var miningSetupWindow = new MiningSetupWindow();
-                    miningSetupWindow.Show();
-
-                    break;
-                }
-                case Key.P:
-                {
-                    // TODO: Play audio
-
-                    break;
-                }
-            }
-        }
-
         private void Window_Closed(object sender, EventArgs e)
         {
             PopupWindow.Instance.Close();
         }
 
-        public static List<Dictionary<string, List<string>>> LookUp(string parsedWord)
+        public static List<Dictionary<string, List<string>>> LookUp(string text)
         {
-            var results = new List<Dictionary<string, List<string>>>();
-
-            if (!JMdictLoader.jMdictDictionary.TryGetValue(parsedWord, out List<Results> jMDictResults)) return null;
-
-            foreach (var jMDictResult in jMDictResults)
+            Dictionary<string, List<Results>> llresults = new();
+            for (int i = 0; i < text.Length; i++)
             {
-                var result = new Dictionary<string, List<string>>();
-
-                var jmdictID = new List<string> {jMDictResult.Id};
-                var definitions = jMDictResult.Definitions.Select(definition => definition + "\n").ToList();
-                var readings = jMDictResult.Readings.ToList();
-                var alternativeSpellings = jMDictResult.AlternativeSpellings.ToList();
-
-                // TODO: Config.FrequencyList instead of "VN"
-                jMDictResult.FrequencyDict.TryGetValue("VN", out var freqList);
-
-                // causes OrderBy to put null values first :(
-                // var frequency = new List<string> {freqList?.FrequencyRank.ToString()};
-                var maybeFreq = freqList?.FrequencyRank;
-                var frequency = new List<string> {maybeFreq == null ? FakeFrequency : maybeFreq.ToString()};
-
-                result.Add("readings", readings);
-                result.Add("definitions", definitions);
-                result.Add("jmdictID", jmdictID);
-                result.Add("alternativeSpellings", alternativeSpellings);
-                result.Add("frequency", frequency);
-
-                // jMDictResult.FrequencyDict.TryGetValue("VN", out var freq1);
-                // jMDictResult.FrequencyDict.TryGetValue("Novel", out var freq2);
-                // jMDictResult.FrequencyDict.TryGetValue("Narou", out var freq3);
-                // Debug.WriteLine(freq1?.FrequencyRank);
-
-                results.Add(result);
+                string foundText = text[..^i];
+                if (JMdictLoader.jMdictDictionary.TryGetValue(foundText, out var temp))
+                {
+                    llresults.Add(foundText, temp);
+                }
             }
 
+            int textLenght = text.Length;
+
+            for (int i = textLenght; i > 0; i--)
+            {
+                (int longestMorphLength, HashSet<string> words) = Mecab.Parse(text[..(textLenght)]);
+
+                words.ExceptWith(llresults.Keys);
+
+                if (!words.Any())
+                    break;
+
+                textLenght = longestMorphLength;
+
+                foreach (string word in words)
+                {
+                    //bool duplicate = false;
+
+                    //foreach (var ol in llresults)
+                    //{
+                    //    foreach (var o in ol.Value)
+                    //    {
+                    //        if (o.Readings.Contains(word))
+                    //        {
+                    //            duplicate = true;
+                    //            break;
+                    //        }
+                    //    }
+                    //    if (duplicate)
+                    //        break;
+                    //}
+
+                    if (JMdictLoader.jMdictDictionary.TryGetValue(word, out var temp))
+                        llresults.Add(word, temp);
+                }
+            }
+
+            if(!llresults.Any()) 
+                return null;
+
+            var results = new List<Dictionary<string, List<string>>>();
+
+            foreach (var rsts in llresults)
+            {
+
+                foreach (var jMDictResult in rsts.Value)
+                {
+                    var result = new Dictionary<string, List<string>>();
+
+                    List<string> foundSpelling = new();
+                    foundSpelling.Add(rsts.Key);
+                    result.Add("foundSpelling", foundSpelling);
+
+                    var jmdictID = new List<string> { jMDictResult.Id };
+                    var definitions = jMDictResult.Definitions.Select(definition => definition + "\n").ToList();
+                    var readings = jMDictResult.Readings.ToList();
+                    var alternativeSpellings = jMDictResult.AlternativeSpellings.ToList();
+
+                    // TODO: Config.FrequencyList instead of "VN"
+                    jMDictResult.FrequencyDict.TryGetValue("VN", out var freqList);
+
+                    // causes OrderBy to put null values first :(
+                    // var frequency = new List<string> {freqList?.FrequencyRank.ToString()};
+                    var maybeFreq = freqList?.FrequencyRank;
+                    var frequency = new List<string> { maybeFreq == null ? FakeFrequency : maybeFreq.ToString() };
+
+                    result.Add("readings", readings);
+                    result.Add("definitions", definitions);
+                    result.Add("jmdictID", jmdictID);
+                    result.Add("alternativeSpellings", alternativeSpellings);
+                    result.Add("frequency", frequency);
+
+                    results.Add(result);
+                }
+            }
             results = results
-                .OrderBy(dict => Convert.ToInt32(dict["frequency"][0]))
-                .ToList();
+                .OrderByDescending(dict => dict["foundSpelling"][0].Length)
+                .ThenBy(dict => Convert.ToInt32(dict["frequency"][0])).ToList();
             return results;
+        }
+        private void MainTextBox_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (!MiningMode)
+                PopupWindow.Instance.Hide();
         }
     }
 }
