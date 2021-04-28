@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using JapaneseLookup.Anki;
 using JapaneseLookup.Parsers;
+using JapaneseLookup.Deconjugation;
 using JapaneseLookup.EDICT;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -62,7 +63,7 @@ namespace JapaneseLookup.GUI
             });
 
             // init AnkiConnect so that it doesn't block later
-            // Task.Run(AnkiConnect.GetDeckNames);
+            Task.Run(AnkiConnect.GetDeckNames);
             // Mining.Mine(null, null, null, null);
 
             CopyFromClipboard();
@@ -201,7 +202,7 @@ namespace JapaneseLookup.GUI
 
                 // if (_lastWord == foundText) return null;
                 // _lastWord = foundText;
-                var deconjugationResults = Deconjugation.Deconjugate(foundText);
+                var deconjugationResults = Deconjugator.Deconjugate(foundText);
 
                 foreach (var result in deconjugationResults)
                 {

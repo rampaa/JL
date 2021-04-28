@@ -1,58 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
-namespace JapaneseLookup
+namespace JapaneseLookup.Deconjugation
 {
     // translated from https://github.com/wareya/nazeka/blob/master/background-script.js
-    public static class Deconjugation
+    public static class Deconjugator
     {
         private static readonly string File =
             System.IO.File.ReadAllText("../net5.0-windows/Resources/deconjugator_edited_arrays.json");
 
         private static readonly Rule[] Rules = JsonSerializer.Deserialize<Rule[]>(File);
-
-        internal class Form
-        {
-            public Form(string text, string originalText, List<string> tags, HashSet<string> seentext,
-                List<string> process)
-            {
-                Text = text;
-                OriginalText = originalText;
-                Tags = tags;
-                Seentext = seentext;
-                Process = process;
-            }
-
-            public string Text { get; }
-            public string OriginalText { get; }
-            public List<string> Tags { get; }
-            public HashSet<string> Seentext { get; }
-            public List<string> Process { get; }
-        }
-
-        private class Rule
-        {
-            public Rule(string type, List<string> decEnd, List<string> conEnd, List<string> decTag,
-                List<string> conTag, string detail)
-            {
-                Type = type;
-                DecEnd = decEnd;
-                ConEnd = conEnd;
-                DecTag = decTag;
-                ConTag = conTag;
-                Detail = detail;
-            }
-
-            [JsonPropertyName("type")] public string Type { get; }
-            [JsonPropertyName("dec_end")] public List<string> DecEnd { get; }
-            [JsonPropertyName("con_end")] public List<string> ConEnd { get; }
-            [JsonPropertyName("dec_tag")] public List<string> DecTag { get; }
-            [JsonPropertyName("con_tag")] public List<string> ConTag { get; }
-            [JsonPropertyName("detail")] public string Detail { get; }
-        }
 
         private static Form stdrule_deconjugate_inner(Form myForm,
             Rule myRule)
@@ -61,16 +20,6 @@ namespace JapaneseLookup
             if (myForm.Tags.Count > 0 &&
                 myForm.Tags[^1] != myRule.ConTag.First())
             {
-                // Debug.WriteLine("TAG DIDN'T MATCH; my_form: " + JsonSerializer.Serialize(
-                //     my_form, new JsonSerializerOptions
-                //     {
-                //         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                //     }));
-                // Debug.WriteLine("TAG DIDN'T MATCH; my_rule: " + JsonSerializer.Serialize(
-                //     my_rule, new JsonSerializerOptions
-                //     {
-                //         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                //     }));
                 return null;
             }
 
@@ -82,11 +31,6 @@ namespace JapaneseLookup
                 myForm.Text.Substring(0, myForm.Text.Length - myRule.ConEnd.First().Length)
                 +
                 myRule.DecEnd.First();
-
-            // Debug.WriteLine(JsonSerializer.Serialize("newtext: " + newtext, new JsonSerializerOptions
-            // {
-            //     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            // }));
 
             var clone = JsonSerializer.Deserialize<Form>(JsonSerializer.Serialize(myForm));
             var newform = new Form(
@@ -131,12 +75,6 @@ namespace JapaneseLookup
             if (array.Count == 1)
             {
                 var result = stdrule_deconjugate_inner(myForm, myRule);
-
-                // Debug.WriteLine("result: " + JsonSerializer.Serialize(result, new JsonSerializerOptions
-                // {
-                //     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                // }));
-
                 return result == null ? null : new HashSet<Form> {result};
             }
             else if (array.Count > 1)
@@ -165,23 +103,7 @@ namespace JapaneseLookup
                         new List<string> {maybeConTag},
                         myRule.Detail
                     );
-                    // Debug.WriteLine("virtual_rule: " + JsonSerializer.Serialize(virtual_rule, new JsonSerializerOptions
-                    // {
-                    //     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                    // }));
-
-                    // Debug.WriteLine("sending to inner my_form: " + JsonSerializer.Serialize(my_form,
-                    //     new JsonSerializerOptions
-                    //     {
-                    //         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                    //     }));
                     var ret = stdrule_deconjugate_inner(myForm, virtualRule);
-
-                    // Debug.WriteLine("ret: " + JsonSerializer.Serialize(ret, new JsonSerializerOptions
-                    // {
-                    //     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                    // }));
-
                     if (ret != null) collection.Add(ret);
                 }
 
@@ -343,25 +265,12 @@ namespace JapaneseLookup
 
             while (novel.Count > 0)
             {
-                // foreach (var n in novel)
-                // {
-                //     Debug.WriteLine("novel: " + JsonSerializer.Serialize(n, new JsonSerializerOptions
-                //     {
-                //         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                //     }));
-                // }
-
                 var newNovel = new HashSet<Form>();
                 foreach (Form form in novel)
                 {
                     foreach (Rule rule in myrules)
                     {
                         HashSet<Form> newform = null;
-
-                        // Debug.WriteLine("rule: " + JsonSerializer.Serialize(rule, new JsonSerializerOptions
-                        // {
-                        //     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                        // }));
 
                         switch (rule.Type)
                         {
