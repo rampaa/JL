@@ -113,18 +113,20 @@ namespace JapaneseLookup.GUI
         {
             if (MiningMode) return;
 
+            PopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+
             int charPosition = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
             if (charPosition != -1)
             {
                 (string sentence, int endPosition) = FindSentence(MainTextBox.Text, charPosition);
                 string text;
                 if (endPosition - charPosition + 1 < MaxSearchLength)
-                    text = MainTextBox.Text[charPosition..endPosition];
+                    text = MainTextBox.Text[charPosition..(endPosition + 1)];
                 else
                     text = MainTextBox.Text[charPosition..(charPosition + MaxSearchLength)];
 
-                // if (parsedWord == _lastWord) return;
-                // _lastWord = parsedWord;
+                if (text == _lastWord) return;
+                _lastWord = text;
 
                 var results = LookUp(text);
 
@@ -143,7 +145,10 @@ namespace JapaneseLookup.GUI
                     PopupWindow.Instance.Hide();
             }
             else
+            {
+                _lastWord = "";
                 PopupWindow.Instance.Hide();
+            }
         }
 
         private static (string sentence, int endPosition) FindSentence(string text, int position)
@@ -200,8 +205,6 @@ namespace JapaneseLookup.GUI
             {
                 string foundText = text[..^i];
 
-                // if (_lastWord == foundText) return null;
-                // _lastWord = foundText;
                 var deconjugationResults = Deconjugator.Deconjugate(foundText);
 
                 foreach (var result in deconjugationResults)

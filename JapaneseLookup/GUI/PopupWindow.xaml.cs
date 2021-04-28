@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -34,7 +35,6 @@ namespace JapaneseLookup.GUI
             Instance.Top = position.Y + 20;
         }
 
-
         private void StackPanel_KeyDown(object sender, KeyEventArgs e)
         {
         }
@@ -45,6 +45,8 @@ namespace JapaneseLookup.GUI
             foreach (var result in results)
             {
                 var stackPanel = new StackPanel();
+                Instance.StackPanel.Children.Add(stackPanel);
+                Instance.StackPanel.Children.Add(new Separator());
 
                 var textBlockFoundSpelling = new TextBlock
                 {
@@ -88,6 +90,14 @@ namespace JapaneseLookup.GUI
                     Foreground = Brushes.White,
                 };
 
+                var process = string.Join(", ", result["process"]);
+                var textBlockProcess = new TextBlock
+                {
+                    Name = "process",
+                    Text = process,
+                    Foreground = Brushes.White,
+                };
+
                 stackPanel.Children.Add(textBlockFoundSpelling);
                 stackPanel.Children.Add(textBlockReadings);
                 stackPanel.Children.Add(textBlockDefinitions);
@@ -95,9 +105,7 @@ namespace JapaneseLookup.GUI
                 stackPanel.Children.Add(textBlockAlternativeSpellings);
                 if (frequency != MainWindow.FakeFrequency)
                     stackPanel.Children.Add(textBlockFrequency);
-
-                Instance.StackPanel.Children.Add(stackPanel);
-                Instance.StackPanel.Children.Add(new Separator());
+                stackPanel.Children.Add(textBlockProcess);
             }
         }
 
@@ -120,8 +128,8 @@ namespace JapaneseLookup.GUI
             string alternativeSpellings = null;
             string frequency = null;
 
-            var textBlock = (TextBlock)sender;
-            var stackPanel = (StackPanel)textBlock.Parent;
+            var textBlock = (TextBlock) sender;
+            var stackPanel = (StackPanel) textBlock.Parent;
 
             foreach (TextBlock child in stackPanel.Children)
             {
@@ -174,34 +182,34 @@ namespace JapaneseLookup.GUI
             switch (e.Key)
             {
                 case Key.M:
-                    {
-                        MainWindow.MiningMode = true;
-                        // TODO: Tell the user that they are in mining mode
-                        // PopupWindow.Instance.ScrollViewer.Visibility = Visibility.Visible;
-                        PopupWindow.Instance.Focus();
+                {
+                    MainWindow.MiningMode = true;
+                    // TODO: Tell the user that they are in mining mode
+                    // PopupWindow.Instance.ScrollViewer.Visibility = Visibility.Visible;
+                    Instance.Focus();
 
-                        break;
-                    }
+                    break;
+                }
                 case Key.C:
-                    {
-                        var miningSetupWindow = new MiningSetupWindow();
-                        miningSetupWindow.Show();
+                {
+                    var miningSetupWindow = new MiningSetupWindow();
+                    miningSetupWindow.Show();
 
-                        break;
-                    }
+                    break;
+                }
                 case Key.P:
-                    {
-                        // TODO: Play audio
+                {
+                    // TODO: Play audio
 
-                        break;
-                    }
+                    break;
+                }
 
                 case Key.Escape:
-                    {
-                        if (MainWindow.MiningMode)
-                            MainWindow.MiningMode = false;
-                        break;
-                    }
+                {
+                    if (MainWindow.MiningMode)
+                        MainWindow.MiningMode = false;
+                    break;
+                }
             }
         }
     }
