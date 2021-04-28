@@ -142,8 +142,8 @@ namespace JapaneseLookup.Deconjugation
         {
             var result = myRule.Detail switch
             {
-                "v1inftrap" => v1inftrap_check(myForm),
-                "saspecial" => saspecial_check(myForm, myRule),
+                "v1inftrap" => V1InftrapCheck(myForm),
+                "saspecial" => SaspecialCheck(myForm, myRule),
                 _ => false
             };
             if (!result)
@@ -151,7 +151,7 @@ namespace JapaneseLookup.Deconjugation
             return StdruleDeconjugate(myForm, myRule);
         }
 
-        private static Form substitution_inner(Form myForm,
+        private static Form SubstitutionInner(Form myForm,
             Rule myRule)
         {
             if (!myForm.Text.Contains(myRule.ConEnd.First()))
@@ -177,7 +177,7 @@ namespace JapaneseLookup.Deconjugation
             return newForm;
         }
 
-        private static HashSet<Form> substitution_deconjugate(Form myForm,
+        private static HashSet<Form> SubstitutionDeconjugate(Form myForm,
             Rule myRule)
         {
             if (myForm.Process.Count != 0)
@@ -191,7 +191,7 @@ namespace JapaneseLookup.Deconjugation
 
             if (array.Count == 1)
             {
-                var result = substitution_inner(myForm, myRule);
+                var result = SubstitutionInner(myForm, myRule);
                 return result == null ? null : new HashSet<Form> {result};
             }
             else if (array.Count > 1)
@@ -217,7 +217,7 @@ namespace JapaneseLookup.Deconjugation
                         myRule.Detail
                     );
 
-                    var ret = substitution_inner(myForm, virtualRule);
+                    var ret = SubstitutionInner(myForm, virtualRule);
                     if (ret != null) collection.Add(ret);
                 }
 
@@ -227,7 +227,7 @@ namespace JapaneseLookup.Deconjugation
             return null;
         }
 
-        private static bool v1inftrap_check(Form myForm)
+        private static bool V1InftrapCheck(Form myForm)
         {
             if (myForm.Tags.Count != 1) return true;
             var myTag = myForm.Tags[0];
@@ -236,7 +236,7 @@ namespace JapaneseLookup.Deconjugation
             return true;
         }
 
-        private static bool saspecial_check(Form myForm,
+        private static bool SaspecialCheck(Form myForm,
             Rule myRule)
         {
             if (myForm.Text == "") return false;
@@ -288,7 +288,7 @@ namespace JapaneseLookup.Deconjugation
                                 newForm = ContextruleDeconjugate(form, rule);
                                 break;
                             case "substitution":
-                                newForm = substitution_deconjugate(form, rule);
+                                newForm = SubstitutionDeconjugate(form, rule);
                                 break;
                         }
 
