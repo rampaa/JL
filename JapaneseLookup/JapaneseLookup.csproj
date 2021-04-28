@@ -16,6 +16,9 @@
     <None Update="Resources\deconjugator.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\deconjugator_edited_arrays.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\freqlist_narou.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
