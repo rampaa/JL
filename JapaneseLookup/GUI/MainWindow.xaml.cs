@@ -66,8 +66,6 @@ namespace JapaneseLookup.GUI
             // Mining.Mine(null, null, null, null);
 
             CopyFromClipboard();
-
-            Deconjugation.Test();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -95,7 +93,6 @@ namespace JapaneseLookup.GUI
                 }
                 catch
                 {
-
                 }
             }
         }
@@ -188,71 +185,55 @@ namespace JapaneseLookup.GUI
             PopupWindow.Instance.Close();
         }
 
-        public static List<Dictionary<string, List<string>>> LookUp(string text)
+        private void MainTextBox_MouseLeave(object sender, MouseEventArgs e)
         {
-            Dictionary<string, List<Results>> llresults = new();
+            if (!MiningMode)
+                PopupWindow.Instance.Hide();
+        }
+
+        public List<Dictionary<string, List<string>>> LookUp(string text)
+        {
+            Dictionary<string, Tuple<List<Results>, List<string>>> llresults = new();
+
             for (int i = 0; i < text.Length; i++)
             {
                 string foundText = text[..^i];
-                if (JMdictLoader.jMdictDictionary.TryGetValue(foundText, out var temp))
+
+                // if (_lastWord == foundText) return null;
+                // _lastWord = foundText;
+                var deconjugationResults = Deconjugation.Deconjugate(foundText);
+
+                foreach (var result in deconjugationResults)
                 {
-                    llresults.Add(foundText, temp);
+                    if (JMdictLoader.jMdictDictionary.TryGetValue(result.Text, out var temp))
+                    {
+                        llresults.TryAdd(result.Text, Tuple.Create(temp, result.Process));
+                    }
+                }
+
+                if (JMdictLoader.jMdictDictionary.TryGetValue(foundText, out var tempResult))
+                {
+                    llresults.TryAdd(foundText, Tuple.Create(tempResult, new List<string>()));
                 }
             }
 
-            int textLenght = text.Length;
-
-            for (int i = textLenght; i > 0; i--)
-            {
-                (int longestMorphLength, HashSet<string> words) = Mecab.Parse(text[..(textLenght)]);
-
-                words.ExceptWith(llresults.Keys);
-
-                if (!words.Any())
-                    break;
-
-                textLenght = longestMorphLength;
-
-                foreach (string word in words)
-                {
-                    //bool duplicate = false;
-
-                    //foreach (var ol in llresults)
-                    //{
-                    //    foreach (var o in ol.Value)
-                    //    {
-                    //        if (o.Readings.Contains(word))
-                    //        {
-                    //            duplicate = true;
-                    //            break;
-                    //        }
-                    //    }
-                    //    if (duplicate)
-                    //        break;
-                    //}
-
-                    if (JMdictLoader.jMdictDictionary.TryGetValue(word, out var temp))
-                        llresults.Add(word, temp);
-                }
-            }
-
-            if(!llresults.Any()) 
+            if (!llresults.Any())
                 return null;
 
             var results = new List<Dictionary<string, List<string>>>();
 
             foreach (var rsts in llresults)
             {
-
-                foreach (var jMDictResult in rsts.Value)
+                foreach (var jMDictResult in rsts.Value.Item1)
                 {
                     var result = new Dictionary<string, List<string>>();
 
                     List<string> foundSpelling = new();
                     foundSpelling.Add(rsts.Key);
                     result.Add("foundSpelling", foundSpelling);
+                    result.Add("process", rsts.Value.Item2);
 
-                    var jmdictID = new List<string> { jMDictResult.Id };
+                    var jmdictID = new List<string> {jMDictResult.Id};
                     var definitions = jMDictResult.Definitions.Select(definition => definition + "\n").ToList();
                     var readings = jMDictResult.Readings.ToList();
                     var alternativeSpellings = jMDictResult.AlternativeSpellings.ToList();
@@ -263,7 +244,7 @@ namespace JapaneseLookup.GUI
                     // causes OrderBy to put null values first :(
                     // var frequency = new List<string> {freqList?.FrequencyRank.ToString()};
                     var maybeFreq = freqList?.FrequencyRank;
-                    var frequency = new List<string> { maybeFreq == null ? FakeFrequency : maybeFreq.ToString() };
+                    var frequency = new List<string> {maybeFreq == null ? FakeFrequency : maybeFreq.ToString()};
 
                     result.Add("readings", readings);
                     result.Add("definitions", definitions);
@@ -274,15 +255,11 @@ namespace JapaneseLookup.GUI
                     results.Add(result);
                 }
             }
+
             results = results
                 .OrderByDescending(dict => dict["foundSpelling"][0].Length)
                 .ThenBy(dict => Convert.ToInt32(dict["frequency"][0])).ToList();
             return results;
-        }
-        private void MainTextBox_MouseLeave(object sender, MouseEventArgs e)
-        {
-            if (!MiningMode)
-                PopupWindow.Instance.Hide();
         }
     }
 }

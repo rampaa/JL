@@ -1,91 +1,65 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Text.Encodings.Web;
+using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using System.Threading;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using JsonSerializer = System.Text.Json.JsonSerializer;
-
-// ReSharper disable CommentTypo
-
-// ReSharper disable StringLiteralTypo
-
-// ReSharper disable IdentifierTypo
-
-// ReSharper disable InconsistentNaming
 
 namespace JapaneseLookup
 {
+    // translated from https://github.com/wareya/nazeka/blob/master/background-script.js
     public static class Deconjugation
     {
-        private static readonly string file = File.ReadAllText("../net5.0-windows/Resources/deconjugator_edited.json");
+        private static readonly string File =
+            System.IO.File.ReadAllText("../net5.0-windows/Resources/deconjugator_edited_arrays.json");
 
-        // private static Rule[] rules = JsonSerializer.Deserialize<Rule[]>(file);
-
-        private static readonly Rule[] rules = JsonConvert.DeserializeObject<Rule[]>(file);
+        private static readonly Rule[] Rules = JsonSerializer.Deserialize<Rule[]>(File);
 
         internal class Form
         {
-            public Form(string text, string original_text, List<string> tags, HashSet<string> seentext,
+            public Form(string text, string originalText, List<string> tags, HashSet<string> seentext,
                 List<string> process)
             {
-                this.text = text;
-                this.original_text = original_text;
-                this.tags = tags;
-                this.seentext = seentext;
-                this.process = process;
+                Text = text;
+                OriginalText = originalText;
+                Tags = tags;
+                Seentext = seentext;
+                Process = process;
             }
 
-            public string text { get; }
-            public string original_text { get; }
-            public List<string> tags { get; }
-            public HashSet<string> seentext { get; }
-            public List<string> process { get; }
+            public string Text { get; }
+            public string OriginalText { get; }
+            public List<string> Tags { get; }
+            public HashSet<string> Seentext { get; }
+            public List<string> Process { get; }
         }
 
         private class Rule
         {
-            public Rule(string type, object dec_end, object con_end, object dec_tag, object con_tag, string detail)
+            public Rule(string type, List<string> decEnd, List<string> conEnd, List<string> decTag,
+                List<string> conTag, string detail)
             {
-                this.type = type;
-                this.dec_end = dec_end;
-                this.con_end = con_end;
-                this.dec_tag = dec_tag;
-                this.con_tag = con_tag;
-                this.detail = detail;
+                Type = type;
+                DecEnd = decEnd;
+                ConEnd = conEnd;
+                DecTag = decTag;
+                ConTag = conTag;
+                Detail = detail;
             }
 
-            public string type { get; }
-            public object dec_end { get; }
-            public object con_end { get; }
-            public object dec_tag { get; }
-            public object con_tag { get; }
-            public string detail { get; }
+            [JsonPropertyName("type")] public string Type { get; }
+            [JsonPropertyName("dec_end")] public List<string> DecEnd { get; }
+            [JsonPropertyName("con_end")] public List<string> ConEnd { get; }
+            [JsonPropertyName("dec_tag")] public List<string> DecTag { get; }
+            [JsonPropertyName("con_tag")] public List<string> ConTag { get; }
+            [JsonPropertyName("detail")] public string Detail { get; }
         }
 
-        public static void Test()
+        private static Form stdrule_deconjugate_inner(Form myForm,
+            Rule myRule)
         {
-            Thread.Sleep(500);
-            var result = deconjugate("わからない");
-
-            Debug.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions
-            {
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            }));
-        }
-
-        private static Form stdrule_deconjugate_inner(Form my_form,
-            Rule my_rule)
-        {
-            // ending doesn't match
-            if (!my_form.text.EndsWith((string) my_rule.con_end))
-                return null;
             // tag doesn't match
-            if (my_form.tags.Count > 0 &&
-                my_form.tags[^1] != (string) my_rule.con_tag)
+            if (myForm.Tags.Count > 0 &&
+                myForm.Tags[^1] != myRule.ConTag.First())
             {
                 // Debug.WriteLine("TAG DIDN'T MATCH; my_form: " + JsonSerializer.Serialize(
                 //     my_form, new JsonSerializerOptions
@@ -100,91 +74,63 @@ namespace JapaneseLookup
                 return null;
             }
 
+            // ending doesn't match
+            if (!myForm.Text.EndsWith(myRule.ConEnd.First()))
+                return null;
+
             var newtext =
-                my_form.text.Substring(0, my_form.text.Length - ((string) my_rule.con_end).Length)
+                myForm.Text.Substring(0, myForm.Text.Length - myRule.ConEnd.First().Length)
                 +
-                (string) my_rule.dec_end;
+                myRule.DecEnd.First();
 
             // Debug.WriteLine(JsonSerializer.Serialize("newtext: " + newtext, new JsonSerializerOptions
             // {
             //     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             // }));
 
-            // I hate javascript reeeeeeeeeeeeeee
-            Stopwatch stopWatch = new Stopwatch();
-            stopWatch.Start();
-            var clone = JsonSerializer.Deserialize<Form>(JsonSerializer.Serialize(my_form));
-            stopWatch.Stop();
-            double ms = (stopWatch.ElapsedTicks * 1000.0) / Stopwatch.Frequency;
-            Debug.WriteLine(string.Concat(ms.ToString(), " ms"));
-
+            var clone = JsonSerializer.Deserialize<Form>(JsonSerializer.Serialize(myForm));
             var newform = new Form(
                 newtext,
-                my_form.original_text,
-                clone?.tags,
-                clone?.seentext,
-                clone?.process
-            ); //new Object();
+                myForm.OriginalText,
+                clone?.Tags,
+                clone?.Seentext,
+                clone?.Process
+            );
 
-            newform.process.Add(my_rule.detail);
+            newform.Process.Add(myRule.Detail);
 
-            if (newform.tags.Count == 0)
-                newform.tags.Add((string) my_rule.con_tag);
-            newform.tags.Add((string) my_rule.dec_tag);
+            if (newform.Tags.Count == 0)
+                newform.Tags.Add(myRule.ConTag.First());
+            newform.Tags.Add(myRule.DecTag.First());
 
-            if (newform.seentext.Count == 0)
-                newform.seentext.Add(my_form.text);
-            newform.seentext.Add(newtext);
+            if (newform.Seentext.Count == 0)
+                newform.Seentext.Add(myForm.Text);
+            newform.Seentext.Add(newtext);
 
             return newform;
         }
 
-        private static string index_or_value(object variable, int index)
-        {
-            return variable is string[] array ? array[index] : (string) variable;
-        }
-
-        private static HashSet<Form> stdrule_deconjugate(Form my_form,
-            Rule my_rule)
+        private static HashSet<Form> stdrule_deconjugate(Form myForm,
+            Rule myRule)
         {
             // can't deconjugate nothingness
-            if (my_form.text == "")
+            if (myForm.Text == "")
                 return null;
             // deconjugated form too much longer than conjugated form
-            if (my_form.text.Length > my_form.original_text.Length + 10)
+            if (myForm.Text.Length > myForm.OriginalText.Length + 10)
                 return null;
             // impossibly information-dense
-            if (my_form.tags.Count > my_form.original_text.Length + 6)
+            if (myForm.Tags.Count > myForm.OriginalText.Length + 6)
                 return null;
             // blank detail mean it can't be the last (first applied, but rightmost) rule
-            if (my_rule.detail == "" && my_form.tags.Count == 0)
+            if (myRule.Detail == "" && myForm.Tags.Count == 0)
                 return null;
 
-            var array = new List<object>();
-            // pick the first one that is an array
-            // FIXME: use minimum length for safety reasons? assert all arrays equal length?
+            var array = myRule.DecEnd;
 
-            var dec_end_array_or_string =
-                (my_rule.dec_end as JArray)?.ToObject<string[]>() ?? (object) ((string) my_rule.dec_end);
-            var con_end_array_or_string =
-                (my_rule.con_end as JArray)?.ToObject<string[]>() ?? (object) ((string) my_rule.con_end);
-            var dec_tag_array_or_string =
-                (my_rule.dec_tag as JArray)?.ToObject<string[]>() ?? (object) ((string) my_rule.dec_tag);
-            var con_tag_array_or_string =
-                (my_rule.con_tag as JArray)?.ToObject<string[]>() ?? (object) ((string) my_rule.con_tag);
-
-            if (my_rule.dec_end != null)
-                array = new List<object> {dec_end_array_or_string};
-            else if (my_rule.con_end != null)
-                array = new List<object> {con_end_array_or_string};
-            else if (my_rule.dec_tag != null)
-                array = new List<object> {dec_tag_array_or_string};
-            else if (my_rule.con_tag != null)
-                array = new List<object> {con_tag_array_or_string};
-
-            if (array[0] is string)
+            if (array.Count == 1)
             {
-                var result = stdrule_deconjugate_inner(my_form, my_rule);
+                var result = stdrule_deconjugate_inner(myForm, myRule);
 
                 // Debug.WriteLine("result: " + JsonSerializer.Serialize(result, new JsonSerializerOptions
                 // {
@@ -193,21 +139,31 @@ namespace JapaneseLookup
 
                 return result == null ? null : new HashSet<Form> {result};
             }
-            else
+            else if (array.Count > 1)
             {
                 var collection = new HashSet<Form>();
 
-                var length = ((string[]) array[0]).Length;
+                var maybeDecEnd = myRule.DecEnd[0];
+                var maybeConEnd = myRule.ConEnd[0];
+                var maybeDecTag = myRule.DecTag[0];
+                var maybeConTag = myRule.ConTag[0];
+
+                var length = array.Count;
                 for (var i = 0; i < length; i++)
                 {
-                    var virtual_rule = new Rule
+                    maybeDecEnd = myRule.DecEnd.ElementAtOrDefault(i) ?? maybeDecEnd;
+                    maybeConEnd = myRule.ConEnd.ElementAtOrDefault(i) ?? maybeConEnd;
+                    maybeDecTag = myRule.DecTag.ElementAtOrDefault(i) ?? maybeDecTag;
+                    maybeConTag = myRule.ConTag.ElementAtOrDefault(i) ?? maybeConTag;
+
+                    var virtualRule = new Rule
                     (
-                        my_rule.type,
-                        index_or_value(dec_end_array_or_string, i),
-                        index_or_value(con_end_array_or_string, i),
-                        index_or_value(dec_tag_array_or_string, i),
-                        index_or_value(con_tag_array_or_string, i),
-                        my_rule.detail
+                        myRule.Type,
+                        new List<string> {maybeDecEnd},
+                        new List<string> {maybeConEnd},
+                        new List<string> {maybeDecTag},
+                        new List<string> {maybeConTag},
+                        myRule.Detail
                     );
                     // Debug.WriteLine("virtual_rule: " + JsonSerializer.Serialize(virtual_rule, new JsonSerializerOptions
                     // {
@@ -219,7 +175,7 @@ namespace JapaneseLookup
                     //     {
                     //         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
                     //     }));
-                    var ret = stdrule_deconjugate_inner(my_form, virtual_rule);
+                    var ret = stdrule_deconjugate_inner(myForm, virtualRule);
 
                     // Debug.WriteLine("ret: " + JsonSerializer.Serialize(ret, new JsonSerializerOptions
                     // {
@@ -231,162 +187,159 @@ namespace JapaneseLookup
 
                 return collection;
             }
+
+            return null;
         }
 
-        private static HashSet<Form> rewriterule_deconjugate(Form my_form,
-            Rule my_rule)
+        private static HashSet<Form> rewriterule_deconjugate(Form myForm,
+            Rule myRule)
         {
-            if (my_form.text != (string) my_rule.con_end)
+            if (myForm.Text != myRule.ConEnd.First())
                 return null;
-            return stdrule_deconjugate(my_form, my_rule);
+            return stdrule_deconjugate(myForm, myRule);
         }
 
-        private static HashSet<Form> onlyfinalrule_deconjugate(Form my_form,
-            Rule my_rule)
+        private static HashSet<Form> onlyfinalrule_deconjugate(Form myForm,
+            Rule myRule)
         {
-            if (my_form.tags.Count != 0)
+            if (myForm.Tags.Count != 0)
                 return null;
-            return stdrule_deconjugate(my_form, my_rule);
+            return stdrule_deconjugate(myForm, myRule);
         }
 
-        private static HashSet<Form> neverfinalrule_deconjugate(Form my_form,
-            Rule my_rule)
+        private static HashSet<Form> neverfinalrule_deconjugate(Form myForm,
+            Rule myRule)
         {
-            if (my_form.tags.Count == 0)
+            if (myForm.Tags.Count == 0)
                 return null;
-            return stdrule_deconjugate(my_form, my_rule);
+            return stdrule_deconjugate(myForm, myRule);
         }
 
-        private static HashSet<Form> contextrule_deconjugate(Form my_form,
-            Rule my_rule)
+        private static HashSet<Form> contextrule_deconjugate(Form myForm,
+            Rule myRule)
         {
-            var result = my_rule.detail switch
+            var result = myRule.Detail switch
             {
-                "v1inftrap" => v1inftrap_check(my_form),
-                "saspecial" => saspecial_check(my_form, my_rule),
+                "v1inftrap" => v1inftrap_check(myForm),
+                "saspecial" => saspecial_check(myForm, myRule),
                 _ => false
             };
             if (!result)
                 return null;
-            return stdrule_deconjugate(my_form, my_rule);
+            return stdrule_deconjugate(myForm, myRule);
         }
 
-        private static Form substitution_inner(Form my_form,
-            Rule my_rule)
+        private static Form substitution_inner(Form myForm,
+            Rule myRule)
         {
-            if (!my_form.text.Contains((string) my_rule.con_end))
+            if (!myForm.Text.Contains(myRule.ConEnd.First()))
                 return null;
-            var newtext = new Regex((string) my_rule.con_end)
-                .Replace(my_form.text, (string) my_rule.dec_end);
+            var newtext = new Regex(myRule.ConEnd.First())
+                .Replace(myForm.Text, myRule.DecEnd.First());
 
-            // I hate javascript reeeeeeeeeeeeeee
-            var clone = JsonSerializer.Deserialize<Form>(JsonSerializer.Serialize(my_form));
+            var clone = JsonSerializer.Deserialize<Form>(JsonSerializer.Serialize(myForm));
             var newform = new Form(
                 newtext,
-                my_form.original_text,
-                clone?.tags,
-                clone?.seentext,
-                clone?.process
-            ); //new Object();
+                myForm.OriginalText,
+                clone?.Tags,
+                clone?.Seentext,
+                clone?.Process
+            );
 
-            newform.process.Add(my_rule.detail);
+            newform.Process.Add(myRule.Detail);
 
-            if (newform.seentext.Count == 0)
-                newform.seentext.Add(my_form.text);
-            newform.seentext.Add(newtext);
+            if (newform.Seentext.Count == 0)
+                newform.Seentext.Add(myForm.Text);
+            newform.Seentext.Add(newtext);
 
             return newform;
         }
 
-        private static HashSet<Form> substitution_deconjugate(Form my_form,
-            Rule my_rule)
+        private static HashSet<Form> substitution_deconjugate(Form myForm,
+            Rule myRule)
         {
-            if (my_form.process.Count != 0)
+            if (myForm.Process.Count != 0)
                 return null;
 
             // can't deconjugate nothingness
-            if (my_form.text == "")
+            if (myForm.Text == "")
                 return null;
 
-            var array = new List<object>();
+            var array = myRule.DecEnd;
 
-            var dec_end_array_or_string =
-                (my_rule.dec_end as JArray)?.ToObject<string[]>() ?? (object) ((string) my_rule.dec_end);
-            var con_end_array_or_string =
-                (my_rule.con_end as JArray)?.ToObject<string[]>() ?? (object) ((string) my_rule.con_end);
-
-            // pick the first one that is an array
-            // FIXME: use minimum length for safety reasons? assert all arrays equal length?
-            if (my_rule.dec_end != null)
-                array = new List<object> {dec_end_array_or_string};
-            else if (my_rule.con_end != null)
-                array = new List<object> {con_end_array_or_string};
-
-            if (array[0] is string)
+            if (array.Count == 1)
             {
-                var result = substitution_inner(my_form, my_rule);
+                var result = substitution_inner(myForm, myRule);
                 return result == null ? null : new HashSet<Form> {result};
             }
-            else
+            else if (array.Count > 1)
             {
                 var collection = new HashSet<Form>();
 
-                var length = ((string[]) array[0]).Length;
+                var maybeDecEnd = myRule.DecEnd[0];
+                var maybeConEnd = myRule.ConEnd[0];
+
+                var length = array.Count;
                 for (var i = 0; i < length; i++)
                 {
-                    var virtual_rule = new Rule
+                    maybeDecEnd = myRule.DecEnd.ElementAtOrDefault(i) ?? maybeDecEnd;
+                    maybeConEnd = myRule.ConEnd.ElementAtOrDefault(i) ?? maybeConEnd;
+
+                    var virtualRule = new Rule
                     (
-                        my_rule.type,
-                        index_or_value(dec_end_array_or_string, i),
-                        index_or_value(con_end_array_or_string, i),
+                        myRule.Type,
+                        new List<string> {maybeDecEnd},
+                        new List<string> {maybeConEnd},
                         null,
                         null,
-                        my_rule.detail
+                        myRule.Detail
                     );
 
-                    var ret = substitution_inner(my_form, virtual_rule);
+                    var ret = substitution_inner(myForm, virtualRule);
                     if (ret != null) collection.Add(ret);
                 }
 
                 return collection;
             }
+
+            return null;
         }
 
-        private static bool v1inftrap_check(Form my_form)
+        private static bool v1inftrap_check(Form myForm)
         {
-            if (my_form.tags.Count != 1) return true;
-            var my_tag = my_form.tags[0];
-            if (my_tag == "stem-ren")
+            if (myForm.Tags.Count != 1) return true;
+            var myTag = myForm.Tags[0];
+            if (myTag == "stem-ren")
                 return false;
             return true;
         }
 
-        private static bool saspecial_check(Form my_form,
-            Rule my_rule)
+        private static bool saspecial_check(Form myForm,
+            Rule myRule)
         {
-            if (my_form.text == "") return false;
-            if (!my_form.text.EndsWith((string) my_rule.con_end)) return false;
-            var base_text = my_form.text.Substring(0, my_form.text.Length - ((string) my_rule.con_end).Length);
-            if (base_text.EndsWith("さ"))
+            if (myForm.Text == "") return false;
+            if (!myForm.Text.EndsWith(myRule.ConEnd.First())) return false;
+            var baseText = myForm.Text.Substring(0, myForm.Text.Length - myRule.ConEnd.First().Length);
+            if (baseText.EndsWith("さ"))
                 return false;
             return true;
         }
 
-        internal static HashSet<Form> deconjugate(string mytext)
+        internal static HashSet<Form> Deconjugate(string mytext)
         {
             var processed = new HashSet<Form>();
             var novel = new HashSet<Form>();
 
-            var start_form =
+            var startForm =
                 new Form(mytext,
                     mytext,
                     new List<string>(),
                     new HashSet<string>(),
                     new List<string>()
                 );
-            novel.Add(start_form);
+            novel.Add(startForm);
 
-            var myrules = rules;
+            var myrules = Rules;
 
             while (novel.Count > 0)
             {
@@ -398,7 +351,7 @@ namespace JapaneseLookup
                 //     }));
                 // }
 
-                var new_novel = new HashSet<Form>();
+                var newNovel = new HashSet<Form>();
                 foreach (Form form in novel)
                 {
                     foreach (Rule rule in myrules)
@@ -410,7 +363,7 @@ namespace JapaneseLookup
                         //     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
                         // }));
 
-                        switch (rule.type)
+                        switch (rule.Type)
                         {
                             case "stdrule":
                                 newform = stdrule_deconjugate(form, rule);
@@ -439,31 +392,22 @@ namespace JapaneseLookup
                             if (myform != null &&
                                 !processed.Contains(myform) &&
                                 !novel.Contains(myform) &&
-                                !new_novel.Contains(myform))
+                                !newNovel.Contains(myform))
                             {
-                                new_novel.Add(myform);
+                                newNovel.Add(myform);
                             }
                         }
-
-                        // foreach (var nn in new_novel)
-                        // {
-                        //     Debug.WriteLine("new_novel:" + JsonSerializer.Serialize(nn,
-                        //         new JsonSerializerOptions
-                        //         {
-                        //             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                        //         }));
-                        // }
                     }
                 }
 
-                processed = union(processed, novel);
-                novel = new_novel;
+                processed = Union(processed, novel);
+                novel = newNovel;
             }
 
             return processed;
         }
 
-        private static HashSet<Form> union(HashSet<Form> setA, HashSet<Form> setB)
+        private static HashSet<Form> Union(HashSet<Form> setA, HashSet<Form> setB)
         {
             foreach (var elem in setB)
                 setA.Add(elem);
