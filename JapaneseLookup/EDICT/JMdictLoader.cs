@@ -247,7 +247,7 @@ namespace JapaneseLookup.EDICT
                 Results result = new();
                 string key = rEle.Reb;
 
-                //result.Readings.Add(rEle.Reb);
+                result.Readings.Add(rEle.Reb);
 
                 if (rEle.ReRestrList.Any())
                     result.AlternativeSpellings = rEle.ReRestrList;
@@ -273,18 +273,21 @@ namespace JapaneseLookup.EDICT
             foreach (KeyValuePair<string, Results> rl in resultList)
             {
                 rl.Value.Id = entry.Id;
+                string key = Kana.KatakanaToHiraganaConverter(rl.Key);
 
-                if (jMdictDictionary.TryGetValue(rl.Key, out List<Results> tempList))
+                if (jMdictDictionary.TryGetValue(key, out List<Results> tempList))
                 {
                     tempList.Add(rl.Value);
-                    jMdictDictionary[rl.Key] = tempList;
+                    jMdictDictionary[key] = tempList;
                 }
                 else
                 {
                     tempList = new();
                     tempList.Add(rl.Value);
-                    jMdictDictionary.Add(rl.Key, tempList);
+                    jMdictDictionary.Add(key, tempList);
                 }
+
+
             }
         }
     }

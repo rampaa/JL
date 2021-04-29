@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using JapaneseLookup.Anki;
-using JapaneseLookup.Parsers;
 using JapaneseLookup.Deconjugation;
 using JapaneseLookup.EDICT;
 using System.Collections.Generic;
@@ -197,27 +196,64 @@ namespace JapaneseLookup.GUI
                 PopupWindow.Instance.Hide();
         }
 
-        public List<Dictionary<string, List<string>>> LookUp(string text)
+        public static List<Dictionary<string, List<string>>> LookUp(string text)
         {
-            Dictionary<string, Tuple<List<Results>, List<string>>> llresults = new();
-
+            Dictionary<string, (List<Results> jMdictResults, List<string> processList, string foundForm)> llresults = new();
+            int succAttempt = 0;
             for (int i = 0; i < text.Length; i++)
             {
-                string foundText = text[..^i];
+                string textInHiragana = Kana.KatakanaToHiraganaConverter(text[..^i]);
+                Debug.WriteLine(textInHiragana);
+                Debug.WriteLine(Kana.LongVowelMarkConverter(textInHiragana));
 
-                var deconjugationResults = Deconjugator.Deconjugate(foundText);
+                bool tryLongVowelConvertion = true;
 
-                foreach (var result in deconjugationResults)
+                // if (_lastWord == foundText) return null;
+                // _lastWord = foundText;
+
+                if (JMdictLoader.jMdictDictionary.TryGetValue(textInHiragana, out var tempResult))
                 {
-                    if (JMdictLoader.jMdictDictionary.TryGetValue(result.Text, out var temp))
+                    llresults.TryAdd(text[..^i], (tempResult, new List<string>(), text[..^i]));
+                    tryLongVowelConvertion = false;
+                }
+
+                if(succAttempt<3)
+                {
+                    var deconjugationResults = Deconjugator.Deconjugate(textInHiragana);
+                    foreach (var result in deconjugationResults)
                     {
-                        llresults.TryAdd(result.Text, Tuple.Create(temp, result.Process));
+                        if (JMdictLoader.jMdictDictionary.TryGetValue(result.Text, out var temp))
+                        {
+                            List<Results> resultsList = new();
+
+                            foreach (var rslt in temp)
+                            {
+                                if (rslt.WordClasses.Intersect(result.Tags).Any())
+                                {
+                                    resultsList.Add(rslt);
+                                }
+                            }
+
+                            if (resultsList.Any())
+                            {
+                                llresults.TryAdd(result.Text, (resultsList, result.Process, text[..result.OriginalText.Length]));
+                                ++succAttempt;
+                                tryLongVowelConvertion = false;
+                            }
+                        }
                     }
                 }
 
-                if (JMdictLoader.jMdictDictionary.TryGetValue(foundText, out var tempResult))
+                if (tryLongVowelConvertion)
                 {
-                    llresults.TryAdd(foundText, Tuple.Create(tempResult, new List<string>()));
+                    if (textInHiragana[0] != 'ー' && textInHiragana.Contains("ー"))
+                    {
+                        string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiragana);
+                            if (JMdictLoader.jMdictDictionary.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
+                            {
+                                llresults.TryAdd(text[..^i], (tmpResult, new List<string>(), text[..^i]));
+                            }
+                    }
                 }
             }
 
@@ -228,14 +264,21 @@ namespace JapaneseLookup.GUI
 
             foreach (var rsts in llresults)
             {
-                foreach (var jMDictResult in rsts.Value.Item1)
+                foreach (var jMDictResult in rsts.Value.jMdictResults)
                 {
                     var result = new Dictionary<string, List<string>>();
 
                     List<string> foundSpelling = new();
                     foundSpelling.Add(rsts.Key);
                     result.Add("foundSpelling", foundSpelling);
-                    result.Add("process", rsts.Value.Item2);
+
+                    result.Add("process", rsts.Value.processList);
+
+                    List<string> foundForm = new();
+                    foundForm.Add(rsts.Value.foundForm);
+                    result.Add("foundForm", foundForm);
+                    
+                    result.Add("foundText", foundSpelling);
 
                     var jmdictID = new List<string> {jMDictResult.Id};
                     var definitions = jMDictResult.Definitions.Select(definition => definition + "\n").ToList();
@@ -261,7 +304,7 @@ namespace JapaneseLookup.GUI
             }
 
             results = results
-                .OrderByDescending(dict => dict["foundSpelling"][0].Length)
+                .OrderByDescending(dict => dict["foundForm"][0].Length)
                 .ThenBy(dict => Convert.ToInt32(dict["frequency"][0])).ToList();
             return results;
         }
