@@ -184,6 +184,7 @@ namespace JapaneseLookup.GUI
                 case Key.M:
                 {
                     MainWindow.MiningMode = true;
+                    PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
                     // TODO: Tell the user that they are in mining mode
                     // PopupWindow.Instance.ScrollViewer.Visibility = Visibility.Visible;
                     Instance.Focus();
@@ -207,7 +208,11 @@ namespace JapaneseLookup.GUI
                 case Key.Escape:
                 {
                     if (MainWindow.MiningMode)
-                        MainWindow.MiningMode = false;
+                        {
+                            MainWindow.MiningMode = false;
+                            PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                        }
+                        
                     break;
                 }
             }
