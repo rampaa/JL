@@ -8,21 +8,22 @@ using System.Threading.Tasks;
 
 namespace JapaneseLookup.Anki
 {
+    // TODO: Dedicated error logging/display mechanism
+    // all console statements need to be converted to that ^
     public static class AnkiConnect
     {
         private static readonly HttpClient Client = new();
         private static readonly Uri Uri = new("http://127.0.0.1:8765");
 
-        // TODO: Put these methods in order
-        public static async Task<Response> GetDeckNames()
-        {
-            var req = new Request("deckNames", 6);
-            return await Send(req);
-        }
-
         public static async Task<Response> AddNoteToDeck(Note note)
         {
             var req = new Request("addNote", 6, new Dictionary<string, object> {{"note", note}});
+            return await Send(req);
+        }
+
+        public static async Task<Response> GetDeckNames()
+        {
+            var req = new Request("deckNames", 6);
             return await Send(req);
         }
 
@@ -38,13 +39,34 @@ namespace JapaneseLookup.Anki
             return await Send(req);
         }
 
+        public static async Task<Response> StoreMediaFile(string filename, string data)
+        {
+            var req = new Request("storeMediaFile", 6,
+                new Dictionary<string, object> {{"filename", filename}, {"data", data}});
+            return await Send(req);
+        }
+
+        public static async Task<string> GetAudio(string foundSpelling, string reading)
+        {
+            Uri uri = new(
+                "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=" +
+                foundSpelling +
+                "&kana=" +
+                reading
+            );
+            var getResponse = await Client.GetAsync(uri);
+
+            //  var filename = "JL_" + foundSpelling + "_" + reading + ".mp3";
+
+            var base64 = Convert.ToBase64String(await getResponse.Content.ReadAsByteArrayAsync());
+            return base64;
+            //  await StoreMediaFile(filename, data);
+        }
+
         private static async Task<Response> Send(Request req)
         {
             try
             {
-                // couldn't get this to work
-                // var response = await Client.PostAsJsonAsync(Uri, req);
-
                 // AnkiConnect doesn't like null values
                 var payload = new StringContent(JsonSerializer.Serialize(req,
                     new JsonSerializerOptions {IgnoreNullValues = true}));
@@ -55,8 +77,6 @@ namespace JapaneseLookup.Anki
                 var json = await postResponse.Content.ReadFromJsonAsync<Response>();
                 Debug.WriteLine("json result: " + json!.result);
 
-                // TODO: Dedicated error logging/display mechanism
-                // all console statements need to be converted to that ^
                 if (json!.error == null) return json;
 
                 Console.WriteLine(json.error.ToString());
@@ -71,7 +91,7 @@ namespace JapaneseLookup.Anki
             catch (Exception e)
             {
                 Console.WriteLine("Communication error: Unknown error");
-                Console.WriteLine(e); // this should be Debug.WriteLine after we're done developing
+                Debug.WriteLine(e);
                 return null;
             }
         }
