@@ -45,8 +45,6 @@ namespace JapaneseLookup.GUI
             foreach (var result in results)
             {
                 var stackPanel = new StackPanel();
-                Instance.StackPanel.Children.Add(stackPanel);
-                Instance.StackPanel.Children.Add(new Separator());
 
                 var textBlockFoundSpelling = new TextBlock
                 {
@@ -106,6 +104,8 @@ namespace JapaneseLookup.GUI
                 if (frequency != MainWindow.FakeFrequency)
                     stackPanel.Children.Add(textBlockFrequency);
                 stackPanel.Children.Add(textBlockProcess);
+                Instance.StackPanel.Children.Add(stackPanel);
+                Instance.StackPanel.Children.Add(new Separator());
             }
         }
 
