@@ -13,11 +13,15 @@ namespace JapaneseLookup.GUI
     /// </summary>
     public partial class MiningSetupWindow : Window
     {
+        private static MiningSetupWindow _instance;
+
+        public static MiningSetupWindow Instance
+        {
+            get { return _instance ??= new MiningSetupWindow(); }
+        }
+
         // TODO: Make this window close too if the MainWindow is closed
-        // TODO: Make sure that this window doesn't spawn under the MainWindow
-        // TODO: Scrolling (test with like 100 fields)
         // TODO: read existing config and fill in the fields accordingly
-        // maybe convert all the procedural GUI generation to xaml-based GUI generation
         public MiningSetupWindow()
         {
             InitializeComponent();
@@ -113,7 +117,7 @@ namespace JapaneseLookup.GUI
 
                 var ankiConfig = new AnkiConfig(deckName, modelName, fields, tags);
 
-                Console.WriteLine(AnkiConfig.WriteAnkiConfig(ankiConfig) != null
+                Console.WriteLine(AnkiConfig.WriteAnkiConfig(ankiConfig).Result == "ok"
                     ? "Saved config"
                     : "Error saving config");
             }

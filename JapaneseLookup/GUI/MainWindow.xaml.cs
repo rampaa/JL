@@ -67,6 +67,8 @@ namespace JapaneseLookup.GUI
             // Mining.Mine(null, null, null, null);
 
             CopyFromClipboard();
+
+            AnkiConnect.GetAudio("猫", "ねこ");
         }
 
         protected override void OnSourceInitialized(EventArgs e)

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -44,10 +44,7 @@ namespace JapaneseLookup.GUI
         {
             foreach (var result in results)
             {
-                var stackPanel = new StackPanel();
-                Instance.StackPanel.Children.Add(stackPanel);
-                Instance.StackPanel.Children.Add(new Separator());
-
+                var innerStackPanel = new StackPanel();
                 var textBlockFoundSpelling = new TextBlock
                 {
                     Name = "foundSpelling",
@@ -55,6 +52,7 @@ namespace JapaneseLookup.GUI
                     Foreground = Brushes.White,
                 };
                 textBlockFoundSpelling.PreviewMouseUp += FoundSpelling_PreviewMouseUp;
+                textBlockFoundSpelling.KeyDown += FoundSpelling_KeyDown;
 
                 var textBlockReadings = new TextBlock
                 {
@@ -98,14 +96,16 @@ namespace JapaneseLookup.GUI
                     Foreground = Brushes.White,
                 };
 
-                stackPanel.Children.Add(textBlockFoundSpelling);
-                stackPanel.Children.Add(textBlockReadings);
-                stackPanel.Children.Add(textBlockDefinitions);
-                stackPanel.Children.Add(textBlockJmdictID);
-                stackPanel.Children.Add(textBlockAlternativeSpellings);
+                innerStackPanel.Children.Add(textBlockFoundSpelling);
+                innerStackPanel.Children.Add(textBlockReadings);
+                innerStackPanel.Children.Add(textBlockDefinitions);
+                innerStackPanel.Children.Add(textBlockJmdictID);
+                innerStackPanel.Children.Add(textBlockAlternativeSpellings);
                 if (frequency != MainWindow.FakeFrequency)
-                    stackPanel.Children.Add(textBlockFrequency);
-                stackPanel.Children.Add(textBlockProcess);
+                    innerStackPanel.Children.Add(textBlockFrequency);
+                innerStackPanel.Children.Add(textBlockProcess);
+                Instance.StackPanel.Children.Add(innerStackPanel);
+                Instance.StackPanel.Children.Add(new Separator());
             }
         }
 
@@ -177,6 +177,24 @@ namespace JapaneseLookup.GUI
             );
         }
 
+        static void PlayAudio(string foundSpelling, string reading)
+        {
+            Debug.WriteLine(foundSpelling);
+            Debug.WriteLine(reading);
+
+            Uri uri = new(
+                "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=" +
+                foundSpelling +
+                "&kana=" +
+                reading
+            );
+
+            // var sound = AnkiConnect.GetAudio("猫", "ねこ").Result;
+            var test = new MediaElement
+                {Source = uri, Volume = 1, Visibility = Visibility.Collapsed};
+            Instance.StackPanel.Children.Add(test);
+        }
+
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
@@ -185,29 +203,71 @@ namespace JapaneseLookup.GUI
                 {
                     MainWindow.MiningMode = true;
                     // TODO: Tell the user that they are in mining mode
-                    // PopupWindow.Instance.ScrollViewer.Visibility = Visibility.Visible;
+                    Instance.Activate();
                     Instance.Focus();
 
                     break;
                 }
                 case Key.C:
                 {
-                    var miningSetupWindow = new MiningSetupWindow();
-                    miningSetupWindow.Show();
+                    MiningSetupWindow.Instance.Show();
+                    MiningSetupWindow.Instance.Activate();
+                    MiningSetupWindow.Instance.Focus();
 
                     break;
                 }
                 case Key.P:
                 {
-                    // TODO: Play audio
+                    var innerStackPanel = (StackPanel) StackPanel.Children[0];
+                    string foundSpelling = null;
+                    string reading = null;
+
+                    foreach (TextBlock child in innerStackPanel.Children)
+                    {
+                        switch (child.Name)
+                        {
+                            case "foundSpelling":
+                                foundSpelling = child.Text;
+                                break;
+                            case "readings":
+                                reading = child.Text.Split(",")[0];
+                                break;
+                        }
+                    }
+
+                    PlayAudio(foundSpelling, reading);
 
                     break;
                 }
+            }
+        }
 
-                case Key.Escape:
+        private static void FoundSpelling_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.P:
                 {
-                    if (MainWindow.MiningMode)
-                        MainWindow.MiningMode = false;
+                    var textBlock = (TextBlock) sender;
+                    var innerStackPanel = (StackPanel) textBlock.Parent;
+                    string foundSpelling = null;
+                    string reading = null;
+
+                    foreach (TextBlock child in innerStackPanel.Children)
+                    {
+                        switch (child.Name)
+                        {
+                            case "foundSpelling":
+                                foundSpelling = child.Text;
+                                break;
+                            case "readings":
+                                reading = child.Text.Split(",")[0];
+                                break;
+                        }
+                    }
+
+                    PlayAudio(foundSpelling, reading);
+
                     break;
                 }
             }

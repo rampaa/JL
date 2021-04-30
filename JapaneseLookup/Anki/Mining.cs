@@ -40,7 +40,6 @@ namespace JapaneseLookup.Anki
             Dictionary<string, object> options = null;
             var tags = ankiConfig.tags;
 
-
             // idk if this gets the right audio for every word
             var reading = readings.Split(",")[0];
 
