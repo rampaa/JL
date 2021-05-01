@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 
 namespace JapaneseLookup.EDICT
 {
-    //TODO: Refactor
     class JMdictLoader
     {
         // public static List<JMdictEntry> jMdict;
@@ -55,7 +55,7 @@ namespace JapaneseLookup.EDICT
                     }
                 }
             }
-            DictionaryBuilder(entry);
+            JMDictBuilder.DictionaryBuilder(entry, jMdictDictionary);
         }
 
         private static void KEleReader(XmlTextReader jMDictXML, JMdictEntry entry)
@@ -186,109 +186,6 @@ namespace JapaneseLookup.EDICT
                 return jMDictXML.Name;
             }
             else return null;
-        }
-        private static void DictionaryBuilder(JMdictEntry entry)
-        {
-            // entry (k_ele*, r_ele+, sense+)
-            // k_ele (keb, ke_inf*, ke_pri*)
-            // r_ele (reb, re_restr*, re_inf*, re_pri*)
-            // sense (stagk*, stagr*, pos*, xref*, ant*, field*, misc*, s_inf*, dial*, gloss*)
-
-            Dictionary<string, Results> resultList = new();
-            List<string> alternativeSpellings = new();
-
-            foreach (KEle kEle in entry.KEleList)
-            {
-                Results result = new();
-                string key = kEle.Keb;
-
-                alternativeSpellings.Add(key);
-
-                result.OrthographyInfoList = kEle.KeInfList;
-                result.PriorityList = kEle.KePriList;
-
-                foreach (REle rEle in entry.REleList)
-                {
-                    if (!rEle.ReRestrList.Any() || rEle.ReRestrList.Contains(key))
-                        result.Readings.Add(rEle.Reb);
-                }
-
-                foreach (Sense sense in entry.SenseList)
-                {
-                    if ((!sense.StagKList.Any() && !sense.StagRList.Any()) || sense.StagKList.Contains(key))
-                    {
-                        result.Definitions.AddRange(sense.GlossList);
-                        result.WordClasses.AddRange(sense.PosList);
-                        result.RelatedTerms.AddRange(sense.XRefList);
-                        result.Antonyms.AddRange(sense.AntList);
-                        result.FieldInfoList.AddRange(sense.FieldList);
-                        result.MiscList.AddRange(sense.MiscList);
-                        result.Dialects.AddRange(sense.DialList);
-                        if (sense.SInf != null)
-                            result.SpellingInfo = sense.SInf;
-                    }
-                }
-                resultList.Add(key, result);
-            }
-
-            foreach (KeyValuePair<string, Results> item in resultList)
-            {
-                foreach (string s in alternativeSpellings)
-                {
-                    if (item.Key != s)
-                    {
-                        item.Value.AlternativeSpellings.Add(s);
-                    }
-                }
-            }
-
-            foreach (REle rEle in entry.REleList)
-            {
-                Results result = new();
-                string key = rEle.Reb;
-
-                result.Readings.Add(rEle.Reb);
-
-                if (rEle.ReRestrList.Any())
-                    result.AlternativeSpellings = rEle.ReRestrList;
-                else
-                    result.AlternativeSpellings = alternativeSpellings;
-
-                foreach (Sense sense in entry.SenseList)
-                {
-                    // if((!sense.StagList.Any() && !sense.StagRList.Any()) || sense.StagRList.Contains(key))
-                    result.Definitions.AddRange(sense.GlossList);
-                    result.WordClasses.AddRange(sense.PosList);
-                    result.RelatedTerms.AddRange(sense.XRefList);
-                    result.Antonyms.AddRange(sense.AntList);
-                    result.FieldInfoList.AddRange(sense.FieldList);
-                    result.MiscList.AddRange(sense.MiscList);
-                    result.Dialects.AddRange(sense.DialList);
-                    if (sense.SInf != null)
-                        result.SpellingInfo = sense.SInf;
-                }
-                resultList.Add(key, result);
-            }
-
-            foreach (KeyValuePair<string, Results> rl in resultList)
-            {
-                rl.Value.Id = entry.Id;
-                string key = Kana.KatakanaToHiraganaConverter(rl.Key);
-
-                if (jMdictDictionary.TryGetValue(key, out List<Results> tempList))
-                {
-                    tempList.Add(rl.Value);
-                    jMdictDictionary[key] = tempList;
-                }
-                else
-                {
-                    tempList = new();
-                    tempList.Add(rl.Value);
-                    jMdictDictionary.Add(key, tempList);
-                }
-
-
-            }
         }
     }
 }

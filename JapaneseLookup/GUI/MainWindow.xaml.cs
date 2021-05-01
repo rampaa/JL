@@ -67,7 +67,7 @@ namespace JapaneseLookup.GUI
 
             CopyFromClipboard();
 
-            AnkiConnect.GetAudio("猫", "ねこ");
+            //AnkiConnect.GetAudio("猫", "ねこ");
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -206,8 +206,6 @@ namespace JapaneseLookup.GUI
             for (int i = 0; i < text.Length; i++)
             {
                 string textInHiragana = Kana.KatakanaToHiraganaConverter(text[..^i]);
-                Debug.WriteLine(textInHiragana);
-                Debug.WriteLine(Kana.LongVowelMarkConverter(textInHiragana));
 
                 bool tryLongVowelConversion = true;
 
@@ -228,7 +226,7 @@ namespace JapaneseLookup.GUI
 
                             foreach (var rslt in temp)
                             {
-                                if (rslt.WordClasses.Intersect(result.Tags).Any())
+                                if (rslt.WordClasses.SelectMany(pos => pos).Intersect(result.Tags).Any())
                                 {
                                     resultsList.Add(rslt);
                                 }
@@ -268,19 +266,74 @@ namespace JapaneseLookup.GUI
                 foreach (var jMDictResult in rsts.Value.jMdictResults)
                 {
                     var result = new Dictionary<string, List<string>>();
+                    List<string> mainBody = new();
 
-                    var foundSpelling = new List<string> {rsts.Key};
+                    int count = 1;
+                    string defResult = "";
+                    for (int i = 0; i < jMDictResult.DefinitionsList.Count; i++)
+                    {
+                        if (jMDictResult.WordClasses[i].Any())
+                        {
+                            defResult += "(";
+                            defResult += string.Join(", ", jMDictResult.WordClasses[i]);
+                            defResult += ") ";
+                        }
+
+                        if (jMDictResult.DefinitionsList.Any())
+                        {
+                            defResult += "(" + count + ") ";
+
+                            if (jMDictResult.SpellingInfo[i] != null)
+                            {
+                                defResult += "(";
+                                defResult += jMDictResult.SpellingInfo[i];
+                                defResult += ") ";
+                            }
+
+                            if (jMDictResult.MiscList[i].Any())
+                            {
+                                defResult += "(";
+                                defResult += string.Join(", ", jMDictResult.MiscList[i]);
+                                defResult += ") ";
+                            }
+                            defResult += string.Join("; ", jMDictResult.DefinitionsList[i].Definitions) + " ";
+
+                            if (jMDictResult.DefinitionsList[i].RRestrictions.Any() || jMDictResult.DefinitionsList[i].KRestrictions.Any())
+                            {
+                                defResult += "(only applies to ";
+
+                                if (jMDictResult.DefinitionsList[i].KRestrictions.Any())
+                                    defResult += string.Join("; ", jMDictResult.DefinitionsList[i].KRestrictions);
+
+                                if (jMDictResult.DefinitionsList[i].RRestrictions.Any())
+                                    defResult += string.Join("; ", jMDictResult.DefinitionsList[i].RRestrictions);
+
+                                defResult += ") ";
+                            }
+                            //defResult += "\n";
+                            ++count;
+                        }
+                    }
+                    mainBody.Add(defResult);
+                    result.Add("mainBody", mainBody);
+
+                    var foundSpelling = new List<string> { rsts.Key };
                     result.Add("foundSpelling", foundSpelling);
 
                     result.Add("process", rsts.Value.processList);
 
-                    var foundForm = new List<string> {rsts.Value.foundForm};
+                    var foundForm = new List<string> { rsts.Value.foundForm };
                     result.Add("foundForm", foundForm);
 
                     result.Add("foundText", foundSpelling);
 
-                    var jmdictID = new List<string> {jMDictResult.Id};
-                    var definitions = jMDictResult.Definitions.Select(definition => definition + "\n").ToList();
+                    var primarySpelling = new List<string> { jMDictResult.PrimarySpelling };
+                    result.Add("primarySpelling", primarySpelling);
+
+                    result.Add("kanaSpellings", jMDictResult.KanaSpellings);
+
+                    var jmdictID = new List<string> { jMDictResult.Id };
+                    var definitions = jMDictResult.DefinitionsList.Select((definitions => definitions.Definitions.Select(def => def + "\n"))).ToList();
                     var readings = jMDictResult.Readings.ToList();
                     var alternativeSpellings = jMDictResult.AlternativeSpellings.ToList();
 
@@ -290,10 +343,15 @@ namespace JapaneseLookup.GUI
                     // causes OrderBy to put null values first :(
                     // var frequency = new List<string> {freqList?.FrequencyRank.ToString()};
                     var maybeFreq = freqList?.FrequencyRank;
-                    var frequency = new List<string> {maybeFreq == null ? FakeFrequency : maybeFreq.ToString()};
+                    var frequency = new List<string> { maybeFreq == null ? FakeFrequency : maybeFreq.ToString() };
 
                     result.Add("readings", readings);
-                    result.Add("definitions", definitions);
+                    List<string> def = new();
+                    foreach (var a in definitions)
+                    {
+                        def.AddRange(a);
+                    }
+                    result.Add("definitions", def);
                     result.Add("jmdictID", jmdictID);
                     result.Add("alternativeSpellings", alternativeSpellings);
                     result.Add("frequency", frequency);

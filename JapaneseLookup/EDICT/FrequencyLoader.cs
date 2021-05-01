@@ -32,7 +32,7 @@ namespace JapaneseLookup.EDICT
                     {
                         foreach (Results result in jMDictResults)
                         {
-                            if ((!result.Readings.Any() && !result.AlternativeSpellings.Any()) || result.Readings.Contains(reading))
+                            if ((!result.KanaSpellings.Any()) || result.Readings.Contains(reading))
                             {
                                 if (result.FrequencyDict.TryGetValue(freqListName, out var frequency))
                                 {
@@ -54,7 +54,9 @@ namespace JapaneseLookup.EDICT
                     {
                         foreach (Results result in jMDictResults)
                         {
-                            if (result.AlternativeSpellings.Contains(exactSpelling))
+                            if (result.PrimarySpelling == exactSpelling 
+                                || result.AlternativeSpellings.Contains(exactSpelling) 
+                                || result.KanaSpellings.Contains(exactSpelling))
                             {
                                 if (result.FrequencyDict.TryGetValue(freqListName, out var frequency))
                                 {

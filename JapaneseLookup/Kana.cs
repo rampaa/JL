@@ -144,18 +144,28 @@ namespace JapaneseLookup
             string textWithoutLongVowelMark = text[0].ToString();
             for(int i = 1; i < text.Length; i++)
             {
-                if (text[i] == 'ー')
-                {
-                    if (kanaFinalVowelDict.TryGetValue(text[i - 1], out char vowel))
-                        textWithoutLongVowelMark += vowel;
-                    else
-                        textWithoutLongVowelMark += 'ー';
-                }
-
+                if (text[i] == 'ー' && kanaFinalVowelDict.TryGetValue(text[i - 1], out char vowel))
+                    textWithoutLongVowelMark += vowel;
                 else
                     textWithoutLongVowelMark += text[i];
             }
             return textWithoutLongVowelMark;
+        }
+
+        public static bool IsHiragana(string text)
+        {
+            if (hiraganaToKatakanaDict.ContainsKey(text[0]))
+                return true;
+            else
+                return false;
+        }
+
+        public static bool IsKatakana(string text)
+        {
+            if (katanakaToHiraganaDict.ContainsKey(text[0]))
+                return true;
+            else
+                return false;
         }
     }
 }

@@ -44,6 +44,21 @@ namespace JapaneseLookup.GUI
         {
             foreach (var result in results)
             {
+                var textBlockPrimarySpelling = new TextBlock
+                {
+                    Name = "primarySpelling",
+                    Text = result["primarySpelling"][0],
+                    Foreground = Brushes.White,
+                };
+
+                var textBlockKanaSpellings = new TextBlock
+                {
+                    Name = "kanaSpellings",
+                    Text = string.Join(" ", result["kanaSpellings"]),
+                    TextWrapping = TextWrapping.Wrap,
+                    Foreground = Brushes.White
+                };
+
                 var innerStackPanel = new StackPanel();
                 var textBlockFoundSpelling = new TextBlock
                 {
@@ -60,6 +75,15 @@ namespace JapaneseLookup.GUI
                     Text = string.Join(", ", result["readings"]),
                     Foreground = Brushes.White
                 };
+
+                var textBlockMainBody = new TextBlock
+                {
+                    Name = "mainBody",
+                    Text = result["mainBody"][0],
+                    TextWrapping = TextWrapping.Wrap,
+                    Foreground = Brushes.White
+                };
+
                 var textBlockDefinitions = new TextBlock
                 {
                     Name = "definitions",
@@ -96,11 +120,14 @@ namespace JapaneseLookup.GUI
                     Foreground = Brushes.White,
                 };
 
-                innerStackPanel.Children.Add(textBlockFoundSpelling);
-                innerStackPanel.Children.Add(textBlockReadings);
-                innerStackPanel.Children.Add(textBlockDefinitions);
-                innerStackPanel.Children.Add(textBlockJmdictID);
+                innerStackPanel.Children.Add(textBlockPrimarySpelling);
                 innerStackPanel.Children.Add(textBlockAlternativeSpellings);
+                //innerStackPanel.Children.Add(textBlockKanaSpellings);
+                //innerStackPanel.Children.Add(textBlockFoundSpelling);
+                innerStackPanel.Children.Add(textBlockReadings);
+                //innerStackPanel.Children.Add(textBlockDefinitions);
+                innerStackPanel.Children.Add(textBlockMainBody);
+                innerStackPanel.Children.Add(textBlockJmdictID);
                 if (frequency != MainWindow.FakeFrequency)
                     innerStackPanel.Children.Add(textBlockFrequency);
                 innerStackPanel.Children.Add(textBlockProcess);
@@ -277,6 +304,8 @@ namespace JapaneseLookup.GUI
                                 break;
                         }
                     }
+
+                     Debug.WriteLine(foundSpelling + reading);
 
                     PlayAudio(foundSpelling, reading);
 
