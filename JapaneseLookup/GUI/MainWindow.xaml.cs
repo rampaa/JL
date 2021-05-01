@@ -194,8 +194,10 @@ namespace JapaneseLookup.GUI
 
         private void MainTextBox_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (!MiningMode)
-                PopupWindow.Instance.Hide();
+            if (MiningMode) return;
+
+            PopupWindow.Instance.Hide();
+            _lastWord = "";
         }
 
         public static List<Dictionary<string, List<string>>> LookUp(string text)
@@ -296,9 +298,11 @@ namespace JapaneseLookup.GUI
                                 defResult += string.Join(", ", jMDictResult.MiscList[i]);
                                 defResult += ") ";
                             }
+
                             defResult += string.Join("; ", jMDictResult.DefinitionsList[i].Definitions) + " ";
 
-                            if (jMDictResult.DefinitionsList[i].RRestrictions.Any() || jMDictResult.DefinitionsList[i].KRestrictions.Any())
+                            if (jMDictResult.DefinitionsList[i].RRestrictions.Any() ||
+                                jMDictResult.DefinitionsList[i].KRestrictions.Any())
                             {
                                 defResult += "(only applies to ";
 
@@ -310,30 +314,33 @@ namespace JapaneseLookup.GUI
 
                                 defResult += ") ";
                             }
+
                             //defResult += "\n";
                             ++count;
                         }
                     }
+
                     mainBody.Add(defResult);
                     result.Add("mainBody", mainBody);
 
-                    var foundSpelling = new List<string> { rsts.Key };
+                    var foundSpelling = new List<string> {rsts.Key};
                     result.Add("foundSpelling", foundSpelling);
 
                     result.Add("process", rsts.Value.processList);
 
-                    var foundForm = new List<string> { rsts.Value.foundForm };
+                    var foundForm = new List<string> {rsts.Value.foundForm};
                     result.Add("foundForm", foundForm);
 
                     result.Add("foundText", foundSpelling);
 
-                    var primarySpelling = new List<string> { jMDictResult.PrimarySpelling };
+                    var primarySpelling = new List<string> {jMDictResult.PrimarySpelling};
                     result.Add("primarySpelling", primarySpelling);
 
                     result.Add("kanaSpellings", jMDictResult.KanaSpellings);
 
-                    var jmdictID = new List<string> { jMDictResult.Id };
-                    var definitions = jMDictResult.DefinitionsList.Select((definitions => definitions.Definitions.Select(def => def + "\n"))).ToList();
+                    var jmdictID = new List<string> {jMDictResult.Id};
+                    var definitions = jMDictResult.DefinitionsList
+                        .Select((definitions => definitions.Definitions.Select(def => def + "\n"))).ToList();
                     var readings = jMDictResult.Readings.ToList();
                     var alternativeSpellings = jMDictResult.AlternativeSpellings.ToList();
 
@@ -343,7 +350,7 @@ namespace JapaneseLookup.GUI
                     // causes OrderBy to put null values first :(
                     // var frequency = new List<string> {freqList?.FrequencyRank.ToString()};
                     var maybeFreq = freqList?.FrequencyRank;
-                    var frequency = new List<string> { maybeFreq == null ? FakeFrequency : maybeFreq.ToString() };
+                    var frequency = new List<string> {maybeFreq == null ? FakeFrequency : maybeFreq.ToString()};
 
                     result.Add("readings", readings);
                     List<string> def = new();
@@ -351,6 +358,7 @@ namespace JapaneseLookup.GUI
                     {
                         def.AddRange(a);
                     }
+
                     result.Add("definitions", def);
                     result.Add("jmdictID", jmdictID);
                     result.Add("alternativeSpellings", alternativeSpellings);
