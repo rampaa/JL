@@ -71,7 +71,6 @@ namespace JapaneseLookup.Deconjugation
                 return null;
 
             var array = myRule.DecEnd;
-
             if (array.Count == 1)
             {
                 var result = StdruleDeconjugateInner(myForm, myRule);
@@ -86,8 +85,7 @@ namespace JapaneseLookup.Deconjugation
                 var maybeDecTag = myRule.DecTag[0];
                 var maybeConTag = myRule.ConTag[0];
 
-                var length = array.Count;
-                for (var i = 0; i < length; i++)
+                for (var i = 0; i < array.Count; i++)
                 {
                     maybeDecEnd = myRule.DecEnd.ElementAtOrDefault(i) ?? maybeDecEnd;
                     maybeConEnd = myRule.ConEnd.ElementAtOrDefault(i) ?? maybeConEnd;
@@ -188,7 +186,6 @@ namespace JapaneseLookup.Deconjugation
                 return null;
 
             var array = myRule.DecEnd;
-
             if (array.Count == 1)
             {
                 var result = SubstitutionInner(myForm, myRule);
@@ -201,8 +198,7 @@ namespace JapaneseLookup.Deconjugation
                 var maybeDecEnd = myRule.DecEnd[0];
                 var maybeConEnd = myRule.ConEnd[0];
 
-                var length = array.Count;
-                for (var i = 0; i < length; i++)
+                for (var i = 0; i < array.Count; i++)
                 {
                     maybeDecEnd = myRule.DecEnd.ElementAtOrDefault(i) ?? maybeDecEnd;
                     maybeConEnd = myRule.ConEnd.ElementAtOrDefault(i) ?? maybeConEnd;
@@ -307,18 +303,11 @@ namespace JapaneseLookup.Deconjugation
                     }
                 }
 
-                processed = Union(processed, novel);
+                processed.UnionWith(novel);
                 novel = newNovel;
             }
 
             return processed;
-        }
-
-        private static HashSet<Form> Union(HashSet<Form> setA, HashSet<Form> setB)
-        {
-            foreach (var elem in setB)
-                setA.Add(elem);
-            return setA;
         }
     }
 }
