@@ -96,6 +96,9 @@ namespace JapaneseLookup.EDICT
                         result.Readings = mainEntry.Readings;
                 }
 
+                else
+                    result.PrimarySpelling = rEle.Reb;
+
                 foreach (Sense sense in entry.SenseList)
                 {
                     if((!sense.StagKList.Any() && !sense.StagRList.Any())
