@@ -64,9 +64,6 @@ namespace JapaneseLookup.GUI
             // init AnkiConnect so that it doesn't block later
             Task.Run(AnkiConnect.GetDeckNames);
             // Mining.Mine(null, null, null, null);
-
-            CopyFromClipboard();
-
             //AnkiConnect.GetAudio("猫", "ねこ");
         }
 
@@ -84,17 +81,23 @@ namespace JapaneseLookup.GUI
         {
             if (Clipboard.ContainsText())
             {
-                try
+                bool gotTextFromClipboard = false;
+                while (!gotTextFromClipboard)
                 {
-                    string text = Clipboard.GetText();
-                    if (JapaneseRegex.IsMatch(text))
+                    try
                     {
-                        _backlog += text + "\n";
-                        MainTextBox.Text = text;
+                        string text = Clipboard.GetText();
+                        gotTextFromClipboard = true;
+                        if (JapaneseRegex.IsMatch(text))
+                        {
+                            text = text.Trim();
+                            _backlog += text + "\n";
+                            MainTextBox.Text = text;
+                        }
                     }
-                }
-                catch
-                {
+                    catch
+                    {
+                    }
                 }
             }
         }
@@ -323,22 +326,22 @@ namespace JapaneseLookup.GUI
                     mainBody.Add(defResult);
                     result.Add("mainBody", mainBody);
 
-                    var foundSpelling = new List<string> {rsts.Key};
+                    var foundSpelling = new List<string> { rsts.Key };
                     result.Add("foundSpelling", foundSpelling);
 
                     result.Add("process", rsts.Value.processList);
 
-                    var foundForm = new List<string> {rsts.Value.foundForm};
+                    var foundForm = new List<string> { rsts.Value.foundForm };
                     result.Add("foundForm", foundForm);
 
                     result.Add("foundText", foundSpelling);
 
-                    var primarySpelling = new List<string> {jMDictResult.PrimarySpelling};
+                    var primarySpelling = new List<string> { jMDictResult.PrimarySpelling };
                     result.Add("primarySpelling", primarySpelling);
 
                     result.Add("kanaSpellings", jMDictResult.KanaSpellings);
 
-                    var jmdictID = new List<string> {jMDictResult.Id};
+                    var jmdictID = new List<string> { jMDictResult.Id };
                     var definitions = jMDictResult.DefinitionsList
                         .Select((definitions => definitions.Definitions.Select(def => def + "\n"))).ToList();
                     var readings = jMDictResult.Readings.ToList();
@@ -350,7 +353,7 @@ namespace JapaneseLookup.GUI
                     // causes OrderBy to put null values first :(
                     // var frequency = new List<string> {freqList?.FrequencyRank.ToString()};
                     var maybeFreq = freqList?.FrequencyRank;
-                    var frequency = new List<string> {maybeFreq == null ? FakeFrequency : maybeFreq.ToString()};
+                    var frequency = new List<string> { maybeFreq == null ? FakeFrequency : maybeFreq.ToString() };
 
                     result.Add("readings", readings);
                     List<string> def = new();
@@ -372,6 +375,23 @@ namespace JapaneseLookup.GUI
                 .OrderByDescending(dict => dict["foundForm"][0].Length)
                 .ThenBy(dict => Convert.ToInt32(dict["frequency"][0])).ToList();
             return results;
+        }
+
+        private void MainTextBox_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (e.Delta > 0)
+            {
+                if (MainTextBox.Text != _backlog)
+                {
+                    if (MainTextBox.GetFirstVisibleLineIndex() == 0)
+                    {
+                        int caretIndex = _backlog.Length - MainTextBox.Text.Length;
+                        MainTextBox.Text = _backlog;
+                        MainTextBox.CaretIndex = caretIndex;
+                        MainTextBox.ScrollToEnd();
+                    }
+                }
+            }
         }
     }
 }
