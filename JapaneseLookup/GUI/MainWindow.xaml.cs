@@ -79,25 +79,22 @@ namespace JapaneseLookup.GUI
 
         private void CopyFromClipboard()
         {
-            if (Clipboard.ContainsText())
+            bool gotTextFromClipboard = false;
+            while (Clipboard.ContainsText() && !gotTextFromClipboard)
             {
-                bool gotTextFromClipboard = false;
-                while (!gotTextFromClipboard)
+                try
                 {
-                    try
+                    string text = Clipboard.GetText();
+                    gotTextFromClipboard = true;
+                    if (JapaneseRegex.IsMatch(text))
                     {
-                        string text = Clipboard.GetText();
-                        gotTextFromClipboard = true;
-                        if (JapaneseRegex.IsMatch(text))
-                        {
-                            text = text.Trim();
-                            _backlog += text + "\n";
-                            MainTextBox.Text = text;
-                        }
+                        text = text.Trim();
+                        _backlog += text + "\n";
+                        MainTextBox.Text = text;
                     }
-                    catch
-                    {
-                    }
+                }
+                catch
+                {
                 }
             }
         }
