@@ -14,11 +14,9 @@ namespace JapaneseLookup.GUI
     /// Interaction logic for PopupWindow.xaml
     /// </summary>
     public partial class PopupWindow : Window
-
     {
         private static PopupWindow _instance;
 
-        // TODO: ShowInTaskbar = false
         public static PopupWindow Instance
         {
             get { return _instance ??= new PopupWindow(); }
@@ -91,6 +89,16 @@ namespace JapaneseLookup.GUI
                     TextWrapping = TextWrapping.Wrap,
                     Foreground = Brushes.White
                 };
+                var textBlockFoundForm = new TextBlock
+                {
+                    Name = "foundForm",
+                    Text = string.Join("", result["foundForm"]),
+                    TextWrapping = TextWrapping.Wrap,
+                    Foreground = Brushes.White,
+
+                    // decide if we want to display this
+                    Visibility = Visibility.Collapsed
+                };
                 var textBlockJmdictID = new TextBlock
                 {
                     Name = "jmdictID",
@@ -127,6 +135,7 @@ namespace JapaneseLookup.GUI
                 innerStackPanel.Children.Add(textBlockReadings);
                 //innerStackPanel.Children.Add(textBlockDefinitions);
                 innerStackPanel.Children.Add(textBlockMainBody);
+                innerStackPanel.Children.Add(textBlockFoundForm);
                 innerStackPanel.Children.Add(textBlockJmdictID);
                 if (frequency != MainWindow.FakeFrequency)
                     innerStackPanel.Children.Add(textBlockFrequency);
@@ -149,7 +158,7 @@ namespace JapaneseLookup.GUI
             string definitions = null;
             var context = MainWindow.LastSentence;
             string definitionsRaw = null;
-            string foundText = null;
+            string foundForm = null;
             string jmdictID = null;
             var timeLocal = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
             string alternativeSpellings = null;
@@ -173,10 +182,10 @@ namespace JapaneseLookup.GUI
                         definitionsRaw = child.Text;
                         break;
                     // case "context":
-                    //
+                    //     handled above
                     //     break;
-                    case "foundText":
-                        // TODO: foundText = child.Text;
+                    case "foundForm":
+                        foundForm = child.Text;
                         break;
                     case "jmdictID":
                         jmdictID = child.Text;
@@ -196,7 +205,7 @@ namespace JapaneseLookup.GUI
                 definitions,
                 context,
                 definitionsRaw,
-                foundText,
+                foundForm,
                 jmdictID,
                 timeLocal,
                 alternativeSpellings,
@@ -206,8 +215,7 @@ namespace JapaneseLookup.GUI
 
         static void PlayAudio(string foundSpelling, string reading)
         {
-            Debug.WriteLine(foundSpelling);
-            Debug.WriteLine(reading);
+            Debug.WriteLine(foundSpelling + " " + reading);
 
             Uri uri = new(
                 "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=" +
@@ -304,8 +312,6 @@ namespace JapaneseLookup.GUI
                                 break;
                         }
                     }
-
-                     Debug.WriteLine(foundSpelling + reading);
 
                     PlayAudio(foundSpelling, reading);
 

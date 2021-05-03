@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 
 namespace JapaneseLookup.Anki
 {
-    // TODO: Dedicated error logging/display mechanism
-    // all console statements need to be converted to that ^
     public static class AnkiConnect
     {
         private static readonly HttpClient Client = new();

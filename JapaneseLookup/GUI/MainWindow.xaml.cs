@@ -331,8 +331,6 @@ namespace JapaneseLookup.GUI
                     var foundForm = new List<string> { rsts.Value.foundForm };
                     result.Add("foundForm", foundForm);
 
-                    result.Add("foundText", foundSpelling);
-
                     var primarySpelling = new List<string> { jMDictResult.PrimarySpelling };
                     result.Add("primarySpelling", primarySpelling);
 

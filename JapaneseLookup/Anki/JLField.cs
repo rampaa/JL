@@ -8,7 +8,7 @@
         Readings,
         Definitions,
         DefinitionsRaw,
-        FoundText,
+        FoundForm,
         Context,
         Audio,
         JMDictID,

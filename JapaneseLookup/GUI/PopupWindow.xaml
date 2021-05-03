@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:JapaneseLookup"
         mc:Ignorable="d"
         Title="PopupWindow" MaxWidth="430" MaxHeight="620" Background="#FF2C2B2B" Foreground="#FF3C3783" Topmost="True"
-        WindowStyle="None" AllowsTransparency="true" KeyDown="Window_KeyDown" Closing="Window_Closing">
+        WindowStyle="None" AllowsTransparency="true" KeyDown="Window_KeyDown" Closing="Window_Closing"
+        ShowInTaskbar="False">
 
     <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Top">
         <Grid>

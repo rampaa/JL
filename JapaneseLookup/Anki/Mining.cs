@@ -11,7 +11,7 @@ namespace JapaneseLookup.Anki
         // TODO: Check if audio was grabbed and tell the user if it was not
         // TODO: Option to force sync after mining
         public static async void Mine(string foundSpelling, string readings, string definitions, string context,
-            string definitionsRaw, string foundText, string jmdictID, string timeLocal, string alternativeSpellings,
+            string definitionsRaw, string foundForm, string jmdictID, string timeLocal, string alternativeSpellings,
             string frequency)
         {
             // should be fine to just read the config everytime, right?
@@ -30,7 +30,7 @@ namespace JapaneseLookup.Anki
                     definitions,
                     context,
                     definitionsRaw,
-                    foundText,
+                    foundForm,
                     jmdictID,
                     timeLocal,
                     alternativeSpellings,
@@ -75,7 +75,7 @@ namespace JapaneseLookup.Anki
 
         private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> fields,
             string foundSpelling, string readings, string definitions, string context, string definitionsRaw,
-            string foundText, string jmdictID, string timeLocal, string alternativeSpellings, string frequency)
+            string foundForm, string jmdictID, string timeLocal, string alternativeSpellings, string frequency)
         {
             var dict = new Dictionary<string, object>();
             foreach (var (key, value) in fields)
@@ -96,8 +96,8 @@ namespace JapaneseLookup.Anki
                     case JLField.DefinitionsRaw:
                         dict.Add(key, definitionsRaw);
                         break;
-                    case JLField.FoundText:
-                        dict.Add(key, foundText);
+                    case JLField.FoundForm:
+                        dict.Add(key, foundForm);
                         break;
                     case JLField.Context:
                         dict.Add(key, context);

@@ -21,7 +21,6 @@ namespace JapaneseLookup.GUI
             get { return _instance ??= new MiningSetupWindow(); }
         }
 
-        // TODO: Make this window close too if the MainWindow is closed
         public MiningSetupWindow()
         {
             InitializeComponent();
@@ -121,7 +120,6 @@ namespace JapaneseLookup.GUI
         }
 
         // TODO: tags
-        // TODO: Make sure everything is filled before enabling the save button
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -148,8 +146,13 @@ namespace JapaneseLookup.GUI
                 var fields = dict;
                 var tags = new[] {"JL"};
 
-                var ankiConfig = new AnkiConfig(deckName, modelName, fields, tags);
+                if (ComboBoxDeckNames.SelectedItem == null || ComboBoxModelNames.SelectedItem == null )
+                {
+                    Console.WriteLine("Incomplete config");
+                    return;
+                } 
 
+                var ankiConfig = new AnkiConfig(deckName, modelName, fields, tags);
                 Console.WriteLine(AnkiConfig.WriteAnkiConfig(ankiConfig).Result == "ok"
                     ? "Saved config"
                     : "Error saving config");
