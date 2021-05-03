@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,11 +22,32 @@ namespace JapaneseLookup.GUI
         }
 
         // TODO: Make this window close too if the MainWindow is closed
-        // TODO: read existing config and fill in the fields accordingly
         public MiningSetupWindow()
         {
             InitializeComponent();
-            PopulateDeckandModelNames();
+            SetPreviousConfig();
+            if (ComboBoxDeckNames.SelectedItem == null) PopulateDeckandModelNames();
+        }
+
+        private async void SetPreviousConfig()
+        {
+            try
+            {
+                var ankiConfig = await AnkiConfig.ReadAnkiConfig();
+                if (ankiConfig == null) return;
+
+                ComboBoxDeckNames.ItemsSource = new List<string> {ankiConfig.deckName};
+                ComboBoxDeckNames.SelectedIndex = 0;
+                ComboBoxModelNames.ItemsSource = new List<string> {ankiConfig.modelName};
+                ComboBoxModelNames.SelectedIndex = 0;
+                CreateFieldElements(ankiConfig.fields);
+            }
+            catch (Exception e)
+            {
+                // config probably doesn't exist; no need to alert the user
+                Debug.WriteLine(e);
+                throw;
+            }
         }
 
         private async void PopulateDeckandModelNames()
@@ -43,8 +65,8 @@ namespace JapaneseLookup.GUI
             catch
             {
                 Console.WriteLine("Error getting deck and model names");
-                ComboBoxDeckNames.ItemsSource = string.Empty;
-                ComboBoxModelNames.ItemsSource = string.Empty;
+                ComboBoxDeckNames.ItemsSource = "";
+                ComboBoxModelNames.ItemsSource = "";
             }
         }
 
@@ -53,36 +75,48 @@ namespace JapaneseLookup.GUI
             PopulateDeckandModelNames();
         }
 
-        private void ButtonGetFields_Click(object sender, RoutedEventArgs e)
+        private async void ButtonGetFields_Click(object sender, RoutedEventArgs e)
         {
-            CreateFieldElements(ComboBoxModelNames.SelectionBoxItem.ToString());
+            try
+            {
+                var modelName = ComboBoxModelNames.SelectionBoxItem.ToString();
+                var fieldNames =
+                    JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelFieldNames(modelName)).result
+                        .ToString()!);
+
+                var fields =
+                    fieldNames!.ToDictionary(fieldName => fieldName, _ => JLField.Nothing);
+
+                CreateFieldElements(fields);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Error getting fields from AnkiConnect");
+                Debug.WriteLine(exception);
+            }
         }
 
-        private async void CreateFieldElements(string modelName)
+        private void CreateFieldElements(Dictionary<string, JLField> fields)
         {
             StackPanelFields.Children.Clear();
             try
             {
-                var fields =
-                    JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelFieldNames(modelName)).result
-                        .ToString()!);
-
-                foreach (var field in fields!)
+                foreach (var (fieldName, jlField) in fields)
                 {
                     var stackPanel = new StackPanel();
-                    var textBlockField = new TextBlock {Text = field};
+                    var textBlockFieldName = new TextBlock {Text = fieldName};
                     var comboBoxJLFields = new ComboBox
-                        {ItemsSource = Enum.GetValues(typeof(JLField)), SelectedIndex = 0};
+                        {ItemsSource = Enum.GetValues(typeof(JLField)), SelectedItem = jlField};
 
-                    stackPanel.Children.Add(textBlockField);
+                    stackPanel.Children.Add(textBlockFieldName);
                     stackPanel.Children.Add(comboBoxJLFields);
                     StackPanelFields.Children.Add(stackPanel);
                 }
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                Console.WriteLine("Error getting fields");
-                Debug.WriteLine(e);
+                Console.WriteLine("Error creating field elements");
+                Debug.WriteLine(exception);
             }
         }
 
@@ -98,7 +132,6 @@ namespace JapaneseLookup.GUI
                 var dict = new Dictionary<string, JLField>();
                 foreach (StackPanel stackPanel in StackPanelFields.Children)
                 {
-                    // there must be a better way of doing this
                     var textBlock = (TextBlock) stackPanel.Children[0];
                     var comboBox = (ComboBox) stackPanel.Children[1];
 
