@@ -192,7 +192,7 @@ namespace JapaneseLookup.GUI
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            PopupWindow.Instance.Close();
+            Application.Current.Shutdown();
         }
 
         private void MainTextBox_MouseLeave(object sender, MouseEventArgs e)

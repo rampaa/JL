@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" Topmost="True"
-        Title="MiningSetupWindow" Width="480" Height="540">
+        Title="MiningSetupWindow" Width="480" Height="540" Closing="Window_Closing">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="10,10,10,10">
             <StackPanel Margin="10">
