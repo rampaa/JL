@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.IO;
+using System.Windows.Media;
 
 namespace JapaneseLookup.GUI
 {
@@ -42,9 +43,17 @@ namespace JapaneseLookup.GUI
 
         internal const string FakeFrequency = "1000000";
 
+        private static MainWindow _instance;
+        public static MainWindow Instance
+        {
+            get { return _instance ??= new MainWindow(); }
+        }
+
         public MainWindow()
         {
             InitializeComponent();
+
+            //MouseLeftButtonDown += delegate { DragMove(); };
 
             Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderVN = Task.Run(() =>
                 FrequencyLoader.LoadJSON("../net5.0-windows/Resources/freqlist_vns.json"));
@@ -102,12 +111,6 @@ namespace JapaneseLookup.GUI
         private void ClipboardChanged(object sender, EventArgs e)
         {
             CopyFromClipboard();
-        }
-
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-        {
-            base.OnMouseLeftButtonDown(e);
-            DragMove();
         }
 
         private void MainTextBox_MouseMove(object sender, MouseEventArgs e)
@@ -387,6 +390,56 @@ namespace JapaneseLookup.GUI
                     }
                 }
             }
+        }
+        private void MinimizeButton_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void MinimizeButton_MouseEnter(object sender, MouseEventArgs e)
+        {
+            MinimizeButton.Foreground = new SolidColorBrush(Colors.SteelBlue);
+        }
+
+        private void MinimizeButton_MouseLeave(object sender, MouseEventArgs e)
+        {
+            MinimizeButton.Foreground = new SolidColorBrush(Colors.White);
+        }
+
+        private void CloseButton_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Close();
+        }
+
+        private void CloseButton_MouseEnter(object sender, MouseEventArgs e)
+        {
+            CloseButton.Foreground = new SolidColorBrush(Colors.SteelBlue);
+        }
+
+        private void CloseButton_MouseLeave(object sender, MouseEventArgs e)
+        {
+            CloseButton.Foreground = new SolidColorBrush(Colors.White);
+        }
+
+        private void opacitySlider_MouseLeave(object sender, MouseEventArgs e)
+        {
+            opacitySlider.Visibility = Visibility.Collapsed;
+        }
+
+        private void OpacityButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (opacitySlider.Visibility == Visibility.Collapsed)
+                opacitySlider.Visibility = Visibility.Visible;
+            else
+                opacitySlider.Visibility = Visibility.Collapsed;
+        }
+
+        private void FontSizeButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (fontSizeSlider.Visibility == Visibility.Collapsed)
+                fontSizeSlider.Visibility = Visibility.Visible;
+            else
+                fontSizeSlider.Visibility = Visibility.Collapsed;
         }
     }
 }
