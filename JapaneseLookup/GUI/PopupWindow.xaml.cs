@@ -42,22 +42,8 @@ namespace JapaneseLookup.GUI
         {
             foreach (var result in results)
             {
-                var textBlockPrimarySpelling = new TextBlock
-                {
-                    Name = "primarySpelling",
-                    Text = result["primarySpelling"][0],
-                    Foreground = Brushes.White,
-                };
-
-                var textBlockKanaSpellings = new TextBlock
-                {
-                    Name = "kanaSpellings",
-                    Text = string.Join(" ", result["kanaSpellings"]),
-                    TextWrapping = TextWrapping.Wrap,
-                    Foreground = Brushes.White
-                };
-
                 var innerStackPanel = new StackPanel();
+
                 var textBlockFoundSpelling = new TextBlock
                 {
                     Name = "foundSpelling",
@@ -67,18 +53,18 @@ namespace JapaneseLookup.GUI
                 textBlockFoundSpelling.PreviewMouseUp += FoundSpelling_PreviewMouseUp;
                 textBlockFoundSpelling.KeyDown += FoundSpelling_KeyDown;
 
+                var textBlockKanaSpellings = new TextBlock
+                {
+                    Name = "kanaSpellings",
+                    Text = string.Join(" ", result["kanaSpellings"]),
+                    TextWrapping = TextWrapping.Wrap,
+                    Foreground = Brushes.White
+                };
+
                 var textBlockReadings = new TextBlock
                 {
                     Name = "readings",
                     Text = string.Join(", ", result["readings"]),
-                    Foreground = Brushes.White
-                };
-
-                var textBlockMainBody = new TextBlock
-                {
-                    Name = "mainBody",
-                    Text = result["mainBody"][0],
-                    TextWrapping = TextWrapping.Wrap,
                     Foreground = Brushes.White
                 };
 
@@ -89,6 +75,15 @@ namespace JapaneseLookup.GUI
                     TextWrapping = TextWrapping.Wrap,
                     Foreground = Brushes.White
                 };
+
+                var textBlockContext = new TextBlock
+                {
+                    Name = "context",
+                    Text = sentence,
+                    Foreground = Brushes.White,
+                    Visibility = Visibility.Collapsed
+                };
+
                 var textBlockFoundForm = new TextBlock
                 {
                     Name = "foundForm",
@@ -99,17 +94,26 @@ namespace JapaneseLookup.GUI
                     // decide if we want to display this
                     Visibility = Visibility.Collapsed
                 };
+
                 var textBlockJmdictID = new TextBlock
                 {
                     Name = "jmdictID",
                     Text = string.Join(", ", result["jmdictID"]),
                     Visibility = Visibility.Collapsed
                 };
+
                 var textBlockAlternativeSpellings = new TextBlock
                 {
                     Name = "alternativeSpellings",
                     Text = string.Join(", ", result["alternativeSpellings"]),
                     Foreground = Brushes.White
+                };
+
+                var textBlockProcess = new TextBlock
+                {
+                    Name = "process",
+                    Text = string.Join(", ", result["process"]),
+                    Foreground = Brushes.White,
                 };
 
                 var frequency = string.Join(", ", result["frequency"]);
@@ -120,26 +124,18 @@ namespace JapaneseLookup.GUI
                     Foreground = Brushes.White,
                 };
 
-                var process = string.Join(", ", result["process"]);
-                var textBlockProcess = new TextBlock
-                {
-                    Name = "process",
-                    Text = process,
-                    Foreground = Brushes.White,
-                };
-
-                innerStackPanel.Children.Add(textBlockPrimarySpelling);
-                innerStackPanel.Children.Add(textBlockAlternativeSpellings);
+                innerStackPanel.Children.Add(textBlockFoundSpelling);
                 //innerStackPanel.Children.Add(textBlockKanaSpellings);
-                //innerStackPanel.Children.Add(textBlockFoundSpelling);
                 innerStackPanel.Children.Add(textBlockReadings);
-                //innerStackPanel.Children.Add(textBlockDefinitions);
-                innerStackPanel.Children.Add(textBlockMainBody);
+                innerStackPanel.Children.Add(textBlockDefinitions);
+                innerStackPanel.Children.Add(textBlockContext);
                 innerStackPanel.Children.Add(textBlockFoundForm);
                 innerStackPanel.Children.Add(textBlockJmdictID);
+                innerStackPanel.Children.Add(textBlockAlternativeSpellings);
+                innerStackPanel.Children.Add(textBlockProcess);
                 if (frequency != MainWindow.FakeFrequency)
                     innerStackPanel.Children.Add(textBlockFrequency);
-                innerStackPanel.Children.Add(textBlockProcess);
+
                 Instance.StackPanel.Children.Add(innerStackPanel);
                 Instance.StackPanel.Children.Add(new Separator());
             }
@@ -156,7 +152,7 @@ namespace JapaneseLookup.GUI
             string foundSpelling = null;
             string readings = null;
             string definitions = null;
-            var context = MainWindow.LastSentence;
+            string context = null;
             string definitionsRaw = null;
             string foundForm = null;
             string jmdictID = null;
@@ -181,9 +177,9 @@ namespace JapaneseLookup.GUI
                         // TODO: definitions = html
                         definitionsRaw = child.Text;
                         break;
-                    // case "context":
-                    //     handled above
-                    //     break;
+                    case "context":
+                        context = child.Text;
+                        break;
                     case "foundForm":
                         foundForm = child.Text;
                         break;

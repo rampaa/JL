@@ -21,6 +21,8 @@ namespace JapaneseLookup.GUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static MainWindow _instance;
+
         private static readonly Regex JapaneseRegex =
             new(@"[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]");
 
@@ -39,11 +41,8 @@ namespace JapaneseLookup.GUI
         private static readonly List<string> JapanesePunctuation = new(new[]
             {"。", "！", "？", "…", "―", "\n"});
 
-        internal static string LastSentence;
-
         internal const string FakeFrequency = "1000000";
 
-        private static MainWindow _instance;
         public static MainWindow Instance
         {
             get { return _instance ??= new MainWindow(); }
@@ -72,8 +71,6 @@ namespace JapaneseLookup.GUI
 
             // init AnkiConnect so that it doesn't block later
             Task.Run(AnkiConnect.GetDeckNames);
-            // Mining.Mine(null, null, null, null);
-            //AnkiConnect.GetAudio("猫", "ねこ");
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -117,6 +114,7 @@ namespace JapaneseLookup.GUI
         {
             if (MiningMode) return;
 
+            // nazeka-style popup movement
             PopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
             int charPosition = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
@@ -137,7 +135,9 @@ namespace JapaneseLookup.GUI
                 if (results != null)
                 {
                     PopupWindow.Instance.StackPanel.Children.Clear();
-                    PopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+
+                    // yomichan-style popup movement
+                    // PopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
                     PopupWindow.Instance.Show();
                     PopupWindow.Instance.Activate();
@@ -271,7 +271,6 @@ namespace JapaneseLookup.GUI
                 foreach (var jMDictResult in rsts.Value.jMdictResults)
                 {
                     var result = new Dictionary<string, List<string>>();
-                    List<string> mainBody = new();
 
                     int count = 1;
                     string defResult = "";
@@ -323,46 +322,28 @@ namespace JapaneseLookup.GUI
                         }
                     }
 
-                    mainBody.Add(defResult);
-                    result.Add("mainBody", mainBody);
-
-                    var foundSpelling = new List<string> { rsts.Key };
-                    result.Add("foundSpelling", foundSpelling);
-
-                    result.Add("process", rsts.Value.processList);
-
-                    var foundForm = new List<string> { rsts.Value.foundForm };
-                    result.Add("foundForm", foundForm);
-
-                    var primarySpelling = new List<string> { jMDictResult.PrimarySpelling };
-                    result.Add("primarySpelling", primarySpelling);
-
-                    result.Add("kanaSpellings", jMDictResult.KanaSpellings);
-
-                    var jmdictID = new List<string> { jMDictResult.Id };
-                    var definitions = jMDictResult.DefinitionsList
-                        .Select((definitions => definitions.Definitions.Select(def => def + "\n"))).ToList();
+                    var foundSpelling = new List<string> {jMDictResult.PrimarySpelling};
+                    var kanaSpellings = jMDictResult.KanaSpellings;
                     var readings = jMDictResult.Readings.ToList();
+                    var definitions = new List<string> {defResult};
+                    var foundForm = new List<string> {rsts.Value.foundForm};
+                    var jmdictID = new List<string> {jMDictResult.Id};
                     var alternativeSpellings = jMDictResult.AlternativeSpellings.ToList();
+                    var process = rsts.Value.processList;
 
                     // TODO: Config.FrequencyList instead of "VN"
                     jMDictResult.FrequencyDict.TryGetValue("VN", out var freqList);
-
-                    // causes OrderBy to put null values first :(
-                    // var frequency = new List<string> {freqList?.FrequencyRank.ToString()};
                     var maybeFreq = freqList?.FrequencyRank;
-                    var frequency = new List<string> { maybeFreq == null ? FakeFrequency : maybeFreq.ToString() };
+                    var frequency = new List<string> {maybeFreq == null ? FakeFrequency : maybeFreq.ToString()};
 
+                    result.Add("foundSpelling", foundSpelling);
+                    result.Add("kanaSpellings", kanaSpellings);
                     result.Add("readings", readings);
-                    List<string> def = new();
-                    foreach (var a in definitions)
-                    {
-                        def.AddRange(a);
-                    }
-
-                    result.Add("definitions", def);
+                    result.Add("definitions", definitions);
+                    result.Add("foundForm", foundForm);
                     result.Add("jmdictID", jmdictID);
                     result.Add("alternativeSpellings", alternativeSpellings);
+                    result.Add("process", process);
                     result.Add("frequency", frequency);
 
                     results.Add(result);
@@ -391,6 +372,7 @@ namespace JapaneseLookup.GUI
                 }
             }
         }
+
         private void MinimizeButton_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             WindowState = WindowState.Minimized;

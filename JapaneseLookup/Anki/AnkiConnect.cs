@@ -11,7 +11,9 @@ namespace JapaneseLookup.Anki
     public static class AnkiConnect
     {
         private static readonly HttpClient Client = new();
-        private static readonly Uri Uri = new("http://127.0.0.1:8765");
+
+        // TODO: Config.AnkiConnectUri
+        private static readonly Uri AnkiConnectUri = new("http://localhost:8765");
 
         public static async Task<Response> AddNoteToDeck(Note note)
         {
@@ -70,7 +72,7 @@ namespace JapaneseLookup.Anki
                     new JsonSerializerOptions {IgnoreNullValues = true}));
                 Debug.WriteLine("Sending: " + await payload.ReadAsStringAsync());
 
-                var postResponse = await Client.PostAsync(Uri, payload);
+                var postResponse = await Client.PostAsync(AnkiConnectUri, payload);
 
                 var json = await postResponse.Content.ReadFromJsonAsync<Response>();
                 Debug.WriteLine("json result: " + json!.result);
