@@ -76,8 +76,8 @@ namespace JapaneseLookup.Anki
         {
             try
             {
-                Directory.CreateDirectory(@"../net5.0-windows/Config");
-                await File.WriteAllTextAsync(@"../net5.0-windows/Config/AnkiConfig.json",
+                Directory.CreateDirectory(Path.Join(ConfigManager.ApplicationPath, "Config"));
+                await File.WriteAllTextAsync(Path.Join(ConfigManager.ApplicationPath, "Config/AnkiConfig.json"),
                     JsonSerializer.Serialize(ankiConfig,
                         new JsonSerializerOptions
                         {
@@ -106,7 +106,7 @@ namespace JapaneseLookup.Anki
             try
             {
                 return JsonSerializer.Deserialize<AnkiConfig>(
-                    await File.ReadAllTextAsync(@"../net5.0-windows/Config/AnkiConfig.json"), new JsonSerializerOptions
+                    await File.ReadAllTextAsync(Path.Join(ConfigManager.ApplicationPath, "Config/AnkiConfig.json")), new JsonSerializerOptions
                     {
                         Converters =
                         {

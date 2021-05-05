@@ -2,16 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using JapaneseLookup.Anki;
-using JapaneseLookup.Deconjugation;
-using JapaneseLookup.EDICT;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Text.Json;
-using System.IO;
 using System.Windows.Media;
 
 namespace JapaneseLookup.GUI
@@ -21,56 +12,14 @@ namespace JapaneseLookup.GUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static MainWindow _instance;
-
-        private static readonly Regex JapaneseRegex =
-            new(@"[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]");
-
-        private string _backlog = "";
-
         private string _lastWord = "";
 
         internal static bool MiningMode = false;
 
-        private static bool _ready = false;
-
-        // Consider making max search length configurable.
-        private const int MaxSearchLength = 37;
-
-        // Consider checking for \t, \r, "　", " ", ., !, ?, –, —, ―, ‒, ~, ‥, ♪, ～, ♡, ♥, ☆, ★
-        private static readonly List<string> JapanesePunctuation = new(new[]
-            {"。", "！", "？", "…", "―", "\n"});
-
-        internal const string FakeFrequency = "1000000";
-
-        public static MainWindow Instance
-        {
-            get { return _instance ??= new MainWindow(); }
-        }
-
         public MainWindow()
         {
             InitializeComponent();
-
-            //MouseLeftButtonDown += delegate { DragMove(); };
-
-            Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderVN = Task.Run(() =>
-                FrequencyLoader.LoadJSON("../net5.0-windows/Resources/freqlist_vns.json"));
-            Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderNovel = Task.Run(() =>
-                FrequencyLoader.LoadJSON("../net5.0-windows/Resources/freqlist_novels.json"));
-            Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderNarou = Task.Run(() =>
-                FrequencyLoader.LoadJSON("../net5.0-windows/Resources/freqlist_narou.json"));
-            Task.Run(JMdictLoader.Loader).ContinueWith(_ =>
-            {
-                //Task.WaitAll(taskFreqLoaderVN, taskFreqLoaderNovel, taskFreqLoaderNarou);
-                FrequencyLoader.AddToJMdict("VN", taskFreqLoaderVN.Result);
-                FrequencyLoader.AddToJMdict("Novel", taskFreqLoaderNovel.Result);
-                FrequencyLoader.AddToJMdict("Narou", taskFreqLoaderNarou.Result);
-                _ready = true;
-            });
-
-            // init AnkiConnect so that it doesn't block later
-            Task.Run(AnkiConnect.GetDeckNames);
+            MainWindowUtilities.MainWindowInitializer();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -80,10 +29,12 @@ namespace JapaneseLookup.GUI
             var windowClipboardManager = new ClipboardManager(this);
             windowClipboardManager.ClipboardChanged += ClipboardChanged;
 
+            ConfigManager.LoadSettings(this);
+
             CopyFromClipboard();
         }
 
-        private void CopyFromClipboard()
+        public void CopyFromClipboard()
         {
             bool gotTextFromClipboard = false;
             while (Clipboard.ContainsText() && !gotTextFromClipboard)
@@ -92,10 +43,10 @@ namespace JapaneseLookup.GUI
                 {
                     string text = Clipboard.GetText();
                     gotTextFromClipboard = true;
-                    if (JapaneseRegex.IsMatch(text))
+                    if (MainWindowUtilities.JapaneseRegex.IsMatch(text))
                     {
                         text = text.Trim();
-                        _backlog += text + "\n";
+                        MainWindowUtilities.backlog += text + "\n";
                         MainTextBox.Text = text;
                     }
                 }
@@ -120,17 +71,17 @@ namespace JapaneseLookup.GUI
             int charPosition = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
             if (charPosition != -1)
             {
-                (string sentence, int endPosition) = FindSentence(MainTextBox.Text, charPosition);
+                (string sentence, int endPosition) = MainWindowUtilities.FindSentence(MainTextBox.Text, charPosition);
                 string text;
-                if (endPosition - charPosition + 1 < MaxSearchLength)
+                if (endPosition - charPosition + 1 < ConfigManager.MaxSearchLength)
                     text = MainTextBox.Text[charPosition..(endPosition + 1)];
                 else
-                    text = MainTextBox.Text[charPosition..(charPosition + MaxSearchLength)];
+                    text = MainTextBox.Text[charPosition..(charPosition + ConfigManager.MaxSearchLength)];
 
                 if (text == _lastWord) return;
                 _lastWord = text;
 
-                var results = LookUp(text);
+                var results = MainWindowUtilities.LookUp(text);
 
                 if (results != null)
                 {
@@ -155,42 +106,7 @@ namespace JapaneseLookup.GUI
             }
         }
 
-        private static (string sentence, int endPosition) FindSentence(string text, int position)
-        {
-            int startPosition = -1;
-            int endPosition = -1;
-
-            foreach (string punctuation in JapanesePunctuation)
-            {
-                int tempIndex = text.LastIndexOf(punctuation, position, StringComparison.Ordinal);
-
-                if (tempIndex > startPosition)
-                    startPosition = tempIndex;
-
-                tempIndex = text.IndexOf(punctuation, position, StringComparison.Ordinal);
-                if (tempIndex != -1 && (endPosition == -1 || tempIndex < endPosition))
-                    endPosition = tempIndex;
-            }
-
-            ++startPosition;
-
-            if (endPosition == -1)
-                endPosition = text.Length - 1;
-
-            // Consider trimming \t, \r, (, ), "　", " "
-            return (
-                text.Substring(startPosition, endPosition - startPosition + 1)
-                    .Trim('「', '」', '『', '』', '（', '）', '\n'),
-                endPosition
-            );
-            //text = text.Substring(startPosition, endPosition - startPosition + 1).TrimStart('「', '『', '（', '\n').TrimEnd('」', '』', '）', '\n');
-        }
-
-        private void MainTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-        }
-
-        private void Window_Closed(object sender, EventArgs e)
+        private void MWindow_Closed(object sender, EventArgs e)
         {
             Application.Current.Shutdown();
         }
@@ -203,169 +119,16 @@ namespace JapaneseLookup.GUI
             _lastWord = "";
         }
 
-        public static List<Dictionary<string, List<string>>> LookUp(string text)
-        {
-            Dictionary<string, (List<Results> jMdictResults, List<string> processList, string foundForm)> llresults =
-                new();
-            int succAttempt = 0;
-            for (int i = 0; i < text.Length; i++)
-            {
-                string textInHiragana = Kana.KatakanaToHiraganaConverter(text[..^i]);
-
-                bool tryLongVowelConversion = true;
-
-                if (JMdictLoader.jMdictDictionary.TryGetValue(textInHiragana, out var tempResult))
-                {
-                    llresults.TryAdd(text[..^i], (tempResult, new List<string>(), text[..^i]));
-                    tryLongVowelConversion = false;
-                }
-
-                if (succAttempt < 3)
-                {
-                    var deconjugationResults = Deconjugator.Deconjugate(textInHiragana);
-                    foreach (var result in deconjugationResults)
-                    {
-                        if (JMdictLoader.jMdictDictionary.TryGetValue(result.Text, out var temp))
-                        {
-                            List<Results> resultsList = new();
-
-                            foreach (var rslt in temp)
-                            {
-                                if (rslt.WordClasses.SelectMany(pos => pos).Intersect(result.Tags).Any())
-                                {
-                                    resultsList.Add(rslt);
-                                }
-                            }
-
-                            if (resultsList.Any())
-                            {
-                                llresults.TryAdd(result.Text,
-                                    (resultsList, result.Process, text[..result.OriginalText.Length]));
-                                ++succAttempt;
-                                tryLongVowelConversion = false;
-                            }
-                        }
-                    }
-                }
-
-                if (tryLongVowelConversion)
-                {
-                    if (textInHiragana[0] != 'ー' && textInHiragana.Contains("ー"))
-                    {
-                        string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiragana);
-                        if (JMdictLoader.jMdictDictionary.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
-                        {
-                            llresults.TryAdd(text[..^i], (tmpResult, new List<string>(), text[..^i]));
-                        }
-                    }
-                }
-            }
-
-            if (!llresults.Any())
-                return null;
-
-            var results = new List<Dictionary<string, List<string>>>();
-
-            foreach (var rsts in llresults)
-            {
-                foreach (var jMDictResult in rsts.Value.jMdictResults)
-                {
-                    var result = new Dictionary<string, List<string>>();
-
-                    int count = 1;
-                    string defResult = "";
-                    for (int i = 0; i < jMDictResult.DefinitionsList.Count; i++)
-                    {
-                        if (jMDictResult.WordClasses[i].Any())
-                        {
-                            defResult += "(";
-                            defResult += string.Join(", ", jMDictResult.WordClasses[i]);
-                            defResult += ") ";
-                        }
-
-                        if (jMDictResult.DefinitionsList.Any())
-                        {
-                            defResult += "(" + count + ") ";
-
-                            if (jMDictResult.SpellingInfo[i] != null)
-                            {
-                                defResult += "(";
-                                defResult += jMDictResult.SpellingInfo[i];
-                                defResult += ") ";
-                            }
-
-                            if (jMDictResult.MiscList[i].Any())
-                            {
-                                defResult += "(";
-                                defResult += string.Join(", ", jMDictResult.MiscList[i]);
-                                defResult += ") ";
-                            }
-
-                            defResult += string.Join("; ", jMDictResult.DefinitionsList[i].Definitions) + " ";
-
-                            if (jMDictResult.DefinitionsList[i].RRestrictions.Any() ||
-                                jMDictResult.DefinitionsList[i].KRestrictions.Any())
-                            {
-                                defResult += "(only applies to ";
-
-                                if (jMDictResult.DefinitionsList[i].KRestrictions.Any())
-                                    defResult += string.Join("; ", jMDictResult.DefinitionsList[i].KRestrictions);
-
-                                if (jMDictResult.DefinitionsList[i].RRestrictions.Any())
-                                    defResult += string.Join("; ", jMDictResult.DefinitionsList[i].RRestrictions);
-
-                                defResult += ") ";
-                            }
-
-                            //defResult += "\n";
-                            ++count;
-                        }
-                    }
-
-                    var foundSpelling = new List<string> {jMDictResult.PrimarySpelling};
-                    var kanaSpellings = jMDictResult.KanaSpellings;
-                    var readings = jMDictResult.Readings.ToList();
-                    var definitions = new List<string> {defResult};
-                    var foundForm = new List<string> {rsts.Value.foundForm};
-                    var jmdictID = new List<string> {jMDictResult.Id};
-                    var alternativeSpellings = jMDictResult.AlternativeSpellings.ToList();
-                    var process = rsts.Value.processList;
-
-                    // TODO: Config.FrequencyList instead of "VN"
-                    jMDictResult.FrequencyDict.TryGetValue("VN", out var freqList);
-                    var maybeFreq = freqList?.FrequencyRank;
-                    var frequency = new List<string> {maybeFreq == null ? FakeFrequency : maybeFreq.ToString()};
-
-                    result.Add("foundSpelling", foundSpelling);
-                    result.Add("kanaSpellings", kanaSpellings);
-                    result.Add("readings", readings);
-                    result.Add("definitions", definitions);
-                    result.Add("foundForm", foundForm);
-                    result.Add("jmdictID", jmdictID);
-                    result.Add("alternativeSpellings", alternativeSpellings);
-                    result.Add("process", process);
-                    result.Add("frequency", frequency);
-
-                    results.Add(result);
-                }
-            }
-
-            results = results
-                .OrderByDescending(dict => dict["foundForm"][0].Length)
-                .ThenBy(dict => Convert.ToInt32(dict["frequency"][0])).ToList();
-            return results;
-        }
-
         private void MainTextBox_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0)
             {
-                if (MainTextBox.Text != _backlog)
+                if (MainTextBox.Text != MainWindowUtilities.backlog)
                 {
                     if (MainTextBox.GetFirstVisibleLineIndex() == 0)
                     {
-                        int caretIndex = _backlog.Length - MainTextBox.Text.Length;
-                        MainTextBox.Text = _backlog;
+                        int caretIndex = MainWindowUtilities.backlog.Length - MainTextBox.Text.Length;
+                        MainTextBox.Text = MainWindowUtilities.backlog;
                         MainTextBox.CaretIndex = caretIndex;
                         MainTextBox.ScrollToEnd();
                     }
@@ -403,11 +166,6 @@ namespace JapaneseLookup.GUI
             CloseButton.Foreground = new SolidColorBrush(Colors.White);
         }
 
-        private void opacitySlider_MouseLeave(object sender, MouseEventArgs e)
-        {
-            opacitySlider.Visibility = Visibility.Collapsed;
-        }
-
         private void OpacityButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (opacitySlider.Visibility == Visibility.Collapsed)
@@ -422,6 +180,10 @@ namespace JapaneseLookup.GUI
                 fontSizeSlider.Visibility = Visibility.Visible;
             else
                 fontSizeSlider.Visibility = Visibility.Collapsed;
+        }
+        private void MWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            ConfigManager.SaveBeforeClosing(this);
         }
     }
 }

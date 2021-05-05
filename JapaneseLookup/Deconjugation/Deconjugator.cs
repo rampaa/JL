@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -9,7 +10,8 @@ namespace JapaneseLookup.Deconjugation
     public static class Deconjugator
     {
         private static readonly string File =
-            System.IO.File.ReadAllText("../net5.0-windows/Resources/deconjugator_edited_arrays.json");
+            
+            System.IO.File.ReadAllText(Path.Join(ConfigManager.ApplicationPath, "Resources/deconjugator_edited_arrays.json"));
 
         private static readonly Rule[] Rules = JsonSerializer.Deserialize<Rule[]>(File);
 

@@ -133,7 +133,7 @@ namespace JapaneseLookup.GUI
                 innerStackPanel.Children.Add(textBlockJmdictID);
                 innerStackPanel.Children.Add(textBlockAlternativeSpellings);
                 innerStackPanel.Children.Add(textBlockProcess);
-                if (frequency != MainWindow.FakeFrequency)
+                if (frequency != MainWindowUtilities.FakeFrequency)
                     innerStackPanel.Children.Add(textBlockFrequency);
 
                 Instance.StackPanel.Children.Add(innerStackPanel);

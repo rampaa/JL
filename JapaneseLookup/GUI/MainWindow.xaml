@@ -1,4 +1,4 @@
-﻿<Window x:Name="mainWindow" x:Class="JapaneseLookup.GUI.MainWindow"
+﻿<Window x:Name="MWindow" x:Class="JapaneseLookup.GUI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:JapaneseLookup"
         AllowsTransparency="True"
         mc:Ignorable="d" Height="269" Width="800" WindowStyle="None" ResizeMode="CanResize" Topmost="True"
-        Closed="Window_Closed">
+        Closed="MWindow_Closed" Closing="MWindow_Closing">
     <Window.Background>
         <SolidColorBrush Color="Black" Opacity="{Binding Value, ElementName=opacitySlider}" />
     </Window.Background>
@@ -26,8 +26,7 @@
         <TextBox x:Name="MainTextBox" Margin="0,25,0,0" TextWrapping="Wrap" VerticalContentAlignment="Top"
                  Background="Transparent" Opacity="1" FontSize="{Binding Value, ElementName=fontSizeSlider}" Foreground="White" SelectionTextBrush="Black"
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"
-                 VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
-                 TextChanged="MainTextBox_TextChanged" MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" />
+                 VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" />
         <Slider x:Name="opacitySlider" HorizontalAlignment="Left" Margin="-42,70,0,0" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.5,0.5" Maximum="1" Value="0.3" Visibility="Collapsed" Minimum="0.01" ToolTip="{Binding Value, ElementName=opacitySlider}">
             <Slider.RenderTransform>
                 <TransformGroup>

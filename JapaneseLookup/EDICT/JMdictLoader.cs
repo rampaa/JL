@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
@@ -16,7 +17,7 @@ namespace JapaneseLookup.EDICT
         {
             // jMdict = new List<JMdictEntry>();
             jMdictDictionary = new Dictionary<string, List<Results>>();
-            using XmlTextReader jMDictXML = new("../net5.0-windows/Resources/JMdict.xml");
+            using XmlTextReader jMDictXML = new(Path.Join(ConfigManager.ApplicationPath, "Resources/JMdict.xml"));
             jMDictXML.DtdProcessing = DtdProcessing.Parse;
             jMDictXML.WhitespaceHandling = WhitespaceHandling.None;
             jMDictXML.EntityHandling = EntityHandling.ExpandCharEntities;
@@ -176,7 +177,6 @@ namespace JapaneseLookup.EDICT
             }
             entry.SenseList.Add(sense);
         }
-
         private static string EntityReader(XmlTextReader jMDictXML)
         {
             jMDictXML.Read();

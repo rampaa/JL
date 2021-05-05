@@ -15,7 +15,7 @@ namespace JapaneseLookup.EDICT
         {
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz");
-            request.IfModifiedSince = File.GetLastWriteTime("../net5.0-windows/Resources/JMdict.xml");
+            request.IfModifiedSince = File.GetLastWriteTime(Path.Join(ConfigManager.ApplicationPath, "Resources/JMdict.xml"));
             try
             {
                 request.GetResponse();
@@ -38,7 +38,7 @@ namespace JapaneseLookup.EDICT
         {
             using FileStream originalFileStream = fileToDecompress.OpenRead();
             string currentFileName = fileToDecompress.FullName;
-            string newFileName = "../net5.0-windows/Resources/JMdict.xml";
+            string newFileName = Path.Join(ConfigManager.ApplicationPath, "Resources/JMdict.xml");
 
             using FileStream decompressedFileStream = File.Create(newFileName);
             using GZipStream decompressionStream = new(originalFileStream, CompressionMode.Decompress);
