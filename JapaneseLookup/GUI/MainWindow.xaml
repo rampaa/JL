@@ -6,9 +6,9 @@
         xmlns:local="clr-namespace:JapaneseLookup"
         AllowsTransparency="True"
         mc:Ignorable="d" Height="269" Width="800" WindowStyle="None" ResizeMode="CanResize" Topmost="True"
-        Closed="MWindow_Closed" Closing="MWindow_Closing">
+        Closed="MWindow_Closed" Closing="MWindow_Closing" KeyDown="MWindow_KeyDown">
     <Window.Background>
-        <SolidColorBrush Color="Black" Opacity="{Binding Value, ElementName=opacitySlider}" />
+        <SolidColorBrush Color="Black" Opacity="0.3"/>
     </Window.Background>
 
     <WindowChrome.WindowChrome>
@@ -17,7 +17,6 @@
             CornerRadius="0"
             ResizeBorderThickness="4"
             GlassFrameThickness="0" 
-            
             />
     </WindowChrome.WindowChrome>
 
@@ -26,8 +25,8 @@
         <TextBox x:Name="MainTextBox" Margin="0,25,0,0" TextWrapping="Wrap" VerticalContentAlignment="Top"
                  Background="Transparent" Opacity="1" FontSize="{Binding Value, ElementName=fontSizeSlider}" Foreground="White" SelectionTextBrush="Black"
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"
-                 VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" />
-        <Slider x:Name="opacitySlider" HorizontalAlignment="Left" Margin="-42,70,0,0" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.5,0.5" Maximum="1" Value="0.3" Visibility="Collapsed" Minimum="0.01" ToolTip="{Binding Value, ElementName=opacitySlider}">
+                 VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow" />
+        <Slider x:Name="OpacitySlider" HorizontalAlignment="Left" Margin="-42,70,0,0" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.5,0.5" Maximum="1" Value="0.3" Visibility="Collapsed" Minimum="0.01" ToolTip="{Binding Value, ElementName=OpacitySlider}" ValueChanged="OpacitySlider_ValueChanged" LostMouseCapture="OpacitySlider_LostMouseCapture">
             <Slider.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -37,7 +36,7 @@
                 </TransformGroup>
             </Slider.RenderTransform>
         </Slider>
-        <Slider x:Name="fontSizeSlider" HorizontalAlignment="Left" Margin="-15,70,0,0" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.5,0.5" Value="70" Maximum="300" Minimum="1" ToolTip="{Binding Value, ElementName=fontSizeSlider}" Visibility="Collapsed">
+        <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="-15,70,0,0" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.5,0.5" Value="70" Maximum="300" Minimum="1" ToolTip="{Binding Value, ElementName=FontSizeSlider}" Visibility="Collapsed" ValueChanged="FontSizeSlider_ValueChanged" LostMouseCapture="FontSizeSlider_LostMouseCapture">
             <Slider.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>

@@ -9,15 +9,15 @@ namespace JapaneseLookup.EDICT
         public List<string> AlternativeSpellings { get; set; }
         public List<(List<string> Definitions, List<string> RRestrictions, List<string> KRestrictions)> DefinitionsList { get; set; }
         public List<string> Readings { get; set; }
-        public List<string> OrthographyInfoList { get; set; }
-        public List<string> PriorityList { get; set; }
-        public List<List<string>> WordClasses { get; set; }
-        public List<string> RelatedTerms { get; set; }
+        public List<string> OrthographyInfoList { get; set; } //e.g. Ateji, Reading
+        public List<string> PriorityList { get; set; } // e.g. gai1
+        public List<List<string>> WordClasses { get; set; } //e.g. noun +
+        public List<string> RelatedTerms { get; set; } 
         public List<string> Antonyms { get; set; }
-        public List<string> FieldInfoList { get; set; }
-        public List<List<string>> MiscList { get; set; }
-        public List<string> SpellingInfo { get; set; }
-        public List<string> Dialects { get; set; }
+        public List<string> FieldInfoList { get; set; } // e.g. "martial arts"
+        public List<List<string>> MiscList { get; set; } // e.g. "abbr" +
+        public List<string> SpellingInfo { get; set; } // e.g. "often derog" +
+        public List<string> Dialects { get; set; } // e.g. ksb
         public Dictionary<string, Frequency> FrequencyDict { get; set; }
         public List<string> KanaSpellings { get; set; }
         public string PrimarySpelling { get; set; }

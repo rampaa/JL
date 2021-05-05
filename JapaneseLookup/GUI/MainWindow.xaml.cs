@@ -29,7 +29,7 @@ namespace JapaneseLookup.GUI
             var windowClipboardManager = new ClipboardManager(this);
             windowClipboardManager.ClipboardChanged += ClipboardChanged;
 
-            ConfigManager.LoadSettings(this);
+            ConfigManager.ApplySettings(this);
 
             CopyFromClipboard();
         }
@@ -168,22 +168,60 @@ namespace JapaneseLookup.GUI
 
         private void OpacityButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (opacitySlider.Visibility == Visibility.Collapsed)
-                opacitySlider.Visibility = Visibility.Visible;
+            if (OpacitySlider.Visibility == Visibility.Collapsed)
+                OpacitySlider.Visibility = Visibility.Visible;
             else
-                opacitySlider.Visibility = Visibility.Collapsed;
+                OpacitySlider.Visibility = Visibility.Collapsed;
         }
 
         private void FontSizeButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (fontSizeSlider.Visibility == Visibility.Collapsed)
-                fontSizeSlider.Visibility = Visibility.Visible;
+            if (FontSizeSlider.Visibility == Visibility.Collapsed)
+                FontSizeSlider.Visibility = Visibility.Visible;
             else
-                fontSizeSlider.Visibility = Visibility.Collapsed;
+                FontSizeSlider.Visibility = Visibility.Collapsed;
         }
         private void MWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             ConfigManager.SaveBeforeClosing(this);
+        }
+
+        private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            MWindow.Background.Opacity = OpacitySlider.Value;
+        }
+
+        private void FontSizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            MainTextBox.FontSize = FontSizeSlider.Value;
+        }
+
+        private void MWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.K:
+                    {
+                        MiningSetupWindow.Instance.ShowDialog();
+                        break;
+                    }
+                case Key.L:
+                    {
+                        ConfigManager.LoadPreferences(PreferencesWindow.Instance);
+                        PreferencesWindow.Instance.ShowDialog();
+                        break;
+                    }
+            }
+        }
+
+        private void OpacitySlider_LostMouseCapture(object sender, MouseEventArgs e)
+        {
+            OpacitySlider.Visibility = Visibility.Collapsed;
+        }
+
+        private void FontSizeSlider_LostMouseCapture(object sender, MouseEventArgs e)
+        {
+            FontSizeSlider.Visibility = Visibility.Collapsed;
         }
     }
 }

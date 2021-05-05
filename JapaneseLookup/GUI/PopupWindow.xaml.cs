@@ -240,14 +240,7 @@ namespace JapaneseLookup.GUI
 
                     break;
                 }
-                case Key.C:
-                {
-                    MiningSetupWindow.Instance.Show();
-                    MiningSetupWindow.Instance.Activate();
-                    MiningSetupWindow.Instance.Focus();
 
-                    break;
-                }
                 case Key.P:
                 {
                     var innerStackPanel = (StackPanel) StackPanel.Children[0];

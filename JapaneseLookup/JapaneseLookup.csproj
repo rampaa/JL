@@ -4,13 +4,19 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
-	<MeCabUseDefaultDictionary>false</MeCabUseDefaultDictionary>
+	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="Resources\deconjugator.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Reference Include="System.Windows.Forms">
+      <HintPath>References\System.Windows.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsFormsIntegration">
+      <HintPath>References\WindowsFormsIntegration.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Resources\deconjugator_edited_arrays.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

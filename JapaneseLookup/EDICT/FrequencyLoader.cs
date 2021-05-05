@@ -28,11 +28,13 @@ namespace JapaneseLookup.EDICT
                     string exactSpelling = element[0].ToString();
                     element[1].TryGetInt32(out int frequencyRank);
                     element[2].TryGetDouble(out double frequencyPPM);
+
                     if (JMdictLoader.jMdictDictionary.TryGetValue(exactSpelling, out List<Results> jMDictResults))
                     {
                         foreach (Results result in jMDictResults)
                         {
-                            if ((!result.KanaSpellings.Any()) || result.Readings.Contains(reading))
+                            if (result.PrimarySpelling == reading
+                                || (reading != exactSpelling && result.Readings.Contains(reading)))
                             {
                                 if (result.FrequencyDict.TryGetValue(freqListName, out var frequency))
                                 {
@@ -54,7 +56,7 @@ namespace JapaneseLookup.EDICT
                     {
                         foreach (Results result in jMDictResults)
                         {
-                            if (result.PrimarySpelling == exactSpelling 
+                            if (result.PrimarySpelling == exactSpelling
                                 || result.AlternativeSpellings.Contains(exactSpelling) 
                                 || result.KanaSpellings.Contains(exactSpelling))
                             {
