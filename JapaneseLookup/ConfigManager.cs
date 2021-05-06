@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,24 +16,18 @@ namespace JapaneseLookup
     {
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
         public static int MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength"));
-        public static readonly string FrequencyList = ConfigurationManager.AppSettings.Get("FrequencyList");
-        public static readonly string AnkiConnectUri = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
+        public static string FrequencyList = ConfigurationManager.AppSettings.Get("FrequencyList");
+        public static string AnkiConnectUri = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
 
         public static void SaveBeforeClosing(MainWindow mainWindow)
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["MainWindowFontSize"].Value =
-                mainWindow.FontSizeSlider.Value.ToString(CultureInfo.InvariantCulture);
-            config.AppSettings.Settings["MainWindowOpacity"].Value =
-                mainWindow.OpacitySlider.Value.ToString(CultureInfo.InvariantCulture);
-            config.AppSettings.Settings["MainWindowHeight"].Value =
-                mainWindow.Height.ToString(CultureInfo.InvariantCulture);
-            config.AppSettings.Settings["MainWindowWidth"].Value =
-                mainWindow.Width.ToString(CultureInfo.InvariantCulture);
-            config.AppSettings.Settings["MainWindowTopPosition"].Value =
-                mainWindow.Top.ToString(CultureInfo.InvariantCulture);
-            config.AppSettings.Settings["MainWindowLeftPosition"].Value =
-                mainWindow.Left.ToString(CultureInfo.InvariantCulture);
+            config.AppSettings.Settings["MainWindowFontSize"].Value = mainWindow.FontSizeSlider.Value.ToString();
+            config.AppSettings.Settings["MainWindowOpacity"].Value = mainWindow.OpacitySlider.Value.ToString();
+            config.AppSettings.Settings["MainWindowHeight"].Value = mainWindow.Height.ToString();
+            config.AppSettings.Settings["MainWindowWidth"].Value = mainWindow.Width.ToString();
+            config.AppSettings.Settings["MainWindowTopPosition"].Value = mainWindow.Top.ToString();
+            config.AppSettings.Settings["MainWindowLeftPosition"].Value = mainWindow.Left.ToString();
             config.Save(ConfigurationSaveMode.Modified);
         }
 
@@ -63,25 +56,20 @@ namespace JapaneseLookup
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             config.AppSettings.Settings["MaxSearchLength"].Value =
-                preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
+                preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString();
             config.AppSettings.Settings["MainWindowBackgroundColor"].Value =
                 preferenceWindow.TextboxBackgroundColorButton.Background.ToString();
             config.AppSettings.Settings["MainWindowTextColor"].Value =
                 preferenceWindow.TextboxTextColorButton.Background.ToString();
             config.AppSettings.Settings["MainWindowFontSize"].Value =
-                preferenceWindow.TextboxTextSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
+                preferenceWindow.TextboxTextSizeNumericUpDown.Value.ToString();
             config.AppSettings.Settings["MainWindowOpacity"].Value =
-                preferenceWindow.TextboxOpacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
-
+                preferenceWindow.TextboxOpacityNumericUpDown.Value.ToString();
             var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
-            config.AppSettings.Settings["MainWindowHeight"].Value =
-                mainWindow.Height.ToString(CultureInfo.InvariantCulture);
-            config.AppSettings.Settings["MainWindowWidth"].Value =
-                mainWindow.Width.ToString(CultureInfo.InvariantCulture);
-            config.AppSettings.Settings["MainWindowTopPosition"].Value =
-                mainWindow.Top.ToString(CultureInfo.InvariantCulture);
-            config.AppSettings.Settings["MainWindowLeftPosition"].Value =
-                mainWindow.Left.ToString(CultureInfo.InvariantCulture);
+            config.AppSettings.Settings["MainWindowHeight"].Value = mainWindow.Height.ToString();
+            config.AppSettings.Settings["MainWindowWidth"].Value = mainWindow.Width.ToString();
+            config.AppSettings.Settings["MainWindowTopPosition"].Value = mainWindow.Top.ToString();
+            config.AppSettings.Settings["MainWindowLeftPosition"].Value = mainWindow.Left.ToString();
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
 
