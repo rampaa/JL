@@ -20,6 +20,7 @@ namespace JapaneseLookup.GUI
         {
             InitializeComponent();
             MainWindowUtilities.MainWindowInitializer();
+            ConfigManager.ApplySettings(this);
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -28,8 +29,6 @@ namespace JapaneseLookup.GUI
 
             var windowClipboardManager = new ClipboardManager(this);
             windowClipboardManager.ClipboardChanged += ClipboardChanged;
-
-            ConfigManager.ApplySettings(this);
 
             CopyFromClipboard();
         }

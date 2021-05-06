@@ -15,9 +15,9 @@
         <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="29,0,0,19" VerticalAlignment="Bottom" Width="80" Click="SaveButton_Click"/>
         <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,22,19" VerticalAlignment="Bottom" Width="82" Click="CancelButton_Click"/>
         <TextBlock HorizontalAlignment="Left" Margin="29,65,0,0" Text="Textbox background color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-        <Button x:Name="TextboxBackgroundColorButton" Content="" HorizontalAlignment="Right" Margin="0,63,21,0" VerticalAlignment="Top" Width="60" Click="TextboxBackgroundColorButton_Click" BorderThickness="5,5,5,5" Height="32"/>
+        <Button x:Name="TextboxBackgroundColorButton" Content="" HorizontalAlignment="Right" Margin="0,63,21,0" VerticalAlignment="Top" Width="60" Click="TextboxBackgroundColorButton_Click" BorderThickness="5,5,5,5" Height="32" BorderBrush="#7F707070"/>
         <TextBlock HorizontalAlignment="Left" Margin="29,104,0,0" Text="Textbox text color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-        <Button x:Name="TextboxTextColorButton" Content="" HorizontalAlignment="Right" Margin="0,104,21,0" VerticalAlignment="Top" Width="60" Height="32" BorderThickness="5,5,5,5" Click="TextboxTextColorButton_Click"/>
+        <Button x:Name="TextboxTextColorButton" Content="" HorizontalAlignment="Right" Margin="0,104,21,0" VerticalAlignment="Top" Width="60" Height="32" BorderThickness="5,5,5,5" Click="TextboxTextColorButton_Click" BorderBrush="#7F707070"/>
         <TextBlock HorizontalAlignment="Left" Margin="29,147,0,0" Text="Textbox text size" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <WindowsFormsHost  Margin="0,147,21,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
             <wf:NumericUpDown x:Name="TextboxTextSizeNumericUpDown" BorderStyle="FixedSingle"  Maximum="300" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
