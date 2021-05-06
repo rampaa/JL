@@ -12,8 +12,7 @@ namespace JapaneseLookup.Anki
     {
         private static readonly HttpClient Client = new();
 
-        // TODO: Config.AnkiConnectUri
-        private static readonly Uri AnkiConnectUri = new("http://localhost:8765");
+        private static readonly Uri AnkiConnectUri = new(ConfigManager.AnkiConnectUri);
 
         public static async Task<Response> AddNoteToDeck(Note note)
         {

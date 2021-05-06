@@ -16,16 +16,19 @@ using System.Windows.Input;
 
 namespace JapaneseLookup
 {
-    class MainWindowUtilities
+    internal static class MainWindowUtilities
     {
         public static bool ready = false;
-        public static string backlog = "";
+        public static string Backlog = "";
         public const string FakeFrequency = "1000000";
-        public static readonly Regex JapaneseRegex = 
+
+        public static readonly Regex JapaneseRegex =
             new(@"[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]");
+
         // Consider checking for \t, \r, "　", " ", ., !, ?, –, —, ―, ‒, ~, ‥, ♪, ～, ♡, ♥, ☆, ★
         private static readonly List<string> JapanesePunctuation = new(new[]
             {"。", "！", "？", "…", "―", "\n"});
+
         public static void MainWindowInitializer()
         {
             Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderVN = Task.Run(() =>
@@ -46,6 +49,7 @@ namespace JapaneseLookup
             // init AnkiConnect so that it doesn't block later
             Task.Run(AnkiConnect.GetDeckNames);
         }
+
         public static (string sentence, int endPosition) FindSentence(string text, int position)
         {
             int startPosition = -1;
@@ -157,19 +161,18 @@ namespace JapaneseLookup
                 {
                     var result = new Dictionary<string, List<string>>();
 
-                    var foundSpelling = new List<string> { jMDictResult.PrimarySpelling };
+                    var foundSpelling = new List<string> {jMDictResult.PrimarySpelling};
                     var kanaSpellings = jMDictResult.KanaSpellings;
                     var readings = jMDictResult.Readings.ToList();
-                    var definitions = new List<string> { DefinitionTextBuilder(jMDictResult) };
-                    var foundForm = new List<string> { rsts.Value.foundForm };
-                    var jmdictID = new List<string> { jMDictResult.Id };
+                    var definitions = new List<string> {DefinitionTextBuilder(jMDictResult)};
+                    var foundForm = new List<string> {rsts.Value.foundForm};
+                    var jmdictID = new List<string> {jMDictResult.Id};
                     var alternativeSpellings = jMDictResult.AlternativeSpellings.ToList();
                     var process = rsts.Value.processList;
 
-                    // TODO: Config.FrequencyList instead of "VN"
-                    jMDictResult.FrequencyDict.TryGetValue("VN", out var freqList);
+                    jMDictResult.FrequencyDict.TryGetValue(ConfigManager.FrequencyList, out var freqList);
                     var maybeFreq = freqList?.FrequencyRank;
-                    var frequency = new List<string> { maybeFreq == null ? FakeFrequency : maybeFreq.ToString() };
+                    var frequency = new List<string> {maybeFreq == null ? FakeFrequency : maybeFreq.ToString()};
 
                     result.Add("foundSpelling", foundSpelling);
                     result.Add("kanaSpellings", kanaSpellings);
@@ -184,6 +187,7 @@ namespace JapaneseLookup
                     results.Add(result);
                 }
             }
+
             return results;
         }
 
@@ -238,6 +242,7 @@ namespace JapaneseLookup
                     ++count;
                 }
             }
+
             return defResult;
         }
     }

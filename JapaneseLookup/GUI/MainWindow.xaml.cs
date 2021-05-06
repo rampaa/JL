@@ -33,7 +33,7 @@ namespace JapaneseLookup.GUI
             CopyFromClipboard();
         }
 
-        public void CopyFromClipboard()
+        private void CopyFromClipboard()
         {
             bool gotTextFromClipboard = false;
             while (Clipboard.ContainsText() && !gotTextFromClipboard)
@@ -45,7 +45,7 @@ namespace JapaneseLookup.GUI
                     if (MainWindowUtilities.JapaneseRegex.IsMatch(text))
                     {
                         text = text.Trim();
-                        MainWindowUtilities.backlog += text + "\n";
+                        MainWindowUtilities.Backlog += text + "\n";
                         MainTextBox.Text = text;
                     }
                 }
@@ -122,12 +122,12 @@ namespace JapaneseLookup.GUI
         {
             if (e.Delta > 0)
             {
-                if (MainTextBox.Text != MainWindowUtilities.backlog)
+                if (MainTextBox.Text != MainWindowUtilities.Backlog)
                 {
                     if (MainTextBox.GetFirstVisibleLineIndex() == 0)
                     {
-                        int caretIndex = MainWindowUtilities.backlog.Length - MainTextBox.Text.Length;
-                        MainTextBox.Text = MainWindowUtilities.backlog;
+                        int caretIndex = MainWindowUtilities.Backlog.Length - MainTextBox.Text.Length;
+                        MainTextBox.Text = MainWindowUtilities.Backlog;
                         MainTextBox.CaretIndex = caretIndex;
                         MainTextBox.ScrollToEnd();
                     }

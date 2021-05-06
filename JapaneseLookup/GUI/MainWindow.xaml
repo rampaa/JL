@@ -8,7 +8,7 @@
         mc:Ignorable="d" Height="269" Width="800" WindowStyle="None" ResizeMode="CanResize" Topmost="True"
         Closed="MWindow_Closed" Closing="MWindow_Closing" KeyDown="MWindow_KeyDown">
     <Window.Background>
-        <SolidColorBrush Color="Black" Opacity="0.3"/>
+        <SolidColorBrush Color="Black" Opacity="0.3" />
     </Window.Background>
 
     <WindowChrome.WindowChrome>
@@ -16,39 +16,61 @@
             CaptionHeight="20"
             CornerRadius="0"
             ResizeBorderThickness="4"
-            GlassFrameThickness="0" 
-            />
+            GlassFrameThickness="0" />
     </WindowChrome.WindowChrome>
 
     <Grid x:Name="MainGrid">
         <!--TODO: Add option to hide the scrollbar-->
         <TextBox x:Name="MainTextBox" Margin="0,25,0,0" TextWrapping="Wrap" VerticalContentAlignment="Top"
-                 Background="Transparent" Opacity="1" FontSize="{Binding Value, ElementName=fontSizeSlider}" Foreground="White" SelectionTextBrush="Black"
+                 Background="Transparent" Opacity="1" FontSize="{Binding Value, ElementName=FontSizeSlider}"
+                 Foreground="White" SelectionTextBrush="Black"
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"
-                 VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow" />
-        <Slider x:Name="OpacitySlider" HorizontalAlignment="Left" Margin="-42,70,0,0" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.5,0.5" Maximum="1" Value="0.3" Visibility="Collapsed" Minimum="0.01" ToolTip="{Binding Value, ElementName=OpacitySlider}" ValueChanged="OpacitySlider_ValueChanged" LostMouseCapture="OpacitySlider_LostMouseCapture" LargeChange="0.1" IsMoveToPointEnabled="True">
+                 VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
+                 MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow" />
+        <Slider x:Name="OpacitySlider" HorizontalAlignment="Left" Margin="-42,70,0,0" VerticalAlignment="Top"
+                Width="120" RenderTransformOrigin="0.5,0.5" Maximum="1" Value="0.3" Visibility="Collapsed"
+                Minimum="0.01" ToolTip="{Binding Value, ElementName=OpacitySlider}"
+                ValueChanged="OpacitySlider_ValueChanged" LostMouseCapture="OpacitySlider_LostMouseCapture"
+                LargeChange="0.1" IsMoveToPointEnabled="True">
             <Slider.RenderTransform>
                 <TransformGroup>
-                    <ScaleTransform/>
-                    <SkewTransform/>
-                    <RotateTransform Angle="-90"/>
-                    <TranslateTransform/>
+                    <ScaleTransform />
+                    <SkewTransform />
+                    <RotateTransform Angle="-90" />
+                    <TranslateTransform />
                 </TransformGroup>
             </Slider.RenderTransform>
         </Slider>
-        <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="-15,70,0,0" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.5,0.5" Value="70" Maximum="300" Minimum="1" ToolTip="{Binding Value, ElementName=FontSizeSlider}" Visibility="Collapsed" ValueChanged="FontSizeSlider_ValueChanged" LostMouseCapture="FontSizeSlider_LostMouseCapture" IsMoveToPointEnabled="True">
+        <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="-15,70,0,0" VerticalAlignment="Top"
+                Width="120" RenderTransformOrigin="0.5,0.5" Value="70" Maximum="300" Minimum="1"
+                ToolTip="{Binding Value, ElementName=FontSizeSlider}" Visibility="Collapsed"
+                ValueChanged="FontSizeSlider_ValueChanged" LostMouseCapture="FontSizeSlider_LostMouseCapture"
+                IsMoveToPointEnabled="True">
             <Slider.RenderTransform>
                 <TransformGroup>
-                    <ScaleTransform/>
-                    <SkewTransform/>
-                    <RotateTransform Angle="-90"/>
-                    <TranslateTransform/>
+                    <ScaleTransform />
+                    <SkewTransform />
+                    <RotateTransform Angle="-90" />
+                    <TranslateTransform />
                 </TransformGroup>
             </Slider.RenderTransform>
         </Slider>
-        <TextBlock x:Name="CloseButton" WindowChrome.IsHitTestVisibleInChrome="True" HorizontalAlignment="Right" Margin="0,3,10,0" Text="x" TextWrapping="NoWrap" VerticalAlignment="Top" Foreground="White" Width="10" Height="20" FontSize="18" ScrollViewer.VerticalScrollBarVisibility="Disabled" MouseLeftButtonUp="CloseButton_MouseLeftButtonUp" MouseEnter="CloseButton_MouseEnter" MouseLeave="CloseButton_MouseLeave" ToolTip="Close"/>
-        <TextBlock x:Name="MinimizeButton" WindowChrome.IsHitTestVisibleInChrome="True" HorizontalAlignment="Right" Margin="0,3,30,0" Text="―" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="18" Width="10" Height="20" Foreground="White" MouseLeftButtonUp="MinimizeButton_MouseLeftButtonUp" MouseEnter="MinimizeButton_MouseEnter" MouseLeave="MinimizeButton_MouseLeave" ToolTip="Minimize"/>
-        <TextBlock x:Name="FontSizeButton" WindowChrome.IsHitTestVisibleInChrome="True" HorizontalAlignment="Left" Margin="37,1,0,0" Text="🗚" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" Width="15" Height="20" FontSize="15" RenderTransformOrigin="-0.222,0.567" MouseLeftButtonDown="FontSizeButton_MouseLeftButtonDown" ToolTip="Font Size"/>
-        <TextBlock x:Name="OpacityButton" HorizontalAlignment="Left" WindowChrome.IsHitTestVisibleInChrome="True" Margin="10,3,0,0" Text="☯" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" Width="15" Height="15" FontFamily="MS Gothic" Padding="0,0,0,0" MouseLeftButtonDown="OpacityButton_MouseLeftButtonDown" ToolTip="Transparency"/>
+        <TextBlock x:Name="CloseButton" WindowChrome.IsHitTestVisibleInChrome="True" HorizontalAlignment="Right"
+                   Margin="0,3,10,0" Text="x" TextWrapping="NoWrap" VerticalAlignment="Top" Foreground="White"
+                   Width="10" Height="20" FontSize="18" ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                   MouseLeftButtonUp="CloseButton_MouseLeftButtonUp" MouseEnter="CloseButton_MouseEnter"
+                   MouseLeave="CloseButton_MouseLeave" ToolTip="Close" />
+        <TextBlock x:Name="MinimizeButton" WindowChrome.IsHitTestVisibleInChrome="True" HorizontalAlignment="Right"
+                   Margin="0,3,30,0" Text="―" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="18" Width="10"
+                   Height="20" Foreground="White" MouseLeftButtonUp="MinimizeButton_MouseLeftButtonUp"
+                   MouseEnter="MinimizeButton_MouseEnter" MouseLeave="MinimizeButton_MouseLeave" ToolTip="Minimize" />
+        <TextBlock x:Name="FontSizeButton" WindowChrome.IsHitTestVisibleInChrome="True" HorizontalAlignment="Left"
+                   Margin="37,1,0,0" Text="🗚" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White"
+                   Width="15" Height="20" FontSize="15" RenderTransformOrigin="-0.222,0.567"
+                   MouseLeftButtonDown="FontSizeButton_MouseLeftButtonDown" ToolTip="Font Size" />
+        <TextBlock x:Name="OpacityButton" HorizontalAlignment="Left" WindowChrome.IsHitTestVisibleInChrome="True"
+                   Margin="10,3,0,0" Text="☯" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" Width="15"
+                   Height="15" FontFamily="MS Gothic" Padding="0,0,0,0"
+                   MouseLeftButtonDown="OpacityButton_MouseLeftButtonDown" ToolTip="Transparency" />
     </Grid>
 </Window>
