@@ -94,7 +94,7 @@ namespace JapaneseLookup
 
                 if (JMdictLoader.jMdictDictionary.TryGetValue(textInHiragana, out var tempResult))
                 {
-                    llresults.TryAdd(text[..^i], (tempResult, new List<string>(), text[..^i]));
+                    llresults.TryAdd(textInHiragana, (tempResult, new List<string>(), text[..^i]));
                     tryLongVowelConversion = false;
                 }
 
@@ -103,6 +103,9 @@ namespace JapaneseLookup
                     var deconjugationResults = Deconjugator.Deconjugate(textInHiragana);
                     foreach (var result in deconjugationResults)
                     {
+                        if (llresults.ContainsKey(result.Text))
+                            continue;
+
                         if (JMdictLoader.jMdictDictionary.TryGetValue(result.Text, out var temp))
                         {
                             List<Results> resultsList = new();
@@ -117,7 +120,7 @@ namespace JapaneseLookup
 
                             if (resultsList.Any())
                             {
-                                llresults.TryAdd(result.Text,
+                                llresults.Add(result.Text,
                                     (resultsList, result.Process, text[..result.OriginalText.Length]));
                                 ++succAttempt;
                                 tryLongVowelConversion = false;
@@ -133,7 +136,7 @@ namespace JapaneseLookup
                         string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiragana);
                         if (JMdictLoader.jMdictDictionary.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
                         {
-                            llresults.TryAdd(text[..^i], (tmpResult, new List<string>(), text[..^i]));
+                            llresults.Add(textInHiragana, (tmpResult, new List<string>(), text[..^i]));
                         }
                     }
                 }

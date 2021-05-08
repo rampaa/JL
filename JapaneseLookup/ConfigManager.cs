@@ -95,10 +95,9 @@ namespace JapaneseLookup
             preferenceWindow.FontComboBox.SelectedItem = mainWindow.MainTextBox.FontFamily.ToString();
         }
 
-
         public static List<string> FindJapaneseFonts()
         {
-            List<string> japaneseFonts = new List<string>();
+            List<string> japaneseFonts = new();
             foreach (FontFamily fontFamily in Fonts.SystemFontFamilies)
             {
                 if (fontFamily.FamilyNames.Keys.Contains(XmlLanguage.GetLanguage("ja-jp")))
