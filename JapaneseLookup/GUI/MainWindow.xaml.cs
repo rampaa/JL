@@ -167,8 +167,12 @@ namespace JapaneseLookup.GUI
 
         private void OpacityButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (OpacitySlider.Visibility == Visibility.Collapsed)
+            if(MWindow.Background.Opacity == 0)
+                MWindow.Background.Opacity = OpacitySlider.Value / 100;
+
+            else if (OpacitySlider.Visibility == Visibility.Collapsed)
                 OpacitySlider.Visibility = Visibility.Visible;
+
             else
                 OpacitySlider.Visibility = Visibility.Collapsed;
         }
@@ -208,6 +212,11 @@ namespace JapaneseLookup.GUI
                     {
                         ConfigManager.LoadPreferences(PreferencesWindow.Instance);
                         PreferencesWindow.Instance.ShowDialog();
+                        break;
+                    }
+                case Key.T:
+                    {
+                        MWindow.Background.Opacity = 0;
                         break;
                     }
             }
