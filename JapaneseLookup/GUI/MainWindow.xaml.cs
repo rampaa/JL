@@ -137,6 +137,8 @@ namespace JapaneseLookup.GUI
 
         private void MinimizeButton_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            OpacitySlider.Visibility = Visibility.Collapsed;
+            FontSizeSlider.Visibility = Visibility.Collapsed;
             WindowState = WindowState.Minimized;
         }
 
@@ -184,7 +186,7 @@ namespace JapaneseLookup.GUI
 
         private void FontSizeButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            //OpacitySlider.Visibility = Visibility.Collapsed;
+            OpacitySlider.Visibility = Visibility.Collapsed;
 
             if (FontSizeSlider.Visibility == Visibility.Collapsed)
             {
