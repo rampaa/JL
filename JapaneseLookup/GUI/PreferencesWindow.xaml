@@ -6,7 +6,7 @@
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"  
         xmlns:local="clr-namespace:JapaneseLookup.GUI"
         mc:Ignorable="d"
-        Title="PreferenceWindow" Height="403" Width="461" Topmost="True" Closing="Window_Closing">
+        Title="PreferenceWindow" Height="454" Width="487" Topmost="True" Closing="Window_Closing">
     <Grid>
         <TextBlock HorizontalAlignment="Left" Margin="29,24,0,0" Text="Maximum Search Length" TextWrapping="Wrap" VerticalAlignment="Top" Height="26" Width="175"/>
         <WindowsFormsHost  Margin="0,24,21,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
@@ -22,13 +22,15 @@
         <WindowsFormsHost  Margin="0,147,21,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
             <wf:NumericUpDown x:Name="TextboxTextSizeNumericUpDown" BorderStyle="FixedSingle"  Maximum="300" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
         </WindowsFormsHost>
-        <TextBlock HorizontalAlignment="Left" Margin="29,186,0,0" Text="Opacity" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.518,-0.013" ToolTip="0 = transparent, 1 = opaque"/>
+        <TextBlock HorizontalAlignment="Left" Margin="29,186,0,0" Text="Opacity" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.518,-0.013"/>
         <WindowsFormsHost  Margin="0,186,21,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
-            <wf:NumericUpDown x:Name="TextboxOpacityNumericUpDown" DecimalPlaces="2"  BorderStyle="FixedSingle"  Maximum="1" Minimum="0.01" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
+            <wf:NumericUpDown x:Name="TextboxOpacityNumericUpDown" BorderStyle="FixedSingle"  Maximum="100" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
         </WindowsFormsHost>
-        <ComboBox x:Name="FontComboBox" HorizontalAlignment="Right" Margin="0,225,21,0" VerticalAlignment="Top" Width="200"/>
+        <ComboBox x:Name="FontComboBox" HorizontalAlignment="Right" Margin="0,225,21,0" VerticalAlignment="Top" Width="210"/>
         <TextBlock HorizontalAlignment="Left" Margin="29,228,0,0" Text="Textbox font" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" Margin="29,266,0,0" Text="Frequency List" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <ComboBox x:Name="FrequencyListComboBox" HorizontalAlignment="Right" Margin="0,263,21,0" VerticalAlignment="Top" Width="120"/>
+        <TextBlock HorizontalAlignment="Left" Margin="29,300,0,0" Text="AnkiConnect server address" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <TextBox x:Name="AnkiUriTextBox" HorizontalAlignment="Right" Margin="0,300,21,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="210"/>
     </Grid>
 </Window>

@@ -187,7 +187,7 @@ namespace JapaneseLookup.GUI
 
         private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            MWindow.Background.Opacity = OpacitySlider.Value;
+            MWindow.Background.Opacity = OpacitySlider.Value/100;
         }
 
         private void FontSizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

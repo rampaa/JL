@@ -18,26 +18,15 @@ namespace JapaneseLookup
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
         private static readonly List<string> japaneseFonts = FindJapaneseFonts().OrderBy(font => font).ToList();
         private static readonly string[] frequencyLists = { "VN", "Novel", "Narou" };
-        public static int MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength"));
-        public static string FrequencyList = ConfigurationManager.AppSettings.Get("FrequencyList");
-        public static readonly string AnkiConnectUri = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
-
-        public static void SaveBeforeClosing(MainWindow mainWindow)
-        {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["MainWindowFontSize"].Value = mainWindow.FontSizeSlider.Value.ToString();
-            config.AppSettings.Settings["MainWindowOpacity"].Value = mainWindow.OpacitySlider.Value.ToString();
-            config.AppSettings.Settings["MainWindowHeight"].Value = mainWindow.Height.ToString();
-            config.AppSettings.Settings["MainWindowWidth"].Value = mainWindow.Width.ToString();
-            config.AppSettings.Settings["MainWindowTopPosition"].Value = mainWindow.Top.ToString();
-            config.AppSettings.Settings["MainWindowLeftPosition"].Value = mainWindow.Left.ToString();
-            config.Save(ConfigurationSaveMode.Modified);
-        }
-
+        public static string AnkiConnectUri;
+        public static int MaxSearchLength;
+        public static string FrequencyList;
         public static void ApplySettings(MainWindow mainWindow)
         {
             MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength"));
             FrequencyList = ConfigurationManager.AppSettings.Get("FrequencyList");
+            AnkiConnectUri = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
+
             mainWindow.OpacitySlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowOpacity"));
             mainWindow.FontSizeSlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowFontSize"));
             mainWindow.MainTextBox.FontFamily = new FontFamily(ConfigurationManager.AppSettings.Get("MainWindowFont"));
@@ -45,7 +34,7 @@ namespace JapaneseLookup
             mainWindow.Background =
                 (SolidColorBrush) new BrushConverter().ConvertFrom(
                     ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor"));
-            mainWindow.Background.Opacity = mainWindow.OpacitySlider.Value;
+            mainWindow.Background.Opacity = mainWindow.OpacitySlider.Value/100;
             mainWindow.MainTextBox.Foreground =
                 (SolidColorBrush) new BrushConverter().ConvertFrom(
                     ConfigurationManager.AppSettings.Get("MainWindowTextColor"));
@@ -56,12 +45,29 @@ namespace JapaneseLookup
             
             ConfigurationManager.RefreshSection("appSettings");
         }
-
+        public static void LoadPreferences(PreferencesWindow preferenceWindow)
+        {
+            var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
+            preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
+            preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri;
+            preferenceWindow.TextboxBackgroundColorButton.Background =
+                (SolidColorBrush)new BrushConverter().ConvertFrom(
+                    ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor"));
+            preferenceWindow.TextboxTextColorButton.Background = mainWindow.MainTextBox.Foreground;
+            preferenceWindow.TextboxTextSizeNumericUpDown.Value = (decimal)mainWindow.FontSizeSlider.Value;
+            preferenceWindow.TextboxOpacityNumericUpDown.Value = (decimal)mainWindow.OpacitySlider.Value;
+            preferenceWindow.FontComboBox.ItemsSource = japaneseFonts;
+            preferenceWindow.FontComboBox.SelectedItem = mainWindow.MainTextBox.FontFamily.ToString();
+            preferenceWindow.FrequencyListComboBox.ItemsSource = frequencyLists;
+            preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyList;
+        }
         public static void SavePreferences(PreferencesWindow preferenceWindow)
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             config.AppSettings.Settings["MaxSearchLength"].Value =
                 preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString();
+            config.AppSettings.Settings["AnkiConnectUri"].Value =
+                preferenceWindow.AnkiUriTextBox.Text;
             config.AppSettings.Settings["MainWindowBackgroundColor"].Value =
                 preferenceWindow.TextboxBackgroundColorButton.Background.ToString();
             config.AppSettings.Settings["MainWindowTextColor"].Value =
@@ -74,34 +80,32 @@ namespace JapaneseLookup
                 preferenceWindow.FontComboBox.SelectedItem.ToString();
             config.AppSettings.Settings["FrequencyList"].Value =
                 preferenceWindow.FrequencyListComboBox.SelectedItem.ToString();
+
             var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
             config.AppSettings.Settings["MainWindowHeight"].Value = mainWindow.Height.ToString();
             config.AppSettings.Settings["MainWindowWidth"].Value = mainWindow.Width.ToString();
             config.AppSettings.Settings["MainWindowTopPosition"].Value = mainWindow.Top.ToString();
             config.AppSettings.Settings["MainWindowLeftPosition"].Value = mainWindow.Left.ToString();
+
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
 
             ApplySettings(mainWindow);
         }
-
-        public static void LoadPreferences(PreferencesWindow preferenceWindow)
+        public static void SaveBeforeClosing(MainWindow mainWindow)
         {
-            var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
-            preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
-            preferenceWindow.TextboxBackgroundColorButton.Background =
-                (SolidColorBrush) new BrushConverter().ConvertFrom(
-                    ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor"));
-            preferenceWindow.TextboxTextColorButton.Background = mainWindow.MainTextBox.Foreground;
-            preferenceWindow.TextboxTextSizeNumericUpDown.Value = (decimal) mainWindow.FontSizeSlider.Value;
-            preferenceWindow.TextboxOpacityNumericUpDown.Value = (decimal) mainWindow.OpacitySlider.Value;
-            preferenceWindow.FontComboBox.ItemsSource = japaneseFonts;
-            preferenceWindow.FontComboBox.SelectedItem = mainWindow.MainTextBox.FontFamily.ToString();
-            preferenceWindow.FrequencyListComboBox.ItemsSource = frequencyLists;
-            preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyList;
-        }
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
-        public static List<string> FindJapaneseFonts()
+            config.AppSettings.Settings["MainWindowFontSize"].Value = mainWindow.FontSizeSlider.Value.ToString();
+            config.AppSettings.Settings["MainWindowOpacity"].Value = mainWindow.OpacitySlider.Value.ToString();
+            config.AppSettings.Settings["MainWindowHeight"].Value = mainWindow.Height.ToString();
+            config.AppSettings.Settings["MainWindowWidth"].Value = mainWindow.Width.ToString();
+            config.AppSettings.Settings["MainWindowTopPosition"].Value = mainWindow.Top.ToString();
+            config.AppSettings.Settings["MainWindowLeftPosition"].Value = mainWindow.Left.ToString();
+
+            config.Save(ConfigurationSaveMode.Modified);
+        }
+        private static List<string> FindJapaneseFonts()
         {
             List<string> japaneseFonts = new();
             foreach (FontFamily fontFamily in Fonts.SystemFontFamilies)
