@@ -31,7 +31,7 @@
                 Width="120" RenderTransformOrigin="0.5,0.5" Maximum="100" Value="30" Visibility="Collapsed"
                 Minimum="1" ToolTip="{Binding Value, ElementName=OpacitySlider}"
                 ValueChanged="OpacitySlider_ValueChanged" LostMouseCapture="OpacitySlider_LostMouseCapture"
-                IsMoveToPointEnabled="True" IsSnapToTickEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                IsMoveToPointEnabled="True" IsSnapToTickEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" LostFocus="OpacitySlider_LostFocus">
             <Slider.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform />
@@ -45,7 +45,7 @@
                 Width="120" RenderTransformOrigin="0.5,0.5" Value="70" Maximum="300" Minimum="1"
                 ToolTip="{Binding Value, ElementName=FontSizeSlider}" Visibility="Collapsed"
                 ValueChanged="FontSizeSlider_ValueChanged" LostMouseCapture="FontSizeSlider_LostMouseCapture"
-                IsMoveToPointEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" IsSnapToTickEnabled="True">
+                IsMoveToPointEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" IsSnapToTickEnabled="True" LostFocus="FontSizeSlider_LostFocus">
             <Slider.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform />

@@ -62,7 +62,7 @@ namespace JapaneseLookup.GUI
 
         private void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
-            if (MiningMode) return;
+            if (MiningMode || MWindow.Background.Opacity == 0) return;
 
             // nazeka-style popup movement
             PopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
@@ -167,20 +167,31 @@ namespace JapaneseLookup.GUI
 
         private void OpacityButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            FontSizeSlider.Visibility = Visibility.Collapsed;
+
             if(MWindow.Background.Opacity == 0)
                 MWindow.Background.Opacity = OpacitySlider.Value / 100;
 
             else if (OpacitySlider.Visibility == Visibility.Collapsed)
+            {
                 OpacitySlider.Visibility = Visibility.Visible;
-
+                OpacitySlider.Focus();
+            }
+                
             else
                 OpacitySlider.Visibility = Visibility.Collapsed;
         }
 
         private void FontSizeButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            //OpacitySlider.Visibility = Visibility.Collapsed;
+
             if (FontSizeSlider.Visibility == Visibility.Collapsed)
+            {
                 FontSizeSlider.Visibility = Visibility.Visible;
+                FontSizeSlider.Focus();
+            }
+                
             else
                 FontSizeSlider.Visibility = Visibility.Collapsed;
         }
@@ -198,7 +209,6 @@ namespace JapaneseLookup.GUI
         {
             MainTextBox.FontSize = FontSizeSlider.Value;
         }
-
         private void MWindow_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
@@ -226,8 +236,17 @@ namespace JapaneseLookup.GUI
         {
             OpacitySlider.Visibility = Visibility.Collapsed;
         }
+        private void OpacitySlider_LostFocus(object sender, RoutedEventArgs e)
+        {
+            OpacitySlider.Visibility = Visibility.Collapsed;
+        }
 
         private void FontSizeSlider_LostMouseCapture(object sender, MouseEventArgs e)
+        {
+            FontSizeSlider.Visibility = Visibility.Collapsed;
+        }
+
+        private void FontSizeSlider_LostFocus(object sender, RoutedEventArgs e)
         {
             FontSizeSlider.Visibility = Visibility.Collapsed;
         }
