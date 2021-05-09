@@ -129,15 +129,12 @@ namespace JapaneseLookup
                     }
                 }
 
-                if (tryLongVowelConversion)
+                if (tryLongVowelConversion && textInHiragana.Contains("ー") && textInHiragana[0] != 'ー')
                 {
-                    if (textInHiragana[0] != 'ー' && textInHiragana.Contains("ー"))
+                    string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiragana);
+                    if (JMdictLoader.jMdictDictionary.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
                     {
-                        string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiragana);
-                        if (JMdictLoader.jMdictDictionary.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
-                        {
-                            llresults.Add(textInHiragana, (tmpResult, new List<string>(), text[..^i]));
-                        }
+                        llresults.Add(textInHiragana, (tmpResult, new List<string>(), text[..^i]));
                     }
                 }
             }
@@ -164,18 +161,18 @@ namespace JapaneseLookup
                 {
                     var result = new Dictionary<string, List<string>>();
 
-                    var foundSpelling = new List<string> {jMDictResult.PrimarySpelling};
+                    var foundSpelling = new List<string> { jMDictResult.PrimarySpelling };
                     var kanaSpellings = jMDictResult.KanaSpellings;
                     var readings = jMDictResult.Readings.ToList();
-                    var definitions = new List<string> {DefinitionTextBuilder(jMDictResult)};
-                    var foundForm = new List<string> {rsts.Value.foundForm};
-                    var jmdictID = new List<string> {jMDictResult.Id};
+                    var definitions = new List<string> { DefinitionTextBuilder(jMDictResult) };
+                    var foundForm = new List<string> { rsts.Value.foundForm };
+                    var jmdictID = new List<string> { jMDictResult.Id };
                     var alternativeSpellings = jMDictResult.AlternativeSpellings.ToList();
                     var process = rsts.Value.processList;
 
                     jMDictResult.FrequencyDict.TryGetValue(ConfigManager.FrequencyList, out var freqList);
                     var maybeFreq = freqList?.FrequencyRank;
-                    var frequency = new List<string> {maybeFreq == null ? FakeFrequency : maybeFreq.ToString()};
+                    var frequency = new List<string> { maybeFreq == null ? FakeFrequency : maybeFreq.ToString() };
 
                     result.Add("foundSpelling", foundSpelling);
                     result.Add("kanaSpellings", kanaSpellings);

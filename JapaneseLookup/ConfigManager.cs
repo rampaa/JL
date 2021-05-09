@@ -17,9 +17,10 @@ namespace JapaneseLookup
     {
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
         private static readonly List<string> japaneseFonts = FindJapaneseFonts().OrderBy(font => font).ToList();
+        private static readonly string[] frequencyLists = { "VN", "Novel", "Narou" };
         public static int MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength"));
         public static string FrequencyList = ConfigurationManager.AppSettings.Get("FrequencyList");
-        public static string AnkiConnectUri = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
+        public static readonly string AnkiConnectUri = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
 
         public static void SaveBeforeClosing(MainWindow mainWindow)
         {
@@ -36,6 +37,7 @@ namespace JapaneseLookup
         public static void ApplySettings(MainWindow mainWindow)
         {
             MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength"));
+            FrequencyList = ConfigurationManager.AppSettings.Get("FrequencyList");
             mainWindow.OpacitySlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowOpacity"));
             mainWindow.FontSizeSlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowFontSize"));
             mainWindow.MainTextBox.FontFamily = new FontFamily(ConfigurationManager.AppSettings.Get("MainWindowFont"));
@@ -70,6 +72,8 @@ namespace JapaneseLookup
                 preferenceWindow.TextboxOpacityNumericUpDown.Value.ToString();
             config.AppSettings.Settings["MainWindowFont"].Value =
                 preferenceWindow.FontComboBox.SelectedItem.ToString();
+            config.AppSettings.Settings["FrequencyList"].Value =
+                preferenceWindow.FrequencyListComboBox.SelectedItem.ToString();
             var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
             config.AppSettings.Settings["MainWindowHeight"].Value = mainWindow.Height.ToString();
             config.AppSettings.Settings["MainWindowWidth"].Value = mainWindow.Width.ToString();
@@ -93,6 +97,8 @@ namespace JapaneseLookup
             preferenceWindow.TextboxOpacityNumericUpDown.Value = (decimal) mainWindow.OpacitySlider.Value;
             preferenceWindow.FontComboBox.ItemsSource = japaneseFonts;
             preferenceWindow.FontComboBox.SelectedItem = mainWindow.MainTextBox.FontFamily.ToString();
+            preferenceWindow.FrequencyListComboBox.ItemsSource = frequencyLists;
+            preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyList;
         }
 
         public static List<string> FindJapaneseFonts()
@@ -100,10 +106,10 @@ namespace JapaneseLookup
             List<string> japaneseFonts = new();
             foreach (FontFamily fontFamily in Fonts.SystemFontFamilies)
             {
-                if (fontFamily.FamilyNames.Keys.Contains(XmlLanguage.GetLanguage("ja-jp")))
+                if (fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("ja-jp")))
                     japaneseFonts.Add(fontFamily.Source);
 
-                else if (fontFamily.FamilyNames.Keys.Count == 1 && fontFamily.FamilyNames.Keys.Contains(XmlLanguage.GetLanguage("en-US")))
+                else if (fontFamily.FamilyNames.Keys.Count == 1 && fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("en-US")))
                 {
                     foreach (var typeFace in fontFamily.GetTypefaces())
                     {

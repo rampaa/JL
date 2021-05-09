@@ -6,18 +6,18 @@
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"  
         xmlns:local="clr-namespace:JapaneseLookup.GUI"
         mc:Ignorable="d"
-        Title="PreferenceWindow" Height="400" Width="315" Topmost="True" Closing="Window_Closing">
+        Title="PreferenceWindow" Height="403" Width="461" Topmost="True" Closing="Window_Closing">
     <Grid>
         <TextBlock HorizontalAlignment="Left" Margin="29,24,0,0" Text="Maximum Search Length" TextWrapping="Wrap" VerticalAlignment="Top" Height="26" Width="175"/>
         <WindowsFormsHost  Margin="0,24,21,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
             <wf:NumericUpDown x:Name="MaxSearchLengthNumericUpDown" BorderStyle="FixedSingle"  Maximum="100" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
         </WindowsFormsHost>
         <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="29,0,0,19" VerticalAlignment="Bottom" Width="80" Click="SaveButton_Click"/>
-        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,22,19" VerticalAlignment="Bottom" Width="82" Click="CancelButton_Click"/>
+        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,21,19" VerticalAlignment="Bottom" Width="82" Click="CancelButton_Click"/>
         <TextBlock HorizontalAlignment="Left" Margin="29,65,0,0" Text="Textbox background color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-        <Button x:Name="TextboxBackgroundColorButton" Content="" HorizontalAlignment="Right" Margin="0,63,21,0" VerticalAlignment="Top" Width="60" Click="TextboxBackgroundColorButton_Click" BorderThickness="5,5,5,5" Height="32" BorderBrush="#7F707070"/>
+        <Button x:Name="TextboxBackgroundColorButton" Content="" HorizontalAlignment="Right" Margin="0,63,21,0" VerticalAlignment="Top" Width="60" Click="TextboxBackgroundColorButton_Click" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070"/>
         <TextBlock HorizontalAlignment="Left" Margin="29,104,0,0" Text="Textbox text color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-        <Button x:Name="TextboxTextColorButton" Content="" HorizontalAlignment="Right" Margin="0,104,21,0" VerticalAlignment="Top" Width="60" Height="32" BorderThickness="5,5,5,5" Click="TextboxTextColorButton_Click" BorderBrush="#7F707070"/>
+        <Button x:Name="TextboxTextColorButton" Content="" HorizontalAlignment="Right" Margin="0,104,21,0" VerticalAlignment="Top" Width="60" Height="32" BorderThickness="5,5,5,5" Click="TextboxTextColorButton_Click" BorderBrush="#FF707070"/>
         <TextBlock HorizontalAlignment="Left" Margin="29,147,0,0" Text="Textbox text size" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <WindowsFormsHost  Margin="0,147,21,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
             <wf:NumericUpDown x:Name="TextboxTextSizeNumericUpDown" BorderStyle="FixedSingle"  Maximum="300" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
@@ -26,6 +26,9 @@
         <WindowsFormsHost  Margin="0,186,21,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
             <wf:NumericUpDown x:Name="TextboxOpacityNumericUpDown" DecimalPlaces="2"  BorderStyle="FixedSingle"  Maximum="1" Minimum="0.01" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
         </WindowsFormsHost>
-        <ComboBox x:Name="FontComboBox" HorizontalAlignment="Left" Margin="94,229,0,0" VerticalAlignment="Top" Width="200"/>
+        <ComboBox x:Name="FontComboBox" HorizontalAlignment="Right" Margin="0,225,21,0" VerticalAlignment="Top" Width="200"/>
+        <TextBlock HorizontalAlignment="Left" Margin="29,228,0,0" Text="Textbox font" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="29,266,0,0" Text="Frequency List" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <ComboBox x:Name="FrequencyListComboBox" HorizontalAlignment="Right" Margin="0,263,21,0" VerticalAlignment="Top" Width="120"/>
     </Grid>
 </Window>
