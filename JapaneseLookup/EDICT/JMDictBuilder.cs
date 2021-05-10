@@ -9,19 +9,19 @@ namespace JapaneseLookup.EDICT
 {
     class JMDictBuilder
     {
-        public static void DictionaryBuilder(JMdictEntry entry, Dictionary<string, List<Results>> jMdictDictionary)
+        public static void BuildDictionary(EdictEntry entry, Dictionary<string, List<EdictResult>> jMdictDictionary)
         {
             // entry (k_ele*, r_ele+, sense+)
             // k_ele (keb, ke_inf*, ke_pri*)
             // r_ele (reb, re_restr*, re_inf*, re_pri*)
             // sense (stagk*, stagr*, pos*, xref*, ant*, field*, misc*, s_inf*, dial*, gloss*)
 
-            Dictionary<string, Results> resultList = new();
+            Dictionary<string, EdictResult> resultList = new();
             List<string> alternativeSpellings;
 
             foreach (KEle kEle in entry.KEleList)
             {
-                Results result = new();
+                EdictResult result = new();
                 string key = kEle.Keb;
 
                 result.PrimarySpelling = key;
@@ -45,7 +45,7 @@ namespace JapaneseLookup.EDICT
                         result.WordClasses.Add(sense.PosList);
                         result.RelatedTerms.AddRange(sense.XRefList);
                         result.Antonyms.AddRange(sense.AntList);
-                        result.FieldInfoList.AddRange(sense.FieldList);
+                        result.TypeList.Add(sense.FieldList);
                         result.MiscList.Add(sense.MiscList);
                         result.Dialects.AddRange(sense.DialList);
                         result.SpellingInfo.Add(sense.SInf);
@@ -56,7 +56,7 @@ namespace JapaneseLookup.EDICT
 
             alternativeSpellings = resultList.Keys.ToList();
 
-            foreach (KeyValuePair<string, Results> item in resultList)
+            foreach (KeyValuePair<string, EdictResult> item in resultList)
             {
                 foreach (string s in alternativeSpellings)
                 {
@@ -77,7 +77,7 @@ namespace JapaneseLookup.EDICT
                     continue;
                 }
 
-                Results result = new();
+                EdictResult result = new();
 
                 result.KanaSpellings.Add(rEle.Reb);
 
@@ -110,7 +110,7 @@ namespace JapaneseLookup.EDICT
                         result.WordClasses.Add(sense.PosList);
                         result.RelatedTerms.AddRange(sense.XRefList);
                         result.Antonyms.AddRange(sense.AntList);
-                        result.FieldInfoList.AddRange(sense.FieldList);
+                        result.TypeList.Add(sense.FieldList);
                         result.MiscList.Add(sense.MiscList);
                         result.Dialects.AddRange(sense.DialList);
                         result.SpellingInfo.Add(sense.SInf);
@@ -119,12 +119,12 @@ namespace JapaneseLookup.EDICT
                 resultList.Add(key, result);
             }
 
-            foreach (KeyValuePair<string, Results> rl in resultList)
+            foreach (KeyValuePair<string, EdictResult> rl in resultList)
             {
                 rl.Value.Id = entry.Id;
                 string key = rl.Key;
 
-                if (jMdictDictionary.TryGetValue(key, out List<Results> tempList))
+                if (jMdictDictionary.TryGetValue(key, out List<EdictResult> tempList))
                     tempList.Add(rl.Value);
                 else
                     tempList = new() { rl.Value };

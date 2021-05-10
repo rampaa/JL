@@ -13,7 +13,6 @@ namespace JapaneseLookup.EDICT
     {
         public static void JMDictUpdater()
         {
-
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz");
             request.IfModifiedSince = File.GetLastWriteTime(Path.Join(ConfigManager.ApplicationPath, "Resources/JMdict.xml"));
             try

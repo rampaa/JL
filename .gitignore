@@ -365,3 +365,4 @@ FodyWeavers.xsd
 .idea
 
 .vscode
+/JapaneseLookup/Resources/JMnedict.xml
