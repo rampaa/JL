@@ -45,6 +45,12 @@ namespace JapaneseLookup.Anki
             return await Send(req);
         }
 
+        public static async Task<Response> Sync()
+        {
+            var req = new Request("sync", 6);
+            return await Send(req);
+        }
+
         public static async Task<string> GetAudio(string foundSpelling, string reading)
         {
             Uri uri = new(

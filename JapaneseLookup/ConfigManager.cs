@@ -21,6 +21,8 @@ namespace JapaneseLookup
         public static string AnkiConnectUri;
         public static int MaxSearchLength;
         public static string FrequencyList;
+        public static bool ForceSync;
+
         public static void ApplySettings(MainWindow mainWindow)
         {
             MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength"));

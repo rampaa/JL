@@ -8,7 +8,6 @@ namespace JapaneseLookup.Anki
     public static class Mining
     {
         // TODO: Check if audio was grabbed and tell the user if it was not
-        // TODO: Option to force sync after mining
         public static async void Mine(string foundSpelling, string readings, string definitions, string context,
             string foundForm, string jmdictID, string timeLocal, string alternativeSpellings,
             string frequency)
@@ -69,6 +68,8 @@ namespace JapaneseLookup.Anki
             var note = new Note(deckName, modelName, fields, options, tags, audio, video, picture);
             var response = await AnkiConnect.AddNoteToDeck(note);
             Console.WriteLine(response == null ? $"Mining failed for {foundSpelling}" : $"Mined {foundSpelling}");
+
+            if (ConfigManager.ForceSync) await AnkiConnect.Sync();
         }
 
         private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> fields,
