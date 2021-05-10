@@ -1,0 +1,256 @@
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Xml;
+using static JapaneseLookup.MainWindowUtilities;
+
+namespace JapaneseLookup.EDICT
+{
+    class EdictLoader
+    {
+        public static Dictionary<string, List<EdictResult>> jMdictDictionary = new();
+        public static Dictionary<string, List<EdictResult>> jMnedictDictionary = new();
+        public static void Load(DictionaryName dictionaryName)
+        {
+            string dictionaryPath = "";
+
+            switch(dictionaryName)
+            {
+                case DictionaryName.JMdict:
+                    {
+                        dictionaryPath = "Resources/JMdict.xml";
+                        break;
+                    }
+
+                case DictionaryName.JMnedict:
+                    {
+                        dictionaryPath = "Resources/JMnedict.xml";
+                        break;
+                    }
+            }                
+
+            using XmlTextReader edictXml = new(Path.Join(ConfigManager.ApplicationPath, dictionaryPath));
+
+            edictXml.DtdProcessing = DtdProcessing.Parse;
+            edictXml.WhitespaceHandling = WhitespaceHandling.None;
+            edictXml.EntityHandling = EntityHandling.ExpandCharEntities;
+            while (edictXml.ReadToFollowing("entry"))
+            {
+                ReadEntry(edictXml, dictionaryName);
+            }
+        }
+        private static void ReadEntry(XmlTextReader edictXml, DictionaryName dictionaryName)
+        {
+            EdictEntry entry = new();
+            while (edictXml.Read())
+            {
+                if (edictXml.Name == "entry" && edictXml.NodeType == XmlNodeType.EndElement)
+                    break;
+
+                if (edictXml.NodeType == XmlNodeType.Element)
+                {
+                    switch (edictXml.Name)
+                    {
+                        case "ent_seq":
+                            entry.Id = edictXml.ReadString();
+                            break;
+
+                        case "k_ele":
+                            ReadKEle(edictXml, entry);
+                            break;
+
+                        case "r_ele":
+                            ReadREle(edictXml, entry);
+                            break;
+
+                        case "sense":
+                            ReadSense(edictXml, entry);
+                            break;
+
+                        case "trans":
+                            ReadTrans(edictXml, entry);
+                            break;
+                    }
+                }
+            }
+
+            switch (dictionaryName)
+            {
+
+                case DictionaryName.JMdict:
+                    {
+                        JMDictBuilder.BuildDictionary(entry, jMdictDictionary);
+                        break;
+                    }
+
+                case DictionaryName.JMnedict:
+                    {
+                        JMNeDictBuilder.BuildDictionary(entry, jMnedictDictionary);
+                        break;
+                    }
+            }
+        }
+
+        private static void ReadKEle(XmlTextReader edictXml, EdictEntry entry)
+        {
+            KEle kEle = new();
+            while (edictXml.Read())
+            {
+                if (edictXml.Name == "k_ele" && edictXml.NodeType == XmlNodeType.EndElement)
+                    break;
+
+                if (edictXml.NodeType == XmlNodeType.Element)
+                {
+                    switch (edictXml.Name)
+                    {
+                        case "keb":
+                            kEle.Keb = edictXml.ReadString();
+                            break;
+
+                        case "ke_inf":
+                            kEle.KeInfList.Add(ReadEntity(edictXml));
+                            break;
+
+                        case "ke_pri":
+                            kEle.KePriList.Add(edictXml.ReadString());
+                            break;
+                    }
+                }
+            }
+            entry.KEleList.Add(kEle);
+        }
+
+        private static void ReadREle(XmlTextReader jMDictXML, EdictEntry entry)
+        {
+            REle rEle = new();
+            while (jMDictXML.Read())
+            {
+                if (jMDictXML.Name == "r_ele" && jMDictXML.NodeType == XmlNodeType.EndElement)
+                    break;
+
+                if (jMDictXML.NodeType == XmlNodeType.Element)
+                {
+                    switch (jMDictXML.Name)
+                    {
+                        case "reb":
+                            rEle.Reb = jMDictXML.ReadString();
+                            break;
+
+                        case "re_restr":
+                            rEle.ReRestrList.Add(jMDictXML.ReadString());
+                            break;
+
+                        case "re_inf":
+                            rEle.ReInfList.Add(ReadEntity(jMDictXML));
+                            break;
+
+                        case "re_pri":
+                            rEle.ReInfList.Add(jMDictXML.ReadString());
+                            break;
+                    }
+                }
+            }
+            entry.REleList.Add(rEle);
+        }
+
+        private static void ReadTrans(XmlTextReader jMneDictXML, EdictEntry entry)
+        {
+            Trans trans = new();
+            while (jMneDictXML.Read())
+            {
+                if (jMneDictXML.Name == "trans" && jMneDictXML.NodeType == XmlNodeType.EndElement)
+                    break;
+
+                if (jMneDictXML.NodeType == XmlNodeType.Element)
+                {
+                    switch (jMneDictXML.Name)
+                    {
+                        case "xref":
+                            trans.XRefList.Add(jMneDictXML.ReadString());
+                            break;
+
+                        case "name_type":
+                            trans.NameTypeList.Add(ReadEntity(jMneDictXML));
+                            break;
+
+                        case "trans_det":
+                            trans.TransDetList.Add(jMneDictXML.ReadString());
+                            break;
+                    }
+                }
+            }
+            entry.TransList.Add(trans);
+        }
+
+        private static void ReadSense(XmlTextReader jMDictXML, EdictEntry entry)
+        {
+            Sense sense = new();
+            while (jMDictXML.Read())
+            {
+                if (jMDictXML.Name == "sense" && jMDictXML.NodeType == XmlNodeType.EndElement)
+                    break;
+
+                if (jMDictXML.NodeType == XmlNodeType.Element)
+                {
+                    switch (jMDictXML.Name)
+                    {
+                        case "stagk":
+                            sense.StagKList.Add(jMDictXML.ReadString());
+                            break;
+
+                        case "stagr":
+                            sense.StagRList.Add(jMDictXML.ReadString());
+                            break;
+
+                        case "pos":
+                            sense.PosList.Add(ReadEntity(jMDictXML));
+                            break;
+
+                        case "xref":
+                            sense.XRefList.Add(jMDictXML.ReadString());
+                            break;
+
+                        case "ant":
+                            sense.AntList.Add(jMDictXML.ReadString());
+                            break;
+
+                        case "field":
+                            sense.FieldList.Add(ReadEntity(jMDictXML));
+                            break;
+
+                        case "misc":
+                            sense.MiscList.Add(ReadEntity(jMDictXML));
+                            break;
+
+                        case "s_inf":
+                            sense.SInf = jMDictXML.ReadString();
+                            break;
+
+                        case "dial":
+                            sense.DialList.Add(ReadEntity(jMDictXML));
+                            break;
+
+                        case "gloss":
+                            sense.GlossList.Add(jMDictXML.ReadString());
+                            break;
+                    }
+                }
+            }
+            entry.SenseList.Add(sense);
+        }
+        private static string ReadEntity(XmlTextReader jMDictXML)
+        {
+            jMDictXML.Read();
+            if (jMDictXML.NodeType == XmlNodeType.EntityReference)
+            {
+                //jMDictXML.ResolveEntity();
+                return jMDictXML.Name;
+            }
+            else return null;
+        }
+    }
+}

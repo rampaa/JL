@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace JapaneseLookup.EDICT
 {
-    class Results
+    class EdictResult
     {
         public string Id { get; set; }
         public List<string> AlternativeSpellings { get; set; }
@@ -14,7 +14,7 @@ namespace JapaneseLookup.EDICT
         public List<List<string>> WordClasses { get; set; } //e.g. noun +
         public List<string> RelatedTerms { get; set; } 
         public List<string> Antonyms { get; set; }
-        public List<string> FieldInfoList { get; set; } // e.g. "martial arts"
+        public List<List<string>> TypeList { get; set; } // e.g. "martial arts"
         public List<List<string>> MiscList { get; set; } // e.g. "abbr" +
         public List<string> SpellingInfo { get; set; } // e.g. "often derog" +
         public List<string> Dialects { get; set; } // e.g. ksb
@@ -22,7 +22,7 @@ namespace JapaneseLookup.EDICT
         public List<string> KanaSpellings { get; set; }
         public string PrimarySpelling { get; set; }
 
-        public Results()
+        public EdictResult()
         {
             Id = null;
             AlternativeSpellings = new List<string>();
@@ -33,7 +33,7 @@ namespace JapaneseLookup.EDICT
             WordClasses = new List<List<string>>();
             RelatedTerms = new List<string>();
             Antonyms = new List<string>();
-            FieldInfoList = new List<string>();
+            TypeList = new List<List<string>>();
             MiscList = new List<List<string>>();
             SpellingInfo = new List<string>();
             Dialects = new List<string>();

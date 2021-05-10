@@ -29,9 +29,9 @@ namespace JapaneseLookup.EDICT
                     element[1].TryGetInt32(out int frequencyRank);
                     element[2].TryGetDouble(out double frequencyPPM);
 
-                    if (JMdictLoader.jMdictDictionary.TryGetValue(exactSpelling, out List<Results> jMDictResults))
+                    if (EdictLoader.jMdictDictionary.TryGetValue(exactSpelling, out List<EdictResult> jMDictResults))
                     {
-                        foreach (Results result in jMDictResults)
+                        foreach (EdictResult result in jMDictResults)
                         {
                             if (result.PrimarySpelling == reading
                                 || (reading != exactSpelling && result.Readings.Contains(reading)))
@@ -52,9 +52,9 @@ namespace JapaneseLookup.EDICT
                         }
                     }
 
-                    if (reading != exactSpelling && JMdictLoader.jMdictDictionary.TryGetValue(reading, out jMDictResults))
+                    if (reading != exactSpelling && EdictLoader.jMdictDictionary.TryGetValue(reading, out jMDictResults))
                     {
-                        foreach (Results result in jMDictResults)
+                        foreach (EdictResult result in jMDictResults)
                         {
                             if (result.PrimarySpelling == exactSpelling
                                 || result.AlternativeSpellings.Contains(exactSpelling) 
