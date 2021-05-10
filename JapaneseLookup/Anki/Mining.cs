@@ -67,9 +67,16 @@ namespace JapaneseLookup.Anki
 
             var note = new Note(deckName, modelName, fields, options, tags, audio, video, picture);
             var response = await AnkiConnect.AddNoteToDeck(note);
-            Console.WriteLine(response == null ? $"Mining failed for {foundSpelling}" : $"Mined {foundSpelling}");
 
-            if (ConfigManager.ForceSync) await AnkiConnect.Sync();
+            if (response == null)
+            {
+                Console.WriteLine($"Mining failed for {foundSpelling}");
+            }
+            else
+            {
+                Console.WriteLine($"Mined {foundSpelling}");
+                if (ConfigManager.ForceSync) await AnkiConnect.Sync();
+            }
         }
 
         private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> fields,
