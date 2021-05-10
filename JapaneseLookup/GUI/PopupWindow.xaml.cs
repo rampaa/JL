@@ -207,6 +207,8 @@ namespace JapaneseLookup.GUI
         {
             Debug.WriteLine(foundSpelling + " " + reading);
 
+            if (reading == "") reading = foundSpelling;
+
             Uri uri = new(
                 "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=" +
                 foundSpelling +

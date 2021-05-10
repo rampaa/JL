@@ -39,6 +39,7 @@ namespace JapaneseLookup.Anki
 
             // idk if this gets the right audio for every word
             var reading = readings.Split(",")[0];
+            if (reading == "") reading = foundSpelling;
 
             Dictionary<string, object>[] audio =
             {
