@@ -146,14 +146,10 @@ namespace JapaneseLookup.GUI
             MainWindow.MiningMode = false;
             Instance.Hide();
 
-            // doesn't work :(
-            // string readings = stackPanel.FindName("readings").ToString();
-
             string foundSpelling = null;
             string readings = null;
             string definitions = null;
             string context = null;
-            string definitionsRaw = null;
             string foundForm = null;
             string jmdictID = null;
             var timeLocal = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
@@ -174,8 +170,7 @@ namespace JapaneseLookup.GUI
                         readings = child.Text;
                         break;
                     case "definitions":
-                        // TODO: definitions = html
-                        definitionsRaw = child.Text;
+                        definitions = child.Text;
                         break;
                     case "context":
                         context = child.Text;
@@ -200,7 +195,6 @@ namespace JapaneseLookup.GUI
                 readings,
                 definitions,
                 context,
-                definitionsRaw,
                 foundForm,
                 jmdictID,
                 timeLocal,

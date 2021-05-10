@@ -7,14 +7,12 @@ namespace JapaneseLookup.Anki
     // TODO: Exception handling
     public static class Mining
     {
-        // TODO: HTML + CSS for notes
         // TODO: Check if audio was grabbed and tell the user if it was not
         // TODO: Option to force sync after mining
         public static async void Mine(string foundSpelling, string readings, string definitions, string context,
-            string definitionsRaw, string foundForm, string jmdictID, string timeLocal, string alternativeSpellings,
+            string foundForm, string jmdictID, string timeLocal, string alternativeSpellings,
             string frequency)
         {
-            // should be fine to just read the config everytime, right?
             var ankiConfig = await AnkiConfig.ReadAnkiConfig();
             if (ankiConfig == null) return;
 
@@ -29,7 +27,6 @@ namespace JapaneseLookup.Anki
                     readings,
                     definitions,
                     context,
-                    definitionsRaw,
                     foundForm,
                     jmdictID,
                     timeLocal,
@@ -74,7 +71,7 @@ namespace JapaneseLookup.Anki
         }
 
         private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> fields,
-            string foundSpelling, string readings, string definitions, string context, string definitionsRaw,
+            string foundSpelling, string readings, string definitions, string context,
             string foundForm, string jmdictID, string timeLocal, string alternativeSpellings, string frequency)
         {
             var dict = new Dictionary<string, object>();
@@ -92,9 +89,6 @@ namespace JapaneseLookup.Anki
                         break;
                     case JLField.Definitions:
                         dict.Add(key, definitions);
-                        break;
-                    case JLField.DefinitionsRaw:
-                        dict.Add(key, definitionsRaw);
                         break;
                     case JLField.FoundForm:
                         dict.Add(key, foundForm);
