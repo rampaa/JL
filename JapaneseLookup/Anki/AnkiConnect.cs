@@ -55,7 +55,7 @@ namespace JapaneseLookup.Anki
             );
             var getResponse = await Client.GetAsync(uri);
 
-            //  var filename = "JL_" + foundSpelling + "_" + reading + ".mp3";
+            //  var filename = "JL_audio" + foundSpelling + "_" + reading + ".mp3";
 
             var base64 = Convert.ToBase64String(await getResponse.Content.ReadAsByteArrayAsync());
             return base64;

@@ -51,7 +51,7 @@ namespace JapaneseLookup.Anki
                     },
                     {
                         "filename",
-                        $"JL_{foundSpelling}_{reading}.mp3"
+                        $"JL_audio_{foundSpelling}_{reading}.mp3"
                     },
                     {
                         "skipHash",
