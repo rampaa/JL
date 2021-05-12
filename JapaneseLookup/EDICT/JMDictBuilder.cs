@@ -27,7 +27,7 @@ namespace JapaneseLookup.EDICT
                 result.PrimarySpelling = key;
 
                 result.OrthographyInfoList = kEle.KeInfList;
-                result.PriorityList = kEle.KePriList;
+                //result.PriorityList = kEle.KePriList;
 
                 foreach (REle rEle in entry.REleList)
                 {
@@ -43,12 +43,12 @@ namespace JapaneseLookup.EDICT
                     {
                         result.DefinitionsList.Add((sense.GlossList, sense.StagRList, sense.StagKList));
                         result.WordClasses.Add(sense.PosList);
-                        result.RelatedTerms.AddRange(sense.XRefList);
-                        result.Antonyms.AddRange(sense.AntList);
                         result.TypeList.Add(sense.FieldList);
                         result.MiscList.Add(sense.MiscList);
                         result.Dialects.AddRange(sense.DialList);
                         result.SpellingInfo.Add(sense.SInf);
+                        // result.RelatedTerms.AddRange(sense.XRefList);
+                        // result.Antonyms.AddRange(sense.AntList);
                     }
                 }
                 resultList.Add(key, result);
@@ -108,12 +108,12 @@ namespace JapaneseLookup.EDICT
                     {
                         result.DefinitionsList.Add((sense.GlossList, sense.StagRList, sense.StagKList));
                         result.WordClasses.Add(sense.PosList);
-                        result.RelatedTerms.AddRange(sense.XRefList);
-                        result.Antonyms.AddRange(sense.AntList);
                         result.TypeList.Add(sense.FieldList);
                         result.MiscList.Add(sense.MiscList);
                         result.Dialects.AddRange(sense.DialList);
                         result.SpellingInfo.Add(sense.SInf);
+                        // result.RelatedTerms.AddRange(sense.XRefList);
+                        // result.Antonyms.AddRange(sense.AntList);
                     }
                 }
                 resultList.Add(key, result);

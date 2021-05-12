@@ -28,8 +28,8 @@ namespace JapaneseLookup.EDICT
                     foreach (Trans trans in entry.TransList)
                     {
                         result.DefinitionsList.Add((trans.TransDetList, new List<string>(), new List<string>()));
-                        result.RelatedTerms.AddRange(trans.XRefList);
                         result.TypeList.Add(trans.NameTypeList);
+                        // result.RelatedTerms.AddRange(trans.XRefList);
                     }
                     resultList.Add(key, result);
                 }
@@ -68,8 +68,8 @@ namespace JapaneseLookup.EDICT
                     foreach (Trans trans in entry.TransList)
                     {
                         result.DefinitionsList.Add((trans.TransDetList, new List<string>(), new List<string>()));
-                        result.RelatedTerms.AddRange(trans.XRefList);
                         result.TypeList.Add(trans.NameTypeList);
+                        //result.RelatedTerms.AddRange(trans.XRefList);
                     }
                     resultList.Add(key, result);
                 }

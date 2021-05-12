@@ -10,10 +10,7 @@ namespace JapaneseLookup.EDICT
         public List<(List<string> Definitions, List<string> RRestrictions, List<string> KRestrictions)> DefinitionsList { get; set; }
         public List<string> Readings { get; set; }
         public List<string> OrthographyInfoList { get; set; } //e.g. Ateji, Reading
-        public List<string> PriorityList { get; set; } // e.g. gai1
         public List<List<string>> WordClasses { get; set; } //e.g. noun +
-        public List<string> RelatedTerms { get; set; } 
-        public List<string> Antonyms { get; set; }
         public List<List<string>> TypeList { get; set; } // e.g. "martial arts"
         public List<List<string>> MiscList { get; set; } // e.g. "abbr" +
         public List<string> SpellingInfo { get; set; } // e.g. "often derog" +
@@ -21,6 +18,9 @@ namespace JapaneseLookup.EDICT
         public Dictionary<string, Frequency> FrequencyDict { get; set; }
         public List<string> KanaSpellings { get; set; }
         public string PrimarySpelling { get; set; }
+        //public List<string> PriorityList { get; set; } // e.g. gai1
+        //public List<string> Antonyms { get; set; }
+        //public List<string> RelatedTerms { get; set; }
 
         public EdictResult()
         {
@@ -29,10 +29,7 @@ namespace JapaneseLookup.EDICT
             DefinitionsList = new List<(List<string> Definitions, List<string> RRestrictions, List<string> KRestrictions)>();
             Readings = new List<string>();
             OrthographyInfoList = new List<string>();
-            PriorityList = new List<string>();
             WordClasses = new List<List<string>>();
-            RelatedTerms = new List<string>();
-            Antonyms = new List<string>();
             TypeList = new List<List<string>>();
             MiscList = new List<List<string>>();
             SpellingInfo = new List<string>();
@@ -40,6 +37,9 @@ namespace JapaneseLookup.EDICT
             FrequencyDict = new Dictionary<string, Frequency>();
             KanaSpellings = new List<string>();
             PrimarySpelling = null;
+            //PriorityList = new List<string>();
+            //RelatedTerms = new List<string>();
+            //Antonyms = new List<string>();
         }
     }
 }

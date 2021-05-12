@@ -115,9 +115,9 @@ namespace JapaneseLookup.EDICT
                             kEle.KeInfList.Add(ReadEntity(edictXml));
                             break;
 
-                        case "ke_pri":
-                            kEle.KePriList.Add(edictXml.ReadString());
-                            break;
+                        //case "ke_pri":
+                        //    kEle.KePriList.Add(edictXml.ReadString());
+                        //    break;
                     }
                 }
             }
@@ -169,10 +169,6 @@ namespace JapaneseLookup.EDICT
                 {
                     switch (jMneDictXML.Name)
                     {
-                        case "xref":
-                            trans.XRefList.Add(jMneDictXML.ReadString());
-                            break;
-
                         case "name_type":
                             trans.NameTypeList.Add(ReadEntity(jMneDictXML));
                             break;
@@ -180,6 +176,10 @@ namespace JapaneseLookup.EDICT
                         case "trans_det":
                             trans.TransDetList.Add(jMneDictXML.ReadString());
                             break;
+
+                        //case "xref":
+                        //    trans.XRefList.Add(jMneDictXML.ReadString());
+                        //    break;
                     }
                 }
             }
@@ -210,14 +210,6 @@ namespace JapaneseLookup.EDICT
                             sense.PosList.Add(ReadEntity(jMDictXML));
                             break;
 
-                        case "xref":
-                            sense.XRefList.Add(jMDictXML.ReadString());
-                            break;
-
-                        case "ant":
-                            sense.AntList.Add(jMDictXML.ReadString());
-                            break;
-
                         case "field":
                             sense.FieldList.Add(ReadEntity(jMDictXML));
                             break;
@@ -237,6 +229,14 @@ namespace JapaneseLookup.EDICT
                         case "gloss":
                             sense.GlossList.Add(jMDictXML.ReadString());
                             break;
+
+                        //case "xref":
+                        //    sense.XRefList.Add(jMDictXML.ReadString());
+                        //    break;
+
+                        //case "ant":
+                        //    sense.AntList.Add(jMDictXML.ReadString());
+                        //    break;
                     }
                 }
             }

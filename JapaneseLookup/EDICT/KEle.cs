@@ -6,15 +6,13 @@ namespace JapaneseLookup.EDICT
     {
         public string Keb { get; set; } //e.g. 娘 
         public List<string> KeInfList { get; set; } //e.g. Ateji. Can a keb have more than one keInf?
-        public List<string> KePriList { get; set; } // e.g. gai1
+        // public List<string> KePriList { get; set; } // e.g. gai1
 
-        public KEle() : this(null) { }
-
-        public KEle(string keb)
+        public KEle()
         {
-            Keb = keb;
+            Keb = null;
             KeInfList = new List<string>();
-            KePriList = new List<string>();
+            // KePriList = new List<string>();
         }
     }
 }
