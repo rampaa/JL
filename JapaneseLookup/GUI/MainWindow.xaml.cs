@@ -89,19 +89,18 @@ namespace JapaneseLookup.GUI
                     // yomichan-style popup movement
                     // PopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
-                    PopupWindow.Instance.Show();
+                    PopupWindow.Instance.Visibility = Visibility.Visible;
                     PopupWindow.Instance.Activate();
                     PopupWindow.Instance.Focus();
                     PopupWindow.DisplayResults(sentence, results);
                 }
-
                 else
-                    PopupWindow.Instance.Hide();
+                    PopupWindow.Instance.Visibility = Visibility.Hidden;
             }
             else
             {
                 _lastWord = "";
-                PopupWindow.Instance.Hide();
+                PopupWindow.Instance.Visibility = Visibility.Hidden;
             }
         }
 

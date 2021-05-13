@@ -22,6 +22,7 @@ namespace JapaneseLookup
         public static int MaxSearchLength;
         public static string FrequencyList;
         public static bool ForceSync;
+        public static int LookupRate = 0;
         
         public static Brush FoundSpellingColor = Brushes.Chocolate;
         public static Brush ReadingsColor = Brushes.Goldenrod;

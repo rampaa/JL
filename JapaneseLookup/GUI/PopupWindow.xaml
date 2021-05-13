@@ -6,18 +6,14 @@
         xmlns:local="clr-namespace:JapaneseLookup"
         mc:Ignorable="d"
         Title="PopupWindow"
-        Width="Auto" Height="Auto" SizeToContent="WidthAndHeight" MaxWidth="430" MaxHeight="620"
+        Width="Auto" Height="Auto" SizeToContent="Height" MaxWidth="430" MaxHeight="620"
         Background="#FF2C2B2B" Foreground="#FF3C3783"
         Topmost="True" WindowStyle="None" AllowsTransparency="true" ShowInTaskbar="False"
         KeyDown="Window_KeyDown" Closing="Window_Closing">
 
     <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Top">
         <Grid>
-            <StackPanel x:Name="StackPanel" KeyDown="StackPanel_KeyDown">
-                <!--<TextBox x:Name="CardTextBox" HorizontalAlignment="Left" Margin="27,43,0,0" TextWrapping="Wrap"
-                     VerticalAlignment="Top" Width="auto" Height="auto" Background="#FF2C2B2B" Foreground="White"
-                     FontSize="15" />-->
-            </StackPanel>
+            <StackPanel x:Name="StackPanel" KeyDown="StackPanel_KeyDown" />
         </Grid>
     </ScrollViewer>
 </Window>

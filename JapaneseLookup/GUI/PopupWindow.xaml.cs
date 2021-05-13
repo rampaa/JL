@@ -158,7 +158,6 @@ namespace JapaneseLookup.GUI
             }
         }
 
-        // TODO: Fix this and audio
         private static void FoundSpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             MainWindow.MiningMode = false;
@@ -166,7 +165,7 @@ namespace JapaneseLookup.GUI
 
             string foundSpelling = null;
             string readings = null;
-            string definitions = null;
+            string definitions = "";
             string context = null;
             string foundForm = null;
             string jmdictID = null;
@@ -175,9 +174,9 @@ namespace JapaneseLookup.GUI
             string frequency = null;
 
             var textBlock = (TextBlock) sender;
-            var stackPanel = (StackPanel) textBlock.Parent;
+            var top = (WrapPanel) textBlock.Parent;
 
-            foreach (TextBlock child in stackPanel.Children)
+            foreach (TextBlock child in top.Children)
             {
                 switch (child.Name)
                 {
@@ -186,9 +185,6 @@ namespace JapaneseLookup.GUI
                         break;
                     case "readings":
                         readings = child.Text;
-                        break;
-                    case "definitions":
-                        definitions = child.Text;
                         break;
                     case "context":
                         context = child.Text;
@@ -208,6 +204,14 @@ namespace JapaneseLookup.GUI
                 }
             }
 
+            var innerStackPanel = (StackPanel) top.Parent;
+            var bottom = (StackPanel) innerStackPanel.Children[1];
+            // For multiple definitions (multiple dictionaries enabled at the same time)
+            foreach (TextBlock child in bottom.Children)
+            {
+                definitions += child.Text;
+            }
+
             Mining.Mine(
                 foundSpelling,
                 readings,
@@ -223,7 +227,7 @@ namespace JapaneseLookup.GUI
 
         static void PlayAudio(string foundSpelling, string reading)
         {
-            Debug.WriteLine(foundSpelling + " " + reading);
+            Debug.WriteLine("Attempting to play audio: " + foundSpelling + " " + reading);
 
             if (reading == "") reading = foundSpelling;
 
@@ -236,7 +240,7 @@ namespace JapaneseLookup.GUI
 
             // var sound = AnkiConnect.GetAudio("猫", "ねこ").Result;
             var test = new MediaElement
-                {Source = uri, Volume = 1, Visibility = Visibility.Collapsed};
+                { Source = uri, Volume = 1, Visibility = Visibility.Collapsed };
             Instance.StackPanel.Children.Add(test);
         }
 
@@ -257,11 +261,13 @@ namespace JapaneseLookup.GUI
 
                 case Key.P:
                 {
-                    var innerStackPanel = (StackPanel) StackPanel.Children[0];
                     string foundSpelling = null;
                     string reading = null;
 
-                    foreach (TextBlock child in innerStackPanel.Children)
+                    var innerStackPanel = (StackPanel) StackPanel.Children[0];
+                    var top = (WrapPanel) innerStackPanel.Children[0];
+
+                    foreach (TextBlock child in top.Children)
                     {
                         switch (child.Name)
                         {
@@ -298,12 +304,14 @@ namespace JapaneseLookup.GUI
             {
                 case Key.P:
                 {
-                    var textBlock = (TextBlock) sender;
-                    var innerStackPanel = (StackPanel) textBlock.Parent;
                     string foundSpelling = null;
                     string reading = null;
 
-                    foreach (TextBlock child in innerStackPanel.Children)
+                    var textBlock = (TextBlock) sender;
+                    var innerStackPanel = (StackPanel) textBlock.Parent;
+                    var top = (WrapPanel) innerStackPanel.Children[0];
+
+                    foreach (TextBlock child in top.Children)
                     {
                         switch (child.Name)
                         {

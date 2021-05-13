@@ -28,7 +28,6 @@ namespace JapaneseLookup
             JMnedict
         };
 
-        public static int LookupRate = 8;
         private static DateTime _lastLookupTime;
 
         public static readonly Regex JapaneseRegex =
@@ -57,9 +56,6 @@ namespace JapaneseLookup
             });
 
             Task.Run(JMnedictLoader.Load);
-
-            // init AnkiConnect so that it doesn't block later
-            Task.Run(AnkiConnect.GetDeckNames);
         }
 
         public static (string sentence, int endPosition) FindSentence(string text, int position)
@@ -96,15 +92,15 @@ namespace JapaneseLookup
         public static List<Dictionary<string, List<string>>> LookUp(string text)
         {
             var preciseTimeNow = new DateTime(Stopwatch.GetTimestamp());
-            if ((preciseTimeNow - _lastLookupTime).Milliseconds < LookupRate)
+            if ((preciseTimeNow - _lastLookupTime).Milliseconds < ConfigManager.LookupRate)
                 return null;
 
             _lastLookupTime = preciseTimeNow;
 
-            Dictionary<string, (List<EdictResult> jMdictResults, List<string> processList, string foundForm)> wordResults =
-                new();
-            Dictionary<string, (List<JMnedictResult> jMdictResults, List<string> processList, string foundForm)> nameResults =
-                new();
+            Dictionary<string, (List<EdictResult> jMdictResults, List<string> processList, string foundForm)>
+                wordResults = new();
+            Dictionary<string, (List<JMnedictResult> jMdictResults, List<string> processList, string foundForm)>
+                nameResults = new();
 
             int succAttempt = 0;
             for (int i = 0; i < text.Length; i++)
