@@ -45,6 +45,12 @@ namespace JapaneseLookup.Anki
             return await Send(req);
         }
 
+        public static async Task<Response> Sync()
+        {
+            var req = new Request("sync", 6);
+            return await Send(req);
+        }
+
         public static async Task<string> GetAudio(string foundSpelling, string reading)
         {
             Uri uri = new(
@@ -55,7 +61,7 @@ namespace JapaneseLookup.Anki
             );
             var getResponse = await Client.GetAsync(uri);
 
-            //  var filename = "JL_" + foundSpelling + "_" + reading + ".mp3";
+            //  var filename = "JL_audio" + foundSpelling + "_" + reading + ".mp3";
 
             var base64 = Convert.ToBase64String(await getResponse.Content.ReadAsByteArrayAsync());
             return base64;

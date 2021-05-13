@@ -5,9 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:JapaneseLookup"
         mc:Ignorable="d"
-        Title="PopupWindow" MaxWidth="430" MaxHeight="620" Background="#FF2C2B2B" Foreground="#FF3C3783" Topmost="True"
-        WindowStyle="None" AllowsTransparency="true" KeyDown="Window_KeyDown" Closing="Window_Closing"
-        ShowInTaskbar="False">
+        Title="PopupWindow"
+        Width="Auto" Height="Auto" SizeToContent="WidthAndHeight" MaxWidth="430" MaxHeight="620"
+        Background="#FF2C2B2B" Foreground="#FF3C3783"
+        Topmost="True" WindowStyle="None" AllowsTransparency="true" ShowInTaskbar="False"
+        KeyDown="Window_KeyDown" Closing="Window_Closing">
 
     <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Top">
         <Grid>

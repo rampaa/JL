@@ -7,7 +7,6 @@
         FoundSpelling,
         Readings,
         Definitions,
-        DefinitionsRaw,
         FoundForm,
         Context,
         Audio,

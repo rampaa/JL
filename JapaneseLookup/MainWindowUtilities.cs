@@ -21,14 +21,22 @@ namespace JapaneseLookup
         public static bool ready = false;
         public static string Backlog = "";
         public const string FakeFrequency = "1000000";
-        public enum DictionaryName { JMdict, JMnedict };
+
+        public enum DictionaryName
+        {
+            JMdict,
+            JMnedict
+        };
+
+        public static int LookupRate = 8;
+        private static DateTime _lastLookupTime;
 
         public static readonly Regex JapaneseRegex =
             new(@"[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]");
 
         // Consider checking for \t, \r, "　", " ", ., !, ?, –, —, ―, ‒, ~, ‥, ♪, ～, ♡, ♥, ☆, ★
-        private static readonly List<string> JapanesePunctuation = new(new[]
-            {"。", "！", "？", "…", "―", "\n"});
+        private static readonly List<string> JapanesePunctuation =
+            new() { "。", "！", "？", "…", "―", "\n" };
 
         public static void MainWindowInitializer()
         {
@@ -87,6 +95,12 @@ namespace JapaneseLookup
 
         public static List<Dictionary<string, List<string>>> LookUp(string text)
         {
+            var preciseTimeNow = new DateTime(Stopwatch.GetTimestamp());
+            if ((preciseTimeNow - _lastLookupTime).Milliseconds < LookupRate)
+                return null;
+
+            _lastLookupTime = preciseTimeNow;
+
             Dictionary<string, (List<EdictResult> jMdictResults, List<string> processList, string foundForm)> wordResults =
                 new();
             Dictionary<string, (List<JMnedictResult> jMdictResults, List<string> processList, string foundForm)> nameResults =
@@ -214,6 +228,7 @@ namespace JapaneseLookup
                     results.Add(result);
                 }
             }
+
             return results;
         }
 
@@ -281,8 +296,10 @@ namespace JapaneseLookup
                     results.Add(result);
                 }
             }
+
             return results;
         }
+
         private static string BuildNameDefinition(JMnedictResult jMDictResult)
         {
             int count = 1;
@@ -298,8 +315,8 @@ namespace JapaneseLookup
                         defResult += ") ";
                     }
 
-                    if (jMDictResult.Definitions.Count>0)
-                    defResult += "(" + count + ") ";
+                    if (jMDictResult.Definitions.Count > 0)
+                        defResult += "(" + count + ") ";
 
                     defResult += string.Join("; ", jMDictResult.Definitions[i]) + " ";
 
@@ -307,8 +324,10 @@ namespace JapaneseLookup
                     ++count;
                 }
             }
+
             return defResult;
         }
+
         private static string BuildWordDefinition(EdictResult jMDictResult)
         {
             int count = 1;
@@ -355,9 +374,11 @@ namespace JapaneseLookup
 
                         defResult += ") ";
                     }
+
                     ++count;
                 }
             }
+
             return defResult;
         }
     }

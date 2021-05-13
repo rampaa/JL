@@ -29,7 +29,7 @@ namespace JapaneseLookup.GUI
 
         public static void UpdatePosition(Point position)
         {
-            Instance.Left = position.X + 0;
+            Instance.Left = position.X + 10;
             Instance.Top = position.Y + 20;
         }
 
@@ -42,30 +42,66 @@ namespace JapaneseLookup.GUI
         {
             foreach (var result in results)
             {
-                var innerStackPanel = new StackPanel();
+                var innerStackPanel = new StackPanel
+                {
+                    Margin = new Thickness(2, 2, 2, 2),
+                };
+                var top = new WrapPanel();
+                var bottom = new StackPanel();
+
 
                 var textBlockFoundSpelling = new TextBlock
                 {
                     Name = "foundSpelling",
                     Text = result["foundSpelling"][0],
-                    Foreground = Brushes.White,
+                    Foreground = ConfigManager.FoundSpellingColor,
+                    FontSize = ConfigManager.FoundSpellingFontSize
                 };
                 textBlockFoundSpelling.PreviewMouseUp += FoundSpelling_PreviewMouseUp;
                 textBlockFoundSpelling.KeyDown += FoundSpelling_KeyDown;
 
-                var textBlockKanaSpellings = new TextBlock
-                {
-                    Name = "kanaSpellings",
-                    Text = string.Join(" ", result["kanaSpellings"]),
-                    TextWrapping = TextWrapping.Wrap,
-                    Foreground = Brushes.White
-                };
+                // var textBlockKanaSpellings = new TextBlock
+                // {
+                //     Name = "kanaSpellings",
+                //     Text = string.Join(" ", result["kanaSpellings"]),
+                //     TextWrapping = TextWrapping.Wrap,
+                //     Foreground = Brushes.White
+                // };
 
                 var textBlockReadings = new TextBlock
                 {
                     Name = "readings",
                     Text = string.Join(", ", result["readings"]),
-                    Foreground = Brushes.White
+                    Foreground = ConfigManager.ReadingsColor,
+                    FontSize = ConfigManager.ReadingsFontSize,
+                    Margin = new Thickness(5, 0, 0, 0),
+                };
+
+                var textBlockAlternativeSpellings = new TextBlock
+                {
+                    Name = "alternativeSpellings",
+                    Text = "(" + string.Join(", ", result["alternativeSpellings"]) + ")",
+                    Foreground = ConfigManager.AlternativeSpellingsColor,
+                    FontSize = ConfigManager.AlternativeSpellingsFontSize,
+                    Margin = new Thickness(5, 0, 0, 0),
+                };
+
+                var textBlockProcess = new TextBlock
+                {
+                    Name = "process",
+                    Text = string.Join(", ", result["process"]),
+                    Foreground = ConfigManager.ProcessColor,
+                    FontSize = ConfigManager.ProcessFontSize,
+                    Margin = new Thickness(5, 0, 0, 0),
+                };
+
+                var textBlockFrequency = new TextBlock
+                {
+                    Name = "frequency",
+                    Text = "#" + string.Join(", ", result["frequency"]),
+                    Foreground = ConfigManager.FrequencyColor,
+                    FontSize = ConfigManager.FrequencyFontSize,
+                    Margin = new Thickness(5, 0, 0, 0),
                 };
 
                 var textBlockDefinitions = new TextBlock
@@ -73,14 +109,15 @@ namespace JapaneseLookup.GUI
                     Name = "definitions",
                     Text = string.Join("", result["definitions"]),
                     TextWrapping = TextWrapping.Wrap,
-                    Foreground = Brushes.White
+                    Foreground = ConfigManager.DefinitionsColor,
+                    FontSize = ConfigManager.DefinitionsFontSize,
+                    Margin = new Thickness(0, 5, 0, 0),
                 };
 
                 var textBlockContext = new TextBlock
                 {
                     Name = "context",
                     Text = sentence,
-                    Foreground = Brushes.White,
                     Visibility = Visibility.Collapsed
                 };
 
@@ -88,10 +125,6 @@ namespace JapaneseLookup.GUI
                 {
                     Name = "foundForm",
                     Text = string.Join("", result["foundForm"]),
-                    TextWrapping = TextWrapping.Wrap,
-                    Foreground = Brushes.White,
-
-                    // decide if we want to display this
                     Visibility = Visibility.Collapsed
                 };
 
@@ -102,58 +135,39 @@ namespace JapaneseLookup.GUI
                     Visibility = Visibility.Collapsed
                 };
 
-                var textBlockAlternativeSpellings = new TextBlock
+                TextBlock[] babies =
                 {
-                    Name = "alternativeSpellings",
-                    Text = string.Join(", ", result["alternativeSpellings"]),
-                    Foreground = Brushes.White
+                    textBlockFoundSpelling, textBlockReadings, textBlockAlternativeSpellings, textBlockProcess,
+                    textBlockFrequency, textBlockContext, textBlockFoundForm, textBlockJmdictID
                 };
-
-                var textBlockProcess = new TextBlock
+                foreach (var baby in babies)
                 {
-                    Name = "process",
-                    Text = string.Join(", ", result["process"]),
-                    Foreground = Brushes.White,
-                };
+                    // general check, alternativespellings check, frequency check
+                    if (baby.Text != "" && baby.Text != "()" && baby.Text != ("#" + MainWindowUtilities.FakeFrequency))
+                    {
+                        top.Children.Add(baby);
+                    }
+                }
 
-                var frequency = string.Join(", ", result["frequency"]);
-                var textBlockFrequency = new TextBlock
-                {
-                    Name = "frequency",
-                    Text = frequency,
-                    Foreground = Brushes.White,
-                };
+                bottom.Children.Add(textBlockDefinitions);
 
-                innerStackPanel.Children.Add(textBlockFoundSpelling);
-                //innerStackPanel.Children.Add(textBlockKanaSpellings);
-                innerStackPanel.Children.Add(textBlockReadings);
-                innerStackPanel.Children.Add(textBlockDefinitions);
-                innerStackPanel.Children.Add(textBlockContext);
-                innerStackPanel.Children.Add(textBlockFoundForm);
-                innerStackPanel.Children.Add(textBlockJmdictID);
-                innerStackPanel.Children.Add(textBlockAlternativeSpellings);
-                innerStackPanel.Children.Add(textBlockProcess);
-                if (frequency != MainWindowUtilities.FakeFrequency)
-                    innerStackPanel.Children.Add(textBlockFrequency);
-
+                innerStackPanel.Children.Add(top);
+                innerStackPanel.Children.Add(bottom);
                 Instance.StackPanel.Children.Add(innerStackPanel);
                 Instance.StackPanel.Children.Add(new Separator());
             }
         }
 
+        // TODO: Fix this and audio
         private static void FoundSpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             MainWindow.MiningMode = false;
             Instance.Hide();
 
-            // doesn't work :(
-            // string readings = stackPanel.FindName("readings").ToString();
-
             string foundSpelling = null;
             string readings = null;
             string definitions = null;
             string context = null;
-            string definitionsRaw = null;
             string foundForm = null;
             string jmdictID = null;
             var timeLocal = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
@@ -174,8 +188,7 @@ namespace JapaneseLookup.GUI
                         readings = child.Text;
                         break;
                     case "definitions":
-                        // TODO: definitions = html
-                        definitionsRaw = child.Text;
+                        definitions = child.Text;
                         break;
                     case "context":
                         context = child.Text;
@@ -200,7 +213,6 @@ namespace JapaneseLookup.GUI
                 readings,
                 definitions,
                 context,
-                definitionsRaw,
                 foundForm,
                 jmdictID,
                 timeLocal,
@@ -212,6 +224,8 @@ namespace JapaneseLookup.GUI
         static void PlayAudio(string foundSpelling, string reading)
         {
             Debug.WriteLine(foundSpelling + " " + reading);
+
+            if (reading == "") reading = foundSpelling;
 
             Uri uri = new(
                 "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=" +

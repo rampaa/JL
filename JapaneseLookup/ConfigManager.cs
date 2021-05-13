@@ -21,6 +21,21 @@ namespace JapaneseLookup
         public static string AnkiConnectUri;
         public static int MaxSearchLength;
         public static string FrequencyList;
+        public static bool ForceSync;
+        
+        public static Brush FoundSpellingColor = Brushes.Chocolate;
+        public static Brush ReadingsColor = Brushes.Goldenrod;
+        public static Brush DefinitionsColor = Brushes.White;
+        public static Brush ProcessColor = Brushes.White;
+        public static Brush FrequencyColor = Brushes.White;
+        public static Brush AlternativeSpellingsColor = Brushes.White;
+        public static int FoundSpellingFontSize = 19;
+        public static int ReadingsFontSize = 17;
+        public static int DefinitionsFontSize = 15;
+        public static int ProcessFontSize = 15;
+        public static int FrequencyFontSize = 15;
+        public static int AlternativeSpellingsFontSize = 15;
+
         public static void ApplySettings(MainWindow mainWindow)
         {
             MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength"));
