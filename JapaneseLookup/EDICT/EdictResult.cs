@@ -7,9 +7,13 @@ namespace JapaneseLookup.EDICT
     {
         public string Id { get; set; }
         public List<string> AlternativeSpellings { get; set; }
-        public List<(List<string> Definitions, List<string> RRestrictions, List<string> KRestrictions)> DefinitionsList { get; set; }
+        public List<List<string>> Definitions { get; set; }
+        public List<List<string>> RRestrictions { get; set; }
+        public List<List<string>> KRestrictions { get; set; }
         public List<string> Readings { get; set; }
-        public List<string> OrthographyInfoList { get; set; } //e.g. Ateji, Reading
+        public List<string> POrthographyInfoList { get; set; }
+        public List<List<string>> AOrthographyInfoList { get; set; }
+        public List<List<string>> ROrthographyInfoList { get; set; }
         public List<List<string>> WordClasses { get; set; } //e.g. noun +
         public List<List<string>> TypeList { get; set; } // e.g. "martial arts"
         public List<List<string>> MiscList { get; set; } // e.g. "abbr" +
@@ -25,16 +29,20 @@ namespace JapaneseLookup.EDICT
         public EdictResult()
         {
             Id = null;
-            AlternativeSpellings = new List<string>();
-            DefinitionsList = new List<(List<string> Definitions, List<string> RRestrictions, List<string> KRestrictions)>();
+            Definitions = new List<List<string>>();
+            RRestrictions = new List<List<string>>();
+            KRestrictions = new List<List<string>>();
             Readings = new List<string>();
-            OrthographyInfoList = new List<string>();
+            AlternativeSpellings = new List<string>();
+            POrthographyInfoList = new List<string>();
+            AOrthographyInfoList = new List<List<string>>();
+            ROrthographyInfoList = new List<List<string>>();
             WordClasses = new List<List<string>>();
             TypeList = new List<List<string>>();
             MiscList = new List<List<string>>();
             SpellingInfo = new List<string>();
             Dialects = new List<string>();
-            FrequencyDict = new Dictionary<string, Frequency>();
+            //FrequencyDict = new Dictionary<string, Frequency>();
             KanaSpellings = new List<string>();
             PrimarySpelling = null;
             //PriorityList = new List<string>();

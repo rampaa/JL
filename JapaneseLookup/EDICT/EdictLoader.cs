@@ -13,37 +13,19 @@ namespace JapaneseLookup.EDICT
     class EdictLoader
     {
         public static Dictionary<string, List<EdictResult>> jMdictDictionary = new();
-        public static Dictionary<string, List<EdictResult>> jMnedictDictionary = new();
-        public static void Load(DictionaryName dictionaryName)
+        public static void Load()
         {
-            string dictionaryPath = "";
-
-            switch(dictionaryName)
-            {
-                case DictionaryName.JMdict:
-                    {
-                        dictionaryPath = "Resources/JMdict.xml";
-                        break;
-                    }
-
-                case DictionaryName.JMnedict:
-                    {
-                        dictionaryPath = "Resources/JMnedict.xml";
-                        break;
-                    }
-            }                
-
-            using XmlTextReader edictXml = new(Path.Join(ConfigManager.ApplicationPath, dictionaryPath));
+            using XmlTextReader edictXml = new(Path.Join(ConfigManager.ApplicationPath, "Resources/JMdict.xml"));
 
             edictXml.DtdProcessing = DtdProcessing.Parse;
             edictXml.WhitespaceHandling = WhitespaceHandling.None;
             edictXml.EntityHandling = EntityHandling.ExpandCharEntities;
             while (edictXml.ReadToFollowing("entry"))
             {
-                ReadEntry(edictXml, dictionaryName);
+                ReadEntry(edictXml);
             }
         }
-        private static void ReadEntry(XmlTextReader edictXml, DictionaryName dictionaryName)
+        private static void ReadEntry(XmlTextReader edictXml)
         {
             EdictEntry entry = new();
             while (edictXml.Read())
@@ -70,29 +52,10 @@ namespace JapaneseLookup.EDICT
                         case "sense":
                             ReadSense(edictXml, entry);
                             break;
-
-                        case "trans":
-                            ReadTrans(edictXml, entry);
-                            break;
                     }
                 }
             }
-
-            switch (dictionaryName)
-            {
-
-                case DictionaryName.JMdict:
-                    {
-                        JMDictBuilder.BuildDictionary(entry, jMdictDictionary);
-                        break;
-                    }
-
-                case DictionaryName.JMnedict:
-                    {
-                        JMNeDictBuilder.BuildDictionary(entry, jMnedictDictionary);
-                        break;
-                    }
-            }
+            JMDictBuilder.BuildDictionary(entry, jMdictDictionary);
         }
 
         private static void ReadKEle(XmlTextReader edictXml, EdictEntry entry)
@@ -148,42 +111,13 @@ namespace JapaneseLookup.EDICT
                             rEle.ReInfList.Add(ReadEntity(jMDictXML));
                             break;
 
-                        case "re_pri":
-                            rEle.ReInfList.Add(jMDictXML.ReadString());
-                            break;
-                    }
-                }
-            }
-            entry.REleList.Add(rEle);
-        }
-
-        private static void ReadTrans(XmlTextReader jMneDictXML, EdictEntry entry)
-        {
-            Trans trans = new();
-            while (jMneDictXML.Read())
-            {
-                if (jMneDictXML.Name == "trans" && jMneDictXML.NodeType == XmlNodeType.EndElement)
-                    break;
-
-                if (jMneDictXML.NodeType == XmlNodeType.Element)
-                {
-                    switch (jMneDictXML.Name)
-                    {
-                        case "name_type":
-                            trans.NameTypeList.Add(ReadEntity(jMneDictXML));
-                            break;
-
-                        case "trans_det":
-                            trans.TransDetList.Add(jMneDictXML.ReadString());
-                            break;
-
-                        //case "xref":
-                        //    trans.XRefList.Add(jMneDictXML.ReadString());
+                        //case "re_pri":
+                        //    rEle.RePriList.Add(jMDictXML.ReadString());
                         //    break;
                     }
                 }
             }
-            entry.TransList.Add(trans);
+            entry.REleList.Add(rEle);
         }
 
         private static void ReadSense(XmlTextReader jMDictXML, EdictEntry entry)

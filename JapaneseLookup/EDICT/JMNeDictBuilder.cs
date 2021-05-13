@@ -8,35 +8,33 @@ namespace JapaneseLookup.EDICT
 {
     class JMNeDictBuilder
     {
-        public static void BuildDictionary(EdictEntry entry, Dictionary<string, List<EdictResult>> jMnedictDictionary)
+        public static void BuildDictionary(JMnedictEntry entry, Dictionary<string, List<JMnedictResult>> jMnedictDictionary)
         {
-            Dictionary<string, EdictResult> resultList = new();
+            Dictionary<string, JMnedictResult> resultList = new();
             List<string> alternativeSpellings;
 
-            if (entry.KEleList.Any())
+            if (entry.KebList.Any())
             {
-                foreach (KEle kEle in entry.KEleList)
+                foreach (string keb in entry.KebList)
                 {
-                    EdictResult result = new();
-                    string key = kEle.Keb;
+                    JMnedictResult result = new();
+                    string key = Kana.KatakanaToHiraganaConverter(keb);
 
-                    result.PrimarySpelling = key;
-
-                    foreach (REle rEle in entry.REleList)
-                        result.Readings.Add(rEle.Reb);
+                    result.PrimarySpelling = keb;
+                    result.Readings = entry.RebList;
 
                     foreach (Trans trans in entry.TransList)
                     {
-                        result.DefinitionsList.Add((trans.TransDetList, new List<string>(), new List<string>()));
-                        result.TypeList.Add(trans.NameTypeList);
+                        result.Definitions.AddRange(trans.TransDetList);
+                        result.NameTypes.AddRange(trans.NameTypeList);
                         // result.RelatedTerms.AddRange(trans.XRefList);
                     }
-                    resultList.Add(key, result);
+                    resultList.TryAdd(key, result);
                 }
 
                 alternativeSpellings = resultList.Keys.ToList();
 
-                foreach (KeyValuePair<string, EdictResult> item in resultList)
+                foreach (KeyValuePair<string, JMnedictResult> item in resultList)
                 {
                     foreach (string s in alternativeSpellings)
                     {
@@ -50,38 +48,50 @@ namespace JapaneseLookup.EDICT
 
             else
             {
-                foreach (REle rEle in entry.REleList)
+                foreach (string reb in entry.RebList)
                 {
-                    string key = Kana.KatakanaToHiraganaConverter(rEle.Reb);
+                    string key = Kana.KatakanaToHiraganaConverter(reb);
 
-                    if (resultList.TryGetValue(key, out var previousResult))
-                    {
-                        previousResult.KanaSpellings.Add(rEle.Reb);
+                    if (resultList.ContainsKey(key))
                         continue;
-                    }
 
-                    EdictResult result = new();
+                    JMnedictResult result = new();
 
-                    result.KanaSpellings.Add(rEle.Reb);
-                    result.PrimarySpelling = rEle.Reb;
+                    result.PrimarySpelling = reb;
 
                     foreach (Trans trans in entry.TransList)
                     {
-                        result.DefinitionsList.Add((trans.TransDetList, new List<string>(), new List<string>()));
-                        result.TypeList.Add(trans.NameTypeList);
+                        result.Definitions.AddRange(trans.TransDetList);
+
+                        result.Definitions.AddRange(trans.NameTypeList);
+
                         //result.RelatedTerms.AddRange(trans.XRefList);
                     }
                     resultList.Add(key, result);
                 }
             }
 
-
-            foreach (KeyValuePair<string, EdictResult> rl in resultList)
+            foreach (KeyValuePair<string, JMnedictResult> rl in resultList)
             {
                 rl.Value.Id = entry.Id;
                 string key = rl.Key;
 
-                if (jMnedictDictionary.TryGetValue(key, out List<EdictResult> tempList))
+                if (!rl.Value.AlternativeSpellings.Any())
+                    rl.Value.AlternativeSpellings = null;
+
+                if (!rl.Value.Definitions.Any())
+                    rl.Value.Definitions = null;
+
+                if (!rl.Value.NameTypes.Any())
+                    rl.Value.NameTypes = null;
+
+                if (!rl.Value.PrimarySpelling.Any())
+                    rl.Value.PrimarySpelling = null;
+
+                if (!rl.Value.Readings.Any())
+                    rl.Value.Readings = null;
+
+                if (jMnedictDictionary.TryGetValue(key, out List<JMnedictResult> tempList))
                     tempList.Add(rl.Value);
                 else
                     tempList = new() { rl.Value };

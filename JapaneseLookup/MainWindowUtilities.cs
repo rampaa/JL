@@ -39,7 +39,7 @@ namespace JapaneseLookup
             Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderNarou = Task.Run(() =>
                 FrequencyLoader.LoadJSON(Path.Join(ConfigManager.ApplicationPath, "Resources/freqlist_narou.json")));
 
-            Task.Run(() => EdictLoader.Load(DictionaryName.JMdict)).ContinueWith(_ =>
+            Task.Run(() => EdictLoader.Load()).ContinueWith(_ =>
             {
                 //Task.WaitAll(taskFreqLoaderVN, taskFreqLoaderNovel, taskFreqLoaderNarou);
                 FrequencyLoader.AddToJMdict("VN", taskFreqLoaderVN.Result);
@@ -48,7 +48,7 @@ namespace JapaneseLookup
                 ready = true;
             });
 
-            Task.Run(() => EdictLoader.Load(DictionaryName.JMnedict));
+            Task.Run(JMnedictLoader.Load);
 
             // init AnkiConnect so that it doesn't block later
             Task.Run(AnkiConnect.GetDeckNames);
@@ -89,7 +89,7 @@ namespace JapaneseLookup
         {
             Dictionary<string, (List<EdictResult> jMdictResults, List<string> processList, string foundForm)> wordResults =
                 new();
-            Dictionary<string, (List<EdictResult> jMdictResults, List<string> processList, string foundForm)> nameResults =
+            Dictionary<string, (List<JMnedictResult> jMdictResults, List<string> processList, string foundForm)> nameResults =
                 new();
 
             int succAttempt = 0;
@@ -105,7 +105,7 @@ namespace JapaneseLookup
                     tryLongVowelConversion = false;
                 }
 
-                if (EdictLoader.jMnedictDictionary.TryGetValue(textInHiragana, out var tempNameResult))
+                if (JMnedictLoader.jMnedictDictionary.TryGetValue(textInHiragana, out var tempNameResult))
                 {
                     nameResults.TryAdd(textInHiragana, (tempNameResult, new List<string>(), text[..^i]));
                 }
@@ -160,11 +160,60 @@ namespace JapaneseLookup
                 results.AddRange(WordResultBuilder(wordResults));
 
             if (nameResults.Any())
-                results.AddRange(WordResultBuilder(nameResults));
+                results.AddRange(NameResultBuilder(nameResults));
 
             results = results
                 .OrderByDescending(dict => dict["foundForm"][0].Length)
                 .ThenBy(dict => Convert.ToInt32(dict["frequency"][0])).ToList();
+            return results;
+        }
+
+        private static List<Dictionary<string, List<string>>> NameResultBuilder
+            (Dictionary<string, (List<JMnedictResult> jMdictResults, List<string> processList, string foundForm)> nameResult)
+        {
+            var results = new List<Dictionary<string, List<string>>>();
+
+            foreach (var wordResult in nameResult)
+            {
+                foreach (var jMDictResult in wordResult.Value.jMdictResults)
+                {
+                    var result = new Dictionary<string, List<string>>();
+
+                    var foundSpelling = new List<string> { jMDictResult.PrimarySpelling };
+                    List<string> readings;
+
+                    if (jMDictResult.Readings != null)
+                        readings = jMDictResult.Readings.ToList();
+                    else
+                        readings = new List<string>();
+
+                    var foundForm = new List<string> { wordResult.Value.foundForm };
+                    var jmdictID = new List<string> { jMDictResult.Id };
+
+
+                    List<string> alternativeSpellings;
+                    if (jMDictResult.AlternativeSpellings != null)
+                        alternativeSpellings = jMDictResult.AlternativeSpellings;
+                    else
+                        alternativeSpellings = new List<string>();
+
+                    var process = wordResult.Value.processList;
+
+                    var definitions = new List<string> { BuildNameDefinition(jMDictResult) };
+
+                    result.Add("foundSpelling", foundSpelling);
+                    result.Add("readings", readings);
+                    result.Add("definitions", definitions);
+                    result.Add("foundForm", foundForm);
+                    result.Add("jmdictID", jmdictID);
+                    result.Add("alternativeSpellings", alternativeSpellings);
+                    result.Add("process", process);
+                    result.Add("frequency", new() { FakeFrequency });
+                    result.Add("kanaSpellings", new List<string>());
+
+                    results.Add(result);
+                }
+            }
             return results;
         }
 
@@ -180,18 +229,40 @@ namespace JapaneseLookup
                     var result = new Dictionary<string, List<string>>();
 
                     var foundSpelling = new List<string> { jMDictResult.PrimarySpelling };
-                    var kanaSpellings = jMDictResult.KanaSpellings;
+
+                    List<string> kanaSpellings;
+
+                    if (jMDictResult.KanaSpellings != null)
+                        kanaSpellings = jMDictResult.KanaSpellings;
+                    else
+                        kanaSpellings = new List<string>();
+
                     var readings = jMDictResult.Readings.ToList();
                     var foundForm = new List<string> { wordResult.Value.foundForm };
                     var jmdictID = new List<string> { jMDictResult.Id };
-                    var alternativeSpellings = jMDictResult.AlternativeSpellings.ToList();
+
+                    List<string> alternativeSpellings;
+                    if (jMDictResult.AlternativeSpellings != null)
+                        alternativeSpellings = jMDictResult.AlternativeSpellings.ToList();
+                    else
+                        alternativeSpellings = new List<string>();
                     var process = wordResult.Value.processList;
 
-                    jMDictResult.FrequencyDict.TryGetValue(ConfigManager.FrequencyList, out var freqList);
-                    var maybeFreq = freqList?.FrequencyRank;
-                    var frequency = new List<string> { maybeFreq == null ? FakeFrequency : maybeFreq.ToString() };
+                    List<string> frequency;
+                    if (jMDictResult.FrequencyDict != null)
+                    {
+                        jMDictResult.FrequencyDict.TryGetValue(ConfigManager.FrequencyList, out var freqList);
+                        var maybeFreq = freqList?.FrequencyRank;
+                        frequency = new List<string> { maybeFreq == null ? FakeFrequency : maybeFreq.ToString() };
+                    }
+
+                    else frequency = new List<string> { FakeFrequency };
 
                     var definitions = new List<string> { BuildWordDefinition(jMDictResult) };
+
+                    //var POrthographyInfoList = jMDictResult.POrthographyInfoList;
+                    //var AOrthographyInfoList = jMDictResult.AOrthographyInfoList;
+                    //var ROrthographyInfoList = jMDictResult.ROrthographyInfoList;
 
                     result.Add("foundSpelling", foundSpelling);
                     result.Add("kanaSpellings", kanaSpellings);
@@ -203,19 +274,46 @@ namespace JapaneseLookup
                     result.Add("process", process);
                     result.Add("frequency", frequency);
 
+                    //result.Add("pOrthographyInfoList", POrthographyInfoList);
+                    //result.Add("aOrthographyInfoList", AOrthographyInfoList);
+                    //result.Add("rOrthographyInfoList", ROrthographyInfoList);
+
                     results.Add(result);
                 }
             }
             return results;
         }
+        private static string BuildNameDefinition(JMnedictResult jMDictResult)
+        {
+            int count = 1;
+            string defResult = "";
+            for (int i = 0; i < jMDictResult.Definitions.Count; i++)
+            {
+                if (jMDictResult.Definitions.Any())
+                {
+                    if (jMDictResult.NameTypes != null && jMDictResult.NameTypes[i] != null)
+                    {
+                        defResult += "(";
+                        defResult += jMDictResult.NameTypes[i];
+                        defResult += ") ";
+                    }
 
-        //TODO: BuildNameDefinition
+                    if (jMDictResult.Definitions.Count>0)
+                    defResult += "(" + count + ") ";
 
+                    defResult += string.Join("; ", jMDictResult.Definitions[i]) + " ";
+
+                    //defResult += "\n";
+                    ++count;
+                }
+            }
+            return defResult;
+        }
         private static string BuildWordDefinition(EdictResult jMDictResult)
         {
             int count = 1;
             string defResult = "";
-            for (int i = 0; i < jMDictResult.DefinitionsList.Count; i++)
+            for (int i = 0; i < jMDictResult.Definitions.Count; i++)
             {
                 if (jMDictResult.WordClasses.Any() && jMDictResult.WordClasses[i].Any())
                 {
@@ -224,7 +322,7 @@ namespace JapaneseLookup
                     defResult += ") ";
                 }
 
-                if (jMDictResult.DefinitionsList.Any())
+                if (jMDictResult.Definitions.Any())
                 {
                     defResult += "(" + count + ") ";
 
@@ -242,28 +340,24 @@ namespace JapaneseLookup
                         defResult += ") ";
                     }
 
-                    defResult += string.Join("; ", jMDictResult.DefinitionsList[i].Definitions) + " ";
+                    defResult += string.Join("; ", jMDictResult.Definitions[i]) + " ";
 
-                    if (jMDictResult.DefinitionsList.Any()
-                        && (jMDictResult.DefinitionsList[i].RRestrictions.Any()
-                        || jMDictResult.DefinitionsList[i].KRestrictions.Any()))
+                    if (jMDictResult.RRestrictions != null && jMDictResult.RRestrictions[i].Any()
+                        || jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
                     {
                         defResult += "(only applies to ";
 
-                        if (jMDictResult.DefinitionsList[i].KRestrictions.Any())
-                            defResult += string.Join("; ", jMDictResult.DefinitionsList[i].KRestrictions);
+                        if (jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
+                            defResult += string.Join("; ", jMDictResult.KRestrictions[i]);
 
-                        if (jMDictResult.DefinitionsList[i].RRestrictions.Any())
-                            defResult += string.Join("; ", jMDictResult.DefinitionsList[i].RRestrictions);
+                        if (jMDictResult.RRestrictions != null && jMDictResult.RRestrictions[i].Any())
+                            defResult += string.Join("; ", jMDictResult.RRestrictions[i]);
 
                         defResult += ") ";
                     }
-
-                    //defResult += "\n";
                     ++count;
                 }
             }
-
             return defResult;
         }
     }
