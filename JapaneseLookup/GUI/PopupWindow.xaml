@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:JapaneseLookup"
         mc:Ignorable="d"
         Title="PopupWindow"
-        Width="Auto" Height="Auto" SizeToContent="WidthAndHeight" MaxWidth="430" MaxHeight="620"
+        Width="Auto" Height="Auto" SizeToContent="Height" MaxWidth="700" MaxHeight="620"
         Background="#FF2C2B2B" Foreground="#FF3C3783"
         Topmost="True" WindowStyle="None" AllowsTransparency="true" ShowInTaskbar="False"
         KeyDown="Window_KeyDown" Closing="Window_Closing">

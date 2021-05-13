@@ -96,12 +96,12 @@ namespace JapaneseLookup.GUI
                 }
 
                 else
-                    PopupWindow.Instance.Hide();
+                    PopupWindow.Instance.Visibility = Visibility.Collapsed;
             }
             else
             {
                 _lastWord = "";
-                PopupWindow.Instance.Hide();
+                PopupWindow.Instance.Visibility = Visibility.Collapsed;
             }
         }
 
