@@ -16,6 +16,7 @@ namespace JapaneseLookup.GUI
     public partial class PopupWindow : Window
     {
         private static PopupWindow _instance;
+        private static int _playAudioIndex;
 
         public static PopupWindow Instance
         {
@@ -40,11 +41,13 @@ namespace JapaneseLookup.GUI
         internal static void DisplayResults(string sentence,
             List<Dictionary<string, List<string>>> results)
         {
-            foreach (var result in results)
+            for (var index = 0; index < results.Count; index++)
             {
+                var result = results[index];
+
                 var innerStackPanel = new StackPanel
                 {
-                    Margin = new Thickness(2, 2, 2, 2),
+                    Margin = new Thickness(4, 2, 4, 2),
                 };
                 var top = new WrapPanel();
                 var bottom = new StackPanel();
@@ -54,11 +57,13 @@ namespace JapaneseLookup.GUI
                 {
                     Name = "foundSpelling",
                     Text = result["foundSpelling"][0],
+                    Tag = index, // for audio
                     Foreground = ConfigManager.FoundSpellingColor,
-                    FontSize = ConfigManager.FoundSpellingFontSize
+                    FontSize = ConfigManager.FoundSpellingFontSize,
                 };
-                textBlockFoundSpelling.PreviewMouseUp += FoundSpelling_PreviewMouseUp;
-                textBlockFoundSpelling.KeyDown += FoundSpelling_KeyDown;
+                textBlockFoundSpelling.MouseEnter += FoundSpelling_MouseEnter; // for audio
+                textBlockFoundSpelling.MouseLeave += FoundSpelling_MouseLeave; // for audio
+                textBlockFoundSpelling.PreviewMouseUp += FoundSpelling_PreviewMouseUp; // for mining
 
                 // var textBlockKanaSpellings = new TextBlock
                 // {
@@ -111,7 +116,7 @@ namespace JapaneseLookup.GUI
                     TextWrapping = TextWrapping.Wrap,
                     Foreground = ConfigManager.DefinitionsColor,
                     FontSize = ConfigManager.DefinitionsFontSize,
-                    Margin = new Thickness(0, 5, 0, 0),
+                    Margin = new Thickness(0, 2, 0, 4),
                 };
 
                 var textBlockContext = new TextBlock
@@ -135,6 +140,7 @@ namespace JapaneseLookup.GUI
                     Visibility = Visibility.Collapsed
                 };
 
+
                 TextBlock[] babies =
                 {
                     textBlockFoundSpelling, textBlockReadings, textBlockAlternativeSpellings, textBlockProcess,
@@ -153,9 +159,21 @@ namespace JapaneseLookup.GUI
 
                 innerStackPanel.Children.Add(top);
                 innerStackPanel.Children.Add(bottom);
+                innerStackPanel.Children.Add(new Separator());
+
                 Instance.StackPanel.Children.Add(innerStackPanel);
-                Instance.StackPanel.Children.Add(new Separator());
             }
+        }
+
+        private static void FoundSpelling_MouseEnter(object sender, MouseEventArgs e)
+        {
+            var textBlock = (TextBlock) sender;
+            _playAudioIndex = (int) textBlock.Tag;
+        }
+
+        private static void FoundSpelling_MouseLeave(object sender, MouseEventArgs e)
+        {
+            _playAudioIndex = 0;
         }
 
         private static void FoundSpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -264,7 +282,7 @@ namespace JapaneseLookup.GUI
                     string foundSpelling = null;
                     string reading = null;
 
-                    var innerStackPanel = (StackPanel) StackPanel.Children[0];
+                    var innerStackPanel = (StackPanel) StackPanel.Children[_playAudioIndex];
                     var top = (WrapPanel) innerStackPanel.Children[0];
 
                     foreach (TextBlock child in top.Children)
@@ -292,39 +310,6 @@ namespace JapaneseLookup.GUI
                         MainWindow.MiningMode = false;
                         PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                     }
-
-                    break;
-                }
-            }
-        }
-
-        private static void FoundSpelling_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.P:
-                {
-                    string foundSpelling = null;
-                    string reading = null;
-
-                    var textBlock = (TextBlock) sender;
-                    var innerStackPanel = (StackPanel) textBlock.Parent;
-                    var top = (WrapPanel) innerStackPanel.Children[0];
-
-                    foreach (TextBlock child in top.Children)
-                    {
-                        switch (child.Name)
-                        {
-                            case "foundSpelling":
-                                foundSpelling = child.Text;
-                                break;
-                            case "readings":
-                                reading = child.Text.Split(",")[0];
-                                break;
-                        }
-                    }
-
-                    PlayAudio(foundSpelling, reading);
 
                     break;
                 }
