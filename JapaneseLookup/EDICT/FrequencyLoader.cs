@@ -29,13 +29,12 @@ namespace JapaneseLookup.EDICT
                     element[1].TryGetInt32(out int frequencyRank);
                     element[2].TryGetDouble(out double frequencyPPM);
 
-                    if (EdictLoader.jMdictDictionary.TryGetValue(exactSpelling, out List<EdictResult> jMDictResults))
+                    if (EdictLoader.jMdictDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(exactSpelling), out List<EdictResult> jMDictResults))
                     {
                         foreach (EdictResult result in jMDictResults)
                         {
-                            if (result.PrimarySpelling == reading
-                                || (reading != exactSpelling 
-                                && result.Readings.Contains(reading)))
+                            if (Kana.KatakanaToHiraganaConverter(result.PrimarySpelling) == reading
+                                || (reading != exactSpelling && (result.Readings.Contains(reading) || result.Readings.Contains(Kana.HiraganaToKatakanaConverter(reading)))))
                             {
                                 if (result.FrequencyDict != null && result.FrequencyDict.TryGetValue(freqListName, out var frequency))
                                 {
@@ -66,7 +65,7 @@ namespace JapaneseLookup.EDICT
                                             foreach (var aresult in edictResults)
                                             {
                                                 if (aresult.PrimarySpelling == reading
-                                                    || (reading != exactSpelling 
+                                                    || (reading != exactSpelling
                                                     && aresult.Readings.Contains(reading)))
 
                                                     if (aresult.FrequencyDict != null && aresult.FrequencyDict.TryGetValue(freqListName, out var afrequency))
@@ -106,16 +105,53 @@ namespace JapaneseLookup.EDICT
                             {
                                 foreach (var rreading in result.Readings)
                                 {
-                                    if (EdictLoader.jMdictDictionary.TryGetValue(rreading, out var rjMDictResults))
+                                    if (EdictLoader.jMdictDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(rreading), out var rjMDictResults))
                                     {
                                         foreach (var rresult in rjMDictResults)
                                         {
                                             if (rresult.PrimarySpelling == exactSpelling
+                                                || rresult.PrimarySpelling == result.PrimarySpelling
                                                 || (rresult.AlternativeSpellings != null && rresult.AlternativeSpellings.Contains(exactSpelling))
                                                 || (rresult.KanaSpellings != null && rresult.KanaSpellings.Contains(exactSpelling)))
                                             {
+                                                if (rresult.Readings.Any())
+                                                {
+                                                    if (EdictLoader.jMdictDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(rresult.PrimarySpelling), out var pDictResults))
+                                                    {
+                                                        foreach (var PDictResult in pDictResults)
+                                                        {
+                                                            if (PDictResult.PrimarySpelling == result.PrimarySpelling
+                                                                && (PDictResult.Readings.Contains(reading)
+                                                                || PDictResult.Readings.Contains(Kana.HiraganaToKatakanaConverter(reading))))
+                                                            {
+
+                                                                if (PDictResult.FrequencyDict != null && PDictResult.FrequencyDict.TryGetValue(freqListName, out var PFrequency))
+                                                                {
+                                                                    if (PFrequency.FrequencyRank > frequencyRank)
+                                                                    {
+                                                                        PFrequency.FrequencyRank = frequencyRank;
+                                                                        PFrequency.FrequencyPPM = frequencyPPM;
+                                                                    }
+                                                                }
+
+                                                                else if (PDictResult.FrequencyDict == null)
+                                                                {
+                                                                    PDictResult.FrequencyDict = new();
+                                                                    PDictResult.FrequencyDict.Add(freqListName, new Frequency(frequencyRank, frequencyPPM));
+                                                                }
+
+                                                                else
+                                                                {
+                                                                    PDictResult.FrequencyDict.Add(freqListName, new Frequency(frequencyRank, frequencyPPM));
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
                                                 if (rresult.FrequencyDict != null && rresult.FrequencyDict.TryGetValue(freqListName, out var frequency))
                                                 {
+
                                                     if (frequency.FrequencyRank > frequencyRank)
                                                     {
                                                         frequency.FrequencyRank = frequencyRank;

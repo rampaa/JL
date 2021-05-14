@@ -304,23 +304,25 @@ namespace JapaneseLookup
         {
             int count = 1;
             string defResult = "";
+
+            if (jMDictResult.NameTypes != null)
+            {
+                foreach (var nameType in jMDictResult.NameTypes)
+                {
+                    defResult += "(";
+                    defResult += nameType;
+                    defResult += ") ";
+                }
+            }
+
             for (int i = 0; i < jMDictResult.Definitions.Count; i++)
             {
                 if (jMDictResult.Definitions.Any())
                 {
-                    if (jMDictResult.NameTypes != null && jMDictResult.NameTypes[i] != null)
-                    {
-                        defResult += "(";
-                        defResult += jMDictResult.NameTypes[i];
-                        defResult += ") ";
-                    }
-
                     if (jMDictResult.Definitions.Count > 0)
                         defResult += "(" + count + ") ";
 
                     defResult += string.Join("; ", jMDictResult.Definitions[i]) + " ";
-
-                    //defResult += "\n";
                     ++count;
                 }
             }

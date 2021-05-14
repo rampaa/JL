@@ -285,8 +285,8 @@ namespace JapaneseLookup.GUI
                     {
                         MainWindow.MiningMode = false;
                         PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                        Hide();
                     }
-
                     break;
                 }
             }

@@ -63,7 +63,7 @@ namespace JapaneseLookup.EDICT
                     {
                         result.Definitions.AddRange(trans.TransDetList);
 
-                        result.Definitions.AddRange(trans.NameTypeList);
+                        result.NameTypes.AddRange(trans.NameTypeList);
 
                         //result.RelatedTerms.AddRange(trans.XRefList);
                     }
