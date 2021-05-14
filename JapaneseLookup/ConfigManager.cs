@@ -36,6 +36,13 @@ namespace JapaneseLookup
         public static int ProcessFontSize = 15;
         public static int FrequencyFontSize = 15;
         public static int AlternativeSpellingsFontSize = 15;
+        
+        public static Brush pOrthographyInfoColor = Brushes.White;
+        public static double pOrthographyInfoFontSize = 15;
+        public static Brush aOrthographyInfoColor = Brushes.White;
+        public static double aOrthographyInfoFontSize = 13;
+        public static Brush rOrthographyInfoColor = Brushes.White;
+        public static double rOrthographyInfoFontSize = 13;
 
         public static void ApplySettings(MainWindow mainWindow)
         {

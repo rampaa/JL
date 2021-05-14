@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using JapaneseLookup.Anki;
@@ -34,8 +35,7 @@ namespace JapaneseLookup.GUI
             Instance.Top = position.Y + 20;
         }
 
-        internal static void DisplayResults(string sentence,
-            List<Dictionary<string, List<string>>> results)
+        internal static void DisplayResults(string sentence, List<Dictionary<string, List<string>>> results)
         {
             for (var index = 0; index < results.Count; index++)
             {
@@ -61,6 +61,15 @@ namespace JapaneseLookup.GUI
                 textBlockFoundSpelling.MouseLeave += FoundSpelling_MouseLeave; // for audio
                 textBlockFoundSpelling.PreviewMouseUp += FoundSpelling_PreviewMouseUp; // for mining
 
+                var textBlockPOrthographyInfo = new TextBlock
+                {
+                    Name = "pOrthographyInfo",
+                    Text = "(" + string.Join(",", result["pOrthographyInfoList"]) + ")",
+                    Foreground = ConfigManager.pOrthographyInfoColor,
+                    FontSize = ConfigManager.pOrthographyInfoFontSize,
+                    Margin = new Thickness(5, 0, 0, 0),
+                };
+
                 // var textBlockKanaSpellings = new TextBlock
                 // {
                 //     Name = "kanaSpellings",
@@ -69,23 +78,9 @@ namespace JapaneseLookup.GUI
                 //     Foreground = Brushes.White
                 // };
 
-                var textBlockReadings = new TextBlock
-                {
-                    Name = "readings",
-                    Text = string.Join(", ", result["readings"]),
-                    Foreground = ConfigManager.ReadingsColor,
-                    FontSize = ConfigManager.ReadingsFontSize,
-                    Margin = new Thickness(5, 0, 0, 0),
-                };
+                var textBlockReadings = MakeTextBlockReadings(result);
 
-                var textBlockAlternativeSpellings = new TextBlock
-                {
-                    Name = "alternativeSpellings",
-                    Text = "(" + string.Join(", ", result["alternativeSpellings"]) + ")",
-                    Foreground = ConfigManager.AlternativeSpellingsColor,
-                    FontSize = ConfigManager.AlternativeSpellingsFontSize,
-                    Margin = new Thickness(5, 0, 0, 0),
-                };
+                var textBlockAlternativeSpellings = MakeTextBlockAlternativeSpellings(result);
 
                 var textBlockProcess = new TextBlock
                 {
@@ -139,16 +134,27 @@ namespace JapaneseLookup.GUI
 
                 TextBlock[] babies =
                 {
-                    textBlockFoundSpelling, textBlockReadings, textBlockAlternativeSpellings, textBlockProcess,
-                    textBlockFrequency, textBlockContext, textBlockFoundForm, textBlockJmdictID
+                    textBlockFoundSpelling, textBlockPOrthographyInfo,
+                    textBlockReadings,
+                    textBlockAlternativeSpellings,
+                    textBlockProcess, textBlockFrequency,
+                    textBlockContext, textBlockFoundForm, textBlockJmdictID
                 };
                 foreach (var baby in babies)
                 {
-                    // general check, alternativespellings check, frequency check
-                    if (baby.Text != "" && baby.Text != "()" && baby.Text != ("#" + MainWindowUtilities.FakeFrequency))
-                    {
-                        top.Children.Add(baby);
-                    }
+                    // common emptiness check; these two have their text as Inlines
+                    if (baby.Text == "" && !(baby.Name == "alternativeSpellings" || baby.Name == "readings"))
+                        continue;
+
+                    // POrthographyInfo check
+                    if (baby.Text == "()")
+                        continue;
+
+                    // Frequency check
+                    if (baby.Text == ("#" + MainWindowUtilities.FakeFrequency))
+                        continue;
+
+                    top.Children.Add(baby);
                 }
 
                 bottom.Children.Add(textBlockDefinitions);
@@ -159,6 +165,101 @@ namespace JapaneseLookup.GUI
 
                 Instance.StackPanel.Children.Add(innerStackPanel);
             }
+        }
+
+        private static TextBlock MakeTextBlockReadings(Dictionary<string, List<string>> result)
+        {
+            var textBlockReadings = new TextBlock
+            {
+                Name = "readings",
+                Text = "",
+                Tag = string.Join(", ", result["readings"]), // for mining
+                Foreground = ConfigManager.ReadingsColor,
+                FontSize = ConfigManager.ReadingsFontSize,
+                Margin = new Thickness(5, 0, 0, 0),
+            };
+
+            // For KANJIDIC maybe?
+            if (result["readings"].Count == 0) return textBlockReadings;
+
+            for (var index = 0; index < result["readings"].Count; index++)
+            {
+                var runReading = new Run(result["readings"][index])
+                {
+                    Foreground = ConfigManager.ReadingsColor,
+                    FontSize = ConfigManager.ReadingsFontSize,
+                };
+                textBlockReadings.Inlines.Add(runReading);
+
+                if (index < result["rOrthographyInfoList"].Count)
+                {
+                    var runReadingOrtho = new Run("(" + result["rOrthographyInfoList"][index] + ")")
+                    {
+                        Foreground = ConfigManager.rOrthographyInfoColor,
+                        FontSize = ConfigManager.rOrthographyInfoFontSize,
+                    };
+                    if (runReadingOrtho.Text != "()")
+                    {
+                        textBlockReadings.Inlines.Add(" ");
+                        textBlockReadings.Inlines.Add(runReadingOrtho);
+                    }
+                }
+
+                if (index != result["readings"].Count - 1)
+                {
+                    textBlockReadings.Inlines.Add(", ");
+                }
+            }
+
+            return textBlockReadings;
+        }
+
+        private static TextBlock MakeTextBlockAlternativeSpellings(Dictionary<string, List<string>> result)
+        {
+            var textBlockAlternativeSpellings = new TextBlock
+            {
+                Name = "alternativeSpellings",
+                Text = "",
+                Tag = "(" + string.Join(",", result["alternativeSpellings"]) + ")", // for mining
+                Foreground = ConfigManager.AlternativeSpellingsColor,
+                FontSize = ConfigManager.AlternativeSpellingsFontSize,
+                Margin = new Thickness(5, 0, 0, 0),
+            };
+
+            if (result["alternativeSpellings"].Count == 0) return textBlockAlternativeSpellings;
+
+            textBlockAlternativeSpellings.Inlines.Add("(");
+
+            for (var index = 0; index < result["alternativeSpellings"].Count; index++)
+            {
+                var runAlt = new Run(result["alternativeSpellings"][index])
+                {
+                    Foreground = ConfigManager.AlternativeSpellingsColor,
+                    FontSize = ConfigManager.AlternativeSpellingsFontSize,
+                };
+                textBlockAlternativeSpellings.Inlines.Add(runAlt);
+
+                // TODO: Bounds check (only after it causes a crash!)
+                var runAltOrtho = new Run("(" + result["aOrthographyInfoList"][index] + ")")
+                {
+                    Foreground = ConfigManager.aOrthographyInfoColor,
+                    FontSize = ConfigManager.aOrthographyInfoFontSize,
+                };
+                if (runAltOrtho.Text != "()")
+                {
+                    textBlockAlternativeSpellings.Inlines.Add(" ");
+                    textBlockAlternativeSpellings.Inlines.Add(runAltOrtho);
+                }
+
+                if (index != result["alternativeSpellings"].Count - 1)
+                {
+                    textBlockAlternativeSpellings.Inlines.Add(", ");
+                }
+            }
+
+            textBlockAlternativeSpellings.Inlines.Add(")");
+
+            return textBlockAlternativeSpellings;
         }
 
         private static void FoundSpelling_MouseEnter(object sender, MouseEventArgs e)

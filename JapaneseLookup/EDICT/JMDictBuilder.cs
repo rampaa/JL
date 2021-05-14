@@ -104,6 +104,7 @@ namespace JapaneseLookup.EDICT
                     {
                         result.Readings = mainEntry.Readings;
                         result.AOrthographyInfoList = mainEntry.AOrthographyInfoList;
+                        result.ROrthographyInfoList = mainEntry.ROrthographyInfoList;
                     }
                 }
 
