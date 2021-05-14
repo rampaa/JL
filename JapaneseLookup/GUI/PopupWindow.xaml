@@ -13,7 +13,7 @@
 
     <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Top">
         <Grid>
-            <StackPanel x:Name="StackPanel" KeyDown="StackPanel_KeyDown" />
+            <StackPanel x:Name="StackPanel" />
         </Grid>
     </ScrollViewer>
 </Window>

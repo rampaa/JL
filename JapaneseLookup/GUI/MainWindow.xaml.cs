@@ -49,8 +49,9 @@ namespace JapaneseLookup.GUI
                         MainTextBox.Text = text;
                     }
                 }
-                catch
+                catch (Exception e)
                 {
+                    Debug.WriteLine(e);
                 }
             }
         }
@@ -64,7 +65,7 @@ namespace JapaneseLookup.GUI
         {
             if (MiningMode || MWindow.Background.Opacity == 0) return;
 
-            // nazeka-style popup movement
+            // popup follows cursor
             PopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
             int charPosition = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
@@ -86,7 +87,7 @@ namespace JapaneseLookup.GUI
                 {
                     PopupWindow.Instance.StackPanel.Children.Clear();
 
-                    // yomichan-style popup movement
+                    // popup doesn't follow cursor
                     // PopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
                     PopupWindow.Instance.Visibility = Visibility.Visible;

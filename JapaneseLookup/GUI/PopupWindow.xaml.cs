@@ -34,10 +34,6 @@ namespace JapaneseLookup.GUI
             Instance.Top = position.Y + 20;
         }
 
-        private void StackPanel_KeyDown(object sender, KeyEventArgs e)
-        {
-        }
-
         internal static void DisplayResults(string sentence,
             List<Dictionary<string, List<string>>> results)
         {
@@ -109,16 +105,6 @@ namespace JapaneseLookup.GUI
                     Margin = new Thickness(5, 0, 0, 0),
                 };
 
-                var textBlockDefinitions = new TextBlock
-                {
-                    Name = "definitions",
-                    Text = string.Join("", result["definitions"]),
-                    TextWrapping = TextWrapping.Wrap,
-                    Foreground = ConfigManager.DefinitionsColor,
-                    FontSize = ConfigManager.DefinitionsFontSize,
-                    Margin = new Thickness(0, 2, 0, 4),
-                };
-
                 var textBlockContext = new TextBlock
                 {
                     Name = "context",
@@ -138,6 +124,16 @@ namespace JapaneseLookup.GUI
                     Name = "jmdictID",
                     Text = string.Join(", ", result["jmdictID"]),
                     Visibility = Visibility.Collapsed
+                };
+
+                var textBlockDefinitions = new TextBlock
+                {
+                    Name = "definitions",
+                    Text = string.Join("", result["definitions"]),
+                    TextWrapping = TextWrapping.Wrap,
+                    Foreground = ConfigManager.DefinitionsColor,
+                    FontSize = ConfigManager.DefinitionsFontSize,
+                    Margin = new Thickness(2, 2, 2, 2),
                 };
 
 
