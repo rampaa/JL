@@ -5,10 +5,11 @@ namespace JapaneseLookup.Deconjugation
 {
     internal class Rule
     {
-        public Rule(string type, List<string> decEnd, List<string> conEnd, List<string> decTag,
+        public Rule(string type, string contextrule, List<string> decEnd, List<string> conEnd, List<string> decTag,
             List<string> conTag, string detail)
         {
             Type = type;
+            Contextrule = contextrule;
             DecEnd = decEnd;
             ConEnd = conEnd;
             DecTag = decTag;
@@ -17,6 +18,7 @@ namespace JapaneseLookup.Deconjugation
         }
 
         [JsonPropertyName("type")] public string Type { get; }
+        [JsonPropertyName("contextrule")] public string Contextrule { get; }
         [JsonPropertyName("dec_end")] public List<string> DecEnd { get; }
         [JsonPropertyName("con_end")] public List<string> ConEnd { get; }
         [JsonPropertyName("dec_tag")] public List<string> DecTag { get; }

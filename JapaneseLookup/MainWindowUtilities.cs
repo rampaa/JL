@@ -28,7 +28,6 @@ namespace JapaneseLookup
             JMnedict
         };
 
-        public static int LookupRate = 8;
         private static DateTime _lastLookupTime;
 
         public static readonly Regex JapaneseRegex =
@@ -57,9 +56,6 @@ namespace JapaneseLookup
             });
 
             Task.Run(JMnedictLoader.Load);
-
-            // init AnkiConnect so that it doesn't block later
-            Task.Run(AnkiConnect.GetDeckNames);
         }
 
         public static (string sentence, int endPosition) FindSentence(string text, int position)
@@ -96,15 +92,15 @@ namespace JapaneseLookup
         public static List<Dictionary<string, List<string>>> LookUp(string text)
         {
             var preciseTimeNow = new DateTime(Stopwatch.GetTimestamp());
-            if ((preciseTimeNow - _lastLookupTime).Milliseconds < LookupRate)
+            if ((preciseTimeNow - _lastLookupTime).Milliseconds < ConfigManager.LookupRate)
                 return null;
 
             _lastLookupTime = preciseTimeNow;
 
-            Dictionary<string, (List<EdictResult> jMdictResults, List<string> processList, string foundForm)> wordResults =
-                new();
-            Dictionary<string, (List<JMnedictResult> jMdictResults, List<string> processList, string foundForm)> nameResults =
-                new();
+            Dictionary<string, (List<EdictResult> jMdictResults, List<string> processList, string foundForm)>
+                wordResults = new();
+            Dictionary<string, (List<JMnedictResult> jMdictResults, List<string> processList, string foundForm)>
+                nameResults = new();
 
             int succAttempt = 0;
             for (int i = 0; i < text.Length; i++)
@@ -215,15 +211,20 @@ namespace JapaneseLookup
 
                     var definitions = new List<string> { BuildNameDefinition(jMDictResult) };
 
+                    result.Add("jmdictID", jmdictID);
                     result.Add("foundSpelling", foundSpelling);
+                    result.Add("alternativeSpellings", alternativeSpellings);
                     result.Add("readings", readings);
                     result.Add("definitions", definitions);
+
+                    // unused here but necessary for DisplayResults
                     result.Add("foundForm", foundForm);
-                    result.Add("jmdictID", jmdictID);
-                    result.Add("alternativeSpellings", alternativeSpellings);
                     result.Add("process", process);
-                    result.Add("frequency", new() { FakeFrequency });
+                    result.Add("frequency", new List<string> { FakeFrequency });
                     result.Add("kanaSpellings", new List<string>());
+                    result.Add("pOrthographyInfoList", new List<string>());
+                    result.Add("aOrthographyInfoList", new List<string>());
+                    result.Add("rOrthographyInfoList", new List<string>());
 
                     results.Add(result);
                 }
@@ -246,7 +247,6 @@ namespace JapaneseLookup
                     var foundSpelling = new List<string> { jMDictResult.PrimarySpelling };
 
                     List<string> kanaSpellings;
-
                     if (jMDictResult.KanaSpellings != null)
                         kanaSpellings = jMDictResult.KanaSpellings;
                     else
@@ -275,9 +275,38 @@ namespace JapaneseLookup
 
                     var definitions = new List<string> { BuildWordDefinition(jMDictResult) };
 
-                    //var POrthographyInfoList = jMDictResult.POrthographyInfoList;
-                    //var AOrthographyInfoList = jMDictResult.AOrthographyInfoList;
-                    //var ROrthographyInfoList = jMDictResult.ROrthographyInfoList;
+                    var pOrthographyInfoList = jMDictResult.POrthographyInfoList ?? new List<string>();
+
+                    var rList = jMDictResult.ROrthographyInfoList ?? new List<List<string>>();
+                    var aList = jMDictResult.AOrthographyInfoList ?? new List<List<string>>();
+                    var rOrthographyInfoList = new List<string>();
+                    var aOrthographyInfoList = new List<string>();
+
+                    foreach (var list in rList)
+                    {
+                        var final = "";
+                        foreach (var str in list)
+                        {
+                            final += str + ", ";
+                        }
+
+                        final = final.TrimEnd(", ".ToCharArray());
+
+                        rOrthographyInfoList.Add(final);
+                    }
+
+                    foreach (var list in aList)
+                    {
+                        var final = "";
+                        foreach (var str in list)
+                        {
+                            final += str + ", ";
+                        }
+
+                        final = final.TrimEnd(", ".ToCharArray());
+
+                        aOrthographyInfoList.Add(final);
+                    }
 
                     result.Add("foundSpelling", foundSpelling);
                     result.Add("kanaSpellings", kanaSpellings);
@@ -288,10 +317,9 @@ namespace JapaneseLookup
                     result.Add("alternativeSpellings", alternativeSpellings);
                     result.Add("process", process);
                     result.Add("frequency", frequency);
-
-                    //result.Add("pOrthographyInfoList", POrthographyInfoList);
-                    //result.Add("aOrthographyInfoList", AOrthographyInfoList);
-                    //result.Add("rOrthographyInfoList", ROrthographyInfoList);
+                    result.Add("pOrthographyInfoList", pOrthographyInfoList);
+                    result.Add("rOrthographyInfoList", rOrthographyInfoList);
+                    result.Add("aOrthographyInfoList", aOrthographyInfoList);
 
                     results.Add(result);
                 }

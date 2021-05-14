@@ -13,11 +13,7 @@
 
     <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Top">
         <Grid>
-            <StackPanel x:Name="StackPanel" KeyDown="StackPanel_KeyDown">
-                <!--<TextBox x:Name="CardTextBox" HorizontalAlignment="Left" Margin="27,43,0,0" TextWrapping="Wrap"
-                     VerticalAlignment="Top" Width="auto" Height="auto" Background="#FF2C2B2B" Foreground="White"
-                     FontSize="15" />-->
-            </StackPanel>
+            <StackPanel x:Name="StackPanel" />
         </Grid>
     </ScrollViewer>
 </Window>
