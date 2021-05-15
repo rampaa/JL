@@ -22,12 +22,6 @@ namespace JapaneseLookup
         public static string Backlog = "";
         public const string FakeFrequency = "1000000";
 
-        public enum DictionaryName
-        {
-            JMdict,
-            JMnedict
-        };
-
         public static int LookupRate = 8;
         private static DateTime _lastLookupTime;
 

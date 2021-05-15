@@ -22,7 +22,11 @@ namespace JapaneseLookup
         public static int MaxSearchLength;
         public static string FrequencyList;
         public static bool ForceSync;
-        
+        public static bool UseJMnedict;
+
+        public static SolidColorBrush PopupBackgroundColor;
+        public static int PopUpBackGroundOpacity;
+
         public static Brush FoundSpellingColor = Brushes.Chocolate;
         public static Brush ReadingsColor = Brushes.Goldenrod;
         public static Brush DefinitionsColor = Brushes.White;
