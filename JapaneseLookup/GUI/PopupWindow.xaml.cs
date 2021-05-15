@@ -220,7 +220,7 @@ namespace JapaneseLookup.GUI
             {
                 Name = "alternativeSpellings",
                 Text = "",
-                Tag = "(" + string.Join(",", result["alternativeSpellings"]) + ")", // for mining
+                Tag = "(" + string.Join(", ", result["alternativeSpellings"]) + ")", // for mining
                 Foreground = ConfigManager.AlternativeSpellingsColor,
                 FontSize = ConfigManager.AlternativeSpellingsFontSize,
                 Margin = new Thickness(5, 0, 0, 0),
@@ -299,7 +299,7 @@ namespace JapaneseLookup.GUI
                         foundSpelling = child.Text;
                         break;
                     case "readings":
-                        readings = child.Text;
+                        readings = (string) child.Tag;
                         break;
                     case "context":
                         context = child.Text;
@@ -311,7 +311,7 @@ namespace JapaneseLookup.GUI
                         jmdictID = child.Text;
                         break;
                     case "alternativeSpellings":
-                        alternativeSpellings = child.Text;
+                        alternativeSpellings = (string) child.Tag;
                         break;
                     case "frequency":
                         frequency = child.Text;
@@ -390,7 +390,7 @@ namespace JapaneseLookup.GUI
                                 foundSpelling = child.Text;
                                 break;
                             case "readings":
-                                reading = child.Text.Split(",")[0];
+                                reading = ((string) child.Tag).Split(",")[0];
                                 break;
                         }
                     }
@@ -408,6 +408,7 @@ namespace JapaneseLookup.GUI
                         PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                         Hide();
                     }
+
                     break;
                 }
             }
