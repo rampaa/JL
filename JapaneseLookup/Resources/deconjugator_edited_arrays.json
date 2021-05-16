@@ -823,11 +823,12 @@
  },
  {
   "type": "contextrule",
+  "contextrule": "saspecial",
   "dec_end": [""],
   "con_end": ["す"],
   "dec_tag": ["stem-a"],
   "con_tag": ["v5s"],
-  "detail": "saspecial"
+  "detail": "short causative"
  },
  {
   "type": "stdrule",
@@ -895,11 +896,12 @@
  },
  {
   "type": "contextrule",
+  "contextrule": "v1inftrap",
   "dec_end": [""],
   "con_end": ["る"],
   "dec_tag": ["stem-te"],
   "con_tag": ["v1"],
-  "detail": "v1inftrap"
+  "detail": "teru (teiru)"
  },
  {
   "type": "stdrule",

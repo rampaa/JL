@@ -96,6 +96,7 @@ namespace JapaneseLookup.Deconjugation
                     var virtualRule = new Rule
                     (
                         myRule.Type,
+                        null,
                         new List<string> {maybeDecEnd},
                         new List<string> {maybeConEnd},
                         new List<string> {maybeDecTag},
@@ -137,7 +138,7 @@ namespace JapaneseLookup.Deconjugation
         private static HashSet<Form> ContextruleDeconjugate(Form myForm,
             Rule myRule)
         {
-            var result = myRule.Detail switch
+            var result = myRule.Contextrule switch
             {
                 "v1inftrap" => V1InftrapCheck(myForm),
                 "saspecial" => SaspecialCheck(myForm, myRule),
@@ -204,6 +205,7 @@ namespace JapaneseLookup.Deconjugation
                     var virtualRule = new Rule
                     (
                         myRule.Type,
+                        null,
                         new List<string> {maybeDecEnd},
                         new List<string> {maybeConEnd},
                         null,
