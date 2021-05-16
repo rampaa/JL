@@ -50,7 +50,8 @@ namespace JapaneseLookup
                 ready = true;
             });
 
-            Task.Run(JMnedictLoader.Load);
+            if (ConfigManager.UseJMnedict)
+                Task.Run(JMnedictLoader.Load);
 
             // init AnkiConnect so that it doesn't block later
             Task.Run(AnkiConnect.GetDeckNames);
@@ -97,8 +98,9 @@ namespace JapaneseLookup
 
             Dictionary<string, (List<EdictResult> jMdictResults, List<string> processList, string foundForm)> wordResults =
                 new();
+
             Dictionary<string, (List<JMnedictResult> jMdictResults, List<string> processList, string foundForm)> nameResults =
-                new();
+            new();
 
             int succAttempt = 0;
             for (int i = 0; i < text.Length; i++)
@@ -113,10 +115,14 @@ namespace JapaneseLookup
                     tryLongVowelConversion = false;
                 }
 
-                if (JMnedictLoader.jMnedictDictionary.TryGetValue(textInHiragana, out var tempNameResult))
+                if (ConfigManager.UseJMnedict)
                 {
-                    nameResults.TryAdd(textInHiragana, (tempNameResult, new List<string>(), text[..^i]));
+                    if (JMnedictLoader.jMnedictDictionary.TryGetValue(textInHiragana, out var tempNameResult))
+                    {
+                        nameResults.TryAdd(textInHiragana, (tempNameResult, new List<string>(), text[..^i]));
+                    }
                 }
+
 
                 if (succAttempt < 3)
                 {
@@ -299,7 +305,7 @@ namespace JapaneseLookup
             int count = 1;
             string defResult = "";
 
-            if (jMDictResult.NameTypes != null)
+            if (jMDictResult.NameTypes != null && (jMDictResult.NameTypes.Count>1 || !jMDictResult.NameTypes.Contains("unclass")))
             {
                 foreach (var nameType in jMDictResult.NameTypes)
                 {

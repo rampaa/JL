@@ -19,8 +19,8 @@ namespace JapaneseLookup.GUI
         public MainWindow()
         {
             InitializeComponent();
-            MainWindowUtilities.MainWindowInitializer();
             ConfigManager.ApplySettings(this);
+            MainWindowUtilities.MainWindowInitializer();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
