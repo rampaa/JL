@@ -21,8 +21,6 @@ namespace JapaneseLookup
         public static bool ready = false;
         public static string Backlog = "";
         public const string FakeFrequency = "1000000";
-
-        public static int LookupRate = 8;
         private static DateTime _lastLookupTime;
 
         public static readonly Regex JapaneseRegex =
@@ -41,7 +39,7 @@ namespace JapaneseLookup
             Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderNarou = Task.Run(() =>
                 FrequencyLoader.LoadJSON(Path.Join(ConfigManager.ApplicationPath, "Resources/freqlist_narou.json")));
 
-            Task.Run(() => EdictLoader.Load()).ContinueWith(_ =>
+            Task.Run(() => JMdictLoader.Load()).ContinueWith(_ =>
             {
                 //Task.WaitAll(taskFreqLoaderVN, taskFreqLoaderNovel, taskFreqLoaderNarou);
                 FrequencyLoader.AddToJMdict("VN", taskFreqLoaderVN.Result);
@@ -96,7 +94,7 @@ namespace JapaneseLookup
 
             _lastLookupTime = preciseTimeNow;
 
-            Dictionary<string, (List<EdictResult> jMdictResults, List<string> processList, string foundForm)>
+            Dictionary<string, (List<JMdictResult> jMdictResults, List<string> processList, string foundForm)>
                 wordResults = new();
             Dictionary<string, (List<JMnedictResult> jMdictResults, List<string> processList, string foundForm)>
                 nameResults = new();
@@ -108,7 +106,7 @@ namespace JapaneseLookup
 
                 bool tryLongVowelConversion = true;
 
-                if (EdictLoader.jMdictDictionary.TryGetValue(textInHiragana, out var tempResult))
+                if (JMdictLoader.jMdictDictionary.TryGetValue(textInHiragana, out var tempResult))
                 {
                     wordResults.TryAdd(textInHiragana, (tempResult, new List<string>(), text[..^i]));
                     tryLongVowelConversion = false;
@@ -131,9 +129,9 @@ namespace JapaneseLookup
                         if (wordResults.ContainsKey(result.Text))
                             continue;
 
-                        if (EdictLoader.jMdictDictionary.TryGetValue(result.Text, out var temp))
+                        if (JMdictLoader.jMdictDictionary.TryGetValue(result.Text, out var temp))
                         {
-                            List<EdictResult> resultsList = new();
+                            List<JMdictResult> resultsList = new();
 
                             foreach (var rslt in temp)
                             {
@@ -157,7 +155,7 @@ namespace JapaneseLookup
                 if (tryLongVowelConversion && textInHiragana.Contains("ー") && textInHiragana[0] != 'ー')
                 {
                     string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiragana);
-                    if (EdictLoader.jMdictDictionary.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
+                    if (JMdictLoader.jMdictDictionary.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
                     {
                         wordResults.Add(textInHiragana, (tmpResult, new List<string>(), text[..^i]));
                     }
@@ -237,7 +235,7 @@ namespace JapaneseLookup
         }
 
         private static List<Dictionary<string, List<string>>> WordResultBuilder
-            (Dictionary<string, (List<EdictResult> jMdictResults, List<string> processList, string foundForm)> wordResults)
+            (Dictionary<string, (List<JMdictResult> jMdictResults, List<string> processList, string foundForm)> wordResults)
         {
             var results = new List<Dictionary<string, List<string>>>();
 
@@ -361,7 +359,7 @@ namespace JapaneseLookup
             return defResult;
         }
 
-        private static string BuildWordDefinition(EdictResult jMDictResult)
+        private static string BuildWordDefinition(JMdictResult jMDictResult)
         {
             int count = 1;
             string defResult = "";

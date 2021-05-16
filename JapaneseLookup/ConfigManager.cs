@@ -21,6 +21,7 @@ namespace JapaneseLookup
         public static string FrequencyList;
         public static bool UseJMnedict;
         public static bool ForceSync;
+        public static int LookupRate;
         public static SolidColorBrush FoundSpellingColor;
         public static SolidColorBrush ReadingsColor;
         public static SolidColorBrush DefinitionsColor;

@@ -5,29 +5,37 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml;
 using static JapaneseLookup.MainWindowUtilities;
 
 namespace JapaneseLookup.EDICT
 {
-    class EdictLoader
+    class JMdictLoader
     {
-        public static Dictionary<string, List<EdictResult>> jMdictDictionary = new();
+        public static Dictionary<string, List<JMdictResult>> jMdictDictionary = new();
         public static void Load()
         {
-            using XmlTextReader edictXml = new(Path.Join(ConfigManager.ApplicationPath, "Resources/JMdict.xml"));
-
-            edictXml.DtdProcessing = DtdProcessing.Parse;
-            edictXml.WhitespaceHandling = WhitespaceHandling.None;
-            edictXml.EntityHandling = EntityHandling.ExpandCharEntities;
-            while (edictXml.ReadToFollowing("entry"))
+            if(File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/JMdict.xml")))
             {
-                ReadEntry(edictXml);
+                using XmlTextReader edictXml = new(Path.Join(ConfigManager.ApplicationPath, "Resources/JMdict.xml"));
+
+                edictXml.DtdProcessing = DtdProcessing.Parse;
+                edictXml.WhitespaceHandling = WhitespaceHandling.None;
+                edictXml.EntityHandling = EntityHandling.ExpandCharEntities;
+                while (edictXml.ReadToFollowing("entry"))
+                {
+                    ReadEntry(edictXml);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Couldn't find JMdict.xml. Please download it by clicking the \"Update JMdict\" button.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
             }
         }
         private static void ReadEntry(XmlTextReader edictXml)
         {
-            EdictEntry entry = new();
+            JMdictEntry entry = new();
             while (edictXml.Read())
             {
                 if (edictXml.Name == "entry" && edictXml.NodeType == XmlNodeType.EndElement)
@@ -58,7 +66,7 @@ namespace JapaneseLookup.EDICT
             JMDictBuilder.BuildDictionary(entry, jMdictDictionary);
         }
 
-        private static void ReadKEle(XmlTextReader edictXml, EdictEntry entry)
+        private static void ReadKEle(XmlTextReader edictXml, JMdictEntry entry)
         {
             KEle kEle = new();
             while (edictXml.Read())
@@ -87,7 +95,7 @@ namespace JapaneseLookup.EDICT
             entry.KEleList.Add(kEle);
         }
 
-        private static void ReadREle(XmlTextReader jMDictXML, EdictEntry entry)
+        private static void ReadREle(XmlTextReader jMDictXML, JMdictEntry entry)
         {
             REle rEle = new();
             while (jMDictXML.Read())
@@ -120,7 +128,7 @@ namespace JapaneseLookup.EDICT
             entry.REleList.Add(rEle);
         }
 
-        private static void ReadSense(XmlTextReader jMDictXML, EdictEntry entry)
+        private static void ReadSense(XmlTextReader jMDictXML, JMdictEntry entry)
         {
             Sense sense = new();
             while (jMDictXML.Read())

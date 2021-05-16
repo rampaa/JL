@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace JapaneseLookup.EDICT
 {
-    class EdictResult
+    class JMdictResult
     {
         public string Id { get; set; }
         public List<string> AlternativeSpellings { get; set; }
@@ -26,7 +26,7 @@ namespace JapaneseLookup.EDICT
         //public List<string> Antonyms { get; set; }
         //public List<string> RelatedTerms { get; set; }
 
-        public EdictResult()
+        public JMdictResult()
         {
             Id = null;
             Definitions = new List<List<string>>();

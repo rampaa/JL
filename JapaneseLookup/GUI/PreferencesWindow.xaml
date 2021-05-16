@@ -25,6 +25,13 @@
                     <CheckBox x:Name="UseJMnedictCheckBox" Content="" HorizontalAlignment="Right" Margin="0,102,20,0" VerticalAlignment="Top" Padding="0,0,0,0"/>
                     <CheckBox x:Name="ForceAnkiSyncCheckBox" Content="" HorizontalAlignment="Right" Margin="0,169,20,0" VerticalAlignment="Top" Padding="0,0,0,0"/>
                     <TextBlock HorizontalAlignment="Left" Margin="25,165,0,0" Text="Force Anki sync" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="25,202,0,0" Text="Lookup rate" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                    <WindowsFormsHost  Margin="0,198,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
+                        <wf:NumericUpDown x:Name="LookupRateNumericUpDown" BorderStyle="FixedSingle"  Maximum="20" Minimum="0" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
+                    </WindowsFormsHost>
+                    <Button x:Name="AnkiConfigButton" Content="Open Anki Configuration" HorizontalAlignment="Right" Margin="0,252,20,0" VerticalAlignment="Top" RenderTransformOrigin="0.456,2.391" Width="195" Click="AnkiConfigButton_Click"/>
+                    <Button x:Name="UpdateJMdictButton" Content="Update JMdict" HorizontalAlignment="Left" Margin="25,252,0,0" VerticalAlignment="Top" Click="UpdateJMdictButton_Click" Width="125"/>
+                    <Button x:Name="UpdateJMnedictButton" Content="Update JMnedict" HorizontalAlignment="Left" Margin="157,252,0,0" VerticalAlignment="Top" Width="143" Click="UpdateJMnedictButton_Click"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Textbox">

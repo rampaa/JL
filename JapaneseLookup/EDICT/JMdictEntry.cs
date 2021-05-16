@@ -2,14 +2,14 @@
 
 namespace JapaneseLookup.EDICT
 {
-    class EdictEntry
+    class JMdictEntry
     {
         public string Id { get; set; }
         public List<KEle> KEleList { get; set; }
         public List<REle> REleList { get; set; }
         public List<Sense> SenseList { get; set; }
         public List<Trans> TransList { get; set; }
-        public EdictEntry()
+        public JMdictEntry()
         {
             KEleList = new List<KEle>();
             REleList = new List<REle>();

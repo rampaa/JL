@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml;
 using static JapaneseLookup.MainWindowUtilities;
 
@@ -14,15 +16,23 @@ namespace JapaneseLookup.EDICT
         public static Dictionary<string, List<JMnedictResult>> jMnedictDictionary = new();
         public static void Load()
         {
-            using XmlTextReader edictXml = new(Path.Join(ConfigManager.ApplicationPath, "Resources/JMnedict.xml"));
-
-            edictXml.DtdProcessing = DtdProcessing.Parse;
-            edictXml.WhitespaceHandling = WhitespaceHandling.None;
-            edictXml.EntityHandling = EntityHandling.ExpandCharEntities;
-            while (edictXml.ReadToFollowing("entry"))
+            if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/JMnedict.xml")))
             {
-                ReadEntry(edictXml);
+                using XmlTextReader edictXml = new(Path.Join(ConfigManager.ApplicationPath, "Resources/JMnedict.xml"));
+
+                edictXml.DtdProcessing = DtdProcessing.Parse;
+                edictXml.WhitespaceHandling = WhitespaceHandling.None;
+                edictXml.EntityHandling = EntityHandling.ExpandCharEntities;
+                while (edictXml.ReadToFollowing("entry"))
+                {
+                    ReadEntry(edictXml);
+                }
             }
+            else
+            {
+                MessageBox.Show("Couldn't find JMnedict.xml. Please download it by clicking the \"Update JMnedict\" button.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
+            }
+
         }
         private static void ReadEntry(XmlTextReader edictXml)
         {

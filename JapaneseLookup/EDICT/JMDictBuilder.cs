@@ -9,19 +9,19 @@ namespace JapaneseLookup.EDICT
 {
     class JMDictBuilder
     {
-        public static void BuildDictionary(EdictEntry entry, Dictionary<string, List<EdictResult>> jMdictDictionary)
+        public static void BuildDictionary(JMdictEntry entry, Dictionary<string, List<JMdictResult>> jMdictDictionary)
         {
             // entry (k_ele*, r_ele+, sense+)
             // k_ele (keb, ke_inf*, ke_pri*)
             // r_ele (reb, re_restr*, re_inf*, re_pri*)
             // sense (stagk*, stagr*, pos*, xref*, ant*, field*, misc*, s_inf*, dial*, gloss*)
 
-            Dictionary<string, EdictResult> resultList = new();
+            Dictionary<string, JMdictResult> resultList = new();
             List<string> alternativeSpellings;
 
             foreach (KEle kEle in entry.KEleList)
             {
-                EdictResult result = new();
+                JMdictResult result = new();
                 string key = kEle.Keb;
 
                 result.PrimarySpelling = key;
@@ -61,7 +61,7 @@ namespace JapaneseLookup.EDICT
 
             alternativeSpellings = resultList.Keys.ToList();
 
-            foreach (KeyValuePair<string, EdictResult> item in resultList)
+            foreach (KeyValuePair<string, JMdictResult> item in resultList)
             {
                 foreach (string spelling in alternativeSpellings)
                 {
@@ -85,7 +85,7 @@ namespace JapaneseLookup.EDICT
                     continue;
                 }
 
-                EdictResult result = new();
+                JMdictResult result = new();
 
                 result.KanaSpellings.Add(rEle.Reb);
 
@@ -147,7 +147,7 @@ namespace JapaneseLookup.EDICT
             //    }
             //}
 
-            foreach (KeyValuePair<string, EdictResult> rl in resultList)
+            foreach (KeyValuePair<string, JMdictResult> rl in resultList)
             {
                 if (!rl.Value.AlternativeSpellings.Any())
                     rl.Value.AlternativeSpellings = null;
@@ -191,7 +191,7 @@ namespace JapaneseLookup.EDICT
                 rl.Value.Id = entry.Id;
                 string key = rl.Key;
 
-                if (jMdictDictionary.TryGetValue(key, out List<EdictResult> tempList))
+                if (jMdictDictionary.TryGetValue(key, out List<JMdictResult> tempList))
                     tempList.Add(rl.Value);
                 else
                     tempList = new() { rl.Value };

@@ -2,6 +2,8 @@
 using System.Windows.Media;
 using System.Windows.Forms;
 using System.Diagnostics;
+using JapaneseLookup.EDICT;
+using System.Threading.Tasks;
 
 namespace JapaneseLookup.GUI
 {
@@ -90,6 +92,20 @@ namespace JapaneseLookup.GUI
         private void PopupDefinitionColorButton_Click(object sender, RoutedEventArgs e)
         {
             PickColor((System.Windows.Controls.Button)sender);
+        }
+        private void UpdateJMdictButton_Click(object sender, RoutedEventArgs e)
+        {
+            EdictUpdater.UpdateJMdict();
+        }
+
+        private void UpdateJMnedictButton_Click(object sender, RoutedEventArgs e)
+        {
+            Task.Run(EdictUpdater.UpdateJMnedict);
+        }
+
+        private void AnkiConfigButton_Click(object sender, RoutedEventArgs e)
+        {
+            MiningSetupWindow.Instance.ShowDialog();
         }
     }
 }

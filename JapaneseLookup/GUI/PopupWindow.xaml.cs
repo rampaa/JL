@@ -65,8 +65,8 @@ namespace JapaneseLookup.GUI
                 {
                     Name = "pOrthographyInfo",
                     Text = "(" + string.Join(",", result["pOrthographyInfoList"]) + ")",
-                    Foreground = ConfigManager.pOrthographyInfoColor,
-                    FontSize = ConfigManager.pOrthographyInfoFontSize,
+                    //Foreground = ConfigManager.pOrthographyInfoColor,
+                    //FontSize = ConfigManager.pOrthographyInfoFontSize,
                     Margin = new Thickness(5, 0, 0, 0),
                 };
 
@@ -195,8 +195,8 @@ namespace JapaneseLookup.GUI
                 {
                     var runReadingOrtho = new Run("(" + result["rOrthographyInfoList"][index] + ")")
                     {
-                        Foreground = ConfigManager.rOrthographyInfoColor,
-                        FontSize = ConfigManager.rOrthographyInfoFontSize,
+                        //Foreground = ConfigManager.rOrthographyInfoColor,
+                        //FontSize = ConfigManager.rOrthographyInfoFontSize,
                     };
                     if (runReadingOrtho.Text != "()")
                     {
@@ -242,8 +242,8 @@ namespace JapaneseLookup.GUI
                 // TODO: Bounds check (only after it causes a crash!)
                 var runAltOrtho = new Run("(" + result["aOrthographyInfoList"][index] + ")")
                 {
-                    Foreground = ConfigManager.aOrthographyInfoColor,
-                    FontSize = ConfigManager.aOrthographyInfoFontSize,
+                    //Foreground = ConfigManager.aOrthographyInfoColor,
+                    //FontSize = ConfigManager.aOrthographyInfoFontSize,
                 };
                 if (runAltOrtho.Text != "()")
                 {
