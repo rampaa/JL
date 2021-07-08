@@ -19,6 +19,11 @@ namespace JapaneseLookup.GUI
         private static PopupWindow _instance;
         private static int _playAudioIndex;
 
+        private static readonly System.Windows.Interop.WindowInteropHelper InteropHelper =
+            new(Application.Current.MainWindow!);
+        private static readonly System.Windows.Forms.Screen ActiveScreen =
+            System.Windows.Forms.Screen.FromHandle(InteropHelper.Handle);
+
         public static PopupWindow Instance
         {
             get { return _instance ??= new PopupWindow(); }
@@ -29,10 +34,81 @@ namespace JapaneseLookup.GUI
             InitializeComponent();
         }
 
-        public static void UpdatePosition(Point position)
+        public void UpdatePosition(Point cursorPosition)
         {
-            Instance.Left = position.X + 10;
-            Instance.Top = position.Y + 20;
+            var needsFlipX = ConfigManager.FlipX && cursorPosition.X + Width > ActiveScreen.Bounds.Width;
+            var needsFlipY = ConfigManager.FlipY && cursorPosition.Y + Height > ActiveScreen.Bounds.Height;
+            var needsPushX = cursorPosition.X + Width > ActiveScreen.Bounds.Width;
+            var needsPushY = cursorPosition.Y + Height > ActiveScreen.Bounds.Height;
+
+            if (needsFlipX)
+            {
+                // flip Leftwards while preventing OOB
+                var newLeft = cursorPosition.X - Width - ConfigManager.PopupXOffset * 2;
+                while (newLeft < 0)
+                {
+                    newLeft += 1;
+                }
+
+                Left = newLeft;
+
+                if (!needsFlipY && !needsPushX)
+                {
+                    Top = cursorPosition.Y + ConfigManager.PopupYOffset * 2;
+                }
+            }
+
+            if (needsFlipY)
+            {
+                // flip Upwards while preventing OOB
+                var newTop = cursorPosition.Y - Height - ConfigManager.PopupYOffset * 2;
+                while (newTop < 0)
+                {
+                    newTop += 1;
+                }
+
+                Top = newTop;
+
+                if (!needsFlipX && !needsPushY)
+                {
+                    Left = cursorPosition.X + ConfigManager.PopupXOffset * 2;
+                }
+            }
+
+            if (needsPushX)
+            {
+                // push Leftwards
+                while (Left + Width > ActiveScreen.Bounds.Width)
+                {
+                    Left -= 1;
+                }
+
+                if (!needsPushY)
+                {
+                    Top = cursorPosition.Y + ConfigManager.PopupYOffset;
+                }
+            }
+
+            if (needsPushY)
+            {
+                // push Upwards
+                while (Top + Height > ActiveScreen.Bounds.Width)
+                {
+                    Top -= 1;
+                }
+
+                if (!needsPushX)
+                {
+                    Left = cursorPosition.X + ConfigManager.PopupXOffset;
+                }
+            }
+
+            if (!needsFlipX && !needsFlipY && !needsPushX && !needsPushY)
+            {
+                // no push or flip
+                Left = cursorPosition.X + ConfigManager.PopupXOffset;
+                Top = cursorPosition.Y + ConfigManager.PopupYOffset;
+            }
         }
 
         internal static void DisplayResults(string sentence, List<Dictionary<string, List<string>>> results)
@@ -161,7 +237,10 @@ namespace JapaneseLookup.GUI
 
                 innerStackPanel.Children.Add(top);
                 innerStackPanel.Children.Add(bottom);
-                innerStackPanel.Children.Add(new Separator());
+                if (index != results.Count - 1)
+                {
+                    innerStackPanel.Children.Add(new Separator());
+                }
 
                 Instance.StackPanel.Children.Add(innerStackPanel);
             }
@@ -220,7 +299,7 @@ namespace JapaneseLookup.GUI
             {
                 Name = "alternativeSpellings",
                 Text = "",
-                Tag = "(" + string.Join(", ", result["alternativeSpellings"]) + ")", // for mining
+                Tag = string.Join(", ", result["alternativeSpellings"]), // for mining
                 Foreground = ConfigManager.AlternativeSpellingsColor,
                 FontSize = ConfigManager.AlternativeSpellingsFontSize,
                 Margin = new Thickness(5, 0, 0, 0),

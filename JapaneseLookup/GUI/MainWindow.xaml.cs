@@ -66,7 +66,7 @@ namespace JapaneseLookup.GUI
             if (MiningMode || MWindow.Background.Opacity == 0) return;
 
             // popup follows cursor
-            PopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+            PopupWindow.Instance.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
             int charPosition = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
             if (charPosition != -1)
@@ -88,7 +88,7 @@ namespace JapaneseLookup.GUI
                     PopupWindow.Instance.StackPanel.Children.Clear();
 
                     // popup doesn't follow cursor
-                    // PopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+                    // PopupWindow.Instance.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
                     PopupWindow.Instance.Visibility = Visibility.Visible;
                     PopupWindow.Instance.Activate();

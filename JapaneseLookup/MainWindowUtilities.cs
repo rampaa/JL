@@ -52,7 +52,7 @@ namespace JapaneseLookup
                 Task.Run(JMnedictLoader.Load);
 
             // init AnkiConnect so that it doesn't block later
-            Task.Run(AnkiConnect.GetDeckNames);
+            // Task.Run(AnkiConnect.GetDeckNames);
         }
 
         public static (string sentence, int endPosition) FindSentence(string text, int position)
