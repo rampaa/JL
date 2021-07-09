@@ -35,11 +35,11 @@ namespace JapaneseLookup.GUI
                 var ankiConfig = await AnkiConfig.ReadAnkiConfig();
                 if (ankiConfig == null) return;
 
-                ComboBoxDeckNames.ItemsSource = new List<string> {ankiConfig.deckName};
+                ComboBoxDeckNames.ItemsSource = new List<string> {ankiConfig.DeckName};
                 ComboBoxDeckNames.SelectedIndex = 0;
-                ComboBoxModelNames.ItemsSource = new List<string> {ankiConfig.modelName};
+                ComboBoxModelNames.ItemsSource = new List<string> {ankiConfig.ModelName};
                 ComboBoxModelNames.SelectedIndex = 0;
-                CreateFieldElements(ankiConfig.fields);
+                CreateFieldElements(ankiConfig.Fields);
             }
             catch (Exception e)
             {
@@ -54,11 +54,11 @@ namespace JapaneseLookup.GUI
             try
             {
                 var deckNamesList =
-                    JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetDeckNames()).result.ToString()!);
+                    JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetDeckNames()).Result.ToString()!);
                 ComboBoxDeckNames.ItemsSource = deckNamesList;
 
                 var modelNamesList =
-                    JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelNames()).result.ToString()!);
+                    JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelNames()).Result.ToString()!);
                 ComboBoxModelNames.ItemsSource = modelNamesList;
             }
             catch
@@ -80,7 +80,7 @@ namespace JapaneseLookup.GUI
             {
                 var modelName = ComboBoxModelNames.SelectionBoxItem.ToString();
                 var fieldNames =
-                    JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelFieldNames(modelName)).result
+                    JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelFieldNames(modelName)).Result
                         .ToString()!);
 
                 var fields =

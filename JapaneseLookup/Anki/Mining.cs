@@ -4,7 +4,6 @@ using System.Linq;
 
 namespace JapaneseLookup.Anki
 {
-    // TODO: Exception handling
     public static class Mining
     {
         // TODO: Check if audio was grabbed and tell the user if it was not
@@ -15,10 +14,10 @@ namespace JapaneseLookup.Anki
             var ankiConfig = await AnkiConfig.ReadAnkiConfig();
             if (ankiConfig == null) return;
 
-            var deckName = ankiConfig.deckName;
-            var modelName = ankiConfig.modelName;
+            var deckName = ankiConfig.DeckName;
+            var modelName = ankiConfig.ModelName;
 
-            var rawFields = ankiConfig.fields;
+            var rawFields = ankiConfig.Fields;
             var fields =
                 ConvertFields(
                     rawFields,
@@ -34,7 +33,7 @@ namespace JapaneseLookup.Anki
                 );
 
             Dictionary<string, object> options = null;
-            var tags = ankiConfig.tags;
+            var tags = ankiConfig.Tags;
 
             // idk if this gets the right audio for every word
             var reading = readings.Split(",")[0];
@@ -121,7 +120,6 @@ namespace JapaneseLookup.Anki
                         dict.Add(key, frequency);
                         break;
                     default:
-                        // we should never reach here, but just in case
                         return null;
                 }
             }

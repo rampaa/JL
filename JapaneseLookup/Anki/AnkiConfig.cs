@@ -6,29 +6,24 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-// ReSharper disable InconsistentNaming
-
 namespace JapaneseLookup.Anki
 {
     public class AnkiConfig
     {
-        // camelCase property names because AnkiConnect
-        #pragma warning disable IDE1006
+        [JsonPropertyName("deckName")] public string DeckName { get; set; }
 
-        public string deckName { get; set; }
+        [JsonPropertyName("modelName")] public string ModelName { get; set; }
 
-        public string modelName { get; set; }
+        [JsonPropertyName("fields")] public Dictionary<string, JLField> Fields { get; set; }
 
-        public Dictionary<string, JLField> fields { get; set; }
-
-        public string[] tags { get; set; }
+        [JsonPropertyName("tags")]  public string[] Tags { get; set; }
 
         public AnkiConfig(string deckName, string modelName, Dictionary<string, JLField> fields, string[] tags)
         {
-            this.deckName = deckName;
-            this.modelName = modelName;
-            this.fields = fields;
-            this.tags = tags;
+            DeckName = deckName;
+            ModelName = modelName;
+            Fields = fields;
+            Tags = tags;
         }
 
         public static async void CreateDefaultConfig()

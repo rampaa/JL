@@ -80,11 +80,11 @@ namespace JapaneseLookup.Anki
                 var postResponse = await Client.PostAsync(AnkiConnectUri, payload);
 
                 var json = await postResponse.Content.ReadFromJsonAsync<Response>();
-                Debug.WriteLine("json result: " + json!.result);
+                Debug.WriteLine("json result: " + json!.Result);
 
-                if (json!.error == null) return json;
+                if (json!.Error == null) return json;
 
-                Console.WriteLine(json.error.ToString());
+                Console.WriteLine(json.Error.ToString());
                 return null;
             }
             catch (HttpRequestException e)

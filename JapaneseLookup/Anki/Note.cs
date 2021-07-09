@@ -1,29 +1,25 @@
 ﻿using System.Collections.Generic;
-
-// ReSharper disable InconsistentNaming
+using System.Text.Json.Serialization;
 
 namespace JapaneseLookup.Anki
 {
     public class Note
     {
-        // camelCase property names because AnkiConnect
-        #pragma warning disable IDE1006
+        [JsonPropertyName("deckName")] public string DeckName { get; set; }
 
-        public string deckName { get; set; }
+        [JsonPropertyName("modelName")]  public string ModelName { get; set; }
 
-        public string modelName { get; set; }
+        [JsonPropertyName("fields")] public Dictionary<string, object> Fields { get; set; }
 
-        public Dictionary<string, object> fields { get; set; }
+        [JsonPropertyName("options")] public Dictionary<string, object> Options { get; set; }
 
-        public Dictionary<string, object> options { get; set; }
+        [JsonPropertyName("tags")]  public string[] Tags { get; set; }
 
-        public string[] tags { get; set; }
+        [JsonPropertyName("audio")] public Dictionary<string, object>[] Audio { get; set; }
 
-        public Dictionary<string, object>[] audio { get; set; }
+        [JsonPropertyName("video")] public Dictionary<string, object>[] Video { get; set; }
 
-        public Dictionary<string, object>[] video { get; set; }
-
-        public Dictionary<string, object>[] picture { get; set; }
+        [JsonPropertyName("picture")] public Dictionary<string, object>[] Picture { get; set; }
 
         public Note(
             string deckName,
@@ -36,14 +32,14 @@ namespace JapaneseLookup.Anki
             Dictionary<string, object>[] picture
         )
         {
-            this.deckName = deckName;
-            this.modelName = modelName;
-            this.fields = fields;
-            this.options = options;
-            this.tags = tags;
-            this.audio = audio;
-            this.video = video;
-            this.picture = picture;
+            DeckName = deckName;
+            ModelName = modelName;
+            Fields = fields;
+            Options = options;
+            Tags = tags;
+            Audio = audio;
+            Video = video;
+            Picture = picture;
         }
     }
 }
