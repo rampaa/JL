@@ -21,6 +21,7 @@ namespace JapaneseLookup.GUI
 
         private static readonly System.Windows.Interop.WindowInteropHelper InteropHelper =
             new(Application.Current.MainWindow!);
+
         private static readonly System.Windows.Forms.Screen ActiveScreen =
             System.Windows.Forms.Screen.FromHandle(InteropHelper.Handle);
 
@@ -38,77 +39,47 @@ namespace JapaneseLookup.GUI
         {
             var needsFlipX = ConfigManager.FlipX && cursorPosition.X + Width > ActiveScreen.Bounds.Width;
             var needsFlipY = ConfigManager.FlipY && cursorPosition.Y + Height > ActiveScreen.Bounds.Height;
-            var needsPushX = cursorPosition.X + Width > ActiveScreen.Bounds.Width;
-            var needsPushY = cursorPosition.Y + Height > ActiveScreen.Bounds.Height;
+
+            double newLeft;
+            double newTop;
 
             if (needsFlipX)
             {
-                // flip Leftwards while preventing OOB
-                var newLeft = cursorPosition.X - Width - ConfigManager.PopupXOffset * 2;
-                while (newLeft < 0)
-                {
-                    newLeft += 1;
-                }
-
-                Left = newLeft;
-
-                if (!needsFlipY && !needsPushX)
-                {
-                    Top = cursorPosition.Y + ConfigManager.PopupYOffset * 2;
-                }
+                // flip Leftwards while preventing -OOB
+                newLeft = cursorPosition.X - Width - ConfigManager.PopupXOffset * 2;
+                if (newLeft < 0) newLeft = 0;
+            }
+            else
+            {
+                // no flip
+                newLeft = cursorPosition.X + ConfigManager.PopupXOffset;
             }
 
             if (needsFlipY)
             {
-                // flip Upwards while preventing OOB
-                var newTop = cursorPosition.Y - Height - ConfigManager.PopupYOffset * 2;
-                while (newTop < 0)
-                {
-                    newTop += 1;
-                }
-
-                Top = newTop;
-
-                if (!needsFlipX && !needsPushY)
-                {
-                    Left = cursorPosition.X + ConfigManager.PopupXOffset * 2;
-                }
+                // flip Upwards while preventing -OOB
+                newTop = cursorPosition.Y - Height - ConfigManager.PopupYOffset * 2;
+                if (newTop < 0) newTop = 0;
             }
-
-            if (needsPushX)
+            else
             {
-                // push Leftwards
-                while (Left + Width > ActiveScreen.Bounds.Width)
-                {
-                    Left -= 1;
-                }
-
-                if (!needsPushY)
-                {
-                    Top = cursorPosition.Y + ConfigManager.PopupYOffset;
-                }
+                // no flip
+                newTop = cursorPosition.Y + ConfigManager.PopupYOffset;
             }
 
-            if (needsPushY)
+            // push if +OOB
+            if (newLeft + Width > ActiveScreen.Bounds.Width)
             {
-                // push Upwards
-                while (Top + Height > ActiveScreen.Bounds.Width)
-                {
-                    Top -= 1;
-                }
-
-                if (!needsPushX)
-                {
-                    Left = cursorPosition.X + ConfigManager.PopupXOffset;
-                }
+                newLeft = ActiveScreen.Bounds.Width - Width;
             }
 
-            if (!needsFlipX && !needsFlipY && !needsPushX && !needsPushY)
+            if (newTop + Height > ActiveScreen.Bounds.Height)
             {
-                // no push or flip
-                Left = cursorPosition.X + ConfigManager.PopupXOffset;
-                Top = cursorPosition.Y + ConfigManager.PopupYOffset;
+                newTop = ActiveScreen.Bounds.Height - Height;
             }
+
+            Left = newLeft;
+            Top = newTop;
         }
 
         internal static void DisplayResults(string sentence, List<Dictionary<string, List<string>>> results)
