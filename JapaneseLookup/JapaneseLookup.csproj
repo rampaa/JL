@@ -9,12 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="System.Windows.Forms">
-      <HintPath>References\System.Windows.Forms.dll</HintPath>
-    </Reference>
-    <Reference Include="WindowsFormsIntegration">
-      <HintPath>References\WindowsFormsIntegration.dll</HintPath>
-    </Reference>
+    <PackageReference Include="HandyControl" Version="3.2.0" />
   </ItemGroup>
 
   <ItemGroup>

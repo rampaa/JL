@@ -4,13 +4,16 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using JapaneseLookup.EDICT;
 using System.Threading.Tasks;
+using HandyControl.Tools;
+using HandyControl.Controls;
+using HandyControl.Properties;
 
 namespace JapaneseLookup.GUI
 {
     /// <summary>
     /// Interaction logic for PreferenceWindow.xaml
     /// </summary>
-    public partial class PreferencesWindow : Window
+    public partial class PreferencesWindow : System.Windows.Window
     {
         private static PreferencesWindow _instance;
 
@@ -23,13 +26,23 @@ namespace JapaneseLookup.GUI
         {
             InitializeComponent();
         }
-        private void PickColor_Click(object sender, RoutedEventArgs e)
+        private void ShowColowPicker(object sender, RoutedEventArgs e)
         {
-            ColorDialog colorDialog = new();
-            if (colorDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            var picker = SingleOpenHelper.CreateControl<ColorPicker>();
+            var window = new HandyControl.Controls.PopupWindow
             {
-                ((System.Windows.Controls.Button)sender).Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
-            }
+                PopupElement = picker,
+            };
+            picker.Canceled += delegate { window.Close(); };
+            picker.Confirmed += delegate { ColorSetter((System.Windows.Controls.Button)sender, picker.SelectedBrush, window); };
+
+            window.ShowDialog(picker, false);
+        }
+
+        private static void ColorSetter(System.Windows.Controls.Button sender, SolidColorBrush selectedColor, HandyControl.Controls.PopupWindow window)
+        {
+            sender.Background = selectedColor;
+            window.Close();
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)

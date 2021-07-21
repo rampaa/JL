@@ -29,7 +29,6 @@ namespace JapaneseLookup
         public static SolidColorBrush ProcessColor;
         public static SolidColorBrush FrequencyColor;
         public static SolidColorBrush AlternativeSpellingsColor;
-
         public static SolidColorBrush SeparatorColor;
 
         public static int FoundSpellingFontSize;
@@ -39,10 +38,13 @@ namespace JapaneseLookup
         public static int FrequencyFontSize;
         public static int AlternativeSpellingsFontSize;
 
-        public static int XOffset;
+        public static int PopupXOffset;
         public static int PopupYOffset;
-        public static bool FlipX;
-        public static bool FlipY;
+        public static bool PopupFlipX;
+        public static bool PopupFlipY;
+
+        public static int PopupMaxWidth;
+        public static int PopupMaxHeight;
 
         private static readonly List<string> japaneseFonts = FindJapaneseFonts().OrderBy(font => font).ToList();
         private static readonly string[] frequencyLists = { "VN", "Novel", "Narou" };
@@ -78,24 +80,27 @@ namespace JapaneseLookup
             FrequencyFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupFrequencyFontSize"));
             ProcessFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupDeconjugationInfoFontSize"));
 
-            XOffset = int.Parse(ConfigurationManager.AppSettings.Get("PopupXOffset"));
+            PopupXOffset = int.Parse(ConfigurationManager.AppSettings.Get("PopupXOffset"));
             PopupYOffset = int.Parse(ConfigurationManager.AppSettings.Get("PopupYOffset"));
+
+            PopupMaxWidth = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth"));
+            PopupMaxHeight = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight"));
 
             switch (ConfigurationManager.AppSettings.Get("PopupFlip"))
             {
                 case "X":
-                    FlipX = true;
-                    FlipY = false;
+                    PopupFlipX = true;
+                    PopupFlipY = false;
                     break;
 
                 case "Y":
-                    FlipX = false;
-                    FlipY = true;
+                    PopupFlipX = false;
+                    PopupFlipY = true;
                     break;
 
                 case "Both":
-                    FlipX = true;
-                    FlipY = true;
+                    PopupFlipX = true;
+                    PopupFlipY = true;
                     break;
             }
 
@@ -139,8 +144,8 @@ namespace JapaneseLookup
                 (SolidColorBrush)new BrushConverter().ConvertFrom(
                     ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor"));
             preferenceWindow.TextboxTextColorButton.Background = mainWindow.MainTextBox.Foreground;
-            preferenceWindow.TextboxTextSizeNumericUpDown.Value = (decimal)mainWindow.FontSizeSlider.Value;
-            preferenceWindow.TextboxOpacityNumericUpDown.Value = (decimal)mainWindow.OpacitySlider.Value;
+            preferenceWindow.TextboxTextSizeNumericUpDown.Value = mainWindow.FontSizeSlider.Value;
+            preferenceWindow.TextboxOpacityNumericUpDown.Value = mainWindow.OpacitySlider.Value;
 
             preferenceWindow.PopupAlternativeSpellingColorButton.Background = AlternativeSpellingsColor;
             preferenceWindow.PopupDeconjugationInfoColorButton.Background = ProcessColor;
@@ -161,7 +166,7 @@ namespace JapaneseLookup
 
             preferenceWindow.PopupSeparatorColorButton.Background = SeparatorColor;
 
-            preferenceWindow.PopupXOffsetNumericUpDown.Value = XOffset;
+            preferenceWindow.PopupXOffsetNumericUpDown.Value = PopupXOffset;
             preferenceWindow.PopupYOffsetNumericUpDown.Value = PopupYOffset;
 
             switch (ConfigurationManager.AppSettings.Get("PopupFlip"))

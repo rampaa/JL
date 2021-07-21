@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
@@ -33,12 +34,14 @@ namespace JapaneseLookup.GUI
         public PopupWindow()
         {
             InitializeComponent();
+            MaxWidth = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth"));
+            MaxHeight = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight"));
         }
 
         public void UpdatePosition(Point cursorPosition)
         {
-            var needsFlipX = ConfigManager.FlipX && cursorPosition.X + Width > ActiveScreen.Bounds.Width;
-            var needsFlipY = ConfigManager.FlipY && cursorPosition.Y + Height > ActiveScreen.Bounds.Height;
+            var needsFlipX = ConfigManager.PopupFlipX && cursorPosition.X + Width > ActiveScreen.Bounds.Width;
+            var needsFlipY = ConfigManager.PopupFlipY && cursorPosition.Y + Height > ActiveScreen.Bounds.Height;
 
             double newLeft;
             double newTop;
@@ -46,13 +49,13 @@ namespace JapaneseLookup.GUI
             if (needsFlipX)
             {
                 // flip Leftwards while preventing -OOB
-                newLeft = cursorPosition.X - Width - ConfigManager.XOffset * 2;
+                newLeft = cursorPosition.X - Width - ConfigManager.PopupXOffset * 2;
                 if (newLeft < 0) newLeft = 0;
             }
             else
             {
                 // no flip
-                newLeft = cursorPosition.X + ConfigManager.XOffset;
+                newLeft = cursorPosition.X + ConfigManager.PopupXOffset;
             }
 
             if (needsFlipY)
