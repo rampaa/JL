@@ -23,12 +23,12 @@ namespace JapaneseLookup.GUI
         {
             InitializeComponent();
         }
-        private static void PickColor(System.Windows.Controls.Button sender)
+        private void PickColor_Click(object sender, RoutedEventArgs e)
         {
             ColorDialog colorDialog = new();
             if (colorDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                sender.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
+                ((System.Windows.Controls.Button)sender).Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B));
             }
         }
 
@@ -36,16 +36,6 @@ namespace JapaneseLookup.GUI
         {
             ConfigManager.SavePreferences(this);
             Visibility = Visibility.Collapsed;
-        }
-
-        private void TextboxBackgroundColorButton_Click(object sender, RoutedEventArgs e)
-        {
-            PickColor((System.Windows.Controls.Button)sender);
-        }
-
-        private void TextboxTextColorButton_Click(object sender, RoutedEventArgs e)
-        {
-            PickColor((System.Windows.Controls.Button)sender);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -57,41 +47,6 @@ namespace JapaneseLookup.GUI
         {
             e.Cancel = true;
             Visibility = Visibility.Collapsed;
-        }
-
-        private void PopupBackgroundColorButton_Click(object sender, RoutedEventArgs e)
-        {
-            PickColor((System.Windows.Controls.Button)sender);
-        }
-
-        private void PopupPrimarySpellingColorButton_Click(object sender, RoutedEventArgs e)
-        {
-            PickColor((System.Windows.Controls.Button)sender);
-        }
-
-        private void PopupReadingColorButton_Click(object sender, RoutedEventArgs e)
-        {
-            PickColor((System.Windows.Controls.Button)sender);
-        }
-
-        private void PopupAlternativeSpellingColorButton_Click(object sender, RoutedEventArgs e)
-        {
-            PickColor((System.Windows.Controls.Button)sender);
-        }
-
-        private void PopupFrequencyColorButton_Click(object sender, RoutedEventArgs e)
-        {
-            PickColor((System.Windows.Controls.Button)sender);
-        }
-
-        private void PopupDeconjugationInfoColorButton_Click(object sender, RoutedEventArgs e)
-        {
-            PickColor((System.Windows.Controls.Button)sender);
-        }
-
-        private void PopupDefinitionColorButton_Click(object sender, RoutedEventArgs e)
-        {
-            PickColor((System.Windows.Controls.Button)sender);
         }
         private void UpdateJMdictButton_Click(object sender, RoutedEventArgs e)
         {

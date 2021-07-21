@@ -6,7 +6,7 @@
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"  
         xmlns:local="clr-namespace:JapaneseLookup.GUI"
         mc:Ignorable="d"
-        Title="PreferenceWindow" Height="727" Width="559" Topmost="True" Closing="Window_Closing" SizeToContent="Manual" ScrollViewer.CanContentScroll="True" VerticalAlignment="Top" Background="#FFE5E5E5">
+        Title="PreferenceWindow" Height="855" Width="559" Topmost="True" Closing="Window_Closing" SizeToContent="Manual" ScrollViewer.CanContentScroll="True" VerticalAlignment="Top" Background="#FFE5E5E5">
     <Grid>
         <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="25,0,0,19" VerticalAlignment="Bottom" Width="80" Click="SaveButton_Click"/>
         <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,20,19" VerticalAlignment="Bottom" Width="82" Click="CancelButton_Click"/>
@@ -37,9 +37,9 @@
             <TabItem Header="Textbox">
                 <Grid Background="#FFE5E5E5">
                     <TextBlock HorizontalAlignment="Left" Margin="25,151,0,0" Text="Background color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <Button x:Name="TextboxBackgroundColorButton" Content="" HorizontalAlignment="Right" Margin="0,146,20,0" VerticalAlignment="Top" Width="60" Click="TextboxBackgroundColorButton_Click" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070"/>
+                    <Button x:Name="TextboxBackgroundColorButton" Content="" HorizontalAlignment="Right" Margin="0,146,20,0" VerticalAlignment="Top" Width="60" Click="PickColor_Click" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070"/>
                     <TextBlock HorizontalAlignment="Left" Margin="25,191,0,0" Text="Text color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <Button x:Name="TextboxTextColorButton" Content="" HorizontalAlignment="Right" Margin="0,186,20,0" VerticalAlignment="Top" Width="60" Height="32" BorderThickness="5,5,5,5" Click="TextboxTextColorButton_Click" BorderBrush="#FF707070"/>
+                    <Button x:Name="TextboxTextColorButton" Content="" HorizontalAlignment="Right" Margin="0,186,20,0" VerticalAlignment="Top" Width="60" Height="32" BorderThickness="5,5,5,5" Click="PickColor_Click" BorderBrush="#FF707070"/>
                     <TextBlock HorizontalAlignment="Left" Margin="25,63,0,0" Text="Font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
                     <WindowsFormsHost  Margin="0,70,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
                         <wf:NumericUpDown x:Name="TextboxTextSizeNumericUpDown" BorderStyle="FixedSingle"  Maximum="300" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
@@ -53,52 +53,71 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Popup">
-                <Grid Background="#FFE5E5E5">
-                    <TextBlock HorizontalAlignment="Left" Margin="25,25,0,0" Text="Background color" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Row="1"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,105,0,0" Text="Primary spelling color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <Button x:Name="PopupPrimarySpellingColorButton" Content="" HorizontalAlignment="Right" Margin="0,100,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="PopupPrimarySpellingColorButton_Click"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,145,0,0" Text="Primary spelling font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <WindowsFormsHost Margin="0,141,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
-                        <wf:NumericUpDown x:Name="PopupPrimarySpellingSizeNumericUpDown" BorderStyle="FixedSingle"  Maximum="300" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
-                    </WindowsFormsHost>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,187,0,0" Text="Reading color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,225,0,0" Text="Reading font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="27,349,0,0" Text="Definition color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="27,388,0,0" Text="Definition font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="27,425,0,0" Text="Frequency color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,463,0,0" Text="Frequency font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,267,0,0" Text="Alternative spelling color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,308,0,0" Text="Alternative spelling font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,505,0,0" Text="Deconjugation info color" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.54,-0.154"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,551,0,0" Text="Deconjugation info font size" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.761,0.491"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,64,0,0" Text="Opacity" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                    <Grid Background="#FFE5E5E5">
+                        <TextBlock HorizontalAlignment="Left" Margin="25,25,0,0" Text="Background color" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Row="1"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="25,105,0,0" Text="Primary spelling color" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                        <Button x:Name="PopupPrimarySpellingColorButton" Content="" HorizontalAlignment="Right" Margin="0,100,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="PickColor_Click"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="25,145,0,0" Text="Primary spelling font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                        <WindowsFormsHost Margin="0,141,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
+                            <wf:NumericUpDown x:Name="PopupPrimarySpellingSizeNumericUpDown" BorderStyle="FixedSingle"  Maximum="300" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
+                        </WindowsFormsHost>
+                        <TextBlock HorizontalAlignment="Left" Margin="25,187,0,0" Text="Reading color" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="25,225,0,0" Text="Reading font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="27,349,0,0" Text="Definition color" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="27,388,0,0" Text="Definition font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="27,425,0,0" Text="Frequency color" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="25,463,0,0" Text="Frequency font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="25,267,0,0" Text="Alternative spelling color" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="25,308,0,0" Text="Alternative spelling font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="25,505,0,0" Text="Deconjugation info color" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.54,-0.154"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="25,551,0,0" Text="Deconjugation info font size" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.761,0.491"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="25,64,0,0" Text="Opacity" TextWrapping="Wrap" VerticalAlignment="Top"/>
 
-                    <WindowsFormsHost Margin="0,558,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
-                        <wf:NumericUpDown x:Name="PopupDeconjugationInfoFontSizeNumericUpDown" BorderStyle="FixedSingle"  Maximum="50" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
-                    </WindowsFormsHost>
-                    <Button x:Name="PopupBackgroundColorButton" Content="" HorizontalAlignment="Right" Margin="0,19,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="PopupBackgroundColorButton_Click"/>
-                    <Button x:Name="PopupDeconjugationInfoColorButton" Content="" HorizontalAlignment="Right" Margin="0,510,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="PopupDeconjugationInfoColorButton_Click"/>
-                    <Button x:Name="PopupReadingColorButton" Content="" HorizontalAlignment="Right" Margin="0,182,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="PopupReadingColorButton_Click"/>
-                    <WindowsFormsHost Margin="0,60,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
-                        <wf:NumericUpDown x:Name="PopupOpacityNumericUpDown" BorderStyle="FixedSingle"  Maximum="100" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
-                    </WindowsFormsHost>
-                    <WindowsFormsHost Margin="0,225,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
-                        <wf:NumericUpDown x:Name="PopupReadingFontSizeNumericUpDown" BorderStyle="FixedSingle"  Maximum="50" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
-                    </WindowsFormsHost>
-                    <Button x:Name="PopupAlternativeSpellingColorButton" Content="" HorizontalAlignment="Right" Margin="0,262,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="PopupAlternativeSpellingColorButton_Click"/>
-                    <Button x:Name="PopupDefinitionColorButton" Content="" HorizontalAlignment="Right" Margin="0,344,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="PopupDefinitionColorButton_Click"/>
-                    <WindowsFormsHost Margin="0,304,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
-                        <wf:NumericUpDown x:Name="PopupAlternativeSpellingFontSizeNumericUpDown" BorderStyle="FixedSingle"  Maximum="50" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
-                    </WindowsFormsHost>
-                    <WindowsFormsHost Margin="0,388,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
-                        <wf:NumericUpDown x:Name="PopupDefinitionFontSizeNumericUpDown" BorderStyle="FixedSingle"  Maximum="50" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
-                    </WindowsFormsHost>
-                    <Button x:Name="PopupFrequencyColorButton" Content="" HorizontalAlignment="Right" Margin="0,430,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="PopupFrequencyColorButton_Click"/>
-                    <WindowsFormsHost  Margin="0,470,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
-                        <wf:NumericUpDown x:Name="PopupFrequencyFontSizeNumericUpDown" BorderStyle="FixedSingle"  Maximum="50" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
-                    </WindowsFormsHost>
+                        <WindowsFormsHost Margin="0,551,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
+                            <wf:NumericUpDown x:Name="PopupDeconjugationInfoFontSizeNumericUpDown" BorderStyle="FixedSingle"  Maximum="50" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
+                        </WindowsFormsHost>
+                        <Button x:Name="PopupBackgroundColorButton" Content="" HorizontalAlignment="Right" Margin="0,19,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="PickColor_Click"/>
+                        <Button x:Name="PopupDeconjugationInfoColorButton" Content="" HorizontalAlignment="Right" Margin="0,510,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="PickColor_Click"/>
+                        <Button x:Name="PopupReadingColorButton" Content="" HorizontalAlignment="Right" Margin="0,182,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="PickColor_Click"/>
+                        <WindowsFormsHost Margin="0,60,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
+                            <wf:NumericUpDown x:Name="PopupOpacityNumericUpDown" BorderStyle="FixedSingle"  Maximum="100" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
+                        </WindowsFormsHost>
+                        <WindowsFormsHost Margin="0,225,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
+                            <wf:NumericUpDown x:Name="PopupReadingFontSizeNumericUpDown" BorderStyle="FixedSingle"  Maximum="50" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
+                        </WindowsFormsHost>
+                        <Button x:Name="PopupAlternativeSpellingColorButton" Content="" HorizontalAlignment="Right" Margin="0,262,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="PickColor_Click"/>
+                        <Button x:Name="PopupDefinitionColorButton" Content="" HorizontalAlignment="Right" Margin="0,344,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="PickColor_Click"/>
+                        <WindowsFormsHost Margin="0,304,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
+                            <wf:NumericUpDown x:Name="PopupAlternativeSpellingFontSizeNumericUpDown" BorderStyle="FixedSingle"  Maximum="50" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
+                        </WindowsFormsHost>
+                        <WindowsFormsHost Margin="0,388,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
+                            <wf:NumericUpDown x:Name="PopupDefinitionFontSizeNumericUpDown" BorderStyle="FixedSingle"  Maximum="50" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
+                        </WindowsFormsHost>
+                        <Button x:Name="PopupFrequencyColorButton" Content="" HorizontalAlignment="Right" Margin="0,430,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="PickColor_Click"/>
+                        <WindowsFormsHost  Margin="0,470,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
+                            <wf:NumericUpDown x:Name="PopupFrequencyFontSizeNumericUpDown" BorderStyle="FixedSingle"  Maximum="50" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
+                        </WindowsFormsHost>
+                        <TextBlock HorizontalAlignment="Left" Margin="25,589,0,0" Text="X Offset" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.761,0.491"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="25,624,0,0" Text="Y Offset" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.761,0.491"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="25,659,0,0" Text="Flip" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.761,0.491"/>
+                        <WindowsFormsHost Margin="0,589,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
+                            <wf:NumericUpDown x:Name="PopupXOffsetNumericUpDown" BorderStyle="FixedSingle"  Maximum="50" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
+                        </WindowsFormsHost>
+                        <WindowsFormsHost Margin="0,624,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30">
+                            <wf:NumericUpDown x:Name="PopupYOffsetNumericUpDown" BorderStyle="FixedSingle"  Maximum="50" Minimum="1" Margin="0,0,0,0" Padding="0,0,0,0" Height="50"/>
+                        </WindowsFormsHost>
 
-                </Grid>
+                        <ComboBox x:Name="PopupFlipComboBox" HorizontalAlignment="Right" Margin="396,659,20,0" VerticalAlignment="Top" Width="120" SelectedValuePath="Content">
+                            <ComboBoxItem Content="X"/>
+                            <ComboBoxItem Content="Y"/>
+                            <ComboBoxItem Content="Both"/>
+                        </ComboBox>
+                        <TextBlock HorizontalAlignment="Left" Margin="25,695,0,0" Text="Separator Color" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.761,0.491"/>
+                        <Button x:Name="PopupSeparatorColorButton" Content="" HorizontalAlignment="Right" Margin="0,695,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="PickColor_Click"/>
+
+                    </Grid>
+                </ScrollViewer>
             </TabItem>
         </TabControl>
     </Grid>

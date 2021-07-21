@@ -21,13 +21,7 @@ namespace JapaneseLookup
         public static string FrequencyList;
         public static bool UseJMnedict;
         public static bool ForceSync;
-        
-        // TODO: make these configurable
         public static int LookupRate;
-        public static int PopupXOffset = 10;
-        public static int PopupYOffset = 20;
-        public static bool FlipX = false;
-        public static bool FlipY = true;
         
         public static SolidColorBrush FoundSpellingColor;
         public static SolidColorBrush ReadingsColor;
@@ -35,12 +29,20 @@ namespace JapaneseLookup
         public static SolidColorBrush ProcessColor;
         public static SolidColorBrush FrequencyColor;
         public static SolidColorBrush AlternativeSpellingsColor;
+
+        public static SolidColorBrush SeparatorColor;
+
         public static int FoundSpellingFontSize;
         public static int ReadingsFontSize;
         public static int DefinitionsFontSize;
         public static int ProcessFontSize;
         public static int FrequencyFontSize;
         public static int AlternativeSpellingsFontSize;
+
+        public static int XOffset;
+        public static int PopupYOffset;
+        public static bool FlipX;
+        public static bool FlipY;
 
         private static readonly List<string> japaneseFonts = FindJapaneseFonts().OrderBy(font => font).ToList();
         private static readonly string[] frequencyLists = { "VN", "Novel", "Narou" };
@@ -52,6 +54,7 @@ namespace JapaneseLookup
             AnkiConnectUri = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
             UseJMnedict = bool.Parse(ConfigurationManager.AppSettings.Get("UseJMnedict"));
             ForceSync = bool.Parse(ConfigurationManager.AppSettings.Get("ForceAnkiSync"));
+            LookupRate = int.Parse(ConfigurationManager.AppSettings.Get("LookupRate"));
 
             FoundSpellingColor = (SolidColorBrush)new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupPrimarySpellingColor"));
@@ -65,6 +68,8 @@ namespace JapaneseLookup
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupFrequencyColor"));
             ProcessColor = (SolidColorBrush)new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupDeconjugationInfoColor"));
+            SeparatorColor = (SolidColorBrush)new BrushConverter()
+                .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupSeparatorColor"));
 
             FoundSpellingFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupPrimarySpellingFontSize"));
             ReadingsFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupReadingFontSize"));
@@ -72,6 +77,27 @@ namespace JapaneseLookup
             DefinitionsFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupDefinitionFontSize"));
             FrequencyFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupFrequencyFontSize"));
             ProcessFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupDeconjugationInfoFontSize"));
+
+            XOffset = int.Parse(ConfigurationManager.AppSettings.Get("PopupXOffset"));
+            PopupYOffset = int.Parse(ConfigurationManager.AppSettings.Get("PopupYOffset"));
+
+            switch (ConfigurationManager.AppSettings.Get("PopupFlip"))
+            {
+                case "X":
+                    FlipX = true;
+                    FlipY = false;
+                    break;
+
+                case "Y":
+                    FlipX = false;
+                    FlipY = true;
+                    break;
+
+                case "Both":
+                    FlipX = true;
+                    FlipY = true;
+                    break;
+            }
 
             mainWindow.OpacitySlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowOpacity"));
             mainWindow.FontSizeSlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowFontSize"));
@@ -101,9 +127,11 @@ namespace JapaneseLookup
             preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
             preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri;
             preferenceWindow.ForceAnkiSyncCheckBox.IsChecked = ForceSync;
+            preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
             preferenceWindow.UseJMnedictCheckBox.IsChecked = UseJMnedict;
             preferenceWindow.FrequencyListComboBox.ItemsSource = frequencyLists;
             preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyList;
+            preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
 
             preferenceWindow.FontComboBox.ItemsSource = japaneseFonts;
             preferenceWindow.FontComboBox.SelectedItem = mainWindow.MainTextBox.FontFamily.ToString();
@@ -130,6 +158,26 @@ namespace JapaneseLookup
             preferenceWindow.PopupBackgroundColorButton.Background = (SolidColorBrush)new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
             preferenceWindow.PopupOpacityNumericUpDown.Value = int.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity"));
+
+            preferenceWindow.PopupSeparatorColorButton.Background = SeparatorColor;
+
+            preferenceWindow.PopupXOffsetNumericUpDown.Value = XOffset;
+            preferenceWindow.PopupYOffsetNumericUpDown.Value = PopupYOffset;
+
+            switch (ConfigurationManager.AppSettings.Get("PopupFlip"))
+            {
+                case "X":
+                    preferenceWindow.PopupFlipComboBox.SelectedValue = "X";
+                    break;
+
+                case "Y":
+                    preferenceWindow.PopupFlipComboBox.SelectedValue = "Y";
+                    break;
+
+                case "Both":
+                    preferenceWindow.PopupFlipComboBox.SelectedValue = "Both";
+                    break;
+            }
         }
         public static void SavePreferences(PreferencesWindow preferenceWindow)
         {
@@ -150,11 +198,13 @@ namespace JapaneseLookup
                 preferenceWindow.FontComboBox.SelectedItem.ToString();
             config.AppSettings.Settings["FrequencyList"].Value =
                 preferenceWindow.FrequencyListComboBox.SelectedItem.ToString();
-
             config.AppSettings.Settings["UseJMnedict"].Value =
                 preferenceWindow.UseJMnedictCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["ForceAnkiSync"].Value =
                 preferenceWindow.ForceAnkiSyncCheckBox.IsChecked.ToString();
+            config.AppSettings.Settings["LookupRate"].Value =
+                preferenceWindow.LookupRateNumericUpDown.Value.ToString();
+
             config.AppSettings.Settings["PopupBackgroundColor"].Value =
                 preferenceWindow.PopupBackgroundColorButton.Background.ToString();
             config.AppSettings.Settings["PopupPrimarySpellingColor"].Value =
@@ -183,6 +233,15 @@ namespace JapaneseLookup
                 preferenceWindow.PopupFrequencyFontSizeNumericUpDown.Value.ToString();
             config.AppSettings.Settings["PopupDeconjugationInfoFontSize"].Value =
                 preferenceWindow.PopupDeconjugationInfoFontSizeNumericUpDown.Value.ToString();
+
+            config.AppSettings.Settings["PopupSeparatorColor"].Value =
+                preferenceWindow.PopupSeparatorColorButton.Background.ToString();
+            config.AppSettings.Settings["PopupXOffset"].Value =
+                preferenceWindow.PopupXOffsetNumericUpDown.Value.ToString();
+            config.AppSettings.Settings["PopupYOffset"].Value =
+                preferenceWindow.PopupYOffsetNumericUpDown.Value.ToString();
+            config.AppSettings.Settings["PopupFlip"].Value =
+                preferenceWindow.PopupFlipComboBox.SelectedValue.ToString();
 
             var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
             config.AppSettings.Settings["MainWindowHeight"].Value = mainWindow.Height.ToString();

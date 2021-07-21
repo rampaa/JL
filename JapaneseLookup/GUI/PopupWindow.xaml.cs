@@ -46,13 +46,13 @@ namespace JapaneseLookup.GUI
             if (needsFlipX)
             {
                 // flip Leftwards while preventing -OOB
-                newLeft = cursorPosition.X - Width - ConfigManager.PopupXOffset * 2;
+                newLeft = cursorPosition.X - Width - ConfigManager.XOffset * 2;
                 if (newLeft < 0) newLeft = 0;
             }
             else
             {
                 // no flip
-                newLeft = cursorPosition.X + ConfigManager.PopupXOffset;
+                newLeft = cursorPosition.X + ConfigManager.XOffset;
             }
 
             if (needsFlipY)
@@ -210,7 +210,10 @@ namespace JapaneseLookup.GUI
                 innerStackPanel.Children.Add(bottom);
                 if (index != results.Count - 1)
                 {
-                    innerStackPanel.Children.Add(new Separator());
+                    innerStackPanel.Children.Add(new Separator
+                    {
+                        Background = ConfigManager.SeparatorColor
+                    });
                 }
 
                 Instance.StackPanel.Children.Add(innerStackPanel);
