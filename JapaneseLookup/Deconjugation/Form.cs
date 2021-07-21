@@ -2,7 +2,7 @@
 
 namespace JapaneseLookup.Deconjugation
 {
-    internal class Form
+    public class Form
     {
         public Form(string text, string originalText, List<string> tags, HashSet<string> seentext,
             List<string> process)

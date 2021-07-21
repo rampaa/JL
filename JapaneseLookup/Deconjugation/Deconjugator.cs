@@ -97,10 +97,10 @@ namespace JapaneseLookup.Deconjugation
                     (
                         myRule.Type,
                         null,
-                        new List<string> {maybeDecEnd},
-                        new List<string> {maybeConEnd},
-                        new List<string> {maybeDecTag},
-                        new List<string> {maybeConTag},
+                        new List<string> { maybeDecEnd },
+                        new List<string> { maybeConEnd },
+                        new List<string> { maybeDecTag },
+                        new List<string> { maybeConTag },
                         myRule.Detail
                     );
                     var ret = StdruleDeconjugateInner(myForm, virtualRule);
@@ -206,8 +206,8 @@ namespace JapaneseLookup.Deconjugation
                     (
                         myRule.Type,
                         null,
-                        new List<string> {maybeDecEnd},
-                        new List<string> {maybeConEnd},
+                        new List<string> { maybeDecEnd },
+                        new List<string> { maybeConEnd },
                         null,
                         null,
                         myRule.Detail
@@ -241,7 +241,7 @@ namespace JapaneseLookup.Deconjugation
             return true;
         }
 
-        internal static HashSet<Form> Deconjugate(string myText)
+        public static HashSet<Form> Deconjugate(string myText)
         {
             var processed = new HashSet<Form>();
             var novel = new HashSet<Form>();

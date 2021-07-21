@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace JapaneseLookup.Deconjugation
 {
-    internal class Rule
+    public class Rule
     {
         public Rule(string type, string contextrule, List<string> decEnd, List<string> conEnd, List<string> decTag,
             List<string> conTag, string detail)

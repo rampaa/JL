@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JapaneseLookup.EDICT
 {
-    class Frequency
+    public class Frequency
     {
         public int FrequencyRank { get; set; }
         public double FrequencyPPM { get; set; }

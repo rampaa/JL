@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace JapaneseLookup.EDICT
 {
-    class JMdictResult
+    public class JMdictResult
     {
         public string Id { get; set; }
         public List<string> AlternativeSpellings { get; set; }

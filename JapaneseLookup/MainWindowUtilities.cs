@@ -16,7 +16,7 @@ using System.Windows.Input;
 
 namespace JapaneseLookup
 {
-    internal static class MainWindowUtilities
+    public static class MainWindowUtilities
     {
         public static bool ready = false;
         public static string Backlog = "";

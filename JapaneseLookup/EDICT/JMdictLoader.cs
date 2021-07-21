@@ -11,7 +11,7 @@ using static JapaneseLookup.MainWindowUtilities;
 
 namespace JapaneseLookup.EDICT
 {
-    class JMdictLoader
+    public class JMdictLoader
     {
         public static Dictionary<string, List<JMdictResult>> jMdictDictionary = new();
         public static void Load()
