@@ -46,6 +46,9 @@ namespace JapaneseLookup
         public static int PopupMaxWidth;
         public static int PopupMaxHeight;
 
+        public static SolidColorBrush MainWindowTextColor;
+        public static SolidColorBrush MainWindowBacklogTextColor;
+
         private static readonly List<string> japaneseFonts = FindJapaneseFonts().OrderBy(font => font).ToList();
         private static readonly string[] frequencyLists = { "VN", "Novel", "Narou" };
 
@@ -86,6 +89,9 @@ namespace JapaneseLookup
             PopupMaxWidth = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth"));
             PopupMaxHeight = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight"));
 
+            MainWindowTextColor = (SolidColorBrush)new BrushConverter().ConvertFrom(
+                    ConfigurationManager.AppSettings.Get("MainWindowTextColor"));
+
             switch (ConfigurationManager.AppSettings.Get("PopupFlip"))
             {
                 case "X":
@@ -112,9 +118,7 @@ namespace JapaneseLookup
                 (SolidColorBrush)new BrushConverter().ConvertFrom(
                     ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor"));
             mainWindow.Background.Opacity = mainWindow.OpacitySlider.Value / 100;
-            mainWindow.MainTextBox.Foreground =
-                (SolidColorBrush)new BrushConverter().ConvertFrom(
-                    ConfigurationManager.AppSettings.Get("MainWindowTextColor"));
+            mainWindow.MainTextBox.Foreground = MainWindowTextColor;
             mainWindow.Height = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowHeight"));
             mainWindow.Width = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowWidth"));
             mainWindow.Top = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowTopPosition"));
@@ -143,7 +147,7 @@ namespace JapaneseLookup
             preferenceWindow.TextboxBackgroundColorButton.Background =
                 (SolidColorBrush)new BrushConverter().ConvertFrom(
                     ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor"));
-            preferenceWindow.TextboxTextColorButton.Background = mainWindow.MainTextBox.Foreground;
+            preferenceWindow.TextboxTextColorButton.Background = MainWindowTextColor;
             preferenceWindow.TextboxTextSizeNumericUpDown.Value = mainWindow.FontSizeSlider.Value;
             preferenceWindow.TextboxOpacityNumericUpDown.Value = mainWindow.OpacitySlider.Value;
 
