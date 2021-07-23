@@ -13,8 +13,8 @@ namespace JapaneseLookup.GUI
     public partial class MainWindow : Window
     {
         private string _lastWord = "";
-
         internal static bool MiningMode = false;
+        private int _currentTextIndex;
 
         public MainWindow()
         {
@@ -45,8 +45,10 @@ namespace JapaneseLookup.GUI
                     if (MainWindowUtilities.JapaneseRegex.IsMatch(text))
                     {
                         text = text.Trim();
-                        MainWindowUtilities.Backlog += text + "\n";
+                        MainWindowUtilities.Backlog.Add(text + "\n");
                         MainTextBox.Text = text;
+                        MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+                        _currentTextIndex = MainWindowUtilities.Backlog.Count - 1;
                     }
                 }
                 catch (Exception e)
@@ -125,12 +127,14 @@ namespace JapaneseLookup.GUI
         {
             if (e.Delta > 0)
             {
-                if (MainTextBox.Text != MainWindowUtilities.Backlog)
+                var allBacklogText = String.Join("", MainWindowUtilities.Backlog);
+                if (MainTextBox.Text != allBacklogText)
                 {
                     if (MainTextBox.GetFirstVisibleLineIndex() == 0)
                     {
-                        int caretIndex = MainWindowUtilities.Backlog.Length - MainTextBox.Text.Length;
-                        MainTextBox.Text = MainWindowUtilities.Backlog;
+                        int caretIndex = allBacklogText.Length - MainTextBox.Text.Length;
+                        MainTextBox.Text = allBacklogText;
+                        MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
                         MainTextBox.CaretIndex = caretIndex;
                         MainTextBox.ScrollToEnd();
                     }
@@ -174,7 +178,7 @@ namespace JapaneseLookup.GUI
         {
             FontSizeSlider.Visibility = Visibility.Collapsed;
 
-            if(MWindow.Background.Opacity == 0)
+            if (MWindow.Background.Opacity == 0)
                 MWindow.Background.Opacity = OpacitySlider.Value / 100;
 
             else if (OpacitySlider.Visibility == Visibility.Collapsed)
@@ -182,7 +186,7 @@ namespace JapaneseLookup.GUI
                 OpacitySlider.Visibility = Visibility.Visible;
                 OpacitySlider.Focus();
             }
-                
+
             else
                 OpacitySlider.Visibility = Visibility.Collapsed;
         }
@@ -196,10 +200,11 @@ namespace JapaneseLookup.GUI
                 FontSizeSlider.Visibility = Visibility.Visible;
                 FontSizeSlider.Focus();
             }
-                
+
             else
                 FontSizeSlider.Visibility = Visibility.Collapsed;
         }
+
         private void MWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             ConfigManager.SaveBeforeClosing(this);
@@ -207,33 +212,68 @@ namespace JapaneseLookup.GUI
 
         private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            MWindow.Background.Opacity = OpacitySlider.Value/100;
+            MWindow.Background.Opacity = OpacitySlider.Value / 100;
         }
 
         private void FontSizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             MainTextBox.FontSize = FontSizeSlider.Value;
         }
+
         private void MWindow_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
                 case Key.K:
-                    {
-                        MiningSetupWindow.Instance.ShowDialog();
-                        break;
-                    }
+                {
+                    MiningSetupWindow.Instance.ShowDialog();
+                    break;
+                }
                 case Key.L:
-                    {
-                        ConfigManager.LoadPreferences(PreferencesWindow.Instance);
-                        PreferencesWindow.Instance.ShowDialog();
-                        break;
-                    }
+                {
+                    ConfigManager.LoadPreferences(PreferencesWindow.Instance);
+                    PreferencesWindow.Instance.ShowDialog();
+                    break;
+                }
                 case Key.T:
+                {
+                    MWindow.Background.Opacity = 0;
+                    break;
+                }
+            }
+        }
+
+        private void MWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Left:
+                {
+                    if (_currentTextIndex != 0)
                     {
-                        MWindow.Background.Opacity = 0;
-                        break;
+                        _currentTextIndex--;
+                        MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
                     }
+
+                    MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
+                    break;
+                }
+                case Key.Right:
+                {
+                    if (_currentTextIndex < MainWindowUtilities.Backlog.Count - 1)
+                    {
+                        _currentTextIndex++;
+                        MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
+                    }
+
+                    if (_currentTextIndex == MainWindowUtilities.Backlog.Count - 1)
+                    {
+                        MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+                    }
+
+                    MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
+                    break;
+                }
             }
         }
 
@@ -241,6 +281,7 @@ namespace JapaneseLookup.GUI
         {
             OpacitySlider.Visibility = Visibility.Collapsed;
         }
+
         private void OpacitySlider_LostFocus(object sender, RoutedEventArgs e)
         {
             OpacitySlider.Visibility = Visibility.Collapsed;

@@ -46,8 +46,8 @@ namespace JapaneseLookup
         public static int PopupMaxWidth;
         public static int PopupMaxHeight;
 
-        public static SolidColorBrush MainWindowTextColor;
-        public static SolidColorBrush MainWindowBacklogTextColor;
+        public static SolidColorBrush MainWindowTextColor = Brushes.White;
+        public static SolidColorBrush MainWindowBacklogTextColor = Brushes.Brown;
 
         private static readonly List<string> japaneseFonts = FindJapaneseFonts().OrderBy(font => font).ToList();
         private static readonly string[] frequencyLists = { "VN", "Novel", "Narou" };

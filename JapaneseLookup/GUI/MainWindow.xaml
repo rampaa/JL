@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:JapaneseLookup"
         AllowsTransparency="True"
         mc:Ignorable="d" Height="269" Width="800" WindowStyle="None" ResizeMode="CanResize" Topmost="True"
-        Closed="MWindow_Closed" Closing="MWindow_Closing" KeyDown="MWindow_KeyDown">
+        Closed="MWindow_Closed" Closing="MWindow_Closing" KeyDown="MWindow_KeyDown" PreviewKeyDown="MWindow_PreviewKeyDown"> 
     <Window.Background>
         <SolidColorBrush Color="Black" Opacity="0.3" />
     </Window.Background>
@@ -21,7 +21,6 @@
     </WindowChrome.WindowChrome>
 
     <Grid x:Name="MainGrid">
-        <!--TODO: Add option to hide the scrollbar-->
         <TextBox x:Name="MainTextBox" Margin="0,25,0,0" TextWrapping="Wrap" VerticalContentAlignment="Top"
                  Background="Transparent" Opacity="1" FontSize="{Binding Value, ElementName=FontSizeSlider}"
                  Foreground="White" SelectionTextBrush="Black"

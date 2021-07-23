@@ -19,7 +19,7 @@ namespace JapaneseLookup
     public static class MainWindowUtilities
     {
         public static bool ready = false;
-        public static string Backlog = "";
+        public static List<string> Backlog = new();
         public const string FakeFrequency = "1000000";
         private static DateTime _lastLookupTime;
 
