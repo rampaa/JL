@@ -6,9 +6,15 @@
         <IsPackable>false</IsPackable>
 
         <OutputType>WinExe</OutputType>
+
+        <Platforms>AnyCPU;x86</Platforms>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <Prefer32Bit>true</Prefer32Bit>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
       <Prefer32Bit>true</Prefer32Bit>
     </PropertyGroup>
 

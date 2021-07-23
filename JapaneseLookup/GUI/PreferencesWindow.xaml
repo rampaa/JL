@@ -20,7 +20,7 @@
                     <ComboBox x:Name="FrequencyListComboBox" HorizontalAlignment="Right" Margin="0,66,20,0" VerticalAlignment="Top" Width="120"/>
                     <TextBlock HorizontalAlignment="Left" Margin="25,132,0,0" Text="AnkiConnect server address" TextWrapping="Wrap" VerticalAlignment="Top"/>
                     <TextBox x:Name="AnkiUriTextBox" HorizontalAlignment="Right" Margin="0,132,20,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="210"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,100,0,0" Text="Use name dictionary (requires restart)" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="25,100,0,0" Text="Use name dictionary" TextWrapping="Wrap" VerticalAlignment="Top"/>
                     <CheckBox x:Name="UseJMnedictCheckBox" Content="" HorizontalAlignment="Right" Margin="0,108,20,0" VerticalAlignment="Top" Padding="0,0,0,0"/>
                     <CheckBox x:Name="ForceAnkiSyncCheckBox" Content="" HorizontalAlignment="Right" Margin="0,175,20,0" VerticalAlignment="Top" Padding="0,0,0,0"/>
                     <TextBlock HorizontalAlignment="Left" Margin="25,167,0,0" Text="Force Anki sync" TextWrapping="Wrap" VerticalAlignment="Top"/>

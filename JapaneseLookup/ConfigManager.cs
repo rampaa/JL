@@ -46,7 +46,7 @@ namespace JapaneseLookup
         public static int PopupMaxWidth;
         public static int PopupMaxHeight;
 
-        public static SolidColorBrush MainWindowTextColor = Brushes.White;
+        public static SolidColorBrush MainWindowTextColor;
         public static SolidColorBrush MainWindowBacklogTextColor = Brushes.Brown;
 
         private static readonly List<string> japaneseFonts = FindJapaneseFonts().OrderBy(font => font).ToList();
@@ -58,6 +58,10 @@ namespace JapaneseLookup
             FrequencyList = ConfigurationManager.AppSettings.Get("FrequencyList");
             AnkiConnectUri = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
             UseJMnedict = bool.Parse(ConfigurationManager.AppSettings.Get("UseJMnedict"));
+
+            if (UseJMnedict && !EDICT.JMnedictLoader.jMnedictDictionary.Any())
+                Task.Run(EDICT.JMnedictLoader.Load);
+
             ForceSync = bool.Parse(ConfigurationManager.AppSettings.Get("ForceAnkiSync"));
             LookupRate = int.Parse(ConfigurationManager.AppSettings.Get("LookupRate"));
 
@@ -207,8 +211,10 @@ namespace JapaneseLookup
                 preferenceWindow.FontComboBox.SelectedItem.ToString();
             config.AppSettings.Settings["FrequencyList"].Value =
                 preferenceWindow.FrequencyListComboBox.SelectedItem.ToString();
+
             config.AppSettings.Settings["UseJMnedict"].Value =
                 preferenceWindow.UseJMnedictCheckBox.IsChecked.ToString();
+
             config.AppSettings.Settings["ForceAnkiSync"].Value =
                 preferenceWindow.ForceAnkiSyncCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["LookupRate"].Value =

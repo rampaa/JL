@@ -48,9 +48,6 @@ namespace JapaneseLookup
                 ready = true;
             });
 
-            if (ConfigManager.UseJMnedict)
-                Task.Run(JMnedictLoader.Load);
-
             // init AnkiConnect so that it doesn't block later
             // Task.Run(AnkiConnect.GetDeckNames);
         }
