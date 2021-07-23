@@ -35,9 +35,9 @@ namespace JapaneseLookup.GUI
                 var ankiConfig = await AnkiConfig.ReadAnkiConfig();
                 if (ankiConfig == null) return;
 
-                ComboBoxDeckNames.ItemsSource = new List<string> {ankiConfig.DeckName};
+                ComboBoxDeckNames.ItemsSource = new List<string> { ankiConfig.DeckName };
                 ComboBoxDeckNames.SelectedIndex = 0;
-                ComboBoxModelNames.ItemsSource = new List<string> {ankiConfig.ModelName};
+                ComboBoxModelNames.ItemsSource = new List<string> { ankiConfig.ModelName };
                 ComboBoxModelNames.SelectedIndex = 0;
                 CreateFieldElements(ankiConfig.Fields);
             }
@@ -103,9 +103,9 @@ namespace JapaneseLookup.GUI
                 foreach (var (fieldName, jlField) in fields)
                 {
                     var stackPanel = new StackPanel();
-                    var textBlockFieldName = new TextBlock {Text = fieldName};
+                    var textBlockFieldName = new TextBlock { Text = fieldName };
                     var comboBoxJLFields = new ComboBox
-                        {ItemsSource = Enum.GetValues(typeof(JLField)), SelectedItem = jlField};
+                        { ItemsSource = Enum.GetValues(typeof(JLField)), SelectedItem = jlField };
 
                     stackPanel.Children.Add(textBlockFieldName);
                     stackPanel.Children.Add(comboBoxJLFields);
@@ -119,7 +119,6 @@ namespace JapaneseLookup.GUI
             }
         }
 
-        // TODO: tags
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -144,13 +143,13 @@ namespace JapaneseLookup.GUI
                 }
 
                 var fields = dict;
-                var tags = new[] {"JL"};
+                var tags = new[] { "JapaneseLookup" };
 
-                if (ComboBoxDeckNames.SelectedItem == null || ComboBoxModelNames.SelectedItem == null )
+                if (ComboBoxDeckNames.SelectedItem == null || ComboBoxModelNames.SelectedItem == null)
                 {
                     Console.WriteLine("Incomplete config");
                     return;
-                } 
+                }
 
                 var ankiConfig = new AnkiConfig(deckName, modelName, fields, tags);
                 Console.WriteLine(AnkiConfig.WriteAnkiConfig(ankiConfig).Result == "ok"

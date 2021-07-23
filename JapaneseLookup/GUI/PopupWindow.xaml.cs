@@ -295,16 +295,18 @@ namespace JapaneseLookup.GUI
                 };
                 textBlockAlternativeSpellings.Inlines.Add(runAlt);
 
-                // TODO: Bounds check (only after it causes a crash!)
-                var runAltOrtho = new Run("(" + result["aOrthographyInfoList"][index] + ")")
+                if (index < result["aOrthographyInfoList"].Count)
                 {
-                    //Foreground = ConfigManager.aOrthographyInfoColor,
-                    //FontSize = ConfigManager.aOrthographyInfoFontSize,
-                };
-                if (runAltOrtho.Text != "()")
-                {
-                    textBlockAlternativeSpellings.Inlines.Add(" ");
-                    textBlockAlternativeSpellings.Inlines.Add(runAltOrtho);
+                    var runAltOrtho = new Run("(" + result["aOrthographyInfoList"][index] + ")")
+                    {
+                        //Foreground = ConfigManager.aOrthographyInfoColor,
+                        //FontSize = ConfigManager.aOrthographyInfoFontSize,
+                    };
+                    if (runAltOrtho.Text != "()")
+                    {
+                        textBlockAlternativeSpellings.Inlines.Add(" ");
+                        textBlockAlternativeSpellings.Inlines.Add(runAltOrtho);
+                    }
                 }
 
                 if (index != result["alternativeSpellings"].Count - 1)
@@ -396,7 +398,7 @@ namespace JapaneseLookup.GUI
             );
         }
 
-        static void PlayAudio(string foundSpelling, string reading)
+        private static void PlayAudio(string foundSpelling, string reading)
         {
             Debug.WriteLine("Attempting to play audio: " + foundSpelling + " " + reading);
 
@@ -410,9 +412,8 @@ namespace JapaneseLookup.GUI
             );
 
             // var sound = AnkiConnect.GetAudio("猫", "ねこ").Result;
-            var test = new MediaElement
-                { Source = uri, Volume = 1, Visibility = Visibility.Collapsed };
-            Instance.StackPanel.Children.Add(test);
+            var mediaElement = new MediaElement { Source = uri, Volume = 1, Visibility = Visibility.Collapsed };
+            Instance.StackPanel.Children.Add(mediaElement);
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
