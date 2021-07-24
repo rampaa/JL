@@ -16,7 +16,7 @@ namespace JapaneseLookupTests
         [OneTimeSetUp]
         public void ClassInit()
         {
-           JMdictLoader.Load();
+            JMdictLoader.Load();
         }
 
         [Test]
@@ -47,6 +47,44 @@ namespace JapaneseLookupTests
             string text =
                 "すき焼き（鋤焼、すきやき）は、薄くスライスした食肉や他の食材を浅い鉄鍋で焼いてたり煮たりして調理する日本の料理である。調味料は醤油、砂糖が多用される。1862年「牛鍋屋」から始まる大ブームから広まったもので、当時は牛鍋（ぎゅうなべ、うしなべ）と言った[1]。一般にすき焼きと呼ばれるようになったのは大正になってからである[2]。";
             int position = 97;
+
+            // Act
+            var result = MainWindowUtilities.FindSentence(
+                text,
+                position);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void FindSentence_WorksWithSentencesEndingInTrimmedCharacters()
+        {
+            // Arrange
+            var expected = ("a（アーカイブ）", 7);
+
+            string text =
+                "a（アーカイブ）";
+            int position = 0;
+
+            // Act
+            var result = MainWindowUtilities.FindSentence(
+                text,
+                position);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void FindSentence_WorksWithUnterminatedSentences()
+        {
+            // Arrange
+            var expected = ("あああああああああ", 8);
+
+            string text =
+                "あああああああああ";
+            int position = 0;
 
             // Act
             var result = MainWindowUtilities.FindSentence(
