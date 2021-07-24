@@ -60,7 +60,20 @@ namespace JapaneseLookup
             UseJMnedict = bool.Parse(ConfigurationManager.AppSettings.Get("UseJMnedict"));
 
             if (UseJMnedict && !EDICT.JMnedictLoader.jMnedictDictionary.Any())
-                Task.Run(EDICT.JMnedictLoader.Load);
+                Task.Run(EDICT.JMnedictLoader.Load).ContinueWith(_ =>
+                {
+                    if (!UseJMnedict && EDICT.JMnedictLoader.jMnedictDictionary.Any())
+                    {
+                        EDICT.JMnedictLoader.jMnedictDictionary = new();
+                        GC.Collect();
+                    }
+                });
+
+            else if (!UseJMnedict && EDICT.JMnedictLoader.jMnedictDictionary.Any())
+            {
+                EDICT.JMnedictLoader.jMnedictDictionary = new();
+                GC.Collect();
+            }
 
             ForceSync = bool.Parse(ConfigurationManager.AppSettings.Get("ForceAnkiSync"));
             LookupRate = int.Parse(ConfigurationManager.AppSettings.Get("LookupRate"));
