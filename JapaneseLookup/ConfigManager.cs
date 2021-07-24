@@ -65,14 +65,14 @@ namespace JapaneseLookup
                     if (!UseJMnedict && EDICT.JMnedictLoader.jMnedictDictionary.Any())
                     {
                         EDICT.JMnedictLoader.jMnedictDictionary = new();
-                        GC.Collect();
+                        Task.Delay(10000).ContinueWith(_ => { GC.Collect(); } );
                     }
                 });
 
             else if (!UseJMnedict && EDICT.JMnedictLoader.jMnedictDictionary.Any())
             {
                 EDICT.JMnedictLoader.jMnedictDictionary = new();
-                GC.Collect();
+                Task.Delay(10000).ContinueWith(_ => { GC.Collect(); });
             }
 
             ForceSync = bool.Parse(ConfigurationManager.AppSettings.Get("ForceAnkiSync"));
