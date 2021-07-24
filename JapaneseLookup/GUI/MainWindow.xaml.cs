@@ -19,7 +19,7 @@ namespace JapaneseLookup.GUI
         public MainWindow()
         {
             InitializeComponent();
-            ConfigManager.ApplySettings(this);
+            ConfigManager.ApplyPreferences(this);
             MainWindowUtilities.MainWindowInitializer();
         }
 

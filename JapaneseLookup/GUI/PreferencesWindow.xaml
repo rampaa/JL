@@ -3,92 +3,320 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"  
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:local="clr-namespace:JapaneseLookup.GUI"
         mc:Ignorable="d"
-        Title="PreferenceWindow" Height="518" Width="559" Topmost="True" Closing="Window_Closing" SizeToContent="Manual" ScrollViewer.CanContentScroll="True" VerticalAlignment="Top" Background="Black">
+        Title="PreferenceWindow" Height="518" Width="579" Topmost="True" Closing="Window_Closing"
+        SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Background="Black">
     <Grid>
-        <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="25,0,0,19" VerticalAlignment="Bottom" Width="80" Click="SaveButton_Click"/>
-        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,20,19" VerticalAlignment="Bottom" Width="82" Click="CancelButton_Click"/>
-        <TabControl TabStripPlacement="Top" VerticalContentAlignment="Stretch" Margin="0,0,0,79" Background="#F3000000">
+        <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="25,0,0,19"
+                VerticalAlignment="Bottom" Width="80" Click="SaveButton_Click" />
+        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,20,19"
+                VerticalAlignment="Bottom" Width="82" Click="CancelButton_Click" />
+        <TabControl TabStripPlacement="Top" VerticalContentAlignment="Stretch" Margin="0,0,0,79"
+                    Background="#F3000000">
             <TabItem Header="General">
-                <Grid Background="Black">
-                    <TextBlock HorizontalAlignment="Left" Margin="25,25,0,0" Text="Maximum Search Length" TextWrapping="Wrap" VerticalAlignment="Top" Height="26" Width="175"/>
-                    <hc:NumericUpDown x:Name="MaxSearchLengthNumericUpDown" Maximum="100" Minimum="1" Margin="0,24,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30" />
-                    <TextBlock HorizontalAlignment="Left" Margin="25,62,0,0" Text="Frequency List" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <ComboBox x:Name="FrequencyListComboBox" HorizontalAlignment="Right" Margin="0,66,20,0" VerticalAlignment="Top" Width="120"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,132,0,0" Text="AnkiConnect server address" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <TextBox x:Name="AnkiUriTextBox" HorizontalAlignment="Right" Margin="0,132,20,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="210"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,100,0,0" Text="Use name dictionary" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="UseJMnedictCheckBox" Content="" HorizontalAlignment="Right" Margin="0,108,20,0" VerticalAlignment="Top" Padding="0,0,0,0"/>
-                    <CheckBox x:Name="ForceAnkiSyncCheckBox" Content="" HorizontalAlignment="Right" Margin="0,175,20,0" VerticalAlignment="Top" Padding="0,0,0,0"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,167,0,0" Text="Force Anki sync" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,206,0,0" Text="Lookup rate" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <hc:NumericUpDown x:Name="LookupRateNumericUpDown" Maximum="20" Minimum="0" Margin="0,202,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30"/>
-                    <Button x:Name="AnkiConfigButton" Content="Open Anki Configuration" HorizontalAlignment="Right" Margin="0,252,20,0" VerticalAlignment="Top" RenderTransformOrigin="0.456,2.391" Width="195" Click="AnkiConfigButton_Click"/>
-                    <Button x:Name="UpdateJMdictButton" Content="Update JMdict" HorizontalAlignment="Left" Margin="25,252,0,0" VerticalAlignment="Top" Click="UpdateJMdictButton_Click" Width="125"/>
-                    <Button x:Name="UpdateJMnedictButton" Content="Update JMnedict" HorizontalAlignment="Left" Margin="175,252,0,0" VerticalAlignment="Top" Width="143" Click="UpdateJMnedictButton_Click" RenderTransformOrigin="0.825,0.548"/>
-                </Grid>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                    <StackPanel Background="Black" Margin="20,10,20,10">
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type DockPanel}">
+                                <Setter Property="Margin" Value="0,10,0,0" />
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Maximum Search Length"
+                                       TextWrapping="Wrap"
+                                       Height="26" Width="175" />
+                            <hc:NumericUpDown x:Name="MaxSearchLengthNumericUpDown" Maximum="100" Minimum="1"
+                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Frequency List"
+                                       TextWrapping="Wrap" />
+                            <ComboBox x:Name="FrequencyListComboBox" HorizontalAlignment="Right"
+                                      Width="120" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Use name dictionary"
+                                       TextWrapping="Wrap" />
+                            <CheckBox x:Name="UseJMnedictCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Lookup rate"
+                                       TextWrapping="Wrap" />
+                            <hc:NumericUpDown x:Name="LookupRateNumericUpDown" Maximum="20" Minimum="0"
+                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button x:Name="UpdateJMdictButton" Content="Update JMdict" Margin="5"
+                                    Width="125"
+                                    HorizontalAlignment="Left"
+                                    Click="UpdateJMdictButton_Click" />
+                            <Button x:Name="UpdateJMnedictButton" Content="Update JMnedict" Margin="5"
+                                    Width="143"
+                                    HorizontalAlignment="Left"
+                                    Click="UpdateJMnedictButton_Click" />
+                        </DockPanel>
+                    </StackPanel>
+                </ScrollViewer>
             </TabItem>
             <TabItem Header="Textbox">
-                <Grid Background="Black">
-                    <TextBlock HorizontalAlignment="Left" Margin="25,151,0,0" Text="Background color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <Button x:Name="TextboxBackgroundColorButton" Content="" HorizontalAlignment="Right" Margin="0,146,20,0" VerticalAlignment="Top" Width="60" Click="ShowColowPicker" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,191,0,0" Text="Text color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <Button x:Name="TextboxTextColorButton" Content="" HorizontalAlignment="Right" Margin="0,186,20,0" VerticalAlignment="Top" Width="60" Height="32" BorderThickness="5,5,5,5" Click="ShowColowPicker" BorderBrush="#FF707070"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,63,0,0" Text="Font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <hc:NumericUpDown x:Name="TextboxTextSizeNumericUpDown" Maximum="300" Minimum="1"  Margin="0,70,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="25,111,0,0" Text="Opacity" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.518,-0.013"/>
-                    <hc:NumericUpDown x:Name="TextboxOpacityNumericUpDown" Maximum="100" Minimum="1" Margin="0,107,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30" />
-                    <TextBlock HorizontalAlignment="Left" Margin="25,25,0,0" Text="Font" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                    <ComboBox x:Name="FontComboBox" HorizontalAlignment="Right" Margin="0,34,20,0" VerticalAlignment="Top" Width="210"/>
-                </Grid>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                    <StackPanel Background="Black" Margin="20,10,20,10">
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type DockPanel}">
+                                <Setter Property="Margin" Value="0,10,0,0" />
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Background color"
+                                       TextWrapping="Wrap" />
+                            <Button x:Name="TextboxBackgroundColorButton" Content="" HorizontalAlignment="Right"
+                                    Width="60" Click="ShowColorPicker"
+                                    BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Text color"
+                                       TextWrapping="Wrap" />
+                            <Button x:Name="TextboxTextColorButton" Content="" HorizontalAlignment="Right"
+                                    Width="60" Height="32" BorderThickness="5,5,5,5"
+                                    Click="ShowColorPicker" BorderBrush="#FF707070" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Font size"
+                                       TextWrapping="Wrap" />
+                            <hc:NumericUpDown x:Name="TextboxFontSizeNumericUpDown" Maximum="300" Minimum="1"
+                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Opacity"
+                                       TextWrapping="Wrap" />
+                            <hc:NumericUpDown x:Name="TextboxOpacityNumericUpDown" Maximum="100" Minimum="1"
+                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Font"
+                                       TextWrapping="Wrap" />
+                            <ComboBox x:Name="FontComboBox" HorizontalAlignment="Right"
+                                      Width="210" />
+                        </DockPanel>
+                    </StackPanel>
+                </ScrollViewer>
             </TabItem>
             <TabItem Header="Popup">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                    <Grid Background="Black" Height="694">
-                        <TextBlock HorizontalAlignment="Left" Margin="25,25,0,0" Text="Background color" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Row="1"/>
-                        <TextBlock HorizontalAlignment="Left" Margin="25,105,0,0" Text="Primary spelling color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                        <Button x:Name="PopupPrimarySpellingColorButton" Content="" HorizontalAlignment="Right" Margin="0,100,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="ShowColowPicker"/>
-                        <TextBlock HorizontalAlignment="Left" Margin="25,145,0,0" Text="Primary spelling font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                        <hc:NumericUpDown x:Name="PopupPrimarySpellingSizeNumericUpDown" Maximum="300" Minimum="1" Margin="0,141,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30"/>
-                        <TextBlock HorizontalAlignment="Left" Margin="25,187,0,0" Text="Reading color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                        <TextBlock HorizontalAlignment="Left" Margin="25,225,0,0" Text="Reading font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                        <TextBlock HorizontalAlignment="Left" Margin="27,349,0,0" Text="Definition color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                        <TextBlock HorizontalAlignment="Left" Margin="27,388,0,0" Text="Definition font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                        <TextBlock HorizontalAlignment="Left" Margin="27,425,0,0" Text="Frequency color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                        <TextBlock HorizontalAlignment="Left" Margin="25,463,0,0" Text="Frequency font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                        <TextBlock HorizontalAlignment="Left" Margin="25,267,0,0" Text="Alternative spelling color" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                        <TextBlock HorizontalAlignment="Left" Margin="25,308,0,0" Text="Alternative spelling font size" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                        <TextBlock HorizontalAlignment="Left" Margin="25,505,0,0" Text="Deconjugation info color" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.54,-0.154"/>
-                        <TextBlock HorizontalAlignment="Left" Margin="25,551,0,0" Text="Deconjugation info font size" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.761,0.491"/>
-                        <TextBlock HorizontalAlignment="Left" Margin="25,64,0,0" Text="Opacity" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                        <hc:NumericUpDown x:Name="PopupDeconjugationInfoFontSizeNumericUpDown" Maximum="50" Minimum="1" Margin="0,551,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30" />
-                        <Button x:Name="PopupBackgroundColorButton" Content="" HorizontalAlignment="Right" Margin="0,19,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="ShowColowPicker"/>
-                        <Button x:Name="PopupDeconjugationInfoColorButton" Content="" HorizontalAlignment="Right" Margin="0,510,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="ShowColowPicker"/>
-                        <Button x:Name="PopupReadingColorButton" Content="" HorizontalAlignment="Right" Margin="0,182,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="ShowColowPicker"/>
-                        <hc:NumericUpDown x:Name="PopupOpacityNumericUpDown" Maximum="100" Minimum="1" Margin="0,60,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30" />
-                        <hc:NumericUpDown x:Name="PopupReadingFontSizeNumericUpDown" Maximum="50" Minimum="1" Margin="0,225,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30"/>
-                        <Button x:Name="PopupAlternativeSpellingColorButton" Content="" HorizontalAlignment="Right" Margin="0,262,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="ShowColowPicker"/>
-                        <Button x:Name="PopupDefinitionColorButton" Content="" HorizontalAlignment="Right" Margin="0,344,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="ShowColowPicker"/>
-                        <hc:NumericUpDown x:Name="PopupAlternativeSpellingFontSizeNumericUpDown" Maximum="50" Minimum="1" Margin="0,304,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30" />
-                        <hc:NumericUpDown x:Name="PopupDefinitionFontSizeNumericUpDown" Maximum="50" Minimum="1" Margin="0,388,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30"/>
-                        <Button x:Name="PopupFrequencyColorButton" Content="" HorizontalAlignment="Right" Margin="0,430,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="ShowColowPicker"/>
-                        <hc:NumericUpDown x:Name="PopupFrequencyFontSizeNumericUpDown" Maximum="50" Minimum="1" Margin="0,470,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30"/>
-                        <TextBlock HorizontalAlignment="Left" Margin="25,589,0,0" Text="X Offset" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.761,0.491"/>
-                        <TextBlock HorizontalAlignment="Left" Margin="25,624,0,0" Text="Y Offset" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.761,0.491"/>
-                        <TextBlock HorizontalAlignment="Left" Margin="25,659,0,0" Text="Flip" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.761,0.491"/>
-                        <hc:NumericUpDown x:Name="PopupXOffsetNumericUpDown" Maximum="50" Minimum="1" Margin="0,589,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30"/>
-                        <hc:NumericUpDown x:Name="PopupYOffsetNumericUpDown" Maximum="50" Minimum="1" Margin="0,624,20,0" Padding="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Height="30"/>
-                        <ComboBox x:Name="PopupFlipComboBox" HorizontalAlignment="Right" Margin="396,659,20,0" VerticalAlignment="Top" Width="120" SelectedValuePath="Content">
-                            <ComboBoxItem Content="X"/>
-                            <ComboBoxItem Content="Y"/>
-                            <ComboBoxItem Content="Both"/>
-                        </ComboBox>
-                        <TextBlock HorizontalAlignment="Left" Margin="25,695,0,0" Text="Separator Color" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.761,0.491"/>
-                        <Button x:Name="PopupSeparatorColorButton" Content="" HorizontalAlignment="Right" Margin="0,695,20,0" VerticalAlignment="Top" Width="60" BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" Click="ShowColowPicker"/>
-                    </Grid>
+                    <StackPanel Background="Black" Margin="20,10,20,10">
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type DockPanel}">
+                                <Setter Property="Margin" Value="0,10,0,0" />
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Background color"
+                                       TextWrapping="Wrap" />
+                            <Button x:Name="PopupBackgroundColorButton" Content="" HorizontalAlignment="Right"
+                                    Width="60" BorderThickness="5,5,5,5"
+                                    Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Opacity"
+                                       TextWrapping="Wrap" />
+                            <hc:NumericUpDown x:Name="PopupOpacityNumericUpDown" Maximum="100" Minimum="1"
+                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Primary spelling color"
+                                       TextWrapping="Wrap" />
+                            <Button x:Name="PopupPrimarySpellingColorButton" Content="" HorizontalAlignment="Right"
+                                    Width="60" BorderThickness="5,5,5,5"
+                                    Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Primary spelling font size"
+                                       TextWrapping="Wrap" />
+                            <hc:NumericUpDown x:Name="PopupPrimarySpellingFontSizeNumericUpDown" Maximum="300"
+                                              Minimum="1"
+                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Reading color"
+                                       TextWrapping="Wrap" />
+                            <Button x:Name="PopupReadingColorButton" Content="" HorizontalAlignment="Right"
+                                    Width="60" BorderThickness="5,5,5,5"
+                                    Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Reading font size"
+                                       TextWrapping="Wrap" />
+                            <hc:NumericUpDown x:Name="PopupReadingFontSizeNumericUpDown" Maximum="50" Minimum="1"
+                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Alternative spelling color"
+                                       TextWrapping="Wrap" />
+                            <Button x:Name="PopupAlternativeSpellingColorButton" Content=""
+                                    HorizontalAlignment="Right"
+                                    Width="60" BorderThickness="5,5,5,5"
+                                    Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left"
+                                       Text="Alternative spelling font size"
+                                       TextWrapping="Wrap" />
+                            <hc:NumericUpDown x:Name="PopupAlternativeSpellingFontSizeNumericUpDown" Maximum="50"
+                                              Minimum="1"
+                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Definition color"
+                                       TextWrapping="Wrap" />
+                            <Button x:Name="PopupDefinitionColorButton" Content="" HorizontalAlignment="Right"
+                                    Width="60" BorderThickness="5,5,5,5"
+                                    Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Definition font size"
+                                       TextWrapping="Wrap" />
+                            <hc:NumericUpDown x:Name="PopupDefinitionFontSizeNumericUpDown" Maximum="50"
+                                              Minimum="1"
+                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                        </DockPanel>
+
+                        <DockPanel>
+
+                            <TextBlock HorizontalAlignment="Left" Text="Frequency color"
+                                       TextWrapping="Wrap" />
+                            <Button x:Name="PopupFrequencyColorButton" Content="" HorizontalAlignment="Right"
+                                    Width="60" BorderThickness="5,5,5,5"
+                                    Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Frequency font size"
+                                       TextWrapping="Wrap" />
+                            <hc:NumericUpDown x:Name="PopupFrequencyFontSizeNumericUpDown" Maximum="50" Minimum="1"
+                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Deconjugation info color"
+                                       TextWrapping="Wrap" />
+                            <Button x:Name="PopupDeconjugationInfoColorButton" Content=""
+                                    HorizontalAlignment="Right"
+                                    Width="60" BorderThickness="5,5,5,5"
+                                    Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Deconjugation info font size"
+                                       TextWrapping="Wrap" />
+                            <hc:NumericUpDown x:Name="PopupDeconjugationInfoFontSizeNumericUpDown" Maximum="50"
+                                              Minimum="1"
+                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="X Offset"
+                                       TextWrapping="Wrap" />
+                            <hc:NumericUpDown x:Name="PopupXOffsetNumericUpDown" Maximum="50" Minimum="1"
+                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Y Offset"
+                                       TextWrapping="Wrap" />
+                            <hc:NumericUpDown x:Name="PopupYOffsetNumericUpDown" Maximum="50" Minimum="1"
+                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Flip"
+                                       TextWrapping="Wrap" />
+                            <ComboBox x:Name="PopupFlipComboBox" HorizontalAlignment="Right"
+                                      Width="120" SelectedValuePath="Content">
+                                <ComboBoxItem Content="X" />
+                                <ComboBoxItem Content="Y" />
+                                <ComboBoxItem Content="Both" />
+                            </ComboBox>
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Separator Color"
+                                       TextWrapping="Wrap" />
+                            <Button x:Name="PopupSeparatorColorButton" Content="" HorizontalAlignment="Right"
+                                    Width="60" BorderThickness="5,5,5,5"
+                                    Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
+                        </DockPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <!-- TODO: Migrate the MiningSetupWindow here -->
+            <TabItem Header="Anki">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                    <StackPanel Background="Black" Margin="20,10,20,10">
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type DockPanel}">
+                                <Setter Property="Margin" Value="0,10,0,0" />
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="AnkiConnect server address"
+                                       TextWrapping="Wrap" />
+                            <TextBox x:Name="AnkiUriTextBox" HorizontalAlignment="Right"
+                                     TextWrapping="NoWrap" Width="210" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Force sync after mining"
+                                       TextWrapping="Wrap" />
+                            <CheckBox x:Name="ForceAnkiSyncCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <Grid Margin="10,10,10,10">
+                            <StackPanel Margin="10">
+                                <ComboBox x:Name="MiningSetupComboBoxDeckNames" Width="200" Margin="0,10,30,0" />
+                                <Button x:Name="MiningSetupButtonRefresh" Click="MiningSetupButtonRefresh_Click"
+                                        Width="100"
+                                        Margin="0,10,15,0" HorizontalAlignment="Right">
+                                    Refresh
+                                </Button>
+                                <ComboBox x:Name="MiningSetupComboBoxModelNames" Width="200" Margin="0,10,30,0" />
+
+                                <Separator Height="29" />
+
+                                <Button x:Name="MiningSetupButtonGetFields" Click="MiningSetupButtonGetFields_Click"
+                                        Width="150"
+                                        Content="Get Fields" />
+                                <StackPanel x:Name="MiningSetupStackPanelFields" Margin="10" />
+
+                                <Separator Height="29" />
+
+                                <Button x:Name="MiningSetupButtonSave" Click="MiningSetupButtonSave_Click" Width="120"
+                                        Content="Save AnkiConfig" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
                 </ScrollViewer>
             </TabItem>
         </TabControl>
