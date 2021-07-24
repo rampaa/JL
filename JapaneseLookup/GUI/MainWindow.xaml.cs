@@ -45,7 +45,7 @@ namespace JapaneseLookup.GUI
                     if (MainWindowUtilities.JapaneseRegex.IsMatch(text))
                     {
                         text = text.Trim();
-                        MainWindowUtilities.Backlog.Add(text + "\n");
+                        MainWindowUtilities.Backlog.Add(text);
                         MainTextBox.Text = text;
                         MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
                         _currentTextIndex = MainWindowUtilities.Backlog.Count - 1;
@@ -127,7 +127,7 @@ namespace JapaneseLookup.GUI
         {
             if (e.Delta > 0)
             {
-                var allBacklogText = String.Join("", MainWindowUtilities.Backlog);
+                var allBacklogText = String.Join("\n", MainWindowUtilities.Backlog);
                 if (MainTextBox.Text != allBacklogText)
                 {
                     if (MainTextBox.GetFirstVisibleLineIndex() == 0)
@@ -224,11 +224,6 @@ namespace JapaneseLookup.GUI
         {
             switch (e.Key)
             {
-                case Key.K:
-                {
-                    MiningSetupWindow.Instance.ShowDialog();
-                    break;
-                }
                 case Key.L:
                 {
                     ConfigManager.LoadPreferences(PreferencesWindow.Instance);
@@ -238,6 +233,7 @@ namespace JapaneseLookup.GUI
                 case Key.T:
                 {
                     MWindow.Background.Opacity = 0;
+                    Keyboard.ClearFocus();
                     break;
                 }
             }
