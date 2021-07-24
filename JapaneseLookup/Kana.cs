@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace JapaneseLookup
 {
-    class Kana
+    public static class Kana
     {
-        public static readonly Dictionary<char, char> hiraganaToKatakanaDict = new()
+        private static readonly Dictionary<char, char> HiraganaToKatakanaDict = new()
         {
             { 'あ', 'ア' }, { 'い', 'イ' }, { 'う', 'ウ' }, { 'え', 'エ' }, { 'お', 'オ' },
             { 'か', 'カ' }, { 'き', 'キ' }, { 'く', 'ク' }, { 'け', 'ケ' }, { 'こ', 'コ' },
@@ -31,12 +31,12 @@ namespace JapaneseLookup
 
             { 'ぁ', 'ァ' }, { 'ぃ', 'ィ' }, { 'ぅ', 'ゥ' }, { 'ぇ', 'ェ' }, { 'ぉ', 'ォ' },
             { 'ゃ', 'ャ' }, { 'ゅ', 'ュ' }, { 'ょ', 'ョ' },
-            
+
             { 'ゕ', 'ヵ' }, { 'ゖ', 'ヶ' }, { 'ゔ', 'ヴ' },
             { 'ゝ', 'ヽ' }, { 'ゞ', 'ヾ' }, { 'っ', 'ッ' }
         };
 
-        public static readonly Dictionary<char, char> katanakaToHiraganaDict = new()
+        private static readonly Dictionary<char, char> KatakanaToHiraganaDict = new()
         {
             { 'ア', 'あ' }, { 'イ', 'い' }, { 'ウ', 'う' }, { 'エ', 'え' }, { 'オ', 'お' },
             { 'カ', 'か' }, { 'キ', 'き' }, { 'ク', 'く' }, { 'ケ', 'け' }, { 'コ', 'こ' },
@@ -59,31 +59,31 @@ namespace JapaneseLookup
 
             { 'ァ', 'ぁ' }, { 'ィ', 'ぃ' }, { 'ゥ', 'ぅ' }, { 'ェ', 'ぇ' }, { 'ォ', 'ぉ' },
             { 'ャ', 'ゃ' }, { 'ュ', 'ゅ' }, { 'ョ', 'ょ' },
-            
+
             { 'ヴ', 'ゔ' }, { 'ヵ', 'ゕ' }, { 'ヶ', 'ゖ' },
-            { 'ヽ', 'ゝ' }, { 'ヾ', 'ゞ' }, { 'ッ', 'っ' } 
+            { 'ヽ', 'ゝ' }, { 'ヾ', 'ゞ' }, { 'ッ', 'っ' }
 
             // {'ヸ','ゐ゙'}, { 'ヹ', 'ゑ゙' } { 'ヺ', 'を゙' }
             // Apparently ゐ゙, ゑ゙ and を゙ don't count as single characters.
         };
 
-        public static readonly Dictionary<char, char> kanaFinalVowelDict = new()
+        private static readonly Dictionary<char, char> KanaFinalVowelDict = new()
         {
             //Katakana
-            { 'ア', 'ア' }, { 'カ', 'ア' }, { 'サ', 'ア' }, { 'タ', 'ア' }, { 'ナ', 'ア' }, { 'ハ', 'ア' }, 
-            { 'マ', 'ア' }, { 'ラ', 'ア' }, { 'ガ', 'ア' }, { 'ザ', 'ア' }, { 'ダ', 'ア' }, { 'バ', 'ア' }, 
+            { 'ア', 'ア' }, { 'カ', 'ア' }, { 'サ', 'ア' }, { 'タ', 'ア' }, { 'ナ', 'ア' }, { 'ハ', 'ア' },
+            { 'マ', 'ア' }, { 'ラ', 'ア' }, { 'ガ', 'ア' }, { 'ザ', 'ア' }, { 'ダ', 'ア' }, { 'バ', 'ア' },
             { 'パ', 'ア' }, { 'ワ', 'ア' }, { 'ヤ', 'ア' }, { 'ァ', 'ア' }, { 'ャ', 'ア' }, { 'ヵ', 'ア' },
 
             { 'イ', 'イ' }, { 'キ', 'イ' }, { 'シ', 'イ' }, { 'チ', 'イ' }, { 'ニ', 'イ' },
-            { 'ヰ', 'イ' }, { 'ヒ', 'イ' }, { 'ミ', 'イ' }, { 'リ', 'イ' }, { 'ギ', 'イ' }, 
+            { 'ヰ', 'イ' }, { 'ヒ', 'イ' }, { 'ミ', 'イ' }, { 'リ', 'イ' }, { 'ギ', 'イ' },
             { 'ジ', 'イ' }, { 'ヂ', 'イ' }, { 'ビ', 'イ' }, { 'ピ', 'イ' }, { 'ィ', 'イ' },
 
             { 'ウ', 'ウ' }, { 'ク', 'ウ' }, { 'ス', 'ウ' }, { 'ツ', 'ウ' }, { 'ヌ', 'ウ' }, { 'ヘ', 'ウ' },
             { 'ム', 'ウ' }, { 'ル', 'ウ' }, { 'グ', 'ウ' }, { 'ズ', 'ウ' }, { 'ヅ', 'ウ' }, { 'ブ', 'ウ' },
             { 'プ', 'ウ' }, { 'ユ', 'ウ' }, { 'ゥ', 'ウ' }, { 'ュ', 'ウ' }, { 'ヴ', 'ウ' },
 
-            { 'エ', 'エ' }, { 'ケ', 'エ' }, { 'セ', 'エ' }, { 'テ', 'エ' }, { 'ネ', 'エ' }, { 'フ', 'エ' }, 
-            { 'メ', 'エ' }, { 'レ', 'エ' }, { 'ゲ', 'エ' }, { 'ゼ', 'エ' }, { 'デ', 'エ' }, { 'ベ', 'エ' }, 
+            { 'エ', 'エ' }, { 'ケ', 'エ' }, { 'セ', 'エ' }, { 'テ', 'エ' }, { 'ネ', 'エ' }, { 'フ', 'エ' },
+            { 'メ', 'エ' }, { 'レ', 'エ' }, { 'ゲ', 'エ' }, { 'ゼ', 'エ' }, { 'デ', 'エ' }, { 'ベ', 'エ' },
             { 'ペ', 'エ' }, { 'ヱ', 'エ' }, { 'ェ', 'エ' }, { 'ヶ', 'エ' },
 
             { 'オ', 'オ' }, { 'コ', 'オ' }, { 'ソ', 'オ' }, { 'ト', 'オ' }, { 'ノ', 'オ' }, { 'ホ', 'オ' },
@@ -118,54 +118,51 @@ namespace JapaneseLookup
             string textInHiragana = "";
             foreach (var ch in text)
             {
-                if (hiraganaToKatakanaDict.TryGetValue(ch, out char hiraganaChar))
+                if (HiraganaToKatakanaDict.TryGetValue(ch, out char hiraganaChar))
                     textInHiragana += hiraganaChar;
                 else
                     textInHiragana += ch;
             }
+
             return textInHiragana;
         }
 
         public static string KatakanaToHiraganaConverter(string text)
         {
             string textInHiragana = "";
-            foreach(var ch in text)
+            foreach (var ch in text)
             {
-                if (katanakaToHiraganaDict.TryGetValue(ch, out char hiraganaChar))
+                if (KatakanaToHiraganaDict.TryGetValue(ch, out char hiraganaChar))
                     textInHiragana += hiraganaChar;
                 else
                     textInHiragana += ch;
             }
+
             return textInHiragana;
         }
 
         public static string LongVowelMarkConverter(string text)
         {
             string textWithoutLongVowelMark = text[0].ToString();
-            for(int i = 1; i < text.Length; i++)
+            for (int i = 1; i < text.Length; i++)
             {
-                if (text[i] == 'ー' && kanaFinalVowelDict.TryGetValue(text[i - 1], out char vowel))
+                if (text[i] == 'ー' && KanaFinalVowelDict.TryGetValue(text[i - 1], out char vowel))
                     textWithoutLongVowelMark += vowel;
                 else
                     textWithoutLongVowelMark += text[i];
             }
+
             return textWithoutLongVowelMark;
         }
 
         public static bool IsHiragana(string text)
         {
-            if (hiraganaToKatakanaDict.ContainsKey(text[0]))
-                return true;
-            else
-                return false;
+            return HiraganaToKatakanaDict.ContainsKey(text[0]);
         }
 
         public static bool IsKatakana(string text)
         {
-            if (katanakaToHiraganaDict.ContainsKey(text[0]))
-                return true;
-            else
-                return false;
+            return KatakanaToHiraganaDict.ContainsKey(text[0]);
         }
     }
 }

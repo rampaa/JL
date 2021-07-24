@@ -270,7 +270,6 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-            <!-- TODO: Migrate the MiningSetupWindow here -->
             <TabItem Header="Anki">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
                     <StackPanel Background="Black" Margin="20,10,20,10">
