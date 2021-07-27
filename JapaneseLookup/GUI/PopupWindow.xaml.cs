@@ -201,7 +201,7 @@ namespace JapaneseLookup.GUI
                         continue;
 
                     // Frequency check
-                    if (baby.Text == ("#" + MainWindowUtilities.FakeFrequency))
+                    if (baby.Text == ("#" + MainWindowUtilities.FakeFrequency) || baby.Text == "#0")
                         continue;
 
                     top.Children.Add(baby);

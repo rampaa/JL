@@ -67,12 +67,12 @@ namespace JapaneseLookup.GUI
         {
             if (MiningMode || MWindow.Background.Opacity == 0) return;
 
-            // popup follows cursor
-            PopupWindow.Instance.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
-
             int charPosition = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
             if (charPosition != -1)
             {
+                // popup follows cursor
+                PopupWindow.Instance.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+
                 (string sentence, int endPosition) = MainWindowUtilities.FindSentence(MainTextBox.Text, charPosition);
                 string text;
                 if (endPosition - charPosition + 1 < ConfigManager.MaxSearchLength)

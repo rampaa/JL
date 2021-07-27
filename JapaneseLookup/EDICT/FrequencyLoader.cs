@@ -10,9 +10,9 @@ using System.Collections.Concurrent;
 
 namespace JapaneseLookup.EDICT
 {
-    class FrequencyLoader
+    public static class FrequencyLoader
     {
-        public static async Task<Dictionary<string, List<List<JsonElement>>>> LoadJSON(string path)
+        public static async Task<Dictionary<string, List<List<JsonElement>>>> LoadJson(string path)
         {
             await using FileStream openStream = File.OpenRead(path);
             return await JsonSerializer.DeserializeAsync<Dictionary<string, List<List<JsonElement>>>>(openStream);
@@ -27,149 +27,160 @@ namespace JapaneseLookup.EDICT
                 {
                     string exactSpelling = element[0].ToString();
                     element[1].TryGetInt32(out int frequencyRank);
-                    element[2].TryGetDouble(out double frequencyPPM);
 
-                    if (JMdictLoader.jMdictDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(exactSpelling), out List<JMdictResult> jMDictResults))
+                    if (JMdictLoader.jMdictDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(exactSpelling),
+                        out List<JMdictResult> jMDictResults))
                     {
                         foreach (JMdictResult result in jMDictResults)
                         {
                             if (Kana.KatakanaToHiraganaConverter(result.PrimarySpelling) == reading
-                                || (reading != exactSpelling && (result.Readings.Contains(reading) || result.Readings.Contains(Kana.HiraganaToKatakanaConverter(reading)))))
+                                || (reading != exactSpelling && (result.Readings.Contains(reading) ||
+                                                                 result.Readings.Contains(
+                                                                     Kana.HiraganaToKatakanaConverter(reading)))))
                             {
-                                if (result.FrequencyDict != null && result.FrequencyDict.TryGetValue(freqListName, out var frequency))
+                                if (result.FrequencyDict != null &&
+                                    result.FrequencyDict.TryGetValue(freqListName, out var frequency))
                                 {
-                                    if (frequency.FrequencyRank > frequencyRank)
+                                    if (frequency > frequencyRank)
                                     {
-                                        frequency.FrequencyRank = frequencyRank;
-                                        frequency.FrequencyPPM = frequencyPPM;
+                                        result.FrequencyDict[freqListName] = frequencyRank;
                                     }
                                 }
 
                                 else if (result.FrequencyDict == null)
                                 {
                                     result.FrequencyDict = new();
-                                    result.FrequencyDict.Add(freqListName, new Frequency(frequencyRank, frequencyPPM));
+                                    result.FrequencyDict.Add(freqListName, frequencyRank);
                                 }
 
                                 else
                                 {
-                                    result.FrequencyDict.Add(freqListName, new Frequency(frequencyRank, frequencyPPM));
+                                    result.FrequencyDict.Add(freqListName, frequencyRank);
                                 }
 
-                                if (result.AlternativeSpellings != null)
+                                if (result.AlternativeSpellings == null)
+                                    continue;
+
+                                foreach (var aspelling in result.AlternativeSpellings)
                                 {
-                                    foreach (var aspelling in result.AlternativeSpellings)
+                                    if (!JMdictLoader.jMdictDictionary.TryGetValue(aspelling, out var edictResults))
+                                        continue;
+
+                                    foreach (var aresult in edictResults)
                                     {
-                                        if (JMdictLoader.jMdictDictionary.TryGetValue(aspelling, out var edictResults))
-                                        {
-                                            foreach (var aresult in edictResults)
+                                        if (aresult.PrimarySpelling == reading
+                                            || (reading != exactSpelling
+                                                && aresult.Readings.Contains(reading)))
+
+                                            if (aresult.FrequencyDict != null &&
+                                                aresult.FrequencyDict.TryGetValue(freqListName, out var afrequency))
                                             {
-                                                if (aresult.PrimarySpelling == reading
-                                                    || (reading != exactSpelling
-                                                    && aresult.Readings.Contains(reading)))
-
-                                                    if (aresult.FrequencyDict != null && aresult.FrequencyDict.TryGetValue(freqListName, out var afrequency))
-                                                    {
-                                                        if (afrequency.FrequencyRank > frequencyRank)
-                                                        {
-                                                            afrequency.FrequencyRank = frequencyRank;
-                                                            afrequency.FrequencyPPM = frequencyPPM;
-                                                        }
-                                                    }
-
-                                                    else if (aresult.FrequencyDict == null)
-                                                    {
-                                                        aresult.FrequencyDict = new();
-                                                        aresult.FrequencyDict.Add(freqListName, new Frequency(frequencyRank, frequencyPPM));
-                                                    }
-
-                                                    else
-                                                    {
-                                                        aresult.FrequencyDict.Add(freqListName, new Frequency(frequencyRank, frequencyPPM));
-                                                    }
+                                                if (afrequency > frequencyRank)
+                                                {
+                                                    aresult.FrequencyDict[freqListName] = frequencyRank;
+                                                }
                                             }
-                                        }
+
+                                            else if (aresult.FrequencyDict == null)
+                                            {
+                                                aresult.FrequencyDict = new();
+                                                aresult.FrequencyDict.Add(freqListName, frequencyRank);
+                                            }
+
+                                            else
+                                            {
+                                                aresult.FrequencyDict.Add(freqListName, frequencyRank);
+                                            }
                                     }
                                 }
                             }
                         }
                     }
 
-                    if (reading != exactSpelling && JMdictLoader.jMdictDictionary.TryGetValue(reading, out jMDictResults))
+                    if (reading == exactSpelling ||
+                        !JMdictLoader.jMdictDictionary.TryGetValue(reading, out jMDictResults))
+                        continue;
+
+                    foreach (JMdictResult result in jMDictResults)
                     {
-                        foreach (JMdictResult result in jMDictResults)
+                        if (result.PrimarySpelling == exactSpelling
+                            || (result.AlternativeSpellings != null &&
+                                result.AlternativeSpellings.Contains(exactSpelling))
+                            || (result.KanaSpellings != null && result.KanaSpellings.Contains(exactSpelling)))
                         {
-                            if (result.PrimarySpelling == exactSpelling
-                                || (result.AlternativeSpellings != null && result.AlternativeSpellings.Contains(exactSpelling))
-                                || (result.KanaSpellings != null && result.KanaSpellings.Contains(exactSpelling)))
+                            foreach (var rreading in result.Readings)
                             {
-                                foreach (var rreading in result.Readings)
+                                if (!JMdictLoader.jMdictDictionary.TryGetValue(
+                                    Kana.KatakanaToHiraganaConverter(rreading), out var rjMDictResults))
+                                    continue;
+
+                                foreach (var rresult in rjMDictResults)
                                 {
-                                    if (JMdictLoader.jMdictDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(rreading), out var rjMDictResults))
+                                    if (rresult.PrimarySpelling == exactSpelling
+                                        || rresult.PrimarySpelling == result.PrimarySpelling
+                                        || (rresult.AlternativeSpellings != null &&
+                                            rresult.AlternativeSpellings.Contains(exactSpelling))
+                                        || (rresult.KanaSpellings != null &&
+                                            rresult.KanaSpellings.Contains(exactSpelling)))
                                     {
-                                        foreach (var rresult in rjMDictResults)
+                                        if (rresult.Readings.Any())
                                         {
-                                            if (rresult.PrimarySpelling == exactSpelling
-                                                || rresult.PrimarySpelling == result.PrimarySpelling
-                                                || (rresult.AlternativeSpellings != null && rresult.AlternativeSpellings.Contains(exactSpelling))
-                                                || (rresult.KanaSpellings != null && rresult.KanaSpellings.Contains(exactSpelling)))
+                                            if (JMdictLoader.jMdictDictionary.TryGetValue(
+                                                Kana.KatakanaToHiraganaConverter(rresult.PrimarySpelling),
+                                                out var pDictResults))
                                             {
-                                                if (rresult.Readings.Any())
+                                                foreach (var pDictResult in pDictResults)
                                                 {
-                                                    if (JMdictLoader.jMdictDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(rresult.PrimarySpelling), out var pDictResults))
+                                                    if (pDictResult.PrimarySpelling == result.PrimarySpelling
+                                                        && (pDictResult.Readings.Contains(reading)
+                                                            || pDictResult.Readings.Contains(
+                                                                Kana.HiraganaToKatakanaConverter(reading))))
                                                     {
-                                                        foreach (var PDictResult in pDictResults)
+                                                        if (pDictResult.FrequencyDict != null &&
+                                                            pDictResult.FrequencyDict.TryGetValue(freqListName,
+                                                                out var pFrequency))
                                                         {
-                                                            if (PDictResult.PrimarySpelling == result.PrimarySpelling
-                                                                && (PDictResult.Readings.Contains(reading)
-                                                                || PDictResult.Readings.Contains(Kana.HiraganaToKatakanaConverter(reading))))
+                                                            if (pFrequency > frequencyRank)
                                                             {
-
-                                                                if (PDictResult.FrequencyDict != null && PDictResult.FrequencyDict.TryGetValue(freqListName, out var PFrequency))
-                                                                {
-                                                                    if (PFrequency.FrequencyRank > frequencyRank)
-                                                                    {
-                                                                        PFrequency.FrequencyRank = frequencyRank;
-                                                                        PFrequency.FrequencyPPM = frequencyPPM;
-                                                                    }
-                                                                }
-
-                                                                else if (PDictResult.FrequencyDict == null)
-                                                                {
-                                                                    PDictResult.FrequencyDict = new();
-                                                                    PDictResult.FrequencyDict.Add(freqListName, new Frequency(frequencyRank, frequencyPPM));
-                                                                }
-
-                                                                else
-                                                                {
-                                                                    PDictResult.FrequencyDict.Add(freqListName, new Frequency(frequencyRank, frequencyPPM));
-                                                                }
+                                                                pDictResult.FrequencyDict[freqListName] = frequencyRank;
                                                             }
+                                                        }
+
+                                                        else if (pDictResult.FrequencyDict == null)
+                                                        {
+                                                            pDictResult.FrequencyDict = new();
+                                                            pDictResult.FrequencyDict.Add(freqListName,
+                                                                frequencyRank);
+                                                        }
+
+                                                        else
+                                                        {
+                                                            pDictResult.FrequencyDict.Add(freqListName,
+                                                                frequencyRank);
                                                         }
                                                     }
                                                 }
-
-                                                if (rresult.FrequencyDict != null && rresult.FrequencyDict.TryGetValue(freqListName, out var frequency))
-                                                {
-
-                                                    if (frequency.FrequencyRank > frequencyRank)
-                                                    {
-                                                        frequency.FrequencyRank = frequencyRank;
-                                                        frequency.FrequencyPPM = frequencyPPM;
-                                                    }
-                                                }
-
-                                                else if (rresult.FrequencyDict == null)
-                                                {
-                                                    rresult.FrequencyDict = new();
-                                                    rresult.FrequencyDict.Add(freqListName, new Frequency(frequencyRank, frequencyPPM));
-                                                }
-
-                                                else
-                                                {
-                                                    rresult.FrequencyDict.Add(freqListName, new Frequency(frequencyRank, frequencyPPM));
-                                                }
                                             }
+                                        }
+
+                                        if (rresult.FrequencyDict != null &&
+                                            rresult.FrequencyDict.TryGetValue(freqListName, out var frequency))
+                                        {
+                                            if (frequency > frequencyRank)
+                                            {
+                                                rresult.FrequencyDict[freqListName] = frequencyRank;
+                                            }
+                                        }
+
+                                        else if (rresult.FrequencyDict == null)
+                                        {
+                                            rresult.FrequencyDict = new();
+                                            rresult.FrequencyDict.Add(freqListName, frequencyRank);
+                                        }
+
+                                        else
+                                        {
+                                            rresult.FrequencyDict.Add(freqListName, frequencyRank);
                                         }
                                     }
                                 }

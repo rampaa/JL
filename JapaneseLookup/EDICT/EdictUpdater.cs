@@ -11,9 +11,9 @@ using System.Windows;
 
 namespace JapaneseLookup.EDICT
 {
-    class EdictUpdater
+    public static class EdictUpdater
     {
-        public async static void UpdateJMdict()
+        public static async void UpdateJMdict()
         {
             if (MessageBox.Show("Do you want to update JMdict?", "", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
@@ -26,7 +26,7 @@ namespace JapaneseLookup.EDICT
                     MessageBox.Show("This may take a while. Please don't shut down the program until JMdict is updated.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                     using WebClient client = new();
                     await Task.Run(() => client.DownloadFile("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz", downloadName));
-                    await Task.Run(() => GzipDecompresser(new FileInfo(downloadName), Path.Join(ConfigManager.ApplicationPath, "Resources/JMdict.xml")));
+                    await Task.Run(() => GzipDecompressor(new FileInfo(downloadName), Path.Join(ConfigManager.ApplicationPath, "Resources/JMdict.xml")));
                     File.Delete(downloadName);
                     MessageBox.Show("JMdict has been updated successfully.", "", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -54,7 +54,7 @@ namespace JapaneseLookup.EDICT
                     string downloadName = Path.Join(ConfigManager.ApplicationPath, "Resources/JMnedict.xml.gz");
                     using WebClient client = new();
                     await Task.Run(() => client.DownloadFile("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz", downloadName));
-                    await Task.Run(() => GzipDecompresser(new FileInfo(downloadName), Path.Join(ConfigManager.ApplicationPath, "Resources/JMnedict.xml")));
+                    await Task.Run(() => GzipDecompressor(new FileInfo(downloadName), Path.Join(ConfigManager.ApplicationPath, "Resources/JMnedict.xml")));
                     File.Delete(downloadName);
                     MessageBox.Show("JMnedict has been updated successfully.", "", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -68,7 +68,8 @@ namespace JapaneseLookup.EDICT
                 }
             }
         }
-        public static void GzipDecompresser(FileInfo fileToDecompress, string filePath)
+
+        private static void GzipDecompressor(FileInfo fileToDecompress, string filePath)
         {
             using FileStream originalFileStream = fileToDecompress.OpenRead();
             using FileStream decompressedFileStream = File.Create(filePath);

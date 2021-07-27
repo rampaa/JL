@@ -18,7 +18,6 @@ namespace JapaneseLookup
 {
     public static class MainWindowUtilities
     {
-        public static bool ready = false;
         public static readonly List<string> Backlog = new();
         public const string FakeFrequency = "1000000";
         private static DateTime _lastLookupTime;
@@ -32,22 +31,6 @@ namespace JapaneseLookup
 
         public static void MainWindowInitializer()
         {
-            Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderVN = Task.Run(() =>
-                FrequencyLoader.LoadJSON(Path.Join(ConfigManager.ApplicationPath, "Resources/freqlist_vns.json")));
-            Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderNovel = Task.Run(() =>
-                FrequencyLoader.LoadJSON(Path.Join(ConfigManager.ApplicationPath, "Resources/freqlist_novels.json")));
-            Task<Dictionary<string, List<List<JsonElement>>>> taskFreqLoaderNarou = Task.Run(() =>
-                FrequencyLoader.LoadJSON(Path.Join(ConfigManager.ApplicationPath, "Resources/freqlist_narou.json")));
-
-            Task.Run(() => JMdictLoader.Load()).ContinueWith(_ =>
-            {
-                //Task.WaitAll(taskFreqLoaderVN, taskFreqLoaderNovel, taskFreqLoaderNarou);
-                FrequencyLoader.AddToJMdict("VN", taskFreqLoaderVN.Result);
-                FrequencyLoader.AddToJMdict("Novel", taskFreqLoaderNovel.Result);
-                FrequencyLoader.AddToJMdict("Narou", taskFreqLoaderNarou.Result);
-                ready = true;
-            });
-
             // init AnkiConnect so that it doesn't block later
             // Task.Run(AnkiConnect.GetDeckNames);
         }
@@ -264,9 +247,8 @@ namespace JapaneseLookup
                     List<string> frequency;
                     if (jMDictResult.FrequencyDict != null)
                     {
-                        jMDictResult.FrequencyDict.TryGetValue(ConfigManager.FrequencyList, out var freqList);
-                        var maybeFreq = freqList?.FrequencyRank;
-                        frequency = new List<string> { maybeFreq == null ? FakeFrequency : maybeFreq.ToString() };
+                        jMDictResult.FrequencyDict.TryGetValue(ConfigManager.FrequencyList, out var freq);
+                        frequency = new List<string> { freq.ToString() };
                     }
 
                     else frequency = new List<string> { FakeFrequency };
@@ -331,7 +313,8 @@ namespace JapaneseLookup
             int count = 1;
             string defResult = "";
 
-            if (jMDictResult.NameTypes != null && (jMDictResult.NameTypes.Count>1 || !jMDictResult.NameTypes.Contains("unclass")))
+            if (jMDictResult.NameTypes != null &&
+                (jMDictResult.NameTypes.Count > 1 || !jMDictResult.NameTypes.Contains("unclass")))
             {
                 foreach (var nameType in jMDictResult.NameTypes)
                 {

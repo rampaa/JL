@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,6 +18,17 @@ namespace JapaneseLookup
     internal static class ConfigManager
     {
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
+        private static readonly List<string> JapaneseFonts = FindJapaneseFonts().OrderBy(font => font).ToList();
+
+        private static readonly Dictionary<string, string> FrequencyLists = new()
+        {
+            { "VN", "Resources/freqlist_vns.json" },
+            { "Novel", "Resources/freqlist_novels.json" },
+            { "Narou", "Resources/freqlist_narou.json" }
+        };
+
+        public static bool Ready;
+
         public static string AnkiConnectUri;
         public static int MaxSearchLength;
         public static string FrequencyList;
@@ -50,9 +62,6 @@ namespace JapaneseLookup
         public static SolidColorBrush MainWindowTextColor;
         public static SolidColorBrush MainWindowBacklogTextColor = Brushes.Bisque;
 
-        private static readonly List<string> JapaneseFonts = FindJapaneseFonts().OrderBy(font => font).ToList();
-        private static readonly string[] FrequencyLists = { "VN", "Novel", "Narou" };
-
         public static void ApplyPreferences(MainWindow mainWindow)
         {
             MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength") ??
@@ -61,22 +70,6 @@ namespace JapaneseLookup
             AnkiConnectUri = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
             UseJMnedict = bool.Parse(ConfigurationManager.AppSettings.Get("UseJMnedict") ??
                                      throw new InvalidOperationException());
-
-            if (UseJMnedict && !JMnedictLoader.jMnedictDictionary.Any())
-                Task.Run(JMnedictLoader.Load).ContinueWith(_ =>
-                {
-                    if (!UseJMnedict && JMnedictLoader.jMnedictDictionary.Any())
-                    {
-                        JMnedictLoader.jMnedictDictionary = new Dictionary<string, List<JMnedictResult>>();
-                        Task.Delay(10000).ContinueWith(_ => { GC.Collect(); });
-                    }
-                });
-
-            else if (!UseJMnedict && JMnedictLoader.jMnedictDictionary.Any())
-            {
-                JMnedictLoader.jMnedictDictionary = new();
-                Task.Delay(10000).ContinueWith(_ => { GC.Collect(); });
-            }
 
             ForceSync = bool.Parse(ConfigurationManager.AppSettings.Get("ForceAnkiSync") ??
                                    throw new InvalidOperationException());
@@ -151,6 +144,8 @@ namespace JapaneseLookup
             popupWindow.Background = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
             popupWindow.Background.Opacity = int.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")) / 100;
+
+            Task.Run(async () => { await LoadDictionaries(); });
         }
 
         public static void LoadPreferences(PreferencesWindow preferenceWindow)
@@ -162,7 +157,7 @@ namespace JapaneseLookup
             preferenceWindow.ForceAnkiSyncCheckBox.IsChecked = ForceSync;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
             preferenceWindow.UseJMnedictCheckBox.IsChecked = UseJMnedict;
-            preferenceWindow.FrequencyListComboBox.ItemsSource = FrequencyLists;
+            preferenceWindow.FrequencyListComboBox.ItemsSource = FrequencyLists.Keys;
             preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyList;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
 
@@ -332,6 +327,64 @@ namespace JapaneseLookup
             }
 
             return japaneseFonts;
+        }
+
+
+        private static async Task LoadDictionaries()
+        {
+            string freqListPath = FrequencyLists[FrequencyList];
+
+            // initial jmdict and freqlist load
+            if (!JMdictLoader.jMdictDictionary.Any())
+            {
+                await Task.Run(JMdictLoader.Load).ContinueWith(_ =>
+                {
+                    FrequencyLoader.AddToJMdict($"{FrequencyList}", FrequencyLoader.LoadJson(Path.Join(
+                        ApplicationPath,
+                        freqListPath)).Result);
+
+                    Ready = true;
+                });
+            }
+
+            if (UseJMnedict && !JMnedictLoader.jMnedictDictionary.Any())
+            {
+                await Task.Run(JMnedictLoader.Load).ContinueWith(_ =>
+                {
+                    if (!UseJMnedict && JMnedictLoader.jMnedictDictionary.Any())
+                    {
+                        JMnedictLoader.jMnedictDictionary = new Dictionary<string, List<JMnedictResult>>();
+                        Task.Delay(10000).ContinueWith(_ => { GC.Collect(); });
+                    }
+                });
+            }
+            else if (!UseJMnedict && JMnedictLoader.jMnedictDictionary.Any())
+            {
+                JMnedictLoader.jMnedictDictionary = new();
+                await Task.Delay(10000).ContinueWith(_ => { GC.Collect(); });
+            }
+
+            // load new freqlist if necessary
+            if (Ready)
+            {
+                JMdictLoader.jMdictDictionary.TryGetValue("俺", out var freqTest);
+                Debug.Assert(freqTest != null, nameof(freqTest) + " != null");
+
+                if (!freqTest[0].FrequencyDict.TryGetValue(FrequencyList, out int _))
+                {
+                    Debug.WriteLine("Banzai! (changed freqlist)");
+                    await Task.Run(JMnedictLoader.Load).ContinueWith(async _ =>
+                    {
+                        FrequencyLoader.AddToJMdict($"{FrequencyList}", await FrequencyLoader.LoadJson(Path.Join(
+                            ApplicationPath,
+                            freqListPath)));
+                    });
+                }
+            }
+
+            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+            GC.GetTotalMemory(true);
+            GC.Collect();
         }
     }
 }
