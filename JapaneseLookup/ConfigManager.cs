@@ -373,7 +373,8 @@ namespace JapaneseLookup
                 if (!freqTest[0].FrequencyDict.TryGetValue(FrequencyList, out int _))
                 {
                     Debug.WriteLine("Banzai! (changed freqlist)");
-                    await Task.Run(JMnedictLoader.Load).ContinueWith(async _ =>
+
+                    await Task.Run(async () =>
                     {
                         FrequencyLoader.AddToJMdict($"{FrequencyList}", await FrequencyLoader.LoadJson(Path.Join(
                             ApplicationPath,
