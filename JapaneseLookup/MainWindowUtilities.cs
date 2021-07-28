@@ -1,18 +1,10 @@
-﻿using JapaneseLookup.Anki;
-using JapaneseLookup.Deconjugation;
+﻿using JapaneseLookup.Deconjugation;
 using JapaneseLookup.EDICT;
-using JapaneseLookup.GUI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 
 namespace JapaneseLookup
 {
@@ -27,7 +19,7 @@ namespace JapaneseLookup
 
         // Consider checking for \t, \r, "　", " ", ., !, ?, –, —, ―, ‒, ~, ‥, ♪, ～, ♡, ♥, ☆, ★
         private static readonly List<string> JapanesePunctuation =
-            new() { "。", "！", "？", "…", "―", "\n" };
+            new() { "。", "！", "？", "…", "―", ".", "＆", "\n"};
 
         private static readonly Dictionary<string, string> JapaneseParentheses = new()
         {
@@ -56,24 +48,6 @@ namespace JapaneseLookup
 
                 tempIndex = text.IndexOf(punctuation, position, StringComparison.Ordinal);
 
-                // keep going if there are multiple punctuation marks in a row
-                for (int i = 1; tempIndex + i < text.Length - 1; i++)
-                {
-                    var nextChar = text[tempIndex + i].ToString();
-
-                    if (JapanesePunctuation.Union(JapaneseParentheses.Values).Contains(nextChar))
-                    {
-                        if (tempIndex != -1)
-                        {
-                            tempIndex = text.IndexOf(punctuation, tempIndex + i + 1, StringComparison.Ordinal);
-                            endPosition = -1;
-                            continue;
-                        }
-                    }
-
-                    break;
-                }
-
                 if (tempIndex != -1 && (endPosition == -1 || tempIndex < endPosition))
                     endPosition = tempIndex;
             }
@@ -87,19 +61,45 @@ namespace JapaneseLookup
             string sentence = text.Substring(startPosition, endPosition - startPosition + 1)
                 .Trim('\n', '\t', '\r', ' ', '　');
 
-            // remove unmatched parentheses at the beginning (dirty)
-            if (sentence != "")
+            if (sentence.Length > 0)
             {
-                foreach ((string key, string value) in JapaneseParentheses)
+                if (JapaneseParentheses.TryGetValue(sentence[0].ToString(), out string rightParentheses))
                 {
-                    var firstChar = sentence[0].ToString();
-                    if (key == firstChar && !sentence.Contains(value))
+                    if (sentence.Last().ToString() == rightParentheses)
+                        sentence = sentence.Substring(1, sentence.Length-2);
+
+                    else if (!sentence.Contains(rightParentheses))
+                        sentence = sentence.Substring(1);
+
+                    else if (sentence.Contains(rightParentheses))
                     {
-                        sentence = sentence.Replace(firstChar, "");
-                        break;
+                        int numberOfLeftParentheses = sentence.Count(p => p == sentence[0]);
+                        int numberOfRightParentheses = sentence.Count(p => p == rightParentheses[0]);
+
+                        if (numberOfLeftParentheses == numberOfRightParentheses + 1)
+                            sentence = sentence.Substring(1);
+                    }
+                }
+
+                else if (JapaneseParentheses.ContainsValue(sentence.Last().ToString()))
+                {
+                    string leftParenthesis = JapaneseParentheses.First(p => p.Value == sentence.Last().ToString()).Key;
+
+                    if (!sentence.Contains(leftParenthesis))
+                        sentence = sentence.Substring(0, sentence.Length - 1);
+
+                    else if (sentence.Contains(leftParenthesis))
+                    {
+                        int numberOfLeftParentheses = sentence.Count(p => p == leftParenthesis[0]);
+                        int numberOfRightParentheses = sentence.Count(p => p == sentence.Last());
+                        
+                        if (numberOfRightParentheses == numberOfLeftParentheses + 1)
+                            sentence = sentence.Substring(0, sentence.Length - 1);
                     }
                 }
             }
+
+            Debug.WriteLine(sentence);
 
             return (
                 sentence,

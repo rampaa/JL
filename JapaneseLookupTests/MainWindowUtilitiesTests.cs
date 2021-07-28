@@ -99,11 +99,11 @@ namespace JapaneseLookupTests
         public void FindSentence_WorksWithNestedQuotes()
         {
             // Arrange
-            var expected = ("「......はぁ、『高校生活を振り返って』というテーマの作文でしたが」", 35);
+            var expected = ("はぁ、『高校生活を振り返って』というテーマの作文でしたが", 35);
 
             string text =
                 "「......はぁ、『高校生活を振り返って』というテーマの作文でしたが」";
-            int position = 0;
+            int position = 15;
 
             // Act
             var result = MainWindowUtilities.FindSentence(
@@ -118,7 +118,7 @@ namespace JapaneseLookupTests
         public void FindSentence_WorksWithMultiplePunctuationMarksInARow()
         {
             // Arrange
-            var expected = ("『今日の晩ご飯はなんと......、カレーでしたっ！！』みたいな。", 32);
+            var expected = ("今日の晩ご飯はなんと.", 11);
 
             string text =
                 "『今日の晩ご飯はなんと......、カレーでしたっ！！』みたいな。";
