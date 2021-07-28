@@ -96,6 +96,120 @@ namespace JapaneseLookupTests
         }
 
         [Test]
+        public void FindSentence_WorksWithNestedQuotes()
+        {
+            // Arrange
+            var expected = ("「......はぁ、『高校生活を振り返って』というテーマの作文でしたが」", 35);
+
+            string text =
+                "「......はぁ、『高校生活を振り返って』というテーマの作文でしたが」";
+            int position = 0;
+
+            // Act
+            var result = MainWindowUtilities.FindSentence(
+                text,
+                position);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void FindSentence_WorksWithMultiplePunctuationMarksInARow()
+        {
+            // Arrange
+            var expected = ("『今日の晩ご飯はなんと......、カレーでしたっ！！』みたいな。", 32);
+
+            string text =
+                "『今日の晩ご飯はなんと......、カレーでしたっ！！』みたいな。";
+            int position = 0;
+
+            // Act
+            var result = MainWindowUtilities.FindSentence(
+                text,
+                position);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void FindSentence_TrimsLeadingTabs()
+        {
+            // Arrange
+            var expected = ("a（アーカイブ）", 9);
+
+            string text =
+                "\t\ta（アーカイブ）";
+            int position = 0;
+
+            // Act
+            var result = MainWindowUtilities.FindSentence(
+                text,
+                position);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void FindSentence_TrimsTrailingNewline()
+        {
+            // Arrange
+            var expected = ("a（アーカイブ）", 8);
+
+            string text =
+                "a（アーカイブ）\n";
+            int position = 0;
+
+            // Act
+            var result = MainWindowUtilities.FindSentence(
+                text,
+                position);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void FindSentence_TrimsUnmatchedParentheses()
+        {
+            // Arrange
+            var expected = ("なぁ、比企谷。", 7);
+
+            string text =
+                "「なぁ、比企谷。私が授業で出した課題は何だったかな？」";
+            int position = 0;
+
+            // Act
+            var result = MainWindowUtilities.FindSentence(
+                text,
+                position);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void FindSentence_idk()
+        {
+            // Arrange
+            var expected = ("私が授業で出した課題は何だったかな？", 25);
+
+            string text =
+                "「なぁ、比企谷。私が授業で出した課題は何だったかな？」";
+            int position = 8;
+
+            // Act
+            var result = MainWindowUtilities.FindSentence(
+                text,
+                position);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
         public void LookUp_始まる()
         {
             // Arrange

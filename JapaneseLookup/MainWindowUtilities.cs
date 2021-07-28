@@ -29,6 +29,13 @@ namespace JapaneseLookup
         private static readonly List<string> JapanesePunctuation =
             new() { "。", "！", "？", "…", "―", "\n" };
 
+        private static readonly Dictionary<string, string> JapaneseParentheses = new()
+        {
+            { "「", "」" },
+            { "『", "』" },
+            { "（", "）" },
+        };
+
         public static void MainWindowInitializer()
         {
             // init AnkiConnect so that it doesn't block later
@@ -48,6 +55,22 @@ namespace JapaneseLookup
                     startPosition = tempIndex;
 
                 tempIndex = text.IndexOf(punctuation, position, StringComparison.Ordinal);
+
+                // keep going if there are multiple punctuation marks in a row
+                for (int i = 1; tempIndex + i < text.Length - 1; i++)
+                {
+                    var nextChar = text[tempIndex + i].ToString();
+
+                    if (JapanesePunctuation.Union(JapaneseParentheses.Values).Contains(nextChar))
+                    {
+                        tempIndex = text.IndexOf(punctuation, tempIndex + i + 1, StringComparison.Ordinal);
+
+                        continue;
+                    }
+
+                    break;
+                }
+
                 if (tempIndex != -1 && (endPosition == -1 || tempIndex < endPosition))
                     endPosition = tempIndex;
             }
@@ -58,12 +81,26 @@ namespace JapaneseLookup
                 endPosition = text.Length - 1;
 
             // Consider trimming \t, \r, (, ), "　", " "
+            string sentence = text.Substring(startPosition, endPosition - startPosition + 1).Trim('\n', '\t', '\r');
+
+            // remove unmatched parentheses at the beginning (dirty)
+            if (sentence != "")
+            {
+                foreach ((string key, string value) in JapaneseParentheses)
+                {
+                    var firstChar = sentence[0].ToString();
+                    if (key == firstChar && !sentence.Contains(value))
+                    {
+                        sentence = sentence.Replace(firstChar, "");
+                        break;
+                    }
+                }
+            }
+
             return (
-                text.Substring(startPosition, endPosition - startPosition + 1)
-                    .Trim('「', '」', '『', '』', '（', '）', '\n'),
+                sentence,
                 endPosition
             );
-            //text = text.Substring(startPosition, endPosition - startPosition + 1).TrimStart('「', '『', '（', '\n').TrimEnd('」', '』', '）', '\n');
         }
 
         public static List<Dictionary<string, List<string>>> LookUp(string text)
