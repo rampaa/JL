@@ -229,6 +229,24 @@ namespace JapaneseLookupTests
         }
 
         [Test]
+        public void FindSentence_idk3()
+        {
+            // Arrange
+            var expected = ("申し訳ありません。", 11);
+
+            string text =
+                "「……申し訳ありません。稽古をしていたのですが。　少し、考える事があって……没頭しておりました」";
+            int position = 10;
+
+            // Act
+            var result = MainWindowUtilities.FindSentence(
+                text,
+                position);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+        [Test]
         public void LookUp_始まる()
         {
             // Arrange
