@@ -64,7 +64,7 @@ namespace JapaneseLookup
                     if (JapanesePunctuation.Union(JapaneseParentheses.Values).Contains(nextChar))
                     {
                         tempIndex = text.IndexOf(punctuation, tempIndex + i + 1, StringComparison.Ordinal);
-
+                        endPosition = -1;
                         continue;
                     }
 
@@ -80,8 +80,8 @@ namespace JapaneseLookup
             if (endPosition == -1)
                 endPosition = text.Length - 1;
 
-            // Consider trimming \t, \r, (, ), "　", " "
-            string sentence = text.Substring(startPosition, endPosition - startPosition + 1).Trim('\n', '\t', '\r');
+            // Consider trimming (, )
+            string sentence = text.Substring(startPosition, endPosition - startPosition + 1).Trim('\n', '\t', '\r',' ', '　');
 
             // remove unmatched parentheses at the beginning (dirty)
             if (sentence != "")

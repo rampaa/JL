@@ -210,6 +210,25 @@ namespace JapaneseLookupTests
         }
 
         [Test]
+        public void FindSentence_idk2()
+        {
+            // Arrange
+            var expected = ("実際のところ、武者ではない俺が武者刀法を修める意味は少なく、素肌剣術をやっていれば良かったのだろうが、そうと認めてしまうのはなかなかに辛い。", 92);
+
+            string text =
+                "……単なる身びいきというものかも知れないが。　実際のところ、武者ではない俺が武者刀法を修める意味は少なく、素肌剣術をやっていれば良かったのだろうが、そうと認めてしまうのはなかなかに辛い。";
+            int position = 72;
+
+            // Act
+            var result = MainWindowUtilities.FindSentence(
+                text,
+                position);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
         public void LookUp_始まる()
         {
             // Arrange
