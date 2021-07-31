@@ -62,7 +62,7 @@ namespace JapaneseLookup
             string sentence = text.Substring(startPosition, endPosition - startPosition + 1)
                 .Trim('\n', '\t', '\r', ' ', '　');
 
-            if (sentence.Any())
+            if (sentence.Length > 0)
             {
                 if (JapaneseParentheses.TryGetValue(sentence[0].ToString(), out string rightParenthesis))
                 {
