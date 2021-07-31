@@ -329,7 +329,6 @@ namespace JapaneseLookup
             return japaneseFonts;
         }
 
-
         private static async Task LoadDictionaries()
         {
             string freqListPath = FrequencyLists[FrequencyList];
@@ -381,6 +380,9 @@ namespace JapaneseLookup
                             freqListPath)));
                     });
                 }
+
+                if(!KANJIDIC.KanjiInfoLoader.kanjiDictionary.Any())
+                    await Task.Run(KANJIDIC.KanjiInfoLoader.Load);
             }
 
             GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;

@@ -1,5 +1,6 @@
 ﻿using JapaneseLookup.Deconjugation;
 using JapaneseLookup.EDICT;
+using JapaneseLookup.KANJIDIC;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -61,20 +62,20 @@ namespace JapaneseLookup
             string sentence = text.Substring(startPosition, endPosition - startPosition + 1)
                 .Trim('\n', '\t', '\r', ' ', '　');
 
-            if (sentence.Length > 0)
+            if (sentence.Any())
             {
-                if (JapaneseParentheses.TryGetValue(sentence[0].ToString(), out string rightParentheses))
+                if (JapaneseParentheses.TryGetValue(sentence[0].ToString(), out string rightParenthesis))
                 {
-                    if (sentence.Last().ToString() == rightParentheses)
-                        sentence = sentence.Substring(1, sentence.Length-2);
+                    if (sentence.Last().ToString() == rightParenthesis)
+                        sentence = sentence.Substring(1, sentence.Length - 1);
 
-                    else if (!sentence.Contains(rightParentheses))
+                    else if (!sentence.Contains(rightParenthesis))
                         sentence = sentence.Substring(1);
 
-                    else if (sentence.Contains(rightParentheses))
+                    else if (sentence.Contains(rightParenthesis))
                     {
                         int numberOfLeftParentheses = sentence.Count(p => p == sentence[0]);
-                        int numberOfRightParentheses = sentence.Count(p => p == rightParentheses[0]);
+                        int numberOfRightParentheses = sentence.Count(p => p == rightParenthesis[0]);
 
                         if (numberOfLeftParentheses == numberOfRightParentheses + 1)
                             sentence = sentence.Substring(1);
@@ -99,14 +100,11 @@ namespace JapaneseLookup
                 }
             }
 
-            Debug.WriteLine(sentence);
-
             return (
                 sentence,
                 endPosition
             );
         }
-
         public static List<Dictionary<string, List<string>>> LookUp(string text)
         {
             var preciseTimeNow = new DateTime(Stopwatch.GetTimestamp());
@@ -117,8 +115,10 @@ namespace JapaneseLookup
 
             Dictionary<string, (List<JMdictResult> jMdictResults, List<string> processList, string foundForm)>
                 wordResults = new();
-            Dictionary<string, (List<JMnedictResult> jMdictResults, List<string> processList, string foundForm)>
+            Dictionary<string, (List<JMnedictResult> jMnedictResults, List<string> processList, string foundForm)>
                 nameResults = new();
+            Dictionary<string, (List<KanjiResult> KanjiResult, List<string> processList, string foundForm)>
+                kanjiResult = new();
 
             int succAttempt = 0;
             for (int i = 0; i < text.Length; i++)
@@ -184,7 +184,10 @@ namespace JapaneseLookup
             }
 
             if (!wordResults.Any() && !nameResults.Any())
-                return null;
+                if (!KanjiInfoLoader.kanjiDictionary.TryGetValue(text[0].ToString(), out var kResult))
+                    return null;
+                else
+                    kanjiResult.Add(text[0].ToString(), (new List<KanjiResult>() { kResult }, new List<string>(), text[0].ToString()));
 
             List<Dictionary<string, List<string>>> results = new();
 
@@ -194,20 +197,59 @@ namespace JapaneseLookup
             if (nameResults.Any())
                 results.AddRange(NameResultBuilder(nameResults));
 
+            if (kanjiResult.Any())
+                results.AddRange(KanjiResultBuilder(kanjiResult));
+
             results = results
                 .OrderByDescending(dict => dict["foundForm"][0].Length)
                 .ThenBy(dict => Convert.ToInt32(dict["frequency"][0])).ToList();
             return results;
         }
 
+        private static List<Dictionary<string, List<string>>> KanjiResultBuilder
+            (Dictionary<string, (List<KanjiResult> kanjiResult, List<string> processList, string foundForm)> kanjiResults)
+        {
+            var results = new List<Dictionary<string, List<string>>>();
+            var result = new Dictionary<string, List<string>>();
+
+            var kanjiResult = kanjiResults.First().Value.kanjiResult.First();
+
+            result.Add("foundSpelling", new List<string> { kanjiResults.First().Key });
+            result.Add("definitions", kanjiResult.Meanings);
+            result.Add("onReading", kanjiResult.OnReadings);
+            result.Add("nanori", kanjiResult.Nanori);
+            result.Add("strokeCount", new List<string> { kanjiResult.StrokeCount.ToString() } );
+            result.Add("grade", new List<string> { kanjiResult.Grade.ToString() });
+            result.Add("composition", new List<string> { kanjiResult.Composition });
+            result.Add("frequency", new List<string> { kanjiResult.Frequency.ToString() });
+
+
+            // unused here but necessary for DisplayResults
+            var foundForm = new List<string> { kanjiResults.First().Value.foundForm };
+            var process = kanjiResults.First().Value.processList;
+            result.Add("jmdictID", new List<string> { "-1" });
+            result.Add("alternativeSpellings", new List<string>());
+            result.Add("readings", new List<string>());
+            result.Add("foundForm", foundForm);
+            result.Add("process", process);
+            result.Add("kanaSpellings", new List<string>());
+            result.Add("pOrthographyInfoList", new List<string>());
+            result.Add("aOrthographyInfoList", new List<string>());
+            result.Add("rOrthographyInfoList", new List<string>());
+
+            results.Add(result);
+
+            return results;
+        }
+
         private static List<Dictionary<string, List<string>>> NameResultBuilder
-            (Dictionary<string, (List<JMnedictResult> jMdictResults, List<string> processList, string foundForm)> nameResult)
+            (Dictionary<string, (List<JMnedictResult> jMdictResults, List<string> processList, string foundForm)> nameResults)
         {
             var results = new List<Dictionary<string, List<string>>>();
 
-            foreach (var wordResult in nameResult)
+            foreach (var nameResult in nameResults)
             {
-                foreach (var jMDictResult in wordResult.Value.jMdictResults)
+                foreach (var jMDictResult in nameResult.Value.jMdictResults)
                 {
                     var result = new Dictionary<string, List<string>>();
 
@@ -219,7 +261,7 @@ namespace JapaneseLookup
                     else
                         readings = new List<string>();
 
-                    var foundForm = new List<string> { wordResult.Value.foundForm };
+                    var foundForm = new List<string> { nameResult.Value.foundForm };
                     var jmdictID = new List<string> { jMDictResult.Id };
 
 
@@ -229,7 +271,7 @@ namespace JapaneseLookup
                     else
                         alternativeSpellings = new List<string>();
 
-                    var process = wordResult.Value.processList;
+                    var process = nameResult.Value.processList;
 
                     var definitions = new List<string> { BuildNameDefinition(jMDictResult) };
 

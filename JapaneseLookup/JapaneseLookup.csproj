@@ -31,6 +31,9 @@
     <None Update="Resources\JMnedict.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\kanjidic2.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties resources_4freqlist_3vns_1json__JsonSchema="https://beaujs.com/schema.json" /></VisualStudio></ProjectExtensions>
