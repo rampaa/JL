@@ -9,6 +9,7 @@ using JapaneseLookup.EDICT;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Forms.VisualStyles;
+using System.Windows.Input;
 using HandyControl.Tools;
 using HandyControl.Controls;
 using HandyControl.Properties;
@@ -31,9 +32,6 @@ namespace JapaneseLookup.GUI
         public PreferencesWindow()
         {
             InitializeComponent();
-
-            SetPreviousMiningConfig();
-            if (MiningSetupComboBoxDeckNames.SelectedItem == null) PopulateDeckAndModelNames();
         }
 
         private void ShowColorPicker(object sender, RoutedEventArgs e)
@@ -87,6 +85,12 @@ namespace JapaneseLookup.GUI
         }
 
         #region MiningSetup
+
+        private void TabItemAnki_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            SetPreviousMiningConfig();
+            if (MiningSetupComboBoxDeckNames.SelectedItem == null) PopulateDeckAndModelNames();
+        }
 
         private async void SetPreviousMiningConfig()
         {
@@ -205,7 +209,8 @@ namespace JapaneseLookup.GUI
                 var fields = dict;
                 var tags = new[] { "JapaneseLookup" };
 
-                if (MiningSetupComboBoxDeckNames.SelectedItem == null || MiningSetupComboBoxModelNames.SelectedItem == null)
+                if (MiningSetupComboBoxDeckNames.SelectedItem == null ||
+                    MiningSetupComboBoxModelNames.SelectedItem == null)
                 {
                     Console.WriteLine("Incomplete config");
                     return;

@@ -29,14 +29,13 @@
                                        TextWrapping="Wrap"
                                        Height="26" Width="175" />
                             <hc:NumericUpDown x:Name="MaxSearchLengthNumericUpDown" Maximum="100" Minimum="1"
-                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                                              HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Frequency List"
                                        TextWrapping="Wrap" />
-                            <ComboBox x:Name="FrequencyListComboBox" HorizontalAlignment="Right"
-                                      Width="120" />
+                            <ComboBox x:Name="FrequencyListComboBox" HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -49,7 +48,7 @@
                             <TextBlock HorizontalAlignment="Left" Text="Lookup rate"
                                        TextWrapping="Wrap" />
                             <hc:NumericUpDown x:Name="LookupRateNumericUpDown" Maximum="20" Minimum="0"
-                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                                              HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -94,14 +93,14 @@
                             <TextBlock HorizontalAlignment="Left" Text="Font size"
                                        TextWrapping="Wrap" />
                             <hc:NumericUpDown x:Name="TextboxFontSizeNumericUpDown" Maximum="300" Minimum="1"
-                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                                              HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Opacity"
                                        TextWrapping="Wrap" />
                             <hc:NumericUpDown x:Name="TextboxOpacityNumericUpDown" Maximum="100" Minimum="1"
-                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                                              HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -134,7 +133,7 @@
                             <TextBlock HorizontalAlignment="Left" Text="Opacity"
                                        TextWrapping="Wrap" />
                             <hc:NumericUpDown x:Name="PopupOpacityNumericUpDown" Maximum="100" Minimum="1"
-                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                                              HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -150,7 +149,7 @@
                                        TextWrapping="Wrap" />
                             <hc:NumericUpDown x:Name="PopupPrimarySpellingFontSizeNumericUpDown" Maximum="300"
                                               Minimum="1"
-                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                                              HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -165,7 +164,7 @@
                             <TextBlock HorizontalAlignment="Left" Text="Reading font size"
                                        TextWrapping="Wrap" />
                             <hc:NumericUpDown x:Name="PopupReadingFontSizeNumericUpDown" Maximum="50" Minimum="1"
-                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                                              HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -183,7 +182,7 @@
                                        TextWrapping="Wrap" />
                             <hc:NumericUpDown x:Name="PopupAlternativeSpellingFontSizeNumericUpDown" Maximum="50"
                                               Minimum="1"
-                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                                              HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -199,7 +198,7 @@
                                        TextWrapping="Wrap" />
                             <hc:NumericUpDown x:Name="PopupDefinitionFontSizeNumericUpDown" Maximum="50"
                                               Minimum="1"
-                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                                              HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -215,7 +214,7 @@
                             <TextBlock HorizontalAlignment="Left" Text="Frequency font size"
                                        TextWrapping="Wrap" />
                             <hc:NumericUpDown x:Name="PopupFrequencyFontSizeNumericUpDown" Maximum="50" Minimum="1"
-                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                                              HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -232,28 +231,28 @@
                                        TextWrapping="Wrap" />
                             <hc:NumericUpDown x:Name="PopupDeconjugationInfoFontSizeNumericUpDown" Maximum="50"
                                               Minimum="1"
-                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                                              HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="X Offset"
                                        TextWrapping="Wrap" />
                             <hc:NumericUpDown x:Name="PopupXOffsetNumericUpDown" Maximum="50" Minimum="1"
-                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                                              HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Y Offset"
                                        TextWrapping="Wrap" />
                             <hc:NumericUpDown x:Name="PopupYOffsetNumericUpDown" Maximum="50" Minimum="1"
-                                              HorizontalAlignment="Right" Width="60" Height="30" />
+                                              HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Flip"
                                        TextWrapping="Wrap" />
                             <ComboBox x:Name="PopupFlipComboBox" HorizontalAlignment="Right"
-                                      Width="120" SelectedValuePath="Content">
+                                      SelectedValuePath="Content">
                                 <ComboBoxItem Content="X" />
                                 <ComboBoxItem Content="Y" />
                                 <ComboBoxItem Content="Both" />
@@ -270,7 +269,7 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-            <TabItem Header="Anki">
+            <TabItem Header="Anki" PreviewMouseLeftButtonDown="TabItemAnki_OnPreviewMouseLeftButtonDown">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
                     <StackPanel Background="Black" Margin="20,10,20,10">
                         <StackPanel.Resources>
