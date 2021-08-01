@@ -381,7 +381,7 @@ namespace JapaneseLookup
                     });
                 }
 
-                if(!KANJIDIC.KanjiInfoLoader.kanjiDictionary.Any())
+                if (!KANJIDIC.KanjiInfoLoader.kanjiDictionary.Any())
                     await Task.Run(KANJIDIC.KanjiInfoLoader.Load);
             }
 

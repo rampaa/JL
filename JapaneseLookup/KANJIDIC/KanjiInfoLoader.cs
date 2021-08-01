@@ -22,9 +22,33 @@ namespace JapaneseLookup.KANJIDIC
                 edictXml.DtdProcessing = DtdProcessing.Parse;
                 edictXml.WhitespaceHandling = WhitespaceHandling.None;
                 edictXml.EntityHandling = EntityHandling.ExpandCharEntities;
+
+                Dictionary<string, string> kanjiCompositionDictionary = new();
+
+                foreach (string line in File.ReadLines(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
+                {
+                    string[] lParts = line.Split("\t");
+
+                    if (lParts.Length == 3) kanjiCompositionDictionary.Add(lParts[1], lParts[2]);
+
+                    else if (lParts.Length > 3)
+                    {
+                        int japaneseCompositionIndex = -1;
+                        for(int i = 2; i < lParts.Length; i++)
+                        {
+                            if (lParts[i].Contains("J"))
+                            {
+                                japaneseCompositionIndex = i;
+                                break;
+                            }
+                        }
+                        if (japaneseCompositionIndex != -1) kanjiCompositionDictionary.Add(lParts[1], lParts[japaneseCompositionIndex]);
+                    }
+                }
+
                 while (edictXml.ReadToFollowing("literal"))
                 {
-                    ReadCharacter(edictXml);
+                    ReadCharacter(edictXml, kanjiCompositionDictionary);
                 }
             }
             else
@@ -32,14 +56,14 @@ namespace JapaneseLookup.KANJIDIC
                 MessageBox.Show("Couldn't find kanjidic2.xml. Please download it by clicking the \"Update KANJIDIC\" button.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
             }
         }
-        private static void ReadCharacter(XmlReader kanjiDicXml)
+        private static void ReadCharacter(XmlReader kanjiDicXml, Dictionary<string, string> kanjiCompositionDictionary)
         {
             string key = kanjiDicXml.ReadString();
 
-            //if (EDICT.JMdictLoader.jMdictDictionary.ContainsKey(key))
-            //    return;
-
             KanjiResult entry = new();
+
+            if (kanjiCompositionDictionary.TryGetValue(key, out string composition))
+                entry.Composition = composition;
 
             while (kanjiDicXml.Read())
             {
