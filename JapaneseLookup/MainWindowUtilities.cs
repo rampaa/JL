@@ -184,15 +184,15 @@ namespace JapaneseLookup
                 }
             }
 
-            // if (!wordResults.Any() && !nameResults.Any())
-            // {
-            KanjiInfoLoader.KanjiDictionary.TryGetValue(text[0].ToString(), out KanjiResult kResult);
-            if (kResult != null)
+            if (!wordResults.Any() && !nameResults.Any())
             {
-                kanjiResult.Add(text[0].ToString(),
-                    (new List<KanjiResult> { kResult }, new List<string>(), text[0].ToString()));
+                KanjiInfoLoader.KanjiDictionary.TryGetValue(text[0].ToString(), out KanjiResult kResult);
+                if (kResult != null)
+                {
+                    kanjiResult.Add(text[0].ToString(),
+                        (new List<KanjiResult> { kResult }, new List<string>(), text[0].ToString()));
+                }
             }
-            // }
 
             // don't display an empty popup if there are no results
             if (!wordResults.Any() && !nameResults.Any() && !kanjiResult.Any())

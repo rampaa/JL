@@ -368,6 +368,9 @@ namespace JapaneseLookup
                 await Task.Delay(10000).ContinueWith(_ => { GC.Collect(); });
             }
 
+            if (!KANJIDIC.KanjiInfoLoader.KanjiDictionary.Any())
+                await Task.Run(KANJIDIC.KanjiInfoLoader.Load);
+
             // load new freqlist if necessary
             if (Ready)
             {
@@ -385,9 +388,6 @@ namespace JapaneseLookup
                             freqListPath)));
                     });
                 }
-
-                if(!KANJIDIC.KanjiInfoLoader.KanjiDictionary.Any())
-                    await Task.Run(KANJIDIC.KanjiInfoLoader.Load);
             }
 
             GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;

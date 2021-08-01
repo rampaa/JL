@@ -25,10 +25,6 @@ namespace JapaneseLookup.KANJIDIC
                     EntityHandling = EntityHandling.ExpandCharEntities
                 };
 
-                edictXml.DtdProcessing = DtdProcessing.Parse;
-                edictXml.WhitespaceHandling = WhitespaceHandling.None;
-                edictXml.EntityHandling = EntityHandling.ExpandCharEntities;
-
                 Dictionary<string, string> kanjiCompositionDictionary = new();
 
                 if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
@@ -38,7 +34,14 @@ namespace JapaneseLookup.KANJIDIC
                     {
                         string[] lParts = line.Split("\t");
 
-                        if (lParts.Length == 3) kanjiCompositionDictionary.Add(lParts[1], lParts[2]);
+                        if (lParts.Length == 3)
+                        {
+                            int endIndex = lParts[2].IndexOf("[");
+                            if (endIndex == -1)
+                                kanjiCompositionDictionary.Add(lParts[1], lParts[2]);
+                            else
+                                kanjiCompositionDictionary.Add(lParts[1], lParts[2].Substring(0, endIndex));
+                        }
 
                         else if (lParts.Length > 3)
                         {
