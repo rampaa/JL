@@ -51,15 +51,17 @@
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
-                        <DockPanel>
+                        <DockPanel HorizontalAlignment="Center" VerticalAlignment="Stretch">
                             <Button x:Name="UpdateJMdictButton" Content="Update JMdict" Margin="5"
-                                    Width="125"
                                     HorizontalAlignment="Left"
                                     Click="UpdateJMdictButton_Click" />
                             <Button x:Name="UpdateJMnedictButton" Content="Update JMnedict" Margin="5"
-                                    Width="143"
-                                    HorizontalAlignment="Left"
+                                    HorizontalAlignment="Center"
                                     Click="UpdateJMnedictButton_Click" />
+                            <Button x:Name="UpdateKanjidicButton" Content="Update Kanjidic" Margin="5"
+                                    HorizontalAlignment="Right" Click="UpdateKanjidicButton_Click"
+                                     />
+
                         </DockPanel>
                     </StackPanel>
                 </ScrollViewer>

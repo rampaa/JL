@@ -25,24 +25,29 @@ namespace JapaneseLookup.KANJIDIC
 
                 Dictionary<string, string> kanjiCompositionDictionary = new();
 
-                foreach (string line in File.ReadLines(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
+                if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
                 {
-                    string[] lParts = line.Split("\t");
-
-                    if (lParts.Length == 3) kanjiCompositionDictionary.Add(lParts[1], lParts[2]);
-
-                    else if (lParts.Length > 3)
+                    foreach (string line in File.ReadLines(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
                     {
-                        int japaneseCompositionIndex = -1;
-                        for(int i = 2; i < lParts.Length; i++)
+                        string[] lParts = line.Split("\t");
+
+                        if (lParts.Length == 3) kanjiCompositionDictionary.Add(lParts[1], lParts[2]);
+
+                        else if (lParts.Length > 3)
                         {
-                            if (lParts[i].Contains("J"))
+                            for (int i = 2; i < lParts.Length; i++)
                             {
-                                japaneseCompositionIndex = i;
-                                break;
+                                if (lParts[i].Contains("J"))
+                                {
+                                    int endIndex = lParts[i].IndexOf("[");
+                                    if(endIndex!=-1)
+                                    {
+                                        kanjiCompositionDictionary.Add(lParts[1], lParts[i].Substring(0, endIndex));
+                                        break;
+                                    }
+                                }
                             }
                         }
-                        if (japaneseCompositionIndex != -1) kanjiCompositionDictionary.Add(lParts[1], lParts[japaneseCompositionIndex]);
                     }
                 }
 
@@ -75,19 +80,21 @@ namespace JapaneseLookup.KANJIDIC
                     switch (kanjiDicXml.Name)
                     {
                         case "grade":
-                            entry.Grade = kanjiDicXml.ReadElementContentAsInt();
+                            //kanjiDicXml.ReadElementContentAsInt();
+                            entry.Grade = int.Parse(kanjiDicXml.ReadString());
                             break;
 
                         case "stroke_count":
-                            entry.StrokeCount = kanjiDicXml.ReadElementContentAsInt();
+                            entry.StrokeCount = int.Parse(kanjiDicXml.ReadString());
                             break;
 
                         case "freq":
-                            entry.Frequency = kanjiDicXml.ReadElementContentAsInt();
+                            entry.Frequency = int.Parse(kanjiDicXml.ReadString());
                             break;
 
                         case "meaning":
-                            entry.Meanings.Add(kanjiDicXml.ReadString());
+                            if (!kanjiDicXml.HasAttributes)
+                                entry.Meanings.Add(kanjiDicXml.ReadString());
                             break;
 
                         case "nanori":

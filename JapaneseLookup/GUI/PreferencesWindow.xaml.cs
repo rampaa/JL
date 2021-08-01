@@ -76,12 +76,17 @@ namespace JapaneseLookup.GUI
 
         private void UpdateJMdictButton_Click(object sender, RoutedEventArgs e)
         {
-            EdictUpdater.UpdateJMdict();
+            ResourceUpdater.UpdateJMdict();
         }
 
         private void UpdateJMnedictButton_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(EdictUpdater.UpdateJMnedict);
+            Task.Run(ResourceUpdater.UpdateJMnedict);
+        }
+
+        private void UpdateKanjidicButton_Click(object sender, RoutedEventArgs e)
+        {
+            Task.Run(ResourceUpdater.UpdateKanjidic);
         }
 
         #region MiningSetup
