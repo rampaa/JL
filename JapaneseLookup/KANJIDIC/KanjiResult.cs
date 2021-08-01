@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JapaneseLookup.KANJIDIC
 {
-    class KanjiResult
+    public class KanjiResult
     {
         public List<string> Meanings { get; set; }
         public List<string> OnReadings { get; set; }

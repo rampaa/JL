@@ -1,86 +1,96 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace JapaneseLookup.Anki
 {
     public static class Mining
     {
         // TODO: Check if audio was grabbed and tell the user if it was not
-        public static async void Mine(string foundSpelling, string readings, string definitions, string context,
-            string foundForm, string jmdictID, string timeLocal, string alternativeSpellings,
+        public static async Task Mine(string foundSpelling, string readings, string definitions, string context,
+            string foundForm, string edictID, string timeLocal, string alternativeSpellings,
             string frequency)
         {
-            var ankiConfig = await AnkiConfig.ReadAnkiConfig();
-            if (ankiConfig == null) return;
-
-            var deckName = ankiConfig.DeckName;
-            var modelName = ankiConfig.ModelName;
-
-            var rawFields = ankiConfig.Fields;
-            var fields =
-                ConvertFields(
-                    rawFields,
-                    foundSpelling,
-                    readings,
-                    definitions,
-                    context,
-                    foundForm,
-                    jmdictID,
-                    timeLocal,
-                    alternativeSpellings,
-                    frequency
-                );
-
-            Dictionary<string, object> options = null;
-            var tags = ankiConfig.Tags;
-
-            // idk if this gets the right audio for every word
-            var reading = readings.Split(",")[0];
-            if (reading == "") reading = foundSpelling;
-
-            Dictionary<string, object>[] audio =
+            try
             {
-                new()
+                var ankiConfig = await AnkiConfig.ReadAnkiConfig();
+                if (ankiConfig == null) return;
+
+                var deckName = ankiConfig.DeckName;
+                var modelName = ankiConfig.ModelName;
+
+                var rawFields = ankiConfig.Fields;
+                var fields =
+                    ConvertFields(
+                        rawFields,
+                        foundSpelling,
+                        readings,
+                        definitions,
+                        context,
+                        foundForm,
+                        edictID,
+                        timeLocal,
+                        alternativeSpellings,
+                        frequency
+                    );
+
+                Dictionary<string, object> options = null;
+                var tags = ankiConfig.Tags;
+
+                // idk if this gets the right audio for every word
+                var reading = readings.Split(",")[0];
+                if (reading == "") reading = foundSpelling;
+
+                Dictionary<string, object>[] audio =
                 {
+                    new()
                     {
-                        "url",
-                        $"http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={foundSpelling}&kana={reading}"
-                    },
-                    {
-                        "filename",
-                        $"JL_audio_{foundSpelling}_{reading}.mp3"
-                    },
-                    {
-                        "skipHash",
-                        "7e2c2f954ef6051373ba916f000168dc"
-                    },
-                    {
-                        "fields",
-                        FindAudioFields(rawFields)
-                    },
+                        {
+                            "url",
+                            $"http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={foundSpelling}&kana={reading}"
+                        },
+                        {
+                            "filename",
+                            $"JL_audio_{foundSpelling}_{reading}.mp3"
+                        },
+                        {
+                            "skipHash",
+                            "7e2c2f954ef6051373ba916f000168dc"
+                        },
+                        {
+                            "fields",
+                            FindAudioFields(rawFields)
+                        },
+                    }
+                };
+                Dictionary<string, object>[] video = null;
+                Dictionary<string, object>[] picture = null;
+
+                var note = new Note(deckName, modelName, fields, options, tags, audio, video, picture);
+                var response = await AnkiConnect.AddNoteToDeck(note);
+
+                if (response == null)
+                {
+                    Console.WriteLine($"Mining failed for {foundSpelling}");
                 }
-            };
-            Dictionary<string, object>[] video = null;
-            Dictionary<string, object>[] picture = null;
-
-            var note = new Note(deckName, modelName, fields, options, tags, audio, video, picture);
-            var response = await AnkiConnect.AddNoteToDeck(note);
-
-            if (response == null)
-            {
-                Console.WriteLine($"Mining failed for {foundSpelling}");
+                else
+                {
+                    Console.WriteLine($"Mined {foundSpelling}");
+                    if (ConfigManager.ForceSync) await AnkiConnect.Sync();
+                }
             }
-            else
+            catch (Exception e)
             {
-                Console.WriteLine($"Mined {foundSpelling}");
-                if (ConfigManager.ForceSync) await AnkiConnect.Sync();
+                Debug.WriteLine(e);
+                Console.WriteLine($"Mining failed for {foundSpelling}");
             }
         }
 
         private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> fields,
             string foundSpelling, string readings, string definitions, string context,
-            string foundForm, string jmdictID, string timeLocal, string alternativeSpellings, string frequency)
+            string foundForm, string edictID, string timeLocal, string alternativeSpellings, string frequency)
         {
             var dict = new Dictionary<string, object>();
             foreach (var (key, value) in fields)
@@ -107,8 +117,8 @@ namespace JapaneseLookup.Anki
                     case JLField.Audio:
                         // needs to be handled separately (by FindAudioFields())
                         break;
-                    case JLField.JMDictID:
-                        dict.Add(key, jmdictID);
+                    case JLField.EdictID:
+                        dict.Add(key, edictID);
                         break;
                     case JLField.TimeLocal:
                         dict.Add(key, timeLocal);

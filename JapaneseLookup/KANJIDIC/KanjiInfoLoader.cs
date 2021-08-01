@@ -10,14 +10,20 @@ using System.Xml;
 
 namespace JapaneseLookup.KANJIDIC
 {
-    class KanjiInfoLoader
+    public static class KanjiInfoLoader
     {
-        public static Dictionary<string, KanjiResult> kanjiDictionary = new();
+        public static readonly Dictionary<string, KanjiResult> KanjiDictionary = new();
+
         public static void Load()
         {
             if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/kanjidic2.xml")))
             {
-                using XmlTextReader edictXml = new(Path.Join(ConfigManager.ApplicationPath, "Resources/kanjidic2.xml"));
+                using XmlTextReader edictXml = new(Path.Join(ConfigManager.ApplicationPath, "Resources/kanjidic2.xml"))
+                {
+                    DtdProcessing = DtdProcessing.Parse,
+                    WhitespaceHandling = WhitespaceHandling.None,
+                    EntityHandling = EntityHandling.ExpandCharEntities
+                };
 
                 edictXml.DtdProcessing = DtdProcessing.Parse;
                 edictXml.WhitespaceHandling = WhitespaceHandling.None;
@@ -27,7 +33,8 @@ namespace JapaneseLookup.KANJIDIC
 
                 if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
                 {
-                    foreach (string line in File.ReadLines(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
+                    foreach (string line in File.ReadLines(
+                        Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
                     {
                         string[] lParts = line.Split("\t");
 
@@ -39,8 +46,8 @@ namespace JapaneseLookup.KANJIDIC
                             {
                                 if (lParts[i].Contains("J"))
                                 {
-                                    int endIndex = lParts[i].IndexOf("[");
-                                    if(endIndex!=-1)
+                                    int endIndex = lParts[i].IndexOf("[", StringComparison.Ordinal);
+                                    if (endIndex != -1)
                                     {
                                         kanjiCompositionDictionary.Add(lParts[1], lParts[i].Substring(0, endIndex));
                                         break;
@@ -58,9 +65,13 @@ namespace JapaneseLookup.KANJIDIC
             }
             else
             {
-                MessageBox.Show("Couldn't find kanjidic2.xml. Please download it by clicking the \"Update KANJIDIC\" button.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
+                MessageBox.Show(
+                    "Couldn't find kanjidic2.xml. Please download it by clicking the \"Update KANJIDIC\" button.", "",
+                    MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK,
+                    MessageBoxOptions.DefaultDesktopOnly);
             }
         }
+
         private static void ReadCharacter(XmlReader kanjiDicXml, Dictionary<string, string> kanjiCompositionDictionary)
         {
             string key = kanjiDicXml.ReadString();
@@ -112,11 +123,13 @@ namespace JapaneseLookup.KANJIDIC
                                     entry.KunReadings.Add(kanjiDicXml.ReadString());
                                     break;
                             }
+
                             break;
                     }
                 }
             }
-            kanjiDictionary.Add(key, entry);
+
+            KanjiDictionary.Add(key, entry);
         }
     }
 }

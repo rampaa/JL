@@ -34,8 +34,8 @@ namespace JapaneseLookup.Anki
                     new Dictionary<string, JLField>
                     {
                         {
-                            "JMDict ID",
-                            JLField.JMDictID
+                            "Edict ID",
+                            JLField.EdictID
                         },
                         {
                             "Expression",

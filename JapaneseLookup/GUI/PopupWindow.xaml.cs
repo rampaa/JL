@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using JapaneseLookup.Anki;
 
 namespace JapaneseLookup.GUI
@@ -34,8 +34,10 @@ namespace JapaneseLookup.GUI
         public PopupWindow()
         {
             InitializeComponent();
-            MaxWidth = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth"));
-            MaxHeight = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight"));
+            MaxWidth = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth") ??
+                                 throw new InvalidOperationException());
+            MaxHeight = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight") ??
+                                  throw new InvalidOperationException());
         }
 
         public void UpdatePosition(Point cursorPosition)
@@ -85,183 +87,354 @@ namespace JapaneseLookup.GUI
             Top = newTop;
         }
 
-        internal static void DisplayResults(string sentence, List<Dictionary<string, List<string>>> results)
+        internal static StackPanel MakeResultStackPanel(string sentence, Dictionary<LookupResult, List<string>> result,
+            int index)
         {
-            for (var index = 0; index < results.Count; index++)
+            var innerStackPanel = new StackPanel
             {
-                var result = results[index];
+                Margin = new Thickness(4, 2, 4, 2),
+            };
+            var top = new WrapPanel();
+            var bottom = new StackPanel();
 
-                var innerStackPanel = new StackPanel
+
+            // top
+            TextBlock textBlockFoundSpelling = null;
+            TextBlock textBlockPOrthographyInfo = null;
+            TextBlock textBlockReadings = null;
+            TextBlock textBlockAlternativeSpellings = null;
+            TextBlock textBlockProcess = null;
+            TextBlock textBlockFrequency = null;
+            var textBlockContext = new TextBlock
+            {
+                Name = "context",
+                Text = sentence,
+                Visibility = Visibility.Collapsed
+            };
+            TextBlock textBlockFoundForm = null;
+            TextBlock textBlockEdictID = null;
+            TextBlock textBlockNanori = null;
+            TextBlock textBlockOnReadings = null;
+            TextBlock textBlockKunReadings = null;
+
+            // bottom
+            TextBlock textBlockDefinitions = null;
+            TextBlock textBlockStrokeCount = null;
+            TextBlock textBlockGrade = null;
+            TextBlock textBlockComposition = null;
+
+
+            foreach ((LookupResult key, var value) in result)
+            {
+                switch (key)
                 {
-                    Margin = new Thickness(4, 2, 4, 2),
-                };
-                var top = new WrapPanel();
-                var bottom = new StackPanel();
+                    // common
+                    case LookupResult.FoundForm:
+                        textBlockFoundForm = new TextBlock
+                        {
+                            Name = key.ToString(),
+                            Text = string.Join("", value),
+                            Visibility = Visibility.Collapsed
+                        };
+                        break;
+
+                    case LookupResult.Frequency:
+
+                        textBlockFrequency = new TextBlock
+                        {
+                            Name = key.ToString(),
+                            Text = "#" + string.Join(", ", value),
+                            Foreground = ConfigManager.FrequencyColor,
+                            FontSize = ConfigManager.FrequencyFontSize,
+                            Margin = new Thickness(5, 0, 0, 0),
+                        };
+                        break;
 
 
-                var textBlockFoundSpelling = new TextBlock
-                {
-                    Name = "foundSpelling",
-                    Text = result["foundSpelling"][0],
-                    Tag = index, // for audio
-                    Foreground = ConfigManager.FoundSpellingColor,
-                    FontSize = ConfigManager.FoundSpellingFontSize,
-                };
-                textBlockFoundSpelling.MouseEnter += FoundSpelling_MouseEnter; // for audio
-                textBlockFoundSpelling.MouseLeave += FoundSpelling_MouseLeave; // for audio
-                textBlockFoundSpelling.PreviewMouseUp += FoundSpelling_PreviewMouseUp; // for mining
+                    // EDICT
+                    case LookupResult.FoundSpelling:
+                        textBlockFoundSpelling = new TextBlock
+                        {
+                            Name = key.ToString(),
+                            Text = value[0],
+                            Tag = index, // for audio
+                            Foreground = ConfigManager.FoundSpellingColor,
+                            FontSize = ConfigManager.FoundSpellingFontSize,
+                        };
+                        textBlockFoundSpelling.MouseEnter += FoundSpelling_MouseEnter; // for audio
+                        textBlockFoundSpelling.MouseLeave += FoundSpelling_MouseLeave; // for audio
+                        textBlockFoundSpelling.PreviewMouseUp += FoundSpelling_PreviewMouseUp; // for mining
+                        break;
 
-                var textBlockPOrthographyInfo = new TextBlock
-                {
-                    Name = "pOrthographyInfo",
-                    Text = "(" + string.Join(",", result["pOrthographyInfoList"]) + ")",
-                    //Foreground = ConfigManager.pOrthographyInfoColor,
-                    //FontSize = ConfigManager.pOrthographyInfoFontSize,
-                    Margin = new Thickness(5, 0, 0, 0),
-                };
+                    case LookupResult.KanaSpellings:
+                        // var textBlockKanaSpellings = new TextBlock
+                        // {
+                        //     Name = "kanaSpellings",
+                        //     Text = string.Join(" ", result["kanaSpellings"]),
+                        //     TextWrapping = TextWrapping.Wrap,
+                        //     Foreground = Brushes.White
+                        // };
+                        break;
 
-                // var textBlockKanaSpellings = new TextBlock
-                // {
-                //     Name = "kanaSpellings",
-                //     Text = string.Join(" ", result["kanaSpellings"]),
-                //     TextWrapping = TextWrapping.Wrap,
-                //     Foreground = Brushes.White
-                // };
+                    case LookupResult.Readings:
+                        textBlockReadings = MakeTextBlockReadings(result);
+                        break;
 
-                var textBlockReadings = MakeTextBlockReadings(result);
+                    case LookupResult.Definitions:
+                        textBlockDefinitions = new TextBlock
+                        {
+                            Name = key.ToString(),
+                            Text = string.Join(", ", value),
+                            TextWrapping = TextWrapping.Wrap,
+                            Foreground = ConfigManager.DefinitionsColor,
+                            FontSize = ConfigManager.DefinitionsFontSize,
+                            Margin = new Thickness(2, 2, 2, 2),
+                        };
+                        break;
 
-                var textBlockAlternativeSpellings = MakeTextBlockAlternativeSpellings(result);
+                    case LookupResult.EdictID:
+                        textBlockEdictID = new TextBlock
+                        {
+                            Name = key.ToString(),
+                            Text = string.Join(", ", value),
+                            Visibility = Visibility.Collapsed
+                        };
+                        break;
 
-                var textBlockProcess = new TextBlock
-                {
-                    Name = "process",
-                    Text = string.Join(", ", result["process"]),
-                    Foreground = ConfigManager.ProcessColor,
-                    FontSize = ConfigManager.ProcessFontSize,
-                    Margin = new Thickness(5, 0, 0, 0),
-                };
+                    case LookupResult.AlternativeSpellings:
+                        textBlockAlternativeSpellings = MakeTextBlockAlternativeSpellings(result);
+                        break;
 
-                var textBlockFrequency = new TextBlock
-                {
-                    Name = "frequency",
-                    Text = "#" + string.Join(", ", result["frequency"]),
-                    Foreground = ConfigManager.FrequencyColor,
-                    FontSize = ConfigManager.FrequencyFontSize,
-                    Margin = new Thickness(5, 0, 0, 0),
-                };
+                    case LookupResult.Process:
+                        textBlockProcess = new TextBlock
+                        {
+                            Name = key.ToString(),
+                            Text = string.Join(", ", value),
+                            Foreground = ConfigManager.ProcessColor,
+                            FontSize = ConfigManager.ProcessFontSize,
+                            Margin = new Thickness(5, 0, 0, 0),
+                        };
+                        break;
 
-                var textBlockContext = new TextBlock
-                {
-                    Name = "context",
-                    Text = sentence,
-                    Visibility = Visibility.Collapsed
-                };
+                    case LookupResult.POrthographyInfoList:
+                        textBlockPOrthographyInfo = new TextBlock
+                        {
+                            Name = key.ToString(),
+                            Text = "(" + string.Join(",", value) + ")",
+                            //Foreground = ConfigManager.pOrthographyInfoColor,
+                            //FontSize = ConfigManager.pOrthographyInfoFontSize,
+                            Margin = new Thickness(5, 0, 0, 0),
+                        };
+                        break;
 
-                var textBlockFoundForm = new TextBlock
-                {
-                    Name = "foundForm",
-                    Text = string.Join("", result["foundForm"]),
-                    Visibility = Visibility.Collapsed
-                };
+                    case LookupResult.ROrthographyInfoList:
+                        // processed in MakeTextBlockReadings()
+                        break;
 
-                var textBlockJmdictID = new TextBlock
-                {
-                    Name = "jmdictID",
-                    Text = string.Join(", ", result["jmdictID"]),
-                    Visibility = Visibility.Collapsed
-                };
-
-                var textBlockDefinitions = new TextBlock
-                {
-                    Name = "definitions",
-                    Text = string.Join("", result["definitions"]),
-                    TextWrapping = TextWrapping.Wrap,
-                    Foreground = ConfigManager.DefinitionsColor,
-                    FontSize = ConfigManager.DefinitionsFontSize,
-                    Margin = new Thickness(2, 2, 2, 2),
-                };
+                    case LookupResult.AOrthographyInfoList:
+                        // processed in MakeTextBlockAlternativeSpellings()
+                        break;
 
 
-                TextBlock[] babies =
-                {
-                    textBlockFoundSpelling, textBlockPOrthographyInfo,
-                    textBlockReadings,
-                    textBlockAlternativeSpellings,
-                    textBlockProcess, textBlockFrequency,
-                    textBlockContext, textBlockFoundForm, textBlockJmdictID
-                };
-                foreach (var baby in babies)
-                {
-                    // common emptiness check; these two have their text as Inlines
-                    if (baby.Text == "" && !(baby.Name == "alternativeSpellings" || baby.Name == "readings"))
-                        continue;
+                    // KANJIDIC
+                    case LookupResult.OnReadings:
+                        if (!value.Any())
+                            break;
 
-                    // POrthographyInfo check
-                    if (baby.Text == "()")
-                        continue;
+                        textBlockOnReadings = new TextBlock
+                        {
+                            Name = key.ToString(),
+                            Text = "On" + ": " + string.Join(", ", value),
+                            Foreground = ConfigManager.ReadingsColor,
+                            FontSize = ConfigManager.ReadingsFontSize,
+                            Margin = new Thickness(5, 0, 0, 0),
+                        };
+                        break;
 
-                    // Frequency check
-                    if (baby.Text == ("#" + MainWindowUtilities.FakeFrequency) || baby.Text == "#0")
-                        continue;
+                    case LookupResult.KunReadings:
+                        if (!value.Any())
+                            break;
 
-                    top.Children.Add(baby);
+                        textBlockKunReadings = new TextBlock
+                        {
+                            Name = key.ToString(),
+                            Text = "Kun" + ": " + string.Join(", ", value),
+                            Foreground = ConfigManager.ReadingsColor,
+                            FontSize = ConfigManager.ReadingsFontSize,
+                            Margin = new Thickness(5, 0, 0, 0),
+                        };
+                        break;
+
+                    case LookupResult.Nanori:
+                        if (!value.Any())
+                            break;
+
+                        textBlockNanori = new TextBlock
+                        {
+                            Name = key.ToString(),
+                            Text = key + ": " + string.Join(", ", value),
+                            Foreground = ConfigManager.ReadingsColor,
+                            FontSize = ConfigManager.ReadingsFontSize,
+                            Margin = new Thickness(5, 0, 0, 0),
+                        };
+                        break;
+
+                    case LookupResult.StrokeCount:
+                        textBlockStrokeCount = new TextBlock
+                        {
+                            Name = key.ToString(),
+                            Text = "Strokes" + ": " + string.Join(", ", value),
+                            // Foreground = ConfigManager. Color,
+                            FontSize = ConfigManager.DefinitionsFontSize,
+                            Margin = new Thickness(2, 2, 2, 2),
+                        };
+                        break;
+
+                    case LookupResult.Grade:
+                        var gradeString = "";
+                        var gradeInt = Convert.ToInt32(value[0]);
+                        gradeString = gradeInt switch
+                        {
+                            0 => "Hyougai",
+                            <=6 => $"Kyouiku ({gradeInt})",
+                            8 => $"Jouyou ({gradeInt})",
+                            <=10 => $"Jinmeiyou ({gradeInt})",
+                            _ => gradeString
+                        };
+
+                        textBlockGrade = new TextBlock
+                        {
+                            Name = key.ToString(),
+                            Text = key + ": " + gradeString,
+                            // Foreground = ConfigManager. Color,
+                            FontSize = ConfigManager.DefinitionsFontSize,
+                            Margin = new Thickness(2, 2, 2, 2),
+                        };
+                        break;
+
+                    case LookupResult.Composition:
+                        textBlockComposition = new TextBlock
+                        {
+                            Name = key.ToString(),
+                            Text = key + ": " + string.Join(", ", value),
+                            // Foreground = ConfigManager. Color,
+                            FontSize = ConfigManager.ReadingsFontSize,
+                            Margin = new Thickness(2, 2, 2, 2),
+                        };
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
-
-                bottom.Children.Add(textBlockDefinitions);
-
-                innerStackPanel.Children.Add(top);
-                innerStackPanel.Children.Add(bottom);
-                if (index != results.Count - 1)
-                {
-                    innerStackPanel.Children.Add(new Separator
-                    {
-                        Background = ConfigManager.SeparatorColor
-                    });
-                }
-
-                Instance.StackPanel.Children.Add(innerStackPanel);
             }
+
+
+            TextBlock[] babies =
+            {
+                textBlockFoundSpelling, textBlockPOrthographyInfo,
+                textBlockReadings,
+                textBlockAlternativeSpellings,
+                textBlockProcess,
+                textBlockContext, textBlockFoundForm, textBlockEdictID, // undisplayed, for mining
+
+                // Kanjidic only
+                textBlockOnReadings,
+                textBlockKunReadings,
+                textBlockNanori,
+
+                textBlockFrequency,
+            };
+            foreach (TextBlock baby in babies)
+            {
+                if (baby == null) continue;
+
+                Enum.TryParse(baby.Name, out LookupResult enumName);
+
+                // common emptiness check; these two have their text as inline Runs
+                if (baby.Text == "" &&
+                    !(enumName == LookupResult.AlternativeSpellings || enumName == LookupResult.Readings))
+                    continue;
+
+                // POrthographyInfo check
+                if (baby.Text == "()")
+                    continue;
+
+                // Frequency check
+                if ((baby.Text == ("#" + MainWindowUtilities.FakeFrequency)) || baby.Text == "#0")
+                    continue;
+
+                top.Children.Add(baby);
+            }
+
+            bottom.Children.Add(textBlockDefinitions);
+
+            TextBlock[] babiesKanji =
+            {
+                textBlockGrade,
+                textBlockStrokeCount,
+                textBlockComposition,
+            };
+            foreach (TextBlock baby in babiesKanji)
+            {
+                if (baby == null) continue;
+
+                // common emptiness check
+                if (baby.Text == "")
+                    continue;
+
+                bottom.Children.Add(baby);
+            }
+
+            innerStackPanel.Children.Add(top);
+            innerStackPanel.Children.Add(bottom);
+            return innerStackPanel;
         }
 
-        private static TextBlock MakeTextBlockReadings(Dictionary<string, List<string>> result)
+        private static TextBlock MakeTextBlockReadings(Dictionary<LookupResult, List<string>> result)
         {
+            result.TryGetValue(LookupResult.ROrthographyInfoList, out var rOrthographyInfoList);
+
+            var readings = result[LookupResult.Readings];
+
             var textBlockReadings = new TextBlock
             {
-                Name = "readings",
+                Name = LookupResult.Readings.ToString(),
                 Text = "",
-                Tag = string.Join(", ", result["readings"]), // for mining
+                Tag = string.Join(", ", readings), // for mining
                 Foreground = ConfigManager.ReadingsColor,
                 FontSize = ConfigManager.ReadingsFontSize,
                 Margin = new Thickness(5, 0, 0, 0),
             };
 
-            // For KANJIDIC maybe?
-            if (result["readings"].Count == 0) return textBlockReadings;
+            if (readings.Count == 0) return textBlockReadings;
 
-            for (var index = 0; index < result["readings"].Count; index++)
+            for (var index = 0; index < readings.Count; index++)
             {
-                var runReading = new Run(result["readings"][index])
+                var runReading = new Run(readings[index])
                 {
                     Foreground = ConfigManager.ReadingsColor,
                     FontSize = ConfigManager.ReadingsFontSize,
                 };
                 textBlockReadings.Inlines.Add(runReading);
 
-                if (index < result["rOrthographyInfoList"].Count)
+                if (rOrthographyInfoList != null)
                 {
-                    var runReadingOrtho = new Run("(" + result["rOrthographyInfoList"][index] + ")")
+                    if (index < rOrthographyInfoList.Count)
                     {
-                        //Foreground = ConfigManager.rOrthographyInfoColor,
-                        //FontSize = ConfigManager.rOrthographyInfoFontSize,
-                    };
-                    if (runReadingOrtho.Text != "()")
-                    {
-                        textBlockReadings.Inlines.Add(" ");
-                        textBlockReadings.Inlines.Add(runReadingOrtho);
+                        var runReadingOrtho = new Run("(" + rOrthographyInfoList[index] + ")")
+                        {
+                            Foreground = ConfigManager.ROrthographyInfoColor,
+                            FontSize = ConfigManager.ROrthographyInfoFontSize,
+                        };
+                        if (runReadingOrtho.Text != "()")
+                        {
+                            textBlockReadings.Inlines.Add(" ");
+                            textBlockReadings.Inlines.Add(runReadingOrtho);
+                        }
                     }
                 }
 
-                if (index != result["readings"].Count - 1)
+                if (index != readings.Count - 1)
                 {
                     textBlockReadings.Inlines.Add(", ");
                 }
@@ -270,37 +443,39 @@ namespace JapaneseLookup.GUI
             return textBlockReadings;
         }
 
-        private static TextBlock MakeTextBlockAlternativeSpellings(Dictionary<string, List<string>> result)
+        private static TextBlock MakeTextBlockAlternativeSpellings(Dictionary<LookupResult, List<string>> result)
         {
+            var alternativeSpellings = result[LookupResult.AlternativeSpellings];
+
             var textBlockAlternativeSpellings = new TextBlock
             {
-                Name = "alternativeSpellings",
+                Name = LookupResult.AlternativeSpellings.ToString(),
                 Text = "",
-                Tag = string.Join(", ", result["alternativeSpellings"]), // for mining
+                Tag = string.Join(", ", alternativeSpellings), // for mining
                 Foreground = ConfigManager.AlternativeSpellingsColor,
                 FontSize = ConfigManager.AlternativeSpellingsFontSize,
                 Margin = new Thickness(5, 0, 0, 0),
             };
 
-            if (result["alternativeSpellings"].Count == 0) return textBlockAlternativeSpellings;
+            if (alternativeSpellings.Count == 0) return textBlockAlternativeSpellings;
 
             textBlockAlternativeSpellings.Inlines.Add("(");
 
-            for (var index = 0; index < result["alternativeSpellings"].Count; index++)
+            for (var index = 0; index < alternativeSpellings.Count; index++)
             {
-                var runAlt = new Run(result["alternativeSpellings"][index])
+                var runAlt = new Run(alternativeSpellings[index])
                 {
                     Foreground = ConfigManager.AlternativeSpellingsColor,
                     FontSize = ConfigManager.AlternativeSpellingsFontSize,
                 };
                 textBlockAlternativeSpellings.Inlines.Add(runAlt);
 
-                if (index < result["aOrthographyInfoList"].Count)
+                if (index < alternativeSpellings.Count)
                 {
-                    var runAltOrtho = new Run("(" + result["aOrthographyInfoList"][index] + ")")
+                    var runAltOrtho = new Run("(" + alternativeSpellings[index] + ")")
                     {
-                        //Foreground = ConfigManager.aOrthographyInfoColor,
-                        //FontSize = ConfigManager.aOrthographyInfoFontSize,
+                        Foreground = ConfigManager.AOrthographyInfoColor,
+                        FontSize = ConfigManager.AOrthographyInfoFontSize,
                     };
                     if (runAltOrtho.Text != "()")
                     {
@@ -309,7 +484,7 @@ namespace JapaneseLookup.GUI
                     }
                 }
 
-                if (index != result["alternativeSpellings"].Count - 1)
+                if (index != alternativeSpellings.Count - 1)
                 {
                     textBlockAlternativeSpellings.Inlines.Add(", ");
                 }
@@ -331,7 +506,7 @@ namespace JapaneseLookup.GUI
             _playAudioIndex = 0;
         }
 
-        private static void FoundSpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        private static async void FoundSpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             MainWindow.MiningMode = false;
             Instance.Hide();
@@ -341,57 +516,88 @@ namespace JapaneseLookup.GUI
             string definitions = "";
             string context = null;
             string foundForm = null;
-            string jmdictID = null;
+            string edictID = null;
             var timeLocal = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
             string alternativeSpellings = null;
             string frequency = null;
 
             var textBlock = (TextBlock) sender;
             var top = (WrapPanel) textBlock.Parent;
-
             foreach (TextBlock child in top.Children)
             {
-                switch (child.Name)
+                if (child.Name == "context")
                 {
-                    case "foundSpelling":
+                    context = child.Text;
+                }
+
+                Enum.TryParse(child.Name, out LookupResult result);
+                switch (result)
+                {
+                    case LookupResult.FoundSpelling:
                         foundSpelling = child.Text;
                         break;
-                    case "readings":
+                    case LookupResult.Readings:
                         readings = (string) child.Tag;
                         break;
-                    case "context":
-                        context = child.Text;
-                        break;
-                    case "foundForm":
+                    // case "context":
+                    //     context = child.Text;
+                    //     break;
+                    case LookupResult.FoundForm:
                         foundForm = child.Text;
                         break;
-                    case "jmdictID":
-                        jmdictID = child.Text;
+                    case LookupResult.EdictID:
+                        edictID = child.Text;
                         break;
-                    case "alternativeSpellings":
+                    case LookupResult.AlternativeSpellings:
                         alternativeSpellings = (string) child.Tag;
                         break;
-                    case "frequency":
+                    case LookupResult.Frequency:
                         frequency = child.Text;
                         break;
+                    case LookupResult.OnReadings:
+                        readings += child.Text + " ";
+                        break;
+                    case LookupResult.KunReadings:
+                        readings += child.Text + " ";
+                        break;
+                    case LookupResult.Nanori:
+                        readings += child.Text + " ";
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
 
             var innerStackPanel = (StackPanel) top.Parent;
             var bottom = (StackPanel) innerStackPanel.Children[1];
-            // For multiple definitions (multiple dictionaries enabled at the same time)
             foreach (TextBlock child in bottom.Children)
             {
-                definitions += child.Text;
+                Enum.TryParse(child.Name, out LookupResult result);
+                switch (result)
+                {
+                    case LookupResult.Definitions:
+                        definitions += child.Text;
+                        break;
+                    case LookupResult.StrokeCount:
+                        // TODO
+                        break;
+                    case LookupResult.Grade:
+                        // TODO
+                        break;
+                    case LookupResult.Composition:
+                        // TODO
+                        break;
+                }
             }
 
-            Mining.Mine(
+            await Mining.Mine(
                 foundSpelling,
                 readings,
                 definitions,
                 context,
                 foundForm,
-                jmdictID,
+                edictID,
                 timeLocal,
                 alternativeSpellings,
                 frequency
@@ -412,6 +618,8 @@ namespace JapaneseLookup.GUI
             );
 
             // var sound = AnkiConnect.GetAudio("猫", "ねこ").Result;
+
+            // TODO: find a better solution for this that avoids adding an element to Instance.StackPanel
             var mediaElement = new MediaElement { Source = uri, Volume = 1, Visibility = Visibility.Collapsed };
             Instance.StackPanel.Children.Add(mediaElement);
         }
@@ -441,12 +649,13 @@ namespace JapaneseLookup.GUI
 
                     foreach (TextBlock child in top.Children)
                     {
-                        switch (child.Name)
+                        Enum.TryParse(child.Name, out LookupResult result);
+                        switch (result)
                         {
-                            case "foundSpelling":
+                            case LookupResult.FoundSpelling:
                                 foundSpelling = child.Text;
                                 break;
-                            case "readings":
+                            case LookupResult.Readings:
                                 reading = ((string) child.Tag).Split(",")[0];
                                 break;
                         }

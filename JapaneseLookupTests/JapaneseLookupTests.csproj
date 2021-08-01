@@ -8,6 +8,7 @@
         <OutputType>WinExe</OutputType>
 
         <Platforms>AnyCPU;x86</Platforms>
+        <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

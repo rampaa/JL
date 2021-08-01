@@ -35,6 +35,8 @@ namespace JapaneseLookup
         public static bool UseJMnedict;
         public static bool ForceSync;
         public static int LookupRate;
+        
+        public static SolidColorBrush MainWindowTextColor;
 
         public static SolidColorBrush FoundSpellingColor;
         public static SolidColorBrush ReadingsColor;
@@ -56,11 +58,14 @@ namespace JapaneseLookup
         public static bool PopupFlipX;
         public static bool PopupFlipY;
 
+        // TODO: hook these up
         public static int PopupMaxWidth;
         public static int PopupMaxHeight;
-
-        public static SolidColorBrush MainWindowTextColor;
         public static SolidColorBrush MainWindowBacklogTextColor = Brushes.Bisque;
+        public static SolidColorBrush ROrthographyInfoColor = Brushes.Gold;
+        public static int ROrthographyInfoFontSize = 17;
+        public static SolidColorBrush AOrthographyInfoColor = Brushes.White;
+        public static int AOrthographyInfoFontSize = 15;
 
         public static void ApplyPreferences(MainWindow mainWindow)
         {
@@ -91,19 +96,19 @@ namespace JapaneseLookup
             SeparatorColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupSeparatorColor"));
 
-            FoundSpellingFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupPrimarySpellingFontSize"));
-            ReadingsFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupReadingFontSize"));
+            FoundSpellingFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupPrimarySpellingFontSize")!);
+            ReadingsFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupReadingFontSize")!);
             AlternativeSpellingsFontSize =
-                int.Parse(ConfigurationManager.AppSettings.Get("PopupAlternativeSpellingFontSize"));
-            DefinitionsFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupDefinitionFontSize"));
-            FrequencyFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupFrequencyFontSize"));
-            ProcessFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupDeconjugationInfoFontSize"));
+                int.Parse(ConfigurationManager.AppSettings.Get("PopupAlternativeSpellingFontSize")!);
+            DefinitionsFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupDefinitionFontSize")!);
+            FrequencyFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupFrequencyFontSize")!);
+            ProcessFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupDeconjugationInfoFontSize")!);
 
-            PopupXOffset = int.Parse(ConfigurationManager.AppSettings.Get("PopupXOffset"));
-            PopupYOffset = int.Parse(ConfigurationManager.AppSettings.Get("PopupYOffset"));
+            PopupXOffset = int.Parse(ConfigurationManager.AppSettings.Get("PopupXOffset")!);
+            PopupYOffset = int.Parse(ConfigurationManager.AppSettings.Get("PopupYOffset")!);
 
-            PopupMaxWidth = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth"));
-            PopupMaxHeight = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight"));
+            PopupMaxWidth = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth")!);
+            PopupMaxHeight = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight")!);
 
             MainWindowTextColor = (SolidColorBrush) new BrushConverter().ConvertFrom(
                 ConfigurationManager.AppSettings.Get("MainWindowTextColor"));
@@ -334,7 +339,7 @@ namespace JapaneseLookup
             string freqListPath = FrequencyLists[FrequencyList];
 
             // initial jmdict and freqlist load
-            if (!JMdictLoader.jMdictDictionary.Any())
+            if (!JMdictLoader.JMdictDictionary.Any())
             {
                 await Task.Run(JMdictLoader.Load).ContinueWith(_ =>
                 {
@@ -366,7 +371,7 @@ namespace JapaneseLookup
             // load new freqlist if necessary
             if (Ready)
             {
-                JMdictLoader.jMdictDictionary.TryGetValue("俺", out var freqTest);
+                JMdictLoader.JMdictDictionary.TryGetValue("俺", out var freqTest);
                 Debug.Assert(freqTest != null, nameof(freqTest) + " != null");
 
                 if (!freqTest[0].FrequencyDict.TryGetValue(FrequencyList, out int _))
@@ -381,7 +386,7 @@ namespace JapaneseLookup
                     });
                 }
 
-                if (!KANJIDIC.KanjiInfoLoader.kanjiDictionary.Any())
+                if(!KANJIDIC.KanjiInfoLoader.KanjiDictionary.Any())
                     await Task.Run(KANJIDIC.KanjiInfoLoader.Load);
             }
 

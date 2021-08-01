@@ -13,7 +13,7 @@ namespace JapaneseLookup.EDICT
 {
     public class JMdictLoader
     {
-        public static Dictionary<string, List<JMdictResult>> jMdictDictionary = new();
+        public static readonly Dictionary<string, List<JMdictResult>> JMdictDictionary = new();
         public static void Load()
         {
             if(File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/JMdict.xml")))
@@ -63,7 +63,7 @@ namespace JapaneseLookup.EDICT
                     }
                 }
             }
-            JMDictBuilder.BuildDictionary(entry, jMdictDictionary);
+            JMDictBuilder.BuildDictionary(entry, JMdictDictionary);
         }
 
         private static void ReadKEle(XmlTextReader edictXml, JMdictEntry entry)

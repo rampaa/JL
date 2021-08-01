@@ -9,7 +9,7 @@
         FoundForm,
         Context,
         Audio,
-        JMDictID,
+        EdictID,
         TimeLocal,
         AlternativeSpellings,
         Frequency,

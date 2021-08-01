@@ -20,7 +20,7 @@ namespace JapaneseLookup
 
         // Consider checking for \t, \r, "　", " ", ., !, ?, –, —, ―, ‒, ~, ‥, ♪, ～, ♡, ♥, ☆, ★
         private static readonly List<string> JapanesePunctuation =
-            new() { "。", "！", "？", "…", "―", ".", "＆", "\n"};
+            new() { "。", "！", "？", "…", "―", ".", "＆", "\n" };
 
         private static readonly Dictionary<string, string> JapaneseParentheses = new()
         {
@@ -93,7 +93,7 @@ namespace JapaneseLookup
                     {
                         int numberOfLeftParentheses = sentence.Count(p => p == leftParenthesis[0]);
                         int numberOfRightParentheses = sentence.Count(p => p == sentence.Last());
-                        
+
                         if (numberOfRightParentheses == numberOfLeftParentheses + 1)
                             sentence = sentence.Substring(0, sentence.Length - 1);
                     }
@@ -105,7 +105,8 @@ namespace JapaneseLookup
                 endPosition
             );
         }
-        public static List<Dictionary<string, List<string>>> LookUp(string text)
+
+        public static List<Dictionary<LookupResult, List<string>>> Lookup(string text)
         {
             var preciseTimeNow = new DateTime(Stopwatch.GetTimestamp());
             if ((preciseTimeNow - _lastLookupTime).Milliseconds < ConfigManager.LookupRate)
@@ -127,7 +128,7 @@ namespace JapaneseLookup
 
                 bool tryLongVowelConversion = true;
 
-                if (JMdictLoader.jMdictDictionary.TryGetValue(textInHiragana, out var tempResult))
+                if (JMdictLoader.JMdictDictionary.TryGetValue(textInHiragana, out var tempResult))
                 {
                     wordResults.TryAdd(textInHiragana, (tempResult, new List<string>(), text[..^i]));
                     tryLongVowelConversion = false;
@@ -150,7 +151,7 @@ namespace JapaneseLookup
                         if (wordResults.ContainsKey(result.Text))
                             continue;
 
-                        if (JMdictLoader.jMdictDictionary.TryGetValue(result.Text, out var temp))
+                        if (JMdictLoader.JMdictDictionary.TryGetValue(result.Text, out var temp))
                         {
                             List<JMdictResult> resultsList = new();
 
@@ -176,20 +177,30 @@ namespace JapaneseLookup
                 if (tryLongVowelConversion && textInHiragana.Contains("ー") && textInHiragana[0] != 'ー')
                 {
                     string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiragana);
-                    if (JMdictLoader.jMdictDictionary.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
+                    if (JMdictLoader.JMdictDictionary.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
                     {
                         wordResults.Add(textInHiragana, (tmpResult, new List<string>(), text[..^i]));
                     }
                 }
             }
 
-            if (!wordResults.Any() && !nameResults.Any())
-                if (!KanjiInfoLoader.kanjiDictionary.TryGetValue(text[0].ToString(), out var kResult))
-                    return null;
-                else
-                    kanjiResult.Add(text[0].ToString(), (new List<KanjiResult>() { kResult }, new List<string>(), text[0].ToString()));
+            // if (!wordResults.Any() && !nameResults.Any())
+            // {
+            KanjiInfoLoader.KanjiDictionary.TryGetValue(text[0].ToString(), out KanjiResult kResult);
+            if (kResult != null)
+            {
+                kanjiResult.Add(text[0].ToString(),
+                    (new List<KanjiResult> { kResult }, new List<string>(), text[0].ToString()));
+            }
+            // }
 
-            List<Dictionary<string, List<string>>> results = new();
+            // don't display an empty popup if there are no results
+            if (!wordResults.Any() && !nameResults.Any() && !kanjiResult.Any())
+            {
+                return null;
+            }
+
+            List<Dictionary<LookupResult, List<string>>> results = new();
 
             if (wordResults.Any())
                 results.AddRange(WordResultBuilder(wordResults));
@@ -201,94 +212,67 @@ namespace JapaneseLookup
                 results.AddRange(KanjiResultBuilder(kanjiResult));
 
             results = results
-                .OrderByDescending(dict => dict["foundForm"][0].Length)
-                .ThenBy(dict => Convert.ToInt32(dict["frequency"][0])).ToList();
+                .OrderByDescending(dict => dict[LookupResult.FoundForm][0].Length)
+                .ThenBy(dict => Convert.ToInt32(dict[LookupResult.Frequency][0])).ToList();
             return results;
         }
 
-        private static List<Dictionary<string, List<string>>> KanjiResultBuilder
+        private static List<Dictionary<LookupResult, List<string>>> KanjiResultBuilder
             (Dictionary<string, (List<KanjiResult> kanjiResult, List<string> processList, string foundForm)> kanjiResults)
         {
-            var results = new List<Dictionary<string, List<string>>>();
-            var result = new Dictionary<string, List<string>>();
+            var results = new List<Dictionary<LookupResult, List<string>>>();
+            var result = new Dictionary<LookupResult, List<string>>();
 
             var kanjiResult = kanjiResults.First().Value.kanjiResult.First();
 
-            result.Add("foundSpelling", new List<string> { kanjiResults.First().Key });
-            result.Add("definitions", kanjiResult.Meanings);
-            result.Add("onReading", kanjiResult.OnReadings);
-            result.Add("nanori", kanjiResult.Nanori);
-            result.Add("strokeCount", new List<string> { kanjiResult.StrokeCount.ToString() } );
-            result.Add("grade", new List<string> { kanjiResult.Grade.ToString() });
-            result.Add("composition", new List<string> { kanjiResult.Composition });
-            result.Add("frequency", new List<string> { kanjiResult.Frequency.ToString() });
+            result.Add(LookupResult.FoundSpelling, new List<string> { kanjiResults.First().Key });
+            result.Add(LookupResult.Definitions, kanjiResult.Meanings);
+            result.Add(LookupResult.OnReadings, kanjiResult.OnReadings);
+            result.Add(LookupResult.KunReadings, kanjiResult.KunReadings);
+            result.Add(LookupResult.Nanori, kanjiResult.Nanori);
+            result.Add(LookupResult.StrokeCount, new List<string> { kanjiResult.StrokeCount.ToString() });
+            result.Add(LookupResult.Grade, new List<string> { kanjiResult.Grade.ToString() });
+            result.Add(LookupResult.Composition, new List<string> { kanjiResult.Composition });
+            result.Add(LookupResult.Frequency, new List<string> { kanjiResult.Frequency.ToString() });
 
-
-            // unused here but necessary for DisplayResults
             var foundForm = new List<string> { kanjiResults.First().Value.foundForm };
-            var process = kanjiResults.First().Value.processList;
-            result.Add("jmdictID", new List<string> { "-1" });
-            result.Add("alternativeSpellings", new List<string>());
-            result.Add("readings", new List<string>());
-            result.Add("foundForm", foundForm);
-            result.Add("process", process);
-            result.Add("kanaSpellings", new List<string>());
-            result.Add("pOrthographyInfoList", new List<string>());
-            result.Add("aOrthographyInfoList", new List<string>());
-            result.Add("rOrthographyInfoList", new List<string>());
+            result.Add(LookupResult.FoundForm, foundForm);
 
             results.Add(result);
-
             return results;
         }
 
-        private static List<Dictionary<string, List<string>>> NameResultBuilder
+        private static List<Dictionary<LookupResult, List<string>>> NameResultBuilder
             (Dictionary<string, (List<JMnedictResult> jMdictResults, List<string> processList, string foundForm)> nameResults)
         {
-            var results = new List<Dictionary<string, List<string>>>();
+            var results = new List<Dictionary<LookupResult, List<string>>>();
 
             foreach (var nameResult in nameResults)
             {
                 foreach (var jMDictResult in nameResult.Value.jMdictResults)
                 {
-                    var result = new Dictionary<string, List<string>>();
+                    var result = new Dictionary<LookupResult, List<string>>();
 
                     var foundSpelling = new List<string> { jMDictResult.PrimarySpelling };
-                    List<string> readings;
 
-                    if (jMDictResult.Readings != null)
-                        readings = jMDictResult.Readings.ToList();
-                    else
-                        readings = new List<string>();
+                    var readings = jMDictResult.Readings != null ? jMDictResult.Readings.ToList() : new List<string>();
 
                     var foundForm = new List<string> { nameResult.Value.foundForm };
-                    var jmdictID = new List<string> { jMDictResult.Id };
 
+                    var edictID = new List<string> { jMDictResult.Id };
 
-                    List<string> alternativeSpellings;
-                    if (jMDictResult.AlternativeSpellings != null)
-                        alternativeSpellings = jMDictResult.AlternativeSpellings;
-                    else
-                        alternativeSpellings = new List<string>();
-
-                    var process = nameResult.Value.processList;
+                    var alternativeSpellings = jMDictResult.AlternativeSpellings ?? new List<string>();
 
                     var definitions = new List<string> { BuildNameDefinition(jMDictResult) };
 
-                    result.Add("jmdictID", jmdictID);
-                    result.Add("foundSpelling", foundSpelling);
-                    result.Add("alternativeSpellings", alternativeSpellings);
-                    result.Add("readings", readings);
-                    result.Add("definitions", definitions);
+                    result.Add(LookupResult.EdictID, edictID);
+                    result.Add(LookupResult.FoundSpelling, foundSpelling);
+                    result.Add(LookupResult.AlternativeSpellings, alternativeSpellings);
+                    result.Add(LookupResult.Readings, readings);
+                    result.Add(LookupResult.Definitions, definitions);
 
-                    // unused here but necessary for DisplayResults
-                    result.Add("foundForm", foundForm);
-                    result.Add("process", process);
-                    result.Add("frequency", new List<string> { FakeFrequency });
-                    result.Add("kanaSpellings", new List<string>());
-                    result.Add("pOrthographyInfoList", new List<string>());
-                    result.Add("aOrthographyInfoList", new List<string>());
-                    result.Add("rOrthographyInfoList", new List<string>());
+                    result.Add(LookupResult.FoundForm, foundForm);
+                    result.Add(LookupResult.Frequency, new List<string> { FakeFrequency });
 
                     results.Add(result);
                 }
@@ -297,28 +281,24 @@ namespace JapaneseLookup
             return results;
         }
 
-        private static List<Dictionary<string, List<string>>> WordResultBuilder
+        private static List<Dictionary<LookupResult, List<string>>> WordResultBuilder
             (Dictionary<string, (List<JMdictResult> jMdictResults, List<string> processList, string foundForm)> wordResults)
         {
-            var results = new List<Dictionary<string, List<string>>>();
+            var results = new List<Dictionary<LookupResult, List<string>>>();
 
             foreach (var wordResult in wordResults)
             {
                 foreach (var jMDictResult in wordResult.Value.jMdictResults)
                 {
-                    var result = new Dictionary<string, List<string>>();
+                    var result = new Dictionary<LookupResult, List<string>>();
 
                     var foundSpelling = new List<string> { jMDictResult.PrimarySpelling };
 
-                    List<string> kanaSpellings;
-                    if (jMDictResult.KanaSpellings != null)
-                        kanaSpellings = jMDictResult.KanaSpellings;
-                    else
-                        kanaSpellings = new List<string>();
+                    var kanaSpellings = jMDictResult.KanaSpellings ?? new List<string>();
 
                     var readings = jMDictResult.Readings.ToList();
                     var foundForm = new List<string> { wordResult.Value.foundForm };
-                    var jmdictID = new List<string> { jMDictResult.Id };
+                    var edictID = new List<string> { jMDictResult.Id };
 
                     List<string> alternativeSpellings;
                     if (jMDictResult.AlternativeSpellings != null)
@@ -371,18 +351,18 @@ namespace JapaneseLookup
                         aOrthographyInfoList.Add(final);
                     }
 
-                    result.Add("foundSpelling", foundSpelling);
-                    result.Add("kanaSpellings", kanaSpellings);
-                    result.Add("readings", readings);
-                    result.Add("definitions", definitions);
-                    result.Add("foundForm", foundForm);
-                    result.Add("jmdictID", jmdictID);
-                    result.Add("alternativeSpellings", alternativeSpellings);
-                    result.Add("process", process);
-                    result.Add("frequency", frequency);
-                    result.Add("pOrthographyInfoList", pOrthographyInfoList);
-                    result.Add("rOrthographyInfoList", rOrthographyInfoList);
-                    result.Add("aOrthographyInfoList", aOrthographyInfoList);
+                    result.Add(LookupResult.FoundSpelling, foundSpelling);
+                    result.Add(LookupResult.KanaSpellings, kanaSpellings);
+                    result.Add(LookupResult.Readings, readings);
+                    result.Add(LookupResult.Definitions, definitions);
+                    result.Add(LookupResult.FoundForm, foundForm);
+                    result.Add(LookupResult.EdictID, edictID);
+                    result.Add(LookupResult.AlternativeSpellings, alternativeSpellings);
+                    result.Add(LookupResult.Process, process);
+                    result.Add(LookupResult.Frequency, frequency);
+                    result.Add(LookupResult.POrthographyInfoList, pOrthographyInfoList);
+                    result.Add(LookupResult.ROrthographyInfoList, rOrthographyInfoList);
+                    result.Add(LookupResult.AOrthographyInfoList, aOrthographyInfoList);
 
                     results.Add(result);
                 }

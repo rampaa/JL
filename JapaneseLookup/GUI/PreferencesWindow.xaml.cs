@@ -23,6 +23,7 @@ namespace JapaneseLookup.GUI
     public partial class PreferencesWindow : System.Windows.Window
     {
         private static PreferencesWindow _instance;
+        private bool _setAnkiConfig;
 
         public static PreferencesWindow Instance
         {
@@ -91,13 +92,17 @@ namespace JapaneseLookup.GUI
 
         #region MiningSetup
 
-        private void TabItemAnki_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private async void TabItemAnki_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            SetPreviousMiningConfig();
-            if (MiningSetupComboBoxDeckNames.SelectedItem == null) PopulateDeckAndModelNames();
+            if (!_setAnkiConfig)
+            {
+                await SetPreviousMiningConfig();
+                if (MiningSetupComboBoxDeckNames.SelectedItem == null) await PopulateDeckAndModelNames();
+                _setAnkiConfig = true;
+            }
         }
 
-        private async void SetPreviousMiningConfig()
+        private async Task SetPreviousMiningConfig()
         {
             try
             {
@@ -118,14 +123,16 @@ namespace JapaneseLookup.GUI
             }
         }
 
-        private async void PopulateDeckAndModelNames()
+        private async Task PopulateDeckAndModelNames()
         {
             try
             {
+                MiningSetupComboBoxDeckNames.ItemsSource = null;
                 var deckNamesList =
                     JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetDeckNames()).Result.ToString()!);
                 MiningSetupComboBoxDeckNames.ItemsSource = deckNamesList;
 
+                MiningSetupComboBoxModelNames.ItemsSource = null;
                 var modelNamesList =
                     JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelNames()).Result.ToString()!);
                 MiningSetupComboBoxModelNames.ItemsSource = modelNamesList;
@@ -138,9 +145,9 @@ namespace JapaneseLookup.GUI
             }
         }
 
-        private void MiningSetupButtonRefresh_Click(object sender, RoutedEventArgs e)
+        private async void MiningSetupButtonRefresh_Click(object sender, RoutedEventArgs e)
         {
-            PopulateDeckAndModelNames();
+            await PopulateDeckAndModelNames();
         }
 
         private async void MiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)

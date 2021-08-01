@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="PopupWindow"
         Width="Auto" Height="Auto" SizeToContent="Height" MaxWidth="700" MaxHeight="520"
-        Background="#FF2C2B2B" Foreground="#FF3C3783"
+        Background="#FF2C2B2B" Foreground="White"
         Topmost="True" WindowStyle="None" AllowsTransparency="true" ShowInTaskbar="False"
         KeyDown="Window_KeyDown" Closing="Window_Closing">
 

@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows.Media;
 
 namespace JapaneseLookup.GUI
@@ -83,7 +84,7 @@ namespace JapaneseLookup.GUI
                 if (text == _lastWord) return;
                 _lastWord = text;
 
-                var results = MainWindowUtilities.LookUp(text);
+                var results = MainWindowUtilities.Lookup(text);
 
                 if (results != null)
                 {
@@ -95,7 +96,30 @@ namespace JapaneseLookup.GUI
                     PopupWindow.Instance.Visibility = Visibility.Visible;
                     PopupWindow.Instance.Activate();
                     PopupWindow.Instance.Focus();
-                    PopupWindow.DisplayResults(sentence, results);
+
+                    for (int i = 0; i < results.Count; i++)
+                    {
+                        var result = results[i];
+
+                        // if (result[LookupResult.Grade].Any())
+                        // {
+                        //     PopupWindow.Instance.StackPanel.Children.Add(
+                        //         PopupWindow.MakeResultStackPanelKanji(sentence, result, i));
+                        // }
+                        // else
+                        // {
+                            PopupWindow.Instance.StackPanel.Children.Add(
+                                PopupWindow.MakeResultStackPanel(sentence, result, i));
+                        // }
+
+                        if (i != results.Count - 1)
+                        {
+                            PopupWindow.Instance.StackPanel.Children.Add(new Separator
+                            {
+                                Background = ConfigManager.SeparatorColor
+                            });
+                        }
+                    }
                 }
                 else
                     PopupWindow.Instance.Visibility = Visibility.Hidden;
