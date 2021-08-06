@@ -16,7 +16,7 @@ namespace JapaneseLookup.Anki
 
         [JsonPropertyName("fields")] public Dictionary<string, JLField> Fields { get; set; }
 
-        [JsonPropertyName("tags")]  public string[] Tags { get; set; }
+        [JsonPropertyName("tags")] public string[] Tags { get; set; }
 
         public AnkiConfig(string deckName, string modelName, Dictionary<string, JLField> fields, string[] tags)
         {
@@ -26,7 +26,7 @@ namespace JapaneseLookup.Anki
             Tags = tags;
         }
 
-        public static async void CreateDefaultConfig()
+        public static async Task CreateDefaultConfig()
         {
             await WriteAnkiConfig(new AnkiConfig(
                     "JLDeck",
@@ -62,7 +62,7 @@ namespace JapaneseLookup.Anki
                             JLField.TimeLocal
                         },
                     },
-                    new[] {"JL"}
+                    new[] { "JapaneseLookup" }
                 )
             );
         }
@@ -101,7 +101,8 @@ namespace JapaneseLookup.Anki
             try
             {
                 return JsonSerializer.Deserialize<AnkiConfig>(
-                    await File.ReadAllTextAsync(Path.Join(ConfigManager.ApplicationPath, "Config/AnkiConfig.json")), new JsonSerializerOptions
+                    await File.ReadAllTextAsync(Path.Join(ConfigManager.ApplicationPath, "Config/AnkiConfig.json")),
+                    new JsonSerializerOptions
                     {
                         Converters =
                         {

@@ -35,7 +35,7 @@ namespace JapaneseLookup
         public static bool UseJMnedict;
         public static bool ForceSync;
         public static int LookupRate;
-        
+
         public static SolidColorBrush MainWindowTextColor;
 
         public static SolidColorBrush FoundSpellingColor;
@@ -59,7 +59,8 @@ namespace JapaneseLookup
         public static bool PopupFlipY;
 
         // TODO: hook these up
-        public static bool KanjiMode = true;
+        public static bool KanjiMode;
+
         //public static bool fixedWidth = false;
         //public static bool fixedHeight = false;
         public static int PopupMaxWidth;
@@ -383,14 +384,14 @@ namespace JapaneseLookup
 
                 if (!freqTest[0].FrequencyDict.TryGetValue(FrequencyList, out int _))
                 {
-                    Debug.WriteLine("Banzai! (changed freqlist)");
-
                     await Task.Run(async () =>
                     {
                         FrequencyLoader.AddToJMdict($"{FrequencyList}", await FrequencyLoader.LoadJson(Path.Join(
                             ApplicationPath,
                             freqListPath)));
                     });
+
+                    Debug.WriteLine("Banzai! (changed freqlist)");
                 }
             }
 

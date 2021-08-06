@@ -113,12 +113,12 @@ namespace JapaneseLookup.GUI
             };
             TextBlock textBlockFoundForm = null;
             TextBlock textBlockEdictID = null;
-            TextBlock textBlockNanori = null;
-            TextBlock textBlockOnReadings = null;
-            TextBlock textBlockKunReadings = null;
 
             // bottom
             TextBlock textBlockDefinitions = null;
+            TextBlock textBlockNanori = null;
+            TextBlock textBlockOnReadings = null;
+            TextBlock textBlockKunReadings = null;
             TextBlock textBlockStrokeCount = null;
             TextBlock textBlockGrade = null;
             TextBlock textBlockComposition = null;
@@ -247,7 +247,7 @@ namespace JapaneseLookup.GUI
                             Text = "On" + ": " + string.Join(", ", value),
                             Foreground = ConfigManager.ReadingsColor,
                             FontSize = ConfigManager.ReadingsFontSize,
-                            Margin = new Thickness(5, 0, 0, 0),
+                            Margin = new Thickness(2, 0, 0, 0),
                         };
                         break;
 
@@ -261,7 +261,7 @@ namespace JapaneseLookup.GUI
                             Text = "Kun" + ": " + string.Join(", ", value),
                             Foreground = ConfigManager.ReadingsColor,
                             FontSize = ConfigManager.ReadingsFontSize,
-                            Margin = new Thickness(5, 0, 0, 0),
+                            Margin = new Thickness(2, 0, 0, 0),
                         };
                         break;
 
@@ -275,7 +275,7 @@ namespace JapaneseLookup.GUI
                             Text = key + ": " + string.Join(", ", value),
                             Foreground = ConfigManager.ReadingsColor,
                             FontSize = ConfigManager.ReadingsFontSize,
-                            Margin = new Thickness(5, 0, 0, 0),
+                            Margin = new Thickness(2, 0, 0, 0),
                         };
                         break;
 
@@ -336,12 +336,6 @@ namespace JapaneseLookup.GUI
                 textBlockAlternativeSpellings,
                 textBlockProcess,
                 textBlockContext, textBlockFoundForm, textBlockEdictID, // undisplayed, for mining
-
-                // Kanjidic only
-                textBlockOnReadings,
-                textBlockKunReadings,
-                textBlockNanori,
-
                 textBlockFrequency,
             };
             foreach (TextBlock baby in babies)
@@ -370,6 +364,9 @@ namespace JapaneseLookup.GUI
 
             TextBlock[] babiesKanji =
             {
+                textBlockOnReadings,
+                textBlockKunReadings,
+                textBlockNanori,
                 textBlockGrade,
                 textBlockStrokeCount,
                 textBlockComposition,
