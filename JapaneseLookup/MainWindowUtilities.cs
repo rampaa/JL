@@ -15,8 +15,10 @@ namespace JapaneseLookup
         public const string FakeFrequency = "1000000";
         private static DateTime _lastLookupTime;
 
+        // Doesn't work with unicode characters bigger than 2 bytes. Should be fixed, somehow.
         public static readonly Regex JapaneseRegex =
-            new(@"[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]");
+                        new(@"[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]");
+        //new(@"[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf\u2E80-\u2EFF\u3200-\u32FF\u3300-\u33FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\u20000-\u2A6DF\u2A700-\u2B73F\u2B740-\u2B81F\u2B820-\u2CEAF\u2CEB0-\u2EBEF\u2F800-\u2FA1F]");
 
         // Consider checking for \t, \r, "　", " ", ., !, ?, –, —, ―, ‒, ~, ‥, ♪, ～, ♡, ♥, ☆, ★
         private static readonly List<string> JapanesePunctuation =
@@ -67,10 +69,10 @@ namespace JapaneseLookup
                 if (JapaneseParentheses.TryGetValue(sentence[0].ToString(), out string rightParenthesis))
                 {
                     if (sentence.Last().ToString() == rightParenthesis)
-                        sentence = sentence.Substring(1, sentence.Length - 1);
+                        sentence = sentence[1..^1];
 
                     else if (!sentence.Contains(rightParenthesis))
-                        sentence = sentence.Substring(1);
+                        sentence = sentence[1..];
 
                     else if (sentence.Contains(rightParenthesis))
                     {
@@ -78,7 +80,7 @@ namespace JapaneseLookup
                         int numberOfRightParentheses = sentence.Count(p => p == rightParenthesis[0]);
 
                         if (numberOfLeftParentheses == numberOfRightParentheses + 1)
-                            sentence = sentence.Substring(1);
+                            sentence = sentence[1..];
                     }
                 }
 
@@ -87,7 +89,7 @@ namespace JapaneseLookup
                     string leftParenthesis = JapaneseParentheses.First(p => p.Value == sentence.Last().ToString()).Key;
 
                     if (!sentence.Contains(leftParenthesis))
-                        sentence = sentence.Substring(0, sentence.Length - 1);
+                        sentence = sentence[0..^1];
 
                     else if (sentence.Contains(leftParenthesis))
                     {
@@ -95,7 +97,7 @@ namespace JapaneseLookup
                         int numberOfRightParentheses = sentence.Count(p => p == sentence.Last());
 
                         if (numberOfRightParentheses == numberOfLeftParentheses + 1)
-                            sentence = sentence.Substring(0, sentence.Length - 1);
+                            sentence = sentence[0..^1];
                     }
                 }
             }
@@ -114,12 +116,26 @@ namespace JapaneseLookup
 
             _lastLookupTime = preciseTimeNow;
 
+            Dictionary<string, (List<KanjiResult> KanjiResult, List<string> processList, string foundForm)>
+                kanjiResult = new();
+
+            if (ConfigManager.KanjiMode)
+            {
+                if (KanjiInfoLoader.KanjiDictionary.TryGetValue(text.UnicodeIterator().First(), out KanjiResult kResult))
+                {
+                    kanjiResult.Add(text.UnicodeIterator().First(),
+                    (new List<KanjiResult> { kResult }, new List<string>(), text.UnicodeIterator().First()));
+
+                    return KanjiResultBuilder(kanjiResult);
+                }
+
+                else return null;
+            }
+
             Dictionary<string, (List<JMdictResult> jMdictResults, List<string> processList, string foundForm)>
                 wordResults = new();
             Dictionary<string, (List<JMnedictResult> jMnedictResults, List<string> processList, string foundForm)>
                 nameResults = new();
-            Dictionary<string, (List<KanjiResult> KanjiResult, List<string> processList, string foundForm)>
-                kanjiResult = new();
 
             int succAttempt = 0;
             for (int i = 0; i < text.Length; i++)
@@ -186,11 +202,10 @@ namespace JapaneseLookup
 
             if (!wordResults.Any() && !nameResults.Any())
             {
-                KanjiInfoLoader.KanjiDictionary.TryGetValue(text[0].ToString(), out KanjiResult kResult);
-                if (kResult != null)
+                if (KanjiInfoLoader.KanjiDictionary.TryGetValue(text.UnicodeIterator().First(), out KanjiResult kResult))
                 {
-                    kanjiResult.Add(text[0].ToString(),
-                        (new List<KanjiResult> { kResult }, new List<string>(), text[0].ToString()));
+                    kanjiResult.Add(text.UnicodeIterator().First(),
+                    (new List<KanjiResult> { kResult }, new List<string>(), text.UnicodeIterator().First()));
                 }
             }
 
@@ -455,5 +470,15 @@ namespace JapaneseLookup
 
             return defResult;
         }
+        public static IEnumerable<string> UnicodeIterator(this string s)
+        {
+            for (int i = 0; i < s.Length; ++i)
+            {
+                yield return char.ConvertFromUtf32(char.ConvertToUtf32(s, i));
+                if (char.IsHighSurrogate(s, i))
+                    i++;
+            }
+        }
+
     }
 }

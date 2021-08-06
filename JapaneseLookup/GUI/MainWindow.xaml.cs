@@ -260,6 +260,11 @@ namespace JapaneseLookup.GUI
                     Keyboard.ClearFocus();
                     break;
                 }
+                case Key.K:
+                    {
+                        ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
+                        break;
+                    }
             }
         }
 

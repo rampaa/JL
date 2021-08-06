@@ -677,6 +677,12 @@ namespace JapaneseLookup.GUI
 
                     break;
                 }
+
+                case Key.K:
+                    {
+                        ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
+                        break;
+                    }
             }
         }
 

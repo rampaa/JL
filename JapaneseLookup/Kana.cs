@@ -8,6 +8,8 @@ namespace JapaneseLookup
 {
     public static class Kana
     {
+        //Maybe use a Dictionary<string, string>, because some characters don't fit into a char (e.g. ゐ゙).
+
         private static readonly Dictionary<char, char> HiraganaToKatakanaDict = new()
         {
             { 'あ', 'ア' }, { 'い', 'イ' }, { 'う', 'ウ' }, { 'え', 'エ' }, { 'お', 'オ' },

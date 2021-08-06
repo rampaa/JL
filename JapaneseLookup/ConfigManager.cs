@@ -59,6 +59,9 @@ namespace JapaneseLookup
         public static bool PopupFlipY;
 
         // TODO: hook these up
+        public static bool KanjiMode = true;
+        //public static bool fixedWidth = false;
+        //public static bool fixedHeight = false;
         public static int PopupMaxWidth;
         public static int PopupMaxHeight;
         public static SolidColorBrush MainWindowBacklogTextColor = Brushes.Bisque;
@@ -150,6 +153,7 @@ namespace JapaneseLookup
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
             popupWindow.Background.Opacity = int.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")) / 100;
 
+            //Test without async/await.
             Task.Run(async () => { await LoadDictionaries(); });
         }
 
