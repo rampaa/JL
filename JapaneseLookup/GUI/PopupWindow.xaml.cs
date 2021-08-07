@@ -177,7 +177,9 @@ namespace JapaneseLookup.GUI
                         break;
 
                     case LookupResult.Readings:
-                        textBlockReadings = MakeTextBlockReadings(result);
+                        result.TryGetValue(LookupResult.ROrthographyInfoList, out var rOrthographyInfoList);
+
+                        textBlockReadings = MakeTextBlockReadings(result[LookupResult.Readings], rOrthographyInfoList);
                         break;
 
                     case LookupResult.Definitions:
@@ -202,7 +204,9 @@ namespace JapaneseLookup.GUI
                         break;
 
                     case LookupResult.AlternativeSpellings:
-                        textBlockAlternativeSpellings = MakeTextBlockAlternativeSpellings(result);
+                        textBlockAlternativeSpellings =
+                            MakeTextBlockAlternativeSpellings(result[LookupResult.AlternativeSpellings],
+                                result[LookupResult.AOrthographyInfoList]);
                         break;
 
                     case LookupResult.Process:
@@ -387,12 +391,8 @@ namespace JapaneseLookup.GUI
             return innerStackPanel;
         }
 
-        private static TextBlock MakeTextBlockReadings(Dictionary<LookupResult, List<string>> result)
+        private static TextBlock MakeTextBlockReadings(List<string> readings, List<string> rOrthographyInfoList)
         {
-            result.TryGetValue(LookupResult.ROrthographyInfoList, out var rOrthographyInfoList);
-
-            var readings = result[LookupResult.Readings];
-
             var textBlockReadings = new TextBlock
             {
                 Name = LookupResult.Readings.ToString(),
@@ -440,10 +440,9 @@ namespace JapaneseLookup.GUI
             return textBlockReadings;
         }
 
-        private static TextBlock MakeTextBlockAlternativeSpellings(Dictionary<LookupResult, List<string>> result)
+        private static TextBlock MakeTextBlockAlternativeSpellings(List<string> alternativeSpellings,
+            List<string> aOrthographyInfoList)
         {
-            var alternativeSpellings = result[LookupResult.AlternativeSpellings];
-
             var textBlockAlternativeSpellings = new TextBlock
             {
                 Name = LookupResult.AlternativeSpellings.ToString(),
@@ -467,9 +466,9 @@ namespace JapaneseLookup.GUI
                 };
                 textBlockAlternativeSpellings.Inlines.Add(runAlt);
 
-                if (index < alternativeSpellings.Count)
+                if (index < aOrthographyInfoList.Count)
                 {
-                    var runAltOrtho = new Run("(" + alternativeSpellings[index] + ")")
+                    var runAltOrtho = new Run("(" + aOrthographyInfoList[index] + ")")
                     {
                         Foreground = ConfigManager.AOrthographyInfoColor,
                         FontSize = ConfigManager.AOrthographyInfoFontSize,
@@ -676,10 +675,10 @@ namespace JapaneseLookup.GUI
                 }
 
                 case Key.K:
-                    {
-                        ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
-                        break;
-                    }
+                {
+                    ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
+                    break;
+                }
             }
         }
 
