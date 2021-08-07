@@ -204,9 +204,11 @@ namespace JapaneseLookup.GUI
                         break;
 
                     case LookupResult.AlternativeSpellings:
+                        result.TryGetValue(LookupResult.AOrthographyInfoList, out var aOrthographyInfoList);
+
                         textBlockAlternativeSpellings =
                             MakeTextBlockAlternativeSpellings(result[LookupResult.AlternativeSpellings],
-                                result[LookupResult.AOrthographyInfoList]);
+                                aOrthographyInfoList);
                         break;
 
                     case LookupResult.Process:
