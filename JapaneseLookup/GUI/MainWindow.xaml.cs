@@ -269,6 +269,12 @@ namespace JapaneseLookup.GUI
                         ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
                         break;
                     }
+
+                case Key.N:
+                    {
+                        AddNameWindow.Instance.ShowDialog();
+                        break;
+                    }
             }
         }
 
