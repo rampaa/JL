@@ -152,7 +152,7 @@ namespace JapaneseLookup
             var popupWindow = PopupWindow.Instance;
             popupWindow.Background = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
-            popupWindow.Background.Opacity = int.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")) / 100;
+            popupWindow.Background.Opacity = double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")) / 100;
 
             //Test without async/await.
             Task.Run(async () => { await LoadDictionaries(); });
