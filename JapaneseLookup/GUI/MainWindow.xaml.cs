@@ -112,8 +112,8 @@ namespace JapaneseLookup.GUI
                         // }
                         // else
                         // {
-                            PopupWindow.Instance.StackPanel.Children.Add(
-                                PopupWindow.MakeResultStackPanel(sentence, result, i));
+                        PopupWindow.Instance.StackPanel.Children.Add(
+                            PopupWindow.MakeResultStackPanel(sentence, result, i));
                         // }
 
                         if (i != results.Count - 1)
@@ -253,17 +253,17 @@ namespace JapaneseLookup.GUI
             switch (e.Key)
             {
                 case Key.L:
-                {
-                    ConfigManager.LoadPreferences(PreferencesWindow.Instance);
-                    PreferencesWindow.Instance.ShowDialog();
-                    break;
-                }
+                    {
+                        ConfigManager.LoadPreferences(PreferencesWindow.Instance);
+                        PreferencesWindow.Instance.ShowDialog();
+                        break;
+                    }
                 case Key.T:
-                {
-                    MWindow.Background.Opacity = 0;
-                    Keyboard.ClearFocus();
-                    break;
-                }
+                    {
+                        MWindow.Background.Opacity = 0;
+                        Keyboard.ClearFocus();
+                        break;
+                    }
                 case Key.K:
                     {
                         ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
@@ -275,6 +275,12 @@ namespace JapaneseLookup.GUI
                         AddNameWindow.Instance.ShowDialog();
                         break;
                     }
+
+                case Key.W:
+                    {
+                        AddWordWindow.Instance.ShowDialog();
+                        break;
+                    }
             }
         }
 
@@ -283,32 +289,32 @@ namespace JapaneseLookup.GUI
             switch (e.Key)
             {
                 case Key.Left:
-                {
-                    if (_currentTextIndex != 0)
                     {
-                        _currentTextIndex--;
-                        MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
-                    }
+                        if (_currentTextIndex != 0)
+                        {
+                            _currentTextIndex--;
+                            MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
+                        }
 
-                    MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
-                    break;
-                }
+                        MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
+                        break;
+                    }
                 case Key.Right:
-                {
-                    if (_currentTextIndex < MainWindowUtilities.Backlog.Count - 1)
                     {
-                        _currentTextIndex++;
-                        MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
-                    }
+                        if (_currentTextIndex < MainWindowUtilities.Backlog.Count - 1)
+                        {
+                            _currentTextIndex++;
+                            MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
+                        }
 
-                    if (_currentTextIndex == MainWindowUtilities.Backlog.Count - 1)
-                    {
-                        MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
-                    }
+                        if (_currentTextIndex == MainWindowUtilities.Backlog.Count - 1)
+                        {
+                            MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+                        }
 
-                    MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
-                    break;
-                }
+                        MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
+                        break;
+                    }
             }
         }
 

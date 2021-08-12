@@ -6,22 +6,26 @@
         xmlns:local="clr-namespace:JapaneseLookup.GUI"
         xmlns:hc="https://handyorg.github.io/handycontrol" x:Class="JapaneseLookup.GUI.AddNameWindow"
         mc:Ignorable="d"
-        Title="Add Name" Height="350" Width="400" Topmost="True" SizeToContent="Height" ResizeMode="NoResize" MaxHeight="900" WindowStyle="SingleBorderWindow">
-    <Grid Background="Black">
+        Title="Add Name" Height="350" Width="400" Topmost="True" SizeToContent="Height" ResizeMode="NoResize" MaxHeight="600" WindowStyle="SingleBorderWindow">
+
+    <ScrollViewer>
+        <Grid Background="Black">
+
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,0,70">
-            <Label Content="Spelling" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+            <TextBlock HorizontalAlignment="Left" Margin="0,0,0,10" Text="Spelling" Foreground="White"/>
             <TextBox TextWrapping="Wrap" HorizontalAlignment="Stretch" Margin="0,0,0,40" Width="200"/>
-            <Label Content="Reading" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+            <TextBlock Text="Reading" Foreground="White" HorizontalAlignment="Left" Margin="0,0,0,10"/>
             <TextBox TextWrapping="Wrap" HorizontalAlignment="Stretch" Width="200"/>
         </StackPanel>
         <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,20,70">
-            <Label Content="Name Type" HorizontalAlignment="Stretch" Margin="0,0,0,10"/>
+            <TextBlock Text="Name Type" Foreground="White" HorizontalAlignment="Stretch" Margin="0,0,0,10"/>
             <RadioButton Content="Male" HorizontalAlignment="Stretch" FontSize="16" Height="40"/>
             <RadioButton Content="Female" HorizontalAlignment="Stretch" FontSize="16" Height="40"/>
             <RadioButton Content="Surname" HorizontalAlignment="Stretch" FontSize="16" Height="40"/>
             <RadioButton Content="Other" HorizontalAlignment="Stretch" FontSize="16" Height="40"/>
         </StackPanel>
-        <Button Content="Save" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="120,0,0,20" Width="60" Height="30"/>
-        <Button Content="Cancel" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="60" Height="30" Margin="0,0,120,20"/>
+        <Button Content="Save" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="120,0,0,20" Width="60" Height="35" FontSize="16"/>
+        <Button Content="Cancel" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,120,20" FontSize="16" Height="35"/>
     </Grid>
+    </ScrollViewer>
 </Window>

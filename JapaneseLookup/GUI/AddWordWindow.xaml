@@ -1,0 +1,23 @@
+﻿<Window x:Class="JapaneseLookup.GUI.AddWordWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:JapaneseLookup.GUI"
+        mc:Ignorable="d"
+        Title="Add Word" Height="450" ResizeMode="NoResize" Width="400" SizeToContent="Height" MaxHeight="600" Topmost="True">
+    <ScrollViewer>
+        <Grid Background="Black">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="20,20,20,20">
+                <TextBlock Foreground="White" Text="Spellings" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                <TextBox TextWrapping="Wrap" Width="300" Margin="0,0,0,40"/>
+                <TextBlock Foreground="White" Text="Readings" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                <TextBox TextWrapping="Wrap" Width="300" Margin="0,0,0,40"/>
+                <TextBlock Foreground="White" Text="Definitions" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                <TextBox TextWrapping="Wrap" Width="300" Margin="0,0,0,50"/>
+            </StackPanel>
+            <Button Content="Save" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="120,0,0,20" Width="70" FontSize="16" Height="35"/>
+        <Button Content="Cancel" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,120,20" FontSize="16" Width="70" Height="35"/>
+    </Grid>
+    </ScrollViewer>
+</Window>

@@ -302,9 +302,9 @@ namespace JapaneseLookup.GUI
                         gradeString = gradeInt switch
                         {
                             0 => "Hyougai",
-                            <=6 => $"Kyouiku ({gradeInt})",
+                            <= 6 => $"Kyouiku ({gradeInt})",
                             8 => $"Jouyou ({gradeInt})",
-                            <=10 => $"Jinmeiyou ({gradeInt})",
+                            <= 10 => $"Jinmeiyou ({gradeInt})",
                             _ => gradeString
                         };
 
@@ -495,8 +495,8 @@ namespace JapaneseLookup.GUI
 
         private static void FoundSpelling_MouseEnter(object sender, MouseEventArgs e)
         {
-            var textBlock = (TextBlock) sender;
-            _playAudioIndex = (int) textBlock.Tag;
+            var textBlock = (TextBlock)sender;
+            _playAudioIndex = (int)textBlock.Tag;
         }
 
         private static void FoundSpelling_MouseLeave(object sender, MouseEventArgs e)
@@ -519,8 +519,8 @@ namespace JapaneseLookup.GUI
             string alternativeSpellings = null;
             string frequency = null;
 
-            var textBlock = (TextBlock) sender;
-            var top = (WrapPanel) textBlock.Parent;
+            var textBlock = (TextBlock)sender;
+            var top = (WrapPanel)textBlock.Parent;
             foreach (TextBlock child in top.Children)
             {
                 if (child.Name == "context")
@@ -535,7 +535,7 @@ namespace JapaneseLookup.GUI
                         foundSpelling = child.Text;
                         break;
                     case LookupResult.Readings:
-                        readings = (string) child.Tag;
+                        readings = (string)child.Tag;
                         break;
                     // case "context":
                     //     context = child.Text;
@@ -547,7 +547,7 @@ namespace JapaneseLookup.GUI
                         edictID = child.Text;
                         break;
                     case LookupResult.AlternativeSpellings:
-                        alternativeSpellings = (string) child.Tag;
+                        alternativeSpellings = (string)child.Tag;
                         break;
                     case LookupResult.Frequency:
                         frequency = child.Text;
@@ -567,8 +567,8 @@ namespace JapaneseLookup.GUI
                 }
             }
 
-            var innerStackPanel = (StackPanel) top.Parent;
-            var bottom = (StackPanel) innerStackPanel.Children[1];
+            var innerStackPanel = (StackPanel)top.Parent;
+            var bottom = (StackPanel)innerStackPanel.Children[1];
             foreach (TextBlock child in bottom.Children)
             {
                 Enum.TryParse(child.Name, out LookupResult result);
@@ -627,60 +627,65 @@ namespace JapaneseLookup.GUI
             switch (e.Key)
             {
                 case Key.M:
-                {
-                    MainWindow.MiningMode = true;
-                    PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-                    // TODO: Tell the user that they are in mining mode
-                    Instance.Activate();
-                    Instance.Focus();
+                    {
+                        MainWindow.MiningMode = true;
+                        PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+                        // TODO: Tell the user that they are in mining mode
+                        Instance.Activate();
+                        Instance.Focus();
 
-                    break;
-                }
+                        break;
+                    }
 
                 case Key.P:
-                {
-                    string foundSpelling = null;
-                    string reading = null;
-
-                    var innerStackPanel = (StackPanel) StackPanel.Children[_playAudioIndex];
-                    var top = (WrapPanel) innerStackPanel.Children[0];
-
-                    foreach (TextBlock child in top.Children)
                     {
-                        Enum.TryParse(child.Name, out LookupResult result);
-                        switch (result)
+                        string foundSpelling = null;
+                        string reading = null;
+
+                        var innerStackPanel = (StackPanel)StackPanel.Children[_playAudioIndex];
+                        var top = (WrapPanel)innerStackPanel.Children[0];
+
+                        foreach (TextBlock child in top.Children)
                         {
-                            case LookupResult.FoundSpelling:
-                                foundSpelling = child.Text;
-                                break;
-                            case LookupResult.Readings:
-                                reading = ((string) child.Tag).Split(",")[0];
-                                break;
+                            Enum.TryParse(child.Name, out LookupResult result);
+                            switch (result)
+                            {
+                                case LookupResult.FoundSpelling:
+                                    foundSpelling = child.Text;
+                                    break;
+                                case LookupResult.Readings:
+                                    reading = ((string)child.Tag).Split(",")[0];
+                                    break;
+                            }
                         }
+
+                        PlayAudio(foundSpelling, reading);
+
+                        break;
                     }
-
-                    PlayAudio(foundSpelling, reading);
-
-                    break;
-                }
 
                 case Key.Escape:
-                {
-                    if (MainWindow.MiningMode)
                     {
-                        MainWindow.MiningMode = false;
-                        PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
-                        Hide();
+                        if (MainWindow.MiningMode)
+                        {
+                            MainWindow.MiningMode = false;
+                            PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                            Hide();
+                        }
+
+                        break;
                     }
 
-                    break;
-                }
-
                 case Key.K:
-                {
-                    ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
-                    break;
-                }
+                    {
+                        ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
+                        break;
+                    }
+                case Key.W:
+                    {
+                        AddWordWindow.Instance.ShowDialog();
+                        break;
+                    }
             }
         }
 
