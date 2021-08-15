@@ -11,7 +11,7 @@ namespace JapaneseLookup.Anki
         // TODO: Check if audio was grabbed and tell the user if it was not
         public static async Task Mine(string foundSpelling, string readings, string definitions, string context,
             string foundForm, string edictID, string timeLocal, string alternativeSpellings,
-            string frequency)
+            string frequency, string strokeCount, string grade, string composition)
         {
             try
             {
@@ -33,7 +33,10 @@ namespace JapaneseLookup.Anki
                         edictID,
                         timeLocal,
                         alternativeSpellings,
-                        frequency
+                        frequency,
+                        strokeCount,
+                        grade,
+                        composition
                     );
 
                 Dictionary<string, object> options = null;
@@ -90,10 +93,11 @@ namespace JapaneseLookup.Anki
 
         private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> fields,
             string foundSpelling, string readings, string definitions, string context,
-            string foundForm, string edictID, string timeLocal, string alternativeSpellings, string frequency)
+            string foundForm, string edictID, string timeLocal, string alternativeSpellings, string frequency,
+            string strokeCount, string grade, string composition)
         {
             var dict = new Dictionary<string, object>();
-            foreach (var (key, value) in fields)
+            foreach ((string key, JLField value) in fields)
             {
                 switch (value)
                 {
@@ -128,6 +132,15 @@ namespace JapaneseLookup.Anki
                         break;
                     case JLField.Frequency:
                         dict.Add(key, frequency);
+                        break;
+                    case JLField.StrokeCount:
+                        dict.Add(key, strokeCount);
+                        break;
+                    case JLField.Grade:
+                        dict.Add(key, grade);
+                        break;
+                    case JLField.Composition:
+                        dict.Add(key, composition);
                         break;
                     default:
                         return null;

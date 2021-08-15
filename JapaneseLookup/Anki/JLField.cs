@@ -13,6 +13,9 @@
         TimeLocal,
         AlternativeSpellings,
         Frequency,
+        StrokeCount,
+        Grade,
+        Composition,
         // Source
     }
 }

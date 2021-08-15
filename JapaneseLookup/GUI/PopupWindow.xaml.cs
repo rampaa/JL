@@ -518,6 +518,9 @@ namespace JapaneseLookup.GUI
             var timeLocal = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
             string alternativeSpellings = null;
             string frequency = null;
+            string strokeCount = null;
+            string grade = null;
+            string composition = null;
 
             var textBlock = (TextBlock)sender;
             var top = (WrapPanel)textBlock.Parent;
@@ -578,13 +581,13 @@ namespace JapaneseLookup.GUI
                         definitions += child.Text;
                         break;
                     case LookupResult.StrokeCount:
-                        // TODO
+                        strokeCount += child.Text;
                         break;
                     case LookupResult.Grade:
-                        // TODO
+                        grade += child.Text;
                         break;
                     case LookupResult.Composition:
-                        // TODO
+                        composition += child.Text;
                         break;
                 }
             }
@@ -598,7 +601,10 @@ namespace JapaneseLookup.GUI
                 edictID,
                 timeLocal,
                 alternativeSpellings,
-                frequency
+                frequency,
+                strokeCount,
+                grade,
+                composition
             );
         }
 
