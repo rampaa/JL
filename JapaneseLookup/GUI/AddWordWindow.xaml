@@ -10,14 +10,14 @@
         <Grid Background="Black">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="20,20,20,20">
                 <TextBlock Foreground="White" Text="Spellings" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                <TextBox TextWrapping="Wrap" Width="300" Margin="0,0,0,40"/>
+                <TextBox x:Name="SpellingsTextBox" TextWrapping="Wrap" Width="300" Margin="0,0,0,40"/>
                 <TextBlock Foreground="White" Text="Readings" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                <TextBox TextWrapping="Wrap" Width="300" Margin="0,0,0,40"/>
+                <TextBox x:Name="ReadingsTextBox" TextWrapping="Wrap" Width="300" Margin="0,0,0,40"/>
                 <TextBlock Foreground="White" Text="Definitions" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                <TextBox TextWrapping="Wrap" Width="300" Margin="0,0,0,50"/>
+                <TextBox x:Name="DefinitionsTextBox" TextWrapping="Wrap" Width="300" Margin="0,0,0,50"/>
             </StackPanel>
-            <Button Content="Save" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="120,0,0,20" Width="70" FontSize="16" Height="35"/>
-        <Button Content="Cancel" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,120,20" FontSize="16" Width="70" Height="35"/>
+            <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="120,0,0,20" Width="70" FontSize="16" Height="35" Click="SaveButton_Click"/>
+        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,120,20" FontSize="16" Width="70" Height="35" Click="CancelButton_Click"/>
     </Grid>
     </ScrollViewer>
 </Window>

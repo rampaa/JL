@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace JapaneseLookup
 {
-    class UserDefinedWordEntry
+    class CustomWordEntry
     {
         public string PrimarySpelling { get; set; }
         public List<string> AlternativeSpellings { get; set; }
         public List<string> Readings { get; set; }
         public List<List<string>> Definitions { get; set; }
-        public UserDefinedWordEntry()
+        public CustomWordEntry()
         {
             PrimarySpelling = null;
             AlternativeSpellings = new List<string>();
