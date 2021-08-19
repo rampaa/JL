@@ -119,7 +119,7 @@ namespace JapaneseLookup
 
             if (ConfigManager.KanjiMode)
             {
-                if (KanjiInfoLoader.KanjiDictionary.TryGetValue(text.UnicodeIterator().First(), out KanjiResult kResult))
+                if (KanjiInfoLoader.KanjiDictionary.TryGetValue(text.UnicodeIterator().DefaultIfEmpty(string.Empty).First(), out KanjiResult kResult))
                 {
                     kanjiResult.Add(text.UnicodeIterator().First(),
                     (new List<KanjiResult> { kResult }, new List<string>(), text.UnicodeIterator().First()));
@@ -200,7 +200,7 @@ namespace JapaneseLookup
 
             if (!wordResults.Any() && !nameResults.Any())
             {
-                if (KanjiInfoLoader.KanjiDictionary.TryGetValue(text.UnicodeIterator().First(), out KanjiResult kResult))
+                if (KanjiInfoLoader.KanjiDictionary.TryGetValue(text.UnicodeIterator().DefaultIfEmpty(string.Empty).First(), out KanjiResult kResult))
                 {
                     kanjiResult.Add(text.UnicodeIterator().First(),
                     (new List<KanjiResult> { kResult }, new List<string>(), text.UnicodeIterator().First()));
