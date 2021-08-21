@@ -158,9 +158,6 @@ namespace JapaneseLookup.GUI
                     case LookupResult.Nanori:
                         readings += child.Text + " ";
                         break;
-
-                    default:
-                        throw new ArgumentOutOfRangeException();
                 }
             }
 
