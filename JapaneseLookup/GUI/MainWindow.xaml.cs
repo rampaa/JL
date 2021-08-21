@@ -113,7 +113,7 @@ namespace JapaneseLookup.GUI
                         // else
                         // {
                         PopupWindow.Instance.StackPanel.Children.Add(
-                            PopupWindow.MakeResultStackPanel(sentence, result, i));
+                            PopupWindowUtilities.MakeResultStackPanel(sentence, result, i));
                         // }
 
                         if (i != results.Count - 1)
@@ -253,39 +253,39 @@ namespace JapaneseLookup.GUI
             switch (e.Key)
             {
                 case Key.L:
-                    {
-                        MainWindowUtilities.ShowPreferencesWindow();
-                        break;
-                    }
+                {
+                    MainWindowUtilities.ShowPreferencesWindow();
+                    break;
+                }
                 case Key.T:
-                    {
-                        MWindow.Background.Opacity = 0;
-                        Keyboard.ClearFocus();
-                        break;
-                    }
+                {
+                    MWindow.Background.Opacity = 0;
+                    Keyboard.ClearFocus();
+                    break;
+                }
                 case Key.K:
-                    {
-                        ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
-                        break;
-                    }
+                {
+                    ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
+                    break;
+                }
 
                 case Key.N:
-                    {
-                        MainWindowUtilities.ShowAddNameWindow();
-                        break;
-                    }
+                {
+                    MainWindowUtilities.ShowAddNameWindow();
+                    break;
+                }
 
                 case Key.W:
-                    {
-                        MainWindowUtilities.ShowAddWordWindow();
-                        break;
-                    }
+                {
+                    MainWindowUtilities.ShowAddWordWindow();
+                    break;
+                }
 
                 case Key.S:
-                    {
-                        MainWindowUtilities.SearchWithBrowser();
-                        break;
-                    }
+                {
+                    MainWindowUtilities.SearchWithBrowser();
+                    break;
+                }
             }
         }
 
@@ -314,32 +314,32 @@ namespace JapaneseLookup.GUI
             switch (e.Key)
             {
                 case Key.Left:
+                {
+                    if (_currentTextIndex != 0)
                     {
-                        if (_currentTextIndex != 0)
-                        {
-                            _currentTextIndex--;
-                            MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
-                        }
-
-                        MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
-                        break;
+                        _currentTextIndex--;
+                        MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
                     }
+
+                    MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
+                    break;
+                }
                 case Key.Right:
+                {
+                    if (_currentTextIndex < MainWindowUtilities.Backlog.Count - 1)
                     {
-                        if (_currentTextIndex < MainWindowUtilities.Backlog.Count - 1)
-                        {
-                            _currentTextIndex++;
-                            MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
-                        }
-
-                        if (_currentTextIndex == MainWindowUtilities.Backlog.Count - 1)
-                        {
-                            MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
-                        }
-
-                        MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
-                        break;
+                        _currentTextIndex++;
+                        MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
                     }
+
+                    if (_currentTextIndex == MainWindowUtilities.Backlog.Count - 1)
+                    {
+                        MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+                    }
+
+                    MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
+                    break;
+                }
             }
         }
 
