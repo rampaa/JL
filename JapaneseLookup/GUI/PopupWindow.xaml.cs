@@ -689,13 +689,34 @@ namespace JapaneseLookup.GUI
                     ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
                     break;
                 }
+
+                case Key.L:
+                    {
+                        MainWindowUtilities.ShowPreferencesWindow();
+                        break;
+                    }
+
+                case Key.N:
+                    {
+                        MainWindowUtilities.ShowAddNameWindow();
+                        break;
+                    }
+
                 case Key.W:
                 {
-                    AddWordWindow.Instance.ShowDialog();
+                    MainWindowUtilities.ShowAddWordWindow();
                     break;
                 }
+
+                case Key.S:
+                    {
+                        MainWindowUtilities.SearchWithBrowser();
+                        break;
+                    }
             }
         }
+
+
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

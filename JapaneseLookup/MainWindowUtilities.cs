@@ -1,11 +1,13 @@
 ﻿using JapaneseLookup.Deconjugation;
 using JapaneseLookup.EDICT;
+using JapaneseLookup.GUI;
 using JapaneseLookup.KANJIDIC;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows;
 
 namespace JapaneseLookup
 {
@@ -477,6 +479,30 @@ namespace JapaneseLookup
                     i++;
             }
         }
-
+        public static void ShowAddNameWindow()
+        {
+            var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
+            var addNameWindowInstance = AddNameWindow.Instance;
+            addNameWindowInstance.SpellingTextBox.Text = mainWindow.MainTextBox.SelectedText;
+            addNameWindowInstance.ShowDialog();
+        }
+        public static void ShowAddWordWindow()
+        {
+            var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
+            var addWordWindowInstance = AddWordWindow.Instance;
+            addWordWindowInstance.SpellingsTextBox.Text = mainWindow.MainTextBox.SelectedText;
+            addWordWindowInstance.ShowDialog();
+        }
+        public static void ShowPreferencesWindow()
+        {
+            ConfigManager.LoadPreferences(PreferencesWindow.Instance);
+            PreferencesWindow.Instance.ShowDialog();
+        }
+        public static void SearchWithBrowser()
+        {
+            var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
+            if(mainWindow.MainTextBox.SelectedText.Length > 0)
+                Process.Start(new ProcessStartInfo("cmd", $"/c start https://www.google.com/search?q={mainWindow.MainTextBox.SelectedText}^&hl=ja") { CreateNoWindow = true });
+        }
     }
 }

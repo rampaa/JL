@@ -254,8 +254,7 @@ namespace JapaneseLookup.GUI
             {
                 case Key.L:
                     {
-                        ConfigManager.LoadPreferences(PreferencesWindow.Instance);
-                        PreferencesWindow.Instance.ShowDialog();
+                        MainWindowUtilities.ShowPreferencesWindow();
                         break;
                     }
                 case Key.T:
@@ -272,16 +271,42 @@ namespace JapaneseLookup.GUI
 
                 case Key.N:
                     {
-                        AddNameWindow.Instance.ShowDialog();
+                        MainWindowUtilities.ShowAddNameWindow();
                         break;
                     }
 
                 case Key.W:
                     {
-                        AddWordWindow.Instance.ShowDialog();
+                        MainWindowUtilities.ShowAddWordWindow();
+                        break;
+                    }
+
+                case Key.S:
+                    {
+                        MainWindowUtilities.SearchWithBrowser();
                         break;
                     }
             }
+        }
+
+        private void AddName(object sender, RoutedEventArgs e)
+        {
+            MainWindowUtilities.ShowAddNameWindow();
+        }
+
+        private void AddWord(object sender, RoutedEventArgs e)
+        {
+            MainWindowUtilities.ShowAddWordWindow();
+        }
+
+        private void ShowPreferences(object sender, RoutedEventArgs e)
+        {
+            MainWindowUtilities.ShowPreferencesWindow();
+        }
+
+        private void SearchWithBrowser(object sender, RoutedEventArgs e)
+        {
+            MainWindowUtilities.SearchWithBrowser();
         }
 
         private void MWindow_PreviewKeyDown(object sender, KeyEventArgs e)

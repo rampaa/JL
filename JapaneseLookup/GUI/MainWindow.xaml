@@ -26,7 +26,27 @@
                  Foreground="White" SelectionTextBrush="Black"
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"
                  VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
-                 MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow" FlowDirection="LeftToRight" />
+                 MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow" FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled ="True">
+
+            <TextBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem
+                        Header="Add name"
+                        Click= "AddName"/>
+                    <MenuItem
+                        Header="Add word"
+                        Click= "AddWord"/>
+                    <MenuItem
+                        Header="Search"
+                        Click= "SearchWithBrowser"/>
+                    <MenuItem
+                        Header="Preferences"
+                        Click= "ShowPreferences"/>
+                </ContextMenu>
+            </TextBox.ContextMenu>
+        </TextBox>
+
+
         <Slider x:Name="OpacitySlider" HorizontalAlignment="Left" Margin="-42,70,0,0" VerticalAlignment="Top"
                 Width="120" RenderTransformOrigin="0.5,0.5" Maximum="100" Value="30" Visibility="Collapsed"
                 Minimum="1" ToolTip="{Binding Value, ElementName=OpacitySlider}"
