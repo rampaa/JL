@@ -30,7 +30,7 @@ namespace JapaneseLookupTests
             int position = 0;
 
             // Act
-            var result = MainWindowUtilities.FindSentence(
+            var result = MainWindowUtilities.FindWordBoundary(
                 text,
                 position);
 
@@ -49,7 +49,7 @@ namespace JapaneseLookupTests
             int position = 97;
 
             // Act
-            var result = MainWindowUtilities.FindSentence(
+            var result = MainWindowUtilities.FindWordBoundary(
                 text,
                 position);
 
@@ -68,7 +68,7 @@ namespace JapaneseLookupTests
             int position = 0;
 
             // Act
-            var result = MainWindowUtilities.FindSentence(
+            var result = MainWindowUtilities.FindWordBoundary(
                 text,
                 position);
 
@@ -87,7 +87,7 @@ namespace JapaneseLookupTests
             int position = 0;
 
             // Act
-            var result = MainWindowUtilities.FindSentence(
+            var result = MainWindowUtilities.FindWordBoundary(
                 text,
                 position);
 
@@ -106,7 +106,7 @@ namespace JapaneseLookupTests
             int position = 15;
 
             // Act
-            var result = MainWindowUtilities.FindSentence(
+            var result = MainWindowUtilities.FindWordBoundary(
                 text,
                 position);
 
@@ -125,7 +125,7 @@ namespace JapaneseLookupTests
             int position = 0;
 
             // Act
-            var result = MainWindowUtilities.FindSentence(
+            var result = MainWindowUtilities.FindWordBoundary(
                 text,
                 position);
 
@@ -144,7 +144,7 @@ namespace JapaneseLookupTests
             int position = 0;
 
             // Act
-            var result = MainWindowUtilities.FindSentence(
+            var result = MainWindowUtilities.FindWordBoundary(
                 text,
                 position);
 
@@ -163,7 +163,7 @@ namespace JapaneseLookupTests
             int position = 0;
 
             // Act
-            var result = MainWindowUtilities.FindSentence(
+            var result = MainWindowUtilities.FindWordBoundary(
                 text,
                 position);
 
@@ -182,7 +182,7 @@ namespace JapaneseLookupTests
             int position = 0;
 
             // Act
-            var result = MainWindowUtilities.FindSentence(
+            var result = MainWindowUtilities.FindWordBoundary(
                 text,
                 position);
 
@@ -201,7 +201,7 @@ namespace JapaneseLookupTests
             int position = 8;
 
             // Act
-            var result = MainWindowUtilities.FindSentence(
+            var result = MainWindowUtilities.FindWordBoundary(
                 text,
                 position);
 
@@ -220,7 +220,7 @@ namespace JapaneseLookupTests
             int position = 72;
 
             // Act
-            var result = MainWindowUtilities.FindSentence(
+            var result = MainWindowUtilities.FindWordBoundary(
                 text,
                 position);
 
@@ -239,7 +239,7 @@ namespace JapaneseLookupTests
             int position = 10;
 
             // Act
-            var result = MainWindowUtilities.FindSentence(
+            var result = MainWindowUtilities.FindWordBoundary(
                 text,
                 position);
 

@@ -78,12 +78,14 @@ namespace JapaneseLookup.GUI
                 if (charPosition > 0 && char.IsHighSurrogate(MainTextBox.Text[charPosition - 1]))
                     --charPosition;
 
-                (string sentence, int endPosition) = MainWindowUtilities.FindSentence(MainTextBox.Text, charPosition);
+                (string sentence, int endPosition) = MainWindowUtilities.FindWordBoundary(MainTextBox.Text, charPosition);
                 string text;
                 if (endPosition - charPosition <= ConfigManager.MaxSearchLength)
                     text = MainTextBox.Text[charPosition..endPosition];
                 else
                     text = MainTextBox.Text[charPosition..(charPosition + ConfigManager.MaxSearchLength)];
+
+                Debug.WriteLine(text);
 
                 if (text == _lastWord) return;
                 _lastWord = text;
