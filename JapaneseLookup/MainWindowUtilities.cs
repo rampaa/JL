@@ -59,16 +59,36 @@ namespace JapaneseLookup
             ++startPosition;
 
             if (endPosition == -1)
-                endPosition = text.Length - 1;
+                endPosition = text.Length;
 
-            // Consider trimming (, )
-            string sentence = text.Substring(startPosition, endPosition - startPosition + 1)
-                .Trim('\n', '\t', '\r', ' ', '　');
+            string sentence;
 
-            if (sentence.Length > 0)
+            if (startPosition < endPosition)
             {
-                if (JapaneseParentheses.TryGetValue(sentence[0].ToString(), out string rightParenthesis))
+                // Consider trimming (, )
+                sentence = text[startPosition..endPosition].Trim('\n', '\t', '\r', ' ', '　');
+            }
+
+            else
+            {
+                sentence = "";
+            }
+
+            if (sentence.Length > 1)
+            {
+                if (JapaneseParentheses.ContainsValue(sentence.First().ToString()))
                 {
+                    sentence = sentence[1..];
+                }
+
+                if (JapaneseParentheses.Keys.Contains(sentence.LastOrDefault().ToString()))
+                {
+                    sentence = sentence[0..^1];
+                }
+
+                if (JapaneseParentheses.TryGetValue(sentence.FirstOrDefault().ToString(), out string rightParenthesis))
+                {
+
                     if (sentence.Last().ToString() == rightParenthesis)
                         sentence = sentence[1..^1];
 
@@ -85,7 +105,7 @@ namespace JapaneseLookup
                     }
                 }
 
-                else if (JapaneseParentheses.ContainsValue(sentence.Last().ToString()))
+                else if (JapaneseParentheses.ContainsValue(sentence.LastOrDefault().ToString()))
                 {
                     string leftParenthesis = JapaneseParentheses.First(p => p.Value == sentence.Last().ToString()).Key;
 
@@ -108,6 +128,8 @@ namespace JapaneseLookup
                 endPosition
             );
         }
+
+
 
         public static List<Dictionary<LookupResult, List<string>>> Lookup(string text)
         {

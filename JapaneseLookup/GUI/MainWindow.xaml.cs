@@ -80,7 +80,7 @@ namespace JapaneseLookup.GUI
 
                 (string sentence, int endPosition) = MainWindowUtilities.FindSentence(MainTextBox.Text, charPosition);
                 string text;
-                if (endPosition - charPosition + 1 < ConfigManager.MaxSearchLength)
+                if (endPosition - charPosition <= ConfigManager.MaxSearchLength)
                     text = MainTextBox.Text[charPosition..endPosition];
                 else
                     text = MainTextBox.Text[charPosition..(charPosition + ConfigManager.MaxSearchLength)];
