@@ -78,7 +78,8 @@ namespace JapaneseLookup.GUI
                 if (charPosition > 0 && char.IsHighSurrogate(MainTextBox.Text[charPosition - 1]))
                     --charPosition;
 
-                (string sentence, int endPosition) = MainWindowUtilities.FindWordBoundary(MainTextBox.Text, charPosition);
+                (string sentence, int endPosition) =
+                    MainWindowUtilities.FindWordBoundary(MainTextBox.Text, charPosition);
                 string text;
                 if (endPosition - charPosition <= ConfigManager.MaxSearchLength)
                     text = MainTextBox.Text[charPosition..endPosition];
@@ -252,42 +253,30 @@ namespace JapaneseLookup.GUI
 
         private void MWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.Key)
+            if (e.Key == ConfigManager.ShowPreferencesWindowKey)
             {
-                case Key.L:
-                {
-                    MainWindowUtilities.ShowPreferencesWindow();
-                    break;
-                }
-                case Key.T:
-                {
-                    MWindow.Background.Opacity = 0;
-                    Keyboard.ClearFocus();
-                    break;
-                }
-                case Key.K:
-                {
-                    ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
-                    break;
-                }
-
-                case Key.N:
-                {
-                    MainWindowUtilities.ShowAddNameWindow();
-                    break;
-                }
-
-                case Key.W:
-                {
-                    MainWindowUtilities.ShowAddWordWindow();
-                    break;
-                }
-
-                case Key.S:
-                {
-                    MainWindowUtilities.SearchWithBrowser();
-                    break;
-                }
+                MainWindowUtilities.ShowPreferencesWindow();
+            }
+            else if (e.Key == ConfigManager.TransparentModeKey)
+            {
+                MWindow.Background.Opacity = 0;
+                Keyboard.ClearFocus();
+            }
+            else if (e.Key == ConfigManager.KanjiModeKey)
+            {
+                ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
+            }
+            else if (e.Key == ConfigManager.ShowAddNameWindowKey)
+            {
+                MainWindowUtilities.ShowAddNameWindow();
+            }
+            else if (e.Key == ConfigManager.ShowAddWordWindowKey)
+            {
+                MainWindowUtilities.ShowAddWordWindow();
+            }
+            else if (e.Key == ConfigManager.SearchWithBrowserKey)
+            {
+                MainWindowUtilities.SearchWithBrowser();
             }
         }
 
@@ -313,35 +302,35 @@ namespace JapaneseLookup.GUI
 
         private void MWindow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.Key)
+            SteppedBacklog(e);
+        }
+
+        private void SteppedBacklog(KeyEventArgs e)
+        {
+            if (e.Key == ConfigManager.SteppedBacklogBackwardsKey)
             {
-                case Key.Left:
+                if (_currentTextIndex != 0)
                 {
-                    if (_currentTextIndex != 0)
-                    {
-                        _currentTextIndex--;
-                        MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
-                    }
-
-                    MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
-                    break;
+                    _currentTextIndex--;
+                    MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
                 }
-                case Key.Right:
+
+                MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
+            }
+            else if (e.Key == ConfigManager.SteppedBacklogForwardsKey)
+            {
+                if (_currentTextIndex < MainWindowUtilities.Backlog.Count - 1)
                 {
-                    if (_currentTextIndex < MainWindowUtilities.Backlog.Count - 1)
-                    {
-                        _currentTextIndex++;
-                        MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
-                    }
-
-                    if (_currentTextIndex == MainWindowUtilities.Backlog.Count - 1)
-                    {
-                        MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
-                    }
-
-                    MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
-                    break;
+                    _currentTextIndex++;
+                    MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
                 }
+
+                if (_currentTextIndex == MainWindowUtilities.Backlog.Count - 1)
+                {
+                    MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+                }
+
+                MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
             }
         }
 

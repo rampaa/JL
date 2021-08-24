@@ -221,87 +221,66 @@ namespace JapaneseLookup.GUI
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.Key)
+            if (e.Key == ConfigManager.MiningModeKey)
             {
-                case Key.M:
+                MainWindow.MiningMode = true;
+                PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+                // TODO: Tell the user that they are in mining mode
+                Instance.Activate();
+                Instance.Focus();
+            }
+            else if (e.Key == ConfigManager.PlayAudioKey)
+            {
+                string foundSpelling = null;
+                string reading = null;
+
+                var innerStackPanel = (StackPanel) StackPanel.Children[_playAudioIndex];
+                var top = (WrapPanel) innerStackPanel.Children[0];
+
+                foreach (TextBlock child in top.Children)
                 {
-                    MainWindow.MiningMode = true;
-                    PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-                    // TODO: Tell the user that they are in mining mode
-                    Instance.Activate();
-                    Instance.Focus();
-
-                    break;
-                }
-
-                case Key.P:
-                {
-                    string foundSpelling = null;
-                    string reading = null;
-
-                    var innerStackPanel = (StackPanel) StackPanel.Children[_playAudioIndex];
-                    var top = (WrapPanel) innerStackPanel.Children[0];
-
-                    foreach (TextBlock child in top.Children)
+                    Enum.TryParse(child.Name, out LookupResult result);
+                    switch (result)
                     {
-                        Enum.TryParse(child.Name, out LookupResult result);
-                        switch (result)
-                        {
-                            case LookupResult.FoundSpelling:
-                                foundSpelling = child.Text;
-                                break;
-                            case LookupResult.Readings:
-                                reading = ((string) child.Tag).Split(",")[0];
-                                break;
-                        }
+                        case LookupResult.FoundSpelling:
+                            foundSpelling = child.Text;
+                            break;
+                        case LookupResult.Readings:
+                            reading = ((string) child.Tag).Split(",")[0];
+                            break;
                     }
-
-                    PlayAudio(foundSpelling, reading);
-
-                    break;
                 }
 
-                case Key.Escape:
+                PlayAudio(foundSpelling, reading);
+            }
+            else if (e.Key == Key.Escape)
+            {
+                if (MainWindow.MiningMode)
                 {
-                    if (MainWindow.MiningMode)
-                    {
-                        MainWindow.MiningMode = false;
-                        PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
-                        Hide();
-                    }
-
-                    break;
+                    MainWindow.MiningMode = false;
+                    PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                    Hide();
                 }
-
-                case Key.K:
-                {
-                    ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
-                    break;
-                }
-
-                case Key.L:
-                {
-                    MainWindowUtilities.ShowPreferencesWindow();
-                    break;
-                }
-
-                case Key.N:
-                {
-                    MainWindowUtilities.ShowAddNameWindow();
-                    break;
-                }
-
-                case Key.W:
-                {
-                    MainWindowUtilities.ShowAddWordWindow();
-                    break;
-                }
-
-                case Key.S:
-                {
-                    MainWindowUtilities.SearchWithBrowser();
-                    break;
-                }
+            }
+            else if (e.Key == ConfigManager.KanjiModeKey)
+            {
+                ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
+            }
+            else if (e.Key == ConfigManager.ShowPreferencesWindowKey)
+            {
+                MainWindowUtilities.ShowPreferencesWindow();
+            }
+            else if (e.Key == ConfigManager.ShowAddNameWindowKey)
+            {
+                MainWindowUtilities.ShowAddNameWindow();
+            }
+            else if (e.Key == ConfigManager.ShowAddWordWindowKey)
+            {
+                MainWindowUtilities.ShowAddWordWindow();
+            }
+            else if (e.Key == ConfigManager.SearchWithBrowserKey)
+            {
+                MainWindowUtilities.SearchWithBrowser();
             }
         }
 

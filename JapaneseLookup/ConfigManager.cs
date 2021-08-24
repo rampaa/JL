@@ -9,6 +9,7 @@ using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Markup;
 using JapaneseLookup.EDICT;
@@ -33,43 +34,54 @@ namespace JapaneseLookup
         public static int MaxSearchLength;
         public static string FrequencyList;
         public static bool UseJMnedict;
+        public static bool KanjiMode;
         public static bool ForceSync;
         public static int LookupRate;
 
-        public static SolidColorBrush MainWindowTextColor;
+        public static double MainWindowHeight;
+        public static double MainWindowWidth;
 
+        public static SolidColorBrush MainWindowTextColor;
+        public static SolidColorBrush MainWindowBacklogTextColor;
         public static SolidColorBrush FoundSpellingColor;
         public static SolidColorBrush ReadingsColor;
+        public static SolidColorBrush ROrthographyInfoColor;
         public static SolidColorBrush DefinitionsColor;
         public static SolidColorBrush ProcessColor;
         public static SolidColorBrush FrequencyColor;
         public static SolidColorBrush AlternativeSpellingsColor;
+        public static SolidColorBrush AOrthographyInfoColor;
         public static SolidColorBrush SeparatorColor;
 
         public static int FoundSpellingFontSize;
         public static int ReadingsFontSize;
+        public static int ROrthographyInfoFontSize;
         public static int DefinitionsFontSize;
         public static int ProcessFontSize;
         public static int FrequencyFontSize;
         public static int AlternativeSpellingsFontSize;
+        public static int AOrthographyInfoFontSize;
 
+        public static int PopupMaxWidth;
+        public static int PopupMaxHeight;
         public static int PopupXOffset;
         public static int PopupYOffset;
         public static bool PopupFlipX;
         public static bool PopupFlipY;
 
         // TODO: hook these up
-        public static bool KanjiMode;
-
         //public static bool fixedWidth = false;
         //public static bool fixedHeight = false;
-        public static int PopupMaxWidth;
-        public static int PopupMaxHeight;
-        public static SolidColorBrush MainWindowBacklogTextColor = Brushes.Bisque;
-        public static SolidColorBrush ROrthographyInfoColor = Brushes.Gold;
-        public static int ROrthographyInfoFontSize = 17;
-        public static SolidColorBrush AOrthographyInfoColor = Brushes.White;
-        public static int AOrthographyInfoFontSize = 15;
+        public static Key MiningModeKey = Key.M;
+        public static Key PlayAudioKey = Key.P;
+        public static Key KanjiModeKey = Key.K;
+        public static Key ShowPreferencesWindowKey = Key.L;
+        public static Key ShowAddNameWindowKey = Key.N;
+        public static Key ShowAddWordWindowKey = Key.W;
+        public static Key SearchWithBrowserKey = Key.S;
+        public static Key TransparentModeKey = Key.T;
+        public static Key SteppedBacklogBackwardsKey = Key.Left;
+        public static Key SteppedBacklogForwardsKey = Key.Right;
 
         public static void ApplyPreferences(MainWindow mainWindow)
         {
@@ -79,18 +91,27 @@ namespace JapaneseLookup
             AnkiConnectUri = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
             UseJMnedict = bool.Parse(ConfigurationManager.AppSettings.Get("UseJMnedict") ??
                                      throw new InvalidOperationException());
+            KanjiMode = bool.Parse(ConfigurationManager.AppSettings.Get("KanjiMode") ??
+                                   throw new InvalidOperationException());
 
             ForceSync = bool.Parse(ConfigurationManager.AppSettings.Get("ForceAnkiSync") ??
                                    throw new InvalidOperationException());
             LookupRate = int.Parse(ConfigurationManager.AppSettings.Get("LookupRate") ??
                                    throw new InvalidOperationException());
 
+            MainWindowHeight = int.Parse(ConfigurationManager.AppSettings.Get("MainWindowHeight")!);
+            MainWindowWidth = int.Parse(ConfigurationManager.AppSettings.Get("MainWindowWidth")!);
+
             FoundSpellingColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupPrimarySpellingColor"));
             ReadingsColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupReadingColor"));
+            ROrthographyInfoColor = (SolidColorBrush) new BrushConverter()
+                .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupROrthographyInfoColor"));
             AlternativeSpellingsColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupAlternativeSpellingColor"));
+            AOrthographyInfoColor = (SolidColorBrush) new BrushConverter()
+                .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupAOrthographyInfoColor"));
             DefinitionsColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupDefinitionColor"));
             FrequencyColor = (SolidColorBrush) new BrushConverter()
@@ -102,8 +123,12 @@ namespace JapaneseLookup
 
             FoundSpellingFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupPrimarySpellingFontSize")!);
             ReadingsFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupReadingFontSize")!);
+            ROrthographyInfoFontSize =
+                int.Parse(ConfigurationManager.AppSettings.Get("PopupROrthographyInfoFontSize")!);
             AlternativeSpellingsFontSize =
                 int.Parse(ConfigurationManager.AppSettings.Get("PopupAlternativeSpellingFontSize")!);
+            AOrthographyInfoFontSize =
+                int.Parse(ConfigurationManager.AppSettings.Get("PopupAOrthographyInfoFontSize")!);
             DefinitionsFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupDefinitionFontSize")!);
             FrequencyFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupFrequencyFontSize")!);
             ProcessFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupDeconjugationInfoFontSize")!);
@@ -116,6 +141,8 @@ namespace JapaneseLookup
 
             MainWindowTextColor = (SolidColorBrush) new BrushConverter().ConvertFrom(
                 ConfigurationManager.AppSettings.Get("MainWindowTextColor"));
+            MainWindowBacklogTextColor = (SolidColorBrush) new BrushConverter().ConvertFrom(
+                ConfigurationManager.AppSettings.Get("MainWindowBacklogTextColor"));
 
             switch (ConfigurationManager.AppSettings.Get("PopupFlip"))
             {
@@ -153,6 +180,8 @@ namespace JapaneseLookup
             popupWindow.Background = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
             popupWindow.Background.Opacity = double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")) / 100;
+            popupWindow.MaxHeight = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight"));
+            popupWindow.MaxWidth = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth"));
 
             //Test without async/await.
             Task.Run(async () => { await LoadDictionaries(); });
@@ -167,39 +196,46 @@ namespace JapaneseLookup
             preferenceWindow.ForceAnkiSyncCheckBox.IsChecked = ForceSync;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
             preferenceWindow.UseJMnedictCheckBox.IsChecked = UseJMnedict;
+            preferenceWindow.KanjiModeCheckBox.IsChecked = KanjiMode;
             preferenceWindow.FrequencyListComboBox.ItemsSource = FrequencyLists.Keys;
             preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyList;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
 
-            preferenceWindow.FontComboBox.ItemsSource = JapaneseFonts;
-            preferenceWindow.FontComboBox.SelectedItem = mainWindow.MainTextBox.FontFamily.ToString();
+            preferenceWindow.MainWindowHeightNumericUpDown.Value = MainWindowHeight;
+            preferenceWindow.MainWindowWidthNumericUpDown.Value = MainWindowWidth;
             preferenceWindow.TextboxBackgroundColorButton.Background =
                 (SolidColorBrush) new BrushConverter().ConvertFrom(
                     ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor"));
             preferenceWindow.TextboxTextColorButton.Background = MainWindowTextColor;
+            preferenceWindow.TextboxBacklogTextColorButton.Background = MainWindowBacklogTextColor;
             preferenceWindow.TextboxFontSizeNumericUpDown.Value = mainWindow.FontSizeSlider.Value;
             preferenceWindow.TextboxOpacityNumericUpDown.Value = mainWindow.OpacitySlider.Value;
+            preferenceWindow.FontComboBox.ItemsSource = JapaneseFonts;
+            preferenceWindow.FontComboBox.SelectedItem = mainWindow.MainTextBox.FontFamily.ToString();
 
+            preferenceWindow.PopupMaxHeightNumericUpDown.Value = PopupMaxHeight;
+            preferenceWindow.PopupMaxWidthNumericUpDown.Value = PopupMaxWidth;
             preferenceWindow.PopupAlternativeSpellingColorButton.Background = AlternativeSpellingsColor;
+            preferenceWindow.PopupAOrthographyInfoColorButton.Background = AOrthographyInfoColor;
             preferenceWindow.PopupDeconjugationInfoColorButton.Background = ProcessColor;
             preferenceWindow.PopupDefinitionColorButton.Background = DefinitionsColor;
             preferenceWindow.PopupFrequencyColorButton.Background = FrequencyColor;
             preferenceWindow.PopupPrimarySpellingColorButton.Background = FoundSpellingColor;
             preferenceWindow.PopupReadingColorButton.Background = ReadingsColor;
+            preferenceWindow.PopupROrthographyInfoColorButton.Background = ROrthographyInfoColor;
             preferenceWindow.PopupAlternativeSpellingFontSizeNumericUpDown.Value = AlternativeSpellingsFontSize;
+            preferenceWindow.PopupAOrthographyInfoFontSizeNumericUpDown.Value = AOrthographyInfoFontSize;
             preferenceWindow.PopupDeconjugationInfoFontSizeNumericUpDown.Value = ProcessFontSize;
             preferenceWindow.PopupDefinitionFontSizeNumericUpDown.Value = DefinitionsFontSize;
             preferenceWindow.PopupFrequencyFontSizeNumericUpDown.Value = FrequencyFontSize;
             preferenceWindow.PopupPrimarySpellingFontSizeNumericUpDown.Value = FoundSpellingFontSize;
             preferenceWindow.PopupReadingFontSizeNumericUpDown.Value = ReadingsFontSize;
-
+            preferenceWindow.PopupROrthographyInfoFontSizeNumericUpDown.Value = ROrthographyInfoFontSize;
             preferenceWindow.PopupBackgroundColorButton.Background = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
             preferenceWindow.PopupOpacityNumericUpDown.Value = int.Parse(
                 ConfigurationManager.AppSettings.Get("PopupOpacity") ?? throw new InvalidOperationException());
-
             preferenceWindow.PopupSeparatorColorButton.Background = SeparatorColor;
-
             preferenceWindow.PopupXOffsetNumericUpDown.Value = PopupXOffset;
             preferenceWindow.PopupYOffsetNumericUpDown.Value = PopupYOffset;
 
@@ -226,10 +262,17 @@ namespace JapaneseLookup
                 preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString();
             config.AppSettings.Settings["AnkiConnectUri"].Value =
                 preferenceWindow.AnkiUriTextBox.Text;
+
+            config.AppSettings.Settings["MainWindowWidth"].Value =
+                preferenceWindow.MainWindowWidthNumericUpDown.Value.ToString();
+            config.AppSettings.Settings["MainWindowHeight"].Value =
+                preferenceWindow.MainWindowHeightNumericUpDown.Value.ToString();
             config.AppSettings.Settings["MainWindowBackgroundColor"].Value =
                 preferenceWindow.TextboxBackgroundColorButton.Background.ToString();
             config.AppSettings.Settings["MainWindowTextColor"].Value =
                 preferenceWindow.TextboxTextColorButton.Background.ToString();
+            config.AppSettings.Settings["MainWindowBacklogTextColor"].Value =
+                preferenceWindow.TextboxBacklogTextColorButton.Background.ToString();
             config.AppSettings.Settings["MainWindowFontSize"].Value =
                 preferenceWindow.TextboxFontSizeNumericUpDown.Value.ToString();
             config.AppSettings.Settings["MainWindowOpacity"].Value =
@@ -241,12 +284,18 @@ namespace JapaneseLookup
 
             config.AppSettings.Settings["UseJMnedict"].Value =
                 preferenceWindow.UseJMnedictCheckBox.IsChecked.ToString();
+            config.AppSettings.Settings["KanjiMode"].Value =
+                preferenceWindow.KanjiModeCheckBox.IsChecked.ToString();
 
             config.AppSettings.Settings["ForceAnkiSync"].Value =
                 preferenceWindow.ForceAnkiSyncCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["LookupRate"].Value =
                 preferenceWindow.LookupRateNumericUpDown.Value.ToString();
 
+            config.AppSettings.Settings["PopupMaxWidth"].Value =
+                preferenceWindow.PopupMaxWidthNumericUpDown.Value.ToString();
+            config.AppSettings.Settings["PopupMaxHeight"].Value =
+                preferenceWindow.PopupMaxHeightNumericUpDown.Value.ToString();
             config.AppSettings.Settings["PopupBackgroundColor"].Value =
                 preferenceWindow.PopupBackgroundColorButton.Background.ToString();
             config.AppSettings.Settings["PopupPrimarySpellingColor"].Value =
