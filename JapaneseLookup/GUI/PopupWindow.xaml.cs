@@ -214,9 +214,10 @@ namespace JapaneseLookup.GUI
 
             // var sound = AnkiConnect.GetAudio("猫", "ねこ").Result;
 
-            // TODO: find a better solution for this that avoids adding an element to Instance.StackPanel
+            // TODO: find a better solution for this that has less latency and prevents the noaudio clip from playing
             var mediaElement = new MediaElement { Source = uri, Volume = 1, Visibility = Visibility.Collapsed };
-            Instance.StackPanel.Children.Add(mediaElement);
+            var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
+            mainWindow.MainGrid.Children.Add(mediaElement);
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
