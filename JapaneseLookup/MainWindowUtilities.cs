@@ -25,109 +25,13 @@ namespace JapaneseLookup
         private static readonly List<string> JapanesePunctuation =
             new() { "。", "！", "？", "…", "―", ".", "＆", "、", "「", "」", "『", "』", "（", "）", "\n" };
 
-        private static readonly List<string> JapanesePunctuation2 =
-            new() { "。", "！", "？", "…", ".", "\n", };
-
-        private static readonly Dictionary<string, string> JapaneseParentheses = new()
-        {
-            { "「", "」" },
-            { "『", "』" },
-            { "（", "）" },
-        };
-
         public static void MainWindowInitializer()
         {
             // init AnkiConnect so that it doesn't block later
             // Task.Run(AnkiConnect.GetDeckNames);
         }
-        public static string FindSentence(string text, int position)
-        {
-            int startPosition = -1;
-            int endPositionForSentence = -1;
 
-            foreach (string punctuation in JapanesePunctuation2)
-            {
-                int tempIndex = text.LastIndexOf(punctuation, position, StringComparison.Ordinal);
-
-                if (tempIndex > startPosition)
-                    startPosition = tempIndex;
-
-                tempIndex = text.IndexOf(punctuation, position, StringComparison.Ordinal);
-
-                if (tempIndex != -1 && (endPositionForSentence == -1 || tempIndex < endPositionForSentence))
-                    endPositionForSentence = tempIndex;
-            }
-
-            ++startPosition;
-
-            if (endPositionForSentence == -1)
-                endPositionForSentence = text.Length - 1;
-
-            string sentence;
-
-            if (startPosition < endPositionForSentence)
-            {
-                sentence = text[startPosition..(endPositionForSentence + 1)].Trim('\n', '\t', '\r', ' ', '　');
-            }
-
-            else
-            {
-                sentence = "";
-            }
-
-            if (sentence.Length > 1)
-            {
-                if (JapaneseParentheses.ContainsValue(sentence.First().ToString()))
-                {
-                    sentence = sentence[1..];
-                }
-
-                if (JapaneseParentheses.Keys.Contains(sentence.LastOrDefault().ToString()))
-                {
-                    sentence = sentence[0..^1];
-                }
-
-                if (JapaneseParentheses.TryGetValue(sentence.FirstOrDefault().ToString(), out string rightParenthesis))
-                {
-
-                    if (sentence.Last().ToString() == rightParenthesis)
-                        sentence = sentence[1..^1];
-
-                    else if (!sentence.Contains(rightParenthesis))
-                        sentence = sentence[1..];
-
-                    else if (sentence.Contains(rightParenthesis))
-                    {
-                        int numberOfLeftParentheses = sentence.Count(p => p == sentence[0]);
-                        int numberOfRightParentheses = sentence.Count(p => p == rightParenthesis[0]);
-
-                        if (numberOfLeftParentheses == numberOfRightParentheses + 1)
-                            sentence = sentence[1..];
-                    }
-                }
-
-                else if (JapaneseParentheses.ContainsValue(sentence.LastOrDefault().ToString()))
-                {
-                    string leftParenthesis = JapaneseParentheses.First(p => p.Value == sentence.Last().ToString()).Key;
-
-                    if (!sentence.Contains(leftParenthesis))
-                        sentence = sentence[0..^1];
-
-                    else if (sentence.Contains(leftParenthesis))
-                    {
-                        int numberOfLeftParentheses = sentence.Count(p => p == leftParenthesis[0]);
-                        int numberOfRightParentheses = sentence.Count(p => p == sentence.Last());
-
-                        if (numberOfRightParentheses == numberOfLeftParentheses + 1)
-                            sentence = sentence[0..^1];
-                    }
-                }
-            }
-
-            return sentence;
-        }
-
-        public static (string sentence, int endPosition) FindWordBoundary(string text, int position)
+        public static int FindWordBoundary(string text, int position)
         {
             int endPosition = -1;
 
@@ -142,10 +46,7 @@ namespace JapaneseLookup
             if (endPosition == -1)
                 endPosition = text.Length;
 
-            return (
-                FindSentence(text, position),
-                endPosition
-            );
+            return endPosition;
         }
 
         public static List<Dictionary<LookupResult, List<string>>> Lookup(string text)

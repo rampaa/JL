@@ -106,7 +106,7 @@ namespace JapaneseLookup.GUI
             string foundSpelling = null;
             string readings = null;
             string definitions = "";
-            string context = null;
+            string context = PopupWindowUtilities.FindSentence(MainWindow.CurrentText, MainWindow.CurrentCharPosition);
             string foundForm = null;
             string edictID = null;
             var timeLocal = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
@@ -120,11 +120,6 @@ namespace JapaneseLookup.GUI
             var top = (WrapPanel) textBlock.Parent;
             foreach (TextBlock child in top.Children)
             {
-                if (child.Name == "context")
-                {
-                    context = child.Text;
-                }
-
                 Enum.TryParse(child.Name, out LookupResult result);
                 switch (result)
                 {
@@ -134,9 +129,6 @@ namespace JapaneseLookup.GUI
                     case LookupResult.Readings:
                         readings = (string) child.Tag;
                         break;
-                    // case "context":
-                    //     context = child.Text;
-                    //     break;
                     case LookupResult.FoundForm:
                         foundForm = child.Text;
                         break;

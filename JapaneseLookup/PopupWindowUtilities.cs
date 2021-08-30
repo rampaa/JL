@@ -10,7 +10,7 @@ namespace JapaneseLookup
 {
     public static class PopupWindowUtilities
     {
-        internal static StackPanel MakeResultStackPanel(string sentence, Dictionary<LookupResult, List<string>> result,
+        internal static StackPanel MakeResultStackPanel(Dictionary<LookupResult, List<string>> result,
             int index)
         {
             var innerStackPanel = new StackPanel
@@ -28,12 +28,6 @@ namespace JapaneseLookup
             TextBlock textBlockAlternativeSpellings = null;
             TextBlock textBlockProcess = null;
             TextBlock textBlockFrequency = null;
-            var textBlockContext = new TextBlock
-            {
-                Name = "context",
-                Text = sentence,
-                Visibility = Visibility.Collapsed
-            };
             TextBlock textBlockFoundForm = null;
             TextBlock textBlockEdictID = null;
 
@@ -266,7 +260,7 @@ namespace JapaneseLookup
                 textBlockReadings,
                 textBlockAlternativeSpellings,
                 textBlockProcess,
-                textBlockContext, textBlockFoundForm, textBlockEdictID, // undisplayed, for mining
+                textBlockFoundForm, textBlockEdictID, // undisplayed, for mining
                 textBlockFrequency,
             };
             foreach (TextBlock baby in babies)
@@ -416,6 +410,102 @@ namespace JapaneseLookup
             textBlockAlternativeSpellings.Inlines.Add(")");
 
             return textBlockAlternativeSpellings;
+        }
+
+        public static string FindSentence(string text, int position)
+        {
+            List<string> JapanesePunctuation = new() { "。", "！", "？", "…", ".", "\n", };
+
+            Dictionary<string, string> JapaneseParentheses = new()
+            {
+                { "「", "」" },
+                { "『", "』" },
+                { "（", "）" },
+            };
+
+            int startPosition = -1;
+            int endPosition = -1;
+
+            foreach (string punctuation in JapanesePunctuation)
+            {
+                int tempIndex = text.LastIndexOf(punctuation, position, StringComparison.Ordinal);
+
+                if (tempIndex > startPosition)
+                    startPosition = tempIndex;
+
+                tempIndex = text.IndexOf(punctuation, position, StringComparison.Ordinal);
+
+                if (tempIndex != -1 && (endPosition == -1 || tempIndex < endPosition))
+                    endPosition = tempIndex;
+            }
+
+            ++startPosition;
+
+            if (endPosition == -1)
+                endPosition = text.Length - 1;
+
+            string sentence;
+
+            if (startPosition < endPosition)
+            {
+                sentence = text[startPosition..(endPosition + 1)].Trim('\n', '\t', '\r', ' ', '　');
+            }
+
+            else
+            {
+                sentence = "";
+            }
+
+            if (sentence.Length > 1)
+            {
+                if (JapaneseParentheses.ContainsValue(sentence.First().ToString()))
+                {
+                    sentence = sentence[1..];
+                }
+
+                if (JapaneseParentheses.Keys.Contains(sentence.LastOrDefault().ToString()))
+                {
+                    sentence = sentence[0..^1];
+                }
+
+                if (JapaneseParentheses.TryGetValue(sentence.FirstOrDefault().ToString(), out string rightParenthesis))
+                {
+
+                    if (sentence.Last().ToString() == rightParenthesis)
+                        sentence = sentence[1..^1];
+
+                    else if (!sentence.Contains(rightParenthesis))
+                        sentence = sentence[1..];
+
+                    else if (sentence.Contains(rightParenthesis))
+                    {
+                        int numberOfLeftParentheses = sentence.Count(p => p == sentence[0]);
+                        int numberOfRightParentheses = sentence.Count(p => p == rightParenthesis[0]);
+
+                        if (numberOfLeftParentheses == numberOfRightParentheses + 1)
+                            sentence = sentence[1..];
+                    }
+                }
+
+                else if (JapaneseParentheses.ContainsValue(sentence.LastOrDefault().ToString()))
+                {
+                    string leftParenthesis = JapaneseParentheses.First(p => p.Value == sentence.Last().ToString()).Key;
+
+                    if (!sentence.Contains(leftParenthesis))
+                        sentence = sentence[0..^1];
+
+                    else if (sentence.Contains(leftParenthesis))
+                    {
+                        int numberOfLeftParentheses = sentence.Count(p => p == leftParenthesis[0]);
+                        int numberOfRightParentheses = sentence.Count(p => p == sentence.Last());
+
+                        if (numberOfRightParentheses == numberOfLeftParentheses + 1)
+                            sentence = sentence[0..^1];
+                    }
+                }
+            }
+
+            return sentence;
         }
     }
 }

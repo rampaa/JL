@@ -16,6 +16,8 @@ namespace JapaneseLookup.GUI
         private string _lastWord = "";
         internal static bool MiningMode = false;
         private int _currentTextIndex;
+        public static int CurrentCharPosition { get; set; }
+        public static string CurrentText { get; set; }
 
         public MainWindow()
         {
@@ -78,15 +80,16 @@ namespace JapaneseLookup.GUI
                 if (charPosition > 0 && char.IsHighSurrogate(MainTextBox.Text[charPosition - 1]))
                     --charPosition;
 
-                (string sentence, int endPosition) =
-                    MainWindowUtilities.FindWordBoundary(MainTextBox.Text, charPosition);
+                CurrentText = MainTextBox.Text;
+                CurrentCharPosition = charPosition;
+
+                int endPosition = MainWindowUtilities.FindWordBoundary(MainTextBox.Text, charPosition);
+
                 string text;
                 if (endPosition - charPosition <= ConfigManager.MaxSearchLength)
                     text = MainTextBox.Text[charPosition..endPosition];
                 else
                     text = MainTextBox.Text[charPosition..(charPosition + ConfigManager.MaxSearchLength)];
-
-                Debug.WriteLine(text);
 
                 if (text == _lastWord) return;
                 _lastWord = text;
@@ -116,7 +119,7 @@ namespace JapaneseLookup.GUI
                         // else
                         // {
                         PopupWindow.Instance.StackPanel.Children.Add(
-                            PopupWindowUtilities.MakeResultStackPanel(sentence, result, i));
+                            PopupWindowUtilities.MakeResultStackPanel(result, i));
                         // }
 
                         if (i != results.Count - 1)
