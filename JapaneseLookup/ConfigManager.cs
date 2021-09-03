@@ -7,33 +7,62 @@ using System.IO;
 using System.Linq;
 using System.Runtime;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Markup;
 using JapaneseLookup.EDICT;
+using JapaneseLookup.EPWING;
+using JapaneseLookup.KANJIDIC;
 
 namespace JapaneseLookup
 {
-    internal static class ConfigManager
+    public static class ConfigManager
     {
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
         private static readonly List<string> JapaneseFonts = FindJapaneseFonts().OrderBy(font => font).ToList();
 
+        // TODO: Make these configurable too
         private static readonly Dictionary<string, string> FrequencyLists = new()
         {
             { "VN", "Resources/freqlist_vns.json" },
             { "Novel", "Resources/freqlist_novels.json" },
-            { "Narou", "Resources/freqlist_narou.json" }
+            { "Narou", "Resources/freqlist_narou.json" },
+            { "None", "" }
         };
 
-        public static bool Ready;
+        // private static List<Dict> SelectedDicts = new List<Dict>()
+        // {
+        //     new(DictType.JMdict, "./Resources/JMdict.xml", true, new Dictionary<string, IResult>()),
+        //     new(DictType.JMnedict, "./Resources/JMnedict.xml", true, new Dictionary<string, IResult>()),
+        //     new(DictType.Kanjidic, "./Resources/kanjidic2.xml", true, new Dictionary<string, IResult>()),
+        //     new(DictType.Daijirin, "./daijirin", true, new Dictionary<string, IResult>()),
+        // };
+
+        // private static Dictionary<DictType, string> SelectedDicts = new Dictionary<DictType, string>
+        // {
+        //     // { DictType.JMdict, "./Resources/JMdict.xml" },
+        //     // { DictType.JMnedict, "./Resources/JMnedict.xml" },
+        //     // { DictType.Kanjidic, "./Resources/kanjidic2.xml" },
+        //     // { DictType.Daijirin, "./daijirin" },
+        //     // { DictType.Daijisen, "./daijisen" },
+        //     // { DictType.Kojien, "./kojien" },
+        //     // { DictType.Meikyou, "./meikyou" },
+        //     // { DictType.Shinmeikai, "./shinmeikai" },
+        // };
+        //todo
+        // public static bool Ready;
 
         public static string AnkiConnectUri;
         public static int MaxSearchLength;
         public static string FrequencyList;
-        public static bool UseJMnedict;
+
+        //todo
+        // public static bool UseJMnedict;
+        // TODO: Don't let KanjiMode be turned on if Kanjidic is not loaded?
         public static bool KanjiMode;
         public static bool ForceSync;
         public static int LookupRate;
@@ -83,14 +112,18 @@ namespace JapaneseLookup
         public static Key SteppedBacklogBackwardsKey = Key.Left;
         public static Key SteppedBacklogForwardsKey = Key.Right;
 
+        // consider making this dictionary specific
+        public static bool NewlineBetweenDefinitions = false;
+        public static int MaxResults = 99;
+
         public static void ApplyPreferences(MainWindow mainWindow)
         {
             MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength") ??
                                         throw new InvalidOperationException());
             FrequencyList = ConfigurationManager.AppSettings.Get("FrequencyList");
             AnkiConnectUri = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
-            UseJMnedict = bool.Parse(ConfigurationManager.AppSettings.Get("UseJMnedict") ??
-                                     throw new InvalidOperationException());
+            // UseJMnedict = bool.Parse(ConfigurationManager.AppSettings.Get("UseJMnedict") ??
+            //                          throw new InvalidOperationException());
             KanjiMode = bool.Parse(ConfigurationManager.AppSettings.Get("KanjiMode") ??
                                    throw new InvalidOperationException());
 
@@ -183,8 +216,11 @@ namespace JapaneseLookup
             popupWindow.MaxHeight = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight"));
             popupWindow.MaxWidth = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth"));
 
+            DeserializeDicts();
+
             //Test without async/await.
-            Task.Run(async () => { await LoadDictionaries(); });
+            // Task.Run(async () => { await LoadDictionaries(); });
+            Task.Run(() => { LoadDictionaries(); });
         }
 
         public static void LoadPreferences(PreferencesWindow preferenceWindow)
@@ -195,7 +231,7 @@ namespace JapaneseLookup
             preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri;
             preferenceWindow.ForceAnkiSyncCheckBox.IsChecked = ForceSync;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
-            preferenceWindow.UseJMnedictCheckBox.IsChecked = UseJMnedict;
+            // preferenceWindow.UseJMnedictCheckBox.IsChecked = UseJMnedict;
             preferenceWindow.KanjiModeCheckBox.IsChecked = KanjiMode;
             preferenceWindow.FrequencyListComboBox.ItemsSource = FrequencyLists.Keys;
             preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyList;
@@ -340,6 +376,8 @@ namespace JapaneseLookup
             config.AppSettings.Settings["MainWindowTopPosition"].Value = mainWindow.Top.ToString();
             config.AppSettings.Settings["MainWindowLeftPosition"].Value = mainWindow.Left.ToString();
 
+            SerializeDicts();
+
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
 
@@ -358,6 +396,96 @@ namespace JapaneseLookup
             config.AppSettings.Settings["MainWindowLeftPosition"].Value = mainWindow.Left.ToString();
 
             config.Save(ConfigurationSaveMode.Modified);
+        }
+
+        private static void SerializeDicts()
+        {
+            try
+            {
+                var jso = new JsonSerializerOptions
+                {
+                    // Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                    WriteIndented = true,
+                    Converters =
+                    {
+                        new JsonStringEnumConverter(),
+                    }
+                };
+
+                // todo
+                // foreach (var dict in Dicts.dicts)
+                // {
+                //     config.AppSettings.Settings["SelectedDicts"].Value += JsonSerializer.Serialize(dict,
+                //         jso);
+                // }
+
+                // config.AppSettings.Settings["SelectedDicts"].Value = JsonSerializer.Serialize(Dicts.dicts,
+                //     jso);
+
+                File.WriteAllText(Path.Join(ApplicationPath, "Config/dicts.json"),
+                    JsonSerializer.Serialize(Dicts.dicts, jso));
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                throw;
+            }
+        }
+
+        private static void DeserializeDicts()
+        {
+            try
+            {
+                var jso = new JsonSerializerOptions
+                {
+                    // Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                    Converters =
+                    {
+                        new JsonStringEnumConverter(),
+                    }
+                };
+
+                Dictionary<DictType, Dict> deserializedDicts = JsonSerializer.Deserialize<Dictionary<DictType, Dict>>(
+                    File.ReadAllText(Path.Join(ApplicationPath, "Config/dicts.json")), jso);
+
+                if (deserializedDicts != null)
+                {
+                    foreach ((DictType _, Dict dict) in deserializedDicts)
+                    {
+                        // todo make sure this works
+                        if (!Dicts.dicts.ContainsKey(dict.Type)
+                            // bunch of extra checks to make sure we load a newly added dict
+                            // || Dicts.dicts[dict.Type].Active &&
+                            // (Dicts.dicts[dict.Type].Contents == null ||
+                            //  !Dicts.dicts[dict.Type].Contents.Any())
+                        )
+                        {
+                            dict.Contents = new Dictionary<string, List<IResult>>();
+                            Dicts.dicts.Add(dict.Type, dict);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Couldn't load Config/dicts.json");
+                }
+
+                // todo
+                // NameValueCollection selectedDictsSection =
+                //     (NameValueCollection)ConfigurationManager.GetSection("SelectedDicts");
+                //
+                // // var selectedDictsSection = ConfigurationManager.GetSection("SelectedDicts");
+                // //.Sections.Get("SelectedDicts");
+                // foreach (var VARIABLE in selectedDictsSection)
+                // {
+                //     Console.WriteLine(VARIABLE);
+                // }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                throw;
+            }
         }
 
         private static List<string> FindJapaneseFonts()
@@ -388,62 +516,165 @@ namespace JapaneseLookup
             return japaneseFonts;
         }
 
-        private static async Task LoadDictionaries()
+        private static void LoadDictionaries()
         {
             string freqListPath = FrequencyLists[FrequencyList];
 
-            // initial jmdict and freqlist load
-            if (!JMdictLoader.JMdictDictionary.Any())
+            var tasks = new List<Task>();
+
+            foreach ((DictType _, Dict dict) in Dicts.dicts)
             {
-                await Task.Run(JMdictLoader.Load).ContinueWith(_ =>
+                // todo
+                // initialize dicts
+                // if (!Dicts.dicts.TryGetValue(dict.Type, out _))
+                // {
+                //     if (dict.Contents == null || !dict.Contents.Any())
+                //     {
+                //         dict.Contents = new Dictionary<string, List<IResult>>();
+                //     }
+                //
+                //     Dicts.dicts.Add(dict.Type, dict);
+                // }
+
+                if (!dict.Active)
+                    continue;
+
+                switch (dict.Type)
                 {
-                    FrequencyLoader.AddToJMdict($"{FrequencyList}", FrequencyLoader.LoadJson(Path.Join(
-                        ApplicationPath,
-                        freqListPath)).Result);
+                    case DictType.JMdict:
+                        // initial jmdict and freqlist load
+                        if (!Dicts.dicts[DictType.JMdict].Contents.Any())
+                        {
+                            var taskJmdict = Task.Run(() => JMdictLoader.Load(dict.Path)).ContinueWith(_ =>
+                            {
+                                FrequencyLoader.AddToJMdict($"{FrequencyList}", FrequencyLoader.LoadJson(Path.Join(
+                                    ApplicationPath,
+                                    freqListPath)).Result);
+                            });
 
-                    Ready = true;
-                });
+                            tasks.Add(taskJmdict);
+                        }
+
+                        break;
+                    case DictType.JMnedict:
+                        // JMnedict
+                        if (!Dicts.dicts[DictType.JMnedict].Contents.Any())
+                        {
+                            var taskJMnedict = Task.Run(() => JMnedictLoader.Load(dict.Path)).ContinueWith(_ =>
+                            {
+                                // todo
+                                // if (!UseJMnedict && Dicts.JMnedict.Any())
+                                // {
+                                //     Dicts.JMnedict.Clear();
+                                //     Task.Delay(10000).ContinueWith(_ => { GC.Collect(); });
+                                // }
+                            });
+                            tasks.Add(taskJMnedict);
+                        }
+
+                        break;
+                    case DictType.Kanjidic:
+                        // KANJIDIC
+                        if (!Dicts.dicts[DictType.Kanjidic].Contents.Any())
+                        {
+                            var taskKanjidict = Task.Run(() => KanjiInfoLoader.Load(dict.Path));
+                            tasks.Add(taskKanjidict);
+                        }
+
+                        break;
+                    case DictType.UnknownEpwing:
+                        if (!Dicts.dicts[DictType.UnknownEpwing].Contents.Any())
+                        {
+                            var taskEpwing = Task.Run(async () =>
+                                await EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            tasks.Add(taskEpwing);
+                        }
+
+                        break;
+                    case DictType.Daijirin:
+                        if (!Dicts.dicts[DictType.Daijirin].Contents.Any())
+                        {
+                            var taskEpwing = Task.Run(async () =>
+                                await EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            tasks.Add(taskEpwing);
+                        }
+
+                        break;
+                    case DictType.Daijisen:
+                        if (!Dicts.dicts[DictType.Daijisen].Contents.Any())
+                        {
+                            var taskEpwing = Task.Run(async () =>
+                                await EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            tasks.Add(taskEpwing);
+                        }
+
+                        break;
+                    case DictType.Kojien:
+                        if (!Dicts.dicts[DictType.Kojien].Contents.Any())
+                        {
+                            var taskEpwing = Task.Run(async () =>
+                                await EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            tasks.Add(taskEpwing);
+                        }
+
+                        break;
+                    case DictType.Meikyou:
+                        if (!Dicts.dicts[DictType.Meikyou].Contents.Any())
+                        {
+                            var taskEpwing = Task.Run(async () =>
+                                await EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            tasks.Add(taskEpwing);
+                        }
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
 
-            if (UseJMnedict && !JMnedictLoader.jMnedictDictionary.Any())
+            foreach ((DictType _, Dict dict) in Dicts.dicts)
             {
-                await Task.Run(JMnedictLoader.Load).ContinueWith(_ =>
+                if (!dict.Active && dict.Contents.Any())
                 {
-                    if (!UseJMnedict && JMnedictLoader.jMnedictDictionary.Any())
-                    {
-                        JMnedictLoader.jMnedictDictionary = new Dictionary<string, List<JMnedictResult>>();
-                        Task.Delay(10000).ContinueWith(_ => { GC.Collect(); });
-                    }
-                });
+                    dict.Contents.Clear();
+                }
             }
-            else if (!UseJMnedict && JMnedictLoader.jMnedictDictionary.Any())
-            {
-                JMnedictLoader.jMnedictDictionary = new();
-                await Task.Delay(10000).ContinueWith(_ => { GC.Collect(); });
-            }
-
-            if (!KANJIDIC.KanjiInfoLoader.KanjiDictionary.Any())
-                await Task.Run(KANJIDIC.KanjiInfoLoader.Load);
 
             // load new freqlist if necessary
-            if (Ready)
+            if (Dicts.dicts[DictType.JMdict]?.Contents.Any() ?? false)
             {
-                JMdictLoader.JMdictDictionary.TryGetValue("俺", out var freqTest);
-                Debug.Assert(freqTest != null, nameof(freqTest) + " != null");
+                Dicts.dicts[DictType.JMdict].Contents.TryGetValue("俺", out List<IResult> freqTest1);
+                Debug.Assert(freqTest1 != null, nameof(freqTest1) + " != null");
+
+                var freqTest = freqTest1.Cast<JMdictResult>().ToList();
+                // var freqTest=freqTest1.OfType<JMdictResult>().ToList();
 
                 if (!freqTest[0].FrequencyDict.TryGetValue(FrequencyList, out int _))
                 {
-                    await Task.Run(async () =>
+                    var taskNewFreqlist = Task.Run(async () =>
                     {
                         FrequencyLoader.AddToJMdict($"{FrequencyList}", await FrequencyLoader.LoadJson(Path.Join(
                             ApplicationPath,
                             freqListPath)));
                     });
+                    tasks.Add(taskNewFreqlist);
 
                     Debug.WriteLine("Banzai! (changed freqlist)");
                 }
             }
 
+            // foreach ((DictType _, Dict dict) in Dicts.dicts.Where(d => d.Value.Active))
+            // {
+            //     Debug.WriteLine("Loading " + dict.Type);
+            // }
+
+            foreach (Task task in tasks)
+            {
+                task.Wait();
+            }
+
+            // TODO: doesn't seem to compact when (many?) new dicts are added from the PreferencesWindow
+            Debug.WriteLine("Starting compacting GC run");
             GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.GetTotalMemory(true);
             GC.Collect();

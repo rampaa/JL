@@ -10,8 +10,47 @@ namespace JapaneseLookup
 {
     public static class PopupWindowUtilities
     {
+        // super bad hack that improves performance by a lot...
+        public static List<Dictionary<LookupResult, List<string>>> LastLookupResults = new();
+        private const int Magic = 7;
+
+        public static void DisplayResults(bool generateAllResults)
+        {
+            var results = LastLookupResults;
+            // apparently you can't get the desired size of a control before the layout pass
+            // probably won't be worth (performance-wise) forcing that to happen instead of just using a magic number
+            int resultsCount = generateAllResults ? results.Count : Math.Min(results.Count, Magic);
+
+            // var resultStackPanels = new List<StackPanel>();
+
+            for (int index = 0; index < resultsCount; index++)
+            {
+                if (index > ConfigManager.MaxResults)
+                    return;
+
+                // double heights = resultStackPanels.Sum(rsp => rsp.Height);
+                // if (heights > PopupWindow.Instance.MaxHeight)
+                //     return;
+
+                var result = results[index];
+                //todo
+                // if (result[LookupResult.Grade].Any())
+                // {
+                //     PopupWindow.Instance.StackPanel.Children.Add(
+                //         PopupWindow.MakeResultStackPanelKanji(sentence, result, index));
+                // }
+                // else
+                // {
+                StackPanel resultStackPanel = MakeResultStackPanel(result, index, results.Count);
+
+                // resultStackPanels.Add(resultStackPanel);
+                PopupWindow.Instance.ResultStackPanels.Add(resultStackPanel);
+                // }
+            }
+        }
+
         internal static StackPanel MakeResultStackPanel(Dictionary<LookupResult, List<string>> result,
-            int index)
+            int index, int resultsCount)
         {
             var innerStackPanel = new StackPanel
             {
@@ -307,6 +346,16 @@ namespace JapaneseLookup
                 bottom.Children.Add(baby);
             }
 
+            if (index != resultsCount - 1 && index != ConfigManager.MaxResults)
+            {
+                bottom.Children.Add(new Separator
+                {
+                    // TODO: Fix thickness' differing from one separator to another
+                    Width = PopupWindow.Instance.Width,
+                    Background = ConfigManager.SeparatorColor
+                });
+            }
+
             innerStackPanel.Children.Add(top);
             innerStackPanel.Children.Add(bottom);
             return innerStackPanel;
@@ -414,9 +463,9 @@ namespace JapaneseLookup
 
         public static string FindSentence(string text, int position)
         {
-            List<string> JapanesePunctuation = new() { "。", "！", "？", "…", ".", "\n", };
+            List<string> japanesePunctuation = new() { "。", "！", "？", "…", ".", "\n", };
 
-            Dictionary<string, string> JapaneseParentheses = new()
+            Dictionary<string, string> japaneseParentheses = new()
             {
                 { "「", "」" },
                 { "『", "』" },
@@ -426,7 +475,7 @@ namespace JapaneseLookup
             int startPosition = -1;
             int endPosition = -1;
 
-            foreach (string punctuation in JapanesePunctuation)
+            foreach (string punctuation in japanesePunctuation)
             {
                 int tempIndex = text.LastIndexOf(punctuation, position, StringComparison.Ordinal);
 
@@ -458,19 +507,18 @@ namespace JapaneseLookup
 
             if (sentence.Length > 1)
             {
-                if (JapaneseParentheses.ContainsValue(sentence.First().ToString()))
+                if (japaneseParentheses.ContainsValue(sentence.First().ToString()))
                 {
                     sentence = sentence[1..];
                 }
 
-                if (JapaneseParentheses.Keys.Contains(sentence.LastOrDefault().ToString()))
+                if (japaneseParentheses.Keys.Contains(sentence.LastOrDefault().ToString()))
                 {
-                    sentence = sentence[0..^1];
+                    sentence = sentence[..^1];
                 }
 
-                if (JapaneseParentheses.TryGetValue(sentence.FirstOrDefault().ToString(), out string rightParenthesis))
+                if (japaneseParentheses.TryGetValue(sentence.FirstOrDefault().ToString(), out string rightParenthesis))
                 {
-
                     if (sentence.Last().ToString() == rightParenthesis)
                         sentence = sentence[1..^1];
 
@@ -487,12 +535,12 @@ namespace JapaneseLookup
                     }
                 }
 
-                else if (JapaneseParentheses.ContainsValue(sentence.LastOrDefault().ToString()))
+                else if (japaneseParentheses.ContainsValue(sentence.LastOrDefault().ToString()))
                 {
-                    string leftParenthesis = JapaneseParentheses.First(p => p.Value == sentence.Last().ToString()).Key;
+                    string leftParenthesis = japaneseParentheses.First(p => p.Value == sentence.Last().ToString()).Key;
 
                     if (!sentence.Contains(leftParenthesis))
-                        sentence = sentence[0..^1];
+                        sentence = sentence[..^1];
 
                     else if (sentence.Contains(leftParenthesis))
                     {
@@ -500,7 +548,7 @@ namespace JapaneseLookup
                         int numberOfRightParentheses = sentence.Count(p => p == sentence.Last());
 
                         if (numberOfRightParentheses == numberOfLeftParentheses + 1)
-                            sentence = sentence[0..^1];
+                            sentence = sentence[..^1];
                     }
                 }
             }

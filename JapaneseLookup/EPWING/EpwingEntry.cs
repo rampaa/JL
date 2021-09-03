@@ -5,12 +5,18 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace JapaneseLookup.EPWING
 {
-    class EpwingEntry
+    public class EpwingEntry
     {
+        //todo
+        public static readonly Regex DefinitionsRegex =
+            new(
+                @"");
+
         public string Expression { get; set; }
         public string Reading { get; set; }
         public string DefinitionTags { get; set; }
@@ -31,7 +37,17 @@ namespace JapaneseLookup.EPWING
             jsonElement[4].TryGetInt32(out int score);
             Score = score;
 
-            Glosssary = jsonElement[5].ToString()[2..^2].Split("\\n", StringSplitOptions.TrimEntries).ToList();
+            Glosssary = jsonElement[5].ToString()[2..^2]
+                .Split(
+                    new string[]
+                    {
+                        //todo
+                        // "⓪", "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩",
+                        // "⑪", "⑫", "⑬", "⑭", "⑮", "⑯", "⑰", "⑱", "⑲", "⑳",
+                        "\\n"
+                    }
+                    , StringSplitOptions.TrimEntries
+                ).ToList();
 
             jsonElement[6].TryGetInt32(out int sequence);
             Sequence = sequence;

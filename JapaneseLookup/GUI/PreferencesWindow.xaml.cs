@@ -3,17 +3,23 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using JapaneseLookup.EDICT;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
 using HandyControl.Tools;
 using HandyControl.Controls;
 using HandyControl.Properties;
 using JapaneseLookup.Anki;
+using Button = System.Windows.Controls.Button;
+using CheckBox = System.Windows.Controls.CheckBox;
+using MessageBoxOptions = System.Windows.MessageBoxOptions;
+using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
 namespace JapaneseLookup.GUI
 {
@@ -90,17 +96,44 @@ namespace JapaneseLookup.GUI
             Task.Run(ResourceUpdater.UpdateKanjidic);
         }
 
-        #region MiningSetup
-
-        private async void TabItemAnki_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        // todo
+        private async void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!_setAnkiConfig)
+            var itemTab = (System.Windows.Controls.TabItem) TabControl.SelectedItem;
+            if (itemTab == null) return;
+
+            switch (itemTab.Header)
             {
-                await SetPreviousMiningConfig();
-                if (MiningSetupComboBoxDeckNames.SelectedItem == null) await PopulateDeckAndModelNames();
-                _setAnkiConfig = true;
+                case "Anki":
+                    if (!_setAnkiConfig)
+                    {
+                        await SetPreviousMiningConfig();
+                        if (MiningSetupComboBoxDeckNames.SelectedItem == null) await PopulateDeckAndModelNames();
+                        _setAnkiConfig = true;
+                    }
+
+                    break;
+                case "Dictionaries":
+                    UpdateDictionariesDisplay();
+                    break;
+                default:
+                    Console.WriteLine(itemTab);
+                    break;
             }
         }
+
+        #region MiningSetup
+
+        // private async void TabItemAnki_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        // {
+        //     //todo
+        //     if (!_setAnkiConfig)
+        //     {
+        //         await SetPreviousMiningConfig();
+        //         if (MiningSetupComboBoxDeckNames.SelectedItem == null) await PopulateDeckAndModelNames();
+        //         _setAnkiConfig = true;
+        //     }
+        // }
 
         private async Task SetPreviousMiningConfig()
         {
@@ -237,6 +270,209 @@ namespace JapaneseLookup.GUI
             {
                 Console.WriteLine("Error saving config");
                 Debug.WriteLine(exception);
+            }
+        }
+
+        #endregion
+
+        #region Dictionaries
+
+        // private void TabItemDictionaries_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        // {
+        //     UpdateDictionariesDisplay();
+        // }
+
+        // probably should be split into several methods
+        private void UpdateDictionariesDisplay()
+        {
+            List<DockPanel> resultDockPanels = new();
+
+            foreach ((DictType _, Dict dict) in Dicts.dicts)
+            {
+                var dockPanel = new DockPanel();
+
+                var checkBox = new CheckBox()
+                {
+                    Width = 20,
+                    IsChecked = dict.Active,
+                    Margin = new Thickness(10),
+                };
+                var dictTypeDisplay = new TextBlock()
+                {
+                    Width = 100,
+                    Text = dict.Type.ToString(),
+                    Margin = new Thickness(10),
+                };
+                //todo
+                // var buttonBrowse = new Button()
+                // {
+                //     Width = 70,
+                //     Content = "Browse",
+                //     Margin = new Thickness(10),
+                // };
+                var dictPathDisplay = new TextBlock()
+                {
+                    Width = 210,
+                    Text = dict.Path,
+                    Margin = new Thickness(10),
+                };
+
+                // should be a red cross ideally
+                var buttonRemove = new Button()
+                {
+                    Width = 70,
+                    Content = "Remove",
+                    Background = Brushes.Red,
+                    Margin = new Thickness(10),
+                };
+
+                // yeah, dunno about this
+                checkBox.Unchecked += (sender, args) => dict.Active = false;
+                checkBox.Checked += (sender, args) => dict.Active = true;
+                // buttonBrowse.Click += OnButtonBrowseClick;
+                buttonRemove.Click += (sender, args) =>
+                {
+                    if (System.Windows.MessageBox.Show("Really remove dictionary?", "Confirmation",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question,
+                        MessageBoxResult.No,
+                        MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
+                    {
+                        Dicts.dicts.Remove(dict.Type);
+                        UpdateDictionariesDisplay();
+                    }
+                };
+
+                // switch (dict.Type)
+                // {
+                //     case DictType.JMdict:
+                //         buttonBrowse.Click += OnButtonBrowseClickFile;
+                //         break;
+                //     case DictType.JMnedict:
+                //         buttonBrowse.Click += OnButtonBrowseClickFile;
+                //         break;
+                //     case DictType.Kanjidic:
+                //         buttonBrowse.Click += OnButtonBrowseClickFile;
+                //         break;
+                //     case DictType.UnknownEpwing:
+                //         buttonBrowse.Click += OnButtonBrowseClickFolder;
+                //         break;
+                //     case DictType.Daijirin:
+                //         buttonBrowse.Click += OnButtonBrowseClickFolder;
+                //         break;
+                //     case DictType.Daijisen:
+                //         buttonBrowse.Click += OnButtonBrowseClickFolder;
+                //         break;
+                //     case DictType.Kojien:
+                //         buttonBrowse.Click += OnButtonBrowseClickFolder;
+                //         break;
+                //     case DictType.Meikyou:
+                //         buttonBrowse.Click += OnButtonBrowseClickFolder;
+                //         break;
+                //     default:
+                //         throw new ArgumentOutOfRangeException();
+                // }
+
+                dockPanel.Children.Add(checkBox);
+                dockPanel.Children.Add(dictTypeDisplay);
+                // dockPanel.Children.Add(buttonBrowse);
+                dockPanel.Children.Add(dictPathDisplay);
+                dockPanel.Children.Add(buttonRemove);
+
+                resultDockPanels.Add(dockPanel);
+                //  DictionariesDisplay.Children.Add(dockPanel);
+            }
+
+            // TODO: AddDictionaryWindow
+            List<DictType> allDictTypes = Enum.GetValues(typeof(DictType)).Cast<DictType>().ToList();
+            List<DictType> loadedDictTypes = Dicts.dicts.Keys.ToList();
+            ComboBoxAddDictionary.ItemsSource = allDictTypes.Except(loadedDictTypes);
+            DictionariesDisplay.ItemsSource = resultDockPanels;
+        }
+
+        private void OnButtonBrowseClickFile(DictType selectedDictType, string filter)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog()
+            {
+                InitialDirectory = ConfigManager.ApplicationPath,
+                Filter = filter
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                var relativePath = Path.GetRelativePath(ConfigManager.ApplicationPath, openFileDialog.FileName);
+                Dicts.dicts.Add(selectedDictType, new Dict(selectedDictType, relativePath, true));
+                Dicts.dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
+                UpdateDictionariesDisplay();
+            }
+        }
+
+        // could get rid of this and make users select the index.json file for EPWING dictionaries
+        private void OnButtonBrowseClickFolder(DictType selectedDictType)
+        {
+            using var fbd = new FolderBrowserDialog()
+            {
+                SelectedPath = ConfigManager.ApplicationPath
+            };
+
+            if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK &&
+                !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+            {
+                var relativePath = Path.GetRelativePath(ConfigManager.ApplicationPath, fbd.SelectedPath);
+                Dicts.dicts.Add(selectedDictType, new Dict(selectedDictType, relativePath, true));
+                Dicts.dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
+                UpdateDictionariesDisplay();
+            }
+        }
+
+        // private void OnButtonRemoveClick(object sender, RoutedEventArgs e, Dictionary<DictType, Dict> dicts)
+        // {
+        // }
+
+        private void ButtonAddDictionary_OnClick(object sender, RoutedEventArgs e)
+        {
+            // var comboBox = new System.Windows.Controls.ComboBox
+            // {
+            //     ItemsSource = allDictTypes.Except(loadedDictTypes),
+            // };
+
+            // TODO: Shouldn't need this if done properly w/ a dedicated window
+            if (ComboBoxAddDictionary.SelectionBoxItem.ToString() == "") return;
+
+            var selectedDictType =
+                Enum.Parse<DictType>(ComboBoxAddDictionary.SelectionBoxItem.ToString() ??
+                                     throw new InvalidOperationException());
+
+            switch (selectedDictType)
+            {
+                case DictType.JMdict:
+                    // not providing a description for the filter causes the filename returned to be empty, lmfao microsoft
+                    // OnButtonBrowseClickFile(selectedDictType, "|JMdict.xml");
+                    OnButtonBrowseClickFile(selectedDictType, "JMdict file|JMdict.xml");
+                    break;
+                case DictType.JMnedict:
+                    OnButtonBrowseClickFile(selectedDictType, "JMnedict file|JMnedict.xml");
+                    break;
+                case DictType.Kanjidic:
+                    OnButtonBrowseClickFile(selectedDictType, "Kanjidic2 file|Kanjidic2.xml");
+                    break;
+                case DictType.UnknownEpwing:
+                    OnButtonBrowseClickFolder(selectedDictType);
+                    break;
+                case DictType.Daijirin:
+                    OnButtonBrowseClickFolder(selectedDictType);
+                    break;
+                case DictType.Daijisen:
+                    OnButtonBrowseClickFolder(selectedDictType);
+                    break;
+                case DictType.Kojien:
+                    OnButtonBrowseClickFolder(selectedDictType);
+                    break;
+                case DictType.Meikyou:
+                    OnButtonBrowseClickFolder(selectedDictType);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 

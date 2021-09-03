@@ -1,6 +1,8 @@
-﻿using JapaneseLookup;
+﻿using System.Collections.Generic;
+using JapaneseLookup;
 using NUnit.Framework;
 using System.Text.Json;
+using System.Threading.Tasks;
 using JapaneseLookup.EDICT;
 
 namespace JapaneseLookupTests
@@ -16,7 +18,12 @@ namespace JapaneseLookupTests
         [OneTimeSetUp]
         public void ClassInit()
         {
-            JMdictLoader.Load();
+            Dicts.dicts.Add(DictType.JMdict,
+                new Dict(DictType.JMdict, "", true
+                   // ,new Dictionary<string, List<IResult>>()
+                    ));
+            Dicts.dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();
+            JMdictLoader.Load("/Resources/JMdict.xml");
         }
 
         [Test]

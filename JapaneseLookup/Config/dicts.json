@@ -1,0 +1,17 @@
+{
+  "JMdict": {
+    "Type": "JMdict",
+    "Path": "Resources\\JMdict.xml",
+    "Active": true
+  },
+  "JMnedict": {
+    "Type": "JMnedict",
+    "Path": "Resources\\JMnedict.xml",
+    "Active": true
+  },
+  "Kanjidic": {
+    "Type": "Kanjidic",
+    "Path": "Resources\\kanjidic2.xml",
+    "Active": true
+  }
+}

@@ -94,11 +94,12 @@ namespace JapaneseLookup.GUI
                 if (text == _lastWord) return;
                 _lastWord = text;
 
-                var results = MainWindowUtilities.Lookup(text);
-
-                if (results != null)
+                var lookupResults = MainWindowUtilities.Lookup(text);
+                if (lookupResults != null && lookupResults.Any())
                 {
-                    PopupWindow.Instance.StackPanel.Children.Clear();
+                    //todo
+                    // PopupWindow.Instance.StackPanel.Children.Clear();
+                    PopupWindow.Instance.ResultStackPanels.Clear();
 
                     // popup doesn't follow cursor
                     // PopupWindow.Instance.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
@@ -107,29 +108,8 @@ namespace JapaneseLookup.GUI
                     PopupWindow.Instance.Activate();
                     PopupWindow.Instance.Focus();
 
-                    for (int i = 0; i < results.Count; i++)
-                    {
-                        var result = results[i];
-
-                        // if (result[LookupResult.Grade].Any())
-                        // {
-                        //     PopupWindow.Instance.StackPanel.Children.Add(
-                        //         PopupWindow.MakeResultStackPanelKanji(sentence, result, i));
-                        // }
-                        // else
-                        // {
-                        PopupWindow.Instance.StackPanel.Children.Add(
-                            PopupWindowUtilities.MakeResultStackPanel(result, i));
-                        // }
-
-                        if (i != results.Count - 1)
-                        {
-                            PopupWindow.Instance.StackPanel.Children.Add(new Separator
-                            {
-                                Background = ConfigManager.SeparatorColor
-                            });
-                        }
-                    }
+                    PopupWindowUtilities.LastLookupResults = lookupResults;
+                    PopupWindowUtilities.DisplayResults(false);
                 }
                 else
                     PopupWindow.Instance.Visibility = Visibility.Hidden;

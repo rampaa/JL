@@ -12,8 +12,15 @@
         KeyDown="Window_KeyDown" Closing="Window_Closing">
 
     <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Top">
-        <Grid>
-            <StackPanel x:Name="StackPanel" />
-        </Grid>
+        <!-- idk why but a ListBox works way better than an ItemsControl for this 
+        (possibly because of virtualization shenanigans?) -->
+        <ListBox VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False" Foreground="White"
+                 x:Name="StackPanel">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="Focusable" Value="False" />
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
     </ScrollViewer>
 </Window>

@@ -1,14 +1,10 @@
 ﻿using JapaneseLookup;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JapaneseLookupTests
 {
-    class PopupWindowUtilitiesTests
+    [TestFixture]
+    public class PopupWindowUtilitiesTests
     {
         [Test]
         public void FindSentence_FromTheStart()

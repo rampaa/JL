@@ -9,49 +9,64 @@ using System.Diagnostics;
 
 namespace JapaneseLookup.EPWING
 {
-    class EpwingJsonLoader
+    public static class EpwingJsonLoader
     {
-        public async static void Loader(string path)
+        public static async Task Loader(DictType dictType, string dictPath)
         {
             List<EpwingEntry> epwingEntryList = new();
 
-            string[] jsonFiles = Directory.GetFiles(path, "*_bank_*.json");
+            string[] jsonFiles = Directory.GetFiles(dictPath, "*_bank_*.json");
+            // string[] jsonFiles = Directory.GetFiles(dictPath, "*.json");
 
             foreach (string jsonFile in jsonFiles)
             {
                 await using FileStream openStream = File.OpenRead(jsonFile);
                 var jsonObject = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream);
 
-                foreach(var obj in jsonObject)
+                Debug.Assert(jsonObject != null, nameof(jsonObject) + " != null");
+                foreach (var obj in jsonObject)
                 {
                     epwingEntryList.Add(new EpwingEntry(obj));
                 }
             }
 
-            DictionaryBuilder(epwingEntryList);
+            DictionaryBuilder(epwingEntryList, Dicts.dicts[dictType].Contents);
+            Dicts.dicts[dictType].Contents.TrimExcess();
         }
 
-        public static void DictionaryBuilder(List<EpwingEntry> epwing)
+        public static void DictionaryBuilder(List<EpwingEntry> epwingEntryList,
+            Dictionary<string, List<IResult>> epwingDictionary)
         {
-            //Debug.WriteLine(epwing[20000].Expression);
-            //Debug.WriteLine(epwing[20000].Reading);
-            //foreach (var gloss in epwing[20000].Glosssary)
-            //{
-             //Debug.WriteLine(gloss);
-            //}
-            
-
-            foreach(var entry in epwing)
+            foreach (var entry in epwingEntryList)
             {
                 //Rules = POS, Reading, Expression
                 //TermTags, DefinitionTags
                 //dammar;damar
+                if ("\"\"" != entry.DefinitionTags)
+                    Debug.WriteLine(entry.DefinitionTags);
+                // if ("\"\"" != entry.Rules)
+                //     Debug.WriteLine(entry.Expression+" "+entry.Rules);
+                if (0 != entry.Score)
+                    Debug.WriteLine(entry.Score);
                 if ("\"\"" != entry.TermTags)
-                Debug.WriteLine(entry.TermTags);
-                //foreach(var gloss in entry.Glosssary)
-                //{
-                //    Debug.WriteLine(gloss);
-                //}
+                    Debug.WriteLine(entry.TermTags);
+
+                var result = new EpwingResult
+                {
+                    Definitions = new List<List<string>> { entry.Glosssary },
+                    Readings = new List<string> { entry.Reading ?? entry.Expression },
+                    PrimarySpelling = entry.Expression,
+                    WordClasses = new List<List<string>> { new() { entry.Rules } }
+                };
+                // if (entry.Expression == "アイドル")
+                //     Console.WriteLine();
+
+                if (epwingDictionary.TryGetValue(entry.Expression, out List<IResult> tempList))
+                    tempList.Add(result);
+                else
+                    tempList = new() { result };
+
+                epwingDictionary[entry.Expression] = tempList;
             }
         }
     }

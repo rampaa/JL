@@ -12,13 +12,11 @@ namespace JapaneseLookup.KANJIDIC
 {
     public static class KanjiInfoLoader
     {
-        public static readonly Dictionary<string, KanjiResult> KanjiDictionary = new();
-
-        public static void Load()
+        public static void Load(string dictPath)
         {
-            if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/kanjidic2.xml")))
+            if (File.Exists(Path.Join(ConfigManager.ApplicationPath, dictPath)))
             {
-                using XmlTextReader edictXml = new(Path.Join(ConfigManager.ApplicationPath, "Resources/kanjidic2.xml"))
+                using XmlTextReader edictXml = new(Path.Join(ConfigManager.ApplicationPath, dictPath))
                 {
                     DtdProcessing = DtdProcessing.Parse,
                     WhitespaceHandling = WhitespaceHandling.None,
@@ -26,10 +24,11 @@ namespace JapaneseLookup.KANJIDIC
                 };
 
                 Dictionary<string, string> kanjiCompositionDictionary = new();
-
+                // TODO
                 if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
                 {
                     foreach (string line in File.ReadLines(
+                        // TODO
                         Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
                     {
                         string[] lParts = line.Split("\t");
@@ -61,18 +60,22 @@ namespace JapaneseLookup.KANJIDIC
                     }
                 }
 
+                Dicts.dicts[DictType.Kanjidic].Contents = new Dictionary<string, List<IResult>>();
                 while (edictXml.ReadToFollowing("literal"))
                 {
                     ReadCharacter(edictXml, kanjiCompositionDictionary);
                 }
+
+                Dicts.dicts[DictType.Kanjidic].Contents.TrimExcess();
             }
-            else
-            {
-                MessageBox.Show(
-                    "Couldn't find kanjidic2.xml. Please download it by clicking the \"Update KANJIDIC\" button.", "",
-                    MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK,
-                    MessageBoxOptions.DefaultDesktopOnly);
-            }
+
+            // else
+            // {
+            //     MessageBox.Show(
+            //         "Couldn't find kanjidic2.xml. Please download it by clicking the \"Update KANJIDIC\" button.", "",
+            //         MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK,
+            //         MessageBoxOptions.DefaultDesktopOnly);
+            // }
         }
 
         private static void ReadCharacter(XmlReader kanjiDicXml, Dictionary<string, string> kanjiCompositionDictionary)
@@ -132,7 +135,7 @@ namespace JapaneseLookup.KANJIDIC
                 }
             }
 
-            KanjiDictionary.Add(key, entry);
+            Dicts.dicts[DictType.Kanjidic].Contents.Add(key, new List<IResult> { entry });
         }
     }
 }

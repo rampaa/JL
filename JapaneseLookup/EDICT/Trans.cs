@@ -2,7 +2,7 @@
 
 namespace JapaneseLookup.EDICT
 {
-    class Trans
+    public class Trans
     {
         public List<string> NameTypeList { get; set; }
         public List<string> TransDetList { get; set; }
