@@ -21,31 +21,15 @@ namespace JapaneseLookup
             // probably won't be worth (performance-wise) forcing that to happen instead of just using a magic number
             int resultsCount = generateAllResults ? results.Count : Math.Min(results.Count, Magic);
 
-            // var resultStackPanels = new List<StackPanel>();
-
             for (int index = 0; index < resultsCount; index++)
             {
                 if (index > ConfigManager.MaxResults)
                     return;
 
-                // double heights = resultStackPanels.Sum(rsp => rsp.Height);
-                // if (heights > PopupWindow.Instance.MaxHeight)
-                //     return;
-
                 var result = results[index];
-                //todo
-                // if (result[LookupResult.Grade].Any())
-                // {
-                //     PopupWindow.Instance.StackPanel.Children.Add(
-                //         PopupWindow.MakeResultStackPanelKanji(sentence, result, index));
-                // }
-                // else
-                // {
                 StackPanel resultStackPanel = MakeResultStackPanel(result, index, results.Count);
 
-                // resultStackPanels.Add(resultStackPanel);
                 PopupWindow.Instance.ResultStackPanels.Add(resultStackPanel);
-                // }
             }
         }
 

@@ -7,9 +7,6 @@ namespace JapaneseLookup
 {
     public class Dict
     {
-        //todo
-        // public string name { get; set; }
-
         public DictType Type { get; set; }
 
         public string Path { get; set; }
@@ -22,15 +19,12 @@ namespace JapaneseLookup
 
         public Dict(DictType type, string path, bool active
             // , bool loaded,
-            // , Dictionary<string, List<IResult>> contents
         )
         {
-            // this.name = name;
             Type = type;
             Path = path;
             Active = active;
             // Loaded = loaded;
-            // Contents = contents;
         }
     }
 }

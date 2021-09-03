@@ -96,7 +96,6 @@ namespace JapaneseLookup.GUI
             Task.Run(ResourceUpdater.UpdateKanjidic);
         }
 
-        // todo
         private async void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var itemTab = (System.Windows.Controls.TabItem) TabControl.SelectedItem;
@@ -116,24 +115,10 @@ namespace JapaneseLookup.GUI
                 case "Dictionaries":
                     UpdateDictionariesDisplay();
                     break;
-                default:
-                    Console.WriteLine(itemTab);
-                    break;
             }
         }
 
         #region MiningSetup
-
-        // private async void TabItemAnki_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        // {
-        //     //todo
-        //     if (!_setAnkiConfig)
-        //     {
-        //         await SetPreviousMiningConfig();
-        //         if (MiningSetupComboBoxDeckNames.SelectedItem == null) await PopulateDeckAndModelNames();
-        //         _setAnkiConfig = true;
-        //     }
-        // }
 
         private async Task SetPreviousMiningConfig()
         {
@@ -277,11 +262,6 @@ namespace JapaneseLookup.GUI
 
         #region Dictionaries
 
-        // private void TabItemDictionaries_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        // {
-        //     UpdateDictionariesDisplay();
-        // }
-
         // probably should be split into several methods
         private void UpdateDictionariesDisplay()
         {
@@ -303,13 +283,6 @@ namespace JapaneseLookup.GUI
                     Text = dict.Type.ToString(),
                     Margin = new Thickness(10),
                 };
-                //todo
-                // var buttonBrowse = new Button()
-                // {
-                //     Width = 70,
-                //     Content = "Browse",
-                //     Margin = new Thickness(10),
-                // };
                 var dictPathDisplay = new TextBlock()
                 {
                     Width = 210,
@@ -329,7 +302,6 @@ namespace JapaneseLookup.GUI
                 // yeah, dunno about this
                 checkBox.Unchecked += (sender, args) => dict.Active = false;
                 checkBox.Checked += (sender, args) => dict.Active = true;
-                // buttonBrowse.Click += OnButtonBrowseClick;
                 buttonRemove.Click += (sender, args) =>
                 {
                     if (System.Windows.MessageBox.Show("Really remove dictionary?", "Confirmation",
@@ -343,44 +315,12 @@ namespace JapaneseLookup.GUI
                     }
                 };
 
-                // switch (dict.Type)
-                // {
-                //     case DictType.JMdict:
-                //         buttonBrowse.Click += OnButtonBrowseClickFile;
-                //         break;
-                //     case DictType.JMnedict:
-                //         buttonBrowse.Click += OnButtonBrowseClickFile;
-                //         break;
-                //     case DictType.Kanjidic:
-                //         buttonBrowse.Click += OnButtonBrowseClickFile;
-                //         break;
-                //     case DictType.UnknownEpwing:
-                //         buttonBrowse.Click += OnButtonBrowseClickFolder;
-                //         break;
-                //     case DictType.Daijirin:
-                //         buttonBrowse.Click += OnButtonBrowseClickFolder;
-                //         break;
-                //     case DictType.Daijisen:
-                //         buttonBrowse.Click += OnButtonBrowseClickFolder;
-                //         break;
-                //     case DictType.Kojien:
-                //         buttonBrowse.Click += OnButtonBrowseClickFolder;
-                //         break;
-                //     case DictType.Meikyou:
-                //         buttonBrowse.Click += OnButtonBrowseClickFolder;
-                //         break;
-                //     default:
-                //         throw new ArgumentOutOfRangeException();
-                // }
-
                 dockPanel.Children.Add(checkBox);
                 dockPanel.Children.Add(dictTypeDisplay);
-                // dockPanel.Children.Add(buttonBrowse);
                 dockPanel.Children.Add(dictPathDisplay);
                 dockPanel.Children.Add(buttonRemove);
 
                 resultDockPanels.Add(dockPanel);
-                //  DictionariesDisplay.Children.Add(dockPanel);
             }
 
             // TODO: AddDictionaryWindow
@@ -390,7 +330,7 @@ namespace JapaneseLookup.GUI
             DictionariesDisplay.ItemsSource = resultDockPanels;
         }
 
-        private void OnButtonBrowseClickFile(DictType selectedDictType, string filter)
+        private void BrowseForDictionaryFile(DictType selectedDictType, string filter)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog()
             {
@@ -408,7 +348,7 @@ namespace JapaneseLookup.GUI
         }
 
         // could get rid of this and make users select the index.json file for EPWING dictionaries
-        private void OnButtonBrowseClickFolder(DictType selectedDictType)
+        private void BrowseForDictionaryFolder(DictType selectedDictType)
         {
             using var fbd = new FolderBrowserDialog()
             {
@@ -425,17 +365,8 @@ namespace JapaneseLookup.GUI
             }
         }
 
-        // private void OnButtonRemoveClick(object sender, RoutedEventArgs e, Dictionary<DictType, Dict> dicts)
-        // {
-        // }
-
         private void ButtonAddDictionary_OnClick(object sender, RoutedEventArgs e)
         {
-            // var comboBox = new System.Windows.Controls.ComboBox
-            // {
-            //     ItemsSource = allDictTypes.Except(loadedDictTypes),
-            // };
-
             // TODO: Shouldn't need this if done properly w/ a dedicated window
             if (ComboBoxAddDictionary.SelectionBoxItem.ToString() == "") return;
 
@@ -447,29 +378,29 @@ namespace JapaneseLookup.GUI
             {
                 case DictType.JMdict:
                     // not providing a description for the filter causes the filename returned to be empty, lmfao microsoft
-                    // OnButtonBrowseClickFile(selectedDictType, "|JMdict.xml");
-                    OnButtonBrowseClickFile(selectedDictType, "JMdict file|JMdict.xml");
+                    // BrowseForDictionaryFile(selectedDictType, "|JMdict.xml");
+                    BrowseForDictionaryFile(selectedDictType, "JMdict file|JMdict.xml");
                     break;
                 case DictType.JMnedict:
-                    OnButtonBrowseClickFile(selectedDictType, "JMnedict file|JMnedict.xml");
+                    BrowseForDictionaryFile(selectedDictType, "JMnedict file|JMnedict.xml");
                     break;
                 case DictType.Kanjidic:
-                    OnButtonBrowseClickFile(selectedDictType, "Kanjidic2 file|Kanjidic2.xml");
+                    BrowseForDictionaryFile(selectedDictType, "Kanjidic2 file|Kanjidic2.xml");
                     break;
                 case DictType.UnknownEpwing:
-                    OnButtonBrowseClickFolder(selectedDictType);
+                    BrowseForDictionaryFolder(selectedDictType);
                     break;
                 case DictType.Daijirin:
-                    OnButtonBrowseClickFolder(selectedDictType);
+                    BrowseForDictionaryFolder(selectedDictType);
                     break;
                 case DictType.Daijisen:
-                    OnButtonBrowseClickFolder(selectedDictType);
+                    BrowseForDictionaryFolder(selectedDictType);
                     break;
                 case DictType.Kojien:
-                    OnButtonBrowseClickFolder(selectedDictType);
+                    BrowseForDictionaryFolder(selectedDictType);
                     break;
                 case DictType.Meikyou:
-                    OnButtonBrowseClickFolder(selectedDictType);
+                    BrowseForDictionaryFolder(selectedDictType);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

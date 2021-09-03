@@ -491,23 +491,10 @@ namespace JapaneseLookup
                 foreach (var jMDictResult in wordResult.Value.epwingResults)
                 {
                     var result = new Dictionary<LookupResult, List<string>>();
-
                     var foundSpelling = new List<string> { jMDictResult.PrimarySpelling };
-
-                    //todo
-                    // var kanaSpellings = jMDictResult.KanaSpellings ?? new List<string>();
-
                     var readings = jMDictResult.Readings.ToList();
                     var foundForm = new List<string> { wordResult.Value.foundForm };
-                    // var edictID = new List<string> { jMDictResult.Id };
-
-                    // List<string> alternativeSpellings;
-                    // if (jMDictResult.AlternativeSpellings != null)
-                    //     alternativeSpellings = jMDictResult.AlternativeSpellings.ToList();
-                    // else
-                    //     alternativeSpellings = new List<string>();
                     var process = wordResult.Value.processList;
-
                     List<string> frequency;
                     // if (jMDictResult.FrequencyDict != null)
                     // {
@@ -520,51 +507,12 @@ namespace JapaneseLookup
 
                     var definitions = new List<string> { BuildEpwingWordDefinition(jMDictResult) };
 
-                    // var pOrthographyInfoList = jMDictResult.POrthographyInfoList ?? new List<string>();
-                    //
-                    // var rList = jMDictResult.ROrthographyInfoList ?? new List<List<string>>();
-                    // var aList = jMDictResult.AOrthographyInfoList ?? new List<List<string>>();
-                    // var rOrthographyInfoList = new List<string>();
-                    // var aOrthographyInfoList = new List<string>();
-
-                    // foreach (var list in rList)
-                    // {
-                    //     var final = "";
-                    //     foreach (var str in list)
-                    //     {
-                    //         final += str + ", ";
-                    //     }
-                    //
-                    //     final = final.TrimEnd(", ".ToCharArray());
-                    //
-                    //     rOrthographyInfoList.Add(final);
-                    // }
-                    //
-                    // foreach (var list in aList)
-                    // {
-                    //     var final = "";
-                    //     foreach (var str in list)
-                    //     {
-                    //         final += str + ", ";
-                    //     }
-                    //
-                    //     final = final.TrimEnd(", ".ToCharArray());
-                    //
-                    //     aOrthographyInfoList.Add(final);
-                    // }
-
                     result.Add(LookupResult.FoundSpelling, foundSpelling);
-                    // result.Add(LookupResult.KanaSpellings, kanaSpellings);
                     result.Add(LookupResult.Readings, readings);
                     result.Add(LookupResult.Definitions, definitions);
                     result.Add(LookupResult.FoundForm, foundForm);
-                    // result.Add(LookupResult.EdictID, edictID);
-                    // result.Add(LookupResult.AlternativeSpellings, alternativeSpellings);
                     result.Add(LookupResult.Process, process);
                     result.Add(LookupResult.Frequency, frequency);
-                    // result.Add(LookupResult.POrthographyInfoList, pOrthographyInfoList);
-                    // result.Add(LookupResult.ROrthographyInfoList, rOrthographyInfoList);
-                    // result.Add(LookupResult.AOrthographyInfoList, aOrthographyInfoList);
 
                     results.Add(result);
                 }
@@ -680,37 +628,8 @@ namespace JapaneseLookup
                 {
                     // defResult += "(" + count + ") ";
 
-                    // if (jMDictResult.SpellingInfo.Any() && jMDictResult.SpellingInfo[i] != null)
-                    // {
-                    //     defResult += "(";
-                    //     defResult += jMDictResult.SpellingInfo[i];
-                    //     defResult += ") ";
-                    // }
-                    //
-                    // if (jMDictResult.MiscList.Any() && jMDictResult.MiscList[i].Any())
-                    // {
-                    //     defResult += "(";
-                    //     defResult += string.Join(", ", jMDictResult.MiscList[i]);
-                    //     defResult += ") ";
-                    // }
-
                     var separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "; ";
-                    // defResult += string.Join("; ", jMDictResult.Definitions[i]) + " ";
                     defResult += string.Join(separator, jMDictResult.Definitions[i]);
-                    //
-                    // if (jMDictResult.RRestrictions != null && jMDictResult.RRestrictions[i].Any()
-                    //     || jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
-                    // {
-                    //     defResult += "(only applies to ";
-                    //
-                    //     if (jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
-                    //         defResult += string.Join("; ", jMDictResult.KRestrictions[i]);
-                    //
-                    //     if (jMDictResult.RRestrictions != null && jMDictResult.RRestrictions[i].Any())
-                    //         defResult += string.Join("; ", jMDictResult.RRestrictions[i]);
-                    //
-                    //     defResult += ") ";
-                    // }
 
                     // ++count;
                 }

@@ -40,12 +40,6 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Use name dictionary"
-                                       TextWrapping="Wrap" />
-                            <CheckBox x:Name="UseJMnedictCheckBox" Content="" HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Kanji mode"
                                        TextWrapping="Wrap" />
                             <CheckBox x:Name="KanjiModeCheckBox" Content="" HorizontalAlignment="Right" />

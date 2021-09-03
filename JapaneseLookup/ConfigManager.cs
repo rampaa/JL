@@ -34,34 +34,10 @@ namespace JapaneseLookup
             { "None", "" }
         };
 
-        // private static List<Dict> SelectedDicts = new List<Dict>()
-        // {
-        //     new(DictType.JMdict, "./Resources/JMdict.xml", true, new Dictionary<string, IResult>()),
-        //     new(DictType.JMnedict, "./Resources/JMnedict.xml", true, new Dictionary<string, IResult>()),
-        //     new(DictType.Kanjidic, "./Resources/kanjidic2.xml", true, new Dictionary<string, IResult>()),
-        //     new(DictType.Daijirin, "./daijirin", true, new Dictionary<string, IResult>()),
-        // };
-
-        // private static Dictionary<DictType, string> SelectedDicts = new Dictionary<DictType, string>
-        // {
-        //     // { DictType.JMdict, "./Resources/JMdict.xml" },
-        //     // { DictType.JMnedict, "./Resources/JMnedict.xml" },
-        //     // { DictType.Kanjidic, "./Resources/kanjidic2.xml" },
-        //     // { DictType.Daijirin, "./daijirin" },
-        //     // { DictType.Daijisen, "./daijisen" },
-        //     // { DictType.Kojien, "./kojien" },
-        //     // { DictType.Meikyou, "./meikyou" },
-        //     // { DictType.Shinmeikai, "./shinmeikai" },
-        // };
-        //todo
-        // public static bool Ready;
-
         public static string AnkiConnectUri;
         public static int MaxSearchLength;
         public static string FrequencyList;
 
-        //todo
-        // public static bool UseJMnedict;
         // TODO: Don't let KanjiMode be turned on if Kanjidic is not loaded?
         public static bool KanjiMode;
         public static bool ForceSync;
@@ -318,8 +294,6 @@ namespace JapaneseLookup
             config.AppSettings.Settings["FrequencyList"].Value =
                 preferenceWindow.FrequencyListComboBox.SelectedItem.ToString();
 
-            config.AppSettings.Settings["UseJMnedict"].Value =
-                preferenceWindow.UseJMnedictCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["KanjiMode"].Value =
                 preferenceWindow.KanjiModeCheckBox.IsChecked.ToString();
 
@@ -404,23 +378,12 @@ namespace JapaneseLookup
             {
                 var jso = new JsonSerializerOptions
                 {
-                    // Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
                     WriteIndented = true,
                     Converters =
                     {
                         new JsonStringEnumConverter(),
                     }
                 };
-
-                // todo
-                // foreach (var dict in Dicts.dicts)
-                // {
-                //     config.AppSettings.Settings["SelectedDicts"].Value += JsonSerializer.Serialize(dict,
-                //         jso);
-                // }
-
-                // config.AppSettings.Settings["SelectedDicts"].Value = JsonSerializer.Serialize(Dicts.dicts,
-                //     jso);
 
                 File.WriteAllText(Path.Join(ApplicationPath, "Config/dicts.json"),
                     JsonSerializer.Serialize(Dicts.dicts, jso));
@@ -438,7 +401,6 @@ namespace JapaneseLookup
             {
                 var jso = new JsonSerializerOptions
                 {
-                    // Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
                     Converters =
                     {
                         new JsonStringEnumConverter(),
@@ -452,13 +414,7 @@ namespace JapaneseLookup
                 {
                     foreach ((DictType _, Dict dict) in deserializedDicts)
                     {
-                        // todo make sure this works
-                        if (!Dicts.dicts.ContainsKey(dict.Type)
-                            // bunch of extra checks to make sure we load a newly added dict
-                            // || Dicts.dicts[dict.Type].Active &&
-                            // (Dicts.dicts[dict.Type].Contents == null ||
-                            //  !Dicts.dicts[dict.Type].Contents.Any())
-                        )
+                        if (!Dicts.dicts.ContainsKey(dict.Type))
                         {
                             dict.Contents = new Dictionary<string, List<IResult>>();
                             Dicts.dicts.Add(dict.Type, dict);
@@ -469,17 +425,6 @@ namespace JapaneseLookup
                 {
                     Console.WriteLine("Couldn't load Config/dicts.json");
                 }
-
-                // todo
-                // NameValueCollection selectedDictsSection =
-                //     (NameValueCollection)ConfigurationManager.GetSection("SelectedDicts");
-                //
-                // // var selectedDictsSection = ConfigurationManager.GetSection("SelectedDicts");
-                // //.Sections.Get("SelectedDicts");
-                // foreach (var VARIABLE in selectedDictsSection)
-                // {
-                //     Console.WriteLine(VARIABLE);
-                // }
             }
             catch (Exception e)
             {
@@ -524,18 +469,6 @@ namespace JapaneseLookup
 
             foreach ((DictType _, Dict dict) in Dicts.dicts)
             {
-                // todo
-                // initialize dicts
-                // if (!Dicts.dicts.TryGetValue(dict.Type, out _))
-                // {
-                //     if (dict.Contents == null || !dict.Contents.Any())
-                //     {
-                //         dict.Contents = new Dictionary<string, List<IResult>>();
-                //     }
-                //
-                //     Dicts.dicts.Add(dict.Type, dict);
-                // }
-
                 if (!dict.Active)
                     continue;
 
@@ -560,15 +493,7 @@ namespace JapaneseLookup
                         // JMnedict
                         if (!Dicts.dicts[DictType.JMnedict].Contents.Any())
                         {
-                            var taskJMnedict = Task.Run(() => JMnedictLoader.Load(dict.Path)).ContinueWith(_ =>
-                            {
-                                // todo
-                                // if (!UseJMnedict && Dicts.JMnedict.Any())
-                                // {
-                                //     Dicts.JMnedict.Clear();
-                                //     Task.Delay(10000).ContinueWith(_ => { GC.Collect(); });
-                                // }
-                            });
+                            var taskJMnedict = Task.Run(() => JMnedictLoader.Load(dict.Path));
                             tasks.Add(taskJMnedict);
                         }
 
@@ -647,7 +572,6 @@ namespace JapaneseLookup
                 Debug.Assert(freqTest1 != null, nameof(freqTest1) + " != null");
 
                 var freqTest = freqTest1.Cast<JMdictResult>().ToList();
-                // var freqTest=freqTest1.OfType<JMdictResult>().ToList();
 
                 if (!freqTest[0].FrequencyDict.TryGetValue(FrequencyList, out int _))
                 {
