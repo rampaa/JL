@@ -97,7 +97,7 @@ namespace JapaneseLookup.GUI
                 var lookupResults = MainWindowUtilities.Lookup(text);
                 if (lookupResults != null && lookupResults.Any())
                 {
-                    PopupWindow.Instance.ResultStackPanels.Clear();
+                    PopupWindowUtilities.DisposeResultStackPanels();
 
                     // popup doesn't follow cursor
                     // PopupWindow.Instance.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
