@@ -112,7 +112,8 @@ namespace JapaneseLookup
                 }
             }
 
-            if (!wordResults.Any() && !nameResults.Any() && (epwingWordResults.Any() && (!epwingWordResults.First()?.Any() ?? false)))
+            if (!wordResults.Any() && !nameResults.Any() &&
+                (epwingWordResults.Any() && !epwingWordResults.First().Any()))
             {
                 if (Dicts.dicts[DictType.Kanjidic]?.Contents.Any() ?? false)
                 {
