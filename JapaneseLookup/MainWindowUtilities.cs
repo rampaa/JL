@@ -333,7 +333,9 @@ namespace JapaneseLookup
             var results = new List<Dictionary<LookupResult, List<string>>>();
             var result = new Dictionary<LookupResult, List<string>>();
 
-            // peak code
+            if (!kanjiResults.Any())
+                return results;
+
             KanjiResult kanjiResult = kanjiResults.First().Value.kanjiResult.First().First();
 
             result.Add(LookupResult.FoundSpelling, new List<string> { kanjiResults.First().Key });
