@@ -16,23 +16,23 @@ namespace JapaneseLookup.Deconjugation
         private static readonly Rule[] Rules = JsonSerializer.Deserialize<Rule[]>(File);
 
         private static Form StdruleDeconjugateInner(Form myForm,
-            Rule myRule)
+            VirtualRule myRule)
         {
             // tag doesn't match
             if (myForm.Tags.Count > 0 &&
-                myForm.Tags[^1] != myRule.ConTag.First())
+                myForm.Tags[^1] != myRule.ConTag)
             {
                 return null;
             }
 
             // ending doesn't match
-            if (!myForm.Text.EndsWith(myRule.ConEnd.First()))
+            if (!myForm.Text.EndsWith(myRule.ConEnd))
                 return null;
 
-            var newText =
-                myForm.Text.Substring(0, myForm.Text.Length - myRule.ConEnd.First().Length)
+            string newText =
+                myForm.Text.Substring(0, myForm.Text.Length - myRule.ConEnd.Length)
                 +
-                myRule.DecEnd.First();
+                myRule.DecEnd;
 
             var newForm = new Form(
                 newText,
@@ -45,8 +45,8 @@ namespace JapaneseLookup.Deconjugation
             newForm.Process.Add(myRule.Detail);
 
             if (newForm.Tags.Count == 0)
-                newForm.Tags.Add(myRule.ConTag.First());
-            newForm.Tags.Add(myRule.DecTag.First());
+                newForm.Tags.Add(myRule.ConTag);
+            newForm.Tags.Add(myRule.DecTag);
 
             if (newForm.Seentext.Count == 0)
                 newForm.Seentext.Add(myForm.Text);
@@ -76,15 +76,23 @@ namespace JapaneseLookup.Deconjugation
             var array = myRule.DecEnd;
             if (array.Count == 1)
             {
-                var result = StdruleDeconjugateInner(myForm, myRule);
+                var virtualRule = new VirtualRule
+                (
+                    myRule.DecEnd.First(),
+                    myRule.ConEnd.First(),
+                    myRule.DecTag.First(),
+                    myRule.ConTag.First(),
+                    myRule.Detail
+                );
+                Form result = StdruleDeconjugateInner(myForm, virtualRule);
                 if (result != null) collection.Add(result);
             }
             else if (array.Count > 1)
             {
-                var maybeDecEnd = myRule.DecEnd[0];
-                var maybeConEnd = myRule.ConEnd[0];
-                var maybeDecTag = myRule.DecTag[0];
-                var maybeConTag = myRule.ConTag[0];
+                string maybeDecEnd = myRule.DecEnd[0];
+                string maybeConEnd = myRule.ConEnd[0];
+                string maybeDecTag = myRule.DecTag[0];
+                string maybeConTag = myRule.ConTag[0];
 
                 for (var i = 0; i < array.Count; i++)
                 {
@@ -93,17 +101,15 @@ namespace JapaneseLookup.Deconjugation
                     maybeDecTag = myRule.DecTag.ElementAtOrDefault(i) ?? maybeDecTag;
                     maybeConTag = myRule.ConTag.ElementAtOrDefault(i) ?? maybeConTag;
 
-                    var virtualRule = new Rule
+                    var virtualRule = new VirtualRule
                     (
-                        myRule.Type,
-                        null,
-                        new List<string> { maybeDecEnd },
-                        new List<string> { maybeConEnd },
-                        new List<string> { maybeDecTag },
-                        new List<string> { maybeConTag },
+                        maybeDecEnd,
+                        maybeConEnd,
+                        maybeDecTag,
+                        maybeConTag,
                         myRule.Detail
                     );
-                    var ret = StdruleDeconjugateInner(myForm, virtualRule);
+                    Form ret = StdruleDeconjugateInner(myForm, virtualRule);
                     if (ret != null) collection.Add(ret);
                 }
             }
@@ -138,7 +144,7 @@ namespace JapaneseLookup.Deconjugation
         private static HashSet<Form> ContextruleDeconjugate(Form myForm,
             Rule myRule)
         {
-            var result = myRule.Contextrule switch
+            bool result = myRule.Contextrule switch
             {
                 "v1inftrap" => V1InftrapCheck(myForm),
                 "saspecial" => SaspecialCheck(myForm, myRule),
@@ -154,7 +160,7 @@ namespace JapaneseLookup.Deconjugation
         {
             if (!myForm.Text.Contains(myRule.ConEnd.First()))
                 return null;
-            var newText = new Regex(myRule.ConEnd.First())
+            string newText = new Regex(myRule.ConEnd.First())
                 .Replace(myForm.Text, myRule.DecEnd.First());
 
             var newForm = new Form(
@@ -189,13 +195,13 @@ namespace JapaneseLookup.Deconjugation
             var array = myRule.DecEnd;
             if (array.Count == 1)
             {
-                var result = SubstitutionInner(myForm, myRule);
+                Form result = SubstitutionInner(myForm, myRule);
                 if (result != null) collection.Add(result);
             }
             else if (array.Count > 1)
             {
-                var maybeDecEnd = myRule.DecEnd[0];
-                var maybeConEnd = myRule.ConEnd[0];
+                string maybeDecEnd = myRule.DecEnd[0];
+                string maybeConEnd = myRule.ConEnd[0];
 
                 for (var i = 0; i < array.Count; i++)
                 {
@@ -213,7 +219,7 @@ namespace JapaneseLookup.Deconjugation
                         myRule.Detail
                     );
 
-                    var ret = SubstitutionInner(myForm, virtualRule);
+                    Form ret = SubstitutionInner(myForm, virtualRule);
                     if (ret != null) collection.Add(ret);
                 }
             }
@@ -224,7 +230,7 @@ namespace JapaneseLookup.Deconjugation
         private static bool V1InftrapCheck(Form myForm)
         {
             if (myForm.Tags.Count != 1) return true;
-            var myTag = myForm.Tags[0];
+            string myTag = myForm.Tags[0];
             if (myTag == "stem-ren")
                 return false;
             return true;
@@ -235,10 +241,8 @@ namespace JapaneseLookup.Deconjugation
         {
             if (myForm.Text == "") return false;
             if (!myForm.Text.EndsWith(myRule.ConEnd.First())) return false;
-            var baseText = myForm.Text.Substring(0, myForm.Text.Length - myRule.ConEnd.First().Length);
-            if (baseText.EndsWith("さ"))
-                return false;
-            return true;
+            string baseText = myForm.Text.Substring(0, myForm.Text.Length - myRule.ConEnd.First().Length);
+            return !baseText.EndsWith("さ");
         }
 
         public static HashSet<Form> Deconjugate(string myText)
@@ -275,7 +279,7 @@ namespace JapaneseLookup.Deconjugation
 
                         if (newForm == null || newForm.Count == 0) continue;
 
-                        foreach (var myForm in newForm)
+                        foreach (Form myForm in newForm)
                         {
                             if (myForm != null &&
                                 !processed.Contains(myForm) &&

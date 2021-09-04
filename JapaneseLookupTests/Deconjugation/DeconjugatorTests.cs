@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 using JapaneseLookup.Deconjugation;
 using NUnit.Framework;
 
@@ -40,6 +41,126 @@ namespace JapaneseLookupTests.Deconjugation
 
             // Assert
             StringAssert.AreEqualIgnoringCase(expected, actual);
+        }
+
+        [Test]
+        public void Deconjugate_MemoryUsageIsAcceptable100()
+        {
+            // Arrange
+            int iterations = 100;
+            double expected = 75000000 + 8000000;
+            // Act
+            // double start = GC.GetTotalMemory(true);
+            double start = GC.GetAllocatedBytesForCurrentThread();
+
+            for (int i = 0; i < iterations; i++)
+            {
+                Deconjugator.Deconjugate("飽きて");
+                Deconjugator.Deconjugate("座り込む");
+                Deconjugator.Deconjugate("していられない");
+                Deconjugator.Deconjugate("なく");
+                Deconjugator.Deconjugate("握って");
+                Deconjugator.Deconjugate("開き");
+                Deconjugator.Deconjugate("伸ばして");
+                Deconjugator.Deconjugate("戻す");
+            }
+
+            //var end = GC.GetTotalMemory(true);
+            var end = GC.GetAllocatedBytesForCurrentThread();
+            var actual = end - start;
+            // Assert
+            Assert.Less(actual, expected);
+            // Assert.AreEqual(expected, actual, 8000000);
+        }
+
+        [Test]
+        public void Deconjugate_MemoryUsageIsAcceptable1000()
+        {
+            // Arrange
+            int iterations = 1000;
+            double expected = 750000000 + 80000000;
+            // Act
+            // double start = GC.GetTotalMemory(true);
+            double start = GC.GetAllocatedBytesForCurrentThread();
+
+            for (int i = 0; i < iterations; i++)
+            {
+                Deconjugator.Deconjugate("飽きて");
+                Deconjugator.Deconjugate("座り込む");
+                Deconjugator.Deconjugate("していられない");
+                Deconjugator.Deconjugate("なく");
+                Deconjugator.Deconjugate("握って");
+                Deconjugator.Deconjugate("開き");
+                Deconjugator.Deconjugate("伸ばして");
+                Deconjugator.Deconjugate("戻す");
+            }
+
+            //var end = GC.GetTotalMemory(true);
+            var end = GC.GetAllocatedBytesForCurrentThread();
+            var actual = end - start;
+            // Assert
+            Assert.Less(actual, expected);
+            // Assert.AreEqual(expected, actual, 80000000);
+        }
+
+        [Test]
+        public void Deconjugate_MemoryUsageIsAcceptable10000()
+        {
+            // Arrange
+            int iterations = 10000;
+            double expected = 7500000000 + 800000000;
+            // Act
+            // double start = GC.GetTotalMemory(true);
+            double start = GC.GetAllocatedBytesForCurrentThread();
+
+            for (int i = 0; i < iterations; i++)
+            {
+                Deconjugator.Deconjugate("飽きて");
+                Deconjugator.Deconjugate("座り込む");
+                Deconjugator.Deconjugate("していられない");
+                Deconjugator.Deconjugate("なく");
+                Deconjugator.Deconjugate("握って");
+                Deconjugator.Deconjugate("開き");
+                Deconjugator.Deconjugate("伸ばして");
+                Deconjugator.Deconjugate("戻す");
+            }
+
+            //var end = GC.GetTotalMemory(true);
+            var end = GC.GetAllocatedBytesForCurrentThread();
+            var actual = end - start;
+            // Assert
+            Assert.Less(actual, expected);
+            // Assert.AreEqual(expected, actual, 800000000);
+        }
+
+        [Test, Explicit]
+        public void Deconjugate_MemoryUsageIsAcceptable100000()
+        {
+            // Arrange
+            int iterations = 100000;
+            double expected = 75000000000 + 8000000000;
+            // Act
+            // double start = GC.GetTotalMemory(true);
+            double start = GC.GetAllocatedBytesForCurrentThread();
+
+            for (int i = 0; i < iterations; i++)
+            {
+                Deconjugator.Deconjugate("飽きて");
+                Deconjugator.Deconjugate("座り込む");
+                Deconjugator.Deconjugate("していられない");
+                Deconjugator.Deconjugate("なく");
+                Deconjugator.Deconjugate("握って");
+                Deconjugator.Deconjugate("開き");
+                Deconjugator.Deconjugate("伸ばして");
+                Deconjugator.Deconjugate("戻す");
+            }
+
+            //var end = GC.GetTotalMemory(true);
+            var end = GC.GetAllocatedBytesForCurrentThread();
+            var actual = end - start;
+            // Assert
+            Assert.Less(actual, expected);
+            // Assert.AreEqual(expected, actual, 8000000000);
         }
     }
 }
