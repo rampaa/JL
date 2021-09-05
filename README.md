@@ -8,7 +8,7 @@
 
 ### J-J (yomichan-import format)
 
-* Daijirin - "Full" support
+* Daijirin - Basic+ support
 * Daijisen - Basic support
 * Koujien - Basic support
 * Meikyou - Basic support
