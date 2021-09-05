@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace JapaneseLookup.GUI
@@ -66,7 +67,7 @@ namespace JapaneseLookup.GUI
             CopyFromClipboard();
         }
 
-        private void MainTextBox_MouseMove(object sender, MouseEventArgs e)
+        private async void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
             if (MiningMode || MWindow.Background.Opacity == 0) return;
 
@@ -94,10 +95,10 @@ namespace JapaneseLookup.GUI
                 if (text == _lastWord) return;
                 _lastWord = text;
 
-                var lookupResults = MainWindowUtilities.Lookup(text);
+                var lookupResults = await Task.Run(() => MainWindowUtilities.Lookup(text));
                 if (lookupResults != null && lookupResults.Any())
                 {
-                    PopupWindowUtilities.DisposeResultStackPanels();
+                    PopupWindow.Instance.ResultStackPanels.Clear();
 
                     // popup doesn't follow cursor
                     // PopupWindow.Instance.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));

@@ -230,7 +230,7 @@ namespace JapaneseLookup.GUI
                 Instance.Activate();
                 Instance.Focus();
 
-                PopupWindowUtilities.DisposeResultStackPanels();
+                Instance.ResultStackPanels.Clear();
                 PopupWindowUtilities.DisplayResults(true);
             }
             else if (e.Key == ConfigManager.PlayAudioKey)

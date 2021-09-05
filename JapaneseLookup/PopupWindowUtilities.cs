@@ -539,15 +539,5 @@ namespace JapaneseLookup
 
             return sentence;
         }
-
-        public static void DisposeResultStackPanels()
-        {
-            foreach (StackPanel stackPanel in PopupWindow.Instance.ResultStackPanels)
-            {
-                stackPanel.Children.Clear();
-            }
-
-            PopupWindow.Instance.ResultStackPanels.Clear();
-        }
     }
 }
