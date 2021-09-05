@@ -75,37 +75,52 @@ namespace JapaneseLookup
                     return KanjiResultBuilder(GetKanjidicResults(text));
                 }
 
+            List<string> textInHiraganaList = new();
+            List<HashSet<Form>> deconjugationResultsList = new();
+
+            for (int i = 0; i < text.Length; i++)
+            {
+                var textInHiragana = Kana.KatakanaToHiraganaConverter(text[..^i]);
+                textInHiraganaList.Add(textInHiragana);
+                deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
+            }
+
             foreach ((DictType dictType, Dict dict) in Dicts.dicts)
             {
                 switch (dictType)
                 {
                     case DictType.JMdict:
-                        wordResults = GetJMdictResults(text);
+                        wordResults = GetJMdictResults(text, textInHiraganaList, deconjugationResultsList);
                         break;
                     case DictType.JMnedict:
-                        nameResults = GetJMnedictResults(text);
+                        nameResults = GetJMnedictResults(text, textInHiraganaList);
                         break;
                     case DictType.Kanjidic:
                         // handled above and below
                         break;
                     case DictType.UnknownEpwing:
                         // TODO
-                        epwingWordResults.Add(GetDaijirinResults(text, dict.Contents));
+                        epwingWordResults.Add(GetDaijirinResults(text, textInHiraganaList, deconjugationResultsList,
+                            dict.Contents));
                         break;
                     case DictType.Daijirin:
-                        epwingWordResults.Add(GetDaijirinResults(text, dict.Contents));
+                        epwingWordResults.Add(GetDaijirinResults(text, textInHiraganaList, deconjugationResultsList,
+                            dict.Contents));
                         break;
                     case DictType.Daijisen:
                         // TODO
-                        epwingWordResults.Add(GetDaijirinResults(text, dict.Contents));
+                        epwingWordResults.Add(GetDaijirinResults(text, textInHiraganaList, deconjugationResultsList,
+                            dict.Contents));
                         break;
                     case DictType.Kojien:
                         // TODO
-                        epwingWordResults.Add(GetDaijirinResults(text, dict.Contents));
+                        epwingWordResults.Add(GetDaijirinResults(text, textInHiraganaList, deconjugationResultsList,
+                            dict.Contents));
                         break;
                     case DictType.Meikyou:
                         // TODO
-                        epwingWordResults.Add(GetDaijirinResults(text, dict.Contents));
+                        epwingWordResults.Add(GetDaijirinResults(text, textInHiraganaList, deconjugationResultsList,
+                            dict.Contents));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -145,30 +160,28 @@ namespace JapaneseLookup
         }
 
         private static Dictionary<string, (List<JMdictResult> jMdictResults, List<string> Process, string)>
-            GetJMdictResults(string text)
+            GetJMdictResults(string text, List<string> textInHiraganaList, List<HashSet<Form>> deconjugationResultsList)
         {
             var wordResults =
                 new Dictionary<string,
                     (List<JMdictResult> resultsList, List<string> Process, string)>();
 
             int succAttempt = 0;
+
             for (int i = 0; i < text.Length; i++)
             {
-                string textInHiragana = Kana.KatakanaToHiraganaConverter(text[..^i]);
-
                 bool tryLongVowelConversion = true;
 
-                if (Dicts.dicts[DictType.JMdict].Contents.TryGetValue(textInHiragana, out var tempResult1))
+                if (Dicts.dicts[DictType.JMdict].Contents.TryGetValue(textInHiraganaList[i], out var tempResult1))
                 {
                     var tempResult = tempResult1.Cast<JMdictResult>().ToList();
-                    wordResults.TryAdd(textInHiragana, (tempResult, new List<string>(), text[..^i]));
+                    wordResults.TryAdd(textInHiraganaList[i], (tempResult, new List<string>(), text[..^i]));
                     tryLongVowelConversion = false;
                 }
 
                 if (succAttempt < 3)
                 {
-                    var deconjugationResults = Deconjugator.Deconjugate(textInHiragana);
-                    foreach (var result in deconjugationResults)
+                    foreach (var result in deconjugationResultsList[i])
                     {
                         if (wordResults.ContainsKey(result.Text))
                             continue;
@@ -197,13 +210,13 @@ namespace JapaneseLookup
                     }
                 }
 
-                if (tryLongVowelConversion && textInHiragana.Contains("ー") && textInHiragana[0] != 'ー')
+                if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") && textInHiraganaList[i][0] != 'ー')
                 {
-                    string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiragana);
+                    string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
                     if (Dicts.dicts[DictType.JMdict].Contents.TryGetValue(textWithoutLongVowelMark, out var tmpResult1))
                     {
                         var tmpResult = tmpResult1.Cast<JMdictResult>().ToList();
-                        wordResults.Add(textInHiragana, (tmpResult, new List<string>(), text[..^i]));
+                        wordResults.Add(textInHiraganaList[i], (tmpResult, new List<string>(), text[..^i]));
                     }
                 }
             }
@@ -213,7 +226,7 @@ namespace JapaneseLookup
 
         private static Dictionary<string,
                 (List<JMnedictResult> jMnedictResults, List<string> processList, string foundForm)>
-            GetJMnedictResults(string text)
+            GetJMnedictResults(string text, List<string> textInHiraganaList)
         {
             var nameResults =
                 new Dictionary<string,
@@ -221,12 +234,10 @@ namespace JapaneseLookup
 
             for (int i = 0; i < text.Length; i++)
             {
-                string textInHiragana = Kana.KatakanaToHiraganaConverter(text[..^i]);
-
-                if (Dicts.dicts[DictType.JMnedict].Contents.TryGetValue(textInHiragana, out var tempNameResult1))
+                if (Dicts.dicts[DictType.JMnedict].Contents.TryGetValue(textInHiraganaList[i], out var tempNameResult1))
                 {
                     var tempNameResult = tempNameResult1.Cast<JMnedictResult>().ToList();
-                    nameResults.TryAdd(textInHiragana, (tempNameResult, new List<string>(), text[..^i]));
+                    nameResults.TryAdd(textInHiraganaList[i], (tempNameResult, new List<string>(), text[..^i]));
                 }
             }
 
@@ -253,7 +264,9 @@ namespace JapaneseLookup
 
         private static Dictionary<string,
                 (List<EpwingResult> daijirinResults, List<string> processList, string foundForm)>
-            GetDaijirinResults(string text, Dictionary<string, List<IResult>> dict)
+            GetDaijirinResults(string text, List<string> textInHiraganaList,
+                List<HashSet<Form>> deconjugationResultsList,
+                Dictionary<string, List<IResult>> dict)
         {
             var daijirinWordResults =
                 new Dictionary<string,
@@ -262,14 +275,13 @@ namespace JapaneseLookup
             int succAttempt = 0;
             for (int i = 0; i < text.Length; i++)
             {
-                string textInHiragana = Kana.KatakanaToHiraganaConverter(text[..^i]);
-
                 bool tryLongVowelConversion = true;
 
-                if (dict.TryGetValue(textInHiragana, out var hiraganaTempResult1))
+                if (dict.TryGetValue(textInHiraganaList[i], out var hiraganaTempResult1))
                 {
                     var hiraganaTempResult = hiraganaTempResult1.Cast<EpwingResult>().ToList();
-                    daijirinWordResults.TryAdd(textInHiragana, (hiraganaTempResult, new List<string>(), text[..^i]));
+                    daijirinWordResults.TryAdd(textInHiraganaList[i],
+                        (hiraganaTempResult, new List<string>(), text[..^i]));
                     tryLongVowelConversion = false;
                 }
 
@@ -283,8 +295,7 @@ namespace JapaneseLookup
 
                 if (succAttempt < 3)
                 {
-                    var deconjugationResults = Deconjugator.Deconjugate(textInHiragana);
-                    foreach (var result in deconjugationResults)
+                    foreach (var result in deconjugationResultsList[i])
                     {
                         if (daijirinWordResults.ContainsKey(result.Text))
                             continue;
@@ -313,13 +324,13 @@ namespace JapaneseLookup
                     }
                 }
 
-                if (tryLongVowelConversion && textInHiragana.Contains("ー") && textInHiragana[0] != 'ー')
+                if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") && textInHiraganaList[i][0] != 'ー')
                 {
-                    string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiragana);
+                    string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
                     if (dict.TryGetValue(textWithoutLongVowelMark, out var tmpResult1))
                     {
                         var tmpResult = tmpResult1.Cast<EpwingResult>().ToList();
-                        daijirinWordResults.Add(textInHiragana, (tmpResult, new List<string>(), text[..^i]));
+                        daijirinWordResults.Add(textInHiraganaList[i], (tmpResult, new List<string>(), text[..^i]));
                     }
                 }
             }
@@ -509,6 +520,10 @@ namespace JapaneseLookup
                     frequency = new List<string> { FakeFrequency };
 
                     var definitions = new List<string> { BuildEpwingWordDefinition(jMDictResult) };
+
+                    // TODO: Should be filtered while loading the dict ideally (+ it's daijirin specific?)
+                    if (definitions.First().Contains("→英和"))
+                        continue;
 
                     result.Add(LookupResult.FoundSpelling, foundSpelling);
                     result.Add(LookupResult.Readings, readings);
