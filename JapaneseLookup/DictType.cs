@@ -8,7 +8,7 @@
         UnknownEpwing,
         Daijirin,
         Daijisen,
-        Kojien,
+        Koujien,
         Meikyou,
     }
 }

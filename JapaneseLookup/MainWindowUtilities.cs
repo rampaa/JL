@@ -112,7 +112,7 @@ namespace JapaneseLookup
                         epwingWordResults.Add(GetDaijirinResults(text, textInHiraganaList, deconjugationResultsList,
                             dict.Contents));
                         break;
-                    case DictType.Kojien:
+                    case DictType.Koujien:
                         // TODO
                         epwingWordResults.Add(GetDaijirinResults(text, textInHiraganaList, deconjugationResultsList,
                             dict.Contents));

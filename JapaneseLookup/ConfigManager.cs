@@ -544,8 +544,8 @@ namespace JapaneseLookup
                         }
 
                         break;
-                    case DictType.Kojien:
-                        if (!Dicts.dicts[DictType.Kojien].Contents.Any())
+                    case DictType.Koujien:
+                        if (!Dicts.dicts[DictType.Koujien].Contents.Any())
                         {
                             var taskEpwing = Task.Run(async () =>
                                 await EpwingJsonLoader.Loader(dict.Type, dict.Path));

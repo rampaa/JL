@@ -396,7 +396,7 @@ namespace JapaneseLookup.GUI
                 case DictType.Daijisen:
                     BrowseForDictionaryFolder(selectedDictType);
                     break;
-                case DictType.Kojien:
+                case DictType.Koujien:
                     BrowseForDictionaryFolder(selectedDictType);
                     break;
                 case DictType.Meikyou:
