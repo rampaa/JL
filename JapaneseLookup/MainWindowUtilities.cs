@@ -435,7 +435,10 @@ namespace JapaneseLookup
                     if (jMDictResult.FrequencyDict != null)
                     {
                         jMDictResult.FrequencyDict.TryGetValue(ConfigManager.FrequencyList, out var freq);
-                        frequency = new List<string> { freq.ToString() };
+                        if (freq == 0)
+                            frequency = new List<string> { FakeFrequency };
+                        else
+                            frequency = new List<string> { freq.ToString() };
                     }
 
                     else frequency = new List<string> { FakeFrequency };
