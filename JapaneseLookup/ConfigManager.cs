@@ -197,9 +197,17 @@ namespace JapaneseLookup
             mainWindow.Left = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowLeftPosition"));
 
             var popupWindow = PopupWindow.Instance;
+
             popupWindow.Background = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
-            popupWindow.Background.Opacity = double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")) / 100;
+            popupWindow.StackPanel.Background = popupWindow.Background = (SolidColorBrush) new BrushConverter()
+                .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
+
+            popupWindow.Background.Opacity =
+                double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")) / 100;
+            popupWindow.StackPanel.Background.Opacity =
+                double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")) / 100;
+            
             popupWindow.MaxHeight = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight"));
             popupWindow.MaxWidth = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth"));
 
