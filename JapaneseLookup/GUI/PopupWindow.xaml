@@ -15,6 +15,8 @@
         <!-- idk why but a ListBox works way better than an ItemsControl for this 
         (possibly because of virtualization shenanigans?) -->
         <ListBox VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False" Foreground="White"
+                 Background="{Binding Path=Background,
+                  RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
                  x:Name="StackPanel">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}">
