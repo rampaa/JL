@@ -31,7 +31,7 @@ namespace JapaneseLookupTests
         {
             // Arrange
             var expected =
-                "[{\"foundSpelling\":[\"始まる\"],\"kanaSpellings\":[],\"readings\":[\"はじまる\"],\"definitions\":[\"(v5r, vi) (1) to begin; to start; to commence (v5r, vi) (2) to happen (again); to begin (anew) (v5r, vi) (3) to date (from); to originate (in) \"],\"foundForm\":[\"始まる\"],\"EdictID\":[\"1307500\"],\"alternativeSpellings\":[],\"process\":[],\"frequency\":[\"1000000\"],\"pOrthographyInfoList\":[],\"rOrthographyInfoList\":[\"\"],\"aOrthographyInfoList\":[]}]";
+                "[{\"foundSpelling\":[\"始まる\"],\"kanaSpellings\":[],\"readings\":[\"はじまる\"],\"definitions\":[\"(v5r, vi) (1) to begin; to start; to commence (v5r, vi) (2) to happen (again); to begin (anew) (v5r, vi) (3) to date (from); to originate (in) \"],\"foundForm\":[\"始まる\"],\"EdictID\":[\"1307500\"],\"alternativeSpellings\":[],\"process\":[],\"frequency\":[\"1000000\"],\"pOrthographyInfoList\":[],\"rOrthographyInfoList\":[\"\"],\"aOrthographyInfoList\":[],\"DictType\":[\"JMdict\"]}]";
 
             string text = "始まる";
 
@@ -44,7 +44,7 @@ namespace JapaneseLookupTests
             StringAssert.AreEqualIgnoringCase(expected, actual);
         }
 
-        [Test]
+        [Test, Explicit]
         public void Lookup_ニューモノウルトラマイクロスコーピックシリコヴォルケーノコニオシス()
         {
             // Arrange
