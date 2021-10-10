@@ -24,11 +24,9 @@ namespace JapaneseLookup.KANJIDIC
                 };
 
                 Dictionary<string, string> kanjiCompositionDictionary = new();
-                // TODO
                 if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
                 {
                     foreach (string line in File.ReadLines(
-                        // TODO
                         Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
                     {
                         string[] lParts = line.Split("\t");

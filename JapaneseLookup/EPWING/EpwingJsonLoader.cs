@@ -42,20 +42,6 @@ namespace JapaneseLookup.EPWING
         {
             foreach (var entry in epwingEntryList)
             {
-                //todo
-                //Rules = POS, Reading, Expression
-                //TermTags, DefinitionTags
-                //dammar;damar
-
-                // if ("\"\"" != entry.DefinitionTags)
-                //     Debug.WriteLine(entry.DefinitionTags);
-                // // if ("\"\"" != entry.Rules)
-                // //     Debug.WriteLine(entry.Expression+" "+entry.Rules);
-                // if (0 != entry.Score)
-                //     Debug.WriteLine(entry.Score);
-                // if ("\"\"" != entry.TermTags)
-                //     Debug.WriteLine(entry.TermTags);
-
                 if ("" != entry.DefinitionTags)
                     Debug.WriteLine(entry.DefinitionTags);
                 // if ("" != entry.Rules)

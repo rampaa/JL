@@ -196,40 +196,12 @@ namespace JapaneseLookup
             SortLookupResults(List<Dictionary<LookupResult, List<string>>> lookupResults)
         {
             return lookupResults
-                .OrderByDescending(dict =>
-                {
-                    Enum.TryParse(dict[LookupResult.DictType][0], out DictType dictType);
-                    return dict[LookupResult.FoundForm][0].Length;
-                })
+                .OrderByDescending(dict => dict[LookupResult.FoundForm][0].Length)
                 .ThenBy(dict =>
                 {
                     Enum.TryParse(dict[LookupResult.DictType][0], out DictType dictType);
                     return Dicts.dicts[dictType].Priority;
                 })
-                //todo
-                // an extremely dirty solution? to an extremely frustrating problem
-                // .OrderByDescending(dict =>
-                // {
-                //     // an extremely dirty solution? to an extremely frustrating problem
-                //     Enum.TryParse(dict[LookupResult.DictType][0], out DictType dictType);
-                //     return dictType switch
-                //     {
-                //         DictType.JMdict => dict[LookupResult.FoundForm][0].Length,
-                //         DictType.JMnedict => dict[LookupResult.FoundForm][0].Length,
-                //         DictType.Kanjidic => dict[LookupResult.FoundForm][0].Length,
-                //         DictType.UnknownEpwing => dict[LookupResult.FoundSpelling][0].Length,
-                //         DictType.Daijirin => dict[LookupResult.FoundSpelling][0].Length,
-                //         DictType.Daijisen => dict[LookupResult.FoundSpelling][0].Length,
-                //         DictType.Koujien => dict[LookupResult.FoundSpelling][0].Length,
-                //         DictType.Meikyou => dict[LookupResult.FoundSpelling][0].Length,
-                //         _ => throw new ArgumentOutOfRangeException()
-                //     };
-                // })
-                // .ThenBy(dict =>
-                // {
-                //     Enum.TryParse(dict[LookupResult.DictType][0], out DictType dictType);
-                //     return Dicts.dicts[dictType].Priority;
-                // })
                 .ThenBy(dict => Convert.ToInt32(dict[LookupResult.Frequency][0]))
                 .ToList();
         }
@@ -392,15 +364,6 @@ namespace JapaneseLookup
                             {
                                 var rslt = (EpwingResult) rslt1;
 
-                                // todo
-                                // // hack to stop some nouns being displayed as if they were deconjugated
-                                // // doesn't seem to help much
-                                // var blacklistedTags = new List<string>
-                                // {
-                                //     // "v1", "v5", "vs", "v5s",
-                                //     "n",
-                                // };
-                                // test with すき焼き
                                 // if (rslt.WordClasses.SelectMany(pos => pos.Except(blacklistedTags))
                                 //     .Intersect(result.Tags).Any())
                                 // {

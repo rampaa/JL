@@ -408,18 +408,6 @@ namespace JapaneseLookup.GUI
 
             if (openFileDialog.ShowDialog() == true)
             {
-                //todo
-                // int lowestPriority = 0;
-                // foreach ((DictType _, Dict dict) in Dicts.dicts)
-                //     if (dict.Priority > lowestPriority)
-                //         lowestPriority = dict.Priority;
-
-                // int lowestPriority = Dicts.dicts.OrderBy(p =>
-                // {
-                //     (DictType _, Dict dict) = p;
-                //     return dict.Priority;
-                // }).First().Value.Priority;
-
                 // lowest priority means highest number
                 int lowestPriority = Dicts.dicts.Select(dict => dict.Value.Priority).Max();
 
