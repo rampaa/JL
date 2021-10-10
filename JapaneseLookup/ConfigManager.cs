@@ -94,7 +94,7 @@ namespace JapaneseLookup
         // enabling this seems to improve rendering performance by a lot; need to test if it's because
         // a) there's less text on the screen overall
         // b) there's less word-wrapping to do
-        public static bool NewlineBetweenDefinitions = true;
+        public static bool NewlineBetweenDefinitions = false;
         public static int MaxResults = 99;
 
         public static void ApplyPreferences(MainWindow mainWindow)
