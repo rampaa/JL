@@ -14,9 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Config\dicts.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Resources\deconjugator_edited_arrays.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

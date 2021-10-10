@@ -8,9 +8,7 @@ namespace JapaneseLookup.EPWING
 
         public List<string> Readings { get; set; }
 
-         public List<List<string>> WordClasses { get; set; } //e.g. noun +
-
-        // public Dictionary<string, int> FrequencyDict { get; set; }
+        public List<List<string>> WordClasses { get; set; } //e.g. noun +
 
         public string PrimarySpelling { get; set; }
 
@@ -18,8 +16,7 @@ namespace JapaneseLookup.EPWING
         {
             Definitions = new List<List<string>>();
             Readings = new List<string>();
-             WordClasses = new List<List<string>>();
-            //FrequencyDict = new Dictionary<string, Frequency>();
+            WordClasses = new List<List<string>>();
             PrimarySpelling = null;
         }
     }

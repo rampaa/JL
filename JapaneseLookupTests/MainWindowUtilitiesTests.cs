@@ -19,7 +19,7 @@ namespace JapaneseLookupTests
         public void ClassInit()
         {
             Dicts.dicts.Add(DictType.JMdict,
-                new Dict(DictType.JMdict, "", true
+                new Dict(DictType.JMdict, "", true, 0
                    // ,new Dictionary<string, List<IResult>>()
                     ));
             Dicts.dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();

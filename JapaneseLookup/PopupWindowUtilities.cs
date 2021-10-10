@@ -10,16 +10,19 @@ namespace JapaneseLookup
 {
     public static class PopupWindowUtilities
     {
-        // super bad hack that improves performance by a lot...
-        public static List<Dictionary<LookupResult, List<string>>> LastLookupResults = new();
-        private const int Magic = 7;
+        public static List<Dictionary<LookupResult, List<string>>> LastLookupResults { get; set; } = new();
+
+        // super bad hack that improves performance by a lot when many dictionaries are loaded...
+        private const int MaxNumberOfResultsWhenNotInMiningMode = 10;
 
         public static void DisplayResults(bool generateAllResults)
         {
             var results = LastLookupResults;
             // apparently you can't get the desired size of a control before the layout pass
             // probably won't be worth (performance-wise) forcing that to happen instead of just using a magic number
-            int resultsCount = generateAllResults ? results.Count : Math.Min(results.Count, Magic);
+            int resultsCount = generateAllResults
+                ? results.Count
+                : Math.Min(results.Count, MaxNumberOfResultsWhenNotInMiningMode);
 
             for (int index = 0; index < resultsCount; index++)
             {
@@ -52,6 +55,7 @@ namespace JapaneseLookup
             TextBlock textBlockProcess = null;
             TextBlock textBlockFrequency = null;
             TextBlock textBlockFoundForm = null;
+            TextBlock textBlockDictType = null;
             TextBlock textBlockEdictID = null;
 
             // bottom
@@ -86,6 +90,17 @@ namespace JapaneseLookup
                             Text = "#" + string.Join(", ", value),
                             Foreground = ConfigManager.FrequencyColor,
                             FontSize = ConfigManager.FrequencyFontSize,
+                            Margin = new Thickness(5, 0, 0, 0),
+                        };
+                        break;
+
+                    case LookupResult.DictType:
+                        textBlockDictType = new TextBlock
+                        {
+                            Name = key.ToString(),
+                            Text = value[0],
+                            Foreground = ConfigManager.DictTypeColor,
+                            FontSize = ConfigManager.DictTypeFontSize,
                             Margin = new Thickness(5, 0, 0, 0),
                         };
                         break;
@@ -284,7 +299,7 @@ namespace JapaneseLookup
                 textBlockAlternativeSpellings,
                 textBlockProcess,
                 textBlockFoundForm, textBlockEdictID, // undisplayed, for mining
-                textBlockFrequency,
+                textBlockFrequency, textBlockDictType
             };
             foreach (TextBlock baby in babies)
             {

@@ -13,18 +13,16 @@ namespace JapaneseLookup
 
         public bool Active { get; set; }
 
-        // [JsonIgnore] public bool Loaded { get; set; }
+        public int Priority { get; set; }
 
         [JsonIgnore] public Dictionary<string, List<IResult>> Contents { get; set; }
 
-        public Dict(DictType type, string path, bool active
-            // , bool loaded,
-        )
+        public Dict(DictType type, string path, bool active, int priority)
         {
             Type = type;
             Path = path;
             Active = active;
-            // Loaded = loaded;
+            Priority = priority;
         }
     }
 }

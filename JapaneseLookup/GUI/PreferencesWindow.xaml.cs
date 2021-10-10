@@ -277,32 +277,71 @@ namespace JapaneseLookup.GUI
                     IsChecked = dict.Active,
                     Margin = new Thickness(10),
                 };
+                var buttonIncreasePriority = new Button()
+                {
+                    Width = 25,
+                    Content = "↑",
+                    Margin = new Thickness(1),
+                };
+                var buttonDecreasePriority = new Button()
+                {
+                    Width = 25,
+                    Content = "↓",
+                    Margin = new Thickness(1),
+                };
+                var priority = new TextBlock()
+                {
+                    Name = "priority",
+                    // Width = 20,
+                    Width = 0,
+                    Text = dict.Priority.ToString(),
+                    // Margin = new Thickness(10),
+                };
                 var dictTypeDisplay = new TextBlock()
                 {
                     Width = 100,
                     Text = dict.Type.ToString(),
                     Margin = new Thickness(10),
                 };
+                var dictPathValidityDisplay = new TextBlock()
+                {
+                    Width = 12,
+                    //TODO: this should look nicer
+                    Text = (Directory.Exists(dict.Path) || File.Exists(dict.Path)) ? "" : "❌",
+                    Margin = new Thickness(1),
+                };
                 var dictPathDisplay = new TextBlock()
                 {
-                    Width = 210,
+                    Width = 200,
                     Text = dict.Path,
                     Margin = new Thickness(10),
                 };
-
-                // should be a red cross ideally
-                var buttonRemove = new Button()
+                var buttonRemove = new Button { Width = 0 };
+                if (!(dict.Type == DictType.JMdict || dict.Type == DictType.JMnedict || dict.Type == DictType.Kanjidic))
                 {
-                    Width = 70,
-                    Content = "Remove",
-                    Background = Brushes.Red,
-                    Margin = new Thickness(10),
-                };
+                    // should be a red cross ideally
+                    buttonRemove = new Button()
+                    {
+                        Width = 65,
+                        Content = "Remove",
+                        Background = Brushes.Red,
+                        Margin = new Thickness(10),
+                    };
+                }
 
-                // yeah, dunno about this
-                checkBox.Unchecked += (sender, args) => dict.Active = false;
-                checkBox.Checked += (sender, args) => dict.Active = true;
-                buttonRemove.Click += (sender, args) =>
+                checkBox.Unchecked += (_, _) => dict.Active = false;
+                checkBox.Checked += (_, _) => dict.Active = true;
+                buttonIncreasePriority.Click += (_, _) =>
+                {
+                    PrioritizeDict(Dicts.dicts, dict.Type);
+                    UpdateDictionariesDisplay();
+                };
+                buttonDecreasePriority.Click += (_, _) =>
+                {
+                    UnPrioritizeDict(Dicts.dicts, dict.Type);
+                    UpdateDictionariesDisplay();
+                };
+                buttonRemove.Click += (_, _) =>
                 {
                     if (System.Windows.MessageBox.Show("Really remove dictionary?", "Confirmation",
                         MessageBoxButton.YesNo,
@@ -316,7 +355,11 @@ namespace JapaneseLookup.GUI
                 };
 
                 dockPanel.Children.Add(checkBox);
+                dockPanel.Children.Add(buttonIncreasePriority);
+                dockPanel.Children.Add(buttonDecreasePriority);
+                dockPanel.Children.Add(priority);
                 dockPanel.Children.Add(dictTypeDisplay);
+                dockPanel.Children.Add(dictPathValidityDisplay);
                 dockPanel.Children.Add(dictPathDisplay);
                 dockPanel.Children.Add(buttonRemove);
 
@@ -327,7 +370,32 @@ namespace JapaneseLookup.GUI
             List<DictType> allDictTypes = Enum.GetValues(typeof(DictType)).Cast<DictType>().ToList();
             List<DictType> loadedDictTypes = Dicts.dicts.Keys.ToList();
             ComboBoxAddDictionary.ItemsSource = allDictTypes.Except(loadedDictTypes);
-            DictionariesDisplay.ItemsSource = resultDockPanels;
+            // lol
+            DictionariesDisplay.ItemsSource = resultDockPanels.OrderBy(dockPanel =>
+                dockPanel.Children
+                    .OfType<TextBlock>()
+                    .Where(textBlock => textBlock.Name == "priority")
+                    .Select(textBlockPriority => Convert.ToInt32(textBlockPriority.Text)).First());
+        }
+
+        private void PrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBePrioritized)
+        {
+            if (Dicts.dicts[typeToBePrioritized].Priority == 0) return;
+
+            dicts.Single(dict => dict.Value.Priority == Dicts.dicts[typeToBePrioritized].Priority - 1).Value
+                .Priority += 1;
+            Dicts.dicts[typeToBePrioritized].Priority -= 1;
+        }
+
+        private void UnPrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBeUnPrioritized)
+        {
+            // lowest priority means highest number
+            int lowestPriority = Dicts.dicts.Select(dict => dict.Value.Priority).Max();
+            if (Dicts.dicts[typeToBeUnPrioritized].Priority == lowestPriority) return;
+
+            dicts.Single(dict => dict.Value.Priority == Dicts.dicts[typeToBeUnPrioritized].Priority + 1).Value
+                .Priority -= 1;
+            Dicts.dicts[typeToBeUnPrioritized].Priority += 1;
         }
 
         private void BrowseForDictionaryFile(DictType selectedDictType, string filter)
@@ -340,8 +408,23 @@ namespace JapaneseLookup.GUI
 
             if (openFileDialog.ShowDialog() == true)
             {
+                //todo
+                // int lowestPriority = 0;
+                // foreach ((DictType _, Dict dict) in Dicts.dicts)
+                //     if (dict.Priority > lowestPriority)
+                //         lowestPriority = dict.Priority;
+
+                // int lowestPriority = Dicts.dicts.OrderBy(p =>
+                // {
+                //     (DictType _, Dict dict) = p;
+                //     return dict.Priority;
+                // }).First().Value.Priority;
+
+                // lowest priority means highest number
+                int lowestPriority = Dicts.dicts.Select(dict => dict.Value.Priority).Max();
+
                 var relativePath = Path.GetRelativePath(ConfigManager.ApplicationPath, openFileDialog.FileName);
-                Dicts.dicts.Add(selectedDictType, new Dict(selectedDictType, relativePath, true));
+                Dicts.dicts.Add(selectedDictType, new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
                 Dicts.dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
                 UpdateDictionariesDisplay();
             }
@@ -358,8 +441,11 @@ namespace JapaneseLookup.GUI
             if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK &&
                 !string.IsNullOrWhiteSpace(fbd.SelectedPath))
             {
+                // lowest priority means highest number
+                int lowestPriority = Dicts.dicts.Select(dict => dict.Value.Priority).Max();
+
                 var relativePath = Path.GetRelativePath(ConfigManager.ApplicationPath, fbd.SelectedPath);
-                Dicts.dicts.Add(selectedDictType, new Dict(selectedDictType, relativePath, true));
+                Dicts.dicts.Add(selectedDictType, new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
                 Dicts.dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
                 UpdateDictionariesDisplay();
             }

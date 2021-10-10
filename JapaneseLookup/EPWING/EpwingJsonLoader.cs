@@ -13,6 +13,9 @@ namespace JapaneseLookup.EPWING
     {
         public static async Task Loader(DictType dictType, string dictPath)
         {
+            if (!(Directory.Exists(dictPath) || File.Exists(dictPath)))
+                return;
+
             List<EpwingEntry> epwingEntryList = new();
 
             string[] jsonFiles = Directory.GetFiles(dictPath, "*_bank_*.json");
@@ -39,16 +42,27 @@ namespace JapaneseLookup.EPWING
         {
             foreach (var entry in epwingEntryList)
             {
+                //todo
                 //Rules = POS, Reading, Expression
                 //TermTags, DefinitionTags
                 //dammar;damar
-                if ("\"\"" != entry.DefinitionTags)
+
+                // if ("\"\"" != entry.DefinitionTags)
+                //     Debug.WriteLine(entry.DefinitionTags);
+                // // if ("\"\"" != entry.Rules)
+                // //     Debug.WriteLine(entry.Expression+" "+entry.Rules);
+                // if (0 != entry.Score)
+                //     Debug.WriteLine(entry.Score);
+                // if ("\"\"" != entry.TermTags)
+                //     Debug.WriteLine(entry.TermTags);
+
+                if ("" != entry.DefinitionTags)
                     Debug.WriteLine(entry.DefinitionTags);
-                // if ("\"\"" != entry.Rules)
-                //     Debug.WriteLine(entry.Expression+" "+entry.Rules);
+                // if ("" != entry.Rules)
+                //     Debug.WriteLine(entry.Expression + " " + entry.Rules);
                 if (0 != entry.Score)
                     Debug.WriteLine(entry.Score);
-                if ("\"\"" != entry.TermTags)
+                if ("" != entry.TermTags)
                     Debug.WriteLine(entry.TermTags);
 
                 var result = new EpwingResult
@@ -66,6 +80,13 @@ namespace JapaneseLookup.EPWING
                 else
                     tempList = new() { result };
 
+                Debug.Assert(entry.Reading != null, "entry.Reading != null");
+                if (entry.Reading != "")
+                    epwingDictionary[entry.Reading] = tempList;
+                // string hira = entry.Reading == "" ? null : entry.Reading;
+                string kata = Kana.KatakanaToHiraganaConverter(entry.Expression);
+
+                epwingDictionary[kata] = tempList;
                 epwingDictionary[entry.Expression] = tempList;
             }
         }

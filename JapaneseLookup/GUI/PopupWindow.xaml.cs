@@ -36,10 +36,12 @@ namespace JapaneseLookup.GUI
         public PopupWindow()
         {
             InitializeComponent();
+            // TODO: do we really need these two lines when we set them up in the ConfigManager?
             MaxWidth = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth") ??
                                  throw new InvalidOperationException());
             MaxHeight = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight") ??
                                   throw new InvalidOperationException());
+
             StackPanel.ItemsSource = ResultStackPanels;
         }
 
@@ -269,6 +271,8 @@ namespace JapaneseLookup.GUI
             else if (e.Key == ConfigManager.KanjiModeKey)
             {
                 ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
+                MainWindow.LastWord = "";
+                Application.Current.Windows.OfType<MainWindow>().First().MainTextBox_MouseMove(null, null);
             }
             else if (e.Key == ConfigManager.ShowPreferencesWindowKey)
             {

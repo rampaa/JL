@@ -13,9 +13,9 @@ namespace JapaneseLookup.EPWING
     public class EpwingEntry
     {
         //todo
-        public static readonly Regex DefinitionsRegex =
-            new(
-                @"");
+        // public static readonly Regex DefinitionsRegex =
+        //     new(
+        //         @"");
 
         public string Expression { get; set; }
         public string Reading { get; set; }
@@ -30,29 +30,29 @@ namespace JapaneseLookup.EPWING
         {
             Expression = jsonElement[0].ToString();
             Reading = jsonElement[1].ToString();
-            DefinitionTags = jsonElement[2].GetRawText();
+            DefinitionTags = jsonElement[2].ToString();
 
-            Rules = jsonElement[3].GetRawText();
+            Rules = jsonElement[3].ToString();
 
             jsonElement[4].TryGetInt32(out int score);
             Score = score;
 
             Glosssary = jsonElement[5].ToString()[2..^2]
                 .Split(
-                    new string[]
-                    {
-                        //todo
-                        // "⓪", "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩",
-                        // "⑪", "⑫", "⑬", "⑭", "⑮", "⑯", "⑰", "⑱", "⑲", "⑳",
-                        "\\n"
-                    }
+                    // new string[]
+                    // {
+                    //todo
+                    // "⓪", "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩",
+                    // "⑪", "⑫", "⑬", "⑭", "⑮", "⑯", "⑰", "⑱", "⑲", "⑳",
+                    "\\n"
+                    // }
                     , StringSplitOptions.TrimEntries
                 ).ToList();
 
             jsonElement[6].TryGetInt32(out int sequence);
             Sequence = sequence;
 
-            TermTags = jsonElement[7].GetRawText();
+            TermTags = jsonElement[7].ToString();
         }
     }
 }

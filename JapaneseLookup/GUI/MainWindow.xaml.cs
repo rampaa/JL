@@ -14,9 +14,9 @@ namespace JapaneseLookup.GUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private string _lastWord = "";
-        internal static bool MiningMode = false;
         private int _currentTextIndex;
+        public static string LastWord { get; set; } = "";
+        public static bool MiningMode { get; set; }
         public static int CurrentCharPosition { get; set; }
         public static string CurrentText { get; set; }
 
@@ -67,7 +67,7 @@ namespace JapaneseLookup.GUI
             CopyFromClipboard();
         }
 
-        private async void MainTextBox_MouseMove(object sender, MouseEventArgs e)
+        public async void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
             if (MiningMode || MWindow.Background.Opacity == 0) return;
 
@@ -92,8 +92,8 @@ namespace JapaneseLookup.GUI
                 else
                     text = MainTextBox.Text[charPosition..(charPosition + ConfigManager.MaxSearchLength)];
 
-                if (text == _lastWord) return;
-                _lastWord = text;
+                if (text == LastWord) return;
+                LastWord = text;
 
                 var lookupResults = await Task.Run(() => MainWindowUtilities.Lookup(text));
                 if (lookupResults != null && lookupResults.Any())
@@ -115,7 +115,7 @@ namespace JapaneseLookup.GUI
             }
             else
             {
-                _lastWord = "";
+                LastWord = "";
                 PopupWindow.Instance.Visibility = Visibility.Hidden;
             }
         }
@@ -133,7 +133,7 @@ namespace JapaneseLookup.GUI
             if (MiningMode) return;
 
             PopupWindow.Instance.Hide();
-            _lastWord = "";
+            LastWord = "";
         }
 
         private void MainTextBox_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -146,7 +146,9 @@ namespace JapaneseLookup.GUI
                     if (MainTextBox.GetFirstVisibleLineIndex() == 0)
                     {
                         int caretIndex = allBacklogText.Length - MainTextBox.Text.Length;
-                        MainTextBox.Text = allBacklogText;
+                        MainTextBox.Text =
+                            "Character count: " + String.Join("", MainWindowUtilities.Backlog).Length + "\n"
+                            + allBacklogText;
                         MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
                         MainTextBox.CaretIndex = caretIndex;
                         MainTextBox.ScrollToEnd();
@@ -247,6 +249,8 @@ namespace JapaneseLookup.GUI
             else if (e.Key == ConfigManager.KanjiModeKey)
             {
                 ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
+                LastWord = "";
+                MainTextBox_MouseMove(null, null);
             }
             else if (e.Key == ConfigManager.ShowAddNameWindowKey)
             {

@@ -77,6 +77,8 @@ namespace JapaneseLookup
         // TODO: hook these up
         //public static bool fixedWidth = false;
         //public static bool fixedHeight = false;
+        public static Brush DictTypeColor = Brushes.LightBlue;
+        public static int DictTypeFontSize = 15;
         public static Key MiningModeKey = Key.M;
         public static Key PlayAudioKey = Key.P;
         public static Key KanjiModeKey = Key.K;
@@ -89,7 +91,10 @@ namespace JapaneseLookup
         public static Key SteppedBacklogForwardsKey = Key.Right;
 
         // consider making this dictionary specific
-        public static bool NewlineBetweenDefinitions = false;
+        // enabling this seems to improve rendering performance by a lot; need to test if it's because
+        // a) there's less text on the screen overall
+        // b) there's less word-wrapping to do
+        public static bool NewlineBetweenDefinitions = true;
         public static int MaxResults = 99;
 
         public static void ApplyPreferences(MainWindow mainWindow)
@@ -203,6 +208,9 @@ namespace JapaneseLookup
                 double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")) / 100;
             popupWindow.MaxHeight = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight"));
             popupWindow.MaxWidth = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth"));
+
+            if (!File.Exists(Path.Join(ApplicationPath, "Config/dicts.json")))
+                CreateDefaultDictsConfig();
 
             DeserializeDicts();
 
@@ -444,6 +452,38 @@ namespace JapaneseLookup
             }
         }
 
+        public static void CreateDefaultDictsConfig()
+        {
+            var jso = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Converters =
+                {
+                    new JsonStringEnumConverter(),
+                }
+            };
+
+            var defaultDictsConfig =
+                new Dictionary<string, Dict>
+                {
+                    { "JMdict", new Dict(DictType.JMdict, "Resources\\JMdict.xml", true, 0) },
+                    { "JMnedict", new Dict(DictType.JMnedict, "Resources\\JMnedict.xml", true, 1) },
+                    { "Kanjidic", new Dict(DictType.Kanjidic, "Resources\\kanjidic2.xml", true, 2) }
+                };
+
+            try
+            {
+                Directory.CreateDirectory(Path.Join(ApplicationPath, "Config"));
+                File.WriteAllText(Path.Join(ApplicationPath, "Config/dicts.json"),
+                    JsonSerializer.Serialize(defaultDictsConfig, jso));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Couldn't write default Dicts config");
+                Debug.WriteLine(e);
+            }
+        }
+
         private static List<string> FindJapaneseFonts()
         {
             List<string> japaneseFonts = new();
@@ -572,6 +612,7 @@ namespace JapaneseLookup
             {
                 if (!dict.Active && dict.Contents.Any())
                 {
+                    Debug.WriteLine("Clearing " + dict.Type);
                     dict.Contents.Clear();
                 }
             }
@@ -583,7 +624,7 @@ namespace JapaneseLookup
                 Debug.Assert(freqTest1 != null, nameof(freqTest1) + " != null");
 
                 var freqTest = freqTest1.Cast<JMdictResult>().ToList();
-
+                // todo get NRE here sometimes
                 if (!freqTest[0].FrequencyDict.TryGetValue(FrequencyList, out int _))
                 {
                     var taskNewFreqlist = Task.Run(async () =>
@@ -603,12 +644,9 @@ namespace JapaneseLookup
             //     Debug.WriteLine("Loading " + dict.Type);
             // }
 
-            foreach (Task task in tasks)
-            {
-                task.Wait();
-            }
+            Task.WaitAll(tasks.ToArray());
 
-            // TODO: doesn't seem to compact when (many?) new dicts are added from the PreferencesWindow
+            // TODO: doesn't seem to compact after saving settings sometimes
             Debug.WriteLine("Starting compacting GC run");
             GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.GetTotalMemory(true);

@@ -5,6 +5,7 @@
         // common (required for sorting)
         FoundForm,
         Frequency,
+        DictType,
 
         // EDICT (and EPWING?)
         FoundSpelling,

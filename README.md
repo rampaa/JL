@@ -7,6 +7,7 @@
 * KANJIDIC - Full support (w/ composition data)
 
 ### J-J (yomichan-import format)
+Lots of irrelevant/wrong results because we lack WordClasses
 
 * Daijirin - Basic+ support
 * Daijisen - Basic support
