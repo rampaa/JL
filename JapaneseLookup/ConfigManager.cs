@@ -7,33 +7,38 @@ using System.IO;
 using System.Linq;
 using System.Runtime;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Markup;
 using JapaneseLookup.EDICT;
+using JapaneseLookup.EPWING;
+using JapaneseLookup.KANJIDIC;
 
 namespace JapaneseLookup
 {
-    internal static class ConfigManager
+    public static class ConfigManager
     {
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
         private static readonly List<string> JapaneseFonts = FindJapaneseFonts().OrderBy(font => font).ToList();
 
+        // TODO: Make these configurable too
         private static readonly Dictionary<string, string> FrequencyLists = new()
         {
             { "VN", "Resources/freqlist_vns.json" },
             { "Novel", "Resources/freqlist_novels.json" },
-            { "Narou", "Resources/freqlist_narou.json" }
+            { "Narou", "Resources/freqlist_narou.json" },
+            { "None", "" }
         };
-
-        public static bool Ready;
 
         public static string AnkiConnectUri;
         public static int MaxSearchLength;
         public static string FrequencyList;
-        public static bool UseJMnedict;
+
+        // TODO: Don't let KanjiMode be turned on if Kanjidic is not loaded?
         public static bool KanjiMode;
         public static bool ForceSync;
         public static int LookupRate;
@@ -72,6 +77,8 @@ namespace JapaneseLookup
         // TODO: hook these up
         //public static bool fixedWidth = false;
         //public static bool fixedHeight = false;
+        public static Brush DictTypeColor = Brushes.LightBlue;
+        public static int DictTypeFontSize = 15;
         public static Key MiningModeKey = Key.M;
         public static Key PlayAudioKey = Key.P;
         public static Key KanjiModeKey = Key.K;
@@ -83,14 +90,19 @@ namespace JapaneseLookup
         public static Key SteppedBacklogBackwardsKey = Key.Left;
         public static Key SteppedBacklogForwardsKey = Key.Right;
 
+        // consider making this dictionary specific
+        // enabling this seems to improve rendering performance by a lot; need to test if it's because
+        // a) there's less text on the screen overall
+        // b) there's less word-wrapping to do
+        public static bool NewlineBetweenDefinitions = false;
+        public static int MaxResults = 99;
+
         public static void ApplyPreferences(MainWindow mainWindow)
         {
             MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength") ??
                                         throw new InvalidOperationException());
             FrequencyList = ConfigurationManager.AppSettings.Get("FrequencyList");
             AnkiConnectUri = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
-            UseJMnedict = bool.Parse(ConfigurationManager.AppSettings.Get("UseJMnedict") ??
-                                     throw new InvalidOperationException());
             KanjiMode = bool.Parse(ConfigurationManager.AppSettings.Get("KanjiMode") ??
                                    throw new InvalidOperationException());
 
@@ -102,24 +114,42 @@ namespace JapaneseLookup
             MainWindowHeight = int.Parse(ConfigurationManager.AppSettings.Get("MainWindowHeight")!);
             MainWindowWidth = int.Parse(ConfigurationManager.AppSettings.Get("MainWindowWidth")!);
 
+            // MAKE SURE YOU FREEZE ANY NEW COLOR OBJECTS YOU ADD
+            // OR THE PROGRAM WILL CRASH AND BURN
+            MainWindowTextColor = (SolidColorBrush) new BrushConverter().ConvertFrom(
+                ConfigurationManager.AppSettings.Get("MainWindowTextColor"));
+            MainWindowTextColor!.Freeze();
+            MainWindowBacklogTextColor = (SolidColorBrush) new BrushConverter().ConvertFrom(
+                ConfigurationManager.AppSettings.Get("MainWindowBacklogTextColor"));
+            MainWindowBacklogTextColor!.Freeze();
+
             FoundSpellingColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupPrimarySpellingColor"));
+            FoundSpellingColor!.Freeze();
             ReadingsColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupReadingColor"));
+            ReadingsColor!.Freeze();
             ROrthographyInfoColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupROrthographyInfoColor"));
+            ROrthographyInfoColor!.Freeze();
             AlternativeSpellingsColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupAlternativeSpellingColor"));
+            AlternativeSpellingsColor!.Freeze();
             AOrthographyInfoColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupAOrthographyInfoColor"));
+            AOrthographyInfoColor!.Freeze();
             DefinitionsColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupDefinitionColor"));
+            DefinitionsColor!.Freeze();
             FrequencyColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupFrequencyColor"));
+            FrequencyColor!.Freeze();
             ProcessColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupDeconjugationInfoColor"));
+            ProcessColor!.Freeze();
             SeparatorColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupSeparatorColor"));
+            SeparatorColor!.Freeze();
 
             FoundSpellingFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupPrimarySpellingFontSize")!);
             ReadingsFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupReadingFontSize")!);
@@ -138,11 +168,6 @@ namespace JapaneseLookup
 
             PopupMaxWidth = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth")!);
             PopupMaxHeight = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight")!);
-
-            MainWindowTextColor = (SolidColorBrush) new BrushConverter().ConvertFrom(
-                ConfigurationManager.AppSettings.Get("MainWindowTextColor"));
-            MainWindowBacklogTextColor = (SolidColorBrush) new BrushConverter().ConvertFrom(
-                ConfigurationManager.AppSettings.Get("MainWindowBacklogTextColor"));
 
             switch (ConfigurationManager.AppSettings.Get("PopupFlip"))
             {
@@ -179,12 +204,19 @@ namespace JapaneseLookup
             var popupWindow = PopupWindow.Instance;
             popupWindow.Background = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
-            popupWindow.Background.Opacity = double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")) / 100;
+            popupWindow.Background.Opacity =
+                double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")) / 100;
             popupWindow.MaxHeight = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight"));
             popupWindow.MaxWidth = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth"));
 
+            if (!File.Exists(Path.Join(ApplicationPath, "Config/dicts.json")))
+                CreateDefaultDictsConfig();
+
+            DeserializeDicts();
+
             //Test without async/await.
-            Task.Run(async () => { await LoadDictionaries(); });
+            // Task.Run(async () => { await LoadDictionaries(); });
+            Task.Run(() => { LoadDictionaries(); });
         }
 
         public static void LoadPreferences(PreferencesWindow preferenceWindow)
@@ -195,7 +227,6 @@ namespace JapaneseLookup
             preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri;
             preferenceWindow.ForceAnkiSyncCheckBox.IsChecked = ForceSync;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
-            preferenceWindow.UseJMnedictCheckBox.IsChecked = UseJMnedict;
             preferenceWindow.KanjiModeCheckBox.IsChecked = KanjiMode;
             preferenceWindow.FrequencyListComboBox.ItemsSource = FrequencyLists.Keys;
             preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyList;
@@ -282,8 +313,6 @@ namespace JapaneseLookup
             config.AppSettings.Settings["FrequencyList"].Value =
                 preferenceWindow.FrequencyListComboBox.SelectedItem.ToString();
 
-            config.AppSettings.Settings["UseJMnedict"].Value =
-                preferenceWindow.UseJMnedictCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["KanjiMode"].Value =
                 preferenceWindow.KanjiModeCheckBox.IsChecked.ToString();
 
@@ -340,6 +369,8 @@ namespace JapaneseLookup
             config.AppSettings.Settings["MainWindowTopPosition"].Value = mainWindow.Top.ToString();
             config.AppSettings.Settings["MainWindowLeftPosition"].Value = mainWindow.Left.ToString();
 
+            SerializeDicts();
+
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
 
@@ -358,6 +389,99 @@ namespace JapaneseLookup
             config.AppSettings.Settings["MainWindowLeftPosition"].Value = mainWindow.Left.ToString();
 
             config.Save(ConfigurationSaveMode.Modified);
+        }
+
+        private static void SerializeDicts()
+        {
+            try
+            {
+                var jso = new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    Converters =
+                    {
+                        new JsonStringEnumConverter(),
+                    }
+                };
+
+                File.WriteAllText(Path.Join(ApplicationPath, "Config/dicts.json"),
+                    JsonSerializer.Serialize(Dicts.dicts, jso));
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                throw;
+            }
+        }
+
+        private static void DeserializeDicts()
+        {
+            try
+            {
+                var jso = new JsonSerializerOptions
+                {
+                    Converters =
+                    {
+                        new JsonStringEnumConverter(),
+                    }
+                };
+
+                Dictionary<DictType, Dict> deserializedDicts = JsonSerializer.Deserialize<Dictionary<DictType, Dict>>(
+                    File.ReadAllText(Path.Join(ApplicationPath, "Config/dicts.json")), jso);
+
+                if (deserializedDicts != null)
+                {
+                    foreach ((DictType _, Dict dict) in deserializedDicts)
+                    {
+                        if (!Dicts.dicts.ContainsKey(dict.Type))
+                        {
+                            dict.Contents = new Dictionary<string, List<IResult>>();
+                            Dicts.dicts.Add(dict.Type, dict);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Couldn't load Config/dicts.json");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                throw;
+            }
+        }
+
+        public static void CreateDefaultDictsConfig()
+        {
+            var jso = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Converters =
+                {
+                    new JsonStringEnumConverter(),
+                }
+            };
+
+            var defaultDictsConfig =
+                new Dictionary<string, Dict>
+                {
+                    { "JMdict", new Dict(DictType.JMdict, "Resources\\JMdict.xml", true, 0) },
+                    { "JMnedict", new Dict(DictType.JMnedict, "Resources\\JMnedict.xml", true, 1) },
+                    { "Kanjidic", new Dict(DictType.Kanjidic, "Resources\\kanjidic2.xml", true, 2) }
+                };
+
+            try
+            {
+                Directory.CreateDirectory(Path.Join(ApplicationPath, "Config"));
+                File.WriteAllText(Path.Join(ApplicationPath, "Config/dicts.json"),
+                    JsonSerializer.Serialize(defaultDictsConfig, jso));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Couldn't write default Dicts config");
+                Debug.WriteLine(e);
+            }
         }
 
         private static List<string> FindJapaneseFonts()
@@ -388,62 +512,142 @@ namespace JapaneseLookup
             return japaneseFonts;
         }
 
-        private static async Task LoadDictionaries()
+        private static void LoadDictionaries()
         {
             string freqListPath = FrequencyLists[FrequencyList];
 
-            // initial jmdict and freqlist load
-            if (!JMdictLoader.JMdictDictionary.Any())
+            var tasks = new List<Task>();
+
+            foreach ((DictType _, Dict dict) in Dicts.dicts)
             {
-                await Task.Run(JMdictLoader.Load).ContinueWith(_ =>
+                if (!dict.Active)
+                    continue;
+
+                switch (dict.Type)
                 {
-                    FrequencyLoader.AddToJMdict($"{FrequencyList}", FrequencyLoader.LoadJson(Path.Join(
-                        ApplicationPath,
-                        freqListPath)).Result);
+                    case DictType.JMdict:
+                        // initial jmdict and freqlist load
+                        if (!Dicts.dicts[DictType.JMdict].Contents.Any())
+                        {
+                            var taskJmdict = Task.Run(() => JMdictLoader.Load(dict.Path)).ContinueWith(_ =>
+                            {
+                                FrequencyLoader.AddToJMdict($"{FrequencyList}", FrequencyLoader.LoadJson(Path.Join(
+                                    ApplicationPath,
+                                    freqListPath)).Result);
+                            });
 
-                    Ready = true;
-                });
+                            tasks.Add(taskJmdict);
+                        }
+
+                        break;
+                    case DictType.JMnedict:
+                        // JMnedict
+                        if (!Dicts.dicts[DictType.JMnedict].Contents.Any())
+                        {
+                            var taskJMnedict = Task.Run(() => JMnedictLoader.Load(dict.Path));
+                            tasks.Add(taskJMnedict);
+                        }
+
+                        break;
+                    case DictType.Kanjidic:
+                        // KANJIDIC
+                        if (!Dicts.dicts[DictType.Kanjidic].Contents.Any())
+                        {
+                            var taskKanjidict = Task.Run(() => KanjiInfoLoader.Load(dict.Path));
+                            tasks.Add(taskKanjidict);
+                        }
+
+                        break;
+                    case DictType.UnknownEpwing:
+                        if (!Dicts.dicts[DictType.UnknownEpwing].Contents.Any())
+                        {
+                            var taskEpwing = Task.Run(async () =>
+                                await EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            tasks.Add(taskEpwing);
+                        }
+
+                        break;
+                    case DictType.Daijirin:
+                        if (!Dicts.dicts[DictType.Daijirin].Contents.Any())
+                        {
+                            var taskEpwing = Task.Run(async () =>
+                                await EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            tasks.Add(taskEpwing);
+                        }
+
+                        break;
+                    case DictType.Daijisen:
+                        if (!Dicts.dicts[DictType.Daijisen].Contents.Any())
+                        {
+                            var taskEpwing = Task.Run(async () =>
+                                await EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            tasks.Add(taskEpwing);
+                        }
+
+                        break;
+                    case DictType.Koujien:
+                        if (!Dicts.dicts[DictType.Koujien].Contents.Any())
+                        {
+                            var taskEpwing = Task.Run(async () =>
+                                await EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            tasks.Add(taskEpwing);
+                        }
+
+                        break;
+                    case DictType.Meikyou:
+                        if (!Dicts.dicts[DictType.Meikyou].Contents.Any())
+                        {
+                            var taskEpwing = Task.Run(async () =>
+                                await EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            tasks.Add(taskEpwing);
+                        }
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
 
-            if (UseJMnedict && !JMnedictLoader.jMnedictDictionary.Any())
+            foreach ((DictType _, Dict dict) in Dicts.dicts)
             {
-                await Task.Run(JMnedictLoader.Load).ContinueWith(_ =>
+                if (!dict.Active && dict.Contents.Any())
                 {
-                    if (!UseJMnedict && JMnedictLoader.jMnedictDictionary.Any())
-                    {
-                        JMnedictLoader.jMnedictDictionary = new Dictionary<string, List<JMnedictResult>>();
-                        Task.Delay(10000).ContinueWith(_ => { GC.Collect(); });
-                    }
-                });
+                    Debug.WriteLine("Clearing " + dict.Type);
+                    dict.Contents.Clear();
+                }
             }
-            else if (!UseJMnedict && JMnedictLoader.jMnedictDictionary.Any())
-            {
-                JMnedictLoader.jMnedictDictionary = new();
-                await Task.Delay(10000).ContinueWith(_ => { GC.Collect(); });
-            }
-
-            if (!KANJIDIC.KanjiInfoLoader.KanjiDictionary.Any())
-                await Task.Run(KANJIDIC.KanjiInfoLoader.Load);
 
             // load new freqlist if necessary
-            if (Ready)
+            if (Dicts.dicts[DictType.JMdict]?.Contents.Any() ?? false)
             {
-                JMdictLoader.JMdictDictionary.TryGetValue("俺", out var freqTest);
-                Debug.Assert(freqTest != null, nameof(freqTest) + " != null");
+                Dicts.dicts[DictType.JMdict].Contents.TryGetValue("俺", out List<IResult> freqTest1);
+                Debug.Assert(freqTest1 != null, nameof(freqTest1) + " != null");
 
+                var freqTest = freqTest1.Cast<JMdictResult>().ToList();
+                // todo get NRE here sometimes
                 if (!freqTest[0].FrequencyDict.TryGetValue(FrequencyList, out int _))
                 {
-                    await Task.Run(async () =>
+                    var taskNewFreqlist = Task.Run(async () =>
                     {
                         FrequencyLoader.AddToJMdict($"{FrequencyList}", await FrequencyLoader.LoadJson(Path.Join(
                             ApplicationPath,
                             freqListPath)));
                     });
+                    tasks.Add(taskNewFreqlist);
 
                     Debug.WriteLine("Banzai! (changed freqlist)");
                 }
             }
 
+            // foreach ((DictType _, Dict dict) in Dicts.dicts.Where(d => d.Value.Active))
+            // {
+            //     Debug.WriteLine("Loading " + dict.Type);
+            // }
+
+            Task.WaitAll(tasks.ToArray());
+
+            // TODO: doesn't seem to compact after saving settings sometimes
+            Debug.WriteLine("Starting compacting GC run");
             GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.GetTotalMemory(true);
             GC.Collect();

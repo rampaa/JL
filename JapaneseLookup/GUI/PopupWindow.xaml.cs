@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using JapaneseLookup.Anki;
 
@@ -31,13 +31,18 @@ namespace JapaneseLookup.GUI
             get { return _instance ??= new PopupWindow(); }
         }
 
+        public ObservableCollection<StackPanel> ResultStackPanels { get; } = new();
+
         public PopupWindow()
         {
             InitializeComponent();
+            // TODO: do we really need these two lines when we set them up in the ConfigManager?
             MaxWidth = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth") ??
                                  throw new InvalidOperationException());
             MaxHeight = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight") ??
                                   throw new InvalidOperationException());
+
+            StackPanel.ItemsSource = ResultStackPanels;
         }
 
         public void UpdatePosition(Point cursorPosition)
@@ -155,22 +160,27 @@ namespace JapaneseLookup.GUI
 
             var innerStackPanel = (StackPanel) top.Parent;
             var bottom = (StackPanel) innerStackPanel.Children[1];
-            foreach (TextBlock child in bottom.Children)
+            foreach (object child in bottom.Children)
             {
-                Enum.TryParse(child.Name, out LookupResult result);
+                if (child is not TextBlock)
+                    continue;
+
+                textBlock = (TextBlock) child;
+
+                Enum.TryParse(textBlock.Name, out LookupResult result);
                 switch (result)
                 {
                     case LookupResult.Definitions:
-                        definitions += child.Text;
+                        definitions += textBlock.Text;
                         break;
                     case LookupResult.StrokeCount:
-                        strokeCount += child.Text;
+                        strokeCount += textBlock.Text;
                         break;
                     case LookupResult.Grade:
-                        grade += child.Text;
+                        grade += textBlock.Text;
                         break;
                     case LookupResult.Composition:
-                        composition += child.Text;
+                        composition += textBlock.Text;
                         break;
                 }
             }
@@ -221,13 +231,16 @@ namespace JapaneseLookup.GUI
                 // TODO: Tell the user that they are in mining mode
                 Instance.Activate();
                 Instance.Focus();
+
+                Instance.ResultStackPanels.Clear();
+                PopupWindowUtilities.DisplayResults(true);
             }
             else if (e.Key == ConfigManager.PlayAudioKey)
             {
                 string foundSpelling = null;
                 string reading = null;
 
-                var innerStackPanel = (StackPanel) StackPanel.Children[_playAudioIndex];
+                var innerStackPanel = (StackPanel) StackPanel.Items[_playAudioIndex];
                 var top = (WrapPanel) innerStackPanel.Children[0];
 
                 foreach (TextBlock child in top.Children)
@@ -258,6 +271,8 @@ namespace JapaneseLookup.GUI
             else if (e.Key == ConfigManager.KanjiModeKey)
             {
                 ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
+                MainWindow.LastWord = "";
+                Application.Current.Windows.OfType<MainWindow>().First().MainTextBox_MouseMove(null, null);
             }
             else if (e.Key == ConfigManager.ShowPreferencesWindowKey)
             {

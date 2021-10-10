@@ -2,7 +2,7 @@
 
 namespace JapaneseLookup.EDICT
 {
-    class Sense
+    public class Sense
     {
         public List<string> StagKList { get; set; } // Meaning only valid for these kebs.
         public List<string> StagRList { get; set; } // Meaning only valid for these rebs.

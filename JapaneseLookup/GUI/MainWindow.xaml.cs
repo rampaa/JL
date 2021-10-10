@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace JapaneseLookup.GUI
@@ -13,9 +14,9 @@ namespace JapaneseLookup.GUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private string _lastWord = "";
-        internal static bool MiningMode = false;
         private int _currentTextIndex;
+        public static string LastWord { get; set; } = "";
+        public static bool MiningMode { get; set; }
         public static int CurrentCharPosition { get; set; }
         public static string CurrentText { get; set; }
 
@@ -66,7 +67,7 @@ namespace JapaneseLookup.GUI
             CopyFromClipboard();
         }
 
-        private void MainTextBox_MouseMove(object sender, MouseEventArgs e)
+        public async void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
             if (MiningMode || MWindow.Background.Opacity == 0) return;
 
@@ -91,14 +92,13 @@ namespace JapaneseLookup.GUI
                 else
                     text = MainTextBox.Text[charPosition..(charPosition + ConfigManager.MaxSearchLength)];
 
-                if (text == _lastWord) return;
-                _lastWord = text;
+                if (text == LastWord) return;
+                LastWord = text;
 
-                var results = MainWindowUtilities.Lookup(text);
-
-                if (results != null)
+                var lookupResults = await Task.Run(() => MainWindowUtilities.Lookup(text));
+                if (lookupResults != null && lookupResults.Any())
                 {
-                    PopupWindow.Instance.StackPanel.Children.Clear();
+                    PopupWindow.Instance.ResultStackPanels.Clear();
 
                     // popup doesn't follow cursor
                     // PopupWindow.Instance.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
@@ -107,36 +107,15 @@ namespace JapaneseLookup.GUI
                     PopupWindow.Instance.Activate();
                     PopupWindow.Instance.Focus();
 
-                    for (int i = 0; i < results.Count; i++)
-                    {
-                        var result = results[i];
-
-                        // if (result[LookupResult.Grade].Any())
-                        // {
-                        //     PopupWindow.Instance.StackPanel.Children.Add(
-                        //         PopupWindow.MakeResultStackPanelKanji(sentence, result, i));
-                        // }
-                        // else
-                        // {
-                        PopupWindow.Instance.StackPanel.Children.Add(
-                            PopupWindowUtilities.MakeResultStackPanel(result, i));
-                        // }
-
-                        if (i != results.Count - 1)
-                        {
-                            PopupWindow.Instance.StackPanel.Children.Add(new Separator
-                            {
-                                Background = ConfigManager.SeparatorColor
-                            });
-                        }
-                    }
+                    PopupWindowUtilities.LastLookupResults = lookupResults;
+                    PopupWindowUtilities.DisplayResults(false);
                 }
                 else
                     PopupWindow.Instance.Visibility = Visibility.Hidden;
             }
             else
             {
-                _lastWord = "";
+                LastWord = "";
                 PopupWindow.Instance.Visibility = Visibility.Hidden;
             }
         }
@@ -154,7 +133,7 @@ namespace JapaneseLookup.GUI
             if (MiningMode) return;
 
             PopupWindow.Instance.Hide();
-            _lastWord = "";
+            LastWord = "";
         }
 
         private void MainTextBox_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -167,7 +146,9 @@ namespace JapaneseLookup.GUI
                     if (MainTextBox.GetFirstVisibleLineIndex() == 0)
                     {
                         int caretIndex = allBacklogText.Length - MainTextBox.Text.Length;
-                        MainTextBox.Text = allBacklogText;
+                        MainTextBox.Text =
+                            "Character count: " + String.Join("", MainWindowUtilities.Backlog).Length + "\n"
+                            + allBacklogText;
                         MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
                         MainTextBox.CaretIndex = caretIndex;
                         MainTextBox.ScrollToEnd();
@@ -268,6 +249,8 @@ namespace JapaneseLookup.GUI
             else if (e.Key == ConfigManager.KanjiModeKey)
             {
                 ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
+                LastWord = "";
+                MainTextBox_MouseMove(null, null);
             }
             else if (e.Key == ConfigManager.ShowAddNameWindowKey)
             {

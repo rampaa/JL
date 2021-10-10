@@ -7,33 +7,37 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
-using static JapaneseLookup.MainWindowUtilities;
 
 namespace JapaneseLookup.EDICT
 {
-    class JMnedictLoader
+    public static class JMnedictLoader
     {
-        public static Dictionary<string, List<JMnedictResult>> jMnedictDictionary = new();
-        public static void Load()
+        public static void Load(string dictPath)
         {
-            if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/JMnedict.xml")))
+            if (File.Exists(Path.Join(ConfigManager.ApplicationPath, dictPath)))
             {
-                using XmlTextReader edictXml = new(Path.Join(ConfigManager.ApplicationPath, "Resources/JMnedict.xml"));
+                using XmlTextReader edictXml = new(Path.Join(ConfigManager.ApplicationPath, dictPath))
+                {
+                    DtdProcessing = DtdProcessing.Parse,
+                    WhitespaceHandling = WhitespaceHandling.None,
+                    EntityHandling = EntityHandling.ExpandCharEntities
+                };
 
-                edictXml.DtdProcessing = DtdProcessing.Parse;
-                edictXml.WhitespaceHandling = WhitespaceHandling.None;
-                edictXml.EntityHandling = EntityHandling.ExpandCharEntities;
                 while (edictXml.ReadToFollowing("entry"))
                 {
                     ReadEntry(edictXml);
                 }
             }
-            else
-            {
-                MessageBox.Show("Couldn't find JMnedict.xml. Please download it by clicking the \"Update JMnedict\" button.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
-            }
 
+            // else
+            // {
+            //     MessageBox.Show(
+            //         "Couldn't find JMnedict.xml. Please download it by clicking the \"Update JMnedict\" button.", "",
+            //         MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK,
+            //         MessageBoxOptions.DefaultDesktopOnly);
+            // }
         }
+
         private static void ReadEntry(XmlTextReader edictXml)
         {
             JMnedictEntry entry = new();
@@ -64,7 +68,9 @@ namespace JapaneseLookup.EDICT
                     }
                 }
             }
-            JMNeDictBuilder.BuildDictionary(entry, jMnedictDictionary);
+
+            JMNeDictBuilder.BuildDictionary(entry, Dicts.dicts[DictType.JMnedict].Contents);
+            Dicts.dicts[DictType.JMnedict].Contents.TrimExcess();
         }
 
         private static void ReadKEle(XmlTextReader jMneDictXML, JMnedictEntry entry)
@@ -101,14 +107,16 @@ namespace JapaneseLookup.EDICT
                             trans.TransDetList.Add(jMneDictXML.ReadString());
                             break;
 
-                            //case "xref":
-                            //    trans.XRefList.Add(jMneDictXML.ReadString());
-                            //    break;
+                        //case "xref":
+                        //    trans.XRefList.Add(jMneDictXML.ReadString());
+                        //    break;
                     }
                 }
             }
+
             entry.TransList.Add(trans);
         }
+
         private static string ReadEntity(XmlTextReader jMDictXML)
         {
             jMDictXML.Read();

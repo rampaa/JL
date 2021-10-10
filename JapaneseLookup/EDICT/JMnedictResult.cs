@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JapaneseLookup.EDICT
 {
-    class JMnedictResult
+    public class JMnedictResult : IResult
     {
         public string Id { get; set; }
         public string PrimarySpelling { get; set; }

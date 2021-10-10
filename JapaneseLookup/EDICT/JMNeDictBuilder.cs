@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace JapaneseLookup.EDICT
 {
-    class JMNeDictBuilder
+    public static class JMNeDictBuilder
     {
-        public static void BuildDictionary(JMnedictEntry entry, Dictionary<string, List<JMnedictResult>> jMnedictDictionary)
+        public static void BuildDictionary(JMnedictEntry entry, Dictionary<string, List<IResult>> jMnedictDictionary)
         {
             Dictionary<string, JMnedictResult> resultList = new();
             List<string> alternativeSpellings;
@@ -91,12 +91,13 @@ namespace JapaneseLookup.EDICT
                 if (!rl.Value.Readings.Any())
                     rl.Value.Readings = null;
 
-                if (jMnedictDictionary.TryGetValue(key, out List<JMnedictResult> tempList))
+                if (jMnedictDictionary.TryGetValue(key, out List<IResult> tempList))
                     tempList.Add(rl.Value);
                 else
                     tempList = new() { rl.Value };
 
                 jMnedictDictionary[key] = tempList;
+                
             }
         }
     }

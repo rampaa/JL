@@ -6,7 +6,7 @@
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:local="clr-namespace:JapaneseLookup.GUI"
         mc:Ignorable="d"
-        Title="PreferenceWindow" Height="550" Width="579" Topmost="True" Closing="Window_Closing"
+        Title="PreferenceWindow" Height="580" Width="620" Topmost="True" Closing="Window_Closing"
         SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Background="Black">
     <Grid>
         <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="20,0,0,20"
@@ -15,7 +15,7 @@
                 VerticalAlignment="Bottom" Width="85" Click="CancelButton_Click" FontSize="16" Height="35" />
 
         <TabControl TabStripPlacement="Top" VerticalContentAlignment="Stretch" Margin="0,0,0,79"
-                    Background="#F3000000">
+                    Background="#F3000000" SelectionChanged="TabControl_OnSelectionChanged" Name="TabControl">
             <TabItem Header="General">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
                     <StackPanel Background="Black" Margin="20,10,20,10">
@@ -39,12 +39,6 @@
                             <ComboBox x:Name="FrequencyListComboBox" HorizontalAlignment="Right" />
                         </DockPanel>
 
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Use name dictionary"
-                                       TextWrapping="Wrap" />
-                            <CheckBox x:Name="UseJMnedictCheckBox" Content="" HorizontalAlignment="Right" />
-                        </DockPanel>
-                        
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Kanji mode"
                                        TextWrapping="Wrap" />
@@ -345,23 +339,23 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-            <TabItem Header="Anki" PreviewMouseLeftButtonDown="TabItemAnki_OnPreviewMouseLeftButtonDown">
+            <TabItem Header="Anki">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                    <StackPanel Background="Black" Margin="20,20,20,20">
+                    <StackPanel Background="Black" Margin="20,10,20,10">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type DockPanel}">
                                 <Setter Property="Margin" Value="0,10,0,0" />
                             </Style>
                         </StackPanel.Resources>
 
-                        <DockPanel Margin="0,0,0,0">
+                        <DockPanel Margin="0,10,0,0">
                             <TextBlock HorizontalAlignment="Left" Text="AnkiConnect server address"
                                        TextWrapping="Wrap" />
                             <TextBox x:Name="AnkiUriTextBox" HorizontalAlignment="Right"
                                      TextWrapping="NoWrap" Width="210" />
                         </DockPanel>
 
-                        <DockPanel>
+                        <DockPanel Margin="0,10,0,0">
                             <TextBlock HorizontalAlignment="Left" Text="Force sync after mining"
                                        TextWrapping="Wrap" />
                             <CheckBox x:Name="ForceAnkiSyncCheckBox" Content="" HorizontalAlignment="Right" />
@@ -390,6 +384,36 @@
                                         Content="Save AnkiConfig" Height="35" FontSize="16" Width="140" />
                             </StackPanel>
                         </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Keys">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                    <StackPanel Background="Black" Margin="20,10,20,10">
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type DockPanel}">
+                                <Setter Property="Margin" Value="0,10,0,0" />
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <TextBlock>TODO</TextBlock>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Dictionaries">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                    <StackPanel Background="Black" Margin="20,10,20,10">
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type DockPanel}">
+                                <Setter Property="Margin" Value="0,10,0,0" />
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <ListBox x:Name="DictionariesDisplay" Focusable="False" Margin="10" />
+
+                        <ComboBox Name="ComboBoxAddDictionary" Width="120" Margin="10" />
+                        <Button Name="ButtonAddDictionary" Margin="10" Click="ButtonAddDictionary_OnClick">Add dictionary</Button>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

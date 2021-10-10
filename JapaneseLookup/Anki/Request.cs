@@ -7,9 +7,8 @@ namespace JapaneseLookup.Anki
     {
         [JsonPropertyName("action")] public string Action { get; set; }
 
-        [JsonPropertyName("version")]  public int Version { get; set; }
+        [JsonPropertyName("version")] public int Version { get; set; }
 
-        // maybe Dictionary<string, Dictionary<string,object>>
         [JsonPropertyName("params")] public Dictionary<string, object> Params { get; set; }
 
         public Request(string action, int version, Dictionary<string, object> @params = null)

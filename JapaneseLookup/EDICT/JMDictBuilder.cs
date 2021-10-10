@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace JapaneseLookup.EDICT
 {
-    class JMDictBuilder
+    internal static class JMDictBuilder
     {
-        public static void BuildDictionary(JMdictEntry entry, Dictionary<string, List<JMdictResult>> jMdictDictionary)
+        public static void BuildDictionary(JMdictEntry entry, Dictionary<string, List<IResult>> jMdictDictionary)
         {
             // entry (k_ele*, r_ele+, sense+)
             // k_ele (keb, ke_inf*, ke_pri*)
@@ -56,6 +56,7 @@ namespace JapaneseLookup.EDICT
                         // result.Antonyms.AddRange(sense.AntList);
                     }
                 }
+
                 resultList.Add(key, result);
             }
 
@@ -70,6 +71,8 @@ namespace JapaneseLookup.EDICT
                         item.Value.AlternativeSpellings.Add(spelling);
 
                         resultList.TryGetValue(spelling, out var tempResult);
+                        Debug.Assert(tempResult != null, nameof(tempResult) + " != null");
+
                         item.Value.AOrthographyInfoList.Add(tempResult.POrthographyInfoList);
                     }
                 }
@@ -113,8 +116,8 @@ namespace JapaneseLookup.EDICT
 
                 foreach (Sense sense in entry.SenseList)
                 {
-                    if((!sense.StagKList.Any() && !sense.StagRList.Any())
-                        || sense.StagRList.Contains(rEle.Reb) 
+                    if ((!sense.StagKList.Any() && !sense.StagRList.Any())
+                        || sense.StagRList.Contains(rEle.Reb)
                         || sense.StagKList.Contains(result.PrimarySpelling)
                         || sense.StagKList.Intersect(result.AlternativeSpellings).Any())
                     {
@@ -130,6 +133,7 @@ namespace JapaneseLookup.EDICT
                         // result.Antonyms.AddRange(sense.AntList);
                     }
                 }
+
                 resultList.Add(key, result);
             }
 
@@ -191,7 +195,7 @@ namespace JapaneseLookup.EDICT
                 rl.Value.Id = entry.Id;
                 string key = rl.Key;
 
-                if (jMdictDictionary.TryGetValue(key, out List<JMdictResult> tempList))
+                if (jMdictDictionary.TryGetValue(key, out List<IResult> tempList))
                     tempList.Add(rl.Value);
                 else
                     tempList = new() { rl.Value };

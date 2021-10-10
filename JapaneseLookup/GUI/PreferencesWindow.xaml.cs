@@ -3,17 +3,23 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using JapaneseLookup.EDICT;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
 using HandyControl.Tools;
 using HandyControl.Controls;
 using HandyControl.Properties;
 using JapaneseLookup.Anki;
+using Button = System.Windows.Controls.Button;
+using CheckBox = System.Windows.Controls.CheckBox;
+using MessageBoxOptions = System.Windows.MessageBoxOptions;
+using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
 namespace JapaneseLookup.GUI
 {
@@ -90,17 +96,29 @@ namespace JapaneseLookup.GUI
             Task.Run(ResourceUpdater.UpdateKanjidic);
         }
 
-        #region MiningSetup
-
-        private async void TabItemAnki_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private async void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!_setAnkiConfig)
+            var itemTab = (System.Windows.Controls.TabItem) TabControl.SelectedItem;
+            if (itemTab == null) return;
+
+            switch (itemTab.Header)
             {
-                await SetPreviousMiningConfig();
-                if (MiningSetupComboBoxDeckNames.SelectedItem == null) await PopulateDeckAndModelNames();
-                _setAnkiConfig = true;
+                case "Anki":
+                    if (!_setAnkiConfig)
+                    {
+                        await SetPreviousMiningConfig();
+                        if (MiningSetupComboBoxDeckNames.SelectedItem == null) await PopulateDeckAndModelNames();
+                        _setAnkiConfig = true;
+                    }
+
+                    break;
+                case "Dictionaries":
+                    UpdateDictionariesDisplay();
+                    break;
             }
         }
+
+        #region MiningSetup
 
         private async Task SetPreviousMiningConfig()
         {
@@ -237,6 +255,229 @@ namespace JapaneseLookup.GUI
             {
                 Console.WriteLine("Error saving config");
                 Debug.WriteLine(exception);
+            }
+        }
+
+        #endregion
+
+        #region Dictionaries
+
+        // probably should be split into several methods
+        private void UpdateDictionariesDisplay()
+        {
+            List<DockPanel> resultDockPanels = new();
+
+            foreach ((DictType _, Dict dict) in Dicts.dicts)
+            {
+                var dockPanel = new DockPanel();
+
+                var checkBox = new CheckBox()
+                {
+                    Width = 20,
+                    IsChecked = dict.Active,
+                    Margin = new Thickness(10),
+                };
+                var buttonIncreasePriority = new Button()
+                {
+                    Width = 25,
+                    Content = "↑",
+                    Margin = new Thickness(1),
+                };
+                var buttonDecreasePriority = new Button()
+                {
+                    Width = 25,
+                    Content = "↓",
+                    Margin = new Thickness(1),
+                };
+                var priority = new TextBlock()
+                {
+                    Name = "priority",
+                    // Width = 20,
+                    Width = 0,
+                    Text = dict.Priority.ToString(),
+                    // Margin = new Thickness(10),
+                };
+                var dictTypeDisplay = new TextBlock()
+                {
+                    Width = 100,
+                    Text = dict.Type.ToString(),
+                    Margin = new Thickness(10),
+                };
+                var dictPathValidityDisplay = new TextBlock()
+                {
+                    Width = 12,
+                    //TODO: this should look nicer
+                    Text = (Directory.Exists(dict.Path) || File.Exists(dict.Path)) ? "" : "❌",
+                    Margin = new Thickness(1),
+                };
+                var dictPathDisplay = new TextBlock()
+                {
+                    Width = 200,
+                    Text = dict.Path,
+                    Margin = new Thickness(10),
+                };
+                var buttonRemove = new Button { Width = 0 };
+                if (!(dict.Type == DictType.JMdict || dict.Type == DictType.JMnedict || dict.Type == DictType.Kanjidic))
+                {
+                    // should be a red cross ideally
+                    buttonRemove = new Button()
+                    {
+                        Width = 65,
+                        Content = "Remove",
+                        Background = Brushes.Red,
+                        Margin = new Thickness(10),
+                    };
+                }
+
+                checkBox.Unchecked += (_, _) => dict.Active = false;
+                checkBox.Checked += (_, _) => dict.Active = true;
+                buttonIncreasePriority.Click += (_, _) =>
+                {
+                    PrioritizeDict(Dicts.dicts, dict.Type);
+                    UpdateDictionariesDisplay();
+                };
+                buttonDecreasePriority.Click += (_, _) =>
+                {
+                    UnPrioritizeDict(Dicts.dicts, dict.Type);
+                    UpdateDictionariesDisplay();
+                };
+                buttonRemove.Click += (_, _) =>
+                {
+                    if (System.Windows.MessageBox.Show("Really remove dictionary?", "Confirmation",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question,
+                        MessageBoxResult.No,
+                        MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
+                    {
+                        Dicts.dicts.Remove(dict.Type);
+                        UpdateDictionariesDisplay();
+                    }
+                };
+
+                dockPanel.Children.Add(checkBox);
+                dockPanel.Children.Add(buttonIncreasePriority);
+                dockPanel.Children.Add(buttonDecreasePriority);
+                dockPanel.Children.Add(priority);
+                dockPanel.Children.Add(dictTypeDisplay);
+                dockPanel.Children.Add(dictPathValidityDisplay);
+                dockPanel.Children.Add(dictPathDisplay);
+                dockPanel.Children.Add(buttonRemove);
+
+                resultDockPanels.Add(dockPanel);
+            }
+
+            // TODO: AddDictionaryWindow
+            List<DictType> allDictTypes = Enum.GetValues(typeof(DictType)).Cast<DictType>().ToList();
+            List<DictType> loadedDictTypes = Dicts.dicts.Keys.ToList();
+            ComboBoxAddDictionary.ItemsSource = allDictTypes.Except(loadedDictTypes);
+            // lol
+            DictionariesDisplay.ItemsSource = resultDockPanels.OrderBy(dockPanel =>
+                dockPanel.Children
+                    .OfType<TextBlock>()
+                    .Where(textBlock => textBlock.Name == "priority")
+                    .Select(textBlockPriority => Convert.ToInt32(textBlockPriority.Text)).First());
+        }
+
+        private void PrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBePrioritized)
+        {
+            if (Dicts.dicts[typeToBePrioritized].Priority == 0) return;
+
+            dicts.Single(dict => dict.Value.Priority == Dicts.dicts[typeToBePrioritized].Priority - 1).Value
+                .Priority += 1;
+            Dicts.dicts[typeToBePrioritized].Priority -= 1;
+        }
+
+        private void UnPrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBeUnPrioritized)
+        {
+            // lowest priority means highest number
+            int lowestPriority = Dicts.dicts.Select(dict => dict.Value.Priority).Max();
+            if (Dicts.dicts[typeToBeUnPrioritized].Priority == lowestPriority) return;
+
+            dicts.Single(dict => dict.Value.Priority == Dicts.dicts[typeToBeUnPrioritized].Priority + 1).Value
+                .Priority -= 1;
+            Dicts.dicts[typeToBeUnPrioritized].Priority += 1;
+        }
+
+        private void BrowseForDictionaryFile(DictType selectedDictType, string filter)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog()
+            {
+                InitialDirectory = ConfigManager.ApplicationPath,
+                Filter = filter
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                // lowest priority means highest number
+                int lowestPriority = Dicts.dicts.Select(dict => dict.Value.Priority).Max();
+
+                var relativePath = Path.GetRelativePath(ConfigManager.ApplicationPath, openFileDialog.FileName);
+                Dicts.dicts.Add(selectedDictType, new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
+                Dicts.dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
+                UpdateDictionariesDisplay();
+            }
+        }
+
+        // could get rid of this and make users select the index.json file for EPWING dictionaries
+        private void BrowseForDictionaryFolder(DictType selectedDictType)
+        {
+            using var fbd = new FolderBrowserDialog()
+            {
+                SelectedPath = ConfigManager.ApplicationPath
+            };
+
+            if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK &&
+                !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+            {
+                // lowest priority means highest number
+                int lowestPriority = Dicts.dicts.Select(dict => dict.Value.Priority).Max();
+
+                var relativePath = Path.GetRelativePath(ConfigManager.ApplicationPath, fbd.SelectedPath);
+                Dicts.dicts.Add(selectedDictType, new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
+                Dicts.dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
+                UpdateDictionariesDisplay();
+            }
+        }
+
+        private void ButtonAddDictionary_OnClick(object sender, RoutedEventArgs e)
+        {
+            // TODO: Shouldn't need this if done properly w/ a dedicated window
+            if (ComboBoxAddDictionary.SelectionBoxItem.ToString() == "") return;
+
+            var selectedDictType =
+                Enum.Parse<DictType>(ComboBoxAddDictionary.SelectionBoxItem.ToString() ??
+                                     throw new InvalidOperationException());
+
+            switch (selectedDictType)
+            {
+                case DictType.JMdict:
+                    // not providing a description for the filter causes the filename returned to be empty, lmfao microsoft
+                    // BrowseForDictionaryFile(selectedDictType, "|JMdict.xml");
+                    BrowseForDictionaryFile(selectedDictType, "JMdict file|JMdict.xml");
+                    break;
+                case DictType.JMnedict:
+                    BrowseForDictionaryFile(selectedDictType, "JMnedict file|JMnedict.xml");
+                    break;
+                case DictType.Kanjidic:
+                    BrowseForDictionaryFile(selectedDictType, "Kanjidic2 file|Kanjidic2.xml");
+                    break;
+                case DictType.UnknownEpwing:
+                    BrowseForDictionaryFolder(selectedDictType);
+                    break;
+                case DictType.Daijirin:
+                    BrowseForDictionaryFolder(selectedDictType);
+                    break;
+                case DictType.Daijisen:
+                    BrowseForDictionaryFolder(selectedDictType);
+                    break;
+                case DictType.Koujien:
+                    BrowseForDictionaryFolder(selectedDictType);
+                    break;
+                case DictType.Meikyou:
+                    BrowseForDictionaryFolder(selectedDictType);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
