@@ -17,6 +17,8 @@ using System.Windows.Markup;
 using JapaneseLookup.EDICT;
 using JapaneseLookup.EPWING;
 using JapaneseLookup.KANJIDIC;
+using JapaneseLookup.Custom_Dictionaries;
+using JapaneseLookup.CustomDict;
 
 namespace JapaneseLookup
 {
@@ -75,8 +77,10 @@ namespace JapaneseLookup
         public static bool PopupFlipY;
 
         // TODO: hook these up
-        //public static bool fixedWidth = false;
-        //public static bool fixedHeight = false;
+        //public static bool FixedPopupWidth = false;
+        //public static bool FixedPopupHeight = false;
+        //public static SolidColorBrush POrthographyInfoColor;
+        //public static int POrthographyInfoFontSize;
         public static Brush DictTypeColor = Brushes.LightBlue;
         public static int DictTypeFontSize = 15;
         public static Key MiningModeKey = Key.M;
@@ -601,8 +605,23 @@ namespace JapaneseLookup
                                 await EpwingJsonLoader.Loader(dict.Type, dict.Path));
                             tasks.Add(taskEpwing);
                         }
-
                         break;
+                    case DictType.CustomWordDictionary:
+                        if (!Dicts.dicts[DictType.CustomWordDictionary].Contents.Any())
+                        {
+                            var taskCustomWordDict = Task.Run(() => CustomWordLoader.Load());
+                            tasks.Add(taskCustomWordDict);
+                        }
+                        break;
+
+                    case DictType.CustomNameDictionary:
+                        if (!Dicts.dicts[DictType.CustomNameDictionary].Contents.Any())
+                        {
+                            var taskCustomNameDict = Task.Run(() => CustomNameLoader.Load());
+                            tasks.Add(taskCustomNameDict);
+                        }
+                        break;
+
                     default:
                         throw new ArgumentOutOfRangeException();
                 }

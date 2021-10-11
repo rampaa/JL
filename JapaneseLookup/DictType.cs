@@ -2,6 +2,8 @@
 {
     public enum DictType
     {
+        CustomWordDictionary,
+        CustomNameDictionary,
         JMdict,
         JMnedict,
         Kanjidic,

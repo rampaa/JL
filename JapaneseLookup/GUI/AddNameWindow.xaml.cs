@@ -1,4 +1,6 @@
-﻿using System;
+﻿using JapaneseLookup.Custom_Dictionaries;
+using JapaneseLookup.CustomDict;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -73,7 +75,10 @@ namespace JapaneseLookup.GUI
             if (isValidated)
             {
                 string nameType = NameTypeStackPanel.Children.OfType<RadioButton>().FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value).Content.ToString();
-                WriteToFile(SpellingTextBox.Text, ReadingTextBox.Text, nameType);
+                string spelling = SpellingTextBox.Text;
+                string reading = ReadingTextBox.Text;
+                WriteToFile(spelling, reading, nameType);
+                CustomNameLoader.AddToDictionary(spelling, reading, nameType);
                 Close();
             }
         }

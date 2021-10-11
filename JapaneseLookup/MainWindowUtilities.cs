@@ -103,6 +103,14 @@ namespace JapaneseLookup
             var kanjiResult =
                 new Dictionary<string,
                     (List<List<KanjiResult>>, List<string>, string, DictType)>();
+           var customWordResults =
+                new Dictionary<string,
+                    (List<CustomWordEntry> customWordResults, List<string> processList, string foundForm,
+                    DictType dictType)>();
+           var customNamedResults =
+                new Dictionary<string,
+                    (List<CustomNameEntry> customNameResults, List<string> processList, string foundForm,
+                    DictType dictType)>();
 
             if (ConfigManager.KanjiMode)
                 if (Dicts.dicts[DictType.Kanjidic]?.Contents.Any() ?? false)
@@ -157,6 +165,13 @@ namespace JapaneseLookup
                         epwingWordResults.Add(GetDaijirinResults(text, textInHiraganaList, deconjugationResultsList,
                             dict.Contents, dictType));
                         break;
+                    case DictType.CustomWordDictionary:
+                        customWordResults = GetCustomWordResults(text, textInHiraganaList, deconjugationResultsList,
+                            DictType.CustomWordDictionary);
+                        break;
+                    case DictType.CustomNameDictionary:
+                        customNamedResults = GetCustomNameResults(text, textInHiraganaList, dictType);
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -179,6 +194,7 @@ namespace JapaneseLookup
             if (epwingWordResults.Any())
                 foreach (var epwingWordResult in epwingWordResults)
                 {
+                    // if (epwingWordResult.Any())
                     lookupResults.AddRange(EpwingWordResultBuilder(epwingWordResult));
                 }
 
@@ -187,6 +203,12 @@ namespace JapaneseLookup
 
             if (kanjiResult.Any())
                 lookupResults.AddRange(KanjiResultBuilder(kanjiResult));
+
+            if (customWordResults.Any())
+                lookupResults.AddRange(CustomWordResultBuilder(customWordResults));
+
+            if (customNamedResults.Any())
+                lookupResults.AddRange(CustomNameResultBuilder(customNamedResults));
 
             lookupResults = SortLookupResults(lookupResults);
             return lookupResults;
@@ -479,6 +501,99 @@ namespace JapaneseLookup
             return daijirinWordResults;
         }
 
+        private static
+    Dictionary<string,
+        (List<CustomWordEntry> customWordResults, List<string> processList, string foundForm, DictType dictType)>
+    GetCustomWordResults(string text, List<string> textInHiraganaList, List<HashSet<Form>> deconjugationResultsList,
+        DictType dictType)
+        {
+            var customWordResults =
+                new Dictionary<string, (List<CustomWordEntry> customWordResults, List<string> processList, string foundForm,
+                    DictType dictType)>();
+
+            int succAttempt = 0;
+
+            for (int i = 0; i < text.Length; i++)
+            {
+                bool tryLongVowelConversion = true;
+
+                if (Dicts.dicts[DictType.CustomWordDictionary].Contents.TryGetValue(textInHiraganaList[i], out var tempResult1))
+                {
+                    var tempResult = tempResult1.Cast<CustomWordEntry>().ToList();
+                    customWordResults.TryAdd(textInHiraganaList[i],
+                        (tempResult, new List<string>(), text[..^i], dictType));
+                    tryLongVowelConversion = false;
+                }
+
+                if (succAttempt < 3)
+                {
+                    foreach (var result in deconjugationResultsList[i])
+                    {
+                        if (customWordResults.ContainsKey(result.Text))
+                            continue;
+
+                        if (Dicts.dicts[DictType.CustomWordDictionary].Contents.TryGetValue(result.Text, out var temp))
+                        {
+                            List<CustomWordEntry> resultsList = new();
+
+                            foreach (var rslt1 in temp)
+                            {
+                                var rslt = (CustomWordEntry)rslt1;
+                                if (rslt.WordClasses.Intersect(result.Tags).Any())
+                                {
+                                    resultsList.Add(rslt);
+                                }
+                            }
+
+                            if (resultsList.Any())
+                            {
+                                customWordResults.Add(result.Text,
+                                    (resultsList, result.Process, text[..result.OriginalText.Length],
+                                        dictType));
+                                ++succAttempt;
+                                tryLongVowelConversion = false;
+                            }
+                        }
+                    }
+                }
+
+                if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") && textInHiraganaList[i][0] != 'ー')
+                {
+                    string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
+                    if (Dicts.dicts[DictType.CustomWordDictionary].Contents.TryGetValue(textWithoutLongVowelMark, out var tmpResult1))
+                    {
+                        var tmpResult = tmpResult1.Cast<CustomWordEntry>().ToList();
+                        customWordResults.Add(textInHiraganaList[i],
+                            (tmpResult, new List<string>(), text[..^i], dictType));
+                    }
+                }
+            }
+
+            return customWordResults;
+        }
+
+        private static
+            Dictionary<string,
+                (List<CustomNameEntry> customNameResults, List<string> processList, string foundForm, DictType dictType)>
+            GetCustomNameResults(string text, List<string> textInHiraganaList, DictType dictType)
+        {
+            var customNameResults =
+                new Dictionary<string, (List<CustomNameEntry> customNameResults, List<string> processList, string foundForm
+                    , DictType dictType)>();
+
+            for (int i = 0; i < text.Length; i++)
+            {
+                if (Dicts.dicts[DictType.CustomNameDictionary].Contents.TryGetValue(textInHiraganaList[i], out var tempNameResult1))
+                {
+                    var tempNameResult = tempNameResult1.Cast<CustomNameEntry>().ToList();
+                    customNameResults.TryAdd(textInHiraganaList[i],
+                        (tempNameResult, new List<string>(), text[..^i], dictType));
+                }
+            }
+
+            return customNameResults;
+        }
+
         private static List<Dictionary<LookupResult, List<string>>> WordResultBuilder
         (Dictionary<string,
                 (List<JMdictResult> jMdictResults, List<string> processList, string foundForm, DictType dictType)>
@@ -704,6 +819,53 @@ namespace JapaneseLookup
             return results;
         }
 
+        private static List<Dictionary<LookupResult, List<string>>> CustomWordResultBuilder
+(Dictionary<string,
+        (List<CustomWordEntry> customWordResults, List<string> processList, string foundForm, DictType dictType)>
+    customWordResults)
+        {
+            var results = new List<Dictionary<LookupResult, List<string>>>();
+
+            foreach (var wordResult in customWordResults)
+            {
+                foreach (var customWordDictResults in wordResult.Value.customWordResults)
+                {
+                    var result = new Dictionary<LookupResult, List<string>>();
+
+                    var foundSpelling = new List<string> { customWordDictResults.PrimarySpelling };
+
+                    var readings = customWordDictResults.Readings.ToList();
+                    var foundForm = new List<string> { wordResult.Value.foundForm };
+
+                    List<string> alternativeSpellings;
+                    if (customWordDictResults.AlternativeSpellings != null)
+                        alternativeSpellings = customWordDictResults.AlternativeSpellings.ToList();
+                    else
+                        alternativeSpellings = new List<string>();
+                    var process = wordResult.Value.processList;
+
+                    List<string> frequency = new List<string> { FakeFrequency };
+
+                    var dictType = new List<string> { wordResult.Value.dictType.ToString() };
+
+                    var definitions = new List<string> { BuildCustomWordDefinition(customWordDictResults) };
+
+                    result.Add(LookupResult.FoundSpelling, foundSpelling);
+                    result.Add(LookupResult.Readings, readings);
+                    result.Add(LookupResult.Definitions, definitions);
+                    result.Add(LookupResult.FoundForm, foundForm);
+                    result.Add(LookupResult.AlternativeSpellings, alternativeSpellings);
+                    result.Add(LookupResult.Process, process);
+                    result.Add(LookupResult.Frequency, frequency);
+                    result.Add(LookupResult.DictType, dictType);
+
+                    results.Add(result);
+                }
+            }
+
+            return results;
+        }
+
         private static string BuildWordDefinition(JMdictResult jMDictResult)
         {
             int count = 1;
@@ -820,6 +982,89 @@ namespace JapaneseLookup
 
             defResult = defResult.Trim('\n');
             return defResult;
+        }
+
+        private static string BuildCustomWordDefinition(CustomWordEntry customWordResult)
+        {
+            int count = 1;
+            string defResult = "";
+
+            if (customWordResult.WordClasses.Any())
+            {
+                string tempWordClass;
+                if (customWordResult.WordClasses.Contains("adj-i"))
+                    tempWordClass = "adjective";
+                else if (customWordResult.WordClasses.Contains("v1"))
+                    tempWordClass = "verb";
+                else if (customWordResult.WordClasses.Contains("noun"))
+                    tempWordClass = "noun";
+                else
+                    tempWordClass = "other";
+
+                defResult += "(" + tempWordClass + ") ";
+            }
+
+            for (int i = 0; i < customWordResult.Definitions.Count; i++)
+            {
+                if (customWordResult.Definitions.Any())
+                {
+                    defResult += "(" + count + ") ";
+
+                    defResult += string.Join("; ", customWordResult.Definitions[i]) + " ";
+
+                    var separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "";
+                    defResult += separator;
+
+                    ++count;
+                }
+            }
+
+            defResult = defResult.Trim('\n');
+            return defResult;
+        }
+        private static string BuildCustomNameDefinition(CustomNameEntry customNameDictResult)
+        {
+            string defResult = "(" + customNameDictResult.NameType + ") " + customNameDictResult.Reading;
+
+            return defResult;
+        }
+
+        private static List<Dictionary<LookupResult, List<string>>> CustomNameResultBuilder
+(Dictionary<string,
+        (List<CustomNameEntry> customNameResults, List<string> processList, string foundForm, DictType dictType)>
+    customNameResults)
+        {
+            var results = new List<Dictionary<LookupResult, List<string>>>();
+
+            foreach (var customNameResult in customNameResults)
+            {
+                foreach (var customNameDictResult in customNameResult.Value.customNameResults)
+                {
+                    var result = new Dictionary<LookupResult, List<string>>();
+
+                    var foundSpelling = new List<string> { customNameDictResult.PrimarySpelling };
+
+                    var readings = new List<string> { customNameDictResult.Reading };
+
+                    var foundForm = new List<string> { customNameResult.Value.foundForm };
+
+                    var dictType = new List<string> { customNameResult.Value.dictType.ToString() };
+
+                    var definitions = new List<string> { BuildCustomNameDefinition(customNameDictResult) };
+
+                    result.Add(LookupResult.FoundSpelling, foundSpelling);
+                    result.Add(LookupResult.Readings, readings);
+                    result.Add(LookupResult.Definitions, definitions);
+
+                    result.Add(LookupResult.FoundForm, foundForm);
+                    result.Add(LookupResult.Frequency, new List<string> { FakeFrequency });
+                    result.Add(LookupResult.DictType, dictType);
+
+                    results.Add(result);
+                }
+            }
+
+            return results;
         }
 
         public static IEnumerable<string> UnicodeIterator(this string s)

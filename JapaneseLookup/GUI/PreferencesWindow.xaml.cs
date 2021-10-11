@@ -317,7 +317,8 @@ namespace JapaneseLookup.GUI
                     Margin = new Thickness(10),
                 };
                 var buttonRemove = new Button { Width = 0 };
-                if (!(dict.Type == DictType.JMdict || dict.Type == DictType.JMnedict || dict.Type == DictType.Kanjidic))
+                if (!(dict.Type == DictType.JMdict || dict.Type == DictType.JMnedict || dict.Type == DictType.Kanjidic 
+                    || dict.Type == DictType.CustomWordDictionary || dict.Type == DictType.CustomNameDictionary))
                 {
                     // should be a red cross ideally
                     buttonRemove = new Button()
@@ -460,6 +461,12 @@ namespace JapaneseLookup.GUI
                     break;
                 case DictType.Kanjidic:
                     BrowseForDictionaryFile(selectedDictType, "Kanjidic2 file|Kanjidic2.xml");
+                    break;
+                case DictType.CustomWordDictionary:
+                    BrowseForDictionaryFile(selectedDictType, "CustomWordDict file|custom_words.txt");
+                    break;
+                case DictType.CustomNameDictionary:
+                    BrowseForDictionaryFile(selectedDictType, "CustomNameDict file|custom_names.txt");
                     break;
                 case DictType.UnknownEpwing:
                     BrowseForDictionaryFolder(selectedDictType);

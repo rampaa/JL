@@ -82,12 +82,24 @@ namespace JapaneseLookup.GUI
 
             if (isValidated)
             {
-                WriteToFile(SpellingsTextBox.Text, ReadingsTextBox.Text, DefinitionsTextBox.Text);
+                string rawSpellings = SpellingsTextBox.Text;
+                string rawReadings = ReadingsTextBox.Text;
+                string rawDefinitions = DefinitionsTextBox.Text;
+                string rawWordClass = WordClassStackPanel.Children.OfType<RadioButton>().FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value).Content.ToString();
+
+                WriteToFile(rawSpellings, rawReadings, rawDefinitions, rawWordClass);
+
+                string[] spellings = rawDefinitions.Split(';');
+                List<string> readings = rawReadings.Split(';').ToList();
+                List<string> definitions = rawDefinitions.Split(';').ToList();
+
+                CustomDict.CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawWordClass);
+
                 Close();
             }
         }
 
-        private static void WriteToFile(string spellings, string readings, string definitions)
+        private static void WriteToFile(string spellings, string readings, string definitions, string wordClass)
         {
             StringBuilder stringBuilder = new();
             stringBuilder.Append(spellings);
@@ -95,11 +107,18 @@ namespace JapaneseLookup.GUI
             stringBuilder.Append(readings);
             stringBuilder.Append('\t');
             stringBuilder.Append(definitions);
+            stringBuilder.Append('\t');
+            stringBuilder.Append(wordClass);
             stringBuilder.Append(Environment.NewLine);
 
             File.AppendAllTextAsync(
                 Path.Join(ConfigManager.ApplicationPath, "Resources/custom_words.txt"),
                 stringBuilder.ToString(), Encoding.UTF8);
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            OtherRadioButton.IsChecked = true;
         }
     }
 }
