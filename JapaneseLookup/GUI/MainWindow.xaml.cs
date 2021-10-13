@@ -95,7 +95,7 @@ namespace JapaneseLookup.GUI
                 if (text == LastWord) return;
                 LastWord = text;
 
-                var lookupResults = await Task.Run(() => MainWindowUtilities.Lookup(text));
+                var lookupResults = await Task.Run(() => Lookup.Lookup.LookupText(text));
                 if (lookupResults != null && lookupResults.Any())
                 {
                     PopupWindow.Instance.ResultStackPanels.Clear();

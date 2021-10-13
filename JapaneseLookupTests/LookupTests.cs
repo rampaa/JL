@@ -2,13 +2,14 @@
 using JapaneseLookup;
 using NUnit.Framework;
 using System.Text.Json;
-using System.Threading.Tasks;
-using JapaneseLookup.EDICT;
+using JapaneseLookup.Dicts;
+using JapaneseLookup.EDICT.JMdict;
+using JapaneseLookup.Lookup;
 
 namespace JapaneseLookupTests
 {
     [TestFixture]
-    public class MainWindowUtilitiesTests
+    public class LookupTests
     {
         private static readonly JsonSerializerOptions Jso = new()
         {
@@ -18,16 +19,13 @@ namespace JapaneseLookupTests
         [OneTimeSetUp]
         public void ClassInit()
         {
-            Dicts.dicts.Add(DictType.JMdict,
-                new Dict(DictType.JMdict, "", true, 0
-                   // ,new Dictionary<string, List<IResult>>()
-                    ));
-            Dicts.dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();
+            ConfigManager.Dicts.Add(DictType.JMdict, new Dict(DictType.JMdict, "", true, 0));
+            ConfigManager.Dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();
             JMdictLoader.Load("/Resources/JMdict.xml");
         }
 
         [Test]
-        public void Lookup_始まる()
+        public void LookupText_始まる()
         {
             // Arrange
             var expected =
@@ -36,7 +34,7 @@ namespace JapaneseLookupTests
             string text = "始まる";
 
             // Act
-            var result = MainWindowUtilities.Lookup(
+            var result = Lookup.LookupText(
                 text);
             var actual = JsonSerializer.Serialize(result, Jso);
 
@@ -45,7 +43,7 @@ namespace JapaneseLookupTests
         }
 
         [Test]
-        public void Lookup_ニューモノウルトラマイクロスコーピックシリコヴォルケーノコニオシス()
+        public void LookupText_ニューモノウルトラマイクロスコーピックシリコヴォルケーノコニオシス()
         {
             // Arrange
             var expected =
@@ -54,7 +52,7 @@ namespace JapaneseLookupTests
             string text = "ニューモノウルトラマイクロスコーピックシリコヴォルケーノコニオシス";
 
             // Act
-            var result = MainWindowUtilities.Lookup(
+            var result = Lookup.LookupText(
                 text);
             var actual = JsonSerializer.Serialize(result, Jso);
 

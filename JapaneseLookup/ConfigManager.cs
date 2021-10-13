@@ -18,6 +18,10 @@ using JapaneseLookup.EDICT;
 using JapaneseLookup.EPWING;
 using JapaneseLookup.KANJIDIC;
 using JapaneseLookup.CustomDict;
+using JapaneseLookup.Dicts;
+using JapaneseLookup.EDICT.JMdict;
+using JapaneseLookup.EDICT.JMnedict;
+using JapaneseLookup.Frequency;
 
 namespace JapaneseLookup
 {
@@ -50,6 +54,8 @@ namespace JapaneseLookup
             { "Narou", "Resources/freqlist_narou.json" },
             { "None", "" }
         };
+
+        public static readonly Dictionary<DictType, Dict> Dicts = new();
 
         public static string AnkiConnectUri;
         public static int MaxSearchLength;
@@ -422,7 +428,7 @@ namespace JapaneseLookup
                 };
 
                 File.WriteAllText(Path.Join(ApplicationPath, "Config/dicts.json"),
-                    JsonSerializer.Serialize(Dicts.dicts, jso));
+                    JsonSerializer.Serialize(ConfigManager.Dicts, jso));
             }
             catch (Exception e)
             {
@@ -450,10 +456,10 @@ namespace JapaneseLookup
                 {
                     foreach ((DictType _, Dict dict) in deserializedDicts)
                     {
-                        if (!Dicts.dicts.ContainsKey(dict.Type))
+                        if (!ConfigManager.Dicts.ContainsKey(dict.Type))
                         {
                             dict.Contents = new Dictionary<string, List<IResult>>();
-                            Dicts.dicts.Add(dict.Type, dict);
+                            ConfigManager.Dicts.Add(dict.Type, dict);
                         }
                     }
                 }
@@ -533,7 +539,7 @@ namespace JapaneseLookup
 
             var tasks = new List<Task>();
 
-            foreach ((DictType _, Dict dict) in Dicts.dicts)
+            foreach ((DictType _, Dict dict) in ConfigManager.Dicts)
             {
                 if (!dict.Active)
                     continue;
@@ -542,7 +548,7 @@ namespace JapaneseLookup
                 {
                     case DictType.JMdict:
                         // initial jmdict and freqlist load
-                        if (!Dicts.dicts[DictType.JMdict].Contents.Any())
+                        if (!ConfigManager.Dicts[DictType.JMdict].Contents.Any())
                         {
                             var taskJmdict = Task.Run(() => JMdictLoader.Load(dict.Path)).ContinueWith(_ =>
                             {
@@ -557,7 +563,7 @@ namespace JapaneseLookup
                         break;
                     case DictType.JMnedict:
                         // JMnedict
-                        if (!Dicts.dicts[DictType.JMnedict].Contents.Any())
+                        if (!ConfigManager.Dicts[DictType.JMnedict].Contents.Any())
                         {
                             var taskJMnedict = Task.Run(() => JMnedictLoader.Load(dict.Path));
                             tasks.Add(taskJMnedict);
@@ -566,7 +572,7 @@ namespace JapaneseLookup
                         break;
                     case DictType.Kanjidic:
                         // KANJIDIC
-                        if (!Dicts.dicts[DictType.Kanjidic].Contents.Any())
+                        if (!ConfigManager.Dicts[DictType.Kanjidic].Contents.Any())
                         {
                             var taskKanjidict = Task.Run(() => KanjiInfoLoader.Load(dict.Path));
                             tasks.Add(taskKanjidict);
@@ -574,7 +580,7 @@ namespace JapaneseLookup
 
                         break;
                     case DictType.UnknownEpwing:
-                        if (!Dicts.dicts[DictType.UnknownEpwing].Contents.Any())
+                        if (!ConfigManager.Dicts[DictType.UnknownEpwing].Contents.Any())
                         {
                             var taskEpwing = Task.Run(async () =>
                                 await EpwingJsonLoader.Loader(dict.Type, dict.Path));
@@ -583,7 +589,7 @@ namespace JapaneseLookup
 
                         break;
                     case DictType.Daijirin:
-                        if (!Dicts.dicts[DictType.Daijirin].Contents.Any())
+                        if (!ConfigManager.Dicts[DictType.Daijirin].Contents.Any())
                         {
                             var taskEpwing = Task.Run(async () =>
                                 await EpwingJsonLoader.Loader(dict.Type, dict.Path));
@@ -592,7 +598,7 @@ namespace JapaneseLookup
 
                         break;
                     case DictType.Daijisen:
-                        if (!Dicts.dicts[DictType.Daijisen].Contents.Any())
+                        if (!ConfigManager.Dicts[DictType.Daijisen].Contents.Any())
                         {
                             var taskEpwing = Task.Run(async () =>
                                 await EpwingJsonLoader.Loader(dict.Type, dict.Path));
@@ -601,7 +607,7 @@ namespace JapaneseLookup
 
                         break;
                     case DictType.Koujien:
-                        if (!Dicts.dicts[DictType.Koujien].Contents.Any())
+                        if (!ConfigManager.Dicts[DictType.Koujien].Contents.Any())
                         {
                             var taskEpwing = Task.Run(async () =>
                                 await EpwingJsonLoader.Loader(dict.Type, dict.Path));
@@ -610,7 +616,7 @@ namespace JapaneseLookup
 
                         break;
                     case DictType.Meikyou:
-                        if (!Dicts.dicts[DictType.Meikyou].Contents.Any())
+                        if (!ConfigManager.Dicts[DictType.Meikyou].Contents.Any())
                         {
                             var taskEpwing = Task.Run(async () =>
                                 await EpwingJsonLoader.Loader(dict.Type, dict.Path));
@@ -619,7 +625,7 @@ namespace JapaneseLookup
 
                         break;
                     case DictType.CustomWordDictionary:
-                        if (!Dicts.dicts[DictType.CustomWordDictionary].Contents.Any())
+                        if (!ConfigManager.Dicts[DictType.CustomWordDictionary].Contents.Any())
                         {
                             var taskCustomWordDict = Task.Run(() => CustomWordLoader.Load());
                             tasks.Add(taskCustomWordDict);
@@ -627,7 +633,7 @@ namespace JapaneseLookup
 
                         break;
                     case DictType.CustomNameDictionary:
-                        if (!Dicts.dicts[DictType.CustomNameDictionary].Contents.Any())
+                        if (!ConfigManager.Dicts[DictType.CustomNameDictionary].Contents.Any())
                         {
                             var taskCustomNameDict = Task.Run(() => CustomNameLoader.Load());
                             tasks.Add(taskCustomNameDict);
@@ -640,7 +646,7 @@ namespace JapaneseLookup
                 }
             }
 
-            foreach ((DictType _, Dict dict) in Dicts.dicts)
+            foreach ((DictType _, Dict dict) in ConfigManager.Dicts)
             {
                 if (!dict.Active && dict.Contents.Any())
                 {
@@ -650,9 +656,9 @@ namespace JapaneseLookup
             }
 
             // load new freqlist if necessary
-            if (Dicts.dicts[DictType.JMdict]?.Contents.Any() ?? false)
+            if (ConfigManager.Dicts[DictType.JMdict]?.Contents.Any() ?? false)
             {
-                Dicts.dicts[DictType.JMdict].Contents.TryGetValue("俺", out List<IResult> freqTest1);
+                ConfigManager.Dicts[DictType.JMdict].Contents.TryGetValue("俺", out List<IResult> freqTest1);
                 Debug.Assert(freqTest1 != null, nameof(freqTest1) + " != null");
 
                 var freqTest = freqTest1.Cast<JMdictResult>().ToList();

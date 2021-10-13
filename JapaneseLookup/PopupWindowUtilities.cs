@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using JapaneseLookup.GUI;
+using JapaneseLookup.Lookup;
 
 namespace JapaneseLookup
 {

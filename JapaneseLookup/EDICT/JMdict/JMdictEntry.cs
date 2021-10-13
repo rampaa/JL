@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace JapaneseLookup.EDICT
+namespace JapaneseLookup.EDICT.JMdict
 {
-    class JMdictEntry
+    public class JMdictEntry
     {
         public string Id { get; set; }
         public List<KEle> KEleList { get; set; }

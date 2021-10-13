@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JapaneseLookup.Dicts;
 
 namespace JapaneseLookup.CustomDict
 {
@@ -26,7 +27,7 @@ namespace JapaneseLookup.CustomDict
                     AddToDictionary(spellings, readings, definitions, wordClass);
                 }
 
-                Dicts.dicts[DictType.CustomWordDictionary].Contents.TrimExcess();
+                ConfigManager.Dicts[DictType.CustomWordDictionary].Contents.TrimExcess();
             }
         }
 
@@ -129,7 +130,7 @@ namespace JapaneseLookup.CustomDict
 
                 CustomWordEntry newWordEntry = new(spelling, alternativeSpellings, readings, definitions, wordClass);
 
-                var customWordDictionary = Dicts.dicts[DictType.CustomWordDictionary].Contents;
+                var customWordDictionary = ConfigManager.Dicts[DictType.CustomWordDictionary].Contents;
 
                 if (customWordDictionary.TryGetValue(spelling, out var result))
                 {

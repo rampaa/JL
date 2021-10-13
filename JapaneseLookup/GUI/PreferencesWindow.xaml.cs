@@ -16,6 +16,7 @@ using HandyControl.Tools;
 using HandyControl.Controls;
 using HandyControl.Properties;
 using JapaneseLookup.Anki;
+using JapaneseLookup.Dicts;
 using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
 using MessageBoxOptions = System.Windows.MessageBoxOptions;
@@ -51,13 +52,13 @@ namespace JapaneseLookup.GUI
             picker.Canceled += delegate { window.Close(); };
             picker.Confirmed += delegate
             {
-                ColorSetter((System.Windows.Controls.Button) sender, picker.SelectedBrush, window);
+                ColorSetter((Button) sender, picker.SelectedBrush, window);
             };
 
             window.ShowDialog(picker, false);
         }
 
-        private static void ColorSetter(System.Windows.Controls.Button sender, SolidColorBrush selectedColor,
+        private static void ColorSetter(Button sender, SolidColorBrush selectedColor,
             HandyControl.Controls.PopupWindow window)
         {
             sender.Background = selectedColor;
@@ -267,7 +268,7 @@ namespace JapaneseLookup.GUI
         {
             List<DockPanel> resultDockPanels = new();
 
-            foreach ((DictType _, Dict dict) in Dicts.dicts)
+            foreach ((DictType _, Dict dict) in ConfigManager.Dicts)
             {
                 var dockPanel = new DockPanel();
 
@@ -333,12 +334,12 @@ namespace JapaneseLookup.GUI
                 checkBox.Checked += (_, _) => dict.Active = true;
                 buttonIncreasePriority.Click += (_, _) =>
                 {
-                    PrioritizeDict(Dicts.dicts, dict.Type);
+                    PrioritizeDict(ConfigManager.Dicts, dict.Type);
                     UpdateDictionariesDisplay();
                 };
                 buttonDecreasePriority.Click += (_, _) =>
                 {
-                    UnPrioritizeDict(Dicts.dicts, dict.Type);
+                    UnPrioritizeDict(ConfigManager.Dicts, dict.Type);
                     UpdateDictionariesDisplay();
                 };
                 buttonRemove.Click += (_, _) =>
@@ -349,7 +350,7 @@ namespace JapaneseLookup.GUI
                         MessageBoxResult.No,
                         MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
                     {
-                        Dicts.dicts.Remove(dict.Type);
+                        ConfigManager.Dicts.Remove(dict.Type);
                         UpdateDictionariesDisplay();
                     }
                 };
@@ -368,7 +369,7 @@ namespace JapaneseLookup.GUI
 
             // TODO: AddDictionaryWindow
             List<DictType> allDictTypes = Enum.GetValues(typeof(DictType)).Cast<DictType>().ToList();
-            List<DictType> loadedDictTypes = Dicts.dicts.Keys.ToList();
+            List<DictType> loadedDictTypes = ConfigManager.Dicts.Keys.ToList();
             ComboBoxAddDictionary.ItemsSource = allDictTypes.Except(loadedDictTypes);
             // lol
             DictionariesDisplay.ItemsSource = resultDockPanels.OrderBy(dockPanel =>
@@ -380,22 +381,22 @@ namespace JapaneseLookup.GUI
 
         private void PrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBePrioritized)
         {
-            if (Dicts.dicts[typeToBePrioritized].Priority == 0) return;
+            if (ConfigManager.Dicts[typeToBePrioritized].Priority == 0) return;
 
-            dicts.Single(dict => dict.Value.Priority == Dicts.dicts[typeToBePrioritized].Priority - 1).Value
+            dicts.Single(dict => dict.Value.Priority == ConfigManager.Dicts[typeToBePrioritized].Priority - 1).Value
                 .Priority += 1;
-            Dicts.dicts[typeToBePrioritized].Priority -= 1;
+            ConfigManager.Dicts[typeToBePrioritized].Priority -= 1;
         }
 
         private void UnPrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBeUnPrioritized)
         {
             // lowest priority means highest number
-            int lowestPriority = Dicts.dicts.Select(dict => dict.Value.Priority).Max();
-            if (Dicts.dicts[typeToBeUnPrioritized].Priority == lowestPriority) return;
+            int lowestPriority = ConfigManager.Dicts.Select(dict => dict.Value.Priority).Max();
+            if (ConfigManager.Dicts[typeToBeUnPrioritized].Priority == lowestPriority) return;
 
-            dicts.Single(dict => dict.Value.Priority == Dicts.dicts[typeToBeUnPrioritized].Priority + 1).Value
+            dicts.Single(dict => dict.Value.Priority == ConfigManager.Dicts[typeToBeUnPrioritized].Priority + 1).Value
                 .Priority -= 1;
-            Dicts.dicts[typeToBeUnPrioritized].Priority += 1;
+            ConfigManager.Dicts[typeToBeUnPrioritized].Priority += 1;
         }
 
         private void BrowseForDictionaryFile(DictType selectedDictType, string filter)
@@ -409,11 +410,11 @@ namespace JapaneseLookup.GUI
             if (openFileDialog.ShowDialog() == true)
             {
                 // lowest priority means highest number
-                int lowestPriority = Dicts.dicts.Select(dict => dict.Value.Priority).Max();
+                int lowestPriority = ConfigManager.Dicts.Select(dict => dict.Value.Priority).Max();
 
                 var relativePath = Path.GetRelativePath(ConfigManager.ApplicationPath, openFileDialog.FileName);
-                Dicts.dicts.Add(selectedDictType, new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
-                Dicts.dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
+                ConfigManager.Dicts.Add(selectedDictType, new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
+                ConfigManager.Dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
                 UpdateDictionariesDisplay();
             }
         }
@@ -430,11 +431,11 @@ namespace JapaneseLookup.GUI
                 !string.IsNullOrWhiteSpace(fbd.SelectedPath))
             {
                 // lowest priority means highest number
-                int lowestPriority = Dicts.dicts.Select(dict => dict.Value.Priority).Max();
+                int lowestPriority = ConfigManager.Dicts.Select(dict => dict.Value.Priority).Max();
 
                 var relativePath = Path.GetRelativePath(ConfigManager.ApplicationPath, fbd.SelectedPath);
-                Dicts.dicts.Add(selectedDictType, new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
-                Dicts.dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
+                ConfigManager.Dicts.Add(selectedDictType, new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
+                ConfigManager.Dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
                 UpdateDictionariesDisplay();
             }
         }

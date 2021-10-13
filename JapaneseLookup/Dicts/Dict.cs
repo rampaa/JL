@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using JapaneseLookup.EDICT;
 
-namespace JapaneseLookup
+namespace JapaneseLookup.Dicts
 {
     public class Dict
     {

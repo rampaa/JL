@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace JapaneseLookup.EDICT
+namespace JapaneseLookup.EDICT.JMnedict
 {
-    public static class JMNeDictBuilder
+    public static class JMnedictBuilder
     {
         public static void BuildDictionary(JMnedictEntry entry, Dictionary<string, List<IResult>> jMnedictDictionary)
         {

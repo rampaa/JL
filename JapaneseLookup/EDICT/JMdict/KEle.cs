@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace JapaneseLookup.EDICT
+namespace JapaneseLookup.EDICT.JMdict
 {
-    class KEle
+    public class KEle
     {
         public string Keb { get; set; } //e.g. 娘 
         public List<string> KeInfList { get; set; } //e.g. Ateji. Can a keb have more than one keInf?

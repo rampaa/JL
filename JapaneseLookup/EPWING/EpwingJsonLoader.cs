@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System.IO;
 using System.Diagnostics;
+using JapaneseLookup.Dicts;
 
 namespace JapaneseLookup.EPWING
 {
@@ -33,8 +34,8 @@ namespace JapaneseLookup.EPWING
                 }
             }
 
-            DictionaryBuilder(epwingEntryList, Dicts.dicts[dictType].Contents);
-            Dicts.dicts[dictType].Contents.TrimExcess();
+            DictionaryBuilder(epwingEntryList, ConfigManager.Dicts[dictType].Contents);
+            ConfigManager.Dicts[dictType].Contents.TrimExcess();
         }
 
         public static void DictionaryBuilder(List<EpwingEntry> epwingEntryList,

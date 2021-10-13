@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.Json;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Diagnostics;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
+using JapaneseLookup.Dicts;
+using JapaneseLookup.EDICT.JMdict;
 
-namespace JapaneseLookup.EDICT
+namespace JapaneseLookup.Frequency
 {
     public static class FrequencyLoader
     {
@@ -27,7 +26,7 @@ namespace JapaneseLookup.EDICT
                     string exactSpelling = element[0].ToString();
                     element[1].TryGetInt32(out int frequencyRank);
 
-                    if (Dicts.dicts[DictType.JMdict].Contents.TryGetValue(
+                    if (ConfigManager.Dicts[DictType.JMdict].Contents.TryGetValue(
                         Kana.KatakanaToHiraganaConverter(exactSpelling),
                         out List<IResult> jMDictResults))
                     {
@@ -64,7 +63,7 @@ namespace JapaneseLookup.EDICT
 
                                 foreach (var aspelling in result.AlternativeSpellings)
                                 {
-                                    if (!Dicts.dicts[DictType.JMdict].Contents
+                                    if (!ConfigManager.Dicts[DictType.JMdict].Contents
                                         .TryGetValue(aspelling, out var edictResults))
                                         continue;
 
@@ -101,7 +100,7 @@ namespace JapaneseLookup.EDICT
                     }
 
                     if (reading == exactSpelling ||
-                        !Dicts.dicts[DictType.JMdict].Contents.TryGetValue(reading, out jMDictResults))
+                        !ConfigManager.Dicts[DictType.JMdict].Contents.TryGetValue(reading, out jMDictResults))
                         continue;
 
                     foreach (var result1 in jMDictResults)
@@ -114,7 +113,7 @@ namespace JapaneseLookup.EDICT
                         {
                             foreach (var rreading in result.Readings)
                             {
-                                if (!Dicts.dicts[DictType.JMdict].Contents.TryGetValue(
+                                if (!ConfigManager.Dicts[DictType.JMdict].Contents.TryGetValue(
                                     Kana.KatakanaToHiraganaConverter(rreading), out var rjMDictResults))
                                     continue;
 
@@ -130,7 +129,7 @@ namespace JapaneseLookup.EDICT
                                     {
                                         if (rresult.Readings.Any())
                                         {
-                                            if (Dicts.dicts[DictType.JMdict].Contents.TryGetValue(
+                                            if (ConfigManager.Dicts[DictType.JMdict].Contents.TryGetValue(
                                                 Kana.KatakanaToHiraganaConverter(rresult.PrimarySpelling),
                                                 out var pDictResults))
                                             {

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace JapaneseLookup.EDICT
+namespace JapaneseLookup.EDICT.JMdict
 {
-    class REle
+    public class REle
     {
         public string Reb { get; set; } // Reading in kana. e.g. むすめ
         public List<string> ReRestrList { get; set; } // ReRestrList = Keb. The reading is only valid for this specific keb.

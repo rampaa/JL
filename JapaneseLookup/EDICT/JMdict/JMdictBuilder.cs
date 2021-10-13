@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace JapaneseLookup.EDICT
+namespace JapaneseLookup.EDICT.JMdict
 {
-    internal static class JMDictBuilder
+    internal static class JMdictBuilder
     {
         public static void BuildDictionary(JMdictEntry entry, Dictionary<string, List<IResult>> jMdictDictionary)
         {

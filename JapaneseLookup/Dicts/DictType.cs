@@ -1,4 +1,4 @@
-﻿namespace JapaneseLookup
+﻿namespace JapaneseLookup.Dicts
 {
     public enum DictType
     {

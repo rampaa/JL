@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.IO;
 using System.Xml;
+using JapaneseLookup.Dicts;
 
-namespace JapaneseLookup.EDICT
+namespace JapaneseLookup.EDICT.JMdict
 {
     public static class JMdictLoader
     {
@@ -69,8 +63,8 @@ namespace JapaneseLookup.EDICT
                 }
             }
 
-            JMDictBuilder.BuildDictionary(entry, Dicts.dicts[DictType.JMdict].Contents);
-            Dicts.dicts[DictType.JMdict].Contents.TrimExcess();
+            JMdictBuilder.BuildDictionary(entry, ConfigManager.Dicts[DictType.JMdict].Contents);
+            ConfigManager.Dicts[DictType.JMdict].Contents.TrimExcess();
         }
 
         private static void ReadKEle(XmlTextReader edictXml, JMdictEntry entry)

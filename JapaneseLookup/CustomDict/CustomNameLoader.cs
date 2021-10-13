@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using JapaneseLookup.Dicts;
 
 namespace JapaneseLookup.CustomDict
 {
@@ -16,7 +17,7 @@ namespace JapaneseLookup.CustomDict
                     AddToDictionary(lParts[0], lParts[1], lParts[2]);
                 }
 
-                Dicts.dicts[DictType.CustomWordDictionary].Contents.TrimExcess();
+                ConfigManager.Dicts[DictType.CustomWordDictionary].Contents.TrimExcess();
             }
         }
 
@@ -24,7 +25,7 @@ namespace JapaneseLookup.CustomDict
         {
             CustomNameEntry newNameEntry = new(spelling, reading, definition);
 
-            var customNameDictionary = Dicts.dicts[DictType.CustomWordDictionary].Contents;
+            var customNameDictionary = ConfigManager.Dicts[DictType.CustomWordDictionary].Contents;
 
             if (customNameDictionary.TryGetValue(spelling, out var entry))
             {

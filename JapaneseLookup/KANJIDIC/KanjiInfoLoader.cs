@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
+using JapaneseLookup.Dicts;
 
 namespace JapaneseLookup.KANJIDIC
 {
@@ -58,13 +59,13 @@ namespace JapaneseLookup.KANJIDIC
                     }
                 }
 
-                Dicts.dicts[DictType.Kanjidic].Contents = new Dictionary<string, List<IResult>>();
+                ConfigManager.Dicts[DictType.Kanjidic].Contents = new Dictionary<string, List<IResult>>();
                 while (edictXml.ReadToFollowing("literal"))
                 {
                     ReadCharacter(edictXml, kanjiCompositionDictionary);
                 }
 
-                Dicts.dicts[DictType.Kanjidic].Contents.TrimExcess();
+                ConfigManager.Dicts[DictType.Kanjidic].Contents.TrimExcess();
             }
 
             // else
@@ -133,7 +134,7 @@ namespace JapaneseLookup.KANJIDIC
                 }
             }
 
-            Dicts.dicts[DictType.Kanjidic].Contents.Add(key, new List<IResult> { entry });
+            ConfigManager.Dicts[DictType.Kanjidic].Contents.Add(key, new List<IResult> { entry });
         }
     }
 }

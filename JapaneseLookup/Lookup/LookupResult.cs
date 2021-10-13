@@ -1,4 +1,4 @@
-﻿namespace JapaneseLookup
+﻿namespace JapaneseLookup.Lookup
 {
     public enum LookupResult
     {
