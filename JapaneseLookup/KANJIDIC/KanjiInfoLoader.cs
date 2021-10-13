@@ -33,7 +33,7 @@ namespace JapaneseLookup.KANJIDIC
 
                         if (lParts.Length == 3)
                         {
-                            int endIndex = lParts[2].IndexOf("[");
+                            int endIndex = lParts[2].IndexOf("[", StringComparison.Ordinal);
                             if (endIndex == -1)
                                 kanjiCompositionDictionary.Add(lParts[1], lParts[2]);
                             else

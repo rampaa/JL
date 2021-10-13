@@ -299,7 +299,7 @@ namespace JapaneseLookup.GUI
                 };
                 var dictTypeDisplay = new TextBlock()
                 {
-                    Width = 100,
+                    Width = 135,
                     Text = dict.Type.ToString(),
                     Margin = new Thickness(10),
                 };
@@ -317,8 +317,7 @@ namespace JapaneseLookup.GUI
                     Margin = new Thickness(10),
                 };
                 var buttonRemove = new Button { Width = 0 };
-                if (!(dict.Type == DictType.JMdict || dict.Type == DictType.JMnedict || dict.Type == DictType.Kanjidic 
-                    || dict.Type == DictType.CustomWordDictionary || dict.Type == DictType.CustomNameDictionary))
+                if (!ConfigManager.BuiltInDicts.Values.Select(t => t.Type).ToList().Contains(dict.Type))
                 {
                     // should be a red cross ideally
                     buttonRemove = new Button()

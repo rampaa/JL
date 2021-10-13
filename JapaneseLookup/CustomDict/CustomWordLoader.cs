@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace JapaneseLookup.CustomDict
 {
-    class CustomWordLoader
+    public static class CustomWordLoader
     {
         public static void Load()
         {
             if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/custom_words.txt")))
             {
                 foreach (string line in File.ReadLines(
-                        Path.Join(ConfigManager.ApplicationPath, "Resources/custom_words.txt")))
+                    Path.Join(ConfigManager.ApplicationPath, "Resources/custom_words.txt")))
                 {
                     string[] lParts = line.Split("\t");
 
@@ -25,11 +25,13 @@ namespace JapaneseLookup.CustomDict
 
                     AddToDictionary(spellings, readings, definitions, wordClass);
                 }
+
                 Dicts.dicts[DictType.CustomWordDictionary].Contents.TrimExcess();
             }
         }
 
-        public static void AddToDictionary(string[] spellings, List<string> readings, List<string> definitions, string rawWordClass)
+        public static void AddToDictionary(string[] spellings, List<string> readings, List<string> definitions,
+            string rawWordClass)
         {
             foreach (string spelling in spellings)
             {
@@ -101,7 +103,6 @@ namespace JapaneseLookup.CustomDict
                     wordClass.Add("vt");
                     wordClass.Add("vz");
                 }
-
                 else if (rawWordClass == "Adjective")
                 {
                     wordClass.Add("adj-f");
@@ -117,12 +118,10 @@ namespace JapaneseLookup.CustomDict
                     wordClass.Add("adj-t");
                     wordClass.Add("aux-adj");
                 }
-
                 else if (rawWordClass == "Name")
                 {
                     wordClass.Add("noun");
                 }
-
                 else
                 {
                     wordClass.Add("other");
@@ -130,24 +129,22 @@ namespace JapaneseLookup.CustomDict
 
                 CustomWordEntry newWordEntry = new(spelling, alternativeSpellings, readings, definitions, wordClass);
 
-                var customWorDictionaryt = Dicts.dicts[DictType.CustomWordDictionary].Contents;
+                var customWordDictionary = Dicts.dicts[DictType.CustomWordDictionary].Contents;
 
-                if (customWorDictionaryt.TryGetValue(spelling, out var result))
+                if (customWordDictionary.TryGetValue(spelling, out var result))
                 {
                     if (result.Contains(newWordEntry))
                     {
                         break;
                     }
-
                     else
                     {
                         result.Add(newWordEntry);
                     }
                 }
-
                 else
                 {
-                    customWorDictionaryt.Add(spelling, new List<IResult>() { newWordEntry });
+                    customWordDictionary.Add(spelling, new List<IResult>() { newWordEntry });
                 }
             }
         }

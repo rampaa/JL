@@ -17,7 +17,6 @@ using System.Windows.Markup;
 using JapaneseLookup.EDICT;
 using JapaneseLookup.EPWING;
 using JapaneseLookup.KANJIDIC;
-using JapaneseLookup.Custom_Dictionaries;
 using JapaneseLookup.CustomDict;
 
 namespace JapaneseLookup
@@ -26,6 +25,22 @@ namespace JapaneseLookup
     {
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
         private static readonly List<string> JapaneseFonts = FindJapaneseFonts().OrderBy(font => font).ToList();
+
+        public static readonly Dictionary<string, Dict> BuiltInDicts =
+            new()
+            {
+                { "JMdict", new Dict(DictType.JMdict, "Resources\\JMdict.xml", true, 0) },
+                { "JMnedict", new Dict(DictType.JMnedict, "Resources\\JMnedict.xml", true, 1) },
+                { "Kanjidic", new Dict(DictType.Kanjidic, "Resources\\kanjidic2.xml", true, 2) },
+                {
+                    "CustomWordDictionary",
+                    new Dict(DictType.CustomWordDictionary, "Resources\\custom_words.txt", true, 3)
+                },
+                {
+                    "CustomNameDictionary",
+                    new Dict(DictType.CustomNameDictionary, "Resources\\custom_names.txt", true, 4)
+                }
+            };
 
         // TODO: Make these configurable too
         private static readonly Dictionary<string, string> FrequencyLists = new()
@@ -103,17 +118,13 @@ namespace JapaneseLookup
 
         public static void ApplyPreferences(MainWindow mainWindow)
         {
-            MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength") ??
-                                        throw new InvalidOperationException());
+            MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength")!);
             FrequencyList = ConfigurationManager.AppSettings.Get("FrequencyList");
             AnkiConnectUri = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
-            KanjiMode = bool.Parse(ConfigurationManager.AppSettings.Get("KanjiMode") ??
-                                   throw new InvalidOperationException());
+            KanjiMode = bool.Parse(ConfigurationManager.AppSettings.Get("KanjiMode")!);
 
-            ForceSync = bool.Parse(ConfigurationManager.AppSettings.Get("ForceAnkiSync") ??
-                                   throw new InvalidOperationException());
-            LookupRate = int.Parse(ConfigurationManager.AppSettings.Get("LookupRate") ??
-                                   throw new InvalidOperationException());
+            ForceSync = bool.Parse(ConfigurationManager.AppSettings.Get("ForceAnkiSync")!);
+            LookupRate = int.Parse(ConfigurationManager.AppSettings.Get("LookupRate")!);
 
             MainWindowHeight = int.Parse(ConfigurationManager.AppSettings.Get("MainWindowHeight")!);
             MainWindowWidth = int.Parse(ConfigurationManager.AppSettings.Get("MainWindowWidth")!);
@@ -191,27 +202,29 @@ namespace JapaneseLookup
                     break;
             }
 
-            mainWindow.OpacitySlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowOpacity"));
-            mainWindow.FontSizeSlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowFontSize"));
-            mainWindow.MainTextBox.FontFamily = new FontFamily(ConfigurationManager.AppSettings.Get("MainWindowFont"));
+            mainWindow.OpacitySlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowOpacity")!);
+            mainWindow.FontSizeSlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowFontSize")!);
+            mainWindow.MainTextBox.FontFamily = new FontFamily(ConfigurationManager.AppSettings.Get("MainWindowFont")!);
             mainWindow.MainTextBox.FontSize = mainWindow.FontSizeSlider.Value;
             mainWindow.Background =
                 (SolidColorBrush) new BrushConverter().ConvertFrom(
                     ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor"));
+            Debug.Assert(mainWindow.Background != null, "mainWindow.Background != null");
             mainWindow.Background.Opacity = mainWindow.OpacitySlider.Value / 100;
             mainWindow.MainTextBox.Foreground = MainWindowTextColor;
-            mainWindow.Height = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowHeight"));
-            mainWindow.Width = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowWidth"));
-            mainWindow.Top = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowTopPosition"));
-            mainWindow.Left = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowLeftPosition"));
+            mainWindow.Height = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowHeight")!);
+            mainWindow.Width = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowWidth")!);
+            mainWindow.Top = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowTopPosition")!);
+            mainWindow.Left = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowLeftPosition")!);
 
             var popupWindow = PopupWindow.Instance;
             popupWindow.Background = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
+            Debug.Assert(popupWindow.Background != null, "popupWindow.Background != null");
             popupWindow.Background.Opacity =
-                double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")) / 100;
-            popupWindow.MaxHeight = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight"));
-            popupWindow.MaxWidth = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth"));
+                double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")!) / 100;
+            popupWindow.MaxHeight = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight")!);
+            popupWindow.MaxWidth = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth")!);
 
             if (!File.Exists(Path.Join(ApplicationPath, "Config/dicts.json")))
                 CreateDefaultDictsConfig();
@@ -467,19 +480,17 @@ namespace JapaneseLookup
                 }
             };
 
-            var defaultDictsConfig =
-                new Dictionary<string, Dict>
-                {
-                    { "JMdict", new Dict(DictType.JMdict, "Resources\\JMdict.xml", true, 0) },
-                    { "JMnedict", new Dict(DictType.JMnedict, "Resources\\JMnedict.xml", true, 1) },
-                    { "Kanjidic", new Dict(DictType.Kanjidic, "Resources\\kanjidic2.xml", true, 2) }
-                };
-
             try
             {
                 Directory.CreateDirectory(Path.Join(ApplicationPath, "Config"));
                 File.WriteAllText(Path.Join(ApplicationPath, "Config/dicts.json"),
-                    JsonSerializer.Serialize(defaultDictsConfig, jso));
+                    JsonSerializer.Serialize(BuiltInDicts, jso));
+
+                if (!File.Exists("Resources\\custom_words.txt"))
+                    File.Create("Resources\\custom_words.txt");
+
+                if (!File.Exists("Resources\\custom_names.txt"))
+                    File.Create("Resources\\custom_names.txt");
             }
             catch (Exception e)
             {
@@ -605,6 +616,7 @@ namespace JapaneseLookup
                                 await EpwingJsonLoader.Loader(dict.Type, dict.Path));
                             tasks.Add(taskEpwing);
                         }
+
                         break;
                     case DictType.CustomWordDictionary:
                         if (!Dicts.dicts[DictType.CustomWordDictionary].Contents.Any())
@@ -612,14 +624,15 @@ namespace JapaneseLookup
                             var taskCustomWordDict = Task.Run(() => CustomWordLoader.Load());
                             tasks.Add(taskCustomWordDict);
                         }
-                        break;
 
+                        break;
                     case DictType.CustomNameDictionary:
                         if (!Dicts.dicts[DictType.CustomNameDictionary].Contents.Any())
                         {
                             var taskCustomNameDict = Task.Run(() => CustomNameLoader.Load());
                             tasks.Add(taskCustomNameDict);
                         }
+
                         break;
 
                     default:
@@ -657,11 +670,6 @@ namespace JapaneseLookup
                     Debug.WriteLine("Banzai! (changed freqlist)");
                 }
             }
-
-            // foreach ((DictType _, Dict dict) in Dicts.dicts.Where(d => d.Value.Active))
-            // {
-            //     Debug.WriteLine("Loading " + dict.Type);
-            // }
 
             Task.WaitAll(tasks.ToArray());
 

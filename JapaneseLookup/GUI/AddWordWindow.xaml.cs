@@ -22,6 +22,7 @@ namespace JapaneseLookup.GUI
     public partial class AddWordWindow : Window
     {
         private static AddWordWindow _instance;
+
         public static AddWordWindow Instance
         {
             get
@@ -43,7 +44,7 @@ namespace JapaneseLookup.GUI
             Close();
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             bool isValidated = true;
 
@@ -52,10 +53,9 @@ namespace JapaneseLookup.GUI
                 SpellingsTextBox.BorderBrush = Brushes.Red;
                 isValidated = false;
             }
-
             else if (SpellingsTextBox.BorderBrush == Brushes.Red)
             {
-                SpellingsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
+                SpellingsTextBox.BorderBrush = (SolidColorBrush) new BrushConverter().ConvertFrom("#FF3F3F46");
             }
 
             if (ReadingsTextBox.Text == "")
@@ -63,10 +63,9 @@ namespace JapaneseLookup.GUI
                 ReadingsTextBox.BorderBrush = Brushes.Red;
                 isValidated = false;
             }
-
             else if (ReadingsTextBox.BorderBrush == Brushes.Red)
             {
-                ReadingsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
+                ReadingsTextBox.BorderBrush = (SolidColorBrush) new BrushConverter().ConvertFrom("#FF3F3F46");
             }
 
             if (DefinitionsTextBox.Text == "")
@@ -74,10 +73,9 @@ namespace JapaneseLookup.GUI
                 DefinitionsTextBox.BorderBrush = Brushes.Red;
                 isValidated = false;
             }
-
             else if (DefinitionsTextBox.BorderBrush == Brushes.Red)
             {
-                DefinitionsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
+                DefinitionsTextBox.BorderBrush = (SolidColorBrush) new BrushConverter().ConvertFrom("#FF3F3F46");
             }
 
             if (isValidated)
@@ -85,9 +83,10 @@ namespace JapaneseLookup.GUI
                 string rawSpellings = SpellingsTextBox.Text;
                 string rawReadings = ReadingsTextBox.Text;
                 string rawDefinitions = DefinitionsTextBox.Text;
-                string rawWordClass = WordClassStackPanel.Children.OfType<RadioButton>().FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value).Content.ToString();
+                string rawWordClass = WordClassStackPanel.Children.OfType<RadioButton>()
+                    .FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString();
 
-                WriteToFile(rawSpellings, rawReadings, rawDefinitions, rawWordClass);
+                await WriteToFile(rawSpellings, rawReadings, rawDefinitions, rawWordClass);
 
                 string[] spellings = rawDefinitions.Split(';');
                 List<string> readings = rawReadings.Split(';').ToList();
@@ -99,7 +98,7 @@ namespace JapaneseLookup.GUI
             }
         }
 
-        private static void WriteToFile(string spellings, string readings, string definitions, string wordClass)
+        private static async Task WriteToFile(string spellings, string readings, string definitions, string wordClass)
         {
             StringBuilder stringBuilder = new();
             stringBuilder.Append(spellings);
@@ -111,7 +110,7 @@ namespace JapaneseLookup.GUI
             stringBuilder.Append(wordClass);
             stringBuilder.Append(Environment.NewLine);
 
-            File.AppendAllTextAsync(
+            await File.AppendAllTextAsync(
                 Path.Join(ConfigManager.ApplicationPath, "Resources/custom_words.txt"),
                 stringBuilder.ToString(), Encoding.UTF8);
         }

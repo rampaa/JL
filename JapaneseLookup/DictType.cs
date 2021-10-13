@@ -2,11 +2,14 @@
 {
     public enum DictType
     {
-        CustomWordDictionary,
-        CustomNameDictionary,
+        // built-in
         JMdict,
         JMnedict,
         Kanjidic,
+        CustomWordDictionary,
+        CustomNameDictionary,
+
+        // user-added
         UnknownEpwing,
         Daijirin,
         Daijisen,

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
+using JapaneseLookup.CustomDict;
 using JapaneseLookup.Deconjugation;
 using JapaneseLookup.EDICT;
 using JapaneseLookup.GUI;
@@ -103,11 +104,11 @@ namespace JapaneseLookup
             var kanjiResult =
                 new Dictionary<string,
                     (List<List<KanjiResult>>, List<string>, string, DictType)>();
-           var customWordResults =
+            var customWordResults =
                 new Dictionary<string,
                     (List<CustomWordEntry> customWordResults, List<string> processList, string foundForm,
                     DictType dictType)>();
-           var customNamedResults =
+            var customNameResults =
                 new Dictionary<string,
                     (List<CustomNameEntry> customNameResults, List<string> processList, string foundForm,
                     DictType dictType)>();
@@ -170,7 +171,7 @@ namespace JapaneseLookup
                             DictType.CustomWordDictionary);
                         break;
                     case DictType.CustomNameDictionary:
-                        customNamedResults = GetCustomNameResults(text, textInHiraganaList, dictType);
+                        customNameResults = GetCustomNameResults(text, textInHiraganaList, dictType);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -194,7 +195,6 @@ namespace JapaneseLookup
             if (epwingWordResults.Any())
                 foreach (var epwingWordResult in epwingWordResults)
                 {
-                    // if (epwingWordResult.Any())
                     lookupResults.AddRange(EpwingWordResultBuilder(epwingWordResult));
                 }
 
@@ -207,8 +207,8 @@ namespace JapaneseLookup
             if (customWordResults.Any())
                 lookupResults.AddRange(CustomWordResultBuilder(customWordResults));
 
-            if (customNamedResults.Any())
-                lookupResults.AddRange(CustomNameResultBuilder(customNamedResults));
+            if (customNameResults.Any())
+                lookupResults.AddRange(CustomNameResultBuilder(customNameResults));
 
             lookupResults = SortLookupResults(lookupResults);
             return lookupResults;
@@ -502,13 +502,16 @@ namespace JapaneseLookup
         }
 
         private static
-    Dictionary<string,
-        (List<CustomWordEntry> customWordResults, List<string> processList, string foundForm, DictType dictType)>
-    GetCustomWordResults(string text, List<string> textInHiraganaList, List<HashSet<Form>> deconjugationResultsList,
-        DictType dictType)
+            Dictionary<string,
+                (List<CustomWordEntry> customWordResults, List<string> processList, string foundForm, DictType dictType)
+            >
+            GetCustomWordResults(string text, List<string> textInHiraganaList,
+                List<HashSet<Form>> deconjugationResultsList,
+                DictType dictType)
         {
             var customWordResults =
-                new Dictionary<string, (List<CustomWordEntry> customWordResults, List<string> processList, string foundForm,
+                new Dictionary<string, (List<CustomWordEntry> customWordResults, List<string> processList, string
+                    foundForm,
                     DictType dictType)>();
 
             int succAttempt = 0;
@@ -517,7 +520,8 @@ namespace JapaneseLookup
             {
                 bool tryLongVowelConversion = true;
 
-                if (Dicts.dicts[DictType.CustomWordDictionary].Contents.TryGetValue(textInHiraganaList[i], out var tempResult1))
+                if (Dicts.dicts[DictType.CustomWordDictionary].Contents
+                    .TryGetValue(textInHiraganaList[i], out var tempResult1))
                 {
                     var tempResult = tempResult1.Cast<CustomWordEntry>().ToList();
                     customWordResults.TryAdd(textInHiraganaList[i],
@@ -538,7 +542,7 @@ namespace JapaneseLookup
 
                             foreach (var rslt1 in temp)
                             {
-                                var rslt = (CustomWordEntry)rslt1;
+                                var rslt = (CustomWordEntry) rslt1;
                                 if (rslt.WordClasses.Intersect(result.Tags).Any())
                                 {
                                     resultsList.Add(rslt);
@@ -560,7 +564,8 @@ namespace JapaneseLookup
                 if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") && textInHiraganaList[i][0] != 'ー')
                 {
                     string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
-                    if (Dicts.dicts[DictType.CustomWordDictionary].Contents.TryGetValue(textWithoutLongVowelMark, out var tmpResult1))
+                    if (Dicts.dicts[DictType.CustomWordDictionary].Contents
+                        .TryGetValue(textWithoutLongVowelMark, out var tmpResult1))
                     {
                         var tmpResult = tmpResult1.Cast<CustomWordEntry>().ToList();
                         customWordResults.Add(textInHiraganaList[i],
@@ -574,16 +579,19 @@ namespace JapaneseLookup
 
         private static
             Dictionary<string,
-                (List<CustomNameEntry> customNameResults, List<string> processList, string foundForm, DictType dictType)>
+                (List<CustomNameEntry> customNameResults, List<string> processList, string foundForm, DictType dictType)
+            >
             GetCustomNameResults(string text, List<string> textInHiraganaList, DictType dictType)
         {
             var customNameResults =
-                new Dictionary<string, (List<CustomNameEntry> customNameResults, List<string> processList, string foundForm
+                new Dictionary<string, (List<CustomNameEntry> customNameResults, List<string> processList, string
+                    foundForm
                     , DictType dictType)>();
 
             for (int i = 0; i < text.Length; i++)
             {
-                if (Dicts.dicts[DictType.CustomNameDictionary].Contents.TryGetValue(textInHiraganaList[i], out var tempNameResult1))
+                if (Dicts.dicts[DictType.CustomNameDictionary].Contents
+                    .TryGetValue(textInHiraganaList[i], out var tempNameResult1))
                 {
                     var tempNameResult = tempNameResult1.Cast<CustomNameEntry>().ToList();
                     customNameResults.TryAdd(textInHiraganaList[i],
@@ -820,9 +828,10 @@ namespace JapaneseLookup
         }
 
         private static List<Dictionary<LookupResult, List<string>>> CustomWordResultBuilder
-(Dictionary<string,
-        (List<CustomWordEntry> customWordResults, List<string> processList, string foundForm, DictType dictType)>
-    customWordResults)
+        (Dictionary<string,
+                (List<CustomWordEntry> customWordResults, List<string> processList,
+                string foundForm, DictType dictType)>
+            customWordResults)
         {
             var results = new List<Dictionary<LookupResult, List<string>>>();
 
@@ -1022,6 +1031,7 @@ namespace JapaneseLookup
             defResult = defResult.Trim('\n');
             return defResult;
         }
+
         private static string BuildCustomNameDefinition(CustomNameEntry customNameDictResult)
         {
             string defResult = "(" + customNameDictResult.NameType + ") " + customNameDictResult.Reading;
@@ -1030,9 +1040,10 @@ namespace JapaneseLookup
         }
 
         private static List<Dictionary<LookupResult, List<string>>> CustomNameResultBuilder
-(Dictionary<string,
-        (List<CustomNameEntry> customNameResults, List<string> processList, string foundForm, DictType dictType)>
-    customNameResults)
+        (Dictionary<string,
+                (List<CustomNameEntry> customNameResults, List<string> processList,
+                string foundForm, DictType dictType)>
+            customNameResults)
         {
             var results = new List<Dictionary<LookupResult, List<string>>>();
 

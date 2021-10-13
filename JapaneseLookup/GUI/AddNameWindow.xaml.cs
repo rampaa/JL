@@ -1,5 +1,4 @@
-﻿using JapaneseLookup.Custom_Dictionaries;
-using JapaneseLookup.CustomDict;
+﻿using JapaneseLookup.CustomDict;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,6 +24,7 @@ namespace JapaneseLookup.GUI
     public partial class AddNameWindow : Window
     {
         private static AddNameWindow _instance;
+
         public static AddNameWindow Instance
         {
             get
@@ -46,7 +46,7 @@ namespace JapaneseLookup.GUI
             Close();
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             bool isValidated = true;
 
@@ -55,10 +55,9 @@ namespace JapaneseLookup.GUI
                 SpellingTextBox.BorderBrush = Brushes.Red;
                 isValidated = false;
             }
-
             else if (SpellingTextBox.BorderBrush == Brushes.Red)
             {
-                SpellingTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
+                SpellingTextBox.BorderBrush = (SolidColorBrush) new BrushConverter().ConvertFrom("#FF3F3F46");
             }
 
             if (ReadingTextBox.Text == "")
@@ -66,24 +65,25 @@ namespace JapaneseLookup.GUI
                 ReadingTextBox.BorderBrush = Brushes.Red;
                 isValidated = false;
             }
-
             else if (ReadingTextBox.BorderBrush == Brushes.Red)
             {
-                ReadingTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
+                ReadingTextBox.BorderBrush = (SolidColorBrush) new BrushConverter().ConvertFrom("#FF3F3F46");
             }
 
             if (isValidated)
             {
-                string nameType = NameTypeStackPanel.Children.OfType<RadioButton>().FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value).Content.ToString();
+                string nameType =
+                    NameTypeStackPanel.Children.OfType<RadioButton>()
+                        .FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString();
                 string spelling = SpellingTextBox.Text;
                 string reading = ReadingTextBox.Text;
-                WriteToFile(spelling, reading, nameType);
+                await WriteToFile(spelling, reading, nameType);
                 CustomNameLoader.AddToDictionary(spelling, reading, nameType);
                 Close();
             }
         }
 
-        private static void WriteToFile(string spelling, string reading, string type)
+        private static async Task WriteToFile(string spelling, string reading, string type)
         {
             StringBuilder stringBuilder = new();
             stringBuilder.Append(spelling);
@@ -92,11 +92,12 @@ namespace JapaneseLookup.GUI
             stringBuilder.Append('\t');
             stringBuilder.Append(type);
             stringBuilder.Append(Environment.NewLine);
-            
-            File.AppendAllTextAsync(
+
+            await File.AppendAllTextAsync(
                 Path.Join(ConfigManager.ApplicationPath, "Resources/custom_names.txt"),
                 stringBuilder.ToString(), Encoding.UTF8);
         }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             OtherRadioButton.IsChecked = true;

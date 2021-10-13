@@ -1,27 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace JapaneseLookup.Custom_Dictionaries
+namespace JapaneseLookup.CustomDict
 {
-    class CustomNameLoader
+    public static class CustomNameLoader
     {
         public static void Load()
         {
             if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/custom_names.txt")))
             {
                 foreach (string line in File.ReadLines(
-                        Path.Join(ConfigManager.ApplicationPath, "Resources/custom_names.txt")))
+                    Path.Join(ConfigManager.ApplicationPath, "Resources/custom_names.txt")))
                 {
                     string[] lParts = line.Split("\t");
                     AddToDictionary(lParts[0], lParts[1], lParts[2]);
                 }
+
                 Dicts.dicts[DictType.CustomWordDictionary].Contents.TrimExcess();
             }
         }
+
         public static void AddToDictionary(string spelling, string reading, string definition)
         {
             CustomNameEntry newNameEntry = new(spelling, reading, definition);
@@ -38,7 +36,7 @@ namespace JapaneseLookup.Custom_Dictionaries
 
             else
             {
-                customNameDictionary.Add(spelling, new List<IResult>() { newNameEntry });
+                customNameDictionary.Add(spelling, new List<IResult> { newNameEntry });
             }
         }
     }
