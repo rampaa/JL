@@ -43,6 +43,7 @@ namespace JapaneseLookup.Anki
                 var tags = ankiConfig.Tags;
 
                 // idk if this gets the right audio for every word
+                readings ??= "";
                 var reading = readings.Split(",")[0];
                 if (reading == "") reading = foundSpelling;
 
