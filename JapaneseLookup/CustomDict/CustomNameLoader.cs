@@ -17,7 +17,7 @@ namespace JapaneseLookup.CustomDict
                     AddToDictionary(lParts[0], lParts[1], lParts[2]);
                 }
 
-                ConfigManager.Dicts[DictType.CustomWordDictionary].Contents.TrimExcess();
+                ConfigManager.Dicts[DictType.CustomNameDictionary].Contents.TrimExcess();
             }
         }
 
@@ -25,7 +25,7 @@ namespace JapaneseLookup.CustomDict
         {
             CustomNameEntry newNameEntry = new(spelling, reading, definition);
 
-            var customNameDictionary = ConfigManager.Dicts[DictType.CustomWordDictionary].Contents;
+            var customNameDictionary = ConfigManager.Dicts[DictType.CustomNameDictionary].Contents;
 
             if (customNameDictionary.TryGetValue(spelling, out var entry))
             {
