@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace JapaneseLookup.EDICT
+namespace JapaneseLookup.EDICT.JMnedict
 {
     public class Trans
     {
