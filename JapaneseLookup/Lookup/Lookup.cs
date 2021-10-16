@@ -398,10 +398,13 @@ namespace JapaneseLookup.Lookup
 
                             foreach (EpwingResult rslt in temp.Cast<EpwingResult>())
                             {
-                                if (rslt.WordClasses.Union(jmdictWordClasses[result.Text]).SelectMany(pos => pos)
-                                    .Intersect(result.Tags).Any())
+                                if (jmdictWordClasses.ContainsKey(result.Text))
                                 {
-                                    resultsList.Add(rslt);
+                                    if (rslt.WordClasses.Union(jmdictWordClasses[result.Text]).SelectMany(pos => pos)
+                                        .Intersect(result.Tags).Any())
+                                    {
+                                        resultsList.Add(rslt);
+                                    }
                                 }
                                 // TODO
                                 else
