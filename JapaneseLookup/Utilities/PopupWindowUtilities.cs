@@ -7,7 +7,7 @@ using System.Windows.Documents;
 using JapaneseLookup.GUI;
 using JapaneseLookup.Lookup;
 
-namespace JapaneseLookup
+namespace JapaneseLookup.Utilities
 {
     public static class PopupWindowUtilities
     {

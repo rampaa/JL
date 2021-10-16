@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JapaneseLookup.Abstract;
 
 namespace JapaneseLookup.EDICT.JMdict
 {

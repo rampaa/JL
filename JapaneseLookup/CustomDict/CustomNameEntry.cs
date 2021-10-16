@@ -1,4 +1,6 @@
-﻿namespace JapaneseLookup.CustomDict
+﻿using JapaneseLookup.Abstract;
+
+namespace JapaneseLookup.CustomDict
 {
     public class CustomNameEntry : IResult
     {

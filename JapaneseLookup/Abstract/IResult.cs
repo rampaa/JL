@@ -1,4 +1,4 @@
-﻿namespace JapaneseLookup
+﻿namespace JapaneseLookup.Abstract
 {
     public interface IResult
     {

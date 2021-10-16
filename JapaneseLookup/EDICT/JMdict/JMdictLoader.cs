@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Windows;
 using System.Xml;
 using JapaneseLookup.Dicts;
 
@@ -23,13 +24,13 @@ namespace JapaneseLookup.EDICT.JMdict
                 }
             }
 
-            // else
-            // {
-            //     MessageBox.Show(
-            //         "Couldn't find JMdict.xml. Please download it by clicking the \"Update JMdict\" button.", "",
-            //         MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK,
-            //         MessageBoxOptions.DefaultDesktopOnly);
-            // }
+            else
+            {
+                MessageBox.Show(
+                    "Couldn't find JMdict.xml. Please download it by clicking the \"Update JMdict\" button.", "",
+                    MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK,
+                    MessageBoxOptions.DefaultDesktopOnly);
+            }
         }
 
         private static void ReadEntry(XmlTextReader edictXml)

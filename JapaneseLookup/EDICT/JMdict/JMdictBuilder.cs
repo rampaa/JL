@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using JapaneseLookup.Abstract;
 
 namespace JapaneseLookup.EDICT.JMdict
 {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System.IO;
 using System.Diagnostics;
+using JapaneseLookup.Abstract;
 using JapaneseLookup.Dicts;
 
 namespace JapaneseLookup.EPWING

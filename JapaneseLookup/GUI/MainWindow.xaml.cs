@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using JapaneseLookup.Utilities;
 
 namespace JapaneseLookup.GUI
 {

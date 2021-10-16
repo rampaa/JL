@@ -1,4 +1,5 @@
 ﻿using JapaneseLookup;
+using JapaneseLookup.Utilities;
 using NUnit.Framework;
 
 namespace JapaneseLookupTests

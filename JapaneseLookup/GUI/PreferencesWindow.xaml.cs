@@ -15,6 +15,7 @@ using System.Windows.Input;
 using HandyControl.Tools;
 using HandyControl.Controls;
 using HandyControl.Properties;
+using JapaneseLookup.Abstract;
 using JapaneseLookup.Anki;
 using JapaneseLookup.Dicts;
 using Button = System.Windows.Controls.Button;

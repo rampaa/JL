@@ -2,6 +2,7 @@
 using JapaneseLookup;
 using NUnit.Framework;
 using System.Text.Json;
+using JapaneseLookup.Abstract;
 using JapaneseLookup.Dicts;
 using JapaneseLookup.EDICT.JMdict;
 using JapaneseLookup.Lookup;
@@ -21,7 +22,8 @@ namespace JapaneseLookupTests
         {
             ConfigManager.Dicts.Add(DictType.JMdict, new Dict(DictType.JMdict, "", true, 0));
             ConfigManager.Dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();
-            JMdictLoader.Load("/Resources/JMdict.xml");
+            string jmdictPath = ConfigManager.Dicts[DictType.JMdict].Path;
+            JMdictLoader.Load(jmdictPath);
         }
 
         [Test]

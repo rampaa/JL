@@ -12,6 +12,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using JapaneseLookup.Dicts;
+using JapaneseLookup.Utilities;
 using Path = System.IO.Path;
 
 namespace JapaneseLookup.GUI
@@ -110,8 +112,9 @@ namespace JapaneseLookup.GUI
             stringBuilder.Append(wordClass);
             stringBuilder.Append(Environment.NewLine);
 
+            string customWordDictPath = ConfigManager.Dicts[DictType.CustomWordDictionary].Path;
             await File.AppendAllTextAsync(
-                Path.Join(ConfigManager.ApplicationPath, "Resources/custom_words.txt"),
+                Path.Join(ConfigManager.ApplicationPath, customWordDictPath),
                 stringBuilder.ToString(), Encoding.UTF8);
         }
 

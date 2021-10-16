@@ -15,16 +15,11 @@ namespace JapaneseLookup.Deconjugation
 
         private static readonly Rule[] Rules = JsonSerializer.Deserialize<Rule[]>(File);
 
-        private static Form StdruleDeconjugateInner(Form myForm,
-            VirtualRule myRule)
+        private static Form StdruleDeconjugateInner(Form myForm, VirtualRule myRule)
         {
             // tag doesn't match
-            if (myForm.Tags.Count > 0 &&
-                myForm.Tags[^1] != myRule.ConTag)
-            {
+            if (myForm.Tags.Count > 0 && myForm.Tags[^1] != myRule.ConTag)
                 return null;
-            }
-
             // ending doesn't match
             if (!myForm.Text.EndsWith(myRule.ConEnd))
                 return null;
@@ -46,10 +41,12 @@ namespace JapaneseLookup.Deconjugation
 
             if (newForm.Tags.Count == 0)
                 newForm.Tags.Add(myRule.ConTag);
+
             newForm.Tags.Add(myRule.DecTag);
 
             if (newForm.Seentext.Count == 0)
                 newForm.Seentext.Add(myForm.Text);
+
             newForm.Seentext.Add(newText);
 
             return newForm;
@@ -117,32 +114,31 @@ namespace JapaneseLookup.Deconjugation
             return collection;
         }
 
-        private static HashSet<Form> RewriteruleDeconjugate(Form myForm,
-            Rule myRule)
+        private static HashSet<Form> RewriteruleDeconjugate(Form myForm, Rule myRule)
         {
             if (myForm.Text != myRule.ConEnd.First())
                 return null;
+
             return StdruleDeconjugate(myForm, myRule);
         }
 
-        private static HashSet<Form> OnlyfinalruleDeconjugate(Form myForm,
-            Rule myRule)
+        private static HashSet<Form> OnlyfinalruleDeconjugate(Form myForm, Rule myRule)
         {
             if (myForm.Tags.Count != 0)
                 return null;
+
             return StdruleDeconjugate(myForm, myRule);
         }
 
-        private static HashSet<Form> NeverfinalruleDeconjugate(Form myForm,
-            Rule myRule)
+        private static HashSet<Form> NeverfinalruleDeconjugate(Form myForm, Rule myRule)
         {
             if (myForm.Tags.Count == 0)
                 return null;
+
             return StdruleDeconjugate(myForm, myRule);
         }
 
-        private static HashSet<Form> ContextruleDeconjugate(Form myForm,
-            Rule myRule)
+        private static HashSet<Form> ContextruleDeconjugate(Form myForm, Rule myRule)
         {
             bool result = myRule.Contextrule switch
             {
@@ -152,14 +148,15 @@ namespace JapaneseLookup.Deconjugation
             };
             if (!result)
                 return null;
+
             return StdruleDeconjugate(myForm, myRule);
         }
 
-        private static Form SubstitutionInner(Form myForm,
-            Rule myRule)
+        private static Form SubstitutionInner(Form myForm, Rule myRule)
         {
             if (!myForm.Text.Contains(myRule.ConEnd.First()))
                 return null;
+
             string newText = new Regex(myRule.ConEnd.First())
                 .Replace(myForm.Text, myRule.DecEnd.First());
 
@@ -175,13 +172,13 @@ namespace JapaneseLookup.Deconjugation
 
             if (newForm.Seentext.Count == 0)
                 newForm.Seentext.Add(myForm.Text);
+
             newForm.Seentext.Add(newText);
 
             return newForm;
         }
 
-        private static HashSet<Form> SubstitutionDeconjugate(Form myForm,
-            Rule myRule)
+        private static HashSet<Form> SubstitutionDeconjugate(Form myForm, Rule myRule)
         {
             if (myForm.Process.Count != 0)
                 return null;
@@ -233,6 +230,7 @@ namespace JapaneseLookup.Deconjugation
             string myTag = myForm.Tags[0];
             if (myTag == "stem-ren")
                 return false;
+
             return true;
         }
 
@@ -241,6 +239,7 @@ namespace JapaneseLookup.Deconjugation
         {
             if (myForm.Text == "") return false;
             if (!myForm.Text.EndsWith(myRule.ConEnd.First())) return false;
+
             string baseText = myForm.Text.Substring(0, myForm.Text.Length - myRule.ConEnd.First().Length);
             return !baseText.EndsWith("さ");
         }

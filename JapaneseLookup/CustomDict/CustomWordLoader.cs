@@ -4,18 +4,19 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JapaneseLookup.Abstract;
 using JapaneseLookup.Dicts;
 
 namespace JapaneseLookup.CustomDict
 {
     public static class CustomWordLoader
     {
-        public static void Load()
+        public static void Load(string customWordDictPath)
         {
-            if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/custom_words.txt")))
+            if (File.Exists(Path.Join(ConfigManager.ApplicationPath, customWordDictPath)))
             {
                 foreach (string line in File.ReadLines(
-                    Path.Join(ConfigManager.ApplicationPath, "Resources/custom_words.txt")))
+                    Path.Join(ConfigManager.ApplicationPath, customWordDictPath)))
                 {
                     string[] lParts = line.Split("\t");
 

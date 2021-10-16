@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using JapaneseLookup.GUI;
 
-namespace JapaneseLookup
+namespace JapaneseLookup.Utilities
 {
     public static class MainWindowUtilities
     {

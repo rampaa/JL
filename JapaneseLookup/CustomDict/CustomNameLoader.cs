@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using JapaneseLookup.Abstract;
 using JapaneseLookup.Dicts;
 
 namespace JapaneseLookup.CustomDict
 {
     public static class CustomNameLoader
     {
-        public static void Load()
+        public static void Load(string customNameDictPath)
         {
-            if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/custom_names.txt")))
+            if (File.Exists(Path.Join(ConfigManager.ApplicationPath, customNameDictPath)))
             {
                 foreach (string line in File.ReadLines(
-                    Path.Join(ConfigManager.ApplicationPath, "Resources/custom_names.txt")))
+                    Path.Join(ConfigManager.ApplicationPath, customNameDictPath)))
                 {
                     string[] lParts = line.Split("\t");
                     AddToDictionary(lParts[0], lParts[1], lParts[2]);

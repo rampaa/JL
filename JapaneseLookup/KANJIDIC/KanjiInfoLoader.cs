@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
+using JapaneseLookup.Abstract;
 using JapaneseLookup.Dicts;
 
 namespace JapaneseLookup.KANJIDIC
@@ -68,13 +69,13 @@ namespace JapaneseLookup.KANJIDIC
                 ConfigManager.Dicts[DictType.Kanjidic].Contents.TrimExcess();
             }
 
-            // else
-            // {
-            //     MessageBox.Show(
-            //         "Couldn't find kanjidic2.xml. Please download it by clicking the \"Update KANJIDIC\" button.", "",
-            //         MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK,
-            //         MessageBoxOptions.DefaultDesktopOnly);
-            // }
+            else
+            {
+                MessageBox.Show(
+                    "Couldn't find kanjidic2.xml. Please download it by clicking the \"Update KANJIDIC\" button.", "",
+                    MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK,
+                    MessageBoxOptions.DefaultDesktopOnly);
+            }
         }
 
         private static void ReadCharacter(XmlReader kanjiDicXml, Dictionary<string, string> kanjiCompositionDictionary)

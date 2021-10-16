@@ -14,6 +14,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using JapaneseLookup.Dicts;
+using JapaneseLookup.Utilities;
 using Path = System.IO.Path;
 
 namespace JapaneseLookup.GUI
@@ -93,8 +95,9 @@ namespace JapaneseLookup.GUI
             stringBuilder.Append(type);
             stringBuilder.Append(Environment.NewLine);
 
+            string customNameDictPath = ConfigManager.Dicts[DictType.CustomNameDictionary].Path;
             await File.AppendAllTextAsync(
-                Path.Join(ConfigManager.ApplicationPath, "Resources/custom_names.txt"),
+                Path.Join(ConfigManager.ApplicationPath, customNameDictPath),
                 stringBuilder.ToString(), Encoding.UTF8);
         }
 

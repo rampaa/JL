@@ -14,7 +14,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Markup;
-using JapaneseLookup.EDICT;
+using JapaneseLookup.Abstract;
 using JapaneseLookup.EPWING;
 using JapaneseLookup.KANJIDIC;
 using JapaneseLookup.CustomDict;
@@ -627,7 +627,8 @@ namespace JapaneseLookup
                     case DictType.CustomWordDictionary:
                         if (!ConfigManager.Dicts[DictType.CustomWordDictionary].Contents.Any())
                         {
-                            var taskCustomWordDict = Task.Run(() => CustomWordLoader.Load());
+                            var taskCustomWordDict = Task.Run(() => CustomWordLoader.Load(
+                                ConfigManager.Dicts[DictType.CustomWordDictionary].Path));
                             tasks.Add(taskCustomWordDict);
                         }
 
@@ -635,7 +636,8 @@ namespace JapaneseLookup
                     case DictType.CustomNameDictionary:
                         if (!ConfigManager.Dicts[DictType.CustomNameDictionary].Contents.Any())
                         {
-                            var taskCustomNameDict = Task.Run(() => CustomNameLoader.Load());
+                            var taskCustomNameDict = Task.Run(() => CustomNameLoader.Load(
+                                ConfigManager.Dicts[DictType.CustomNameDictionary].Path));
                             tasks.Add(taskCustomNameDict);
                         }
 

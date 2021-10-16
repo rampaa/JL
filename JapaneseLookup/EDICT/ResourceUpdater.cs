@@ -8,6 +8,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using JapaneseLookup.Dicts;
 
 namespace JapaneseLookup.EDICT
 {
@@ -15,10 +16,12 @@ namespace JapaneseLookup.EDICT
     {
         public static async void UpdateJMdict()
         {
+            string jmdictPath = ConfigManager.Dicts[DictType.JMdict].Path;
+
             if (MessageBox.Show("Do you want to update JMdict?", "", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
             {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz");
-                request.IfModifiedSince = File.GetLastWriteTime(Path.Join(ConfigManager.ApplicationPath, "Resources/JMdict.xml"));
+                request.IfModifiedSince = File.GetLastWriteTime(Path.Join(ConfigManager.ApplicationPath, jmdictPath));
                 try
                 {
                     request.GetResponse();
@@ -26,7 +29,7 @@ namespace JapaneseLookup.EDICT
                     MessageBox.Show("This may take a while. Please don't shut down the program until JMdict is updated.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
                     using WebClient client = new();
                     await Task.Run(() => client.DownloadFile("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz", downloadName));
-                    await Task.Run(() => GzipDecompressor(new FileInfo(downloadName), Path.Join(ConfigManager.ApplicationPath, "Resources/JMdict.xml")));
+                    await Task.Run(() => GzipDecompressor(new FileInfo(downloadName), Path.Join(ConfigManager.ApplicationPath, jmdictPath)));
                     File.Delete(downloadName);
                     MessageBox.Show("JMdict has been updated successfully.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
                 }
@@ -43,10 +46,12 @@ namespace JapaneseLookup.EDICT
 
         public static async void UpdateJMnedict()
         {
+            string jmnedictPath = ConfigManager.Dicts[DictType.JMnedict].Path;
+
             if (MessageBox.Show("Do you want to update JMnedict?", "", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
             {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
-                request.IfModifiedSince = File.GetLastWriteTime(Path.Join(ConfigManager.ApplicationPath, "Resources/JMnedict.xml"));
+                request.IfModifiedSince = File.GetLastWriteTime(Path.Join(ConfigManager.ApplicationPath, jmnedictPath));
                 try
                 {
                     request.GetResponse();
@@ -54,7 +59,7 @@ namespace JapaneseLookup.EDICT
                     string downloadName = Path.Join(ConfigManager.ApplicationPath, "Resources/JMnedict.xml.gz");
                     using WebClient client = new();
                     await Task.Run(() => client.DownloadFile("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz", downloadName));
-                    await Task.Run(() => GzipDecompressor(new FileInfo(downloadName), Path.Join(ConfigManager.ApplicationPath, "Resources/JMnedict.xml")));
+                    await Task.Run(() => GzipDecompressor(new FileInfo(downloadName), Path.Join(ConfigManager.ApplicationPath, jmnedictPath)));
                     File.Delete(downloadName);
                     MessageBox.Show("JMnedict has been updated successfully.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
                 }
@@ -71,10 +76,12 @@ namespace JapaneseLookup.EDICT
 
         public static async void UpdateKanjidic()
         {
+            string kanjidicPath = ConfigManager.Dicts[DictType.Kanjidic].Path;
+
             if (MessageBox.Show("Do you want to update KANJIDIC2?", "", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
             {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
-                request.IfModifiedSince = File.GetLastWriteTime(Path.Join(ConfigManager.ApplicationPath, "Resources/kanjidic2.xml"));
+                request.IfModifiedSince = File.GetLastWriteTime(Path.Join(ConfigManager.ApplicationPath, kanjidicPath));
                 try
                 {
                     request.GetResponse();
@@ -82,7 +89,7 @@ namespace JapaneseLookup.EDICT
                     string downloadName = Path.Join(ConfigManager.ApplicationPath, "Resources/kanjidic2.xml.gz");
                     using WebClient client = new();
                     await Task.Run(() => client.DownloadFile("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz", downloadName));
-                    await Task.Run(() => GzipDecompressor(new FileInfo(downloadName), Path.Join(ConfigManager.ApplicationPath, "Resources/kanjidic2.xml")));
+                    await Task.Run(() => GzipDecompressor(new FileInfo(downloadName), Path.Join(ConfigManager.ApplicationPath, kanjidicPath)));
                     File.Delete(downloadName);
                     MessageBox.Show("KANJIDIC2 has been updated successfully.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
                 }
