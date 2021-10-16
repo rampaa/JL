@@ -378,8 +378,7 @@ namespace JapaneseLookup.GUI
                     .Where(textBlock => textBlock.Name == "priority")
                     .Select(textBlockPriority => Convert.ToInt32(textBlockPriority.Text)).First());
         }
-
-        private void PrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBePrioritized)
+        private static void PrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBePrioritized)
         {
             if (ConfigManager.Dicts[typeToBePrioritized].Priority == 0) return;
 
@@ -388,7 +387,7 @@ namespace JapaneseLookup.GUI
             ConfigManager.Dicts[typeToBePrioritized].Priority -= 1;
         }
 
-        private void UnPrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBeUnPrioritized)
+        private static void UnPrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBeUnPrioritized)
         {
             // lowest priority means highest number
             int lowestPriority = ConfigManager.Dicts.Select(dict => dict.Value.Priority).Max();
@@ -401,7 +400,7 @@ namespace JapaneseLookup.GUI
 
         private void BrowseForDictionaryFile(DictType selectedDictType, string filter)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog()
+            OpenFileDialog openFileDialog = new()
             {
                 InitialDirectory = ConfigManager.ApplicationPath,
                 Filter = filter

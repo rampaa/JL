@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JapaneseLookup.Lookup;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,65 +9,62 @@ namespace JapaneseLookup
 {
     public static class Kana
     {
-        //Maybe use a Dictionary<string, string>, because some characters don't fit into a char (e.g. ゐ゙).
-
-        private static readonly Dictionary<char, char> HiraganaToKatakanaDict = new()
+        private static readonly Dictionary<string, string> HiraganaToKatakanaDict = new()
         {
-            { 'あ', 'ア' }, { 'い', 'イ' }, { 'う', 'ウ' }, { 'え', 'エ' }, { 'お', 'オ' },
-            { 'か', 'カ' }, { 'き', 'キ' }, { 'く', 'ク' }, { 'け', 'ケ' }, { 'こ', 'コ' },
-            { 'さ', 'サ' }, { 'し', 'シ' }, { 'す', 'ス' }, { 'せ', 'セ' }, { 'そ', 'ソ' },
-            { 'た', 'タ' }, { 'ち', 'チ' }, { 'つ', 'ツ' }, { 'て', 'テ' }, { 'と', 'ト' },
-            { 'な', 'ナ' }, { 'に', 'ニ' }, { 'ぬ', 'ヌ' }, { 'ね', 'ネ' }, { 'の', 'ノ' },
-            { 'は', 'ハ' }, { 'ひ', 'ヒ' }, { 'へ', 'ヘ' }, { 'ふ', 'フ' }, { 'ほ', 'ホ' },
-            { 'ま', 'マ' }, { 'み', 'ミ' }, { 'む', 'ム' }, { 'め', 'メ' }, { 'も', 'モ' },
-            { 'ら', 'ラ' }, { 'り', 'リ' }, { 'る', 'ル' }, { 'れ', 'レ' }, { 'ろ', 'ロ' },
+            { "あ", "ア" }, { "い", "イ" }, { "う", "ウ" }, { "え", "エ" }, { "お", "オ" },
+            { "か", "カ" }, { "き", "キ" }, { "く", "ク" }, { "け", "ケ" }, { "こ", "コ" },
+            { "さ", "サ" }, { "し", "シ" }, { "す", "ス" }, { "せ", "セ" }, { "そ", "ソ" },
+            { "た", "タ" }, { "ち", "チ" }, { "つ", "ツ" }, { "て", "テ" }, { "と", "ト" },
+            { "な", "ナ" }, { "に", "ニ" }, { "ぬ", "ヌ" }, { "ね", "ネ" }, { "の", "ノ" },
+            { "は", "ハ" }, { "ひ", "ヒ" }, { "ふ", "フ" }, { "へ", "ヘ" }, { "ほ", "ホ" },
+            { "ま", "マ" }, { "み", "ミ" }, { "む", "ム" }, { "め", "メ" }, { "も", "モ" },
+            { "ら", "ラ" }, { "り", "リ" }, { "る", "ル" }, { "れ", "レ" }, { "ろ", "ロ" },
 
-            { 'が', 'ガ' }, { 'ぎ', 'ギ' }, { 'ぐ', 'グ' }, { 'げ', 'ゲ' }, { 'ご', 'ゴ' },
-            { 'ざ', 'ザ' }, { 'じ', 'ジ' }, { 'ず', 'ズ' }, { 'ぜ', 'ゼ' }, { 'ぞ', 'ゾ' },
-            { 'だ', 'ダ' }, { 'ぢ', 'ヂ' }, { 'づ', 'ヅ' }, { 'で', 'デ' }, { 'ど', 'ド' },
-            { 'ば', 'バ' }, { 'び', 'ビ' }, { 'ぶ', 'ブ' }, { 'べ', 'ベ' }, { 'ぼ', 'ボ' },
-            { 'ぱ', 'パ' }, { 'ぴ', 'ピ' }, { 'ぷ', 'プ' }, { 'ぺ', 'ペ' }, { 'ぽ', 'ポ' },
+            { "が", "ガ" }, { "ぎ", "ギ" }, { "ぐ", "グ" }, { "げ", "ゲ" }, { "ご", "ゴ" },
+            { "ざ", "ザ" }, { "じ", "ジ" }, { "ず", "ズ" }, { "ぜ", "ゼ" }, { "ぞ", "ゾ" },
+            { "だ", "ダ" }, { "ぢ", "ヂ" }, { "づ", "ヅ" }, { "で", "デ" }, { "ど", "ド" },
+            { "ば", "バ" }, { "び", "ビ" }, { "ぶ", "ブ" }, { "べ", "ベ" }, { "ぼ", "ボ" },
+            { "ぱ", "パ" }, { "ぴ", "ピ" }, { "ぷ", "プ" }, { "ぺ", "ペ" }, { "ぽ", "ポ" },
 
-            { 'わ', 'ワ' }, { 'を', 'ヲ' },
-            { 'や', 'ヤ' }, { 'ゆ', 'ユ' }, { 'よ', 'ヨ' },
-            { 'ん', 'ン' },
+            { "わ", "ワ" }, { "を", "ヲ" },
+            { "や", "ヤ" }, { "ゆ", "ユ" }, { "よ", "ヨ" },
+            { "ん", "ン" },
 
-            { 'ぁ', 'ァ' }, { 'ぃ', 'ィ' }, { 'ぅ', 'ゥ' }, { 'ぇ', 'ェ' }, { 'ぉ', 'ォ' },
-            { 'ゃ', 'ャ' }, { 'ゅ', 'ュ' }, { 'ょ', 'ョ' },
+            { "ぁ", "ァ" }, { "ぃ", "ィ" }, { "ぅ", "ゥ" }, { "ぇ", "ェ" }, { "ぉ", "ォ" },
+            { "ゃ", "ャ" }, { "ゅ", "ュ" }, { "ょ", "ョ" },
 
-            { 'ゕ', 'ヵ' }, { 'ゖ', 'ヶ' }, { 'ゔ', 'ヴ' },
-            { 'ゝ', 'ヽ' }, { 'ゞ', 'ヾ' }, { 'っ', 'ッ' }
+            { "ゕ", "ヵ" }, { "ゖ", "ヶ" }, { "ゔ", "ヴ" },
+            { "ゝ", "ヽ" }, { "ゞ", "ヾ" }, { "っ", "ッ" },
+            { "ゐ゙", "ヸ" }, { "ゑ゙", "ヹ" }, { "を゙", "ヺ" }
         };
 
-        private static readonly Dictionary<char, char> KatakanaToHiraganaDict = new()
+        private static readonly Dictionary<string, string> KatakanaToHiraganaDict = new()
         {
-            { 'ア', 'あ' }, { 'イ', 'い' }, { 'ウ', 'う' }, { 'エ', 'え' }, { 'オ', 'お' },
-            { 'カ', 'か' }, { 'キ', 'き' }, { 'ク', 'く' }, { 'ケ', 'け' }, { 'コ', 'こ' },
-            { 'サ', 'さ' }, { 'シ', 'し' }, { 'ス', 'す' }, { 'セ', 'せ' }, { 'ソ', 'そ' },
-            { 'タ', 'た' }, { 'チ', 'ち' }, { 'ツ', 'つ' }, { 'テ', 'て' }, { 'ト', 'と' },
-            { 'ナ', 'な' }, { 'ニ', 'に' }, { 'ヌ', 'ぬ' }, { 'ネ', 'ね' }, { 'ノ', 'の' },
-            { 'ハ', 'は' }, { 'ヒ', 'ひ' }, { 'ヘ', 'へ' }, { 'フ', 'ふ' }, { 'ホ', 'ほ' },
-            { 'マ', 'ま' }, { 'ミ', 'み' }, { 'ム', 'む' }, { 'メ', 'め' }, { 'モ', 'も' },
-            { 'ラ', 'ら' }, { 'リ', 'り' }, { 'ル', 'る' }, { 'レ', 'れ' }, { 'ロ', 'ろ' },
+            { "ア", "あ" }, { "イ", "い" }, { "ウ", "う" }, { "エ", "え" }, { "オ", "お" },
+            { "カ", "か" }, { "キ", "き" }, { "ク", "く" }, { "ケ", "け" }, { "コ", "こ" },
+            { "サ", "さ" }, { "シ", "し" }, { "ス", "す" }, { "セ", "せ" }, { "ソ", "そ" },
+            { "タ", "た" }, { "チ", "ち" }, { "ツ", "つ" }, { "テ", "て" }, { "ト", "と" },
+            { "ナ", "な" }, { "ニ", "に" }, { "ヌ", "ぬ" }, { "ネ", "ね" }, { "ノ", "の" },
+            { "ハ", "は" }, { "ヒ", "ひ" }, { "フ", "ふ" }, { "ヘ", "へ" }, { "ホ", "ほ" },
+            { "マ", "ま" }, { "ミ", "み" }, { "ム", "む" }, { "メ", "め" }, { "モ", "も" },
+            { "ラ", "ら" }, { "リ", "り" }, { "ル", "る" }, { "レ", "れ" }, { "ロ", "ろ" },
 
-            { 'ガ', 'が' }, { 'ギ', 'ぎ' }, { 'グ', 'ぐ' }, { 'ゲ', 'げ' }, { 'ゴ', 'ご' },
-            { 'ザ', 'ざ' }, { 'ジ', 'じ' }, { 'ズ', 'ず' }, { 'ゼ', 'ぜ' }, { 'ゾ', 'ぞ' },
-            { 'ダ', 'だ' }, { 'ヂ', 'ぢ' }, { 'ヅ', 'づ' }, { 'デ', 'で' }, { 'ド', 'ど' },
-            { 'バ', 'ば' }, { 'ビ', 'び' }, { 'ブ', 'ぶ' }, { 'ベ', 'べ' }, { 'ボ', 'ぼ' },
-            { 'パ', 'ぱ' }, { 'ピ', 'ぴ' }, { 'プ', 'ぷ' }, { 'ペ', 'ぺ' }, { 'ポ', 'ぽ' },
+            { "ガ", "が" }, { "ギ", "ぎ" }, { "グ", "ぐ" }, { "ゲ", "げ" }, { "ゴ", "ご" },
+            { "ザ", "ざ" }, { "ジ", "じ" }, { "ズ", "ず" }, { "ゼ", "ぜ" }, { "ゾ", "ぞ" },
+            { "ダ", "だ" }, { "ヂ", "ぢ" }, { "ヅ", "づ" }, { "デ", "で" }, { "ド", "ど" },
+            { "バ", "ば" }, { "ビ", "び" }, { "ブ", "ぶ" }, { "ベ", "べ" }, { "ボ", "ぼ" },
+            { "パ", "ぱ" }, { "ピ", "ぴ" }, { "プ", "ぷ" }, { "ペ", "ぺ" }, { "ポ", "ぽ" },
 
-            { 'ワ', 'わ' }, { 'ヲ', 'を' },
-            { 'ヤ', 'や' }, { 'ユ', 'ゆ' }, { 'ヨ', 'よ' },
-            { 'ン', 'ん' },
+            { "ワ", "わ" }, { "ヲ", "を" },
+            { "ヤ", "や" }, { "ユ", "ゆ" }, { "ヨ", "よ" },
+            { "ン", "ん" },
 
-            { 'ァ', 'ぁ' }, { 'ィ', 'ぃ' }, { 'ゥ', 'ぅ' }, { 'ェ', 'ぇ' }, { 'ォ', 'ぉ' },
-            { 'ャ', 'ゃ' }, { 'ュ', 'ゅ' }, { 'ョ', 'ょ' },
+            { "ァ", "ぁ" }, { "ィ", "ぃ" }, { "ゥ", "ぅ" }, { "ェ", "ぇ" }, { "ォ", "ぉ" },
+            { "ャ", "ゃ" }, { "ュ", "ゅ" }, { "ョ", "ょ" },
 
-            { 'ヵ', 'ゕ' }, { 'ヶ', 'ゖ' }, { 'ヴ', 'ゔ' },
-            { 'ヽ', 'ゝ' }, { 'ヾ', 'ゞ' }, { 'ッ', 'っ' }
+            { "ヴ", "ゔ" }, { "ヽ", "ゝ" }, { "ヾ", "ゞ" }, { "ッ", "っ" },
 
-            // {'ヸ','ゐ゙'}, { 'ヹ', 'ゑ゙' } { 'ヺ', 'を゙' }
-            // Apparently ゐ゙, ゑ゙ and を゙ don't count as single characters.
+            {"ヸ","ゐ゙"}, { "ヹ", "ゑ゙" }, { "ヺ", "を゙" }
         };
 
         private static readonly Dictionary<char, char> KanaFinalVowelDict = new()
@@ -115,56 +113,124 @@ namespace JapaneseLookup
             { 'ぽ', 'お' }, { 'を', 'お' }, { 'よ', 'お' }, { 'ぉ', 'お' }, { 'ょ', 'お' }
         };
 
-        public static string HiraganaToKatakanaConverter(string text)
+        private static readonly Dictionary<string, string> HalfWidthToFullWidthDict = new()
         {
-            string textInHiragana = "";
-            foreach (var ch in text)
-            {
-                if (HiraganaToKatakanaDict.TryGetValue(ch, out char hiraganaChar))
-                    textInHiragana += hiraganaChar;
-                else
-                    textInHiragana += ch;
-            }
+            //Half-width katakana
+            { "ｱ", "あ" }, { "ｲ", "い" }, { "ｳ", "う" }, { "ｴ", "え" }, { "ｵ", "お" },
+            { "ｶ", "か" }, { "ｷ", "き" }, { "ｸ",  "く" }, { "ｹ", "け" }, { "ｺ", "こ" },
+            { "ｻ", "さ" }, { "ｼ", "し" }, { "ｽ", "す" }, { "ｾ", "せ" }, { "ｿ", "そ" },
+            { "ﾀ", "た" }, { "ﾁ", "ち" }, { "ﾂ",  "つ" }, { "ﾃ", "て" }, { "ﾄ", "と" },
+            { "ﾅ", "な" }, { "ﾆ", "に" }, { "ﾇ", "ぬ" }, { "ﾈ", "ね" }, { "ﾉ", "の" },
+            { "ﾊ", "は" }, { "ﾋ", "ひ" }, { "ﾌ", "ふ" }, { "ﾍ", "へ"}, { "ﾎ", "ほ" },
+            { "ﾏ", "ま" }, { "ﾐ", "み" }, { "ﾑ",  "む" }, { "ﾒ", "め" }, { "ﾓ", "も" },
+            { "ﾗ", "ら" }, { "ﾘ", "り" }, { "ﾙ",  "る" }, { "ﾚ", "れ" }, { "ﾛ", "ろ" },
 
-            return textInHiragana;
-        }
+            { "ﾜ", "わ" }, { "ｦ", "を" },
+            { "ﾔ", "や" }, { "ﾕ", "ゆ" }, { "ﾖ", "よ" },
+            { "ﾝ", "ん" },
+
+            { "ｧ", "ぁ" }, { "ｨ", "ぃ" }, { "ｩ", "ぅ" }, { "ｪ", "ぇ" }, { "ｫ", "ぉ" },
+            { "ｬ", "ゃ" }, { "ｭ", "ゅ" }, { "ｮ", "ょ" },
+
+            { "ヵ", "ゕ" }, { "ヶ", "ゖ" }, { "ｯ", "っ" },
+
+            //Uppercase letters
+            { "A", "Ａ" }, { "B", "Ｂ" }, { "C", "Ｃ" }, { "D", "Ｄ" }, { "E", "Ｅ" }, { "F", "Ｆ" },
+            { "G", "Ｇ" }, { "H", "Ｈ" }, { "I", "Ｉ" }, { "J", "Ｊ" }, { "K", "Ｋ" }, { "L", "Ｌ" },
+            { "M", "Ｍ" }, { "N", "Ｎ" }, { "O", "Ｏ" }, { "P", "Ｐ" }, { "Q", "Ｑ" }, { "R", "Ｒ" },
+            { "S", "Ｓ" }, { "T", "Ｔ" }, { "U", "Ｕ" }, { "V", "Ｖ" }, { "W", "Ｗ" }, { "X", "Ｘ" },
+            { "Y", "Ｙ" }, { "Z", "Ｚ" },
+
+            //Lowercase letters
+            { "a", "ａ" }, { "b", "ｂ" }, { "c", "ｃ" }, { "d", "ｄ" }, { "e", "ｅ" }, { "f", "ｆ" },
+            { "g", "ｇ" }, { "h", "ｈ" }, { "i", "ｉ" }, { "j", "ｊ" }, { "k", "ｋ" }, { "l", "ｌ" },
+            { "m", "ｍ" }, { "n", "ｎ" }, { "o", "ｏ" }, { "p", "ｐ" }, { "q", "ｑ" }, { "r", "ｒ" },
+            { "s", "ｓ" }, { "t", "ｔ" }, { "u", "ｕ" }, { "v", "ｖ" }, { "w", "ｗ" }, { "x", "ｘ" },
+            { "y", "ｙ" }, { "z", "ｚ" }, 
+            
+            //Numbers
+            { "0", "０" }, { "1", "１" }, { "2", "２" }, { "3", "３" }, { "4", "４" },
+            { "5", "５" }, { "6", "６" }, { "7", "７" }, { "8", "８" }, { "9", "９" },
+
+            //Typographical symbols and punctuation marks
+            { "!", "！" }, { "\"", "＂" }, { "#", "＃" }, { "$", "＄" }, { "%", "％" }, { "&", "＆" },
+            { "'", "＇" }, { "(", "（" }, { ")", "）" }, { "*", "＊" }, { "+", "＋" }, { "/", "／" },
+            { ":", "：" }, { ";", "；" }, { "<", "＜" }, { "=", "＝" }, { ">", "＞" }, { "?", "？" }, 
+            { "@", "＠" }, { "[", "［" }, { "\\", "＼" }, { "]", "］" }, { "^", "＾" }, { "{", "｛" },
+            { "|", "｜" }, { "}", "｝" }, { "~", "～" }, { "ｰ", "ー" } 
+            //，－ ．＿｀｟｡｢｣､･
+        };
+
+        private static readonly Dictionary<string, string> CompositeHalfWidthKatakanaToFullWidthHiraganaDict = new()
+        {
+            { "ｶﾞ", "が" }, { "ｷﾞ", "ぎ" }, { "ｸﾞ", "ぐ" }, { "ｹﾞ", "げ" }, { "ｺﾞ", "ご" },
+            { "ｻﾞ", "ざ" }, { "ｼﾞ", "じ" }, { "ｽﾞ", "ず" }, { "ｾﾞ", "ぜ" }, { "ｿﾞ", "ぞ" },
+            { "ﾀﾞ", "だ" }, { "ﾁﾞ", "ぢ" }, { "ﾂﾞ", "づ" }, { "ﾃﾞ", "で" }, { "ﾄﾞ", "ど" },
+            { "ﾊﾞ", "ば" }, { "ﾋﾞ", "び" }, { "ﾌﾞ", "ぶ" }, { "ﾍﾞ", "べ" }, { "ﾎﾞ", "ぼ" },
+            { "ﾊﾟ", "ぱ" }, { "ﾋﾟ", "ぴ" }, { "ﾌﾟ", "ぷ" }, { "ﾍﾟ", "ぺ" }, { "ﾎﾟ", "ぽ" },
+            { "ｳﾞ", "ゔ" }
+        };
 
         public static string KatakanaToHiraganaConverter(string text)
         {
-            string textInHiragana = "";
-            foreach (var ch in text)
+            StringBuilder textInHiragana = new();
+            List<string> unicodeCharacters = text.UnicodeIterator().ToList();
+            int listLength = unicodeCharacters.Count;
+            for (int i = 0; i < listLength; i++)
             {
-                if (KatakanaToHiraganaDict.TryGetValue(ch, out char hiraganaChar))
-                    textInHiragana += hiraganaChar;
+                if (listLength>i+1 
+                    && CompositeHalfWidthKatakanaToFullWidthHiraganaDict.TryGetValue(
+                        unicodeCharacters[i] + unicodeCharacters[i + 1], out string compositStr))
+                {
+                    textInHiragana.Append(compositStr);
+                    ++i;
+                }
+                else if (KatakanaToHiraganaDict.TryGetValue(unicodeCharacters[i], out string hiraganaStr))
+                    textInHiragana.Append(hiraganaStr);
+                else if (HalfWidthToFullWidthDict.TryGetValue(unicodeCharacters[i], out string fullWidthStr))
+                    textInHiragana.Append(fullWidthStr);
                 else
-                    textInHiragana += ch;
+                    textInHiragana.Append(unicodeCharacters[i]);
+            }
+            return textInHiragana.ToString();
+        }
+
+        public static string HiraganaToKatakanaConverter(string text)
+        {
+            StringBuilder textInKatakana = new();
+            foreach (var str in text.UnicodeIterator().ToList())
+            {
+                if (HiraganaToKatakanaDict.TryGetValue(str, out string hiraganaStr))
+                    textInKatakana.Append(hiraganaStr);
+                else
+                    textInKatakana.Append(str);
             }
 
-            return textInHiragana;
+            return textInKatakana.ToString();
         }
 
         public static string LongVowelMarkConverter(string text)
         {
-            string textWithoutLongVowelMark = text[0].ToString();
+            StringBuilder textWithoutLongVowelMark = new();
+            textWithoutLongVowelMark.Append(text[0]);
             for (int i = 1; i < text.Length; i++)
             {
                 if (text[i] == 'ー' && KanaFinalVowelDict.TryGetValue(text[i - 1], out char vowel))
-                    textWithoutLongVowelMark += vowel;
+                    textWithoutLongVowelMark.Append(vowel);
                 else
-                    textWithoutLongVowelMark += text[i];
+                    textWithoutLongVowelMark.Append(text[i]);
             }
 
-            return textWithoutLongVowelMark;
+            return textWithoutLongVowelMark.ToString();
         }
-
         public static bool IsHiragana(string text)
         {
-            return HiraganaToKatakanaDict.ContainsKey(text[0]);
+            return HiraganaToKatakanaDict.ContainsKey(text.UnicodeIterator().First());
         }
 
         public static bool IsKatakana(string text)
         {
-            return KatakanaToHiraganaDict.ContainsKey(text[0]);
+            return KatakanaToHiraganaDict.ContainsKey(text.UnicodeIterator().First());
         }
     }
 }

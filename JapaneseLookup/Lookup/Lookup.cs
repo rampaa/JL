@@ -730,10 +730,10 @@ namespace JapaneseLookup.Lookup
                     if (customWordDictResults.AlternativeSpellings != null)
                         alternativeSpellings = customWordDictResults.AlternativeSpellings.ToList();
                     else
-                        alternativeSpellings = new List<string>();
+                        alternativeSpellings = new();
                     var process = wordResult.Value.ProcessList;
 
-                    List<string> frequency = new List<string> { MainWindowUtilities.FakeFrequency };
+                    List<string> frequency = new() { MainWindowUtilities.FakeFrequency };
 
                     var dictType = new List<string> { wordResult.Value.DictType.ToString() };
 
@@ -956,7 +956,7 @@ namespace JapaneseLookup.Lookup
             return results;
         }
 
-        private static IEnumerable<string> UnicodeIterator(this string s)
+        public static IEnumerable<string> UnicodeIterator(this string s)
         {
             for (int i = 0; i < s.Length; ++i)
             {
