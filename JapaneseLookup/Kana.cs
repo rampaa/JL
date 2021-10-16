@@ -157,8 +157,8 @@ namespace JapaneseLookup
             { "'", "＇" }, { "(", "（" }, { ")", "）" }, { "*", "＊" }, { "+", "＋" }, { "/", "／" },
             { ":", "：" }, { ";", "；" }, { "<", "＜" }, { "=", "＝" }, { ">", "＞" }, { "?", "？" }, 
             { "@", "＠" }, { "[", "［" }, { "\\", "＼" }, { "]", "］" }, { "^", "＾" }, { "{", "｛" },
-            { "|", "｜" }, { "}", "｝" }, { "~", "～" }, { "ｰ", "ー" } 
-            //，－ ．＿｀｟｡｢｣､･
+            { "|", "｜" }, { "}", "｝" }, { "~", "～" }, { "ｰ", "ー" }
+            //，－ ．＿｀｟｡｢｣､･￠￡
         };
 
         private static readonly Dictionary<string, string> CompositeHalfWidthKatakanaToFullWidthHiraganaDict = new()
@@ -211,7 +211,7 @@ namespace JapaneseLookup
 
         public static string LongVowelMarkConverter(string text)
         {
-            StringBuilder textWithoutLongVowelMark = new();
+            StringBuilder textWithoutLongVowelMark = new(text.Length);
             textWithoutLongVowelMark.Append(text[0]);
             for (int i = 1; i < text.Length; i++)
             {
@@ -223,6 +223,7 @@ namespace JapaneseLookup
 
             return textWithoutLongVowelMark.ToString();
         }
+
         public static bool IsHiragana(string text)
         {
             return HiraganaToKatakanaDict.ContainsKey(text.UnicodeIterator().First());

@@ -119,7 +119,7 @@ namespace JapaneseLookup.CustomDict
                     wordClass.Add("adj-t");
                     wordClass.Add("aux-adj");
                 }
-                else if (rawWordClass == "Name")
+                else if (rawWordClass == "Noun")
                 {
                     wordClass.Add("noun");
                 }
