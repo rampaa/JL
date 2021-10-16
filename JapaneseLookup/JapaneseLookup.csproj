@@ -7,6 +7,7 @@
 	<UseWindowsForms>true</UseWindowsForms>
 	<Platforms>AnyCPU;x86</Platforms>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
