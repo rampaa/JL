@@ -16,10 +16,15 @@ namespace JapaneseLookup.GUI
     public partial class MainWindow : Window
     {
         private int _currentTextIndex;
-        public static string LastWord { get; set; } = "";
-        public static bool MiningMode { get; set; }
-        public static int CurrentCharPosition { get; set; }
-        public static string CurrentText { get; set; }
+
+        private static PopupWindow _firstPopupWindow;
+
+        public static PopupWindow FirstPopupWindow
+        {
+            get { return _firstPopupWindow ??= new PopupWindow(); }
+        }
+
+        public static int PopupWindowCount { get; set; }
 
         public MainWindow()
         {
@@ -70,20 +75,21 @@ namespace JapaneseLookup.GUI
 
         public async void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
-            if (MiningMode || MWindow.Background.Opacity == 0) return;
+            if (FirstPopupWindow.MiningMode || MWindow.Background.Opacity == 0) return;
 
             int charPosition = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
 
             if (charPosition != -1)
             {
                 // popup follows cursor
-                PopupWindow.Instance.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+
+                FirstPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
                 if (charPosition > 0 && char.IsHighSurrogate(MainTextBox.Text[charPosition - 1]))
                     --charPosition;
 
-                CurrentText = MainTextBox.Text;
-                CurrentCharPosition = charPosition;
+                FirstPopupWindow.CurrentText = MainTextBox.Text;
+                FirstPopupWindow.CurrentCharPosition = charPosition;
 
                 int endPosition = MainWindowUtilities.FindWordBoundary(MainTextBox.Text, charPosition);
 
@@ -93,31 +99,31 @@ namespace JapaneseLookup.GUI
                 else
                     text = MainTextBox.Text[charPosition..(charPosition + ConfigManager.MaxSearchLength)];
 
-                if (text == LastWord) return;
-                LastWord = text;
+                if (text == FirstPopupWindow.LastWord) return;
+                FirstPopupWindow.LastWord = text;
 
                 var lookupResults = await Task.Run(() => Lookup.Lookup.LookupText(text));
                 if (lookupResults != null && lookupResults.Any())
                 {
-                    PopupWindow.Instance.ResultStackPanels.Clear();
+                    FirstPopupWindow.ResultStackPanels.Clear();
 
                     // popup doesn't follow cursor
                     // PopupWindow.Instance.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
-                    PopupWindow.Instance.Visibility = Visibility.Visible;
-                    PopupWindow.Instance.Activate();
-                    PopupWindow.Instance.Focus();
+                    FirstPopupWindow.Visibility = Visibility.Visible;
+                    FirstPopupWindow.Activate();
+                    FirstPopupWindow.Focus();
 
-                    PopupWindowUtilities.LastLookupResults = lookupResults;
-                    PopupWindowUtilities.DisplayResults(false);
+                    FirstPopupWindow.LastLookupResults = lookupResults;
+                    FirstPopupWindow.DisplayResults(false);
                 }
                 else
-                    PopupWindow.Instance.Visibility = Visibility.Hidden;
+                    FirstPopupWindow.Visibility = Visibility.Hidden;
             }
             else
             {
-                LastWord = "";
-                PopupWindow.Instance.Visibility = Visibility.Hidden;
+                FirstPopupWindow.LastWord = "";
+                FirstPopupWindow.Visibility = Visibility.Hidden;
             }
         }
 
@@ -131,10 +137,10 @@ namespace JapaneseLookup.GUI
             //OpacitySlider.Visibility = Visibility.Collapsed;
             //FontSizeSlider.Visibility = Visibility.Collapsed;
 
-            if (MiningMode) return;
+            if (FirstPopupWindow.MiningMode) return;
 
-            PopupWindow.Instance.Hide();
-            LastWord = "";
+            FirstPopupWindow.Hide();
+            FirstPopupWindow.LastWord = "";
         }
 
         private void MainTextBox_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -250,7 +256,7 @@ namespace JapaneseLookup.GUI
             else if (e.Key == ConfigManager.KanjiModeKey)
             {
                 ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
-                LastWord = "";
+                FirstPopupWindow.LastWord = "";
                 MainTextBox_MouseMove(null, null);
             }
             else if (e.Key == ConfigManager.ShowAddNameWindowKey)

@@ -121,6 +121,7 @@ namespace JapaneseLookup
         // b) there's less word-wrapping to do
         public static bool NewlineBetweenDefinitions = false;
         public static int MaxResults = 99;
+        public static int MaxPopupWindowCount = 7;
 
         public static void ApplyPreferences(MainWindow mainWindow)
         {
@@ -223,10 +224,10 @@ namespace JapaneseLookup
             mainWindow.Top = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowTopPosition")!);
             mainWindow.Left = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowLeftPosition")!);
 
-            var popupWindow = PopupWindow.Instance;
+            var popupWindow = MainWindow.FirstPopupWindow;
             popupWindow.Background = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
-            Debug.Assert(popupWindow.Background != null, "popupWindow.Background != null");
+            Debug.Assert(popupWindow.Background != null, "FirstPopupWindow.Background != null");
             popupWindow.Background.Opacity =
                 double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")!) / 100;
             popupWindow.MaxHeight = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight")!);

@@ -23,6 +23,7 @@ namespace JapaneseLookup.Utilities
 
         public static void MainWindowInitializer()
         {
+            // todo
             // init AnkiConnect so that it doesn't block later
             // Task.Run(AnkiConnect.GetDeckNames);
         }
