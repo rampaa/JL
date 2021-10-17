@@ -60,7 +60,7 @@ namespace JapaneseLookup.Utilities
             TextBlock textBlockEdictID = null;
 
             // bottom
-            TextBlock textBlockDefinitions = null;
+            TextBox textBlockDefinitions = null;
             TextBlock textBlockNanori = null;
             TextBlock textBlockOnReadings = null;
             TextBlock textBlockKunReadings = null;
@@ -140,7 +140,7 @@ namespace JapaneseLookup.Utilities
                         break;
 
                     case LookupResult.Definitions:
-                        textBlockDefinitions = new TextBlock
+                        textBlockDefinitions = new TextBox
                         {
                             Name = key.ToString(),
                             Text = string.Join(", ", value),
@@ -148,7 +148,11 @@ namespace JapaneseLookup.Utilities
                             Foreground = ConfigManager.DefinitionsColor,
                             FontSize = ConfigManager.DefinitionsFontSize,
                             Margin = new Thickness(2, 2, 2, 2),
+                            IsReadOnly = true,
+                            IsUndoEnabled = false,
+                            UndoLimit = 0,
                         };
+                        textBlockDefinitions.MouseMove += PopupWindow.Definitions_MouseMove;
                         break;
 
                     case LookupResult.EdictID:

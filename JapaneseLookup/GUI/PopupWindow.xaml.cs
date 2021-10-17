@@ -5,6 +5,8 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -201,6 +203,69 @@ namespace JapaneseLookup.GUI
                 grade,
                 composition
             );
+        }
+        
+        public static void Definitions_MouseMove(object sender, MouseEventArgs e)
+        {
+            仮((TextBox) sender);
+        }
+
+        private static async void 仮(TextBox tb)
+        {
+           // if (MainWindow.MiningMode || tb.Background.Opacity == 0) return;
+
+            int charPosition = tb.GetCharacterIndexFromPoint(Mouse.GetPosition(tb), false);
+
+            if (charPosition != -1)
+            {
+                // popup follows cursor
+                // PopupWindow.Instance.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+
+                if (charPosition > 0 && char.IsHighSurrogate(tb.Text[charPosition - 1]))
+                    --charPosition;
+
+                // MainWindow.CurrentText = tb.Text;
+                // MainWindow.CurrentCharPosition = charPosition;
+
+                int endPosition = MainWindowUtilities.FindWordBoundary(tb.Text, charPosition);
+
+                string text;
+                if (endPosition - charPosition <= ConfigManager.MaxSearchLength)
+                    text = tb.Text[charPosition..endPosition];
+                else
+                    text = tb.Text[charPosition..(charPosition + ConfigManager.MaxSearchLength)];
+
+                // if (text == MainWindow.LastWord) return;
+                // MainWindow.LastWord = text;
+
+                Console.WriteLine("getting lookupresults");
+                var lookupResults = await Task.Run(() => Lookup.Lookup.LookupText(text));
+                Debug.WriteLine(JsonSerializer.Serialize(lookupResults));
+                
+                
+                // if (lookupResults != null && lookupResults.Any())
+                // {
+                //     PopupWindow.Instance.ResultStackPanels.Clear();
+                //
+                //     // popup doesn't follow cursor
+                //     // PopupWindow.Instance.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+                //
+                //     PopupWindow.Instance.Visibility = Visibility.Visible;
+                //     PopupWindow.Instance.Activate();
+                //     PopupWindow.Instance.Focus();
+                //
+                //     PopupWindowUtilities.LastLookupResults = lookupResults;
+                //     PopupWindowUtilities.DisplayResults(false);
+                // }
+                // else
+                //     PopupWindow.Instance.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                Console.WriteLine("else");
+                // MainWindow.LastWord = "";
+                // PopupWindow.Instance.Visibility = Visibility.Hidden;
+            }
         }
 
         private static void PlayAudio(string foundSpelling, string reading)
