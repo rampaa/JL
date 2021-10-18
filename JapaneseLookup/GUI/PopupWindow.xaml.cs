@@ -29,17 +29,17 @@ namespace JapaneseLookup.GUI
         private static readonly System.Windows.Forms.Screen ActiveScreen =
             System.Windows.Forms.Screen.FromHandle(InteropHelper.Handle);
 
-        private PopupWindow ChildPopupWindow { get; }
+        private PopupWindow ChildPopupWindow { get; set; }
 
-        public string LastWord { get; set; }
+        private int CurrentCharPosition { get; set; }
 
-        public int CurrentCharPosition { get; set; }
+        private string CurrentText { get; set; }
 
-        public string CurrentText { get; set; }
+        public string LastText { get; set; }
 
-        public bool MiningMode { get; set; }
+        public bool MiningMode { get; private set; }
 
-        public List<Dictionary<LookupResult, List<string>>> LastLookupResults { get; set; } = new();
+        private List<Dictionary<LookupResult, List<string>>> LastLookupResults { get; set; } = new();
 
         public ObservableCollection<StackPanel> ResultStackPanels { get; } = new();
 
@@ -52,23 +52,65 @@ namespace JapaneseLookup.GUI
             MaxHeight = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight") ??
                                   throw new InvalidOperationException());
 
-            if (MainWindow.PopupWindowCount < ConfigManager.MaxPopupWindowCount)
-            {
-                MainWindow.PopupWindowCount++;
-                ChildPopupWindow = new PopupWindow();
-
-                // need to initialize window (position) for later
-                ChildPopupWindow.Show();
-                ChildPopupWindow.Hide();
-            }
-
-            StackPanel.ItemsSource = ResultStackPanels;
+            // need to initialize window (position) for later
+            Show();
+            Hide();
         }
 
-        public void UpdatePosition(Point cursorPosition)
+        public async Task TextBox_MouseMove(TextBox tb)
         {
-            var needsFlipX = ConfigManager.PopupFlipX && cursorPosition.X + Width > ActiveScreen.Bounds.Width;
-            var needsFlipY = ConfigManager.PopupFlipY && cursorPosition.Y + Height > ActiveScreen.Bounds.Height;
+            if (MiningMode) return;
+
+            int charPosition = tb.GetCharacterIndexFromPoint(Mouse.GetPosition(tb), false);
+
+            if (charPosition != -1)
+            {
+                UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+
+                if (charPosition > 0 && char.IsHighSurrogate(tb.Text[charPosition - 1]))
+                    --charPosition;
+
+                CurrentText = tb.Text;
+                CurrentCharPosition = charPosition;
+
+                int endPosition = MainWindowUtilities.FindWordBoundary(tb.Text, charPosition);
+
+                string text;
+                if (endPosition - charPosition <= ConfigManager.MaxSearchLength)
+                    text = tb.Text[charPosition..endPosition];
+                else
+                    text = tb.Text[charPosition..(charPosition + ConfigManager.MaxSearchLength)];
+
+                if (text == LastText) return;
+                LastText = text;
+
+                var lookupResults = await Task.Run(() => Lookup.Lookup.LookupText(text));
+
+                if (lookupResults != null && lookupResults.Any())
+                {
+                    ResultStackPanels.Clear();
+
+                    Visibility = Visibility.Visible;
+                    Activate();
+                    Focus();
+
+                    LastLookupResults = lookupResults;
+                    DisplayResults(false);
+                }
+                else
+                    Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                LastText = "";
+                Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void UpdatePosition(Point cursorPosition)
+        {
+            bool needsFlipX = ConfigManager.PopupFlipX && cursorPosition.X + Width > ActiveScreen.Bounds.Width;
+            bool needsFlipY = ConfigManager.PopupFlipY && cursorPosition.Y + Height > ActiveScreen.Bounds.Height;
 
             double newLeft;
             double newTop;
@@ -112,7 +154,7 @@ namespace JapaneseLookup.GUI
             Top = newTop;
         }
 
-        public void DisplayResults(bool generateAllResults)
+        private void DisplayResults(bool generateAllResults)
         {
             var results = LastLookupResults;
             // apparently you can't get the desired size of a control before the layout pass
@@ -133,7 +175,7 @@ namespace JapaneseLookup.GUI
             }
         }
 
-        internal StackPanel MakeResultStackPanel(Dictionary<LookupResult, List<string>> result,
+        private StackPanel MakeResultStackPanel(Dictionary<LookupResult, List<string>> result,
             int index, int resultsCount)
         {
             var innerStackPanel = new StackPanel
@@ -250,14 +292,10 @@ namespace JapaneseLookup.GUI
                             IsUndoEnabled = false,
                             UndoLimit = 0,
                         };
-                        textBlockDefinitions.MouseMove += (o, args) =>
+                        textBlockDefinitions.MouseMove += (sender, _) =>
                         {
-                            // will be null if we are over MaxPopupWindowCount
-                            if (ChildPopupWindow != null)
-                            {
-                                var newPopupWindow = ChildPopupWindow;
-                                newPopupWindow.Definitions_MouseMove(o, args);
-                            }
+                            ChildPopupWindow ??= new PopupWindow();
+                            ChildPopupWindow.Definitions_MouseMove((TextBox) sender);
                         };
                         break;
 
@@ -472,18 +510,18 @@ namespace JapaneseLookup.GUI
             return innerStackPanel;
         }
 
-        public static void FoundSpelling_MouseEnter(object sender, MouseEventArgs e)
+        private static void FoundSpelling_MouseEnter(object sender, MouseEventArgs e)
         {
             var textBlock = (TextBlock) sender;
             _playAudioIndex = (int) textBlock.Tag;
         }
 
-        public static void FoundSpelling_MouseLeave(object sender, MouseEventArgs e)
+        private static void FoundSpelling_MouseLeave(object sender, MouseEventArgs e)
         {
             _playAudioIndex = 0;
         }
 
-        public async void FoundSpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        private async void FoundSpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             MiningMode = false;
             Hide();
@@ -582,66 +620,10 @@ namespace JapaneseLookup.GUI
             );
         }
 
-        public void Definitions_MouseMove(object sender, MouseEventArgs e)
+        private async void Definitions_MouseMove(TextBox tb)
         {
-            var tb = (TextBox) sender;
-
             if (MainWindowUtilities.JapaneseRegex.IsMatch(tb.Text))
-                仮(tb);
-        }
-
-        private async void 仮(TextBox tb)
-        {
-            if (MiningMode) return;
-
-            int charPosition = tb.GetCharacterIndexFromPoint(Mouse.GetPosition(tb), false);
-
-            if (charPosition != -1)
-            {
-                // popup follows cursor
-                UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
-
-                if (charPosition > 0 && char.IsHighSurrogate(tb.Text[charPosition - 1]))
-                    --charPosition;
-
-                CurrentText = tb.Text;
-                CurrentCharPosition = charPosition;
-
-                int endPosition = MainWindowUtilities.FindWordBoundary(tb.Text, charPosition);
-
-                string text;
-                if (endPosition - charPosition <= ConfigManager.MaxSearchLength)
-                    text = tb.Text[charPosition..endPosition];
-                else
-                    text = tb.Text[charPosition..(charPosition + ConfigManager.MaxSearchLength)];
-
-                if (text == LastWord) return;
-                LastWord = text;
-
-                var lookupResults = await Task.Run(() => Lookup.Lookup.LookupText(text));
-
-                if (lookupResults != null && lookupResults.Any())
-                {
-                    ResultStackPanels.Clear();
-
-                    // popup doesn't follow cursor
-                    // PopupWindow.Instance.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
-
-                    Visibility = Visibility.Visible;
-                    Activate();
-                    Focus();
-
-                    LastLookupResults = lookupResults;
-                    DisplayResults(false);
-                }
-                else
-                    Visibility = Visibility.Hidden;
-            }
-            else
-            {
-                LastWord = "";
-                Visibility = Visibility.Hidden;
-            }
+                await TextBox_MouseMove(tb);
         }
 
         private static void PlayAudio(string foundSpelling, string reading)
@@ -661,7 +643,7 @@ namespace JapaneseLookup.GUI
 
             // TODO: find a better solution for this that has less latency and prevents the noaudio clip from playing
             var mediaElement = new MediaElement { Source = uri, Volume = 1, Visibility = Visibility.Collapsed };
-            var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
+            MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
             mainWindow.MainGrid.Children.Add(mediaElement);
         }
 
@@ -714,7 +696,7 @@ namespace JapaneseLookup.GUI
             else if (e.Key == ConfigManager.KanjiModeKey)
             {
                 ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
-                LastWord = "";
+                LastText = "";
                 //todo will only work for the FirstPopupWindow
                 Application.Current.Windows.OfType<MainWindow>().First().MainTextBox_MouseMove(null, null);
             }

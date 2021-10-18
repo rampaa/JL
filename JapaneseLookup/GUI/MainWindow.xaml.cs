@@ -24,8 +24,6 @@ namespace JapaneseLookup.GUI
             get { return _firstPopupWindow ??= new PopupWindow(); }
         }
 
-        public static int PopupWindowCount { get; set; }
-
         public MainWindow()
         {
             InitializeComponent();
@@ -75,56 +73,8 @@ namespace JapaneseLookup.GUI
 
         public async void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
-            if (FirstPopupWindow.MiningMode || MWindow.Background.Opacity == 0) return;
-
-            int charPosition = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
-
-            if (charPosition != -1)
-            {
-                // popup follows cursor
-
-                FirstPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
-
-                if (charPosition > 0 && char.IsHighSurrogate(MainTextBox.Text[charPosition - 1]))
-                    --charPosition;
-
-                FirstPopupWindow.CurrentText = MainTextBox.Text;
-                FirstPopupWindow.CurrentCharPosition = charPosition;
-
-                int endPosition = MainWindowUtilities.FindWordBoundary(MainTextBox.Text, charPosition);
-
-                string text;
-                if (endPosition - charPosition <= ConfigManager.MaxSearchLength)
-                    text = MainTextBox.Text[charPosition..endPosition];
-                else
-                    text = MainTextBox.Text[charPosition..(charPosition + ConfigManager.MaxSearchLength)];
-
-                if (text == FirstPopupWindow.LastWord) return;
-                FirstPopupWindow.LastWord = text;
-
-                var lookupResults = await Task.Run(() => Lookup.Lookup.LookupText(text));
-                if (lookupResults != null && lookupResults.Any())
-                {
-                    FirstPopupWindow.ResultStackPanels.Clear();
-
-                    // popup doesn't follow cursor
-                    // PopupWindow.Instance.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
-
-                    FirstPopupWindow.Visibility = Visibility.Visible;
-                    FirstPopupWindow.Activate();
-                    FirstPopupWindow.Focus();
-
-                    FirstPopupWindow.LastLookupResults = lookupResults;
-                    FirstPopupWindow.DisplayResults(false);
-                }
-                else
-                    FirstPopupWindow.Visibility = Visibility.Hidden;
-            }
-            else
-            {
-                FirstPopupWindow.LastWord = "";
-                FirstPopupWindow.Visibility = Visibility.Hidden;
-            }
+            if (MWindow.Background.Opacity == 0) return;
+            await FirstPopupWindow.TextBox_MouseMove(MainTextBox);
         }
 
         private void MWindow_Closed(object sender, EventArgs e)
@@ -140,7 +90,7 @@ namespace JapaneseLookup.GUI
             if (FirstPopupWindow.MiningMode) return;
 
             FirstPopupWindow.Hide();
-            FirstPopupWindow.LastWord = "";
+            FirstPopupWindow.LastText = "";
         }
 
         private void MainTextBox_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -256,7 +206,7 @@ namespace JapaneseLookup.GUI
             else if (e.Key == ConfigManager.KanjiModeKey)
             {
                 ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
-                FirstPopupWindow.LastWord = "";
+                FirstPopupWindow.LastText = "";
                 MainTextBox_MouseMove(null, null);
             }
             else if (e.Key == ConfigManager.ShowAddNameWindowKey)
