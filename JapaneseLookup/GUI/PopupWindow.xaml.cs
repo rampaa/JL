@@ -295,7 +295,10 @@ namespace JapaneseLookup.GUI
                         textBlockDefinitions.MouseMove += (sender, _) =>
                         {
                             ChildPopupWindow ??= new PopupWindow();
-                            ChildPopupWindow.Definitions_MouseMove((TextBox) sender);
+
+                            // prevents stray PopupWindows being created when you move your mouse too fast
+                            if (MiningMode)
+                                ChildPopupWindow.Definitions_MouseMove((TextBox) sender);
                         };
                         break;
 
