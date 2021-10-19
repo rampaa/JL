@@ -652,7 +652,6 @@ namespace JapaneseLookup.GUI
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            
             if (Utils.KeyGestureComparer(e, ConfigManager.MiningModeKeyGesture))
             {
                 MiningMode = true;
@@ -664,7 +663,7 @@ namespace JapaneseLookup.GUI
                 ResultStackPanels.Clear();
                 DisplayResults(true);
             }
-            
+
             else if (Utils.KeyGestureComparer(e, ConfigManager.PlayAudioKeyGesture))
             {
                 string foundSpelling = null;

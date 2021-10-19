@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace JapaneseLookup.Utilities
 {
-    class Utils
+    public static class Utils
     {
         public static bool KeyGestureComparer(KeyEventArgs e, KeyGesture keyGesture)
         {

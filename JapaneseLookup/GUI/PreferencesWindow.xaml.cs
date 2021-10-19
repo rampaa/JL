@@ -52,10 +52,7 @@ namespace JapaneseLookup.GUI
                 PopupElement = picker,
             };
             picker.Canceled += delegate { window.Close(); };
-            picker.Confirmed += delegate
-            {
-                ColorSetter((Button) sender, picker.SelectedBrush, window);
-            };
+            picker.Confirmed += delegate { ColorSetter((Button) sender, picker.SelectedBrush, window); };
 
             window.ShowDialog(picker, false);
         }
@@ -380,6 +377,7 @@ namespace JapaneseLookup.GUI
                     .Where(textBlock => textBlock.Name == "priority")
                     .Select(textBlockPriority => Convert.ToInt32(textBlockPriority.Text)).First());
         }
+
         private static void PrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBePrioritized)
         {
             if (ConfigManager.Dicts[typeToBePrioritized].Priority == 0) return;
@@ -414,7 +412,8 @@ namespace JapaneseLookup.GUI
                 int lowestPriority = ConfigManager.Dicts.Select(dict => dict.Value.Priority).Max();
 
                 var relativePath = Path.GetRelativePath(ConfigManager.ApplicationPath, openFileDialog.FileName);
-                ConfigManager.Dicts.Add(selectedDictType, new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
+                ConfigManager.Dicts.Add(selectedDictType,
+                    new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
                 ConfigManager.Dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
                 UpdateDictionariesDisplay();
             }
@@ -435,7 +434,8 @@ namespace JapaneseLookup.GUI
                 int lowestPriority = ConfigManager.Dicts.Select(dict => dict.Value.Priority).Max();
 
                 var relativePath = Path.GetRelativePath(ConfigManager.ApplicationPath, fbd.SelectedPath);
-                ConfigManager.Dicts.Add(selectedDictType, new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
+                ConfigManager.Dicts.Add(selectedDictType,
+                    new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
                 ConfigManager.Dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
                 UpdateDictionariesDisplay();
             }
@@ -498,9 +498,9 @@ namespace JapaneseLookup.GUI
             Key key = (e.Key == Key.System ? e.SystemKey : e.Key);
 
             if (key == Key.LeftShift || key == Key.RightShift
-                || key == Key.LeftCtrl || key == Key.RightCtrl
-                || key == Key.LeftAlt || key == Key.RightAlt
-                || key == Key.LWin || key == Key.RWin)
+                                     || key == Key.LeftCtrl || key == Key.RightCtrl
+                                     || key == Key.LeftAlt || key == Key.RightAlt
+                                     || key == Key.LWin || key == Key.RWin)
             {
                 return;
             }
@@ -511,10 +511,12 @@ namespace JapaneseLookup.GUI
             {
                 hotkeyTextBuilder.Append("Ctrl+");
             }
+
             if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0)
             {
                 hotkeyTextBuilder.Append("Shift+");
             }
+
             if ((Keyboard.Modifiers & ModifierKeys.Alt) != 0)
             {
                 hotkeyTextBuilder.Append("Alt+");
@@ -522,7 +524,7 @@ namespace JapaneseLookup.GUI
 
             hotkeyTextBuilder.Append(key.ToString());
 
-            ((TextBox)sender).Text = hotkeyTextBuilder.ToString();
+            ((TextBox) sender).Text = hotkeyTextBuilder.ToString();
         }
     }
 }

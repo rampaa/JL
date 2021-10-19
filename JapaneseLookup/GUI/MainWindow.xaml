@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:JapaneseLookup"
         AllowsTransparency="True"
         mc:Ignorable="d" Height="269" Width="800" WindowStyle="None" ResizeMode="CanResize" Topmost="True"
-        Closed="MWindow_Closed" Closing="MWindow_Closing" KeyDown="MWindow_KeyDown" PreviewKeyDown="MWindow_PreviewKeyDown"> 
+        Closed="MWindow_Closed" Closing="MWindow_Closing" KeyDown="MWindow_KeyDown"
+        PreviewKeyDown="MWindow_PreviewKeyDown">
     <Window.Background>
         <SolidColorBrush Color="Black" Opacity="0.3" />
     </Window.Background>
@@ -17,7 +18,7 @@
             CornerRadius="0"
             ResizeBorderThickness="7"
             GlassFrameThickness="0"
-            x:Name="MainWindowChrome"/>
+            x:Name="MainWindowChrome" />
     </WindowChrome.WindowChrome>
 
     <Grid x:Name="MainGrid">
@@ -26,22 +27,23 @@
                  Foreground="White" SelectionTextBrush="Black"
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"
                  VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
-                 MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow" FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled ="True" IsUndoEnabled="False">
+                 MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow"
+                 FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled="True" IsUndoEnabled="False">
 
             <TextBox.ContextMenu>
                 <ContextMenu>
                     <MenuItem
                         Header="Add name"
-                        Click= "AddName"/>
+                        Click="AddName" />
                     <MenuItem
                         Header="Add word"
-                        Click= "AddWord"/>
+                        Click="AddWord" />
                     <MenuItem
                         Header="Search"
-                        Click= "SearchWithBrowser"/>
+                        Click="SearchWithBrowser" />
                     <MenuItem
                         Header="Preferences"
-                        Click= "ShowPreferences"/>
+                        Click="ShowPreferences" />
                 </ContextMenu>
             </TextBox.ContextMenu>
         </TextBox>
@@ -51,7 +53,8 @@
                 Width="120" RenderTransformOrigin="0.5,0.5" Maximum="100" Value="30" Visibility="Collapsed"
                 Minimum="1" ToolTip="{Binding Value, ElementName=OpacitySlider}"
                 ValueChanged="OpacitySlider_ValueChanged" LostMouseCapture="OpacitySlider_LostMouseCapture"
-                IsMoveToPointEnabled="True" IsSnapToTickEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" LostFocus="OpacitySlider_LostFocus">
+                IsMoveToPointEnabled="True" IsSnapToTickEnabled="True"
+                ScrollViewer.VerticalScrollBarVisibility="Disabled" LostFocus="OpacitySlider_LostFocus">
             <Slider.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform />
@@ -65,7 +68,8 @@
                 Width="120" RenderTransformOrigin="0.5,0.5" Value="70" Maximum="300" Minimum="1"
                 ToolTip="{Binding Value, ElementName=FontSizeSlider}" Visibility="Collapsed"
                 ValueChanged="FontSizeSlider_ValueChanged" LostMouseCapture="FontSizeSlider_LostMouseCapture"
-                IsMoveToPointEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" IsSnapToTickEnabled="True" LostFocus="FontSizeSlider_LostFocus">
+                IsMoveToPointEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                IsSnapToTickEnabled="True" LostFocus="FontSizeSlider_LostFocus">
             <Slider.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform />

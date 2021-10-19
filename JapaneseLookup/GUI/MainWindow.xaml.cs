@@ -199,13 +199,13 @@ namespace JapaneseLookup.GUI
             {
                 MainWindowUtilities.ShowPreferencesWindow();
             }
-            
+
             else if (Utils.KeyGestureComparer(e, ConfigManager.TransparentModeKeyGesture))
             {
                 MWindow.Background.Opacity = 0;
                 Keyboard.ClearFocus();
             }
-            
+
             else if (Utils.KeyGestureComparer(e, ConfigManager.KanjiModeKeyGesture))
             {
                 ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
@@ -217,7 +217,7 @@ namespace JapaneseLookup.GUI
             {
                 MainWindowUtilities.ShowAddNameWindow();
             }
-            
+
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
             {
                 MainWindowUtilities.ShowAddWordWindow();
@@ -302,6 +302,5 @@ namespace JapaneseLookup.GUI
         {
             FontSizeSlider.Visibility = Visibility.Collapsed;
         }
-
-        }
     }
+}
