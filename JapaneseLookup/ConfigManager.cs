@@ -121,6 +121,7 @@ namespace JapaneseLookup
         // b) there's less word-wrapping to do
         public static bool NewlineBetweenDefinitions = false;
         public static int MaxResults = 99;
+        public static bool AllowDuplicateCards = false;
 
         public static void ApplyPreferences(MainWindow mainWindow)
         {
