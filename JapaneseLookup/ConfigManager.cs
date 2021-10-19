@@ -400,7 +400,7 @@ namespace JapaneseLookup
             else
                 config.AppSettings.Settings["KanjiModeKeyGesture"].Value = rawKeyGesture;
 
-            rawKeyGesture = preferenceWindow.SteppedBacklogBackwardsKeyGestureTextBox.Text;
+            rawKeyGesture = preferenceWindow.ShowPreferencesWindowKeyGestureTextBox.Text;
             if (rawKeyGesture.StartsWith("Win+"))
                 config.AppSettings.Settings["ShowPreferencesWindowKeyGesture"].Value = rawKeyGesture[4..];
             else
