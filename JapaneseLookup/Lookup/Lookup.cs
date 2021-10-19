@@ -34,7 +34,7 @@ namespace JapaneseLookup.Lookup
             if ((preciseTimeNow - _lastLookupTime).Milliseconds < ConfigManager.LookupRate) return null;
             _lastLookupTime = preciseTimeNow;
 
-            var jMdictResults = new Dictionary<string, IntermediaryResult>();
+            Dictionary<string, IntermediaryResult> jMdictResults;
             var jMnedictResults = new Dictionary<string, IntermediaryResult>();
             var epwingWordResultsList = new List<Dictionary<string, IntermediaryResult>>();
             var kanjiResult = new Dictionary<string, IntermediaryResult>();
@@ -49,7 +49,6 @@ namespace JapaneseLookup.Lookup
 
             List<string> textInHiraganaList = new();
             List<HashSet<Form>> deconjugationResultsList = new();
-
             for (int i = 0; i < text.Length; i++)
             {
                 var textInHiragana = Kana.KatakanaToHiraganaConverter(text[..^i]);
@@ -57,12 +56,26 @@ namespace JapaneseLookup.Lookup
                 deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
             }
 
+            jMdictResults = GetJMdictResults(text, textInHiraganaList, deconjugationResultsList, DictType.JMdict);
+
+            Dictionary<string, List<List<string>>> jmdictWordClasses = new Dictionary<string, List<List<string>>>();
+            foreach ((string key, IntermediaryResult value) in jMdictResults)
+            {
+                foreach (JMdictResult jmdictResult in value.ResultsList.Cast<JMdictResult>())
+                {
+                    if (!jmdictWordClasses.ContainsKey(key))
+                    {
+                        jmdictWordClasses.Add(key, jmdictResult.WordClasses);
+                    }
+                }
+            }
+
             foreach ((DictType dictType, Dict dict) in ConfigManager.Dicts)
             {
                 switch (dictType)
                 {
                     case DictType.JMdict:
-                        jMdictResults = GetJMdictResults(text, textInHiraganaList, deconjugationResultsList, dictType);
+                        // handled above
                         break;
                     case DictType.JMnedict:
                         jMnedictResults = GetJMnedictResults(text, textInHiraganaList, dictType);
@@ -71,31 +84,31 @@ namespace JapaneseLookup.Lookup
                         // handled above and below
                         break;
                     case DictType.UnknownEpwing:
-                        epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList, deconjugationResultsList,
-                            dict.Contents, dictType));
+                        epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
+                            deconjugationResultsList, dict.Contents, dictType, jmdictWordClasses));
                         break;
                     case DictType.Daijirin:
-                        epwingWordResultsList.Add(GetDaijirinResults(text, textInHiraganaList, deconjugationResultsList,
-                            dict.Contents, dictType));
+                        epwingWordResultsList.Add(GetDaijirinResults(text, textInHiraganaList,
+                            deconjugationResultsList, dict.Contents, dictType, jmdictWordClasses));
                         break;
                     case DictType.Daijisen:
                         // TODO
-                        epwingWordResultsList.Add(GetDaijirinResults(text, textInHiraganaList, deconjugationResultsList,
-                            dict.Contents, dictType));
+                        epwingWordResultsList.Add(GetDaijirinResults(text, textInHiraganaList,
+                            deconjugationResultsList, dict.Contents, dictType, jmdictWordClasses));
                         break;
                     case DictType.Koujien:
                         // TODO
-                        epwingWordResultsList.Add(GetDaijirinResults(text, textInHiraganaList, deconjugationResultsList,
-                            dict.Contents, dictType));
+                        epwingWordResultsList.Add(GetDaijirinResults(text, textInHiraganaList,
+                            deconjugationResultsList, dict.Contents, dictType, jmdictWordClasses));
                         break;
                     case DictType.Meikyou:
                         // TODO
-                        epwingWordResultsList.Add(GetDaijirinResults(text, textInHiraganaList, deconjugationResultsList,
-                            dict.Contents, dictType));
+                        epwingWordResultsList.Add(GetDaijirinResults(text, textInHiraganaList,
+                            deconjugationResultsList, dict.Contents, dictType, jmdictWordClasses));
                         break;
                     case DictType.CustomWordDictionary:
-                        customWordResults = GetCustomWordResults(text, textInHiraganaList, deconjugationResultsList,
-                            dictType);
+                        customWordResults = GetCustomWordResults(text, textInHiraganaList,
+                            deconjugationResultsList, dictType);
                         break;
                     case DictType.CustomNameDictionary:
                         customNameResults = GetCustomNameResults(text, textInHiraganaList, dictType);
@@ -182,7 +195,8 @@ namespace JapaneseLookup.Lookup
                         if (jMdictResults.ContainsKey(result.Text))
                             continue;
 
-                        if (ConfigManager.Dicts[DictType.JMdict].Contents.TryGetValue(result.Text, out var temp))
+                        if (ConfigManager.Dicts[DictType.JMdict].Contents
+                            .TryGetValue(result.Text, out var temp))
                         {
                             List<IResult> resultsList = new();
 
@@ -209,7 +223,8 @@ namespace JapaneseLookup.Lookup
                     }
                 }
 
-                if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") && textInHiraganaList[i][0] != 'ー')
+                if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") &&
+                    textInHiraganaList[i][0] != 'ー')
                 {
                     string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
                     if (ConfigManager.Dicts[DictType.JMdict].Contents
@@ -261,7 +276,8 @@ namespace JapaneseLookup.Lookup
 
         private static Dictionary<string, IntermediaryResult> GetDaijirinResults(string text,
             List<string> textInHiraganaList, List<HashSet<Form>> deconjugationResultsList,
-            Dictionary<string, List<IResult>> dict, DictType dictType)
+            Dictionary<string, List<IResult>> dict, DictType dictType,
+            Dictionary<string, List<List<string>>> jmdictWordClasses)
         {
             var daijirinResults =
                 new Dictionary<string, IntermediaryResult>();
@@ -297,15 +313,21 @@ namespace JapaneseLookup.Lookup
                         {
                             List<IResult> resultsList = new();
 
-                            foreach (var rslt1 in temp)
+                            foreach (EpwingResult rslt in temp.Cast<EpwingResult>())
                             {
-                                var rslt = (EpwingResult) rslt1;
-
-                                // if (rslt.WordClasses.SelectMany(pos => pos.Except(blacklistedTags))
-                                //     .Intersect(result.Tags).Any())
-                                // {
-                                resultsList.Add(rslt);
-                                // }
+                                if (jmdictWordClasses.ContainsKey(result.Text))
+                                {
+                                    if (rslt.WordClasses.Union(jmdictWordClasses[result.Text]).SelectMany(pos => pos)
+                                        .Intersect(result.Tags).Any())
+                                    {
+                                        resultsList.Add(rslt);
+                                    }
+                                }
+                                // TODO
+                                else
+                                {
+                                    resultsList.Add(rslt);
+                                }
                             }
 
                             if (resultsList.Any())
@@ -337,7 +359,8 @@ namespace JapaneseLookup.Lookup
 
         private static Dictionary<string, IntermediaryResult> GetEpwingResults(string text,
             List<string> textInHiraganaList, List<HashSet<Form>> deconjugationResultsList,
-            Dictionary<string, List<IResult>> dict, DictType dictType)
+            Dictionary<string, List<IResult>> dict, DictType dictType,
+            Dictionary<string, List<List<string>>> jmdictWordClasses)
         {
             var epwingResults =
                 new Dictionary<string, IntermediaryResult>();
@@ -373,15 +396,21 @@ namespace JapaneseLookup.Lookup
                         {
                             List<IResult> resultsList = new();
 
-                            foreach (var rslt1 in temp)
+                            foreach (EpwingResult rslt in temp.Cast<EpwingResult>())
                             {
-                                var rslt = (EpwingResult) rslt1;
-
-                                // if (rslt.WordClasses.SelectMany(pos => pos.Except(blacklistedTags))
-                                //     .Intersect(result.Tags).Any())
-                                // {
-                                resultsList.Add(rslt);
-                                // }
+                                if (jmdictWordClasses.ContainsKey(result.Text))
+                                {
+                                    if (rslt.WordClasses.Union(jmdictWordClasses[result.Text]).SelectMany(pos => pos)
+                                        .Intersect(result.Tags).Any())
+                                    {
+                                        resultsList.Add(rslt);
+                                    }
+                                }
+                                // TODO
+                                else
+                                {
+                                    resultsList.Add(rslt);
+                                }
                             }
 
                             if (resultsList.Any())
@@ -397,7 +426,8 @@ namespace JapaneseLookup.Lookup
                     }
                 }
 
-                if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") && textInHiraganaList[i][0] != 'ー')
+                if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") &&
+                    textInHiraganaList[i][0] != 'ー')
                 {
                     string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
                     if (dict.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
@@ -912,7 +942,9 @@ namespace JapaneseLookup.Lookup
                 {
                     // defResult += "(" + count + ") ";
 
-                    var separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "; ";
+                    // todo
+                    // var separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "; ";
+                    var separator = "\n";
                     defResult += string.Join(separator, jMDictResult.Definitions[i]);
 
                     // ++count;
