@@ -10,11 +10,9 @@ using JapaneseLookup.EDICT;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
 using HandyControl.Tools;
 using HandyControl.Controls;
-using HandyControl.Properties;
 using JapaneseLookup.Abstract;
 using JapaneseLookup.Anki;
 using JapaneseLookup.Dicts;
@@ -22,6 +20,9 @@ using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
 using MessageBoxOptions = System.Windows.MessageBoxOptions;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using System.Text;
+using TextBox = System.Windows.Controls.TextBox;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace JapaneseLookup.GUI
 {
@@ -489,5 +490,39 @@ namespace JapaneseLookup.GUI
         }
 
         #endregion
+
+        private void KeyGesturetoText(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
+
+            Key key = (e.Key == Key.System ? e.SystemKey : e.Key);
+
+            if (key == Key.LeftShift || key == Key.RightShift
+                || key == Key.LeftCtrl || key == Key.RightCtrl
+                || key == Key.LeftAlt || key == Key.RightAlt
+                || key == Key.LWin || key == Key.RWin)
+            {
+                return;
+            }
+
+            StringBuilder hotkeyTextBuilder = new StringBuilder();
+
+            if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
+            {
+                hotkeyTextBuilder.Append("Ctrl+");
+            }
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0)
+            {
+                hotkeyTextBuilder.Append("Shift+");
+            }
+            if ((Keyboard.Modifiers & ModifierKeys.Alt) != 0)
+            {
+                hotkeyTextBuilder.Append("Alt+");
+            }
+
+            hotkeyTextBuilder.Append(key.ToString());
+
+            ((TextBox)sender).Text = hotkeyTextBuilder.ToString();
+        }
     }
 }

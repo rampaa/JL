@@ -78,20 +78,20 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Height"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="MainWindowHeightNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Width"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="MainWindowWidthNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Background color"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="TextboxBackgroundColorButton" Content="" HorizontalAlignment="Right"
                                     Width="60" Click="ShowColorPicker"
                                     BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" />
@@ -99,7 +99,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Text color"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="TextboxTextColorButton" Content="" HorizontalAlignment="Right"
                                     Width="60" Height="32" BorderThickness="5,5,5,5"
                                     Click="ShowColorPicker" BorderBrush="#FF707070" />
@@ -107,7 +107,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Backlog text color"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="TextboxBacklogTextColorButton" Content="" HorizontalAlignment="Right"
                                     Width="60" Height="32" BorderThickness="5,5,5,5"
                                     Click="ShowColorPicker" BorderBrush="#FF707070" />
@@ -115,21 +115,21 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Font size"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="TextboxFontSizeNumericUpDown" Maximum="300" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Opacity"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="TextboxOpacityNumericUpDown" Maximum="100" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Font"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <ComboBox x:Name="FontComboBox" HorizontalAlignment="Right"
                                       Width="210" />
                         </DockPanel>
@@ -147,20 +147,20 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max height"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupMaxHeightNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max width"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupMaxWidthNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Background color"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="PopupBackgroundColorButton" Content="" HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
@@ -168,14 +168,14 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Opacity"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupOpacityNumericUpDown" Maximum="100" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Primary spelling color"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="PopupPrimarySpellingColorButton" Content="" HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
@@ -183,7 +183,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Primary spelling font size"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupPrimarySpellingFontSizeNumericUpDown" Maximum="300"
                                               Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -191,7 +191,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Reading color"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="PopupReadingColorButton" Content="" HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
@@ -207,14 +207,14 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Reading font size"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupReadingFontSizeNumericUpDown" Maximum="50" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Reading orthography info font size"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupROrthographyInfoFontSizeNumericUpDown" Maximum="50"
                                               Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -222,7 +222,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Alternative spelling color"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <Button x:Name="PopupAlternativeSpellingColorButton" Content=""
                                     HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
@@ -231,7 +231,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Alternative spelling orthography info color"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <Button x:Name="PopupAOrthographyInfoColorButton" Content="" HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
@@ -240,7 +240,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left"
                                        Text="Alternative spelling font size"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <hc:NumericUpDown x:Name="PopupAlternativeSpellingFontSizeNumericUpDown" Maximum="50"
                                               Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -249,7 +249,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left"
                                        Text="Alternative spelling orthography info font size"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupAOrthographyInfoFontSizeNumericUpDown" Maximum="50"
                                               Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -257,7 +257,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Definition color"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <Button x:Name="PopupDefinitionColorButton" Content="" HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
@@ -265,16 +265,15 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Definition font size"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupDefinitionFontSizeNumericUpDown" Maximum="50"
                                               Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
-
                             <TextBlock HorizontalAlignment="Left" Text="Frequency color"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <Button x:Name="PopupFrequencyColorButton" Content="" HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
@@ -282,14 +281,14 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Frequency font size"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <hc:NumericUpDown x:Name="PopupFrequencyFontSizeNumericUpDown" Maximum="50" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Deconjugation info color"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <Button x:Name="PopupDeconjugationInfoColorButton" Content=""
                                     HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
@@ -298,7 +297,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Deconjugation info font size"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <hc:NumericUpDown x:Name="PopupDeconjugationInfoFontSizeNumericUpDown" Maximum="50"
                                               Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -306,21 +305,21 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="X Offset"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <hc:NumericUpDown x:Name="PopupXOffsetNumericUpDown" Maximum="50" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Y Offset"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <hc:NumericUpDown x:Name="PopupYOffsetNumericUpDown" Maximum="50" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Flip"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <ComboBox x:Name="PopupFlipComboBox" HorizontalAlignment="Right"
                                       SelectedValuePath="Content">
                                 <ComboBoxItem Content="X" />
@@ -331,7 +330,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Separator Color"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <Button x:Name="PopupSeparatorColorButton" Content="" HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
@@ -396,8 +395,46 @@
                             </Style>
                         </StackPanel.Resources>
 
-                        <TextBlock>TODO</TextBlock>
-
+                        <DockPanel>
+                            <TextBox x:Name="MiningModeKeyGestureTextBox" AutomationProperties.Name="" PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                            <TextBlock Text="Mining mode" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBox x:Name="KanjiModeKeyGestureTextBox" AutomationProperties.Name="" PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                            <TextBlock Text="Kanji mode" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBox x:Name="TransparentModeKeyGestureTextBox" AutomationProperties.Name="" PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                            <TextBlock Text="Transparent mode" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBox x:Name="PlayAudioKeyGestureTextBox" AutomationProperties.Name="" PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                            <TextBlock Text="Play audio" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBox x:Name="ShowPreferencesWindowKeyGestureTextBox" AutomationProperties.Name="" PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                            <TextBlock Text="Preferences" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBox x:Name="ShowAddNameWindowKeyGestureTextBox" AutomationProperties.Name="" PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                            <TextBlock Text="Add name" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBox x:Name="ShowAddWordWindowKeyGestureTextBox" AutomationProperties.Name="" PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                            <TextBlock Text="Add word" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBox x:Name="SearchWithBrowserKeyGestureTextBox" AutomationProperties.Name="" PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                            <TextBlock Text="Search" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBox x:Name="SteppedBacklogBackwardsKeyGestureTextBox" AutomationProperties.Name="" PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                            <TextBlock Text="Move backwards (Backlog)" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBox x:Name="SteppedBacklogForwardsKeyGestureTextBox" AutomationProperties.Name="" PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                            <TextBlock Text="Move forward (Backlog)" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </DockPanel>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

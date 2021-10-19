@@ -371,6 +371,7 @@ namespace JapaneseLookup.Utilities
                 Foreground = ConfigManager.ReadingsColor,
                 FontSize = ConfigManager.ReadingsFontSize,
                 Margin = new Thickness(5, 0, 0, 0),
+                TextWrapping = TextWrapping.Wrap
             };
 
             if (readings.Count == 0) return textBlockReadings;

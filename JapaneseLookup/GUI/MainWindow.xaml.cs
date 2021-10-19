@@ -26,6 +26,7 @@ namespace JapaneseLookup.GUI
             InitializeComponent();
             ConfigManager.ApplyPreferences(this);
             MainWindowUtilities.MainWindowInitializer();
+            MainWindowChrome.Freeze();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -71,7 +72,6 @@ namespace JapaneseLookup.GUI
         public async void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
             if (MiningMode || MWindow.Background.Opacity == 0) return;
-
             int charPosition = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
 
             if (charPosition != -1)
@@ -238,30 +238,35 @@ namespace JapaneseLookup.GUI
 
         private void MWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == ConfigManager.ShowPreferencesWindowKey)
+            if (Utils.KeyGestureComparer(e, ConfigManager.ShowPreferencesWindowKeyGesture))
             {
                 MainWindowUtilities.ShowPreferencesWindow();
             }
-            else if (e.Key == ConfigManager.TransparentModeKey)
+            
+            else if (Utils.KeyGestureComparer(e, ConfigManager.TransparentModeKeyGesture))
             {
                 MWindow.Background.Opacity = 0;
                 Keyboard.ClearFocus();
             }
-            else if (e.Key == ConfigManager.KanjiModeKey)
+            
+            else if (Utils.KeyGestureComparer(e, ConfigManager.KanjiModeKeyGesture))
             {
                 ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
                 LastWord = "";
                 MainTextBox_MouseMove(null, null);
             }
-            else if (e.Key == ConfigManager.ShowAddNameWindowKey)
+
+            else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
             {
                 MainWindowUtilities.ShowAddNameWindow();
             }
-            else if (e.Key == ConfigManager.ShowAddWordWindowKey)
+            
+            else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
             {
                 MainWindowUtilities.ShowAddWordWindow();
             }
-            else if (e.Key == ConfigManager.SearchWithBrowserKey)
+
+            else if (Utils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))
             {
                 MainWindowUtilities.SearchWithBrowser();
             }
@@ -294,7 +299,7 @@ namespace JapaneseLookup.GUI
 
         private void SteppedBacklog(KeyEventArgs e)
         {
-            if (e.Key == ConfigManager.SteppedBacklogBackwardsKey)
+            if (Utils.KeyGestureComparer(e, ConfigManager.SteppedBacklogBackwardsKeyGesture))
             {
                 if (_currentTextIndex != 0)
                 {
@@ -304,7 +309,7 @@ namespace JapaneseLookup.GUI
 
                 MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
             }
-            else if (e.Key == ConfigManager.SteppedBacklogForwardsKey)
+            else if (Utils.KeyGestureComparer(e, ConfigManager.SteppedBacklogForwardsKeyGesture))
             {
                 if (_currentTextIndex < MainWindowUtilities.Backlog.Count - 1)
                 {
@@ -340,5 +345,6 @@ namespace JapaneseLookup.GUI
         {
             FontSizeSlider.Visibility = Visibility.Collapsed;
         }
+
+        }
     }
-}

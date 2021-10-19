@@ -15,7 +15,7 @@
         <WindowChrome
             CaptionHeight="20"
             CornerRadius="0"
-            ResizeBorderThickness="4"
+            ResizeBorderThickness="7"
             GlassFrameThickness="0"
             x:Name="MainWindowChrome"/>
     </WindowChrome.WindowChrome>
@@ -26,7 +26,7 @@
                  Foreground="White" SelectionTextBrush="Black"
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"
                  VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
-                 MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow" FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled ="True">
+                 MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow" FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled ="True" IsUndoEnabled="False">
 
             <TextBox.ContextMenu>
                 <ContextMenu>

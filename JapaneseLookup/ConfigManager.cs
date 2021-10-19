@@ -104,16 +104,16 @@ namespace JapaneseLookup
         //public static int POrthographyInfoFontSize;
         public static Brush DictTypeColor = Brushes.LightBlue;
         public static int DictTypeFontSize = 15;
-        public static Key MiningModeKey = Key.M;
-        public static Key PlayAudioKey = Key.P;
-        public static Key KanjiModeKey = Key.K;
-        public static Key ShowPreferencesWindowKey = Key.L;
-        public static Key ShowAddNameWindowKey = Key.N;
-        public static Key ShowAddWordWindowKey = Key.W;
-        public static Key SearchWithBrowserKey = Key.S;
-        public static Key TransparentModeKey = Key.T;
-        public static Key SteppedBacklogBackwardsKey = Key.Left;
-        public static Key SteppedBacklogForwardsKey = Key.Right;
+        public static KeyGesture MiningModeKeyGesture;
+        public static KeyGesture PlayAudioKeyGesture;
+        public static KeyGesture KanjiModeKeyGesture;
+        public static KeyGesture ShowPreferencesWindowKeyGesture;
+        public static KeyGesture ShowAddNameWindowKeyGesture;
+        public static KeyGesture ShowAddWordWindowKeyGesture;
+        public static KeyGesture SearchWithBrowserKeyGesture;
+        public static KeyGesture TransparentModeKeyGesture;
+        public static KeyGesture SteppedBacklogBackwardsKeyGesture;
+        public static KeyGesture SteppedBacklogForwardsKeyGesture;
 
         // consider making this dictionary specific
         // enabling this seems to improve rendering performance by a lot; need to test if it's because
@@ -208,6 +208,65 @@ namespace JapaneseLookup
                     break;
             }
 
+            #region KeyGestures
+            string rawKeyGesture;
+            KeyGestureConverter keyGestureConverter = new();
+
+            rawKeyGesture = ConfigurationManager.AppSettings.Get("MiningModeKeyGesture");
+            if (!rawKeyGesture.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") && !rawKeyGesture.StartsWith("Alt+"))
+                MiningModeKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+            else
+                MiningModeKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
+
+            rawKeyGesture = ConfigurationManager.AppSettings.Get("PlayAudioKeyGesture");
+            if (!rawKeyGesture.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") && !rawKeyGesture.StartsWith("Alt+"))
+                PlayAudioKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+            else
+                PlayAudioKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
+
+            rawKeyGesture = ConfigurationManager.AppSettings.Get("KanjiModeKeyGesture");
+            if (!rawKeyGesture.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") && !rawKeyGesture.StartsWith("Alt+"))
+                KanjiModeKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+            else
+                KanjiModeKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
+
+            rawKeyGesture = ConfigurationManager.AppSettings.Get("ShowPreferencesWindowKeyGesture");
+            if (!rawKeyGesture.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") && !rawKeyGesture.StartsWith("Alt+"))
+                ShowPreferencesWindowKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+            else
+                ShowPreferencesWindowKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
+
+            rawKeyGesture = ConfigurationManager.AppSettings.Get("ShowAddNameWindowKeyGesture");
+            if (!rawKeyGesture.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") && !rawKeyGesture.StartsWith("Alt+"))
+                ShowAddNameWindowKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+            else
+                ShowAddNameWindowKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
+
+            rawKeyGesture = ConfigurationManager.AppSettings.Get("SearchWithBrowserKeyGesture");
+            if (!rawKeyGesture.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") && !rawKeyGesture.StartsWith("Alt+"))
+                SearchWithBrowserKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+            else
+                SearchWithBrowserKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
+
+            rawKeyGesture = ConfigurationManager.AppSettings.Get("TransparentModeKeyGesture");
+            if (!rawKeyGesture.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") && !rawKeyGesture.StartsWith("Alt+"))
+                TransparentModeKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+            else
+                TransparentModeKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
+
+            rawKeyGesture = ConfigurationManager.AppSettings.Get("SteppedBacklogBackwardsKeyGesture");
+            if (!rawKeyGesture.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") && !rawKeyGesture.StartsWith("Alt+"))
+                SteppedBacklogBackwardsKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+            else
+                SteppedBacklogBackwardsKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
+
+            rawKeyGesture = ConfigurationManager.AppSettings.Get("SteppedBacklogForwardsKeyGesture");
+            if (!rawKeyGesture.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") && !rawKeyGesture.StartsWith("Alt+"))
+                SteppedBacklogForwardsKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+            else
+                SteppedBacklogForwardsKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
+            #endregion
+
             mainWindow.OpacitySlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowOpacity")!);
             mainWindow.FontSizeSlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowFontSize")!);
             mainWindow.MainTextBox.FontFamily = new FontFamily(ConfigurationManager.AppSettings.Get("MainWindowFont")!);
@@ -245,6 +304,27 @@ namespace JapaneseLookup
         public static void LoadPreferences(PreferencesWindow preferenceWindow)
         {
             var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
+            
+            preferenceWindow.MiningModeKeyGestureTextBox.Text = 
+                ConfigurationManager.AppSettings.Get("MiningModeKeyGesture");
+            preferenceWindow.PlayAudioKeyGestureTextBox.Text =
+                ConfigurationManager.AppSettings.Get("PlayAudioKeyGesture");
+           preferenceWindow.KanjiModeKeyGestureTextBox.Text =
+                ConfigurationManager.AppSettings.Get("KanjiModeKeyGesture");
+            preferenceWindow.ShowPreferencesWindowKeyGestureTextBox.Text =
+                ConfigurationManager.AppSettings.Get("ShowPreferencesWindowKeyGesture");
+            preferenceWindow.ShowAddNameWindowKeyGestureTextBox.Text =
+                ConfigurationManager.AppSettings.Get("ShowAddNameWindowKeyGesture");
+            preferenceWindow.ShowAddWordWindowKeyGestureTextBox.Text =
+                ConfigurationManager.AppSettings.Get("ShowAddWordWindowKeyGesture");
+            preferenceWindow.SearchWithBrowserKeyGestureTextBox.Text =
+                ConfigurationManager.AppSettings.Get("SearchWithBrowserKeyGesture");
+            preferenceWindow.TransparentModeKeyGestureTextBox.Text =
+                ConfigurationManager.AppSettings.Get("TransparentModeKeyGesture");
+            preferenceWindow.SteppedBacklogBackwardsKeyGestureTextBox.Text =
+                ConfigurationManager.AppSettings.Get("SteppedBacklogBackwardsKeyGesture");
+            preferenceWindow.SteppedBacklogForwardsKeyGestureTextBox.Text =
+                ConfigurationManager.AppSettings.Get("SteppedBacklogForwardsKeyGesture");
 
             preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
             preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri;
@@ -293,25 +373,76 @@ namespace JapaneseLookup
             preferenceWindow.PopupXOffsetNumericUpDown.Value = PopupXOffset;
             preferenceWindow.PopupYOffsetNumericUpDown.Value = PopupYOffset;
 
-            switch (ConfigurationManager.AppSettings.Get("PopupFlip"))
-            {
-                case "X":
-                    preferenceWindow.PopupFlipComboBox.SelectedValue = "X";
-                    break;
-
-                case "Y":
-                    preferenceWindow.PopupFlipComboBox.SelectedValue = "Y";
-                    break;
-
-                case "Both":
-                    preferenceWindow.PopupFlipComboBox.SelectedValue = "Both";
-                    break;
-            }
+            preferenceWindow.PopupFlipComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("PopupFlip");
         }
 
         public static void SavePreferences(PreferencesWindow preferenceWindow)
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            #region KeyGestures
+            string rawKeyGesture;
+            rawKeyGesture = preferenceWindow.MiningModeKeyGestureTextBox.Text;
+            if (rawKeyGesture.StartsWith("Win+"))
+                config.AppSettings.Settings["MiningModeKeyGesture"].Value = rawKeyGesture[4..];
+            else
+                config.AppSettings.Settings["MiningModeKeyGesture"].Value = rawKeyGesture;
+
+            rawKeyGesture = preferenceWindow.PlayAudioKeyGestureTextBox.Text;
+            if (rawKeyGesture.StartsWith("Win+"))
+                config.AppSettings.Settings["PlayAudioKeyGesture"].Value = rawKeyGesture[4..];
+            else
+                config.AppSettings.Settings["PlayAudioKeyGesture"].Value = rawKeyGesture;
+
+            rawKeyGesture = preferenceWindow.KanjiModeKeyGestureTextBox.Text;
+            if (rawKeyGesture.StartsWith("Win+"))
+                config.AppSettings.Settings["KanjiModeKeyGesture"].Value = rawKeyGesture[4..];
+            else
+                config.AppSettings.Settings["KanjiModeKeyGesture"].Value = rawKeyGesture;
+
+            rawKeyGesture = preferenceWindow.SteppedBacklogBackwardsKeyGestureTextBox.Text;
+            if (rawKeyGesture.StartsWith("Win+"))
+                config.AppSettings.Settings["ShowPreferencesWindowKeyGesture"].Value = rawKeyGesture[4..];
+            else
+                config.AppSettings.Settings["ShowPreferencesWindowKeyGesture"].Value = rawKeyGesture;
+
+            rawKeyGesture = preferenceWindow.ShowAddNameWindowKeyGestureTextBox.Text;
+            if (rawKeyGesture.StartsWith("Win+"))
+                config.AppSettings.Settings["ShowAddNameWindowKeyGesture"].Value = rawKeyGesture[4..];
+            else
+                config.AppSettings.Settings["ShowAddNameWindowKeyGesture"].Value = rawKeyGesture;
+
+            rawKeyGesture = preferenceWindow.ShowAddWordWindowKeyGestureTextBox.Text;
+            if (rawKeyGesture.StartsWith("Win+"))
+                config.AppSettings.Settings["ShowAddWordWindowKeyGesture"].Value = rawKeyGesture[4..];
+            else
+                config.AppSettings.Settings["ShowAddWordWindowKeyGesture"].Value = rawKeyGesture;
+
+            rawKeyGesture = preferenceWindow.SearchWithBrowserKeyGestureTextBox.Text;
+            if (rawKeyGesture.StartsWith("Win+"))
+                config.AppSettings.Settings["SearchWithBrowserKeyGesture"].Value = rawKeyGesture[4..];
+            else
+                config.AppSettings.Settings["SearchWithBrowserKeyGesture"].Value = rawKeyGesture;
+
+            rawKeyGesture = preferenceWindow.TransparentModeKeyGestureTextBox.Text;
+            if (rawKeyGesture.StartsWith("Win+"))
+                config.AppSettings.Settings["TransparentModeKeyGesture"].Value = rawKeyGesture[4..];
+            else
+                config.AppSettings.Settings["TransparentModeKeyGesture"].Value = rawKeyGesture;
+
+            rawKeyGesture = preferenceWindow.SteppedBacklogBackwardsKeyGestureTextBox.Text;
+            if (rawKeyGesture.StartsWith("Win+"))
+                config.AppSettings.Settings["SteppedBacklogBackwardsKeyGesture"].Value = rawKeyGesture[4..];
+            else
+                config.AppSettings.Settings["SteppedBacklogBackwardsKeyGesture"].Value = rawKeyGesture;
+
+            rawKeyGesture = preferenceWindow.SteppedBacklogForwardsKeyGestureTextBox.Text;
+            if (rawKeyGesture.StartsWith("Win+"))
+                config.AppSettings.Settings["SteppedBacklogForwardsKeyGesture"].Value = rawKeyGesture[4..];
+            else
+                config.AppSettings.Settings["SteppedBacklogForwardsKeyGesture"].Value = rawKeyGesture;
+            #endregion
+
             config.AppSettings.Settings["MaxSearchLength"].Value =
                 preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString();
             config.AppSettings.Settings["AnkiConnectUri"].Value =

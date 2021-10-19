@@ -226,7 +226,8 @@ namespace JapaneseLookup.GUI
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == ConfigManager.MiningModeKey)
+            
+            if (Utils.KeyGestureComparer(e, ConfigManager.MiningModeKeyGesture))
             {
                 MainWindow.MiningMode = true;
                 PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
@@ -237,7 +238,8 @@ namespace JapaneseLookup.GUI
                 Instance.ResultStackPanels.Clear();
                 PopupWindowUtilities.DisplayResults(true);
             }
-            else if (e.Key == ConfigManager.PlayAudioKey)
+            
+            else if (Utils.KeyGestureComparer(e, ConfigManager.PlayAudioKeyGesture))
             {
                 string foundSpelling = null;
                 string reading = null;
@@ -261,6 +263,7 @@ namespace JapaneseLookup.GUI
 
                 PlayAudio(foundSpelling, reading);
             }
+
             else if (e.Key == Key.Escape)
             {
                 if (MainWindow.MiningMode)
@@ -270,25 +273,30 @@ namespace JapaneseLookup.GUI
                     Hide();
                 }
             }
-            else if (e.Key == ConfigManager.KanjiModeKey)
+
+            else if (Utils.KeyGestureComparer(e, ConfigManager.KanjiModeKeyGesture))
             {
                 ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
                 MainWindow.LastWord = "";
                 Application.Current.Windows.OfType<MainWindow>().First().MainTextBox_MouseMove(null, null);
             }
-            else if (e.Key == ConfigManager.ShowPreferencesWindowKey)
+
+            else if (Utils.KeyGestureComparer(e, ConfigManager.ShowPreferencesWindowKeyGesture))
             {
                 MainWindowUtilities.ShowPreferencesWindow();
             }
-            else if (e.Key == ConfigManager.ShowAddNameWindowKey)
+
+            else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
             {
                 MainWindowUtilities.ShowAddNameWindow();
             }
-            else if (e.Key == ConfigManager.ShowAddWordWindowKey)
+
+            else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
             {
                 MainWindowUtilities.ShowAddWordWindow();
             }
-            else if (e.Key == ConfigManager.SearchWithBrowserKey)
+
+            else if (Utils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))
             {
                 MainWindowUtilities.SearchWithBrowser();
             }
