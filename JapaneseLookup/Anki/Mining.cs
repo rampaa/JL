@@ -18,8 +18,8 @@ namespace JapaneseLookup.Anki
                 var ankiConfig = await AnkiConfig.ReadAnkiConfig();
                 if (ankiConfig == null) return;
 
-                var deckName = ankiConfig.DeckName;
-                var modelName = ankiConfig.ModelName;
+                string deckName = ankiConfig.DeckName;
+                string modelName = ankiConfig.ModelName;
 
                 var rawFields = ankiConfig.Fields;
                 var fields =
@@ -39,12 +39,18 @@ namespace JapaneseLookup.Anki
                         composition
                     );
 
-                Dictionary<string, object> options = null;
-                var tags = ankiConfig.Tags;
+                Dictionary<string, object> options = new Dictionary<string, object>
+                {
+                    {
+                        "allowDuplicate",
+                        ConfigManager.AllowDuplicateCards
+                    },
+                };
+                string[] tags = ankiConfig.Tags;
 
                 // idk if this gets the right audio for every word
                 readings ??= "";
-                var reading = readings.Split(",")[0];
+                string reading = readings.Split(",")[0];
                 if (reading == "") reading = foundSpelling;
 
                 Dictionary<string, object>[] audio =
@@ -73,7 +79,7 @@ namespace JapaneseLookup.Anki
                 Dictionary<string, object>[] picture = null;
 
                 var note = new Note(deckName, modelName, fields, options, tags, audio, video, picture);
-                var response = await AnkiConnect.AddNoteToDeck(note);
+                Response response = await AnkiConnect.AddNoteToDeck(note);
 
                 if (response == null)
                 {

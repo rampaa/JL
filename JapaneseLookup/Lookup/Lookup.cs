@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using JapaneseLookup.Abstract;
 using JapaneseLookup.CustomDict;
 using JapaneseLookup.Deconjugation;
@@ -51,7 +52,7 @@ namespace JapaneseLookup.Lookup
             List<HashSet<Form>> deconjugationResultsList = new();
             for (int i = 0; i < text.Length; i++)
             {
-                var textInHiragana = Kana.KatakanaToHiraganaConverter(text[..^i]);
+                string textInHiragana = Kana.KatakanaToHiraganaConverter(text[..^i]);
                 textInHiraganaList.Add(textInHiragana);
                 deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
             }
@@ -190,7 +191,7 @@ namespace JapaneseLookup.Lookup
 
                 if (succAttempt < 3)
                 {
-                    foreach (var result in deconjugationResultsList[i])
+                    foreach (Form result in deconjugationResultsList[i])
                     {
                         if (jMdictResults.ContainsKey(result.Text))
                             continue;
@@ -200,7 +201,7 @@ namespace JapaneseLookup.Lookup
                         {
                             List<IResult> resultsList = new();
 
-                            foreach (var rslt1 in temp)
+                            foreach (IResult rslt1 in temp)
                             {
                                 var rslt = (JMdictResult) rslt1;
                                 if (rslt.WordClasses.SelectMany(pos => pos).Intersect(result.Tags).Any())
@@ -304,7 +305,7 @@ namespace JapaneseLookup.Lookup
 
                 if (succAttempt < 3)
                 {
-                    foreach (var result in deconjugationResultsList[i])
+                    foreach (Form result in deconjugationResultsList[i])
                     {
                         if (daijirinResults.ContainsKey(result.Text))
                             continue;
@@ -387,7 +388,7 @@ namespace JapaneseLookup.Lookup
 
                 if (succAttempt < 3)
                 {
-                    foreach (var result in deconjugationResultsList[i])
+                    foreach (Form result in deconjugationResultsList[i])
                     {
                         if (epwingResults.ContainsKey(result.Text))
                             continue;
@@ -463,7 +464,7 @@ namespace JapaneseLookup.Lookup
 
                 if (succAttempt < 3)
                 {
-                    foreach (var result in deconjugationResultsList[i])
+                    foreach (Form result in deconjugationResultsList[i])
                     {
                         if (customWordResults.ContainsKey(result.Text))
                             continue;
@@ -473,7 +474,7 @@ namespace JapaneseLookup.Lookup
                         {
                             List<IResult> resultsList = new();
 
-                            foreach (var rslt1 in temp)
+                            foreach (IResult rslt1 in temp)
                             {
                                 var rslt = (CustomWordEntry) rslt1;
                                 if (rslt.WordClasses.Intersect(result.Tags).Any())
@@ -536,7 +537,7 @@ namespace JapaneseLookup.Lookup
 
             foreach (var wordResult in jmdictResults)
             {
-                foreach (var iResult in wordResult.Value.ResultsList)
+                foreach (IResult iResult in wordResult.Value.ResultsList)
                 {
                     var jMDictResult = (JMdictResult) iResult;
                     var result = new Dictionary<LookupResult, List<string>>();
@@ -559,7 +560,7 @@ namespace JapaneseLookup.Lookup
                     List<string> frequency;
                     if (jMDictResult.FrequencyDict != null)
                     {
-                        jMDictResult.FrequencyDict.TryGetValue(ConfigManager.FrequencyList, out var freq);
+                        jMDictResult.FrequencyDict.TryGetValue(ConfigManager.FrequencyList, out int freq);
                         if (freq == 0)
                             frequency = new List<string> { MainWindowUtilities.FakeFrequency };
                         else
@@ -582,7 +583,7 @@ namespace JapaneseLookup.Lookup
                     foreach (var list in rList)
                     {
                         var final = "";
-                        foreach (var str in list)
+                        foreach (string str in list)
                         {
                             final += str + ", ";
                         }
@@ -595,7 +596,7 @@ namespace JapaneseLookup.Lookup
                     foreach (var list in aList)
                     {
                         var final = "";
-                        foreach (var str in list)
+                        foreach (string str in list)
                         {
                             final += str + ", ";
                         }
@@ -633,7 +634,7 @@ namespace JapaneseLookup.Lookup
 
             foreach (var nameResult in jmnedictResults)
             {
-                foreach (var iResult in nameResult.Value.ResultsList)
+                foreach (IResult iResult in nameResult.Value.ResultsList)
                 {
                     var jMnedictResult = (JMnedictResult) iResult;
                     var result = new Dictionary<LookupResult, List<string>>();
@@ -710,7 +711,7 @@ namespace JapaneseLookup.Lookup
 
             foreach (var wordResult in epwingResults)
             {
-                foreach (var iResult in wordResult.Value.ResultsList)
+                foreach (IResult iResult in wordResult.Value.ResultsList)
                 {
                     var epwingResult = (EpwingResult) iResult;
                     var result = new Dictionary<LookupResult, List<string>>();
@@ -759,7 +760,7 @@ namespace JapaneseLookup.Lookup
 
             foreach (var wordResult in customWordResults)
             {
-                foreach (var iResult in wordResult.Value.ResultsList)
+                foreach (IResult iResult in wordResult.Value.ResultsList)
                 {
                     var customWordDictResults = (CustomWordEntry) iResult;
                     var result = new Dictionary<LookupResult, List<string>>();
@@ -805,7 +806,7 @@ namespace JapaneseLookup.Lookup
 
             foreach (var customNameResult in customNameResults)
             {
-                foreach (var iResult in customNameResult.Value.ResultsList)
+                foreach (IResult iResult in customNameResult.Value.ResultsList)
                 {
                     var customNameDictResult = (CustomNameEntry) iResult;
                     var result = new Dictionary<LookupResult, List<string>>();
@@ -837,75 +838,74 @@ namespace JapaneseLookup.Lookup
 
         private static string BuildJmdictDefinition(JMdictResult jMDictResult)
         {
+            string separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "";
             int count = 1;
-            string defResult = "";
+            var defResult = new StringBuilder();
             for (int i = 0; i < jMDictResult.Definitions.Count; i++)
             {
                 if (jMDictResult.WordClasses.Any() && jMDictResult.WordClasses[i].Any())
                 {
-                    defResult += "(";
-                    defResult += string.Join(", ", jMDictResult.WordClasses[i]);
-                    defResult += ") ";
+                    defResult.Append('(');
+                    defResult.Append(string.Join(", ", jMDictResult.WordClasses[i]));
+                    defResult.Append(") ");
                 }
 
                 if (jMDictResult.Definitions.Any())
                 {
-                    defResult += "(" + count + ") ";
+                    defResult.Append($"({count}) ");
 
                     if (jMDictResult.SpellingInfo.Any() && jMDictResult.SpellingInfo[i] != null)
                     {
-                        defResult += "(";
-                        defResult += jMDictResult.SpellingInfo[i];
-                        defResult += ") ";
+                        defResult.Append('(');
+                        defResult.Append(jMDictResult.SpellingInfo[i]);
+                        defResult.Append(") ");
                     }
 
                     if (jMDictResult.MiscList.Any() && jMDictResult.MiscList[i].Any())
                     {
-                        defResult += "(";
-                        defResult += string.Join(", ", jMDictResult.MiscList[i]);
-                        defResult += ") ";
+                        defResult.Append("(");
+                        defResult.Append(string.Join(", ", jMDictResult.MiscList[i]));
+                        defResult.Append(") ");
                     }
 
-                    defResult += string.Join("; ", jMDictResult.Definitions[i]) + " ";
+                    defResult.Append(string.Join("; ", jMDictResult.Definitions[i]) + " ");
 
                     if (jMDictResult.RRestrictions != null && jMDictResult.RRestrictions[i].Any()
                         || jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
                     {
-                        defResult += "(only applies to ";
+                        defResult.Append("(only applies to ");
 
                         if (jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
-                            defResult += string.Join("; ", jMDictResult.KRestrictions[i]);
+                            defResult.Append(string.Join("; ", jMDictResult.KRestrictions[i]));
 
                         if (jMDictResult.RRestrictions != null && jMDictResult.RRestrictions[i].Any())
-                            defResult += string.Join("; ", jMDictResult.RRestrictions[i]);
+                            defResult.Append(string.Join("; ", jMDictResult.RRestrictions[i]));
 
-                        defResult += ") ";
+                        defResult.Append(") ");
                     }
 
-                    var separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "";
-                    defResult += separator;
+                    defResult.Append(separator);
 
                     ++count;
                 }
             }
 
-            defResult = defResult.Trim('\n');
-            return defResult;
+            return defResult.ToString().Trim('\n');
         }
 
         private static string BuildJmnedictDefinition(JMnedictResult jMDictResult)
         {
             int count = 1;
-            string defResult = "";
+            var defResult = new StringBuilder();
 
             if (jMDictResult.NameTypes != null &&
                 (jMDictResult.NameTypes.Count > 1 || !jMDictResult.NameTypes.Contains("unclass")))
             {
-                foreach (var nameType in jMDictResult.NameTypes)
+                foreach (string nameType in jMDictResult.NameTypes)
                 {
-                    defResult += "(";
-                    defResult += nameType;
-                    defResult += ") ";
+                    defResult.Append('(');
+                    defResult.Append(nameType);
+                    defResult.Append(") ");
                 }
             }
 
@@ -914,51 +914,38 @@ namespace JapaneseLookup.Lookup
                 if (jMDictResult.Definitions.Any())
                 {
                     if (jMDictResult.Definitions.Count > 0)
-                        defResult += "(" + count + ") ";
+                        defResult.Append($"({count}) ");
 
-                    defResult += string.Join("; ", jMDictResult.Definitions[i]) + " ";
+                    defResult.Append($"{string.Join("; ", jMDictResult.Definitions[i])} ");
                     ++count;
                 }
             }
 
-            return defResult;
+            return defResult.ToString();
         }
 
         private static string BuildEpwingDefinition(EpwingResult jMDictResult)
         {
-            //todo
-            // int count = 1;
-            string defResult = "";
+            var defResult = new StringBuilder();
             for (int i = 0; i < jMDictResult.Definitions.Count; i++)
             {
-                // if (jMDictResult.WordClasses.Any() && jMDictResult.WordClasses[i].Any())
-                // {
-                //     defResult += "(";
-                //     defResult += string.Join(", ", jMDictResult.WordClasses[i]);
-                //     defResult += ") ";
-                // }
-
                 if (jMDictResult.Definitions.Any())
                 {
-                    // defResult += "(" + count + ") ";
-
                     // todo
                     // var separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "; ";
-                    var separator = "\n";
-                    defResult += string.Join(separator, jMDictResult.Definitions[i]);
-
-                    // ++count;
+                    const string separator = "\n";
+                    defResult.Append(string.Join(separator, jMDictResult.Definitions[i]));
                 }
             }
 
-            defResult = defResult.Trim('\n');
-            return defResult;
+            return defResult.ToString().Trim('\n');
         }
 
         private static string BuildCustomWordDefinition(CustomWordEntry customWordResult)
         {
+            string separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "";
             int count = 1;
-            string defResult = "";
+            var defResult = new StringBuilder();
 
             if (customWordResult.WordClasses.Any())
             {
@@ -972,31 +959,27 @@ namespace JapaneseLookup.Lookup
                 else
                     tempWordClass = "other";
 
-                defResult += "(" + tempWordClass + ") ";
+                defResult.Append($"({tempWordClass}) ");
             }
 
             for (int i = 0; i < customWordResult.Definitions.Count; i++)
             {
                 if (customWordResult.Definitions.Any())
                 {
-                    defResult += "(" + count + ") ";
-
-                    defResult += string.Join("; ", customWordResult.Definitions[i]) + " ";
-
-                    var separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "";
-                    defResult += separator;
+                    defResult.Append($"({count}) ");
+                    defResult.Append(string.Join("; ", customWordResult.Definitions[i]) + " ");
+                    defResult.Append(separator);
 
                     ++count;
                 }
             }
 
-            defResult = defResult.Trim('\n');
-            return defResult;
+            return defResult.ToString().Trim('\n');
         }
 
         private static string BuildCustomNameDefinition(CustomNameEntry customNameDictResult)
         {
-            string defResult = "(" + customNameDictResult.NameType + ") " + customNameDictResult.Reading;
+            string defResult = $"({customNameDictResult.NameType}) {customNameDictResult.Reading}";
 
             return defResult;
         }
