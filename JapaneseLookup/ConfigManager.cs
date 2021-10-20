@@ -676,6 +676,7 @@ namespace JapaneseLookup
                     WriteXmlAdd(writer, "FrequencyList", "VN");
                     WriteXmlAdd(writer, "KanjiMode", "false");
                     WriteXmlAdd(writer, "LookupRate", "0");
+
                     WriteXmlAdd(writer, "MainWindowOpacity", "30");
                     WriteXmlAdd(writer, "MainWindowBackgroundColor", "#FF000000");
                     WriteXmlAdd(writer, "MainWindowTextColor", "#FFFFFFFF");
@@ -686,6 +687,7 @@ namespace JapaneseLookup
                     WriteXmlAdd(writer, "MainWindowWidth", "1200");
                     WriteXmlAdd(writer, "MainWindowTopPosition", "100");
                     WriteXmlAdd(writer, "MainWindowLeftPosition", "100");
+
                     WriteXmlAdd(writer, "PopupBackgroundColor", "#FF000000");
                     WriteXmlAdd(writer, "PopupOpacity", "100");
                     WriteXmlAdd(writer, "PopupPrimarySpellingColor", "#FFD2691E");
@@ -710,8 +712,10 @@ namespace JapaneseLookup
                     WriteXmlAdd(writer, "PopupYOffset", "20");
                     WriteXmlAdd(writer, "PopupFlip", "Y");
                     WriteXmlAdd(writer, "PopupSeparatorColor", "#FFFFFFFF");
+
                     WriteXmlAdd(writer, "AnkiConnectUri", "http://localhost:8765");
                     WriteXmlAdd(writer, "ForceAnkiSync", "false");
+
                     WriteXmlAdd(writer, "MiningModeKeyGesture", "M");
                     WriteXmlAdd(writer, "PlayAudioKeyGesture", "P");
                     WriteXmlAdd(writer, "KanjiModeKeyGesture", "K");
