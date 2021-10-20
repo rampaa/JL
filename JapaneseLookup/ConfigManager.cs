@@ -126,7 +126,7 @@ namespace JapaneseLookup
 
         public static void ApplyPreferences(MainWindow mainWindow)
         {
-            CreateDefaultConfigFile();
+            CreateDefaultAppConfig();
 
             MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength")!);
             FrequencyList = ConfigurationManager.AppSettings.Get("FrequencyList");
@@ -323,7 +323,7 @@ namespace JapaneseLookup
 
         public static void LoadPreferences(PreferencesWindow preferenceWindow)
         {
-            CreateDefaultConfigFile();
+            CreateDefaultAppConfig();
             var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
 
             preferenceWindow.MiningModeKeyGestureTextBox.Text =
@@ -556,7 +556,7 @@ namespace JapaneseLookup
 
         public static void SaveBeforeClosing(MainWindow mainWindow)
         {
-            CreateDefaultConfigFile();
+            CreateDefaultAppConfig();
 
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
@@ -661,269 +661,68 @@ namespace JapaneseLookup
             }
         }
 
-        private static void CreateDefaultConfigFile()
+        private static void CreateDefaultAppConfig()
         {
             string configPath = System.Reflection.Assembly.GetExecutingAssembly().Location + ".config";
             if (!File.Exists(configPath))
             {
-                using (XmlWriter writer = XmlWriter.Create(configPath, new XmlWriterSettings() { Indent = true }))
+                using (XmlWriter writer = XmlWriter.Create(configPath, new XmlWriterSettings { Indent = true }))
                 {
                     writer.WriteStartDocument();
-
                     writer.WriteStartElement("configuration");
                     writer.WriteStartElement("appSettings");
 
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "MaxSearchLength");
-                    writer.WriteAttributeString("value", "37");
-                    writer.WriteEndElement();
+                    WriteXmlAdd(writer, "MaxSearchLength", "37");
+                    WriteXmlAdd(writer, "FrequencyList", "VN");
+                    WriteXmlAdd(writer, "KanjiMode", "false");
+                    WriteXmlAdd(writer, "LookupRate", "0");
+                    WriteXmlAdd(writer, "MainWindowOpacity", "30");
+                    WriteXmlAdd(writer, "MainWindowBackgroundColor", "#FF000000");
+                    WriteXmlAdd(writer, "MainWindowTextColor", "#FFFFFFFF");
+                    WriteXmlAdd(writer, "MainWindowBacklogTextColor", "#FFFFE4C4");
+                    WriteXmlAdd(writer, "MainWindowFontSize", "40");
+                    WriteXmlAdd(writer, "MainWindowFont", "Meiryo");
+                    WriteXmlAdd(writer, "MainWindowHeight", "300");
+                    WriteXmlAdd(writer, "MainWindowWidth", "1200");
+                    WriteXmlAdd(writer, "MainWindowTopPosition", "100");
+                    WriteXmlAdd(writer, "MainWindowLeftPosition", "100");
+                    WriteXmlAdd(writer, "PopupBackgroundColor", "#FF000000");
+                    WriteXmlAdd(writer, "PopupOpacity", "100");
+                    WriteXmlAdd(writer, "PopupPrimarySpellingColor", "#FFD2691E");
+                    WriteXmlAdd(writer, "PopupPrimarySpellingFontSize", "21");
+                    WriteXmlAdd(writer, "PopupReadingColor", "#FFDAA520");
+                    WriteXmlAdd(writer, "PopupROrthographyInfoColor", "#FFDAA520");
+                    WriteXmlAdd(writer, "PopupReadingFontSize", "19");
+                    WriteXmlAdd(writer, "PopupROrthographyInfoFontSize", "17");
+                    WriteXmlAdd(writer, "PopupAlternativeSpellingColor", "#FFFFFFFF");
+                    WriteXmlAdd(writer, "PopupAOrthographyInfoColor", "#FFFFFFFF");
+                    WriteXmlAdd(writer, "PopupAlternativeSpellingFontSize", "17");
+                    WriteXmlAdd(writer, "PopupAOrthographyInfoFontSize", "17");
+                    WriteXmlAdd(writer, "PopupDefinitionColor", "#FFFFFFFF");
+                    WriteXmlAdd(writer, "PopupDefinitionFontSize", "17");
+                    WriteXmlAdd(writer, "PopupFrequencyColor", "#FFFFFFFF");
+                    WriteXmlAdd(writer, "PopupFrequencyFontSize", "17");
+                    WriteXmlAdd(writer, "PopupDeconjugationInfoColor", "#FFFFFFFF");
+                    WriteXmlAdd(writer, "PopupDeconjugationInfoFontSize", "17");
+                    WriteXmlAdd(writer, "PopupMaxWidth", "700");
+                    WriteXmlAdd(writer, "PopupMaxHeight", "520");
+                    WriteXmlAdd(writer, "PopupXOffset", "10");
+                    WriteXmlAdd(writer, "PopupYOffset", "20");
+                    WriteXmlAdd(writer, "PopupFlip", "Y");
+                    WriteXmlAdd(writer, "PopupSeparatorColor", "#FFFFFFFF");
+                    WriteXmlAdd(writer, "AnkiConnectUri", "http://localhost:8765");
+                    WriteXmlAdd(writer, "ForceAnkiSync", "false");
+                    WriteXmlAdd(writer, "MiningModeKeyGesture", "M");
+                    WriteXmlAdd(writer, "PlayAudioKeyGesture", "P");
+                    WriteXmlAdd(writer, "KanjiModeKeyGesture", "K");
+                    WriteXmlAdd(writer, "ShowPreferencesWindowKeyGesture", "L");
+                    WriteXmlAdd(writer, "ShowAddNameWindowKeyGesture", "N");
+                    WriteXmlAdd(writer, "ShowAddWordWindowKeyGesture", "W");
+                    WriteXmlAdd(writer, "SearchWithBrowserKeyGesture", "S");
+                    WriteXmlAdd(writer, "TransparentModeKeyGesture", "T");
+                    WriteXmlAdd(writer, "SteppedBacklogBackwardsKeyGesture", "Left");
+                    WriteXmlAdd(writer, "SteppedBacklogForwardsKeyGesture", "Right");
 
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "FrequencyList");
-                    writer.WriteAttributeString("value", "VN");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "KanjiMode");
-                    writer.WriteAttributeString("value", "false");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "LookupRate");
-                    writer.WriteAttributeString("value", "0");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "MainWindowOpacity");
-                    writer.WriteAttributeString("value", "30");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "MainWindowBackgroundColor");
-                    writer.WriteAttributeString("value", "#FF000000");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "MainWindowTextColor");
-                    writer.WriteAttributeString("value", "#FFFFFFFF");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "MainWindowBacklogTextColor");
-                    writer.WriteAttributeString("value", "#FFFFE4C4");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "MainWindowFontSize");
-                    writer.WriteAttributeString("value", "40");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "MainWindowFont");
-                    writer.WriteAttributeString("value", "Meiryo");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "MainWindowHeight");
-                    writer.WriteAttributeString("value", "300");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "MainWindowWidth");
-                    writer.WriteAttributeString("value", "1200");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "MainWindowTopPosition");
-                    writer.WriteAttributeString("value", "100");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "MainWindowLeftPosition");
-                    writer.WriteAttributeString("value", "100");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupBackgroundColor");
-                    writer.WriteAttributeString("value", "#FF000000");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupOpacity");
-                    writer.WriteAttributeString("value", "100");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupPrimarySpellingColor");
-                    writer.WriteAttributeString("value", "#FFD2691E");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupPrimarySpellingFontSize");
-                    writer.WriteAttributeString("value", "19");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupReadingColor");
-                    writer.WriteAttributeString("value", "#FFDAA520");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupROrthographyInfoColor");
-                    writer.WriteAttributeString("value", "#FFDAA520");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupReadingFontSize");
-                    writer.WriteAttributeString("value", "17");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupROrthographyInfoFontSize");
-                    writer.WriteAttributeString("value", "17");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupAlternativeSpellingColor");
-                    writer.WriteAttributeString("value", "#FFFFFFFF");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupAOrthographyInfoColor");
-                    writer.WriteAttributeString("value", "#FFFFFFFF");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupAlternativeSpellingFontSize");
-                    writer.WriteAttributeString("value", "15");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupAOrthographyInfoFontSize");
-                    writer.WriteAttributeString("value", "15");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupDefinitionColor");
-                    writer.WriteAttributeString("value", "#FFFFFFFF");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupDefinitionFontSize");
-                    writer.WriteAttributeString("value", "15");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupFrequencyColor");
-                    writer.WriteAttributeString("value", "#FFFFFFFF");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupFrequencyFontSize");
-                    writer.WriteAttributeString("value", "15");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupDeconjugationInfoColor");
-                    writer.WriteAttributeString("value", "#FFFFFFFF");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupDeconjugationInfoFontSize");
-                    writer.WriteAttributeString("value", "15");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupMaxWidth");
-                    writer.WriteAttributeString("value", "700");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupMaxHeight");
-                    writer.WriteAttributeString("value", "520");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupXOffset");
-                    writer.WriteAttributeString("value", "10");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupYOffset");
-                    writer.WriteAttributeString("value", "20");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupFlip");
-                    writer.WriteAttributeString("value", "Y");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PopupSeparatorColor");
-                    writer.WriteAttributeString("value", "#FFFFFFFF");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "AnkiConnectUri");
-                    writer.WriteAttributeString("value", "http://localhost:8765");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "ForceAnkiSync");
-                    writer.WriteAttributeString("value", "false");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "MiningModeKeyGesture");
-                    writer.WriteAttributeString("value", "M");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "PlayAudioKeyGesture");
-                    writer.WriteAttributeString("value", "P");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "KanjiModeKeyGesture");
-                    writer.WriteAttributeString("value", "K");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "ShowPreferencesWindowKeyGesture");
-                    writer.WriteAttributeString("value", "L");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "ShowAddNameWindowKeyGesture");
-                    writer.WriteAttributeString("value", "N");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "ShowAddWordWindowKeyGesture");
-                    writer.WriteAttributeString("value", "W");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "SearchWithBrowserKeyGesture");
-                    writer.WriteAttributeString("value", "S");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "TransparentModeKeyGesture");
-                    writer.WriteAttributeString("value", "T");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "SteppedBacklogBackwardsKeyGesture");
-                    writer.WriteAttributeString("value", "Left");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("add");
-                    writer.WriteAttributeString("key", "SteppedBacklogForwardsKeyGesture");
-                    writer.WriteAttributeString("value", "Right");
-                    writer.WriteEndElement();
-
-                    writer.WriteEndElement();
                     writer.WriteEndDocument();
                 }
 
@@ -931,6 +730,14 @@ namespace JapaneseLookup
                 config.Save(ConfigurationSaveMode.Modified);
                 ConfigurationManager.RefreshSection("appSettings");
             }
+        }
+
+        private static void WriteXmlAdd(XmlWriter writer, string key, string value)
+        {
+            writer.WriteStartElement("add");
+            writer.WriteAttributeString("key", key);
+            writer.WriteAttributeString("value", value);
+            writer.WriteEndElement();
         }
 
         private static List<string> FindJapaneseFonts()
