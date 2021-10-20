@@ -8,10 +8,20 @@
 	<Platforms>AnyCPU;x86</Platforms>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <ApplicationIcon>icon.ico</ApplicationIcon>
+    <AssemblyName>JL</AssemblyName>
+    <RootNamespace>JapaneseLookup</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="App.config" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="HandyControl" Version="3.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="App.config" />
   </ItemGroup>
 
   <ItemGroup>
