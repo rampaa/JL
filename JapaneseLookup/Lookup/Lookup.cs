@@ -325,7 +325,7 @@ namespace JapaneseLookup.Lookup
                                         resultsList.Add(rslt);
                                     }
                                 }
-                                else if (!rslt.WordClasses.Any() && !!jmdictWordClasses[result.Text].Any())
+                                else if (!rslt.WordClasses.Any() && !jmdictWordClasses[result.Text].Any())
                                 {
                                     resultsList.Add(rslt);
                                 }
