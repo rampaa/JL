@@ -5,20 +5,18 @@ namespace JapaneseLookup.EPWING
 {
     public class EpwingResult : IResult
     {
-        public List<List<string>> Definitions { get; set; }
-
-        public List<string> Readings { get; set; }
-
-        public List<List<string>> WordClasses { get; set; } //e.g. noun +
-
+        public List<string> Definitions { get; set; }
+        public string Reading { get; set; }
+        public List<string> WordClasses { get; set; } //e.g. noun +
         public string PrimarySpelling { get; set; }
-
+        public string KanaSpelling { get; set; }
         public EpwingResult()
         {
-            Definitions = new List<List<string>>();
-            Readings = new List<string>();
-            WordClasses = new List<List<string>>();
+            Definitions = new List<string>();
+            Reading = null;
+            WordClasses = new List<string>();
             PrimarySpelling = null;
+            KanaSpelling = null;
         }
     }
 }

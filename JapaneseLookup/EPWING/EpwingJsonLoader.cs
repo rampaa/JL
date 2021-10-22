@@ -44,38 +44,35 @@ namespace JapaneseLookup.EPWING
         {
             foreach (var entry in epwingEntryList)
             {
-                if ("" != entry.DefinitionTags)
-                    Debug.WriteLine(entry.DefinitionTags);
-                // if ("" != entry.Rules)
-                //     Debug.WriteLine(entry.Expression + " " + entry.Rules);
-                if (0 != entry.Score)
-                    Debug.WriteLine(entry.Score);
-                if ("" != entry.TermTags)
-                    Debug.WriteLine(entry.TermTags);
-
                 var result = new EpwingResult
                 {
-                    Definitions = new List<List<string>> { entry.Glosssary },
-                    Readings = new List<string> { entry.Reading ?? entry.Expression },
+                    Definitions = entry.Glosssary,
+                    Reading = entry.Reading,
                     PrimarySpelling = entry.Expression,
-                    WordClasses = new List<List<string>> { new() { entry.Rules } }
+                    WordClasses = entry.Rules
                 };
-                // if (entry.Expression == "アイドル")
-                //     Console.WriteLine();
+                
+                string hiraganaExpression = Kana.KatakanaToHiraganaConverter(entry.Expression);
+                if (hiraganaExpression != entry.Expression && string.IsNullOrEmpty(entry.Reading))
+                    result.KanaSpelling = entry.Expression;
 
-                if (epwingDictionary.TryGetValue(entry.Expression, out List<IResult> tempList))
+                if (!string.IsNullOrEmpty(entry.Reading))
+                {
+                    string hiraganaReading = Kana.KatakanaToHiraganaConverter(entry.Reading);
+                    if (hiraganaReading != entry.Reading)
+                        result.KanaSpelling = entry.Reading;
+
+                    if (epwingDictionary.TryGetValue(hiraganaReading, out List<IResult> tempList2))
+                        tempList2.Add(result);
+                    else
+                        epwingDictionary.TryAdd(entry.Reading, new List<IResult> { result });
+                }
+
+                if (epwingDictionary.TryGetValue(hiraganaExpression, out List<IResult> tempList))
                     tempList.Add(result);
                 else
-                    tempList = new() { result };
+                    epwingDictionary.TryAdd(hiraganaExpression, new List<IResult> { result });
 
-                Debug.Assert(entry.Reading != null, "entry.Reading != null");
-                if (entry.Reading != "")
-                    epwingDictionary[entry.Reading] = tempList;
-                // string hira = entry.Reading == "" ? null : entry.Reading;
-                string kata = Kana.KatakanaToHiraganaConverter(entry.Expression);
-
-                epwingDictionary[kata] = tempList;
-                epwingDictionary[entry.Expression] = tempList;
             }
         }
     }

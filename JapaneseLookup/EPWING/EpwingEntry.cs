@@ -15,7 +15,7 @@ namespace JapaneseLookup.EPWING
         public string Expression { get; set; }
         public string Reading { get; set; }
         public string DefinitionTags { get; set; }
-        public string Rules { get; set; }
+        public List<string> Rules { get; set; }
         public int Score { get; set; }
         public List<string> Glosssary { get; set; }
         public int Sequence { get; set; }
@@ -27,7 +27,7 @@ namespace JapaneseLookup.EPWING
             Reading = jsonElement[1].ToString();
             DefinitionTags = jsonElement[2].ToString();
 
-            Rules = jsonElement[3].ToString();
+            Rules = jsonElement[3].ToString().Split(" ").ToList();
 
             jsonElement[4].TryGetInt32(out int score);
             Score = score;

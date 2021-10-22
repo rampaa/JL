@@ -318,14 +318,13 @@ namespace JapaneseLookup.Lookup
                             {
                                 if (jmdictWordClasses.ContainsKey(result.Text))
                                 {
-                                    if (rslt.WordClasses.Union(jmdictWordClasses[result.Text]).SelectMany(pos => pos)
-                                        .Intersect(result.Tags).Any())
+                                    if (new List<List<string>> { rslt.WordClasses }.Union(jmdictWordClasses[result.Text]).SelectMany(pos => pos).Intersect(result.Tags).Any())
                                     {
                                         resultsList.Add(rslt);
                                     }
                                 }
                                 // TODO
-                                else
+                                else if (!rslt.WordClasses.Any() && !!jmdictWordClasses[result.Text].Any())
                                 {
                                     resultsList.Add(rslt);
                                 }
@@ -401,14 +400,13 @@ namespace JapaneseLookup.Lookup
                             {
                                 if (jmdictWordClasses.ContainsKey(result.Text))
                                 {
-                                    if (rslt.WordClasses.Union(jmdictWordClasses[result.Text]).SelectMany(pos => pos)
-                                        .Intersect(result.Tags).Any())
+                                    if (new List<List<string>> { rslt.WordClasses }.Union(jmdictWordClasses[result.Text]).SelectMany(pos => pos).Intersect(result.Tags).Any())
                                     {
                                         resultsList.Add(rslt);
                                     }
                                 }
                                 // TODO
-                                else
+                                else if (!rslt.WordClasses.Any() && !jmdictWordClasses[result.Text].Any())
                                 {
                                     resultsList.Add(rslt);
                                 }
@@ -717,7 +715,7 @@ namespace JapaneseLookup.Lookup
                     var result = new Dictionary<LookupResult, List<string>>();
 
                     var foundSpelling = new List<string> { epwingResult.PrimarySpelling };
-                    var readings = epwingResult.Readings.ToList();
+                    var reading = new List<string> { epwingResult.Reading };
                     var foundForm = new List<string> { wordResult.Value.FoundForm };
                     var process = wordResult.Value.ProcessList;
                     List<string> frequency;
@@ -739,7 +737,7 @@ namespace JapaneseLookup.Lookup
                         continue;
 
                     result.Add(LookupResult.FoundSpelling, foundSpelling);
-                    result.Add(LookupResult.Readings, readings);
+                    result.Add(LookupResult.Readings, reading);
                     result.Add(LookupResult.Definitions, definitions);
                     result.Add(LookupResult.FoundForm, foundForm);
                     result.Add(LookupResult.Process, process);
@@ -927,18 +925,13 @@ namespace JapaneseLookup.Lookup
         private static string BuildEpwingDefinition(EpwingResult jMDictResult)
         {
             var defResult = new StringBuilder();
-            for (int i = 0; i < jMDictResult.Definitions.Count; i++)
+            foreach (string definitionPart in jMDictResult.Definitions)
             {
-                if (jMDictResult.Definitions.Any())
-                {
                     // todo
                     // var separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "; ";
-                    const string separator = "\n";
-                    defResult.Append(string.Join(separator, jMDictResult.Definitions[i]));
-                }
+                    defResult.Append(definitionPart + Environment.NewLine);
             }
-
-            return defResult.ToString().Trim('\n');
+            return defResult.ToString().Trim();
         }
 
         private static string BuildCustomWordDefinition(CustomWordEntry customWordResult)
