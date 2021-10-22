@@ -397,7 +397,7 @@
 
                         <DockPanel>
                             <TextBox x:Name="MiningModeKeyGestureTextBox" AutomationProperties.Name=""
-                                     PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" />
                             <TextBlock Text="Mining mode" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
@@ -405,7 +405,7 @@
 
                         <DockPanel>
                             <TextBox x:Name="KanjiModeKeyGestureTextBox" AutomationProperties.Name=""
-                                     PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" />
                             <TextBlock Text="Kanji mode" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
@@ -413,7 +413,7 @@
 
                         <DockPanel>
                             <TextBox x:Name="TransparentModeKeyGestureTextBox" AutomationProperties.Name=""
-                                     PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" />
                             <TextBlock Text="Transparent mode" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
@@ -421,7 +421,7 @@
 
                         <DockPanel>
                             <TextBox x:Name="PlayAudioKeyGestureTextBox" AutomationProperties.Name=""
-                                     PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" />
                             <TextBlock Text="Play audio" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
@@ -429,7 +429,7 @@
 
                         <DockPanel>
                             <TextBox x:Name="ShowPreferencesWindowKeyGestureTextBox" AutomationProperties.Name=""
-                                     PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" />
                             <TextBlock Text="Preferences" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
@@ -437,7 +437,7 @@
 
                         <DockPanel>
                             <TextBox x:Name="ShowAddNameWindowKeyGestureTextBox" AutomationProperties.Name=""
-                                     PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" />
                             <TextBlock Text="Add name" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
@@ -445,7 +445,7 @@
 
                         <DockPanel>
                             <TextBox x:Name="ShowAddWordWindowKeyGestureTextBox" AutomationProperties.Name=""
-                                     PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" />
                             <TextBlock Text="Add word" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
@@ -453,7 +453,7 @@
 
                         <DockPanel>
                             <TextBox x:Name="SearchWithBrowserKeyGestureTextBox" AutomationProperties.Name=""
-                                     PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" />
                             <TextBlock Text="Search" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
@@ -461,7 +461,7 @@
 
                         <DockPanel>
                             <TextBox x:Name="SteppedBacklogBackwardsKeyGestureTextBox" AutomationProperties.Name=""
-                                     PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" />
                             <TextBlock Text="Move backwards (Backlog)" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
@@ -469,7 +469,7 @@
 
                         <DockPanel>
                             <TextBox x:Name="SteppedBacklogForwardsKeyGestureTextBox" AutomationProperties.Name=""
-                                     PreviewKeyDown="KeyGesturetoText" CaretBrush="#00000000" Width="250"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" />
                             <TextBlock Text="Move forward (Backlog)" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />

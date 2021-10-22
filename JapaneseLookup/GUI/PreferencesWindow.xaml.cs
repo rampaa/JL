@@ -491,7 +491,7 @@ namespace JapaneseLookup.GUI
 
         #endregion
 
-        private void KeyGesturetoText(object sender, KeyEventArgs e)
+        private void KeyGestureToText(object sender, KeyEventArgs e)
         {
             e.Handled = true;
 
@@ -505,7 +505,7 @@ namespace JapaneseLookup.GUI
                 return;
             }
 
-            StringBuilder hotkeyTextBuilder = new StringBuilder();
+            StringBuilder hotkeyTextBuilder = new();
 
             if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
             {

@@ -10,6 +10,7 @@ namespace JapaneseLookup.EPWING
         public List<string> WordClasses { get; set; } //e.g. noun +
         public string PrimarySpelling { get; set; }
         public string KanaSpelling { get; set; }
+
         public EpwingResult()
         {
             Definitions = new List<string>();

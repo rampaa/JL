@@ -39,7 +39,7 @@ namespace JapaneseLookup.Anki
                         composition
                     );
 
-                Dictionary<string, object> options = new Dictionary<string, object>
+                Dictionary<string, object> options = new()
                 {
                     {
                         "allowDuplicate",

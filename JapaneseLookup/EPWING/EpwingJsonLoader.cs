@@ -39,10 +39,10 @@ namespace JapaneseLookup.EPWING
             ConfigManager.Dicts[dictType].Contents.TrimExcess();
         }
 
-        public static void DictionaryBuilder(List<EpwingEntry> epwingEntryList,
+        private static void DictionaryBuilder(List<EpwingEntry> epwingEntryList,
             Dictionary<string, List<IResult>> epwingDictionary)
         {
-            foreach (var entry in epwingEntryList)
+            foreach (EpwingEntry entry in epwingEntryList)
             {
                 var result = new EpwingResult
                 {
@@ -51,7 +51,7 @@ namespace JapaneseLookup.EPWING
                     PrimarySpelling = entry.Expression,
                     WordClasses = entry.Rules
                 };
-                
+
                 string hiraganaExpression = Kana.KatakanaToHiraganaConverter(entry.Expression);
                 if (hiraganaExpression != entry.Expression && string.IsNullOrEmpty(entry.Reading))
                     result.KanaSpelling = entry.Expression;
@@ -72,7 +72,6 @@ namespace JapaneseLookup.EPWING
                     tempList.Add(result);
                 else
                     epwingDictionary.TryAdd(hiraganaExpression, new List<IResult> { result });
-
             }
         }
     }

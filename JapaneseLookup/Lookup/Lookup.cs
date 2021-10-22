@@ -59,7 +59,7 @@ namespace JapaneseLookup.Lookup
 
             jMdictResults = GetJMdictResults(text, textInHiraganaList, deconjugationResultsList, DictType.JMdict);
 
-            Dictionary<string, List<List<string>>> jmdictWordClasses = new Dictionary<string, List<List<string>>>();
+            Dictionary<string, List<List<string>>> jmdictWordClasses = new();
             foreach ((string key, IntermediaryResult value) in jMdictResults)
             {
                 foreach (JMdictResult jmdictResult in value.ResultsList.Cast<JMdictResult>())
@@ -318,12 +318,13 @@ namespace JapaneseLookup.Lookup
                             {
                                 if (jmdictWordClasses.ContainsKey(result.Text))
                                 {
-                                    if (new List<List<string>> { rslt.WordClasses }.Union(jmdictWordClasses[result.Text]).SelectMany(pos => pos).Intersect(result.Tags).Any())
+                                    if (new List<List<string>> { rslt.WordClasses }
+                                        .Union(jmdictWordClasses[result.Text]).SelectMany(pos => pos)
+                                        .Intersect(result.Tags).Any())
                                     {
                                         resultsList.Add(rslt);
                                     }
                                 }
-                                // TODO
                                 else if (!rslt.WordClasses.Any() && !!jmdictWordClasses[result.Text].Any())
                                 {
                                     resultsList.Add(rslt);
@@ -400,12 +401,13 @@ namespace JapaneseLookup.Lookup
                             {
                                 if (jmdictWordClasses.ContainsKey(result.Text))
                                 {
-                                    if (new List<List<string>> { rslt.WordClasses }.Union(jmdictWordClasses[result.Text]).SelectMany(pos => pos).Intersect(result.Tags).Any())
+                                    if (new List<List<string>> { rslt.WordClasses }
+                                        .Union(jmdictWordClasses[result.Text]).SelectMany(pos => pos)
+                                        .Intersect(result.Tags).Any())
                                     {
                                         resultsList.Add(rslt);
                                     }
                                 }
-                                // TODO
                                 else if (!rslt.WordClasses.Any() && !jmdictWordClasses[result.Text].Any())
                                 {
                                     resultsList.Add(rslt);
@@ -861,7 +863,7 @@ namespace JapaneseLookup.Lookup
 
                     if (jMDictResult.MiscList.Any() && jMDictResult.MiscList[i].Any())
                     {
-                        defResult.Append("(");
+                        defResult.Append('(');
                         defResult.Append(string.Join(", ", jMDictResult.MiscList[i]));
                         defResult.Append(") ");
                     }
@@ -927,11 +929,13 @@ namespace JapaneseLookup.Lookup
             var defResult = new StringBuilder();
             foreach (string definitionPart in jMDictResult.Definitions)
             {
-                    // todo
-                    // var separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "; ";
-                    defResult.Append(definitionPart + Environment.NewLine);
+                // todo
+                // var separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "; ";
+                const string separator = "\n";
+                defResult.Append(definitionPart + separator);
             }
-            return defResult.ToString().Trim();
+
+            return defResult.ToString().Trim('\n');
         }
 
         private static string BuildCustomWordDefinition(CustomWordEntry customWordResult)
