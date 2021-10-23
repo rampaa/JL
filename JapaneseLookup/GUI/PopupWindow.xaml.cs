@@ -198,7 +198,7 @@ namespace JapaneseLookup.GUI
             TextBlock textBlockEdictID = null;
 
             // bottom
-            TextBox textBlockDefinitions = null;
+            UIElement textBlockDefinitions = null;
             TextBlock textBlockNanori = null;
             TextBlock textBlockOnReadings = null;
             TextBlock textBlockKunReadings = null;
@@ -280,26 +280,42 @@ namespace JapaneseLookup.GUI
                         break;
 
                     case LookupResult.Definitions:
-                        textBlockDefinitions = new TextBox
+                        if (MiningMode)
                         {
-                            Name = key.ToString(),
-                            Text = string.Join(", ", value),
-                            TextWrapping = TextWrapping.Wrap,
-                            Foreground = ConfigManager.DefinitionsColor,
-                            FontSize = ConfigManager.DefinitionsFontSize,
-                            Margin = new Thickness(2, 2, 2, 2),
-                            IsReadOnly = true,
-                            IsUndoEnabled = false,
-                            UndoLimit = 0,
-                        };
-                        textBlockDefinitions.MouseMove += (sender, _) =>
-                        {
-                            ChildPopupWindow ??= new PopupWindow();
+                            textBlockDefinitions = new TextBox
+                            {
+                                Name = key.ToString(),
+                                Text = string.Join(", ", value),
+                                TextWrapping = TextWrapping.Wrap,
+                                Foreground = ConfigManager.DefinitionsColor,
+                                FontSize = ConfigManager.DefinitionsFontSize,
+                                Margin = new Thickness(2, 2, 2, 2),
+                                IsReadOnly = true,
+                                IsUndoEnabled = false,
+                                UndoLimit = 0,
+                            };
+                            textBlockDefinitions.MouseMove += (sender, _) =>
+                            {
+                                ChildPopupWindow ??= new PopupWindow();
 
-                            // prevents stray PopupWindows being created when you move your mouse too fast
-                            if (MiningMode)
-                                ChildPopupWindow.Definitions_MouseMove((TextBox) sender);
-                        };
+                                // prevents stray PopupWindows being created when you move your mouse too fast
+                                if (MiningMode)
+                                    ChildPopupWindow.Definitions_MouseMove((TextBox) sender);
+                            };
+                        }
+                        else
+                        {
+                            textBlockDefinitions = new TextBlock()
+                            {
+                                Name = key.ToString(),
+                                Text = string.Join(", ", value),
+                                TextWrapping = TextWrapping.Wrap,
+                                Foreground = ConfigManager.DefinitionsColor,
+                                FontSize = ConfigManager.DefinitionsFontSize,
+                                Margin = new Thickness(2, 2, 2, 2),
+                            };
+                        }
+                        
                         break;
 
                     case LookupResult.EdictID:
@@ -531,8 +547,7 @@ namespace JapaneseLookup.GUI
 
             string foundSpelling = null;
             string readings = null;
-            //todo broken because of textbox
-            string definitions = "";
+            var definitions = "";
             string context = PopupWindowUtilities.FindSentence(CurrentText, CurrentCharPosition);
             string foundForm = null;
             string edictID = null;
@@ -584,6 +599,11 @@ namespace JapaneseLookup.GUI
             var bottom = (StackPanel) innerStackPanel.Children[1];
             foreach (object child in bottom.Children)
             {
+                if (child is TextBox textBox)
+                {
+                    definitions += textBox.Text;
+                    break;
+                }
                 if (child is not TextBlock)
                     continue;
 
@@ -592,9 +612,6 @@ namespace JapaneseLookup.GUI
                 Enum.TryParse(textBlock.Name, out LookupResult result);
                 switch (result)
                 {
-                    case LookupResult.Definitions:
-                        definitions += textBlock.Text;
-                        break;
                     case LookupResult.StrokeCount:
                         strokeCount += textBlock.Text;
                         break;
