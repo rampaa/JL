@@ -878,11 +878,15 @@ namespace JapaneseLookup.Lookup
                         if (jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
                         {
                             defResult.Append(string.Join("; ", jMDictResult.KRestrictions[i]));
-                            defResult.Append("; ");
                         }
 
                         if (jMDictResult.RRestrictions != null && jMDictResult.RRestrictions[i].Any())
+                        {
+                            if (jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
+                                defResult.Append("; ");
+
                             defResult.Append(string.Join("; ", jMDictResult.RRestrictions[i]));
+                        }
 
                         defResult.Append(") ");
                     }
