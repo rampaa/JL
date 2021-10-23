@@ -46,11 +46,12 @@ namespace JapaneseLookup.GUI
         public PopupWindow()
         {
             InitializeComponent();
-            // TODO: do we really need these two lines when we set them up in the ConfigManager?
+
             MaxWidth = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth") ??
                                  throw new InvalidOperationException());
             MaxHeight = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight") ??
                                   throw new InvalidOperationException());
+            Background = ConfigManager.PopupBackgroundColor;
 
             // need to initialize window (position) for later
             Show();

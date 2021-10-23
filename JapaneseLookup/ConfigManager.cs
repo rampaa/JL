@@ -178,6 +178,7 @@ namespace JapaneseLookup
             SeparatorColor!.Freeze();
             PopupBackgroundColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
+            PopupBackgroundColor.Opacity = double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")!) / 100;
             PopupBackgroundColor!.Freeze();
 
             FoundSpellingFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupPrimarySpellingFontSize")!);
@@ -315,11 +316,8 @@ namespace JapaneseLookup
             mainWindow.Left = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowLeftPosition")!);
 
             var popupWindow = MainWindow.FirstPopupWindow;
-            popupWindow.Background = (SolidColorBrush) new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
+            popupWindow.Background = PopupBackgroundColor;
             Debug.Assert(popupWindow.Background != null, "FirstPopupWindow.Background != null");
-            popupWindow.Background.Opacity =
-                double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")!) / 100;
             popupWindow.MaxHeight = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight")!);
             popupWindow.MaxWidth = double.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth")!);
 
@@ -398,12 +396,10 @@ namespace JapaneseLookup
             preferenceWindow.PopupPrimarySpellingFontSizeNumericUpDown.Value = FoundSpellingFontSize;
             preferenceWindow.PopupReadingFontSizeNumericUpDown.Value = ReadingsFontSize;
             preferenceWindow.PopupROrthographyInfoFontSizeNumericUpDown.Value = ROrthographyInfoFontSize;
-            preferenceWindow.PopupBackgroundColorButton.Background = (SolidColorBrush) new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
+            preferenceWindow.PopupBackgroundColorButton.Background = PopupBackgroundColor;
             preferenceWindow.PopupOpacityNumericUpDown.Value = int.Parse(
                 ConfigurationManager.AppSettings.Get("PopupOpacity") ?? throw new InvalidOperationException());
             preferenceWindow.PopupSeparatorColorButton.Background = SeparatorColor;
-            preferenceWindow.PopupBackgroundColorButton.Background = PopupBackgroundColor;
             preferenceWindow.PopupXOffsetNumericUpDown.Value = PopupXOffset;
             preferenceWindow.PopupYOffsetNumericUpDown.Value = PopupYOffset;
 
