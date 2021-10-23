@@ -708,12 +708,9 @@ namespace JapaneseLookup.GUI
 
             else if (e.Key == Key.Escape)
             {
-                if (MiningMode)
-                {
                     MiningMode = false;
                     PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                     Hide();
-                }
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.KanjiModeKeyGesture))
