@@ -254,6 +254,14 @@ namespace JapaneseLookup
             else
                 ShowAddNameWindowKeyGesture = (KeyGesture) keyGestureConverter.ConvertFromString(rawKeyGesture);
 
+            rawKeyGesture = ConfigurationManager.AppSettings.Get("ShowAddWordWindowKeyGesture");
+            if (!rawKeyGesture!.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
+                !rawKeyGesture.StartsWith("Alt+"))
+                ShowAddWordWindowKeyGesture =
+                    (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+            else
+                ShowAddWordWindowKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
+
             rawKeyGesture = ConfigurationManager.AppSettings.Get("SearchWithBrowserKeyGesture");
             if (!rawKeyGesture!.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
                 !rawKeyGesture.StartsWith("Alt+"))
