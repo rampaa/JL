@@ -81,6 +81,7 @@ namespace JapaneseLookup
         public static SolidColorBrush AlternativeSpellingsColor;
         public static SolidColorBrush AOrthographyInfoColor;
         public static SolidColorBrush SeparatorColor;
+        public static SolidColorBrush PopupBackgroundColor;
 
         public static int FoundSpellingFontSize;
         public static int ReadingsFontSize;
@@ -175,6 +176,9 @@ namespace JapaneseLookup
             SeparatorColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupSeparatorColor"));
             SeparatorColor!.Freeze();
+            PopupBackgroundColor = (SolidColorBrush) new BrushConverter()
+                .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
+            PopupBackgroundColor!.Freeze();
 
             FoundSpellingFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupPrimarySpellingFontSize")!);
             ReadingsFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupReadingFontSize")!);
@@ -399,6 +403,7 @@ namespace JapaneseLookup
             preferenceWindow.PopupOpacityNumericUpDown.Value = int.Parse(
                 ConfigurationManager.AppSettings.Get("PopupOpacity") ?? throw new InvalidOperationException());
             preferenceWindow.PopupSeparatorColorButton.Background = SeparatorColor;
+            preferenceWindow.PopupBackgroundColorButton.Background = PopupBackgroundColor;
             preferenceWindow.PopupXOffsetNumericUpDown.Value = PopupXOffset;
             preferenceWindow.PopupYOffsetNumericUpDown.Value = PopupYOffset;
 
@@ -541,6 +546,7 @@ namespace JapaneseLookup
 
             config.AppSettings.Settings["PopupSeparatorColor"].Value =
                 preferenceWindow.PopupSeparatorColorButton.Background.ToString();
+
             config.AppSettings.Settings["PopupXOffset"].Value =
                 preferenceWindow.PopupXOffsetNumericUpDown.Value.ToString();
             config.AppSettings.Settings["PopupYOffset"].Value =

@@ -287,12 +287,12 @@ namespace JapaneseLookup.GUI
                                 Name = key.ToString(),
                                 Text = string.Join(", ", value),
                                 TextWrapping = TextWrapping.Wrap,
+                                Background = ConfigManager.PopupBackgroundColor,
                                 Foreground = ConfigManager.DefinitionsColor,
                                 FontSize = ConfigManager.DefinitionsFontSize,
                                 Margin = new Thickness(2, 2, 2, 2),
                                 IsReadOnly = true,
                                 IsUndoEnabled = false,
-                                UndoLimit = 0,
                             };
                             textBlockDefinitions.MouseMove += (sender, _) =>
                             {
