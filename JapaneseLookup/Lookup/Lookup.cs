@@ -876,7 +876,10 @@ namespace JapaneseLookup.Lookup
                         defResult.Append("(only applies to ");
 
                         if (jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
+                        {
                             defResult.Append(string.Join("; ", jMDictResult.KRestrictions[i]));
+                            defResult.Append("; ");
+                        }
 
                         if (jMDictResult.RRestrictions != null && jMDictResult.RRestrictions[i].Any())
                             defResult.Append(string.Join("; ", jMDictResult.RRestrictions[i]));
