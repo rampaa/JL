@@ -396,7 +396,10 @@ namespace JapaneseLookup
             preferenceWindow.PopupPrimarySpellingFontSizeNumericUpDown.Value = FoundSpellingFontSize;
             preferenceWindow.PopupReadingFontSizeNumericUpDown.Value = ReadingsFontSize;
             preferenceWindow.PopupROrthographyInfoFontSizeNumericUpDown.Value = ROrthographyInfoFontSize;
-            preferenceWindow.PopupBackgroundColorButton.Background = PopupBackgroundColor;
+
+            // Button background colors has to be opaque, so we cannot use PopupBackgroundColor here
+            preferenceWindow.PopupBackgroundColorButton.Background = (SolidColorBrush)new BrushConverter()
+                .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
             preferenceWindow.PopupOpacityNumericUpDown.Value = int.Parse(
                 ConfigurationManager.AppSettings.Get("PopupOpacity") ?? throw new InvalidOperationException());
             preferenceWindow.PopupSeparatorColorButton.Background = SeparatorColor;
