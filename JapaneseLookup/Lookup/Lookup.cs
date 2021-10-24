@@ -18,17 +18,6 @@ namespace JapaneseLookup.Lookup
     public static class Lookup
     {
         private static DateTime _lastLookupTime;
-
-        public static IEnumerable<string> UnicodeIterator(this string s)
-        {
-            for (int i = 0; i < s.Length; ++i)
-            {
-                yield return char.ConvertFromUtf32(char.ConvertToUtf32(s, i));
-                if (char.IsHighSurrogate(s, i))
-                    i++;
-            }
-        }
-
         public static List<Dictionary<LookupResult, List<string>>> LookupText(string text)
         {
             var preciseTimeNow = new DateTime(Stopwatch.GetTimestamp());
@@ -445,8 +434,9 @@ namespace JapaneseLookup.Lookup
         private static Dictionary<string, IntermediaryResult> GetCustomWordResults(string text,
             List<string> textInHiraganaList, List<HashSet<Form>> deconjugationResultsList, DictType dictType)
         {
-            var customWordResults =
-                new Dictionary<string, IntermediaryResult>();
+            var customWordResults = new Dictionary<string, IntermediaryResult>();
+
+            var customWordDictionary = ConfigManager.Dicts[DictType.CustomWordDictionary].Contents;
 
             int succAttempt = 0;
 
@@ -454,8 +444,7 @@ namespace JapaneseLookup.Lookup
             {
                 bool tryLongVowelConversion = true;
 
-                if (ConfigManager.Dicts[DictType.CustomWordDictionary].Contents
-                    .TryGetValue(textInHiraganaList[i], out var tempResult))
+                if (customWordDictionary.TryGetValue(textInHiraganaList[i], out var tempResult))
                 {
                     customWordResults.TryAdd(textInHiraganaList[i],
                         new IntermediaryResult(tempResult, new List<string>(), text[..^i], dictType));
@@ -469,8 +458,7 @@ namespace JapaneseLookup.Lookup
                         if (customWordResults.ContainsKey(result.Text))
                             continue;
 
-                        if (ConfigManager.Dicts[DictType.CustomWordDictionary].Contents
-                            .TryGetValue(result.Text, out var temp))
+                        if (customWordDictionary.TryGetValue(result.Text, out var temp))
                         {
                             List<IResult> resultsList = new();
 
@@ -499,8 +487,7 @@ namespace JapaneseLookup.Lookup
                 if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") && textInHiraganaList[i][0] != 'ー')
                 {
                     string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
-                    if (ConfigManager.Dicts[DictType.CustomWordDictionary].Contents
-                        .TryGetValue(textWithoutLongVowelMark, out var tmpResult))
+                    if (customWordDictionary.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
                     {
                         customWordResults.Add(textInHiraganaList[i],
                             new IntermediaryResult(tmpResult, new List<string>(), text[..^i], dictType));
@@ -760,9 +747,9 @@ namespace JapaneseLookup.Lookup
 
             foreach (var wordResult in customWordResults)
             {
-                foreach (IResult iResult in wordResult.Value.ResultsList)
+                for (int i = wordResult.Value.ResultsList.Count - 1; i >= 0; i--)
                 {
-                    var customWordDictResults = (CustomWordEntry) iResult;
+                    var customWordDictResults = (CustomWordEntry)wordResult.Value.ResultsList[i];
                     var result = new Dictionary<LookupResult, List<string>>();
 
                     var foundSpelling = new List<string> { customWordDictResults.PrimarySpelling };
@@ -806,9 +793,9 @@ namespace JapaneseLookup.Lookup
 
             foreach (var customNameResult in customNameResults)
             {
-                foreach (IResult iResult in customNameResult.Value.ResultsList)
+                for (int i = customNameResult.Value.ResultsList.Count -1; i >=0 ; i--)
                 {
-                    var customNameDictResult = (CustomNameEntry) iResult;
+                    var customNameDictResult = (CustomNameEntry)customNameResult.Value.ResultsList[i];
                     var result = new Dictionary<LookupResult, List<string>>();
 
                     var foundSpelling = new List<string> { customNameDictResult.PrimarySpelling };
@@ -983,7 +970,7 @@ namespace JapaneseLookup.Lookup
 
         private static string BuildCustomNameDefinition(CustomNameEntry customNameDictResult)
         {
-            string defResult = $"({customNameDictResult.NameType}) {customNameDictResult.Reading}";
+            string defResult = $"({customNameDictResult.NameType.ToLower()}) {customNameDictResult.Reading}";
 
             return defResult;
         }

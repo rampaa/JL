@@ -15,16 +15,18 @@ namespace JapaneseLookup.CustomDict
                     Path.Join(ConfigManager.ApplicationPath, customNameDictPath)))
                 {
                     string[] lParts = line.Split("\t");
-                    AddToDictionary(lParts[0], lParts[1], lParts[2]);
-                }
 
-                ConfigManager.Dicts[DictType.CustomNameDictionary].Contents.TrimExcess();
+                    if (lParts.Length == 3)
+                    {
+                        AddToDictionary(lParts[0].Trim(), lParts[1].Trim(), lParts[2].Trim());
+                    }
+                }
             }
         }
 
-        public static void AddToDictionary(string spelling, string reading, string definition)
+        public static void AddToDictionary(string spelling, string reading, string nameType)
         {
-            CustomNameEntry newNameEntry = new(spelling, reading, definition);
+            CustomNameEntry newNameEntry = new(spelling, reading, nameType);
 
             var customNameDictionary = ConfigManager.Dicts[DictType.CustomNameDictionary].Contents;
 

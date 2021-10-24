@@ -29,7 +29,7 @@ namespace JapaneseLookup
     public static class ConfigManager
     {
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
-        private static readonly List<string> JapaneseFonts = FindJapaneseFonts().OrderBy(font => font).ToList();
+        private static readonly List<string> JapaneseFonts = Utilities.Utils.FindJapaneseFonts().OrderBy(font => font).ToList();
 
         public static readonly Dictionary<string, Dict> BuiltInDicts =
             new()
@@ -757,35 +757,6 @@ namespace JapaneseLookup
             writer.WriteAttributeString("value", value);
             writer.WriteEndElement();
         }
-
-        private static List<string> FindJapaneseFonts()
-        {
-            List<string> japaneseFonts = new();
-            foreach (FontFamily fontFamily in Fonts.SystemFontFamilies)
-            {
-                if (fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("ja-jp")))
-                    japaneseFonts.Add(fontFamily.Source);
-
-                else if (fontFamily.FamilyNames.Keys != null && fontFamily.FamilyNames.Keys.Count == 1 &&
-                         fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("en-US")))
-                {
-                    foreach (var typeFace in fontFamily.GetTypefaces())
-                    {
-                        if (typeFace.TryGetGlyphTypeface(out var glyphTypeFace))
-                        {
-                            if (glyphTypeFace.CharacterToGlyphMap.ContainsKey(20685))
-                            {
-                                japaneseFonts.Add(fontFamily.Source);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return japaneseFonts;
-        }
-
         private static void LoadDictionaries()
         {
             string freqListPath = FrequencyLists[FrequencyList];

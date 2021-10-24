@@ -90,7 +90,7 @@ namespace JapaneseLookup.GUI
 
                 await WriteToFile(rawSpellings, rawReadings, rawDefinitions, rawWordClass);
 
-                string[] spellings = rawDefinitions.Split(';');
+                string[] spellings = rawSpellings.Split(';');
                 List<string> readings = rawReadings.Split(';').ToList();
                 List<string> definitions = rawDefinitions.Split(';').ToList();
 

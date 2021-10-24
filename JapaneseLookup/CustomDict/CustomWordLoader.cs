@@ -20,15 +20,16 @@ namespace JapaneseLookup.CustomDict
                 {
                     string[] lParts = line.Split("\t");
 
-                    string[] spellings = lParts[0].Split(';');
-                    List<string> readings = lParts[1].Split(';').ToList();
-                    List<string> definitions = lParts[2].Split(';').ToList();
-                    string wordClass = lParts[3];
+                    if (lParts.Length == 4)
+                    {
+                        string[] spellings = lParts[0].Split(';').Select(s => s.Trim()).ToArray();
+                        List<string> readings = lParts[1].Split(';').Select(r => r.Trim()).ToList();
+                        List<string> definitions = lParts[2].Split(';').Select(d => d.Trim()).ToList();
+                        string wordClass = lParts[3].Trim();
 
-                    AddToDictionary(spellings, readings, definitions, wordClass);
+                        AddToDictionary(spellings, readings, definitions, wordClass);
+                    }
                 }
-
-                ConfigManager.Dicts[DictType.CustomWordDictionary].Contents.TrimExcess();
             }
         }
 
@@ -146,7 +147,7 @@ namespace JapaneseLookup.CustomDict
                 }
                 else
                 {
-                    customWordDictionary.Add(spelling, new List<IResult>() { newWordEntry });
+                    customWordDictionary.Add(spelling, new List<IResult> { newWordEntry });
                 }
             }
         }
