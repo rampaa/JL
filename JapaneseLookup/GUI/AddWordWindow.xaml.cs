@@ -90,9 +90,9 @@ namespace JapaneseLookup.GUI
 
                 await WriteToFile(rawSpellings, rawReadings, rawDefinitions, rawWordClass);
 
-                string[] spellings = rawSpellings.Split(';');
-                List<string> readings = rawReadings.Split(';').ToList();
-                List<string> definitions = rawDefinitions.Split(';').ToList();
+                string[] spellings = rawSpellings.Split(';').Select(s => s.Trim()).ToArray();
+                List<string> readings = rawReadings.Split(';').Select(r => r.Trim()).ToList();
+                List<string> definitions = rawDefinitions.Split(';').Select(s => s.Trim()).ToList();
 
                 CustomDict.CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawWordClass);
 

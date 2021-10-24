@@ -80,7 +80,7 @@ namespace JapaneseLookup.GUI
                 string spelling = SpellingTextBox.Text;
                 string reading = ReadingTextBox.Text;
                 await WriteToFile(spelling, reading, nameType);
-                CustomNameLoader.AddToDictionary(spelling, reading, nameType);
+                CustomNameLoader.AddToDictionary(spelling.Trim(), reading.Trim(), nameType.Trim());
                 Close();
             }
         }
