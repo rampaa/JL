@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using JapaneseLookup.Anki;
 using JapaneseLookup.Lookup;
 using JapaneseLookup.Utilities;
@@ -291,6 +292,7 @@ namespace JapaneseLookup.GUI
                                 Background = ConfigManager.PopupBackgroundColor,
                                 Foreground = ConfigManager.DefinitionsColor,
                                 FontSize = ConfigManager.DefinitionsFontSize,
+                                BorderThickness = new Thickness(0, 0, 0, 0),
                                 Margin = new Thickness(2, 2, 2, 2),
                                 IsReadOnly = true,
                                 IsUndoEnabled = false,

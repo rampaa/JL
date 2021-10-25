@@ -632,6 +632,28 @@ namespace JapaneseLookup.Lookup
                         }
                     }
                 }
+
+                if (freqValue == int.MaxValue && jMDictResult.AlternativeSpellings != null)
+                {
+                    foreach (var alternativeSpelling in jMDictResult.AlternativeSpellings)
+                    {
+                        if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(alternativeSpelling), out var alternativeSpellingFreqResults))
+                        {
+                            foreach (var alternativeSpellingFreqResult in alternativeSpellingFreqResults)
+                            {
+                                if (jMDictResult.Readings != null && jMDictResult.Readings.Contains(alternativeSpellingFreqResult.Spelling)
+                                    )
+                                {
+                                    if (freqValue > alternativeSpellingFreqResult.Frequency)
+                                    {
+                                        freqValue = alternativeSpellingFreqResult.Frequency;
+                                        frequency = new List<string> { alternativeSpellingFreqResult.Frequency.ToString() };
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             else
