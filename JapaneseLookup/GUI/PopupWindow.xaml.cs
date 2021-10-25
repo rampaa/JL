@@ -62,12 +62,11 @@ namespace JapaneseLookup.GUI
         {
             if (MiningMode) return;
 
-            int charPosition = tb.GetCharacterIndexFromPoint(Mouse.GetPosition(tb), false);
+            UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
+            int charPosition = tb.GetCharacterIndexFromPoint(Mouse.GetPosition(tb), false);
             if (charPosition != -1)
             {
-                UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
-
                 if (charPosition > 0 && char.IsHighSurrogate(tb.Text[charPosition - 1]))
                     --charPosition;
 
@@ -306,7 +305,7 @@ namespace JapaneseLookup.GUI
                         }
                         else
                         {
-                            textBlockDefinitions = new TextBlock()
+                            textBlockDefinitions = new TextBlock
                             {
                                 Name = key.ToString(),
                                 Text = string.Join(", ", value),
@@ -316,7 +315,7 @@ namespace JapaneseLookup.GUI
                                 Margin = new Thickness(2, 2, 2, 2),
                             };
                         }
-                        
+
                         break;
 
                     case LookupResult.EdictID:
@@ -605,6 +604,7 @@ namespace JapaneseLookup.GUI
                     definitions += textBox.Text;
                     break;
                 }
+
                 if (child is not TextBlock)
                     continue;
 
@@ -709,9 +709,9 @@ namespace JapaneseLookup.GUI
 
             else if (e.Key == Key.Escape)
             {
-                    MiningMode = false;
-                    PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
-                    Hide();
+                MiningMode = false;
+                PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                Hide();
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.KanjiModeKeyGesture))
@@ -747,6 +747,22 @@ namespace JapaneseLookup.GUI
         {
             e.Cancel = true;
             Hide();
+        }
+
+        private void OnMouseEnter(object sender, MouseEventArgs e)
+        {
+            if (MiningMode) return;
+
+            Hide();
+            LastText = "";
+        }
+
+        private void OnMouseLeave(object sender, MouseEventArgs e)
+        {
+            if (MiningMode) return;
+
+            Hide();
+            LastText = "";
         }
     }
 }
