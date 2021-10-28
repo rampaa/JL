@@ -16,10 +16,12 @@ namespace JapaneseLookup.Utilities
         {
             for (int i = 0; i < s.Length; ++i)
             {
-                if ((s.Length == i + 1 && char.IsHighSurrogate(s, i))
+                if ((char.IsHighSurrogate(s, i)
+                    && (s.Length == i + 1
+                        || (s.Length > i + 1 && !char.IsLowSurrogate(s, i + 1))))
                     || (char.IsLowSurrogate(s, i)
                         && (s.Length == 1
-                            || (i != 0 && char.IsHighSurrogate(s, i - 1)))))
+                            || (i > 0 && !char.IsHighSurrogate(s, i - 1)))))
                 {
                     yield return s[i].ToString();
                 }
@@ -28,7 +30,7 @@ namespace JapaneseLookup.Utilities
                 {
                     yield return char.ConvertFromUtf32(char.ConvertToUtf32(s, i));
                     if (char.IsHighSurrogate(s, i))
-                        i++;
+                        ++i;
                 }
             }
         }
