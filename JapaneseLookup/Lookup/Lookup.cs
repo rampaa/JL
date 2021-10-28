@@ -216,12 +216,15 @@ namespace JapaneseLookup.Lookup
                 if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") &&
                     textInHiraganaList[i][0] != 'ー')
                 {
-                    string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
-                    if (ConfigManager.Dicts[DictType.JMdict].Contents
-                        .TryGetValue(textWithoutLongVowelMark, out var tmpResult))
+                    List<string> textWithoutLongVowelMarkList = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
+                    foreach (string textWithoutLongVowelMark in textWithoutLongVowelMarkList)
                     {
-                        jMdictResults.Add(textInHiraganaList[i],
-                            new IntermediaryResult(tmpResult, new List<string>(), text[..^i], dictType));
+                        if (ConfigManager.Dicts[DictType.JMdict].Contents
+                            .TryGetValue(textWithoutLongVowelMark, out var tmpResult))
+                        {
+                            jMdictResults.Add(textWithoutLongVowelMark,
+                                new IntermediaryResult(tmpResult, new List<string>(), text[..^i], dictType));
+                        }
                     }
                 }
             }
@@ -335,11 +338,14 @@ namespace JapaneseLookup.Lookup
 
                 if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") && textInHiraganaList[i][0] != 'ー')
                 {
-                    string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
-                    if (dict.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
+                    List<string> textWithoutLongVowelMarkList = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
+                    foreach (string textWithoutLongVowelMark in textWithoutLongVowelMarkList)
                     {
-                        daijirinResults.Add(textInHiraganaList[i],
-                            new IntermediaryResult(tmpResult, new List<string>(), text[..^i], dictType));
+                        if (dict.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
+                        {
+                            daijirinResults.Add(textWithoutLongVowelMark,
+                                new IntermediaryResult(tmpResult, new List<string>(), text[..^i], dictType));
+                        }
                     }
                 }
             }
@@ -419,11 +425,14 @@ namespace JapaneseLookup.Lookup
                 if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") &&
                     textInHiraganaList[i][0] != 'ー')
                 {
-                    string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
-                    if (dict.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
+                    List<string> textWithoutLongVowelMarkList = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
+                    foreach (string textWithoutLongVowelMark in textWithoutLongVowelMarkList)
                     {
-                        epwingResults.Add(textInHiraganaList[i],
-                            new IntermediaryResult(tmpResult, new List<string>(), text[..^i], dictType));
+                        if (dict.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
+                        {
+                            epwingResults.Add(textWithoutLongVowelMark,
+                                new IntermediaryResult(tmpResult, new List<string>(), text[..^i], dictType));
+                        }
                     }
                 }
             }
@@ -486,11 +495,14 @@ namespace JapaneseLookup.Lookup
 
                 if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") && textInHiraganaList[i][0] != 'ー')
                 {
-                    string textWithoutLongVowelMark = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
-                    if (customWordDictionary.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
+                    List<string> textWithoutLongVowelMarkList = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
+                    foreach (string textWithoutLongVowelMark in textWithoutLongVowelMarkList)
                     {
-                        customWordResults.Add(textInHiraganaList[i],
-                            new IntermediaryResult(tmpResult, new List<string>(), text[..^i], dictType));
+                        if (customWordDictionary.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
+                        {
+                            customWordResults.Add(textWithoutLongVowelMark,
+                                new IntermediaryResult(tmpResult, new List<string>(), text[..^i], dictType));
+                        }
                     }
                 }
             }

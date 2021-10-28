@@ -1,6 +1,7 @@
 ﻿using JapaneseLookup;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 
 namespace JapaneseLookupTests
 {
@@ -40,10 +41,10 @@ namespace JapaneseLookupTests
         }
 
         [Test]
-        public void LongVowelMarkConverter_オーToオオ()
+        public void LongVowelMarkConverter_オーToオオAndオウ()
         {
             // Arrange
-            var expected = "オオ";
+            List<string> expected = new List<string> { "オオ", "オウ" };
 
             string text = "オー";
 
@@ -52,7 +53,7 @@ namespace JapaneseLookupTests
                 text);
 
             // Assert
-            StringAssert.AreEqualIgnoringCase(expected, result);
+            Assert.AreEqual(expected, result);
         }
     }
 }
