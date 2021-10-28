@@ -12,14 +12,14 @@ namespace JapaneseLookup.EPWING
 {
     public class EpwingEntry
     {
-        public string Expression { get; set; }
-        public string Reading { get; set; }
-        public string DefinitionTags { get; set; }
-        public List<string> Rules { get; set; }
-        public int Score { get; set; }
-        public List<string> Glosssary { get; set; }
-        public int Sequence { get; set; }
-        public string TermTags { get; set; }
+        public string Expression { get; init; }
+        public string Reading { get; init; }
+        public string DefinitionTags { get; init; }
+        public List<string> Rules { get; init; }
+        public int Score { get; init; }
+        public List<string> Glosssary { get; init; }
+        public int Sequence { get; init; }
+        public string TermTags { get; init; }
 
         public EpwingEntry(List<JsonElement> jsonElement)
         {

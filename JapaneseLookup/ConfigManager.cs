@@ -178,7 +178,7 @@ namespace JapaneseLookup
             SeparatorColor!.Freeze();
             PopupBackgroundColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
-            PopupBackgroundColor.Opacity = double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")!) / 100;
+            PopupBackgroundColor!.Opacity = double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")!) / 100;
             PopupBackgroundColor!.Freeze();
 
             FoundSpellingFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupPrimarySpellingFontSize")!);
@@ -763,6 +763,9 @@ namespace JapaneseLookup
 
             var tasks = new List<Task>();
 
+            var freqTask = Task.Run(() => FrequencyLoader.BuildFreqDict(FrequencyLoader.LoadJson(Path.Join(ApplicationPath, freqListPath)).Result));
+            tasks.Add(freqTask);
+            
             foreach ((DictType _, Dict dict) in ConfigManager.Dicts)
             {
                 if (!dict.Active)
@@ -771,23 +774,17 @@ namespace JapaneseLookup
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
-                        // initial jmdict and freqlist load
-                        if (!ConfigManager.Dicts[DictType.JMdict].Contents.Any())
+                        // initial jmdict load
+                        if (!Dicts[DictType.JMdict].Contents.Any())
                         {
-                            var taskJmdict = Task.Run(() => JMdictLoader.Load(dict.Path)).ContinueWith(_ =>
-                            {
-                                FrequencyLoader.AddToJMdict($"{FrequencyList}", FrequencyLoader.LoadJson(Path.Join(
-                                    ApplicationPath,
-                                    freqListPath)).Result);
-                            });
-
+                            var taskJmdict = Task.Run(() => JMdictLoader.Load(dict.Path));
                             tasks.Add(taskJmdict);
                         }
 
                         break;
                     case DictType.JMnedict:
                         // JMnedict
-                        if (!ConfigManager.Dicts[DictType.JMnedict].Contents.Any())
+                        if (!Dicts[DictType.JMnedict].Contents.Any())
                         {
                             var taskJMnedict = Task.Run(() => JMnedictLoader.Load(dict.Path));
                             tasks.Add(taskJMnedict);
@@ -882,26 +879,26 @@ namespace JapaneseLookup
             }
 
             // load new freqlist if necessary
-            if (ConfigManager.Dicts[DictType.JMdict]?.Contents.Any() ?? false)
-            {
-                ConfigManager.Dicts[DictType.JMdict].Contents.TryGetValue("俺", out List<IResult> freqTest1);
-                Debug.Assert(freqTest1 != null, nameof(freqTest1) + " != null");
+            //if (Dicts[DictType.JMdict]?.Contents.Any() ?? false)
+            //{
+            //    Dicts[DictType.JMdict].Contents.TryGetValue("俺", out List<IResult> freqTest1);
+            //    Debug.Assert(freqTest1 != null, nameof(freqTest1) + " != null");
 
-                var freqTest = freqTest1.Cast<JMdictResult>().ToList();
-                // todo get NRE here sometimes
-                if (!freqTest[0].FrequencyDict.TryGetValue(FrequencyList, out int _))
-                {
-                    var taskNewFreqlist = Task.Run(async () =>
-                    {
-                        FrequencyLoader.AddToJMdict($"{FrequencyList}", await FrequencyLoader.LoadJson(Path.Join(
-                            ApplicationPath,
-                            freqListPath)));
-                    });
-                    tasks.Add(taskNewFreqlist);
+            //    var freqTest = freqTest1.Cast<JMdictResult>().ToList();
+            //    // todo get NRE here sometimes
+            //    if (!freqTest[0].FrequencyDict.TryGetValue(FrequencyList, out int _))
+            //    {
+            //        var taskNewFreqlist = Task.Run(async () =>
+            //        {
+            //            FrequencyLoader.AddToJMdict($"{FrequencyList}", await FrequencyLoader.LoadJson(Path.Join(
+            //                ApplicationPath,
+            //                freqListPath)));
+            //        });
+            //        tasks.Add(taskNewFreqlist);
 
-                    Debug.WriteLine("Banzai! (changed freqlist)");
-                }
-            }
+            //        Debug.WriteLine("Banzai! (changed freqlist)");
+            //    }
+            //}
 
             Task.WaitAll(tasks.ToArray());
 
