@@ -16,9 +16,20 @@ namespace JapaneseLookup.Utilities
         {
             for (int i = 0; i < s.Length; ++i)
             {
-                yield return char.ConvertFromUtf32(char.ConvertToUtf32(s, i));
-                if (char.IsHighSurrogate(s, i))
-                    i++;
+                if ((s.Length == i + 1 && char.IsHighSurrogate(s, i))
+                    || (char.IsLowSurrogate(s, i)
+                        && (s.Length == 1
+                            || (i != 0 && char.IsHighSurrogate(s, i - 1)))))
+                {
+                    yield return s[i].ToString();
+                }
+
+                else
+                {
+                    yield return char.ConvertFromUtf32(char.ConvertToUtf32(s, i));
+                    if (char.IsHighSurrogate(s, i))
+                        i++;
+                }
             }
         }
         public static List<string> FindJapaneseFonts()
