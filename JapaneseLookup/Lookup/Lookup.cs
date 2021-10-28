@@ -634,7 +634,7 @@ namespace JapaneseLookup.Lookup
                 foreach (var freqResult in freqResults)
                 {
                     if (epwingResult.Reading == freqResult.Spelling
-                        || (epwingResult.Reading is null && epwingResult.PrimarySpelling == freqResult.Spelling))
+                        || (string.IsNullOrEmpty(epwingResult.Reading) && epwingResult.PrimarySpelling == freqResult.Spelling))
                     {
                         if (freqValue > freqResult.Frequency)
                         {
