@@ -66,7 +66,7 @@ namespace JapaneseLookup
 
             { "ヴ", "ゔ" }, { "ヽ", "ゝ" }, { "ヾ", "ゞ" }, { "ッ", "っ" },
 
-            {"ヸ","ゐ゙"}, { "ヹ", "ゑ゙" }, { "ヺ", "を゙" }
+            { "ヸ", "ゐ゙" }, { "ヹ", "ゑ゙" }, { "ヺ", "を゙" }
         };
 
         private static readonly Dictionary<string, string> KanaFinalVowelDict = new()
@@ -91,15 +91,15 @@ namespace JapaneseLookup
             { "オ", "オ" }, { "コ", "オ" }, { "ソ", "オ" }, { "ト", "オ" }, { "ノ", "オ" }, { "ホ", "オ" },
             { "モ", "オ" }, { "ロ", "オ" }, { "ゴ", "オ" }, { "ゾ", "オ" }, { "ド", "オ" }, { "ボ", "オ" },
             { "ポ", "オ" }, { "ヲ", "オ" }, { "ヨ", "オ" }, { "ォ", "オ" }, { "ョ", "オ" }, { "ヺ", "オ" },
-            
+
             //Hiragana
             { "あ", "あ" }, { "か", "あ" }, { "さ", "あ" }, { "た", "あ" }, { "な", "あ" }, { "は", "あ" },
             { "ま", "あ" }, { "ら", "あ" }, { "が", "あ" }, { "ざ", "あ" }, { "だ", "あ" }, { "ば", "あ" },
             { "ぱ", "あ" }, { "わ", "あ" }, { "や", "あ" }, { "ぁ", "あ" }, { "ゃ", "あ" }, { "ゕ", "あ" },
 
-            { "い", "い" }, { "き", "い" }, { "し", "い" }, { "ち", "い" }, { "に", "い" }, { "ひ", "い" }, 
-            { "み", "い" }, { "り", "い" }, { "ぎ", "い" }, { "じ", "い" }, { "ぢ", "い" }, { "び", "い" }, 
-            { "ぴ", "い" }, { "ぃ", "い" }, { "ゐ", "い" },{ "ゐ゙", "イ" },
+            { "い", "い" }, { "き", "い" }, { "し", "い" }, { "ち", "い" }, { "に", "い" }, { "ひ", "い" },
+            { "み", "い" }, { "り", "い" }, { "ぎ", "い" }, { "じ", "い" }, { "ぢ", "い" }, { "び", "い" },
+            { "ぴ", "い" }, { "ぃ", "い" }, { "ゐ", "い" }, { "ゐ゙", "イ" },
 
             { "う", "う" }, { "く", "う" }, { "す", "う" }, { "つ", "う" }, { "ぬ", "う" }, { "ふ", "う" },
             { "む", "う" }, { "る", "う" }, { "ぐ", "う" }, { "ず", "う" }, { "づ", "う" }, { "ぶ", "う" },
@@ -118,13 +118,13 @@ namespace JapaneseLookup
         {
             //Half-width katakana
             { "ｱ", "あ" }, { "ｲ", "い" }, { "ｳ", "う" }, { "ｴ", "え" }, { "ｵ", "お" },
-            { "ｶ", "か" }, { "ｷ", "き" }, { "ｸ",  "く" }, { "ｹ", "け" }, { "ｺ", "こ" },
+            { "ｶ", "か" }, { "ｷ", "き" }, { "ｸ", "く" }, { "ｹ", "け" }, { "ｺ", "こ" },
             { "ｻ", "さ" }, { "ｼ", "し" }, { "ｽ", "す" }, { "ｾ", "せ" }, { "ｿ", "そ" },
-            { "ﾀ", "た" }, { "ﾁ", "ち" }, { "ﾂ",  "つ" }, { "ﾃ", "て" }, { "ﾄ", "と" },
+            { "ﾀ", "た" }, { "ﾁ", "ち" }, { "ﾂ", "つ" }, { "ﾃ", "て" }, { "ﾄ", "と" },
             { "ﾅ", "な" }, { "ﾆ", "に" }, { "ﾇ", "ぬ" }, { "ﾈ", "ね" }, { "ﾉ", "の" },
-            { "ﾊ", "は" }, { "ﾋ", "ひ" }, { "ﾌ", "ふ" }, { "ﾍ", "へ"}, { "ﾎ", "ほ" },
-            { "ﾏ", "ま" }, { "ﾐ", "み" }, { "ﾑ",  "む" }, { "ﾒ", "め" }, { "ﾓ", "も" },
-            { "ﾗ", "ら" }, { "ﾘ", "り" }, { "ﾙ",  "る" }, { "ﾚ", "れ" }, { "ﾛ", "ろ" },
+            { "ﾊ", "は" }, { "ﾋ", "ひ" }, { "ﾌ", "ふ" }, { "ﾍ", "へ" }, { "ﾎ", "ほ" },
+            { "ﾏ", "ま" }, { "ﾐ", "み" }, { "ﾑ", "む" }, { "ﾒ", "め" }, { "ﾓ", "も" },
+            { "ﾗ", "ら" }, { "ﾘ", "り" }, { "ﾙ", "る" }, { "ﾚ", "れ" }, { "ﾛ", "ろ" },
 
             { "ﾜ", "わ" }, { "ｦ", "を" },
             { "ﾔ", "や" }, { "ﾕ", "ゆ" }, { "ﾖ", "よ" },
@@ -147,8 +147,8 @@ namespace JapaneseLookup
             { "g", "ｇ" }, { "h", "ｈ" }, { "i", "ｉ" }, { "j", "ｊ" }, { "k", "ｋ" }, { "l", "ｌ" },
             { "m", "ｍ" }, { "n", "ｎ" }, { "o", "ｏ" }, { "p", "ｐ" }, { "q", "ｑ" }, { "r", "ｒ" },
             { "s", "ｓ" }, { "t", "ｔ" }, { "u", "ｕ" }, { "v", "ｖ" }, { "w", "ｗ" }, { "x", "ｘ" },
-            { "y", "ｙ" }, { "z", "ｚ" }, 
-            
+            { "y", "ｙ" }, { "z", "ｚ" },
+
             //Numbers
             { "0", "０" }, { "1", "１" }, { "2", "２" }, { "3", "３" }, { "4", "４" },
             { "5", "５" }, { "6", "６" }, { "7", "７" }, { "8", "８" }, { "9", "９" },
@@ -156,7 +156,7 @@ namespace JapaneseLookup
             //Typographical symbols and punctuation marks
             { "!", "！" }, { "\"", "＂" }, { "#", "＃" }, { "$", "＄" }, { "%", "％" }, { "&", "＆" },
             { "'", "＇" }, { "(", "（" }, { ")", "）" }, { "*", "＊" }, { "+", "＋" }, { "/", "／" },
-            { ":", "：" }, { ";", "；" }, { "<", "＜" }, { "=", "＝" }, { ">", "＞" }, { "?", "？" }, 
+            { ":", "：" }, { ";", "；" }, { "<", "＜" }, { "=", "＝" }, { ">", "＞" }, { "?", "？" },
             { "@", "＠" }, { "[", "［" }, { "\\", "＼" }, { "]", "］" }, { "^", "＾" }, { "{", "｛" },
             { "|", "｜" }, { "}", "｝" }, { "~", "～" }, { "ｰ", "ー" }
             //，－ ．＿｀｟｡｢｣､･￠￡
@@ -179,11 +179,11 @@ namespace JapaneseLookup
             int listLength = unicodeCharacters.Count;
             for (int i = 0; i < listLength; i++)
             {
-                if (listLength>i+1 
+                if (listLength > i + 1
                     && CompositeHalfWidthKatakanaToFullWidthHiraganaDict.TryGetValue(
-                        unicodeCharacters[i] + unicodeCharacters[i + 1], out string compositStr))
+                        unicodeCharacters[i] + unicodeCharacters[i + 1], out string compositeStr))
                 {
-                    textInHiragana.Append(compositStr);
+                    textInHiragana.Append(compositeStr);
                     ++i;
                 }
                 else if (KatakanaToHiraganaDict.TryGetValue(unicodeCharacters[i], out string hiraganaStr))
@@ -193,6 +193,7 @@ namespace JapaneseLookup
                 else
                     textInHiragana.Append(unicodeCharacters[i]);
             }
+
             return textInHiragana.ToString();
         }
 
@@ -231,21 +232,21 @@ namespace JapaneseLookup
 
                     else
                     {
-                        string alternativeVovel = "";
+                        string alternativeVowel = "";
 
                         switch (vowel)
                         {
                             case "お":
-                                alternativeVovel = "う";
+                                alternativeVowel = "う";
                                 break;
                             case "え":
-                                alternativeVovel = "い";
+                                alternativeVowel = "い";
                                 break;
                             case "オ":
-                                alternativeVovel = "ウ";
+                                alternativeVowel = "ウ";
                                 break;
                             case "エ":
-                                alternativeVovel = "イ";
+                                alternativeVowel = "イ";
                                 break;
                         }
 
@@ -262,7 +263,7 @@ namespace JapaneseLookup
                             if (k < listSize / 2)
                                 stringBuilders[k].Append(vowel);
                             else
-                                stringBuilders[k].Append(alternativeVovel);
+                                stringBuilders[k].Append(alternativeVowel);
                         }
                     }
                 }

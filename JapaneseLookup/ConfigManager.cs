@@ -178,7 +178,7 @@ namespace JapaneseLookup
             SeparatorColor!.Freeze();
             PopupBackgroundColor = (SolidColorBrush) new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
-            PopupBackgroundColor.Opacity = double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")!) / 100;
+            PopupBackgroundColor!.Opacity = double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")!) / 100;
             PopupBackgroundColor!.Freeze();
 
             FoundSpellingFontSize = int.Parse(ConfigurationManager.AppSettings.Get("PopupPrimarySpellingFontSize")!);

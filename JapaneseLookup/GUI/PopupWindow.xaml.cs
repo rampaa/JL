@@ -318,7 +318,7 @@ namespace JapaneseLookup.GUI
                                 Margin = new Thickness(2, 2, 2, 2),
                             };
                         }
-                        
+
                         break;
 
                     case LookupResult.EdictID:
@@ -607,6 +607,7 @@ namespace JapaneseLookup.GUI
                     definitions += textBox.Text;
                     break;
                 }
+
                 if (child is not TextBlock)
                     continue;
 
@@ -711,9 +712,9 @@ namespace JapaneseLookup.GUI
 
             else if (e.Key == Key.Escape)
             {
-                    MiningMode = false;
-                    PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
-                    Hide();
+                MiningMode = false;
+                PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                Hide();
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.KanjiModeKeyGesture))
