@@ -17,10 +17,10 @@ namespace JapaneseLookup.Utilities
             for (int i = 0; i < s.Length; ++i)
             {
                 if ((char.IsHighSurrogate(s, i)
-                    && (s.Length == i + 1
+                    && (i + 1 == s.Length
                         || (s.Length > i + 1 && !char.IsLowSurrogate(s, i + 1))))
                     || (char.IsLowSurrogate(s, i)
-                        && (s.Length == 1
+                        && (i == 0
                             || (i > 0 && !char.IsHighSurrogate(s, i - 1)))))
                 {
                     yield return s[i].ToString();
