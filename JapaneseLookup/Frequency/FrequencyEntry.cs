@@ -8,8 +8,8 @@ namespace JapaneseLookup.Frequency
 {
     public class FrequencyEntry
     {
-        public string Spelling { get; set; }
-        public int Frequency { get; set; }
+        public string Spelling { get; init; }
+        public int Frequency { get; init; }
 
         public FrequencyEntry(string spelling, int frequency)
         {

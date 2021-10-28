@@ -225,7 +225,6 @@ namespace JapaneseLookup
                     {
                         foreach (var stringBuilder in stringBuilders)
                         {
-                            Debug.WriteLine("Wtf");
                             stringBuilder.Append(vowel);
                         }
                     }
