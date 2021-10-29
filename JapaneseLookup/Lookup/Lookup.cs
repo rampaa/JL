@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -926,10 +926,6 @@ namespace JapaneseLookup.Lookup
                     var dictType = new List<string> { wordResult.Value.DictType.ToString() };
 
                     var definitions = new List<string> { BuildEpwingDefinition(epwingResult) };
-
-                    // TODO: Should be filtered while loading the dict ideally (+ it's daijirin specific)
-                    if (definitions.First().Contains("→英和"))
-                        continue;
 
                     result.Add(LookupResult.FoundSpelling, foundSpelling);
                     result.Add(LookupResult.Readings, reading);

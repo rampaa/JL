@@ -8,6 +8,7 @@ using System.IO;
 using System.Diagnostics;
 using JapaneseLookup.Abstract;
 using JapaneseLookup.Dicts;
+using JapaneseLookup.Utilities;
 
 namespace JapaneseLookup.EPWING
 {
@@ -35,12 +36,12 @@ namespace JapaneseLookup.EPWING
                 }
             }
 
-            DictionaryBuilder(epwingEntryList, ConfigManager.Dicts[dictType].Contents);
+            DictionaryBuilder(epwingEntryList, ConfigManager.Dicts[dictType].Contents, dictType);
             ConfigManager.Dicts[dictType].Contents.TrimExcess();
         }
 
         private static void DictionaryBuilder(List<EpwingEntry> epwingEntryList,
-            Dictionary<string, List<IResult>> epwingDictionary)
+            Dictionary<string, List<IResult>> epwingDictionary, DictType dictType)
         {
             foreach (EpwingEntry entry in epwingEntryList)
             {
@@ -51,6 +52,9 @@ namespace JapaneseLookup.EPWING
                     PrimarySpelling = entry.Expression,
                     WordClasses = entry.Rules
                 };
+
+                if (!IsValidEpwingResultForDictType(result, dictType))
+                    continue;
 
                 string hiraganaExpression = Kana.KatakanaToHiraganaConverter(entry.Expression);
                 if (hiraganaExpression != entry.Expression && string.IsNullOrEmpty(entry.Reading))
@@ -73,6 +77,41 @@ namespace JapaneseLookup.EPWING
                 else
                     epwingDictionary.TryAdd(hiraganaExpression, new List<IResult> { result });
             }
+        }
+
+        private static bool IsValidEpwingResultForDictType(EpwingResult result, DictType dictType)
+        {
+            // � check
+            if (result.PrimarySpelling == "�")
+                return false;
+
+            switch (dictType)
+            {
+                case DictType.UnknownEpwing:
+                    break;
+                case DictType.Daijirin:
+                    // english definitions
+                    if (result.Definitions.Any(def => def.Contains("→英和")))
+                        return false;
+
+                    // english definitions
+                    if (!result.Definitions.Any(def => MainWindowUtilities.JapaneseRegex.IsMatch(def)))
+                        return false;
+
+                    break;
+                case DictType.Daijisen:
+                    // kanji definitions
+                    if (result.Definitions.Any(def => def.Contains("［音］")))
+                        return false;
+
+                    break;
+                case DictType.Koujien:
+                    break;
+                case DictType.Meikyou:
+                    break;
+            }
+
+            return true;
         }
     }
 }
