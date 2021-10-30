@@ -81,7 +81,7 @@ namespace JapaneseLookup.EPWING
 
         private static bool IsValidEpwingResultForDictType(EpwingResult result, DictType dictType)
         {
-            string[] badCharacters = new string[] { "�", "(", "=", "=", "［", "〔", "「", "『", "（", "（" };
+            string[] badCharacters = new string[] { "�", "(", "=", "=", "［", "〔", "「", "『", "（" };
 
             foreach (string badCharacter in badCharacters)
             {
