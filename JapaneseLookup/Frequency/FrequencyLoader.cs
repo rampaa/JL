@@ -11,7 +11,7 @@ namespace JapaneseLookup.Frequency
 {
     public static class FrequencyLoader
     {
-        public static Dictionary<string, List<FrequencyEntry>> FreqDict;
+        public static Dictionary<string, Dictionary<string, List<FrequencyEntry>>> FreqDicts { get; set; } = new();
         public static async Task<Dictionary<string, List<List<JsonElement>>>> LoadJson(string path)
         {
             await using FileStream openStream = File.OpenRead(path);
@@ -20,7 +20,8 @@ namespace JapaneseLookup.Frequency
 
         public static void BuildFreqDict(Dictionary<string, List<List<JsonElement>>> frequencyDict)
         {
-            FreqDict = new();
+            FreqDicts.TryGetValue(ConfigManager.FrequencyList, out var FreqDict);
+
             foreach (KeyValuePair<string, List<List<JsonElement>>> dictEntry in frequencyDict)
             {
                 string reading = dictEntry.Key;

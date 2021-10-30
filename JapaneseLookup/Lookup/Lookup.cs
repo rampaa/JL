@@ -152,8 +152,10 @@ namespace JapaneseLookup.Lookup
                 .OrderByDescending(dict => dict[LookupResult.FoundForm][0].Length)
                 .ThenBy(dict =>
                 {
-                    Enum.TryParse(dict[LookupResult.DictType][0], out DictType dictType);
-                    return ConfigManager.Dicts[dictType].Priority;
+                    if (Enum.TryParse(dict[LookupResult.DictType][0], out DictType dictType))
+                        return ConfigManager.Dicts[dictType].Priority;
+                    else
+                        return int.MaxValue;
                 })
                 .ThenBy(dict => Convert.ToInt32(dict[LookupResult.Frequency][0]))
                 .ToList();
@@ -619,11 +621,11 @@ namespace JapaneseLookup.Lookup
 
         private static List<string> GetEpwingFreq(EpwingResult epwingResult)
         {
-            List<string> frequency = new List<string> { MainWindowUtilities.FakeFrequency };
+            List<string> frequency = new() { MainWindowUtilities.FakeFrequency };
 
             int freqValue = int.MaxValue;
 
-            var freqDict = Frequency.FrequencyLoader.FreqDict;
+            Frequency.FrequencyLoader.FreqDicts.TryGetValue(ConfigManager.FrequencyList, out var freqDict);
 
             if (freqDict == null)
                 return frequency;
@@ -669,11 +671,11 @@ namespace JapaneseLookup.Lookup
 
         private static List<string> GetJMDictFreq(JMdictResult jMDictResult)
         {
-            List<string> frequency = new List<string> { MainWindowUtilities.FakeFrequency };
+            List<string> frequency = new() { MainWindowUtilities.FakeFrequency };
 
             int freqValue = int.MaxValue;
 
-            var freqDict = Frequency.FrequencyLoader.FreqDict;
+            Frequency.FrequencyLoader.FreqDicts.TryGetValue(ConfigManager.FrequencyList, out var freqDict);
 
             if (freqDict == null)
                 return frequency;
@@ -750,11 +752,11 @@ namespace JapaneseLookup.Lookup
 
         private static List<string> GetCustomWordFreq(CustomWordEntry customWordResult)
         {
-            List<string> frequency = new List<string> { MainWindowUtilities.FakeFrequency };
+            List<string> frequency = new() { MainWindowUtilities.FakeFrequency };
 
             int freqValue = int.MaxValue;
 
-            var freqDict = Frequency.FrequencyLoader.FreqDict;
+            Frequency.FrequencyLoader.FreqDicts.TryGetValue(ConfigManager.FrequencyList, out var freqDict);
 
             if (freqDict == null)
                 return frequency;

@@ -44,7 +44,7 @@ namespace JapaneseLookupTests
         public void LongVowelMarkConverter_オーToオオAndオウ()
         {
             // Arrange
-            List<string> expected = new List<string> { "オオ", "オウ" };
+            List<string> expected = new() { "オオ", "オウ" };
 
             string text = "オー";
 

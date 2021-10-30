@@ -58,72 +58,73 @@ namespace JapaneseLookup
 
         public static readonly Dictionary<DictType, Dict> Dicts = new();
 
-        public static string AnkiConnectUri;
-        public static int MaxSearchLength;
-        public static string FrequencyList;
+        public static string AnkiConnectUri { get; set; }
+        public static int MaxSearchLength { get; set; }
+        public static string FrequencyList { get; set; }
 
         // TODO: Don't let KanjiMode be turned on if Kanjidic is not loaded?
-        public static bool KanjiMode;
-        public static bool ForceSync;
-        public static int LookupRate;
+        public static bool KanjiMode { get; set; }
+        public static bool ForceSync { get; set; }
+        public static int LookupRate{ get; set; }
 
-        public static double MainWindowHeight;
-        public static double MainWindowWidth;
+        public static double MainWindowHeight { get; set; }
+        public static double MainWindowWidth { get; set; }
 
-        public static SolidColorBrush MainWindowTextColor;
-        public static SolidColorBrush MainWindowBacklogTextColor;
-        public static SolidColorBrush FoundSpellingColor;
-        public static SolidColorBrush ReadingsColor;
-        public static SolidColorBrush ROrthographyInfoColor;
-        public static SolidColorBrush DefinitionsColor;
-        public static SolidColorBrush ProcessColor;
-        public static SolidColorBrush FrequencyColor;
-        public static SolidColorBrush AlternativeSpellingsColor;
-        public static SolidColorBrush AOrthographyInfoColor;
-        public static SolidColorBrush SeparatorColor;
-        public static SolidColorBrush PopupBackgroundColor;
+        public static SolidColorBrush MainWindowTextColor { get; set; }
+        public static SolidColorBrush MainWindowBacklogTextColor { get; set; }
+        public static SolidColorBrush FoundSpellingColor { get; set; }
+        public static SolidColorBrush ReadingsColor { get; set; }
+        public static SolidColorBrush ROrthographyInfoColor { get; set; }
+        public static SolidColorBrush DefinitionsColor { get; set; }
+        public static SolidColorBrush ProcessColor { get; set; }
+        public static SolidColorBrush FrequencyColor { get; set; }
+        public static SolidColorBrush AlternativeSpellingsColor { get; set; }
+        public static SolidColorBrush AOrthographyInfoColor { get; set; }
+        public static SolidColorBrush SeparatorColor { get; set; }
+        public static SolidColorBrush PopupBackgroundColor { get; set; }
 
-        public static int FoundSpellingFontSize;
-        public static int ReadingsFontSize;
-        public static int ROrthographyInfoFontSize;
-        public static int DefinitionsFontSize;
-        public static int ProcessFontSize;
-        public static int FrequencyFontSize;
-        public static int AlternativeSpellingsFontSize;
-        public static int AOrthographyInfoFontSize;
+        public static KeyGesture MiningModeKeyGesture { get; set; }
+        public static KeyGesture PlayAudioKeyGesture { get; set; }
+        public static KeyGesture KanjiModeKeyGesture { get; set; }
+        public static KeyGesture ShowPreferencesWindowKeyGesture { get; set; }
+        public static KeyGesture ShowAddNameWindowKeyGesture { get; set; }
+        public static KeyGesture ShowAddWordWindowKeyGesture { get; set; }
+        public static KeyGesture SearchWithBrowserKeyGesture { get; set; }
+        public static KeyGesture TransparentModeKeyGesture { get; set; }
+        public static KeyGesture SteppedBacklogBackwardsKeyGesture { get; set; }
+        public static KeyGesture SteppedBacklogForwardsKeyGesture { get; set; }
 
-        public static int PopupMaxWidth;
-        public static int PopupMaxHeight;
-        public static int PopupXOffset;
-        public static int PopupYOffset;
-        public static bool PopupFlipX;
-        public static bool PopupFlipY;
+        public static int FoundSpellingFontSize { get; set; }
+        public static int ReadingsFontSize { get; set; }
+        public static int ROrthographyInfoFontSize { get; set; }
+        public static int DefinitionsFontSize { get; set; }
+        public static int ProcessFontSize { get; set; }
+        public static int FrequencyFontSize { get; set; }
+        public static int AlternativeSpellingsFontSize { get; set; }
+        public static int AOrthographyInfoFontSize { get; set; }
+
+        public static int PopupMaxWidth { get; set; }
+        public static int PopupMaxHeight { get; set; }
+        public static int PopupXOffset { get; set; }
+        public static int PopupYOffset { get; set; }
+        public static bool PopupFlipX { get; set; }
+        public static bool PopupFlipY { get; set; }
 
         // TODO: hook these up
         //public static bool FixedPopupWidth = false;
         //public static bool FixedPopupHeight = false;
         //public static SolidColorBrush POrthographyInfoColor;
         //public static int POrthographyInfoFontSize;
-        public static Brush DictTypeColor = Brushes.LightBlue;
-        public static int DictTypeFontSize = 15;
-        public static KeyGesture MiningModeKeyGesture;
-        public static KeyGesture PlayAudioKeyGesture;
-        public static KeyGesture KanjiModeKeyGesture;
-        public static KeyGesture ShowPreferencesWindowKeyGesture;
-        public static KeyGesture ShowAddNameWindowKeyGesture;
-        public static KeyGesture ShowAddWordWindowKeyGesture;
-        public static KeyGesture SearchWithBrowserKeyGesture;
-        public static KeyGesture TransparentModeKeyGesture;
-        public static KeyGesture SteppedBacklogBackwardsKeyGesture;
-        public static KeyGesture SteppedBacklogForwardsKeyGesture;
+        public static Brush DictTypeColor { get; set; } = Brushes.LightBlue;
+        public static int DictTypeFontSize { get; set; } = 15;
 
         // consider making this dictionary specific
         // enabling this seems to improve rendering performance by a lot; need to test if it's because
         // a) there's less text on the screen overall
         // b) there's less word-wrapping to do
-        public static bool NewlineBetweenDefinitions = false;
-        public static int MaxResults = 99;
-        public static bool AllowDuplicateCards = false;
+        public static bool NewlineBetweenDefinitions { get; set; } = false;
+        public static int MaxResults { get; set; } = 99;
+        public static bool AllowDuplicateCards { get; set; } = false;
 
         public static void ApplyPreferences(MainWindow mainWindow)
         {
@@ -142,41 +143,41 @@ namespace JapaneseLookup
 
             // MAKE SURE YOU FREEZE ANY NEW COLOR OBJECTS YOU ADD
             // OR THE PROGRAM WILL CRASH AND BURN
-            MainWindowTextColor = (SolidColorBrush) new BrushConverter().ConvertFrom(
+            MainWindowTextColor = (SolidColorBrush)new BrushConverter().ConvertFrom(
                 ConfigurationManager.AppSettings.Get("MainWindowTextColor"));
             MainWindowTextColor!.Freeze();
-            MainWindowBacklogTextColor = (SolidColorBrush) new BrushConverter().ConvertFrom(
+            MainWindowBacklogTextColor = (SolidColorBrush)new BrushConverter().ConvertFrom(
                 ConfigurationManager.AppSettings.Get("MainWindowBacklogTextColor"));
             MainWindowBacklogTextColor!.Freeze();
 
-            FoundSpellingColor = (SolidColorBrush) new BrushConverter()
+            FoundSpellingColor = (SolidColorBrush)new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupPrimarySpellingColor"));
             FoundSpellingColor!.Freeze();
-            ReadingsColor = (SolidColorBrush) new BrushConverter()
+            ReadingsColor = (SolidColorBrush)new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupReadingColor"));
             ReadingsColor!.Freeze();
-            ROrthographyInfoColor = (SolidColorBrush) new BrushConverter()
+            ROrthographyInfoColor = (SolidColorBrush)new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupROrthographyInfoColor"));
             ROrthographyInfoColor!.Freeze();
-            AlternativeSpellingsColor = (SolidColorBrush) new BrushConverter()
+            AlternativeSpellingsColor = (SolidColorBrush)new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupAlternativeSpellingColor"));
             AlternativeSpellingsColor!.Freeze();
-            AOrthographyInfoColor = (SolidColorBrush) new BrushConverter()
+            AOrthographyInfoColor = (SolidColorBrush)new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupAOrthographyInfoColor"));
             AOrthographyInfoColor!.Freeze();
-            DefinitionsColor = (SolidColorBrush) new BrushConverter()
+            DefinitionsColor = (SolidColorBrush)new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupDefinitionColor"));
             DefinitionsColor!.Freeze();
-            FrequencyColor = (SolidColorBrush) new BrushConverter()
+            FrequencyColor = (SolidColorBrush)new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupFrequencyColor"));
             FrequencyColor!.Freeze();
-            ProcessColor = (SolidColorBrush) new BrushConverter()
+            ProcessColor = (SolidColorBrush)new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupDeconjugationInfoColor"));
             ProcessColor!.Freeze();
-            SeparatorColor = (SolidColorBrush) new BrushConverter()
+            SeparatorColor = (SolidColorBrush)new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupSeparatorColor"));
             SeparatorColor!.Freeze();
-            PopupBackgroundColor = (SolidColorBrush) new BrushConverter()
+            PopupBackgroundColor = (SolidColorBrush)new BrushConverter()
                 .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor"));
             PopupBackgroundColor!.Opacity = double.Parse(ConfigurationManager.AppSettings.Get("PopupOpacity")!) / 100;
             PopupBackgroundColor!.Freeze();
@@ -225,39 +226,39 @@ namespace JapaneseLookup
             rawKeyGesture = ConfigurationManager.AppSettings.Get("MiningModeKeyGesture");
             if (!rawKeyGesture!.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
                 !rawKeyGesture.StartsWith("Alt+"))
-                MiningModeKeyGesture = (KeyGesture) keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+                MiningModeKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
             else
-                MiningModeKeyGesture = (KeyGesture) keyGestureConverter.ConvertFromString(rawKeyGesture);
+                MiningModeKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
 
             rawKeyGesture = ConfigurationManager.AppSettings.Get("PlayAudioKeyGesture");
             if (!rawKeyGesture!.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
                 !rawKeyGesture.StartsWith("Alt+"))
-                PlayAudioKeyGesture = (KeyGesture) keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+                PlayAudioKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
             else
-                PlayAudioKeyGesture = (KeyGesture) keyGestureConverter.ConvertFromString(rawKeyGesture);
+                PlayAudioKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
 
             rawKeyGesture = ConfigurationManager.AppSettings.Get("KanjiModeKeyGesture");
             if (!rawKeyGesture!.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
                 !rawKeyGesture.StartsWith("Alt+"))
-                KanjiModeKeyGesture = (KeyGesture) keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+                KanjiModeKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
             else
-                KanjiModeKeyGesture = (KeyGesture) keyGestureConverter.ConvertFromString(rawKeyGesture);
+                KanjiModeKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
 
             rawKeyGesture = ConfigurationManager.AppSettings.Get("ShowPreferencesWindowKeyGesture");
             if (!rawKeyGesture!.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
                 !rawKeyGesture.StartsWith("Alt+"))
                 ShowPreferencesWindowKeyGesture =
-                    (KeyGesture) keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+                    (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
             else
-                ShowPreferencesWindowKeyGesture = (KeyGesture) keyGestureConverter.ConvertFromString(rawKeyGesture);
+                ShowPreferencesWindowKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
 
             rawKeyGesture = ConfigurationManager.AppSettings.Get("ShowAddNameWindowKeyGesture");
             if (!rawKeyGesture!.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
                 !rawKeyGesture.StartsWith("Alt+"))
                 ShowAddNameWindowKeyGesture =
-                    (KeyGesture) keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+                    (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
             else
-                ShowAddNameWindowKeyGesture = (KeyGesture) keyGestureConverter.ConvertFromString(rawKeyGesture);
+                ShowAddNameWindowKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
 
             rawKeyGesture = ConfigurationManager.AppSettings.Get("ShowAddWordWindowKeyGesture");
             if (!rawKeyGesture!.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
@@ -271,32 +272,32 @@ namespace JapaneseLookup
             if (!rawKeyGesture!.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
                 !rawKeyGesture.StartsWith("Alt+"))
                 SearchWithBrowserKeyGesture =
-                    (KeyGesture) keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+                    (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
             else
-                SearchWithBrowserKeyGesture = (KeyGesture) keyGestureConverter.ConvertFromString(rawKeyGesture);
+                SearchWithBrowserKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
 
             rawKeyGesture = ConfigurationManager.AppSettings.Get("TransparentModeKeyGesture");
             if (!rawKeyGesture!.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
                 !rawKeyGesture.StartsWith("Alt+"))
-                TransparentModeKeyGesture = (KeyGesture) keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+                TransparentModeKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
             else
-                TransparentModeKeyGesture = (KeyGesture) keyGestureConverter.ConvertFromString(rawKeyGesture);
+                TransparentModeKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
 
             rawKeyGesture = ConfigurationManager.AppSettings.Get("SteppedBacklogBackwardsKeyGesture");
             if (!rawKeyGesture!.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
                 !rawKeyGesture.StartsWith("Alt+"))
                 SteppedBacklogBackwardsKeyGesture =
-                    (KeyGesture) keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+                    (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
             else
-                SteppedBacklogBackwardsKeyGesture = (KeyGesture) keyGestureConverter.ConvertFromString(rawKeyGesture);
+                SteppedBacklogBackwardsKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
 
             rawKeyGesture = ConfigurationManager.AppSettings.Get("SteppedBacklogForwardsKeyGesture");
             if (!rawKeyGesture.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
                 !rawKeyGesture.StartsWith("Alt+"))
                 SteppedBacklogForwardsKeyGesture =
-                    (KeyGesture) keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+                    (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
             else
-                SteppedBacklogForwardsKeyGesture = (KeyGesture) keyGestureConverter.ConvertFromString(rawKeyGesture);
+                SteppedBacklogForwardsKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
 
             #endregion
 
@@ -305,7 +306,7 @@ namespace JapaneseLookup
             mainWindow.MainTextBox.FontFamily = new FontFamily(ConfigurationManager.AppSettings.Get("MainWindowFont")!);
             mainWindow.MainTextBox.FontSize = mainWindow.FontSizeSlider.Value;
             mainWindow.Background =
-                (SolidColorBrush) new BrushConverter().ConvertFrom(
+                (SolidColorBrush)new BrushConverter().ConvertFrom(
                     ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor"));
             Debug.Assert(mainWindow.Background != null, "mainWindow.Background != null");
             mainWindow.Background.Opacity = mainWindow.OpacitySlider.Value / 100;
@@ -369,7 +370,7 @@ namespace JapaneseLookup
             preferenceWindow.MainWindowHeightNumericUpDown.Value = MainWindowHeight;
             preferenceWindow.MainWindowWidthNumericUpDown.Value = MainWindowWidth;
             preferenceWindow.TextboxBackgroundColorButton.Background =
-                (SolidColorBrush) new BrushConverter().ConvertFrom(
+                (SolidColorBrush)new BrushConverter().ConvertFrom(
                     ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor"));
             preferenceWindow.TextboxTextColorButton.Background = MainWindowTextColor;
             preferenceWindow.TextboxBacklogTextColorButton.Background = MainWindowBacklogTextColor;
@@ -763,10 +764,7 @@ namespace JapaneseLookup
 
             var tasks = new List<Task>();
 
-            var freqTask = Task.Run(() => FrequencyLoader.BuildFreqDict(FrequencyLoader.LoadJson(Path.Join(ApplicationPath, freqListPath)).Result));
-            tasks.Add(freqTask);
-            
-            foreach ((DictType _, Dict dict) in ConfigManager.Dicts)
+            foreach ((DictType _, Dict dict) in Dicts)
             {
                 if (!dict.Active)
                     continue;
@@ -793,7 +791,7 @@ namespace JapaneseLookup
                         break;
                     case DictType.Kanjidic:
                         // KANJIDIC
-                        if (!ConfigManager.Dicts[DictType.Kanjidic].Contents.Any())
+                        if (!Dicts[DictType.Kanjidic].Contents.Any())
                         {
                             var taskKanjidict = Task.Run(() => KanjiInfoLoader.Load(dict.Path));
                             tasks.Add(taskKanjidict);
@@ -801,7 +799,7 @@ namespace JapaneseLookup
 
                         break;
                     case DictType.UnknownEpwing:
-                        if (!ConfigManager.Dicts[DictType.UnknownEpwing].Contents.Any())
+                        if (!Dicts[DictType.UnknownEpwing].Contents.Any())
                         {
                             var taskEpwing = Task.Run(async () =>
                                 await EpwingJsonLoader.Loader(dict.Type, dict.Path));
@@ -810,7 +808,7 @@ namespace JapaneseLookup
 
                         break;
                     case DictType.Daijirin:
-                        if (!ConfigManager.Dicts[DictType.Daijirin].Contents.Any())
+                        if (!Dicts[DictType.Daijirin].Contents.Any())
                         {
                             var taskEpwing = Task.Run(async () =>
                                 await EpwingJsonLoader.Loader(dict.Type, dict.Path));
@@ -819,7 +817,7 @@ namespace JapaneseLookup
 
                         break;
                     case DictType.Daijisen:
-                        if (!ConfigManager.Dicts[DictType.Daijisen].Contents.Any())
+                        if (!Dicts[DictType.Daijisen].Contents.Any())
                         {
                             var taskEpwing = Task.Run(async () =>
                                 await EpwingJsonLoader.Loader(dict.Type, dict.Path));
@@ -828,7 +826,7 @@ namespace JapaneseLookup
 
                         break;
                     case DictType.Koujien:
-                        if (!ConfigManager.Dicts[DictType.Koujien].Contents.Any())
+                        if (!Dicts[DictType.Koujien].Contents.Any())
                         {
                             var taskEpwing = Task.Run(async () =>
                                 await EpwingJsonLoader.Loader(dict.Type, dict.Path));
@@ -837,7 +835,7 @@ namespace JapaneseLookup
 
                         break;
                     case DictType.Meikyou:
-                        if (!ConfigManager.Dicts[DictType.Meikyou].Contents.Any())
+                        if (!Dicts[DictType.Meikyou].Contents.Any())
                         {
                             var taskEpwing = Task.Run(async () =>
                                 await EpwingJsonLoader.Loader(dict.Type, dict.Path));
@@ -846,7 +844,7 @@ namespace JapaneseLookup
 
                         break;
                     case DictType.CustomWordDictionary:
-                        if (!ConfigManager.Dicts[DictType.CustomWordDictionary].Contents.Any())
+                        if (!Dicts[DictType.CustomWordDictionary].Contents.Any())
                         {
                             var taskCustomWordDict = Task.Run(() => CustomWordLoader.Load(
                                 ConfigManager.Dicts[DictType.CustomWordDictionary].Path));
@@ -855,7 +853,7 @@ namespace JapaneseLookup
 
                         break;
                     case DictType.CustomNameDictionary:
-                        if (!ConfigManager.Dicts[DictType.CustomNameDictionary].Contents.Any())
+                        if (!Dicts[DictType.CustomNameDictionary].Contents.Any())
                         {
                             var taskCustomNameDict = Task.Run(() => CustomNameLoader.Load(
                                 ConfigManager.Dicts[DictType.CustomNameDictionary].Path));
@@ -869,7 +867,7 @@ namespace JapaneseLookup
                 }
             }
 
-            foreach ((DictType _, Dict dict) in ConfigManager.Dicts)
+            foreach ((DictType _, Dict dict) in Dicts)
             {
                 if (!dict.Active && dict.Contents.Any())
                 {
@@ -879,26 +877,22 @@ namespace JapaneseLookup
             }
 
             // load new freqlist if necessary
-            //if (Dicts[DictType.JMdict]?.Contents.Any() ?? false)
-            //{
-            //    Dicts[DictType.JMdict].Contents.TryGetValue("俺", out List<IResult> freqTest1);
-            //    Debug.Assert(freqTest1 != null, nameof(freqTest1) + " != null");
+            if (!FrequencyLoader.FreqDicts.ContainsKey(FrequencyList))
+            {
+                FrequencyLoader.FreqDicts.Clear();
 
-            //    var freqTest = freqTest1.Cast<JMdictResult>().ToList();
-            //    // todo get NRE here sometimes
-            //    if (!freqTest[0].FrequencyDict.TryGetValue(FrequencyList, out int _))
-            //    {
-            //        var taskNewFreqlist = Task.Run(async () =>
-            //        {
-            //            FrequencyLoader.AddToJMdict($"{FrequencyList}", await FrequencyLoader.LoadJson(Path.Join(
-            //                ApplicationPath,
-            //                freqListPath)));
-            //        });
-            //        tasks.Add(taskNewFreqlist);
+                if (FrequencyList != "None")
+                {
+                    FrequencyLoader.FreqDicts.Add(FrequencyList, new Dictionary<string, List<FrequencyEntry>>());
 
-            //        Debug.WriteLine("Banzai! (changed freqlist)");
-            //    }
-            //}
+                    Task taskNewFreqlist = Task.Run(() =>
+                    {
+                        FrequencyLoader.BuildFreqDict(FrequencyLoader.LoadJson(Path.Join(ApplicationPath, freqListPath)).Result);
+                    });
+
+                    tasks.Add(taskNewFreqlist);
+                }
+            }
 
             Task.WaitAll(tasks.ToArray());
 

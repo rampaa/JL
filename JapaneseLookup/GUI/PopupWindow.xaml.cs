@@ -476,13 +476,13 @@ namespace JapaneseLookup.GUI
             {
                 if (baby == null) continue;
 
-                Enum.TryParse(baby.Name, out LookupResult enumName);
-
-                // common emptiness check; these two have their text as inline Runs
-                if (baby.Text == "" &&
-                    !(enumName == LookupResult.AlternativeSpellings || enumName == LookupResult.Readings))
-                    continue;
-
+                if (Enum.TryParse(baby.Name, out LookupResult enumName))
+                {
+                    // common emptiness check; these two have their text as inline Runs
+                    if (baby.Text == "" &&
+                        !(enumName == LookupResult.AlternativeSpellings || enumName == LookupResult.Readings))
+                        continue;
+                }
                 // POrthographyInfo check
                 if (baby.Text == "()")
                     continue;
@@ -564,36 +564,38 @@ namespace JapaneseLookup.GUI
             var top = (WrapPanel) textBlock.Parent;
             foreach (TextBlock child in top.Children)
             {
-                Enum.TryParse(child.Name, out LookupResult result);
-                switch (result)
+                if (Enum.TryParse(child.Name, out LookupResult result))
                 {
-                    case LookupResult.FoundSpelling:
-                        foundSpelling = child.Text;
-                        break;
-                    case LookupResult.Readings:
-                        readings = (string) child.Tag;
-                        break;
-                    case LookupResult.FoundForm:
-                        foundForm = child.Text;
-                        break;
-                    case LookupResult.EdictID:
-                        edictID = child.Text;
-                        break;
-                    case LookupResult.AlternativeSpellings:
-                        alternativeSpellings = (string) child.Tag;
-                        break;
-                    case LookupResult.Frequency:
-                        frequency = child.Text;
-                        break;
-                    case LookupResult.OnReadings:
-                        readings += child.Text + " ";
-                        break;
-                    case LookupResult.KunReadings:
-                        readings += child.Text + " ";
-                        break;
-                    case LookupResult.Nanori:
-                        readings += child.Text + " ";
-                        break;
+                    switch (result)
+                    {
+                        case LookupResult.FoundSpelling:
+                            foundSpelling = child.Text;
+                            break;
+                        case LookupResult.Readings:
+                            readings = (string)child.Tag;
+                            break;
+                        case LookupResult.FoundForm:
+                            foundForm = child.Text;
+                            break;
+                        case LookupResult.EdictID:
+                            edictID = child.Text;
+                            break;
+                        case LookupResult.AlternativeSpellings:
+                            alternativeSpellings = (string)child.Tag;
+                            break;
+                        case LookupResult.Frequency:
+                            frequency = child.Text;
+                            break;
+                        case LookupResult.OnReadings:
+                            readings += child.Text + " ";
+                            break;
+                        case LookupResult.KunReadings:
+                            readings += child.Text + " ";
+                            break;
+                        case LookupResult.Nanori:
+                            readings += child.Text + " ";
+                            break;
+                    }
                 }
             }
 
@@ -612,18 +614,20 @@ namespace JapaneseLookup.GUI
 
                 textBlock = (TextBlock) child;
 
-                Enum.TryParse(textBlock.Name, out LookupResult result);
-                switch (result)
+                if (Enum.TryParse(textBlock.Name, out LookupResult result))
                 {
-                    case LookupResult.StrokeCount:
-                        strokeCount += textBlock.Text;
-                        break;
-                    case LookupResult.Grade:
-                        grade += textBlock.Text;
-                        break;
-                    case LookupResult.Composition:
-                        composition += textBlock.Text;
-                        break;
+                    switch (result)
+                    {
+                        case LookupResult.StrokeCount:
+                            strokeCount += textBlock.Text;
+                            break;
+                        case LookupResult.Grade:
+                            grade += textBlock.Text;
+                            break;
+                        case LookupResult.Composition:
+                            composition += textBlock.Text;
+                            break;
+                    }
                 }
             }
 
@@ -694,15 +698,17 @@ namespace JapaneseLookup.GUI
 
                 foreach (TextBlock child in top.Children)
                 {
-                    Enum.TryParse(child.Name, out LookupResult result);
-                    switch (result)
+                    if (Enum.TryParse(child.Name, out LookupResult result))
                     {
-                        case LookupResult.FoundSpelling:
-                            foundSpelling = child.Text;
-                            break;
-                        case LookupResult.Readings:
-                            reading = ((string) child.Tag).Split(",")[0];
-                            break;
+                        switch (result)
+                        {
+                            case LookupResult.FoundSpelling:
+                                foundSpelling = child.Text;
+                                break;
+                            case LookupResult.Readings:
+                                reading = ((string)child.Tag).Split(",")[0];
+                                break;
+                        }
                     }
                 }
 
