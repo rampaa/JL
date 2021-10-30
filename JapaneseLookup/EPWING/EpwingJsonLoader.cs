@@ -81,8 +81,15 @@ namespace JapaneseLookup.EPWING
 
         private static bool IsValidEpwingResultForDictType(EpwingResult result, DictType dictType)
         {
-            // � check
-            if (result.PrimarySpelling == "�")
+            string[] badCharacters = new string[] { "�", "(", "=", "=", "［", "〔", "「", "『", "（", "（" };
+
+            foreach (string badCharacter in badCharacters)
+            {
+                if (result.PrimarySpelling.Contains(badCharacter))
+                    return false;
+            }
+
+            if (!MainWindowUtilities.JapaneseRegex.IsMatch(result.PrimarySpelling))
                 return false;
 
             switch (dictType)

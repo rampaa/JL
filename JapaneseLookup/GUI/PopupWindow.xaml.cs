@@ -462,7 +462,6 @@ namespace JapaneseLookup.GUI
                 }
             }
 
-
             TextBlock[] babies =
             {
                 textBlockFoundSpelling, textBlockPOrthographyInfo,
