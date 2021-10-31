@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Configuration;
 using JapaneseLookup;
 using NUnit.Framework;
 using System.Text.Json;
