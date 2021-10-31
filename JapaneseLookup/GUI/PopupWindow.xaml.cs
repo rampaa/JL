@@ -140,7 +140,7 @@ namespace JapaneseLookup.GUI
                 newTop = cursorPosition.Y + ConfigManager.PopupYOffset;
             }
 
-            // push if +OOB
+            // stick to edges if +OOB
             if (newLeft + Width > ActiveScreen.Bounds.Width)
             {
                 newLeft = ActiveScreen.Bounds.Width - Width;
