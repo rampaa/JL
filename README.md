@@ -7,9 +7,10 @@
 * KANJIDIC - Full support (w/ composition data)
 
 ### J-J (yomichan-import format)
-Lots of irrelevant/wrong results because we don't have the WordClasses of every word
+JMdict must be enabled in order to get accurate results from these.
 
 * Daijirin - Basic+ support
 * Daijisen - Basic support
 * Koujien - Basic support
 * Meikyou - Basic support
+* Kenkyuusha - Basic support
