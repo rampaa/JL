@@ -594,6 +594,12 @@ namespace JapaneseLookup.GUI
                         case LookupResult.Nanori:
                             readings += child.Text + " ";
                             break;
+                        case LookupResult.DictType:
+                            // TODO
+                            break;
+                        case LookupResult.Process:
+                            // TODO
+                            break;
                     }
                 }
             }

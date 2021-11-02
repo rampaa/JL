@@ -46,7 +46,7 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Lookup rate"
+                            <TextBlock HorizontalAlignment="Left" Text="Lookup throttle (ms)"
                                        TextWrapping="Wrap" />
                             <hc:NumericUpDown x:Name="LookupRateNumericUpDown" Maximum="20" Minimum="0"
                                               HorizontalAlignment="Right" />

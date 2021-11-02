@@ -5,8 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace JapaneseLookup.EPWING
 {
@@ -17,7 +15,7 @@ namespace JapaneseLookup.EPWING
         public string DefinitionTags { get; init; }
         public List<string> Rules { get; init; }
         public int Score { get; init; }
-        public List<string> Glosssary { get; init; }
+        public List<string> Glossary { get; init; }
         public int Sequence { get; init; }
         public string TermTags { get; init; }
 
@@ -32,7 +30,7 @@ namespace JapaneseLookup.EPWING
             jsonElement[4].TryGetInt32(out int score);
             Score = score;
 
-            Glosssary = jsonElement[5].ToString()[2..^2]
+            Glossary = jsonElement[5].ToString()[2..^2]
                 .Split("\\n", StringSplitOptions.TrimEntries).ToList();
 
             jsonElement[6].TryGetInt32(out int sequence);

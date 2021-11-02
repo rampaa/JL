@@ -20,9 +20,7 @@ namespace JapaneseLookup.EPWING
                 return;
 
             List<EpwingEntry> epwingEntryList = new();
-
             string[] jsonFiles = Directory.GetFiles(dictPath, "*_bank_*.json");
-            // string[] jsonFiles = Directory.GetFiles(dictPath, "*.json");
 
             foreach (string jsonFile in jsonFiles)
             {
@@ -47,7 +45,7 @@ namespace JapaneseLookup.EPWING
             {
                 var result = new EpwingResult
                 {
-                    Definitions = entry.Glosssary,
+                    Definitions = entry.Glossary,
                     Reading = entry.Reading,
                     PrimarySpelling = entry.Expression,
                     WordClasses = entry.Rules
@@ -81,7 +79,7 @@ namespace JapaneseLookup.EPWING
 
         private static bool IsValidEpwingResultForDictType(EpwingResult result, DictType dictType)
         {
-            string[] badCharacters = new string[] { "�", "(", "=", "＝", "［", "〔", "「", "『", "（" };
+            string[] badCharacters = { "�", "(", "=", "＝", "［", "〔", "「", "『", "（" };
 
             foreach (string badCharacter in badCharacters)
             {
@@ -116,6 +114,8 @@ namespace JapaneseLookup.EPWING
                     break;
                 case DictType.Meikyou:
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(dictType), dictType, null);
             }
 
             return true;
