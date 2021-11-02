@@ -6,14 +6,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Markup;
 using JapaneseLookup.Abstract;
 using JapaneseLookup.EPWING;
 using JapaneseLookup.KANJIDIC;
@@ -29,7 +27,9 @@ namespace JapaneseLookup
     public static class ConfigManager
     {
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
-        private static readonly List<string> JapaneseFonts = Utilities.Utils.FindJapaneseFonts().OrderBy(font => font).ToList();
+
+        private static readonly List<string> JapaneseFonts =
+            Utilities.Utils.FindJapaneseFonts().OrderBy(font => font).ToList();
 
         public static readonly Dictionary<string, Dict> BuiltInDicts =
             new()
@@ -65,7 +65,7 @@ namespace JapaneseLookup
         // TODO: Don't let KanjiMode be turned on if Kanjidic is not loaded?
         public static bool KanjiMode { get; set; }
         public static bool ForceSync { get; set; }
-        public static int LookupRate{ get; set; }
+        public static int LookupRate { get; set; }
 
         public static double MainWindowHeight { get; set; }
         public static double MainWindowWidth { get; set; }
@@ -758,10 +758,9 @@ namespace JapaneseLookup
             writer.WriteAttributeString("value", value);
             writer.WriteEndElement();
         }
+
         private static void LoadDictionaries()
         {
-            string freqListPath = FrequencyLists[FrequencyList];
-
             var tasks = new List<Task>();
 
             foreach ((DictType _, Dict dict) in Dicts)
@@ -798,8 +797,8 @@ namespace JapaneseLookup
                         }
 
                         break;
-                    case DictType.UnknownEpwing:
-                        if (!Dicts[DictType.UnknownEpwing].Contents.Any())
+                    case DictType.Kenkyuusha:
+                        if (!Dicts[DictType.Kenkyuusha].Contents.Any())
                         {
                             var taskEpwing = Task.Run(async () =>
                                 await EpwingJsonLoader.Loader(dict.Type, dict.Path));
@@ -847,7 +846,7 @@ namespace JapaneseLookup
                         if (!Dicts[DictType.CustomWordDictionary].Contents.Any())
                         {
                             var taskCustomWordDict = Task.Run(() => CustomWordLoader.Load(
-                                ConfigManager.Dicts[DictType.CustomWordDictionary].Path));
+                                Dicts[DictType.CustomWordDictionary].Path));
                             tasks.Add(taskCustomWordDict);
                         }
 
@@ -856,7 +855,7 @@ namespace JapaneseLookup
                         if (!Dicts[DictType.CustomNameDictionary].Contents.Any())
                         {
                             var taskCustomNameDict = Task.Run(() => CustomNameLoader.Load(
-                                ConfigManager.Dicts[DictType.CustomNameDictionary].Path));
+                                Dicts[DictType.CustomNameDictionary].Path));
                             tasks.Add(taskCustomNameDict);
                         }
 
@@ -887,7 +886,8 @@ namespace JapaneseLookup
 
                     Task taskNewFreqlist = Task.Run(() =>
                     {
-                        FrequencyLoader.BuildFreqDict(FrequencyLoader.LoadJson(Path.Join(ApplicationPath, freqListPath)).Result);
+                        FrequencyLoader.BuildFreqDict(FrequencyLoader
+                            .LoadJson(Path.Join(ApplicationPath, FrequencyLists[FrequencyList])).Result);
                     });
 
                     tasks.Add(taskNewFreqlist);

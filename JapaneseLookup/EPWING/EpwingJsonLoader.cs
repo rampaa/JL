@@ -94,7 +94,7 @@ namespace JapaneseLookup.EPWING
 
             switch (dictType)
             {
-                case DictType.UnknownEpwing:
+                case DictType.Kenkyuusha:
                     break;
                 case DictType.Daijirin:
                     // english definitions

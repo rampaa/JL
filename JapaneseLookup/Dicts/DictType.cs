@@ -10,7 +10,7 @@
         CustomNameDictionary,
 
         // user-added
-        UnknownEpwing,
+        Kenkyuusha,
         Daijirin,
         Daijisen,
         Koujien,

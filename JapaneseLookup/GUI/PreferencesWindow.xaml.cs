@@ -469,7 +469,7 @@ namespace JapaneseLookup.GUI
                 case DictType.CustomNameDictionary:
                     BrowseForDictionaryFile(selectedDictType, "CustomNameDict file|custom_names.txt");
                     break;
-                case DictType.UnknownEpwing:
+                case DictType.Kenkyuusha:
                     BrowseForDictionaryFolder(selectedDictType);
                     break;
                 case DictType.Daijirin:
