@@ -1,12 +1,12 @@
 ## Supported dictionaries
 
-### J-E
+### EDICT
 
 * JMdict - Full support
 * JMnedict - Full support
 * KANJIDIC - Full support (w/ composition data)
 
-### J-J (yomichan-import format)
+### EPWING (yomichan-import format)
 JMdict must be enabled in order to get accurate results from these.
 
 * Daijirin - Basic+ support
