@@ -306,7 +306,6 @@ namespace JapaneseLookup.GUI
                 var dictPathValidityDisplay = new TextBlock()
                 {
                     Width = 12,
-                    //TODO: this should look nicer
                     Text = (Directory.Exists(dict.Path) || File.Exists(dict.Path)) ? "" : "❌",
                     Margin = new Thickness(1),
                 };
@@ -443,7 +442,6 @@ namespace JapaneseLookup.GUI
 
         private void ButtonAddDictionary_OnClick(object sender, RoutedEventArgs e)
         {
-            // TODO: Shouldn't need this if done properly w/ a dedicated window
             if (ComboBoxAddDictionary.SelectionBoxItem.ToString() == "") return;
 
             var selectedDictType =

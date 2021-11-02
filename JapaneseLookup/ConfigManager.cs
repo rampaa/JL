@@ -47,7 +47,6 @@ namespace JapaneseLookup
                 }
             };
 
-        // TODO: Make these configurable too
         private static readonly Dictionary<string, string> FrequencyLists = new()
         {
             { "VN", "Resources/freqlist_vns.json" },
@@ -62,7 +61,6 @@ namespace JapaneseLookup
         public static int MaxSearchLength { get; set; }
         public static string FrequencyList { get; set; }
 
-        // TODO: Don't let KanjiMode be turned on if Kanjidic is not loaded?
         public static bool KanjiMode { get; set; }
         public static bool ForceSync { get; set; }
         public static int LookupRate { get; set; }
@@ -896,7 +894,6 @@ namespace JapaneseLookup
 
             Task.WaitAll(tasks.ToArray());
 
-            // TODO: doesn't seem to compact after saving settings sometimes
             Debug.WriteLine("Starting compacting GC run");
             GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.GetTotalMemory(true);

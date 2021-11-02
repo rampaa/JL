@@ -195,7 +195,7 @@ namespace JapaneseLookup.Lookup
 
                             foreach (IResult rslt1 in temp)
                             {
-                                var rslt = (JMdictResult) rslt1;
+                                var rslt = (JMdictResult)rslt1;
                                 if (rslt.WordClasses.SelectMany(pos => pos).Intersect(result.Tags).Any())
                                 {
                                     resultsList.Add(rslt);
@@ -290,7 +290,6 @@ namespace JapaneseLookup.Lookup
                     tryLongVowelConversion = false;
                 }
 
-                //todo
                 if (dict.TryGetValue(text, out var textTempResult))
                 {
                     daijirinResults.TryAdd(text,
@@ -376,7 +375,6 @@ namespace JapaneseLookup.Lookup
                     tryLongVowelConversion = false;
                 }
 
-                //todo
                 if (dict.TryGetValue(text, out var textTempResult))
                 {
                     epwingResults.TryAdd(text,
@@ -476,7 +474,7 @@ namespace JapaneseLookup.Lookup
 
                             foreach (IResult rslt1 in temp)
                             {
-                                var rslt = (CustomWordEntry) rslt1;
+                                var rslt = (CustomWordEntry)rslt1;
                                 if (rslt.WordClasses.Intersect(result.Tags).Any())
                                 {
                                     resultsList.Add(rslt);
@@ -541,7 +539,7 @@ namespace JapaneseLookup.Lookup
             {
                 foreach (IResult iResult in wordResult.Value.ResultsList)
                 {
-                    var jMDictResult = (JMdictResult) iResult;
+                    var jMDictResult = (JMdictResult)iResult;
                     var result = new Dictionary<LookupResult, List<string>>();
 
                     var foundSpelling = new List<string> { jMDictResult.PrimarySpelling };
@@ -636,7 +634,8 @@ namespace JapaneseLookup.Lookup
                 foreach (var freqResult in freqResults)
                 {
                     if (epwingResult.Reading == freqResult.Spelling
-                        || (string.IsNullOrEmpty(epwingResult.Reading) && epwingResult.PrimarySpelling == freqResult.Spelling))
+                        || (string.IsNullOrEmpty(epwingResult.Reading) &&
+                            epwingResult.PrimarySpelling == freqResult.Spelling))
                     {
                         if (freqValue > freqResult.Frequency)
                         {
@@ -840,7 +839,7 @@ namespace JapaneseLookup.Lookup
             {
                 foreach (IResult iResult in nameResult.Value.ResultsList)
                 {
-                    var jMnedictResult = (JMnedictResult) iResult;
+                    var jMnedictResult = (JMnedictResult)iResult;
                     var result = new Dictionary<LookupResult, List<string>>();
 
                     var foundSpelling = new List<string> { jMnedictResult.PrimarySpelling };
@@ -886,7 +885,7 @@ namespace JapaneseLookup.Lookup
                 return results;
 
             var iResult = kanjiResults.First().Value.ResultsList;
-            KanjiResult kanjiResult = (KanjiResult) iResult.First();
+            KanjiResult kanjiResult = (KanjiResult)iResult.First();
 
             var dictType = new List<string> { kanjiResults.First().Value.DictType.ToString() };
 
@@ -917,7 +916,7 @@ namespace JapaneseLookup.Lookup
             {
                 foreach (IResult iResult in wordResult.Value.ResultsList)
                 {
-                    var epwingResult = (EpwingResult) iResult;
+                    var epwingResult = (EpwingResult)iResult;
                     var result = new Dictionary<LookupResult, List<string>>();
 
                     var foundSpelling = new List<string> { epwingResult.PrimarySpelling };
@@ -953,7 +952,7 @@ namespace JapaneseLookup.Lookup
             {
                 for (int i = wordResult.Value.ResultsList.Count - 1; i >= 0; i--)
                 {
-                    var customWordDictResult = (CustomWordEntry) wordResult.Value.ResultsList[i];
+                    var customWordDictResult = (CustomWordEntry)wordResult.Value.ResultsList[i];
                     var result = new Dictionary<LookupResult, List<string>>();
 
                     var foundSpelling = new List<string> { customWordDictResult.PrimarySpelling };
@@ -999,7 +998,7 @@ namespace JapaneseLookup.Lookup
             {
                 for (int i = customNameResult.Value.ResultsList.Count - 1; i >= 0; i--)
                 {
-                    var customNameDictResult = (CustomNameEntry) customNameResult.Value.ResultsList[i];
+                    var customNameDictResult = (CustomNameEntry)customNameResult.Value.ResultsList[i];
                     var result = new Dictionary<LookupResult, List<string>>();
 
                     var foundSpelling = new List<string> { customNameDictResult.PrimarySpelling };
@@ -1127,7 +1126,6 @@ namespace JapaneseLookup.Lookup
             var defResult = new StringBuilder();
             foreach (string definitionPart in jMDictResult.Definitions)
             {
-                // todo
                 // var separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "; ";
                 const string separator = "\n";
                 defResult.Append(definitionPart + separator);
