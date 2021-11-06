@@ -74,7 +74,7 @@ namespace JapaneseLookup.GUI
 
         public async void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
-            if (MWindow.Background.Opacity == 0) return;
+            if (MWindow.Background.Opacity == 0 ||ConfigManager.InactiveLookupMode) return;
             await FirstPopupWindow.TextBox_MouseMove(MainTextBox);
         }
 
@@ -200,7 +200,7 @@ namespace JapaneseLookup.GUI
                 MainWindowUtilities.ShowPreferencesWindow();
             }
 
-            else if (Utils.KeyGestureComparer(e, ConfigManager.TransparentModeKeyGesture))
+            else if (Utils.KeyGestureComparer(e, ConfigManager.MousePassThroughModeKeyGesture))
             {
                 MWindow.Background.Opacity = 0;
                 Keyboard.ClearFocus();
@@ -226,6 +226,11 @@ namespace JapaneseLookup.GUI
             else if (Utils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))
             {
                 MainWindowUtilities.SearchWithBrowser();
+            }
+
+            else if (Utils.KeyGestureComparer(e, ConfigManager.InactiveLookupModeKeyGesture))
+            {
+                ConfigManager.InactiveLookupMode = !ConfigManager.InactiveLookupMode;
             }
         }
 
@@ -301,6 +306,12 @@ namespace JapaneseLookup.GUI
         private void FontSizeSlider_LostFocus(object sender, RoutedEventArgs e)
         {
             FontSizeSlider.Visibility = Visibility.Collapsed;
+        }
+
+        private void MWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ConfigManager.MainWindowHeight = Height;
+            ConfigManager.MainWindowWidth = Width;
         }
     }
 }

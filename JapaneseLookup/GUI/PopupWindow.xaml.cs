@@ -48,11 +48,19 @@ namespace JapaneseLookup.GUI
         {
             InitializeComponent();
 
-            MaxWidth = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxWidth") ??
-                                 throw new InvalidOperationException());
-            MaxHeight = int.Parse(ConfigurationManager.AppSettings.Get("PopupMaxHeight") ??
-                                  throw new InvalidOperationException());
+            MaxHeight = ConfigManager.PopupMaxHeight;
+            MaxWidth = ConfigManager.PopupMaxWidth;
             Background = ConfigManager.PopupBackgroundColor;
+            FontFamily = ConfigManager.PopupFont;
+
+            if (ConfigManager.PopupDynamicWidth && ConfigManager.PopupDynamicHeight)
+                SizeToContent = SizeToContent.WidthAndHeight;
+            else if (ConfigManager.PopupDynamicWidth)
+                SizeToContent = SizeToContent.Width;
+            else if (ConfigManager.PopupDynamicHeight)
+                SizeToContent = SizeToContent.Height;
+            else
+                SizeToContent = SizeToContent.Manual;
 
             // need to initialize window (position) for later
             Show();
@@ -61,7 +69,7 @@ namespace JapaneseLookup.GUI
 
         public async Task TextBox_MouseMove(TextBox tb)
         {
-            if (MiningMode) return;
+            if (MiningMode || ConfigManager.InactiveLookupMode) return;
 
             UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
@@ -253,8 +261,8 @@ namespace JapaneseLookup.GUI
                             Name = key.ToString(),
                             Text = value[0],
                             Tag = index, // for audio
-                            Foreground = ConfigManager.FoundSpellingColor,
-                            FontSize = ConfigManager.FoundSpellingFontSize,
+                            Foreground = ConfigManager.PrimarySpellingColor,
+                            FontSize = ConfigManager.PrimarySpellingFontSize,
                         };
                         textBlockFoundSpelling.MouseEnter += FoundSpelling_MouseEnter; // for audio
                         textBlockFoundSpelling.MouseLeave += FoundSpelling_MouseLeave; // for audio
@@ -344,8 +352,8 @@ namespace JapaneseLookup.GUI
                         {
                             Name = key.ToString(),
                             Text = string.Join(", ", value),
-                            Foreground = ConfigManager.ProcessColor,
-                            FontSize = ConfigManager.ProcessFontSize,
+                            Foreground = ConfigManager.DeconjugationInfoColor,
+                            FontSize = ConfigManager.DeconjugationInfoFontSize,
                             Margin = new Thickness(5, 0, 0, 0),
                         };
                         break;
@@ -355,8 +363,8 @@ namespace JapaneseLookup.GUI
                         {
                             Name = key.ToString(),
                             Text = "(" + string.Join(",", value) + ")",
-                            //Foreground = ConfigManager.pOrthographyInfoColor,
-                            //FontSize = ConfigManager.pOrthographyInfoFontSize,
+                            Foreground = ConfigManager.POrthographyInfoColor,
+                            FontSize = ConfigManager.POrthographyInfoFontSize,
                             Margin = new Thickness(5, 0, 0, 0),
                         };
                         break;
@@ -753,6 +761,11 @@ namespace JapaneseLookup.GUI
             else if (Utils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))
             {
                 MainWindowUtilities.SearchWithBrowser();
+            }
+
+            else if (Utils.KeyGestureComparer(e, ConfigManager.InactiveLookupModeKeyGesture))
+            {
+                ConfigManager.InactiveLookupMode = !ConfigManager.InactiveLookupMode;
             }
         }
 

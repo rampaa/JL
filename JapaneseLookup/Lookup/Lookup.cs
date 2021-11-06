@@ -623,7 +623,7 @@ namespace JapaneseLookup.Lookup
 
             int freqValue = int.MaxValue;
 
-            Frequency.FrequencyLoader.FreqDicts.TryGetValue(ConfigManager.FrequencyList, out var freqDict);
+            Frequency.FrequencyLoader.FreqDicts.TryGetValue(ConfigManager.FrequencyListName, out var freqDict);
 
             if (freqDict == null)
                 return frequency;
@@ -674,7 +674,7 @@ namespace JapaneseLookup.Lookup
 
             int freqValue = int.MaxValue;
 
-            Frequency.FrequencyLoader.FreqDicts.TryGetValue(ConfigManager.FrequencyList, out var freqDict);
+            Frequency.FrequencyLoader.FreqDicts.TryGetValue(ConfigManager.FrequencyListName, out var freqDict);
 
             if (freqDict == null)
                 return frequency;
@@ -755,7 +755,7 @@ namespace JapaneseLookup.Lookup
 
             int freqValue = int.MaxValue;
 
-            Frequency.FrequencyLoader.FreqDicts.TryGetValue(ConfigManager.FrequencyList, out var freqDict);
+            Frequency.FrequencyLoader.FreqDicts.TryGetValue(ConfigManager.FrequencyListName, out var freqDict);
 
             if (freqDict == null)
                 return frequency;

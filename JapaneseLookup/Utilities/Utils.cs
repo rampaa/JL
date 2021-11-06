@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -16,21 +17,16 @@ namespace JapaneseLookup.Utilities
         {
             for (int i = 0; i < s.Length; ++i)
             {
-                if ((char.IsHighSurrogate(s, i)
-                    && (i + 1 == s.Length
-                        || (s.Length > i + 1 && !char.IsLowSurrogate(s, i + 1))))
-                    || (char.IsLowSurrogate(s, i)
-                        && (i == 0
-                            || (i > 0 && !char.IsHighSurrogate(s, i - 1)))))
-                {
-                    yield return s[i].ToString();
-                }
-
-                else
+                if (char.IsHighSurrogate(s, i)
+                    && s.Length > i + 1
+                    && char.IsLowSurrogate(s, i + 1))
                 {
                     yield return char.ConvertFromUtf32(char.ConvertToUtf32(s, i));
-                    if (char.IsHighSurrogate(s, i))
-                        ++i;
+                    ++i;
+                }
+                else
+                {
+                    yield return s[i].ToString();
                 }
             }
         }
@@ -69,6 +65,93 @@ namespace JapaneseLookup.Utilities
                 return keyGesture.Key == e.Key && (Keyboard.Modifiers & ModifierKeys.Windows) == 0;
             else
                 return keyGesture.Matches(null, e);
+        }
+
+        public static string KeyGestureToString(KeyGesture keyGesture)
+        {
+            StringBuilder keyGestureStringBuilder = new();
+
+            if (keyGesture.Modifiers.HasFlag(ModifierKeys.Control))
+            {
+                keyGestureStringBuilder.Append("Ctrl+");
+            }
+
+            if (keyGesture.Modifiers.HasFlag(ModifierKeys.Shift))
+            {
+                keyGestureStringBuilder.Append("Shift+");
+            }
+
+            if (keyGesture.Modifiers.HasFlag(ModifierKeys.Alt))
+            {
+                keyGestureStringBuilder.Append("Alt+");
+            }
+
+            keyGestureStringBuilder.Append(keyGesture.Key.ToString());
+
+            return keyGestureStringBuilder.ToString();
+        }
+
+        public static void Try(Action a, object variable, string key)
+        {
+            try
+            {
+                a();
+            }
+            catch
+            {
+                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                if (ConfigurationManager.AppSettings.Get(key) == null)
+                    config.AppSettings.Settings.Add(key, variable.ToString());
+                else
+                    config.AppSettings.Settings[key].Value = variable.ToString();
+
+                config.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection("appSettings");
+            }
+        }
+
+        public static KeyGesture KeyGestureSetter(string keyGestureName, KeyGesture keyGesture)
+        {
+            string rawKeyGesture = ConfigurationManager.AppSettings.Get(keyGestureName);
+
+            if (rawKeyGesture != null)
+            {
+                KeyGestureConverter keyGestureConverter = new();
+                if (!rawKeyGesture!.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") && !rawKeyGesture.StartsWith("Alt+"))
+                    return (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+                else
+                    return (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
+            }
+
+            else
+            {
+                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                config.AppSettings.Settings.Add(keyGestureName, KeyGestureToString(keyGesture));
+                config.Save(ConfigurationSaveMode.Modified);
+
+                return keyGesture;
+            }
+        }
+
+        public static void AddToConfig(string key, string value)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings.Add(key, value);
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
+        }
+
+        public static void KeyGestureSaver(string key, string rawKeyGesture)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            if (rawKeyGesture.StartsWith("Win+"))
+                config.AppSettings.Settings[key].Value = rawKeyGesture[4..];
+            else
+                config.AppSettings.Settings[key].Value = rawKeyGesture;
+
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
         }
     }
 }

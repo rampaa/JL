@@ -22,7 +22,7 @@ namespace JapaneseLookup.Frequency
 
         public static void BuildFreqDict(Dictionary<string, List<List<JsonElement>>> frequencyDict)
         {
-            FreqDicts.TryGetValue(ConfigManager.FrequencyList, out var freqDict);
+            FreqDicts.TryGetValue(ConfigManager.FrequencyListName, out var freqDict);
 
             foreach ((string reading, var value) in frequencyDict)
             {

@@ -88,7 +88,7 @@ namespace JapaneseLookup.Anki
                 else
                 {
                     Console.WriteLine($"Mined {foundSpelling}");
-                    if (ConfigManager.ForceSync) await AnkiConnect.Sync();
+                    if (ConfigManager.ForceSyncAnki) await AnkiConnect.Sync();
                 }
             }
             catch (Exception e)

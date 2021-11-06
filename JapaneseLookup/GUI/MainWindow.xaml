@@ -7,7 +7,7 @@
         AllowsTransparency="True"
         mc:Ignorable="d" Height="269" Width="800" WindowStyle="None" ResizeMode="CanResize" Topmost="True"
         Closed="MWindow_Closed" Closing="MWindow_Closing" KeyDown="MWindow_KeyDown"
-        PreviewKeyDown="MWindow_PreviewKeyDown">
+        PreviewKeyDown="MWindow_PreviewKeyDown" SizeChanged="MWindow_SizeChanged">
     <Window.Background>
         <SolidColorBrush Color="Black" Opacity="0.3" />
     </Window.Background>
@@ -16,7 +16,7 @@
         <WindowChrome
             CaptionHeight="20"
             CornerRadius="0"
-            ResizeBorderThickness="7"
+            ResizeBorderThickness="3"
             GlassFrameThickness="0"
             x:Name="MainWindowChrome" />
     </WindowChrome.WindowChrome>
@@ -65,7 +65,7 @@
             </Slider.RenderTransform>
         </Slider>
         <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="-15,70,0,0" VerticalAlignment="Top"
-                Width="120" RenderTransformOrigin="0.5,0.5" Value="70" Maximum="300" Minimum="1"
+                Width="120" RenderTransformOrigin="0.5,0.5" Value="50" Maximum="300" Minimum="1"
                 ToolTip="{Binding Value, ElementName=FontSizeSlider}" Visibility="Collapsed"
                 ValueChanged="FontSizeSlider_ValueChanged" LostMouseCapture="FontSizeSlider_LostMouseCapture"
                 IsMoveToPointEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Disabled"
