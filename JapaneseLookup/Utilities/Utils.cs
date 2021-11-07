@@ -51,6 +51,10 @@ namespace JapaneseLookup.Utilities
                                 japaneseFonts.Add(fontFamily.Source);
                                 break;
                             }
+                        }
+                    }
+                }
+            }
 
             return japaneseFonts;
         }
@@ -98,7 +102,8 @@ namespace JapaneseLookup.Utilities
             }
             catch
             {
-                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                Configuration config =
+                    ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
                 if (ConfigurationManager.AppSettings.Get(key) == null)
                     config.AppSettings.Settings.Add(key, variable.ToString());
                 else
@@ -125,7 +130,8 @@ namespace JapaneseLookup.Utilities
 
             else
             {
-                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                Configuration config =
+                    ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
                 config.AppSettings.Settings.Add(keyGestureName, KeyGestureToString(keyGesture));
                 config.Save(ConfigurationSaveMode.Modified);
 
@@ -135,7 +141,8 @@ namespace JapaneseLookup.Utilities
 
         public static void AddToConfig(string key, string value)
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            Configuration config =
+                ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             config.AppSettings.Settings.Add(key, value);
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
@@ -143,7 +150,8 @@ namespace JapaneseLookup.Utilities
 
         public static void KeyGestureSaver(string key, string rawKeyGesture)
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            Configuration config =
+                ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
             if (rawKeyGesture.StartsWith("Win+"))
                 config.AppSettings.Settings[key].Value = rawKeyGesture[4..];

@@ -52,7 +52,6 @@ namespace JapaneseLookup.GUI
             MaxWidth = ConfigManager.PopupMaxWidth;
             Background = ConfigManager.PopupBackgroundColor;
             FontFamily = ConfigManager.PopupFont;
-            Console.WriteLine(FontFamily);
 
             if (ConfigManager.PopupDynamicWidth && ConfigManager.PopupDynamicHeight)
                 SizeToContent = SizeToContent.WidthAndHeight;
