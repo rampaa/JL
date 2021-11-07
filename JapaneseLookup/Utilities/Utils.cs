@@ -36,7 +36,7 @@ namespace JapaneseLookup.Utilities
             List<string> japaneseFonts = new();
             foreach (FontFamily fontFamily in Fonts.SystemFontFamilies)
             {
-                // if (fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("ja-jp")))
+                if (fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("ja-jp")))
                     japaneseFonts.Add(fontFamily.Source);
 
                 else if (fontFamily.FamilyNames.Keys != null && fontFamily.FamilyNames.Keys.Count == 1 &&
