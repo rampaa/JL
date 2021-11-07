@@ -296,13 +296,14 @@ namespace JapaneseLookup.GUI
                                 Name = key.ToString(),
                                 Text = string.Join(", ", value),
                                 TextWrapping = TextWrapping.Wrap,
-                                Background = ConfigManager.PopupBackgroundColor,
+                                Background = Brushes.Transparent,
                                 Foreground = ConfigManager.DefinitionsColor,
                                 FontSize = ConfigManager.DefinitionsFontSize,
                                 BorderThickness = new Thickness(0, 0, 0, 0),
                                 Margin = new Thickness(2, 2, 2, 2),
                                 IsReadOnly = true,
                                 IsUndoEnabled = false,
+                                Cursor = Cursors.Arrow,
                             };
                             textBlockDefinitions.MouseMove += (sender, _) =>
                             {
