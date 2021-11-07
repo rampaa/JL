@@ -527,7 +527,7 @@
                             <TextBlock Text="Move forward (Backlog)" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
-                        
+
                         <DockPanel>
                             <TextBox x:Name="InactiveLookupModeKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -546,11 +546,10 @@
                                 <Setter Property="Margin" Value="0,10,0,0" />
                             </Style>
                         </StackPanel.Resources>
-
-                        <ListBox x:Name="DictionariesDisplay" Focusable="False" Margin="10" />
-
                         <ComboBox Name="ComboBoxAddDictionary" Width="120" Margin="10" />
                         <Button Name="ButtonAddDictionary" Margin="10" Click="ButtonAddDictionary_OnClick">Add dictionary</Button>
+
+                        <ListBox x:Name="DictionariesDisplay" Focusable="False" Margin="10" />
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

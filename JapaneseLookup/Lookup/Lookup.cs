@@ -75,6 +75,7 @@ namespace JapaneseLookup.Lookup
                         // handled above and below
                         break;
                     case DictType.Kenkyuusha:
+                        // TODO
                         epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
                             deconjugationResultsList, dict.Contents, dictType, jmdictWordClasses));
                         break;

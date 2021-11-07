@@ -74,7 +74,7 @@ namespace JapaneseLookup.GUI
 
         public async void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
-            if (MWindow.Background.Opacity == 0 ||ConfigManager.InactiveLookupMode) return;
+            if (MWindow.Background.Opacity == 0 || ConfigManager.InactiveLookupMode) return;
             await FirstPopupWindow.TextBox_MouseMove(MainTextBox);
         }
 

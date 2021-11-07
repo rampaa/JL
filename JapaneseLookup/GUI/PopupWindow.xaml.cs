@@ -52,6 +52,7 @@ namespace JapaneseLookup.GUI
             MaxWidth = ConfigManager.PopupMaxWidth;
             Background = ConfigManager.PopupBackgroundColor;
             FontFamily = ConfigManager.PopupFont;
+            Console.WriteLine(FontFamily);
 
             if (ConfigManager.PopupDynamicWidth && ConfigManager.PopupDynamicHeight)
                 SizeToContent = SizeToContent.WidthAndHeight;
@@ -310,7 +311,7 @@ namespace JapaneseLookup.GUI
 
                                 // prevents stray PopupWindows being created when you move your mouse too fast
                                 if (MiningMode)
-                                    ChildPopupWindow.Definitions_MouseMove((TextBox) sender);
+                                    ChildPopupWindow.Definitions_MouseMove((TextBox)sender);
                             };
                         }
                         else
@@ -490,6 +491,7 @@ namespace JapaneseLookup.GUI
                         !(enumName == LookupResult.AlternativeSpellings || enumName == LookupResult.Readings))
                         continue;
                 }
+
                 // POrthographyInfo check
                 if (baby.Text == "()")
                     continue;
@@ -540,8 +542,8 @@ namespace JapaneseLookup.GUI
 
         private static void FoundSpelling_MouseEnter(object sender, MouseEventArgs e)
         {
-            var textBlock = (TextBlock) sender;
-            _playAudioIndex = (int) textBlock.Tag;
+            var textBlock = (TextBlock)sender;
+            _playAudioIndex = (int)textBlock.Tag;
         }
 
         private static void FoundSpelling_MouseLeave(object sender, MouseEventArgs e)
@@ -567,8 +569,8 @@ namespace JapaneseLookup.GUI
             string grade = null;
             string composition = null;
 
-            var textBlock = (TextBlock) sender;
-            var top = (WrapPanel) textBlock.Parent;
+            var textBlock = (TextBlock)sender;
+            var top = (WrapPanel)textBlock.Parent;
             foreach (TextBlock child in top.Children)
             {
                 if (Enum.TryParse(child.Name, out LookupResult result))
@@ -612,8 +614,8 @@ namespace JapaneseLookup.GUI
                 }
             }
 
-            var innerStackPanel = (StackPanel) top.Parent;
-            var bottom = (StackPanel) innerStackPanel.Children[1];
+            var innerStackPanel = (StackPanel)top.Parent;
+            var bottom = (StackPanel)innerStackPanel.Children[1];
             foreach (object child in bottom.Children)
             {
                 if (child is TextBox textBox)
@@ -625,7 +627,7 @@ namespace JapaneseLookup.GUI
                 if (child is not TextBlock)
                     continue;
 
-                textBlock = (TextBlock) child;
+                textBlock = (TextBlock)child;
 
                 if (Enum.TryParse(textBlock.Name, out LookupResult result))
                 {
@@ -706,8 +708,8 @@ namespace JapaneseLookup.GUI
                 string foundSpelling = null;
                 string reading = null;
 
-                var innerStackPanel = (StackPanel) StackPanel.Items[_playAudioIndex];
-                var top = (WrapPanel) innerStackPanel.Children[0];
+                var innerStackPanel = (StackPanel)StackPanel.Items[_playAudioIndex];
+                var top = (WrapPanel)innerStackPanel.Children[0];
 
                 foreach (TextBlock child in top.Children)
                 {

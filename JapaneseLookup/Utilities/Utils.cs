@@ -30,12 +30,13 @@ namespace JapaneseLookup.Utilities
                 }
             }
         }
+
         public static List<string> FindJapaneseFonts()
         {
             List<string> japaneseFonts = new();
             foreach (FontFamily fontFamily in Fonts.SystemFontFamilies)
             {
-                if (fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("ja-jp")))
+                // if (fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("ja-jp")))
                     japaneseFonts.Add(fontFamily.Source);
 
                 else if (fontFamily.FamilyNames.Keys != null && fontFamily.FamilyNames.Keys.Count == 1 &&
@@ -50,12 +51,10 @@ namespace JapaneseLookup.Utilities
                                 japaneseFonts.Add(fontFamily.Source);
                                 break;
                             }
-                        }
-                    }
-                }
-            }
+
             return japaneseFonts;
         }
+
         public static bool KeyGestureComparer(KeyEventArgs e, KeyGesture keyGesture)
         {
             if (keyGesture == null)
@@ -117,7 +116,8 @@ namespace JapaneseLookup.Utilities
             if (rawKeyGesture != null)
             {
                 KeyGestureConverter keyGestureConverter = new();
-                if (!rawKeyGesture!.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") && !rawKeyGesture.StartsWith("Alt+"))
+                if (!rawKeyGesture!.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
+                    !rawKeyGesture.StartsWith("Alt+"))
                     return (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
                 else
                     return (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);

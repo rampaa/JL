@@ -52,7 +52,7 @@ namespace JapaneseLookup.GUI
                 PopupElement = picker,
             };
             picker.Canceled += delegate { window.Close(); };
-            picker.Confirmed += delegate { ColorSetter((Button) sender, picker.SelectedBrush, window); };
+            picker.Confirmed += delegate { ColorSetter((Button)sender, picker.SelectedBrush, window); };
 
             window.ShowDialog(picker, false);
         }
@@ -98,7 +98,7 @@ namespace JapaneseLookup.GUI
 
         private async void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var itemTab = (System.Windows.Controls.TabItem) TabControl.SelectedItem;
+            var itemTab = (System.Windows.Controls.TabItem)TabControl.SelectedItem;
             if (itemTab == null) return;
 
             switch (itemTab.Header)
@@ -223,8 +223,8 @@ namespace JapaneseLookup.GUI
                 var dict = new Dictionary<string, JLField>();
                 foreach (StackPanel stackPanel in MiningSetupStackPanelFields.Children)
                 {
-                    var textBlock = (TextBlock) stackPanel.Children[0];
-                    var comboBox = (System.Windows.Controls.ComboBox) stackPanel.Children[1];
+                    var textBlock = (TextBlock)stackPanel.Children[0];
+                    var comboBox = (System.Windows.Controls.ComboBox)stackPanel.Children[1];
 
                     if (Enum.TryParse<JLField>(comboBox.SelectionBoxItem.ToString(), out var result))
                     {
@@ -369,7 +369,6 @@ namespace JapaneseLookup.GUI
             List<DictType> allDictTypes = Enum.GetValues(typeof(DictType)).Cast<DictType>().ToList();
             List<DictType> loadedDictTypes = ConfigManager.Dicts.Keys.ToList();
             ComboBoxAddDictionary.ItemsSource = allDictTypes.Except(loadedDictTypes);
-            // lol
             DictionariesDisplay.ItemsSource = resultDockPanels.OrderBy(dockPanel =>
                 dockPanel.Children
                     .OfType<TextBlock>()
@@ -522,7 +521,7 @@ namespace JapaneseLookup.GUI
 
             hotkeyTextBuilder.Append(key.ToString());
 
-            ((TextBox) sender).Text = hotkeyTextBuilder.ToString();
+            ((TextBox)sender).Text = hotkeyTextBuilder.ToString();
         }
     }
 }

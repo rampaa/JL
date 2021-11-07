@@ -30,7 +30,7 @@ namespace JapaneseLookup
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
 
         private static readonly List<string> JapaneseFonts =
-            Utilities.Utils.FindJapaneseFonts().OrderBy(font => font).ToList();
+            Utils.FindJapaneseFonts().OrderBy(font => font).ToList();
 
         public static readonly Dictionary<string, Dict> BuiltInDicts =
             new()
@@ -88,17 +88,18 @@ namespace JapaneseLookup
         public static Brush POrthographyInfoColor { get; set; } = Brushes.White;
         public static Brush DictTypeColor { get; set; } = Brushes.LightBlue;
 
-        public static KeyGesture MiningModeKeyGesture { get; set; } = new KeyGesture(Key.M, ModifierKeys.Windows);
-        public static KeyGesture PlayAudioKeyGesture { get; set; } = new KeyGesture(Key.P, ModifierKeys.Windows);
-        public static KeyGesture KanjiModeKeyGesture { get; set; } = new KeyGesture(Key.K, ModifierKeys.Windows);
-        public static KeyGesture ShowPreferencesWindowKeyGesture { get; set; } = new KeyGesture(Key.L, ModifierKeys.Windows);
-        public static KeyGesture ShowAddNameWindowKeyGesture { get; set; } = new KeyGesture(Key.N, ModifierKeys.Windows);
-        public static KeyGesture ShowAddWordWindowKeyGesture { get; set; } = new KeyGesture(Key.W, ModifierKeys.Windows);
-        public static KeyGesture SearchWithBrowserKeyGesture { get; set; } = new KeyGesture(Key.S, ModifierKeys.Windows);
-        public static KeyGesture MousePassThroughModeKeyGesture { get; set; } = new KeyGesture(Key.T, ModifierKeys.Windows);
-        public static KeyGesture SteppedBacklogBackwardsKeyGesture { get; set; } = new KeyGesture(Key.Left, ModifierKeys.Windows);
-        public static KeyGesture SteppedBacklogForwardsKeyGesture { get; set; } = new KeyGesture(Key.Right, ModifierKeys.Windows);
-        public static KeyGesture InactiveLookupModeKeyGesture { get; set; } = new KeyGesture(Key.Q, ModifierKeys.Windows);
+        public static KeyGesture MiningModeKeyGesture { get; set; } = new(Key.M, ModifierKeys.Windows);
+        public static KeyGesture PlayAudioKeyGesture { get; set; } = new(Key.P, ModifierKeys.Windows);
+        public static KeyGesture KanjiModeKeyGesture { get; set; } = new(Key.K, ModifierKeys.Windows);
+        public static KeyGesture ShowPreferencesWindowKeyGesture { get; set; } = new(Key.L, ModifierKeys.Windows);
+        public static KeyGesture ShowAddNameWindowKeyGesture { get; set; } = new(Key.N, ModifierKeys.Windows);
+        public static KeyGesture ShowAddWordWindowKeyGesture { get; set; } = new(Key.W, ModifierKeys.Windows);
+        public static KeyGesture SearchWithBrowserKeyGesture { get; set; } = new(Key.S, ModifierKeys.Windows);
+        public static KeyGesture MousePassThroughModeKeyGesture { get; set; } = new(Key.T, ModifierKeys.Windows);
+        public static KeyGesture SteppedBacklogBackwardsKeyGesture { get; set; } = new(Key.Left, ModifierKeys.Windows);
+        public static KeyGesture SteppedBacklogForwardsKeyGesture { get; set; } = new(Key.Right, ModifierKeys.Windows);
+        public static KeyGesture InactiveLookupModeKeyGesture { get; set; } = new(Key.Q, ModifierKeys.Windows);
+
         public static int PrimarySpellingFontSize { get; set; } = 21;
         public static int ReadingsFontSize { get; set; } = 19;
         public static int ROrthographyInfoFontSize { get; set; } = 17;
@@ -116,7 +117,7 @@ namespace JapaneseLookup
         public static int PopupYOffset { get; set; } = 20;
         public static bool PopupFlipX { get; set; } = false;
         public static bool PopupFlipY { get; set; } = true;
-        public static FontFamily PopupFont { get; set; } = new FontFamily("Meiryo");
+        public static FontFamily PopupFont { get; set; } = new("Meiryo");
 
         // consider making this dictionary specific
         // enabling this seems to improve rendering performance by a lot; need to test if it's because
@@ -137,6 +138,7 @@ namespace JapaneseLookup
                 tempStr = "VN";
                 Utils.AddToConfig("FrequencyListName", tempStr);
             }
+
             FrequencyListName = tempStr;
 
             tempStr = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
@@ -145,132 +147,135 @@ namespace JapaneseLookup
                 tempStr = "http://localhost:8765";
                 Utils.AddToConfig("AnkiConnectUri", "http://localhost:8765");
             }
+
             AnkiConnectUri = tempStr;
 
-            Utils.Try(() => MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength")), MaxSearchLength, "MaxSearchLength");
-            Utils.Try(() => KanjiMode = bool.Parse(ConfigurationManager.AppSettings.Get("KanjiMode")), KanjiMode, "KanjiMode");
-            Utils.Try(() => ForceSyncAnki = bool.Parse(ConfigurationManager.AppSettings.Get("ForceSyncAnki")), ForceSyncAnki, "ForceSyncAnki");
-            Utils.Try(() => LookupRate = int.Parse(ConfigurationManager.AppSettings.Get("LookupRate")), LookupRate, "LookupRate");
+            Utils.Try(() => MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength")!),
+                MaxSearchLength, "MaxSearchLength");
+            Utils.Try(() => KanjiMode = bool.Parse(ConfigurationManager.AppSettings.Get("KanjiMode")!), KanjiMode,
+                "KanjiMode");
+            Utils.Try(() => ForceSyncAnki = bool.Parse(ConfigurationManager.AppSettings.Get("ForceSyncAnki")!),
+                ForceSyncAnki, "ForceSyncAnki");
+            Utils.Try(() => LookupRate = int.Parse(ConfigurationManager.AppSettings.Get("LookupRate")!), LookupRate,
+                "LookupRate");
 
             // MAKE SURE YOU FREEZE ANY NEW COLOR OBJECTS YOU ADD
             // OR THE PROGRAM WILL CRASH AND BURN
             Utils.Try(() =>
-            MainWindowTextColor = (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowTextColor")),
+                    MainWindowTextColor = (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowTextColor")),
                 MainWindowTextColor, "MainWindowTextColor");
             MainWindowTextColor.Freeze();
 
             Utils.Try(() =>
-            MainWindowBacklogTextColor = (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowBacklogTextColor")),
+                    MainWindowBacklogTextColor = (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowBacklogTextColor")),
                 MainWindowBacklogTextColor, "MainWindowBacklogTextColor");
             MainWindowBacklogTextColor.Freeze();
 
             Utils.Try(() =>
-            PrimarySpellingColor = (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings.Get("PrimarySpellingColor")),
+                    PrimarySpellingColor = (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("PrimarySpellingColor")),
                 PrimarySpellingColor, "PrimarySpellingColor");
             PrimarySpellingColor.Freeze();
 
             Utils.Try(() =>
-
-                ReadingsColor = (SolidColorBrush)new BrushConverter()
-                    .ConvertFrom(ConfigurationManager.AppSettings.Get("ReadingsColor")),
-                    ReadingsColor, "ReadingsColor");
+                    ReadingsColor = (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("ReadingsColor")),
+                ReadingsColor, "ReadingsColor");
             ReadingsColor.Freeze();
 
             Utils.Try(() =>
-            ROrthographyInfoColor = (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings.Get("ROrthographyInfoColor")),
+                    ROrthographyInfoColor = (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("ROrthographyInfoColor")),
                 ROrthographyInfoColor, "ROrthographyInfoColor");
             ROrthographyInfoColor.Freeze();
 
             Utils.Try(() =>
-            POrthographyInfoColor = (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings.Get("POrthographyInfoColor")),
+                    POrthographyInfoColor = (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("POrthographyInfoColor")),
                 POrthographyInfoColor, "POrthographyInfoColor");
             POrthographyInfoColor.Freeze();
 
             Utils.Try(() =>
-            AlternativeSpellingsColor = (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings.Get("AlternativeSpellingsColor")),
+                    AlternativeSpellingsColor = (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("AlternativeSpellingsColor")),
                 AlternativeSpellingsColor, "AlternativeSpellingsColor");
             AlternativeSpellingsColor.Freeze();
 
             Utils.Try(() =>
-            AOrthographyInfoColor = (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings.Get("AOrthographyInfoColor")),
+                    AOrthographyInfoColor = (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("AOrthographyInfoColor")),
                 AOrthographyInfoColor, "AOrthographyInfoColor");
             AOrthographyInfoColor.Freeze();
 
             Utils.Try(() =>
-            DefinitionsColor = (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings.Get("DefinitionsColor")),
+                    DefinitionsColor = (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("DefinitionsColor")),
                 DefinitionsColor, "DefinitionsColor");
             DefinitionsColor.Freeze();
 
             Utils.Try(() =>
-            FrequencyColor = (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings.Get("FrequencyColor")),
+                    FrequencyColor = (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("FrequencyColor")),
                 FrequencyColor, "FrequencyColor");
             FrequencyColor.Freeze();
 
             Utils.Try(() =>
-            DeconjugationInfoColor = (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings.Get("DeconjugationInfoColor")),
+                    DeconjugationInfoColor = (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("DeconjugationInfoColor")),
                 DeconjugationInfoColor, "DeconjugationInfoColor");
             DeconjugationInfoColor.Freeze();
 
             Utils.Try(() =>
-            SeparatorColor = (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings.Get("SeparatorColor")),
+                    SeparatorColor = (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("SeparatorColor")),
                 SeparatorColor, "SeparatorColor");
             SeparatorColor!.Freeze();
 
             Utils.Try(() =>
-            DictTypeColor = (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings.Get("DictTypeColor")),
+                    DictTypeColor = (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("DictTypeColor")),
                 DictTypeColor, "DictTypeColor");
             DictTypeColor!.Freeze();
 
 
-
             Utils.Try(() =>
-            PopupBackgroundColor = (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings
-                .Get("PopupBackgroundColor")), PopupBackgroundColor, "PopupBackgroundColor");
+                PopupBackgroundColor = (SolidColorBrush)new BrushConverter()
+                    .ConvertFrom(ConfigurationManager.AppSettings
+                        .Get("PopupBackgroundColor")), PopupBackgroundColor, "PopupBackgroundColor");
             Utils.Try(() => PopupBackgroundColor.Opacity = double.Parse(ConfigurationManager.AppSettings
-                .Get("PopupOpacity")) / 100, 70, "PopupOpacity");
+                .Get("PopupOpacity")!) / 100, 70, "PopupOpacity");
             PopupBackgroundColor.Freeze();
 
             Utils.Try(() => PrimarySpellingFontSize = int.Parse(ConfigurationManager.AppSettings
-                .Get("PrimarySpellingFontSize")), PrimarySpellingFontSize, "PrimarySpellingFontSize");
+                .Get("PrimarySpellingFontSize")!), PrimarySpellingFontSize, "PrimarySpellingFontSize");
             Utils.Try(() => ReadingsFontSize = int.Parse(ConfigurationManager.AppSettings
-                .Get("ReadingsFontSize")), ReadingsFontSize, "ReadingsFontSize");
+                .Get("ReadingsFontSize")!), ReadingsFontSize, "ReadingsFontSize");
             Utils.Try(() => ROrthographyInfoFontSize = int.Parse(ConfigurationManager.AppSettings
-                .Get("ROrthographyInfoFontSize")), ROrthographyInfoFontSize, "ROrthographyInfoFontSize");
+                .Get("ROrthographyInfoFontSize")!), ROrthographyInfoFontSize, "ROrthographyInfoFontSize");
             Utils.Try(() => POrthographyInfoFontSize = int.Parse(ConfigurationManager.AppSettings
-                .Get("POrthographyInfoFontSize")), POrthographyInfoFontSize, "POrthographyInfoFontSize");
+                .Get("POrthographyInfoFontSize")!), POrthographyInfoFontSize, "POrthographyInfoFontSize");
             Utils.Try(() => AlternativeSpellingsFontSize = int.Parse(ConfigurationManager.AppSettings
-                .Get("AlternativeSpellingsFontSize")), AlternativeSpellingsFontSize, "AlternativeSpellingsFontSize");
+                .Get("AlternativeSpellingsFontSize")!), AlternativeSpellingsFontSize, "AlternativeSpellingsFontSize");
             Utils.Try(() => AOrthographyInfoFontSize = int.Parse(ConfigurationManager.AppSettings
-                .Get("AOrthographyInfoFontSize")), AOrthographyInfoFontSize, "AOrthographyInfoFontSize");
+                .Get("AOrthographyInfoFontSize")!), AOrthographyInfoFontSize, "AOrthographyInfoFontSize");
             Utils.Try(() => DefinitionsFontSize = int.Parse(ConfigurationManager.AppSettings
-                .Get("DefinitionsFontSize")), DefinitionsFontSize, "DefinitionsFontSize");
+                .Get("DefinitionsFontSize")!), DefinitionsFontSize, "DefinitionsFontSize");
             Utils.Try(() => FrequencyFontSize = int.Parse(ConfigurationManager.AppSettings
-                .Get("FrequencyFontSize")), FrequencyFontSize, "FrequencyFontSize");
+                .Get("FrequencyFontSize")!), FrequencyFontSize, "FrequencyFontSize");
             Utils.Try(() => DeconjugationInfoFontSize = int.Parse(ConfigurationManager.AppSettings
-                .Get("DeconjugationInfoFontSize")), DeconjugationInfoFontSize, "DeconjugationInfoFontSize");
+                .Get("DeconjugationInfoFontSize")!), DeconjugationInfoFontSize, "DeconjugationInfoFontSize");
             Utils.Try(() => DictTypeFontSize = int.Parse(ConfigurationManager.AppSettings
-                .Get("DictTypeFontSize")), DictTypeFontSize, "DictTypeFontSize");
+                .Get("DictTypeFontSize")!), DictTypeFontSize, "DictTypeFontSize");
             Utils.Try(() => PopupXOffset = int.Parse(ConfigurationManager.AppSettings
-                .Get("PopupXOffset")), PopupXOffset, "PopupXOffset");
+                .Get("PopupXOffset")!), PopupXOffset, "PopupXOffset");
             Utils.Try(() => PopupYOffset = int.Parse(ConfigurationManager.AppSettings
-                .Get("PopupYOffset")), PopupYOffset, "PopupYOffset");
+                .Get("PopupYOffset")!), PopupYOffset, "PopupYOffset");
             Utils.Try(() => PopupMaxWidth = int.Parse(ConfigurationManager.AppSettings
-                .Get("PopupMaxWidth")), PopupMaxWidth, "PopupMaxWidth");
+                .Get("PopupMaxWidth")!), PopupMaxWidth, "PopupMaxWidth");
             Utils.Try(() => PopupMaxHeight = int.Parse(ConfigurationManager.AppSettings
-                .Get("PopupMaxHeight")), PopupMaxHeight, "PopupMaxHeight");
+                .Get("PopupMaxHeight")!), PopupMaxHeight, "PopupMaxHeight");
 
             tempStr = ConfigurationManager.AppSettings.Get("PopupFlip");
 
@@ -312,19 +317,27 @@ namespace JapaneseLookup
             MiningModeKeyGesture = Utils.KeyGestureSetter("MiningModeKeyGesture", MiningModeKeyGesture);
             PlayAudioKeyGesture = Utils.KeyGestureSetter("PlayAudioKeyGesture", PlayAudioKeyGesture);
             KanjiModeKeyGesture = Utils.KeyGestureSetter("KanjiModeKeyGesture", KanjiModeKeyGesture);
-            ShowPreferencesWindowKeyGesture = Utils.KeyGestureSetter("ShowPreferencesWindowKeyGesture", ShowPreferencesWindowKeyGesture);
-            ShowAddNameWindowKeyGesture = Utils.KeyGestureSetter("ShowAddNameWindowKeyGesture", ShowAddNameWindowKeyGesture);
-            ShowAddWordWindowKeyGesture = Utils.KeyGestureSetter("ShowAddWordWindowKeyGesture", ShowAddWordWindowKeyGesture);
-            SearchWithBrowserKeyGesture = Utils.KeyGestureSetter("SearchWithBrowserKeyGesture", SearchWithBrowserKeyGesture);
-            MousePassThroughModeKeyGesture = Utils.KeyGestureSetter("MousePassThroughModeKeyGesture", MousePassThroughModeKeyGesture);
-            SteppedBacklogBackwardsKeyGesture = Utils.KeyGestureSetter("SteppedBacklogBackwardsKeyGesture", SteppedBacklogBackwardsKeyGesture);
-            SteppedBacklogForwardsKeyGesture = Utils.KeyGestureSetter("SteppedBacklogForwardsKeyGesture", SteppedBacklogForwardsKeyGesture);
-            InactiveLookupModeKeyGesture = Utils.KeyGestureSetter("InactiveLookupModeKeyGesture", InactiveLookupModeKeyGesture);
+            ShowPreferencesWindowKeyGesture =
+                Utils.KeyGestureSetter("ShowPreferencesWindowKeyGesture", ShowPreferencesWindowKeyGesture);
+            ShowAddNameWindowKeyGesture =
+                Utils.KeyGestureSetter("ShowAddNameWindowKeyGesture", ShowAddNameWindowKeyGesture);
+            ShowAddWordWindowKeyGesture =
+                Utils.KeyGestureSetter("ShowAddWordWindowKeyGesture", ShowAddWordWindowKeyGesture);
+            SearchWithBrowserKeyGesture =
+                Utils.KeyGestureSetter("SearchWithBrowserKeyGesture", SearchWithBrowserKeyGesture);
+            MousePassThroughModeKeyGesture =
+                Utils.KeyGestureSetter("MousePassThroughModeKeyGesture", MousePassThroughModeKeyGesture);
+            SteppedBacklogBackwardsKeyGesture = Utils.KeyGestureSetter("SteppedBacklogBackwardsKeyGesture",
+                SteppedBacklogBackwardsKeyGesture);
+            SteppedBacklogForwardsKeyGesture =
+                Utils.KeyGestureSetter("SteppedBacklogForwardsKeyGesture", SteppedBacklogForwardsKeyGesture);
+            InactiveLookupModeKeyGesture =
+                Utils.KeyGestureSetter("InactiveLookupModeKeyGesture", InactiveLookupModeKeyGesture);
 
             Utils.Try(() => mainWindow.OpacitySlider.Value = double.Parse(ConfigurationManager.AppSettings
-                .Get("MainWindowOpacity")), mainWindow.OpacitySlider.Value, "MainWindowOpacity");
+                .Get("MainWindowOpacity")!), mainWindow.OpacitySlider.Value, "MainWindowOpacity");
             Utils.Try(() => mainWindow.FontSizeSlider.Value = double.Parse(ConfigurationManager.AppSettings
-                .Get("MainWindowFontSize")), mainWindow.FontSizeSlider.Value, "MainWindowFontSize");
+                .Get("MainWindowFontSize")!), mainWindow.FontSizeSlider.Value, "MainWindowFontSize");
 
             tempStr = ConfigurationManager.AppSettings.Get("MainWindowFont");
 
@@ -337,26 +350,26 @@ namespace JapaneseLookup
             mainWindow.MainTextBox.FontFamily = new FontFamily(tempStr);
 
             Utils.Try(() =>
-                mainWindow.Background = (SolidColorBrush)new BrushConverter()
-                    .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor")),
-                    mainWindow.Background, "MainWindowBackgroundColor");
+                    mainWindow.Background = (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor")),
+                mainWindow.Background, "MainWindowBackgroundColor");
             mainWindow.Background.Opacity = mainWindow.OpacitySlider.Value / 100;
 
             mainWindow.MainTextBox.Foreground = MainWindowTextColor;
 
             Utils.Try(() => MainWindowHeight = double.Parse(ConfigurationManager.AppSettings
-                .Get("MainWindowHeight")), MainWindowHeight, "MainWindowHeight");
+                .Get("MainWindowHeight")!), MainWindowHeight, "MainWindowHeight");
             mainWindow.Height = MainWindowHeight;
 
             Utils.Try(() => MainWindowWidth = double.Parse(ConfigurationManager.AppSettings
-                .Get("MainWindowWidth")), MainWindowWidth, "MainWindowWidth");
+                .Get("MainWindowWidth")!), MainWindowWidth, "MainWindowWidth");
             mainWindow.Width = MainWindowWidth;
 
             Utils.Try(() => mainWindow.Top = double.Parse(ConfigurationManager.AppSettings
-                .Get("MainWindowTopPosition")), mainWindow.Top, "MainWindowTopPosition");
+                .Get("MainWindowTopPosition")!), mainWindow.Top, "MainWindowTopPosition");
 
             Utils.Try(() => mainWindow.Left = double.Parse(ConfigurationManager.AppSettings
-                .Get("MainWindowLeftPosition")), mainWindow.Left, "MainWindowLeftPosition");
+                .Get("MainWindowLeftPosition")!), mainWindow.Left, "MainWindowLeftPosition");
 
             var firstPopupWindow = MainWindow.FirstPopupWindow;
             firstPopupWindow.Background = PopupBackgroundColor;
@@ -371,9 +384,9 @@ namespace JapaneseLookup
             firstPopupWindow.FontFamily = PopupFont;
 
             Utils.Try(() => PopupDynamicHeight = bool.Parse(ConfigurationManager.AppSettings
-                .Get("PopupDynamicHeight")), PopupDynamicHeight, "PopupDynamicHeight");
+                .Get("PopupDynamicHeight")!), PopupDynamicHeight, "PopupDynamicHeight");
             Utils.Try(() => PopupDynamicWidth = bool.Parse(ConfigurationManager.AppSettings
-                .Get("PopupDynamicWidth")), PopupDynamicWidth, "PopupDynamicWidth");
+                .Get("PopupDynamicWidth")!), PopupDynamicWidth, "PopupDynamicWidth");
 
             if (PopupDynamicWidth && PopupDynamicHeight)
                 firstPopupWindow.SizeToContent = SizeToContent.WidthAndHeight;
@@ -401,8 +414,8 @@ namespace JapaneseLookup
             //Test without async/await.
             // Task.Run(async () => { await LoadDictionaries(); });
             Task.Run(() => { LoadDictionaries(); });
-
         }
+
         public static void LoadPreferences(PreferencesWindow preferenceWindow)
         {
             CreateDefaultAppConfig();
@@ -411,14 +424,22 @@ namespace JapaneseLookup
             preferenceWindow.MiningModeKeyGestureTextBox.Text = Utils.KeyGestureToString(MiningModeKeyGesture);
             preferenceWindow.PlayAudioKeyGestureTextBox.Text = Utils.KeyGestureToString(PlayAudioKeyGesture);
             preferenceWindow.KanjiModeKeyGestureTextBox.Text = Utils.KeyGestureToString(KanjiModeKeyGesture);
-            preferenceWindow.ShowPreferencesWindowKeyGestureTextBox.Text = Utils.KeyGestureToString(ShowPreferencesWindowKeyGesture);
-            preferenceWindow.ShowAddNameWindowKeyGestureTextBox.Text = Utils.KeyGestureToString(ShowAddNameWindowKeyGesture);
-            preferenceWindow.ShowAddWordWindowKeyGestureTextBox.Text = Utils.KeyGestureToString(ShowAddWordWindowKeyGesture);
-            preferenceWindow.SearchWithBrowserKeyGestureTextBox.Text = Utils.KeyGestureToString(SearchWithBrowserKeyGesture);
-            preferenceWindow.MousePassThroughModeKeyGestureTextBox.Text = Utils.KeyGestureToString(MousePassThroughModeKeyGesture);
-            preferenceWindow.SteppedBacklogBackwardsKeyGestureTextBox.Text = Utils.KeyGestureToString(SteppedBacklogBackwardsKeyGesture);
-            preferenceWindow.SteppedBacklogForwardsKeyGestureTextBox.Text = Utils.KeyGestureToString(SteppedBacklogForwardsKeyGesture);
-            preferenceWindow.InactiveLookupModeKeyGestureTextBox.Text = Utils.KeyGestureToString(InactiveLookupModeKeyGesture);
+            preferenceWindow.ShowPreferencesWindowKeyGestureTextBox.Text =
+                Utils.KeyGestureToString(ShowPreferencesWindowKeyGesture);
+            preferenceWindow.ShowAddNameWindowKeyGestureTextBox.Text =
+                Utils.KeyGestureToString(ShowAddNameWindowKeyGesture);
+            preferenceWindow.ShowAddWordWindowKeyGestureTextBox.Text =
+                Utils.KeyGestureToString(ShowAddWordWindowKeyGesture);
+            preferenceWindow.SearchWithBrowserKeyGestureTextBox.Text =
+                Utils.KeyGestureToString(SearchWithBrowserKeyGesture);
+            preferenceWindow.MousePassThroughModeKeyGestureTextBox.Text =
+                Utils.KeyGestureToString(MousePassThroughModeKeyGesture);
+            preferenceWindow.SteppedBacklogBackwardsKeyGestureTextBox.Text =
+                Utils.KeyGestureToString(SteppedBacklogBackwardsKeyGesture);
+            preferenceWindow.SteppedBacklogForwardsKeyGestureTextBox.Text =
+                Utils.KeyGestureToString(SteppedBacklogForwardsKeyGesture);
+            preferenceWindow.InactiveLookupModeKeyGestureTextBox.Text =
+                Utils.KeyGestureToString(InactiveLookupModeKeyGesture);
 
             preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
             preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri;
@@ -434,8 +455,8 @@ namespace JapaneseLookup
 
 
             Utils.Try(() => preferenceWindow.TextboxBackgroundColorButton.Background =
-                (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor")),
+                    (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor")),
                 preferenceWindow.TextboxBackgroundColorButton.Background, "MainWindowBackgroundColor");
 
             preferenceWindow.TextboxTextColorButton.Background = MainWindowTextColor;
@@ -473,12 +494,13 @@ namespace JapaneseLookup
             preferenceWindow.POrthographyInfoFontSizeNumericUpDown.Value = POrthographyInfoFontSize;
 
             // Button background color has to be opaque, so we cannot use PopupBackgroundColor here
-            Utils.Try(() => preferenceWindow.PopupBackgroundColorButton.Background = (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor")),
+            Utils.Try(() => preferenceWindow.PopupBackgroundColorButton.Background =
+                    (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor")),
                 preferenceWindow.PopupBackgroundColorButton.Background, "PopupBackgroundColor");
 
             Utils.Try(() => preferenceWindow.PopupOpacityNumericUpDown.Value = int.Parse(
-                ConfigurationManager.AppSettings.Get("PopupOpacity")),
+                    ConfigurationManager.AppSettings.Get("PopupOpacity")!),
                 preferenceWindow.PopupOpacityNumericUpDown.Value, "PopupOpacity");
 
             preferenceWindow.SeparatorColorButton.Background = SeparatorColor;
@@ -494,14 +516,22 @@ namespace JapaneseLookup
             Utils.KeyGestureSaver("MiningModeKeyGesture", preferenceWindow.MiningModeKeyGestureTextBox.Text);
             Utils.KeyGestureSaver("PlayAudioKeyGesture", preferenceWindow.PlayAudioKeyGestureTextBox.Text);
             Utils.KeyGestureSaver("KanjiModeKeyGesture", preferenceWindow.KanjiModeKeyGestureTextBox.Text);
-            Utils.KeyGestureSaver("ShowPreferencesWindowKeyGesture", preferenceWindow.ShowPreferencesWindowKeyGestureTextBox.Text);
-            Utils.KeyGestureSaver("ShowAddNameWindowKeyGesture", preferenceWindow.ShowAddNameWindowKeyGestureTextBox.Text);
-            Utils.KeyGestureSaver("ShowAddWordWindowKeyGesture", preferenceWindow.ShowAddWordWindowKeyGestureTextBox.Text);
-            Utils.KeyGestureSaver("SearchWithBrowserKeyGesture", preferenceWindow.SearchWithBrowserKeyGestureTextBox.Text);
-            Utils.KeyGestureSaver("MousePassThroughModeKeyGesture", preferenceWindow.MousePassThroughModeKeyGestureTextBox.Text);
-            Utils.KeyGestureSaver("SteppedBacklogBackwardsKeyGesture", preferenceWindow.SteppedBacklogBackwardsKeyGestureTextBox.Text);
-            Utils.KeyGestureSaver("SteppedBacklogForwardsKeyGesture", preferenceWindow.SteppedBacklogForwardsKeyGestureTextBox.Text);
-            Utils.KeyGestureSaver("InactiveLookupModeKeyGesture", preferenceWindow.InactiveLookupModeKeyGestureTextBox.Text);
+            Utils.KeyGestureSaver("ShowPreferencesWindowKeyGesture",
+                preferenceWindow.ShowPreferencesWindowKeyGestureTextBox.Text);
+            Utils.KeyGestureSaver("ShowAddNameWindowKeyGesture",
+                preferenceWindow.ShowAddNameWindowKeyGestureTextBox.Text);
+            Utils.KeyGestureSaver("ShowAddWordWindowKeyGesture",
+                preferenceWindow.ShowAddWordWindowKeyGestureTextBox.Text);
+            Utils.KeyGestureSaver("SearchWithBrowserKeyGesture",
+                preferenceWindow.SearchWithBrowserKeyGestureTextBox.Text);
+            Utils.KeyGestureSaver("MousePassThroughModeKeyGesture",
+                preferenceWindow.MousePassThroughModeKeyGestureTextBox.Text);
+            Utils.KeyGestureSaver("SteppedBacklogBackwardsKeyGesture",
+                preferenceWindow.SteppedBacklogBackwardsKeyGestureTextBox.Text);
+            Utils.KeyGestureSaver("SteppedBacklogForwardsKeyGesture",
+                preferenceWindow.SteppedBacklogForwardsKeyGestureTextBox.Text);
+            Utils.KeyGestureSaver("InactiveLookupModeKeyGesture",
+                preferenceWindow.InactiveLookupModeKeyGestureTextBox.Text);
 
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
