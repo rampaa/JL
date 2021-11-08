@@ -875,12 +875,15 @@ namespace JapaneseLookup
                 }
             }
 
+            bool dictRemoved = false;
+
             foreach ((DictType _, Dict dict) in Dicts)
             {
                 if (!dict.Active && dict.Contents.Any())
                 {
                     Debug.WriteLine("Clearing " + dict.Type);
                     dict.Contents.Clear();
+                    dictRemoved = true;
                 }
             }
 
@@ -903,9 +906,13 @@ namespace JapaneseLookup
                 }
             }
 
-            if (tasks.Any())
+            if (tasks.Any() || dictRemoved)
             {
-                Task.WaitAll(tasks.ToArray());
+                if (tasks.Any())
+                {
+                    Task.WaitAll(tasks.ToArray());
+                }
+
                 Debug.WriteLine("Starting compacting GC run");
                 GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
                 GC.GetTotalMemory(true);
