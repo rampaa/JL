@@ -900,12 +900,14 @@ namespace JapaneseLookup
                 }
             }
 
-            Task.WaitAll(tasks.ToArray());
-
-            Debug.WriteLine("Starting compacting GC run");
-            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            GC.GetTotalMemory(true);
-            GC.Collect();
+            if (tasks.Count > 0)
+            {
+                Task.WaitAll(tasks.ToArray());
+                Debug.WriteLine("Starting compacting GC run");
+                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                GC.GetTotalMemory(true);
+                GC.Collect();
+            }
         }
     }
 }
