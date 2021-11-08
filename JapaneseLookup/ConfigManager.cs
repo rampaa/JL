@@ -686,6 +686,9 @@ namespace JapaneseLookup
 
         private static void DeserializeDicts()
         {
+            if (Dicts.Any())
+                return;
+
             try
             {
                 var jso = new JsonSerializerOptions
@@ -900,7 +903,7 @@ namespace JapaneseLookup
                 }
             }
 
-            if (tasks.Count > 0)
+            if (tasks.Any())
             {
                 Task.WaitAll(tasks.ToArray());
                 Debug.WriteLine("Starting compacting GC run");
