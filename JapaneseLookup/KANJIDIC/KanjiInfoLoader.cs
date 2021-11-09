@@ -14,7 +14,7 @@ namespace JapaneseLookup.KANJIDIC
 {
     public static class KanjiInfoLoader
     {
-        public static void Load(string dictPath)
+        public static async Task Load(string dictPath)
         {
             if (File.Exists(Path.Join(ConfigManager.ApplicationPath, dictPath)))
             {
@@ -28,8 +28,9 @@ namespace JapaneseLookup.KANJIDIC
                 Dictionary<string, string> kanjiCompositionDictionary = new();
                 if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
                 {
-                    foreach (string line in File.ReadLines(
-                        Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
+                    var lines = await File.ReadAllLinesAsync(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt"));
+
+                    foreach (string line in lines)
                     {
                         string[] lParts = line.Split("\t");
 
@@ -134,6 +135,15 @@ namespace JapaneseLookup.KANJIDIC
                     }
                 }
             }
+
+            if (!entry.Nanori.Any())
+                entry.Nanori = null;
+            if (!entry.Meanings.Any())
+                entry.Meanings = null;
+            if (!entry.OnReadings.Any())
+                entry.OnReadings = null;
+            if (!entry.KunReadings.Any())
+                entry.KunReadings = null;
 
             ConfigManager.Dicts[DictType.Kanjidic].Contents.Add(key, new List<IResult> { entry });
         }

@@ -22,6 +22,8 @@ namespace JapaneseLookup.EDICT.JMnedict
                 {
                     ReadEntry(edictXml);
                 }
+
+                ConfigManager.Dicts[DictType.JMnedict].Contents.TrimExcess();
             }
 
             else
@@ -65,7 +67,6 @@ namespace JapaneseLookup.EDICT.JMnedict
             }
 
             JMnedictBuilder.BuildDictionary(entry, ConfigManager.Dicts[DictType.JMnedict].Contents);
-            ConfigManager.Dicts[DictType.JMnedict].Contents.TrimExcess();
         }
 
         private static void ReadKEle(XmlTextReader jMneDictXML, JMnedictEntry entry)

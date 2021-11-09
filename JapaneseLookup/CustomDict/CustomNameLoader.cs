@@ -2,17 +2,18 @@
 using System.IO;
 using JapaneseLookup.Abstract;
 using JapaneseLookup.Dicts;
+using System.Threading.Tasks;
 
 namespace JapaneseLookup.CustomDict
 {
     public static class CustomNameLoader
     {
-        public static void Load(string customNameDictPath)
+        public static async Task Load(string customNameDictPath)
         {
             if (File.Exists(Path.Join(ConfigManager.ApplicationPath, customNameDictPath)))
             {
-                foreach (string line in File.ReadLines(
-                    Path.Join(ConfigManager.ApplicationPath, customNameDictPath)))
+                var lines = await File.ReadAllLinesAsync(Path.Join(ConfigManager.ApplicationPath, customNameDictPath));
+                foreach (string line in lines)
                 {
                     string[] lParts = line.Split("\t");
 

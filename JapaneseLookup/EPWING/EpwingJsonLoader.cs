@@ -51,6 +51,12 @@ namespace JapaneseLookup.EPWING
                     WordClasses = entry.Rules
                 };
 
+                if (!result.WordClasses.Any())
+                    result.WordClasses = null;
+
+                if (!result.Definitions.Any())
+                    result.Definitions = null;
+
                 if (!IsValidEpwingResultForDictType(result, dictType))
                     continue;
 

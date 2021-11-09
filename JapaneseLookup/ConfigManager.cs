@@ -411,7 +411,7 @@ namespace JapaneseLookup
 
             DeserializeDicts();
 
-            //Test without async/await.
+            // Test without async/await.
             // Task.Run(async () => { await LoadDictionaries(); });
             Task.Run(() => { LoadDictionaries(); });
         }
@@ -813,7 +813,8 @@ namespace JapaneseLookup
                         // KANJIDIC
                         if (dict.Active && !Dicts[DictType.Kanjidic].Contents.Any())
                         {
-                            var taskKanjidict = Task.Run(() => KanjiInfoLoader.Load(dict.Path));
+                            var taskKanjidict = Task.Run(async () =>
+                                await KanjiInfoLoader.Load(dict.Path).ConfigureAwait(false));
                             tasks.Add(taskKanjidict);
                         }
 
@@ -827,8 +828,8 @@ namespace JapaneseLookup
                     case DictType.Kenkyuusha:
                         if (dict.Active && !Dicts[DictType.Kenkyuusha].Contents.Any())
                         {
-                            var taskEpwing = Task.Run(() =>
-                                EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            var taskEpwing = Task.Run(async () =>
+                                await EpwingJsonLoader.Loader(dict.Type, dict.Path).ConfigureAwait(false));
                             tasks.Add(taskEpwing);
                         }
 
@@ -842,8 +843,8 @@ namespace JapaneseLookup
                     case DictType.Daijirin:
                         if (dict.Active && !Dicts[DictType.Daijirin].Contents.Any())
                         {
-                            var taskEpwing = Task.Run(() =>
-                                EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            var taskEpwing = Task.Run(async () => await
+                                EpwingJsonLoader.Loader(dict.Type, dict.Path).ConfigureAwait(false));
                             tasks.Add(taskEpwing);
                         }
 
@@ -857,8 +858,8 @@ namespace JapaneseLookup
                     case DictType.Daijisen:
                         if (dict.Active && !Dicts[DictType.Daijisen].Contents.Any())
                         {
-                            var taskEpwing = Task.Run(() =>
-                                EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            var taskEpwing = Task.Run(async () =>
+                                await EpwingJsonLoader.Loader(dict.Type, dict.Path).ConfigureAwait(false));
                             tasks.Add(taskEpwing);
                         }
 
@@ -872,8 +873,8 @@ namespace JapaneseLookup
                     case DictType.Koujien:
                         if (dict.Active && !Dicts[DictType.Koujien].Contents.Any())
                         {
-                            var taskEpwing = Task.Run(() =>
-                                EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            var taskEpwing = Task.Run(async () =>
+                                await EpwingJsonLoader.Loader(dict.Type, dict.Path).ConfigureAwait(false));
                             tasks.Add(taskEpwing);
                         }
 
@@ -887,8 +888,8 @@ namespace JapaneseLookup
                     case DictType.Meikyou:
                         if (dict.Active && !Dicts[DictType.Meikyou].Contents.Any())
                         {
-                            var taskEpwing = Task.Run(() =>
-                                EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            var taskEpwing = Task.Run(async () =>
+                                await EpwingJsonLoader.Loader(dict.Type, dict.Path).ConfigureAwait(false));
                             tasks.Add(taskEpwing);
                         }
 
@@ -902,8 +903,8 @@ namespace JapaneseLookup
                     case DictType.CustomWordDictionary:
                         if (dict.Active && !Dicts[DictType.CustomWordDictionary].Contents.Any())
                         {
-                            var taskCustomWordDict = Task.Run(() => CustomWordLoader.Load(
-                                Dicts[DictType.CustomWordDictionary].Path));
+                            var taskCustomWordDict = Task.Run(async () => 
+                                await CustomWordLoader.Load(Dicts[DictType.CustomWordDictionary].Path).ConfigureAwait(false));
                             tasks.Add(taskCustomWordDict);
                         }
 
@@ -917,8 +918,8 @@ namespace JapaneseLookup
                     case DictType.CustomNameDictionary:
                         if (dict.Active && !Dicts[DictType.CustomNameDictionary].Contents.Any())
                         {
-                            var taskCustomNameDict = Task.Run(() => CustomNameLoader.Load(
-                                Dicts[DictType.CustomNameDictionary].Path));
+                            var taskCustomNameDict = Task.Run(async() => 
+                                await CustomNameLoader.Load(Dicts[DictType.CustomNameDictionary].Path).ConfigureAwait(false));
                             tasks.Add(taskCustomNameDict);
                         }
 
@@ -945,10 +946,10 @@ namespace JapaneseLookup
                 {
                     FrequencyLoader.FreqDicts.Add(FrequencyListName, new Dictionary<string, List<FrequencyEntry>>());
 
-                    Task taskNewFreqlist = Task.Run(() =>
+                    Task taskNewFreqlist = Task.Run(async () =>
                     {
-                        FrequencyLoader.BuildFreqDict(FrequencyLoader
-                            .LoadJson(Path.Join(ApplicationPath, FrequencyLists[FrequencyListName])).Result);
+                        FrequencyLoader.BuildFreqDict(await FrequencyLoader
+                            .LoadJson(Path.Join(ApplicationPath, FrequencyLists[FrequencyListName])).ConfigureAwait(false));
                     });
 
                     tasks.Add(taskNewFreqlist);

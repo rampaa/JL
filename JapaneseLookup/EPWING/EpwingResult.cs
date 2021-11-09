@@ -5,9 +5,9 @@ namespace JapaneseLookup.EPWING
 {
     public class EpwingResult : IResult
     {
-        public List<string> Definitions { get; init; }
+        public List<string> Definitions { get; set; }
         public string Reading { get; init; }
-        public List<string> WordClasses { get; init; } //e.g. noun +
+        public List<string> WordClasses { get; set; } //e.g. noun +
         public string PrimarySpelling { get; init; }
         public string KanaSpelling { get; set; }
 

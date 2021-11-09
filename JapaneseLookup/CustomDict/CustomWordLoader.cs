@@ -11,12 +11,12 @@ namespace JapaneseLookup.CustomDict
 {
     public static class CustomWordLoader
     {
-        public static void Load(string customWordDictPath)
+        public static async Task Load(string customWordDictPath)
         {
             if (File.Exists(Path.Join(ConfigManager.ApplicationPath, customWordDictPath)))
             {
-                foreach (string line in File.ReadLines(
-                    Path.Join(ConfigManager.ApplicationPath, customWordDictPath)))
+                var lines = await File.ReadAllLinesAsync(Path.Join(ConfigManager.ApplicationPath, customWordDictPath));
+                foreach (string line in lines)
                 {
                     string[] lParts = line.Split("\t");
 
