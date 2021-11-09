@@ -772,100 +772,160 @@ namespace JapaneseLookup
         {
             var tasks = new List<Task>();
 
+            bool dictRemoved = false;
+
             foreach ((DictType _, Dict dict) in Dicts)
             {
-                if (!dict.Active)
-                    continue;
 
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
                         // initial jmdict load
-                        if (!Dicts[DictType.JMdict].Contents.Any())
+                        if (dict.Active && !Dicts[DictType.JMdict].Contents.Any())
                         {
                             var taskJmdict = Task.Run(() => JMdictLoader.Load(dict.Path));
                             tasks.Add(taskJmdict);
                         }
 
+                        else if (!dict.Active)
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
+                        }
+
                         break;
                     case DictType.JMnedict:
                         // JMnedict
-                        if (!Dicts[DictType.JMnedict].Contents.Any())
+                        if (dict.Active && !Dicts[DictType.JMnedict].Contents.Any())
                         {
                             var taskJMnedict = Task.Run(() => JMnedictLoader.Load(dict.Path));
                             tasks.Add(taskJMnedict);
                         }
 
+                        else if (!dict.Active)
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
+                        }
+
                         break;
                     case DictType.Kanjidic:
                         // KANJIDIC
-                        if (!Dicts[DictType.Kanjidic].Contents.Any())
+                        if (dict.Active && !Dicts[DictType.Kanjidic].Contents.Any())
                         {
                             var taskKanjidict = Task.Run(() => KanjiInfoLoader.Load(dict.Path));
                             tasks.Add(taskKanjidict);
                         }
 
+                        else if (!dict.Active)
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
+                        }
+
                         break;
                     case DictType.Kenkyuusha:
-                        if (!Dicts[DictType.Kenkyuusha].Contents.Any())
+                        if (dict.Active && !Dicts[DictType.Kenkyuusha].Contents.Any())
                         {
-                            var taskEpwing = Task.Run(async () =>
-                                await EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            var taskEpwing = Task.Run(() =>
+                                EpwingJsonLoader.Loader(dict.Type, dict.Path));
                             tasks.Add(taskEpwing);
+                        }
+
+                        else if (!dict.Active)
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
                         }
 
                         break;
                     case DictType.Daijirin:
-                        if (!Dicts[DictType.Daijirin].Contents.Any())
+                        if (dict.Active && !Dicts[DictType.Daijirin].Contents.Any())
                         {
-                            var taskEpwing = Task.Run(async () =>
-                                await EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            var taskEpwing = Task.Run(() =>
+                                EpwingJsonLoader.Loader(dict.Type, dict.Path));
                             tasks.Add(taskEpwing);
+                        }
+
+                        else if (!dict.Active)
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
                         }
 
                         break;
                     case DictType.Daijisen:
-                        if (!Dicts[DictType.Daijisen].Contents.Any())
+                        if (dict.Active && !Dicts[DictType.Daijisen].Contents.Any())
                         {
-                            var taskEpwing = Task.Run(async () =>
-                                await EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            var taskEpwing = Task.Run(() =>
+                                EpwingJsonLoader.Loader(dict.Type, dict.Path));
                             tasks.Add(taskEpwing);
+                        }
+
+                        else if (!dict.Active)
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
                         }
 
                         break;
                     case DictType.Koujien:
-                        if (!Dicts[DictType.Koujien].Contents.Any())
+                        if (dict.Active && !Dicts[DictType.Koujien].Contents.Any())
                         {
-                            var taskEpwing = Task.Run(async () =>
-                                await EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            var taskEpwing = Task.Run(() =>
+                                EpwingJsonLoader.Loader(dict.Type, dict.Path));
                             tasks.Add(taskEpwing);
+                        }
+
+                        else if (!dict.Active)
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
                         }
 
                         break;
                     case DictType.Meikyou:
-                        if (!Dicts[DictType.Meikyou].Contents.Any())
+                        if (dict.Active && !Dicts[DictType.Meikyou].Contents.Any())
                         {
-                            var taskEpwing = Task.Run(async () =>
-                                await EpwingJsonLoader.Loader(dict.Type, dict.Path));
+                            var taskEpwing = Task.Run(() =>
+                                EpwingJsonLoader.Loader(dict.Type, dict.Path));
                             tasks.Add(taskEpwing);
+                        }
+
+                        else if (!dict.Active)
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
                         }
 
                         break;
                     case DictType.CustomWordDictionary:
-                        if (!Dicts[DictType.CustomWordDictionary].Contents.Any())
+                        if (dict.Active && !Dicts[DictType.CustomWordDictionary].Contents.Any())
                         {
                             var taskCustomWordDict = Task.Run(() => CustomWordLoader.Load(
                                 Dicts[DictType.CustomWordDictionary].Path));
                             tasks.Add(taskCustomWordDict);
                         }
 
+                        else if (!dict.Active)
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
+                        }
+
                         break;
                     case DictType.CustomNameDictionary:
-                        if (!Dicts[DictType.CustomNameDictionary].Contents.Any())
+                        if (dict.Active && !Dicts[DictType.CustomNameDictionary].Contents.Any())
                         {
                             var taskCustomNameDict = Task.Run(() => CustomNameLoader.Load(
                                 Dicts[DictType.CustomNameDictionary].Path));
                             tasks.Add(taskCustomNameDict);
+                        }
+
+                        else if (!dict.Active)
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
                         }
 
                         break;
@@ -875,22 +935,11 @@ namespace JapaneseLookup
                 }
             }
 
-            bool dictRemoved = false;
-
-            foreach ((DictType _, Dict dict) in Dicts)
-            {
-                if (!dict.Active && dict.Contents.Any())
-                {
-                    Debug.WriteLine("Clearing " + dict.Type);
-                    dict.Contents.Clear();
-                    dictRemoved = true;
-                }
-            }
-
             // load new freqlist if necessary
             if (!FrequencyLoader.FreqDicts.ContainsKey(FrequencyListName))
             {
                 FrequencyLoader.FreqDicts.Clear();
+                dictRemoved = true;
 
                 if (FrequencyListName != "None")
                 {
@@ -906,17 +955,19 @@ namespace JapaneseLookup
                 }
             }
 
-            if (tasks.Any() || dictRemoved)
+            if (tasks.Any())
             {
-                if (tasks.Any())
+                Task.WhenAll(tasks.ToArray()).ContinueWith(_ =>
                 {
-                    Task.WaitAll(tasks.ToArray());
-                }
+                    GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+                });
+            }
 
-                Debug.WriteLine("Starting compacting GC run");
+            else if (dictRemoved)
+            {
                 GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                GC.GetTotalMemory(true);
-                GC.Collect();
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
             }
         }
     }
