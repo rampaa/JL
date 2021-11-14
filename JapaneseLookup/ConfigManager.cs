@@ -32,9 +32,6 @@ namespace JapaneseLookup
 
         public static readonly HttpClient Client = new();
 
-        private static readonly List<string> JapaneseFonts =
-            Utils.FindJapaneseFonts().OrderBy(font => font).ToList();
-
         public static readonly Dictionary<string, Dict> BuiltInDicts =
             new()
             {
@@ -466,11 +463,12 @@ namespace JapaneseLookup
             preferenceWindow.TextboxBacklogTextColorButton.Background = MainWindowBacklogTextColor;
             preferenceWindow.TextboxFontSizeNumericUpDown.Value = mainWindow.FontSizeSlider.Value;
             preferenceWindow.TextboxOpacityNumericUpDown.Value = mainWindow.OpacitySlider.Value;
-            preferenceWindow.MainWindowFontComboBox.ItemsSource = JapaneseFonts;
-            preferenceWindow.MainWindowFontComboBox.SelectedItem = mainWindow.MainTextBox.FontFamily.ToString();
 
-            preferenceWindow.PopupFontComboBox.ItemsSource = JapaneseFonts;
-            preferenceWindow.PopupFontComboBox.SelectedItem = PopupFont.ToString();
+            preferenceWindow.MainWindowFontComboBox.ItemsSource = UIControls.JapaneseFonts;
+            preferenceWindow.MainWindowFontComboBox.SelectedIndex = UIControls.JapaneseFonts.FindIndex(f => f.Content.ToString() == mainWindow.MainTextBox.FontFamily.Source);
+
+            preferenceWindow.PopupFontComboBox.ItemsSource = UIControls.PopupJapaneseFonts;
+            preferenceWindow.PopupFontComboBox.SelectedIndex = UIControls.PopupJapaneseFonts.FindIndex(f => f.Content.ToString() == PopupFont.Source);
 
             preferenceWindow.PopupMaxHeightNumericUpDown.Value = PopupMaxHeight;
             preferenceWindow.PopupMaxWidthNumericUpDown.Value = PopupMaxWidth;
@@ -558,11 +556,11 @@ namespace JapaneseLookup
             config.AppSettings.Settings["MainWindowOpacity"].Value =
                 preferenceWindow.TextboxOpacityNumericUpDown.Value.ToString();
             config.AppSettings.Settings["MainWindowFont"].Value =
-                preferenceWindow.MainWindowFontComboBox.SelectedItem.ToString();
+                preferenceWindow.MainWindowFontComboBox.SelectedValue.ToString();
             config.AppSettings.Settings["PopupFont"].Value =
-                preferenceWindow.PopupFontComboBox.SelectedItem.ToString();
+                preferenceWindow.PopupFontComboBox.SelectedValue.ToString();
             config.AppSettings.Settings["FrequencyListName"].Value =
-                preferenceWindow.FrequencyListComboBox.SelectedItem.ToString();
+                preferenceWindow.FrequencyListComboBox.SelectedValue.ToString();
 
             config.AppSettings.Settings["KanjiMode"].Value =
                 preferenceWindow.KanjiModeCheckBox.IsChecked.ToString();

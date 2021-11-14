@@ -11,21 +11,21 @@
     <ScrollViewer>
         <Grid Background="Black">
 
-        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,0,70">
-            <TextBlock HorizontalAlignment="Left" Margin="0,0,0,10" Text="Spelling" Foreground="White"/>
-            <TextBox x:Name="SpellingTextBox" TextWrapping="Wrap" HorizontalAlignment="Stretch" Margin="0,0,0,40" Width="200"/>
-            <TextBlock Text="Reading" Foreground="White" HorizontalAlignment="Left" Margin="0,0,0,10"/>
-            <TextBox x:Name="ReadingTextBox" TextWrapping="Wrap" HorizontalAlignment="Stretch" Width="200"/>
-        </StackPanel>
-        <StackPanel x:Name="NameTypeStackPanel" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,20,70">
-            <TextBlock Text="Name Type" Foreground="White" HorizontalAlignment="Stretch" Margin="0,0,0,10"/>
-            <RadioButton Content="Male" HorizontalAlignment="Stretch" FontSize="16" Height="40"/>
-            <RadioButton Content="Female" HorizontalAlignment="Stretch" FontSize="16" Height="40"/>
-            <RadioButton Content="Surname" HorizontalAlignment="Stretch" FontSize="16" Height="40"/>
-            <RadioButton x:Name="OtherRadioButton" Content="Other" HorizontalAlignment="Stretch" FontSize="16" Height="40"/>
-        </StackPanel>
-        <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="120,0,0,20" Width="60" Height="35" FontSize="16" Click="SaveButton_Click"/>
-        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,120,20" FontSize="16" Height="35" Click="CancelButton_Click"/>
-    </Grid>
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,0,70">
+                <TextBlock HorizontalAlignment="Left" Margin="0,0,0,10" Text="Spelling" Foreground="White"/>
+                <TextBox x:Name="SpellingTextBox" TextWrapping="Wrap" HorizontalAlignment="Stretch" Margin="0,0,0,40" Width="200"/>
+                <TextBlock Text="Reading" Foreground="White" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+                <TextBox x:Name="ReadingTextBox" TextWrapping="Wrap" HorizontalAlignment="Stretch" Width="200"/>
+            </StackPanel>
+            <StackPanel x:Name="NameTypeStackPanel" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,20,70">
+                <TextBlock Text="Name Type" Foreground="White" HorizontalAlignment="Stretch" Margin="0,0,0,10"/>
+                <RadioButton Content="Male" HorizontalAlignment="Stretch" FontSize="16" Height="40"/>
+                <RadioButton Content="Female" HorizontalAlignment="Stretch" FontSize="16" Height="40"/>
+                <RadioButton Content="Surname" HorizontalAlignment="Stretch" FontSize="16" Height="40"/>
+                <RadioButton x:Name="OtherRadioButton" Content="Other" HorizontalAlignment="Stretch" FontSize="16" Height="40"/>
+            </StackPanel>
+            <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="120,0,0,20" Width="70" Height="35" FontSize="16" Click="CancelButton_Click"/>
+            <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,120,20" FontSize="16" Height="35" Click="SaveButton_Click" Width="70"/>
+        </Grid>
     </ScrollViewer>
 </Window>

@@ -9,10 +9,10 @@
         Title="PreferenceWindow" Height="580" Width="666" Topmost="True" Closing="Window_Closing"
         SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Background="Black">
     <Grid>
-        <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="20,0,0,20"
-                VerticalAlignment="Bottom" Click="SaveButton_Click" FontSize="16" Height="35" Width="85" />
-        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,20,20"
-                VerticalAlignment="Bottom" Width="85" Click="CancelButton_Click" FontSize="16" Height="35" />
+        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="20,0,0,20"
+                VerticalAlignment="Bottom" Click="CancelButton_Click" FontSize="16" Height="35" Width="85" />
+        <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Right" Margin="0,0,20,20"
+                VerticalAlignment="Bottom" Width="85" Click="SaveButton_Click" FontSize="16" Height="35" />
 
         <TabControl TabStripPlacement="Top" VerticalContentAlignment="Stretch" Margin="0,0,0,79"
                     Background="#F3000000" SelectionChanged="TabControl_OnSelectionChanged" Name="TabControl">
@@ -131,7 +131,7 @@
                             <TextBlock HorizontalAlignment="Left" Text="Font"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <ComboBox x:Name="MainWindowFontComboBox" HorizontalAlignment="Right"
-                                      Width="210" />
+                                      Width="210" SelectedValuePath="Content" />
                         </DockPanel>
                     </StackPanel>
                 </ScrollViewer>
@@ -149,7 +149,7 @@
                             <TextBlock HorizontalAlignment="Left" Text="Font"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <ComboBox x:Name="PopupFontComboBox" HorizontalAlignment="Right"
-                                      Width="210" />
+                                      Width="210" SelectedValuePath="Content" />
                         </DockPanel>
 
                         <DockPanel>

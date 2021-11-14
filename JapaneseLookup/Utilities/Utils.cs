@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Text;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
@@ -27,14 +28,21 @@ namespace JapaneseLookup.Utilities
                 }
             }
         }
-
-        public static List<string> FindJapaneseFonts()
+        public static List<ComboBoxItem> FindJapaneseFonts()
         {
-            List<string> japaneseFonts = new();
+            List<ComboBoxItem> japaneseFonts = new();
+
             foreach (FontFamily fontFamily in Fonts.SystemFontFamilies)
             {
+                ComboBoxItem comboBoxItem = new();
+
+                comboBoxItem.Content = fontFamily.Source;
+                comboBoxItem.FontFamily = fontFamily;
+
                 if (fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("ja-jp")))
-                    japaneseFonts.Add(fontFamily.Source);
+                {
+                    japaneseFonts.Add(comboBoxItem);
+                }
 
                 else if (fontFamily.FamilyNames.Keys != null && fontFamily.FamilyNames.Keys.Count == 1 &&
                          fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("en-US")))
@@ -45,11 +53,16 @@ namespace JapaneseLookup.Utilities
                         {
                             if (glyphTypeFace.CharacterToGlyphMap.ContainsKey(20685))
                             {
-                                japaneseFonts.Add(fontFamily.Source);
+                                japaneseFonts.Add(comboBoxItem);
                                 break;
                             }
                         }
                     }
+                }
+                else
+                {
+                    comboBoxItem.Foreground = Brushes.DimGray;
+                    japaneseFonts.Add(comboBoxItem);
                 }
             }
 
