@@ -1,13 +1,15 @@
-﻿using System.IO;
+﻿using JapaneseLookup.Dicts;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
-using JapaneseLookup.Dicts;
 
 namespace JapaneseLookup.EDICT.JMnedict
 {
     public static class JMnedictLoader
     {
-        public static void Load(string dictPath)
+        public static async Task Load(string dictPath)
         {
             if (File.Exists(Path.Join(ConfigManager.ApplicationPath, dictPath)))
             {
@@ -26,12 +28,15 @@ namespace JapaneseLookup.EDICT.JMnedict
                 ConfigManager.Dicts[DictType.JMnedict].Contents.TrimExcess();
             }
 
-            else
+            else if (MessageBox.Show(
+                    "Couldn't find JMnedict.xml. Would you like to download it now?", "",
+                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
+                    MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
             {
-                MessageBox.Show(
-                    "Couldn't find JMnedict.xml. Please download it by clicking the \"Update JMnedict\" button.", "",
-                    MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK,
-                    MessageBoxOptions.DefaultDesktopOnly);
+                await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMnedict].Path,
+                    new Uri("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz"),
+                    DictType.JMnedict.ToString(), false).ConfigureAwait(false);
+                await Load(ConfigManager.Dicts[DictType.JMnedict].Path).ConfigureAwait(false);
             }
         }
 
@@ -103,9 +108,9 @@ namespace JapaneseLookup.EDICT.JMnedict
                             trans.TransDetList.Add(jMneDictXML.ReadString());
                             break;
 
-                        //case "xref":
-                        //    trans.XRefList.Add(jMneDictXML.ReadString());
-                        //    break;
+                            //case "xref":
+                            //    trans.XRefList.Add(jMneDictXML.ReadString());
+                            //    break;
                     }
                 }
             }

@@ -95,7 +95,7 @@ namespace JapaneseLookup.EDICT.JMnedict
                     tempList = new() { rl.Value };
 
                 jMnedictDictionary[key] = tempList;
-                
+
             }
         }
     }

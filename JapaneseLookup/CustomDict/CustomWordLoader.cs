@@ -1,11 +1,9 @@
-﻿using System;
+﻿using JapaneseLookup.Abstract;
+using JapaneseLookup.Dicts;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using JapaneseLookup.Abstract;
-using JapaneseLookup.Dicts;
 
 namespace JapaneseLookup.CustomDict
 {

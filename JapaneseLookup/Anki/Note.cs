@@ -7,13 +7,13 @@ namespace JapaneseLookup.Anki
     {
         [JsonPropertyName("deckName")] public string DeckName { get; set; }
 
-        [JsonPropertyName("modelName")]  public string ModelName { get; set; }
+        [JsonPropertyName("modelName")] public string ModelName { get; set; }
 
         [JsonPropertyName("fields")] public Dictionary<string, object> Fields { get; set; }
 
         [JsonPropertyName("options")] public Dictionary<string, object> Options { get; set; }
 
-        [JsonPropertyName("tags")]  public string[] Tags { get; set; }
+        [JsonPropertyName("tags")] public string[] Tags { get; set; }
 
         [JsonPropertyName("audio")] public Dictionary<string, object>[] Audio { get; set; }
 

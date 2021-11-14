@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using JapaneseLookup;
-using NUnit.Framework;
-using System.Text.Json;
+﻿using JapaneseLookup;
 using JapaneseLookup.Abstract;
 using JapaneseLookup.Dicts;
 using JapaneseLookup.EDICT.JMdict;
 using JapaneseLookup.Lookup;
+using NUnit.Framework;
+using System.Collections.Generic;
+using System.Text.Json;
 
 namespace JapaneseLookupTests
 {
@@ -23,7 +23,7 @@ namespace JapaneseLookupTests
             string jmdictPath = ConfigManager.BuiltInDicts["JMdict"].Path;
             ConfigManager.Dicts.Add(DictType.JMdict, new Dict(DictType.JMdict, jmdictPath, true, 0));
             ConfigManager.Dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();
-            JMdictLoader.Load(jmdictPath);
+            JMdictLoader.Load(jmdictPath).Wait();
         }
 
         [Test]

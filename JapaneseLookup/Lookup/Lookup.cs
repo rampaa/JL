@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using JapaneseLookup.Abstract;
 using JapaneseLookup.CustomDict;
 using JapaneseLookup.Deconjugation;
@@ -12,6 +7,11 @@ using JapaneseLookup.EDICT.JMnedict;
 using JapaneseLookup.EPWING;
 using JapaneseLookup.KANJIDIC;
 using JapaneseLookup.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
 
 namespace JapaneseLookup.Lookup
 {
@@ -217,7 +217,7 @@ namespace JapaneseLookup.Lookup
                     }
                 }
 
-                if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") &&
+                if (tryLongVowelConversion && textInHiraganaList[i].Contains('ー') &&
                     textInHiraganaList[i][0] != 'ー')
                 {
                     List<string> textWithoutLongVowelMarkList = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
@@ -339,7 +339,7 @@ namespace JapaneseLookup.Lookup
                     }
                 }
 
-                if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") && textInHiraganaList[i][0] != 'ー')
+                if (tryLongVowelConversion && textInHiraganaList[i].Contains('ー') && textInHiraganaList[i][0] != 'ー')
                 {
                     List<string> textWithoutLongVowelMarkList = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
                     foreach (string textWithoutLongVowelMark in textWithoutLongVowelMarkList)
@@ -424,7 +424,7 @@ namespace JapaneseLookup.Lookup
                     }
                 }
 
-                if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") &&
+                if (tryLongVowelConversion && textInHiraganaList[i].Contains('ー') &&
                     textInHiraganaList[i][0] != 'ー')
                 {
                     List<string> textWithoutLongVowelMarkList = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
@@ -495,7 +495,7 @@ namespace JapaneseLookup.Lookup
                     }
                 }
 
-                if (tryLongVowelConversion && textInHiraganaList[i].Contains("ー") && textInHiraganaList[i][0] != 'ー')
+                if (tryLongVowelConversion && textInHiraganaList[i].Contains('ー') && textInHiraganaList[i][0] != 'ー')
                 {
                     List<string> textWithoutLongVowelMarkList = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
                     foreach (string textWithoutLongVowelMark in textWithoutLongVowelMarkList)
@@ -688,7 +688,7 @@ namespace JapaneseLookup.Lookup
                     if (jMDictResult.Readings != null &&
                         (jMDictResult.Readings.Contains(freqResult.Spelling)
                          || (!jMDictResult.Readings.Any() && jMDictResult.PrimarySpelling == freqResult.Spelling)))
-                        //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(freqResult.Spelling))
+                    //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(freqResult.Spelling))
                     {
                         if (freqValue > freqResult.Frequency)
                         {
@@ -733,8 +733,8 @@ namespace JapaneseLookup.Lookup
                         foreach (var readingFreqResult in readingFreqResults)
                         {
                             if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
-                                //|| (jMDictResult.AlternativeSpellings != null && jMDictResult.AlternativeSpellings.Contains(readingFreqResults.Spelling))
-                                //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
+                            //|| (jMDictResult.AlternativeSpellings != null && jMDictResult.AlternativeSpellings.Contains(readingFreqResults.Spelling))
+                            //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                             {
                                 if (freqValue > readingFreqResult.Frequency)
                                 {
@@ -814,8 +814,8 @@ namespace JapaneseLookup.Lookup
                         foreach (var readingFreqResult in readingFreqResults)
                         {
                             if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
-                                //|| (jMDictResult.AlternativeSpellings != null && jMDictResult.AlternativeSpellings.Contains(readingFreqResults.Spelling))
-                                //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
+                            //|| (jMDictResult.AlternativeSpellings != null && jMDictResult.AlternativeSpellings.Contains(readingFreqResults.Spelling))
+                            //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                             {
                                 if (freqValue > readingFreqResult.Frequency)
                                 {

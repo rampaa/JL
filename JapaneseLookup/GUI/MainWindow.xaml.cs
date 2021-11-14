@@ -1,12 +1,9 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
+﻿using JapaneseLookup.Utilities;
+using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
-using JapaneseLookup.Utilities;
 
 namespace JapaneseLookup.GUI
 {
@@ -27,7 +24,7 @@ namespace JapaneseLookup.GUI
         public MainWindow()
         {
             InitializeComponent();
-            ConfigManager.ApplyPreferences(this);
+            ConfigManager.ApplyPreferences(this).ConfigureAwait(false);
             MainWindowUtilities.MainWindowInitializer();
             MainWindowChrome.Freeze();
         }

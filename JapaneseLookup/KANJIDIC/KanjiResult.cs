@@ -1,9 +1,5 @@
-﻿using System;
+﻿using JapaneseLookup.Abstract;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using JapaneseLookup.Abstract;
 
 namespace JapaneseLookup.KANJIDIC
 {

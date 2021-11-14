@@ -1,13 +1,15 @@
-﻿using System.IO;
+﻿using JapaneseLookup.Dicts;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
-using JapaneseLookup.Dicts;
 
 namespace JapaneseLookup.EDICT.JMdict
 {
     public static class JMdictLoader
     {
-        public static void Load(string dictPath)
+        public static async Task Load(string dictPath)
         {
             if (File.Exists(Path.Join(ConfigManager.ApplicationPath, dictPath)))
             {
@@ -26,12 +28,15 @@ namespace JapaneseLookup.EDICT.JMdict
                 ConfigManager.Dicts[DictType.JMdict].Contents.TrimExcess();
             }
 
-            else
+            else if (MessageBox.Show(
+                    "Couldn't find JMdict.xml. Would you like to download it now?", "",
+                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
+                    MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
             {
-                MessageBox.Show(
-                    "Couldn't find JMdict.xml. Please download it by clicking the \"Update JMdict\" button.", "",
-                    MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK,
-                    MessageBoxOptions.DefaultDesktopOnly);
+                await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMdict].Path,
+                    new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
+                    DictType.JMdict.ToString(), false).ConfigureAwait(false);
+                await Load(ConfigManager.Dicts[DictType.JMdict].Path).ConfigureAwait(false);
             }
         }
 
@@ -89,9 +94,9 @@ namespace JapaneseLookup.EDICT.JMdict
                             kEle.KeInfList.Add(ReadEntity(edictXml));
                             break;
 
-                        //case "ke_pri":
-                        //    kEle.KePriList.Add(edictXml.ReadString());
-                        //    break;
+                            //case "ke_pri":
+                            //    kEle.KePriList.Add(edictXml.ReadString());
+                            //    break;
                     }
                 }
             }
@@ -123,9 +128,9 @@ namespace JapaneseLookup.EDICT.JMdict
                             rEle.ReInfList.Add(ReadEntity(jMDictXML));
                             break;
 
-                        //case "re_pri":
-                        //    rEle.RePriList.Add(jMDictXML.ReadString());
-                        //    break;
+                            //case "re_pri":
+                            //    rEle.RePriList.Add(jMDictXML.ReadString());
+                            //    break;
                     }
                 }
             }
@@ -177,13 +182,13 @@ namespace JapaneseLookup.EDICT.JMdict
                             sense.GlossList.Add(jMDictXML.ReadString());
                             break;
 
-                        //case "xref":
-                        //    sense.XRefList.Add(jMDictXML.ReadString());
-                        //    break;
+                            //case "xref":
+                            //    sense.XRefList.Add(jMDictXML.ReadString());
+                            //    break;
 
-                        //case "ant":
-                        //    sense.AntList.Add(jMDictXML.ReadString());
-                        //    break;
+                            //case "ant":
+                            //    sense.AntList.Add(jMDictXML.ReadString());
+                            //    break;
                     }
                 }
             }

@@ -1,21 +1,14 @@
 ﻿using JapaneseLookup.CustomDict;
+using JapaneseLookup.Dicts;
+using JapaneseLookup.Utilities;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using JapaneseLookup.Dicts;
-using JapaneseLookup.Utilities;
 using Path = System.IO.Path;
 
 namespace JapaneseLookup.GUI
@@ -59,7 +52,7 @@ namespace JapaneseLookup.GUI
             }
             else if (SpellingTextBox.BorderBrush == Brushes.Red)
             {
-                SpellingTextBox.BorderBrush = (SolidColorBrush) new BrushConverter().ConvertFrom("#FF3F3F46");
+                SpellingTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
             }
 
             if (ReadingTextBox.Text == "")
@@ -69,7 +62,7 @@ namespace JapaneseLookup.GUI
             }
             else if (ReadingTextBox.BorderBrush == Brushes.Red)
             {
-                ReadingTextBox.BorderBrush = (SolidColorBrush) new BrushConverter().ConvertFrom("#FF3F3F46");
+                ReadingTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
             }
 
             if (isValidated)

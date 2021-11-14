@@ -1,19 +1,17 @@
-﻿using System;
+﻿using JapaneseLookup.Anki;
+using JapaneseLookup.Lookup;
+using JapaneseLookup.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using JapaneseLookup.Anki;
-using JapaneseLookup.Lookup;
-using JapaneseLookup.Utilities;
 
 namespace JapaneseLookup.GUI
 {

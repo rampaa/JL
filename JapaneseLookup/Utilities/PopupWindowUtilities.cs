@@ -1,11 +1,10 @@
-﻿using System;
+﻿using JapaneseLookup.Lookup;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using JapaneseLookup.GUI;
-using JapaneseLookup.Lookup;
 
 namespace JapaneseLookup.Utilities
 {
@@ -166,7 +165,7 @@ namespace JapaneseLookup.Utilities
                     sentence = sentence[1..];
                 }
 
-                if (japaneseParentheses.Keys.Contains(sentence.LastOrDefault().ToString()))
+                if (japaneseParentheses.ContainsKey(sentence.LastOrDefault().ToString()))
                 {
                     sentence = sentence[..^1];
                 }

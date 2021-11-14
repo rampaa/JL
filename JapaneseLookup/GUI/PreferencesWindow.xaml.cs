@@ -1,28 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Media;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-using JapaneseLookup.EDICT;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Forms;
-using System.Windows.Input;
+﻿using HandyControl.Controls;
 using HandyControl.Tools;
-using HandyControl.Controls;
 using JapaneseLookup.Abstract;
 using JapaneseLookup.Anki;
 using JapaneseLookup.Dicts;
+using JapaneseLookup.EDICT;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Forms;
+using System.Windows.Input;
+using System.Windows.Media;
 using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MessageBoxOptions = System.Windows.MessageBoxOptions;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
-using System.Text;
 using TextBox = System.Windows.Controls.TextBox;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace JapaneseLookup.GUI
 {
@@ -66,7 +66,7 @@ namespace JapaneseLookup.GUI
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            ConfigManager.SavePreferences(this);
+            ConfigManager.SavePreferences(this).ConfigureAwait(false);
             Visibility = Visibility.Collapsed;
         }
 
@@ -81,19 +81,28 @@ namespace JapaneseLookup.GUI
             Visibility = Visibility.Collapsed;
         }
 
-        private void UpdateJMdictButton_Click(object sender, RoutedEventArgs e)
+        private async void UpdateJMdictButton_Click(object sender, RoutedEventArgs e)
         {
-            ResourceUpdater.UpdateJMdict();
+            await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMdict].Path,
+                new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
+                DictType.JMdict.ToString(), true)
+                .ConfigureAwait(false);
         }
 
-        private void UpdateJMnedictButton_Click(object sender, RoutedEventArgs e)
+        private async void UpdateJMnedictButton_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(ResourceUpdater.UpdateJMnedict);
+            await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMnedict].Path,
+                new Uri("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz"),
+                DictType.JMnedict.ToString(), true)
+                .ConfigureAwait(false);
         }
 
-        private void UpdateKanjidicButton_Click(object sender, RoutedEventArgs e)
+        private async void UpdateKanjidicButton_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(ResourceUpdater.UpdateKanjidic);
+            await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.Kanjidic].Path,
+                new Uri("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz"),
+                DictType.Kanjidic.ToString(), true)
+                .ConfigureAwait(false);
         }
 
         private async void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -199,7 +208,7 @@ namespace JapaneseLookup.GUI
                     var stackPanel = new StackPanel();
                     var textBlockFieldName = new TextBlock { Text = fieldName };
                     var comboBoxJLFields = new System.Windows.Controls.ComboBox
-                        { ItemsSource = Enum.GetValues(typeof(JLField)), SelectedItem = jlField };
+                    { ItemsSource = Enum.GetValues(typeof(JLField)), SelectedItem = jlField };
 
                     stackPanel.Children.Add(textBlockFieldName);
                     stackPanel.Children.Add(comboBoxJLFields);

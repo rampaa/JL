@@ -1,4 +1,6 @@
-﻿using System;
+﻿using JapaneseLookup.Dicts;
+using JapaneseLookup.Utilities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,14 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using JapaneseLookup.Dicts;
-using JapaneseLookup.Utilities;
 using Path = System.IO.Path;
 
 namespace JapaneseLookup.GUI
@@ -57,7 +52,7 @@ namespace JapaneseLookup.GUI
             }
             else if (SpellingsTextBox.BorderBrush == Brushes.Red)
             {
-                SpellingsTextBox.BorderBrush = (SolidColorBrush) new BrushConverter().ConvertFrom("#FF3F3F46");
+                SpellingsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
             }
 
             if (ReadingsTextBox.Text == "")
@@ -67,7 +62,7 @@ namespace JapaneseLookup.GUI
             }
             else if (ReadingsTextBox.BorderBrush == Brushes.Red)
             {
-                ReadingsTextBox.BorderBrush = (SolidColorBrush) new BrushConverter().ConvertFrom("#FF3F3F46");
+                ReadingsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
             }
 
             if (DefinitionsTextBox.Text == "")
@@ -77,7 +72,7 @@ namespace JapaneseLookup.GUI
             }
             else if (DefinitionsTextBox.BorderBrush == Brushes.Red)
             {
-                DefinitionsTextBox.BorderBrush = (SolidColorBrush) new BrushConverter().ConvertFrom("#FF3F3F46");
+                DefinitionsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
             }
 
             if (isValidated)

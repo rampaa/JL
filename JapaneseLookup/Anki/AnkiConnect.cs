@@ -4,19 +4,19 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace JapaneseLookup.Anki
 {
     public static class AnkiConnect
     {
-        private static readonly HttpClient Client = new();
 
         private static readonly Uri AnkiConnectUri = new(ConfigManager.AnkiConnectUri);
 
         public static async Task<Response> AddNoteToDeck(Note note)
         {
-            var req = new Request("addNote", 6, new Dictionary<string, object> {{"note", note}});
+            var req = new Request("addNote", 6, new Dictionary<string, object> { { "note", note } });
             return await Send(req);
         }
 
@@ -34,14 +34,14 @@ namespace JapaneseLookup.Anki
 
         public static async Task<Response> GetModelFieldNames(string modelName)
         {
-            var req = new Request("modelFieldNames", 6, new Dictionary<string, object> {{"modelName", modelName}});
+            var req = new Request("modelFieldNames", 6, new Dictionary<string, object> { { "modelName", modelName } });
             return await Send(req);
         }
 
         public static async Task<Response> StoreMediaFile(string filename, string data)
         {
             var req = new Request("storeMediaFile", 6,
-                new Dictionary<string, object> {{"filename", filename}, {"data", data}});
+                new Dictionary<string, object> { { "filename", filename }, { "data", data } });
             return await Send(req);
         }
 
@@ -59,7 +59,7 @@ namespace JapaneseLookup.Anki
                 "&kana=" +
                 reading
             );
-            var getResponse = await Client.GetAsync(uri);
+            var getResponse = await ConfigManager.Client.GetAsync(uri);
 
             //  var filename = "JL_audio" + foundSpelling + "_" + reading + ".mp3";
 
@@ -74,10 +74,10 @@ namespace JapaneseLookup.Anki
             {
                 // AnkiConnect doesn't like null values
                 var payload = new StringContent(JsonSerializer.Serialize(req,
-                    new JsonSerializerOptions {IgnoreNullValues = true}));
+                    new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }));
                 Debug.WriteLine("Sending: " + await payload.ReadAsStringAsync());
 
-                var postResponse = await Client.PostAsync(AnkiConnectUri, payload);
+                var postResponse = await ConfigManager.Client.PostAsync(AnkiConnectUri, payload);
 
                 var json = await postResponse.Content.ReadFromJsonAsync<Response>();
                 Debug.WriteLine("json result: " + json!.Result);

@@ -1,115 +1,51 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Net;
-using System.Text;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
-using JapaneseLookup.Dicts;
 
 namespace JapaneseLookup.EDICT
 {
     public static class ResourceUpdater
     {
-        public static async void UpdateJMdict()
+        public static async Task UpdateResource(string resourcePath, Uri resourceDownloadUri, string resourceName, bool isUpdate)
         {
-            string jmdictPath = ConfigManager.Dicts[DictType.JMdict].Path;
-
-            if (MessageBox.Show("Do you want to update JMdict?", "", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
+            if (!isUpdate || MessageBox.Show($"Do you want to download the latest version of {resourceName}?", "", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz");
-                request.IfModifiedSince = File.GetLastWriteTime(Path.Join(ConfigManager.ApplicationPath, jmdictPath));
-                try
+                HttpRequestMessage request = new(HttpMethod.Get, resourceDownloadUri);
+
+                if (File.Exists(Path.Join(ConfigManager.ApplicationPath, resourcePath)))
+                    request.Headers.IfModifiedSince = File.GetLastWriteTime(Path.Join(ConfigManager.ApplicationPath, resourcePath));
+
+                MessageBox.Show($"This may take a while. Please don't shut down the program until {resourceName} is downloaded.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
+
+                var response = await ConfigManager.Client.SendAsync(request);
+                if (response.IsSuccessStatusCode)
                 {
-                    request.GetResponse();
-                    string downloadName = Path.Join(ConfigManager.ApplicationPath, "Resources/JMdict_e.gz");
-                    MessageBox.Show("This may take a while. Please don't shut down the program until JMdict is updated.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
-                    using WebClient client = new();
-                    await Task.Run(() => client.DownloadFile("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz", downloadName));
-                    await Task.Run(() => GzipDecompressor(new FileInfo(downloadName), Path.Join(ConfigManager.ApplicationPath, jmdictPath)));
-                    File.Delete(downloadName);
-                    MessageBox.Show("JMdict has been updated successfully.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
+                    var responseStream = await response.Content.ReadAsStreamAsync();
+                    await GzipStreamDecompressor(responseStream, Path.Join(ConfigManager.ApplicationPath, resourcePath));
+                    MessageBox.Show($"{resourceName} has been downloaded successfully.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
                 }
 
-                catch (WebException e)
+                else if (response.StatusCode == HttpStatusCode.NotModified)
                 {
-                    if (e.Response != null && ((HttpWebResponse)e.Response).StatusCode == HttpStatusCode.NotModified)
-                        MessageBox.Show("JMdict is up to date.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
-                    else
-                        MessageBox.Show("Unexpected error while updating.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
+                    MessageBox.Show($"{resourceName} is up to date.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
+                }
+
+                else
+                {
+                    MessageBox.Show($"Unexpected error while downloading {resourceName}.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
                 }
             }
         }
 
-        public static async void UpdateJMnedict()
+        private static async Task GzipStreamDecompressor(Stream stream, string filePath)
         {
-            string jmnedictPath = ConfigManager.Dicts[DictType.JMnedict].Path;
-
-            if (MessageBox.Show("Do you want to update JMnedict?", "", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
-            {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
-                request.IfModifiedSince = File.GetLastWriteTime(Path.Join(ConfigManager.ApplicationPath, jmnedictPath));
-                try
-                {
-                    request.GetResponse();
-                    MessageBox.Show("This may take a while. Please don't shut down the program until JMnedict is updated.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
-                    string downloadName = Path.Join(ConfigManager.ApplicationPath, "Resources/JMnedict.xml.gz");
-                    using WebClient client = new();
-                    await Task.Run(() => client.DownloadFile("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz", downloadName));
-                    await Task.Run(() => GzipDecompressor(new FileInfo(downloadName), Path.Join(ConfigManager.ApplicationPath, jmnedictPath)));
-                    File.Delete(downloadName);
-                    MessageBox.Show("JMnedict has been updated successfully.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
-                }
-
-                catch (WebException e)
-                {
-                    if (e.Response != null && ((HttpWebResponse)e.Response).StatusCode == HttpStatusCode.NotModified)
-                        MessageBox.Show("JMnedict is up to date.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
-                    else
-                        MessageBox.Show("Unexpected error while updating.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
-                }
-            }
-        }
-
-        public static async void UpdateKanjidic()
-        {
-            string kanjidicPath = ConfigManager.Dicts[DictType.Kanjidic].Path;
-
-            if (MessageBox.Show("Do you want to update KANJIDIC2?", "", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
-            {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
-                request.IfModifiedSince = File.GetLastWriteTime(Path.Join(ConfigManager.ApplicationPath, kanjidicPath));
-                try
-                {
-                    request.GetResponse();
-                    MessageBox.Show("This may take a while. Please don't shut down the program until KANJIDIC2 is updated.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
-                    string downloadName = Path.Join(ConfigManager.ApplicationPath, "Resources/kanjidic2.xml.gz");
-                    using WebClient client = new();
-                    await Task.Run(() => client.DownloadFile("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz", downloadName));
-                    await Task.Run(() => GzipDecompressor(new FileInfo(downloadName), Path.Join(ConfigManager.ApplicationPath, kanjidicPath)));
-                    File.Delete(downloadName);
-                    MessageBox.Show("KANJIDIC2 has been updated successfully.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
-                }
-
-                catch (WebException e)
-                {
-                    if (e.Response != null && ((HttpWebResponse)e.Response).StatusCode == HttpStatusCode.NotModified)
-                        MessageBox.Show("KANJIDIC2 is up to date.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
-                    else
-                        MessageBox.Show("Unexpected error while updating.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
-                }
-            }
-        }
-
-        private static void GzipDecompressor(FileInfo fileToDecompress, string filePath)
-        {
-            using FileStream originalFileStream = fileToDecompress.OpenRead();
             using FileStream decompressedFileStream = File.Create(filePath);
-            using GZipStream decompressionStream = new(originalFileStream, CompressionMode.Decompress);
-            decompressionStream.CopyTo(decompressedFileStream);
+            using GZipStream decompressionStream = new(stream, CompressionMode.Decompress);
+            await decompressionStream.CopyToAsync(decompressedFileStream).ConfigureAwait(false);
         }
     }
 }

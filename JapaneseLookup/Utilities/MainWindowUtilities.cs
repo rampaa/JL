@@ -1,10 +1,10 @@
-﻿using System;
+﻿using JapaneseLookup.GUI;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
-using JapaneseLookup.GUI;
 
 namespace JapaneseLookup.Utilities
 {
@@ -74,7 +74,7 @@ namespace JapaneseLookup.Utilities
             if (mainWindow.MainTextBox.SelectedText.Length > 0)
                 Process.Start(new ProcessStartInfo("cmd",
                         $"/c start https://www.google.com/search?q={mainWindow.MainTextBox.SelectedText}^&hl=ja")
-                    { CreateNoWindow = true });
+                { CreateNoWindow = true });
         }
     }
 }

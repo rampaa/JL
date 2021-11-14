@@ -1,10 +1,20 @@
-﻿using JapaneseLookup.GUI;
+﻿using JapaneseLookup.Abstract;
+using JapaneseLookup.CustomDict;
+using JapaneseLookup.Dicts;
+using JapaneseLookup.EDICT.JMdict;
+using JapaneseLookup.EDICT.JMnedict;
+using JapaneseLookup.EPWING;
+using JapaneseLookup.Frequency;
+using JapaneseLookup.GUI;
+using JapaneseLookup.KANJIDIC;
+using JapaneseLookup.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -12,22 +22,15 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using JapaneseLookup.Abstract;
-using JapaneseLookup.EPWING;
-using JapaneseLookup.KANJIDIC;
-using JapaneseLookup.CustomDict;
-using JapaneseLookup.Dicts;
-using JapaneseLookup.EDICT.JMdict;
-using JapaneseLookup.EDICT.JMnedict;
-using JapaneseLookup.Frequency;
 using System.Xml;
-using JapaneseLookup.Utilities;
 
 namespace JapaneseLookup
 {
     public static class ConfigManager
     {
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
+
+        public static readonly HttpClient Client = new();
 
         private static readonly List<string> JapaneseFonts =
             Utils.FindJapaneseFonts().OrderBy(font => font).ToList();
@@ -127,7 +130,7 @@ namespace JapaneseLookup
         public static int MaxResults { get; set; } = 99;
         public static bool AllowDuplicateCards { get; set; } = false;
 
-        public static void ApplyPreferences(MainWindow mainWindow)
+        public static async Task ApplyPreferences(MainWindow mainWindow)
         {
             CreateDefaultAppConfig();
 
@@ -409,11 +412,11 @@ namespace JapaneseLookup
             if (!File.Exists("Resources/custom_names.txt"))
                 File.Create("Resources/custom_names.txt");
 
-            DeserializeDicts();
+            await DeserializeDicts().ConfigureAwait(false);
 
             // Test without async/await.
             // Task.Run(async () => { await LoadDictionaries(); });
-            Task.Run(() => { LoadDictionaries(); });
+            await LoadDictionaries().ConfigureAwait(false);
         }
 
         public static void LoadPreferences(PreferencesWindow preferenceWindow)
@@ -511,7 +514,7 @@ namespace JapaneseLookup
             preferenceWindow.PopupFlipComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("PopupFlip");
         }
 
-        public static void SavePreferences(PreferencesWindow preferenceWindow)
+        public static async Task SavePreferences(PreferencesWindow preferenceWindow)
         {
             Utils.KeyGestureSaver("MiningModeKeyGesture", preferenceWindow.MiningModeKeyGestureTextBox.Text);
             Utils.KeyGestureSaver("PlayAudioKeyGesture", preferenceWindow.PlayAudioKeyGestureTextBox.Text);
@@ -642,7 +645,7 @@ namespace JapaneseLookup
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
 
-            ApplyPreferences(mainWindow);
+            await ApplyPreferences(mainWindow);
         }
 
         public static void SaveBeforeClosing(MainWindow mainWindow)
@@ -674,7 +677,7 @@ namespace JapaneseLookup
                     }
                 };
 
-                File.WriteAllText(Path.Join(ApplicationPath, "Config/dicts.json"),
+                File.WriteAllTextAsync(Path.Join(ApplicationPath, "Config/dicts.json"),
                     JsonSerializer.Serialize(ConfigManager.Dicts, jso));
             }
             catch (Exception e)
@@ -684,11 +687,8 @@ namespace JapaneseLookup
             }
         }
 
-        private static void DeserializeDicts()
+        private static async Task DeserializeDicts()
         {
-            if (Dicts.Any())
-                return;
-
             try
             {
                 var jso = new JsonSerializerOptions
@@ -699,8 +699,8 @@ namespace JapaneseLookup
                     }
                 };
 
-                Dictionary<DictType, Dict> deserializedDicts = JsonSerializer.Deserialize<Dictionary<DictType, Dict>>(
-                    File.ReadAllText(Path.Join(ApplicationPath, "Config/dicts.json")), jso);
+                Dictionary<DictType, Dict> deserializedDicts = await JsonSerializer.DeserializeAsync<Dictionary<DictType, Dict>>(
+                    (new StreamReader(Path.Join(ApplicationPath, "Config/dicts.json"))).BaseStream, jso);
 
                 if (deserializedDicts != null)
                 {
@@ -768,9 +768,10 @@ namespace JapaneseLookup
             }
         }
 
-        private static void LoadDictionaries()
+        private static async Task LoadDictionaries()
         {
             var tasks = new List<Task>();
+
 
             bool dictRemoved = false;
 
@@ -783,11 +784,10 @@ namespace JapaneseLookup
                         // initial jmdict load
                         if (dict.Active && !Dicts[DictType.JMdict].Contents.Any())
                         {
-                            var taskJmdict = Task.Run(() => JMdictLoader.Load(dict.Path));
-                            tasks.Add(taskJmdict);
+                            tasks.Add(JMdictLoader.Load(dict.Path));
                         }
 
-                        else if (!dict.Active)
+                        else if (!dict.Active && Dicts[DictType.JMdict].Contents.Any())
                         {
                             dict.Contents.Clear();
                             dictRemoved = true;
@@ -798,11 +798,10 @@ namespace JapaneseLookup
                         // JMnedict
                         if (dict.Active && !Dicts[DictType.JMnedict].Contents.Any())
                         {
-                            var taskJMnedict = Task.Run(() => JMnedictLoader.Load(dict.Path));
-                            tasks.Add(taskJMnedict);
+                            tasks.Add(JMnedictLoader.Load(dict.Path));
                         }
 
-                        else if (!dict.Active)
+                        else if (!dict.Active && Dicts[DictType.JMnedict].Contents.Any())
                         {
                             dict.Contents.Clear();
                             dictRemoved = true;
@@ -813,12 +812,10 @@ namespace JapaneseLookup
                         // KANJIDIC
                         if (dict.Active && !Dicts[DictType.Kanjidic].Contents.Any())
                         {
-                            var taskKanjidict = Task.Run(async () =>
-                                await KanjiInfoLoader.Load(dict.Path).ConfigureAwait(false));
-                            tasks.Add(taskKanjidict);
+                            tasks.Add(KanjiInfoLoader.Load(dict.Path));
                         }
 
-                        else if (!dict.Active)
+                        else if (!dict.Active && Dicts[DictType.Kanjidic].Contents.Any())
                         {
                             dict.Contents.Clear();
                             dictRemoved = true;
@@ -828,12 +825,10 @@ namespace JapaneseLookup
                     case DictType.Kenkyuusha:
                         if (dict.Active && !Dicts[DictType.Kenkyuusha].Contents.Any())
                         {
-                            var taskEpwing = Task.Run(async () =>
-                                await EpwingJsonLoader.Loader(dict.Type, dict.Path).ConfigureAwait(false));
-                            tasks.Add(taskEpwing);
+                            tasks.Add(EpwingJsonLoader.Loader(dict.Type, dict.Path));
                         }
 
-                        else if (!dict.Active)
+                        else if (!dict.Active && Dicts[DictType.Kenkyuusha].Contents.Any())
                         {
                             dict.Contents.Clear();
                             dictRemoved = true;
@@ -843,12 +838,10 @@ namespace JapaneseLookup
                     case DictType.Daijirin:
                         if (dict.Active && !Dicts[DictType.Daijirin].Contents.Any())
                         {
-                            var taskEpwing = Task.Run(async () => await
-                                EpwingJsonLoader.Loader(dict.Type, dict.Path).ConfigureAwait(false));
-                            tasks.Add(taskEpwing);
+                            tasks.Add(EpwingJsonLoader.Loader(dict.Type, dict.Path));
                         }
 
-                        else if (!dict.Active)
+                        else if (!dict.Active && Dicts[DictType.Daijirin].Contents.Any())
                         {
                             dict.Contents.Clear();
                             dictRemoved = true;
@@ -858,12 +851,10 @@ namespace JapaneseLookup
                     case DictType.Daijisen:
                         if (dict.Active && !Dicts[DictType.Daijisen].Contents.Any())
                         {
-                            var taskEpwing = Task.Run(async () =>
-                                await EpwingJsonLoader.Loader(dict.Type, dict.Path).ConfigureAwait(false));
-                            tasks.Add(taskEpwing);
+                            tasks.Add(EpwingJsonLoader.Loader(dict.Type, dict.Path));
                         }
 
-                        else if (!dict.Active)
+                        else if (!dict.Active && Dicts[DictType.Daijisen].Contents.Any())
                         {
                             dict.Contents.Clear();
                             dictRemoved = true;
@@ -873,12 +864,10 @@ namespace JapaneseLookup
                     case DictType.Koujien:
                         if (dict.Active && !Dicts[DictType.Koujien].Contents.Any())
                         {
-                            var taskEpwing = Task.Run(async () =>
-                                await EpwingJsonLoader.Loader(dict.Type, dict.Path).ConfigureAwait(false));
-                            tasks.Add(taskEpwing);
+                            tasks.Add(EpwingJsonLoader.Loader(dict.Type, dict.Path));
                         }
 
-                        else if (!dict.Active)
+                        else if (!dict.Active && Dicts[DictType.Koujien].Contents.Any())
                         {
                             dict.Contents.Clear();
                             dictRemoved = true;
@@ -888,12 +877,10 @@ namespace JapaneseLookup
                     case DictType.Meikyou:
                         if (dict.Active && !Dicts[DictType.Meikyou].Contents.Any())
                         {
-                            var taskEpwing = Task.Run(async () =>
-                                await EpwingJsonLoader.Loader(dict.Type, dict.Path).ConfigureAwait(false));
-                            tasks.Add(taskEpwing);
+                            tasks.Add(EpwingJsonLoader.Loader(dict.Type, dict.Path));
                         }
 
-                        else if (!dict.Active)
+                        else if (!dict.Active && Dicts[DictType.Meikyou].Contents.Any())
                         {
                             dict.Contents.Clear();
                             dictRemoved = true;
@@ -903,12 +890,10 @@ namespace JapaneseLookup
                     case DictType.CustomWordDictionary:
                         if (dict.Active && !Dicts[DictType.CustomWordDictionary].Contents.Any())
                         {
-                            var taskCustomWordDict = Task.Run(async () => 
-                                await CustomWordLoader.Load(Dicts[DictType.CustomWordDictionary].Path).ConfigureAwait(false));
-                            tasks.Add(taskCustomWordDict);
+                            tasks.Add(CustomWordLoader.Load(Dicts[DictType.CustomWordDictionary].Path));
                         }
 
-                        else if (!dict.Active)
+                        else if (!dict.Active && Dicts[DictType.CustomWordDictionary].Contents.Any())
                         {
                             dict.Contents.Clear();
                             dictRemoved = true;
@@ -918,12 +903,10 @@ namespace JapaneseLookup
                     case DictType.CustomNameDictionary:
                         if (dict.Active && !Dicts[DictType.CustomNameDictionary].Contents.Any())
                         {
-                            var taskCustomNameDict = Task.Run(async() => 
-                                await CustomNameLoader.Load(Dicts[DictType.CustomNameDictionary].Path).ConfigureAwait(false));
-                            tasks.Add(taskCustomNameDict);
+                            tasks.Add(CustomNameLoader.Load(Dicts[DictType.CustomNameDictionary].Path));
                         }
 
-                        else if (!dict.Active)
+                        else if (!dict.Active && Dicts[DictType.CustomNameDictionary].Contents.Any())
                         {
                             dict.Contents.Clear();
                             dictRemoved = true;
@@ -956,17 +939,13 @@ namespace JapaneseLookup
                 }
             }
 
-            if (tasks.Any())
+            if (tasks.Any() || dictRemoved)
             {
-                Task.WhenAll(tasks.ToArray()).ContinueWith(_ =>
+                if (tasks.Any())
                 {
-                    GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-                });
-            }
+                    await Task.WhenAll(tasks.ToArray()).ConfigureAwait(false);
+                }
 
-            else if (dictRemoved)
-            {
                 GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
             }

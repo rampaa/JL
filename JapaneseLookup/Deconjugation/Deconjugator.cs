@@ -25,7 +25,7 @@ namespace JapaneseLookup.Deconjugation
                 return null;
 
             string newText =
-                myForm.Text.Substring(0, myForm.Text.Length - myRule.ConEnd.Length)
+                myForm.Text[..^myRule.ConEnd.Length]
                 +
                 myRule.DecEnd;
 
@@ -240,7 +240,7 @@ namespace JapaneseLookup.Deconjugation
             if (myForm.Text == "") return false;
             if (!myForm.Text.EndsWith(myRule.ConEnd.First())) return false;
 
-            string baseText = myForm.Text.Substring(0, myForm.Text.Length - myRule.ConEnd.First().Length);
+            string baseText = myForm.Text[..^myRule.ConEnd.First().Length];
             return !baseText.EndsWith("さ");
         }
 

@@ -1,14 +1,13 @@
-﻿using System;
+﻿using JapaneseLookup.Abstract;
+using JapaneseLookup.Dicts;
+using JapaneseLookup.EDICT;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
-using JapaneseLookup.Abstract;
-using JapaneseLookup.Dicts;
 
 namespace JapaneseLookup.KANJIDIC
 {
@@ -40,19 +39,19 @@ namespace JapaneseLookup.KANJIDIC
                             if (endIndex == -1)
                                 kanjiCompositionDictionary.Add(lParts[1], lParts[2]);
                             else
-                                kanjiCompositionDictionary.Add(lParts[1], lParts[2].Substring(0, endIndex));
+                                kanjiCompositionDictionary.Add(lParts[1], lParts[2][..endIndex]);
                         }
 
                         else if (lParts.Length > 3)
                         {
                             for (int i = 2; i < lParts.Length; i++)
                             {
-                                if (lParts[i].Contains("J"))
+                                if (lParts[i].Contains('J'))
                                 {
                                     int endIndex = lParts[i].IndexOf("[", StringComparison.Ordinal);
                                     if (endIndex != -1)
                                     {
-                                        kanjiCompositionDictionary.Add(lParts[1], lParts[i].Substring(0, endIndex));
+                                        kanjiCompositionDictionary.Add(lParts[1], lParts[i][..endIndex]);
                                         break;
                                     }
                                 }
@@ -70,12 +69,15 @@ namespace JapaneseLookup.KANJIDIC
                 ConfigManager.Dicts[DictType.Kanjidic].Contents.TrimExcess();
             }
 
-            else
+            else if (MessageBox.Show(
+                    "Couldn't find kanjidic2.xml. Would you like to download it now?", "",
+                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
+                    MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
             {
-                MessageBox.Show(
-                    "Couldn't find kanjidic2.xml. Please download it by clicking the \"Update KANJIDIC\" button.", "",
-                    MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK,
-                    MessageBoxOptions.DefaultDesktopOnly);
+                await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.Kanjidic].Path,
+                    new Uri("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz"),
+                    DictType.Kanjidic.ToString(), false).ConfigureAwait(false);
+                await Load(ConfigManager.Dicts[DictType.Kanjidic].Path).ConfigureAwait(false);
             }
         }
 
