@@ -63,7 +63,11 @@ namespace JapaneseLookup.Utilities
                     }
 
                     if (!foundGlyph)
+                    {
+                        comboBoxItem.Foreground = Brushes.DimGray;
                         japaneseFonts.Add(comboBoxItem);
+                    }
+                        
                 }
                 else
                 {
