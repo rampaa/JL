@@ -21,11 +21,11 @@ namespace JapaneseLookup.EDICT
 
                 MessageBox.Show($"This may take a while. Please don't shut down the program until {resourceName} is downloaded.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
 
-                var response = await ConfigManager.Client.SendAsync(request);
+                var response = await ConfigManager.Client.SendAsync(request).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseStream = await response.Content.ReadAsStreamAsync();
-                    await GzipStreamDecompressor(responseStream, Path.Join(ConfigManager.ApplicationPath, resourcePath));
+                    var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                    await GzipStreamDecompressor(responseStream, Path.Join(ConfigManager.ApplicationPath, resourcePath)).ConfigureAwait(false);
                     MessageBox.Show($"{resourceName} has been downloaded successfully.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
                 }
 

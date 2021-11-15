@@ -15,7 +15,7 @@ namespace JapaneseLookup.Anki
         {
             try
             {
-                var ankiConfig = await AnkiConfig.ReadAnkiConfig();
+                var ankiConfig = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
                 if (ankiConfig == null) return;
 
                 string deckName = ankiConfig.DeckName;
@@ -79,7 +79,7 @@ namespace JapaneseLookup.Anki
                 Dictionary<string, object>[] picture = null;
 
                 var note = new Note(deckName, modelName, fields, options, tags, audio, video, picture);
-                Response response = await AnkiConnect.AddNoteToDeck(note);
+                Response response = await AnkiConnect.AddNoteToDeck(note).ConfigureAwait(false);
 
                 if (response == null)
                 {

@@ -72,9 +72,9 @@ namespace JapaneseLookup.GUI
                         .FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString();
                 string spelling = SpellingTextBox.Text;
                 string reading = ReadingTextBox.Text;
-                await WriteToFile(spelling, reading, nameType);
                 CustomNameLoader.AddToDictionary(spelling.Trim(), reading.Trim(), nameType.Trim());
                 Close();
+                await WriteToFile(spelling, reading, nameType).ConfigureAwait(false);
             }
         }
 
@@ -91,7 +91,7 @@ namespace JapaneseLookup.GUI
             string customNameDictPath = ConfigManager.Dicts[DictType.CustomNameDictionary].Path;
             await File.AppendAllTextAsync(
                 Path.Join(ConfigManager.ApplicationPath, customNameDictPath),
-                stringBuilder.ToString(), Encoding.UTF8);
+                stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

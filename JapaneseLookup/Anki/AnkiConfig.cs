@@ -64,10 +64,10 @@ namespace JapaneseLookup.Anki
                     },
                     new[] { "JapaneseLookup" }
                 )
-            );
+            ).ConfigureAwait(false);
         }
 
-        public static async Task<string> WriteAnkiConfig(AnkiConfig ankiConfig)
+        public static async Task<bool> WriteAnkiConfig(AnkiConfig ankiConfig)
         {
             try
             {
@@ -83,16 +83,16 @@ namespace JapaneseLookup.Anki
                                 new JsonStringEnumConverter()
                             }
                         })
-                );
+                ).ConfigureAwait(false);
 
-                return "ok";
+                return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine("Couldn't write AnkiConfig");
                 Debug.WriteLine(e);
 
-                return null;
+                return false;
             }
         }
 
@@ -101,7 +101,8 @@ namespace JapaneseLookup.Anki
             try
             {
                 return JsonSerializer.Deserialize<AnkiConfig>(
-                    await File.ReadAllTextAsync(Path.Join(ConfigManager.ApplicationPath, "Config/AnkiConfig.json")),
+                    await File.ReadAllTextAsync(Path.Join(ConfigManager.ApplicationPath, "Config/AnkiConfig.json"))
+                        .ConfigureAwait(false),
                     new JsonSerializerOptions
                     {
                         Converters =

@@ -12,7 +12,7 @@ namespace JapaneseLookup.CustomDict
         {
             if (File.Exists(Path.Join(ConfigManager.ApplicationPath, customNameDictPath)))
             {
-                var lines = await File.ReadAllLinesAsync(Path.Join(ConfigManager.ApplicationPath, customNameDictPath));
+                var lines = await File.ReadAllLinesAsync(Path.Join(ConfigManager.ApplicationPath, customNameDictPath)).ConfigureAwait(false);
                 foreach (string line in lines)
                 {
                     string[] lParts = line.Split("\t");

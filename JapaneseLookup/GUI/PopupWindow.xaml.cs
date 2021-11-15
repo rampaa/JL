@@ -657,13 +657,13 @@ namespace JapaneseLookup.GUI
                 strokeCount,
                 grade,
                 composition
-            );
+            ).ConfigureAwait(false);
         }
 
         private async void Definitions_MouseMove(TextBox tb)
         {
             if (MainWindowUtilities.JapaneseRegex.IsMatch(tb.Text))
-                await TextBox_MouseMove(tb);
+                await TextBox_MouseMove(tb).ConfigureAwait(false);
         }
 
         private static void PlayAudio(string foundSpelling, string reading)

@@ -38,6 +38,7 @@ namespace JapaneseLookup.Utilities
 
                 comboBoxItem.Content = fontFamily.Source;
                 comboBoxItem.FontFamily = fontFamily;
+                comboBoxItem.Foreground = Brushes.White;
 
                 if (fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("ja-jp")))
                 {
@@ -47,6 +48,7 @@ namespace JapaneseLookup.Utilities
                 else if (fontFamily.FamilyNames.Keys != null && fontFamily.FamilyNames.Keys.Count == 1 &&
                          fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("en-US")))
                 {
+                    bool foundGlyph = false;
                     foreach (var typeFace in fontFamily.GetTypefaces())
                     {
                         if (typeFace.TryGetGlyphTypeface(out var glyphTypeFace))
@@ -54,10 +56,14 @@ namespace JapaneseLookup.Utilities
                             if (glyphTypeFace.CharacterToGlyphMap.ContainsKey(20685))
                             {
                                 japaneseFonts.Add(comboBoxItem);
+                                foundGlyph = true;
                                 break;
                             }
                         }
                     }
+
+                    if (!foundGlyph)
+                        japaneseFonts.Add(comboBoxItem);
                 }
                 else
                 {

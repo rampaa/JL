@@ -83,8 +83,6 @@ namespace JapaneseLookup.GUI
                 string rawWordClass = WordClassStackPanel.Children.OfType<RadioButton>()
                     .FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString();
 
-                await WriteToFile(rawSpellings, rawReadings, rawDefinitions, rawWordClass);
-
                 string[] spellings = rawSpellings.Split(';').Select(s => s.Trim()).ToArray();
                 List<string> readings = rawReadings.Split(';').Select(r => r.Trim()).ToList();
                 List<string> definitions = rawDefinitions.Split(';').Select(s => s.Trim()).ToList();
@@ -92,6 +90,8 @@ namespace JapaneseLookup.GUI
                 CustomDict.CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawWordClass);
 
                 Close();
+
+                await WriteToFile(rawSpellings, rawReadings, rawDefinitions, rawWordClass).ConfigureAwait(false);
             }
         }
 
@@ -110,7 +110,7 @@ namespace JapaneseLookup.GUI
             string customWordDictPath = ConfigManager.Dicts[DictType.CustomWordDictionary].Path;
             await File.AppendAllTextAsync(
                 Path.Join(ConfigManager.ApplicationPath, customWordDictPath),
-                stringBuilder.ToString(), Encoding.UTF8);
+                stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

@@ -27,7 +27,7 @@ namespace JapaneseLookup.KANJIDIC
                 Dictionary<string, string> kanjiCompositionDictionary = new();
                 if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
                 {
-                    var lines = await File.ReadAllLinesAsync(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt"));
+                    var lines = await File.ReadAllLinesAsync(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")).ConfigureAwait(false);
 
                     foreach (string line in lines)
                     {

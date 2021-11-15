@@ -13,7 +13,7 @@ namespace JapaneseLookup.EPWING
 {
     public static class EpwingJsonLoader
     {
-        public static async Task Loader(DictType dictType, string dictPath)
+        public static async Task Load(DictType dictType, string dictPath)
         {
             if (!(Directory.Exists(dictPath) || File.Exists(dictPath)))
                 return;
@@ -24,7 +24,7 @@ namespace JapaneseLookup.EPWING
             foreach (string jsonFile in jsonFiles)
             {
                 await using FileStream openStream = File.OpenRead(jsonFile);
-                var jsonObject = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream);
+                var jsonObject = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream).ConfigureAwait(false);
 
                 Debug.Assert(jsonObject != null, nameof(jsonObject) + " != null");
                 foreach (var obj in jsonObject)

@@ -222,7 +222,7 @@ namespace JapaneseLookup.GUI
             }
         }
 
-        private void MiningSetupButtonSave_Click(object sender, RoutedEventArgs e)
+        private async void MiningSetupButtonSave_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -256,7 +256,7 @@ namespace JapaneseLookup.GUI
                 }
 
                 var ankiConfig = new AnkiConfig(deckName, modelName, fields, tags);
-                Console.WriteLine(AnkiConfig.WriteAnkiConfig(ankiConfig).Result == "ok"
+                Console.WriteLine(await AnkiConfig.WriteAnkiConfig(ankiConfig).ConfigureAwait(false) == true
                     ? "Saved config"
                     : "Error saving config");
             }
