@@ -1,6 +1,5 @@
 ﻿using JapaneseLookup.Utilities;
 using System;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -59,7 +58,7 @@ namespace JapaneseLookup.GUI
                 }
                 catch (Exception e)
                 {
-                    Debug.WriteLine(e);
+                    Utils.logger.Information(e, "CopyFromClipboard failed.");
                 }
             }
         }

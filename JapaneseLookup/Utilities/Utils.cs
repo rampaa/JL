@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Serilog;
+using Serilog.Core;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Text;
@@ -11,6 +13,12 @@ namespace JapaneseLookup.Utilities
 {
     public static class Utils
     {
+        public static readonly Logger logger = new LoggerConfiguration().WriteTo.Console().WriteTo.File("Logs/log.txt",
+            rollingInterval: RollingInterval.Minute,
+            retainedFileTimeLimit: TimeSpan.FromDays(90),
+            shared: true)
+             .CreateLogger();
+
         public static IEnumerable<string> UnicodeIterator(this string s)
         {
             for (int i = 0; i < s.Length; ++i)
@@ -67,7 +75,7 @@ namespace JapaneseLookup.Utilities
                         comboBoxItem.Foreground = Brushes.DimGray;
                         japaneseFonts.Add(comboBoxItem);
                     }
-                        
+
                 }
                 else
                 {

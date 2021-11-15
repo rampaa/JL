@@ -1,6 +1,6 @@
-﻿using System;
+﻿using JapaneseLookup.Utilities;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -89,9 +89,7 @@ namespace JapaneseLookup.Anki
             }
             catch (Exception e)
             {
-                Console.WriteLine("Couldn't write AnkiConfig");
-                Debug.WriteLine(e);
-
+                Utils.logger.Information(e, "Couldn't write AnkiConfig");
                 return false;
             }
         }
@@ -113,9 +111,7 @@ namespace JapaneseLookup.Anki
             }
             catch (Exception e)
             {
-                Console.WriteLine("Couldn't read AnkiConfig");
-                Debug.WriteLine(e);
-
+                Utils.logger.Information(e, "Couldn't read AnkiConfig");
                 return null;
             }
         }

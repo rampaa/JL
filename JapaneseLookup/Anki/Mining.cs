@@ -1,6 +1,6 @@
-﻿using System;
+﻿using JapaneseLookup.Utilities;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -83,18 +83,17 @@ namespace JapaneseLookup.Anki
 
                 if (response == null)
                 {
-                    Console.WriteLine($"Mining failed for {foundSpelling}");
+                    Utils.logger.Information($"Mining failed for {foundSpelling}");
                 }
                 else
                 {
-                    Console.WriteLine($"Mined {foundSpelling}");
+                    Utils.logger.Information($"Mined {foundSpelling}");
                     if (ConfigManager.ForceSyncAnki) await AnkiConnect.Sync();
                 }
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e);
-                Console.WriteLine($"Mining failed for {foundSpelling}");
+                Utils.logger.Information(e, $"Mining failed for {foundSpelling}");
             }
         }
 

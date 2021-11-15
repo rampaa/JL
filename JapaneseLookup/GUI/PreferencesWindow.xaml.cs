@@ -4,9 +4,9 @@ using JapaneseLookup.Abstract;
 using JapaneseLookup.Anki;
 using JapaneseLookup.Dicts;
 using JapaneseLookup.EDICT;
+using JapaneseLookup.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -145,7 +145,7 @@ namespace JapaneseLookup.GUI
             catch (Exception e)
             {
                 // config probably doesn't exist; no need to alert the user
-                Debug.WriteLine(e);
+                Utils.logger.Information(e, "AnkiConfig does not exist, probably.");
                 throw;
             }
         }
@@ -166,7 +166,7 @@ namespace JapaneseLookup.GUI
             }
             catch
             {
-                Console.WriteLine("Error getting deck and model names");
+                Utils.logger.Information("Error getting deck and model names");
                 MiningSetupComboBoxDeckNames.ItemsSource = "";
                 MiningSetupComboBoxModelNames.ItemsSource = "";
             }
@@ -193,8 +193,7 @@ namespace JapaneseLookup.GUI
             }
             catch (Exception exception)
             {
-                Console.WriteLine("Error getting fields from AnkiConnect");
-                Debug.WriteLine(exception);
+                Utils.logger.Information(exception, "Error getting fields from AnkiConnect");
             }
         }
 
@@ -217,8 +216,7 @@ namespace JapaneseLookup.GUI
             }
             catch (Exception exception)
             {
-                Console.WriteLine("Error creating field elements");
-                Debug.WriteLine(exception);
+                Utils.logger.Information(exception, "Error creating field elements");
             }
         }
 
@@ -251,7 +249,7 @@ namespace JapaneseLookup.GUI
                 if (MiningSetupComboBoxDeckNames.SelectedItem == null ||
                     MiningSetupComboBoxModelNames.SelectedItem == null)
                 {
-                    Console.WriteLine("Incomplete config");
+                    Utils.logger.Information("Incomplete config");
                     return;
                 }
 
@@ -262,8 +260,7 @@ namespace JapaneseLookup.GUI
             }
             catch (Exception exception)
             {
-                Console.WriteLine("Error saving config");
-                Debug.WriteLine(exception);
+                Utils.logger.Information(exception, "Error saving Anki config");
             }
         }
 

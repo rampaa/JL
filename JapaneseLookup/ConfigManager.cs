@@ -11,7 +11,6 @@ using JapaneseLookup.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -131,8 +130,6 @@ namespace JapaneseLookup
 
         public static async Task ApplyPreferences(MainWindow mainWindow)
         {
-            CreateDefaultAppConfig();
-
             string tempStr = ConfigurationManager.AppSettings.Get("FrequencyListName");
 
             if (tempStr == null)
@@ -683,7 +680,7 @@ namespace JapaneseLookup
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e);
+                Utils.logger.Information(e, "SerializeDicts failed.");
                 throw;
             }
         }
@@ -716,12 +713,12 @@ namespace JapaneseLookup
                 }
                 else
                 {
-                    Console.WriteLine("Couldn't load Config/dicts.json");
+                    Utils.logger.Information("Couldn't load Config/dicts.json");
                 }
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e);
+                Utils.logger.Information(e, "DeserializeDicts failed.");
                 throw;
             }
         }
@@ -745,8 +742,7 @@ namespace JapaneseLookup
             }
             catch (Exception e)
             {
-                Console.WriteLine("Couldn't write default Dicts config");
-                Debug.WriteLine(e);
+                Utils.logger.Information(e, "Couldn't write default Dicts config");
             }
         }
 

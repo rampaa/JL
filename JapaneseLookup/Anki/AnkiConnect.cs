@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JapaneseLookup.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
@@ -84,19 +85,17 @@ namespace JapaneseLookup.Anki
 
                 if (json!.Error == null) return json;
 
-                Console.WriteLine(json.Error.ToString());
+                Utils.logger.Information(json.Error.ToString());
                 return null;
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine("Communication error: Is Anki open?");
-                Debug.WriteLine(e);
+                Utils.logger.Information(e, "Communication error: Is Anki open?");
                 return null;
             }
             catch (Exception e)
             {
-                Console.WriteLine("Communication error: Unknown error");
-                Debug.WriteLine(e);
+                Utils.logger.Information(e, "Communication error: Unknown error");
                 return null;
             }
         }
