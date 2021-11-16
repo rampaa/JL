@@ -26,7 +26,7 @@ namespace JapaneseLookup.Anki
             Tags = tags;
         }
 
-        public static async Task CreateDefaultConfig()
+        public static async Task CreateDefaultAnkiConfig()
         {
             await WriteAnkiConfig(new AnkiConfig(
                     "JLDeck",

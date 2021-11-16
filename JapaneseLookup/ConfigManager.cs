@@ -464,11 +464,11 @@ namespace JapaneseLookup
             preferenceWindow.TextboxFontSizeNumericUpDown.Value = mainWindow.FontSizeSlider.Value;
             preferenceWindow.TextboxOpacityNumericUpDown.Value = mainWindow.OpacitySlider.Value;
 
-            preferenceWindow.MainWindowFontComboBox.ItemsSource = UIControls.JapaneseFonts;
-            preferenceWindow.MainWindowFontComboBox.SelectedIndex = UIControls.JapaneseFonts.FindIndex(f => f.Content.ToString() == mainWindow.MainTextBox.FontFamily.Source);
+            preferenceWindow.MainWindowFontComboBox.ItemsSource = UiControls.JapaneseFonts;
+            preferenceWindow.MainWindowFontComboBox.SelectedIndex = UiControls.JapaneseFonts.FindIndex(f => f.Content.ToString() == mainWindow.MainTextBox.FontFamily.Source);
 
-            preferenceWindow.PopupFontComboBox.ItemsSource = UIControls.PopupJapaneseFonts;
-            preferenceWindow.PopupFontComboBox.SelectedIndex = UIControls.PopupJapaneseFonts.FindIndex(f => f.Content.ToString() == PopupFont.Source);
+            preferenceWindow.PopupFontComboBox.ItemsSource = UiControls.PopupJapaneseFonts;
+            preferenceWindow.PopupFontComboBox.SelectedIndex = UiControls.PopupJapaneseFonts.FindIndex(f => f.Content.ToString() == PopupFont.Source);
 
             preferenceWindow.PopupMaxHeightNumericUpDown.Value = PopupMaxHeight;
             preferenceWindow.PopupMaxWidthNumericUpDown.Value = PopupMaxWidth;

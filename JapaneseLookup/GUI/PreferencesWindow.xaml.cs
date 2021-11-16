@@ -254,7 +254,7 @@ namespace JapaneseLookup.GUI
                 }
 
                 var ankiConfig = new AnkiConfig(deckName, modelName, fields, tags);
-                Console.WriteLine(await AnkiConfig.WriteAnkiConfig(ankiConfig).ConfigureAwait(false) == true
+                Console.WriteLine(await AnkiConfig.WriteAnkiConfig(ankiConfig).ConfigureAwait(false)
                     ? "Saved config"
                     : "Error saving config");
             }

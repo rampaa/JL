@@ -6,7 +6,7 @@ namespace JapaneseLookup.Utilities
 {
     // Creating a UI control within ConfigManager makes half of the tests fail
     // Because apparently UI controls can only be created in a UI thread and tests don't like that.
-    public static class UIControls
+    public static class UiControls
     {
         public static readonly List<ComboBoxItem> JapaneseFonts =
             Utils.FindJapaneseFonts().OrderByDescending(f => f.Foreground.ToString()).ThenBy(font => font.Content).ToList();
