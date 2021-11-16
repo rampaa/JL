@@ -379,7 +379,7 @@ namespace JapaneseLookup.GUI
 
                     // KANJIDIC
                     case LookupResult.OnReadings:
-                        if (!value.Any())
+                        if (value?.Any() != true)
                             break;
 
                         textBlockOnReadings = new TextBlock
@@ -393,7 +393,7 @@ namespace JapaneseLookup.GUI
                         break;
 
                     case LookupResult.KunReadings:
-                        if (!value.Any())
+                        if (value?.Any() != true)
                             break;
 
                         textBlockKunReadings = new TextBlock
@@ -407,7 +407,7 @@ namespace JapaneseLookup.GUI
                         break;
 
                     case LookupResult.Nanori:
-                        if (!value.Any())
+                        if (value?.Any() != true)
                             break;
 
                         textBlockNanori = new TextBlock
