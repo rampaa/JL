@@ -267,15 +267,15 @@ namespace JapaneseLookup.GUI
                         textBlockFoundSpelling.PreviewMouseUp += FoundSpelling_PreviewMouseUp; // for mining
                         break;
 
-                    case LookupResult.KanaSpellings:
-                        // var textBlockKanaSpellings = new TextBlock
-                        // {
-                        //     Name = "kanaSpellings",
-                        //     Text = string.Join(" ", result["kanaSpellings"]),
-                        //     TextWrapping = TextWrapping.Wrap,
-                        //     Foreground = Brushes.White
-                        // };
-                        break;
+                    //case LookupResult.KanaSpellings:
+                    //    // var textBlockKanaSpellings = new TextBlock
+                    //    // {
+                    //    //     Name = "kanaSpellings",
+                    //    //     Text = string.Join(" ", result["kanaSpellings"]),
+                    //    //     TextWrapping = TextWrapping.Wrap,
+                    //    //     Foreground = Brushes.White
+                    //    // };
+                    //    break;
 
                     case LookupResult.Readings:
                         result.TryGetValue(LookupResult.ROrthographyInfoList, out var rOrthographyInfoList);

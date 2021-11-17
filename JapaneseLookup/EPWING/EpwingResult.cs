@@ -9,7 +9,7 @@ namespace JapaneseLookup.EPWING
         public string Reading { get; init; }
         public List<string> WordClasses { get; set; } //e.g. noun +
         public string PrimarySpelling { get; init; }
-        public string KanaSpelling { get; set; }
+        // public string KanaSpelling { get; set; }
 
         public EpwingResult()
         {
@@ -17,7 +17,7 @@ namespace JapaneseLookup.EPWING
             Reading = null;
             WordClasses = new List<string>();
             PrimarySpelling = null;
-            KanaSpelling = null;
+            // KanaSpelling = null;
         }
     }
 }

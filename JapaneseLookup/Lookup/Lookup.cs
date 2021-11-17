@@ -545,7 +545,7 @@ namespace JapaneseLookup.Lookup
 
                     var foundSpelling = new List<string> { jMDictResult.PrimarySpelling };
 
-                    var kanaSpellings = jMDictResult.KanaSpellings ?? new List<string>();
+                    //var kanaSpellings = jMDictResult.KanaSpellings ?? new List<string>();
 
                     var readings = jMDictResult.Readings.ToList();
                     var foundForm = new List<string> { wordResult.Value.FoundForm };
@@ -598,7 +598,7 @@ namespace JapaneseLookup.Lookup
                     }
 
                     result.Add(LookupResult.FoundSpelling, foundSpelling);
-                    result.Add(LookupResult.KanaSpellings, kanaSpellings);
+                    //result.Add(LookupResult.KanaSpellings, kanaSpellings);
                     result.Add(LookupResult.Readings, readings);
                     result.Add(LookupResult.Definitions, definitions);
                     result.Add(LookupResult.FoundForm, foundForm);

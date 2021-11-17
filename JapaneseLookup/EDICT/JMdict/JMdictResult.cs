@@ -19,7 +19,7 @@ namespace JapaneseLookup.EDICT.JMdict
         public List<List<string>> MiscList { get; set; } // e.g. "abbr" +
         public List<string> SpellingInfo { get; set; } // e.g. "often derog" +
         public List<string> Dialects { get; set; } // e.g. ksb
-        public List<string> KanaSpellings { get; set; }
+        // public List<string> KanaSpellings { get; set; }
         public string PrimarySpelling { get; set; }
         //public List<string> PriorityList { get; set; } // e.g. gai1
         //public List<string> Antonyms { get; set; }
@@ -42,7 +42,7 @@ namespace JapaneseLookup.EDICT.JMdict
             SpellingInfo = new List<string>();
             Dialects = new List<string>();
             //FrequencyDict = new Dictionary<string, Frequency>();
-            KanaSpellings = new List<string>();
+            //KanaSpellings = new List<string>();
             PrimarySpelling = null;
             //PriorityList = new List<string>();
             //RelatedTerms = new List<string>();

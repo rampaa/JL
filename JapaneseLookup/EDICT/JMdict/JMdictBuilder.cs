@@ -80,15 +80,14 @@ namespace JapaneseLookup.EDICT.JMdict
             {
                 string key = Kana.KatakanaToHiraganaConverter(rEle.Reb);
 
-                if (resultList.TryGetValue(key, out var previousResult))
+                if (resultList.ContainsKey(key))
                 {
-                    previousResult.KanaSpellings.Add(rEle.Reb);
                     continue;
                 }
 
                 JMdictResult result = new();
 
-                result.KanaSpellings.Add(rEle.Reb);
+                //result.KanaSpellings.Add(rEle.Reb);
 
                 if (rEle.ReRestrList.Any())
                     result.AlternativeSpellings = rEle.ReRestrList;
@@ -166,8 +165,8 @@ namespace JapaneseLookup.EDICT.JMdict
                 if (!rl.Value.Dialects.Any())
                     rl.Value.Dialects = null;
 
-                if (!rl.Value.KanaSpellings.Any())
-                    rl.Value.KanaSpellings = null;
+                //if (!rl.Value.KanaSpellings.Any())
+                //    rl.Value.KanaSpellings = null;
 
                 if (!rl.Value.MiscList.Any())
                     rl.Value.MiscList = null;

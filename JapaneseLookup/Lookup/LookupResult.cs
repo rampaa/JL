@@ -9,7 +9,7 @@
 
         // EDICT (and EPWING?)
         FoundSpelling,
-        KanaSpellings,
+        // KanaSpellings,
         Readings,
         Definitions,
         EdictID,

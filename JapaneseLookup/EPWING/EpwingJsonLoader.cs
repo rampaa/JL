@@ -60,14 +60,15 @@ namespace JapaneseLookup.EPWING
                     continue;
 
                 string hiraganaExpression = Kana.KatakanaToHiraganaConverter(entry.Expression);
-                if (hiraganaExpression != entry.Expression && string.IsNullOrEmpty(entry.Reading))
-                    result.KanaSpelling = entry.Expression;
+
+                //if (hiraganaExpression != entry.Expression && string.IsNullOrEmpty(entry.Reading))
+                //    result.KanaSpelling = entry.Expression;
 
                 if (!string.IsNullOrEmpty(entry.Reading))
                 {
                     string hiraganaReading = Kana.KatakanaToHiraganaConverter(entry.Reading);
-                    if (hiraganaReading != entry.Reading)
-                        result.KanaSpelling = entry.Reading;
+                    //if (hiraganaReading != entry.Reading)
+                    //    result.KanaSpelling = entry.Reading;
 
                     if (epwingDictionary.TryGetValue(hiraganaReading, out List<IResult> tempList2))
                         tempList2.Add(result);
