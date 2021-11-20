@@ -547,15 +547,11 @@ namespace JapaneseLookup.Lookup
 
                     //var kanaSpellings = jMDictResult.KanaSpellings ?? new List<string>();
 
-                    var readings = jMDictResult.Readings.ToList();
+                    var readings = jMDictResult.Readings ?? new List<string>();
                     var foundForm = new List<string> { wordResult.Value.FoundForm };
                     var edictID = new List<string> { jMDictResult.Id };
 
-                    List<string> alternativeSpellings;
-                    if (jMDictResult.AlternativeSpellings != null)
-                        alternativeSpellings = jMDictResult.AlternativeSpellings.ToList();
-                    else
-                        alternativeSpellings = new List<string>();
+                    var alternativeSpellings = jMDictResult.AlternativeSpellings ?? new List<string>();
                     var process = wordResult.Value.ProcessList;
 
                     var frequency = GetJMDictFreq(jMDictResult);
@@ -845,9 +841,7 @@ namespace JapaneseLookup.Lookup
 
                     var foundSpelling = new List<string> { jMnedictResult.PrimarySpelling };
 
-                    var readings = jMnedictResult.Readings != null
-                        ? jMnedictResult.Readings.ToList()
-                        : new List<string>();
+                    var readings = jMnedictResult.Readings ?? new List<string>();
 
                     var foundForm = new List<string> { nameResult.Value.FoundForm };
 
@@ -958,7 +952,8 @@ namespace JapaneseLookup.Lookup
 
                     var foundSpelling = new List<string> { customWordDictResult.PrimarySpelling };
 
-                    var readings = customWordDictResult.Readings.ToList();
+                    var readings = customWordDictResult.Readings != null
+                        ? customWordDictResult.Readings.ToList() : new List<string>();
                     var foundForm = new List<string> { wordResult.Value.FoundForm };
 
                     List<string> alternativeSpellings;

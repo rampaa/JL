@@ -7,6 +7,7 @@ using JapaneseLookup.EPWING;
 using JapaneseLookup.Frequency;
 using JapaneseLookup.GUI;
 using JapaneseLookup.KANJIDIC;
+using JapaneseLookup.PoS;
 using JapaneseLookup.Utilities;
 using System;
 using System.Collections.Generic;
@@ -768,20 +769,20 @@ namespace JapaneseLookup
         private static async Task LoadDictionaries()
         {
             var tasks = new List<Task>();
-
-
+            Task jMDictTask = null;
             bool dictRemoved = false;
 
             foreach ((DictType _, Dict dict) in Dicts)
             {
-
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
                         // initial jmdict load
                         if (dict.Active && !Dicts[DictType.JMdict].Contents.Any())
                         {
-                            tasks.Add(Task.Run(async () => await JMdictLoader.Load(dict.Path).ConfigureAwait(false)));
+                            jMDictTask = Task.Run(async () => await JMdictLoader.Load(dict.Path).ConfigureAwait(false));
+
+                            tasks.Add(jMDictTask);
                         }
 
                         else if (!dict.Active && Dicts[DictType.JMdict].Contents.Any())
@@ -937,6 +938,31 @@ namespace JapaneseLookup
                 }
             }
 
+            if (JmdictWcLoader.WcDict == null || !JmdictWcLoader.WcDict.Any())
+            {
+                Task taskLoadWc = Task.Run(async () => {
+
+                    if (!File.Exists(Path.Join(ApplicationPath, "Resource/wc.json")))
+                    {
+                        if (Dicts[DictType.JMdict].Active)
+                        {
+                            await jMDictTask.ConfigureAwait(false);
+                            await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
+                        }
+
+                        else
+                        {
+                            await Task.Run(async () => await JMdictLoader.Load(Dicts[DictType.JMdict].Path).ConfigureAwait(false));
+                            await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
+                            Dicts[DictType.JMdict].Contents.Clear();
+                        }
+                    }
+                    await JmdictWcLoader.Load();
+                });
+
+                tasks.Add(taskLoadWc);
+            }
+
             if (tasks.Any() || dictRemoved)
             {
                 if (tasks.Any())
@@ -948,7 +974,6 @@ namespace JapaneseLookup
                     //MessageBox.Show("Time taken: " + timeTaken.ToString(@"m\:ss\.fff"), "");
                     //});
                 }
-
                 GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
             }

@@ -4,6 +4,10 @@ using JapaneseLookup.Abstract;
 using JapaneseLookup.Anki;
 using JapaneseLookup.Dicts;
 using JapaneseLookup.EDICT;
+using JapaneseLookup.EDICT.JMdict;
+using JapaneseLookup.EDICT.JMnedict;
+using JapaneseLookup.KANJIDIC;
+using JapaneseLookup.PoS;
 using JapaneseLookup.Utilities;
 using System;
 using System.Collections.Generic;
@@ -87,6 +91,15 @@ namespace JapaneseLookup.GUI
                 new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
                 DictType.JMdict.ToString(), true)
                 .ConfigureAwait(false);
+
+            await Task.Run(async () => await JMdictLoader
+                .Load(ConfigManager.Dicts[DictType.JMdict].Path).ConfigureAwait(false));
+
+            await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
+
+            JmdictWcLoader.WcDict.Clear();
+
+            await JmdictWcLoader.Load().ConfigureAwait(false);
         }
 
         private async void UpdateJMnedictButton_Click(object sender, RoutedEventArgs e)
@@ -95,7 +108,11 @@ namespace JapaneseLookup.GUI
                 new Uri("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz"),
                 DictType.JMnedict.ToString(), true)
                 .ConfigureAwait(false);
+
+            await Task.Run(async () => await JMnedictLoader
+                .Load(ConfigManager.Dicts[DictType.JMnedict].Path).ConfigureAwait(false));
         }
+
 
         private async void UpdateKanjidicButton_Click(object sender, RoutedEventArgs e)
         {
@@ -103,6 +120,9 @@ namespace JapaneseLookup.GUI
                 new Uri("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz"),
                 DictType.Kanjidic.ToString(), true)
                 .ConfigureAwait(false);
+
+            await Task.Run(async () => await KanjiInfoLoader
+                .Load(ConfigManager.Dicts[DictType.Kanjidic].Path).ConfigureAwait(false));
         }
 
         private async void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

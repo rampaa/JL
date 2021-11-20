@@ -150,6 +150,9 @@ namespace JapaneseLookup.EDICT.JMdict
 
             foreach (KeyValuePair<string, JMdictResult> rl in resultList)
             {
+                if (!rl.Value.Readings.Any())
+                    rl.Value.Readings = null;
+
                 if (!rl.Value.AlternativeSpellings.Any())
                     rl.Value.AlternativeSpellings = null;
 

@@ -18,8 +18,8 @@ namespace JapaneseLookup.EPWING
 
         public EpwingEntry(List<JsonElement> jsonElement)
         {
-            Expression = jsonElement[0].ToString();
-            Reading = jsonElement[1].ToString();
+            Expression = jsonElement[0].ToString() == "" ? null : jsonElement[0].ToString();
+            Reading = jsonElement[1].ToString() == "" ? null : jsonElement[1].ToString();
             DefinitionTags = jsonElement[2].ToString();
 
             Rules = jsonElement[3].ToString().Split(" ").ToList();
