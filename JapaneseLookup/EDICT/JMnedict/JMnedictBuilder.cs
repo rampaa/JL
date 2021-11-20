@@ -74,9 +74,6 @@ namespace JapaneseLookup.EDICT.JMnedict
                 rl.Value.Id = entry.Id;
                 string key = rl.Key;
 
-                if (!rl.Value.Readings.Any())
-                    rl.Value.Readings = null;
-
                 if (!rl.Value.AlternativeSpellings.Any())
                     rl.Value.AlternativeSpellings = null;
 
