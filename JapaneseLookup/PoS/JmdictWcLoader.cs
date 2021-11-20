@@ -59,53 +59,46 @@ namespace JapaneseLookup.PoS
             {
                 foreach (EDICT.JMdict.JMdictResult value in values)
                 {
-                    JmdictWC temp = new();
-
                     if (!value.WordClasses?.Any() ?? true)
                         continue;
 
-                    temp.WordClasses = value.WordClasses.SelectMany(wc => wc).ToHashSet().ToList();
+                    var wordClasses = value.WordClasses?.SelectMany(wc => wc).ToHashSet().ToList() ?? null;
+
+                    if (wordClasses == null)
+                        continue;
 
                     foreach (string unusedWc in unusedWcs)
                     {
-                        temp.WordClasses.Remove(unusedWc);
+                        wordClasses.Remove(unusedWc);
                     }
 
-                    if (!temp.WordClasses.Any())
+                    if (!wordClasses.Any())
                         continue;
-
-                    temp.Readings = value.Readings;
-
-                    temp.Spelling = value.PrimarySpelling;
 
                     if (jmdictWcDict.TryGetValue(value.PrimarySpelling, out var pSR))
                     {
-                        if (!pSR.Any(r => r.Readings?.SequenceEqual(temp?.Readings ?? new List<string>()) ?? temp.Readings == null))
-                            pSR.Add(temp);
+                        if (!pSR.Any(r => r.Readings?.SequenceEqual(value?.Readings ?? new List<string>()) ?? value.Readings == null && r.Spelling == value.PrimarySpelling))
+                            pSR.Add(new JmdictWC(value.PrimarySpelling, value.Readings, wordClasses));
                     }
 
                     else
                     {
-                        jmdictWcDict.Add(value.PrimarySpelling, new List<JmdictWC> { temp });
+                        jmdictWcDict.Add(value.PrimarySpelling, new List<JmdictWC> { new JmdictWC(value.PrimarySpelling, value.Readings, wordClasses) });
                     }
 
                     if (value.AlternativeSpellings != null)
                     {
-
                         foreach (var spelling in value.AlternativeSpellings)
                         {
-                            temp.Spelling = spelling;
-
                             if (jmdictWcDict.TryGetValue(spelling, out var aSR))
                             {
-                                if (!aSR.Any(r => r.Readings?.SequenceEqual(temp?.Readings ?? new List<string>()) ?? temp.Readings == null))
-                                    aSR.Add(temp);
-
+                                if (!aSR.Any(r => r.Readings?.SequenceEqual(value?.Readings ?? new List<string>()) ?? value.Readings == null && r.Spelling == spelling))
+                                    aSR.Add(new JmdictWC(spelling, value.Readings, wordClasses));
                             }
 
                             else
                             {
-                                jmdictWcDict.Add(spelling, new List<JmdictWC> { temp });
+                                jmdictWcDict.Add(spelling, new List<JmdictWC> { new JmdictWC(spelling, value.Readings, wordClasses) });
                             }
                         }
                     }
