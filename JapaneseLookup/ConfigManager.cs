@@ -58,6 +58,8 @@ namespace JapaneseLookup
             { "None", "" }
         };
 
+        private static bool initializedPoS = false;
+
         public static readonly Dictionary<DictType, Dict> Dicts = new();
 
         public static string AnkiConnectUri { get; set; } = "http://localhost:8765";
@@ -777,7 +779,7 @@ namespace JapaneseLookup
             Task jMDictTask = null;
             bool dictRemoved = false;
 
-            foreach ((DictType _, Dict dict) in Dicts)
+            foreach ((DictType _, Dict dict) in Dicts.ToList())
             {
                 switch (dict.Type)
                 {
@@ -943,7 +945,7 @@ namespace JapaneseLookup
                 }
             }
 
-            if (JmdictWcLoader.WcDict == null || !JmdictWcLoader.WcDict.Any())
+            if (!initializedPoS)
             {
                 Task taskLoadWc = Task.Run(async () => {
 
@@ -966,6 +968,8 @@ namespace JapaneseLookup
                     }
                     await JmdictWcLoader.Load();
                 });
+
+                initializedPoS = true;
 
                 tasks.Add(taskLoadWc);
             }

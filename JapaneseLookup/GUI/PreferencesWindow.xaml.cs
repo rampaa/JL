@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -92,6 +93,8 @@ namespace JapaneseLookup.GUI
                 DictType.JMdict.ToString(), true, false)
                 .ConfigureAwait(false);
 
+            ConfigManager.Dicts[DictType.JMdict].Contents.Clear();
+
             await Task.Run(async () => await JMdictLoader
                 .Load(ConfigManager.Dicts[DictType.JMdict].Path).ConfigureAwait(false));
 
@@ -100,6 +103,12 @@ namespace JapaneseLookup.GUI
             JmdictWcLoader.WcDict.Clear();
 
             await JmdictWcLoader.Load().ConfigureAwait(false);
+
+            if (!ConfigManager.Dicts[DictType.JMdict].Active)
+                ConfigManager.Dicts[DictType.JMdict].Contents.Clear();
+
+            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
         }
 
         private async void UpdateJMnedictButton_Click(object sender, RoutedEventArgs e)
@@ -109,10 +118,17 @@ namespace JapaneseLookup.GUI
                 DictType.JMnedict.ToString(), true, false)
                 .ConfigureAwait(false);
 
+            ConfigManager.Dicts[DictType.JMnedict].Contents.Clear();
+
             await Task.Run(async () => await JMnedictLoader
                 .Load(ConfigManager.Dicts[DictType.JMnedict].Path).ConfigureAwait(false));
-        }
 
+            if (!ConfigManager.Dicts[DictType.JMnedict].Active)
+                ConfigManager.Dicts[DictType.JMnedict].Contents.Clear();
+
+            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+        }
 
         private async void UpdateKanjidicButton_Click(object sender, RoutedEventArgs e)
         {
@@ -121,8 +137,16 @@ namespace JapaneseLookup.GUI
                 DictType.Kanjidic.ToString(), true, false)
                 .ConfigureAwait(false);
 
+            ConfigManager.Dicts[DictType.Kanjidic].Contents.Clear();
+
             await Task.Run(async () => await KanjiInfoLoader
                 .Load(ConfigManager.Dicts[DictType.Kanjidic].Path).ConfigureAwait(false));
+
+            if (!ConfigManager.Dicts[DictType.Kanjidic].Active)
+                ConfigManager.Dicts[DictType.Kanjidic].Contents.Clear();
+
+            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
         }
 
         private async void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

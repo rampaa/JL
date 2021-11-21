@@ -55,7 +55,7 @@ namespace JapaneseLookup.PoS
                 "exp", "vs", "vz"
             };
 
-            foreach (var (key, values) in ConfigManager.Dicts[Dicts.DictType.JMdict].Contents)
+            foreach (var (key, values) in ConfigManager.Dicts[Dicts.DictType.JMdict].Contents.ToList())
             {
                 foreach (EDICT.JMdict.JMdictResult value in values)
                 {
