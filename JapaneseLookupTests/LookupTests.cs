@@ -1,10 +1,13 @@
 ﻿using JapaneseLookup;
 using JapaneseLookup.Abstract;
 using JapaneseLookup.Dicts;
+using JapaneseLookup.EDICT;
 using JapaneseLookup.EDICT.JMdict;
 using JapaneseLookup.Lookup;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
 
 namespace JapaneseLookupTests
@@ -21,9 +24,18 @@ namespace JapaneseLookupTests
         public void ClassInit()
         {
             string jmdictPath = ConfigManager.BuiltInDicts["JMdict"].Path;
+
             ConfigManager.Dicts.Add(DictType.JMdict, new Dict(DictType.JMdict, jmdictPath, true, 0));
             ConfigManager.Dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();
-            JMdictLoader.Load(jmdictPath).Wait();
+
+            if (!File.Exists(Path.Join(ConfigManager.ApplicationPath, jmdictPath)))
+            {
+                ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMdict].Path,
+                    new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
+                    DictType.JMdict.ToString(), false).Wait();
+            }
+
+            JMdictLoader.Load(ConfigManager.Dicts[DictType.JMdict].Path).Wait();
         }
 
         [Test]
