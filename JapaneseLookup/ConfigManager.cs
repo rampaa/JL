@@ -117,7 +117,7 @@ namespace JapaneseLookup
         public static int PopupMaxHeight { get; set; } = 520;
         public static int PopupXOffset { get; set; } = 10;
         public static int PopupYOffset { get; set; } = 20;
-        public static bool PopupFlipX { get; set; } = false;
+        public static bool PopupFlipX { get; set; } = true;
         public static bool PopupFlipY { get; set; } = true;
         public static FontFamily PopupFont { get; set; } = new("Meiryo");
 
@@ -281,12 +281,12 @@ namespace JapaneseLookup
 
             if (tempStr == null)
             {
-                tempStr = "Y";
+                tempStr = "Both";
 
                 Utils.AddToConfig("PopupFlip", tempStr);
 
                 if (ConfigurationManager.AppSettings.Get("PopupFlipX") == null)
-                    Utils.AddToConfig("PopupFlipX", "False");
+                    Utils.AddToConfig("PopupFlipX", "True");
                 if (ConfigurationManager.AppSettings.Get("PopupFlipY") == null)
                     Utils.AddToConfig("PopupFlipY", "True");
             }
