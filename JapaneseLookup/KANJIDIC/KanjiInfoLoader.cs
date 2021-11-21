@@ -79,6 +79,12 @@ namespace JapaneseLookup.KANJIDIC
                     DictType.Kanjidic.ToString(), false).ConfigureAwait(false);
                 await Load(ConfigManager.Dicts[DictType.Kanjidic].Path).ConfigureAwait(false);
             }
+
+            else
+            {
+                ConfigManager.Dicts[DictType.Kanjidic].Active = false;
+                ConfigManager.SerializeDicts();
+            }
         }
 
         private static void ReadCharacter(XmlReader kanjiDicXml, Dictionary<string, string> kanjiCompositionDictionary)

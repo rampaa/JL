@@ -663,7 +663,7 @@ namespace JapaneseLookup
             config.Save(ConfigurationSaveMode.Modified);
         }
 
-        private static void SerializeDicts()
+        public static void SerializeDicts()
         {
             try
             {

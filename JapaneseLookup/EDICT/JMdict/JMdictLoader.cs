@@ -38,6 +38,12 @@ namespace JapaneseLookup.EDICT.JMdict
                     DictType.JMdict.ToString(), false).ConfigureAwait(false);
                 await Load(ConfigManager.Dicts[DictType.JMdict].Path).ConfigureAwait(false);
             }
+
+            else
+            {
+                ConfigManager.Dicts[DictType.JMdict].Active = false;
+                ConfigManager.SerializeDicts();
+            }
         }
 
         private static void ReadEntry(XmlTextReader edictXml)
