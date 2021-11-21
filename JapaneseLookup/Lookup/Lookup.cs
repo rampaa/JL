@@ -643,20 +643,18 @@ namespace JapaneseLookup.Lookup
                 }
             }
 
-            else
+            else if (!string.IsNullOrEmpty(epwingResult.Reading)
+                && freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingResult.Reading),
+                out var readingFreqResults))
             {
-                if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingResult.Reading),
-                    out var readingFreqResults))
+                foreach (var readingFreqResult in readingFreqResults)
                 {
-                    foreach (var readingFreqResult in readingFreqResults)
+                    if (epwingResult.Reading == readingFreqResult.Spelling && Kana.IsKatakana(epwingResult.Reading))
                     {
-                        if (epwingResult.Reading == readingFreqResult.Spelling && Kana.IsKatakana(epwingResult.Reading))
+                        if (freqValue > readingFreqResult.Frequency)
                         {
-                            if (freqValue > readingFreqResult.Frequency)
-                            {
-                                freqValue = readingFreqResult.Frequency;
-                                frequency = new List<string> { readingFreqResult.Frequency.ToString() };
-                            }
+                            freqValue = readingFreqResult.Frequency;
+                            frequency = new List<string> { readingFreqResult.Frequency.ToString() };
                         }
                     }
                 }
@@ -720,7 +718,7 @@ namespace JapaneseLookup.Lookup
                 }
             }
 
-            else
+            else if (jMDictResult.Readings != null)
             {
                 foreach (var reading in jMDictResult.Readings)
                 {

@@ -18,69 +18,50 @@ namespace JapaneseLookup.EPWING
             if (!(Directory.Exists(dictPath) || File.Exists(dictPath)))
                 return;
 
-            List<EpwingEntry> epwingEntryList = new();
             string[] jsonFiles = Directory.GetFiles(dictPath, "*_bank_*.json");
 
             foreach (string jsonFile in jsonFiles)
             {
                 await using FileStream openStream = File.OpenRead(jsonFile);
-                var jsonObject = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream).ConfigureAwait(false);
+                var jsonObjects = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream).ConfigureAwait(false);
 
-                Debug.Assert(jsonObject != null, nameof(jsonObject) + " != null");
-                foreach (var obj in jsonObject)
+                Debug.Assert(jsonObjects != null, nameof(jsonObjects) + " != null");
+                foreach (var obj in jsonObjects)
                 {
-                    epwingEntryList.Add(new EpwingEntry(obj));
+                    DictionaryBuilder(new EpwingResult(obj), ConfigManager.Dicts[dictType].Contents, dictType);
                 }
             }
 
-            DictionaryBuilder(epwingEntryList, ConfigManager.Dicts[dictType].Contents, dictType);
             ConfigManager.Dicts[dictType].Contents.TrimExcess();
         }
 
-        private static void DictionaryBuilder(List<EpwingEntry> epwingEntryList,
+        private static void DictionaryBuilder(EpwingResult result,
             Dictionary<string, List<IResult>> epwingDictionary, DictType dictType)
         {
-            foreach (EpwingEntry entry in epwingEntryList)
-            {
-                var result = new EpwingResult
-                {
-                    Definitions = entry.Glossary,
-                    Reading = entry.Reading,
-                    PrimarySpelling = entry.Expression,
-                    WordClasses = entry.Rules
-                };
-
-                if (!result.WordClasses.Any())
-                    result.WordClasses = null;
-
-                if (!result.Definitions.Any())
-                    result.Definitions = null;
-
                 if (!IsValidEpwingResultForDictType(result, dictType))
-                    continue;
+                    return;
 
-                string hiraganaExpression = Kana.KatakanaToHiraganaConverter(entry.Expression);
+                string hiraganaExpression = Kana.KatakanaToHiraganaConverter(result.PrimarySpelling);
 
                 //if (hiraganaExpression != entry.Expression && string.IsNullOrEmpty(entry.Reading))
                 //    result.KanaSpelling = entry.Expression;
 
-                if (!string.IsNullOrEmpty(entry.Reading))
+                if (!string.IsNullOrEmpty(result.Reading))
                 {
-                    string hiraganaReading = Kana.KatakanaToHiraganaConverter(entry.Reading);
+                    string hiraganaReading = Kana.KatakanaToHiraganaConverter(result.Reading);
                     //if (hiraganaReading != entry.Reading)
                     //    result.KanaSpelling = entry.Reading;
 
                     if (epwingDictionary.TryGetValue(hiraganaReading, out List<IResult> tempList2))
                         tempList2.Add(result);
                     else
-                        epwingDictionary.TryAdd(entry.Reading, new List<IResult> { result });
+                        epwingDictionary.Add(hiraganaReading, new List<IResult> { result });
                 }
 
                 if (epwingDictionary.TryGetValue(hiraganaExpression, out List<IResult> tempList))
                     tempList.Add(result);
                 else
-                    epwingDictionary.TryAdd(hiraganaExpression, new List<IResult> { result });
-            }
+                    epwingDictionary.Add(hiraganaExpression, new List<IResult> { result });
         }
 
         private static bool IsValidEpwingResultForDictType(EpwingResult result, DictType dictType)

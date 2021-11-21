@@ -946,7 +946,9 @@ namespace JapaneseLookup
                     {
                         if (Dicts[DictType.JMdict].Active)
                         {
-                            await jMDictTask.ConfigureAwait(false);
+                            if (jMDictTask != null)
+                                await jMDictTask.ConfigureAwait(false);
+
                             await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
                         }
 
