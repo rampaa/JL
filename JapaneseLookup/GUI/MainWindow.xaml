@@ -33,15 +33,23 @@
             <TextBox.ContextMenu>
                 <ContextMenu>
                     <MenuItem
+                        Name ="AddNameButton"
                         Header="Add name"
-                        Click="AddName" />
+                        Click="AddName"
+                        InputGestureText=""/>
                     <MenuItem
+                        Name ="AddWordButton"
                         Header="Add word"
                         Click="AddWord" />
                     <MenuItem
+                        Header="Copy"
+                        Command="Copy" />
+                    <MenuItem
+                        Name ="SearchButton"
                         Header="Search"
                         Click="SearchWithBrowser" />
                     <MenuItem
+                        Name ="PreferencesButton"
                         Header="Preferences"
                         Click="ShowPreferences" />
                 </ContextMenu>

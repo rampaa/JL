@@ -334,6 +334,11 @@ namespace JapaneseLookup
             InactiveLookupModeKeyGesture =
                 Utils.KeyGestureSetter("InactiveLookupModeKeyGesture", InactiveLookupModeKeyGesture);
 
+            mainWindow.AddNameButton.InputGestureText = Utils.KeyGestureToString(ShowAddNameWindowKeyGesture);
+            mainWindow.AddWordButton.InputGestureText = Utils.KeyGestureToString(ShowAddWordWindowKeyGesture);
+            mainWindow.SearchButton.InputGestureText = Utils.KeyGestureToString(SearchWithBrowserKeyGesture);
+            mainWindow.PreferencesButton.InputGestureText = Utils.KeyGestureToString(ShowPreferencesWindowKeyGesture);
+
             Utils.Try(() => mainWindow.OpacitySlider.Value = double.Parse(ConfigurationManager.AppSettings
                 .Get("MainWindowOpacity")!), mainWindow.OpacitySlider.Value, "MainWindowOpacity");
             Utils.Try(() => mainWindow.FontSizeSlider.Value = double.Parse(ConfigurationManager.AppSettings
