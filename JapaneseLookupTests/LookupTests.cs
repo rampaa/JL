@@ -32,7 +32,7 @@ namespace JapaneseLookupTests
             {
                 ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMdict].Path,
                     new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
-                    DictType.JMdict.ToString(), false).Wait();
+                    DictType.JMdict.ToString(), false, true).Wait();
             }
 
             JMdictLoader.Load(ConfigManager.Dicts[DictType.JMdict].Path).Wait();

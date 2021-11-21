@@ -35,7 +35,7 @@ namespace JapaneseLookup.EDICT.JMnedict
             {
                 await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMnedict].Path,
                     new Uri("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz"),
-                    DictType.JMnedict.ToString(), false).ConfigureAwait(false);
+                    DictType.JMnedict.ToString(), false, false).ConfigureAwait(false);
                 await Load(ConfigManager.Dicts[DictType.JMnedict].Path).ConfigureAwait(false);
             }
 

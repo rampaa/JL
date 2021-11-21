@@ -89,7 +89,7 @@ namespace JapaneseLookup.GUI
         {
             await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMdict].Path,
                 new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
-                DictType.JMdict.ToString(), true)
+                DictType.JMdict.ToString(), true, false)
                 .ConfigureAwait(false);
 
             await Task.Run(async () => await JMdictLoader
@@ -106,7 +106,7 @@ namespace JapaneseLookup.GUI
         {
             await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMnedict].Path,
                 new Uri("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz"),
-                DictType.JMnedict.ToString(), true)
+                DictType.JMnedict.ToString(), true, false)
                 .ConfigureAwait(false);
 
             await Task.Run(async () => await JMnedictLoader
@@ -118,7 +118,7 @@ namespace JapaneseLookup.GUI
         {
             await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.Kanjidic].Path,
                 new Uri("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz"),
-                DictType.Kanjidic.ToString(), true)
+                DictType.Kanjidic.ToString(), true, false)
                 .ConfigureAwait(false);
 
             await Task.Run(async () => await KanjiInfoLoader

@@ -76,7 +76,7 @@ namespace JapaneseLookup.KANJIDIC
             {
                 await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.Kanjidic].Path,
                     new Uri("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz"),
-                    DictType.Kanjidic.ToString(), false).ConfigureAwait(false);
+                    DictType.Kanjidic.ToString(), false, false).ConfigureAwait(false);
                 await Load(ConfigManager.Dicts[DictType.Kanjidic].Path).ConfigureAwait(false);
             }
 
