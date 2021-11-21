@@ -104,7 +104,10 @@ namespace JapaneseLookup.GUI
                             "Character count: " + String.Join("", MainWindowUtilities.Backlog).Length + "\n"
                             + allBacklogText;
                         MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
-                        MainTextBox.CaretIndex = caretIndex;
+
+                        if (caretIndex >= 0)
+                            MainTextBox.CaretIndex = caretIndex;
+
                         MainTextBox.ScrollToEnd();
                     }
                 }
