@@ -24,7 +24,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Resource Include="App.config" />
+		<Resource Include="App.config">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
 	</ItemGroup>
 
 	<ItemGroup>
