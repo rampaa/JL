@@ -151,13 +151,9 @@ namespace JapaneseLookup.Lookup
         {
             return lookupResults
                 .OrderByDescending(dict => dict[LookupResult.FoundForm][0].Length)
-                .ThenBy(dict =>
-                {
-                    if (Enum.TryParse(dict[LookupResult.DictType][0], out DictType dictType))
-                        return ConfigManager.Dicts[dictType].Priority;
-                    else
-                        return int.MaxValue;
-                })
+                .ThenBy(dict => Enum.TryParse(dict[LookupResult.DictType][0], out DictType dictType)
+                    ? ConfigManager.Dicts[dictType].Priority
+                    : int.MaxValue)
                 .ThenBy(dict => Convert.ToInt32(dict[LookupResult.Frequency][0]))
                 .ToList();
         }
@@ -644,8 +640,8 @@ namespace JapaneseLookup.Lookup
             }
 
             else if (!string.IsNullOrEmpty(epwingResult.Reading)
-                && freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingResult.Reading),
-                out var readingFreqResults))
+                     && freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingResult.Reading),
+                         out var readingFreqResults))
             {
                 foreach (var readingFreqResult in readingFreqResults)
                 {
@@ -682,7 +678,7 @@ namespace JapaneseLookup.Lookup
                     if (jMDictResult.Readings != null &&
                         (jMDictResult.Readings.Contains(freqResult.Spelling)
                          || (!jMDictResult.Readings.Any() && jMDictResult.PrimarySpelling == freqResult.Spelling)))
-                    //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(freqResult.Spelling))
+                        //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(freqResult.Spelling))
                     {
                         if (freqValue > freqResult.Frequency)
                         {
@@ -720,25 +716,26 @@ namespace JapaneseLookup.Lookup
 
             else if (jMDictResult.Readings != null)
             {
-                foreach (var reading in jMDictResult.Readings)
-                {
-                    if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(reading), out var readingFreqResults))
+                if (jMDictResult.Readings != null)
+                    foreach (var reading in jMDictResult.Readings)
                     {
-                        foreach (var readingFreqResult in readingFreqResults)
+                        if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(reading), out var readingFreqResults))
                         {
-                            if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
-                            //|| (jMDictResult.AlternativeSpellings != null && jMDictResult.AlternativeSpellings.Contains(readingFreqResults.Spelling))
-                            //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
+                            foreach (var readingFreqResult in readingFreqResults)
                             {
-                                if (freqValue > readingFreqResult.Frequency)
+                                if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
+                                    //|| (jMDictResult.AlternativeSpellings != null && jMDictResult.AlternativeSpellings.Contains(readingFreqResults.Spelling))
+                                    //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                                 {
-                                    freqValue = readingFreqResult.Frequency;
-                                    frequency = new List<string> { readingFreqResult.Frequency.ToString() };
+                                    if (freqValue > readingFreqResult.Frequency)
+                                    {
+                                        freqValue = readingFreqResult.Frequency;
+                                        frequency = new List<string> { readingFreqResult.Frequency.ToString() };
+                                    }
                                 }
                             }
                         }
                     }
-                }
             }
 
             return frequency;
@@ -801,25 +798,26 @@ namespace JapaneseLookup.Lookup
 
             else
             {
-                foreach (var reading in customWordResult.Readings)
-                {
-                    if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(reading), out var readingFreqResults))
+                if (customWordResult.Readings != null)
+                    foreach (var reading in customWordResult.Readings)
                     {
-                        foreach (var readingFreqResult in readingFreqResults)
+                        if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(reading), out var readingFreqResults))
                         {
-                            if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
-                            //|| (jMDictResult.AlternativeSpellings != null && jMDictResult.AlternativeSpellings.Contains(readingFreqResults.Spelling))
-                            //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
+                            foreach (var readingFreqResult in readingFreqResults)
                             {
-                                if (freqValue > readingFreqResult.Frequency)
+                                if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
+                                    //|| (jMDictResult.AlternativeSpellings != null && jMDictResult.AlternativeSpellings.Contains(readingFreqResults.Spelling))
+                                    //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                                 {
-                                    freqValue = readingFreqResult.Frequency;
-                                    frequency = new List<string> { readingFreqResult.Frequency.ToString() };
+                                    if (freqValue > readingFreqResult.Frequency)
+                                    {
+                                        freqValue = readingFreqResult.Frequency;
+                                        frequency = new List<string> { readingFreqResult.Frequency.ToString() };
+                                    }
                                 }
                             }
                         }
                     }
-                }
             }
 
             return frequency;
@@ -951,7 +949,8 @@ namespace JapaneseLookup.Lookup
                     var foundSpelling = new List<string> { customWordDictResult.PrimarySpelling };
 
                     var readings = customWordDictResult.Readings != null
-                        ? customWordDictResult.Readings.ToList() : new List<string>();
+                        ? customWordDictResult.Readings.ToList()
+                        : new List<string>();
                     var foundForm = new List<string> { wordResult.Value.FoundForm };
 
                     List<string> alternativeSpellings;
