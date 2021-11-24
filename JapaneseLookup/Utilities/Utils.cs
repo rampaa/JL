@@ -13,7 +13,7 @@ namespace JapaneseLookup.Utilities
 {
     public static class Utils
     {
-        public static readonly Logger logger = new LoggerConfiguration().WriteTo.Console().WriteTo.File("Logs/log.txt",
+        public static readonly Logger logger = new LoggerConfiguration().WriteTo.File("Logs/log.txt",
             rollingInterval: RollingInterval.Minute,
             retainedFileTimeLimit: TimeSpan.FromDays(90),
             shared: true)
