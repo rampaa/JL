@@ -44,15 +44,6 @@
 		<None Update="Resources\ids.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Resources\JMdict.xml">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="Resources\JMnedict.xml">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="Resources\kanjidic2.xml">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
 	</ItemGroup>
 
 	<ProjectExtensions>

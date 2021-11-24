@@ -1,0 +1,46 @@
+# adapted from https://patriksvensson.se/2020/03/creating-release-artifacts-with-github-actions/
+name: Publish
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    name: Release
+    strategy:
+      matrix:
+        kind: ['windowsx64', 'windowsx86']
+        include:
+          - kind: windowsx64
+            os: windows-2022
+            target: win-x64
+          - kind: windowsx86
+            os: windows-2022
+            target: win-x86
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+          include-prerelease: true
+
+      - name: Build
+        shell: bash
+        run: |
+          tag=$(git describe --tags --abbrev=0)
+          release_name="JL-$tag-${{ matrix.target }}"
+          # Build everything
+          dotnet publish JapaneseLookup/JapaneseLookup.csproj --framework net6.0-windows --runtime "${{ matrix.target }}" --no-self-contained -c Release -o "$release_name"
+          # Pack files
+          7z a -tzip "${release_name}.zip" "./${release_name}/*"
+          # Delete output directory
+          rm -r "$release_name"
+      - name: Publish
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "JL*"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
