@@ -14,7 +14,7 @@ namespace JapaneseLookup.Utilities
     public static class Utils
     {
         public static readonly Logger logger = new LoggerConfiguration().WriteTo.File("Logs/log.txt",
-            rollingInterval: RollingInterval.Minute,
+            rollingInterval: RollingInterval.Day,
             retainedFileTimeLimit: TimeSpan.FromDays(90),
             shared: true)
              .CreateLogger();
