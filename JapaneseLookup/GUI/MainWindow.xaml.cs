@@ -194,7 +194,7 @@ namespace JapaneseLookup.GUI
 
         private void MWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (Utils.KeyGestureComparer(e, ConfigManager.ShowPreferencesWindowKeyGesture))
+            if (ConfigManager.Ready && Utils.KeyGestureComparer(e, ConfigManager.ShowPreferencesWindowKeyGesture))
             {
                 MainWindowUtilities.ShowPreferencesWindow();
             }
@@ -311,6 +311,16 @@ namespace JapaneseLookup.GUI
         {
             ConfigManager.MainWindowHeight = Height;
             ConfigManager.MainWindowWidth = Width;
+        }
+
+        private void MainTextBox_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (ConfigManager.Ready)
+                PreferencesButton.Header = "Preferences";
+            else
+                PreferencesButton.Header = "Preferences are being applied...";
+
+            PreferencesButton.IsEnabled = ConfigManager.Ready;
         }
     }
 }

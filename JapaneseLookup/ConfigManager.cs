@@ -130,9 +130,12 @@ namespace JapaneseLookup
         public static bool NewlineBetweenDefinitions { get; set; } = false;
         public static int MaxResults { get; set; } = 99;
         public static bool AllowDuplicateCards { get; set; } = false;
+        public static bool Ready { get; set; } = false;
 
         public static async Task ApplyPreferences(MainWindow mainWindow)
         {
+            Ready = false;
+
             string tempStr = ConfigurationManager.AppSettings.Get("FrequencyListName");
 
             if (tempStr == null)
@@ -988,6 +991,8 @@ namespace JapaneseLookup
                 GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
             }
+
+            Ready = true;
         }
     }
 }

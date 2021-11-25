@@ -15,7 +15,7 @@ namespace JapaneseLookup.EPWING
     {
         public static async Task Load(DictType dictType, string dictPath)
         {
-            if (!(Directory.Exists(dictPath) || File.Exists(dictPath)))
+            if (!Directory.Exists(dictPath) && !File.Exists(dictPath))
                 return;
 
             string[] jsonFiles = Directory.GetFiles(dictPath, "*_bank_*.json");
