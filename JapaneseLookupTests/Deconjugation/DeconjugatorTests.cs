@@ -55,14 +55,14 @@ namespace JapaneseLookupTests.Deconjugation
 
             for (int i = 0; i < iterations; i++)
             {
-                Deconjugator.Deconjugate("飽きて");
-                Deconjugator.Deconjugate("座り込む");
-                Deconjugator.Deconjugate("していられない");
-                Deconjugator.Deconjugate("なく");
-                Deconjugator.Deconjugate("握って");
-                Deconjugator.Deconjugate("開き");
-                Deconjugator.Deconjugate("伸ばして");
-                Deconjugator.Deconjugate("戻す");
+                Deconjugator.Deconjugate("飽きて", false);
+                Deconjugator.Deconjugate("座り込む", false);
+                Deconjugator.Deconjugate("していられない", false);
+                Deconjugator.Deconjugate("なく", false);
+                Deconjugator.Deconjugate("握って", false);
+                Deconjugator.Deconjugate("開き", false);
+                Deconjugator.Deconjugate("伸ばして", false);
+                Deconjugator.Deconjugate("戻す", false);
             }
 
             var end = GC.GetAllocatedBytesForCurrentThread();
@@ -84,14 +84,14 @@ namespace JapaneseLookupTests.Deconjugation
 
             for (int i = 0; i < iterations; i++)
             {
-                Deconjugator.Deconjugate("飽きて");
-                Deconjugator.Deconjugate("座り込む");
-                Deconjugator.Deconjugate("していられない");
-                Deconjugator.Deconjugate("なく");
-                Deconjugator.Deconjugate("握って");
-                Deconjugator.Deconjugate("開き");
-                Deconjugator.Deconjugate("伸ばして");
-                Deconjugator.Deconjugate("戻す");
+                Deconjugator.Deconjugate("飽きて", false);
+                Deconjugator.Deconjugate("座り込む", false);
+                Deconjugator.Deconjugate("していられない", false);
+                Deconjugator.Deconjugate("なく", false);
+                Deconjugator.Deconjugate("握って", false);
+                Deconjugator.Deconjugate("開き", false);
+                Deconjugator.Deconjugate("伸ばして", false);
+                Deconjugator.Deconjugate("戻す", false);
             }
 
             var end = GC.GetAllocatedBytesForCurrentThread();
@@ -113,14 +113,14 @@ namespace JapaneseLookupTests.Deconjugation
 
             for (int i = 0; i < iterations; i++)
             {
-                Deconjugator.Deconjugate("飽きて");
-                Deconjugator.Deconjugate("座り込む");
-                Deconjugator.Deconjugate("していられない");
-                Deconjugator.Deconjugate("なく");
-                Deconjugator.Deconjugate("握って");
-                Deconjugator.Deconjugate("開き");
-                Deconjugator.Deconjugate("伸ばして");
-                Deconjugator.Deconjugate("戻す");
+                Deconjugator.Deconjugate("飽きて", false);
+                Deconjugator.Deconjugate("座り込む", false);
+                Deconjugator.Deconjugate("していられない", false);
+                Deconjugator.Deconjugate("なく", false);
+                Deconjugator.Deconjugate("握って", false);
+                Deconjugator.Deconjugate("開き", false);
+                Deconjugator.Deconjugate("伸ばして", false);
+                Deconjugator.Deconjugate("戻す", false);
             }
 
             var end = GC.GetAllocatedBytesForCurrentThread();

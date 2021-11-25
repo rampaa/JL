@@ -247,10 +247,11 @@ namespace JapaneseLookup.Deconjugation
             return !baseText.EndsWith("さ");
         }
 
-        public static HashSet<Form> Deconjugate(string myText)
+        public static HashSet<Form> Deconjugate(string myText, bool useCache = true)
         {
-            if (Cache.TryGet(myText, out var data))
-                return data;
+            if (useCache)
+                if (Cache.TryGet(myText, out var data))
+                    return data;
 
             var processed = new HashSet<Form>();
             var novel = new HashSet<Form>();
@@ -301,7 +302,9 @@ namespace JapaneseLookup.Deconjugation
                 novel = newNovel;
             }
 
-            Cache.AddReplace(myText, processed);
+            if (useCache)
+                Cache.AddReplace(myText, processed);
+
             return processed;
         }
     }
