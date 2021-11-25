@@ -68,7 +68,7 @@ namespace JapaneseLookup.GUI
             CopyFromClipboard();
         }
 
-        public async void MainTextBox_MouseMove(object sender, MouseEventArgs e)
+        public void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
             if (MWindow.Background.Opacity == 0 || ConfigManager.InactiveLookupMode) return;
             FirstPopupWindow.TextBox_MouseMove(MainTextBox);
