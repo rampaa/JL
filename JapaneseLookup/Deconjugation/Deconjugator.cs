@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Caching;
 
 namespace JapaneseLookup.Deconjugation
 {
@@ -14,6 +15,8 @@ namespace JapaneseLookup.Deconjugation
                 "Resources/deconjugator_edited_arrays.json"));
 
         private static readonly Rule[] Rules = JsonSerializer.Deserialize<Rule[]>(File);
+
+        private static readonly LRUCache<string, HashSet<Form>> Cache = new(777, 88);
 
         private static Form StdruleDeconjugateInner(Form myForm, VirtualRule myRule)
         {
@@ -246,6 +249,9 @@ namespace JapaneseLookup.Deconjugation
 
         public static HashSet<Form> Deconjugate(string myText)
         {
+            if (Cache.TryGet(myText, out var data))
+                return data;
+
             var processed = new HashSet<Form>();
             var novel = new HashSet<Form>();
 
@@ -295,6 +301,7 @@ namespace JapaneseLookup.Deconjugation
                 novel = newNovel;
             }
 
+            Cache.AddReplace(myText, processed);
             return processed;
         }
     }

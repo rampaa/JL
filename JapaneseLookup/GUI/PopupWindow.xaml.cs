@@ -1,4 +1,4 @@
-﻿using JapaneseLookup.Anki;
+using JapaneseLookup.Anki;
 using JapaneseLookup.Lookup;
 using JapaneseLookup.Utilities;
 using System;
@@ -65,7 +65,7 @@ namespace JapaneseLookup.GUI
             Hide();
         }
 
-        public async Task TextBox_MouseMove(TextBox tb)
+        public void TextBox_MouseMove(TextBox tb)
         {
             if (MiningMode || ConfigManager.InactiveLookupMode) return;
 
@@ -91,7 +91,7 @@ namespace JapaneseLookup.GUI
                 if (text == LastText) return;
                 LastText = text;
 
-                var lookupResults = await Task.Run(() => Lookup.Lookup.LookupText(text));
+                var lookupResults = Lookup.Lookup.LookupText(text);
 
                 if (lookupResults != null && lookupResults.Any())
                 {
@@ -192,6 +192,8 @@ namespace JapaneseLookup.GUI
             var top = new WrapPanel();
             var bottom = new StackPanel();
 
+            innerStackPanel.Children.Add(top);
+            innerStackPanel.Children.Add(bottom);
 
             // top
             TextBlock textBlockFoundSpelling = null;
@@ -533,8 +535,6 @@ namespace JapaneseLookup.GUI
                 });
             }
 
-            innerStackPanel.Children.Add(top);
-            innerStackPanel.Children.Add(bottom);
             return innerStackPanel;
         }
 
@@ -660,10 +660,10 @@ namespace JapaneseLookup.GUI
             ).ConfigureAwait(false);
         }
 
-        private async void Definitions_MouseMove(TextBox tb)
+        private void Definitions_MouseMove(TextBox tb)
         {
             if (MainWindowUtilities.JapaneseRegex.IsMatch(tb.Text))
-                await TextBox_MouseMove(tb).ConfigureAwait(false);
+               TextBox_MouseMove(tb);
         }
 
         private static void PlayAudio(string foundSpelling, string reading)
