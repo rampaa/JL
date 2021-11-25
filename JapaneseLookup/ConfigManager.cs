@@ -1,6 +1,7 @@
 ﻿using JapaneseLookup.Abstract;
 using JapaneseLookup.CustomDict;
 using JapaneseLookup.Dicts;
+using JapaneseLookup.EDICT;
 using JapaneseLookup.EDICT.JMdict;
 using JapaneseLookup.EDICT.JMnedict;
 using JapaneseLookup.EPWING;
@@ -950,7 +951,8 @@ namespace JapaneseLookup
 
             if (!initializedPoS)
             {
-                Task taskLoadWc = Task.Run(async () => {
+                Task taskLoadWc = Task.Run(async () =>
+                {
 
                     if (!File.Exists(Path.Join(ApplicationPath, "Resource/wc.json")))
                     {
@@ -964,9 +966,21 @@ namespace JapaneseLookup
 
                         else
                         {
+                            bool deleteJmdictFile = false;
+                            if (!File.Exists(Path.Join(ApplicationPath, Dicts[DictType.JMdict].Path)))
+                            {
+                                deleteJmdictFile = true;
+                                await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMdict].Path,
+                                                new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
+                                                DictType.JMdict.ToString(), false, true).ConfigureAwait(false);
+                            }
+
                             await Task.Run(async () => await JMdictLoader.Load(Dicts[DictType.JMdict].Path).ConfigureAwait(false));
                             await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
                             Dicts[DictType.JMdict].Contents.Clear();
+
+                            if (deleteJmdictFile)
+                                File.Delete(Path.Join(ApplicationPath, Dicts[DictType.JMdict].Path));
                         }
                     }
                     await JmdictWcLoader.Load();

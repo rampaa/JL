@@ -10,7 +10,7 @@ namespace JapaneseLookup.EDICT
 {
     public static class ResourceUpdater
     {
-        public static async Task UpdateResource(string resourcePath, Uri resourceDownloadUri, string resourceName, bool isUpdate, bool isTest)
+        public static async Task UpdateResource(string resourcePath, Uri resourceDownloadUri, string resourceName, bool isUpdate, bool noPrompt)
         {
             if (!isUpdate || MessageBox.Show($"Do you want to download the latest version of {resourceName}?", "", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
             {
@@ -19,7 +19,7 @@ namespace JapaneseLookup.EDICT
                 if (File.Exists(Path.Join(ConfigManager.ApplicationPath, resourcePath)))
                     request.Headers.IfModifiedSince = File.GetLastWriteTime(Path.Join(ConfigManager.ApplicationPath, resourcePath));
 
-                if (!isTest)
+                if (!noPrompt)
                     MessageBox.Show($"This may take a while. Please don't shut down the program until {resourceName} is downloaded.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
 
                 var response = await ConfigManager.Client.SendAsync(request).ConfigureAwait(false);
@@ -28,16 +28,16 @@ namespace JapaneseLookup.EDICT
                     var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                     await GzipStreamDecompressor(responseStream, Path.Join(ConfigManager.ApplicationPath, resourcePath)).ConfigureAwait(false);
 
-                    if (!isTest)
+                    if (!noPrompt)
                         MessageBox.Show($"{resourceName} has been downloaded successfully.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
                 }
 
-                else if (response.StatusCode == HttpStatusCode.NotModified && !isTest)
+                else if (response.StatusCode == HttpStatusCode.NotModified && !noPrompt)
                 {
                     MessageBox.Show($"{resourceName} is up to date.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
                 }
 
-                else if (!isTest)
+                else if (!noPrompt)
                 {
                     MessageBox.Show($"Unexpected error while downloading {resourceName}.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
                 }
