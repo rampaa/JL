@@ -62,7 +62,7 @@ namespace JapaneseLookup.Lookup
                         break;
                     case DictType.Kenkyuusha:
                         // TODO
-                        epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
+                        epwingWordResultsList.Add(GetDaijirinResults(text, textInHiraganaList,
                             deconjugationResultsList, dict.Contents, dictType));
                         break;
                     case DictType.Daijirin:
@@ -337,95 +337,6 @@ namespace JapaneseLookup.Lookup
             }
 
             return daijirinResults;
-        }
-
-        private static Dictionary<string, IntermediaryResult> GetEpwingResults(string text,
-            List<string> textInHiraganaList, List<HashSet<Form>> deconjugationResultsList,
-            Dictionary<string, List<IResult>> dict, DictType dictType)
-        {
-            Dictionary<string, IntermediaryResult> epwingResults = new();
-
-            int succAttempt = 0;
-            for (int i = 0; i < text.Length; i++)
-            {
-                bool tryLongVowelConversion = true;
-
-                if (dict.TryGetValue(textInHiraganaList[i], out var hiraganaTempResult))
-                {
-                    epwingResults.TryAdd(textInHiraganaList[i],
-                        new IntermediaryResult(hiraganaTempResult, new List<string>(), text[..^i], dictType));
-                    tryLongVowelConversion = false;
-                }
-
-                if (succAttempt < 3)
-                {
-                    foreach (Form deconjugationResult in deconjugationResultsList[i])
-                    {
-                        if (epwingResults.ContainsKey(deconjugationResult.Text))
-                            continue;
-
-                        if (dict.TryGetValue(deconjugationResult.Text, out var temp))
-                        {
-                            List<IResult> resultsList = new();
-
-                            foreach (EpwingResult epwingResult in epwingResults.Cast<EpwingResult>())
-                            {
-                                bool noMatchingEntryInJmdict = true;
-
-                                if (epwingResult.WordClasses.Intersect(deconjugationResult.Tags).Any())
-                                    resultsList.Add(epwingResult);
-
-                                else if (PoS.JmdictWcLoader.WcDict?.TryGetValue(deconjugationResult.Text, out var jmdictWcResults) ?? false)
-                                {
-                                    foreach (var jmdictWcResult in jmdictWcResults)
-                                    {
-                                        if (epwingResult.PrimarySpelling == jmdictWcResult.Spelling
-                                            && (jmdictWcResult.Readings?.Contains(epwingResult.Reading)
-                                            ?? string.IsNullOrEmpty(epwingResult.Reading)))
-                                        {
-                                            noMatchingEntryInJmdict = false;
-                                            if (jmdictWcResult.WordClasses.Intersect(deconjugationResult.Tags).Any())
-                                            {
-                                                resultsList.Add(epwingResult);
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-
-                                else if (!epwingResult.WordClasses.Any() && noMatchingEntryInJmdict)
-                                    resultsList.Add(epwingResult);
-                            }
-
-                            if (resultsList.Any())
-                            {
-                                epwingResults.Add(deconjugationResult.Text,
-                                    new IntermediaryResult(resultsList, deconjugationResult.Process,
-                                        text[..deconjugationResult.OriginalText.Length],
-                                        dictType));
-                                ++succAttempt;
-                                tryLongVowelConversion = false;
-                            }
-                        }
-                    }
-                }
-
-                if (tryLongVowelConversion && textInHiraganaList[i].Contains('ー') &&
-                    textInHiraganaList[i][0] != 'ー')
-                {
-                    List<string> textWithoutLongVowelMarkList = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
-                    foreach (string textWithoutLongVowelMark in textWithoutLongVowelMarkList)
-                    {
-                        if (dict.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
-                        {
-                            epwingResults.Add(textWithoutLongVowelMark,
-                                new IntermediaryResult(tmpResult, new List<string>(), text[..^i], dictType));
-                        }
-                    }
-                }
-            }
-
-            return epwingResults;
         }
 
         private static Dictionary<string, IntermediaryResult> GetCustomWordResults(string text,
