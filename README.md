@@ -7,7 +7,6 @@
 * KANJIDIC - Full support (w/ composition data)
 
 ### EPWING (yomichan-import format)
-JMdict must be enabled in order to get accurate results from these.
 
 * Daijirin - Basic+ support
 * Daijisen - Basic support
