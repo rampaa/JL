@@ -212,12 +212,12 @@ namespace JapaneseLookup.GUI
                 MainTextBox_MouseMove(null, null);
             }
 
-            else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
+            else if (ConfigManager.Ready && Utils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
             {
                 MainWindowUtilities.ShowAddNameWindow();
             }
 
-            else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
+            else if (ConfigManager.Ready && Utils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
             {
                 MainWindowUtilities.ShowAddWordWindow();
             }
@@ -320,6 +320,8 @@ namespace JapaneseLookup.GUI
             else
                 PreferencesButton.Header = "Preferences are being applied...";
 
+            AddNameButton.IsEnabled = ConfigManager.Ready;
+            AddWordButton.IsEnabled = ConfigManager.Ready;
             PreferencesButton.IsEnabled = ConfigManager.Ready;
         }
     }
