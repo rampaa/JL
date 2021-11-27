@@ -585,5 +585,60 @@ namespace JapaneseLookup.GUI
 
             ((TextBox)sender).Text = hotkeyTextBuilder.ToString();
         }
+
+        private void MiningModeKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            MiningModeKeyGestureTextBox.Text = "None";
+        }
+
+        private void KanjiModeKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            KanjiModeKeyGestureTextBox.Text = "None";
+        }
+
+        private void MousePassThroughModeKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            MousePassThroughModeKeyGestureTextBox.Text = "None";
+        }
+
+        private void PlayAudioKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            PlayAudioKeyGestureTextBox.Text = "None";
+        }
+
+        private void ShowPreferencesWindowKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowPreferencesWindowKeyGestureTextBox.Text = "None";
+        }
+
+        private void ShowAddNameWindowKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowAddNameWindowKeyGestureTextBox.Text = "None";
+        }
+
+        private void ShowAddWordWindowKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowAddWordWindowKeyGestureTextBox.Text = "None";
+        }
+
+        private void SearchWithBrowserKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            SearchWithBrowserKeyGestureTextBox.Text = "None";
+        }
+
+        private void SteppedBacklogBackwardsKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            SteppedBacklogBackwardsKeyGestureTextBox.Text = "None";
+        }
+
+        private void SteppedBacklogForwardsKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            SteppedBacklogForwardsKeyGestureTextBox.Text = "None";
+        }
+
+        private void InactiveLookupModeKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            InactiveLookupModeKeyGestureTextBox.Text = "None";
+        }
     }
 }

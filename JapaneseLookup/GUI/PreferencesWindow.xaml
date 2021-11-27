@@ -449,89 +449,100 @@
                         </StackPanel.Resources>
 
                         <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="MiningModeKeyGestureTextBoxButton_Click"/>
                             <TextBox x:Name="MiningModeKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" />
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Mining mode" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="KanjiModeKeyGestureTextBoxButton_Click"/>
                             <TextBox x:Name="KanjiModeKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" />
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Kanji mode" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="MousePassThroughModeKeyGestureTextBoxButton_Click"/>
                             <TextBox x:Name="MousePassThroughModeKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" />
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Mouse pass-through mode" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="PlayAudioKeyGestureTextBoxButton_Click"/>
                             <TextBox x:Name="PlayAudioKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" />
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Play audio" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="ShowPreferencesWindowKeyGestureTextBoxButton_Click"/>
                             <TextBox x:Name="ShowPreferencesWindowKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" />
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Preferences" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="ShowAddNameWindowKeyGestureTextBoxButton_Click"/>
                             <TextBox x:Name="ShowAddNameWindowKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" />
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Add name" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="ShowAddWordWindowKeyGestureTextBoxButton_Click"/>
                             <TextBox x:Name="ShowAddWordWindowKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" />
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Add word" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="SearchWithBrowserKeyGestureTextBoxButton_Click"/>
                             <TextBox x:Name="SearchWithBrowserKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" />
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Search" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="SteppedBacklogBackwardsKeyGestureTextBoxButton_Click"/>
                             <TextBox x:Name="SteppedBacklogBackwardsKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" />
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Move backwards (Backlog)" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="SteppedBacklogForwardsKeyGestureTextBoxButton_Click"/>
                             <TextBox x:Name="SteppedBacklogForwardsKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" />
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Move forward (Backlog)" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="InactiveLookupModeKeyGestureTextBoxButton_Click"/>
                             <TextBox x:Name="InactiveLookupModeKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" />
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle lookup" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>

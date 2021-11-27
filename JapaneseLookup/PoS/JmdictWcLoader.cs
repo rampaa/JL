@@ -28,16 +28,19 @@ namespace JapaneseLookup.PoS
             {
                 foreach (JmdictWc jMDictWcEntry in value.ToList())
                 {
-                    foreach (string reading in jMDictWcEntry.Readings)
+                    if (jMDictWcEntry.Readings != null)
                     {
-                        if (WcDict.TryGetValue(reading, out var result))
+                        foreach (string reading in jMDictWcEntry.Readings)
                         {
-                            result.Add(jMDictWcEntry);
-                        }
+                            if (WcDict.TryGetValue(reading, out var result))
+                            {
+                                result.Add(jMDictWcEntry);
+                            }
 
-                        else
-                        {
-                            WcDict.Add(reading, new List<JmdictWc> { jMDictWcEntry });
+                            else
+                            {
+                                WcDict.Add(reading, new List<JmdictWc> { jMDictWcEntry });
+                            }
                         }
                     }
                 }

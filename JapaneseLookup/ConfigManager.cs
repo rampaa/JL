@@ -340,10 +340,25 @@ namespace JapaneseLookup
             InactiveLookupModeKeyGesture =
                 Utils.KeyGestureSetter("InactiveLookupModeKeyGesture", InactiveLookupModeKeyGesture);
 
-            mainWindow.AddNameButton.InputGestureText = Utils.KeyGestureToString(ShowAddNameWindowKeyGesture);
-            mainWindow.AddWordButton.InputGestureText = Utils.KeyGestureToString(ShowAddWordWindowKeyGesture);
-            mainWindow.SearchButton.InputGestureText = Utils.KeyGestureToString(SearchWithBrowserKeyGesture);
-            mainWindow.PreferencesButton.InputGestureText = Utils.KeyGestureToString(ShowPreferencesWindowKeyGesture);
+            if (Utils.KeyGestureToString(ShowAddNameWindowKeyGesture) == "None")
+                mainWindow.AddNameButton.InputGestureText = "";
+            else
+                mainWindow.AddNameButton.InputGestureText = Utils.KeyGestureToString(ShowAddNameWindowKeyGesture);
+
+            if (Utils.KeyGestureToString(ShowAddWordWindowKeyGesture) == "None")
+                mainWindow.AddWordButton.InputGestureText = "";
+            else
+                mainWindow.AddWordButton.InputGestureText = Utils.KeyGestureToString(ShowAddWordWindowKeyGesture);
+
+            if (Utils.KeyGestureToString(SearchWithBrowserKeyGesture) == "None")
+                mainWindow.SearchButton.InputGestureText = "";
+            else
+                mainWindow.SearchButton.InputGestureText = Utils.KeyGestureToString(SearchWithBrowserKeyGesture);
+
+            if (Utils.KeyGestureToString(ShowPreferencesWindowKeyGesture) == "None")
+                mainWindow.PreferencesButton.InputGestureText = "";
+            else
+                mainWindow.PreferencesButton.InputGestureText = Utils.KeyGestureToString(ShowPreferencesWindowKeyGesture);
 
             Utils.Try(() => mainWindow.OpacitySlider.Value = double.Parse(ConfigurationManager.AppSettings
                 .Get("MainWindowOpacity")!), mainWindow.OpacitySlider.Value, "MainWindowOpacity");
