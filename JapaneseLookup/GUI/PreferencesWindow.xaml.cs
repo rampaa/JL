@@ -384,7 +384,6 @@ namespace JapaneseLookup.GUI
                 var buttonRemove = new Button { Width = 0 };
                 if (!ConfigManager.BuiltInDicts.Values.Select(t => t.Type).ToList().Contains(dict.Type))
                 {
-                    // should be a red cross ideally
                     buttonRemove = new Button()
                     {
                         Width = 30,
@@ -421,8 +420,6 @@ namespace JapaneseLookup.GUI
                     }
                 };
 
-
-
                 dockPanel.Children.Add(checkBox);
                 dockPanel.Children.Add(buttonIncreasePriority);
                 dockPanel.Children.Add(buttonDecreasePriority);
@@ -455,7 +452,7 @@ namespace JapaneseLookup.GUI
                 if (File.Exists(path)) 
                     path = Path.GetDirectoryName(path);
 
-                Process.Start("explorer.exe", $"{path}");
+                Process.Start("explorer.exe", path);
             }
         }
 
@@ -467,7 +464,6 @@ namespace JapaneseLookup.GUI
                 .Priority += 1;
             ConfigManager.Dicts[typeToBePrioritized].Priority -= 1;
         }
-
 
         private static void UnPrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBeUnPrioritized)
         {
