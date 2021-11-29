@@ -392,9 +392,7 @@ namespace JapaneseLookup.GUI
                         Content = "X",
                         FontWeight = FontWeights.Bold,
                         Foreground = Brushes.Red,
-                        BorderBrush = Brushes.Transparent,
-                        BorderThickness = new Thickness(0),
-                        Margin = new Thickness(0),
+                        BorderThickness = new Thickness(1),
                     };
                 }
 
