@@ -11,6 +11,7 @@ using JapaneseLookup.PoS;
 using JapaneseLookup.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime;
@@ -377,16 +378,23 @@ namespace JapaneseLookup.GUI
                     Text = dict.Path,
                     Margin = new Thickness(10),
                 };
+
+                dictPathDisplay.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(PathTextbox_PreviewMouseLeftButtonUp);
+
                 var buttonRemove = new Button { Width = 0 };
                 if (!ConfigManager.BuiltInDicts.Values.Select(t => t.Type).ToList().Contains(dict.Type))
                 {
                     // should be a red cross ideally
                     buttonRemove = new Button()
                     {
-                        Width = 65,
-                        Content = "Remove",
-                        Background = Brushes.Red,
-                        Margin = new Thickness(10),
+                        Width = 30,
+                        Height = 30,
+                        Content = "X",
+                        FontWeight = FontWeights.Bold,
+                        Foreground = Brushes.Red,
+                        BorderBrush = Brushes.Transparent,
+                        BorderThickness = new Thickness(0),
+                        Margin = new Thickness(0),
                     };
                 }
 
@@ -415,6 +423,8 @@ namespace JapaneseLookup.GUI
                     }
                 };
 
+
+
                 dockPanel.Children.Add(checkBox);
                 dockPanel.Children.Add(buttonIncreasePriority);
                 dockPanel.Children.Add(buttonDecreasePriority);
@@ -438,6 +448,19 @@ namespace JapaneseLookup.GUI
                     .Select(textBlockPriority => Convert.ToInt32(textBlockPriority.Text)).First());
         }
 
+        private void PathTextbox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            string path = ((TextBlock)sender).Text;
+
+            if (File.Exists(path) || Directory.Exists(path))
+            {
+                if (File.Exists(path)) 
+                    path = Path.GetDirectoryName(path);
+
+                Process.Start("explorer.exe", $"{path}");
+            }
+        }
+
         private static void PrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBePrioritized)
         {
             if (ConfigManager.Dicts[typeToBePrioritized].Priority == 0) return;
@@ -446,6 +469,7 @@ namespace JapaneseLookup.GUI
                 .Priority += 1;
             ConfigManager.Dicts[typeToBePrioritized].Priority -= 1;
         }
+
 
         private static void UnPrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBeUnPrioritized)
         {
