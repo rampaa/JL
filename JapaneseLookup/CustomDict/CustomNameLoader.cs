@@ -31,7 +31,7 @@ namespace JapaneseLookup.CustomDict
 
             var customNameDictionary = ConfigManager.Dicts[DictType.CustomNameDictionary].Contents;
 
-            if (customNameDictionary.TryGetValue(spelling, out var entry))
+            if (customNameDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out var entry))
             {
                 if (!entry.Contains(newNameEntry))
                 {
@@ -41,7 +41,7 @@ namespace JapaneseLookup.CustomDict
 
             else
             {
-                customNameDictionary.Add(spelling, new List<IResult> { newNameEntry });
+                customNameDictionary.Add(Kana.KatakanaToHiraganaConverter(spelling), new List<IResult> { newNameEntry });
             }
         }
     }

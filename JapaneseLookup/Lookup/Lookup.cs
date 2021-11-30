@@ -864,6 +864,9 @@ namespace JapaneseLookup.Lookup
 
                     List<string> frequency = GetCustomWordFreq(customWordDictResult);
 
+                    if (frequency.First() == MainWindowUtilities.FakeFrequency )
+                        frequency = new List<string> { (i+1).ToString() };
+
                     var dictType = new List<string> { wordResult.Value.DictType.ToString() };
 
                     var definitions = new List<string> { BuildCustomWordDefinition(customWordDictResult) };
@@ -911,7 +914,7 @@ namespace JapaneseLookup.Lookup
                     result.Add(LookupResult.Definitions, definitions);
 
                     result.Add(LookupResult.FoundForm, foundForm);
-                    result.Add(LookupResult.Frequency, new List<string> { MainWindowUtilities.FakeFrequency });
+                    result.Add(LookupResult.Frequency, new List<string> { (i+1).ToString() });
                     result.Add(LookupResult.DictType, dictType);
 
                     results.Add(result);

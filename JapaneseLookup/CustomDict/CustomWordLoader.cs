@@ -81,7 +81,7 @@ namespace JapaneseLookup.CustomDict
 
                 var customWordDictionary = ConfigManager.Dicts[DictType.CustomWordDictionary].Contents;
 
-                if (customWordDictionary.TryGetValue(spelling, out var result))
+                if (customWordDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out var result))
                 {
                     if (result.Contains(newWordEntry))
                     {
@@ -94,7 +94,7 @@ namespace JapaneseLookup.CustomDict
                 }
                 else
                 {
-                    customWordDictionary.Add(spelling, new List<IResult> { newWordEntry });
+                    customWordDictionary.Add(Kana.KatakanaToHiraganaConverter(spelling), new List<IResult> { newWordEntry });
                 }
             }
         }
