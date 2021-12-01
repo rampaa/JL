@@ -379,7 +379,9 @@ namespace JapaneseLookup.GUI
                     Margin = new Thickness(10),
                 };
 
-                dictPathDisplay.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(PathTextbox_PreviewMouseLeftButtonUp);
+                dictPathDisplay.PreviewMouseLeftButtonUp += PathTextbox_PreviewMouseLeftButtonUp;
+                dictPathDisplay.MouseEnter += (_, _) => dictPathDisplay.TextDecorations = TextDecorations.Underline;
+                dictPathDisplay.MouseLeave += (_, _) => dictPathDisplay.TextDecorations = null;
 
                 var buttonRemove = new Button { Width = 0 };
                 if (!ConfigManager.BuiltInDicts.Values.Select(t => t.Type).ToList().Contains(dict.Type))
@@ -452,7 +454,7 @@ namespace JapaneseLookup.GUI
                 if (File.Exists(path)) 
                     path = Path.GetDirectoryName(path);
 
-                Process.Start("explorer.exe", path);
+                Process.Start("explorer.exe", path ?? throw new InvalidOperationException());
             }
         }
 
