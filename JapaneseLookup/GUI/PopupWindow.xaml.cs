@@ -167,7 +167,13 @@ namespace JapaneseLookup.GUI
 
             for (int index = 0; index < results.Count; index++)
             {
-                double currentHeight = StackPanel.Items.Cast<StackPanel>().Sum(item => item.ActualHeight);
+                double currentHeight = 0;
+                foreach (StackPanel item in StackPanel.Items)
+                {
+                    item.UpdateLayout();
+                    currentHeight += item.ActualHeight;
+                }
+
                 if (currentHeight > MaxHeight && !generateAllResults)
                     return;
 
@@ -175,7 +181,6 @@ namespace JapaneseLookup.GUI
                 StackPanel resultStackPanel = MakeResultStackPanel(result, index, results.Count);
 
                 ResultStackPanels.Add(resultStackPanel);
-                StackPanel.UpdateLayout();
             }
         }
 
