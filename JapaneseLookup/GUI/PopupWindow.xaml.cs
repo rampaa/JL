@@ -164,21 +164,18 @@ namespace JapaneseLookup.GUI
         private void DisplayResults(bool generateAllResults)
         {
             var results = LastLookupResults;
-            // apparently you can't get the desired size of a control before the layout pass
-            // probably won't be worth (performance-wise) forcing that to happen instead of just using a magic number
-            int resultsCount = generateAllResults
-                ? results.Count
-                : Math.Min(results.Count, PopupWindowUtilities.MaxNumberOfResultsWhenNotInMiningMode);
 
-            for (int index = 0; index < resultsCount; index++)
+            for (int index = 0; index < results.Count; index++)
             {
-                if (index > ConfigManager.MaxResults)
+                double currentHeight = StackPanel.Items.Cast<StackPanel>().Sum(item => item.ActualHeight);
+                if (currentHeight > MaxHeight && !generateAllResults)
                     return;
 
                 var result = results[index];
                 StackPanel resultStackPanel = MakeResultStackPanel(result, index, results.Count);
 
                 ResultStackPanels.Add(resultStackPanel);
+                StackPanel.UpdateLayout();
             }
         }
 
@@ -663,7 +660,7 @@ namespace JapaneseLookup.GUI
         private void Definitions_MouseMove(TextBox tb)
         {
             if (MainWindowUtilities.JapaneseRegex.IsMatch(tb.Text))
-               TextBox_MouseMove(tb);
+                TextBox_MouseMove(tb);
         }
 
         private static void PlayAudio(string foundSpelling, string reading)

@@ -10,9 +10,6 @@ namespace JapaneseLookup.Utilities
 {
     public static class PopupWindowUtilities
     {
-        // super bad hack that improves performance by a lot when many dictionaries are loaded...
-        public const int MaxNumberOfResultsWhenNotInMiningMode = 10;
-
         public static TextBlock MakeTextBlockReadings(List<string> readings, List<string> rOrthographyInfoList)
         {
             var textBlockReadings = new TextBlock
