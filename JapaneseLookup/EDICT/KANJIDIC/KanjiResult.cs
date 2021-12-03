@@ -1,7 +1,7 @@
-﻿using JapaneseLookup.Abstract;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using JapaneseLookup.Abstract;
 
-namespace JapaneseLookup.KANJIDIC
+namespace JapaneseLookup.EDICT.KANJIDIC
 {
     public class KanjiResult : IResult
     {

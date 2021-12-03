@@ -7,7 +7,6 @@ using JapaneseLookup.EDICT.JMnedict;
 using JapaneseLookup.EPWING;
 using JapaneseLookup.Frequency;
 using JapaneseLookup.GUI;
-using JapaneseLookup.KANJIDIC;
 using JapaneseLookup.PoS;
 using JapaneseLookup.Utilities;
 using System;
@@ -24,6 +23,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
+using JapaneseLookup.EDICT.KANJIDIC;
 
 namespace JapaneseLookup
 {

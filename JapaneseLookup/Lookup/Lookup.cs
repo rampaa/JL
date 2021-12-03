@@ -5,13 +5,13 @@ using JapaneseLookup.Dicts;
 using JapaneseLookup.EDICT.JMdict;
 using JapaneseLookup.EDICT.JMnedict;
 using JapaneseLookup.EPWING;
-using JapaneseLookup.KANJIDIC;
 using JapaneseLookup.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using JapaneseLookup.EDICT.KANJIDIC;
 using JapaneseLookup.Frequency;
 using JapaneseLookup.PoS;
 

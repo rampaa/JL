@@ -1,15 +1,14 @@
-﻿using JapaneseLookup.Abstract;
-using JapaneseLookup.Dicts;
-using JapaneseLookup.EDICT;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
+using JapaneseLookup.Abstract;
+using JapaneseLookup.Dicts;
 
-namespace JapaneseLookup.KANJIDIC
+namespace JapaneseLookup.EDICT.KANJIDIC
 {
     public static class KanjiInfoLoader
     {
