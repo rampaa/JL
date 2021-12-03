@@ -11,7 +11,7 @@ namespace JapaneseLookup.Utilities
     public static class MainWindowUtilities
     {
         public static readonly List<string> Backlog = new();
-        public const string FakeFrequency = "1000000";
+        public static readonly string FakeFrequency = int.MaxValue.ToString();
 
         public static readonly Regex JapaneseRegex =
             new(

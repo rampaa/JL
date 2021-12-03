@@ -843,7 +843,8 @@ namespace JapaneseLookup.Lookup
 
             foreach (var wordResult in customWordResults)
             {
-                for (int i = wordResult.Value.ResultsList.Count - 1; i >= 0; i--)
+                int wordResultCount = wordResult.Value.ResultsList.Count;
+                for (int i = 0; i < wordResultCount; i++)
                 {
                     var customWordDictResult = (CustomWordEntry)wordResult.Value.ResultsList[i];
                     var result = new Dictionary<LookupResult, List<string>>();
@@ -865,7 +866,7 @@ namespace JapaneseLookup.Lookup
                     List<string> frequency = GetCustomWordFreq(customWordDictResult);
 
                     if (frequency.First() == MainWindowUtilities.FakeFrequency )
-                        frequency = new List<string> { (i+1).ToString() };
+                        frequency = new List<string> { (wordResultCount - i).ToString() };
 
                     var dictType = new List<string> { wordResult.Value.DictType.ToString() };
 
@@ -894,7 +895,8 @@ namespace JapaneseLookup.Lookup
 
             foreach (var customNameResult in customNameResults)
             {
-                for (int i = customNameResult.Value.ResultsList.Count - 1; i >= 0; i--)
+                int resultCount = customNameResult.Value.ResultsList.Count;
+                for (int i = 0; i < resultCount; i++)
                 {
                     var customNameDictResult = (CustomNameEntry)customNameResult.Value.ResultsList[i];
                     var result = new Dictionary<LookupResult, List<string>>();
@@ -914,7 +916,7 @@ namespace JapaneseLookup.Lookup
                     result.Add(LookupResult.Definitions, definitions);
 
                     result.Add(LookupResult.FoundForm, foundForm);
-                    result.Add(LookupResult.Frequency, new List<string> { (i+1).ToString() });
+                    result.Add(LookupResult.Frequency, new List<string> { (resultCount - i).ToString()});
                     result.Add(LookupResult.DictType, dictType);
 
                     results.Add(result);

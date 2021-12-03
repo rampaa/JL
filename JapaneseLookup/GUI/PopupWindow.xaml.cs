@@ -228,7 +228,7 @@ namespace JapaneseLookup.GUI
                         {
                             Name = key.ToString(),
                             Text = string.Join("", value),
-                            Visibility = Visibility.Collapsed
+                            Visibility = Visibility.Collapsed,
                         };
                         break;
 
@@ -241,6 +241,7 @@ namespace JapaneseLookup.GUI
                             Foreground = ConfigManager.FrequencyColor,
                             FontSize = ConfigManager.FrequencyFontSize,
                             Margin = new Thickness(5, 0, 0, 0),
+                            TextWrapping = TextWrapping.Wrap,
                         };
                         break;
 
@@ -252,6 +253,7 @@ namespace JapaneseLookup.GUI
                             Foreground = ConfigManager.DictTypeColor,
                             FontSize = ConfigManager.DictTypeFontSize,
                             Margin = new Thickness(5, 0, 0, 0),
+                            TextWrapping = TextWrapping.Wrap,
                         };
                         break;
 
@@ -265,6 +267,7 @@ namespace JapaneseLookup.GUI
                             Tag = index, // for audio
                             Foreground = ConfigManager.PrimarySpellingColor,
                             FontSize = ConfigManager.PrimarySpellingFontSize,
+                            TextWrapping = TextWrapping.Wrap,
                         };
                         textBlockFoundSpelling.MouseEnter += FoundSpelling_MouseEnter; // for audio
                         textBlockFoundSpelling.MouseLeave += FoundSpelling_MouseLeave; // for audio
@@ -336,7 +339,7 @@ namespace JapaneseLookup.GUI
                         {
                             Name = key.ToString(),
                             Text = string.Join(", ", value),
-                            Visibility = Visibility.Collapsed
+                            Visibility = Visibility.Collapsed,
                         };
                         break;
 
@@ -358,6 +361,7 @@ namespace JapaneseLookup.GUI
                             Foreground = ConfigManager.DeconjugationInfoColor,
                             FontSize = ConfigManager.DeconjugationInfoFontSize,
                             Margin = new Thickness(5, 0, 0, 0),
+                            TextWrapping = TextWrapping.Wrap,
                         };
                         break;
 
@@ -369,6 +373,7 @@ namespace JapaneseLookup.GUI
                             Foreground = ConfigManager.POrthographyInfoColor,
                             FontSize = ConfigManager.POrthographyInfoFontSize,
                             Margin = new Thickness(5, 0, 0, 0),
+                            TextWrapping = TextWrapping.Wrap,
                         };
                         break;
 
@@ -393,6 +398,7 @@ namespace JapaneseLookup.GUI
                             Foreground = ConfigManager.ReadingsColor,
                             FontSize = ConfigManager.ReadingsFontSize,
                             Margin = new Thickness(2, 0, 0, 0),
+                            TextWrapping = TextWrapping.Wrap,
                         };
                         break;
 
@@ -407,6 +413,7 @@ namespace JapaneseLookup.GUI
                             Foreground = ConfigManager.ReadingsColor,
                             FontSize = ConfigManager.ReadingsFontSize,
                             Margin = new Thickness(2, 0, 0, 0),
+                            TextWrapping = TextWrapping.Wrap,
                         };
                         break;
 
@@ -421,6 +428,7 @@ namespace JapaneseLookup.GUI
                             Foreground = ConfigManager.ReadingsColor,
                             FontSize = ConfigManager.ReadingsFontSize,
                             Margin = new Thickness(2, 0, 0, 0),
+                            TextWrapping = TextWrapping.Wrap,
                         };
                         break;
 
@@ -432,6 +440,7 @@ namespace JapaneseLookup.GUI
                             // Foreground = ConfigManager. Color,
                             FontSize = ConfigManager.DefinitionsFontSize,
                             Margin = new Thickness(2, 2, 2, 2),
+                            TextWrapping = TextWrapping.Wrap,
                         };
                         break;
 
@@ -454,6 +463,7 @@ namespace JapaneseLookup.GUI
                             // Foreground = ConfigManager. Color,
                             FontSize = ConfigManager.DefinitionsFontSize,
                             Margin = new Thickness(2, 2, 2, 2),
+                            TextWrapping = TextWrapping.Wrap,
                         };
                         break;
 
@@ -465,6 +475,7 @@ namespace JapaneseLookup.GUI
                             // Foreground = ConfigManager. Color,
                             FontSize = ConfigManager.ReadingsFontSize,
                             Margin = new Thickness(2, 2, 2, 2),
+                            TextWrapping = TextWrapping.Wrap,
                         };
                         break;
 
