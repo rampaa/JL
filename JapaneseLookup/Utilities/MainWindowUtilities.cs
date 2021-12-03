@@ -48,17 +48,15 @@ namespace JapaneseLookup.Utilities
 
         public static void ShowAddNameWindow()
         {
-            var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
             var addNameWindowInstance = AddNameWindow.Instance;
-            addNameWindowInstance.SpellingTextBox.Text = mainWindow.MainTextBox.SelectedText;
+            addNameWindowInstance.SpellingTextBox.Text = ConfigManager.MainWindowRef.MainTextBox.SelectedText;
             addNameWindowInstance.ShowDialog();
         }
 
         public static void ShowAddWordWindow()
         {
-            var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
             var addWordWindowInstance = AddWordWindow.Instance;
-            addWordWindowInstance.SpellingsTextBox.Text = mainWindow.MainTextBox.SelectedText;
+            addWordWindowInstance.SpellingsTextBox.Text = ConfigManager.MainWindowRef.MainTextBox.SelectedText;
             addWordWindowInstance.ShowDialog();
         }
 
@@ -70,10 +68,9 @@ namespace JapaneseLookup.Utilities
 
         public static void SearchWithBrowser()
         {
-            var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
-            if (mainWindow.MainTextBox.SelectedText.Length > 0)
+            if (ConfigManager.MainWindowRef.MainTextBox.SelectedText.Length > 0)
                 Process.Start(new ProcessStartInfo("cmd",
-                        $"/c start https://www.google.com/search?q={mainWindow.MainTextBox.SelectedText}^&hl=ja")
+                        $"/c start https://www.google.com/search?q={ConfigManager.MainWindowRef.MainTextBox.SelectedText}^&hl=ja")
                 { CreateNoWindow = true });
         }
     }

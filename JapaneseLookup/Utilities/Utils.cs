@@ -3,21 +3,25 @@ using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
+using JapaneseLookup.GUI;
 
 namespace JapaneseLookup.Utilities
 {
     public static class Utils
     {
-        public static readonly Logger logger = new LoggerConfiguration().WriteTo.File("Logs/log.txt",
-            rollingInterval: RollingInterval.Day,
-            retainedFileTimeLimit: TimeSpan.FromDays(90),
-            shared: true)
-             .CreateLogger();
+        public static readonly Logger Logger = new LoggerConfiguration().WriteTo.File("Logs/log.txt",
+                rollingInterval: RollingInterval.Day,
+                retainedFileTimeLimit: TimeSpan.FromDays(90),
+                shared: true)
+            .CreateLogger();
 
         public static IEnumerable<string> UnicodeIterator(this string s)
         {
@@ -36,6 +40,7 @@ namespace JapaneseLookup.Utilities
                 }
             }
         }
+
         public static List<ComboBoxItem> FindJapaneseFonts()
         {
             List<ComboBoxItem> japaneseFonts = new();
@@ -75,7 +80,6 @@ namespace JapaneseLookup.Utilities
                         comboBoxItem.Foreground = Brushes.DimGray;
                         japaneseFonts.Add(comboBoxItem);
                     }
-
                 }
                 else
                 {
@@ -188,6 +192,23 @@ namespace JapaneseLookup.Utilities
 
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
+        }
+
+        public static void Alert(AlertLevel alertLevel, string message)
+        {
+            Application.Current.Dispatcher.Invoke((Action)async delegate
+            {
+                int currentAlertWindowCount = Application.Current.Windows.OfType<AlertWindow>().Count();
+
+                var alertWindow = new AlertWindow();
+                alertWindow.Left = ConfigManager.MainWindowRef.Left + (ConfigManager.MainWindowRef.Width * 3 / 4);
+                alertWindow.Top = ConfigManager.MainWindowRef.Top + 30 + (currentAlertWindowCount * alertWindow.Height);
+
+                alertWindow.DisplayAlert(alertLevel, message);
+                alertWindow.Show();
+                await Task.Delay(4004);
+                alertWindow.Close();
+            });
         }
     }
 }

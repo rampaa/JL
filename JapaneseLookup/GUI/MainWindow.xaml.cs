@@ -58,7 +58,7 @@ namespace JapaneseLookup.GUI
                 }
                 catch (Exception e)
                 {
-                    Utils.logger.Information(e, "CopyFromClipboard failed.");
+                    Utils.Logger.Warning(e, "CopyFromClipboard failed");
                 }
             }
         }

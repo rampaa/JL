@@ -85,17 +85,20 @@ namespace JapaneseLookup.Anki
 
                 if (json!.Error == null) return json;
 
-                Utils.logger.Information(json.Error.ToString());
+                Utils.Alert(AlertLevel.Error, json.Error.ToString());
+                Utils.Logger.Error(json.Error.ToString());
                 return null;
             }
             catch (HttpRequestException e)
             {
-                Utils.logger.Information(e, "Communication error: Is Anki open?");
+                Utils.Alert(AlertLevel.Error, "Communication error: Is Anki open?");   
+                Utils.Logger.Error(e, "Communication error: Is Anki open?");
                 return null;
             }
             catch (Exception e)
             {
-                Utils.logger.Information(e, "Communication error: Unknown error");
+                Utils.Alert(AlertLevel.Error, "Communication error: Unknown error");
+                Utils.Logger.Error(e, "Communication error: Unknown error");
                 return null;
             }
         }

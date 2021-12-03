@@ -696,8 +696,7 @@ namespace JapaneseLookup.GUI
 
             // TODO: find a better solution for this that has less latency and prevents the noaudio clip from playing
             var mediaElement = new MediaElement { Source = uri, Volume = 1, Visibility = Visibility.Collapsed };
-            MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
-            mainWindow.MainGrid.Children.Add(mediaElement);
+            ConfigManager.MainWindowRef.MainGrid.Children.Add(mediaElement);
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -753,7 +752,7 @@ namespace JapaneseLookup.GUI
                 ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
                 LastText = "";
                 //todo will only work for the FirstPopupWindow
-                Application.Current.Windows.OfType<MainWindow>().First().MainTextBox_MouseMove(null, null);
+               ConfigManager.MainWindowRef.MainTextBox_MouseMove(null, null);
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowPreferencesWindowKeyGesture))

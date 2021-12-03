@@ -29,6 +29,8 @@ namespace JapaneseLookup
 {
     public static class ConfigManager
     {
+        public static readonly MainWindow MainWindowRef = (MainWindow)Application.Current.MainWindow;
+
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
 
         // private static readonly Stopwatch timer = new();
@@ -358,7 +360,8 @@ namespace JapaneseLookup
             if (Utils.KeyGestureToString(ShowPreferencesWindowKeyGesture) == "None")
                 mainWindow.PreferencesButton.InputGestureText = "";
             else
-                mainWindow.PreferencesButton.InputGestureText = Utils.KeyGestureToString(ShowPreferencesWindowKeyGesture);
+                mainWindow.PreferencesButton.InputGestureText =
+                    Utils.KeyGestureToString(ShowPreferencesWindowKeyGesture);
 
             Utils.Try(() => mainWindow.OpacitySlider.Value = double.Parse(ConfigurationManager.AppSettings
                 .Get("MainWindowOpacity")!), mainWindow.OpacitySlider.Value, "MainWindowOpacity");
@@ -446,7 +449,6 @@ namespace JapaneseLookup
         public static void LoadPreferences(PreferencesWindow preferenceWindow)
         {
             CreateDefaultAppConfig();
-            var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
 
             preferenceWindow.MiningModeKeyGestureTextBox.Text = Utils.KeyGestureToString(MiningModeKeyGesture);
             preferenceWindow.PlayAudioKeyGestureTextBox.Text = Utils.KeyGestureToString(PlayAudioKeyGesture);
@@ -488,14 +490,16 @@ namespace JapaneseLookup
 
             preferenceWindow.TextboxTextColorButton.Background = MainWindowTextColor;
             preferenceWindow.TextboxBacklogTextColorButton.Background = MainWindowBacklogTextColor;
-            preferenceWindow.TextboxFontSizeNumericUpDown.Value = mainWindow.FontSizeSlider.Value;
-            preferenceWindow.TextboxOpacityNumericUpDown.Value = mainWindow.OpacitySlider.Value;
+            preferenceWindow.TextboxFontSizeNumericUpDown.Value = MainWindowRef.FontSizeSlider.Value;
+            preferenceWindow.TextboxOpacityNumericUpDown.Value = MainWindowRef.OpacitySlider.Value;
 
             preferenceWindow.MainWindowFontComboBox.ItemsSource = UiControls.JapaneseFonts;
-            preferenceWindow.MainWindowFontComboBox.SelectedIndex = UiControls.JapaneseFonts.FindIndex(f => f.Content.ToString() == mainWindow.MainTextBox.FontFamily.Source);
+            preferenceWindow.MainWindowFontComboBox.SelectedIndex = UiControls.JapaneseFonts.FindIndex(f =>
+                f.Content.ToString() == MainWindowRef.MainTextBox.FontFamily.Source);
 
             preferenceWindow.PopupFontComboBox.ItemsSource = UiControls.PopupJapaneseFonts;
-            preferenceWindow.PopupFontComboBox.SelectedIndex = UiControls.PopupJapaneseFonts.FindIndex(f => f.Content.ToString() == PopupFont.Source);
+            preferenceWindow.PopupFontComboBox.SelectedIndex =
+                UiControls.PopupJapaneseFonts.FindIndex(f => f.Content.ToString() == PopupFont.Source);
 
             preferenceWindow.PopupMaxHeightNumericUpDown.Value = PopupMaxHeight;
             preferenceWindow.PopupMaxWidthNumericUpDown.Value = PopupMaxWidth;
@@ -661,16 +665,15 @@ namespace JapaneseLookup
             config.AppSettings.Settings["MainWindowWidth"].Value =
                 preferenceWindow.MainWindowWidthNumericUpDown.Value.ToString();
 
-            var mainWindow = Application.Current.Windows.OfType<MainWindow>().First();
-            config.AppSettings.Settings["MainWindowTopPosition"].Value = mainWindow.Top.ToString();
-            config.AppSettings.Settings["MainWindowLeftPosition"].Value = mainWindow.Left.ToString();
+            config.AppSettings.Settings["MainWindowTopPosition"].Value = MainWindowRef.Top.ToString();
+            config.AppSettings.Settings["MainWindowLeftPosition"].Value = MainWindowRef.Left.ToString();
 
             SerializeDicts();
 
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
 
-            await ApplyPreferences(mainWindow).ConfigureAwait(false);
+            await ApplyPreferences(MainWindowRef).ConfigureAwait(false);
         }
 
         public static void SaveBeforeClosing(MainWindow mainWindow)
@@ -707,7 +710,7 @@ namespace JapaneseLookup
             }
             catch (Exception e)
             {
-                Utils.logger.Information(e, "SerializeDicts failed.");
+                Utils.Logger.Fatal(e, "SerializeDicts failed");
                 throw;
             }
         }
@@ -724,8 +727,10 @@ namespace JapaneseLookup
                     }
                 };
 
-                Dictionary<DictType, Dict> deserializedDicts = await JsonSerializer.DeserializeAsync<Dictionary<DictType, Dict>>(
-                    new StreamReader(Path.Join(ApplicationPath, "Config/dicts.json")).BaseStream, jso).ConfigureAwait(false);
+                Dictionary<DictType, Dict> deserializedDicts = await JsonSerializer
+                    .DeserializeAsync<Dictionary<DictType, Dict>>(
+                        new StreamReader(Path.Join(ApplicationPath, "Config/dicts.json")).BaseStream, jso)
+                    .ConfigureAwait(false);
 
                 if (deserializedDicts != null)
                 {
@@ -740,12 +745,13 @@ namespace JapaneseLookup
                 }
                 else
                 {
-                    Utils.logger.Information("Couldn't load Config/dicts.json");
+                    Utils.Alert(AlertLevel.Error, "Couldn't load Config/dicts.json");
+                    Utils.Logger.Error("Couldn't load Config/dicts.json");
                 }
             }
             catch (Exception e)
             {
-                Utils.logger.Information(e, "DeserializeDicts failed.");
+                Utils.Logger.Fatal(e, "DeserializeDicts failed");
                 throw;
             }
         }
@@ -769,7 +775,8 @@ namespace JapaneseLookup
             }
             catch (Exception e)
             {
-                Utils.logger.Information(e, "Couldn't write default Dicts config");
+                Utils.Alert(AlertLevel.Error, "Couldn't write default Dicts config");
+                Utils.Logger.Error(e, "Couldn't write default Dicts config");
             }
         }
 
@@ -836,7 +843,8 @@ namespace JapaneseLookup
                         // KANJIDIC
                         if (dict.Active && !Dicts[DictType.Kanjidic].Contents.Any())
                         {
-                            tasks.Add(Task.Run(async () => await KanjiInfoLoader.Load(dict.Path).ConfigureAwait(false)));
+                            tasks.Add(Task.Run(async () =>
+                                await KanjiInfoLoader.Load(dict.Path).ConfigureAwait(false)));
                         }
 
                         else if (!dict.Active && Dicts[DictType.Kanjidic].Contents.Any())
@@ -849,7 +857,8 @@ namespace JapaneseLookup
                     case DictType.Kenkyuusha:
                         if (dict.Active && !Dicts[DictType.Kenkyuusha].Contents.Any())
                         {
-                            tasks.Add(Task.Run(async () => await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                            tasks.Add(Task.Run(async () =>
+                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
                         }
 
                         else if (!dict.Active && Dicts[DictType.Kenkyuusha].Contents.Any())
@@ -862,7 +871,8 @@ namespace JapaneseLookup
                     case DictType.Daijirin:
                         if (dict.Active && !Dicts[DictType.Daijirin].Contents.Any())
                         {
-                            tasks.Add(Task.Run(async () => await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                            tasks.Add(Task.Run(async () =>
+                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
                         }
 
                         else if (!dict.Active && Dicts[DictType.Daijirin].Contents.Any())
@@ -875,7 +885,8 @@ namespace JapaneseLookup
                     case DictType.Daijisen:
                         if (dict.Active && !Dicts[DictType.Daijisen].Contents.Any())
                         {
-                            tasks.Add(Task.Run(async () => await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                            tasks.Add(Task.Run(async () =>
+                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
                         }
 
                         else if (!dict.Active && Dicts[DictType.Daijisen].Contents.Any())
@@ -888,7 +899,8 @@ namespace JapaneseLookup
                     case DictType.Koujien:
                         if (dict.Active && !Dicts[DictType.Koujien].Contents.Any())
                         {
-                            tasks.Add(Task.Run(async () => await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                            tasks.Add(Task.Run(async () =>
+                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
                         }
 
                         else if (!dict.Active && Dicts[DictType.Koujien].Contents.Any())
@@ -901,7 +913,8 @@ namespace JapaneseLookup
                     case DictType.Meikyou:
                         if (dict.Active && !Dicts[DictType.Meikyou].Contents.Any())
                         {
-                            tasks.Add(Task.Run(async () => await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                            tasks.Add(Task.Run(async () =>
+                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
                         }
 
                         else if (!dict.Active && Dicts[DictType.Meikyou].Contents.Any())
@@ -914,7 +927,8 @@ namespace JapaneseLookup
                     case DictType.CustomWordDictionary:
                         if (dict.Active && !Dicts[DictType.CustomWordDictionary].Contents.Any())
                         {
-                            tasks.Add(Task.Run(async () => await CustomWordLoader.Load(Dicts[DictType.CustomWordDictionary].Path)
+                            tasks.Add(Task.Run(async () => await CustomWordLoader
+                                .Load(Dicts[DictType.CustomWordDictionary].Path)
                                 .ConfigureAwait(false)));
                         }
 
@@ -928,7 +942,9 @@ namespace JapaneseLookup
                     case DictType.CustomNameDictionary:
                         if (dict.Active && !Dicts[DictType.CustomNameDictionary].Contents.Any())
                         {
-                            tasks.Add(Task.Run(async () => await CustomNameLoader.Load(Dicts[DictType.CustomNameDictionary].Path).ConfigureAwait(false)));
+                            tasks.Add(Task.Run(async () =>
+                                await CustomNameLoader.Load(Dicts[DictType.CustomNameDictionary].Path)
+                                    .ConfigureAwait(false)));
                         }
 
                         else if (!dict.Active && Dicts[DictType.CustomNameDictionary].Contents.Any())
@@ -957,7 +973,8 @@ namespace JapaneseLookup
                     Task taskNewFreqlist = Task.Run(async () =>
                     {
                         FrequencyLoader.BuildFreqDict(await FrequencyLoader
-                            .LoadJson(Path.Join(ApplicationPath, FrequencyLists[FrequencyListName])).ConfigureAwait(false));
+                            .LoadJson(Path.Join(ApplicationPath, FrequencyLists[FrequencyListName]))
+                            .ConfigureAwait(false));
                     });
 
                     tasks.Add(taskNewFreqlist);
@@ -968,7 +985,6 @@ namespace JapaneseLookup
             {
                 Task taskLoadWc = Task.Run(async () =>
                 {
-
                     if (!File.Exists(Path.Join(ApplicationPath, "Resource/wc.json")))
                     {
                         if (Dicts[DictType.JMdict].Active)
@@ -986,11 +1002,12 @@ namespace JapaneseLookup
                             {
                                 deleteJmdictFile = true;
                                 await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMdict].Path,
-                                                new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
-                                                DictType.JMdict.ToString(), false, true).ConfigureAwait(false);
+                                    new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
+                                    DictType.JMdict.ToString(), false, true).ConfigureAwait(false);
                             }
 
-                            await Task.Run(async () => await JMdictLoader.Load(Dicts[DictType.JMdict].Path).ConfigureAwait(false));
+                            await Task.Run(async () =>
+                                await JMdictLoader.Load(Dicts[DictType.JMdict].Path).ConfigureAwait(false));
                             await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
                             Dicts[DictType.JMdict].Contents.Clear();
 
@@ -998,6 +1015,7 @@ namespace JapaneseLookup
                                 File.Delete(Path.Join(ApplicationPath, Dicts[DictType.JMdict].Path));
                         }
                     }
+
                     await JmdictWcLoader.Load();
                 });
 
@@ -1017,6 +1035,7 @@ namespace JapaneseLookup
                     //MessageBox.Show("Time taken: " + timeTaken.ToString(@"m\:ss\.fff"), "");
                     //});
                 }
+
                 GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
             }

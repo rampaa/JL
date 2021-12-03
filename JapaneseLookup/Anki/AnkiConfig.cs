@@ -89,7 +89,8 @@ namespace JapaneseLookup.Anki
             }
             catch (Exception e)
             {
-                Utils.logger.Information(e, "Couldn't write AnkiConfig");
+                Utils.Alert(AlertLevel.Error, "Couldn't write AnkiConfig");
+                Utils.Logger.Error(e, "Couldn't write AnkiConfig");
                 return false;
             }
         }
@@ -111,7 +112,8 @@ namespace JapaneseLookup.Anki
             }
             catch (Exception e)
             {
-                Utils.logger.Information(e, "Couldn't read AnkiConfig");
+                Utils.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
+                Utils.Logger.Error(e, "Couldn't read AnkiConfig");
                 return null;
             }
         }

@@ -83,17 +83,19 @@ namespace JapaneseLookup.Anki
 
                 if (response == null)
                 {
-                    Utils.logger.Information($"Mining failed for {foundSpelling}");
+                    Utils.Alert(AlertLevel.Error, $"Mining failed for {foundSpelling}");
+                    Utils.Logger.Error($"Mining failed for {foundSpelling}");
                 }
                 else
                 {
-                    Utils.logger.Information($"Mined {foundSpelling}");
+                    Utils.Alert(AlertLevel.Information, $"Mined {foundSpelling}");
+                    Utils.Logger.Information($"Mined {foundSpelling}");
                     if (ConfigManager.ForceSyncAnki) await AnkiConnect.Sync();
                 }
             }
             catch (Exception e)
             {
-                Utils.logger.Information(e, $"Mining failed for {foundSpelling}");
+                Utils.Logger.Information(e, $"Mining failed for {foundSpelling}");
             }
         }
 
