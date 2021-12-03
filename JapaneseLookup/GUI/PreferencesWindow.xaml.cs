@@ -25,6 +25,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
+using Cursors = System.Windows.Input.Cursors;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MessageBoxOptions = System.Windows.MessageBoxOptions;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
@@ -377,6 +378,7 @@ namespace JapaneseLookup.GUI
                     Width = 200,
                     Text = dict.Path,
                     Margin = new Thickness(10),
+                    Cursor = Cursors.Hand
                 };
 
                 dictPathDisplay.PreviewMouseLeftButtonUp += PathTextbox_PreviewMouseLeftButtonUp;
