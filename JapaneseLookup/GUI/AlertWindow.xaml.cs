@@ -14,14 +14,14 @@ namespace JapaneseLookup.GUI
 
         public void DisplayAlert(AlertLevel alertLevel, string message)
         {
-            AlertWindowTextBox.BorderBrush= alertLevel switch
+            AlertBorder.BorderBrush= alertLevel switch
             {
                 AlertLevel.Error => Brushes.Red,
                 AlertLevel.Warning => Brushes.Orange,
                 AlertLevel.Information => Brushes.White,
                 _ => throw new ArgumentOutOfRangeException(nameof(alertLevel), alertLevel, null)
             };
-            AlertWindowTextBox.Text = message;
+            AlertWindowTextBlock.Text = message;
         }
     }
 }

@@ -8,14 +8,18 @@
         WindowStyle="None"
         AllowsTransparency="True"
         ResizeMode="NoResize"
+        SizeToContent="Height"
         Focusable="False"
-        Title="AlertWindow" Height="128" Width="256" Topmost="True" Background="Transparent">
+        Title="AlertWindow" Height="100" Width="500" Topmost="True" Background="{x:Null}" Foreground="{x:Null}">
     <Grid>
-        <TextBox Name="AlertWindowTextBox"
+        <Border Name="AlertBorder" BorderThickness="2">
+            <TextBlock Name="AlertWindowTextBlock"
                  Focusable="False"
                  FontSize="25"
-                 TextWrapping="Wrap"
-                 IsReadOnly="True"
-                 IsUndoEnabled="False" />
+                 Foreground="White"
+                 Background="Black"
+                 Opacity="0.8"
+                 TextWrapping="Wrap"/>
+        </Border>
     </Grid>
 </Window>

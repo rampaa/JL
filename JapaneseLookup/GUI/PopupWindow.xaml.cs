@@ -23,7 +23,7 @@ namespace JapaneseLookup.GUI
         private static int _playAudioIndex;
 
         private static readonly System.Windows.Interop.WindowInteropHelper InteropHelper =
-            new(Application.Current.MainWindow!);
+            new(MainWindow.Instance);
 
         private static readonly System.Windows.Forms.Screen ActiveScreen =
             System.Windows.Forms.Screen.FromHandle(InteropHelper.Handle);

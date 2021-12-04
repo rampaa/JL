@@ -198,11 +198,12 @@ namespace JapaneseLookup.Utilities
         {
             Application.Current.Dispatcher.Invoke((Action)async delegate
             {
-                int currentAlertWindowCount = Application.Current.Windows.OfType<AlertWindow>().Count();
+                List<AlertWindow> alertWindowList = Application.Current.Windows.OfType<AlertWindow>().ToList();
 
                 AlertWindow alertWindow = new();
-                alertWindow.Left = MainWindow.Instance.Left + (MainWindow.Instance.Width * 3 / 4);
-                alertWindow.Top = MainWindow.Instance.Top + 30 + (currentAlertWindowCount * alertWindow.Height);
+
+                alertWindow.Left = SystemParameters.WorkArea.Width - alertWindow.Width - 30;
+                alertWindow.Top = alertWindowList.Count * ((alertWindowList.LastOrDefault()?.ActualHeight ?? 0) + 2) + 30;
 
                 alertWindow.DisplayAlert(alertLevel, message);
                 alertWindow.Show();
