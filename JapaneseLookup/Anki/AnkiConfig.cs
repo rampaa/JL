@@ -97,9 +97,11 @@ namespace JapaneseLookup.Anki
 
         public static async Task<AnkiConfig> ReadAnkiConfig()
         {
-            try
+            if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Config/AnkiConfig.json")))
             {
-                return JsonSerializer.Deserialize<AnkiConfig>(
+                try
+                {
+                    return JsonSerializer.Deserialize<AnkiConfig>(
                     await File.ReadAllTextAsync(Path.Join(ConfigManager.ApplicationPath, "Config/AnkiConfig.json"))
                         .ConfigureAwait(false),
                     new JsonSerializerOptions
@@ -109,11 +111,21 @@ namespace JapaneseLookup.Anki
                             new JsonStringEnumConverter()
                         }
                     });
+                }
+
+                catch
+                {
+                    Utils.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
+                    Utils.Logger.Error("Couldn't read AnkiConfig");
+                    return null;
+                }
+
             }
-            catch (Exception e)
+
+            else
             {
-                Utils.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
-                Utils.Logger.Error(e, "Couldn't read AnkiConfig");
+                Utils.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
+                Utils.Logger.Error("AnkiConfig.json doesn't exist");
                 return null;
             }
         }

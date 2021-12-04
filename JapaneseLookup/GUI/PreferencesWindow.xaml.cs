@@ -210,19 +210,33 @@ namespace JapaneseLookup.GUI
 
         private async Task PopulateDeckAndModelNames()
         {
-            try
-            {
-                MiningSetupComboBoxDeckNames.ItemsSource = null;
-                var deckNamesList =
-                    JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetDeckNames()).Result.ToString()!);
-                MiningSetupComboBoxDeckNames.ItemsSource = deckNamesList;
+            Response getNameResponse = await AnkiConnect.GetDeckNames();
+            Response getModelResponse = await AnkiConnect.GetModelNames();
 
-                MiningSetupComboBoxModelNames.ItemsSource = null;
-                var modelNamesList =
-                    JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelNames()).Result.ToString()!);
-                MiningSetupComboBoxModelNames.ItemsSource = modelNamesList;
+            if (getNameResponse != null && getModelResponse != null)
+            {
+                try
+                {
+                    List<string> deckNamesList =
+                        JsonSerializer.Deserialize<List<string>>(getNameResponse.Result.ToString()!);
+                    
+                    MiningSetupComboBoxDeckNames.ItemsSource = deckNamesList;
+
+                    List<string> modelNamesList =
+                        JsonSerializer.Deserialize<List<string>>(getModelResponse.Result.ToString()!);
+                    MiningSetupComboBoxModelNames.ItemsSource = modelNamesList;
+                }
+
+                catch
+                {
+                    Utils.Alert(AlertLevel.Error, "Error getting deck and model names");
+                    Utils.Logger.Error("Error getting deck and model names");
+                    MiningSetupComboBoxDeckNames.ItemsSource = "";
+                    MiningSetupComboBoxModelNames.ItemsSource = "";
+                }
             }
-            catch
+
+            else
             {
                 Utils.Alert(AlertLevel.Error, "Error getting deck and model names");
                 Utils.Logger.Error("Error getting deck and model names");
