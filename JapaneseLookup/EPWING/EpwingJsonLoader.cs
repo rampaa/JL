@@ -83,24 +83,22 @@ namespace JapaneseLookup.EPWING
                     break;
                 case DictType.Daijirin:
                     // english definitions
-                    if (result.Definitions.Any(def => def.Contains("→英和")))
+                    if (result.Definitions.Any(def => def.Contains("→英和")
+                    || def.Contains("\\u003")))
                         return false;
 
                     // english definitions
                     if (!result.Definitions.Any(def => MainWindowUtilities.JapaneseRegex.IsMatch(def)))
                         return false;
-                    
-                    // english definitions
-                    if (result.Definitions.Any(def => def.Contains("\\u003")))
-                        return false;
 
                     break;
+
                 case DictType.Daijisen:
                     // kanji definitions
                     if (result.Definitions.Any(def => def.Contains("［音］")))
                         return false;
-
                     break;
+
                 case DictType.Koujien:
                     break;
                 case DictType.Meikyou:
