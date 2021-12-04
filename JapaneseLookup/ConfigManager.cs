@@ -59,7 +59,7 @@ namespace JapaneseLookup
             { "None", "" }
         };
 
-        private static bool initializedPoS = false;
+        private static bool _initializedPoS = false;
 
         public static readonly Dictionary<DictType, Dict> Dicts = new();
 
@@ -980,7 +980,7 @@ namespace JapaneseLookup
                 }
             }
 
-            if (!initializedPoS)
+            if (!_initializedPoS)
             {
                 Task taskLoadWc = Task.Run(async () =>
                 {
@@ -1018,7 +1018,7 @@ namespace JapaneseLookup
                     await JmdictWcLoader.Load();
                 });
 
-                initializedPoS = true;
+                _initializedPoS = true;
 
                 tasks.Add(taskLoadWc);
             }
