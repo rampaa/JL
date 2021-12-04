@@ -9,7 +9,7 @@
         AllowsTransparency="True"
         ResizeMode="NoResize"
         Focusable="False"
-        Title="AlertWindow" Height="128" Width="256">
+        Title="AlertWindow" Height="128" Width="256" Topmost="True">
     <Grid>
         <TextBox Name="AlertWindowTextBox"
                  Focusable="False"
