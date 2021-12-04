@@ -412,6 +412,12 @@
                                        TextWrapping="Wrap" />
                             <CheckBox x:Name="ForceSyncAnkiCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
+                        
+                        <DockPanel Margin="0,10,0,0">
+                            <TextBlock HorizontalAlignment="Left" Text="Allow duplicate cards"
+                                       TextWrapping="Wrap" />
+                            <CheckBox x:Name="AllowDuplicateCardsCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
 
                         <Grid Margin="10,10,10,10">
                             <StackPanel Margin="10">

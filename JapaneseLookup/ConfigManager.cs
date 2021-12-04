@@ -73,6 +73,7 @@ namespace JapaneseLookup
         public static bool KanjiMode { get; set; } = false;
         public static bool InactiveLookupMode { get; set; } = false;
         public static bool ForceSyncAnki { get; set; } = false;
+        public static bool AllowDuplicateCards { get; set; } = false;
         public static int LookupRate { get; set; } = 0;
 
         public static bool PopupDynamicHeight { get; set; } = true;
@@ -125,12 +126,8 @@ namespace JapaneseLookup
         public static FontFamily PopupFont { get; set; } = new("Meiryo");
 
         // consider making this dictionary specific
-        // enabling this seems to improve rendering performance by a lot; need to test if it's because
-        // a) there's less text on the screen overall
-        // b) there's less word-wrapping to do
         public static bool NewlineBetweenDefinitions { get; set; } = false;
-        public static int MaxResults { get; set; } = 99;
-        public static bool AllowDuplicateCards { get; set; } = false;
+
         public static bool Ready { get; set; } = false;
 
         public static async Task ApplyPreferences()
@@ -162,6 +159,8 @@ namespace JapaneseLookup
                 "KanjiMode");
             Utils.Try(() => ForceSyncAnki = bool.Parse(ConfigurationManager.AppSettings.Get("ForceSyncAnki")!),
                 ForceSyncAnki, "ForceSyncAnki");
+            Utils.Try(() => AllowDuplicateCards = bool.Parse(ConfigurationManager.AppSettings.Get("AllowDuplicateCards")!),
+                AllowDuplicateCards, "AllowDuplicateCards");
             Utils.Try(() => LookupRate = int.Parse(ConfigurationManager.AppSettings.Get("LookupRate")!), LookupRate,
                 "LookupRate");
 
@@ -470,6 +469,7 @@ namespace JapaneseLookup
             preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
             preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri;
             preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = ForceSyncAnki;
+            preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = AllowDuplicateCards;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
             preferenceWindow.KanjiModeCheckBox.IsChecked = KanjiMode;
             preferenceWindow.FrequencyListComboBox.ItemsSource = FrequencyLists.Keys;
@@ -594,6 +594,8 @@ namespace JapaneseLookup
                 preferenceWindow.KanjiModeCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["ForceSyncAnki"].Value =
                 preferenceWindow.ForceSyncAnkiCheckBox.IsChecked.ToString();
+            config.AppSettings.Settings["AllowDuplicateCards"].Value =
+                preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["LookupRate"].Value =
                 preferenceWindow.LookupRateNumericUpDown.Value.ToString();
 

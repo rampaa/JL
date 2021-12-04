@@ -538,7 +538,7 @@ namespace JapaneseLookup.GUI
                 bottom.Children.Add(baby);
             }
 
-            if (index != resultsCount - 1 && index != ConfigManager.MaxResults)
+            if (index != resultsCount - 1)
             {
                 bottom.Children.Add(new Separator
                 {
