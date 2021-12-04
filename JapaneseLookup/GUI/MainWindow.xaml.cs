@@ -25,10 +25,10 @@ namespace JapaneseLookup.GUI
         public MainWindow()
         {
             InitializeComponent();
+            Instance = this;
             ConfigManager.ApplyPreferences().ConfigureAwait(false);
             MainWindowUtilities.MainWindowInitializer();
             MainWindowChrome.Freeze();
-            Instance = this;
         }
 
         protected override void OnSourceInitialized(EventArgs e)
