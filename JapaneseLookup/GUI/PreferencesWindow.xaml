@@ -52,6 +52,20 @@
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Highlight color"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <Button x:Name="HighlightColorButton" Content="" HorizontalAlignment="Right"
+                                    Width="60" Click="ShowColorPicker"
+                                    BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Highlight longest word"
+                                       TextWrapping="Wrap" />
+                            <CheckBox x:Name="HighlightLongestWordCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
+
                         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Stretch">
                             <Button x:Name="UpdateJMdictButton" Content="Update JMdict" Margin="5"
                                     HorizontalAlignment="Left"

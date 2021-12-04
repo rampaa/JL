@@ -29,6 +29,7 @@ namespace JapaneseLookup.GUI
             ConfigManager.ApplyPreferences().ConfigureAwait(false);
             MainWindowUtilities.MainWindowInitializer();
             MainWindowChrome.Freeze();
+            MainTextBox.IsInactiveSelectionHighlightEnabled = true;
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -97,14 +98,14 @@ namespace JapaneseLookup.GUI
         {
             if (e.Delta > 0)
             {
-                var allBacklogText = String.Join("\n", MainWindowUtilities.Backlog);
+                var allBacklogText = string.Join("\n", MainWindowUtilities.Backlog);
                 if (MainTextBox.Text != allBacklogText)
                 {
                     if (MainTextBox.GetFirstVisibleLineIndex() == 0)
                     {
                         int caretIndex = allBacklogText.Length - MainTextBox.Text.Length;
                         MainTextBox.Text =
-                            "Character count: " + String.Join("", MainWindowUtilities.Backlog).Length + "\n"
+                            "Character count: " + string.Join("", MainWindowUtilities.Backlog).Length + "\n"
                             + allBacklogText;
                         MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
 

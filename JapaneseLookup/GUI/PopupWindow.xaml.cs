@@ -59,7 +59,6 @@ namespace JapaneseLookup.GUI
                 SizeToContent = SizeToContent.Height;
             else
                 SizeToContent = SizeToContent.Manual;
-
             // need to initialize window (position) for later
             Show();
             Hide();
@@ -95,9 +94,16 @@ namespace JapaneseLookup.GUI
 
                 if (lookupResults != null && lookupResults.Any())
                 {
+                    if (ConfigManager.HighlightLongestWord)
+                    {
+                        tb.Focus();
+                        tb.Select(charPosition, lookupResults[0][LookupResult.FoundForm][0].Length);
+                    }
+
                     ResultStackPanels.Clear();
 
                     Visibility = Visibility.Visible;
+
                     Activate();
                     Focus();
 
@@ -163,24 +169,19 @@ namespace JapaneseLookup.GUI
 
         private void DisplayResults(bool generateAllResults)
         {
-            var results = LastLookupResults;
+            int resultCount = LastLookupResults.Count;
 
-            for (int index = 0; index < results.Count; index++)
+            for (int index = 0; index < resultCount; index++)
             {
-                double currentHeight = 0;
-                foreach (StackPanel item in StackPanel.Items)
+                if (!generateAllResults)
                 {
-                    item.UpdateLayout();
-                    currentHeight += item.ActualHeight;
+                    PopupStackPanel.UpdateLayout();
+
+                    if (PopupStackPanel.ActualHeight >= MaxHeight)
+                        return;
                 }
 
-                if (currentHeight > MaxHeight && !generateAllResults)
-                    return;
-
-                var result = results[index];
-                StackPanel resultStackPanel = MakeResultStackPanel(result, index, results.Count);
-
-                ResultStackPanels.Add(resultStackPanel);
+                ResultStackPanels.Add(MakeResultStackPanel(LastLookupResults[index], index, resultCount));
             }
         }
 
@@ -309,7 +310,10 @@ namespace JapaneseLookup.GUI
                                 IsReadOnly = true,
                                 IsUndoEnabled = false,
                                 Cursor = Cursors.Arrow,
+                                SelectionBrush = ConfigManager.HighlightColor,
+                                IsInactiveSelectionHighlightEnabled = true,
                             };
+
                             textBlockDefinitions.MouseMove += (sender, _) =>
                             {
                                 ChildPopupWindow ??= new PopupWindow();
@@ -366,6 +370,7 @@ namespace JapaneseLookup.GUI
                         break;
 
                     case LookupResult.POrthographyInfoList:
+
                         textBlockPOrthographyInfo = new TextBlock
                         {
                             Name = key.ToString(),
@@ -710,6 +715,7 @@ namespace JapaneseLookup.GUI
                 Focus();
 
                 ResultStackPanels.Clear();
+
                 DisplayResults(true);
             }
 
@@ -718,7 +724,7 @@ namespace JapaneseLookup.GUI
                 string foundSpelling = null;
                 string reading = null;
 
-                var innerStackPanel = (StackPanel)StackPanel.Items[_playAudioIndex];
+                var innerStackPanel = (StackPanel)PopupStackPanel.Items[_playAudioIndex];
                 var top = (WrapPanel)innerStackPanel.Children[0];
 
                 foreach (TextBlock child in top.Children)

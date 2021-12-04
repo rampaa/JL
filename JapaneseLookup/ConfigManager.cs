@@ -70,6 +70,7 @@ namespace JapaneseLookup
         public static double MainWindowHeight { get; set; } = 200;
         public static double MainWindowWidth { get; set; } = 800;
 
+        public static bool HighlightLongestWord { get; set; } = false;
         public static bool KanjiMode { get; set; } = false;
         public static bool InactiveLookupMode { get; set; } = false;
         public static bool ForceSyncAnki { get; set; } = false;
@@ -93,6 +94,7 @@ namespace JapaneseLookup
         public static Brush PopupBackgroundColor { get; set; } = Brushes.Black;
         public static Brush POrthographyInfoColor { get; set; } = Brushes.White;
         public static Brush DictTypeColor { get; set; } = Brushes.LightBlue;
+        public static Brush HighlightColor { get; set; } = Brushes.AliceBlue;
 
         public static KeyGesture MiningModeKeyGesture { get; set; } = new(Key.M, ModifierKeys.Windows);
         public static KeyGesture PlayAudioKeyGesture { get; set; } = new(Key.P, ModifierKeys.Windows);
@@ -152,6 +154,9 @@ namespace JapaneseLookup
             }
 
             AnkiConnectUri = tempStr;
+            
+            Utils.Try(() => HighlightLongestWord = bool.Parse(ConfigurationManager.AppSettings.Get("HighlightLongestWord")!),
+                HighlightLongestWord, "HighlightLongestWord");
 
             Utils.Try(() => MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength")!),
                 MaxSearchLength, "MaxSearchLength");
@@ -244,6 +249,12 @@ namespace JapaneseLookup
                 DictTypeColor, "DictTypeColor");
             DictTypeColor!.Freeze();
 
+            Utils.Try(() =>
+                    HighlightColor = (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("HighlightColor")),
+                 HighlightColor, "HighlightColor");
+            HighlightColor.Freeze();
+            MainWindow.Instance.MainTextBox.SelectionBrush = HighlightColor;
 
             Utils.Try(() =>
                 PopupBackgroundColor = (SolidColorBrush)new BrushConverter()
@@ -449,6 +460,7 @@ namespace JapaneseLookup
             preferenceWindow.MiningModeKeyGestureTextBox.Text = Utils.KeyGestureToString(MiningModeKeyGesture);
             preferenceWindow.PlayAudioKeyGestureTextBox.Text = Utils.KeyGestureToString(PlayAudioKeyGesture);
             preferenceWindow.KanjiModeKeyGestureTextBox.Text = Utils.KeyGestureToString(KanjiModeKeyGesture);
+
             preferenceWindow.ShowPreferencesWindowKeyGestureTextBox.Text =
                 Utils.KeyGestureToString(ShowPreferencesWindowKeyGesture);
             preferenceWindow.ShowAddNameWindowKeyGestureTextBox.Text =
@@ -472,6 +484,7 @@ namespace JapaneseLookup
             preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = AllowDuplicateCards;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
             preferenceWindow.KanjiModeCheckBox.IsChecked = KanjiMode;
+            preferenceWindow.HighlightLongestWordCheckBox.IsChecked = HighlightLongestWord;
             preferenceWindow.FrequencyListComboBox.ItemsSource = FrequencyLists.Keys;
             preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyListName;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
@@ -479,6 +492,7 @@ namespace JapaneseLookup
             preferenceWindow.MainWindowHeightNumericUpDown.Value = MainWindowHeight;
             preferenceWindow.MainWindowWidthNumericUpDown.Value = MainWindowWidth;
 
+            preferenceWindow.HighlightColorButton.Background = HighlightColor;
 
             Utils.Try(() => preferenceWindow.TextboxBackgroundColorButton.Background =
                     (SolidColorBrush)new BrushConverter()
@@ -598,6 +612,10 @@ namespace JapaneseLookup
                 preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["LookupRate"].Value =
                 preferenceWindow.LookupRateNumericUpDown.Value.ToString();
+            config.AppSettings.Settings["HighlightLongestWord"].Value =
+                preferenceWindow.HighlightLongestWordCheckBox.IsChecked.ToString();
+            config.AppSettings.Settings["HighlightColor"].Value =
+                preferenceWindow.HighlightColorButton.Background.ToString();
 
             config.AppSettings.Settings["PopupMaxWidth"].Value =
                 preferenceWindow.PopupMaxWidthNumericUpDown.Value.ToString();
