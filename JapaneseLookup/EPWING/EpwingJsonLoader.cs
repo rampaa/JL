@@ -89,6 +89,10 @@ namespace JapaneseLookup.EPWING
                     // english definitions
                     if (!result.Definitions.Any(def => MainWindowUtilities.JapaneseRegex.IsMatch(def)))
                         return false;
+                    
+                    // english definitions
+                    if (result.Definitions.Any(def => def.Contains("\\u003")))
+                        return false;
 
                     break;
                 case DictType.Daijisen:
