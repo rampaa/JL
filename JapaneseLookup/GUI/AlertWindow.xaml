@@ -10,7 +10,7 @@
         ResizeMode="NoResize"
         SizeToContent="Height"
         Focusable="False"
-        Title="AlertWindow" Height="100" Width="500" Topmost="True" Background="{x:Null}" Foreground="{x:Null}">
+        Title="AlertWindow" MaxHeight="200" Width="500" Topmost="True" Background="{x:Null}" Foreground="{x:Null}">
     <Grid>
         <Border Name="AlertBorder" BorderThickness="2">
             <TextBlock Name="AlertWindowTextBlock"
