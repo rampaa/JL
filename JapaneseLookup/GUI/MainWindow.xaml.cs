@@ -20,12 +20,15 @@ namespace JapaneseLookup.GUI
             get { return _firstPopupWindow ??= new PopupWindow(); }
         }
 
+        public static MainWindow Instance { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
-            ConfigManager.ApplyPreferences(this).ConfigureAwait(false);
+            ConfigManager.ApplyPreferences().ConfigureAwait(false);
             MainWindowUtilities.MainWindowInitializer();
             MainWindowChrome.Freeze();
+            Instance = this;
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -70,11 +73,11 @@ namespace JapaneseLookup.GUI
 
         public void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
-            if (MWindow.Background.Opacity == 0 || ConfigManager.InactiveLookupMode) return;
+            if (Background.Opacity == 0 || ConfigManager.InactiveLookupMode) return;
             FirstPopupWindow.TextBox_MouseMove(MainTextBox);
         }
 
-        private void MWindow_Closed(object sender, EventArgs e)
+        private void MainWindow_Closed(object sender, EventArgs e)
         {
             Application.Current.Shutdown();
         }
@@ -150,8 +153,8 @@ namespace JapaneseLookup.GUI
         {
             FontSizeSlider.Visibility = Visibility.Collapsed;
 
-            if (MWindow.Background.Opacity == 0)
-                MWindow.Background.Opacity = OpacitySlider.Value / 100;
+            if (Background.Opacity == 0)
+                Background.Opacity = OpacitySlider.Value / 100;
 
             else if (OpacitySlider.Visibility == Visibility.Collapsed)
             {
@@ -177,14 +180,14 @@ namespace JapaneseLookup.GUI
                 FontSizeSlider.Visibility = Visibility.Collapsed;
         }
 
-        private void MWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            ConfigManager.SaveBeforeClosing(this);
+            ConfigManager.SaveBeforeClosing();
         }
 
         private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            MWindow.Background.Opacity = OpacitySlider.Value / 100;
+            Background.Opacity = OpacitySlider.Value / 100;
         }
 
         private void FontSizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -192,7 +195,7 @@ namespace JapaneseLookup.GUI
             MainTextBox.FontSize = FontSizeSlider.Value;
         }
 
-        private void MWindow_KeyDown(object sender, KeyEventArgs e)
+        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if (ConfigManager.Ready && Utils.KeyGestureComparer(e, ConfigManager.ShowPreferencesWindowKeyGesture))
             {
@@ -201,7 +204,7 @@ namespace JapaneseLookup.GUI
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.MousePassThroughModeKeyGesture))
             {
-                MWindow.Background.Opacity = 0;
+                Background.Opacity = 0;
                 Keyboard.ClearFocus();
             }
 
@@ -253,7 +256,7 @@ namespace JapaneseLookup.GUI
             MainWindowUtilities.SearchWithBrowser();
         }
 
-        private void MWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             SteppedBacklog(e);
         }
@@ -307,7 +310,7 @@ namespace JapaneseLookup.GUI
             FontSizeSlider.Visibility = Visibility.Collapsed;
         }
 
-        private void MWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             ConfigManager.MainWindowHeight = Height;
             ConfigManager.MainWindowWidth = Width;

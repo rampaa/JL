@@ -29,8 +29,6 @@ namespace JapaneseLookup
 {
     public static class ConfigManager
     {
-        public static readonly MainWindow MainWindowRef = (MainWindow)Application.Current.MainWindow;
-
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
 
         // private static readonly Stopwatch timer = new();
@@ -135,7 +133,7 @@ namespace JapaneseLookup
         public static bool AllowDuplicateCards { get; set; } = false;
         public static bool Ready { get; set; } = false;
 
-        public static async Task ApplyPreferences(MainWindow mainWindow)
+        public static async Task ApplyPreferences()
         {
             Ready = false;
 
@@ -343,30 +341,30 @@ namespace JapaneseLookup
                 Utils.KeyGestureSetter("InactiveLookupModeKeyGesture", InactiveLookupModeKeyGesture);
 
             if (Utils.KeyGestureToString(ShowAddNameWindowKeyGesture) == "None")
-                mainWindow.AddNameButton.InputGestureText = "";
+                MainWindow.Instance.AddNameButton.InputGestureText = "";
             else
-                mainWindow.AddNameButton.InputGestureText = Utils.KeyGestureToString(ShowAddNameWindowKeyGesture);
+                MainWindow.Instance.AddNameButton.InputGestureText = Utils.KeyGestureToString(ShowAddNameWindowKeyGesture);
 
             if (Utils.KeyGestureToString(ShowAddWordWindowKeyGesture) == "None")
-                mainWindow.AddWordButton.InputGestureText = "";
+                MainWindow.Instance.AddWordButton.InputGestureText = "";
             else
-                mainWindow.AddWordButton.InputGestureText = Utils.KeyGestureToString(ShowAddWordWindowKeyGesture);
+                MainWindow.Instance.AddWordButton.InputGestureText = Utils.KeyGestureToString(ShowAddWordWindowKeyGesture);
 
             if (Utils.KeyGestureToString(SearchWithBrowserKeyGesture) == "None")
-                mainWindow.SearchButton.InputGestureText = "";
+                MainWindow.Instance.SearchButton.InputGestureText = "";
             else
-                mainWindow.SearchButton.InputGestureText = Utils.KeyGestureToString(SearchWithBrowserKeyGesture);
+                MainWindow.Instance.SearchButton.InputGestureText = Utils.KeyGestureToString(SearchWithBrowserKeyGesture);
 
             if (Utils.KeyGestureToString(ShowPreferencesWindowKeyGesture) == "None")
-                mainWindow.PreferencesButton.InputGestureText = "";
+                MainWindow.Instance.PreferencesButton.InputGestureText = "";
             else
-                mainWindow.PreferencesButton.InputGestureText =
+                MainWindow.Instance.PreferencesButton.InputGestureText =
                     Utils.KeyGestureToString(ShowPreferencesWindowKeyGesture);
 
-            Utils.Try(() => mainWindow.OpacitySlider.Value = double.Parse(ConfigurationManager.AppSettings
-                .Get("MainWindowOpacity")!), mainWindow.OpacitySlider.Value, "MainWindowOpacity");
-            Utils.Try(() => mainWindow.FontSizeSlider.Value = double.Parse(ConfigurationManager.AppSettings
-                .Get("MainWindowFontSize")!), mainWindow.FontSizeSlider.Value, "MainWindowFontSize");
+            Utils.Try(() => MainWindow.Instance.OpacitySlider.Value = double.Parse(ConfigurationManager.AppSettings
+                .Get("MainWindowOpacity")!), MainWindow.Instance.OpacitySlider.Value, "MainWindowOpacity");
+            Utils.Try(() => MainWindow.Instance.FontSizeSlider.Value = double.Parse(ConfigurationManager.AppSettings
+                .Get("MainWindowFontSize")!), MainWindow.Instance.FontSizeSlider.Value, "MainWindowFontSize");
 
             tempStr = ConfigurationManager.AppSettings.Get("MainWindowFont");
 
@@ -376,32 +374,31 @@ namespace JapaneseLookup
                 tempStr = "Meiryo";
             }
 
-            mainWindow.MainTextBox.FontFamily = new FontFamily(tempStr);
+            MainWindow.Instance.MainTextBox.FontFamily = new FontFamily(tempStr);
 
             Utils.Try(() =>
-                    mainWindow.Background = (SolidColorBrush)new BrushConverter()
+                    MainWindow.Instance.Background = (SolidColorBrush)new BrushConverter()
                         .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor")),
-                mainWindow.Background, "MainWindowBackgroundColor");
-            mainWindow.Background.Opacity = mainWindow.OpacitySlider.Value / 100;
+                MainWindow.Instance.Background, "MainWindowBackgroundColor");
+            MainWindow.Instance.Background.Opacity = MainWindow.Instance.OpacitySlider.Value / 100;
 
-            mainWindow.MainTextBox.Foreground = MainWindowTextColor;
+            MainWindow.Instance.MainTextBox.Foreground = MainWindowTextColor;
 
             Utils.Try(() => MainWindowHeight = double.Parse(ConfigurationManager.AppSettings
                 .Get("MainWindowHeight")!), MainWindowHeight, "MainWindowHeight");
-            mainWindow.Height = MainWindowHeight;
+            MainWindow.Instance.Height = MainWindowHeight;
 
             Utils.Try(() => MainWindowWidth = double.Parse(ConfigurationManager.AppSettings
                 .Get("MainWindowWidth")!), MainWindowWidth, "MainWindowWidth");
-            mainWindow.Width = MainWindowWidth;
+            MainWindow.Instance.Width = MainWindowWidth;
 
-            Utils.Try(() => mainWindow.Top = double.Parse(ConfigurationManager.AppSettings
-                .Get("MainWindowTopPosition")!), mainWindow.Top, "MainWindowTopPosition");
+            Utils.Try(() => MainWindow.Instance.Top = double.Parse(ConfigurationManager.AppSettings
+                .Get("MainWindowTopPosition")!), MainWindow.Instance.Top, "MainWindowTopPosition");
 
-            Utils.Try(() => mainWindow.Left = double.Parse(ConfigurationManager.AppSettings
-                .Get("MainWindowLeftPosition")!), mainWindow.Left, "MainWindowLeftPosition");
+            Utils.Try(() => MainWindow.Instance.Left = double.Parse(ConfigurationManager.AppSettings
+                .Get("MainWindowLeftPosition")!), MainWindow.Instance.Left, "MainWindowLeftPosition");
 
-            var firstPopupWindow = MainWindow.FirstPopupWindow;
-            firstPopupWindow.Background = PopupBackgroundColor;
+            MainWindow.FirstPopupWindow.Background = PopupBackgroundColor;
 
             tempStr = ConfigurationManager.AppSettings.Get("PopupFont");
 
@@ -410,7 +407,7 @@ namespace JapaneseLookup
             else
                 PopupFont = new FontFamily(tempStr);
 
-            firstPopupWindow.FontFamily = PopupFont;
+            MainWindow.FirstPopupWindow.FontFamily = PopupFont;
 
             Utils.Try(() => PopupDynamicHeight = bool.Parse(ConfigurationManager.AppSettings
                 .Get("PopupDynamicHeight")!), PopupDynamicHeight, "PopupDynamicHeight");
@@ -418,16 +415,16 @@ namespace JapaneseLookup
                 .Get("PopupDynamicWidth")!), PopupDynamicWidth, "PopupDynamicWidth");
 
             if (PopupDynamicWidth && PopupDynamicHeight)
-                firstPopupWindow.SizeToContent = SizeToContent.WidthAndHeight;
+                MainWindow.FirstPopupWindow.SizeToContent = SizeToContent.WidthAndHeight;
 
             else if (PopupDynamicWidth)
-                firstPopupWindow.SizeToContent = SizeToContent.Width;
+                MainWindow.FirstPopupWindow.SizeToContent = SizeToContent.Width;
 
             else if (PopupDynamicHeight)
-                firstPopupWindow.SizeToContent = SizeToContent.Height;
+                MainWindow.FirstPopupWindow.SizeToContent = SizeToContent.Height;
 
             else
-                firstPopupWindow.SizeToContent = SizeToContent.Manual;
+                MainWindow.FirstPopupWindow.SizeToContent = SizeToContent.Manual;
 
             if (!File.Exists(Path.Join(ApplicationPath, "Config/dicts.json")))
                 CreateDefaultDictsConfig();
@@ -490,12 +487,12 @@ namespace JapaneseLookup
 
             preferenceWindow.TextboxTextColorButton.Background = MainWindowTextColor;
             preferenceWindow.TextboxBacklogTextColorButton.Background = MainWindowBacklogTextColor;
-            preferenceWindow.TextboxFontSizeNumericUpDown.Value = MainWindowRef.FontSizeSlider.Value;
-            preferenceWindow.TextboxOpacityNumericUpDown.Value = MainWindowRef.OpacitySlider.Value;
+            preferenceWindow.TextboxFontSizeNumericUpDown.Value = MainWindow.Instance.FontSizeSlider.Value;
+            preferenceWindow.TextboxOpacityNumericUpDown.Value = MainWindow.Instance.OpacitySlider.Value;
 
             preferenceWindow.MainWindowFontComboBox.ItemsSource = UiControls.JapaneseFonts;
             preferenceWindow.MainWindowFontComboBox.SelectedIndex = UiControls.JapaneseFonts.FindIndex(f =>
-                f.Content.ToString() == MainWindowRef.MainTextBox.FontFamily.Source);
+                f.Content.ToString() == MainWindow.Instance.MainTextBox.FontFamily.Source);
 
             preferenceWindow.PopupFontComboBox.ItemsSource = UiControls.PopupJapaneseFonts;
             preferenceWindow.PopupFontComboBox.SelectedIndex =
@@ -665,29 +662,29 @@ namespace JapaneseLookup
             config.AppSettings.Settings["MainWindowWidth"].Value =
                 preferenceWindow.MainWindowWidthNumericUpDown.Value.ToString();
 
-            config.AppSettings.Settings["MainWindowTopPosition"].Value = MainWindowRef.Top.ToString();
-            config.AppSettings.Settings["MainWindowLeftPosition"].Value = MainWindowRef.Left.ToString();
+            config.AppSettings.Settings["MainWindowTopPosition"].Value = MainWindow.Instance.Top.ToString();
+            config.AppSettings.Settings["MainWindowLeftPosition"].Value = MainWindow.Instance.Left.ToString();
 
             SerializeDicts();
 
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
-
-            await ApplyPreferences(MainWindowRef).ConfigureAwait(false);
+            
+            await ApplyPreferences().ConfigureAwait(false);
         }
 
-        public static void SaveBeforeClosing(MainWindow mainWindow)
+        public static void SaveBeforeClosing()
         {
             CreateDefaultAppConfig();
 
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
-            config.AppSettings.Settings["MainWindowFontSize"].Value = mainWindow.FontSizeSlider.Value.ToString();
-            config.AppSettings.Settings["MainWindowOpacity"].Value = mainWindow.OpacitySlider.Value.ToString();
+            config.AppSettings.Settings["MainWindowFontSize"].Value = MainWindow.Instance.FontSizeSlider.Value.ToString();
+            config.AppSettings.Settings["MainWindowOpacity"].Value = MainWindow.Instance.OpacitySlider.Value.ToString();
             config.AppSettings.Settings["MainWindowHeight"].Value = MainWindowHeight.ToString();
             config.AppSettings.Settings["MainWindowWidth"].Value = MainWindowWidth.ToString();
-            config.AppSettings.Settings["MainWindowTopPosition"].Value = mainWindow.Top.ToString();
-            config.AppSettings.Settings["MainWindowLeftPosition"].Value = mainWindow.Left.ToString();
+            config.AppSettings.Settings["MainWindowTopPosition"].Value = MainWindow.Instance.Top.ToString();
+            config.AppSettings.Settings["MainWindowLeftPosition"].Value = MainWindow.Instance.Left.ToString();
 
             config.Save(ConfigurationSaveMode.Modified);
         }

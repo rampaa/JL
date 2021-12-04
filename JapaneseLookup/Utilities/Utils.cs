@@ -200,9 +200,9 @@ namespace JapaneseLookup.Utilities
             {
                 int currentAlertWindowCount = Application.Current.Windows.OfType<AlertWindow>().Count();
 
-                var alertWindow = new AlertWindow();
-                alertWindow.Left = ConfigManager.MainWindowRef.Left + (ConfigManager.MainWindowRef.Width * 3 / 4);
-                alertWindow.Top = ConfigManager.MainWindowRef.Top + 30 + (currentAlertWindowCount * alertWindow.Height);
+                AlertWindow alertWindow = new();
+                alertWindow.Left = MainWindow.Instance.Left + (MainWindow.Instance.Width * 3 / 4);
+                alertWindow.Top = MainWindow.Instance.Top + 30 + (currentAlertWindowCount * alertWindow.Height);
 
                 alertWindow.DisplayAlert(alertLevel, message);
                 alertWindow.Show();
