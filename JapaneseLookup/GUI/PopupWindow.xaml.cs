@@ -94,7 +94,7 @@ namespace JapaneseLookup.GUI
 
                 if (lookupResults != null && lookupResults.Any())
                 {
-                    if (ConfigManager.HighlightLongestWord)
+                    if (ConfigManager.HighlightLongestMatch)
                     {
                         tb.Focus();
                         tb.Select(charPosition, lookupResults[0][LookupResult.FoundForm][0].Length);

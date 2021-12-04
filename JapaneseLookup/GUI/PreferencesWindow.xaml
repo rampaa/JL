@@ -61,9 +61,9 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Highlight longest word"
+                            <TextBlock HorizontalAlignment="Left" Text="Highlight longest match"
                                        TextWrapping="Wrap" />
-                            <CheckBox x:Name="HighlightLongestWordCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="HighlightLongestMatchCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Stretch">

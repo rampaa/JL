@@ -70,7 +70,7 @@ namespace JapaneseLookup
         public static double MainWindowHeight { get; set; } = 200;
         public static double MainWindowWidth { get; set; } = 800;
 
-        public static bool HighlightLongestWord { get; set; } = false;
+        public static bool HighlightLongestMatch { get; set; } = false;
         public static bool KanjiMode { get; set; } = false;
         public static bool InactiveLookupMode { get; set; } = false;
         public static bool ForceSyncAnki { get; set; } = false;
@@ -155,8 +155,8 @@ namespace JapaneseLookup
 
             AnkiConnectUri = tempStr;
             
-            Utils.Try(() => HighlightLongestWord = bool.Parse(ConfigurationManager.AppSettings.Get("HighlightLongestWord")!),
-                HighlightLongestWord, "HighlightLongestWord");
+            Utils.Try(() => HighlightLongestMatch = bool.Parse(ConfigurationManager.AppSettings.Get("HighlightLongestMatch")!),
+                HighlightLongestMatch, "HighlightLongestMatch");
 
             Utils.Try(() => MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength")!),
                 MaxSearchLength, "MaxSearchLength");
@@ -484,7 +484,7 @@ namespace JapaneseLookup
             preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = AllowDuplicateCards;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
             preferenceWindow.KanjiModeCheckBox.IsChecked = KanjiMode;
-            preferenceWindow.HighlightLongestWordCheckBox.IsChecked = HighlightLongestWord;
+            preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
             preferenceWindow.FrequencyListComboBox.ItemsSource = FrequencyLists.Keys;
             preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyListName;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
@@ -612,8 +612,8 @@ namespace JapaneseLookup
                 preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["LookupRate"].Value =
                 preferenceWindow.LookupRateNumericUpDown.Value.ToString();
-            config.AppSettings.Settings["HighlightLongestWord"].Value =
-                preferenceWindow.HighlightLongestWordCheckBox.IsChecked.ToString();
+            config.AppSettings.Settings["HighlightLongestMatch"].Value =
+                preferenceWindow.HighlightLongestMatchCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["HighlightColor"].Value =
                 preferenceWindow.HighlightColorButton.Background.ToString();
 
