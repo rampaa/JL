@@ -1009,7 +1009,7 @@ namespace JapaneseLookup
             {
                 Task taskLoadWc = Task.Run(async () =>
                 {
-                    if (!File.Exists(Path.Join(ApplicationPath, "Resource/wc.json")))
+                    if (!File.Exists(Path.Join(ApplicationPath, "Resource/PoS.json")))
                     {
                         if (Dicts[DictType.JMdict].Active)
                         {
