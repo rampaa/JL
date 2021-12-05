@@ -5,8 +5,8 @@ JL is . Inspired by Nazeka and Chiitrans Lite.
 Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer the x86 version for 50-80% less memory usage.
 
 ## System requirements
-Windows 7 or later
-.NET Desktop Runtime 6.0 or later
+* Windows 7 or later
+* .NET Desktop Runtime 6.0 or later
 
 ## Supported dictionaries
 
