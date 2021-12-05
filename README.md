@@ -1,4 +1,5 @@
 # JL
+JL is . Inspired by Nazeka and Chiitrans.
 
 ## Supported dictionaries
 
