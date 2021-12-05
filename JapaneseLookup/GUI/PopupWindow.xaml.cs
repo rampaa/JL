@@ -65,7 +65,11 @@ namespace JapaneseLookup.GUI
 
         public void TextBox_MouseMove(TextBox tb)
         {
-            if (MiningMode || ConfigManager.InactiveLookupMode) return;
+            if ( MiningMode || ConfigManager.InactiveLookupMode
+                || (ConfigManager.RequireLookupKeyPress 
+                && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
+                )
+                return;
 
             UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
@@ -352,6 +356,10 @@ namespace JapaneseLookup.GUI
                                     || Background.Opacity == 0
                                     || ConfigManager.InactiveLookupMode)
                                     return;
+
+                                //if (ConfigManager.RequireLookupKeyPress
+                                //    && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
+                                //    return;
 
                                 ChildPopupWindow ??= new PopupWindow();
 

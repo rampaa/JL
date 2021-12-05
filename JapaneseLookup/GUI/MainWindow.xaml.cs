@@ -75,7 +75,7 @@ namespace JapaneseLookup.GUI
 
         public void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
-            if (ConfigManager.LookupOnSelectOnly || Background.Opacity == 0 || ConfigManager.InactiveLookupMode) return;
+            if (ConfigManager.LookupOnSelectOnly || Background.Opacity == 0) return;
             FirstPopupWindow.TextBox_MouseMove(MainTextBox);
         }
 
@@ -335,6 +335,10 @@ namespace JapaneseLookup.GUI
             if (!ConfigManager.LookupOnSelectOnly
                 || Background.Opacity == 0
                 || ConfigManager.InactiveLookupMode) return;
+
+            //if (ConfigManager.RequireLookupKeyPress
+            //    && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
+            //    return;
 
             FirstPopupWindow.LookupOnSelect(MainTextBox);
         }

@@ -72,6 +72,7 @@ namespace JapaneseLookup
 
         public static bool HighlightLongestMatch { get; set; } = false;
         public static bool LookupOnSelectOnly { get; set; } = false;
+        public static bool RequireLookupKeyPress { get; set; } = false;
         public static bool KanjiMode { get; set; } = false;
         public static bool InactiveLookupMode { get; set; } = false;
         public static bool ForceSyncAnki { get; set; } = false;
@@ -108,7 +109,8 @@ namespace JapaneseLookup
         public static KeyGesture SteppedBacklogBackwardsKeyGesture { get; set; } = new(Key.Left, ModifierKeys.Windows);
         public static KeyGesture SteppedBacklogForwardsKeyGesture { get; set; } = new(Key.Right, ModifierKeys.Windows);
         public static KeyGesture InactiveLookupModeKeyGesture { get; set; } = new(Key.Q, ModifierKeys.Windows);
-
+        public static ModifierKeys LookupKey { get; set; } = ModifierKeys.Alt;
+        // (ModifierKeys)new ModifierKeysConverter().ConvertFromString(rawModifierKey);
         public static int PrimarySpellingFontSize { get; set; } = 21;
         public static int ReadingsFontSize { get; set; } = 19;
         public static int ROrthographyInfoFontSize { get; set; } = 17;
@@ -158,9 +160,6 @@ namespace JapaneseLookup
             
             Utils.Try(() => HighlightLongestMatch = bool.Parse(ConfigurationManager.AppSettings.Get("HighlightLongestMatch")!),
                 HighlightLongestMatch, "HighlightLongestMatch");
-            
-            Utils.Try(() => LookupOnSelectOnly = bool.Parse(ConfigurationManager.AppSettings.Get("LookupOnSelectOnly")!),
-                LookupOnSelectOnly, "LookupOnSelectOnly");
 
             Utils.Try(() => MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength")!),
                 MaxSearchLength, "MaxSearchLength");
@@ -172,6 +171,11 @@ namespace JapaneseLookup
                 AllowDuplicateCards, "AllowDuplicateCards");
             Utils.Try(() => LookupRate = int.Parse(ConfigurationManager.AppSettings.Get("LookupRate")!), LookupRate,
                 "LookupRate");
+
+            Utils.Try(() => LookupKey = (ModifierKeys)new ModifierKeysConverter()
+                         .ConvertFromString(ConfigurationManager.AppSettings.Get("LookupKey")!),
+                         LookupKey, "LookupKey");
+
 
             // MAKE SURE YOU FREEZE ANY NEW COLOR OBJECTS YOU ADD
             // OR THE PROGRAM WILL CRASH AND BURN
@@ -301,14 +305,7 @@ namespace JapaneseLookup
 
             if (tempStr == null)
             {
-                tempStr = "Both";
-
-                Utils.AddToConfig("PopupFlip", tempStr);
-
-                if (ConfigurationManager.AppSettings.Get("PopupFlipX") == null)
-                    Utils.AddToConfig("PopupFlipX", "True");
-                if (ConfigurationManager.AppSettings.Get("PopupFlipY") == null)
-                    Utils.AddToConfig("PopupFlipY", "True");
+                Utils.AddToConfig("PopupFlip", "Both");
             }
 
             switch (ConfigurationManager.AppSettings.Get("PopupFlip"))
@@ -331,6 +328,36 @@ namespace JapaneseLookup
                 default:
                     PopupFlipX = false;
                     PopupFlipY = true;
+                    break;
+            }
+
+            tempStr = ConfigurationManager.AppSettings.Get("LookupMode");
+
+            if (tempStr == null)
+            {
+                Utils.AddToConfig("LookupMode", "1");
+            }
+
+            switch (ConfigurationManager.AppSettings.Get("LookupMode"))
+            {
+                case "1":
+                    RequireLookupKeyPress = false;
+                    LookupOnSelectOnly = false;
+                    break;
+
+                case "2":
+                    RequireLookupKeyPress = true;
+                    LookupOnSelectOnly = false;
+                    break;
+
+                case "3":
+                    RequireLookupKeyPress = false;
+                    LookupOnSelectOnly = true;
+                    break;
+
+                default:
+                    RequireLookupKeyPress = false;
+                    LookupOnSelectOnly = false;
                     break;
             }
 
@@ -489,7 +516,6 @@ namespace JapaneseLookup
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
             preferenceWindow.KanjiModeCheckBox.IsChecked = KanjiMode;
             preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
-            preferenceWindow.LookupOnSelectOnlyCheckBox.IsChecked = LookupOnSelectOnly;
             preferenceWindow.FrequencyListComboBox.ItemsSource = FrequencyLists.Keys;
             preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyListName;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
@@ -557,6 +583,8 @@ namespace JapaneseLookup
             preferenceWindow.PopupYOffsetNumericUpDown.Value = PopupYOffset;
 
             preferenceWindow.PopupFlipComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("PopupFlip");
+            preferenceWindow.LookupModeComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("LookupMode");
+            preferenceWindow.LookupKeyComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("LookupKey");
         }
 
         public static async Task SavePreferences(PreferencesWindow preferenceWindow)
@@ -621,8 +649,6 @@ namespace JapaneseLookup
                 preferenceWindow.HighlightLongestMatchCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["HighlightColor"].Value =
                 preferenceWindow.HighlightColorButton.Background.ToString();
-            config.AppSettings.Settings["LookupOnSelectOnly"].Value =
-                preferenceWindow.LookupOnSelectOnlyCheckBox.IsChecked.ToString();
 
             config.AppSettings.Settings["PopupMaxWidth"].Value =
                 preferenceWindow.PopupMaxWidthNumericUpDown.Value.ToString();
@@ -683,6 +709,12 @@ namespace JapaneseLookup
                 preferenceWindow.PopupYOffsetNumericUpDown.Value.ToString();
             config.AppSettings.Settings["PopupFlip"].Value =
                 preferenceWindow.PopupFlipComboBox.SelectedValue.ToString();
+
+            config.AppSettings.Settings["LookupMode"].Value =
+                preferenceWindow.LookupModeComboBox.SelectedValue.ToString();
+
+            config.AppSettings.Settings["LookupKey"].Value =
+                preferenceWindow.LookupKeyComboBox.SelectedValue.ToString();
 
             config.AppSettings.Settings["MainWindowHeight"].Value =
                 preferenceWindow.MainWindowHeightNumericUpDown.Value.ToString();

@@ -61,15 +61,31 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Highlight the longest match"
-                                       TextWrapping="Wrap" />
-                            <CheckBox x:Name="HighlightLongestMatchCheckBox" Content="" HorizontalAlignment="Right" />
+                            <TextBlock HorizontalAlignment="Left" Text="Lookup Mode"
+                                           TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <ComboBox x:Name="LookupModeComboBox" HorizontalAlignment="Right"
+                                          SelectedValuePath="Tag" Width="220">
+                                <ComboBoxItem Content="Mouse move" Tag="1" />
+                                <ComboBoxItem Content="Key press+mouse move" Tag="2" />
+                                <ComboBoxItem Content="Text select" Tag="3" />
+                            </ComboBox>
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Look up on select only"
-                                       TextWrapping="Wrap" />
-                            <CheckBox x:Name="LookupOnSelectOnlyCheckBox" Content="" HorizontalAlignment="Right" />
+                            <TextBlock HorizontalAlignment="Left" Text="Lookup Key"
+                                           TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <ComboBox x:Name="LookupKeyComboBox" HorizontalAlignment="Right"
+                                          SelectedValuePath="Content" Width="80">
+                                <ComboBoxItem Content="Alt" />
+                                <ComboBoxItem Content="Ctrl" />
+                                <ComboBoxItem Content="Shift" />
+                            </ComboBox>
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Highlight the longest match"
+                                       TextWrapping="Wrap" ToolTip="Ignored if lookup mode is set to text select" />
+                            <CheckBox x:Name="HighlightLongestMatchCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Stretch">
