@@ -323,7 +323,7 @@ namespace JapaneseLookup.GUI
                         break;
 
                     case LookupResult.Definitions:
-                        if (MiningMode)
+                        if (MiningMode || ConfigManager.LookupOnSelectOnly)
                         {
                             textBlockDefinitions = new TextBox
                             {
@@ -342,8 +342,23 @@ namespace JapaneseLookup.GUI
                                 IsInactiveSelectionHighlightEnabled = true,
                             };
 
+                            textBlockDefinitions.PreviewMouseLeftButtonUp += (sender, e) =>
+                            {
+                                if (!ConfigManager.LookupOnSelectOnly
+                                    || Background.Opacity == 0
+                                    || ConfigManager.InactiveLookupMode)
+                                    return;
+
+                                ChildPopupWindow ??= new PopupWindow();
+
+                                ChildPopupWindow.LookupOnSelect((TextBox) sender);
+                            };
+
                             textBlockDefinitions.MouseMove += (sender, _) =>
                             {
+                                if (ConfigManager.LookupOnSelectOnly)
+                                    return;
+
                                 ChildPopupWindow ??= new PopupWindow();
 
                                 // prevents stray PopupWindows being created when you move your mouse too fast
@@ -816,7 +831,7 @@ namespace JapaneseLookup.GUI
 
         private void OnMouseLeave(object sender, MouseEventArgs e)
         {
-            if (MiningMode) return;
+            if (MiningMode || ConfigManager.LookupOnSelectOnly) return;
 
             Hide();
             LastText = "";

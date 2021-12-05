@@ -342,8 +342,10 @@ namespace JapaneseLookup.GUI
 
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            FirstPopupWindow.Hide();
-            MainTextBox.Select(0, 0);
+            foreach (var popupWindow in Application.Current.Windows.OfType<PopupWindow>().ToList())
+            {
+                popupWindow.Hide();
+            }
         }
     }
 }
