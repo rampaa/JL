@@ -20,8 +20,6 @@ namespace JapaneseLookup.GUI
     /// </summary>
     public partial class PopupWindow : Window
     {
-        private static int _playAudioIndex;
-
         private static readonly System.Windows.Interop.WindowInteropHelper InteropHelper =
             new(MainWindow.Instance);
 
@@ -29,6 +27,8 @@ namespace JapaneseLookup.GUI
             System.Windows.Forms.Screen.FromHandle(InteropHelper.Handle);
 
         private PopupWindow ChildPopupWindow { get; set; }
+
+        private int _playAudioIndex;
 
         private int CurrentCharPosition { get; set; }
 
@@ -560,13 +560,13 @@ namespace JapaneseLookup.GUI
             return innerStackPanel;
         }
 
-        private static void FoundSpelling_MouseEnter(object sender, MouseEventArgs e)
+        private void FoundSpelling_MouseEnter(object sender, MouseEventArgs e)
         {
             var textBlock = (TextBlock)sender;
             _playAudioIndex = (int)textBlock.Tag;
         }
 
-        private static void FoundSpelling_MouseLeave(object sender, MouseEventArgs e)
+        private void FoundSpelling_MouseLeave(object sender, MouseEventArgs e)
         {
             _playAudioIndex = 0;
         }

@@ -21,13 +21,6 @@ namespace JapaneseLookup.Utilities
         private static readonly List<string> JapanesePunctuation =
             new() { "。", "！", "？", "…", ".", "、", "「", "」", "『", "』", "（", "）", "\n" };
 
-        public static void MainWindowInitializer()
-        {
-            // todo enable this for Release builds
-            // init AnkiConnect so that it doesn't block later
-            // Task.Run(AnkiConnect.GetDeckNames);
-        }
-
         public static int FindWordBoundary(string text, int position)
         {
             int endPosition = -1;
