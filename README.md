@@ -38,3 +38,6 @@ Press the opacity slider button located top-left of the main window.
 Select the folder containing the **unzipped** (so you should have a folder of files named like term_bank_1.json, term_bank_2.json...)  contents of a dictionary converted with https://github.com/FooSoft/yomichan-import on the Dictionaries tab in Preferences. 
 ### Will you add machine translation capabilities?
 No.
+
+## License
+TBD
