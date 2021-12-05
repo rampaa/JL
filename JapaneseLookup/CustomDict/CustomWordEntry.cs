@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JapaneseLookup.Abstract;
 
@@ -6,11 +7,11 @@ namespace JapaneseLookup.CustomDict
 {
     public class CustomWordEntry : IResult
     {
-        public string PrimarySpelling { get; set; }
-        public List<string> AlternativeSpellings { get; set; }
-        public List<string> Readings { get; set; }
-        public List<string> Definitions { get; set; }
-        public List<string> WordClasses { get; set; }
+        public string PrimarySpelling { get; }
+        public List<string> AlternativeSpellings { get; }
+        public List<string> Readings { get; }
+        public List<string> Definitions { get; }
+        public List<string> WordClasses { get; }
 
         public CustomWordEntry(string primarySpelling, List<string> alternativeSpellings, List<string> readings,
             List<string> definitions, List<string> wordClasses)
@@ -29,11 +30,12 @@ namespace JapaneseLookup.CustomDict
 
             CustomWordEntry customWordEntryObj = obj as CustomWordEntry;
 
+            Debug.Assert(customWordEntryObj != null, nameof(customWordEntryObj) + " != null");
             return PrimarySpelling == customWordEntryObj.PrimarySpelling
-                && (customWordEntryObj.AlternativeSpellings?.SequenceEqual(AlternativeSpellings) ?? false)
-                && (customWordEntryObj.Readings?.SequenceEqual(Readings) ?? false)
-                && (customWordEntryObj.Definitions?.SequenceEqual(Definitions) ?? false)
-                && (customWordEntryObj.WordClasses?.SequenceEqual(WordClasses) ?? false);
+                   && (customWordEntryObj.AlternativeSpellings?.SequenceEqual(AlternativeSpellings) ?? false)
+                   && (customWordEntryObj.Readings?.SequenceEqual(Readings) ?? false)
+                   && (customWordEntryObj.Definitions?.SequenceEqual(Definitions) ?? false)
+                   && (customWordEntryObj.WordClasses?.SequenceEqual(WordClasses) ?? false);
         }
 
         public override int GetHashCode()

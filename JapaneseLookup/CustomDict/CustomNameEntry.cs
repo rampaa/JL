@@ -1,12 +1,13 @@
-﻿using JapaneseLookup.Abstract;
+﻿using System.Diagnostics;
+using JapaneseLookup.Abstract;
 
 namespace JapaneseLookup.CustomDict
 {
     public class CustomNameEntry : IResult
     {
-        public string PrimarySpelling { get; set; }
-        public string Reading { get; set; }
-        public string NameType { get; set; }
+        public string PrimarySpelling { get; }
+        public string Reading { get; }
+        public string NameType { get; }
 
         public CustomNameEntry(string primarySpelling, string reading, string nameType)
         {
@@ -22,9 +23,10 @@ namespace JapaneseLookup.CustomDict
 
             CustomNameEntry customNameEntryObj = obj as CustomNameEntry;
 
+            Debug.Assert(customNameEntryObj != null, nameof(customNameEntryObj) + " != null");
             return PrimarySpelling == customNameEntryObj.PrimarySpelling
-                && Reading == customNameEntryObj.Reading
-                && NameType == customNameEntryObj.NameType;
+                   && Reading == customNameEntryObj.Reading
+                   && NameType == customNameEntryObj.NameType;
         }
 
         public override int GetHashCode()
