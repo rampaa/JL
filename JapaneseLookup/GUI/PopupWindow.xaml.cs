@@ -35,7 +35,7 @@ namespace JapaneseLookup.GUI
 
         public string LastText { get; set; }
 
-        public bool MiningMode { get; private set; }
+        public bool MiningMode { get; set; }
 
         private List<Dictionary<LookupResult, List<string>>> LastLookupResults { get; set; } = new();
 

@@ -19,7 +19,7 @@ namespace JapaneseLookup.GUI
 
         public static PopupWindow FirstPopupWindow
         {
-            get { return _firstPopupWindow ??= new PopupWindow(); }
+            get { return _firstPopupWindow ??= new PopupWindow();}
         }
 
         public static MainWindow Instance { get; set; }
@@ -341,6 +341,7 @@ namespace JapaneseLookup.GUI
 
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
+            FirstPopupWindow.MiningMode = false;
             foreach (var popupWindow in Application.Current.Windows.OfType<PopupWindow>().ToList())
             {
                 popupWindow.Hide();
