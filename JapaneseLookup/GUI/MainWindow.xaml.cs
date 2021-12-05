@@ -92,7 +92,7 @@ namespace JapaneseLookup.GUI
 
             FirstPopupWindow.Hide();
             FirstPopupWindow.LastText = "";
-            MainTextBox.Select(0,0);
+            MainTextBox.Select(0, 0);
         }
 
         private void MainTextBox_MouseWheel(object sender, MouseWheelEventArgs e)

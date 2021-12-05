@@ -51,6 +51,20 @@
                             <hc:NumericUpDown x:Name="LookupRateNumericUpDown" Maximum="20" Minimum="0"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
+                        
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Highlight longest match"
+                                       TextWrapping="Wrap" />
+                            <CheckBox x:Name="HighlightLongestMatchCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
+                        
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Highlight color"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <Button x:Name="HighlightColorButton" Content="" HorizontalAlignment="Right"
+                                    Width="60" Click="ShowColorPicker"
+                                    BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" />
+                        </DockPanel>
 
                         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Stretch">
                             <Button x:Name="UpdateJMdictButton" Content="Update JMdict" Margin="5"
@@ -87,20 +101,6 @@
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="MainWindowWidthNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
-                        </DockPanel>
-                        
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Highlight color"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <Button x:Name="HighlightColorButton" Content="" HorizontalAlignment="Right"
-                                    Width="60" Click="ShowColorPicker"
-                                    BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Highlight longest match"
-                                       TextWrapping="Wrap" />
-                            <CheckBox x:Name="HighlightLongestMatchCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
