@@ -196,20 +196,24 @@ namespace JapaneseLookup.Utilities
 
         public static void Alert(AlertLevel alertLevel, string message)
         {
-            Application.Current.Dispatcher.Invoke((Action)async delegate
+            if (Application.Current != null)
             {
-                List<AlertWindow> alertWindowList = Application.Current.Windows.OfType<AlertWindow>().ToList();
+                Application.Current.Dispatcher.Invoke((Action)async delegate
+                {
+                    List<AlertWindow> alertWindowList = Application.Current.Windows.OfType<AlertWindow>().ToList();
 
-                AlertWindow alertWindow = new();
+                    AlertWindow alertWindow = new();
 
-                alertWindow.Left = SystemParameters.WorkArea.Width - alertWindow.Width - 30;
-                alertWindow.Top = alertWindowList.Count * ((alertWindowList.LastOrDefault()?.ActualHeight ?? 0) + 2) + 30;
+                    alertWindow.Left = SystemParameters.WorkArea.Width - alertWindow.Width - 30;
+                    alertWindow.Top =
+                        alertWindowList.Count * ((alertWindowList.LastOrDefault()?.ActualHeight ?? 0) + 2) + 30;
 
-                alertWindow.DisplayAlert(alertLevel, message);
-                alertWindow.Show();
-                await Task.Delay(4004);
-                alertWindow.Close();
-            });
+                    alertWindow.DisplayAlert(alertLevel, message);
+                    alertWindow.Show();
+                    await Task.Delay(4004);
+                    alertWindow.Close();
+                });
+            }
         }
     }
 }

@@ -77,11 +77,20 @@ namespace JapaneseLookup.Anki
             var req = new Request("notesInfo", 6,
                 new Dictionary<string, object> { { "notes", new List<long> { noteId } } });
             Response response = await Send(req).ConfigureAwait(false);
-            var fields =
-                JsonSerializer.Deserialize<List<NotesInfoResult>>(
-                    response.Result.ToString()!)![0].Fields;
+            if (response != null)
+            {
+                var fields =
+                    JsonSerializer.Deserialize<List<NotesInfoResult>>(
+                        response.Result.ToString()!)![0].Fields;
 
-            return fields[audioFieldName]["value"].ToString() != "";
+                return fields[audioFieldName]["value"].ToString() != "";
+            }
+            else
+            {
+                Utils.Alert(AlertLevel.Error, "Error checking audio field");
+                Utils.Logger.Error("Error checking audio field");
+                return false;
+            }
         }
 
         private static async Task<Response> Send(Request req)

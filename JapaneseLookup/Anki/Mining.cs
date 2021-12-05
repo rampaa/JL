@@ -8,12 +8,12 @@ namespace JapaneseLookup.Anki
 {
     public static class Mining
     {
-        public static async Task Mine(MiningParams miningParams)
+        public static async Task<bool> Mine(MiningParams miningParams)
         {
             try
             {
                 AnkiConfig ankiConfig = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
-                if (ankiConfig == null) return;
+                if (ankiConfig == null) return false;
 
                 string deckName = ankiConfig.DeckName;
                 string modelName = ankiConfig.ModelName;
@@ -68,6 +68,7 @@ namespace JapaneseLookup.Anki
                 {
                     Utils.Alert(AlertLevel.Error, $"Mining failed for {miningParams.FoundSpelling}");
                     Utils.Logger.Error($"Mining failed for {miningParams.FoundSpelling}");
+                    return false;
                 }
                 else
                 {
@@ -86,11 +87,14 @@ namespace JapaneseLookup.Anki
                     }
 
                     if (ConfigManager.ForceSyncAnki) await AnkiConnect.Sync();
+                    return true;
                 }
             }
             catch (Exception e)
             {
+                Utils.Alert(AlertLevel.Error, $"Mining failed for {miningParams.FoundSpelling}");
                 Utils.Logger.Information(e, $"Mining failed for {miningParams.FoundSpelling}");
+                return false;
             }
         }
 
