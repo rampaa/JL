@@ -111,12 +111,16 @@ namespace JapaneseLookup.GUI
                     DisplayResults(false);
                 }
                 else
+                {
                     Visibility = Visibility.Hidden;
+                    tb.Select(0, 0);
+                }
             }
             else
             {
                 LastText = "";
                 Visibility = Visibility.Hidden;
+                tb.Select(0, 0);
             }
         }
 
@@ -175,9 +179,9 @@ namespace JapaneseLookup.GUI
             {
                 if (!generateAllResults)
                 {
-                    PopupStackPanel.UpdateLayout();
+                    PopupListBox.UpdateLayout();
 
-                    if (PopupStackPanel.ActualHeight >= MaxHeight)
+                    if (PopupListBox.ActualHeight >= MaxHeight)
                         return;
                 }
 
@@ -724,7 +728,7 @@ namespace JapaneseLookup.GUI
                 string foundSpelling = null;
                 string reading = null;
 
-                var innerStackPanel = (StackPanel)PopupStackPanel.Items[_playAudioIndex];
+                var innerStackPanel = (StackPanel)PopupListBox.Items[_playAudioIndex];
                 var top = (WrapPanel)innerStackPanel.Children[0];
 
                 foreach (TextBlock child in top.Children)
