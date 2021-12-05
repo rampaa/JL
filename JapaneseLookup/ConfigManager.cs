@@ -110,7 +110,6 @@ namespace JapaneseLookup
         public static KeyGesture SteppedBacklogForwardsKeyGesture { get; set; } = new(Key.Right, ModifierKeys.Windows);
         public static KeyGesture InactiveLookupModeKeyGesture { get; set; } = new(Key.Q, ModifierKeys.Windows);
         public static ModifierKeys LookupKey { get; set; } = ModifierKeys.Alt;
-        // (ModifierKeys)new ModifierKeysConverter().ConvertFromString(rawModifierKey);
         public static int PrimarySpellingFontSize { get; set; } = 21;
         public static int ReadingsFontSize { get; set; } = 19;
         public static int ROrthographyInfoFontSize { get; set; } = 17;
@@ -175,7 +174,6 @@ namespace JapaneseLookup
             Utils.Try(() => LookupKey = (ModifierKeys)new ModifierKeysConverter()
                          .ConvertFromString(ConfigurationManager.AppSettings.Get("LookupKey")!),
                          LookupKey, "LookupKey");
-
 
             // MAKE SURE YOU FREEZE ANY NEW COLOR OBJECTS YOU ADD
             // OR THE PROGRAM WILL CRASH AND BURN
