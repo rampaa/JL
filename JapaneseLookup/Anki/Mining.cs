@@ -9,35 +9,18 @@ namespace JapaneseLookup.Anki
     public static class Mining
     {
         // TODO: Check if audio was grabbed and tell the user if it was not
-        public static async Task Mine(string foundSpelling, string readings, string definitions, string context,
-            string foundForm, string edictID, string timeLocal, string alternativeSpellings,
-            string frequency, string strokeCount, string grade, string composition)
+        public static async Task Mine(MiningParams miningParams)
         {
             try
             {
-                var ankiConfig = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
+                AnkiConfig ankiConfig = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
                 if (ankiConfig == null) return;
 
                 string deckName = ankiConfig.DeckName;
                 string modelName = ankiConfig.ModelName;
 
                 var rawFields = ankiConfig.Fields;
-                var fields =
-                    ConvertFields(
-                        rawFields,
-                        foundSpelling,
-                        readings,
-                        definitions,
-                        context,
-                        foundForm,
-                        edictID,
-                        timeLocal,
-                        alternativeSpellings,
-                        frequency,
-                        strokeCount,
-                        grade,
-                        composition
-                    );
+                var fields = ConvertFields(rawFields, miningParams);
 
                 Dictionary<string, object> options = new()
                 {
@@ -49,9 +32,10 @@ namespace JapaneseLookup.Anki
                 string[] tags = ankiConfig.Tags;
 
                 // idk if this gets the right audio for every word
-                readings ??= "";
-                string reading = readings.Split(",")[0];
-                if (reading == "") reading = foundSpelling;
+                string miningParamsReadingsClone = miningParams.Readings;
+                miningParamsReadingsClone ??= "";
+                string reading = miningParamsReadingsClone.Split(",")[0];
+                if (reading == "") reading = miningParams.FoundSpelling;
 
                 Dictionary<string, object>[] audio =
                 {
@@ -59,11 +43,11 @@ namespace JapaneseLookup.Anki
                     {
                         {
                             "url",
-                            $"http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={foundSpelling}&kana={reading}"
+                            $"http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={miningParams.FoundSpelling}&kana={reading}"
                         },
                         {
                             "filename",
-                            $"JL_audio_{foundSpelling}_{reading}.mp3"
+                            $"JL_audio_{reading}_{miningParams.FoundSpelling}.mp3"
                         },
                         {
                             "skipHash",
@@ -83,26 +67,24 @@ namespace JapaneseLookup.Anki
 
                 if (response == null)
                 {
-                    Utils.Alert(AlertLevel.Error, $"Mining failed for {foundSpelling}");
-                    Utils.Logger.Error($"Mining failed for {foundSpelling}");
+                    Utils.Alert(AlertLevel.Error, $"Mining failed for {miningParams.FoundSpelling}");
+                    Utils.Logger.Error($"Mining failed for {miningParams.FoundSpelling}");
                 }
                 else
                 {
-                    Utils.Alert(AlertLevel.Information, $"Mined {foundSpelling}");
-                    Utils.Logger.Information($"Mined {foundSpelling}");
+                    Utils.Alert(AlertLevel.Success, $"Mined {miningParams.FoundSpelling}");
+                    Utils.Logger.Information($"Mined {miningParams.FoundSpelling}");
                     if (ConfigManager.ForceSyncAnki) await AnkiConnect.Sync();
                 }
             }
             catch (Exception e)
             {
-                Utils.Logger.Information(e, $"Mining failed for {foundSpelling}");
+                Utils.Logger.Information(e, $"Mining failed for {miningParams.FoundSpelling}");
             }
         }
 
         private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> fields,
-            string foundSpelling, string readings, string definitions, string context,
-            string foundForm, string edictID, string timeLocal, string alternativeSpellings, string frequency,
-            string strokeCount, string grade, string composition)
+            MiningParams miningParams)
         {
             var dict = new Dictionary<string, object>();
             foreach ((string key, JLField value) in fields)
@@ -112,43 +94,49 @@ namespace JapaneseLookup.Anki
                     case JLField.Nothing:
                         break;
                     case JLField.FoundSpelling:
-                        dict.Add(key, foundSpelling);
+                        dict.Add(key, miningParams.FoundSpelling);
                         break;
                     case JLField.Readings:
-                        dict.Add(key, readings);
+                        dict.Add(key, miningParams.Readings);
                         break;
                     case JLField.Definitions:
-                        dict.Add(key, definitions);
+                        dict.Add(key, miningParams.Definitions);
                         break;
                     case JLField.FoundForm:
-                        dict.Add(key, foundForm);
+                        dict.Add(key, miningParams.FoundForm);
                         break;
                     case JLField.Context:
-                        dict.Add(key, context);
+                        dict.Add(key, miningParams.Context);
                         break;
                     case JLField.Audio:
                         // needs to be handled separately (by FindAudioFields())
                         break;
                     case JLField.EdictID:
-                        dict.Add(key, edictID);
+                        dict.Add(key, miningParams.EdictID);
                         break;
                     case JLField.TimeLocal:
-                        dict.Add(key, timeLocal);
+                        dict.Add(key, miningParams.TimeLocal);
                         break;
                     case JLField.AlternativeSpellings:
-                        dict.Add(key, alternativeSpellings);
+                        dict.Add(key, miningParams.AlternativeSpellings);
                         break;
                     case JLField.Frequency:
-                        dict.Add(key, frequency);
+                        dict.Add(key, miningParams.Frequency);
                         break;
                     case JLField.StrokeCount:
-                        dict.Add(key, strokeCount);
+                        dict.Add(key, miningParams.StrokeCount);
                         break;
                     case JLField.Grade:
-                        dict.Add(key, grade);
+                        dict.Add(key, miningParams.Grade);
                         break;
                     case JLField.Composition:
-                        dict.Add(key, composition);
+                        dict.Add(key, miningParams.Composition);
+                        break;
+                    case JLField.DictType:
+                        dict.Add(key, miningParams.DictType);
+                        break;
+                    case JLField.Process:
+                        dict.Add(key, miningParams.Process);
                         break;
                     default:
                         return null;

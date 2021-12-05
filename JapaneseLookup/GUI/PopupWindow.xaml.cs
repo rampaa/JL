@@ -128,7 +128,7 @@ namespace JapaneseLookup.GUI
         {
             if (string.IsNullOrWhiteSpace(tb.SelectedText))
                 return;
-            
+
             UpdatePosition(tb.PointToScreen(tb.GetRectFromCharacterIndex(tb.SelectionStart).BottomLeft));
 
             var lookupResults = Lookup.Lookup.LookupText(tb.SelectedText);
@@ -604,18 +604,7 @@ namespace JapaneseLookup.GUI
             MiningMode = false;
             Hide();
 
-            string foundSpelling = null;
-            string readings = null;
-            var definitions = "";
-            string context = PopupWindowUtilities.FindSentence(CurrentText, CurrentCharPosition);
-            string foundForm = null;
-            string edictID = null;
-            var timeLocal = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
-            string alternativeSpellings = null;
-            string frequency = null;
-            string strokeCount = null;
-            string grade = null;
-            string composition = null;
+            var miningParams = new MiningParams();
 
             var textBlock = (TextBlock)sender;
             var top = (WrapPanel)textBlock.Parent;
@@ -626,38 +615,31 @@ namespace JapaneseLookup.GUI
                     switch (result)
                     {
                         case LookupResult.FoundSpelling:
-                            foundSpelling = child.Text;
+                            miningParams.FoundSpelling = child.Text;
                             break;
                         case LookupResult.Readings:
-                            readings = (string)child.Tag;
+                            miningParams.Readings = (string)child.Tag;
                             break;
                         case LookupResult.FoundForm:
-                            foundForm = child.Text;
+                            miningParams.FoundForm = child.Text;
                             break;
                         case LookupResult.EdictID:
-                            edictID = child.Text;
+                            miningParams.EdictID = child.Text;
                             break;
                         case LookupResult.AlternativeSpellings:
-                            alternativeSpellings = (string)child.Tag;
+                            miningParams.AlternativeSpellings = (string)child.Tag;
                             break;
                         case LookupResult.Frequency:
-                            frequency = child.Text;
-                            break;
-                        case LookupResult.OnReadings:
-                            readings += child.Text + " ";
-                            break;
-                        case LookupResult.KunReadings:
-                            readings += child.Text + " ";
-                            break;
-                        case LookupResult.Nanori:
-                            readings += child.Text + " ";
+                            miningParams.Frequency = child.Text;
                             break;
                         case LookupResult.DictType:
-                            // TODO
+                            miningParams.DictType = child.Text;
                             break;
                         case LookupResult.Process:
-                            // TODO
+                            miningParams.Process = child.Text;
                             break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
                 }
             }
@@ -668,8 +650,8 @@ namespace JapaneseLookup.GUI
             {
                 if (child is TextBox textBox)
                 {
-                    definitions += textBox.Text;
-                    break;
+                    miningParams.Definitions += textBox.Text;
+                    continue;
                 }
 
                 if (child is not TextBlock)
@@ -682,32 +664,32 @@ namespace JapaneseLookup.GUI
                     switch (result)
                     {
                         case LookupResult.StrokeCount:
-                            strokeCount += textBlock.Text;
+                            miningParams.StrokeCount += textBlock.Text;
                             break;
                         case LookupResult.Grade:
-                            grade += textBlock.Text;
+                            miningParams.Grade += textBlock.Text;
                             break;
                         case LookupResult.Composition:
-                            composition += textBlock.Text;
+                            miningParams.Composition += textBlock.Text;
                             break;
+                        case LookupResult.OnReadings:
+                            miningParams.Readings += textBlock.Text + " | ";
+                            break;
+                        case LookupResult.KunReadings:
+                            miningParams.Readings += textBlock.Text + " | ";
+                            break;
+                        case LookupResult.Nanori:
+                            miningParams.Readings += textBlock.Text + " | ";
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
                 }
             }
+            miningParams.Context = PopupWindowUtilities.FindSentence(CurrentText, CurrentCharPosition);
+            miningParams.TimeLocal = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
 
-            await Mining.Mine(
-                foundSpelling,
-                readings,
-                definitions,
-                context,
-                foundForm,
-                edictID,
-                timeLocal,
-                alternativeSpellings,
-                frequency,
-                strokeCount,
-                grade,
-                composition
-            ).ConfigureAwait(false);
+            await Mining.Mine(miningParams).ConfigureAwait(false);
         }
 
         private void Definitions_MouseMove(TextBox tb)

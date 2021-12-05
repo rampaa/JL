@@ -16,6 +16,8 @@
         StrokeCount,
         Grade,
         Composition,
+        DictType,
+        Process,
         // Source
     }
 }
