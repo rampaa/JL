@@ -112,14 +112,18 @@ namespace JapaneseLookup.GUI
                 else
                 {
                     Visibility = Visibility.Hidden;
-                    tb.Select(0, 0);
+
+                    if (ConfigManager.HighlightLongestMatch)
+                        tb.Select(0, 0);
                 }
             }
             else
             {
                 LastText = "";
                 Visibility = Visibility.Hidden;
-                tb.Select(0, 0);
+
+                if (ConfigManager.HighlightLongestMatch)
+                    tb.Select(0, 0);
             }
         }
 
@@ -835,7 +839,9 @@ namespace JapaneseLookup.GUI
 
             Hide();
             LastText = "";
-            MainWindow.Instance.MainTextBox.Select(0, 0);
+
+            if (ConfigManager.HighlightLongestMatch)
+                MainWindow.Instance.MainTextBox.Select(0, 0);
         }
     }
 }
