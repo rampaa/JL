@@ -113,6 +113,9 @@ namespace JapaneseLookup.Utilities
 
         public static string FindSentence(string text, int position)
         {
+            if (text == null)
+                return null;
+
             List<string> japanesePunctuation = new() { "。", "！", "？", "…", ".", "\n", };
 
             Dictionary<string, string> japaneseParentheses = new()

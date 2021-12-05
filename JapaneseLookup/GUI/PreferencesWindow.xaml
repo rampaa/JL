@@ -51,19 +51,25 @@
                             <hc:NumericUpDown x:Name="LookupRateNumericUpDown" Maximum="20" Minimum="0"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
-                        
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Highlight longest match"
-                                       TextWrapping="Wrap" />
-                            <CheckBox x:Name="HighlightLongestMatchCheckBox" Content="" HorizontalAlignment="Right" />
-                        </DockPanel>
-                        
+
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Highlight color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="HighlightColorButton" Content="" HorizontalAlignment="Right"
                                     Width="60" Click="ShowColorPicker"
                                     BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Highlight the longest match"
+                                       TextWrapping="Wrap" />
+                            <CheckBox x:Name="HighlightLongestMatchCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Look up on select only"
+                                       TextWrapping="Wrap" />
+                            <CheckBox x:Name="LookupOnSelectOnlyCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Stretch">

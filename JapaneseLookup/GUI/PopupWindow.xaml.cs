@@ -124,6 +124,31 @@ namespace JapaneseLookup.GUI
             }
         }
 
+        public void LookupOnSelect(TextBox tb)
+        {
+            if (string.IsNullOrWhiteSpace(tb.SelectedText))
+                return;
+            
+            UpdatePosition(tb.PointToScreen(tb.GetRectFromCharacterIndex(tb.SelectionStart).BottomLeft));
+
+            var lookupResults = Lookup.Lookup.LookupText(tb.SelectedText);
+
+            if (lookupResults != null && lookupResults.Any())
+            {
+                ResultStackPanels.Clear();
+
+                Visibility = Visibility.Visible;
+
+                Activate();
+                Focus();
+
+                LastLookupResults = lookupResults;
+                DisplayResults(true);
+            }
+            else
+                Visibility = Visibility.Hidden;
+        }
+
         private void UpdatePosition(Point cursorPosition)
         {
             bool needsFlipX = ConfigManager.PopupFlipX && cursorPosition.X + Width > ActiveScreen.Bounds.Width;
@@ -573,6 +598,9 @@ namespace JapaneseLookup.GUI
 
         private async void FoundSpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
+            if (!MiningMode)
+                return;
+
             MiningMode = false;
             Hide();
 
@@ -799,7 +827,7 @@ namespace JapaneseLookup.GUI
 
         private void OnMouseEnter(object sender, MouseEventArgs e)
         {
-            if (MiningMode) return;
+            if (MiningMode || ConfigManager.LookupOnSelectOnly) return;
 
             Hide();
             LastText = "";
@@ -811,6 +839,7 @@ namespace JapaneseLookup.GUI
 
             Hide();
             LastText = "";
+            MainWindow.Instance.MainTextBox.Select(0, 0);
         }
     }
 }

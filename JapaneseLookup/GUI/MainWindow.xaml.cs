@@ -1,6 +1,8 @@
 ﻿using JapaneseLookup.Utilities;
 using System;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -73,7 +75,7 @@ namespace JapaneseLookup.GUI
 
         public void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
-            if (Background.Opacity == 0 || ConfigManager.InactiveLookupMode) return;
+            if (ConfigManager.LookupOnSelectOnly || Background.Opacity == 0 || ConfigManager.InactiveLookupMode) return;
             FirstPopupWindow.TextBox_MouseMove(MainTextBox);
         }
 
@@ -87,7 +89,7 @@ namespace JapaneseLookup.GUI
             //OpacitySlider.Visibility = Visibility.Collapsed;
             //FontSizeSlider.Visibility = Visibility.Collapsed;
 
-            if (FirstPopupWindow.MiningMode) return;
+            if (FirstPopupWindow.MiningMode || ConfigManager.LookupOnSelectOnly) return;
 
             FirstPopupWindow.Hide();
             FirstPopupWindow.LastText = "";
@@ -327,6 +329,21 @@ namespace JapaneseLookup.GUI
             AddNameButton.IsEnabled = ConfigManager.Ready;
             AddWordButton.IsEnabled = ConfigManager.Ready;
             PreferencesButton.IsEnabled = ConfigManager.Ready;
+        }
+
+        private void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!ConfigManager.LookupOnSelectOnly
+                || Background.Opacity == 0
+                || ConfigManager.InactiveLookupMode) return;
+
+            FirstPopupWindow.LookupOnSelect(MainTextBox);
+        }
+
+        private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            FirstPopupWindow.Hide();
+            MainTextBox.Select(0, 0);
         }
     }
 }

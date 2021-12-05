@@ -7,7 +7,7 @@
         AllowsTransparency="True"
         mc:Ignorable="d" Height="269" Width="800" WindowStyle="None" ResizeMode="CanResize" Topmost="True"
         Closed="MainWindow_Closed" Closing="MainWindow_Closing" KeyDown="MainWindow_KeyDown"
-        PreviewKeyDown="MainWindow_PreviewKeyDown" SizeChanged="MainWindow_SizeChanged">
+        PreviewKeyDown="MainWindow_PreviewKeyDown" SizeChanged="MainWindow_SizeChanged" PreviewMouseDown="Window_PreviewMouseDown">
     <Window.Background>
         <SolidColorBrush Color="Black" Opacity="0.3" />
     </Window.Background>
@@ -28,7 +28,7 @@
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"
                  VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
                  MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow"
-                 FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled="True" IsUndoEnabled="False" PreviewMouseRightButtonUp="MainTextBox_PreviewMouseRightButtonUp">
+                 FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled="True" IsUndoEnabled="False" PreviewMouseRightButtonUp="MainTextBox_PreviewMouseRightButtonUp" PreviewMouseLeftButtonUp="MainTextBox_PreviewMouseLeftButtonUp">
 
             <TextBox.ContextMenu>
                 <ContextMenu>

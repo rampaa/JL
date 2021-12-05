@@ -71,6 +71,7 @@ namespace JapaneseLookup
         public static double MainWindowWidth { get; set; } = 800;
 
         public static bool HighlightLongestMatch { get; set; } = false;
+        public static bool LookupOnSelectOnly { get; set; } = false;
         public static bool KanjiMode { get; set; } = false;
         public static bool InactiveLookupMode { get; set; } = false;
         public static bool ForceSyncAnki { get; set; } = false;
@@ -157,6 +158,9 @@ namespace JapaneseLookup
             
             Utils.Try(() => HighlightLongestMatch = bool.Parse(ConfigurationManager.AppSettings.Get("HighlightLongestMatch")!),
                 HighlightLongestMatch, "HighlightLongestMatch");
+            
+            Utils.Try(() => LookupOnSelectOnly = bool.Parse(ConfigurationManager.AppSettings.Get("LookupOnSelectOnly")!),
+                LookupOnSelectOnly, "LookupOnSelectOnly");
 
             Utils.Try(() => MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength")!),
                 MaxSearchLength, "MaxSearchLength");
@@ -485,6 +489,7 @@ namespace JapaneseLookup
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
             preferenceWindow.KanjiModeCheckBox.IsChecked = KanjiMode;
             preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
+            preferenceWindow.LookupOnSelectOnlyCheckBox.IsChecked = LookupOnSelectOnly;
             preferenceWindow.FrequencyListComboBox.ItemsSource = FrequencyLists.Keys;
             preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyListName;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
@@ -616,6 +621,8 @@ namespace JapaneseLookup
                 preferenceWindow.HighlightLongestMatchCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["HighlightColor"].Value =
                 preferenceWindow.HighlightColorButton.Background.ToString();
+            config.AppSettings.Settings["LookupOnSelectOnly"].Value =
+                preferenceWindow.LookupOnSelectOnlyCheckBox.IsChecked.ToString();
 
             config.AppSettings.Settings["PopupMaxWidth"].Value =
                 preferenceWindow.PopupMaxWidthNumericUpDown.Value.ToString();
