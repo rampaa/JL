@@ -51,6 +51,8 @@ namespace JapaneseLookup.GUI
             InitializeComponent();
         }
 
+        #region EventHandlers
+
         private void ShowColorPicker(object sender, RoutedEventArgs e)
         {
             var picker = SingleOpenHelper.CreateControl<ColorPicker>();
@@ -93,8 +95,8 @@ namespace JapaneseLookup.GUI
             ConfigManager.Ready = false;
 
             await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMdict].Path,
-                new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
-                DictType.JMdict.ToString(), true, false)
+                    new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
+                    DictType.JMdict.ToString(), true, false)
                 .ConfigureAwait(false);
 
             ConfigManager.Dicts[DictType.JMdict].Contents.Clear();
@@ -122,8 +124,8 @@ namespace JapaneseLookup.GUI
             ConfigManager.Ready = false;
 
             await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMnedict].Path,
-                new Uri("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz"),
-                DictType.JMnedict.ToString(), true, false)
+                    new Uri("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz"),
+                    DictType.JMnedict.ToString(), true, false)
                 .ConfigureAwait(false);
 
             ConfigManager.Dicts[DictType.JMnedict].Contents.Clear();
@@ -145,8 +147,8 @@ namespace JapaneseLookup.GUI
             ConfigManager.Ready = false;
 
             await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.Kanjidic].Path,
-                new Uri("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz"),
-                DictType.Kanjidic.ToString(), true, false)
+                    new Uri("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz"),
+                    DictType.Kanjidic.ToString(), true, false)
                 .ConfigureAwait(false);
 
             ConfigManager.Dicts[DictType.Kanjidic].Contents.Clear();
@@ -185,6 +187,8 @@ namespace JapaneseLookup.GUI
             }
         }
 
+        #endregion
+
         #region MiningSetup
 
         private async Task SetPreviousMiningConfig()
@@ -219,7 +223,7 @@ namespace JapaneseLookup.GUI
                 {
                     List<string> deckNamesList =
                         JsonSerializer.Deserialize<List<string>>(getNameResponse.Result.ToString()!);
-                    
+
                     MiningSetupComboBoxDeckNames.ItemsSource = deckNamesList;
 
                     List<string> modelNamesList =
@@ -281,7 +285,7 @@ namespace JapaneseLookup.GUI
                     var stackPanel = new StackPanel();
                     var textBlockFieldName = new TextBlock { Text = fieldName };
                     var comboBoxJLFields = new System.Windows.Controls.ComboBox
-                    { ItemsSource = Enum.GetValues(typeof(JLField)), SelectedItem = jlField };
+                        { ItemsSource = Enum.GetValues(typeof(JLField)), SelectedItem = jlField };
 
                     stackPanel.Children.Add(textBlockFieldName);
                     stackPanel.Children.Add(comboBoxJLFields);
@@ -330,9 +334,16 @@ namespace JapaneseLookup.GUI
                 }
 
                 var ankiConfig = new AnkiConfig(deckName, modelName, fields, tags);
-                Console.WriteLine(await AnkiConfig.WriteAnkiConfig(ankiConfig).ConfigureAwait(false)
-                    ? "Saved config"
-                    : "Error saving config");
+                if (await AnkiConfig.WriteAnkiConfig(ankiConfig).ConfigureAwait(false))
+                {
+                    Utils.Alert(AlertLevel.Success, "Saved config");
+                    Utils.Logger.Information("Saved config");
+                }
+                else
+                {
+                    Utils.Alert(AlertLevel.Error, "Error saving config");
+                    Utils.Logger.Error("Error saving config");
+                }
             }
             catch (Exception exception)
             {
@@ -472,7 +483,7 @@ namespace JapaneseLookup.GUI
 
             if (File.Exists(path) || Directory.Exists(path))
             {
-                if (File.Exists(path)) 
+                if (File.Exists(path))
                     path = Path.GetDirectoryName(path);
 
                 Process.Start("explorer.exe", path ?? throw new InvalidOperationException());
@@ -591,6 +602,8 @@ namespace JapaneseLookup.GUI
 
         #endregion
 
+        #region Keys
+
         private void KeyGestureToText(object sender, KeyEventArgs e)
         {
             e.Handled = true;
@@ -681,5 +694,7 @@ namespace JapaneseLookup.GUI
         {
             InactiveLookupModeKeyGestureTextBox.Text = "None";
         }
+
+        #endregion
     }
 }

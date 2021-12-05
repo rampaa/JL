@@ -8,7 +8,6 @@ namespace JapaneseLookup.Anki
 {
     public static class Mining
     {
-        // TODO: Check if audio was grabbed and tell the user if it was not
         public static async Task Mine(MiningParams miningParams)
         {
             try
@@ -72,8 +71,20 @@ namespace JapaneseLookup.Anki
                 }
                 else
                 {
-                    Utils.Alert(AlertLevel.Success, $"Mined {miningParams.FoundSpelling}");
-                    Utils.Logger.Information($"Mined {miningParams.FoundSpelling}");
+                    bool hasAudio = await AnkiConnect.CheckAudioField(Convert.ToInt64(response.Result.ToString()),
+                        FindAudioFields(rawFields)[0]);
+
+                    if (hasAudio)
+                    {
+                        Utils.Alert(AlertLevel.Success, $"Mined {miningParams.FoundSpelling}");
+                        Utils.Logger.Information($"Mined {miningParams.FoundSpelling}");
+                    }
+                    else
+                    {
+                        Utils.Alert(AlertLevel.Warning, $"Mined {miningParams.FoundSpelling} (no audio)");
+                        Utils.Logger.Information($"Mined {miningParams.FoundSpelling} (no audio)");
+                    }
+
                     if (ConfigManager.ForceSyncAnki) await AnkiConnect.Sync();
                 }
             }

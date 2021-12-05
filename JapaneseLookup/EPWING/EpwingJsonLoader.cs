@@ -83,8 +83,7 @@ namespace JapaneseLookup.EPWING
                     break;
                 case DictType.Daijirin:
                     // english definitions
-                    if (result.Definitions.Any(def => def.Contains("→英和")
-                    || def.Contains("\\u003")))
+                    if (result.Definitions.Any(def => def.Contains("→英和") || def.Contains("\\u003")))
                         return false;
 
                     // english definitions

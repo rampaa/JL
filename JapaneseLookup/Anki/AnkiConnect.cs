@@ -1,7 +1,6 @@
 ﻿using JapaneseLookup.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -12,7 +11,6 @@ namespace JapaneseLookup.Anki
 {
     public static class AnkiConnect
     {
-
         private static readonly Uri AnkiConnectUri = new(ConfigManager.AnkiConnectUri);
 
         public static async Task<Response> AddNoteToDeck(Note note)
@@ -69,6 +67,23 @@ namespace JapaneseLookup.Anki
             //  await StoreMediaFile(filename, data);
         }
 
+        private class NotesInfoResult
+        {
+            [JsonPropertyName("fields")] public Dictionary<string, Dictionary<string, object>> Fields { get; set; }
+        }
+
+        public static async Task<bool> CheckAudioField(long noteId, string audioFieldName)
+        {
+            var req = new Request("notesInfo", 6,
+                new Dictionary<string, object> { { "notes", new List<long> { noteId } } });
+            Response response = await Send(req).ConfigureAwait(false);
+            var fields =
+                JsonSerializer.Deserialize<List<NotesInfoResult>>(
+                    response.Result.ToString()!)![0].Fields;
+
+            return fields[audioFieldName]["value"].ToString() != "";
+        }
+
         private static async Task<Response> Send(Request req)
         {
             try
@@ -76,12 +91,12 @@ namespace JapaneseLookup.Anki
                 // AnkiConnect doesn't like null values
                 var payload = new StringContent(JsonSerializer.Serialize(req,
                     new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }));
-                Debug.WriteLine("Sending: " + await payload.ReadAsStringAsync().ConfigureAwait(false));
+                Utils.Logger.Information("Sending: " + await payload.ReadAsStringAsync().ConfigureAwait(false));
 
                 var postResponse = await ConfigManager.Client.PostAsync(AnkiConnectUri, payload).ConfigureAwait(false);
 
                 var json = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);
-                Debug.WriteLine("json result: " + json!.Result);
+                Utils.Logger.Information("json result: " + json!.Result);
 
                 if (json!.Error == null) return json;
 
@@ -91,7 +106,7 @@ namespace JapaneseLookup.Anki
             }
             catch (HttpRequestException e)
             {
-                Utils.Alert(AlertLevel.Error, "Communication error: Is Anki open?");   
+                Utils.Alert(AlertLevel.Error, "Communication error: Is Anki open?");
                 Utils.Logger.Error(e, "Communication error: Is Anki open?");
                 return null;
             }

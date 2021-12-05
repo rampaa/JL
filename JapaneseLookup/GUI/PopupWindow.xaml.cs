@@ -4,7 +4,6 @@ using JapaneseLookup.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -700,7 +699,7 @@ namespace JapaneseLookup.GUI
 
         private static void PlayAudio(string foundSpelling, string reading)
         {
-            Debug.WriteLine("Attempting to play audio: " + foundSpelling + " " + reading);
+           Utils.Logger.Information("Attempting to play audio: " + foundSpelling + " " + reading);
 
             if (reading == "") reading = foundSpelling;
 
