@@ -31,8 +31,8 @@ Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer
 
 ## FAQ
 ### Why can't I look anything up?
-Make sure you're not in transparent mode, kanji mode, have lookup-on-select-only enabled, or have disabled lookups (default: Q key).
-### How do I disable transparent mode?
+Make sure you're not in pass-through mode, kanji mode, have lookup-on-select-only enabled, or have disabled lookups (default: Q key).
+### How do I disable pass-through mode?
 Press the opacity slider button located top-left of the main window.
 ### How do I add EPWING dictionaries?
 Select the folder containing the **unzipped** (so you should have a folder of files named like term_bank_1.json, term_bank_2.json...)  contents of a dictionary converted with https://github.com/FooSoft/yomichan-import on the Dictionaries tab in Preferences.
