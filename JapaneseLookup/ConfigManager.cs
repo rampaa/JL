@@ -469,10 +469,10 @@ namespace JapaneseLookup
                 CreateDefaultDictsConfig();
 
             if (!File.Exists("Resources/custom_words.txt"))
-                File.Create("Resources/custom_words.txt");
+                File.Create("Resources/custom_words.txt").Dispose();
 
             if (!File.Exists("Resources/custom_names.txt"))
-                File.Create("Resources/custom_names.txt");
+                File.Create("Resources/custom_names.txt").Dispose();
 
             await DeserializeDicts().ConfigureAwait(false);
 
