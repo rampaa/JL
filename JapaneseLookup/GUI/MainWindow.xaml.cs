@@ -198,7 +198,7 @@ namespace JapaneseLookup.GUI
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (ConfigManager.Ready && Utils.KeyGestureComparer(e, ConfigManager.ShowPreferencesWindowKeyGesture))
+            if (Utils.KeyGestureComparer(e, ConfigManager.ShowPreferencesWindowKeyGesture))
             {
                 MainWindowUtilities.ShowPreferencesWindow();
             }
