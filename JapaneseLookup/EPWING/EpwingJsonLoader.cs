@@ -38,30 +38,30 @@ namespace JapaneseLookup.EPWING
         private static void DictionaryBuilder(EpwingResult result,
             Dictionary<string, List<IResult>> epwingDictionary, DictType dictType)
         {
-                if (!IsValidEpwingResultForDictType(result, dictType))
-                    return;
+            if (!IsValidEpwingResultForDictType(result, dictType))
+                return;
 
-                string hiraganaExpression = Kana.KatakanaToHiraganaConverter(result.PrimarySpelling);
+            string hiraganaExpression = Kana.KatakanaToHiraganaConverter(result.PrimarySpelling);
 
-                //if (hiraganaExpression != entry.Expression && string.IsNullOrEmpty(entry.Reading))
-                //    result.KanaSpelling = entry.Expression;
+            //if (hiraganaExpression != entry.Expression && string.IsNullOrEmpty(entry.Reading))
+            //    result.KanaSpelling = entry.Expression;
 
-                if (!string.IsNullOrEmpty(result.Reading))
-                {
-                    string hiraganaReading = Kana.KatakanaToHiraganaConverter(result.Reading);
-                    //if (hiraganaReading != entry.Reading)
-                    //    result.KanaSpelling = entry.Reading;
+            if (!string.IsNullOrEmpty(result.Reading))
+            {
+                string hiraganaReading = Kana.KatakanaToHiraganaConverter(result.Reading);
+                //if (hiraganaReading != entry.Reading)
+                //    result.KanaSpelling = entry.Reading;
 
-                    if (epwingDictionary.TryGetValue(hiraganaReading, out List<IResult> tempList2))
-                        tempList2.Add(result);
-                    else
-                        epwingDictionary.Add(hiraganaReading, new List<IResult> { result });
-                }
-
-                if (epwingDictionary.TryGetValue(hiraganaExpression, out List<IResult> tempList))
-                    tempList.Add(result);
+                if (epwingDictionary.TryGetValue(hiraganaReading, out List<IResult> tempList2))
+                    tempList2.Add(result);
                 else
-                    epwingDictionary.Add(hiraganaExpression, new List<IResult> { result });
+                    epwingDictionary.Add(hiraganaReading, new List<IResult> { result });
+            }
+
+            if (epwingDictionary.TryGetValue(hiraganaExpression, out List<IResult> tempList))
+                tempList.Add(result);
+            else
+                epwingDictionary.Add(hiraganaExpression, new List<IResult> { result });
         }
 
         private static bool IsValidEpwingResultForDictType(EpwingResult result, DictType dictType)

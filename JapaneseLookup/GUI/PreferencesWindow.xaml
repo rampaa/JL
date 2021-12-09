@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:JapaneseLookup.GUI"
         mc:Ignorable="d"
         Title="Preferences" Height="580" Width="666" Topmost="True" Closing="Window_Closing"
-        SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Background="Black">
+        SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Background="Black" MouseMove="Window_MouseMove">
     <Grid>
         <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="20,0,0,20"
                 VerticalAlignment="Bottom" Click="CancelButton_Click" FontSize="16" Height="35" Width="85" />
@@ -87,19 +87,7 @@
                                        TextWrapping="Wrap" ToolTip="Ignored if lookup mode is set to text select" />
                             <CheckBox x:Name="HighlightLongestMatchCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
-
-                        <DockPanel HorizontalAlignment="Center" VerticalAlignment="Stretch">
-                            <Button x:Name="UpdateJMdictButton" Content="Update JMdict" Margin="5"
-                                    HorizontalAlignment="Left"
-                                    Click="UpdateJMdictButton_Click" FontSize="16" Height="35" />
-                            <Button x:Name="UpdateJMnedictButton" Content="Update JMnedict" Margin="5"
-                                    HorizontalAlignment="Center"
-                                    Click="UpdateJMnedictButton_Click" FontSize="16" Height="35" />
-                            <Button x:Name="UpdateKanjidicButton" Content="Update Kanjidic" Margin="5"
-                                    HorizontalAlignment="Right" Click="UpdateKanjidicButton_Click" FontSize="16"
-                                    Height="35" />
-
-                        </DockPanel>
+                        
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -591,7 +579,7 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-            <TabItem Header="Dictionaries">
+            <TabItem x:Name="DictionariesTab" Header="Dictionaries">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
                     <StackPanel Background="Black" Margin="20,10,20,10">
                         <StackPanel.Resources>
@@ -603,6 +591,19 @@
                         <Button Name="ButtonAddDictionary" Margin="10" Click="ButtonAddDictionary_OnClick">Add dictionary</Button>
 
                         <ListBox x:Name="DictionariesDisplay" Focusable="False" Margin="10" />
+
+                        <DockPanel HorizontalAlignment="Center" VerticalAlignment="Stretch">
+                            <Button x:Name="UpdateJMdictButton" Content="Update JMdict" Margin="5"
+                                    HorizontalAlignment="Left"
+                                    Click="UpdateJMdictButton_Click" FontSize="16" Height="35" />
+                            <Button x:Name="UpdateJMnedictButton" Content="Update JMnedict" Margin="5"
+                                    HorizontalAlignment="Center"
+                                    Click="UpdateJMnedictButton_Click" FontSize="16" Height="35" />
+                            <Button x:Name="UpdateKanjidicButton" Content="Update Kanjidic" Margin="5"
+                                    HorizontalAlignment="Right" Click="UpdateKanjidicButton_Click" FontSize="16"
+                                    Height="35" />
+
+                        </DockPanel>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

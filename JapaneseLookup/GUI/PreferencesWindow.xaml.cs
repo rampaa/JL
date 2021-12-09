@@ -285,7 +285,7 @@ namespace JapaneseLookup.GUI
                     var stackPanel = new StackPanel();
                     var textBlockFieldName = new TextBlock { Text = fieldName };
                     var comboBoxJLFields = new System.Windows.Controls.ComboBox
-                        { ItemsSource = Enum.GetValues(typeof(JLField)), SelectedItem = jlField };
+                    { ItemsSource = Enum.GetValues(typeof(JLField)), SelectedItem = jlField };
 
                     stackPanel.Children.Add(textBlockFieldName);
                     stackPanel.Children.Add(comboBoxJLFields);
@@ -696,5 +696,10 @@ namespace JapaneseLookup.GUI
         }
 
         #endregion
+
+        private void Window_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            DictionariesTab.IsEnabled = ConfigManager.Ready;
+        }
     }
 }

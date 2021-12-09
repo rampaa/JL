@@ -131,13 +131,11 @@ namespace JapaneseLookup
 
         // consider making this dictionary specific
         public static bool NewlineBetweenDefinitions { get; set; } = false;
-
         public static bool Ready { get; set; } = false;
+        private static bool _initialized = false;
 
         public static async Task ApplyPreferences()
         {
-            Ready = false;
-
             string tempStr = ConfigurationManager.AppSettings.Get("FrequencyListName");
 
             if (tempStr == null)
@@ -156,7 +154,7 @@ namespace JapaneseLookup
             }
 
             AnkiConnectUri = tempStr;
-            
+
             Utils.Try(() => HighlightLongestMatch = bool.Parse(ConfigurationManager.AppSettings.Get("HighlightLongestMatch")!),
                 HighlightLongestMatch, "HighlightLongestMatch");
 
@@ -474,12 +472,12 @@ namespace JapaneseLookup
             if (!File.Exists("Resources/custom_names.txt"))
                 File.Create("Resources/custom_names.txt").Dispose();
 
-            await DeserializeDicts().ConfigureAwait(false);
-
             // Test without async/await.
             // Task.Run(async () => { await LoadDictionaries(); });
             // timer.Start();
-            await LoadDictionaries().ConfigureAwait(false);
+
+            if (!_initialized || Ready)
+                await LoadDictionaries().ConfigureAwait(false);
         }
 
         public static void LoadPreferences(PreferencesWindow preferenceWindow)
@@ -722,17 +720,16 @@ namespace JapaneseLookup
             config.AppSettings.Settings["MainWindowTopPosition"].Value = MainWindow.Instance.Top.ToString();
             config.AppSettings.Settings["MainWindowLeftPosition"].Value = MainWindow.Instance.Left.ToString();
 
-            SerializeDicts();
-
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
-            
+
             await ApplyPreferences().ConfigureAwait(false);
         }
 
         public static void SaveBeforeClosing()
         {
             CreateDefaultAppConfig();
+            SerializeDicts();
 
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
@@ -745,7 +742,6 @@ namespace JapaneseLookup
 
             config.Save(ConfigurationSaveMode.Modified);
         }
-
         public static void SerializeDicts()
         {
             try
@@ -855,6 +851,12 @@ namespace JapaneseLookup
 
         private static async Task LoadDictionaries()
         {
+            if (!_initialized)
+                await DeserializeDicts().ConfigureAwait(false);
+
+            Ready = false;
+            _initialized = true;
+
             var tasks = new List<Task>();
             Task jMDictTask = null;
             bool dictRemoved = false;

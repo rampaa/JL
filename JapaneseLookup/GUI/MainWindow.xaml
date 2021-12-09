@@ -31,7 +31,7 @@
                  FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled="True" IsUndoEnabled="False" PreviewMouseRightButtonUp="MainTextBox_PreviewMouseRightButtonUp" PreviewMouseLeftButtonUp="MainTextBox_PreviewMouseLeftButtonUp">
 
             <TextBox.ContextMenu>
-                <ContextMenu>
+                <ContextMenu Name="MainTextboxContextMenu">
                     <MenuItem
                         Name ="AddNameButton"
                         Header="Add name"

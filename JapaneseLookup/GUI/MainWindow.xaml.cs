@@ -2,7 +2,6 @@
 using System;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -19,7 +18,7 @@ namespace JapaneseLookup.GUI
 
         public static PopupWindow FirstPopupWindow
         {
-            get { return _firstPopupWindow ??= new PopupWindow();}
+            get { return _firstPopupWindow ??= new PopupWindow(); }
         }
 
         public static MainWindow Instance { get; set; }
@@ -75,7 +74,7 @@ namespace JapaneseLookup.GUI
 
         public void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
-            if (ConfigManager.LookupOnSelectOnly || Background.Opacity == 0) return;
+            if (ConfigManager.LookupOnSelectOnly || Background.Opacity == 0 || MainTextboxContextMenu.IsVisible) return;
             FirstPopupWindow.TextBox_MouseMove(MainTextBox);
         }
 
@@ -320,14 +319,8 @@ namespace JapaneseLookup.GUI
 
         private void MainTextBox_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (ConfigManager.Ready)
-                PreferencesButton.Header = "Preferences";
-            else
-                PreferencesButton.Header = "Preferences are being applied...";
-
             AddNameButton.IsEnabled = ConfigManager.Ready;
             AddWordButton.IsEnabled = ConfigManager.Ready;
-            PreferencesButton.IsEnabled = ConfigManager.Ready;
         }
 
         private void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

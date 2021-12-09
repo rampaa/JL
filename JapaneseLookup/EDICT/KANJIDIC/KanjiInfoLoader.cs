@@ -82,7 +82,6 @@ namespace JapaneseLookup.EDICT.KANJIDIC
             else
             {
                 ConfigManager.Dicts[DictType.Kanjidic].Active = false;
-                ConfigManager.SerializeDicts();
             }
         }
 

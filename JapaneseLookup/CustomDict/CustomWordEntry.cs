@@ -49,14 +49,14 @@ namespace JapaneseLookup.CustomDict
                 if (AlternativeSpellings == null)
                     hash *= 37;
 
-                else foreach(string spelling in AlternativeSpellings)
-                    hash = hash * 37 + spelling?.GetHashCode() ?? 0;
+                else foreach (string spelling in AlternativeSpellings)
+                        hash = hash * 37 + spelling?.GetHashCode() ?? 0;
 
                 if (Readings == null)
                     hash *= 37;
 
                 else foreach (string readings in Readings)
-                    hash = hash * 37 + readings?.GetHashCode() ?? 0;
+                        hash = hash * 37 + readings?.GetHashCode() ?? 0;
 
                 if (Definitions == null)
                     hash *= 37;
@@ -66,7 +66,7 @@ namespace JapaneseLookup.CustomDict
                 if (WordClasses == null)
                     hash *= 37;
                 else foreach (string wordClass in WordClasses)
-                    hash = hash * 37 + wordClass?.GetHashCode() ?? 0;
+                        hash = hash * 37 + wordClass?.GetHashCode() ?? 0;
 
                 return hash;
             }

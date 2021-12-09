@@ -42,7 +42,6 @@ namespace JapaneseLookup.EDICT.JMdict
             else
             {
                 ConfigManager.Dicts[DictType.JMdict].Active = false;
-                ConfigManager.SerializeDicts();
             }
         }
 

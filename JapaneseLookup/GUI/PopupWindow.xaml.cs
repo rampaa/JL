@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -65,8 +64,8 @@ namespace JapaneseLookup.GUI
 
         public void TextBox_MouseMove(TextBox tb)
         {
-            if ( MiningMode || ConfigManager.InactiveLookupMode
-                || (ConfigManager.RequireLookupKeyPress 
+            if (MiningMode || ConfigManager.InactiveLookupMode
+                || (ConfigManager.RequireLookupKeyPress
                 && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
                 )
                 return;
@@ -363,7 +362,7 @@ namespace JapaneseLookup.GUI
 
                                 ChildPopupWindow ??= new PopupWindow();
 
-                                ChildPopupWindow.LookupOnSelect((TextBox) sender);
+                                ChildPopupWindow.LookupOnSelect((TextBox)sender);
                             };
 
                             textBlockDefinitions.MouseMove += (sender, _) =>
@@ -726,7 +725,7 @@ namespace JapaneseLookup.GUI
 
         private static void PlayAudio(string foundSpelling, string reading)
         {
-           Utils.Logger.Information("Attempting to play audio: " + foundSpelling + " " + reading);
+            Utils.Logger.Information("Attempting to play audio: " + foundSpelling + " " + reading);
 
             if (reading == "") reading = foundSpelling;
 
