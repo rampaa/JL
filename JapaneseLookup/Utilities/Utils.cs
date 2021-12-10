@@ -12,6 +12,11 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using JapaneseLookup.GUI;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using JapaneseLookup.Dicts;
+using System.IO;
+using JapaneseLookup.Abstract;
 
 namespace JapaneseLookup.Utilities
 {
@@ -213,6 +218,69 @@ namespace JapaneseLookup.Utilities
                     await Task.Delay(4004);
                     alertWindow.Close();
                 });
+            }
+        }
+
+        public static void SerializeDicts()
+        {
+            try
+            {
+                var jso = new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    Converters =
+                    {
+                        new JsonStringEnumConverter(),
+                    }
+                };
+
+                File.WriteAllTextAsync(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json"),
+                    JsonSerializer.Serialize(ConfigManager.Dicts, jso));
+            }
+            catch (Exception e)
+            {
+                Logger.Fatal(e, "SerializeDicts failed");
+                throw;
+            }
+        }
+        public static async Task DeserializeDicts()
+        {
+            try
+            {
+                var jso = new JsonSerializerOptions
+                {
+                    Converters =
+                    {
+                        new JsonStringEnumConverter(),
+                    }
+                };
+
+                Dictionary<DictType, Dict> deserializedDicts = await JsonSerializer
+                    .DeserializeAsync<Dictionary<DictType, Dict>>(
+                        new StreamReader(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json")).BaseStream, jso)
+                    .ConfigureAwait(false);
+
+                if (deserializedDicts != null)
+                {
+                    foreach ((DictType _, Dict dict) in deserializedDicts)
+                    {
+                        if (!ConfigManager.Dicts.ContainsKey(dict.Type))
+                        {
+                            dict.Contents = new Dictionary<string, List<IResult>>();
+                            ConfigManager.Dicts.Add(dict.Type, dict);
+                        }
+                    }
+                }
+                else
+                {
+                    Utils.Alert(AlertLevel.Error, "Couldn't load Config/dicts.json");
+                    Utils.Logger.Error("Couldn't load Config/dicts.json");
+                }
+            }
+            catch (Exception e)
+            {
+                Utils.Logger.Fatal(e, "DeserializeDicts failed");
+                throw;
             }
         }
     }

@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:JapaneseLookup.GUI"
         mc:Ignorable="d"
         Title="Preferences" Height="580" Width="666" Topmost="True" Closing="Window_Closing"
-        SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Background="Black" MouseMove="Window_MouseMove">
+        SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Background="Black">
     <Grid>
         <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="20,0,0,20"
                 VerticalAlignment="Bottom" Click="CancelButton_Click" FontSize="16" Height="35" Width="85" />
@@ -515,6 +515,15 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="ShowManageDictionariesWindowKeyGestureTextBoxButton_Click"/>
+                            <TextBox x:Name="ShowManageDictionariesWindowKeyGestureTextBox" AutomationProperties.Name=""
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Manage dictionaries" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="ShowPreferencesWindowKeyGestureTextBoxButton_Click"/>
                             <TextBox x:Name="ShowPreferencesWindowKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -575,34 +584,6 @@
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle lookup" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
-                        </DockPanel>
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-            <TabItem x:Name="DictionariesTab" Header="Dictionaries">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                    <StackPanel Background="Black" Margin="20,10,20,10">
-                        <StackPanel.Resources>
-                            <Style TargetType="{x:Type DockPanel}">
-                                <Setter Property="Margin" Value="0,10,0,0" />
-                            </Style>
-                        </StackPanel.Resources>
-                        <ComboBox Name="ComboBoxAddDictionary" Width="120" Margin="10" />
-                        <Button Name="ButtonAddDictionary" Margin="10" Click="ButtonAddDictionary_OnClick">Add dictionary</Button>
-
-                        <ListBox x:Name="DictionariesDisplay" Focusable="False" Margin="10" />
-
-                        <DockPanel HorizontalAlignment="Center" VerticalAlignment="Stretch">
-                            <Button x:Name="UpdateJMdictButton" Content="Update JMdict" Margin="5"
-                                    HorizontalAlignment="Left"
-                                    Click="UpdateJMdictButton_Click" FontSize="16" Height="35" />
-                            <Button x:Name="UpdateJMnedictButton" Content="Update JMnedict" Margin="5"
-                                    HorizontalAlignment="Center"
-                                    Click="UpdateJMnedictButton_Click" FontSize="16" Height="35" />
-                            <Button x:Name="UpdateKanjidicButton" Content="Update Kanjidic" Margin="5"
-                                    HorizontalAlignment="Right" Click="UpdateKanjidicButton_Click" FontSize="16"
-                                    Height="35" />
-
                         </DockPanel>
                     </StackPanel>
                 </ScrollViewer>

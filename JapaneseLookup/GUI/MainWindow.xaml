@@ -49,6 +49,10 @@
                         Header="Search"
                         Click="SearchWithBrowser" />
                     <MenuItem
+                        Name ="ManageDictionariesButton"
+                        Header="Manage dictionaries"
+                        Click="ShowManageDictionariesWindow" />
+                    <MenuItem
                         Name ="PreferencesButton"
                         Header="Preferences"
                         Click="ShowPreferences" />

@@ -10,7 +10,7 @@ namespace JapaneseLookup.EDICT
 {
     public static class ResourceUpdater
     {
-        public static async Task UpdateResource(string resourcePath, Uri resourceDownloadUri, string resourceName, bool isUpdate, bool noPrompt)
+        public static async Task<bool> UpdateResource(string resourcePath, Uri resourceDownloadUri, string resourceName, bool isUpdate, bool noPrompt)
         {
             if (!isUpdate || MessageBox.Show($"Do you want to download the latest version of {resourceName}?", "", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
             {
@@ -30,6 +30,8 @@ namespace JapaneseLookup.EDICT
 
                     if (!noPrompt)
                         MessageBox.Show($"{resourceName} has been downloaded successfully.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
+
+                    return true;
                 }
 
                 else if (response.StatusCode == HttpStatusCode.NotModified && !noPrompt)
@@ -42,6 +44,7 @@ namespace JapaneseLookup.EDICT
                     MessageBox.Show($"Unexpected error while downloading {resourceName}.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
                 }
             }
+            return false;
         }
 
         private static async Task GzipStreamDecompressor(Stream stream, string filePath)

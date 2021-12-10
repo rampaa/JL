@@ -216,14 +216,22 @@ namespace JapaneseLookup.GUI
                 MainTextBox_MouseMove(null, null);
             }
 
-            else if (ConfigManager.Ready && Utils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
+            else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
             {
-                MainWindowUtilities.ShowAddNameWindow();
+                if (ConfigManager.Ready)
+                    MainWindowUtilities.ShowAddNameWindow();
             }
 
-            else if (ConfigManager.Ready && Utils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
+            else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
             {
-                MainWindowUtilities.ShowAddWordWindow();
+                if (ConfigManager.Ready)
+                    MainWindowUtilities.ShowAddWordWindow();
+            }
+
+            else if (Utils.KeyGestureComparer(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
+            {
+                if (ConfigManager.Ready)
+                    ManageDictionariesWindow.Instance.ShowDialog();
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))
@@ -255,6 +263,11 @@ namespace JapaneseLookup.GUI
         private void SearchWithBrowser(object sender, RoutedEventArgs e)
         {
             MainWindowUtilities.SearchWithBrowser();
+        }
+
+        private void ShowManageDictionariesWindow(object sender, RoutedEventArgs e)
+        {
+            ManageDictionariesWindow.Instance.ShowDialog();
         }
 
         private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -321,6 +334,7 @@ namespace JapaneseLookup.GUI
         {
             AddNameButton.IsEnabled = ConfigManager.Ready;
             AddWordButton.IsEnabled = ConfigManager.Ready;
+            ManageDictionariesButton.IsEnabled = ConfigManager.Ready;
         }
 
         private void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

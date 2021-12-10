@@ -807,12 +807,20 @@ namespace JapaneseLookup.GUI
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
             {
-                MainWindowUtilities.ShowAddNameWindow();
+                if (ConfigManager.Ready)
+                    MainWindowUtilities.ShowAddNameWindow();
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
             {
-                MainWindowUtilities.ShowAddWordWindow();
+                if (ConfigManager.Ready)
+                    MainWindowUtilities.ShowAddWordWindow();
+            }
+
+            else if (Utils.KeyGestureComparer(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
+            {
+                if (ConfigManager.Ready)
+                    ManageDictionariesWindow.Instance.ShowDialog();
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))

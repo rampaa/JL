@@ -1,5 +1,4 @@
-﻿using JapaneseLookup.Abstract;
-using JapaneseLookup.CustomDict;
+﻿using JapaneseLookup.CustomDict;
 using JapaneseLookup.Dicts;
 using JapaneseLookup.EDICT;
 using JapaneseLookup.EDICT.JMdict;
@@ -101,6 +100,7 @@ namespace JapaneseLookup
         public static KeyGesture MiningModeKeyGesture { get; set; } = new(Key.M, ModifierKeys.Windows);
         public static KeyGesture PlayAudioKeyGesture { get; set; } = new(Key.P, ModifierKeys.Windows);
         public static KeyGesture KanjiModeKeyGesture { get; set; } = new(Key.K, ModifierKeys.Windows);
+        public static KeyGesture ShowManageDictionariesWindowKeyGesture { get; set; } = new(Key.D, ModifierKeys.Windows);
         public static KeyGesture ShowPreferencesWindowKeyGesture { get; set; } = new(Key.L, ModifierKeys.Windows);
         public static KeyGesture ShowAddNameWindowKeyGesture { get; set; } = new(Key.N, ModifierKeys.Windows);
         public static KeyGesture ShowAddWordWindowKeyGesture { get; set; } = new(Key.W, ModifierKeys.Windows);
@@ -360,6 +360,11 @@ namespace JapaneseLookup
             MiningModeKeyGesture = Utils.KeyGestureSetter("MiningModeKeyGesture", MiningModeKeyGesture);
             PlayAudioKeyGesture = Utils.KeyGestureSetter("PlayAudioKeyGesture", PlayAudioKeyGesture);
             KanjiModeKeyGesture = Utils.KeyGestureSetter("KanjiModeKeyGesture", KanjiModeKeyGesture);
+
+            ShowManageDictionariesWindowKeyGesture =
+                Utils.KeyGestureSetter("ShowManageDictionariesWindowKeyGesture",
+                ShowManageDictionariesWindowKeyGesture);
+
             ShowPreferencesWindowKeyGesture =
                 Utils.KeyGestureSetter("ShowPreferencesWindowKeyGesture", ShowPreferencesWindowKeyGesture);
             ShowAddNameWindowKeyGesture =
@@ -397,6 +402,12 @@ namespace JapaneseLookup
             else
                 MainWindow.Instance.PreferencesButton.InputGestureText =
                     Utils.KeyGestureToString(ShowPreferencesWindowKeyGesture);
+
+            if (Utils.KeyGestureToString(ShowManageDictionariesWindowKeyGesture) == "None")
+                MainWindow.Instance.ManageDictionariesButton.InputGestureText = "";
+            else
+                MainWindow.Instance.ManageDictionariesButton.InputGestureText =
+                    Utils.KeyGestureToString(ShowManageDictionariesWindowKeyGesture);
 
             Utils.Try(() => MainWindow.Instance.OpacitySlider.Value = double.Parse(ConfigurationManager.AppSettings
                 .Get("MainWindowOpacity")!), MainWindow.Instance.OpacitySlider.Value, "MainWindowOpacity");
@@ -488,6 +499,8 @@ namespace JapaneseLookup
             preferenceWindow.PlayAudioKeyGestureTextBox.Text = Utils.KeyGestureToString(PlayAudioKeyGesture);
             preferenceWindow.KanjiModeKeyGestureTextBox.Text = Utils.KeyGestureToString(KanjiModeKeyGesture);
 
+            preferenceWindow.ShowManageDictionariesWindowKeyGestureTextBox.Text =
+                Utils.KeyGestureToString(ShowManageDictionariesWindowKeyGesture);
             preferenceWindow.ShowPreferencesWindowKeyGestureTextBox.Text =
                 Utils.KeyGestureToString(ShowPreferencesWindowKeyGesture);
             preferenceWindow.ShowAddNameWindowKeyGestureTextBox.Text =
@@ -588,6 +601,9 @@ namespace JapaneseLookup
             Utils.KeyGestureSaver("MiningModeKeyGesture", preferenceWindow.MiningModeKeyGestureTextBox.Text);
             Utils.KeyGestureSaver("PlayAudioKeyGesture", preferenceWindow.PlayAudioKeyGestureTextBox.Text);
             Utils.KeyGestureSaver("KanjiModeKeyGesture", preferenceWindow.KanjiModeKeyGestureTextBox.Text);
+
+            Utils.KeyGestureSaver("ShowManageDictionariesWindowKeyGesture",
+                preferenceWindow.ShowManageDictionariesWindowKeyGestureTextBox.Text);
             Utils.KeyGestureSaver("ShowPreferencesWindowKeyGesture",
                 preferenceWindow.ShowPreferencesWindowKeyGestureTextBox.Text);
             Utils.KeyGestureSaver("ShowAddNameWindowKeyGesture",
@@ -729,7 +745,6 @@ namespace JapaneseLookup
         public static void SaveBeforeClosing()
         {
             CreateDefaultAppConfig();
-            SerializeDicts();
 
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
@@ -741,69 +756,6 @@ namespace JapaneseLookup
             config.AppSettings.Settings["MainWindowLeftPosition"].Value = MainWindow.Instance.Left.ToString();
 
             config.Save(ConfigurationSaveMode.Modified);
-        }
-        public static void SerializeDicts()
-        {
-            try
-            {
-                var jso = new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    Converters =
-                    {
-                        new JsonStringEnumConverter(),
-                    }
-                };
-
-                File.WriteAllTextAsync(Path.Join(ApplicationPath, "Config/dicts.json"),
-                    JsonSerializer.Serialize(ConfigManager.Dicts, jso));
-            }
-            catch (Exception e)
-            {
-                Utils.Logger.Fatal(e, "SerializeDicts failed");
-                throw;
-            }
-        }
-
-        private static async Task DeserializeDicts()
-        {
-            try
-            {
-                var jso = new JsonSerializerOptions
-                {
-                    Converters =
-                    {
-                        new JsonStringEnumConverter(),
-                    }
-                };
-
-                Dictionary<DictType, Dict> deserializedDicts = await JsonSerializer
-                    .DeserializeAsync<Dictionary<DictType, Dict>>(
-                        new StreamReader(Path.Join(ApplicationPath, "Config/dicts.json")).BaseStream, jso)
-                    .ConfigureAwait(false);
-
-                if (deserializedDicts != null)
-                {
-                    foreach ((DictType _, Dict dict) in deserializedDicts)
-                    {
-                        if (!ConfigManager.Dicts.ContainsKey(dict.Type))
-                        {
-                            dict.Contents = new Dictionary<string, List<IResult>>();
-                            ConfigManager.Dicts.Add(dict.Type, dict);
-                        }
-                    }
-                }
-                else
-                {
-                    Utils.Alert(AlertLevel.Error, "Couldn't load Config/dicts.json");
-                    Utils.Logger.Error("Couldn't load Config/dicts.json");
-                }
-            }
-            catch (Exception e)
-            {
-                Utils.Logger.Fatal(e, "DeserializeDicts failed");
-                throw;
-            }
         }
 
         private static void CreateDefaultDictsConfig()
@@ -852,7 +804,7 @@ namespace JapaneseLookup
         private static async Task LoadDictionaries()
         {
             if (!_initialized)
-                await DeserializeDicts().ConfigureAwait(false);
+                await Utils.DeserializeDicts().ConfigureAwait(false);
 
             Ready = false;
             _initialized = true;
