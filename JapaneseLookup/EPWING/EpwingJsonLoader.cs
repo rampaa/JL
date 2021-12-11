@@ -84,8 +84,7 @@ namespace JapaneseLookup.EPWING
                     {
                         foreach (EpwingResult kenkyuushaResult in kenkyuushaResults)
                         {
-                            
-                         if ((kenkyuushaResult).Definitions.SequenceEqual(result.Definitions))
+                            if ((kenkyuushaResult).Definitions.SequenceEqual(result.Definitions))
                             {
                                 if (string.IsNullOrEmpty(kenkyuushaResult.Reading) && !string.IsNullOrEmpty(result.Reading))
                                 {

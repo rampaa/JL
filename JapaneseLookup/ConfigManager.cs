@@ -1,28 +1,17 @@
-﻿using JapaneseLookup.CustomDict;
-using JapaneseLookup.Dicts;
-using JapaneseLookup.EDICT;
-using JapaneseLookup.EDICT.JMdict;
-using JapaneseLookup.EDICT.JMnedict;
-using JapaneseLookup.EPWING;
-using JapaneseLookup.Frequency;
+﻿using JapaneseLookup.Dicts;
 using JapaneseLookup.GUI;
-using JapaneseLookup.PoS;
 using JapaneseLookup.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Runtime;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
-using JapaneseLookup.EDICT.KANJIDIC;
 
 namespace JapaneseLookup
 {
