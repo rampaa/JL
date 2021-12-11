@@ -60,7 +60,7 @@ namespace JapaneseLookup.Lookup
                         jMnedictResults = GetJMnedictResults(text, textInHiraganaList, dictType);
                         break;
                     case DictType.Kanjidic:
-                        // handled above and below
+                        kanjiResult = GetKanjidicResults(text, DictType.Kanjidic);
                         break;
                     case DictType.Kenkyuusha:
                         // TODO
@@ -95,15 +95,6 @@ namespace JapaneseLookup.Lookup
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
-                }
-            }
-
-            if (!jMdictResults.Any() && !jMnedictResults.Any() &&
-                (!epwingWordResultsList.Any() || !epwingWordResultsList.First().Any()))
-            {
-                if (Storage.Dicts[DictType.Kanjidic]?.Contents.Any() ?? false)
-                {
-                    kanjiResult = GetKanjidicResults(text, DictType.Kanjidic);
                 }
             }
 

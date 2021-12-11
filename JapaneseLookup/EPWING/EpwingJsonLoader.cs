@@ -80,6 +80,21 @@ namespace JapaneseLookup.EPWING
             switch (dictType)
             {
                 case DictType.Kenkyuusha:
+                    if (Storage.Dicts[DictType.Kenkyuusha].Contents.TryGetValue(result.PrimarySpelling, out var kenkyuushaResults))
+                    {
+                        foreach (EpwingResult kenkyuushaResult in kenkyuushaResults)
+                        {
+                            
+                         if ((kenkyuushaResult).Definitions.SequenceEqual(result.Definitions))
+                            {
+                                if (string.IsNullOrEmpty(kenkyuushaResult.Reading) && !string.IsNullOrEmpty(result.Reading))
+                                {
+                                    kenkyuushaResult.Reading = result.Reading;
+                                }
+                                return false;
+                            }
+                        }
+                    }
                     break;
                 case DictType.Daijirin:
                     // english definitions
