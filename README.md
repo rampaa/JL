@@ -1,12 +1,16 @@
 # JL
-JL is . Inspired by Nazeka and Chiitrans Lite.
-
+JL is a program for looking up Japanese words and expressions. It can also be used for word/sentence mining. Inspired by Nazeka and Chiitrans Lite.
 
 Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer the x86 version for 50-80% less memory usage.
 
 ## System requirements
 * Windows 7 or later
 * .NET Desktop Runtime 6.0 or later
+
+## Features
+* Highly customizable
+* Anki mining
+* Pass-through mode 
 
 ## Supported dictionaries
 
@@ -24,10 +28,14 @@ Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer
 * Meikyou - Basic support
 * Kenkyuusha - Basic support
 
-## Resources used (TODO: add links)
-* Nazeka: Deconjugator, mining field names, frequency lists
-* EDICT Project: JMdict, JMnedict, KANJIDIC
-* ?: ids.txt
+## Resources used
+* [nazeka](https://github.com/wareya/nazeka): [Deconjugation rules, frequency lists](https://github.com/wareya/nazeka/tree/master/dict)
+* EDICT: 
+[JMdict](https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project), [JMnedict](https://www.edrdg.org/enamdict/enamdict_doc.html), [KANJIDIC](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project)
+* [cjkvi-ids](https://github.com/cjkvi/cjkvi-ids): [ids.txt](https://github.com/cjkvi/cjkvi-ids/blob/master/ids.txt)
+
+## Screenshots (TODO)
+
 
 ## FAQ
 ### Why can't I look anything up?
