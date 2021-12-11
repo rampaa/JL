@@ -56,7 +56,7 @@ namespace JapaneseLookup.GUI
             e.Cancel = true;
             Visibility = Visibility.Collapsed;
             Utils.SerializeDicts();
-            await ConfigManager.LoadDictionaries().ConfigureAwait(false);
+            await Storage.LoadDictionaries().ConfigureAwait(false);
         }
 
         // probably should be split into several methods
@@ -64,7 +64,7 @@ namespace JapaneseLookup.GUI
         {
             List<DockPanel> resultDockPanels = new();
 
-            foreach ((DictType _, Dict dict) in ConfigManager.Dicts)
+            foreach ((DictType _, Dict dict) in Storage.Dicts)
             {
                 var dockPanel = new DockPanel();
 
@@ -172,12 +172,12 @@ namespace JapaneseLookup.GUI
                 checkBox.Checked += (_, _) => dict.Active = true;
                 buttonIncreasePriority.Click += (_, _) =>
                 {
-                    PrioritizeDict(ConfigManager.Dicts, dict.Type);
+                    PrioritizeDict(Storage.Dicts, dict.Type);
                     UpdateDictionariesDisplay();
                 };
                 buttonDecreasePriority.Click += (_, _) =>
                 {
-                    UnPrioritizeDict(ConfigManager.Dicts, dict.Type);
+                    UnPrioritizeDict(Storage.Dicts, dict.Type);
                     UpdateDictionariesDisplay();
                 };
                 buttonRemove.Click += (_, _) =>
@@ -189,7 +189,7 @@ namespace JapaneseLookup.GUI
                         MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
                     {
                         dict.Contents.Clear();
-                        ConfigManager.Dicts.Remove(dict.Type);
+                        Storage.Dicts.Remove(dict.Type);
                         UpdateDictionariesDisplay();
 
                         GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
@@ -212,7 +212,7 @@ namespace JapaneseLookup.GUI
 
             // TODO: AddDictionaryWindow
             List<DictType> allDictTypes = Enum.GetValues(typeof(DictType)).Cast<DictType>().ToList();
-            List<DictType> loadedDictTypes = ConfigManager.Dicts.Keys.ToList();
+            List<DictType> loadedDictTypes = Storage.Dicts.Keys.ToList();
             ComboBoxAddDictionary.ItemsSource = allDictTypes.Except(loadedDictTypes);
             DictionariesDisplay.ItemsSource = resultDockPanels.OrderBy(dockPanel =>
                 dockPanel.Children
@@ -236,22 +236,22 @@ namespace JapaneseLookup.GUI
 
         private static void PrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBePrioritized)
         {
-            if (ConfigManager.Dicts[typeToBePrioritized].Priority == 0) return;
+            if (Storage.Dicts[typeToBePrioritized].Priority == 0) return;
 
-            dicts.Single(dict => dict.Value.Priority == ConfigManager.Dicts[typeToBePrioritized].Priority - 1).Value
+            dicts.Single(dict => dict.Value.Priority == Storage.Dicts[typeToBePrioritized].Priority - 1).Value
                 .Priority += 1;
-            ConfigManager.Dicts[typeToBePrioritized].Priority -= 1;
+            Storage.Dicts[typeToBePrioritized].Priority -= 1;
         }
 
         private static void UnPrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBeUnPrioritized)
         {
             // lowest priority means highest number
-            int lowestPriority = ConfigManager.Dicts.Select(dict => dict.Value.Priority).Max();
-            if (ConfigManager.Dicts[typeToBeUnPrioritized].Priority == lowestPriority) return;
+            int lowestPriority = Storage.Dicts.Select(dict => dict.Value.Priority).Max();
+            if (Storage.Dicts[typeToBeUnPrioritized].Priority == lowestPriority) return;
 
-            dicts.Single(dict => dict.Value.Priority == ConfigManager.Dicts[typeToBeUnPrioritized].Priority + 1).Value
+            dicts.Single(dict => dict.Value.Priority == Storage.Dicts[typeToBeUnPrioritized].Priority + 1).Value
                 .Priority -= 1;
-            ConfigManager.Dicts[typeToBeUnPrioritized].Priority += 1;
+            Storage.Dicts[typeToBeUnPrioritized].Priority += 1;
         }
 
         private void BrowseForDictionaryFile(DictType selectedDictType, string filter)
@@ -265,12 +265,12 @@ namespace JapaneseLookup.GUI
             if (openFileDialog.ShowDialog() == true)
             {
                 // lowest priority means highest number
-                int lowestPriority = ConfigManager.Dicts.Select(dict => dict.Value.Priority).Max();
+                int lowestPriority = Storage.Dicts.Select(dict => dict.Value.Priority).Max();
 
                 var relativePath = Path.GetRelativePath(ConfigManager.ApplicationPath, openFileDialog.FileName);
-                ConfigManager.Dicts.Add(selectedDictType,
+                Storage.Dicts.Add(selectedDictType,
                     new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
-                ConfigManager.Dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
+                Storage.Dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
                 UpdateDictionariesDisplay();
             }
         }
@@ -287,12 +287,12 @@ namespace JapaneseLookup.GUI
                 !string.IsNullOrWhiteSpace(fbd.SelectedPath))
             {
                 // lowest priority means highest number
-                int lowestPriority = ConfigManager.Dicts.Select(dict => dict.Value.Priority).Max();
+                int lowestPriority = Storage.Dicts.Select(dict => dict.Value.Priority).Max();
 
                 var relativePath = Path.GetRelativePath(ConfigManager.ApplicationPath, fbd.SelectedPath);
-                ConfigManager.Dicts.Add(selectedDictType,
+                Storage.Dicts.Add(selectedDictType,
                     new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
-                ConfigManager.Dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
+                Storage.Dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
                 UpdateDictionariesDisplay();
             }
         }
@@ -348,26 +348,26 @@ namespace JapaneseLookup.GUI
         {
             ConfigManager.Ready = false;
 
-            bool isDownloaded = await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMdict].Path,
+            bool isDownloaded = await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMdict].Path,
                     new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
                     DictType.JMdict.ToString(), true, false)
                 .ConfigureAwait(false);
 
             if (isDownloaded)
             {
-                ConfigManager.Dicts[DictType.JMdict].Contents.Clear();
+                Storage.Dicts[DictType.JMdict].Contents.Clear();
 
                 await Task.Run(async () => await JMdictLoader
-                    .Load(ConfigManager.Dicts[DictType.JMdict].Path).ConfigureAwait(false));
+                    .Load(Storage.Dicts[DictType.JMdict].Path).ConfigureAwait(false));
 
                 await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
 
-                JmdictWcLoader.WcDict.Clear();
+                Storage.WcDict.Clear();
 
                 await JmdictWcLoader.Load().ConfigureAwait(false);
 
-                if (!ConfigManager.Dicts[DictType.JMdict].Active)
-                    ConfigManager.Dicts[DictType.JMdict].Contents.Clear();
+                if (!Storage.Dicts[DictType.JMdict].Active)
+                    Storage.Dicts[DictType.JMdict].Contents.Clear();
 
                 GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
@@ -380,20 +380,20 @@ namespace JapaneseLookup.GUI
         {
             ConfigManager.Ready = false;
 
-            bool isDownloaded = await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMnedict].Path,
+            bool isDownloaded = await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMnedict].Path,
                     new Uri("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz"),
                     DictType.JMnedict.ToString(), true, false)
                 .ConfigureAwait(false);
 
             if (isDownloaded)
             {
-                ConfigManager.Dicts[DictType.JMnedict].Contents.Clear();
+                Storage.Dicts[DictType.JMnedict].Contents.Clear();
 
                 await Task.Run(async () => await JMnedictLoader
-                    .Load(ConfigManager.Dicts[DictType.JMnedict].Path).ConfigureAwait(false));
+                    .Load(Storage.Dicts[DictType.JMnedict].Path).ConfigureAwait(false));
 
-                if (!ConfigManager.Dicts[DictType.JMnedict].Active)
-                    ConfigManager.Dicts[DictType.JMnedict].Contents.Clear();
+                if (!Storage.Dicts[DictType.JMnedict].Active)
+                    Storage.Dicts[DictType.JMnedict].Contents.Clear();
 
                 GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
@@ -405,20 +405,20 @@ namespace JapaneseLookup.GUI
         {
             ConfigManager.Ready = false;
 
-            bool isDownloaded = await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.Kanjidic].Path,
+            bool isDownloaded = await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.Kanjidic].Path,
                     new Uri("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz"),
                     DictType.Kanjidic.ToString(), true, false)
                 .ConfigureAwait(false);
 
             if (isDownloaded)
             {
-                ConfigManager.Dicts[DictType.Kanjidic].Contents.Clear();
+                Storage.Dicts[DictType.Kanjidic].Contents.Clear();
 
                 await Task.Run(async () => await KanjiInfoLoader
-                    .Load(ConfigManager.Dicts[DictType.Kanjidic].Path).ConfigureAwait(false));
+                    .Load(Storage.Dicts[DictType.Kanjidic].Path).ConfigureAwait(false));
 
-                if (!ConfigManager.Dicts[DictType.Kanjidic].Active)
-                    ConfigManager.Dicts[DictType.Kanjidic].Contents.Clear();
+                if (!Storage.Dicts[DictType.Kanjidic].Active)
+                    Storage.Dicts[DictType.Kanjidic].Contents.Clear();
 
                 GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);

@@ -28,11 +28,11 @@ namespace JapaneseLookup.EPWING
                 Debug.Assert(jsonObjects != null, nameof(jsonObjects) + " != null");
                 foreach (var obj in jsonObjects)
                 {
-                    DictionaryBuilder(new EpwingResult(obj), ConfigManager.Dicts[dictType].Contents, dictType);
+                    DictionaryBuilder(new EpwingResult(obj), Storage.Dicts[dictType].Contents, dictType);
                 }
             }
 
-            ConfigManager.Dicts[dictType].Contents.TrimExcess();
+            Storage.Dicts[dictType].Contents.TrimExcess();
         }
 
         private static void DictionaryBuilder(EpwingResult result,

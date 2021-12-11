@@ -88,7 +88,7 @@ namespace JapaneseLookup.GUI
             stringBuilder.Append(type);
             stringBuilder.Append(Environment.NewLine);
 
-            string customNameDictPath = ConfigManager.Dicts[DictType.CustomNameDictionary].Path;
+            string customNameDictPath = Storage.Dicts[DictType.CustomNameDictionary].Path;
             await File.AppendAllTextAsync(
                 Path.Join(ConfigManager.ApplicationPath, customNameDictPath),
                 stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);

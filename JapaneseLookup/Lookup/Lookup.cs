@@ -35,7 +35,7 @@ namespace JapaneseLookup.Lookup
             Dictionary<string, IntermediaryResult> customNameResults = new();
 
             if (ConfigManager.KanjiMode)
-                if (ConfigManager.Dicts[DictType.Kanjidic]?.Contents.Any() ?? false)
+                if (Storage.Dicts[DictType.Kanjidic]?.Contents.Any() ?? false)
                 {
                     return KanjiResultBuilder(GetKanjidicResults(text, DictType.Kanjidic));
                 }
@@ -49,7 +49,7 @@ namespace JapaneseLookup.Lookup
                 deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
             }
 
-            foreach ((DictType dictType, Dict dict) in ConfigManager.Dicts)
+            foreach ((DictType dictType, Dict dict) in Storage.Dicts)
             {
                 switch (dictType)
                 {
@@ -101,7 +101,7 @@ namespace JapaneseLookup.Lookup
             if (!jMdictResults.Any() && !jMnedictResults.Any() &&
                 (!epwingWordResultsList.Any() || !epwingWordResultsList.First().Any()))
             {
-                if (ConfigManager.Dicts[DictType.Kanjidic]?.Contents.Any() ?? false)
+                if (Storage.Dicts[DictType.Kanjidic]?.Contents.Any() ?? false)
                 {
                     kanjiResult = GetKanjidicResults(text, DictType.Kanjidic);
                 }
@@ -140,7 +140,7 @@ namespace JapaneseLookup.Lookup
             return lookupResults
                 .OrderByDescending(dict => dict[LookupResult.FoundForm][0].Length)
                 .ThenBy(dict => Enum.TryParse(dict[LookupResult.DictType][0], out DictType dictType)
-                    ? ConfigManager.Dicts[dictType].Priority
+                    ? Storage.Dicts[dictType].Priority
                     : int.MaxValue)
                 .ThenBy(dict => Convert.ToInt32(dict[LookupResult.Frequency][0]))
                 .ToList();
@@ -158,7 +158,7 @@ namespace JapaneseLookup.Lookup
             {
                 bool tryLongVowelConversion = true;
 
-                if (ConfigManager.Dicts[DictType.JMdict].Contents
+                if (Storage.Dicts[DictType.JMdict].Contents
                     .TryGetValue(textInHiraganaList[i], out var tempResult))
                 {
                     jMdictResults.TryAdd(textInHiraganaList[i],
@@ -173,7 +173,7 @@ namespace JapaneseLookup.Lookup
                         if (jMdictResults.ContainsKey(result.Text))
                             continue;
 
-                        if (ConfigManager.Dicts[DictType.JMdict].Contents
+                        if (Storage.Dicts[DictType.JMdict].Contents
                             .TryGetValue(result.Text, out var temp))
                         {
                             List<IResult> resultsList = new();
@@ -207,7 +207,7 @@ namespace JapaneseLookup.Lookup
                     List<string> textWithoutLongVowelMarkList = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
                     foreach (string textWithoutLongVowelMark in textWithoutLongVowelMarkList)
                     {
-                        if (ConfigManager.Dicts[DictType.JMdict].Contents
+                        if (Storage.Dicts[DictType.JMdict].Contents
                             .TryGetValue(textWithoutLongVowelMark, out var tmpResult))
                         {
                             jMdictResults.Add(textWithoutLongVowelMark,
@@ -227,7 +227,7 @@ namespace JapaneseLookup.Lookup
 
             for (int i = 0; i < text.Length; i++)
             {
-                if (ConfigManager.Dicts[DictType.JMnedict].Contents
+                if (Storage.Dicts[DictType.JMnedict].Contents
                     .TryGetValue(textInHiraganaList[i], out var tempJmnedictResult))
                 {
                     jMnedictResults.TryAdd(textInHiraganaList[i],
@@ -242,7 +242,7 @@ namespace JapaneseLookup.Lookup
         {
             Dictionary<string, IntermediaryResult> kanjiResult = new();
 
-            if (ConfigManager.Dicts[DictType.Kanjidic].Contents.TryGetValue(
+            if (Storage.Dicts[DictType.Kanjidic].Contents.TryGetValue(
                 text.UnicodeIterator().DefaultIfEmpty(string.Empty).First(), out List<IResult> kResult))
             {
                 kanjiResult.Add(text.UnicodeIterator().First(),
@@ -288,7 +288,7 @@ namespace JapaneseLookup.Lookup
                                 if (epwingResult.WordClasses.Intersect(deconjugationResult.Tags).Any())
                                     resultsList.Add(epwingResult);
 
-                                else if (PoS.JmdictWcLoader.WcDict.TryGetValue(deconjugationResult.Text,
+                                else if (Storage.WcDict.TryGetValue(deconjugationResult.Text,
                                     out var jmdictWcResults))
                                 {
                                     foreach (JmdictWc jmdictWcResult in jmdictWcResults)
@@ -346,7 +346,7 @@ namespace JapaneseLookup.Lookup
         {
             var customWordResults = new Dictionary<string, IntermediaryResult>();
 
-            var customWordDictionary = ConfigManager.Dicts[DictType.CustomWordDictionary].Contents;
+            var customWordDictionary = Storage.Dicts[DictType.CustomWordDictionary].Contents;
 
             int succAttempt = 0;
 
@@ -419,7 +419,7 @@ namespace JapaneseLookup.Lookup
 
             for (int i = 0; i < text.Length; i++)
             {
-                if (ConfigManager.Dicts[DictType.CustomNameDictionary].Contents
+                if (Storage.Dicts[DictType.CustomNameDictionary].Contents
                     .TryGetValue(textInHiraganaList[i], out var tempNameResult))
                 {
                     customNameResults.TryAdd(textInHiraganaList[i],
@@ -519,7 +519,7 @@ namespace JapaneseLookup.Lookup
 
             int freqValue = int.MaxValue;
 
-            Frequency.FrequencyLoader.FreqDicts.TryGetValue(ConfigManager.FrequencyListName, out var freqDict);
+            Storage.FreqDicts.TryGetValue(ConfigManager.FrequencyListName, out var freqDict);
 
             if (freqDict == null)
                 return frequency;
@@ -568,7 +568,7 @@ namespace JapaneseLookup.Lookup
 
             int freqValue = int.MaxValue;
 
-            Frequency.FrequencyLoader.FreqDicts.TryGetValue(ConfigManager.FrequencyListName, out var freqDict);
+            Storage.FreqDicts.TryGetValue(ConfigManager.FrequencyListName, out var freqDict);
 
             if (freqDict == null)
                 return frequency;
@@ -649,7 +649,7 @@ namespace JapaneseLookup.Lookup
 
             int freqValue = int.MaxValue;
 
-            Frequency.FrequencyLoader.FreqDicts.TryGetValue(ConfigManager.FrequencyListName, out var freqDict);
+            Storage.FreqDicts.TryGetValue(ConfigManager.FrequencyListName, out var freqDict);
 
             if (freqDict == null)
                 return frequency;

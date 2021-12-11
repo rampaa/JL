@@ -15,16 +15,14 @@ namespace JapaneseLookup.PoS
 {
     public static class JmdictWcLoader
     {
-        public static Dictionary<string, List<JmdictWc>> WcDict { get; set; } = new();
-
         public static async Task Load()
         {
             await using FileStream openStream =
                 File.OpenRead(Path.Join(ConfigManager.ApplicationPath, "Resources/PoS.json"));
-            WcDict = await JsonSerializer.DeserializeAsync<Dictionary<string, List<JmdictWc>>>(openStream);
-            if (WcDict == null) throw new InvalidOperationException();
+            Storage.WcDict = await JsonSerializer.DeserializeAsync<Dictionary<string, List<JmdictWc>>>(openStream);
+            if (Storage.WcDict == null) throw new InvalidOperationException();
 
-            foreach ((string _, var value) in WcDict.ToList())
+            foreach ((string _, var value) in Storage.WcDict.ToList())
             {
                 foreach (JmdictWc jMDictWcEntry in value.ToList())
                 {
@@ -32,14 +30,14 @@ namespace JapaneseLookup.PoS
                     {
                         foreach (string reading in jMDictWcEntry.Readings)
                         {
-                            if (WcDict.TryGetValue(reading, out var result))
+                            if (Storage.WcDict.TryGetValue(reading, out var result))
                             {
                                 result.Add(jMDictWcEntry);
                             }
 
                             else
                             {
-                                WcDict.Add(reading, new List<JmdictWc> { jMDictWcEntry });
+                                Storage.WcDict.Add(reading, new List<JmdictWc> { jMDictWcEntry });
                             }
                         }
                     }
@@ -65,7 +63,7 @@ namespace JapaneseLookup.PoS
                 "exp", "vs", "vz"
             };
 
-            foreach ((string _, var values) in ConfigManager.Dicts[Dicts.DictType.JMdict].Contents.ToList())
+            foreach ((string _, var values) in Storage.Dicts[Dicts.DictType.JMdict].Contents.ToList())
             {
                 foreach (IResult result in values)
                 {

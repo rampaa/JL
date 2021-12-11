@@ -25,7 +25,7 @@ namespace JapaneseLookup.EDICT.JMnedict
                     ReadEntry(edictXml);
                 }
 
-                ConfigManager.Dicts[DictType.JMnedict].Contents.TrimExcess();
+                Storage.Dicts[DictType.JMnedict].Contents.TrimExcess();
             }
 
             else if (MessageBox.Show(
@@ -33,15 +33,15 @@ namespace JapaneseLookup.EDICT.JMnedict
                     MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
                     MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
             {
-                await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMnedict].Path,
+                await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMnedict].Path,
                     new Uri("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz"),
                     DictType.JMnedict.ToString(), false, false).ConfigureAwait(false);
-                await Load(ConfigManager.Dicts[DictType.JMnedict].Path).ConfigureAwait(false);
+                await Load(Storage.Dicts[DictType.JMnedict].Path).ConfigureAwait(false);
             }
 
             else
             {
-                ConfigManager.Dicts[DictType.JMnedict].Active = false;
+                Storage.Dicts[DictType.JMnedict].Active = false;
             }
         }
 
@@ -76,7 +76,7 @@ namespace JapaneseLookup.EDICT.JMnedict
                 }
             }
 
-            JMnedictBuilder.BuildDictionary(entry, ConfigManager.Dicts[DictType.JMnedict].Contents);
+            JMnedictBuilder.BuildDictionary(entry, Storage.Dicts[DictType.JMnedict].Contents);
         }
 
         private static void ReadKEle(XmlTextReader jMneDictXML, JMnedictEntry entry)

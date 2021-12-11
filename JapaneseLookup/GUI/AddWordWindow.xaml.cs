@@ -107,7 +107,7 @@ namespace JapaneseLookup.GUI
             stringBuilder.Append(wordClass);
             stringBuilder.Append(Environment.NewLine);
 
-            string customWordDictPath = ConfigManager.Dicts[DictType.CustomWordDictionary].Path;
+            string customWordDictPath = Storage.Dicts[DictType.CustomWordDictionary].Path;
             await File.AppendAllTextAsync(
                 Path.Join(ConfigManager.ApplicationPath, customWordDictPath),
                 stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);

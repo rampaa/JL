@@ -235,7 +235,7 @@ namespace JapaneseLookup.Utilities
                 };
 
                 File.WriteAllTextAsync(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json"),
-                    JsonSerializer.Serialize(ConfigManager.Dicts, jso));
+                    JsonSerializer.Serialize(Storage.Dicts, jso));
             }
             catch (Exception e)
             {
@@ -264,10 +264,10 @@ namespace JapaneseLookup.Utilities
                 {
                     foreach ((DictType _, Dict dict) in deserializedDicts)
                     {
-                        if (!ConfigManager.Dicts.ContainsKey(dict.Type))
+                        if (!Storage.Dicts.ContainsKey(dict.Type))
                         {
                             dict.Contents = new Dictionary<string, List<IResult>>();
-                            ConfigManager.Dicts.Add(dict.Type, dict);
+                            Storage.Dicts.Add(dict.Type, dict);
                         }
                     }
                 }

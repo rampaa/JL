@@ -29,7 +29,7 @@ namespace JapaneseLookup.CustomDict
         {
             CustomNameEntry newNameEntry = new(spelling, reading, nameType);
 
-            var customNameDictionary = ConfigManager.Dicts[DictType.CustomNameDictionary].Contents;
+            var customNameDictionary = Storage.Dicts[DictType.CustomNameDictionary].Contents;
 
             if (customNameDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out var entry))
             {

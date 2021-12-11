@@ -59,13 +59,13 @@ namespace JapaneseLookup.EDICT.KANJIDIC
                     }
                 }
 
-                ConfigManager.Dicts[DictType.Kanjidic].Contents = new Dictionary<string, List<IResult>>();
+                Storage.Dicts[DictType.Kanjidic].Contents = new Dictionary<string, List<IResult>>();
                 while (edictXml.ReadToFollowing("literal"))
                 {
                     ReadCharacter(edictXml, kanjiCompositionDictionary);
                 }
 
-                ConfigManager.Dicts[DictType.Kanjidic].Contents.TrimExcess();
+                Storage.Dicts[DictType.Kanjidic].Contents.TrimExcess();
             }
 
             else if (MessageBox.Show(
@@ -73,15 +73,15 @@ namespace JapaneseLookup.EDICT.KANJIDIC
                     MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
                     MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
             {
-                await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.Kanjidic].Path,
+                await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.Kanjidic].Path,
                     new Uri("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz"),
                     DictType.Kanjidic.ToString(), false, false).ConfigureAwait(false);
-                await Load(ConfigManager.Dicts[DictType.Kanjidic].Path).ConfigureAwait(false);
+                await Load(Storage.Dicts[DictType.Kanjidic].Path).ConfigureAwait(false);
             }
 
             else
             {
-                ConfigManager.Dicts[DictType.Kanjidic].Active = false;
+                Storage.Dicts[DictType.Kanjidic].Active = false;
             }
         }
 
@@ -151,7 +151,7 @@ namespace JapaneseLookup.EDICT.KANJIDIC
             if (!entry.KunReadings.Any())
                 entry.KunReadings = null;
 
-            ConfigManager.Dicts[DictType.Kanjidic].Contents.Add(key, new List<IResult> { entry });
+            Storage.Dicts[DictType.Kanjidic].Contents.Add(key, new List<IResult> { entry });
         }
     }
 }

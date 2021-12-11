@@ -79,7 +79,7 @@ namespace JapaneseLookup.CustomDict
 
                 CustomWordEntry newWordEntry = new(spelling, alternativeSpellings, readings, definitions, wordClass);
 
-                var customWordDictionary = ConfigManager.Dicts[DictType.CustomWordDictionary].Contents;
+                var customWordDictionary = Storage.Dicts[DictType.CustomWordDictionary].Contents;
 
                 if (customWordDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out var result))
                 {

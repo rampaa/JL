@@ -25,17 +25,17 @@ namespace JapaneseLookupTests
         {
             string jmdictPath = ConfigManager.BuiltInDicts["JMdict"].Path;
 
-            ConfigManager.Dicts.Add(DictType.JMdict, new Dict(DictType.JMdict, jmdictPath, true, 0));
-            ConfigManager.Dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();
+            Storage.Dicts.Add(DictType.JMdict, new Dict(DictType.JMdict, jmdictPath, true, 0));
+            Storage.Dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();
 
             if (!File.Exists(Path.Join(ConfigManager.ApplicationPath, jmdictPath)))
             {
-                ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMdict].Path,
+                ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMdict].Path,
                     new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
                     DictType.JMdict.ToString(), false, true).Wait();
             }
 
-            JMdictLoader.Load(ConfigManager.Dicts[DictType.JMdict].Path).Wait();
+            JMdictLoader.Load(Storage.Dicts[DictType.JMdict].Path).Wait();
         }
 
         [Test]

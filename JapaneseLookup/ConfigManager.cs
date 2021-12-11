@@ -50,17 +50,13 @@ namespace JapaneseLookup
                 }
             };
 
-        private static readonly Dictionary<string, string> FrequencyLists = new()
+        public static readonly Dictionary<string, string> FrequencyLists = new()
         {
             { "VN", "Resources/freqlist_vns.json" },
             { "Novel", "Resources/freqlist_novels.json" },
             { "Narou", "Resources/freqlist_narou.json" },
             { "None", "" }
         };
-
-        private static bool _initializedPoS = false;
-
-        public static readonly Dictionary<DictType, Dict> Dicts = new();
 
         public static string AnkiConnectUri { get; set; } = "http://localhost:8765";
         public static int MaxSearchLength { get; set; } = 37;
@@ -481,6 +477,8 @@ namespace JapaneseLookup
 
             if (!File.Exists("Resources/custom_names.txt"))
                 File.Create("Resources/custom_names.txt").Dispose();
+
+            Storage.LoadFrequency().ConfigureAwait(false);
         }
 
         public static void LoadPreferences(PreferencesWindow preferenceWindow)
@@ -791,252 +789,6 @@ namespace JapaneseLookup
                 config.Save(ConfigurationSaveMode.Full);
                 ConfigurationManager.RefreshSection("appSettings");
             }
-        }
-
-        public static async Task LoadDictionaries()
-        {
-            Ready = false;
-
-            List<Task> tasks = new ();
-            Task jMDictTask = null;
-            bool dictRemoved = false;
-
-            foreach ((DictType _, Dict dict) in Dicts.ToList())
-            {
-                switch (dict.Type)
-                {
-                    case DictType.JMdict:
-                        // initial jmdict load
-                        if (dict.Active && !Dicts[DictType.JMdict].Contents.Any())
-                        {
-                            jMDictTask = Task.Run(async () => await JMdictLoader.Load(dict.Path).ConfigureAwait(false));
-
-                            tasks.Add(jMDictTask);
-                        }
-
-                        else if (!dict.Active && Dicts[DictType.JMdict].Contents.Any())
-                        {
-                            dict.Contents.Clear();
-                            dictRemoved = true;
-                        }
-
-                        break;
-                    case DictType.JMnedict:
-                        // JMnedict
-                        if (dict.Active && !Dicts[DictType.JMnedict].Contents.Any())
-                        {
-                            tasks.Add(Task.Run(async () => await JMnedictLoader.Load(dict.Path).ConfigureAwait(false)));
-                        }
-
-                        else if (!dict.Active && Dicts[DictType.JMnedict].Contents.Any())
-                        {
-                            dict.Contents.Clear();
-                            dictRemoved = true;
-                        }
-
-                        break;
-                    case DictType.Kanjidic:
-                        // KANJIDIC
-                        if (dict.Active && !Dicts[DictType.Kanjidic].Contents.Any())
-                        {
-                            tasks.Add(Task.Run(async () =>
-                                await KanjiInfoLoader.Load(dict.Path).ConfigureAwait(false)));
-                        }
-
-                        else if (!dict.Active && Dicts[DictType.Kanjidic].Contents.Any())
-                        {
-                            dict.Contents.Clear();
-                            dictRemoved = true;
-                        }
-
-                        break;
-                    case DictType.Kenkyuusha:
-                        if (dict.Active && !Dicts[DictType.Kenkyuusha].Contents.Any())
-                        {
-                            tasks.Add(Task.Run(async () =>
-                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
-                        }
-
-                        else if (!dict.Active && Dicts[DictType.Kenkyuusha].Contents.Any())
-                        {
-                            dict.Contents.Clear();
-                            dictRemoved = true;
-                        }
-
-                        break;
-                    case DictType.Daijirin:
-                        if (dict.Active && !Dicts[DictType.Daijirin].Contents.Any())
-                        {
-                            tasks.Add(Task.Run(async () =>
-                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
-                        }
-
-                        else if (!dict.Active && Dicts[DictType.Daijirin].Contents.Any())
-                        {
-                            dict.Contents.Clear();
-                            dictRemoved = true;
-                        }
-
-                        break;
-                    case DictType.Daijisen:
-                        if (dict.Active && !Dicts[DictType.Daijisen].Contents.Any())
-                        {
-                            tasks.Add(Task.Run(async () =>
-                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
-                        }
-
-                        else if (!dict.Active && Dicts[DictType.Daijisen].Contents.Any())
-                        {
-                            dict.Contents.Clear();
-                            dictRemoved = true;
-                        }
-
-                        break;
-                    case DictType.Koujien:
-                        if (dict.Active && !Dicts[DictType.Koujien].Contents.Any())
-                        {
-                            tasks.Add(Task.Run(async () =>
-                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
-                        }
-
-                        else if (!dict.Active && Dicts[DictType.Koujien].Contents.Any())
-                        {
-                            dict.Contents.Clear();
-                            dictRemoved = true;
-                        }
-
-                        break;
-                    case DictType.Meikyou:
-                        if (dict.Active && !Dicts[DictType.Meikyou].Contents.Any())
-                        {
-                            tasks.Add(Task.Run(async () =>
-                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
-                        }
-
-                        else if (!dict.Active && Dicts[DictType.Meikyou].Contents.Any())
-                        {
-                            dict.Contents.Clear();
-                            dictRemoved = true;
-                        }
-
-                        break;
-                    case DictType.CustomWordDictionary:
-                        if (dict.Active && !Dicts[DictType.CustomWordDictionary].Contents.Any())
-                        {
-                            tasks.Add(Task.Run(async () => await CustomWordLoader
-                                .Load(Dicts[DictType.CustomWordDictionary].Path)
-                                .ConfigureAwait(false)));
-                        }
-
-                        else if (!dict.Active && Dicts[DictType.CustomWordDictionary].Contents.Any())
-                        {
-                            dict.Contents.Clear();
-                            dictRemoved = true;
-                        }
-
-                        break;
-                    case DictType.CustomNameDictionary:
-                        if (dict.Active && !Dicts[DictType.CustomNameDictionary].Contents.Any())
-                        {
-                            tasks.Add(Task.Run(async () =>
-                                await CustomNameLoader.Load(Dicts[DictType.CustomNameDictionary].Path)
-                                    .ConfigureAwait(false)));
-                        }
-
-                        else if (!dict.Active && Dicts[DictType.CustomNameDictionary].Contents.Any())
-                        {
-                            dict.Contents.Clear();
-                            dictRemoved = true;
-                        }
-
-                        break;
-
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-
-            // load new freqlist if necessary
-            if (!FrequencyLoader.FreqDicts.ContainsKey(FrequencyListName))
-            {
-                FrequencyLoader.FreqDicts.Clear();
-                dictRemoved = true;
-
-                if (FrequencyListName != "None")
-                {
-                    FrequencyLoader.FreqDicts.Add(FrequencyListName, new Dictionary<string, List<FrequencyEntry>>());
-
-                    Task taskNewFreqlist = Task.Run(async () =>
-                    {
-                        FrequencyLoader.BuildFreqDict(await FrequencyLoader
-                            .LoadJson(Path.Join(ApplicationPath, FrequencyLists[FrequencyListName]))
-                            .ConfigureAwait(false));
-                    });
-
-                    tasks.Add(taskNewFreqlist);
-                }
-            }
-
-            if (!_initializedPoS)
-            {
-                Task taskLoadWc = Task.Run(async () =>
-                {
-                    if (!File.Exists(Path.Join(ApplicationPath, "Resources/PoS.json")))
-                    {
-                        if (Dicts[DictType.JMdict].Active)
-                        {
-                            if (jMDictTask != null)
-                                await jMDictTask.ConfigureAwait(false);
-
-                            await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
-                        }
-
-                        else
-                        {
-                            bool deleteJmdictFile = false;
-                            if (!File.Exists(Path.Join(ApplicationPath, Dicts[DictType.JMdict].Path)))
-                            {
-                                deleteJmdictFile = true;
-                                await ResourceUpdater.UpdateResource(ConfigManager.Dicts[DictType.JMdict].Path,
-                                    new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
-                                    DictType.JMdict.ToString(), false, true).ConfigureAwait(false);
-                            }
-
-                            await Task.Run(async () =>
-                                await JMdictLoader.Load(Dicts[DictType.JMdict].Path).ConfigureAwait(false));
-                            await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
-                            Dicts[DictType.JMdict].Contents.Clear();
-
-                            if (deleteJmdictFile)
-                                File.Delete(Path.Join(ApplicationPath, Dicts[DictType.JMdict].Path));
-                        }
-                    }
-
-                    await JmdictWcLoader.Load();
-                });
-
-                _initializedPoS = true;
-
-                tasks.Add(taskLoadWc);
-            }
-
-            if (tasks.Any() || dictRemoved)
-            {
-                if (tasks.Any())
-                {
-                    await Task.WhenAll(tasks.ToArray()).ConfigureAwait(false);
-                    //.ContinueWith(_ => {
-                    //timer.Stop();
-                    //TimeSpan timeTaken = timer.Elapsed;
-                    //MessageBox.Show("Time taken: " + timeTaken.ToString(@"m\:ss\.fff"), "");
-                    //});
-                }
-
-                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-            }
-
-            Ready = true;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime;
 using System.Text.RegularExpressions;
 
 namespace JapaneseLookup.Utilities
@@ -35,6 +36,24 @@ namespace JapaneseLookup.Utilities
                 endPosition = text.Length;
 
             return endPosition;
+        }
+
+        public static void InitializeMainWindow()
+        {
+            Utils.DeserializeDicts().ContinueWith(_ =>
+            {
+                Storage.LoadDictionaries().ContinueWith(_ =>
+                {
+                    Storage.InitializePoS().ContinueWith(_ =>
+                    {
+                        GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+                    }).ConfigureAwait(false);
+                }
+                ).ConfigureAwait(false);
+            }).ConfigureAwait(false);
+
+            ConfigManager.ApplyPreferences();
         }
 
         public static void ShowAddNameWindow()
