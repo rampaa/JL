@@ -8,10 +8,10 @@ namespace JapaneseLookup.EPWING
 {
     public class EpwingResult : IResult
     {
-        public List<string> Definitions { get; set; }
-        public string Reading { get; set; }
-        public List<string> WordClasses { get; set; }
-        public string PrimarySpelling { get; init; }
+        public List<string> Definitions { get; }
+        public string Reading { get; }
+        public List<string> WordClasses { get; }
+        public string PrimarySpelling { get; }
 
         //public string KanaSpelling { get; set; }
         //public string DefinitionTags { get; init; }

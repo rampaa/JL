@@ -80,17 +80,22 @@ namespace JapaneseLookup.EPWING
             switch (dictType)
             {
                 case DictType.Kenkyuusha:
-                    if (Storage.Dicts[DictType.Kenkyuusha].Contents.TryGetValue(result.PrimarySpelling, out var kenkyuushaResults))
+                    if (Storage.Dicts[DictType.Kenkyuusha].Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(result.PrimarySpelling), out var kenkyuushaResults))
                     {
-                        foreach (EpwingResult kenkyuushaResult in kenkyuushaResults)
+                        foreach (EpwingResult kenkyuushaResult in kenkyuushaResults.ToList())
                         {
-                            if ((kenkyuushaResult).Definitions.SequenceEqual(result.Definitions))
+                            if (kenkyuushaResult.Definitions.SequenceEqual(result.Definitions))
                             {
                                 if (string.IsNullOrEmpty(kenkyuushaResult.Reading) && !string.IsNullOrEmpty(result.Reading))
                                 {
-                                    kenkyuushaResult.Reading = result.Reading;
+                                    kenkyuushaResults.Remove(kenkyuushaResult);
+                                    break;
                                 }
-                                return false;
+
+                                else
+                                {
+                                    return false;
+                                }
                             }
                         }
                     }
@@ -103,7 +108,6 @@ namespace JapaneseLookup.EPWING
                     // english definitions
                     if (!result.Definitions.Any(def => MainWindowUtilities.JapaneseRegex.IsMatch(def)))
                         return false;
-
                     break;
 
                 case DictType.Daijisen:
@@ -114,8 +118,10 @@ namespace JapaneseLookup.EPWING
 
                 case DictType.Koujien:
                     break;
+
                 case DictType.Meikyou:
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(dictType), dictType, null);
             }
