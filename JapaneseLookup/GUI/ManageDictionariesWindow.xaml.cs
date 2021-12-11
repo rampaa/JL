@@ -51,11 +51,12 @@ namespace JapaneseLookup.GUI
             UpdateDictionariesDisplay();
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             e.Cancel = true;
             Visibility = Visibility.Collapsed;
             Utils.SerializeDicts();
+            await ConfigManager.LoadDictionaries().ConfigureAwait(false);
         }
 
         // probably should be split into several methods
@@ -187,8 +188,12 @@ namespace JapaneseLookup.GUI
                         MessageBoxResult.No,
                         MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
                     {
+                        dict.Contents.Clear();
                         ConfigManager.Dicts.Remove(dict.Type);
                         UpdateDictionariesDisplay();
+
+                        GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
                     }
                 };
 
@@ -420,6 +425,11 @@ namespace JapaneseLookup.GUI
             }
 
             ConfigManager.Ready = true;
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
 }

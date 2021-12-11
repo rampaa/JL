@@ -801,7 +801,7 @@ namespace JapaneseLookup
             }
         }
 
-        private static async Task LoadDictionaries()
+        public static async Task LoadDictionaries()
         {
             if (!_initialized)
                 await Utils.DeserializeDicts().ConfigureAwait(false);
