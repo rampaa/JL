@@ -35,7 +35,7 @@ Make sure you're not in pass-through mode, kanji mode, have lookup-on-select-onl
 ### How do I disable pass-through mode?
 Press the opacity slider button located top-left of the main window.
 ### How do I add EPWING dictionaries?
-Select the folder containing the **unzipped** (so you should have a folder of files named like term_bank_1.json, term_bank_2.json...)  contents of a dictionary converted with https://github.com/FooSoft/yomichan-import on the Dictionaries tab in Preferences.
+Select the folder containing the **unzipped** (so you should have a folder of files named like term_bank_1.json, term_bank_2.json...)  contents of a dictionary converted with https://github.com/FooSoft/yomichan-import on the Manage Dictionaries window.
 ### Where are my settings stored?
 * Anki settings: Config/AnkiConfig.json
 * Dictionary settings: Config/dicts.json
