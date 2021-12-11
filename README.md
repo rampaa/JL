@@ -29,10 +29,11 @@ Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer
 * Kenkyuusha - Basic support
 
 ## Resources used
-* Nazeka: [Deconjugation rules, frequency lists](https://github.com/wareya/nazeka/tree/master/dict)
-* EDICT: 
-[JMdict](https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project), [JMnedict](https://www.edrdg.org/enamdict/enamdict_doc.html), [KANJIDIC](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project)
-* cjkvi-ids: [ids.txt](https://github.com/cjkvi/cjkvi-ids/blob/master/ids.txt)
+* [Nazeka](https://github.com/wareya/nazeka): Deconjugation rules, deconjugator, frequency lists
+* [JMdict](https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project): JMdict_e.gz
+* [JMnedict](https://www.edrdg.org/enamdict/enamdict_doc.html): JMnedict.xml.gz
+* [KANJIDIC](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project): kanjidic2.xml.gz
+* [cjkvi-ids](https://github.com/cjkvi/cjkvi-ids): ids.txt
 
 ## Screenshots (TODO)
 
