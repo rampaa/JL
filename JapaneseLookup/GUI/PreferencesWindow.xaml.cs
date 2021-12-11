@@ -59,10 +59,10 @@ namespace JapaneseLookup.GUI
             window.Close();
         }
 
-        private async void SaveButton_Click(object sender, RoutedEventArgs e)
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             Visibility = Visibility.Collapsed;
-            await ConfigManager.SavePreferences(this).ConfigureAwait(false);
+            ConfigManager.SavePreferences(this);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)

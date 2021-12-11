@@ -132,9 +132,8 @@ namespace JapaneseLookup
         // consider making this dictionary specific
         public static bool NewlineBetweenDefinitions { get; set; } = false;
         public static bool Ready { get; set; } = false;
-        private static bool _initialized = false;
 
-        public static async Task ApplyPreferences()
+        public static void ApplyPreferences()
         {
             string tempStr = ConfigurationManager.AppSettings.Get("FrequencyListName");
 
@@ -482,13 +481,6 @@ namespace JapaneseLookup
 
             if (!File.Exists("Resources/custom_names.txt"))
                 File.Create("Resources/custom_names.txt").Dispose();
-
-            // Test without async/await.
-            // Task.Run(async () => { await LoadDictionaries(); });
-            // timer.Start();
-
-            if (!_initialized || Ready)
-                await LoadDictionaries().ConfigureAwait(false);
         }
 
         public static void LoadPreferences(PreferencesWindow preferenceWindow)
@@ -596,7 +588,7 @@ namespace JapaneseLookup
             preferenceWindow.LookupKeyComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("LookupKey");
         }
 
-        public static async Task SavePreferences(PreferencesWindow preferenceWindow)
+        public static void SavePreferences(PreferencesWindow preferenceWindow)
         {
             Utils.KeyGestureSaver("MiningModeKeyGesture", preferenceWindow.MiningModeKeyGestureTextBox.Text);
             Utils.KeyGestureSaver("PlayAudioKeyGesture", preferenceWindow.PlayAudioKeyGestureTextBox.Text);
@@ -739,7 +731,7 @@ namespace JapaneseLookup
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
 
-            await ApplyPreferences().ConfigureAwait(false);
+            ApplyPreferences();
         }
 
         public static void SaveBeforeClosing()
@@ -803,13 +795,9 @@ namespace JapaneseLookup
 
         public static async Task LoadDictionaries()
         {
-            if (!_initialized)
-                await Utils.DeserializeDicts().ConfigureAwait(false);
-
             Ready = false;
-            _initialized = true;
 
-            var tasks = new List<Task>();
+            List<Task> tasks = new ();
             Task jMDictTask = null;
             bool dictRemoved = false;
 

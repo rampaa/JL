@@ -27,7 +27,9 @@ namespace JapaneseLookup.GUI
         {
             InitializeComponent();
             Instance = this;
-            ConfigManager.ApplyPreferences().ConfigureAwait(false);
+            ConfigManager.ApplyPreferences();
+            Utils.DeserializeDicts().ConfigureAwait(false);
+            ConfigManager.LoadDictionaries().ConfigureAwait(false);
             MainWindowChrome.Freeze();
             MainTextBox.IsInactiveSelectionHighlightEnabled = true;
         }
