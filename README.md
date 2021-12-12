@@ -23,10 +23,12 @@ Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer
 ### EPWING ([yomichan-import](https://github.com/FooSoft/yomichan-import/) format)
 
 * Daijirin - Basic+ support
+* Kenkyuusha - Basic+ support
 * Daijisen - Basic support
+* Gakken - Basic support
+* Kotowaza - Basic support
 * Koujien - Basic support
 * Meikyou - Basic support
-* Kenkyuusha - Basic support
 
 ## Resources used
 * [Nazeka](https://github.com/wareya/nazeka): Deconjugation rules, deconjugator, frequency lists
