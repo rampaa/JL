@@ -4,6 +4,7 @@ using JapaneseLookup.Utilities;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Windows;
 using System.Windows.Input;
@@ -427,8 +428,6 @@ namespace JapaneseLookup
             Utils.Try(() => MainWindow.Instance.Left = double.Parse(ConfigurationManager.AppSettings
                 .Get("MainWindowLeftPosition")!), MainWindow.Instance.Left, "MainWindowLeftPosition");
 
-            MainWindow.FirstPopupWindow.Background = PopupBackgroundColor;
-
             tempStr = ConfigurationManager.AppSettings.Get("PopupFont");
 
             if (tempStr == null)
@@ -436,24 +435,30 @@ namespace JapaneseLookup
             else
                 PopupFont = new FontFamily(tempStr);
 
-            MainWindow.FirstPopupWindow.FontFamily = PopupFont;
-
             Utils.Try(() => PopupDynamicHeight = bool.Parse(ConfigurationManager.AppSettings
                 .Get("PopupDynamicHeight")!), PopupDynamicHeight, "PopupDynamicHeight");
             Utils.Try(() => PopupDynamicWidth = bool.Parse(ConfigurationManager.AppSettings
                 .Get("PopupDynamicWidth")!), PopupDynamicWidth, "PopupDynamicWidth");
 
-            if (PopupDynamicWidth && PopupDynamicHeight)
-                MainWindow.FirstPopupWindow.SizeToContent = SizeToContent.WidthAndHeight;
+            foreach (var popupWindow in Application.Current.Windows.OfType<PopupWindow>().ToList())
+            {
+                popupWindow.Background = PopupBackgroundColor;
+                popupWindow.MaxHeight = PopupMaxHeight;
+                popupWindow.MaxWidth = PopupMaxWidth;
+                popupWindow.FontFamily = PopupFont;
 
-            else if (PopupDynamicWidth)
-                MainWindow.FirstPopupWindow.SizeToContent = SizeToContent.Width;
+                if (PopupDynamicWidth && PopupDynamicHeight)
+                    popupWindow.SizeToContent = SizeToContent.WidthAndHeight;
 
-            else if (PopupDynamicHeight)
-                MainWindow.FirstPopupWindow.SizeToContent = SizeToContent.Height;
+                else if (PopupDynamicWidth)
+                    popupWindow.SizeToContent = SizeToContent.Width;
 
-            else
-                MainWindow.FirstPopupWindow.SizeToContent = SizeToContent.Manual;
+                else if (PopupDynamicHeight)
+                    popupWindow.SizeToContent = SizeToContent.Height;
+
+                else
+                    popupWindow.SizeToContent = SizeToContent.Manual;
+            }
 
             Storage.LoadFrequency().ConfigureAwait(false);
         }

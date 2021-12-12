@@ -34,7 +34,7 @@ namespace JapaneseLookup.EPWING
             //Score = score;
 
             Definitions = jsonElement[5].ToString()[2..^2]
-                .Split("\\n", StringSplitOptions.TrimEntries).ToList();
+                .Split("\\n", StringSplitOptions.TrimEntries).ToList().Select(s => s.Replace("\\\"", "\"")).ToList();
 
             if (!Definitions.Any())
                 Definitions = null;
