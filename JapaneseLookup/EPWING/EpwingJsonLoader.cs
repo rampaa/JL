@@ -122,6 +122,12 @@ namespace JapaneseLookup.EPWING
                 case DictType.Meikyou:
                     break;
 
+                case DictType.Gakken:
+                    break;
+
+                case DictType.Kotowaza:
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(dictType), dictType, null);
             }

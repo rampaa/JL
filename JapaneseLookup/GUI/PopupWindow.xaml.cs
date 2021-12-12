@@ -820,7 +820,7 @@ namespace JapaneseLookup.GUI
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
             {
                 if (ConfigManager.Ready)
-                    ManageDictionariesWindow.Instance.ShowDialog();
+                    MainWindowUtilities.ShowManageDictionariesWindow();
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))

@@ -339,6 +339,12 @@ namespace JapaneseLookup.GUI
                 case DictType.Meikyou:
                     BrowseForDictionaryFolder(selectedDictType);
                     break;
+                case DictType.Gakken:
+                    BrowseForDictionaryFolder(selectedDictType);
+                    break;
+                case DictType.Kotowaza:
+                    BrowseForDictionaryFolder(selectedDictType);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

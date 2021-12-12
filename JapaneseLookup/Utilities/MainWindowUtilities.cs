@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime;
 using System.Text.RegularExpressions;
 
@@ -40,6 +41,15 @@ namespace JapaneseLookup.Utilities
 
         public static void InitializeMainWindow()
         {
+            if (!File.Exists(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json")))
+                Utils.CreateDefaultDictsConfig();
+
+            if (!File.Exists("Resources/custom_words.txt"))
+                File.Create("Resources/custom_words.txt").Dispose();
+
+            if (!File.Exists("Resources/custom_names.txt"))
+                File.Create("Resources/custom_names.txt").Dispose();
+
             Utils.DeserializeDicts().ContinueWith(_ =>
             {
                 Storage.LoadDictionaries().ContinueWith(_ =>
@@ -74,6 +84,20 @@ namespace JapaneseLookup.Utilities
         {
             ConfigManager.LoadPreferences(PreferencesWindow.Instance);
             PreferencesWindow.Instance.ShowDialog();
+        }
+
+        public static void ShowManageDictionariesWindow()
+        {
+            if (!File.Exists(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json")))
+                Utils.CreateDefaultDictsConfig();
+
+            if (!File.Exists("Resources/custom_words.txt"))
+                File.Create("Resources/custom_words.txt").Dispose();
+
+            if (!File.Exists("Resources/custom_names.txt"))
+                File.Create("Resources/custom_names.txt").Dispose();
+
+            ManageDictionariesWindow.Instance.ShowDialog();
         }
 
         public static void SearchWithBrowser()

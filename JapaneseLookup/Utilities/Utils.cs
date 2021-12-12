@@ -221,6 +221,30 @@ namespace JapaneseLookup.Utilities
             }
         }
 
+        public static void CreateDefaultDictsConfig()
+        {
+            var jso = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Converters =
+                {
+                    new JsonStringEnumConverter(),
+                }
+            };
+
+            try
+            {
+                Directory.CreateDirectory(Path.Join(ConfigManager.ApplicationPath, "Config"));
+                File.WriteAllText(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json"),
+                    JsonSerializer.Serialize(ConfigManager.BuiltInDicts, jso));
+            }
+            catch (Exception e)
+            {
+                Alert(AlertLevel.Error, "Couldn't write default Dicts config");
+                Logger.Error(e, "Couldn't write default Dicts config");
+            }
+        }
+
         public static void SerializeDicts()
         {
             try

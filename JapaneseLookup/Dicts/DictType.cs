@@ -15,5 +15,7 @@
         Daijisen,
         Koujien,
         Meikyou,
+        Gakken,
+        Kotowaza,
     }
 }

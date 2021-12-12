@@ -150,6 +150,37 @@ namespace JapaneseLookup
                         }
 
                         break;
+
+                    case DictType.Gakken:
+                        if (dict.Active && !Dicts[DictType.Gakken].Contents.Any())
+                        {
+                            tasks.Add(Task.Run(async () =>
+                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                        }
+
+                        else if (!dict.Active && Dicts[DictType.Gakken].Contents.Any())
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
+                        }
+
+                        break;
+
+                    case DictType.Kotowaza:
+                        if (dict.Active && !Dicts[DictType.Kotowaza].Contents.Any())
+                        {
+                            tasks.Add(Task.Run(async () =>
+                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                        }
+
+                        else if (!dict.Active && Dicts[DictType.Kotowaza].Contents.Any())
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
+                        }
+
+                        break;
+
                     case DictType.CustomWordDictionary:
                         if (dict.Active && !Dicts[DictType.CustomWordDictionary].Contents.Any())
                         {

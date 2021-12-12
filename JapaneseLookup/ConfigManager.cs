@@ -1,13 +1,10 @@
 ﻿using JapaneseLookup.Dicts;
 using JapaneseLookup.GUI;
 using JapaneseLookup.Utilities;
-using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Net.Http;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -458,15 +455,6 @@ namespace JapaneseLookup
             else
                 MainWindow.FirstPopupWindow.SizeToContent = SizeToContent.Manual;
 
-            if (!File.Exists(Path.Join(ApplicationPath, "Config/dicts.json")))
-                CreateDefaultDictsConfig();
-
-            if (!File.Exists("Resources/custom_words.txt"))
-                File.Create("Resources/custom_words.txt").Dispose();
-
-            if (!File.Exists("Resources/custom_names.txt"))
-                File.Create("Resources/custom_names.txt").Dispose();
-
             Storage.LoadFrequency().ConfigureAwait(false);
         }
 
@@ -735,30 +723,6 @@ namespace JapaneseLookup
             config.AppSettings.Settings["MainWindowLeftPosition"].Value = MainWindow.Instance.Left.ToString();
 
             config.Save(ConfigurationSaveMode.Modified);
-        }
-
-        private static void CreateDefaultDictsConfig()
-        {
-            var jso = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Converters =
-                {
-                    new JsonStringEnumConverter(),
-                }
-            };
-
-            try
-            {
-                Directory.CreateDirectory(Path.Join(ApplicationPath, "Config"));
-                File.WriteAllText(Path.Join(ApplicationPath, "Config/dicts.json"),
-                    JsonSerializer.Serialize(BuiltInDicts, jso));
-            }
-            catch (Exception e)
-            {
-                Utils.Alert(AlertLevel.Error, "Couldn't write default Dicts config");
-                Utils.Logger.Error(e, "Couldn't write default Dicts config");
-            }
         }
 
         private static void CreateDefaultAppConfig()

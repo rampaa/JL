@@ -231,7 +231,7 @@ namespace JapaneseLookup.GUI
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
             {
                 if (ConfigManager.Ready)
-                    ManageDictionariesWindow.Instance.ShowDialog();
+                    MainWindowUtilities.ShowManageDictionariesWindow();
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))
@@ -267,7 +267,7 @@ namespace JapaneseLookup.GUI
 
         private void ShowManageDictionariesWindow(object sender, RoutedEventArgs e)
         {
-            ManageDictionariesWindow.Instance.ShowDialog();
+            MainWindowUtilities.ShowManageDictionariesWindow();
         }
 
         private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
