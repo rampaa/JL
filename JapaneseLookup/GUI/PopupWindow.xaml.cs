@@ -70,8 +70,6 @@ namespace JapaneseLookup.GUI
                 )
                 return;
 
-            UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
-
             int charPosition = tb.GetCharacterIndexFromPoint(Mouse.GetPosition(tb), false);
             if (charPosition != -1)
             {
@@ -96,10 +94,14 @@ namespace JapaneseLookup.GUI
 
                 if (lookupResults != null && lookupResults.Any())
                 {
+                    UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+
                     if (ConfigManager.HighlightLongestMatch)
                     {
+                        double verticalOffset = tb.VerticalOffset;
                         tb.Focus();
                         tb.Select(charPosition, lookupResults[0][LookupResult.FoundForm][0].Length);
+                        tb.ScrollToVerticalOffset(verticalOffset);
                     }
 
                     ResultStackPanels.Clear();
@@ -117,7 +119,11 @@ namespace JapaneseLookup.GUI
                     Visibility = Visibility.Hidden;
 
                     if (ConfigManager.HighlightLongestMatch)
+                    {
+                        double verticalOffset = tb.VerticalOffset;
                         tb.Select(0, 0);
+                        tb.ScrollToVerticalOffset(verticalOffset);
+                    }
                 }
             }
             else
@@ -126,7 +132,12 @@ namespace JapaneseLookup.GUI
                 Visibility = Visibility.Hidden;
 
                 if (ConfigManager.HighlightLongestMatch)
+                {
+                    double verticalOffset = tb.VerticalOffset;
                     tb.Select(0, 0);
+                    tb.ScrollToVerticalOffset(verticalOffset);
+                }
+                    
             }
         }
 
@@ -856,7 +867,11 @@ namespace JapaneseLookup.GUI
             LastText = "";
 
             if (ConfigManager.HighlightLongestMatch)
+            {
+                double verticalOffset = MainWindow.Instance.MainTextBox.VerticalOffset;
                 MainWindow.Instance.MainTextBox.Select(0, 0);
+                MainWindow.Instance.MainTextBox.ScrollToVerticalOffset(verticalOffset);
+            }
         }
     }
 }

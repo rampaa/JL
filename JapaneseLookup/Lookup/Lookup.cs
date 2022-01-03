@@ -181,7 +181,7 @@ namespace JapaneseLookup.Lookup
                         {
                             List<IResult> resultsList = new();
 
-                            foreach (IResult rslt1 in temp)
+                            foreach (IResult rslt1 in temp.ToList())
                             {
                                 var rslt = (JMdictResult)rslt1;
                                 if (rslt.WordClasses.SelectMany(pos => pos).Intersect(result.Tags).Any())
