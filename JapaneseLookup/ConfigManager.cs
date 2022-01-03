@@ -68,15 +68,12 @@ namespace JapaneseLookup
         public static Brush MainWindowBacklogTextColor { get; set; } = Brushes.Bisque;
         public static Brush PrimarySpellingColor { get; set; } = Brushes.Chocolate;
         public static Brush ReadingsColor { get; set; } = Brushes.Goldenrod;
-        public static Brush ROrthographyInfoColor { get; set; } = Brushes.Goldenrod;
         public static Brush DefinitionsColor { get; set; } = Brushes.White;
         public static Brush DeconjugationInfoColor { get; set; } = Brushes.White;
         public static Brush FrequencyColor { get; set; } = Brushes.White;
         public static Brush AlternativeSpellingsColor { get; set; } = Brushes.White;
-        public static Brush AOrthographyInfoColor { get; set; } = Brushes.White;
         public static Brush SeparatorColor { get; set; } = Brushes.White;
         public static Brush PopupBackgroundColor { get; set; } = Brushes.Black;
-        public static Brush POrthographyInfoColor { get; set; } = Brushes.White;
         public static Brush DictTypeColor { get; set; } = Brushes.LightBlue;
         public static Brush HighlightColor { get; set; } = Brushes.AliceBlue;
 
@@ -95,13 +92,10 @@ namespace JapaneseLookup
         public static ModifierKeys LookupKey { get; set; } = ModifierKeys.Alt;
         public static int PrimarySpellingFontSize { get; set; } = 21;
         public static int ReadingsFontSize { get; set; } = 19;
-        public static int ROrthographyInfoFontSize { get; set; } = 17;
         public static int DefinitionsFontSize { get; set; } = 17;
         public static int DeconjugationInfoFontSize { get; set; } = 17;
         public static int FrequencyFontSize { get; set; } = 17;
         public static int AlternativeSpellingsFontSize { get; set; } = 17;
-        public static int AOrthographyInfoFontSize { get; set; } = 17;
-        public static int POrthographyInfoFontSize { get; set; } = 17;
         public static int DictTypeFontSize { get; set; } = 15;
 
         public static int PopupMaxWidth { get; set; } = 700;
@@ -152,7 +146,7 @@ namespace JapaneseLookup
                 "LookupRate");
 
             Utils.Try(() => LookupKey = (ModifierKeys)new ModifierKeysConverter()
-                         .ConvertFromString(ConfigurationManager.AppSettings.Get("LookupKey")!),
+                         .ConvertFromString(ConfigurationManager.AppSettings.Get("LookupKey")!)!,
                          LookupKey, "LookupKey");
 
             // MAKE SURE YOU FREEZE ANY NEW COLOR OBJECTS YOU ADD
@@ -182,28 +176,10 @@ namespace JapaneseLookup
             ReadingsColor.Freeze();
 
             Utils.Try(() =>
-                    ROrthographyInfoColor = (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("ROrthographyInfoColor")),
-                ROrthographyInfoColor, "ROrthographyInfoColor");
-            ROrthographyInfoColor.Freeze();
-
-            Utils.Try(() =>
-                    POrthographyInfoColor = (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("POrthographyInfoColor")),
-                POrthographyInfoColor, "POrthographyInfoColor");
-            POrthographyInfoColor.Freeze();
-
-            Utils.Try(() =>
                     AlternativeSpellingsColor = (SolidColorBrush)new BrushConverter()
                         .ConvertFrom(ConfigurationManager.AppSettings.Get("AlternativeSpellingsColor")),
                 AlternativeSpellingsColor, "AlternativeSpellingsColor");
             AlternativeSpellingsColor.Freeze();
-
-            Utils.Try(() =>
-                    AOrthographyInfoColor = (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("AOrthographyInfoColor")),
-                AOrthographyInfoColor, "AOrthographyInfoColor");
-            AOrthographyInfoColor.Freeze();
 
             Utils.Try(() =>
                     DefinitionsColor = (SolidColorBrush)new BrushConverter()
@@ -254,14 +230,8 @@ namespace JapaneseLookup
                 .Get("PrimarySpellingFontSize")!), PrimarySpellingFontSize, "PrimarySpellingFontSize");
             Utils.Try(() => ReadingsFontSize = int.Parse(ConfigurationManager.AppSettings
                 .Get("ReadingsFontSize")!), ReadingsFontSize, "ReadingsFontSize");
-            Utils.Try(() => ROrthographyInfoFontSize = int.Parse(ConfigurationManager.AppSettings
-                .Get("ROrthographyInfoFontSize")!), ROrthographyInfoFontSize, "ROrthographyInfoFontSize");
-            Utils.Try(() => POrthographyInfoFontSize = int.Parse(ConfigurationManager.AppSettings
-                .Get("POrthographyInfoFontSize")!), POrthographyInfoFontSize, "POrthographyInfoFontSize");
             Utils.Try(() => AlternativeSpellingsFontSize = int.Parse(ConfigurationManager.AppSettings
                 .Get("AlternativeSpellingsFontSize")!), AlternativeSpellingsFontSize, "AlternativeSpellingsFontSize");
-            Utils.Try(() => AOrthographyInfoFontSize = int.Parse(ConfigurationManager.AppSettings
-                .Get("AOrthographyInfoFontSize")!), AOrthographyInfoFontSize, "AOrthographyInfoFontSize");
             Utils.Try(() => DefinitionsFontSize = int.Parse(ConfigurationManager.AppSettings
                 .Get("DefinitionsFontSize")!), DefinitionsFontSize, "DefinitionsFontSize");
             Utils.Try(() => FrequencyFontSize = int.Parse(ConfigurationManager.AppSettings
@@ -529,24 +499,18 @@ namespace JapaneseLookup
             preferenceWindow.PopupDynamicHeightCheckBox.IsChecked = PopupDynamicHeight;
             preferenceWindow.PopupDynamicWidthCheckBox.IsChecked = PopupDynamicWidth;
             preferenceWindow.AlternativeSpellingsColorButton.Background = AlternativeSpellingsColor;
-            preferenceWindow.AOrthographyInfoColorButton.Background = AOrthographyInfoColor;
             preferenceWindow.DeconjugationInfoColorButton.Background = DeconjugationInfoColor;
             preferenceWindow.DefinitionsColorButton.Background = DefinitionsColor;
             preferenceWindow.FrequencyColorButton.Background = FrequencyColor;
             preferenceWindow.PrimarySpellingColorButton.Background = PrimarySpellingColor;
             preferenceWindow.ReadingsColorButton.Background = ReadingsColor;
-            preferenceWindow.ROrthographyInfoColorButton.Background = ROrthographyInfoColor;
-            preferenceWindow.POrthographyInfoColorButton.Background = POrthographyInfoColor;
             preferenceWindow.AlternativeSpellingsFontSizeNumericUpDown.Value = AlternativeSpellingsFontSize;
-            preferenceWindow.AOrthographyInfoFontSizeNumericUpDown.Value = AOrthographyInfoFontSize;
             preferenceWindow.DeconjugationInfoFontSizeNumericUpDown.Value = DeconjugationInfoFontSize;
             preferenceWindow.DictTypeFontSizeNumericUpDown.Value = DictTypeFontSize;
             preferenceWindow.DefinitionsFontSizeNumericUpDown.Value = DefinitionsFontSize;
             preferenceWindow.FrequencyFontSizeNumericUpDown.Value = FrequencyFontSize;
             preferenceWindow.PrimarySpellingFontSizeNumericUpDown.Value = PrimarySpellingFontSize;
             preferenceWindow.ReadingsFontSizeNumericUpDown.Value = ReadingsFontSize;
-            preferenceWindow.ROrthographyInfoFontSizeNumericUpDown.Value = ROrthographyInfoFontSize;
-            preferenceWindow.POrthographyInfoFontSizeNumericUpDown.Value = POrthographyInfoFontSize;
 
             // Button background color has to be opaque, so we cannot use PopupBackgroundColor here
             Utils.Try(() => preferenceWindow.PopupBackgroundColorButton.Background =
@@ -646,12 +610,8 @@ namespace JapaneseLookup
                 preferenceWindow.PopupBackgroundColorButton.Background.ToString();
             config.AppSettings.Settings["PrimarySpellingColor"].Value =
                 preferenceWindow.PrimarySpellingColorButton.Background.ToString();
-            config.AppSettings.Settings["POrthographyInfoColor"].Value =
-                preferenceWindow.POrthographyInfoColorButton.Background.ToString();
             config.AppSettings.Settings["ReadingsColor"].Value =
                 preferenceWindow.ReadingsColorButton.Background.ToString();
-            config.AppSettings.Settings["ROrthographyInfoColor"].Value =
-                preferenceWindow.ROrthographyInfoColorButton.Background.ToString();
             config.AppSettings.Settings["AlternativeSpellingsColor"].Value =
                 preferenceWindow.AlternativeSpellingsColorButton.Background.ToString();
             config.AppSettings.Settings["DefinitionsColor"].Value =
@@ -664,10 +624,6 @@ namespace JapaneseLookup
                 preferenceWindow.PopupOpacityNumericUpDown.Value.ToString();
             config.AppSettings.Settings["PrimarySpellingFontSize"].Value =
                 preferenceWindow.PrimarySpellingFontSizeNumericUpDown.Value.ToString();
-            config.AppSettings.Settings["POrthographyInfoFontSize"].Value =
-                preferenceWindow.POrthographyInfoFontSizeNumericUpDown.Value.ToString();
-            config.AppSettings.Settings["ROrthographyInfoFontSize"].Value =
-                preferenceWindow.ROrthographyInfoFontSizeNumericUpDown.Value.ToString();
             config.AppSettings.Settings["ReadingsFontSize"].Value =
                 preferenceWindow.ReadingsFontSizeNumericUpDown.Value.ToString();
             config.AppSettings.Settings["AlternativeSpellingsFontSize"].Value =

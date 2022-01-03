@@ -225,25 +225,9 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Primary spelling orthography info color"
-                                       TextWrapping="Wrap" />
-                            <Button x:Name="POrthographyInfoColorButton" Content="" HorizontalAlignment="Right"
-                                    Width="60" BorderThickness="5,5,5,5"
-                                    Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
-                        </DockPanel>
-
-                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Primary spelling font size"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PrimarySpellingFontSizeNumericUpDown" Maximum="300"
-                                              Minimum="1"
-                                              HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Primary spelling orthography info font size"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="POrthographyInfoFontSizeNumericUpDown" Maximum="300"
                                               Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
@@ -257,25 +241,9 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Reading orthography info color"
-                                       TextWrapping="Wrap" />
-                            <Button x:Name="ROrthographyInfoColorButton" Content="" HorizontalAlignment="Right"
-                                    Width="60" BorderThickness="5,5,5,5"
-                                    Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
-                        </DockPanel>
-
-                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Reading font size"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="ReadingsFontSizeNumericUpDown" Maximum="50" Minimum="1"
-                                              HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Reading orthography info font size"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="ROrthographyInfoFontSizeNumericUpDown" Maximum="50"
-                                              Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -289,27 +257,10 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Alternative spelling orthography info color"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <Button x:Name="AOrthographyInfoColorButton" Content="" HorizontalAlignment="Right"
-                                    Width="60" BorderThickness="5,5,5,5"
-                                    Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
-                        </DockPanel>
-
-                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left"
                                        Text="Alternative spelling font size"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="AlternativeSpellingsFontSizeNumericUpDown" Maximum="50"
-                                              Minimum="1"
-                                              HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left"
-                                       Text="Alternative spelling orthography info font size"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="AOrthographyInfoFontSizeNumericUpDown" Maximum="50"
                                               Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>

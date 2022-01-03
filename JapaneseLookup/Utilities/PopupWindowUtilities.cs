@@ -1,114 +1,77 @@
-﻿using JapaneseLookup.Lookup;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
+using System.Text;
 
 namespace JapaneseLookup.Utilities
 {
     public static class PopupWindowUtilities
     {
-        public static TextBlock MakeTextBlockReadings(List<string> readings, List<string> rOrthographyInfoList)
+        public static string MakeUiElementReadingsText(List<string> readings, List<string> rOrthographyInfoList)
         {
-            var textBlockReadings = new TextBlock
-            {
-                Name = LookupResult.Readings.ToString(),
-                Text = "",
-                Tag = string.Join(", ", readings), // for mining
-                Foreground = ConfigManager.ReadingsColor,
-                FontSize = ConfigManager.ReadingsFontSize,
-                Margin = new Thickness(5, 0, 0, 0),
-                TextWrapping = TextWrapping.Wrap
-            };
-
-            if (readings.Count == 0) return textBlockReadings;
+            var sb = new StringBuilder();
+            if (readings.Count == 0) return sb.ToString();
 
             for (var index = 0; index < readings.Count; index++)
             {
-                var runReading = new Run(readings[index])
-                {
-                    Foreground = ConfigManager.ReadingsColor,
-                    FontSize = ConfigManager.ReadingsFontSize,
-                };
-                textBlockReadings.Inlines.Add(runReading);
+                sb.Append(readings[index]);
 
                 if (rOrthographyInfoList != null)
                 {
                     if (index < rOrthographyInfoList.Count)
                     {
-                        var runReadingOrtho = new Run("(" + rOrthographyInfoList[index] + ")")
+                        string readingOrtho = "(" + rOrthographyInfoList[index] + ")";
+                        if (readingOrtho != "()")
                         {
-                            Foreground = ConfigManager.ROrthographyInfoColor,
-                            FontSize = ConfigManager.ROrthographyInfoFontSize,
-                        };
-                        if (runReadingOrtho.Text != "()")
-                        {
-                            textBlockReadings.Inlines.Add(" ");
-                            textBlockReadings.Inlines.Add(runReadingOrtho);
+                            sb.Append(' ');
+                            sb.Append(readingOrtho);
                         }
                     }
                 }
 
                 if (index != readings.Count - 1)
                 {
-                    textBlockReadings.Inlines.Add(", ");
+                    sb.Append(", ");
                 }
             }
 
-            return textBlockReadings;
+            return sb.ToString();
         }
 
-        public static TextBlock MakeTextBlockAlternativeSpellings(List<string> alternativeSpellings,
+        public static string MakeUiElementAlternativeSpellingsText(List<string> alternativeSpellings,
             List<string> aOrthographyInfoList)
         {
-            var textBlockAlternativeSpellings = new TextBlock
-            {
-                Name = LookupResult.AlternativeSpellings.ToString(),
-                Text = "",
-                Tag = string.Join(", ", alternativeSpellings), // for mining
-                Foreground = ConfigManager.AlternativeSpellingsColor,
-                FontSize = ConfigManager.AlternativeSpellingsFontSize,
-                Margin = new Thickness(5, 0, 0, 0),
-            };
+            var sb = new StringBuilder();
+            if (alternativeSpellings.Count == 0) return sb.ToString();
 
-            if (alternativeSpellings.Count == 0) return textBlockAlternativeSpellings;
-
-            textBlockAlternativeSpellings.Inlines.Add("(");
+            sb.Append('(');
 
             for (var index = 0; index < alternativeSpellings.Count; index++)
             {
-                var runAlt = new Run(alternativeSpellings[index])
-                {
-                    Foreground = ConfigManager.AlternativeSpellingsColor,
-                    FontSize = ConfigManager.AlternativeSpellingsFontSize,
-                };
-                textBlockAlternativeSpellings.Inlines.Add(runAlt);
+                sb.Append(alternativeSpellings[index]);
 
-                if (index < aOrthographyInfoList.Count)
+                if (aOrthographyInfoList != null)
                 {
-                    var runAltOrtho = new Run("(" + aOrthographyInfoList[index] + ")")
+                    if (index < aOrthographyInfoList.Count)
                     {
-                        Foreground = ConfigManager.AOrthographyInfoColor,
-                        FontSize = ConfigManager.AOrthographyInfoFontSize,
-                    };
-                    if (runAltOrtho.Text != "()")
-                    {
-                        textBlockAlternativeSpellings.Inlines.Add(" ");
-                        textBlockAlternativeSpellings.Inlines.Add(runAltOrtho);
+                        var altOrtho = "(" + aOrthographyInfoList[index] + ")";
+                        if (altOrtho != "()")
+                        {
+                            sb.Append(' ');
+                            sb.Append(altOrtho);
+                        }
                     }
                 }
 
                 if (index != alternativeSpellings.Count - 1)
                 {
-                    textBlockAlternativeSpellings.Inlines.Add(", ");
+                    sb.Append(", ");
                 }
             }
 
-            textBlockAlternativeSpellings.Inlines.Add(")");
+            sb.Append(')');
 
-            return textBlockAlternativeSpellings;
+            return sb.ToString();
         }
 
         public static string FindSentence(string text, int position)

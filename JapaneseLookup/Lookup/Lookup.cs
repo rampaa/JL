@@ -68,6 +68,7 @@ namespace JapaneseLookup.Lookup
                             deconjugationResultsList, dict.Contents, dictType));
                         break;
                     case DictType.Daijirin:
+                        // TODO
                         epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
                             deconjugationResultsList, dict.Contents, dictType));
                         break;
@@ -87,17 +88,15 @@ namespace JapaneseLookup.Lookup
                             deconjugationResultsList, dict.Contents, dictType));
                         break;
                     case DictType.Gakken:
-                        // TOOD
+                        // TODO
                         epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
                             deconjugationResultsList, dict.Contents, dictType));
                         break;
-
                     case DictType.Kotowaza:
-                        // TOOD
+                        // TODO
                         epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
                             deconjugationResultsList, dict.Contents, dictType));
                         break;
-
                     case DictType.CustomWordDictionary:
                         customWordResults = GetCustomWordResults(text, textInHiraganaList,
                             deconjugationResultsList, dictType);

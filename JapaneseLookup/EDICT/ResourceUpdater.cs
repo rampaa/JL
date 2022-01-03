@@ -12,7 +12,7 @@ namespace JapaneseLookup.EDICT
     {
         public static async Task<bool> UpdateResource(string resourcePath, Uri resourceDownloadUri, string resourceName, bool isUpdate, bool noPrompt)
         {
-            if (!isUpdate || MessageBox.Show($"Do you want to download the latest version of {resourceName}?", "", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
+            if (!isUpdate || MessageBox.Show($"Do you want to download the latest version of {resourceName}?", "Update dictionary?", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
             {
                 HttpRequestMessage request = new(HttpMethod.Get, resourceDownloadUri);
 

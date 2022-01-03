@@ -57,6 +57,7 @@ namespace JapaneseLookup.GUI
                 SizeToContent = SizeToContent.Height;
             else
                 SizeToContent = SizeToContent.Manual;
+
             // need to initialize window (position) for later
             Show();
             Hide();
@@ -65,10 +66,12 @@ namespace JapaneseLookup.GUI
         public void TextBox_MouseMove(TextBox tb)
         {
             if (MiningMode || ConfigManager.InactiveLookupMode
-                || (ConfigManager.RequireLookupKeyPress
-                && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
-                )
+                           || (ConfigManager.RequireLookupKeyPress
+                               && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
+            )
                 return;
+
+            UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
             int charPosition = tb.GetCharacterIndexFromPoint(Mouse.GetPosition(tb), false);
             if (charPosition != -1)
@@ -94,8 +97,6 @@ namespace JapaneseLookup.GUI
 
                 if (lookupResults != null && lookupResults.Any())
                 {
-                    UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
-
                     if (ConfigManager.HighlightLongestMatch)
                     {
                         double verticalOffset = tb.VerticalOffset;
@@ -137,7 +138,6 @@ namespace JapaneseLookup.GUI
                     tb.Select(0, 0);
                     tb.ScrollToVerticalOffset(verticalOffset);
                 }
-                    
             }
         }
 
@@ -247,8 +247,8 @@ namespace JapaneseLookup.GUI
             // top
             TextBlock textBlockFoundSpelling = null;
             TextBlock textBlockPOrthographyInfo = null;
-            TextBlock textBlockReadings = null;
-            TextBlock textBlockAlternativeSpellings = null;
+            UIElement uiElementReadings = null;
+            UIElement uiElementAlternativeSpellings = null;
             TextBlock textBlockProcess = null;
             TextBlock textBlockFrequency = null;
             TextBlock textBlockFoundForm = null;
@@ -256,7 +256,7 @@ namespace JapaneseLookup.GUI
             TextBlock textBlockEdictID = null;
 
             // bottom
-            UIElement textBlockDefinitions = null;
+            UIElement uiElementDefinitions = null;
             TextBlock textBlockNanori = null;
             TextBlock textBlockOnReadings = null;
             TextBlock textBlockKunReadings = null;
@@ -335,15 +335,57 @@ namespace JapaneseLookup.GUI
                         result.TryGetValue(LookupResult.ROrthographyInfoList, out var rOrthographyInfoList);
                         rOrthographyInfoList ??= new List<string>();
 
-                        textBlockReadings =
-                            PopupWindowUtilities.MakeTextBlockReadings(result[LookupResult.Readings],
-                                rOrthographyInfoList);
+                        var readings = result[LookupResult.Readings];
+
+                        string readingsText =
+                            PopupWindowUtilities.MakeUiElementReadingsText(readings, rOrthographyInfoList);
+
+                        if (readingsText == "")
+                            continue;
+
+                        if (MiningMode || ConfigManager.LookupOnSelectOnly)
+                        {
+                            uiElementReadings = new TextBox()
+                            {
+                                Name = LookupResult.Readings.ToString(),
+                                Text = readingsText,
+                                Tag = string.Join(", ", readings), // for mining
+                                TextWrapping = TextWrapping.Wrap,
+                                Background = Brushes.Transparent,
+                                Foreground = ConfigManager.ReadingsColor,
+                                FontSize = ConfigManager.ReadingsFontSize,
+                                BorderThickness = new Thickness(0, 0, 0, 0),
+                                Margin = new Thickness(5, 0, 0, 0),
+                                Padding = new Thickness(0),
+                                IsReadOnly = true,
+                                IsUndoEnabled = false,
+                                Cursor = Cursors.Arrow,
+                                SelectionBrush = ConfigManager.HighlightColor,
+                                IsInactiveSelectionHighlightEnabled = true,
+                            };
+
+                            uiElementReadings.MouseMove += Mm;
+                        }
+                        else
+                        {
+                            uiElementReadings = new TextBlock
+                            {
+                                Name = LookupResult.Readings.ToString(),
+                                Text = readingsText,
+                                Tag = string.Join(", ", readings), // for mining
+                                TextWrapping = TextWrapping.Wrap,
+                                Foreground = ConfigManager.ReadingsColor,
+                                FontSize = ConfigManager.ReadingsFontSize,
+                                Margin = new Thickness(5, 0, 0, 0),
+                            };
+                        }
+
                         break;
 
                     case LookupResult.Definitions:
                         if (MiningMode || ConfigManager.LookupOnSelectOnly)
                         {
-                            textBlockDefinitions = new TextBox
+                            uiElementDefinitions = new TextBox
                             {
                                 Name = key.ToString(),
                                 Text = string.Join(", ", value),
@@ -353,6 +395,7 @@ namespace JapaneseLookup.GUI
                                 FontSize = ConfigManager.DefinitionsFontSize,
                                 BorderThickness = new Thickness(0, 0, 0, 0),
                                 Margin = new Thickness(2, 2, 2, 2),
+                                Padding = new Thickness(0),
                                 IsReadOnly = true,
                                 IsUndoEnabled = false,
                                 Cursor = Cursors.Arrow,
@@ -360,7 +403,7 @@ namespace JapaneseLookup.GUI
                                 IsInactiveSelectionHighlightEnabled = true,
                             };
 
-                            textBlockDefinitions.PreviewMouseLeftButtonUp += (sender, e) =>
+                            uiElementDefinitions.PreviewMouseLeftButtonUp += (sender, _) =>
                             {
                                 if (!ConfigManager.LookupOnSelectOnly
                                     || Background.Opacity == 0
@@ -376,21 +419,11 @@ namespace JapaneseLookup.GUI
                                 ChildPopupWindow.LookupOnSelect((TextBox)sender);
                             };
 
-                            textBlockDefinitions.MouseMove += (sender, _) =>
-                            {
-                                if (ConfigManager.LookupOnSelectOnly)
-                                    return;
-
-                                ChildPopupWindow ??= new PopupWindow();
-
-                                // prevents stray PopupWindows being created when you move your mouse too fast
-                                if (MiningMode)
-                                    ChildPopupWindow.Definitions_MouseMove((TextBox)sender);
-                            };
+                            uiElementDefinitions.MouseMove += Mm;
                         }
                         else
                         {
-                            textBlockDefinitions = new TextBlock
+                            uiElementDefinitions = new TextBlock
                             {
                                 Name = key.ToString(),
                                 Text = string.Join(", ", value),
@@ -416,10 +449,52 @@ namespace JapaneseLookup.GUI
                         result.TryGetValue(LookupResult.AOrthographyInfoList, out var aOrthographyInfoList);
                         aOrthographyInfoList ??= new List<string>();
 
-                        textBlockAlternativeSpellings =
-                            PopupWindowUtilities.MakeTextBlockAlternativeSpellings(
-                                result[LookupResult.AlternativeSpellings],
+                        var alternativeSpellings = result[LookupResult.AlternativeSpellings];
+
+                        string alternativeSpellingsText =
+                            PopupWindowUtilities.MakeUiElementAlternativeSpellingsText(alternativeSpellings,
                                 aOrthographyInfoList);
+
+                        if (alternativeSpellingsText == "")
+                            continue;
+
+                        if (MiningMode || ConfigManager.LookupOnSelectOnly)
+                        {
+                            uiElementAlternativeSpellings = new TextBox()
+                            {
+                                Name = LookupResult.AlternativeSpellings.ToString(),
+                                Text = alternativeSpellingsText,
+                                Tag = string.Join(", ", alternativeSpellings), // for mining
+                                TextWrapping = TextWrapping.Wrap,
+                                Background = Brushes.Transparent,
+                                Foreground = ConfigManager.AlternativeSpellingsColor,
+                                FontSize = ConfigManager.AlternativeSpellingsFontSize,
+                                BorderThickness = new Thickness(0, 0, 0, 0),
+                                Margin = new Thickness(5, 0, 0, 0),
+                                Padding = new Thickness(0),
+                                IsReadOnly = true,
+                                IsUndoEnabled = false,
+                                Cursor = Cursors.Arrow,
+                                SelectionBrush = ConfigManager.HighlightColor,
+                                IsInactiveSelectionHighlightEnabled = true,
+                            };
+
+                            uiElementAlternativeSpellings.MouseMove += Mm;
+                        }
+                        else
+                        {
+                            uiElementAlternativeSpellings = new TextBlock
+                            {
+                                Name = LookupResult.AlternativeSpellings.ToString(),
+                                Text = alternativeSpellingsText,
+                                Tag = string.Join(", ", alternativeSpellings), // for mining
+                                TextWrapping = TextWrapping.Wrap,
+                                Foreground = ConfigManager.AlternativeSpellingsColor,
+                                FontSize = ConfigManager.AlternativeSpellingsFontSize,
+                                Margin = new Thickness(5, 0, 0, 0),
+                            };
+                        }
+
                         break;
 
                     case LookupResult.Process:
@@ -440,19 +515,19 @@ namespace JapaneseLookup.GUI
                         {
                             Name = key.ToString(),
                             Text = "(" + string.Join(",", value) + ")",
-                            Foreground = ConfigManager.POrthographyInfoColor,
-                            FontSize = ConfigManager.POrthographyInfoFontSize,
+                            Foreground = ConfigManager.PrimarySpellingColor,
+                            FontSize = ConfigManager.PrimarySpellingFontSize,
                             Margin = new Thickness(5, 0, 0, 0),
                             TextWrapping = TextWrapping.Wrap,
                         };
                         break;
 
                     case LookupResult.ROrthographyInfoList:
-                        // processed in MakeTextBlockReadings()
+                        // processed in MakeUiElementReadingsText()
                         break;
 
                     case LookupResult.AOrthographyInfoList:
-                        // processed in MakeTextBlockAlternativeSpellings()
+                        // processed in MakeUiElementAlternativeSpellingsText()
                         break;
 
 
@@ -554,39 +629,44 @@ namespace JapaneseLookup.GUI
                 }
             }
 
-            TextBlock[] babies =
+            UIElement[] babies =
             {
                 textBlockFoundSpelling, textBlockPOrthographyInfo,
-                textBlockReadings,
-                textBlockAlternativeSpellings,
+                uiElementReadings,
+                uiElementAlternativeSpellings,
                 textBlockProcess,
                 textBlockFoundForm, textBlockEdictID, // undisplayed, for mining
                 textBlockFrequency, textBlockDictType
             };
-            foreach (TextBlock baby in babies)
+            foreach (UIElement baby in babies)
             {
-                if (baby == null) continue;
-
-                if (Enum.TryParse(baby.Name, out LookupResult enumName))
+                if (baby is TextBlock textBlock)
                 {
-                    // common emptiness check; these two have their text as inline Runs
-                    if (baby.Text == "" &&
-                        !(enumName == LookupResult.AlternativeSpellings || enumName == LookupResult.Readings))
+                    if (textBlock == null) continue;
+
+                    // common emptiness check
+                    if (textBlock.Text == "")
                         continue;
+
+                    // POrthographyInfo check
+                    if (textBlock.Text == "()")
+                        continue;
+
+                    // Frequency check
+                    if ((textBlock.Text == ("#" + MainWindowUtilities.FakeFrequency)) || textBlock.Text == "#0")
+                        continue;
+
+                    top.Children.Add(baby);
                 }
+                else if (baby is TextBox textBox)
+                {
+                    if (textBox == null) continue;
 
-                // POrthographyInfo check
-                if (baby.Text == "()")
-                    continue;
-
-                // Frequency check
-                if ((baby.Text == ("#" + MainWindowUtilities.FakeFrequency)) || baby.Text == "#0")
-                    continue;
-
-                top.Children.Add(baby);
+                    top.Children.Add(textBox);
+                }
             }
 
-            bottom.Children.Add(textBlockDefinitions);
+            bottom.Children.Add(uiElementDefinitions);
 
             TextBlock[] babiesKanji =
             {
@@ -619,6 +699,18 @@ namespace JapaneseLookup.GUI
             }
 
             return innerStackPanel;
+        }
+
+        private void Mm(object sender, MouseEventArgs e)
+        {
+            if (ConfigManager.LookupOnSelectOnly)
+                return;
+
+            ChildPopupWindow ??= new PopupWindow();
+
+            // prevents stray PopupWindows being created when you move your mouse too fast
+            if (MiningMode)
+                ChildPopupWindow.Definitions_MouseMove((TextBox)sender);
         }
 
         private void FoundSpelling_MouseEnter(object sender, MouseEventArgs e)
@@ -722,6 +814,7 @@ namespace JapaneseLookup.GUI
                     }
                 }
             }
+
             miningParams.Context = PopupWindowUtilities.FindSentence(CurrentText, CurrentCharPosition);
             miningParams.TimeLocal = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
 
