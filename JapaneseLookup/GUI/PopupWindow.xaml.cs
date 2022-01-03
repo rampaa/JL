@@ -662,7 +662,7 @@ namespace JapaneseLookup.GUI
                 {
                     if (textBox == null) continue;
 
-                    top.Children.Add(textBox);
+                    top.Children.Add(baby);
                 }
             }
 

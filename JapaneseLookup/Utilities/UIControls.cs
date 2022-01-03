@@ -9,10 +9,11 @@ namespace JapaneseLookup.Utilities
     public static class UiControls
     {
         public static readonly List<ComboBoxItem> JapaneseFonts =
-            Utils.FindJapaneseFonts().OrderByDescending(f => f.Foreground.ToString()).ThenBy(font => font.Content).ToList();
+            Utils.FindJapaneseFonts().OrderByDescending(f => f.Foreground.ToString()).ThenBy(font => font.Content)
+                .ToList();
 
         public static readonly List<ComboBoxItem> PopupJapaneseFonts =
             JapaneseFonts.ConvertAll(f => new ComboBoxItem()
-            { Content = f.Content, FontFamily = f.FontFamily, Foreground = f.Foreground });
+                { Content = f.Content, FontFamily = f.FontFamily, Foreground = f.Foreground });
     }
 }

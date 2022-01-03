@@ -45,6 +45,7 @@ namespace JapaneseLookup.GUI
                 return _instance;
             }
         }
+
         public ManageDictionariesWindow()
         {
             InitializeComponent();
@@ -109,7 +110,8 @@ namespace JapaneseLookup.GUI
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Right,
                     Visibility = !Directory.Exists(dict.Path) && !File.Exists(dict.Path)
-                        ? Visibility.Visible : Visibility.Collapsed
+                        ? Visibility.Visible
+                        : Visibility.Collapsed
                 };
                 var dictPathDisplay = new TextBlock()
                 {
@@ -131,11 +133,11 @@ namespace JapaneseLookup.GUI
                     Foreground = Brushes.White,
                     Background = Brushes.DarkGreen,
                     BorderThickness = new Thickness(1),
-                    Visibility = dict.Type != DictType.JMdict
-                            && dict.Type != DictType.JMnedict
-                            && dict.Type != DictType.Kanjidic
-                            ? Visibility.Collapsed
-                            : Visibility.Visible,
+                    Visibility = (dict.Type != DictType.JMdict
+                                  && dict.Type != DictType.JMnedict
+                                  && dict.Type != DictType.Kanjidic)
+                        ? Visibility.Collapsed
+                        : Visibility.Visible,
                 };
 
                 updateButton.Click += async (_, _) =>
@@ -407,6 +409,7 @@ namespace JapaneseLookup.GUI
 
             ConfigManager.Ready = true;
         }
+
         private static async Task UpdateKanjidic()
         {
             ConfigManager.Ready = false;

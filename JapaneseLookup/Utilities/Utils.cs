@@ -267,6 +267,7 @@ namespace JapaneseLookup.Utilities
                 throw;
             }
         }
+
         public static async Task DeserializeDicts()
         {
             try

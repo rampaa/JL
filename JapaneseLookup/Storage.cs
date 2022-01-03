@@ -28,7 +28,6 @@ namespace JapaneseLookup
             ConfigManager.Ready = false;
 
             List<Task> tasks = new();
-            Task jMDictTask = null;
             bool dictRemoved = false;
 
             foreach ((DictType _, Dict dict) in Dicts.ToList())
@@ -39,7 +38,8 @@ namespace JapaneseLookup
                         // initial jmdict load
                         if (dict.Active && !Dicts[DictType.JMdict].Contents.Any())
                         {
-                            jMDictTask = Task.Run(async () => await JMdictLoader.Load(dict.Path).ConfigureAwait(false));
+                            Task jMDictTask = Task.Run(async () =>
+                                await JMdictLoader.Load(dict.Path).ConfigureAwait(false));
 
                             tasks.Add(jMDictTask);
                         }
@@ -268,29 +268,30 @@ namespace JapaneseLookup
         {
             if (!FreqDicts.ContainsKey(ConfigManager.FrequencyListName))
             {
-                bool callGC = false;
+                bool callGc = false;
                 Task taskNewFreqlist = null;
                 if (ConfigManager.FrequencyListName != "None")
                 {
-                    callGC = true;
+                    callGc = true;
                     FreqDicts.Clear();
                     FreqDicts.Add(ConfigManager.FrequencyListName, new Dictionary<string, List<FrequencyEntry>>());
 
                     taskNewFreqlist = Task.Run(async () =>
                     {
                         FrequencyLoader.BuildFreqDict(await FrequencyLoader
-                            .LoadJson(Path.Join(ConfigManager.ApplicationPath, ConfigManager.FrequencyLists[ConfigManager.FrequencyListName]))
+                            .LoadJson(Path.Join(ConfigManager.ApplicationPath,
+                                ConfigManager.FrequencyLists[ConfigManager.FrequencyListName]))
                             .ConfigureAwait(false));
                     });
                 }
 
                 else if (FreqDicts.Any())
                 {
-                    callGC = true;
+                    callGc = true;
                     FreqDicts.Clear();
                 }
 
-                if (callGC)
+                if (callGc)
                 {
                     if (taskNewFreqlist != null)
                         await taskNewFreqlist.ConfigureAwait(false);

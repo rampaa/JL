@@ -53,13 +53,13 @@ namespace JapaneseLookup.Utilities
             Utils.DeserializeDicts().ContinueWith(_ =>
             {
                 Storage.LoadDictionaries().ContinueWith(_ =>
-                {
-                    Storage.InitializePoS().ContinueWith(_ =>
                     {
-                        GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-                    }).ConfigureAwait(false);
-                }
+                        Storage.InitializePoS().ContinueWith(_ =>
+                        {
+                            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+                        }).ConfigureAwait(false);
+                    }
                 ).ConfigureAwait(false);
             }).ConfigureAwait(false);
 
@@ -105,7 +105,7 @@ namespace JapaneseLookup.Utilities
             if (MainWindow.Instance.MainTextBox.SelectedText.Length > 0)
                 Process.Start(new ProcessStartInfo("cmd",
                         $"/c start https://www.google.com/search?q={MainWindow.Instance.MainTextBox.SelectedText}^&hl=ja")
-                { CreateNoWindow = true });
+                    { CreateNoWindow = true });
         }
     }
 }

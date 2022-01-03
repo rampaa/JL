@@ -23,7 +23,8 @@ namespace JapaneseLookup.EPWING
             foreach (string jsonFile in jsonFiles)
             {
                 await using FileStream openStream = File.OpenRead(jsonFile);
-                var jsonObjects = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream).ConfigureAwait(false);
+                var jsonObjects = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream)
+                    .ConfigureAwait(false);
 
                 Debug.Assert(jsonObjects != null, nameof(jsonObjects) + " != null");
                 foreach (var obj in jsonObjects)
@@ -80,13 +81,16 @@ namespace JapaneseLookup.EPWING
             switch (dictType)
             {
                 case DictType.Kenkyuusha:
-                    if (Storage.Dicts[DictType.Kenkyuusha].Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(result.PrimarySpelling), out var kenkyuushaResults))
+                    if (Storage.Dicts[DictType.Kenkyuusha].Contents.TryGetValue(
+                        Kana.KatakanaToHiraganaConverter(result.PrimarySpelling), out var kenkyuushaResults))
                     {
-                        foreach (EpwingResult kenkyuushaResult in kenkyuushaResults.ToList())
+                        foreach (IResult result1 in kenkyuushaResults.ToList())
                         {
+                            var kenkyuushaResult = (EpwingResult)result1;
                             if (kenkyuushaResult.Definitions.SequenceEqual(result.Definitions))
                             {
-                                if (string.IsNullOrEmpty(kenkyuushaResult.Reading) && !string.IsNullOrEmpty(result.Reading))
+                                if (string.IsNullOrEmpty(kenkyuushaResult.Reading) &&
+                                    !string.IsNullOrEmpty(result.Reading))
                                 {
                                     kenkyuushaResults.Remove(kenkyuushaResult);
                                     break;
@@ -99,6 +103,7 @@ namespace JapaneseLookup.EPWING
                             }
                         }
                     }
+
                     break;
                 case DictType.Daijirin:
                     // english definitions
