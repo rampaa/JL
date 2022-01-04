@@ -1,7 +1,5 @@
-﻿using JapaneseLookup.GUI;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime;
 using System.Text.RegularExpressions;
@@ -64,48 +62,6 @@ namespace JapaneseLookup.Utilities
             }).ConfigureAwait(false);
 
             ConfigManager.ApplyPreferences();
-        }
-
-        public static void ShowAddNameWindow()
-        {
-            var addNameWindowInstance = AddNameWindow.Instance;
-            addNameWindowInstance.SpellingTextBox.Text = MainWindow.Instance.MainTextBox.SelectedText;
-            addNameWindowInstance.ShowDialog();
-        }
-
-        public static void ShowAddWordWindow()
-        {
-            var addWordWindowInstance = AddWordWindow.Instance;
-            addWordWindowInstance.SpellingsTextBox.Text = MainWindow.Instance.MainTextBox.SelectedText;
-            addWordWindowInstance.ShowDialog();
-        }
-
-        public static void ShowPreferencesWindow()
-        {
-            ConfigManager.LoadPreferences(PreferencesWindow.Instance);
-            PreferencesWindow.Instance.ShowDialog();
-        }
-
-        public static void ShowManageDictionariesWindow()
-        {
-            if (!File.Exists(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json")))
-                Utils.CreateDefaultDictsConfig();
-
-            if (!File.Exists("Resources/custom_words.txt"))
-                File.Create("Resources/custom_words.txt").Dispose();
-
-            if (!File.Exists("Resources/custom_names.txt"))
-                File.Create("Resources/custom_names.txt").Dispose();
-
-            ManageDictionariesWindow.Instance.ShowDialog();
-        }
-
-        public static void SearchWithBrowser()
-        {
-            if (MainWindow.Instance.MainTextBox.SelectedText.Length > 0)
-                Process.Start(new ProcessStartInfo("cmd",
-                        $"/c start https://www.google.com/search?q={MainWindow.Instance.MainTextBox.SelectedText}^&hl=ja")
-                    { CreateNoWindow = true });
         }
     }
 }

@@ -200,7 +200,7 @@ namespace JapaneseLookup.GUI
         {
             if (Utils.KeyGestureComparer(e, ConfigManager.ShowPreferencesWindowKeyGesture))
             {
-                MainWindowUtilities.ShowPreferencesWindow();
+                Utils.ShowPreferencesWindow();
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.MousePassThroughModeKeyGesture))
@@ -219,24 +219,24 @@ namespace JapaneseLookup.GUI
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
             {
                 if (ConfigManager.Ready)
-                    MainWindowUtilities.ShowAddNameWindow();
+                    Utils.ShowAddNameWindow(MainTextBox.SelectedText);
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
             {
                 if (ConfigManager.Ready)
-                    MainWindowUtilities.ShowAddWordWindow();
+                    Utils.ShowAddWordWindow(MainTextBox.SelectedText);
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
             {
                 if (ConfigManager.Ready)
-                    MainWindowUtilities.ShowManageDictionariesWindow();
+                    Utils.ShowManageDictionariesWindow();
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))
             {
-                MainWindowUtilities.SearchWithBrowser();
+                Utils.SearchWithBrowser(MainTextBox.SelectedText);
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.InactiveLookupModeKeyGesture))
@@ -247,27 +247,27 @@ namespace JapaneseLookup.GUI
 
         private void AddName(object sender, RoutedEventArgs e)
         {
-            MainWindowUtilities.ShowAddNameWindow();
+            Utils.ShowAddNameWindow(MainTextBox.SelectedText);
         }
 
         private void AddWord(object sender, RoutedEventArgs e)
         {
-            MainWindowUtilities.ShowAddWordWindow();
+            Utils.ShowAddWordWindow(MainTextBox.SelectedText);
         }
 
         private void ShowPreferences(object sender, RoutedEventArgs e)
         {
-            MainWindowUtilities.ShowPreferencesWindow();
+            Utils.ShowPreferencesWindow();
         }
 
         private void SearchWithBrowser(object sender, RoutedEventArgs e)
         {
-            MainWindowUtilities.SearchWithBrowser();
+            Utils.SearchWithBrowser(MainTextBox.SelectedText);
         }
 
         private void ShowManageDictionariesWindow(object sender, RoutedEventArgs e)
         {
-            MainWindowUtilities.ShowManageDictionariesWindow();
+            Utils.ShowManageDictionariesWindow();
         }
 
         private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)

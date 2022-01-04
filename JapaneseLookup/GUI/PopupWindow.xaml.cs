@@ -24,19 +24,23 @@ namespace JapaneseLookup.GUI
         private static readonly System.Windows.Forms.Screen ActiveScreen =
             System.Windows.Forms.Screen.FromHandle(InteropHelper.Handle);
 
-        private PopupWindow ChildPopupWindow { get; set; }
+        private PopupWindow _childPopupWindow;
 
         private int _playAudioIndex;
 
-        private int CurrentCharPosition { get; set; }
+        private int _currentCharPosition;
 
-        private string CurrentText { get; set; }
+        private string _currentText;
+
+        private string _lastSelectedText;
+
+        private TextBox _lastFocusedTextBox;
+
+        private List<Dictionary<LookupResult, List<string>>> _lastLookupResults = new();
 
         public string LastText { get; set; }
 
         public bool MiningMode { get; set; }
-
-        private List<Dictionary<LookupResult, List<string>>> LastLookupResults { get; set; } = new();
 
         public ObservableCollection<StackPanel> ResultStackPanels { get; } = new();
 
@@ -63,6 +67,31 @@ namespace JapaneseLookup.GUI
             Hide();
         }
 
+        private void AddName(object sender, RoutedEventArgs e)
+        {
+            Utils.ShowAddNameWindow(_lastSelectedText);
+        }
+
+        private void AddWord(object sender, RoutedEventArgs e)
+        {
+            Utils.ShowAddWordWindow(_lastSelectedText);
+        }
+
+        private void ShowPreferences(object sender, RoutedEventArgs e)
+        {
+            Utils.ShowPreferencesWindow();
+        }
+
+        private void SearchWithBrowser(object sender, RoutedEventArgs e)
+        {
+            Utils.SearchWithBrowser(_lastSelectedText);
+        }
+
+        private void ShowManageDictionariesWindow(object sender, RoutedEventArgs e)
+        {
+            Utils.ShowManageDictionariesWindow();
+        }
+
         public void TextBox_MouseMove(TextBox tb)
         {
             if (MiningMode || ConfigManager.InactiveLookupMode
@@ -79,8 +108,8 @@ namespace JapaneseLookup.GUI
                 if (charPosition > 0 && char.IsHighSurrogate(tb.Text[charPosition - 1]))
                     --charPosition;
 
-                CurrentText = tb.Text;
-                CurrentCharPosition = charPosition;
+                _currentText = tb.Text;
+                _currentCharPosition = charPosition;
 
                 int endPosition = MainWindowUtilities.FindWordBoundary(tb.Text, charPosition);
 
@@ -112,7 +141,7 @@ namespace JapaneseLookup.GUI
                     Activate();
                     Focus();
 
-                    LastLookupResults = lookupResults;
+                    _lastLookupResults = lookupResults;
                     DisplayResults(false);
                 }
                 else
@@ -121,9 +150,7 @@ namespace JapaneseLookup.GUI
 
                     if (ConfigManager.HighlightLongestMatch)
                     {
-                        double verticalOffset = tb.VerticalOffset;
-                        tb.Select(0, 0);
-                        tb.ScrollToVerticalOffset(verticalOffset);
+                        //Unselect(tb);
                     }
                 }
             }
@@ -134,9 +161,7 @@ namespace JapaneseLookup.GUI
 
                 if (ConfigManager.HighlightLongestMatch)
                 {
-                    double verticalOffset = tb.VerticalOffset;
-                    tb.Select(0, 0);
-                    tb.ScrollToVerticalOffset(verticalOffset);
+                    Unselect(tb);
                 }
             }
         }
@@ -159,7 +184,7 @@ namespace JapaneseLookup.GUI
                 Activate();
                 Focus();
 
-                LastLookupResults = lookupResults;
+                _lastLookupResults = lookupResults;
                 DisplayResults(true);
             }
             else
@@ -215,7 +240,7 @@ namespace JapaneseLookup.GUI
 
         private void DisplayResults(bool generateAllResults)
         {
-            int resultCount = LastLookupResults.Count;
+            int resultCount = _lastLookupResults.Count;
 
             for (int index = 0; index < resultCount; index++)
             {
@@ -227,7 +252,7 @@ namespace JapaneseLookup.GUI
                         return;
                 }
 
-                ResultStackPanels.Add(MakeResultStackPanel(LastLookupResults[index], index, resultCount));
+                ResultStackPanels.Add(MakeResultStackPanel(_lastLookupResults[index], index, resultCount));
             }
         }
 
@@ -362,9 +387,13 @@ namespace JapaneseLookup.GUI
                                 Cursor = Cursors.Arrow,
                                 SelectionBrush = ConfigManager.HighlightColor,
                                 IsInactiveSelectionHighlightEnabled = true,
+                                ContextMenu = PopupContextMenu,
                             };
 
-                            uiElementReadings.MouseMove += Mm;
+                            uiElementReadings.MouseMove += PopupMouseMove;
+                            uiElementReadings.MouseEnter += SetFocusedTextBox;
+                            uiElementReadings.LostFocus += Unselect;
+                            uiElementReadings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
                         }
                         else
                         {
@@ -401,6 +430,7 @@ namespace JapaneseLookup.GUI
                                 Cursor = Cursors.Arrow,
                                 SelectionBrush = ConfigManager.HighlightColor,
                                 IsInactiveSelectionHighlightEnabled = true,
+                                ContextMenu = PopupContextMenu,
                             };
 
                             uiElementDefinitions.PreviewMouseLeftButtonUp += (sender, _) =>
@@ -414,12 +444,15 @@ namespace JapaneseLookup.GUI
                                 //    && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
                                 //    return;
 
-                                ChildPopupWindow ??= new PopupWindow();
+                                _childPopupWindow ??= new PopupWindow();
 
-                                ChildPopupWindow.LookupOnSelect((TextBox)sender);
+                                _childPopupWindow.LookupOnSelect((TextBox)sender);
                             };
 
-                            uiElementDefinitions.MouseMove += Mm;
+                            uiElementDefinitions.MouseMove += PopupMouseMove;
+                            uiElementDefinitions.MouseEnter += SetFocusedTextBox;
+                            uiElementDefinitions.LostFocus += Unselect;
+                            uiElementDefinitions.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
                         }
                         else
                         {
@@ -477,9 +510,13 @@ namespace JapaneseLookup.GUI
                                 Cursor = Cursors.Arrow,
                                 SelectionBrush = ConfigManager.HighlightColor,
                                 IsInactiveSelectionHighlightEnabled = true,
+                                ContextMenu = PopupContextMenu,
                             };
 
-                            uiElementAlternativeSpellings.MouseMove += Mm;
+                            uiElementAlternativeSpellings.MouseMove += PopupMouseMove;
+                            uiElementAlternativeSpellings.MouseEnter += SetFocusedTextBox;
+                            uiElementAlternativeSpellings.LostFocus += Unselect;
+                            uiElementAlternativeSpellings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
                         }
                         else
                         {
@@ -701,16 +738,43 @@ namespace JapaneseLookup.GUI
             return innerStackPanel;
         }
 
-        private void Mm(object sender, MouseEventArgs e)
+        private void SetFocusedTextBox(object sender, RoutedEventArgs e)
+        {
+            _lastFocusedTextBox = (TextBox)sender;
+            //FocusedTextBox.Focus();
+        }
+
+        private void Unselect(object sender, RoutedEventArgs e)
+        {
+            Unselect((TextBox)sender);
+            //((TextBox)sender).Select(0, 0);
+        }
+
+        private static void Unselect(TextBox tb)
+        {
+            double verticalOffset = tb.VerticalOffset;
+            tb.Select(0, 0);
+            tb.ScrollToVerticalOffset(verticalOffset);
+        }
+
+        private void TextBoxPreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            ManageDictionariesButton.IsEnabled = ConfigManager.Ready;
+            AddNameButton.IsEnabled = ConfigManager.Ready;
+            AddWordButton.IsEnabled = ConfigManager.Ready;
+            _lastSelectedText = ((TextBox)sender).SelectedText;
+        }
+
+        private void PopupMouseMove(object sender, MouseEventArgs e)
         {
             if (ConfigManager.LookupOnSelectOnly)
                 return;
 
-            ChildPopupWindow ??= new PopupWindow();
+            _childPopupWindow ??= new PopupWindow();
 
             // prevents stray PopupWindows being created when you move your mouse too fast
             if (MiningMode)
-                ChildPopupWindow.Definitions_MouseMove((TextBox)sender);
+                _childPopupWindow.Definitions_MouseMove((TextBox)sender);
         }
 
         private void FoundSpelling_MouseEnter(object sender, MouseEventArgs e)
@@ -815,7 +879,7 @@ namespace JapaneseLookup.GUI
                 }
             }
 
-            miningParams.Context = PopupWindowUtilities.FindSentence(CurrentText, CurrentCharPosition);
+            miningParams.Context = PopupWindowUtilities.FindSentence(_currentText, _currentCharPosition);
             miningParams.TimeLocal = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
 
             await Mining.Mine(miningParams).ConfigureAwait(false);
@@ -845,6 +909,17 @@ namespace JapaneseLookup.GUI
             // TODO: find a better solution for this that has less latency and prevents the noaudio clip from playing
             var mediaElement = new MediaElement { Source = uri, Volume = 1, Visibility = Visibility.Collapsed };
             MainWindow.Instance.MainGrid.Children.Add(mediaElement);
+        }
+        private void PopupListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            e.Handled = true;
+
+            MouseWheelEventArgs e2 = new(e.MouseDevice, e.Timestamp, e.Delta)
+            {
+                RoutedEvent = ListBox.MouseWheelEvent,
+                Source = e.Source
+            };
+            PopupListBox.RaiseEvent(e2);
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -906,30 +981,30 @@ namespace JapaneseLookup.GUI
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowPreferencesWindowKeyGesture))
             {
-                MainWindowUtilities.ShowPreferencesWindow();
+                Utils.ShowPreferencesWindow();
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
             {
                 if (ConfigManager.Ready)
-                    MainWindowUtilities.ShowAddNameWindow();
+                    Utils.ShowAddNameWindow(_lastSelectedText);
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
             {
                 if (ConfigManager.Ready)
-                    MainWindowUtilities.ShowAddWordWindow();
+                    Utils.ShowAddWordWindow(_lastSelectedText);
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
             {
                 if (ConfigManager.Ready)
-                    MainWindowUtilities.ShowManageDictionariesWindow();
+                    Utils.ShowManageDictionariesWindow();
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))
             {
-                MainWindowUtilities.SearchWithBrowser();
+                Utils.SearchWithBrowser(_lastSelectedText);
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.InactiveLookupModeKeyGesture))
@@ -961,9 +1036,7 @@ namespace JapaneseLookup.GUI
 
             if (ConfigManager.HighlightLongestMatch)
             {
-                double verticalOffset = MainWindow.Instance.MainTextBox.VerticalOffset;
-                MainWindow.Instance.MainTextBox.Select(0, 0);
-                MainWindow.Instance.MainTextBox.ScrollToVerticalOffset(verticalOffset);
+                Unselect(MainWindow.Instance.MainTextBox);
             }
         }
     }

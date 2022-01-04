@@ -12,18 +12,45 @@
         Topmost="True" WindowStyle="None" AllowsTransparency="true" ShowInTaskbar="False"
         KeyDown="Window_KeyDown" Closing="Window_Closing" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave">
 
-    <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Top">
-        <!-- idk why but a ListBox works way better than an ItemsControl for this 
-        (possibly because of virtualization shenanigans?) -->
+    <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Top" CanContentScroll="True">
         <ListBox VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False" Foreground="White"
                  Background="{Binding Path=Background,
                   RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
+                 PreviewMouseWheel="PopupListBox_PreviewMouseWheel"
                  x:Name="PopupListBox" ItemsSource="{Binding Path=ResultStackPanels}" Opacity="70">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}">
-                    <Setter Property="Focusable" Value="False" />
+                    <Setter Property="Focusable" Value="True" />
                 </Style>
             </ListBox.ItemContainerStyle>
         </ListBox>
     </ScrollViewer>
+
+    <Window.ContextMenu>
+        <ContextMenu Name="PopupContextMenu">
+            <MenuItem
+                        Name ="AddNameButton"
+                        Header="Add name"
+                        Click="AddName"/>
+            <MenuItem
+                        Name ="AddWordButton"
+                        Header="Add word"
+                        Click="AddWord" />
+            <MenuItem
+                        Header="Copy"
+                        Command="Copy" />
+            <MenuItem
+                        Name ="SearchButton"
+                        Header="Search"
+                        Click="SearchWithBrowser" />
+            <MenuItem
+                        Name ="ManageDictionariesButton"
+                        Header="Manage dictionaries"
+                        Click="ShowManageDictionariesWindow" />
+            <MenuItem
+                        Name ="PreferencesButtons"
+                        Header="Preferences"
+                        Click="ShowPreferences" />
+        </ContextMenu>
+    </Window.ContextMenu>
 </Window>

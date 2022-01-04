@@ -35,8 +35,7 @@
                     <MenuItem
                         Name ="AddNameButton"
                         Header="Add name"
-                        Click="AddName"
-                        InputGestureText=""/>
+                        Click="AddName"/>
                     <MenuItem
                         Name ="AddWordButton"
                         Header="Add word"

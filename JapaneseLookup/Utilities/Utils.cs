@@ -17,6 +17,7 @@ using System.Text.Json.Serialization;
 using JapaneseLookup.Dicts;
 using System.IO;
 using JapaneseLookup.Abstract;
+using System.Diagnostics;
 
 namespace JapaneseLookup.Utilities
 {
@@ -307,6 +308,48 @@ namespace JapaneseLookup.Utilities
                 Utils.Logger.Fatal(e, "DeserializeDicts failed");
                 throw;
             }
+        }
+
+        public static void ShowAddNameWindow(string selectedText)
+        {
+            var addNameWindowInstance = AddNameWindow.Instance;
+            addNameWindowInstance.SpellingTextBox.Text = selectedText;
+            addNameWindowInstance.ShowDialog();
+        }
+
+        public static void ShowAddWordWindow(string selectedText)
+        {
+            var addWordWindowInstance = AddWordWindow.Instance;
+            addWordWindowInstance.SpellingsTextBox.Text = selectedText;
+            addWordWindowInstance.ShowDialog();
+        }
+
+        public static void ShowPreferencesWindow()
+        {
+            ConfigManager.LoadPreferences(PreferencesWindow.Instance);
+            PreferencesWindow.Instance.ShowDialog();
+        }
+
+        public static void ShowManageDictionariesWindow()
+        {
+            if (!File.Exists(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json")))
+                Utils.CreateDefaultDictsConfig();
+
+            if (!File.Exists("Resources/custom_words.txt"))
+                File.Create("Resources/custom_words.txt").Dispose();
+
+            if (!File.Exists("Resources/custom_names.txt"))
+                File.Create("Resources/custom_names.txt").Dispose();
+
+            ManageDictionariesWindow.Instance.ShowDialog();
+        }
+
+        public static void SearchWithBrowser(string selectedText)
+        {
+            if (selectedText.Length > 0)
+                Process.Start(new ProcessStartInfo("cmd",
+                        $"/c start https://www.google.com/search?q={MainWindow.Instance.MainTextBox.SelectedText}^&hl=ja")
+                { CreateNoWindow = true });
         }
     }
 }
