@@ -244,11 +244,11 @@ namespace JapaneseLookup.GUI
 
             for (int index = 0; index < resultCount; index++)
             {
-                if (!generateAllResults)
+                if (!generateAllResults && index > 0)
                 {
                     PopupListBox.UpdateLayout();
 
-                    if (PopupListBox.ActualHeight >= MaxHeight)
+                    if (PopupListBox.ActualHeight >= MaxHeight - 30)
                         return;
                 }
 
