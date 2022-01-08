@@ -20,7 +20,7 @@
                  x:Name="PopupListBox" ItemsSource="{Binding Path=ResultStackPanels}" Opacity="70">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}">
-                    <Setter Property="Focusable" Value="True" />
+                    <Setter Property="Focusable" Value="False" />
                 </Style>
             </ListBox.ItemContainerStyle>
         </ListBox>
