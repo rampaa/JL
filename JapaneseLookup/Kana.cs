@@ -1,11 +1,7 @@
-﻿using JapaneseLookup.Lookup;
-using JapaneseLookup.Utilities;
-using System;
+﻿using JapaneseLookup.Utilities;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace JapaneseLookup
 {
