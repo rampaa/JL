@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using JapaneseLookup.EDICT.KANJIDIC;
 using JapaneseLookup.Frequency;
 using JapaneseLookup.PoS;
@@ -164,7 +166,8 @@ namespace JapaneseLookup.Lookup
                     .TryGetValue(textInHiraganaList[i], out var tempResult))
                 {
                     jMdictResults.TryAdd(textInHiraganaList[i],
-                        new IntermediaryResult(tempResult, new List<string>(), text[..^i], dictType));
+                        new IntermediaryResult(tempResult, new List<List<string>> { new() }, text[..^i],
+                            dictType));
                     tryLongVowelConversion = false;
                 }
 
@@ -172,8 +175,8 @@ namespace JapaneseLookup.Lookup
                 {
                     foreach (Form result in deconjugationResultsList[i])
                     {
-                        if (jMdictResults.ContainsKey(result.Text))
-                            continue;
+                        // if (jMdictResults.ContainsKey(result.Text))
+                        //     continue;
 
                         if (Storage.Dicts[DictType.JMdict].Contents
                             .TryGetValue(result.Text, out var temp))
@@ -191,11 +194,19 @@ namespace JapaneseLookup.Lookup
 
                             if (resultsList.Any())
                             {
-                                jMdictResults.Add(result.Text,
-                                    new IntermediaryResult(resultsList, result.Process,
-                                        text[..result.OriginalText.Length],
-                                        dictType)
-                                );
+                                if (jMdictResults.TryGetValue(result.Text, out var r))
+                                {
+                                    r.ProcessList.Add(result.Process);
+                                }
+                                else
+                                {
+                                    jMdictResults.Add(result.Text,
+                                        new IntermediaryResult(resultsList, new List<List<string>> { result.Process },
+                                            text[..result.OriginalText.Length],
+                                            dictType)
+                                    );
+                                }
+
                                 ++succAttempt;
                                 tryLongVowelConversion = false;
                             }
@@ -213,7 +224,7 @@ namespace JapaneseLookup.Lookup
                             .TryGetValue(textWithoutLongVowelMark, out var tmpResult))
                         {
                             jMdictResults.Add(textWithoutLongVowelMark,
-                                new IntermediaryResult(tmpResult, new List<string>(), text[..^i], dictType));
+                                new IntermediaryResult(tmpResult, new List<List<string>>(), text[..^i], dictType));
                         }
                     }
                 }
@@ -233,7 +244,7 @@ namespace JapaneseLookup.Lookup
                     .TryGetValue(textInHiraganaList[i], out var tempJmnedictResult))
                 {
                     jMnedictResults.TryAdd(textInHiraganaList[i],
-                        new IntermediaryResult(tempJmnedictResult, new List<string>(), text[..^i], dictType));
+                        new IntermediaryResult(tempJmnedictResult, new List<List<string>>(), text[..^i], dictType));
                 }
             }
 
@@ -248,7 +259,7 @@ namespace JapaneseLookup.Lookup
                 text.UnicodeIterator().DefaultIfEmpty(string.Empty).First(), out List<IResult> kResult))
             {
                 kanjiResult.Add(text.UnicodeIterator().First(),
-                    new IntermediaryResult(kResult, new List<string>(), text.UnicodeIterator().First(),
+                    new IntermediaryResult(kResult, new List<List<string>>(), text.UnicodeIterator().First(),
                         dictType));
             }
 
@@ -269,7 +280,7 @@ namespace JapaneseLookup.Lookup
                 if (dict.TryGetValue(textInHiraganaList[i], out var hiraganaTempResult))
                 {
                     epwingResults.TryAdd(textInHiraganaList[i],
-                        new IntermediaryResult(hiraganaTempResult, new List<string>(), text[..^i], dictType));
+                        new IntermediaryResult(hiraganaTempResult, new List<List<string>>(), text[..^i], dictType));
                     tryLongVowelConversion = false;
                 }
 
@@ -277,8 +288,8 @@ namespace JapaneseLookup.Lookup
                 {
                     foreach (Form deconjugationResult in deconjugationResultsList[i])
                     {
-                        if (epwingResults.ContainsKey(deconjugationResult.Text))
-                            continue;
+                        // if (epwingResults.ContainsKey(deconjugationResult.Text))
+                        //     continue;
 
                         if (dict.TryGetValue(deconjugationResult.Text, out var epwingTmpResults))
                         {
@@ -315,10 +326,20 @@ namespace JapaneseLookup.Lookup
 
                             if (resultsList.Any())
                             {
-                                epwingResults.Add(deconjugationResult.Text,
-                                    new IntermediaryResult(resultsList, deconjugationResult.Process,
-                                        text[..deconjugationResult.OriginalText.Length],
-                                        dictType));
+                                if (epwingResults.TryGetValue(deconjugationResult.Text, out var r))
+                                {
+                                    r.ProcessList.Add(deconjugationResult.Process);
+                                }
+                                else
+                                {
+                                    epwingResults.Add(deconjugationResult.Text,
+                                        new IntermediaryResult(resultsList,
+                                            new List<List<string>> { deconjugationResult.Process },
+                                            text[..deconjugationResult.OriginalText.Length],
+                                            dictType)
+                                    );
+                                }
+
                                 ++succAttempt;
                                 tryLongVowelConversion = false;
                             }
@@ -334,7 +355,7 @@ namespace JapaneseLookup.Lookup
                         if (dict.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
                         {
                             epwingResults.Add(textWithoutLongVowelMark,
-                                new IntermediaryResult(tmpResult, new List<string>(), text[..^i], dictType));
+                                new IntermediaryResult(tmpResult, new List<List<string>>(), text[..^i], dictType));
                         }
                     }
                 }
@@ -359,7 +380,7 @@ namespace JapaneseLookup.Lookup
                 if (customWordDictionary.TryGetValue(textInHiraganaList[i], out var tempResult))
                 {
                     customWordResults.TryAdd(textInHiraganaList[i],
-                        new IntermediaryResult(tempResult, new List<string>(), text[..^i], dictType));
+                        new IntermediaryResult(tempResult, new List<List<string>>(), text[..^i], dictType));
                     tryLongVowelConversion = false;
                 }
 
@@ -383,12 +404,13 @@ namespace JapaneseLookup.Lookup
                                 }
                             }
 
+                            // todo
                             if (resultsList.Any())
                             {
-                                customWordResults.Add(result.Text,
-                                    new IntermediaryResult(resultsList, result.Process,
-                                        text[..result.OriginalText.Length],
-                                        dictType));
+                                // customWordResults.Add(result.Text,
+                                //     new IntermediaryResult(resultsList, result.Process,
+                                //         text[..result.OriginalText.Length],
+                                //         dictType));
                                 ++succAttempt;
                                 tryLongVowelConversion = false;
                             }
@@ -404,7 +426,7 @@ namespace JapaneseLookup.Lookup
                         if (customWordDictionary.TryGetValue(textWithoutLongVowelMark, out var tmpResult))
                         {
                             customWordResults.Add(textWithoutLongVowelMark,
-                                new IntermediaryResult(tmpResult, new List<string>(), text[..^i], dictType));
+                                new IntermediaryResult(tmpResult, new List<List<string>>(), text[..^i], dictType));
                         }
                     }
                 }
@@ -425,7 +447,7 @@ namespace JapaneseLookup.Lookup
                     .TryGetValue(textInHiraganaList[i], out var tempNameResult))
                 {
                     customNameResults.TryAdd(textInHiraganaList[i],
-                        new IntermediaryResult(tempNameResult, new List<string>(), text[..^i], dictType));
+                        new IntermediaryResult(tempNameResult, new List<List<string>>(), text[..^i], dictType));
                 }
             }
 
@@ -453,7 +475,8 @@ namespace JapaneseLookup.Lookup
                     var edictID = new List<string> { jMDictResult.Id };
 
                     var alternativeSpellings = jMDictResult.AlternativeSpellings ?? new List<string>();
-                    var process = wordResult.Value.ProcessList;
+                    // TODO
+                    var process = ProcessProcess(wordResult.Value);
 
                     var frequency = GetJMDictFreq(jMDictResult);
 
@@ -583,7 +606,7 @@ namespace JapaneseLookup.Lookup
                     if (jMDictResult.Readings != null &&
                         (jMDictResult.Readings.Contains(freqResult.Spelling)
                          || (!jMDictResult.Readings.Any() && jMDictResult.PrimarySpelling == freqResult.Spelling)))
-                    //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(freqResult.Spelling))
+                        //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(freqResult.Spelling))
                     {
                         if (freqValue > freqResult.Frequency)
                         {
@@ -628,8 +651,8 @@ namespace JapaneseLookup.Lookup
                         foreach (FrequencyEntry readingFreqResult in readingFreqResults)
                         {
                             if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
-                            //|| (jMDictResult.AlternativeSpellings != null && jMDictResult.AlternativeSpellings.Contains(readingFreqResults.Spelling))
-                            //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
+                                //|| (jMDictResult.AlternativeSpellings != null && jMDictResult.AlternativeSpellings.Contains(readingFreqResults.Spelling))
+                                //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                             {
                                 if (freqValue > readingFreqResult.Frequency)
                                 {
@@ -710,8 +733,8 @@ namespace JapaneseLookup.Lookup
                             foreach (FrequencyEntry readingFreqResult in readingFreqResults)
                             {
                                 if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
-                                //|| (jMDictResult.AlternativeSpellings != null && jMDictResult.AlternativeSpellings.Contains(readingFreqResults.Spelling))
-                                //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
+                                    //|| (jMDictResult.AlternativeSpellings != null && jMDictResult.AlternativeSpellings.Contains(readingFreqResults.Spelling))
+                                    //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                                 {
                                     if (freqValue > readingFreqResult.Frequency)
                                     {
@@ -817,7 +840,9 @@ namespace JapaneseLookup.Lookup
                     var foundSpelling = new List<string> { epwingResult.PrimarySpelling };
                     var reading = new List<string> { epwingResult.Reading };
                     var foundForm = new List<string> { wordResult.Value.FoundForm };
-                    var process = wordResult.Value.ProcessList;
+                    // todo
+                    // var process = wordResult.Value.ProcessList;
+                    var process = ProcessProcess(wordResult.Value);
                     List<string> frequency = GetEpwingFreq(epwingResult);
                     var dictType = new List<string> { wordResult.Value.DictType.ToString() };
 
@@ -879,7 +904,8 @@ namespace JapaneseLookup.Lookup
                     result.Add(LookupResult.Definitions, definitions);
                     result.Add(LookupResult.FoundForm, foundForm);
                     result.Add(LookupResult.AlternativeSpellings, alternativeSpellings);
-                    result.Add(LookupResult.Process, process);
+                    // todo
+                    // result.Add(LookupResult.Process, process);
                     result.Add(LookupResult.Frequency, frequency);
                     result.Add(LookupResult.DictType, dictType);
 
@@ -1077,6 +1103,46 @@ namespace JapaneseLookup.Lookup
             string defResult = $"({customNameDictResult.NameType.ToLower()}) {customNameDictResult.Reading}";
 
             return defResult;
+        }
+
+        public static List<string> ProcessProcess(IntermediaryResult intermediaryResult)
+        {
+            // todo 掠めていった should be ~teiku->past
+            
+            // todo めけん should be ～potential→slurred; potential→slurred negative
+
+            var deconj = "";
+            var first = true;
+            foreach (var form in intermediaryResult.ProcessList)
+            {
+                var formtext = "";
+                var added = 0;
+                for (var f = form.Count - 1; f >= 0; f--)
+                {
+                    var info = form[f];
+                    if (info == "")
+                        continue;
+                    if (info.StartsWith("(") && info.EndsWith(")") && f != 0)
+                        continue;
+                    if (added > 0)
+                        formtext += "→";
+                    added++;
+                    formtext += info;
+                }
+
+                if (formtext != "")
+                {
+                    if (first)
+                        deconj += "～";
+                    else
+                        deconj += "; ";
+                    deconj += formtext;
+                }
+
+                first = false;
+            }
+
+            return deconj == "" ? new List<string>() : new List<string> { deconj };
         }
     }
 }
