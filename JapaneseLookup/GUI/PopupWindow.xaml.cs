@@ -789,38 +789,49 @@ namespace JapaneseLookup.GUI
 
             var textBlock = (TextBlock)sender;
             var top = (WrapPanel)textBlock.Parent;
-            foreach (TextBlock child in top.Children)
+            foreach (UIElement child in top.Children)
             {
-                if (Enum.TryParse(child.Name, out LookupResult result))
+                if (child is TextBox chi)
                 {
-                    switch (result)
+                    if (Enum.TryParse(chi.Name, out LookupResult result))
                     {
-                        case LookupResult.FoundSpelling:
-                            miningParams.FoundSpelling = child.Text;
-                            break;
-                        case LookupResult.Readings:
-                            miningParams.Readings = (string)child.Tag;
-                            break;
-                        case LookupResult.FoundForm:
-                            miningParams.FoundForm = child.Text;
-                            break;
-                        case LookupResult.EdictID:
-                            miningParams.EdictID = child.Text;
-                            break;
-                        case LookupResult.AlternativeSpellings:
-                            miningParams.AlternativeSpellings = (string)child.Tag;
-                            break;
-                        case LookupResult.Frequency:
-                            miningParams.Frequency = child.Text;
-                            break;
-                        case LookupResult.DictType:
-                            miningParams.DictType = child.Text;
-                            break;
-                        case LookupResult.Process:
-                            miningParams.Process = child.Text;
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
+                        switch (result)
+                        {
+                            case LookupResult.Readings:
+                                miningParams.Readings = (string)chi.Tag;
+                                break;
+                            case LookupResult.AlternativeSpellings:
+                                miningParams.AlternativeSpellings = (string)chi.Tag;
+                                break;
+                        }
+                    }
+                }
+
+                if (child is TextBlock ch)
+                {
+                    if (Enum.TryParse(ch.Name, out LookupResult result))
+                    {
+                        switch (result)
+                        {
+                            case LookupResult.FoundSpelling:
+                                miningParams.FoundSpelling = ch.Text;
+                                break;
+                            case LookupResult.FoundForm:
+                                miningParams.FoundForm = ch.Text;
+                                break;
+                            case LookupResult.EdictID:
+                                miningParams.EdictID = ch.Text;
+                                break;
+                            case LookupResult.Frequency:
+                                miningParams.Frequency = ch.Text;
+                                break;
+                            case LookupResult.DictType:
+                                miningParams.DictType = ch.Text;
+                                break;
+                            case LookupResult.Process:
+                                miningParams.Process = ch.Text;
+                                break;
+                        }
                     }
                 }
             }
@@ -899,6 +910,7 @@ namespace JapaneseLookup.GUI
             var mediaElement = new MediaElement { Source = uri, Volume = 1, Visibility = Visibility.Collapsed };
             MainWindow.Instance.MainGrid.Children.Add(mediaElement);
         }
+
         private void PopupListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             e.Handled = true;
