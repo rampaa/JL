@@ -34,8 +34,6 @@ namespace JapaneseLookup.GUI
 
         private string _lastSelectedText;
 
-        private TextBox _lastFocusedTextBox;
-
         private List<Dictionary<LookupResult, List<string>>> _lastLookupResults = new();
 
         public string LastText { get; set; }
@@ -391,7 +389,6 @@ namespace JapaneseLookup.GUI
                             };
 
                             uiElementReadings.MouseMove += PopupMouseMove;
-                            uiElementReadings.MouseEnter += SetFocusedTextBox;
                             uiElementReadings.LostFocus += Unselect;
                             uiElementReadings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
                         }
@@ -450,7 +447,6 @@ namespace JapaneseLookup.GUI
                             };
 
                             uiElementDefinitions.MouseMove += PopupMouseMove;
-                            uiElementDefinitions.MouseEnter += SetFocusedTextBox;
                             uiElementDefinitions.LostFocus += Unselect;
                             uiElementDefinitions.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
                         }
@@ -514,7 +510,6 @@ namespace JapaneseLookup.GUI
                             };
 
                             uiElementAlternativeSpellings.MouseMove += PopupMouseMove;
-                            uiElementAlternativeSpellings.MouseEnter += SetFocusedTextBox;
                             uiElementAlternativeSpellings.LostFocus += Unselect;
                             uiElementAlternativeSpellings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
                         }
@@ -736,12 +731,6 @@ namespace JapaneseLookup.GUI
             }
 
             return innerStackPanel;
-        }
-
-        private void SetFocusedTextBox(object sender, RoutedEventArgs e)
-        {
-            _lastFocusedTextBox = (TextBox)sender;
-            //FocusedTextBox.Focus();
         }
 
         private void Unselect(object sender, RoutedEventArgs e)
