@@ -83,17 +83,6 @@ namespace JapaneseLookup.GUI
             Application.Current.Shutdown();
         }
 
-        private void MainTextBox_MouseLeave(object sender, MouseEventArgs e)
-        {
-            //OpacitySlider.Visibility = Visibility.Collapsed;
-            //FontSizeSlider.Visibility = Visibility.Collapsed;
-
-            if (FirstPopupWindow.MiningMode || ConfigManager.LookupOnSelectOnly) return;
-
-            FirstPopupWindow.Hide();
-            FirstPopupWindow.LastText = "";
-        }
-
         private void MainTextBox_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0)

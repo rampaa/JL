@@ -1020,14 +1020,6 @@ namespace JapaneseLookup.GUI
             Hide();
         }
 
-        private void OnMouseEnter(object sender, MouseEventArgs e)
-        {
-            if (MiningMode || ConfigManager.LookupOnSelectOnly) return;
-
-            Hide();
-            LastText = "";
-        }
-
         private void OnMouseLeave(object sender, MouseEventArgs e)
         {
             if (MiningMode || ConfigManager.LookupOnSelectOnly) return;
