@@ -348,7 +348,7 @@ namespace JapaneseLookup.Utilities
         {
             if (selectedText.Length > 0)
                 Process.Start(new ProcessStartInfo("cmd",
-                        $"/c start https://www.google.com/search?q={MainWindow.Instance.MainTextBox.SelectedText}^&hl=ja")
+                        $"/c start https://www.google.com/search?q={selectedText}^&hl=ja")
                 { CreateNoWindow = true });
         }
     }
