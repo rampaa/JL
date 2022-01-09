@@ -115,8 +115,7 @@ namespace JapaneseLookup.GUI
             catch (Exception e)
             {
                 // config probably doesn't exist; no need to alert the user
-                Utils.Logger.Warning(e, "AnkiConfig probably does not exist");
-                throw;
+                Utils.Logger.Warning(e, "Error setting previous mining config");
             }
         }
 
@@ -236,8 +235,8 @@ namespace JapaneseLookup.GUI
                 if (MiningSetupComboBoxDeckNames.SelectedItem == null ||
                     MiningSetupComboBoxModelNames.SelectedItem == null)
                 {
-                    Utils.Alert(AlertLevel.Warning, "Incomplete config");
-                    Utils.Logger.Information("Incomplete config");
+                    Utils.Alert(AlertLevel.Error, "Save failed: Incomplete config");
+                    Utils.Logger.Error("Save failed: Incomplete config");
                     return;
                 }
 

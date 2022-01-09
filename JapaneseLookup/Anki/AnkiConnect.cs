@@ -11,8 +11,6 @@ namespace JapaneseLookup.Anki
 {
     public static class AnkiConnect
     {
-        private static readonly Uri AnkiConnectUri = new(ConfigManager.AnkiConnectUri);
-
         public static async Task<Response> AddNoteToDeck(Note note)
         {
             var req = new Request("addNote", 6, new Dictionary<string, object> { { "note", note } });
@@ -67,15 +65,11 @@ namespace JapaneseLookup.Anki
             //  await StoreMediaFile(filename, data);
         }
 
-        private class NotesInfoResult
-        {
-            [JsonPropertyName("fields")] public Dictionary<string, Dictionary<string, object>> Fields { get; set; }
-        }
-
         public static async Task<bool> CheckAudioField(long noteId, string audioFieldName)
         {
             var req = new Request("notesInfo", 6,
                 new Dictionary<string, object> { { "notes", new List<long> { noteId } } });
+
             Response response = await Send(req).ConfigureAwait(false);
             if (response != null)
             {
@@ -102,7 +96,8 @@ namespace JapaneseLookup.Anki
                     new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }));
                 Utils.Logger.Information("Sending: " + await payload.ReadAsStringAsync().ConfigureAwait(false));
 
-                var postResponse = await ConfigManager.Client.PostAsync(AnkiConnectUri, payload).ConfigureAwait(false);
+                var postResponse = await ConfigManager.Client.PostAsync(ConfigManager.AnkiConnectUri, payload)
+                    .ConfigureAwait(false);
 
                 var json = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);
                 Utils.Logger.Information("json result: " + json!.Result);

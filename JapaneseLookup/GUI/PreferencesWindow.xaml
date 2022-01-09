@@ -62,9 +62,9 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Lookup Mode"
-                                           TextWrapping="Wrap" VerticalAlignment="Center" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <ComboBox x:Name="LookupModeComboBox" HorizontalAlignment="Right"
-                                          SelectedValuePath="Tag" Width="220">
+                                      SelectedValuePath="Tag" Width="220">
                                 <ComboBoxItem Content="Mouse move" Tag="1" />
                                 <ComboBoxItem Content="Key press+mouse move" Tag="2" />
                                 <ComboBoxItem Content="Text select" Tag="3" />
@@ -73,9 +73,9 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Lookup Key"
-                                           TextWrapping="Wrap" VerticalAlignment="Center" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <ComboBox x:Name="LookupKeyComboBox" HorizontalAlignment="Right"
-                                          SelectedValuePath="Content" Width="80">
+                                      SelectedValuePath="Content" Width="80">
                                 <ComboBoxItem Content="Alt" />
                                 <ComboBoxItem Content="Ctrl" />
                                 <ComboBoxItem Content="Shift" />
@@ -87,7 +87,7 @@
                                        TextWrapping="Wrap" ToolTip="Ignored if lookup mode is set to text select" />
                             <CheckBox x:Name="HighlightLongestMatchCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
-                        
+
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -155,7 +155,9 @@
                             <TextBlock HorizontalAlignment="Left" Text="Font"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <ComboBox x:Name="MainWindowFontComboBox" HorizontalAlignment="Right"
-                                      Width="210" SelectedValuePath="Content" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                                      Width="210" SelectedValuePath="Content"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto" />
                         </DockPanel>
                     </StackPanel>
                 </ScrollViewer>
@@ -214,6 +216,31 @@
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupOpacityNumericUpDown" Maximum="100" Minimum="1"
                                               HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="X Offset"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="PopupXOffsetNumericUpDown" Maximum="50" Minimum="1"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Y Offset"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="PopupYOffsetNumericUpDown" Maximum="50" Minimum="1"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Flip"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <ComboBox x:Name="PopupFlipComboBox" HorizontalAlignment="Right"
+                                      SelectedValuePath="Content">
+                                <ComboBoxItem Content="X" />
+                                <ComboBoxItem Content="Y" />
+                                <ComboBoxItem Content="Both" />
+                            </ComboBox>
                         </DockPanel>
 
                         <DockPanel>
@@ -314,32 +341,6 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="X Offset"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="PopupXOffsetNumericUpDown" Maximum="50" Minimum="1"
-                                              HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Y Offset"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="PopupYOffsetNumericUpDown" Maximum="50" Minimum="1"
-                                              HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Flip"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <ComboBox x:Name="PopupFlipComboBox" HorizontalAlignment="Right"
-                                      SelectedValuePath="Content">
-                                <ComboBoxItem Content="X" />
-                                <ComboBoxItem Content="Y" />
-                                <ComboBoxItem Content="Both" />
-                            </ComboBox>
-                        </DockPanel>
-
-
-                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Dictionary name color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="DictTypeColorButton" Content="" HorizontalAlignment="Right"
@@ -354,7 +355,6 @@
                                               Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
-
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Separator Color"
@@ -387,7 +387,7 @@
                                        TextWrapping="Wrap" />
                             <CheckBox x:Name="ForceSyncAnkiCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
-                        
+
                         <DockPanel Margin="0,10,0,0">
                             <TextBlock HorizontalAlignment="Left" Text="Allow duplicate cards"
                                        TextWrapping="Wrap" />
@@ -430,7 +430,8 @@
                         </StackPanel.Resources>
 
                         <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="MiningModeKeyGestureTextBoxButton_Click"/>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="MiningModeKeyGestureTextBoxButton_Click" />
                             <TextBox x:Name="MiningModeKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -439,7 +440,8 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="KanjiModeKeyGestureTextBoxButton_Click"/>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="KanjiModeKeyGestureTextBoxButton_Click" />
                             <TextBox x:Name="KanjiModeKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -448,7 +450,8 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="MousePassThroughModeKeyGestureTextBoxButton_Click"/>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="MousePassThroughModeKeyGestureTextBoxButton_Click" />
                             <TextBox x:Name="MousePassThroughModeKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -457,7 +460,8 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="PlayAudioKeyGestureTextBoxButton_Click"/>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="PlayAudioKeyGestureTextBoxButton_Click" />
                             <TextBox x:Name="PlayAudioKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -466,8 +470,10 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="ShowManageDictionariesWindowKeyGestureTextBoxButton_Click"/>
-                            <TextBox x:Name="ShowManageDictionariesWindowKeyGestureTextBox" AutomationProperties.Name=""
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ShowManageDictionariesWindowKeyGestureTextBoxButton_Click" />
+                            <TextBox x:Name="ShowManageDictionariesWindowKeyGestureTextBox"
+                                     AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Manage dictionaries" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -475,7 +481,8 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="ShowPreferencesWindowKeyGestureTextBoxButton_Click"/>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ShowPreferencesWindowKeyGestureTextBoxButton_Click" />
                             <TextBox x:Name="ShowPreferencesWindowKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -484,7 +491,8 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="ShowAddNameWindowKeyGestureTextBoxButton_Click"/>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ShowAddNameWindowKeyGestureTextBoxButton_Click" />
                             <TextBox x:Name="ShowAddNameWindowKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -493,7 +501,8 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="ShowAddWordWindowKeyGestureTextBoxButton_Click"/>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ShowAddWordWindowKeyGestureTextBoxButton_Click" />
                             <TextBox x:Name="ShowAddWordWindowKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -502,7 +511,8 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="SearchWithBrowserKeyGestureTextBoxButton_Click"/>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="SearchWithBrowserKeyGestureTextBoxButton_Click" />
                             <TextBox x:Name="SearchWithBrowserKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -511,7 +521,8 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="SteppedBacklogBackwardsKeyGestureTextBoxButton_Click"/>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="SteppedBacklogBackwardsKeyGestureTextBoxButton_Click" />
                             <TextBox x:Name="SteppedBacklogBackwardsKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -520,7 +531,8 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="SteppedBacklogForwardsKeyGestureTextBoxButton_Click"/>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="SteppedBacklogForwardsKeyGestureTextBoxButton_Click" />
                             <TextBox x:Name="SteppedBacklogForwardsKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -529,7 +541,8 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24" Click="InactiveLookupModeKeyGestureTextBoxButton_Click"/>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="InactiveLookupModeKeyGestureTextBoxButton_Click" />
                             <TextBox x:Name="InactiveLookupModeKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />

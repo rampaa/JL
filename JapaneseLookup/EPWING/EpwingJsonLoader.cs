@@ -81,6 +81,7 @@ namespace JapaneseLookup.EPWING
             switch (dictType)
             {
                 case DictType.Kenkyuusha:
+                    // TODO add a comment explaining what this filters
                     if (Storage.Dicts[DictType.Kenkyuusha].Contents.TryGetValue(
                         Kana.KatakanaToHiraganaConverter(result.PrimarySpelling), out var kenkyuushaResults))
                     {
@@ -95,7 +96,6 @@ namespace JapaneseLookup.EPWING
                                     kenkyuushaResults.Remove(kenkyuushaResult);
                                     break;
                                 }
-
                                 else
                                 {
                                     return false;

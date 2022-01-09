@@ -102,15 +102,15 @@ namespace JapaneseLookup.Anki
                 try
                 {
                     return JsonSerializer.Deserialize<AnkiConfig>(
-                    await File.ReadAllTextAsync(Path.Join(ConfigManager.ApplicationPath, "Config/AnkiConfig.json"))
-                        .ConfigureAwait(false),
-                    new JsonSerializerOptions
-                    {
-                        Converters =
+                        await File.ReadAllTextAsync(Path.Join(ConfigManager.ApplicationPath, "Config/AnkiConfig.json"))
+                            .ConfigureAwait(false),
+                        new JsonSerializerOptions
                         {
-                            new JsonStringEnumConverter()
-                        }
-                    });
+                            Converters =
+                            {
+                                new JsonStringEnumConverter()
+                            }
+                        });
                 }
 
                 catch
@@ -119,7 +119,6 @@ namespace JapaneseLookup.Anki
                     Utils.Logger.Error("Couldn't read AnkiConfig");
                     return null;
                 }
-
             }
 
             else

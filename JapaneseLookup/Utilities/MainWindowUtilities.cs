@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime;
 using System.Text.RegularExpressions;
@@ -56,6 +57,20 @@ namespace JapaneseLookup.Utilities
                         {
                             GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
                             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+                        }).ContinueWith(async _ =>
+                        {
+                            // initialize ConfigManager.Client
+                            if (!Debugger.IsAttached)
+                            {
+                                try
+                                {
+                                    await ConfigManager.Client.GetAsync(ConfigManager.AnkiConnectUri);
+                                }
+                                catch (Exception)
+                                {
+                                    // ignored
+                                }
+                            }
                         }).ConfigureAwait(false);
                     }
                 ).ConfigureAwait(false);
