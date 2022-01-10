@@ -81,7 +81,8 @@ namespace JapaneseLookup.EPWING
             switch (dictType)
             {
                 case DictType.Kenkyuusha:
-                    // TODO add a comment explaining what this filters
+                    // Filter duplicate entries.
+                    // If an entry has reading info while others don't, keep the one with the reading info.
                     if (Storage.Dicts[DictType.Kenkyuusha].Contents.TryGetValue(
                         Kana.KatakanaToHiraganaConverter(result.PrimarySpelling), out var kenkyuushaResults))
                     {

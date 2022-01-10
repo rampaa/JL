@@ -9,6 +9,7 @@ namespace JapaneseLookup
     {
         private static readonly Dictionary<string, string> HiraganaToKatakanaDict = new()
         {
+            #pragma warning disable format
             { "あ", "ア" }, { "い", "イ" }, { "う", "ウ" }, { "え", "エ" }, { "お", "オ" },
             { "か", "カ" }, { "き", "キ" }, { "く", "ク" }, { "け", "ケ" }, { "こ", "コ" },
             { "さ", "サ" }, { "し", "シ" }, { "す", "ス" }, { "せ", "セ" }, { "そ", "ソ" },
@@ -34,10 +35,12 @@ namespace JapaneseLookup
             { "ゕ", "ヵ" }, { "ゖ", "ヶ" }, { "ゔ", "ヴ" },
             { "ゝ", "ヽ" }, { "ゞ", "ヾ" }, { "っ", "ッ" },
             { "ゐ゙", "ヸ" }, { "ゑ゙", "ヹ" }, { "を゙", "ヺ" }
+            #pragma warning restore format
         };
 
         private static readonly Dictionary<string, string> KatakanaToHiraganaDict = new()
         {
+            #pragma warning disable format
             { "ア", "あ" }, { "イ", "い" }, { "ウ", "う" }, { "エ", "え" }, { "オ", "お" },
             { "カ", "か" }, { "キ", "き" }, { "ク", "く" }, { "ケ", "け" }, { "コ", "こ" },
             { "サ", "さ" }, { "シ", "し" }, { "ス", "す" }, { "セ", "せ" }, { "ソ", "そ" },
@@ -63,11 +66,13 @@ namespace JapaneseLookup
             { "ヴ", "ゔ" }, { "ヽ", "ゝ" }, { "ヾ", "ゞ" }, { "ッ", "っ" },
 
             { "ヸ", "ゐ゙" }, { "ヹ", "ゑ゙" }, { "ヺ", "を゙" }
+            #pragma warning restore format
         };
 
         private static readonly Dictionary<string, string> KanaFinalVowelDict = new()
         {
-            //Katakana
+            #pragma warning disable format
+            // Katakana
             { "ア", "ア" }, { "カ", "ア" }, { "サ", "ア" }, { "タ", "ア" }, { "ナ", "ア" }, { "ハ", "ア" },
             { "マ", "ア" }, { "ラ", "ア" }, { "ガ", "ア" }, { "ザ", "ア" }, { "ダ", "ア" }, { "バ", "ア" },
             { "パ", "ア" }, { "ワ", "ア" }, { "ヤ", "ア" }, { "ァ", "ア" }, { "ャ", "ア" }, { "ヵ", "ア" },
@@ -108,11 +113,13 @@ namespace JapaneseLookup
             { "お", "お" }, { "こ", "お" }, { "そ", "お" }, { "と", "お" }, { "の", "お" }, { "ほ", "お" },
             { "も", "お" }, { "ろ", "お" }, { "ご", "お" }, { "ぞ", "お" }, { "ど", "お" }, { "ぼ", "お" },
             { "ぽ", "お" }, { "を", "お" }, { "よ", "お" }, { "ぉ", "お" }, { "ょ", "お" }, { "を゙", "オ" }
+            #pragma warning restore format
         };
 
         private static readonly Dictionary<string, string> HalfWidthToFullWidthDict = new()
         {
-            //Half-width katakana
+            #pragma warning disable format
+            // Half-width katakana
             { "ｱ", "あ" }, { "ｲ", "い" }, { "ｳ", "う" }, { "ｴ", "え" }, { "ｵ", "お" },
             { "ｶ", "か" }, { "ｷ", "き" }, { "ｸ", "く" }, { "ｹ", "け" }, { "ｺ", "こ" },
             { "ｻ", "さ" }, { "ｼ", "し" }, { "ｽ", "す" }, { "ｾ", "せ" }, { "ｿ", "そ" },
@@ -131,41 +138,44 @@ namespace JapaneseLookup
 
             { "ヵ", "ゕ" }, { "ヶ", "ゖ" }, { "ｯ", "っ" },
 
-            //Uppercase letters
+            // Uppercase letters
             { "A", "Ａ" }, { "B", "Ｂ" }, { "C", "Ｃ" }, { "D", "Ｄ" }, { "E", "Ｅ" }, { "F", "Ｆ" },
             { "G", "Ｇ" }, { "H", "Ｈ" }, { "I", "Ｉ" }, { "J", "Ｊ" }, { "K", "Ｋ" }, { "L", "Ｌ" },
             { "M", "Ｍ" }, { "N", "Ｎ" }, { "O", "Ｏ" }, { "P", "Ｐ" }, { "Q", "Ｑ" }, { "R", "Ｒ" },
             { "S", "Ｓ" }, { "T", "Ｔ" }, { "U", "Ｕ" }, { "V", "Ｖ" }, { "W", "Ｗ" }, { "X", "Ｘ" },
             { "Y", "Ｙ" }, { "Z", "Ｚ" },
 
-            //Lowercase letters
+            // Lowercase letters
             { "a", "ａ" }, { "b", "ｂ" }, { "c", "ｃ" }, { "d", "ｄ" }, { "e", "ｅ" }, { "f", "ｆ" },
             { "g", "ｇ" }, { "h", "ｈ" }, { "i", "ｉ" }, { "j", "ｊ" }, { "k", "ｋ" }, { "l", "ｌ" },
             { "m", "ｍ" }, { "n", "ｎ" }, { "o", "ｏ" }, { "p", "ｐ" }, { "q", "ｑ" }, { "r", "ｒ" },
             { "s", "ｓ" }, { "t", "ｔ" }, { "u", "ｕ" }, { "v", "ｖ" }, { "w", "ｗ" }, { "x", "ｘ" },
             { "y", "ｙ" }, { "z", "ｚ" },
 
-            //Numbers
+            // Numbers
             { "0", "０" }, { "1", "１" }, { "2", "２" }, { "3", "３" }, { "4", "４" },
             { "5", "５" }, { "6", "６" }, { "7", "７" }, { "8", "８" }, { "9", "９" },
 
-            //Typographical symbols and punctuation marks
+            // Typographical symbols and punctuation marks
             { "!", "！" }, { "\"", "＂" }, { "#", "＃" }, { "$", "＄" }, { "%", "％" }, { "&", "＆" },
             { "'", "＇" }, { "(", "（" }, { ")", "）" }, { "*", "＊" }, { "+", "＋" }, { "/", "／" },
             { ":", "：" }, { ";", "；" }, { "<", "＜" }, { "=", "＝" }, { ">", "＞" }, { "?", "？" },
             { "@", "＠" }, { "[", "［" }, { "\\", "＼" }, { "]", "］" }, { "^", "＾" }, { "{", "｛" },
             { "|", "｜" }, { "}", "｝" }, { "~", "～" }, { "ｰ", "ー" }
-            //，－ ．＿｀｟｡｢｣､･￠￡
+            // ，－ ．＿｀｟｡｢｣､･￠￡
+            #pragma warning restore format
         };
 
         private static readonly Dictionary<string, string> CompositeHalfWidthKatakanaToFullWidthHiraganaDict = new()
         {
+            #pragma warning disable format
             { "ｶﾞ", "が" }, { "ｷﾞ", "ぎ" }, { "ｸﾞ", "ぐ" }, { "ｹﾞ", "げ" }, { "ｺﾞ", "ご" },
             { "ｻﾞ", "ざ" }, { "ｼﾞ", "じ" }, { "ｽﾞ", "ず" }, { "ｾﾞ", "ぜ" }, { "ｿﾞ", "ぞ" },
             { "ﾀﾞ", "だ" }, { "ﾁﾞ", "ぢ" }, { "ﾂﾞ", "づ" }, { "ﾃﾞ", "で" }, { "ﾄﾞ", "ど" },
             { "ﾊﾞ", "ば" }, { "ﾋﾞ", "び" }, { "ﾌﾞ", "ぶ" }, { "ﾍﾞ", "べ" }, { "ﾎﾞ", "ぼ" },
             { "ﾊﾟ", "ぱ" }, { "ﾋﾟ", "ぴ" }, { "ﾌﾟ", "ぷ" }, { "ﾍﾟ", "ぺ" }, { "ﾎﾟ", "ぽ" },
             { "ｳﾞ", "ゔ" }
+            #pragma warning restore format
         };
 
         public static string KatakanaToHiraganaConverter(string text)
