@@ -12,7 +12,8 @@
         Topmost="True" WindowStyle="None" AllowsTransparency="true" ShowInTaskbar="False"
         KeyDown="Window_KeyDown" Closing="Window_Closing" MouseLeave="OnMouseLeave">
 
-    <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Top" CanContentScroll="True">
+    <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Top"
+                  CanContentScroll="True">
         <ListBox VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False" Foreground="White"
                  Background="{Binding Path=Background,
                   RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
@@ -29,28 +30,28 @@
     <Window.ContextMenu>
         <ContextMenu Name="PopupContextMenu">
             <MenuItem
-                        Name ="AddNameButton"
-                        Header="Add name"
-                        Click="AddName"/>
+                Name="AddNameButton"
+                Header="Add name"
+                Click="AddName" />
             <MenuItem
-                        Name ="AddWordButton"
-                        Header="Add word"
-                        Click="AddWord" />
+                Name="AddWordButton"
+                Header="Add word"
+                Click="AddWord" />
             <MenuItem
-                        Header="Copy"
-                        Command="Copy" />
+                Header="Copy"
+                Command="Copy" />
             <MenuItem
-                        Name ="SearchButton"
-                        Header="Search"
-                        Click="SearchWithBrowser" />
+                Name="SearchButton"
+                Header="Search"
+                Click="SearchWithBrowser" />
             <MenuItem
-                        Name ="ManageDictionariesButton"
-                        Header="Manage dictionaries"
-                        Click="ShowManageDictionariesWindow" />
+                Name="ManageDictionariesButton"
+                Header="Manage dictionaries"
+                Click="ShowManageDictionariesWindow" />
             <MenuItem
-                        Name ="PreferencesButtons"
-                        Header="Preferences"
-                        Click="ShowPreferences" />
+                Name="PreferencesButtons"
+                Header="Preferences"
+                Click="ShowPreferences" />
         </ContextMenu>
     </Window.ContextMenu>
 </Window>

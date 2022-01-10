@@ -69,24 +69,9 @@ namespace JapaneseLookup.GUI
             {
                 var dockPanel = new DockPanel();
 
-                var checkBox = new CheckBox()
-                {
-                    Width = 20,
-                    IsChecked = dict.Active,
-                    Margin = new Thickness(10),
-                };
-                var buttonIncreasePriority = new Button()
-                {
-                    Width = 25,
-                    Content = "↑",
-                    Margin = new Thickness(1),
-                };
-                var buttonDecreasePriority = new Button()
-                {
-                    Width = 25,
-                    Content = "↓",
-                    Margin = new Thickness(1),
-                };
+                var checkBox = new CheckBox() { Width = 20, IsChecked = dict.Active, Margin = new Thickness(10), };
+                var buttonIncreasePriority = new Button() { Width = 25, Content = "↑", Margin = new Thickness(1), };
+                var buttonDecreasePriority = new Button() { Width = 25, Content = "↓", Margin = new Thickness(1), };
                 var priority = new TextBlock()
                 {
                     Name = "priority",
@@ -97,9 +82,7 @@ namespace JapaneseLookup.GUI
                 };
                 var dictTypeDisplay = new TextBlock()
                 {
-                    Width = 135,
-                    Text = dict.Type.ToString(),
-                    Margin = new Thickness(10),
+                    Width = 135, Text = dict.Type.ToString(), Margin = new Thickness(10),
                 };
                 var dictPathValidityDisplay = new TextBlock()
                 {
@@ -115,10 +98,7 @@ namespace JapaneseLookup.GUI
                 };
                 var dictPathDisplay = new TextBlock()
                 {
-                    Width = 200,
-                    Text = dict.Path,
-                    Margin = new Thickness(10),
-                    Cursor = Cursors.Hand
+                    Width = 200, Text = dict.Path, Margin = new Thickness(10), Cursor = Cursors.Hand
                 };
 
                 dictPathDisplay.PreviewMouseLeftButtonUp += PathTextbox_PreviewMouseLeftButtonUp;
@@ -258,11 +238,7 @@ namespace JapaneseLookup.GUI
 
         private void BrowseForDictionaryFile(DictType selectedDictType, string filter)
         {
-            OpenFileDialog openFileDialog = new()
-            {
-                InitialDirectory = ConfigManager.ApplicationPath,
-                Filter = filter
-            };
+            OpenFileDialog openFileDialog = new() { InitialDirectory = ConfigManager.ApplicationPath, Filter = filter };
 
             if (openFileDialog.ShowDialog() == true)
             {
@@ -280,10 +256,7 @@ namespace JapaneseLookup.GUI
         // could get rid of this and make users select the index.json file for EPWING dictionaries
         private void BrowseForDictionaryFolder(DictType selectedDictType)
         {
-            using var fbd = new FolderBrowserDialog()
-            {
-                SelectedPath = ConfigManager.ApplicationPath
-            };
+            using var fbd = new FolderBrowserDialog() { SelectedPath = ConfigManager.ApplicationPath };
 
             if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK &&
                 !string.IsNullOrWhiteSpace(fbd.SelectedPath))

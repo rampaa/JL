@@ -19,6 +19,7 @@ namespace JapaneseLookup
         }
 
         public event EventHandler ClipboardChanged;
+
         public ClipboardManager(Window windowSource)
         {
             if (PresentationSource.FromVisual(windowSource) is not HwndSource source)

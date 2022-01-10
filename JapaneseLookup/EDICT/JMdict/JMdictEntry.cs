@@ -8,6 +8,7 @@ namespace JapaneseLookup.EDICT.JMdict
         public List<KEle> KEleList { get; set; }
         public List<REle> REleList { get; set; }
         public List<Sense> SenseList { get; set; }
+
         public JMdictEntry()
         {
             KEleList = new List<KEle>();

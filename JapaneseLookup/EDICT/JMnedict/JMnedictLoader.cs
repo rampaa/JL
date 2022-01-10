@@ -29,9 +29,9 @@ namespace JapaneseLookup.EDICT.JMnedict
             }
 
             else if (MessageBox.Show(
-                    "Couldn't find JMnedict.xml. Would you like to download it now?", "",
-                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
-                    MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
+                "Couldn't find JMnedict.xml. Would you like to download it now?", "",
+                MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
+                MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
             {
                 await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMnedict].Path,
                     new Uri("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz"),
@@ -113,9 +113,9 @@ namespace JapaneseLookup.EDICT.JMnedict
                             trans.TransDetList.Add(jMneDictXML.ReadString());
                             break;
 
-                            //case "xref":
-                            //    trans.XRefList.Add(jMneDictXML.ReadString());
-                            //    break;
+                        //case "xref":
+                        //    trans.XRefList.Add(jMneDictXML.ReadString());
+                        //    break;
                     }
                 }
             }

@@ -29,9 +29,9 @@ namespace JapaneseLookup.EDICT.JMdict
             }
 
             else if (MessageBox.Show(
-                    "Couldn't find JMdict.xml. Would you like to download it now?", "",
-                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
-                    MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
+                "Couldn't find JMdict.xml. Would you like to download it now?", "",
+                MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
+                MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
             {
                 await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMdict].Path,
                     new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
@@ -99,9 +99,9 @@ namespace JapaneseLookup.EDICT.JMdict
                             kEle.KeInfList.Add(ReadEntity(edictXml));
                             break;
 
-                            //case "ke_pri":
-                            //    kEle.KePriList.Add(edictXml.ReadString());
-                            //    break;
+                        //case "ke_pri":
+                        //    kEle.KePriList.Add(edictXml.ReadString());
+                        //    break;
                     }
                 }
             }
@@ -133,9 +133,9 @@ namespace JapaneseLookup.EDICT.JMdict
                             rEle.ReInfList.Add(ReadEntity(jMDictXML));
                             break;
 
-                            //case "re_pri":
-                            //    rEle.RePriList.Add(jMDictXML.ReadString());
-                            //    break;
+                        //case "re_pri":
+                        //    rEle.RePriList.Add(jMDictXML.ReadString());
+                        //    break;
                     }
                 }
             }
@@ -187,13 +187,13 @@ namespace JapaneseLookup.EDICT.JMdict
                             sense.GlossList.Add(jMDictXML.ReadString());
                             break;
 
-                            //case "xref":
-                            //    sense.XRefList.Add(jMDictXML.ReadString());
-                            //    break;
+                        //case "xref":
+                        //    sense.XRefList.Add(jMDictXML.ReadString());
+                        //    break;
 
-                            //case "ant":
-                            //    sense.AntList.Add(jMDictXML.ReadString());
-                            //    break;
+                        //case "ant":
+                        //    sense.AntList.Add(jMDictXML.ReadString());
+                        //    break;
                     }
                 }
             }

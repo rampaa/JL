@@ -226,11 +226,7 @@ namespace JapaneseLookup.Utilities
         {
             var jso = new JsonSerializerOptions
             {
-                WriteIndented = true,
-                Converters =
-                {
-                    new JsonStringEnumConverter(),
-                }
+                WriteIndented = true, Converters = { new JsonStringEnumConverter(), }
             };
 
             try
@@ -252,11 +248,7 @@ namespace JapaneseLookup.Utilities
             {
                 var jso = new JsonSerializerOptions
                 {
-                    WriteIndented = true,
-                    Converters =
-                    {
-                        new JsonStringEnumConverter(),
-                    }
+                    WriteIndented = true, Converters = { new JsonStringEnumConverter(), }
                 };
 
                 File.WriteAllTextAsync(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json"),
@@ -273,13 +265,7 @@ namespace JapaneseLookup.Utilities
         {
             try
             {
-                var jso = new JsonSerializerOptions
-                {
-                    Converters =
-                    {
-                        new JsonStringEnumConverter(),
-                    }
-                };
+                var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(), } };
 
                 Dictionary<DictType, Dict> deserializedDicts = await JsonSerializer
                     .DeserializeAsync<Dictionary<DictType, Dict>>(
@@ -348,8 +334,7 @@ namespace JapaneseLookup.Utilities
         {
             if (selectedText.Length > 0)
                 Process.Start(new ProcessStartInfo("cmd",
-                        $"/c start https://www.google.com/search?q={selectedText}^&hl=ja")
-                { CreateNoWindow = true });
+                    $"/c start https://www.google.com/search?q={selectedText}^&hl=ja") { CreateNoWindow = true });
         }
     }
 }

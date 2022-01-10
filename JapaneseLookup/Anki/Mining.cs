@@ -21,13 +21,7 @@ namespace JapaneseLookup.Anki
                 var rawFields = ankiConfig.Fields;
                 var fields = ConvertFields(rawFields, miningParams);
 
-                Dictionary<string, object> options = new()
-                {
-                    {
-                        "allowDuplicate",
-                        ConfigManager.AllowDuplicateCards
-                    },
-                };
+                Dictionary<string, object> options = new() { { "allowDuplicate", ConfigManager.AllowDuplicateCards }, };
                 string[] tags = ankiConfig.Tags;
 
                 // idk if this gets the right audio for every word
@@ -44,18 +38,9 @@ namespace JapaneseLookup.Anki
                             "url",
                             $"http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={miningParams.FoundSpelling}&kana={reading}"
                         },
-                        {
-                            "filename",
-                            $"JL_audio_{reading}_{miningParams.FoundSpelling}.mp3"
-                        },
-                        {
-                            "skipHash",
-                            "7e2c2f954ef6051373ba916f000168dc"
-                        },
-                        {
-                            "fields",
-                            FindAudioFields(rawFields)
-                        },
+                        { "filename", $"JL_audio_{reading}_{miningParams.FoundSpelling}.mp3" },
+                        { "skipHash", "7e2c2f954ef6051373ba916f000168dc" },
+                        { "fields", FindAudioFields(rawFields) },
                     }
                 };
                 Dictionary<string, object>[] video = null;

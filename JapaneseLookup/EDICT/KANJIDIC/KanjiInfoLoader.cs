@@ -26,7 +26,9 @@ namespace JapaneseLookup.EDICT.KANJIDIC
                 Dictionary<string, string> kanjiCompositionDictionary = new();
                 if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
                 {
-                    var lines = await File.ReadAllLinesAsync(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")).ConfigureAwait(false);
+                    var lines = await File
+                        .ReadAllLinesAsync(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt"))
+                        .ConfigureAwait(false);
 
                     foreach (string line in lines)
                     {
@@ -69,9 +71,9 @@ namespace JapaneseLookup.EDICT.KANJIDIC
             }
 
             else if (MessageBox.Show(
-                    "Couldn't find kanjidic2.xml. Would you like to download it now?", "",
-                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
-                    MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
+                "Couldn't find kanjidic2.xml. Would you like to download it now?", "",
+                MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
+                MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
             {
                 await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.Kanjidic].Path,
                     new Uri("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz"),

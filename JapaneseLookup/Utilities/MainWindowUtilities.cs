@@ -18,7 +18,22 @@ namespace JapaneseLookup.Utilities
 
         // Consider checking for \t, \r, "　", " ", ., !, ?, –, —, ―, ‒, ~, ‥, ♪, ～, ♡, ♥, ☆, ★
         private static readonly List<string> JapanesePunctuation =
-            new() { "。", "！", "？", "…", ".", "、", "「", "」", "『", "』", "（", "）", "\n" };
+            new()
+            {
+                "。",
+                "！",
+                "？",
+                "…",
+                ".",
+                "、",
+                "「",
+                "」",
+                "『",
+                "』",
+                "（",
+                "）",
+                "\n"
+            };
 
         public static int FindWordBoundary(string text, int position)
         {

@@ -11,6 +11,7 @@ namespace JapaneseLookup.EDICT.JMdict
         public List<string> MiscList { get; set; } // e.g. "abbr"
         public string SInf { get; set; } // e.g. "often derog"
         public List<string> DialList { get; set; } // e.g. ksb
+
         public List<string> GlossList { get; set; } // English meaning
         // public List<string> XRefList { get; set; } // Related terms
         // public List<string> AntList { get; set; } // Antonyms

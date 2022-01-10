@@ -80,7 +80,10 @@ namespace JapaneseLookup
         public static KeyGesture MiningModeKeyGesture { get; set; } = new(Key.M, ModifierKeys.Windows);
         public static KeyGesture PlayAudioKeyGesture { get; set; } = new(Key.P, ModifierKeys.Windows);
         public static KeyGesture KanjiModeKeyGesture { get; set; } = new(Key.K, ModifierKeys.Windows);
-        public static KeyGesture ShowManageDictionariesWindowKeyGesture { get; set; } = new(Key.D, ModifierKeys.Windows);
+
+        public static KeyGesture ShowManageDictionariesWindowKeyGesture { get; set; } =
+            new(Key.D, ModifierKeys.Windows);
+
         public static KeyGesture ShowPreferencesWindowKeyGesture { get; set; } = new(Key.L, ModifierKeys.Windows);
         public static KeyGesture ShowAddNameWindowKeyGesture { get; set; } = new(Key.N, ModifierKeys.Windows);
         public static KeyGesture ShowAddWordWindowKeyGesture { get; set; } = new(Key.W, ModifierKeys.Windows);
@@ -131,7 +134,9 @@ namespace JapaneseLookup
 
             AnkiConnectUri = tempStr;
 
-            Utils.Try(() => HighlightLongestMatch = bool.Parse(ConfigurationManager.AppSettings.Get("HighlightLongestMatch")!),
+            Utils.Try(
+                () => HighlightLongestMatch =
+                    bool.Parse(ConfigurationManager.AppSettings.Get("HighlightLongestMatch")!),
                 HighlightLongestMatch, "HighlightLongestMatch");
 
             Utils.Try(() => MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength")!),
@@ -140,14 +145,15 @@ namespace JapaneseLookup
                 "KanjiMode");
             Utils.Try(() => ForceSyncAnki = bool.Parse(ConfigurationManager.AppSettings.Get("ForceSyncAnki")!),
                 ForceSyncAnki, "ForceSyncAnki");
-            Utils.Try(() => AllowDuplicateCards = bool.Parse(ConfigurationManager.AppSettings.Get("AllowDuplicateCards")!),
+            Utils.Try(
+                () => AllowDuplicateCards = bool.Parse(ConfigurationManager.AppSettings.Get("AllowDuplicateCards")!),
                 AllowDuplicateCards, "AllowDuplicateCards");
             Utils.Try(() => LookupRate = int.Parse(ConfigurationManager.AppSettings.Get("LookupRate")!), LookupRate,
                 "LookupRate");
 
             Utils.Try(() => LookupKey = (ModifierKeys)new ModifierKeysConverter()
-                         .ConvertFromString(ConfigurationManager.AppSettings.Get("LookupKey")!)!,
-                         LookupKey, "LookupKey");
+                    .ConvertFromString(ConfigurationManager.AppSettings.Get("LookupKey")!)!,
+                LookupKey, "LookupKey");
 
             // MAKE SURE YOU FREEZE ANY NEW COLOR OBJECTS YOU ADD
             // OR THE PROGRAM WILL CRASH AND BURN
@@ -214,7 +220,7 @@ namespace JapaneseLookup
             Utils.Try(() =>
                     HighlightColor = (SolidColorBrush)new BrushConverter()
                         .ConvertFrom(ConfigurationManager.AppSettings.Get("HighlightColor")),
-                 HighlightColor, "HighlightColor");
+                HighlightColor, "HighlightColor");
             HighlightColor.Freeze();
             MainWindow.Instance.MainTextBox.SelectionBrush = HighlightColor;
 
@@ -315,7 +321,7 @@ namespace JapaneseLookup
 
             ShowManageDictionariesWindowKeyGesture =
                 Utils.KeyGestureSetter("ShowManageDictionariesWindowKeyGesture",
-                ShowManageDictionariesWindowKeyGesture);
+                    ShowManageDictionariesWindowKeyGesture);
 
             ShowPreferencesWindowKeyGesture =
                 Utils.KeyGestureSetter("ShowPreferencesWindowKeyGesture", ShowPreferencesWindowKeyGesture);
@@ -337,17 +343,20 @@ namespace JapaneseLookup
             if (Utils.KeyGestureToString(ShowAddNameWindowKeyGesture) == "None")
                 MainWindow.Instance.AddNameButton.InputGestureText = "";
             else
-                MainWindow.Instance.AddNameButton.InputGestureText = Utils.KeyGestureToString(ShowAddNameWindowKeyGesture);
+                MainWindow.Instance.AddNameButton.InputGestureText =
+                    Utils.KeyGestureToString(ShowAddNameWindowKeyGesture);
 
             if (Utils.KeyGestureToString(ShowAddWordWindowKeyGesture) == "None")
                 MainWindow.Instance.AddWordButton.InputGestureText = "";
             else
-                MainWindow.Instance.AddWordButton.InputGestureText = Utils.KeyGestureToString(ShowAddWordWindowKeyGesture);
+                MainWindow.Instance.AddWordButton.InputGestureText =
+                    Utils.KeyGestureToString(ShowAddWordWindowKeyGesture);
 
             if (Utils.KeyGestureToString(SearchWithBrowserKeyGesture) == "None")
                 MainWindow.Instance.SearchButton.InputGestureText = "";
             else
-                MainWindow.Instance.SearchButton.InputGestureText = Utils.KeyGestureToString(SearchWithBrowserKeyGesture);
+                MainWindow.Instance.SearchButton.InputGestureText =
+                    Utils.KeyGestureToString(SearchWithBrowserKeyGesture);
 
             if (Utils.KeyGestureToString(ShowPreferencesWindowKeyGesture) == "None")
                 MainWindow.Instance.PreferencesButton.InputGestureText = "";
@@ -676,7 +685,8 @@ namespace JapaneseLookup
 
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
-            config.AppSettings.Settings["MainWindowFontSize"].Value = MainWindow.Instance.FontSizeSlider.Value.ToString();
+            config.AppSettings.Settings["MainWindowFontSize"].Value =
+                MainWindow.Instance.FontSizeSlider.Value.ToString();
             config.AppSettings.Settings["MainWindowOpacity"].Value = MainWindow.Instance.OpacitySlider.Value.ToString();
             config.AppSettings.Settings["MainWindowHeight"].Value = MainWindowHeight.ToString();
             config.AppSettings.Settings["MainWindowWidth"].Value = MainWindowWidth.ToString();

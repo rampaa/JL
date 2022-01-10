@@ -42,10 +42,7 @@ namespace JapaneseLookup.GUI
         private void ShowColorPicker(object sender, RoutedEventArgs e)
         {
             var picker = SingleOpenHelper.CreateControl<ColorPicker>();
-            var window = new HandyControl.Controls.PopupWindow
-            {
-                PopupElement = picker,
-            };
+            var window = new HandyControl.Controls.PopupWindow { PopupElement = picker, };
             picker.Canceled += delegate { window.Close(); };
             picker.Confirmed += delegate { ColorSetter((Button)sender, picker.SelectedBrush, window); };
 
@@ -192,7 +189,9 @@ namespace JapaneseLookup.GUI
                     var stackPanel = new StackPanel();
                     var textBlockFieldName = new TextBlock { Text = fieldName };
                     var comboBoxJLFields = new System.Windows.Controls.ComboBox
-                    { ItemsSource = Enum.GetValues(typeof(JLField)), SelectedItem = jlField };
+                    {
+                        ItemsSource = Enum.GetValues(typeof(JLField)), SelectedItem = jlField
+                    };
 
                     stackPanel.Children.Add(textBlockFieldName);
                     stackPanel.Children.Add(comboBoxJLFields);

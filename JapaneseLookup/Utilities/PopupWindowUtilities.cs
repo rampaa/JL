@@ -79,14 +79,17 @@ namespace JapaneseLookup.Utilities
             if (text == null)
                 return null;
 
-            List<string> japanesePunctuation = new() { "。", "！", "？", "…", ".", "\n", };
-
-            Dictionary<string, string> japaneseParentheses = new()
+            List<string> japanesePunctuation = new()
             {
-                { "「", "」" },
-                { "『", "』" },
-                { "（", "）" },
+                "。",
+                "！",
+                "？",
+                "…",
+                ".",
+                "\n",
             };
+
+            Dictionary<string, string> japaneseParentheses = new() { { "「", "」" }, { "『", "』" }, { "（", "）" }, };
 
             int startPosition = -1;
             int endPosition = -1;

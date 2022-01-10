@@ -27,6 +27,7 @@ namespace JapaneseLookup.EDICT.JMnedict
                         result.NameTypes.AddRange(trans.NameTypeList);
                         // result.RelatedTerms.AddRange(trans.XRefList);
                     }
+
                     resultList.TryAdd(key, result);
                 }
 
@@ -65,6 +66,7 @@ namespace JapaneseLookup.EDICT.JMnedict
 
                         //result.RelatedTerms.AddRange(trans.XRefList);
                     }
+
                     resultList.Add(key, result);
                 }
             }
@@ -95,7 +97,6 @@ namespace JapaneseLookup.EDICT.JMnedict
                     tempList = new() { rl.Value };
 
                 jMnedictDictionary[key] = tempList;
-
             }
         }
     }

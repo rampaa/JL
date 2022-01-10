@@ -257,10 +257,7 @@ namespace JapaneseLookup.GUI
         private StackPanel MakeResultStackPanel(Dictionary<LookupResult, List<string>> result,
             int index, int resultsCount)
         {
-            var innerStackPanel = new StackPanel
-            {
-                Margin = new Thickness(4, 2, 4, 2),
-            };
+            var innerStackPanel = new StackPanel { Margin = new Thickness(4, 2, 4, 2), };
             var top = new WrapPanel();
             var bottom = new StackPanel();
 
@@ -296,9 +293,7 @@ namespace JapaneseLookup.GUI
                     case LookupResult.FoundForm:
                         textBlockFoundForm = new TextBlock
                         {
-                            Name = key.ToString(),
-                            Text = string.Join("", value),
-                            Visibility = Visibility.Collapsed,
+                            Name = key.ToString(), Text = string.Join("", value), Visibility = Visibility.Collapsed,
                         };
                         break;
 
@@ -663,11 +658,8 @@ namespace JapaneseLookup.GUI
 
             UIElement[] babies =
             {
-                textBlockFoundSpelling, textBlockPOrthographyInfo,
-                uiElementReadings,
-                uiElementAlternativeSpellings,
-                textBlockProcess,
-                textBlockFoundForm, textBlockEdictID, // undisplayed, for mining
+                textBlockFoundSpelling, textBlockPOrthographyInfo, uiElementReadings, uiElementAlternativeSpellings,
+                textBlockProcess, textBlockFoundForm, textBlockEdictID, // undisplayed, for mining
                 textBlockFrequency, textBlockDictType
             };
             foreach (UIElement baby in babies)
@@ -702,11 +694,7 @@ namespace JapaneseLookup.GUI
 
             TextBlock[] babiesKanji =
             {
-                textBlockOnReadings,
-                textBlockKunReadings,
-                textBlockNanori,
-                textBlockGrade,
-                textBlockStrokeCount,
+                textBlockOnReadings, textBlockKunReadings, textBlockNanori, textBlockGrade, textBlockStrokeCount,
                 textBlockComposition,
             };
             foreach (TextBlock baby in babiesKanji)
@@ -917,8 +905,7 @@ namespace JapaneseLookup.GUI
 
             MouseWheelEventArgs e2 = new(e.MouseDevice, e.Timestamp, e.Delta)
             {
-                RoutedEvent = ListBox.MouseWheelEvent,
-                Source = e.Source
+                RoutedEvent = ListBox.MouseWheelEvent, Source = e.Source
             };
             PopupListBox.RaiseEvent(e2);
         }

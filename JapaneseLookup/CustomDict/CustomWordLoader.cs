@@ -13,7 +13,8 @@ namespace JapaneseLookup.CustomDict
         {
             if (File.Exists(Path.Join(ConfigManager.ApplicationPath, customWordDictPath)))
             {
-                var lines = await File.ReadAllLinesAsync(Path.Join(ConfigManager.ApplicationPath, customWordDictPath)).ConfigureAwait(false);
+                var lines = await File.ReadAllLinesAsync(Path.Join(ConfigManager.ApplicationPath, customWordDictPath))
+                    .ConfigureAwait(false);
                 foreach (string line in lines)
                 {
                     string[] lParts = line.Split("\t");
@@ -94,7 +95,8 @@ namespace JapaneseLookup.CustomDict
                 }
                 else
                 {
-                    customWordDictionary.Add(Kana.KatakanaToHiraganaConverter(spelling), new List<IResult> { newWordEntry });
+                    customWordDictionary.Add(Kana.KatakanaToHiraganaConverter(spelling),
+                        new List<IResult> { newWordEntry });
                 }
             }
         }

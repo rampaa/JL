@@ -12,7 +12,8 @@ namespace JapaneseLookup.CustomDict
         {
             if (File.Exists(Path.Join(ConfigManager.ApplicationPath, customNameDictPath)))
             {
-                var lines = await File.ReadAllLinesAsync(Path.Join(ConfigManager.ApplicationPath, customNameDictPath)).ConfigureAwait(false);
+                var lines = await File.ReadAllLinesAsync(Path.Join(ConfigManager.ApplicationPath, customNameDictPath))
+                    .ConfigureAwait(false);
                 foreach (string line in lines)
                 {
                     string[] lParts = line.Split("\t");
@@ -41,7 +42,8 @@ namespace JapaneseLookup.CustomDict
 
             else
             {
-                customNameDictionary.Add(Kana.KatakanaToHiraganaConverter(spelling), new List<IResult> { newNameEntry });
+                customNameDictionary.Add(Kana.KatakanaToHiraganaConverter(spelling),
+                    new List<IResult> { newNameEntry });
             }
         }
     }

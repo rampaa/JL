@@ -33,34 +33,13 @@ namespace JapaneseLookup.Anki
                     "Japanese JL-Basic",
                     new Dictionary<string, JLField>
                     {
-                        {
-                            "Edict ID",
-                            JLField.EdictID
-                        },
-                        {
-                            "Expression",
-                            JLField.FoundSpelling
-                        },
-                        {
-                            "Reading",
-                            JLField.Readings
-                        },
-                        {
-                            "Gloss",
-                            JLField.Definitions
-                        },
-                        {
-                            "Sentence",
-                            JLField.Context
-                        },
-                        {
-                            "Audio",
-                            JLField.Audio
-                        },
-                        {
-                            "Time",
-                            JLField.TimeLocal
-                        },
+                        { "Edict ID", JLField.EdictID },
+                        { "Expression", JLField.FoundSpelling },
+                        { "Reading", JLField.Readings },
+                        { "Gloss", JLField.Definitions },
+                        { "Sentence", JLField.Context },
+                        { "Audio", JLField.Audio },
+                        { "Time", JLField.TimeLocal },
                     },
                     new[] { "JapaneseLookup" }
                 )
@@ -77,11 +56,7 @@ namespace JapaneseLookup.Anki
                         new JsonSerializerOptions
                         {
                             // Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                            WriteIndented = true,
-                            Converters =
-                            {
-                                new JsonStringEnumConverter()
-                            }
+                            WriteIndented = true, Converters = { new JsonStringEnumConverter() }
                         })
                 ).ConfigureAwait(false);
 
@@ -104,13 +79,7 @@ namespace JapaneseLookup.Anki
                     return JsonSerializer.Deserialize<AnkiConfig>(
                         await File.ReadAllTextAsync(Path.Join(ConfigManager.ApplicationPath, "Config/AnkiConfig.json"))
                             .ConfigureAwait(false),
-                        new JsonSerializerOptions
-                        {
-                            Converters =
-                            {
-                                new JsonStringEnumConverter()
-                            }
-                        });
+                        new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } });
                 }
 
                 catch

@@ -50,16 +50,13 @@ namespace JapaneseLookup.PoS
 
             string[] unusedWcs =
             {
-                "adj-f", "adj-ix", "adj-kari", "adj-ku", "adj-nari",
-                "adj-no", "adj-pn", "adj-shiku", "adj-t", "adv", "adv-to", "aux",
-                "aux-adj", "aux-v", "conj", "cop", "ctr", "int", "n", "n-adv", "n-pr",
-                "n-pref", "n-suf", "n-t", "num", "pn", "pref", "prt", "suf", "unc",
-                "v-unspec", "v1-s", "vi", "v2a-s", "v2b-k", "v2b-s", "v2d-k", "v2d-s",
-                "v2g-k", "v2g-s", "v2h-k", "v2h-s", "v2k-k", "v2k-s", "v2m-k", "v2m-s",
-                "v2n-s", "v2r-k", "v2r-s", "v2s-s", "v2t-k", "v2t-s", "v2w-s", "v2y-k",
-                "v2y-s", "v2z-s", "v4b", "v4g", "v4h", "v4k", "v4m", "v4n", "v4r",
-                "v4s", "v4t", "v5uru", "vn", "vr", "vs-i", "vs-s", "vt",
-                "exp", "vs", "vz"
+                "adj-f", "adj-ix", "adj-kari", "adj-ku", "adj-nari", "adj-no", "adj-pn", "adj-shiku", "adj-t",
+                "adv", "adv-to", "aux", "aux-adj", "aux-v", "conj", "cop", "ctr", "int", "n", "n-adv", "n-pr",
+                "n-pref", "n-suf", "n-t", "num", "pn", "pref", "prt", "suf", "unc", "v-unspec", "v1-s", "vi",
+                "v2a-s", "v2b-k", "v2b-s", "v2d-k", "v2d-s", "v2g-k", "v2g-s", "v2h-k", "v2h-s", "v2k-k", "v2k-s",
+                "v2m-k", "v2m-s", "v2n-s", "v2r-k", "v2r-s", "v2s-s", "v2t-k", "v2t-s", "v2w-s", "v2y-k", "v2y-s",
+                "v2z-s", "v4b", "v4g", "v4h", "v4k", "v4m", "v4n", "v4r", "v4s", "v4t", "v5uru", "vn", "vr", "vs-i",
+                "vs-s", "vt", "exp", "vs", "vz"
             };
 
             foreach ((string _, var values) in Storage.Dicts[Dicts.DictType.JMdict].Contents.ToList())

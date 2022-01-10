@@ -18,7 +18,9 @@ namespace JapaneseLookup.EDICT.JMdict
         public List<List<string>> TypeList { get; set; } // e.g. "martial arts"
         public List<List<string>> MiscList { get; set; } // e.g. "abbr" +
         public List<string> SpellingInfo { get; set; } // e.g. "often derog" +
+
         public List<string> Dialects { get; set; } // e.g. ksb
+
         // public List<string> KanaSpellings { get; set; }
         public string PrimarySpelling { get; set; }
         //public List<string> PriorityList { get; set; } // e.g. gai1

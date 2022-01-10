@@ -8,6 +8,7 @@ namespace JapaneseLookup.EDICT.JMnedict
         public List<string> KebList { get; set; }
         public List<string> RebList { get; set; }
         public List<Trans> TransList { get; set; }
+
         public JMnedictEntry()
         {
             Id = null;

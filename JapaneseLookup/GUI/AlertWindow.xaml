@@ -14,12 +14,12 @@
     <Grid>
         <Border Name="AlertBorder" BorderThickness="2">
             <TextBlock Name="AlertWindowTextBlock"
-                 Focusable="False"
-                 FontSize="25"
-                 Foreground="White"
-                 Background="Black"
-                 Opacity="0.8"
-                 TextWrapping="Wrap"/>
+                       Focusable="False"
+                       FontSize="25"
+                       Foreground="White"
+                       Background="Black"
+                       Opacity="0.8"
+                       TextWrapping="Wrap" />
         </Border>
     </Grid>
 </Window>

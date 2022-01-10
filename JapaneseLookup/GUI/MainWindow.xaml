@@ -7,7 +7,8 @@
         AllowsTransparency="True"
         mc:Ignorable="d" Height="269" Width="800" WindowStyle="None" ResizeMode="CanResize" Topmost="True"
         Closed="MainWindow_Closed" Closing="MainWindow_Closing" KeyDown="MainWindow_KeyDown"
-        PreviewKeyDown="MainWindow_PreviewKeyDown" SizeChanged="MainWindow_SizeChanged" PreviewMouseDown="Window_PreviewMouseDown">
+        PreviewKeyDown="MainWindow_PreviewKeyDown" SizeChanged="MainWindow_SizeChanged"
+        PreviewMouseDown="Window_PreviewMouseDown">
     <Window.Background>
         <SolidColorBrush Color="Black" Opacity="0.3" />
     </Window.Background>
@@ -26,32 +27,35 @@
                  Background="Transparent" Opacity="1" FontSize="{Binding Value, ElementName=FontSizeSlider}"
                  Foreground="White" SelectionTextBrush="Black"
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"
-                 VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow"
-                 FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled="True" IsUndoEnabled="False" PreviewMouseRightButtonUp="MainTextBox_PreviewMouseRightButtonUp" PreviewMouseLeftButtonUp="MainTextBox_PreviewMouseLeftButtonUp">
+                 VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
+                 MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow"
+                 FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled="True" IsUndoEnabled="False"
+                 PreviewMouseRightButtonUp="MainTextBox_PreviewMouseRightButtonUp"
+                 PreviewMouseLeftButtonUp="MainTextBox_PreviewMouseLeftButtonUp">
 
             <TextBox.ContextMenu>
                 <ContextMenu Name="MainTextboxContextMenu">
                     <MenuItem
-                        Name ="AddNameButton"
+                        Name="AddNameButton"
                         Header="Add name"
-                        Click="AddName"/>
+                        Click="AddName" />
                     <MenuItem
-                        Name ="AddWordButton"
+                        Name="AddWordButton"
                         Header="Add word"
                         Click="AddWord" />
                     <MenuItem
                         Header="Copy"
                         Command="Copy" />
                     <MenuItem
-                        Name ="SearchButton"
+                        Name="SearchButton"
                         Header="Search"
                         Click="SearchWithBrowser" />
                     <MenuItem
-                        Name ="ManageDictionariesButton"
+                        Name="ManageDictionariesButton"
                         Header="Manage dictionaries"
                         Click="ShowManageDictionariesWindow" />
                     <MenuItem
-                        Name ="PreferencesButton"
+                        Name="PreferencesButton"
                         Header="Preferences"
                         Click="ShowPreferences" />
                 </ContextMenu>

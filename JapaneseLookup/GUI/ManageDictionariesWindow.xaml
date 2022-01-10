@@ -21,6 +21,7 @@
                 <ListBox x:Name="DictionariesDisplay" Focusable="False" Margin="10" />
             </StackPanel>
         </ScrollViewer>
-        <Button Content="Close" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20" FontSize="16" Height="35" Click="CloseButton_Click" Width="70"/>
+        <Button Content="Close" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20" FontSize="16"
+                Height="35" Click="CloseButton_Click" Width="70" />
     </Grid>
 </Window>
