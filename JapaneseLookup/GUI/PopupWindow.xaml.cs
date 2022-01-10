@@ -367,7 +367,6 @@ namespace JapaneseLookup.GUI
                             {
                                 Name = LookupResult.Readings.ToString(),
                                 Text = readingsText,
-                                Tag = string.Join(", ", readings), // for mining
                                 TextWrapping = TextWrapping.Wrap,
                                 Background = Brushes.Transparent,
                                 Foreground = ConfigManager.ReadingsColor,
@@ -393,7 +392,6 @@ namespace JapaneseLookup.GUI
                             {
                                 Name = LookupResult.Readings.ToString(),
                                 Text = readingsText,
-                                Tag = string.Join(", ", readings), // for mining
                                 TextWrapping = TextWrapping.Wrap,
                                 Foreground = ConfigManager.ReadingsColor,
                                 FontSize = ConfigManager.ReadingsFontSize,
@@ -488,7 +486,6 @@ namespace JapaneseLookup.GUI
                             {
                                 Name = LookupResult.AlternativeSpellings.ToString(),
                                 Text = alternativeSpellingsText,
-                                Tag = string.Join(", ", alternativeSpellings), // for mining
                                 TextWrapping = TextWrapping.Wrap,
                                 Background = Brushes.Transparent,
                                 Foreground = ConfigManager.AlternativeSpellingsColor,
@@ -514,7 +511,6 @@ namespace JapaneseLookup.GUI
                             {
                                 Name = LookupResult.AlternativeSpellings.ToString(),
                                 Text = alternativeSpellingsText,
-                                Tag = string.Join(", ", alternativeSpellings), // for mining
                                 TextWrapping = TextWrapping.Wrap,
                                 Foreground = ConfigManager.AlternativeSpellingsColor,
                                 FontSize = ConfigManager.AlternativeSpellingsFontSize,
@@ -786,10 +782,10 @@ namespace JapaneseLookup.GUI
                         switch (result)
                         {
                             case LookupResult.Readings:
-                                miningParams.Readings = (string)chi.Tag;
+                                miningParams.Readings = chi.Text;
                                 break;
                             case LookupResult.AlternativeSpellings:
-                                miningParams.AlternativeSpellings = (string)chi.Tag;
+                                miningParams.AlternativeSpellings = chi.Text;
                                 break;
                         }
                     }
@@ -933,18 +929,34 @@ namespace JapaneseLookup.GUI
                 var innerStackPanel = (StackPanel)PopupListBox.Items[_playAudioIndex];
                 var top = (WrapPanel)innerStackPanel.Children[0];
 
-                foreach (TextBlock child in top.Children)
+                foreach (UIElement child in top.Children)
                 {
-                    if (Enum.TryParse(child.Name, out LookupResult result))
+                    if (child is TextBox chi)
                     {
-                        switch (result)
+                        if (Enum.TryParse(chi.Name, out LookupResult result))
                         {
-                            case LookupResult.FoundSpelling:
-                                foundSpelling = child.Text;
-                                break;
-                            case LookupResult.Readings:
-                                reading = ((string)child.Tag).Split(",")[0];
-                                break;
+                            switch (result)
+                            {
+                                case LookupResult.Readings:
+                                    reading = chi.Text.Split(",")[0];
+                                    break;
+                            }
+                        }
+                    }
+
+                    if (child is TextBlock ch)
+                    {
+                        if (Enum.TryParse(ch.Name, out LookupResult result))
+                        {
+                            switch (result)
+                            {
+                                case LookupResult.FoundSpelling:
+                                    foundSpelling = ch.Text;
+                                    break;
+                                case LookupResult.Readings:
+                                    reading = ch.Text.Split(",")[0];
+                                    break;
+                            }
                         }
                     }
                 }
