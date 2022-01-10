@@ -30,7 +30,7 @@ Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer
 * Koujien - Basic support
 * Meikyou - Basic support
 
-## Resources used
+## Credits
 * [Nazeka](https://github.com/wareya/nazeka): Deconjugation rules, deconjugator, frequency lists
 * [JMdict](https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project): JMdict_e.gz
 * [JMnedict](https://www.edrdg.org/enamdict/enamdict_doc.html): JMnedict.xml.gz
