@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -875,26 +876,6 @@ namespace JapaneseLookup.GUI
                 TextBox_MouseMove(tb);
         }
 
-        private static void PlayAudio(string foundSpelling, string reading)
-        {
-            Utils.Logger.Information("Attempting to play audio: " + foundSpelling + " " + reading);
-
-            if (reading == "") reading = foundSpelling;
-
-            Uri uri = new(
-                "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=" +
-                foundSpelling +
-                "&kana=" +
-                reading
-            );
-
-            // var sound = AnkiConnect.GetAudio("猫", "ねこ").Result;
-
-            // TODO: find a better solution for this that has less latency and prevents the noaudio clip from playing
-            var mediaElement = new MediaElement { Source = uri, Volume = 1, Visibility = Visibility.Collapsed };
-            MainWindow.Instance.MainGrid.Children.Add(mediaElement);
-        }
-
         private void PopupListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             e.Handled = true;
@@ -920,7 +901,6 @@ namespace JapaneseLookup.GUI
 
                 DisplayResults(true);
             }
-
             else if (Utils.KeyGestureComparer(e, ConfigManager.PlayAudioKeyGesture))
             {
                 string foundSpelling = null;
@@ -961,16 +941,14 @@ namespace JapaneseLookup.GUI
                     }
                 }
 
-                PlayAudio(foundSpelling, reading);
+                Task.Run(() => PopupWindowUtilities.PlayAudio(foundSpelling, reading));
             }
-
             else if (e.Key == Key.Escape)
             {
                 MiningMode = false;
                 PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                 Hide();
             }
-
             else if (Utils.KeyGestureComparer(e, ConfigManager.KanjiModeKeyGesture))
             {
                 ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
@@ -978,35 +956,29 @@ namespace JapaneseLookup.GUI
                 //todo will only work for the FirstPopupWindow
                 MainWindow.Instance.MainTextBox_MouseMove(null, null);
             }
-
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowPreferencesWindowKeyGesture))
             {
                 Utils.ShowPreferencesWindow();
             }
-
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
             {
                 if (ConfigManager.Ready)
                     Utils.ShowAddNameWindow(_lastSelectedText);
             }
-
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
             {
                 if (ConfigManager.Ready)
                     Utils.ShowAddWordWindow(_lastSelectedText);
             }
-
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
             {
                 if (ConfigManager.Ready)
                     Utils.ShowManageDictionariesWindow();
             }
-
             else if (Utils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))
             {
                 Utils.SearchWithBrowser(_lastSelectedText);
             }
-
             else if (Utils.KeyGestureComparer(e, ConfigManager.InactiveLookupModeKeyGesture))
             {
                 ConfigManager.InactiveLookupMode = !ConfigManager.InactiveLookupMode;

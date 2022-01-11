@@ -48,7 +48,7 @@ namespace JapaneseLookup.Anki
             return await Send(req).ConfigureAwait(false);
         }
 
-        public static async Task<string> GetAudio(string foundSpelling, string reading)
+        public static async Task<byte[]> GetAudioFromJpod101(string foundSpelling, string reading)
         {
             Uri uri = new(
                 "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=" +
@@ -57,12 +57,8 @@ namespace JapaneseLookup.Anki
                 reading
             );
             var getResponse = await ConfigManager.Client.GetAsync(uri).ConfigureAwait(false);
-
-            //  var filename = "JL_audio" + foundSpelling + "_" + reading + ".mp3";
-
-            var base64 = Convert.ToBase64String(await getResponse.Content.ReadAsByteArrayAsync().ConfigureAwait(false));
-            return base64;
-            //  await StoreMediaFile(filename, data);
+            // todo mining storemediafile thingy
+            return await getResponse.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
         }
 
         public static async Task<bool> CheckAudioField(long noteId, string audioFieldName)

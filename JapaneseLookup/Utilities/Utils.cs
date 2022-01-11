@@ -18,6 +18,7 @@ using JapaneseLookup.Dicts;
 using System.IO;
 using JapaneseLookup.Abstract;
 using System.Diagnostics;
+using System.Security.Cryptography;
 
 namespace JapaneseLookup.Utilities
 {
@@ -335,6 +336,14 @@ namespace JapaneseLookup.Utilities
             if (selectedText.Length > 0)
                 Process.Start(new ProcessStartInfo("cmd",
                     $"/c start https://www.google.com/search?q={selectedText}^&hl=ja") { CreateNoWindow = true });
+        }
+
+        public static string GetMd5String(byte[] b)
+        {
+            byte[] hash = ((HashAlgorithm)CryptoConfig.CreateFromName("MD5"))!.ComputeHash(b);
+            string encoded = BitConverter.ToString(hash).Replace("-", string.Empty).ToLower();
+
+            return encoded;
         }
     }
 }

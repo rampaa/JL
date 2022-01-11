@@ -19,7 +19,8 @@ namespace JapaneseLookup
 
         // private static readonly Stopwatch timer = new();
 
-        public static readonly HttpClient Client = new();
+        private static readonly HttpClientHandler _httpClientHandler = new() { UseProxy = false };
+        public static readonly HttpClient Client = new(_httpClientHandler);
 
         public static readonly Dictionary<string, Dict> BuiltInDicts =
             new()

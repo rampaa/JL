@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime;
 using System.Text.RegularExpressions;
+using JapaneseLookup.Anki;
 
 namespace JapaneseLookup.Utilities
 {
@@ -74,17 +75,14 @@ namespace JapaneseLookup.Utilities
                             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
                         }).ContinueWith(async _ =>
                         {
-                            // initialize ConfigManager.Client
-                            if (!Debugger.IsAttached)
+                            // initialize ConfigManager.Client and audio stuff
+                            try
                             {
-                                try
-                                {
-                                    await ConfigManager.Client.GetAsync(ConfigManager.AnkiConnectUri);
-                                }
-                                catch (Exception)
-                                {
-                                    // ignored
-                                }
+                                await PopupWindowUtilities.PlayAudio("猫", "ねこ", 0).ConfigureAwait(false);
+                            }
+                            catch (Exception)
+                            {
+                                // ignored
                             }
                         }).ConfigureAwait(false);
                     }
