@@ -88,6 +88,7 @@ namespace JapaneseLookup.GUI
                 {
                     Width = 13,
                     Text = "❌",
+                    ToolTip = "Invalid Path",
                     Foreground = Brushes.Crimson,
                     Margin = new Thickness(1),
                     VerticalAlignment = VerticalAlignment.Center,

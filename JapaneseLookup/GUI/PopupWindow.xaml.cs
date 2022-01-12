@@ -121,6 +121,7 @@ namespace JapaneseLookup.GUI
                 if (text == LastText) return;
                 LastText = text;
 
+                ResultStackPanels.Clear();
                 var lookupResults = Lookup.Lookup.LookupText(text);
 
                 if (lookupResults != null && lookupResults.Any())
@@ -133,10 +134,7 @@ namespace JapaneseLookup.GUI
                         tb.ScrollToVerticalOffset(verticalOffset);
                     }
 
-                    ResultStackPanels.Clear();
-
                     Visibility = Visibility.Visible;
-
                     Activate();
                     Focus();
 
@@ -243,13 +241,13 @@ namespace JapaneseLookup.GUI
 
             for (int index = 0; index < resultCount; index++)
             {
-                if (!generateAllResults && index > 0)
-                {
-                    PopupListBox.UpdateLayout();
-
-                    if (PopupListBox.ActualHeight >= MaxHeight - 30)
-                        return;
-                }
+                // if (!generateAllResults && index > 0)
+                // {
+                //     PopupListBox.UpdateLayout();
+                //
+                //     if (PopupListBox.ActualHeight >= MaxHeight - 30)
+                //         return;
+                // }
 
                 ResultStackPanels.Add(MakeResultStackPanel(_lastLookupResults[index], index, resultCount));
             }
@@ -538,7 +536,7 @@ namespace JapaneseLookup.GUI
                         textBlockPOrthographyInfo = new TextBlock
                         {
                             Name = key.ToString(),
-                            Text = "(" + string.Join(",", value) + ")",
+                            Text = $"({string.Join(",", value)})",
                             Foreground = ConfigManager.PrimarySpellingColor,
                             FontSize = ConfigManager.PrimarySpellingFontSize,
                             Margin = new Thickness(5, 0, 0, 0),
@@ -614,16 +612,23 @@ namespace JapaneseLookup.GUI
                         break;
 
                     case LookupResult.Grade:
-                        var gradeString = "";
-                        var gradeInt = Convert.ToInt32(value[0]);
-                        gradeString = gradeInt switch
+                        string gradeString = "";
+                        int gradeInt = Convert.ToInt32(value[0]);
+                        switch (gradeInt)
                         {
-                            0 => "Hyougai",
-                            <= 6 => $"Kyouiku ({gradeInt})",
-                            8 => $"Jouyou ({gradeInt})",
-                            <= 10 => $"Jinmeiyou ({gradeInt})",
-                            _ => gradeString
-                        };
+                            case 0:
+                                gradeString = "Hyougai";
+                                break;
+                            case <= 6:
+                                gradeString = $"{gradeInt} (Kyouiku)";
+                                break;
+                            case 8:
+                                gradeString = $"{gradeInt} (Jouyou)";
+                                break;
+                            case <= 10:
+                                gradeString = $"{gradeInt} (Jinmeiyou)";
+                                break;
+                        }
 
                         textBlockGrade = new TextBlock
                         {
@@ -656,8 +661,7 @@ namespace JapaneseLookup.GUI
             UIElement[] babies =
             {
                 textBlockFoundSpelling, textBlockPOrthographyInfo, uiElementReadings, uiElementAlternativeSpellings,
-                textBlockProcess, textBlockFoundForm, textBlockEdictID, // undisplayed, for mining
-                textBlockFrequency, textBlockDictType
+                textBlockProcess, textBlockFoundForm, textBlockEdictID, textBlockFrequency, textBlockDictType
             };
             foreach (UIElement baby in babies)
             {
@@ -682,6 +686,10 @@ namespace JapaneseLookup.GUI
                 else if (baby is TextBox textBox)
                 {
                     if (textBox == null) continue;
+
+                    // common emptiness check
+                    if (textBox.Text == "")
+                        continue;
 
                     top.Children.Add(baby);
                 }
