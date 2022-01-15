@@ -10,7 +10,7 @@ namespace JL
         internal static class NativeMethods
         {
             // See http://msdn.microsoft.com/en-us/library/ms649021%28v=vs.85%29.aspx
-            public const int WmClipboardUpdate = 0x031D;
+            public const int WM_CLIPBOARDUPDATE = 0x031D;
 
             // See http://msdn.microsoft.com/en-us/library/ms632599%28VS.85%29.aspx#message_only
             [DllImport("user32.dll", SetLastError = true)]
@@ -43,17 +43,15 @@ namespace JL
             ClipboardChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        private static readonly IntPtr WndProcSuccess = IntPtr.Zero;
-
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if (msg == NativeMethods.WmClipboardUpdate)
+            if (msg == NativeMethods.WM_CLIPBOARDUPDATE)
             {
                 OnClipboardChanged();
                 handled = true;
             }
 
-            return WndProcSuccess;
+            return IntPtr.Zero;
         }
     }
 }

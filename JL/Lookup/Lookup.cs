@@ -97,7 +97,7 @@ namespace JL.Lookup
                         customNameResults = GetCustomNameResults(text, textInHiraganaList, dictType);
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        throw new ArgumentOutOfRangeException(null, "Invalid DictType");
                 }
             }
 

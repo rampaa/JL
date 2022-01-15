@@ -326,7 +326,7 @@ namespace JL.GUI
                     BrowseForDictionaryFolder(selectedDictType);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(null, "Invalid DictType");
             }
         }
 

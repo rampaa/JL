@@ -656,7 +656,7 @@ namespace JL.GUI
                         break;
 
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        throw new ArgumentOutOfRangeException(null, "Invalid LookupResult type");
                 }
             }
 
@@ -869,7 +869,7 @@ namespace JL.GUI
                             miningParams.Readings += textBlock.Text + " | ";
                             break;
                         default:
-                            throw new ArgumentOutOfRangeException();
+                            throw new ArgumentOutOfRangeException(null, "Invalid LookupResult type");
                     }
                 }
             }
