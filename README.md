@@ -1,5 +1,5 @@
 # JL
-JL is a program for looking up Japanese words and expressions. It can also be used for word/sentence mining. Inspired by [Nazeka](https://github.com/wareya/nazeka) and [Chiitrans Lite](https://github.com/alexbft/chiitrans).
+JL is a program for looking up Japanese words and expressions. Inspired by [Nazeka](https://github.com/wareya/nazeka) and [Chiitrans Lite](https://github.com/alexbft/chiitrans).
 
 Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer the x86 version for 50-80% less memory usage.
 
@@ -11,6 +11,7 @@ Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer
 * Highly customizable
 * Anki mining
 * Pass-through mode 
+* Remembers last window position
 
 ## Supported dictionaries
 
