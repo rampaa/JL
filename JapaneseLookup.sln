@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JapaneseLookup", "JapaneseLookup\JapaneseLookup.csproj", "{3FF98028-42A1-4FB8-BC28-FCBBEE92A053}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JL", "JL\JL.csproj", "{3FF98028-42A1-4FB8-BC28-FCBBEE92A053}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JapaneseLookupTests", "JapaneseLookupTests\JapaneseLookupTests.csproj", "{7B653E95-D5AB-4A70-9A77-AB2BF7419FDC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLTests", "JLTests\JLTests.csproj", "{7B653E95-D5AB-4A70-9A77-AB2BF7419FDC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
