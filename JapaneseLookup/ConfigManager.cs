@@ -70,6 +70,7 @@ namespace JapaneseLookup
         public static KeyGesture SteppedBacklogForwardsKeyGesture { get; set; } = new(Key.Right, ModifierKeys.Windows);
         public static KeyGesture InactiveLookupModeKeyGesture { get; set; } = new(Key.Q, ModifierKeys.Windows);
         public static KeyGesture MotivationKeyGesture { get; set; } = new(Key.O, ModifierKeys.Windows);
+        public static KeyGesture ClosePopupKeyGesture { get; set; } = new(Key.Escape, ModifierKeys.Windows);
         public static ModifierKeys LookupKey { get; set; } = ModifierKeys.Alt;
         public static int PrimarySpellingFontSize { get; set; } = 21;
         public static int ReadingsFontSize { get; set; } = 19;
@@ -320,6 +321,8 @@ namespace JapaneseLookup
             MotivationKeyGesture =
                 Utils.KeyGestureSetter("MotivationKeyGesture", MotivationKeyGesture);
 
+            ClosePopupKeyGesture = Utils.KeyGestureSetter("ClosePopupKeyGesture", ClosePopupKeyGesture);
+
             if (Utils.KeyGestureToString(ShowAddNameWindowKeyGesture) == "None")
                 MainWindow.Instance.AddNameButton.InputGestureText = "";
             else
@@ -450,6 +453,8 @@ namespace JapaneseLookup
                 Utils.KeyGestureToString(InactiveLookupModeKeyGesture);
             preferenceWindow.MotivationKeyGestureTextBox.Text =
                 Utils.KeyGestureToString(MotivationKeyGesture);
+            preferenceWindow.ClosePopupKeyGestureTextBox.Text =
+                Utils.KeyGestureToString(ClosePopupKeyGesture);
 
             preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
             preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri;
@@ -549,6 +554,8 @@ namespace JapaneseLookup
                 preferenceWindow.InactiveLookupModeKeyGestureTextBox.Text);
             Utils.KeyGestureSaver("MotivationKeyGesture",
                 preferenceWindow.MotivationKeyGestureTextBox.Text);
+            Utils.KeyGestureSaver("ClosePopupKeyGesture",
+                preferenceWindow.ClosePopupKeyGestureTextBox.Text);
 
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 

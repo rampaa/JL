@@ -190,7 +190,8 @@ namespace JapaneseLookup.GUI
                     var textBlockFieldName = new TextBlock { Text = fieldName };
                     var comboBoxJLFields = new System.Windows.Controls.ComboBox
                     {
-                        ItemsSource = Enum.GetValues(typeof(JLField)), SelectedItem = jlField
+                        ItemsSource = Enum.GetValues(typeof(JLField)),
+                        SelectedItem = jlField
                     };
 
                     stackPanel.Children.Add(textBlockFieldName);
@@ -356,6 +357,11 @@ namespace JapaneseLookup.GUI
         private void ShowManageDictionariesWindowKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
         {
             ShowManageDictionariesWindowKeyGestureTextBox.Text = "None";
+        }
+
+        private void ClosePopupKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            ClosePopupKeyGestureTextBox.Text = "None";
         }
 
         private void MotivationKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)

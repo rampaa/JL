@@ -551,12 +551,22 @@
                         </DockPanel>
 
                         <DockPanel>
-                        <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
-                                Click="MotivationKeyGestureTextBoxButton_Click" />
-                        <TextBox x:Name="MotivationKeyGestureTextBox" AutomationProperties.Name=""
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                Click="ClosePopupKeyGestureTextBoxButton_Click" />
+                            <TextBox x:Name="ClosePopupKeyGestureTextBox" AutomationProperties.Name=""
                                  PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                  HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                        <TextBlock Text="???" TextWrapping="Wrap" HorizontalAlignment="Left"
+                            <TextBlock Text="Close popup" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                   VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                Click="MotivationKeyGestureTextBoxButton_Click" />
+                            <TextBox x:Name="MotivationKeyGestureTextBox" AutomationProperties.Name=""
+                                 PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                 HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="???" TextWrapping="Wrap" HorizontalAlignment="Left"
                                    VerticalAlignment="Center" />
                         </DockPanel>
                     </StackPanel>

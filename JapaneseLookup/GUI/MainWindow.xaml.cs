@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -237,6 +238,13 @@ namespace JapaneseLookup.GUI
             else if (Utils.KeyGestureComparer(e, ConfigManager.MotivationKeyGesture))
             {
                 Task.Run(() => Utils.Motivate("Resources/Motivation"));
+            }
+
+            else if (Utils.KeyGestureComparer(e, ConfigManager.ClosePopupKeyGesture))
+            {
+                FirstPopupWindow.MiningMode = false;
+                FirstPopupWindow.PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                FirstPopupWindow.Hide();
             }
         }
 
