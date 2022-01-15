@@ -366,7 +366,7 @@ FodyWeavers.xsd
 
 .vscode
 
-/JapaneseLookup/App.config
-/JapaneseLookup/Resources/JMdict.xml
-/JapaneseLookup/Resources/JMnedict.xml
-/JapaneseLookup/Resources/kanjidic2.xml
+/JL/App.config
+/JL/Resources/JMdict.xml
+/JL/Resources/JMnedict.xml
+/JL/Resources/kanjidic2.xml
