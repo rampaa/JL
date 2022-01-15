@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using JapaneseLookup.Anki;
-using NAudio.Wave;
 
 namespace JapaneseLookup.Utilities
 {
@@ -179,9 +177,9 @@ namespace JapaneseLookup.Utilities
             return sentence;
         }
 
-        public static async Task PlayAudio(string foundSpelling, string reading, float volume = 1)
+        public static async Task GetAndPlayAudioFromJpod101(string foundSpelling, string reading, float volume)
         {
-            Utils.Logger.Information("Attempting to play audio: " + foundSpelling + " " + reading);
+            Utils.Logger.Information("Attempting to play audio from jpod101: " + foundSpelling + " " + reading);
 
             if (string.IsNullOrEmpty(reading))
                 reading = foundSpelling;
@@ -193,14 +191,7 @@ namespace JapaneseLookup.Utilities
                 return;
             }
 
-            var waveOut = new WaveOut { Volume = volume };
-            waveOut.Init(new Mp3FileReader(new MemoryStream(sound)));
-            waveOut.Play();
-
-            while (waveOut.PlaybackState != PlaybackState.Stopped)
-            {
-                // suppress GC until audio playback is over
-            }
+            Utils.PlayAudio(sound, volume);
         }
     }
 }

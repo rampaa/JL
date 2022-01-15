@@ -23,6 +23,30 @@ namespace JapaneseLookup
 
         public static readonly Dictionary<DictType, Dict> Dicts = new();
 
+        public static readonly Dictionary<string, Dict> BuiltInDicts =
+            new()
+            {
+                { "JMdict", new Dict(DictType.JMdict, "Resources\\JMdict.xml", true, 0) },
+                { "JMnedict", new Dict(DictType.JMnedict, "Resources\\JMnedict.xml", true, 1) },
+                { "Kanjidic", new Dict(DictType.Kanjidic, "Resources\\kanjidic2.xml", true, 2) },
+                {
+                    "CustomWordDictionary",
+                    new Dict(DictType.CustomWordDictionary, "Resources\\custom_words.txt", true, 3)
+                },
+                {
+                    "CustomNameDictionary",
+                    new Dict(DictType.CustomNameDictionary, "Resources\\custom_names.txt", true, 4)
+                }
+            };
+
+        public static readonly Dictionary<string, string> FrequencyLists = new()
+        {
+            { "VN", "Resources/freqlist_vns.json" },
+            { "Novel", "Resources/freqlist_novels.json" },
+            { "Narou", "Resources/freqlist_narou.json" },
+            { "None", "" }
+        };
+
         public static async Task LoadDictionaries()
         {
             ConfigManager.Ready = false;
@@ -280,7 +304,7 @@ namespace JapaneseLookup
                     {
                         FrequencyLoader.BuildFreqDict(await FrequencyLoader
                             .LoadJson(Path.Join(ConfigManager.ApplicationPath,
-                                ConfigManager.FrequencyLists[ConfigManager.FrequencyListName]))
+                                Storage.FrequencyLists[ConfigManager.FrequencyListName]))
                             .ConfigureAwait(false));
                     });
                 }

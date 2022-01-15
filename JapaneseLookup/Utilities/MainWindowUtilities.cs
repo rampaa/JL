@@ -78,7 +78,8 @@ namespace JapaneseLookup.Utilities
                             // initialize ConfigManager.Client and audio stuff
                             try
                             {
-                                await PopupWindowUtilities.PlayAudio("猫", "ねこ", 0).ConfigureAwait(false);
+                                await PopupWindowUtilities.GetAndPlayAudioFromJpod101("猫", "ねこ", 0)
+                                    .ConfigureAwait(false);
                             }
                             catch (Exception)
                             {

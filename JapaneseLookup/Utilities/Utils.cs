@@ -19,6 +19,7 @@ using System.IO;
 using JapaneseLookup.Abstract;
 using System.Diagnostics;
 using System.Security.Cryptography;
+using NAudio.Wave;
 
 namespace JapaneseLookup.Utilities
 {
@@ -234,7 +235,7 @@ namespace JapaneseLookup.Utilities
             {
                 Directory.CreateDirectory(Path.Join(ConfigManager.ApplicationPath, "Config"));
                 File.WriteAllText(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json"),
-                    JsonSerializer.Serialize(ConfigManager.BuiltInDicts, jso));
+                    JsonSerializer.Serialize(Storage.BuiltInDicts, jso));
             }
             catch (Exception e)
             {
@@ -338,12 +339,60 @@ namespace JapaneseLookup.Utilities
                     $"/c start https://www.google.com/search?q={selectedText}^&hl=ja") { CreateNoWindow = true });
         }
 
-        public static string GetMd5String(byte[] b)
+        public static string GetMd5String(byte[] bytes)
         {
-            byte[] hash = ((HashAlgorithm)CryptoConfig.CreateFromName("MD5"))!.ComputeHash(b);
+            byte[] hash = ((HashAlgorithm)CryptoConfig.CreateFromName("MD5"))!.ComputeHash(bytes);
             string encoded = BitConverter.ToString(hash).Replace("-", string.Empty).ToLower();
 
             return encoded;
+        }
+
+        public static void PlayAudio(byte[] audio, float volume)
+        {
+            try
+            {
+                var waveOut = new WaveOut { Volume = volume };
+                waveOut.Init(new Mp3FileReader(new MemoryStream(audio)));
+                waveOut.Play();
+
+                while (waveOut.PlaybackState != PlaybackState.Stopped)
+                {
+                    // suppress GC until audio playback is over
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Error playing audio: " + audio);
+                Alert(AlertLevel.Error, "Error playing audio");
+            }
+        }
+
+        public static void Motivate(string motivationFolder)
+        {
+            try
+            {
+                var rand = new Random();
+
+                string[] filePaths = Directory.GetFiles(motivationFolder);
+                int numFiles = filePaths.Length;
+
+                if (numFiles == 0)
+                {
+                    Logger.Error("Motivation folder is empty!");
+                    Alert(AlertLevel.Error, "Motivation folder is empty!");
+                    return;
+                }
+
+                string randomFilePath = filePaths[rand.Next(numFiles)];
+                byte[] randomFile = File.ReadAllBytes(randomFilePath);
+
+                PlayAudio(randomFile, 1);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Error motivating");
+                Alert(AlertLevel.Error, "Error motivating");
+            }
         }
     }
 }

@@ -22,30 +22,6 @@ namespace JapaneseLookup
         private static readonly HttpClientHandler _httpClientHandler = new() { UseProxy = false };
         public static readonly HttpClient Client = new(_httpClientHandler);
 
-        public static readonly Dictionary<string, Dict> BuiltInDicts =
-            new()
-            {
-                { "JMdict", new Dict(DictType.JMdict, "Resources\\JMdict.xml", true, 0) },
-                { "JMnedict", new Dict(DictType.JMnedict, "Resources\\JMnedict.xml", true, 1) },
-                { "Kanjidic", new Dict(DictType.Kanjidic, "Resources\\kanjidic2.xml", true, 2) },
-                {
-                    "CustomWordDictionary",
-                    new Dict(DictType.CustomWordDictionary, "Resources\\custom_words.txt", true, 3)
-                },
-                {
-                    "CustomNameDictionary",
-                    new Dict(DictType.CustomNameDictionary, "Resources\\custom_names.txt", true, 4)
-                }
-            };
-
-        public static readonly Dictionary<string, string> FrequencyLists = new()
-        {
-            { "VN", "Resources/freqlist_vns.json" },
-            { "Novel", "Resources/freqlist_novels.json" },
-            { "Narou", "Resources/freqlist_narou.json" },
-            { "None", "" }
-        };
-
         public static string AnkiConnectUri { get; set; } = "http://localhost:8765";
         public static int MaxSearchLength { get; set; } = 37;
         public static string FrequencyListName { get; set; } = "VN";
@@ -63,7 +39,7 @@ namespace JapaneseLookup
         public static int LookupRate { get; set; } = 0;
 
         public static bool PopupDynamicHeight { get; set; } = true;
-        public static bool PopupDynamicWidth { get; set; } = false;
+        public static bool PopupDynamicWidth { get; set; } = true;
 
         public static Brush MainWindowTextColor { get; set; } = Brushes.White;
         public static Brush MainWindowBacklogTextColor { get; set; } = Brushes.Bisque;
@@ -93,6 +69,7 @@ namespace JapaneseLookup
         public static KeyGesture SteppedBacklogBackwardsKeyGesture { get; set; } = new(Key.Left, ModifierKeys.Windows);
         public static KeyGesture SteppedBacklogForwardsKeyGesture { get; set; } = new(Key.Right, ModifierKeys.Windows);
         public static KeyGesture InactiveLookupModeKeyGesture { get; set; } = new(Key.Q, ModifierKeys.Windows);
+        public static KeyGesture MotivationKeyGesture { get; set; } = new(Key.O, ModifierKeys.Windows);
         public static ModifierKeys LookupKey { get; set; } = ModifierKeys.Alt;
         public static int PrimarySpellingFontSize { get; set; } = 21;
         public static int ReadingsFontSize { get; set; } = 19;
@@ -340,6 +317,8 @@ namespace JapaneseLookup
                 Utils.KeyGestureSetter("SteppedBacklogForwardsKeyGesture", SteppedBacklogForwardsKeyGesture);
             InactiveLookupModeKeyGesture =
                 Utils.KeyGestureSetter("InactiveLookupModeKeyGesture", InactiveLookupModeKeyGesture);
+            MotivationKeyGesture =
+                Utils.KeyGestureSetter("MotivationKeyGesture", MotivationKeyGesture);
 
             if (Utils.KeyGestureToString(ShowAddNameWindowKeyGesture) == "None")
                 MainWindow.Instance.AddNameButton.InputGestureText = "";
@@ -469,6 +448,8 @@ namespace JapaneseLookup
                 Utils.KeyGestureToString(SteppedBacklogForwardsKeyGesture);
             preferenceWindow.InactiveLookupModeKeyGestureTextBox.Text =
                 Utils.KeyGestureToString(InactiveLookupModeKeyGesture);
+            preferenceWindow.MotivationKeyGestureTextBox.Text =
+                Utils.KeyGestureToString(MotivationKeyGesture);
 
             preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
             preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri;
@@ -477,7 +458,7 @@ namespace JapaneseLookup
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
             preferenceWindow.KanjiModeCheckBox.IsChecked = KanjiMode;
             preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
-            preferenceWindow.FrequencyListComboBox.ItemsSource = FrequencyLists.Keys;
+            preferenceWindow.FrequencyListComboBox.ItemsSource = Storage.FrequencyLists.Keys;
             preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyListName;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
 
@@ -566,6 +547,8 @@ namespace JapaneseLookup
                 preferenceWindow.SteppedBacklogForwardsKeyGestureTextBox.Text);
             Utils.KeyGestureSaver("InactiveLookupModeKeyGesture",
                 preferenceWindow.InactiveLookupModeKeyGestureTextBox.Text);
+            Utils.KeyGestureSaver("MotivationKeyGesture",
+                preferenceWindow.MotivationKeyGestureTextBox.Text);
 
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 

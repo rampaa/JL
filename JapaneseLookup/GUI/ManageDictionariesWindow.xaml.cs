@@ -145,7 +145,7 @@ namespace JapaneseLookup.GUI
                     Foreground = Brushes.White,
                     Background = Brushes.Red,
                     BorderThickness = new Thickness(1),
-                    Visibility = ConfigManager.BuiltInDicts.Values
+                    Visibility = Storage.BuiltInDicts.Values
                         .Select(t => t.Type).ToList().Contains(dict.Type)
                         ? Visibility.Collapsed
                         : Visibility.Visible,

@@ -949,7 +949,7 @@ namespace JapaneseLookup.GUI
                     }
                 }
 
-                Task.Run(() => PopupWindowUtilities.PlayAudio(foundSpelling, reading));
+                Task.Run(() => PopupWindowUtilities.GetAndPlayAudioFromJpod101(foundSpelling, reading, 1));
             }
             else if (e.Key == Key.Escape)
             {
@@ -990,6 +990,10 @@ namespace JapaneseLookup.GUI
             else if (Utils.KeyGestureComparer(e, ConfigManager.InactiveLookupModeKeyGesture))
             {
                 ConfigManager.InactiveLookupMode = !ConfigManager.InactiveLookupMode;
+            }
+            else if (Utils.KeyGestureComparer(e, ConfigManager.MotivationKeyGesture))
+            {
+                Task.Run(() => Utils.Motivate("Resources/Motivation"));
             }
         }
 

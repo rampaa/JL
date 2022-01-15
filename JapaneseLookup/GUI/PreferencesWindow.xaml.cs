@@ -353,11 +353,16 @@ namespace JapaneseLookup.GUI
             InactiveLookupModeKeyGestureTextBox.Text = "None";
         }
 
-        #endregion
-
         private void ShowManageDictionariesWindowKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
         {
             ShowManageDictionariesWindowKeyGestureTextBox.Text = "None";
         }
+
+        private void MotivationKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            MotivationKeyGestureTextBox.Text = "None";
+        }
+
+        #endregion
     }
 }

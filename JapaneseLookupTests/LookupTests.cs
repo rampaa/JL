@@ -23,7 +23,7 @@ namespace JapaneseLookupTests
         [OneTimeSetUp]
         public void ClassInit()
         {
-            string jmdictPath = ConfigManager.BuiltInDicts["JMdict"].Path;
+            string jmdictPath = Storage.BuiltInDicts["JMdict"].Path;
 
             Storage.Dicts.Add(DictType.JMdict, new Dict(DictType.JMdict, jmdictPath, true, 0));
             Storage.Dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();
