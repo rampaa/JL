@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 
-namespace JapaneseLookup.Dicts.EDICT.JMdict
+namespace JL.Dicts.EDICT.JMdict
 {
     internal static class JMdictBuilder
     {

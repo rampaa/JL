@@ -1,8 +1,4 @@
-﻿using HandyControl.Controls;
-using HandyControl.Tools;
-using JapaneseLookup.Anki;
-using JapaneseLookup.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,14 +6,17 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
+using HandyControl.Controls;
+using HandyControl.Tools;
+using JL.Anki;
+using JL.Utilities;
 using Button = System.Windows.Controls.Button;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using TextBox = System.Windows.Controls.TextBox;
 
-namespace JapaneseLookup.GUI
+namespace JL.GUI
 {
     /// <summary>
     /// Interaction logic for PreferenceWindow.xaml
@@ -162,7 +161,7 @@ namespace JapaneseLookup.GUI
         {
             try
             {
-                string? modelName = MiningSetupComboBoxModelNames.SelectionBoxItem.ToString();
+                string modelName = MiningSetupComboBoxModelNames.SelectionBoxItem.ToString();
                 var fieldNames =
                     JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelFieldNames(modelName)).Result
                         .ToString()!);
@@ -210,8 +209,8 @@ namespace JapaneseLookup.GUI
         {
             try
             {
-                string? deckName = MiningSetupComboBoxDeckNames.SelectionBoxItem.ToString();
-                string? modelName = MiningSetupComboBoxModelNames.SelectionBoxItem.ToString();
+                string deckName = MiningSetupComboBoxDeckNames.SelectionBoxItem.ToString();
+                string modelName = MiningSetupComboBoxModelNames.SelectionBoxItem.ToString();
 
                 var dict = new Dictionary<string, JLField>();
                 foreach (StackPanel stackPanel in MiningSetupStackPanelFields.Children)

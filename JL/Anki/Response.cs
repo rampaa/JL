@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace JapaneseLookup.Anki
+namespace JL.Anki
 {
     public class Response
     {

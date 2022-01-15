@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace JapaneseLookup.Dicts.EDICT.JMnedict
+namespace JL.Dicts.EDICT.JMnedict
 {
     public static class JMnedictBuilder
     {

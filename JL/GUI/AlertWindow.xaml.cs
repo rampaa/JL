@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Media;
-using JapaneseLookup.Utilities;
+using JL.Utilities;
 
-namespace JapaneseLookup.GUI
+namespace JL.GUI
 {
     public partial class AlertWindow : Window
     {

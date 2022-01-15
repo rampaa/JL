@@ -9,7 +9,6 @@
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 		<ApplicationIcon>icon.ico</ApplicationIcon>
 		<AssemblyName>JL</AssemblyName>
-		<RootNamespace>JapaneseLookup</RootNamespace>
 		<RollForward>Major</RollForward>
 	</PropertyGroup>
 

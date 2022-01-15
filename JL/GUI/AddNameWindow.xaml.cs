@@ -1,6 +1,4 @@
-﻿using JapaneseLookup.Dicts;
-using JapaneseLookup.Utilities;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,10 +6,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using JapaneseLookup.Dicts.CustomDict;
+using JL.Dicts;
+using JL.Dicts.CustomDict;
+using JL.Utilities;
 using Path = System.IO.Path;
 
-namespace JapaneseLookup.GUI
+namespace JL.GUI
 {
     /// <summary>
     /// Interaction logic for AddNameWindow.xaml

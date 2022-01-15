@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace JapaneseLookup.Dicts.CustomDict
+namespace JL.Dicts.CustomDict
 {
     public class CustomNameEntry : IResult
     {

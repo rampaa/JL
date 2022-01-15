@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 
-namespace JapaneseLookup.Dicts.CustomDict
+namespace JL.Dicts.CustomDict
 {
     public class CustomWordEntry : IResult
     {

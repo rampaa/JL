@@ -1,13 +1,13 @@
-﻿using JapaneseLookup.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using JL.Utilities;
 
-namespace JapaneseLookup.Anki
+namespace JL.Anki
 {
     public static class AnkiConnect
     {

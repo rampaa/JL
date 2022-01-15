@@ -1,15 +1,15 @@
-﻿using JapaneseLookup;
-using JapaneseLookup.Dicts;
-using JapaneseLookup.Lookup;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using JapaneseLookup.Dicts.EDICT;
-using JapaneseLookup.Dicts.EDICT.JMdict;
+using JL;
+using JL.Dicts;
+using JL.Dicts.EDICT;
+using JL.Dicts.EDICT.JMdict;
+using JL.Lookup;
+using NUnit.Framework;
 
-namespace JapaneseLookupTests
+namespace JLTests
 {
     [TestFixture]
     public class LookupTests

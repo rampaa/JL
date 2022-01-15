@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace JapaneseLookup.Dicts.CustomDict
+namespace JL.Dicts.CustomDict
 {
     public static class CustomNameLoader
     {

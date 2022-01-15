@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JapaneseLookup.Anki;
+using JL.Anki;
 
-namespace JapaneseLookup.Utilities
+namespace JL.Utilities
 {
     public static class PopupWindowUtilities
     {

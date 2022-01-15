@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace JapaneseLookup.Deconjugation
+namespace JL.Deconjugation
 {
     public class Form
     {

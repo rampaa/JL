@@ -7,10 +7,10 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using System.Threading.Tasks;
-using JapaneseLookup.Dicts;
-using JapaneseLookup.Dicts.EDICT.JMdict;
+using JL.Dicts;
+using JL.Dicts.EDICT.JMdict;
 
-namespace JapaneseLookup.PoS
+namespace JL.PoS
 {
     public static class JmdictWcLoader
     {

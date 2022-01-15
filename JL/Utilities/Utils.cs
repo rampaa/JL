@@ -1,26 +1,26 @@
-﻿using Serilog;
-using Serilog.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
-using JapaneseLookup.GUI;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using JapaneseLookup.Dicts;
-using System.IO;
-using System.Diagnostics;
-using System.Security.Cryptography;
+using JL.Dicts;
+using JL.GUI;
 using NAudio.Wave;
+using Serilog;
+using Serilog.Core;
 
-namespace JapaneseLookup.Utilities
+namespace JL.Utilities
 {
     public static class Utils
     {

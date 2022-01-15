@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
 
-namespace JapaneseLookup.Dicts.EDICT.KANJIDIC
+namespace JL.Dicts.EDICT.KANJIDIC
 {
     public static class KanjiInfoLoader
     {

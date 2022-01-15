@@ -1,8 +1,8 @@
-﻿using JapaneseLookup;
+﻿using System.Collections.Generic;
+using JL;
 using NUnit.Framework;
-using System.Collections.Generic;
 
-namespace JapaneseLookupTests
+namespace JLTests
 {
     [TestFixture]
     public class KanaTests

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime;
 using System.Text.RegularExpressions;
-using JapaneseLookup.Anki;
 
-namespace JapaneseLookup.Utilities
+namespace JL.Utilities
 {
     public static class MainWindowUtilities
     {

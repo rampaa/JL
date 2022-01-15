@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace JapaneseLookup.Dicts.EDICT
+namespace JL.Dicts.EDICT
 {
     public static class ResourceUpdater
     {

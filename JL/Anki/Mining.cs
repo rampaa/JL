@@ -1,10 +1,10 @@
-﻿using JapaneseLookup.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JL.Utilities;
 
-namespace JapaneseLookup.Anki
+namespace JL.Anki
 {
     public static class Mining
     {

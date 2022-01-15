@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Windows.Controls;
 
-namespace JapaneseLookup.Utilities
+namespace JL.Utilities
 {
     // Creating a UI control within ConfigManager makes half of the tests fail
     // Because apparently UI controls can only be created in a UI thread and tests don't like that.

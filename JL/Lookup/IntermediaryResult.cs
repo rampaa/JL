@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using JapaneseLookup.Dicts;
+using JL.Dicts;
 
-namespace JapaneseLookup.Lookup
+namespace JL.Lookup
 {
     public class IntermediaryResult
     {

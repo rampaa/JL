@@ -1,4 +1,4 @@
-﻿namespace JapaneseLookup.Utilities
+﻿namespace JL.Utilities
 {
     public enum AlertLevel
     {

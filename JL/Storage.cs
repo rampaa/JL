@@ -1,20 +1,20 @@
-﻿using JapaneseLookup.Dicts;
-using JapaneseLookup.Frequency;
-using JapaneseLookup.PoS;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime;
 using System.Threading.Tasks;
-using JapaneseLookup.Dicts.CustomDict;
-using JapaneseLookup.Dicts.EDICT;
-using JapaneseLookup.Dicts.EDICT.JMdict;
-using JapaneseLookup.Dicts.EDICT.JMnedict;
-using JapaneseLookup.Dicts.EDICT.KANJIDIC;
-using JapaneseLookup.Dicts.EPWING;
+using JL.Dicts;
+using JL.Dicts.CustomDict;
+using JL.Dicts.EDICT;
+using JL.Dicts.EDICT.JMdict;
+using JL.Dicts.EDICT.JMnedict;
+using JL.Dicts.EDICT.KANJIDIC;
+using JL.Dicts.EPWING;
+using JL.Frequency;
+using JL.PoS;
 
-namespace JapaneseLookup
+namespace JL
 {
     public class Storage
     {

@@ -1,10 +1,9 @@
-﻿<Window x:Class="JapaneseLookup.GUI.PreferencesWindow"
+﻿<Window x:Class="JL.GUI.PreferencesWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:hc="https://handyorg.github.io/handycontrol"
-        xmlns:local="clr-namespace:JapaneseLookup.GUI"
         mc:Ignorable="d"
         Title="Preferences" Height="580" Width="666" Topmost="True" Closing="Window_Closing"
         SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Background="Black">

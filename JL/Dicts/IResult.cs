@@ -1,4 +1,4 @@
-﻿namespace JapaneseLookup.Dicts
+﻿namespace JL.Dicts
 {
     public interface IResult
     {

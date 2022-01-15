@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace JapaneseLookup.Dicts
+namespace JL.Dicts
 {
     public class Dict
     {

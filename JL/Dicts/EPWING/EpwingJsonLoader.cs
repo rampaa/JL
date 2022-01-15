@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using JapaneseLookup.Utilities;
+using JL.Utilities;
 
-namespace JapaneseLookup.Dicts.EPWING
+namespace JL.Dicts.EPWING
 {
     public static class EpwingJsonLoader
     {

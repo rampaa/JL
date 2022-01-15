@@ -1,12 +1,12 @@
-﻿using JapaneseLookup.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using JL.Utilities;
 
-namespace JapaneseLookup.Anki
+namespace JL.Anki
 {
     public class AnkiConfig
     {

@@ -1,13 +1,13 @@
-﻿using JapaneseLookup.Utilities;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using JL.Utilities;
 
-namespace JapaneseLookup.GUI
+namespace JL.GUI
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

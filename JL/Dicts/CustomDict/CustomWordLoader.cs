@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JapaneseLookup.Dicts.CustomDict
+namespace JL.Dicts.CustomDict
 {
     public static class CustomWordLoader
     {

@@ -1,6 +1,4 @@
-﻿using JapaneseLookup.Dicts;
-using JapaneseLookup.PoS;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -12,10 +10,13 @@ using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
-using JapaneseLookup.Dicts.EDICT;
-using JapaneseLookup.Dicts.EDICT.JMdict;
-using JapaneseLookup.Dicts.EDICT.JMnedict;
-using JapaneseLookup.Dicts.EDICT.KANJIDIC;
+using JL.Dicts;
+using JL.Dicts.EDICT;
+using JL.Dicts.EDICT.JMdict;
+using JL.Dicts.EDICT.JMnedict;
+using JL.Dicts.EDICT.KANJIDIC;
+using JL.PoS;
+using JL.Utilities;
 using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
 using Cursors = System.Windows.Input.Cursors;
@@ -23,9 +24,8 @@ using MessageBoxOptions = System.Windows.MessageBoxOptions;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Path = System.IO.Path;
 using HorizontalAlignment = System.Windows.HorizontalAlignment;
-using JapaneseLookup.Utilities;
 
-namespace JapaneseLookup.GUI
+namespace JL.GUI
 {
     /// <summary>
     /// Interaction logic for ManageDictionariesWindow.xaml

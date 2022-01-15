@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 
-namespace JapaneseLookup.Dicts.EPWING
+namespace JL.Dicts.EPWING
 {
     public class EpwingResult : IResult
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace JapaneseLookup.Dicts.EDICT.KANJIDIC
+namespace JL.Dicts.EDICT.KANJIDIC
 {
     public class KanjiResult : IResult
     {

@@ -1,4 +1,4 @@
-﻿namespace JapaneseLookup.Frequency
+﻿namespace JL.Frequency
 {
     public class FrequencyEntry
     {

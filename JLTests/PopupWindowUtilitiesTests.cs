@@ -1,7 +1,7 @@
-﻿using JapaneseLookup.Utilities;
+﻿using JL.Utilities;
 using NUnit.Framework;
 
-namespace JapaneseLookupTests
+namespace JLTests
 {
     [TestFixture]
     public class PopupWindowUtilitiesTests

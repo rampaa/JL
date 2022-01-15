@@ -1,8 +1,4 @@
-﻿using JapaneseLookup.Dicts;
-using JapaneseLookup.GUI;
-using JapaneseLookup.Utilities;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -10,8 +6,10 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
+using JL.GUI;
+using JL.Utilities;
 
-namespace JapaneseLookup
+namespace JL
 {
     public static class ConfigManager
     {

@@ -1,4 +1,4 @@
-﻿namespace JapaneseLookup.Deconjugation
+﻿namespace JL.Deconjugation
 {
     public readonly struct VirtualRule
     {

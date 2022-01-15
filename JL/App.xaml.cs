@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace JapaneseLookup
+namespace JL
 {
     /// <summary>
     /// Interaction logic for App.xaml

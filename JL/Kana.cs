@@ -1,9 +1,9 @@
-﻿using JapaneseLookup.Utilities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using JL.Utilities;
 
-namespace JapaneseLookup
+namespace JL
 {
     public static class Kana
     {

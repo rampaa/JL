@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
 
-namespace JapaneseLookup.Dicts.EDICT.JMdict
+namespace JL.Dicts.EDICT.JMdict
 {
     public static class JMdictLoader
     {

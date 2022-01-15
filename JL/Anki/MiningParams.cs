@@ -1,4 +1,4 @@
-﻿namespace JapaneseLookup.Anki
+﻿namespace JL.Anki
 {
     public struct MiningParams
     {

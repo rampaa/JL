@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text.Json;
-using JapaneseLookup.Deconjugation;
+using JL.Deconjugation;
 using NUnit.Framework;
 
-namespace JapaneseLookupTests.Deconjugation
+namespace JLTests.Deconjugation
 {
     [TestFixture]
     public class DeconjugatorTests

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace JapaneseLookup.PoS
+namespace JL.PoS
 {
     public class JmdictWc
     {

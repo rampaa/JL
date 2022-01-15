@@ -3,8 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:JapaneseLookup.GUI"
-    xmlns:hc="https://handyorg.github.io/handycontrol" x:Class="JapaneseLookup.GUI.AddNameWindow"
+    xmlns:hc="https://handyorg.github.io/handycontrol" x:Class="JL.GUI.AddNameWindow"
     mc:Ignorable="d"
     Title="Add Name" Height="350" Width="400" Topmost="True" SizeToContent="Height" ResizeMode="NoResize"
     MaxHeight="600" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded">

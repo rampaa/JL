@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
-using System.Runtime.InteropServices;
 
-namespace JapaneseLookup
+namespace JL
 {
     public class ClipboardManager
     {

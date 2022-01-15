@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace JapaneseLookup.Dicts.EDICT.JMdict
+namespace JL.Dicts.EDICT.JMdict
 {
     public class KEle
     {

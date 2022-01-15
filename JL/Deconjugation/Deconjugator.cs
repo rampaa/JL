@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using Caching;
 
-namespace JapaneseLookup.Deconjugation
+namespace JL.Deconjugation
 {
     // translated from https://github.com/wareya/nazeka/blob/master/background-script.js
     public static class Deconjugator

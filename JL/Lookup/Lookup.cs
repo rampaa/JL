@@ -1,20 +1,20 @@
-using JapaneseLookup.Deconjugation;
-using JapaneseLookup.Dicts;
-using JapaneseLookup.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using JapaneseLookup.Dicts.CustomDict;
-using JapaneseLookup.Dicts.EDICT.JMdict;
-using JapaneseLookup.Dicts.EDICT.JMnedict;
-using JapaneseLookup.Dicts.EDICT.KANJIDIC;
-using JapaneseLookup.Dicts.EPWING;
-using JapaneseLookup.Frequency;
-using JapaneseLookup.PoS;
+using JL.Deconjugation;
+using JL.Dicts;
+using JL.Dicts.CustomDict;
+using JL.Dicts.EDICT.JMdict;
+using JL.Dicts.EDICT.JMnedict;
+using JL.Dicts.EDICT.KANJIDIC;
+using JL.Dicts.EPWING;
+using JL.Frequency;
+using JL.PoS;
+using JL.Utilities;
 
-namespace JapaneseLookup.Lookup
+namespace JL.Lookup
 {
     public static class Lookup
     {
