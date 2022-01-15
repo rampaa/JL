@@ -19,11 +19,11 @@ namespace JL.GUI
     /// </summary>
     public partial class PopupWindow : Window
     {
-        private static readonly System.Windows.Interop.WindowInteropHelper InteropHelper =
+        private static readonly System.Windows.Interop.WindowInteropHelper s_interopHelper =
             new(MainWindow.Instance);
 
-        private static readonly System.Windows.Forms.Screen ActiveScreen =
-            System.Windows.Forms.Screen.FromHandle(InteropHelper.Handle);
+        private static readonly System.Windows.Forms.Screen s_activeScreen =
+            System.Windows.Forms.Screen.FromHandle(s_interopHelper.Handle);
 
         private PopupWindow _childPopupWindow;
 
@@ -122,7 +122,7 @@ namespace JL.GUI
                 LastText = text;
 
                 ResultStackPanels.Clear();
-                var lookupResults = Lookup.Lookup.LookupText(text);
+                List<Dictionary<LookupResult, List<string>>> lookupResults = Lookup.Lookup.LookupText(text);
 
                 if (lookupResults != null && lookupResults.Any())
                 {
@@ -170,7 +170,7 @@ namespace JL.GUI
 
             UpdatePosition(tb.PointToScreen(tb.GetRectFromCharacterIndex(tb.SelectionStart).BottomLeft));
 
-            var lookupResults = Lookup.Lookup.LookupText(tb.SelectedText);
+            List<Dictionary<LookupResult, List<string>>> lookupResults = Lookup.Lookup.LookupText(tb.SelectedText);
 
             if (lookupResults != null && lookupResults.Any())
             {
@@ -190,8 +190,8 @@ namespace JL.GUI
 
         private void UpdatePosition(Point cursorPosition)
         {
-            bool needsFlipX = ConfigManager.PopupFlipX && cursorPosition.X + Width > ActiveScreen.Bounds.Width;
-            bool needsFlipY = ConfigManager.PopupFlipY && cursorPosition.Y + Height > ActiveScreen.Bounds.Height;
+            bool needsFlipX = ConfigManager.PopupFlipX && cursorPosition.X + Width > s_activeScreen.Bounds.Width;
+            bool needsFlipY = ConfigManager.PopupFlipY && cursorPosition.Y + Height > s_activeScreen.Bounds.Height;
 
             double newLeft;
             double newTop;
@@ -221,14 +221,14 @@ namespace JL.GUI
             }
 
             // stick to edges if +OOB
-            if (newLeft + Width > ActiveScreen.Bounds.Width)
+            if (newLeft + Width > s_activeScreen.Bounds.Width)
             {
-                newLeft = ActiveScreen.Bounds.Width - Width;
+                newLeft = s_activeScreen.Bounds.Width - Width;
             }
 
-            if (newTop + Height > ActiveScreen.Bounds.Height)
+            if (newTop + Height > s_activeScreen.Bounds.Height)
             {
-                newTop = ActiveScreen.Bounds.Height - Height;
+                newTop = s_activeScreen.Bounds.Height - Height;
             }
 
             Left = newLeft;
@@ -284,7 +284,7 @@ namespace JL.GUI
             TextBlock textBlockComposition = null;
 
 
-            foreach ((LookupResult key, var value) in result)
+            foreach ((LookupResult key, List<string> value) in result)
             {
                 switch (key)
                 {
@@ -351,10 +351,10 @@ namespace JL.GUI
                     //    break;
 
                     case LookupResult.Readings:
-                        result.TryGetValue(LookupResult.ROrthographyInfoList, out var rOrthographyInfoList);
+                        result.TryGetValue(LookupResult.ROrthographyInfoList, out List<string> rOrthographyInfoList);
                         rOrthographyInfoList ??= new List<string>();
 
-                        var readings = result[LookupResult.Readings];
+                        List<string> readings = result[LookupResult.Readings];
 
                         string readingsText =
                             PopupWindowUtilities.MakeUiElementReadingsText(readings, rOrthographyInfoList);
@@ -469,10 +469,10 @@ namespace JL.GUI
                         break;
 
                     case LookupResult.AlternativeSpellings:
-                        result.TryGetValue(LookupResult.AOrthographyInfoList, out var aOrthographyInfoList);
+                        result.TryGetValue(LookupResult.AOrthographyInfoList, out List<string> aOrthographyInfoList);
                         aOrthographyInfoList ??= new List<string>();
 
-                        var alternativeSpellings = result[LookupResult.AlternativeSpellings];
+                        List<string> alternativeSpellings = result[LookupResult.AlternativeSpellings];
 
                         string alternativeSpellingsText =
                             PopupWindowUtilities.MakeUiElementAlternativeSpellingsText(alternativeSpellings,

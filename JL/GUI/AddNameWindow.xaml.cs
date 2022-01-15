@@ -18,16 +18,16 @@ namespace JL.GUI
     /// </summary>
     public partial class AddNameWindow : Window
     {
-        private static AddNameWindow _instance;
+        private static AddNameWindow s_instance;
 
         public static AddNameWindow Instance
         {
             get
             {
-                if (_instance == null || !_instance.IsLoaded)
-                    _instance = new AddNameWindow();
+                if (s_instance == null || !s_instance.IsLoaded)
+                    s_instance = new AddNameWindow();
 
-                return _instance;
+                return s_instance;
             }
         }
 

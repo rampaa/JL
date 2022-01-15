@@ -20,10 +20,10 @@ using JL.Utilities;
 using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
 using Cursors = System.Windows.Input.Cursors;
+using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using MessageBoxOptions = System.Windows.MessageBoxOptions;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Path = System.IO.Path;
-using HorizontalAlignment = System.Windows.HorizontalAlignment;
 
 namespace JL.GUI
 {
@@ -32,16 +32,16 @@ namespace JL.GUI
     /// </summary>
     public partial class ManageDictionariesWindow : Window
     {
-        private static ManageDictionariesWindow _instance;
+        private static ManageDictionariesWindow s_instance;
 
         public static ManageDictionariesWindow Instance
         {
             get
             {
-                if (_instance == null || !_instance.IsLoaded)
-                    _instance = new ManageDictionariesWindow();
+                if (s_instance == null || !s_instance.IsLoaded)
+                    s_instance = new ManageDictionariesWindow();
 
-                return _instance;
+                return s_instance;
             }
         }
 
@@ -81,7 +81,9 @@ namespace JL.GUI
                 };
                 var dictTypeDisplay = new TextBlock()
                 {
-                    Width = 135, Text = dict.Type.ToString(), Margin = new Thickness(10),
+                    Width = 135,
+                    Text = dict.Type.ToString(),
+                    Margin = new Thickness(10),
                 };
                 var dictPathValidityDisplay = new TextBlock()
                 {
@@ -98,7 +100,10 @@ namespace JL.GUI
                 };
                 var dictPathDisplay = new TextBlock()
                 {
-                    Width = 200, Text = dict.Path, Margin = new Thickness(10), Cursor = Cursors.Hand
+                    Width = 200,
+                    Text = dict.Path,
+                    Margin = new Thickness(10),
+                    Cursor = Cursors.Hand
                 };
 
                 dictPathDisplay.PreviewMouseLeftButtonUp += PathTextbox_PreviewMouseLeftButtonUp;
@@ -276,7 +281,7 @@ namespace JL.GUI
         {
             if (ComboBoxAddDictionary.SelectionBoxItem.ToString() == "") return;
 
-            var selectedDictType =
+            DictType selectedDictType =
                 Enum.Parse<DictType>(ComboBoxAddDictionary.SelectionBoxItem.ToString() ??
                                      throw new InvalidOperationException());
 

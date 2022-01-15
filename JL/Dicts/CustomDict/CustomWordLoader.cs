@@ -78,9 +78,9 @@ namespace JL.Dicts.CustomDict
 
                 CustomWordEntry newWordEntry = new(spelling, alternativeSpellings, readings, definitions, wordClass);
 
-                var customWordDictionary = Storage.Dicts[DictType.CustomWordDictionary].Contents;
+                Dictionary<string, List<IResult>> customWordDictionary = Storage.Dicts[DictType.CustomWordDictionary].Contents;
 
-                if (customWordDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out var result))
+                if (customWordDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out List<IResult> result))
                 {
                     if (result.Contains(newWordEntry))
                     {

@@ -16,11 +16,11 @@ namespace JL.GUI
     {
         private int _currentTextIndex;
 
-        private static PopupWindow _firstPopupWindow;
+        private static PopupWindow s_firstPopupWindow;
 
         public static PopupWindow FirstPopupWindow
         {
-            get { return _firstPopupWindow ??= new PopupWindow(); }
+            get { return s_firstPopupWindow ??= new PopupWindow(); }
         }
 
         public static MainWindow Instance { get; set; }
@@ -356,7 +356,7 @@ namespace JL.GUI
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             FirstPopupWindow.MiningMode = false;
-            foreach (var popupWindow in Application.Current.Windows.OfType<PopupWindow>().ToList())
+            foreach (PopupWindow popupWindow in Application.Current.Windows.OfType<PopupWindow>().ToList())
             {
                 popupWindow.Hide();
             }

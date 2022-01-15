@@ -56,7 +56,8 @@ namespace JL.Anki
                         new JsonSerializerOptions
                         {
                             // Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                            WriteIndented = true, Converters = { new JsonStringEnumConverter() }
+                            WriteIndented = true,
+                            Converters = { new JsonStringEnumConverter() }
                         })
                 ).ConfigureAwait(false);
 

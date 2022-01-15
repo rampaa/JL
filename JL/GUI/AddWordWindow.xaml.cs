@@ -19,16 +19,16 @@ namespace JL.GUI
     /// </summary>
     public partial class AddWordWindow : Window
     {
-        private static AddWordWindow _instance;
+        private static AddWordWindow s_instance;
 
         public static AddWordWindow Instance
         {
             get
             {
-                if (_instance == null || !_instance.IsLoaded)
-                    _instance = new AddWordWindow();
+                if (s_instance == null || !s_instance.IsLoaded)
+                    s_instance = new AddWordWindow();
 
-                return _instance;
+                return s_instance;
             }
         }
 

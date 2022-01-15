@@ -17,8 +17,8 @@ namespace JL
 
         // private static readonly Stopwatch timer = new();
 
-        private static readonly HttpClientHandler _httpClientHandler = new() { UseProxy = false };
-        public static readonly HttpClient Client = new(_httpClientHandler);
+        private static readonly HttpClientHandler s_httpClientHandler = new() { UseProxy = false };
+        public static readonly HttpClient Client = new(s_httpClientHandler);
 
         public static string AnkiConnectUri { get; set; } = "http://localhost:8765";
         public static int MaxSearchLength { get; set; } = 37;
@@ -400,7 +400,7 @@ namespace JL
             Utils.Try(() => PopupDynamicWidth = bool.Parse(ConfigurationManager.AppSettings
                 .Get("PopupDynamicWidth")!), PopupDynamicWidth, "PopupDynamicWidth");
 
-            foreach (var popupWindow in Application.Current.Windows.OfType<PopupWindow>().ToList())
+            foreach (PopupWindow popupWindow in Application.Current.Windows.OfType<PopupWindow>().ToList())
             {
                 popupWindow.Background = PopupBackgroundColor;
                 popupWindow.MaxHeight = PopupMaxHeight;

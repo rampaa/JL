@@ -17,16 +17,16 @@ namespace JL.Frequency
 
         public static void BuildFreqDict(Dictionary<string, List<List<JsonElement>>> frequencyDict)
         {
-            Storage.FreqDicts.TryGetValue(ConfigManager.FrequencyListName, out var freqDict);
+            Storage.FreqDicts.TryGetValue(ConfigManager.FrequencyListName, out Dictionary<string, List<FrequencyEntry>> freqDict);
 
-            foreach ((string reading, var value) in frequencyDict)
+            foreach ((string reading, List<List<JsonElement>> value) in frequencyDict)
             {
                 foreach (List<JsonElement> element in value)
                 {
                     string exactSpelling = element[0].ToString();
                     element[1].TryGetInt32(out int frequencyRank);
                     Debug.Assert(freqDict != null, nameof(freqDict) + " != null");
-                    if (freqDict.TryGetValue(reading, out var readingFreqResult))
+                    if (freqDict.TryGetValue(reading, out List<FrequencyEntry> readingFreqResult))
                     {
                         readingFreqResult.Add(new FrequencyEntry(exactSpelling, frequencyRank));
                     }
@@ -40,7 +40,7 @@ namespace JL.Frequency
 
                     if (exactSpellingInHiragana != reading)
                     {
-                        if (freqDict.TryGetValue(exactSpellingInHiragana, out var exactSpellingFreqResult))
+                        if (freqDict.TryGetValue(exactSpellingInHiragana, out List<FrequencyEntry> exactSpellingFreqResult))
                         {
                             exactSpellingFreqResult.Add(new FrequencyEntry(reading, frequencyRank));
                         }

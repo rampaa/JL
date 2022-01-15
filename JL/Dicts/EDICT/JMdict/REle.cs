@@ -6,9 +6,7 @@ namespace JL.Dicts.EDICT.JMdict
     {
         public string Reb { get; set; } // Reading in kana. e.g. むすめ
 
-        public List<string>
-            ReRestrList { get; set; } // ReRestrList = Keb. The reading is only valid for this specific keb.
-
+        public List<string> ReRestrList { get; set; } // ReRestrList = Keb. The reading is only valid for this specific keb.
         public List<string> ReInfList { get; set; } // e.g. gikun
 
         // public bool ReNokanji { get; set; } // Is kana insufficiant to notate the right spelling?

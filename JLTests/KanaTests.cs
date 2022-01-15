@@ -48,7 +48,7 @@ namespace JLTests
             string text = "オー";
 
             // Act
-            var result = Kana.LongVowelMarkConverter(
+            List<string> result = Kana.LongVowelMarkConverter(
                 text);
 
             // Assert

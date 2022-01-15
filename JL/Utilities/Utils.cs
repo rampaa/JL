@@ -69,9 +69,9 @@ namespace JL.Utilities
                          fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("en-US")))
                 {
                     bool foundGlyph = false;
-                    foreach (var typeFace in fontFamily.GetTypefaces())
+                    foreach (Typeface typeFace in fontFamily.GetTypefaces())
                     {
-                        if (typeFace.TryGetGlyphTypeface(out var glyphTypeFace))
+                        if (typeFace.TryGetGlyphTypeface(out GlyphTypeface glyphTypeFace))
                         {
                             if (glyphTypeFace.CharacterToGlyphMap.ContainsKey(20685))
                             {
@@ -227,7 +227,8 @@ namespace JL.Utilities
         {
             var jso = new JsonSerializerOptions
             {
-                WriteIndented = true, Converters = { new JsonStringEnumConverter(), }
+                WriteIndented = true,
+                Converters = { new JsonStringEnumConverter(), }
             };
 
             try
@@ -249,7 +250,8 @@ namespace JL.Utilities
             {
                 var jso = new JsonSerializerOptions
                 {
-                    WriteIndented = true, Converters = { new JsonStringEnumConverter(), }
+                    WriteIndented = true,
+                    Converters = { new JsonStringEnumConverter(), }
                 };
 
                 File.WriteAllTextAsync(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json"),
@@ -299,14 +301,14 @@ namespace JL.Utilities
 
         public static void ShowAddNameWindow(string selectedText)
         {
-            var addNameWindowInstance = AddNameWindow.Instance;
+            AddNameWindow addNameWindowInstance = AddNameWindow.Instance;
             addNameWindowInstance.SpellingTextBox.Text = selectedText;
             addNameWindowInstance.ShowDialog();
         }
 
         public static void ShowAddWordWindow(string selectedText)
         {
-            var addWordWindowInstance = AddWordWindow.Instance;
+            AddWordWindow addWordWindowInstance = AddWordWindow.Instance;
             addWordWindowInstance.SpellingsTextBox.Text = selectedText;
             addWordWindowInstance.ShowDialog();
         }
@@ -335,7 +337,8 @@ namespace JL.Utilities
         {
             if (selectedText.Length > 0)
                 Process.Start(new ProcessStartInfo("cmd",
-                    $"/c start https://www.google.com/search?q={selectedText}^&hl=ja") { CreateNoWindow = true });
+                    $"/c start https://www.google.com/search?q={selectedText}^&hl=ja")
+                { CreateNoWindow = true });
         }
 
         public static string GetMd5String(byte[] bytes)

@@ -7,7 +7,7 @@ namespace JL
 {
     public static class Kana
     {
-        private static readonly Dictionary<string, string> HiraganaToKatakanaDict = new()
+        private static readonly Dictionary<string, string> s_hiraganaToKatakanaDict = new()
         {
             #pragma warning disable format
             { "あ", "ア" }, { "い", "イ" }, { "う", "ウ" }, { "え", "エ" }, { "お", "オ" },
@@ -38,7 +38,7 @@ namespace JL
             #pragma warning restore format
         };
 
-        private static readonly Dictionary<string, string> KatakanaToHiraganaDict = new()
+        private static readonly Dictionary<string, string> s_katakanaToHiraganaDict = new()
         {
             #pragma warning disable format
             { "ア", "あ" }, { "イ", "い" }, { "ウ", "う" }, { "エ", "え" }, { "オ", "お" },
@@ -69,7 +69,7 @@ namespace JL
             #pragma warning restore format
         };
 
-        private static readonly Dictionary<string, string> KanaFinalVowelDict = new()
+        private static readonly Dictionary<string, string> s_kanaFinalVowelDict = new()
         {
             #pragma warning disable format
             // Katakana
@@ -116,7 +116,7 @@ namespace JL
             #pragma warning restore format
         };
 
-        private static readonly Dictionary<string, string> HalfWidthToFullWidthDict = new()
+        private static readonly Dictionary<string, string> s_halfWidthToFullWidthDict = new()
         {
             #pragma warning disable format
             // Half-width katakana
@@ -166,7 +166,7 @@ namespace JL
             #pragma warning restore format
         };
 
-        private static readonly Dictionary<string, string> CompositeHalfWidthKatakanaToFullWidthHiraganaDict = new()
+        private static readonly Dictionary<string, string> s_compositeHalfWidthKatakanaToFullWidthHiraganaDict = new()
         {
             #pragma warning disable format
             { "ｶﾞ", "が" }, { "ｷﾞ", "ぎ" }, { "ｸﾞ", "ぐ" }, { "ｹﾞ", "げ" }, { "ｺﾞ", "ご" },
@@ -186,15 +186,15 @@ namespace JL
             for (int i = 0; i < listLength; i++)
             {
                 if (listLength > i + 1
-                    && CompositeHalfWidthKatakanaToFullWidthHiraganaDict.TryGetValue(
+                    && s_compositeHalfWidthKatakanaToFullWidthHiraganaDict.TryGetValue(
                         unicodeCharacters[i] + unicodeCharacters[i + 1], out string compositeStr))
                 {
                     textInHiragana.Append(compositeStr);
                     ++i;
                 }
-                else if (KatakanaToHiraganaDict.TryGetValue(unicodeCharacters[i], out string hiraganaStr))
+                else if (s_katakanaToHiraganaDict.TryGetValue(unicodeCharacters[i], out string hiraganaStr))
                     textInHiragana.Append(hiraganaStr);
-                else if (HalfWidthToFullWidthDict.TryGetValue(unicodeCharacters[i], out string fullWidthStr))
+                else if (s_halfWidthToFullWidthDict.TryGetValue(unicodeCharacters[i], out string fullWidthStr))
                     textInHiragana.Append(fullWidthStr);
                 else
                     textInHiragana.Append(unicodeCharacters[i]);
@@ -208,7 +208,7 @@ namespace JL
             StringBuilder textInKatakana = new();
             foreach (string str in text.UnicodeIterator().ToList())
             {
-                if (HiraganaToKatakanaDict.TryGetValue(str, out string hiraganaStr))
+                if (s_hiraganaToKatakanaDict.TryGetValue(str, out string hiraganaStr))
                     textInKatakana.Append(hiraganaStr);
                 else
                     textInKatakana.Append(str);
@@ -226,11 +226,11 @@ namespace JL
 
             for (int i = 1; i < unicodeTextList.Count; i++)
             {
-                if (text[i] == 'ー' && KanaFinalVowelDict.TryGetValue(unicodeTextList[i - 1], out string vowel))
+                if (text[i] == 'ー' && s_kanaFinalVowelDict.TryGetValue(unicodeTextList[i - 1], out string vowel))
                 {
                     if (vowel != "お" && vowel != "え" && vowel != "オ" && vowel != "エ")
                     {
-                        foreach (var stringBuilder in stringBuilders)
+                        foreach (StringBuilder stringBuilder in stringBuilders)
                         {
                             stringBuilder.Append(vowel);
                         }
@@ -276,7 +276,7 @@ namespace JL
 
                 else
                 {
-                    foreach (var stringBuilder in stringBuilders)
+                    foreach (StringBuilder stringBuilder in stringBuilders)
                     {
                         stringBuilder.Append(text[i]);
                     }
@@ -288,12 +288,12 @@ namespace JL
 
         public static bool IsHiragana(string text)
         {
-            return HiraganaToKatakanaDict.ContainsKey(text.UnicodeIterator().First());
+            return s_hiraganaToKatakanaDict.ContainsKey(text.UnicodeIterator().First());
         }
 
         public static bool IsKatakana(string text)
         {
-            return KatakanaToHiraganaDict.ContainsKey(text.UnicodeIterator().First());
+            return s_katakanaToHiraganaDict.ContainsKey(text.UnicodeIterator().First());
         }
     }
 }

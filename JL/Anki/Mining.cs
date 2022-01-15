@@ -18,8 +18,8 @@ namespace JL.Anki
                 string deckName = ankiConfig.DeckName;
                 string modelName = ankiConfig.ModelName;
 
-                var rawFields = ankiConfig.Fields;
-                var fields = ConvertFields(rawFields, miningParams);
+                Dictionary<string, JLField> rawFields = ankiConfig.Fields;
+                Dictionary<string, object> fields = ConvertFields(rawFields, miningParams);
 
                 Dictionary<string, object> options = new() { { "allowDuplicate", ConfigManager.AllowDuplicateCards }, };
                 string[] tags = ankiConfig.Tags;

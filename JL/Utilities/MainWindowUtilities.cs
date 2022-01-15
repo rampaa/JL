@@ -16,7 +16,7 @@ namespace JL.Utilities
                 @"[\u2e80-\u2eff\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\u31c0-\u31ef\u31f0-\u31ff\u3200-\u32ff\u3300-\u33ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\ufe30-\ufe4f\uff00-\uffef]|[\ud82c-\ud82c][\udc00-\udcff]|[\ud840-\ud869][\udc00-\udedf]|[\ud869-\ud86d][\udf00-\udf3f]|[\ud86e-\ud873][\udc20-\udeaf]|[\ud873-\ud87a][\udeb0-\udfef]|[\ud87e-\ude1f][\udc00-\ude1f]|[\ud880-\ud884][\udc00-\udf4f]");
 
         // Consider checking for \t, \r, "　", " ", ., !, ?, –, —, ―, ‒, ~, ‥, ♪, ～, ♡, ♥, ☆, ★
-        private static readonly List<string> JapanesePunctuation =
+        private static readonly List<string> s_japanesePunctuation =
             new()
             {
                 "。",
@@ -38,7 +38,7 @@ namespace JL.Utilities
         {
             int endPosition = -1;
 
-            foreach (string punctuation in JapanesePunctuation)
+            foreach (string punctuation in s_japanesePunctuation)
             {
                 int tempIndex = text.IndexOf(punctuation, position, StringComparison.Ordinal);
 

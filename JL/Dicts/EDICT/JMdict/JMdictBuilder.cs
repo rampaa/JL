@@ -67,7 +67,7 @@ namespace JL.Dicts.EDICT.JMdict
                     {
                         item.Value.AlternativeSpellings.Add(spelling);
 
-                        resultList.TryGetValue(spelling, out var tempResult);
+                        resultList.TryGetValue(spelling, out JMdictResult tempResult);
                         Debug.Assert(tempResult != null, nameof(tempResult) + " != null");
 
                         item.Value.AOrthographyInfoList.Add(tempResult.POrthographyInfoList);
@@ -99,7 +99,7 @@ namespace JL.Dicts.EDICT.JMdict
 
                     result.AlternativeSpellings.Remove(result.PrimarySpelling);
 
-                    if (resultList.TryGetValue(result.PrimarySpelling, out var mainEntry))
+                    if (resultList.TryGetValue(result.PrimarySpelling, out JMdictResult mainEntry))
                     {
                         result.Readings = mainEntry.Readings;
                         result.AOrthographyInfoList = mainEntry.AOrthographyInfoList;

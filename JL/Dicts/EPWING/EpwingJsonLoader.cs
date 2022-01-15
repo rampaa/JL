@@ -21,11 +21,11 @@ namespace JL.Dicts.EPWING
             foreach (string jsonFile in jsonFiles)
             {
                 await using FileStream openStream = File.OpenRead(jsonFile);
-                var jsonObjects = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream)
+                List<List<JsonElement>> jsonObjects = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream)
                     .ConfigureAwait(false);
 
                 Debug.Assert(jsonObjects != null, nameof(jsonObjects) + " != null");
-                foreach (var obj in jsonObjects)
+                foreach (List<JsonElement> obj in jsonObjects)
                 {
                     DictionaryBuilder(new EpwingResult(obj), Storage.Dicts[dictType].Contents, dictType);
                 }
@@ -82,7 +82,7 @@ namespace JL.Dicts.EPWING
                     // Filter duplicate entries.
                     // If an entry has reading info while others don't, keep the one with the reading info.
                     if (Storage.Dicts[DictType.Kenkyuusha].Contents.TryGetValue(
-                        Kana.KatakanaToHiraganaConverter(result.PrimarySpelling), out var kenkyuushaResults))
+                        Kana.KatakanaToHiraganaConverter(result.PrimarySpelling), out List<IResult> kenkyuushaResults))
                     {
                         foreach (IResult result1 in kenkyuushaResults.ToList())
                         {

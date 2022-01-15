@@ -29,10 +29,10 @@ namespace JL.Dicts.EDICT
                         "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK,
                         MessageBoxOptions.DefaultDesktopOnly);
 
-                var response = await ConfigManager.Client.SendAsync(request).ConfigureAwait(false);
+                HttpResponseMessage response = await ConfigManager.Client.SendAsync(request).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                    Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                     await GzipStreamDecompressor(responseStream, Path.Join(ConfigManager.ApplicationPath, resourcePath))
                         .ConfigureAwait(false);
 

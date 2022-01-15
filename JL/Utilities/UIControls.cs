@@ -15,7 +15,9 @@ namespace JL.Utilities
         public static readonly List<ComboBoxItem> PopupJapaneseFonts =
             JapaneseFonts.ConvertAll(f => new ComboBoxItem()
             {
-                Content = f.Content, FontFamily = f.FontFamily, Foreground = f.Foreground
+                Content = f.Content,
+                FontFamily = f.FontFamily,
+                Foreground = f.Foreground
             });
     }
 }

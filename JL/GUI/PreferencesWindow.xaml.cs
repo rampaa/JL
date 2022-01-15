@@ -23,12 +23,12 @@ namespace JL.GUI
     /// </summary>
     public partial class PreferencesWindow : System.Windows.Window
     {
-        private static PreferencesWindow _instance;
+        private static PreferencesWindow s_instance;
         private bool _setAnkiConfig;
 
         public static PreferencesWindow Instance
         {
-            get { return _instance ??= new PreferencesWindow(); }
+            get { return s_instance ??= new PreferencesWindow(); }
         }
 
         public PreferencesWindow()
@@ -40,7 +40,7 @@ namespace JL.GUI
 
         private void ShowColorPicker(object sender, RoutedEventArgs e)
         {
-            var picker = SingleOpenHelper.CreateControl<ColorPicker>();
+            ColorPicker picker = SingleOpenHelper.CreateControl<ColorPicker>();
             var window = new HandyControl.Controls.PopupWindow { PopupElement = picker, };
             picker.Canceled += delegate { window.Close(); };
             picker.Confirmed += delegate { ColorSetter((Button)sender, picker.SelectedBrush, window); };
@@ -99,7 +99,7 @@ namespace JL.GUI
         {
             try
             {
-                var ankiConfig = await AnkiConfig.ReadAnkiConfig();
+                AnkiConfig ankiConfig = await AnkiConfig.ReadAnkiConfig();
                 if (ankiConfig == null) return;
 
                 MiningSetupComboBoxDeckNames.ItemsSource = new List<string> { ankiConfig.DeckName };
@@ -162,7 +162,7 @@ namespace JL.GUI
             try
             {
                 string modelName = MiningSetupComboBoxModelNames.SelectionBoxItem.ToString();
-                var fieldNames =
+                List<string> fieldNames =
                     JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelFieldNames(modelName)).Result
                         .ToString()!);
 
@@ -218,7 +218,7 @@ namespace JL.GUI
                     var textBlock = (TextBlock)stackPanel.Children[0];
                     var comboBox = (System.Windows.Controls.ComboBox)stackPanel.Children[1];
 
-                    if (Enum.TryParse<JLField>(comboBox.SelectionBoxItem.ToString(), out var result))
+                    if (Enum.TryParse<JLField>(comboBox.SelectionBoxItem.ToString(), out JLField result))
                     {
                         dict.Add(textBlock.Text, result);
                     }
@@ -228,7 +228,7 @@ namespace JL.GUI
                     }
                 }
 
-                var fields = dict;
+                Dictionary<string, JLField> fields = dict;
                 string[] tags = { "JL" };
 
                 if (MiningSetupComboBoxDeckNames.SelectedItem == null ||

@@ -28,9 +28,9 @@ namespace JL.Dicts.CustomDict
         {
             CustomNameEntry newNameEntry = new(spelling, reading, nameType);
 
-            var customNameDictionary = Storage.Dicts[DictType.CustomNameDictionary].Contents;
+            Dictionary<string, List<IResult>> customNameDictionary = Storage.Dicts[DictType.CustomNameDictionary].Contents;
 
-            if (customNameDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out var entry))
+            if (customNameDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out List<IResult> entry))
             {
                 if (!entry.Contains(newNameEntry))
                 {

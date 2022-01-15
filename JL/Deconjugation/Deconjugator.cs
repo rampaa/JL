@@ -10,13 +10,13 @@ namespace JL.Deconjugation
     // translated from https://github.com/wareya/nazeka/blob/master/background-script.js
     public static class Deconjugator
     {
-        private static readonly string File =
+        private static readonly string s_file =
             System.IO.File.ReadAllText(Path.Join(ConfigManager.ApplicationPath,
                 "Resources/deconjugator_edited_arrays.json"));
 
-        private static readonly Rule[] Rules = JsonSerializer.Deserialize<Rule[]>(File);
+        private static readonly Rule[] s_rules = JsonSerializer.Deserialize<Rule[]>(s_file);
 
-        private static readonly LRUCache<string, HashSet<Form>> Cache = new(777, 88);
+        private static readonly LRUCache<string, HashSet<Form>> s_cache = new(777, 88);
 
         private static Form StdruleDeconjugateInner(Form myForm, VirtualRule myRule)
         {
@@ -73,7 +73,7 @@ namespace JL.Deconjugation
 
             var collection = new HashSet<Form>();
 
-            var array = myRule.DecEnd;
+            List<string> array = myRule.DecEnd;
             if (array.Count == 1)
             {
                 var virtualRule = new VirtualRule
@@ -192,7 +192,7 @@ namespace JL.Deconjugation
 
             var collection = new HashSet<Form>();
 
-            var array = myRule.DecEnd;
+            List<string> array = myRule.DecEnd;
             if (array.Count == 1)
             {
                 Form result = SubstitutionInner(myForm, myRule);
@@ -250,7 +250,7 @@ namespace JL.Deconjugation
         public static HashSet<Form> Deconjugate(string myText, bool useCache = true)
         {
             if (useCache)
-                if (Cache.TryGet(myText, out var data))
+                if (s_cache.TryGet(myText, out HashSet<Form> data))
                     return data;
 
             var processed = new HashSet<Form>();
@@ -270,7 +270,7 @@ namespace JL.Deconjugation
                 var newNovel = new HashSet<Form>();
                 foreach (Form form in novel)
                 {
-                    foreach (Rule rule in Rules)
+                    foreach (Rule rule in s_rules)
                     {
                         HashSet<Form> newForm = rule.Type switch
                         {
@@ -303,7 +303,7 @@ namespace JL.Deconjugation
             }
 
             if (useCache)
-                Cache.AddReplace(myText, processed);
+                s_cache.AddReplace(myText, processed);
 
             return processed;
         }

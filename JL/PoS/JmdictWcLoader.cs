@@ -21,7 +21,7 @@ namespace JL.PoS
             Storage.WcDict = await JsonSerializer.DeserializeAsync<Dictionary<string, List<JmdictWc>>>(openStream);
             if (Storage.WcDict == null) throw new InvalidOperationException();
 
-            foreach ((string _, var value) in Storage.WcDict.ToList())
+            foreach ((string _, List<JmdictWc> value) in Storage.WcDict.ToList())
             {
                 foreach (JmdictWc jMDictWcEntry in value.ToList())
                 {
@@ -29,7 +29,7 @@ namespace JL.PoS
                     {
                         foreach (string reading in jMDictWcEntry.Readings)
                         {
-                            if (Storage.WcDict.TryGetValue(reading, out var result))
+                            if (Storage.WcDict.TryGetValue(reading, out List<JmdictWc> result))
                             {
                                 result.Add(jMDictWcEntry);
                             }
@@ -59,7 +59,7 @@ namespace JL.PoS
                 "vs-s", "vt", "exp", "vs", "vz"
             };
 
-            foreach ((string _, var values) in Storage.Dicts[DictType.JMdict].Contents.ToList())
+            foreach ((string _, List<IResult> values) in Storage.Dicts[DictType.JMdict].Contents.ToList())
             {
                 foreach (IResult result in values)
                 {
@@ -77,7 +77,7 @@ namespace JL.PoS
                     if (!wordClasses.Any())
                         continue;
 
-                    if (jmdictWcDict.TryGetValue(value.PrimarySpelling, out var psr))
+                    if (jmdictWcDict.TryGetValue(value.PrimarySpelling, out List<JmdictWc> psr))
                     {
                         if (!psr.Any(r =>
                             r.Readings?.SequenceEqual(value.Readings ?? new List<string>()) ??
@@ -95,7 +95,7 @@ namespace JL.PoS
                     {
                         foreach (string spelling in value.AlternativeSpellings)
                         {
-                            if (jmdictWcDict.TryGetValue(spelling, out var asr))
+                            if (jmdictWcDict.TryGetValue(spelling, out List<JmdictWc> asr))
                             {
                                 if (!asr.Any(r =>
                                     r.Readings?.SequenceEqual(value.Readings ?? new List<string>()) ??

@@ -112,9 +112,9 @@ namespace JL.Dicts.EDICT.JMnedict
                             trans.TransDetList.Add(jMneDictXML.ReadString());
                             break;
 
-                        //case "xref":
-                        //    trans.XRefList.Add(jMneDictXML.ReadString());
-                        //    break;
+                            //case "xref":
+                            //    trans.XRefList.Add(jMneDictXML.ReadString());
+                            //    break;
                     }
                 }
             }
