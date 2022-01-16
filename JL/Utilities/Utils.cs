@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -357,9 +358,10 @@ namespace JL.Utilities
                 waveOut.Init(new Mp3FileReader(new MemoryStream(audio)));
                 waveOut.Play();
 
+                // suppress GC until audio playback is over
                 while (waveOut.PlaybackState != PlaybackState.Stopped)
                 {
-                    // suppress GC until audio playback is over
+                    Thread.Sleep(5);
                 }
             }
             catch (Exception e)
