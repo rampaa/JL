@@ -71,18 +71,6 @@ namespace JL.Utilities
                         {
                             GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
                             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-                        }).ContinueWith(async _ =>
-                        {
-                            // initialize ConfigManager.Client and audio stuff
-                            try
-                            {
-                                await PopupWindowUtilities.GetAndPlayAudioFromJpod101("猫", "ねこ", 0)
-                                    .ConfigureAwait(false);
-                            }
-                            catch (Exception)
-                            {
-                                // ignored
-                            }
                         }).ConfigureAwait(false);
                     }
                 ).ConfigureAwait(false);

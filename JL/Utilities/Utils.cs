@@ -356,12 +356,15 @@ namespace JL.Utilities
         {
             try
             {
-                if (s_audioPlayer?.PlaybackState == PlaybackState.Playing)
-                    s_audioPlayer?.Stop();
+                if (s_audioPlayer != null)
+                {
+                    s_audioPlayer.Dispose();
+                }
 
                 s_audioPlayer = new WaveOut { Volume = volume };
-                s_audioPlayer?.Init(new Mp3FileReader(new MemoryStream(audio)));
-                s_audioPlayer?.Play();
+
+                s_audioPlayer.Init(new Mp3FileReader(new MemoryStream(audio)));
+                s_audioPlayer.Play();
             }
             catch (Exception e)
             {
@@ -388,7 +391,6 @@ namespace JL.Utilities
 
                 string randomFilePath = filePaths[rand.Next(numFiles)];
                 byte[] randomFile = File.ReadAllBytes(randomFilePath);
-
                 PlayAudio(randomFile, 1);
             }
             catch (Exception e)
