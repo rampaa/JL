@@ -237,7 +237,7 @@ namespace JL.GUI
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.MotivationKeyGesture))
             {
-                Task.Run(() => Utils.Motivate("Resources/Motivation"));
+                Utils.Motivate("Resources/Motivation");
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.ClosePopupKeyGesture))

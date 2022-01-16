@@ -31,6 +31,8 @@ namespace JL.Utilities
                 shared: true)
             .CreateLogger();
 
+        private static WaveOut s_audioPlayer;
+
         public static IEnumerable<string> UnicodeIterator(this string s)
         {
             for (int i = 0; i < s.Length; ++i)
@@ -354,15 +356,12 @@ namespace JL.Utilities
         {
             try
             {
-                var waveOut = new WaveOut { Volume = volume };
-                waveOut.Init(new Mp3FileReader(new MemoryStream(audio)));
-                waveOut.Play();
+                if (s_audioPlayer?.PlaybackState == PlaybackState.Playing)
+                    s_audioPlayer.Stop();
 
-                // suppress GC until audio playback is over
-                while (waveOut.PlaybackState != PlaybackState.Stopped)
-                {
-                    Thread.Sleep(5);
-                }
+                s_audioPlayer = new WaveOut { Volume = volume };
+                s_audioPlayer.Init(new Mp3FileReader(new MemoryStream(audio)));
+                s_audioPlayer.Play();
             }
             catch (Exception e)
             {

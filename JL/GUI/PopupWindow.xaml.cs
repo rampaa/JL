@@ -898,7 +898,7 @@ namespace JL.GUI
             PopupListBox.RaiseEvent(e2);
         }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
+        private async void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (Utils.KeyGestureComparer(e, ConfigManager.MiningModeKeyGesture))
             {
@@ -952,7 +952,7 @@ namespace JL.GUI
                     }
                 }
 
-                Task.Run(() => PopupWindowUtilities.GetAndPlayAudioFromJpod101(foundSpelling, reading, 1));
+                await PopupWindowUtilities.GetAndPlayAudioFromJpod101(foundSpelling, reading, 1).ConfigureAwait(false);
             }
             else if (Utils.KeyGestureComparer(e, ConfigManager.ClosePopupKeyGesture))
             {
@@ -996,7 +996,7 @@ namespace JL.GUI
             }
             else if (Utils.KeyGestureComparer(e, ConfigManager.MotivationKeyGesture))
             {
-                Task.Run(() => Utils.Motivate("Resources/Motivation"));
+                Utils.Motivate("Resources/Motivation");
             }
         }
 
