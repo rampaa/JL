@@ -357,11 +357,11 @@ namespace JL.Utilities
             try
             {
                 if (s_audioPlayer?.PlaybackState == PlaybackState.Playing)
-                    s_audioPlayer.Stop();
+                    s_audioPlayer?.Stop();
 
                 s_audioPlayer = new WaveOut { Volume = volume };
-                s_audioPlayer.Init(new Mp3FileReader(new MemoryStream(audio)));
-                s_audioPlayer.Play();
+                s_audioPlayer?.Init(new Mp3FileReader(new MemoryStream(audio)));
+                s_audioPlayer?.Play();
             }
             catch (Exception e)
             {
