@@ -230,8 +230,7 @@ namespace JL.Utilities
         {
             var jso = new JsonSerializerOptions
             {
-                WriteIndented = true,
-                Converters = { new JsonStringEnumConverter(), }
+                WriteIndented = true, Converters = { new JsonStringEnumConverter(), }
             };
 
             try
@@ -253,8 +252,7 @@ namespace JL.Utilities
             {
                 var jso = new JsonSerializerOptions
                 {
-                    WriteIndented = true,
-                    Converters = { new JsonStringEnumConverter(), }
+                    WriteIndented = true, Converters = { new JsonStringEnumConverter(), }
                 };
 
                 File.WriteAllTextAsync(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json"),
@@ -340,8 +338,7 @@ namespace JL.Utilities
         {
             if (selectedText.Length > 0)
                 Process.Start(new ProcessStartInfo("cmd",
-                    $"/c start https://www.google.com/search?q={selectedText}^&hl=ja")
-                { CreateNoWindow = true });
+                    $"/c start https://www.google.com/search?q={selectedText}^&hl=ja") { CreateNoWindow = true });
         }
 
         public static string GetMd5String(byte[] bytes)
@@ -368,7 +365,7 @@ namespace JL.Utilities
             }
             catch (Exception e)
             {
-                Logger.Error(e, "Error playing audio: " + audio);
+                Logger.Error(e, "Error playing audio: " + JsonSerializer.Serialize(audio));
                 Alert(AlertLevel.Error, "Error playing audio");
             }
         }

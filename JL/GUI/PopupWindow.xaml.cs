@@ -292,9 +292,7 @@ namespace JL.GUI
                     case LookupResult.FoundForm:
                         textBlockFoundForm = new TextBlock
                         {
-                            Name = key.ToString(),
-                            Text = string.Join("", value),
-                            Visibility = Visibility.Collapsed,
+                            Name = key.ToString(), Text = string.Join("", value), Visibility = Visibility.Collapsed,
                         };
                         break;
 
@@ -892,14 +890,24 @@ namespace JL.GUI
 
             MouseWheelEventArgs e2 = new(e.MouseDevice, e.Timestamp, e.Delta)
             {
-                RoutedEvent = ListBox.MouseWheelEvent,
-                Source = e.Source
+                RoutedEvent = ListBox.MouseWheelEvent, Source = e.Source
             };
             PopupListBox.RaiseEvent(e2);
         }
 
         private async void Window_KeyDown(object sender, KeyEventArgs e)
         {
+            int keyVal = (int)e.Key;
+            int numericKeyValue = -1;
+            if ((keyVal >= (int)Key.D1 && keyVal <= (int)Key.D9))
+            {
+                numericKeyValue = (int)e.Key - (int)Key.D0 - 1;
+            }
+            else if (keyVal >= (int)Key.NumPad1 && keyVal <= (int)Key.NumPad9)
+            {
+                numericKeyValue = (int)e.Key - (int)Key.NumPad0 - 1;
+            }
+
             if (Utils.KeyGestureComparer(e, ConfigManager.MiningModeKeyGesture))
             {
                 MiningMode = true;
@@ -912,12 +920,19 @@ namespace JL.GUI
 
                 DisplayResults(true);
             }
-            else if (Utils.KeyGestureComparer(e, ConfigManager.PlayAudioKeyGesture))
+            else if (numericKeyValue != -1 || Utils.KeyGestureComparer(e, ConfigManager.PlayAudioKeyGesture))
             {
                 string foundSpelling = null;
                 string reading = null;
 
-                var innerStackPanel = (StackPanel)PopupListBox.Items[_playAudioIndex];
+                int index = numericKeyValue != -1 ? numericKeyValue : _playAudioIndex;
+                if (index > PopupListBox.Items.Count - 1)
+                {
+                    Utils.Alert(AlertLevel.Error, "Index out of range");
+                    return;
+                }
+
+                var innerStackPanel = (StackPanel)PopupListBox.Items[index];
                 var top = (WrapPanel)innerStackPanel.Children[0];
 
                 foreach (UIElement child in top.Children)
