@@ -27,7 +27,7 @@ namespace JLTests
             Storage.Dicts.Add(DictType.JMdict, new Dict(DictType.JMdict, jmdictPath, true, 0));
             Storage.Dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();
 
-            if (!File.Exists(Path.Join(ConfigManager.ApplicationPath, jmdictPath)))
+            if (!File.Exists(Path.Join(Storage.ApplicationPath, jmdictPath)))
             {
                 ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMdict].Path,
                     new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),

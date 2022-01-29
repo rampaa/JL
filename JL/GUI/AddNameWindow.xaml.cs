@@ -90,7 +90,7 @@ namespace JL.GUI
 
             string customNameDictPath = Storage.Dicts[DictType.CustomNameDictionary].Path;
             await File.AppendAllTextAsync(
-                Path.Join(ConfigManager.ApplicationPath, customNameDictPath),
+                Path.Join(Storage.ApplicationPath, customNameDictPath),
                 stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);
         }
 

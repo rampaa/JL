@@ -12,9 +12,9 @@ namespace JL.Dicts.EDICT.KANJIDIC
     {
         public static async Task Load(string dictPath)
         {
-            if (File.Exists(Path.Join(ConfigManager.ApplicationPath, dictPath)))
+            if (File.Exists(Path.Join(Storage.ApplicationPath, dictPath)))
             {
-                using XmlTextReader edictXml = new(Path.Join(ConfigManager.ApplicationPath, dictPath))
+                using XmlTextReader edictXml = new(Path.Join(Storage.ApplicationPath, dictPath))
                 {
                     DtdProcessing = DtdProcessing.Parse,
                     WhitespaceHandling = WhitespaceHandling.None,
@@ -22,10 +22,10 @@ namespace JL.Dicts.EDICT.KANJIDIC
                 };
 
                 Dictionary<string, string> kanjiCompositionDictionary = new();
-                if (File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt")))
+                if (File.Exists(Path.Join(Storage.ApplicationPath, "Resources/ids.txt")))
                 {
                     string[] lines = await File
-                        .ReadAllLinesAsync(Path.Join(ConfigManager.ApplicationPath, "Resources/ids.txt"))
+                        .ReadAllLinesAsync(Path.Join(Storage.ApplicationPath, "Resources/ids.txt"))
                         .ConfigureAwait(false);
 
                     foreach (string line in lines)

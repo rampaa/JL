@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime;
 using System.Threading.Tasks;
 using JL.Dicts;
@@ -18,6 +19,11 @@ namespace JL
 {
     public class Storage
     {
+        public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
+        private static readonly HttpClientHandler s_httpClientHandler = new() { UseProxy = false };
+        public static readonly HttpClient Client = new(s_httpClientHandler);
+        public static readonly Version version = new(0, 0787);
+        public static readonly string repoURL = "https://github.com/rampaa/JL/";
         public static Dictionary<string, List<JmdictWc>> WcDict { get; set; } = new();
         public static Dictionary<string, Dictionary<string, List<FrequencyEntry>>> FreqDicts { get; set; } = new();
 
@@ -257,7 +263,7 @@ namespace JL
 
         public static async Task InitializePoS()
         {
-            if (!File.Exists(Path.Join(ConfigManager.ApplicationPath, "Resources/PoS.json")))
+            if (!File.Exists(Path.Join(Storage.ApplicationPath, "Resources/PoS.json")))
             {
                 if (Dicts[DictType.JMdict].Active)
                 {
@@ -267,7 +273,7 @@ namespace JL
                 else
                 {
                     bool deleteJmdictFile = false;
-                    if (!File.Exists(Path.Join(ConfigManager.ApplicationPath, Dicts[DictType.JMdict].Path)))
+                    if (!File.Exists(Path.Join(Storage.ApplicationPath, Dicts[DictType.JMdict].Path)))
                     {
                         deleteJmdictFile = true;
                         await ResourceUpdater.UpdateResource(Dicts[DictType.JMdict].Path,
@@ -281,7 +287,7 @@ namespace JL
                     Dicts[DictType.JMdict].Contents.Clear();
 
                     if (deleteJmdictFile)
-                        File.Delete(Path.Join(ConfigManager.ApplicationPath, Dicts[DictType.JMdict].Path));
+                        File.Delete(Path.Join(Storage.ApplicationPath, Dicts[DictType.JMdict].Path));
                 }
             }
 
@@ -303,7 +309,7 @@ namespace JL
                     taskNewFreqlist = Task.Run(async () =>
                     {
                         FrequencyLoader.BuildFreqDict(await FrequencyLoader
-                            .LoadJson(Path.Join(ConfigManager.ApplicationPath,
+                            .LoadJson(Path.Join(Storage.ApplicationPath,
                                 Storage.FrequencyLists[ConfigManager.FrequencyListName]))
                             .ConfigureAwait(false));
                     });

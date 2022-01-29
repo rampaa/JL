@@ -8,9 +8,9 @@ namespace JL.Dicts.CustomDict
     {
         public static async Task Load(string customNameDictPath)
         {
-            if (File.Exists(Path.Join(ConfigManager.ApplicationPath, customNameDictPath)))
+            if (File.Exists(Path.Join(Storage.ApplicationPath, customNameDictPath)))
             {
-                string[] lines = await File.ReadAllLinesAsync(Path.Join(ConfigManager.ApplicationPath, customNameDictPath))
+                string[] lines = await File.ReadAllLinesAsync(Path.Join(Storage.ApplicationPath, customNameDictPath))
                     .ConfigureAwait(false);
                 foreach (string line in lines)
                 {

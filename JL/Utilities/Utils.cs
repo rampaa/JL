@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -230,13 +231,14 @@ namespace JL.Utilities
         {
             var jso = new JsonSerializerOptions
             {
-                WriteIndented = true, Converters = { new JsonStringEnumConverter(), }
+                WriteIndented = true,
+                Converters = { new JsonStringEnumConverter(), }
             };
 
             try
             {
-                Directory.CreateDirectory(Path.Join(ConfigManager.ApplicationPath, "Config"));
-                File.WriteAllText(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json"),
+                Directory.CreateDirectory(Path.Join(Storage.ApplicationPath, "Config"));
+                File.WriteAllText(Path.Join(Storage.ApplicationPath, "Config/dicts.json"),
                     JsonSerializer.Serialize(Storage.BuiltInDicts, jso));
             }
             catch (Exception e)
@@ -252,10 +254,11 @@ namespace JL.Utilities
             {
                 var jso = new JsonSerializerOptions
                 {
-                    WriteIndented = true, Converters = { new JsonStringEnumConverter(), }
+                    WriteIndented = true,
+                    Converters = { new JsonStringEnumConverter(), }
                 };
 
-                File.WriteAllTextAsync(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json"),
+                File.WriteAllTextAsync(Path.Join(Storage.ApplicationPath, "Config/dicts.json"),
                     JsonSerializer.Serialize(Storage.Dicts, jso));
             }
             catch (Exception e)
@@ -273,7 +276,7 @@ namespace JL.Utilities
 
                 Dictionary<DictType, Dict> deserializedDicts = await JsonSerializer
                     .DeserializeAsync<Dictionary<DictType, Dict>>(
-                        new StreamReader(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json")).BaseStream, jso)
+                        new StreamReader(Path.Join(Storage.ApplicationPath, "Config/dicts.json")).BaseStream, jso)
                     .ConfigureAwait(false);
 
                 if (deserializedDicts != null)
@@ -322,7 +325,7 @@ namespace JL.Utilities
 
         public static void ShowManageDictionariesWindow()
         {
-            if (!File.Exists(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json")))
+            if (!File.Exists(Path.Join(Storage.ApplicationPath, "Config/dicts.json")))
                 Utils.CreateDefaultDictsConfig();
 
             if (!File.Exists("Resources/custom_words.txt"))
@@ -338,7 +341,8 @@ namespace JL.Utilities
         {
             if (selectedText.Length > 0)
                 Process.Start(new ProcessStartInfo("cmd",
-                    $"/c start https://www.google.com/search?q={selectedText}^&hl=ja") { CreateNoWindow = true });
+                    $"/c start https://www.google.com/search?q={selectedText}^&hl=ja")
+                { CreateNoWindow = true });
         }
 
         public static string GetMd5String(byte[] bytes)
@@ -394,6 +398,41 @@ namespace JL.Utilities
             {
                 Logger.Error(e, "Error motivating");
                 Alert(AlertLevel.Error, "Error motivating");
+            }
+        }
+
+        public static async void CheckForJLUpdates()
+        {
+            HttpResponseMessage response = await Storage.Client.GetAsync(Storage.repoURL + "releases/latest");
+            string responseUri = response.RequestMessage.RequestUri.ToString();
+            Version latestVersion = new(responseUri[(responseUri.LastIndexOf("/") + 1)..]);
+            if (latestVersion > Storage.version)
+            {
+                if (MessageBox.Show("A new version of JL is available. Would you like to download it now?", "",
+                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
+                    MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
+                {
+                    await UpdateJL(response, latestVersion);
+                }
+            }
+        }
+
+        public static async Task UpdateJL(HttpResponseMessage response, Version latestVersion)
+        {
+            string architecture = Environment.Is64BitProcess ? "x64" : "x86";
+            string repoName = Storage.repoURL[(Storage.repoURL.LastIndexOf("/") + 1)..^1];
+            Uri latestReleaseUrl = new(Storage.repoURL + "releases/download/" + latestVersion.ToString(2) + repoName + "-" + latestVersion.ToString(2) + "-win-" + architecture + ".zip");
+
+            HttpRequestMessage request = new(HttpMethod.Get, latestReleaseUrl);
+            response = await Storage.Client.SendAsync(request).ConfigureAwait(false);
+            if (response.IsSuccessStatusCode)
+            {
+                Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                ZipArchive archive = new(responseStream);
+                Directory.CreateDirectory(Path.Join(Storage.ApplicationPath, "tmp"));
+                archive.ExtractToDirectory(Path.Join(Storage.ApplicationPath, "tmp"));
+                Process.Start(new ProcessStartInfo("cmd", $"/c start {Path.Join(Storage.ApplicationPath, "update-helper.cmd")}") { CreateNoWindow = true });
+                Application.Current.Shutdown();
             }
         }
     }

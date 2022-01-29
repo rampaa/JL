@@ -10,9 +10,9 @@ namespace JL.Dicts.EDICT.JMnedict
     {
         public static async Task Load(string dictPath)
         {
-            if (File.Exists(Path.Join(ConfigManager.ApplicationPath, dictPath)))
+            if (File.Exists(Path.Join(Storage.ApplicationPath, dictPath)))
             {
-                using XmlTextReader edictXml = new(Path.Join(ConfigManager.ApplicationPath, dictPath))
+                using XmlTextReader edictXml = new(Path.Join(Storage.ApplicationPath, dictPath))
                 {
                     DtdProcessing = DtdProcessing.Parse,
                     WhitespaceHandling = WhitespaceHandling.None,

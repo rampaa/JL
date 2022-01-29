@@ -19,9 +19,9 @@ namespace JL.Dicts.EDICT
             {
                 HttpRequestMessage request = new(HttpMethod.Get, resourceDownloadUri);
 
-                if (File.Exists(Path.Join(ConfigManager.ApplicationPath, resourcePath)))
+                if (File.Exists(Path.Join(Storage.ApplicationPath, resourcePath)))
                     request.Headers.IfModifiedSince =
-                        File.GetLastWriteTime(Path.Join(ConfigManager.ApplicationPath, resourcePath));
+                        File.GetLastWriteTime(Path.Join(Storage.ApplicationPath, resourcePath));
 
                 if (!noPrompt)
                     MessageBox.Show(
@@ -29,11 +29,11 @@ namespace JL.Dicts.EDICT
                         "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK,
                         MessageBoxOptions.DefaultDesktopOnly);
 
-                HttpResponseMessage response = await ConfigManager.Client.SendAsync(request).ConfigureAwait(false);
+                HttpResponseMessage response = await Storage.Client.SendAsync(request).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
                     Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                    await GzipStreamDecompressor(responseStream, Path.Join(ConfigManager.ApplicationPath, resourcePath))
+                    await GzipStreamDecompressor(responseStream, Path.Join(Storage.ApplicationPath, resourcePath))
                         .ConfigureAwait(false);
 
                     if (!noPrompt)

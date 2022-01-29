@@ -54,7 +54,7 @@ namespace JL.Utilities
 
         public static void InitializeMainWindow()
         {
-            if (!File.Exists(Path.Join(ConfigManager.ApplicationPath, "Config/dicts.json")))
+            if (!File.Exists(Path.Join(Storage.ApplicationPath, "Config/dicts.json")))
                 Utils.CreateDefaultDictsConfig();
 
             if (!File.Exists("Resources/custom_words.txt"))
@@ -77,6 +77,11 @@ namespace JL.Utilities
             }).ConfigureAwait(false);
 
             ConfigManager.ApplyPreferences();
+
+            //if (ConfigManager.CheckForJLUpdatesOnStartUp)
+            //{
+            //    Utils.CheckForJLUpdates();
+            //}
         }
     }
 }

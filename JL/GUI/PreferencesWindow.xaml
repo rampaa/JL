@@ -87,6 +87,17 @@
                             <CheckBox x:Name="HighlightLongestMatchCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
 
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Check for updates on start up"
+                                       TextWrapping="Wrap" />
+                            <CheckBox x:Name="CheckForJLUpdatesOnStartCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button x:Name="CheckForJLUpdatesButton" Content="Check for updates"
+                                    Width="119" Height="32" HorizontalAlignment="Center" Click="CheckForJLUpdatesButton_Click" />
+                        </DockPanel>
+
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

@@ -56,7 +56,7 @@ namespace JL.Anki
                 "&kana=" +
                 reading
             );
-            HttpResponseMessage getResponse = await ConfigManager.Client.GetAsync(uri).ConfigureAwait(false);
+            HttpResponseMessage getResponse = await Storage.Client.GetAsync(uri).ConfigureAwait(false);
             // todo mining storemediafile thingy
             return await getResponse.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
         }
@@ -92,7 +92,7 @@ namespace JL.Anki
                     new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }));
                 Utils.Logger.Information("Sending: " + await payload.ReadAsStringAsync().ConfigureAwait(false));
 
-                HttpResponseMessage postResponse = await ConfigManager.Client.PostAsync(ConfigManager.AnkiConnectUri, payload)
+                HttpResponseMessage postResponse = await Storage.Client.PostAsync(ConfigManager.AnkiConnectUri, payload)
                     .ConfigureAwait(false);
 
                 Response json = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);

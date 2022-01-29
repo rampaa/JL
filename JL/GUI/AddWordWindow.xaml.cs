@@ -110,7 +110,7 @@ namespace JL.GUI
 
             string customWordDictPath = Storage.Dicts[DictType.CustomWordDictionary].Path;
             await File.AppendAllTextAsync(
-                Path.Join(ConfigManager.ApplicationPath, customWordDictPath),
+                Path.Join(Storage.ApplicationPath, customWordDictPath),
                 stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);
         }
 

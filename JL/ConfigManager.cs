@@ -1,7 +1,6 @@
 ﻿using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -13,13 +12,6 @@ namespace JL
 {
     public static class ConfigManager
     {
-        public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
-
-        // private static readonly Stopwatch timer = new();
-
-        private static readonly HttpClientHandler s_httpClientHandler = new() { UseProxy = false };
-        public static readonly HttpClient Client = new(s_httpClientHandler);
-
         public static string AnkiConnectUri { get; set; } = "http://localhost:8765";
         public static int MaxSearchLength { get; set; } = 37;
         public static string FrequencyListName { get; set; } = "VN";
@@ -89,6 +81,7 @@ namespace JL
         // consider making this dictionary specific
         public static bool NewlineBetweenDefinitions { get; set; } = false;
         public static bool Ready { get; set; } = false;
+        public static bool CheckForJLUpdatesOnStartUp { get; set; } = true;
 
         public static void ApplyPreferences()
         {
@@ -115,6 +108,10 @@ namespace JL
                 () => HighlightLongestMatch =
                     bool.Parse(ConfigurationManager.AppSettings.Get("HighlightLongestMatch")!),
                 HighlightLongestMatch, "HighlightLongestMatch");
+
+            Utils.Try(() => CheckForJLUpdatesOnStartUp =
+                bool.Parse(ConfigurationManager.AppSettings.Get("CheckForJLUpdatesOnStartUp")!),
+                CheckForJLUpdatesOnStartUp, "CheckForJLUpdatesOnStartUp");
 
             Utils.Try(() => MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength")!),
                 MaxSearchLength, "MaxSearchLength");
@@ -461,6 +458,7 @@ namespace JL
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
             preferenceWindow.KanjiModeCheckBox.IsChecked = KanjiMode;
             preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
+            preferenceWindow.CheckForJLUpdatesOnStartCheckBox.IsChecked = CheckForJLUpdatesOnStartUp;
             preferenceWindow.FrequencyListComboBox.ItemsSource = Storage.FrequencyLists.Keys;
             preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyListName;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
@@ -593,6 +591,8 @@ namespace JL
                 preferenceWindow.LookupRateNumericUpDown.Value.ToString();
             config.AppSettings.Settings["HighlightLongestMatch"].Value =
                 preferenceWindow.HighlightLongestMatchCheckBox.IsChecked.ToString();
+            config.AppSettings.Settings["CheckForJLUpdatesOnStart"].Value =
+                preferenceWindow.CheckForJLUpdatesOnStartCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["HighlightColor"].Value =
                 preferenceWindow.HighlightColorButton.Background.ToString();
 

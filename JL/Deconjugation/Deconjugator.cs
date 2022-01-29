@@ -11,7 +11,7 @@ namespace JL.Deconjugation
     public static class Deconjugator
     {
         private static readonly string s_file =
-            System.IO.File.ReadAllText(Path.Join(ConfigManager.ApplicationPath,
+            System.IO.File.ReadAllText(Path.Join(Storage.ApplicationPath,
                 "Resources/deconjugator_edited_arrays.json"));
 
         private static readonly Rule[] s_rules = JsonSerializer.Deserialize<Rule[]>(s_file);

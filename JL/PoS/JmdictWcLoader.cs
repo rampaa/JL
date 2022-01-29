@@ -17,7 +17,7 @@ namespace JL.PoS
         public static async Task Load()
         {
             await using FileStream openStream =
-                File.OpenRead(Path.Join(ConfigManager.ApplicationPath, "Resources/PoS.json"));
+                File.OpenRead(Path.Join(Storage.ApplicationPath, "Resources/PoS.json"));
             Storage.WcDict = await JsonSerializer.DeserializeAsync<Dictionary<string, List<JmdictWc>>>(openStream);
             if (Storage.WcDict == null) throw new InvalidOperationException();
 
@@ -119,7 +119,7 @@ namespace JL.PoS
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             };
 
-            await File.WriteAllBytesAsync(Path.Join(ConfigManager.ApplicationPath, "Resources/PoS.json"),
+            await File.WriteAllBytesAsync(Path.Join(Storage.ApplicationPath, "Resources/PoS.json"),
                 JsonSerializer.SerializeToUtf8Bytes(jmdictWcDict, options));
         }
     }

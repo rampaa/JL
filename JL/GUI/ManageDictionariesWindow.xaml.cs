@@ -243,14 +243,14 @@ namespace JL.GUI
 
         private void BrowseForDictionaryFile(DictType selectedDictType, string filter)
         {
-            OpenFileDialog openFileDialog = new() { InitialDirectory = ConfigManager.ApplicationPath, Filter = filter };
+            OpenFileDialog openFileDialog = new() { InitialDirectory = Storage.ApplicationPath, Filter = filter };
 
             if (openFileDialog.ShowDialog() == true)
             {
                 // lowest priority means highest number
                 int lowestPriority = Storage.Dicts.Select(dict => dict.Value.Priority).Max();
 
-                string relativePath = Path.GetRelativePath(ConfigManager.ApplicationPath, openFileDialog.FileName);
+                string relativePath = Path.GetRelativePath(Storage.ApplicationPath, openFileDialog.FileName);
                 Storage.Dicts.Add(selectedDictType,
                     new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
                 Storage.Dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
@@ -261,7 +261,7 @@ namespace JL.GUI
         // could get rid of this and make users select the index.json file for EPWING dictionaries
         private void BrowseForDictionaryFolder(DictType selectedDictType)
         {
-            using var fbd = new FolderBrowserDialog() { SelectedPath = ConfigManager.ApplicationPath };
+            using var fbd = new FolderBrowserDialog() { SelectedPath = Storage.ApplicationPath };
 
             if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK &&
                 !string.IsNullOrWhiteSpace(fbd.SelectedPath))
@@ -269,7 +269,7 @@ namespace JL.GUI
                 // lowest priority means highest number
                 int lowestPriority = Storage.Dicts.Select(dict => dict.Value.Priority).Max();
 
-                string relativePath = Path.GetRelativePath(ConfigManager.ApplicationPath, fbd.SelectedPath);
+                string relativePath = Path.GetRelativePath(Storage.ApplicationPath, fbd.SelectedPath);
                 Storage.Dicts.Add(selectedDictType,
                     new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
                 Storage.Dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();

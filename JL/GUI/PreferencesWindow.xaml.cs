@@ -369,5 +369,10 @@ namespace JL.GUI
         }
 
         #endregion
+
+        private void CheckForJLUpdatesButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Utils.CheckForJLUpdates();
+        }
     }
 }
