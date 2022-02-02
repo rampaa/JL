@@ -473,19 +473,19 @@ namespace JL.Lookup
                 foreach (IResult iResult in wordResult.Value.ResultsList)
                 {
                     var jMDictResult = (JMdictResult)iResult;
-                    var result = new Dictionary<LookupResult, List<string>>();
+                    Dictionary<LookupResult, List<string>> result = new();
 
                     var foundSpelling = new List<string> { jMDictResult.PrimarySpelling };
 
                     //var kanaSpellings = jMDictResult.KanaSpellings ?? new List<string>();
 
-                    List<string> readings = jMDictResult.Readings ?? new List<string>();
+                    List<string> readings = jMDictResult.Readings ?? new();
 
                     var foundForm = new List<string> { wordResult.Value.FoundForm };
 
                     var edictID = new List<string> { jMDictResult.Id };
 
-                    List<string> alternativeSpellings = jMDictResult.AlternativeSpellings ?? new List<string>();
+                    List<string> alternativeSpellings = jMDictResult.AlternativeSpellings ?? new();
 
                     List<string> process = ProcessProcess(wordResult.Value);
 
@@ -495,37 +495,35 @@ namespace JL.Lookup
 
                     var definitions = new List<string> { BuildJmdictDefinition(jMDictResult) };
 
-                    List<string> pOrthographyInfoList = jMDictResult.POrthographyInfoList ?? new List<string>();
+                    List<string> pOrthographyInfoList = jMDictResult.POrthographyInfoList ?? new();
 
-                    List<List<string>> rList = jMDictResult.ROrthographyInfoList ?? new List<List<string>>();
-                    List<List<string>> aList = jMDictResult.AOrthographyInfoList ?? new List<List<string>>();
-                    var rOrthographyInfoList = new List<string>();
-                    var aOrthographyInfoList = new List<string>();
+                    List<List<string>> rLists = jMDictResult.ROrthographyInfoList ?? new();
+                    List<List<string>> aLists = jMDictResult.AOrthographyInfoList ?? new();
+                    List<string> rOrthographyInfoList = new();
+                    List<string> aOrthographyInfoList = new();
 
-                    foreach (List<string> list in rList)
+                    foreach (List<string> rList in rLists)
                     {
-                        string final = "";
-                        foreach (string str in list)
+                        StringBuilder formatedROrthographyInfo = new();
+                        foreach (string rOrthographyInfo in rList)
                         {
-                            final += str + ", ";
+                            formatedROrthographyInfo.Append(rOrthographyInfo);
+                            formatedROrthographyInfo.Append(", ");
                         }
 
-                        final = final.TrimEnd(", ".ToCharArray());
-
-                        rOrthographyInfoList.Add(final);
+                        rOrthographyInfoList.Add(formatedROrthographyInfo.ToString().TrimEnd(", ".ToCharArray()));
                     }
 
-                    foreach (List<string> list in aList)
+                    foreach (List<string> aList in aLists)
                     {
-                        string final = "";
-                        foreach (string str in list)
+                        StringBuilder formatedAOrthographyInfo = new();
+                        foreach (string str in aList)
                         {
-                            final += str + ", ";
+                            formatedAOrthographyInfo.Append(str);
+                            formatedAOrthographyInfo.Append(", ");
                         }
 
-                        final = final.TrimEnd(", ".ToCharArray());
-
-                        aOrthographyInfoList.Add(final);
+                        aOrthographyInfoList.Add(formatedAOrthographyInfo.ToString().TrimEnd(", ".ToCharArray()));
                     }
 
                     result.Add(LookupResult.FoundSpelling, foundSpelling);
@@ -1126,12 +1124,12 @@ namespace JL.Lookup
 
         public static List<string> ProcessProcess(IntermediaryResult intermediaryResult)
         {
-            string deconj = "";
+            StringBuilder deconj = new();
             bool first = true;
 
             foreach (List<string> form in intermediaryResult.ProcessList)
             {
-                string formText = "";
+                StringBuilder formText = new();
                 int added = 0;
 
                 for (int i = form.Count - 1; i >= 0; i--)
@@ -1141,30 +1139,30 @@ namespace JL.Lookup
                     if (info == "")
                         continue;
 
-                    if (info.StartsWith("(") && info.EndsWith(")") && i != 0)
+                    if (info.StartsWith('(') && info.EndsWith(')') && i != 0)
                         continue;
 
                     if (added > 0)
-                        formText += "→";
+                        formText.Append('→');
 
                     added++;
-                    formText += info;
+                    formText.Append(info);
                 }
 
-                if (formText != "")
+                if (formText.Length != 0)
                 {
                     if (first)
-                        deconj += "～";
+                        deconj.Append('～');
                     else
-                        deconj += "; ";
+                        deconj.Append("; ");
 
-                    deconj += formText;
+                    deconj.Append(formText);
                 }
 
                 first = false;
             }
 
-            return deconj == "" ? new List<string>() : new List<string> { deconj };
+            return deconj.Length == 0 ? new List<string>() : new List<string> { deconj.ToString() };
         }
     }
 }

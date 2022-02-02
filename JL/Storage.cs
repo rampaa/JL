@@ -20,10 +20,10 @@ namespace JL
     public class Storage
     {
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
-        private static readonly HttpClientHandler s_httpClientHandler = new() { UseProxy = false };
-        public static readonly HttpClient Client = new(s_httpClientHandler);
-        public static readonly Version version = new(0, 0787);
-        public static readonly string repoURL = "https://github.com/rampaa/JL/";
+        public static readonly HttpClient Client = new(new HttpClientHandler() { UseProxy = false });
+        public static readonly Version version = new(0, 787);
+        public static readonly string repoUrl = "https://github.com/rampaa/JL/";
+
         public static Dictionary<string, List<JmdictWc>> WcDict { get; set; } = new();
         public static Dictionary<string, Dictionary<string, List<FrequencyEntry>>> FreqDicts { get; set; } = new();
 

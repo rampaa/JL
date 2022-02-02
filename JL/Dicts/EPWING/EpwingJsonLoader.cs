@@ -25,9 +25,9 @@ namespace JL.Dicts.EPWING
                     .ConfigureAwait(false);
 
                 Debug.Assert(jsonObjects != null, nameof(jsonObjects) + " != null");
-                foreach (List<JsonElement> obj in jsonObjects)
+                foreach (List<JsonElement> jsonObj in jsonObjects)
                 {
-                    DictionaryBuilder(new EpwingResult(obj), Storage.Dicts[dictType].Contents, dictType);
+                    DictionaryBuilder(new EpwingResult(jsonObj), Storage.Dicts[dictType].Contents, dictType);
                 }
             }
 

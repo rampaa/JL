@@ -403,7 +403,7 @@ namespace JL.Utilities
 
         public static async void CheckForJLUpdates()
         {
-            HttpResponseMessage response = await Storage.Client.GetAsync(Storage.repoURL + "releases/latest");
+            HttpResponseMessage response = await Storage.Client.GetAsync(Storage.repoUrl + "releases/latest");
             string responseUri = response.RequestMessage.RequestUri.ToString();
             Version latestVersion = new(responseUri[(responseUri.LastIndexOf("/") + 1)..]);
             if (latestVersion > Storage.version)
@@ -412,19 +412,19 @@ namespace JL.Utilities
                     MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
                     MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
                 {
-                    await UpdateJL(response, latestVersion);
+                    await UpdateJL(latestVersion).ConfigureAwait(false);
                 }
             }
         }
 
-        public static async Task UpdateJL(HttpResponseMessage response, Version latestVersion)
+        public static async Task UpdateJL(Version latestVersion)
         {
             string architecture = Environment.Is64BitProcess ? "x64" : "x86";
-            string repoName = Storage.repoURL[(Storage.repoURL.LastIndexOf("/") + 1)..^1];
-            Uri latestReleaseUrl = new(Storage.repoURL + "releases/download/" + latestVersion.ToString(2) + repoName + "-" + latestVersion.ToString(2) + "-win-" + architecture + ".zip");
+            string repoName = Storage.repoUrl[(Storage.repoUrl.LastIndexOf("/") + 1)..^1];
+            Uri latestReleaseUrl = new(Storage.repoUrl + "releases/download/" + latestVersion.ToString(2) + repoName + "-" + latestVersion.ToString(2) + "-win-" + architecture + ".zip");
 
             HttpRequestMessage request = new(HttpMethod.Get, latestReleaseUrl);
-            response = await Storage.Client.SendAsync(request).ConfigureAwait(false);
+            HttpResponseMessage response = await Storage.Client.SendAsync(request).ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
                 Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);

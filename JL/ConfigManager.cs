@@ -458,7 +458,7 @@ namespace JL
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
             preferenceWindow.KanjiModeCheckBox.IsChecked = KanjiMode;
             preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
-            preferenceWindow.CheckForJLUpdatesOnStartCheckBox.IsChecked = CheckForJLUpdatesOnStartUp;
+            preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = CheckForJLUpdatesOnStartUp;
             preferenceWindow.FrequencyListComboBox.ItemsSource = Storage.FrequencyLists.Keys;
             preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyListName;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
@@ -591,8 +591,8 @@ namespace JL
                 preferenceWindow.LookupRateNumericUpDown.Value.ToString();
             config.AppSettings.Settings["HighlightLongestMatch"].Value =
                 preferenceWindow.HighlightLongestMatchCheckBox.IsChecked.ToString();
-            config.AppSettings.Settings["CheckForJLUpdatesOnStart"].Value =
-                preferenceWindow.CheckForJLUpdatesOnStartCheckBox.IsChecked.ToString();
+            config.AppSettings.Settings["CheckForJLUpdatesOnStartUp"].Value =
+                preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["HighlightColor"].Value =
                 preferenceWindow.HighlightColorButton.Background.ToString();
 

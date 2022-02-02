@@ -194,12 +194,12 @@ namespace JL.Dicts.EDICT.JMdict
                 rl.Value.Id = entry.Id;
                 string key = rl.Key;
 
-                if (jMdictDictionary.TryGetValue(key, out List<IResult> tempList))
-                    tempList.Add(rl.Value);
+                if (jMdictDictionary.TryGetValue(key, out List<IResult> tempResultList))
+                    tempResultList.Add(rl.Value);
                 else
-                    tempList = new() { rl.Value };
+                    tempResultList = new() { rl.Value };
 
-                jMdictDictionary[key] = tempList;
+                jMdictDictionary[key] = tempResultList;
             }
         }
     }

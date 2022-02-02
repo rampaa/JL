@@ -90,7 +90,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Check for updates on start up"
                                        TextWrapping="Wrap" />
-                            <CheckBox x:Name="CheckForJLUpdatesOnStartCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="CheckForJLUpdatesOnStartUpCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
