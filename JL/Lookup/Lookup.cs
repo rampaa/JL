@@ -217,6 +217,51 @@ namespace JL.Lookup
                             jMdictResults.Add(textWithoutLongVowelMark,
                                 new IntermediaryResult(tmpResult, new List<List<string>>(), text[..^i], dictType));
                         }
+
+                        if (succAttempt < 3)
+                        {
+                            HashSet<Form> deconjugationResults = Deconjugator.Deconjugate(textWithoutLongVowelMark);
+                            foreach (Form result in deconjugationResults)
+                            {
+                                string lastTag = "";
+                                if (result.Tags.Count > 0)
+                                    lastTag = result.Tags.Last();
+
+                                if (Storage.Dicts[DictType.JMdict].Contents.TryGetValue(result.Text, out List<IResult> temp))
+                                {
+                                    List<IResult> resultsList = new();
+
+                                    foreach (IResult rslt1 in temp.ToList())
+                                    {
+                                        var rslt = (JMdictResult)rslt1;
+                                        if (result.Tags.Count == 0 || rslt.WordClasses.SelectMany(pos => pos).Contains(lastTag))
+                                        {
+                                            resultsList.Add(rslt);
+                                        }
+                                    }
+
+                                    if (resultsList.Any())
+                                    {
+                                        if (jMdictResults.TryGetValue(result.Text, out IntermediaryResult r))
+                                        {
+                                            if (r.FoundForm == result.OriginalText)
+                                                r.ProcessList.Add(result.Process);
+                                        }
+                                        else
+                                        {
+                                            jMdictResults.Add(result.Text,
+                                                new IntermediaryResult(resultsList, new List<List<string>> { result.Process },
+                                                    text[..result.OriginalText.Length],
+                                                    dictType)
+                                            );
+                                        }
+
+                                        ++succAttempt;
+                                        tryLongVowelConversion = false;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -354,6 +399,78 @@ namespace JL.Lookup
                         {
                             epwingResults.Add(textWithoutLongVowelMark,
                                 new IntermediaryResult(tmpResult, new List<List<string>>(), text[..^i], dictType));
+                        }
+
+                        if (succAttempt < 3)
+                        {
+                            HashSet<Form> decomjugationResults = Deconjugator.Deconjugate(textWithoutLongVowelMark);
+
+                            foreach (Form deconjugationResult in decomjugationResults)
+                            {
+                                string lastTag = "";
+                                if (deconjugationResult.Tags.Count > 0)
+                                    lastTag = deconjugationResult.Tags.Last();
+
+                                if (dict.TryGetValue(deconjugationResult.Text, out List<IResult> epwingTmpResults))
+                                {
+                                    List<IResult> resultsList = new();
+
+                                    foreach (EpwingResult epwingResult in epwingTmpResults.Cast<EpwingResult>())
+                                    {
+                                        bool noMatchingEntryInJmdictWc = true;
+
+                                        if (deconjugationResult.Tags.Count == 0 || epwingResult.WordClasses.Contains(lastTag))
+                                        {
+                                            resultsList.Add(epwingResult);
+                                        }
+                                        else if (Storage.WcDict.TryGetValue(deconjugationResult.Text, out List<JmdictWc> jmdictWcResults))
+                                        {
+                                            foreach (JmdictWc jmdictWcResult in jmdictWcResults)
+                                            {
+                                                if (epwingResult.PrimarySpelling == jmdictWcResult.Spelling
+                                                    && (jmdictWcResult.Readings?.Contains(epwingResult.Reading)
+                                                        ?? string.IsNullOrEmpty(epwingResult.Reading)))
+                                                {
+                                                    noMatchingEntryInJmdictWc = false;
+                                                    if (deconjugationResult.Tags.Count == 0 ||
+                                                        jmdictWcResult.WordClasses.Contains(lastTag))
+                                                    {
+                                                        resultsList.Add(epwingResult);
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        if (deconjugationResult.Tags.Count != 0 && !epwingResult.WordClasses.Any() &&
+                                            noMatchingEntryInJmdictWc)
+                                        {
+                                            resultsList.Add(epwingResult);
+                                        }
+                                    }
+
+                                    if (resultsList.Any())
+                                    {
+                                        if (epwingResults.TryGetValue(deconjugationResult.Text, out IntermediaryResult r))
+                                        {
+                                            if (r.FoundForm == deconjugationResult.OriginalText)
+                                                r.ProcessList.Add(deconjugationResult.Process);
+                                        }
+                                        else
+                                        {
+                                            epwingResults.Add(deconjugationResult.Text,
+                                                new IntermediaryResult(resultsList,
+                                                    new List<List<string>> { deconjugationResult.Process },
+                                                    text[..deconjugationResult.OriginalText.Length],
+                                                    dictType)
+                                            );
+                                        }
+
+                                        ++succAttempt;
+                                        tryLongVowelConversion = false;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
