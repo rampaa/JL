@@ -257,7 +257,6 @@ namespace JL.Lookup
                                         }
 
                                         ++succAttempt;
-                                        tryLongVowelConversion = false;
                                     }
                                 }
                             }
@@ -467,7 +466,6 @@ namespace JL.Lookup
                                         }
 
                                         ++succAttempt;
-                                        tryLongVowelConversion = false;
                                     }
                                 }
                             }
