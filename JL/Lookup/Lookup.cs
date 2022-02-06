@@ -41,63 +41,81 @@ namespace JL.Lookup
 
             List<string> textInHiraganaList = new();
             List<HashSet<Form>> deconjugationResultsList = new();
+
+            bool needDeconjugation = Storage.Dicts[DictType.JMdict].Active
+                || Storage.Dicts[DictType.CustomWordDictionary].Active
+                || Storage.Dicts[DictType.Daijirin].Active
+                || Storage.Dicts[DictType.Kenkyuusha].Active
+                || Storage.Dicts[DictType.Daijisen].Active
+                || Storage.Dicts[DictType.Gakken].Active
+                || Storage.Dicts[DictType.Kotowaza].Active
+                || Storage.Dicts[DictType.Koujien].Active
+                || Storage.Dicts[DictType.Meikyou].Active;
+
             for (int i = 0; i < text.Length; i++)
             {
                 string textInHiragana = Kana.KatakanaToHiraganaConverter(text[..^i]);
                 textInHiraganaList.Add(textInHiragana);
-                deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
+
+                if (needDeconjugation)
+                {
+                    deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
+                }
             }
 
             foreach ((DictType dictType, Dict dict) in Storage.Dicts)
             {
-                switch (dictType)
+                if (dict.Active)
                 {
-                    case DictType.JMdict:
-                        jMdictResults = GetJMdictResults(text, textInHiraganaList, deconjugationResultsList, dictType);
-                        break;
-                    case DictType.JMnedict:
-                        jMnedictResults = GetJMnedictResults(text, textInHiraganaList, dictType);
-                        break;
-                    case DictType.Kanjidic:
-                        kanjiResult = GetKanjidicResults(text, DictType.Kanjidic);
-                        break;
-                    case DictType.Kenkyuusha:
-                        epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
-                            deconjugationResultsList, dict.Contents, dictType));
-                        break;
-                    case DictType.Daijirin:
-                        epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
-                            deconjugationResultsList, dict.Contents, dictType));
-                        break;
-                    case DictType.Daijisen:
-                        epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
-                            deconjugationResultsList, dict.Contents, dictType));
-                        break;
-                    case DictType.Koujien:
-                        epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
-                            deconjugationResultsList, dict.Contents, dictType));
-                        break;
-                    case DictType.Meikyou:
-                        epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
-                            deconjugationResultsList, dict.Contents, dictType));
-                        break;
-                    case DictType.Gakken:
-                        epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
-                            deconjugationResultsList, dict.Contents, dictType));
-                        break;
-                    case DictType.Kotowaza:
-                        epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
-                            deconjugationResultsList, dict.Contents, dictType));
-                        break;
-                    case DictType.CustomWordDictionary:
-                        customWordResults = GetCustomWordResults(text, textInHiraganaList,
-                            deconjugationResultsList, dictType);
-                        break;
-                    case DictType.CustomNameDictionary:
-                        customNameResults = GetCustomNameResults(text, textInHiraganaList, dictType);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(null, "Invalid DictType");
+                    switch (dictType)
+                    {
+                        case DictType.JMdict:
+                            jMdictResults = GetJMdictResults(text, textInHiraganaList, deconjugationResultsList, dictType);
+                            break;
+                        case DictType.JMnedict:
+                            jMnedictResults = GetJMnedictResults(text, textInHiraganaList, dictType);
+                            break;
+                        case DictType.Kanjidic:
+                            kanjiResult = GetKanjidicResults(text, DictType.Kanjidic);
+                            break;
+                        case DictType.Kenkyuusha:
+                            epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
+                                deconjugationResultsList, dict.Contents, dictType));
+                            break;
+                        case DictType.Daijirin:
+                            epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
+                                deconjugationResultsList, dict.Contents, dictType));
+                            break;
+                        case DictType.Daijisen:
+                            epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
+                                deconjugationResultsList, dict.Contents, dictType));
+                            break;
+                        case DictType.Koujien:
+                            epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
+                                deconjugationResultsList, dict.Contents, dictType));
+                            break;
+                        case DictType.Meikyou:
+                            epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
+                                deconjugationResultsList, dict.Contents, dictType));
+                            break;
+                        case DictType.Gakken:
+                            epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
+                                deconjugationResultsList, dict.Contents, dictType));
+                            break;
+                        case DictType.Kotowaza:
+                            epwingWordResultsList.Add(GetEpwingResults(text, textInHiraganaList,
+                                deconjugationResultsList, dict.Contents, dictType));
+                            break;
+                        case DictType.CustomWordDictionary:
+                            customWordResults = GetCustomWordResults(text, textInHiraganaList,
+                                deconjugationResultsList, dictType);
+                            break;
+                        case DictType.CustomNameDictionary:
+                            customNameResults = GetCustomNameResults(text, textInHiraganaList, dictType);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(null, "Invalid DictType");
+                    }
                 }
             }
 
@@ -169,16 +187,16 @@ namespace JL.Lookup
                         if (result.Tags.Count > 0)
                             lastTag = result.Tags.Last();
 
-                        if (Storage.Dicts[DictType.JMdict].Contents.TryGetValue(result.Text, out List<IResult> temp))
+                        if (Storage.Dicts[DictType.JMdict].Contents.TryGetValue(result.Text, out List<IResult> jmdictResults))
                         {
                             List<IResult> resultsList = new();
 
-                            foreach (IResult rslt1 in temp.ToList())
+                            foreach (IResult jmdictRslt in jmdictResults.ToList())
                             {
-                                var rslt = (JMdictResult)rslt1;
-                                if (result.Tags.Count == 0 || rslt.WordClasses.SelectMany(pos => pos).Contains(lastTag))
+                                var jmdictResult = (JMdictResult)jmdictRslt;
+                                if (result.Tags.Count == 0 || jmdictResult.WordClasses.SelectMany(pos => pos).Contains(lastTag))
                                 {
-                                    resultsList.Add(rslt);
+                                    resultsList.Add(jmdictResult);
                                 }
                             }
 
@@ -505,16 +523,16 @@ namespace JL.Lookup
                         if (deconjugationResult.Tags.Count > 0)
                             lastTag = deconjugationResult.Tags.Last();
 
-                        if (customWordDictionary.TryGetValue(deconjugationResult.Text, out List<IResult> temp))
+                        if (customWordDictionary.TryGetValue(deconjugationResult.Text, out List<IResult> cwResults))
                         {
                             List<IResult> resultsList = new();
 
-                            foreach (IResult rslt1 in temp)
+                            foreach (IResult cwRslt in cwResults)
                             {
-                                var rslt = (CustomWordEntry)rslt1;
-                                if (rslt.WordClasses.Contains(lastTag))
+                                var cwResult = (CustomWordEntry)cwRslt;
+                                if (deconjugationResult.Tags.Count == 0 || cwResult.WordClasses.Contains(lastTag))
                                 {
-                                    resultsList.Add(rslt);
+                                    resultsList.Add(cwResult);
                                 }
                             }
 
@@ -551,6 +569,52 @@ namespace JL.Lookup
                         {
                             customWordResults.Add(textWithoutLongVowelMark,
                                 new IntermediaryResult(tmpResult, new List<List<string>>(), text[..^i], dictType));
+                        }
+
+                        if (succAttempt < 3)
+                        {
+                            HashSet<Form> deconjugations = Deconjugator.Deconjugate(textWithoutLongVowelMark);
+
+                            foreach (Form deconjugationResult in deconjugationResultsList[i])
+                            {
+                                string lastTag = "";
+                                if (deconjugationResult.Tags.Count > 0)
+                                    lastTag = deconjugationResult.Tags.Last();
+
+                                if (customWordDictionary.TryGetValue(deconjugationResult.Text, out List<IResult> cwResults))
+                                {
+                                    List<IResult> resultsList = new();
+
+                                    foreach (IResult cwRslt in cwResults)
+                                    {
+                                        var cwResult = (CustomWordEntry)cwRslt;
+                                        if (deconjugationResult.Tags.Count == 0 || cwResult.WordClasses.Contains(lastTag))
+                                        {
+                                            resultsList.Add(cwResult);
+                                        }
+                                    }
+
+                                    if (resultsList.Any())
+                                    {
+                                        if (customWordResults.TryGetValue(deconjugationResult.Text, out IntermediaryResult r))
+                                        {
+                                            if (r.FoundForm == deconjugationResult.OriginalText)
+                                                r.ProcessList.Add(deconjugationResult.Process);
+                                        }
+                                        else
+                                        {
+                                            customWordResults.Add(deconjugationResult.Text,
+                                                new IntermediaryResult(resultsList,
+                                                    new List<List<string>> { deconjugationResult.Process },
+                                                    text[..deconjugationResult.OriginalText.Length],
+                                                    dictType)
+                                            );
+                                        }
+
+                                        ++succAttempt;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
