@@ -239,20 +239,20 @@ namespace JL.Lookup
                         if (succAttempt < 3)
                         {
                             HashSet<Form> deconjugationResults = Deconjugator.Deconjugate(textWithoutLongVowelMark);
-                            foreach (Form result in deconjugationResults)
+                            foreach (Form deconjugationResult in deconjugationResults)
                             {
                                 string lastTag = "";
-                                if (result.Tags.Count > 0)
-                                    lastTag = result.Tags.Last();
+                                if (deconjugationResult.Tags.Count > 0)
+                                    lastTag = deconjugationResult.Tags.Last();
 
-                                if (Storage.Dicts[DictType.JMdict].Contents.TryGetValue(result.Text, out List<IResult> temp))
+                                if (Storage.Dicts[DictType.JMdict].Contents.TryGetValue(deconjugationResult.Text, out List<IResult> temp))
                                 {
                                     List<IResult> resultsList = new();
 
                                     foreach (IResult rslt1 in temp.ToList())
                                     {
                                         var rslt = (JMdictResult)rslt1;
-                                        if (result.Tags.Count == 0 || rslt.WordClasses.SelectMany(pos => pos).Contains(lastTag))
+                                        if (deconjugationResult.Tags.Count == 0 || rslt.WordClasses.SelectMany(pos => pos).Contains(lastTag))
                                         {
                                             resultsList.Add(rslt);
                                         }
@@ -260,16 +260,16 @@ namespace JL.Lookup
 
                                     if (resultsList.Any())
                                     {
-                                        if (jMdictResults.TryGetValue(result.Text, out IntermediaryResult r))
+                                        if (jMdictResults.TryGetValue(deconjugationResult.Text, out IntermediaryResult r))
                                         {
-                                            if (r.FoundForm == result.OriginalText)
-                                                r.ProcessList.Add(result.Process);
+                                            if (r.FoundForm == deconjugationResult.OriginalText)
+                                                r.ProcessList.Add(deconjugationResult.Process);
                                         }
                                         else
                                         {
-                                            jMdictResults.Add(result.Text,
-                                                new IntermediaryResult(resultsList, new List<List<string>> { result.Process },
-                                                    text[..result.OriginalText.Length],
+                                            jMdictResults.Add(deconjugationResult.Text,
+                                                new IntermediaryResult(resultsList, new List<List<string>> { deconjugationResult.Process },
+                                                    text[..deconjugationResult.OriginalText.Length],
                                                     dictType)
                                             );
                                         }
