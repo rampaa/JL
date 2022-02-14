@@ -339,7 +339,7 @@ namespace JL.Utilities
 
         public static void SearchWithBrowser(string selectedText)
         {
-            if (selectedText.Length > 0)
+            if (selectedText?.Length > 0)
                 Process.Start(new ProcessStartInfo("cmd",
                     $"/c start https://www.google.com/search?q={selectedText}^&hl=ja")
                 { CreateNoWindow = true });

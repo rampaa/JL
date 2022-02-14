@@ -10,7 +10,7 @@
         <Grid Background="Black">
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,20">
                 <TextBlock Foreground="White" Text="Spellings" TextWrapping="Wrap" Margin="0,0,0,10"
-                           ToolTip="Separated by a semicolon" />
+                           Cursor="Help" ToolTip="Separated by a semicolon" />
                 <TextBox x:Name="SpellingsTextBox" TextWrapping="Wrap" Width="300" Margin="0,0,0,40"
                          ToolTip="Separated by a semicolon" />
                 <TextBlock Foreground="White" Text="Readings" TextWrapping="Wrap" Margin="0,0,0,10"

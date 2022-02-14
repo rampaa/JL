@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Anki;
 using JL.Lookup;
@@ -18,11 +19,8 @@ namespace JL.GUI
     /// </summary>
     public partial class PopupWindow : Window
     {
-        private static readonly System.Windows.Interop.WindowInteropHelper s_interopHelper =
-            new(MainWindow.Instance);
-
         private static readonly System.Windows.Forms.Screen s_activeScreen =
-            System.Windows.Forms.Screen.FromHandle(s_interopHelper.Handle);
+            System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(MainWindow.Instance).Handle);
 
         private PopupWindow _childPopupWindow;
 
@@ -45,7 +43,15 @@ namespace JL.GUI
         public PopupWindow()
         {
             InitializeComponent();
+            Init();
 
+            // need to initialize window (position) for later
+            Show();
+            Hide();
+        }
+
+        public void Init()
+        {
             MaxHeight = ConfigManager.PopupMaxHeight;
             MaxWidth = ConfigManager.PopupMaxWidth;
             Background = ConfigManager.PopupBackgroundColor;
@@ -59,10 +65,6 @@ namespace JL.GUI
                 SizeToContent = SizeToContent.Height;
             else
                 SizeToContent = SizeToContent.Manual;
-
-            // need to initialize window (position) for later
-            Show();
-            Hide();
         }
 
         private void AddName(object sender, RoutedEventArgs e)
@@ -125,6 +127,7 @@ namespace JL.GUI
 
                 if (lookupResults != null && lookupResults.Any())
                 {
+                    _lastSelectedText = lookupResults[0][LookupResult.FoundForm][0];
                     if (ConfigManager.HighlightLongestMatch)
                     {
                         double verticalOffset = tb.VerticalOffset;
@@ -132,6 +135,8 @@ namespace JL.GUI
                         tb.Select(charPosition, lookupResults[0][LookupResult.FoundForm][0].Length);
                         tb.ScrollToVerticalOffset(verticalOffset);
                     }
+
+                    Init();
 
                     Visibility = Visibility.Visible;
                     Activate();
@@ -174,6 +179,8 @@ namespace JL.GUI
             if (lookupResults != null && lookupResults.Any())
             {
                 ResultStackPanels.Clear();
+
+                Init();
 
                 Visibility = Visibility.Visible;
 
@@ -682,6 +689,8 @@ namespace JL.GUI
                     if ((textBlock.Text == ("#" + MainWindowUtilities.FakeFrequency)) || textBlock.Text == "#0")
                         continue;
 
+                    baby.MouseLeave += OnMouseLeave;
+
                     top.Children.Add(baby);
                 }
                 else if (baby is TextBox textBox)
@@ -691,6 +700,8 @@ namespace JL.GUI
                     // common emptiness check
                     if (textBox.Text == "")
                         continue;
+
+                    baby.MouseLeave += OnMouseLeave;
 
                     top.Children.Add(baby);
                 }
@@ -711,6 +722,8 @@ namespace JL.GUI
                 if (baby.Text == "")
                     continue;
 
+                baby.MouseLeave += OnMouseLeave;
+
                 bottom.Children.Add(baby);
             }
 
@@ -723,6 +736,10 @@ namespace JL.GUI
                     Background = ConfigManager.SeparatorColor
                 });
             }
+
+            innerStackPanel.MouseLeave += OnMouseLeave;
+            top.MouseLeave += OnMouseLeave;
+            bottom.MouseLeave += OnMouseLeave;
 
             return innerStackPanel;
         }
@@ -1025,8 +1042,28 @@ namespace JL.GUI
             Hide();
         }
 
+        private void OnMouseEnter(object sender, MouseEventArgs e)
+        {
+            if (_childPopupWindow != null && !_childPopupWindow.MiningMode)
+            {
+                _childPopupWindow.Hide();
+                _childPopupWindow.LastText = "";
+            }
+
+            if (MiningMode || ConfigManager.LookupOnSelectOnly) return;
+
+            Hide();
+            LastText = "";
+        }
+
         private void OnMouseLeave(object sender, MouseEventArgs e)
         {
+            if (_childPopupWindow != null && !_childPopupWindow.MiningMode)
+            {
+                _childPopupWindow.Hide();
+                _childPopupWindow.LastText = "";
+            }
+
             if (MiningMode || ConfigManager.LookupOnSelectOnly) return;
 
             Hide();

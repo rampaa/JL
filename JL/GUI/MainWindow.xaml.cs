@@ -120,6 +120,17 @@ namespace JL.GUI
             MinimizeButton.Foreground = new SolidColorBrush(Colors.SteelBlue);
         }
 
+        private void MainTextBox_MouseLeave(object sender, MouseEventArgs e)
+        {
+            //OpacitySlider.Visibility = Visibility.Collapsed;
+            //FontSizeSlider.Visibility = Visibility.Collapsed;
+
+            if (FirstPopupWindow.MiningMode || ConfigManager.LookupOnSelectOnly) return;
+
+            FirstPopupWindow.Hide();
+            FirstPopupWindow.LastText = "";
+        }
+
         private void MinimizeButton_MouseLeave(object sender, MouseEventArgs e)
         {
             MinimizeButton.Foreground = new SolidColorBrush(Colors.White);

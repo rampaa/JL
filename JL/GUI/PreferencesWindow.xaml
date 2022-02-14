@@ -83,7 +83,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Highlight the longest match"
-                                       TextWrapping="Wrap" ToolTip="Ignored if lookup mode is set to text select" />
+                                       Cursor="Help" TextWrapping="Wrap" ToolTip="Ignored if lookup mode is set to text select" />
                             <CheckBox x:Name="HighlightLongestMatchCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -190,13 +190,13 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max height"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                       Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center" ToolTip="Setting this more than half of your available height might cause popup window to flicker." />
                             <hc:NumericUpDown x:Name="PopupMaxHeightNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max width"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                       Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center" ToolTip="Setting this more than half of your available width might cause popup window to flicker." />
                             <hc:NumericUpDown x:Name="PopupMaxWidthNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
