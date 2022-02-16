@@ -164,11 +164,11 @@ namespace JL.Lookup
             string text,
             int i,
             string textInHiragana,
-            bool tryLongVowelConversion,
-            int succAttempt
-            )
+            int succAttempt)
         {
             Dictionary<string, List<IResult>> dictionary = Storage.Dicts[dictType].Contents;
+
+            bool tryLongVowelConversion = true;
 
             if (dictionary.TryGetValue(textInHiragana, out List<IResult> tempResult))
             {
@@ -296,11 +296,8 @@ namespace JL.Lookup
 
             for (int i = 0; i < text.Length; i++)
             {
-                bool tryLongVowelConversion = true;
-
-                (tryLongVowelConversion, succAttempt) = GetWordResultsHelper(dictType, results, deconjugationResultsList[i],
-                    text, i, textInHiraganaList[i],
-                    tryLongVowelConversion, succAttempt);
+                (bool tryLongVowelConversion, succAttempt) = GetWordResultsHelper(dictType, results,
+                    deconjugationResultsList[i], text, i, textInHiraganaList[i], succAttempt);
 
                 if (tryLongVowelConversion && textInHiraganaList[i].Contains('ー') &&
                     textInHiraganaList[i][0] != 'ー')
@@ -308,11 +305,8 @@ namespace JL.Lookup
                     List<string> textWithoutLongVowelMarkList = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
                     foreach (string textWithoutLongVowelMark in textWithoutLongVowelMarkList)
                     {
-                        succAttempt = GetWordResultsHelper(dictType, results,
-                            deconjugationResultsList[i],
-                            text, i, textInHiraganaList[i],
-                            tryLongVowelConversion,
-                            succAttempt).succAttempt;
+                        succAttempt = GetWordResultsHelper(dictType, results, deconjugationResultsList[i],
+                            text, i, textInHiraganaList[i], succAttempt).succAttempt;
                     }
                 }
             }
