@@ -930,6 +930,7 @@ namespace JL.GUI
             if (Utils.KeyGestureComparer(e, ConfigManager.MiningModeKeyGesture))
             {
                 MiningMode = true;
+                PopUpScrollViewer.ScrollToTop();
                 PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
                 // TODO: Tell the user that they are in mining mode
                 Activate();
