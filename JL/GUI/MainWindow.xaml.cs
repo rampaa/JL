@@ -365,9 +365,9 @@ namespace JL.GUI
 
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            FirstPopupWindow.MiningMode = false;
             foreach (PopupWindow popupWindow in Application.Current.Windows.OfType<PopupWindow>().ToList())
             {
+                popupWindow.MiningMode = false;
                 popupWindow.Hide();
             }
         }
