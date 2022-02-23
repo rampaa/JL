@@ -21,8 +21,8 @@ namespace JL
     {
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
         public static readonly HttpClient Client = new(new HttpClientHandler() { UseProxy = false });
-        public static readonly Version version = new(0, 787);
-        public static readonly string repoUrl = "https://github.com/rampaa/JL/";
+        public static readonly Version Version = new(0, 787);
+        public static readonly string RepoUrl = "https://github.com/rampaa/JL/";
 
         public static Dictionary<string, List<JmdictWc>> WcDict { get; set; } = new();
         public static Dictionary<string, Dictionary<string, List<FrequencyEntry>>> FreqDicts { get; set; } = new();

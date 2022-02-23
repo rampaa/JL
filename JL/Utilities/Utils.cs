@@ -403,10 +403,10 @@ namespace JL.Utilities
 
         public static async void CheckForJLUpdates()
         {
-            HttpResponseMessage response = await Storage.Client.GetAsync(Storage.repoUrl + "releases/latest");
+            HttpResponseMessage response = await Storage.Client.GetAsync(Storage.RepoUrl + "releases/latest");
             string responseUri = response.RequestMessage.RequestUri.ToString();
             Version latestVersion = new(responseUri[(responseUri.LastIndexOf("/") + 1)..]);
-            if (latestVersion > Storage.version)
+            if (latestVersion > Storage.Version)
             {
                 if (MessageBox.Show("A new version of JL is available. Would you like to download it now?", "",
                     MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
@@ -420,8 +420,8 @@ namespace JL.Utilities
         public static async Task UpdateJL(Version latestVersion)
         {
             string architecture = Environment.Is64BitProcess ? "x64" : "x86";
-            string repoName = Storage.repoUrl[(Storage.repoUrl.LastIndexOf("/") + 1)..^1];
-            Uri latestReleaseUrl = new(Storage.repoUrl + "releases/download/" + latestVersion.ToString(2) + repoName + "-" + latestVersion.ToString(2) + "-win-" + architecture + ".zip");
+            string repoName = Storage.RepoUrl[(Storage.RepoUrl.LastIndexOf("/") + 1)..^1];
+            Uri latestReleaseUrl = new(Storage.RepoUrl + "releases/download/" + latestVersion.ToString(2) + repoName + "-" + latestVersion.ToString(2) + "-win-" + architecture + ".zip");
 
             HttpRequestMessage request = new(HttpMethod.Get, latestReleaseUrl);
             HttpResponseMessage response = await Storage.Client.SendAsync(request).ConfigureAwait(false);
