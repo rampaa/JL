@@ -28,12 +28,7 @@ namespace JL.Lookup
 
             if (ConfigManager.KanjiMode)
             {
-                if (Storage.Dicts[DictType.Kanjidic]?.Contents.Any() ?? false)
-                {
-                    return KanjiResultBuilder(GetKanjidicResults(text, DictType.Kanjidic));
-                }
-
-                return null;
+                return KanjiResultBuilder(GetKanjidicResults(text, DictType.Kanjidic));
             }
 
             Dictionary<string, IntermediaryResult> jMdictResults = new();
