@@ -22,9 +22,14 @@ namespace JL.Lookup
 
         public static List<Dictionary<LookupResult, List<string>>> LookupText(string text)
         {
-            var preciseTimeNow = new DateTime(Stopwatch.GetTimestamp());
+            DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
             if ((preciseTimeNow - s_lastLookupTime).Milliseconds < ConfigManager.LookupRate) return null;
             s_lastLookupTime = preciseTimeNow;
+
+            if (ConfigManager.KanjiMode && (Storage.Dicts[DictType.Kanjidic]?.Contents.Any() ?? false))
+            {
+                return KanjiResultBuilder(GetKanjidicResults(text, DictType.Kanjidic));
+            }
 
             Dictionary<string, IntermediaryResult> jMdictResults = new();
             Dictionary<string, IntermediaryResult> jMnedictResults = new();
@@ -32,12 +37,6 @@ namespace JL.Lookup
             Dictionary<string, IntermediaryResult> kanjiResult = new();
             Dictionary<string, IntermediaryResult> customWordResults = new();
             Dictionary<string, IntermediaryResult> customNameResults = new();
-
-            if (ConfigManager.KanjiMode)
-                if (Storage.Dicts[DictType.Kanjidic]?.Contents.Any() ?? false)
-                {
-                    return KanjiResultBuilder(GetKanjidicResults(text, DictType.Kanjidic));
-                }
 
             List<string> textInHiraganaList = new();
             List<HashSet<Form>> deconjugationResultsList = new();
@@ -125,10 +124,12 @@ namespace JL.Lookup
                 lookupResults.AddRange(JmdictResultBuilder(jMdictResults));
 
             if (epwingWordResultsList.Any())
+            {
                 foreach (Dictionary<string, IntermediaryResult> epwingWordResult in epwingWordResultsList)
                 {
                     lookupResults.AddRange(EpwingResultBuilder(epwingWordResult));
                 }
+            }
 
             if (jMnedictResults.Any())
                 lookupResults.AddRange(JmnedictResultBuilder(jMnedictResults));
@@ -306,7 +307,7 @@ namespace JL.Lookup
                     foreach (string textWithoutLongVowelMark in textWithoutLongVowelMarkList)
                     {
                         succAttempt = GetWordResultsHelper(dictType, results, deconjugationResultsList[i],
-                            text, i, textInHiraganaList[i], succAttempt).succAttempt;
+                            text, i, textWithoutLongVowelMark, succAttempt).succAttempt;
                     }
                 }
             }
@@ -430,7 +431,6 @@ namespace JL.Lookup
 
             return results;
         }
-
 
         private static List<Dictionary<LookupResult, List<string>>> JmnedictResultBuilder(
             Dictionary<string, IntermediaryResult> jmnedictResults)

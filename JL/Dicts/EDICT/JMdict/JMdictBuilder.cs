@@ -192,7 +192,7 @@ namespace JL.Dicts.EDICT.JMdict
                     rl.Value.WordClasses = null;
 
                 rl.Value.Id = entry.Id;
-                string key = rl.Key;
+                string key = Kana.KatakanaToHiraganaConverter(rl.Key);
 
                 if (jMdictDictionary.TryGetValue(key, out List<IResult> tempResultList))
                     tempResultList.Add(rl.Value);
