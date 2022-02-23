@@ -26,9 +26,14 @@ namespace JL.Lookup
             if ((preciseTimeNow - s_lastLookupTime).Milliseconds < ConfigManager.LookupRate) return null;
             s_lastLookupTime = preciseTimeNow;
 
-            if (ConfigManager.KanjiMode && (Storage.Dicts[DictType.Kanjidic]?.Contents.Any() ?? false))
+            if (ConfigManager.KanjiMode)
             {
-                return KanjiResultBuilder(GetKanjidicResults(text, DictType.Kanjidic));
+                if (Storage.Dicts[DictType.Kanjidic]?.Contents.Any() ?? false)
+                {
+                    return KanjiResultBuilder(GetKanjidicResults(text, DictType.Kanjidic));
+                }
+
+                return null;
             }
 
             Dictionary<string, IntermediaryResult> jMdictResults = new();
