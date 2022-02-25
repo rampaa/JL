@@ -6,8 +6,6 @@
         FoundForm,
         Frequency,
         DictType,
-
-        // EDICT (and EPWING?)
         FoundSpelling,
 
         // KanaSpellings,

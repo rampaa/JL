@@ -143,20 +143,30 @@ namespace JL.Lookup
             if (customNameResults.Any())
                 lookupResults.AddRange(CustomNameResultBuilder(customNameResults));
 
-            lookupResults = SortLookupResults(lookupResults);
+            if (lookupResults.Any())
+                lookupResults = SortLookupResults(lookupResults);
+
             return lookupResults;
         }
 
         private static List<Dictionary<LookupResult, List<string>>> SortLookupResults(
             List<Dictionary<LookupResult, List<string>>> lookupResults)
         {
-            return lookupResults
+            List<Dictionary<LookupResult, List<string>>> sortedLookupResults = lookupResults
                 .OrderByDescending(dict => dict[LookupResult.FoundForm][0].Length)
                 .ThenBy(dict => Enum.TryParse(dict[LookupResult.DictType][0], out DictType dictType)
-                    ? Storage.Dicts[dictType].Priority
-                    : int.MaxValue)
-                .ThenBy(dict => Convert.ToInt32(dict[LookupResult.Frequency][0]))
+                ? Storage.Dicts[dictType].Priority
+                : int.MaxValue)
+                .ThenBy(dict => Convert.ToInt32(dict[LookupResult.Frequency][0])).ToList();
+
+            string longestFoundForm = sortedLookupResults.First()[LookupResult.FoundForm][0];
+
+            sortedLookupResults = sortedLookupResults
+                .OrderByDescending(dict => longestFoundForm == dict[LookupResult.FoundSpelling][0])
+                .ThenByDescending(dict => dict[LookupResult.Readings].Contains(longestFoundForm))
                 .ToList();
+
+            return sortedLookupResults.ToList();
         }
 
         private static (bool tryLongVowelConversion, int succAttempt) GetWordResultsHelper(DictType dictType,
@@ -502,6 +512,19 @@ namespace JL.Lookup
             var foundForm = new List<string> { kanjiResults.First().Value.FoundForm };
             result.Add(LookupResult.FoundForm, foundForm);
             result.Add(LookupResult.DictType, dictType);
+
+            List<string> allReadings = new();
+
+            if (kanjiResult.OnReadings != null)
+                allReadings.AddRange(kanjiResult.OnReadings);
+
+            if (kanjiResult.KunReadings != null)
+                allReadings.AddRange(kanjiResult.KunReadings);
+
+            if (kanjiResult.Nanori != null)
+                allReadings.AddRange(kanjiResult.Nanori);
+
+            result.Add(LookupResult.Readings, allReadings);
 
             results.Add(result);
             return results;
