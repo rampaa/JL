@@ -33,10 +33,12 @@ namespace JL.Dicts.CustomDict
         public static void AddToDictionary(string[] spellings, List<string> readings, List<string> definitions,
             string rawWordClass)
         {
-            foreach (string spelling in spellings)
+            for (int i = 0; i < spellings.Length; i++)
             {
                 List<string> alternativeSpellings = spellings.ToList();
-                alternativeSpellings.Remove(spelling);
+                alternativeSpellings.RemoveAt(i);
+
+                string spelling = spellings[i];
 
                 List<string> wordClass = new();
 

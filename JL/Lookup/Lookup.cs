@@ -155,8 +155,8 @@ namespace JL.Lookup
             List<Dictionary<LookupResult, List<string>>> sortedLookupResults = lookupResults
                 .OrderByDescending(dict => dict[LookupResult.FoundForm][0].Length)
                 .ThenBy(dict => Enum.TryParse(dict[LookupResult.DictType][0], out DictType dictType)
-                ? Storage.Dicts[dictType].Priority
-                : int.MaxValue)
+                    ? Storage.Dicts[dictType].Priority
+                    : int.MaxValue)
                 .ThenBy(dict => Convert.ToInt32(dict[LookupResult.Frequency][0])).ToList();
 
             string longestFoundForm = sortedLookupResults.First()[LookupResult.FoundForm][0];

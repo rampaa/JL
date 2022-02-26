@@ -124,15 +124,16 @@ namespace JL.Dicts.EPWING
                     if (Storage.Dicts[DictType.Kenkyuusha].Contents.TryGetValue(
                         Kana.KatakanaToHiraganaConverter(result.PrimarySpelling), out List<IResult> kenkyuushaResults))
                     {
-                        foreach (IResult result1 in kenkyuushaResults.ToList())
+                        for (int i = 0; i < kenkyuushaResults.Count; i++)
                         {
-                            var kenkyuushaResult = (EpwingResult)result1;
+                            var kenkyuushaResult = (EpwingResult)kenkyuushaResults[i];
+
                             if (kenkyuushaResult.Definitions.SequenceEqual(result.Definitions))
                             {
                                 if (string.IsNullOrEmpty(kenkyuushaResult.Reading) &&
                                     !string.IsNullOrEmpty(result.Reading))
                                 {
-                                    kenkyuushaResults.Remove(kenkyuushaResult);
+                                    kenkyuushaResults.RemoveAt(i);
                                     break;
                                 }
                                 else
