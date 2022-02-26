@@ -65,7 +65,7 @@ namespace JL.Dicts.EPWING
 
         private static bool IsValidEpwingResultForDictType(EpwingResult result, DictType dictType)
         {
-            string[] badCharacters = { "�", "(", "=", "＝", "［", "〔", "「", "『", "（", "【" };
+            string[] badCharacters = { "�", "(", "=", "＝", "［", "〔", "「", "『", "（", "【", "[" };
 
             foreach (string badCharacter in badCharacters)
             {
@@ -79,6 +79,46 @@ namespace JL.Dicts.EPWING
             switch (dictType)
             {
                 case DictType.Kenkyuusha:
+
+                    // TODO: Make this configurable? 
+                    // Remove all example sentences
+                    if (result.Definitions.Count > 2)
+                    {
+                        for (int i = 2; i < result.Definitions.Count; i++)
+                        {
+                            if (!char.IsDigit(result.Definitions[i][0]))
+                            {
+                                result.Definitions.RemoveAt(i);
+                                --i;
+                            }
+                        }
+                    }
+
+                    // Only keep one example sentence per definition
+                    //if (result.Definitions.Count > 2)
+                    //{
+                    //    bool isMainExample = true;
+
+                    //    for (int i = 2; i < result.Definitions.Count; i++)
+                    //    {
+                    //        if (char.IsDigit(result.Definitions[i][0]))
+                    //        {
+                    //            isMainExample = true;
+                    //        }
+
+                    //        else
+                    //        {
+                    //            if (!isMainExample)
+                    //            {
+                    //                result.Definitions.RemoveAt(i);
+                    //                --i;
+                    //            }
+
+                    //            isMainExample = false;
+                    //        }
+                    //    }
+                    //}
+
                     // Filter duplicate entries.
                     // If an entry has reading info while others don't, keep the one with the reading info.
                     if (Storage.Dicts[DictType.Kenkyuusha].Contents.TryGetValue(
