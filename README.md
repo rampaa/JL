@@ -23,6 +23,7 @@ Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer
 
 ### EPWING ([yomichan-import](https://github.com/FooSoft/yomichan-import/) format)
 
+
 * Daijirin - Basic+ support
 * Kenkyuusha - Basic+ support
 * Daijisen - Basic support
@@ -38,7 +39,14 @@ Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer
 * [KANJIDIC](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project): kanjidic2.xml.gz
 * [cjkvi-ids](https://github.com/cjkvi/cjkvi-ids): ids.txt
 
-## Screenshots (TODO)
+## Screenshots
+
+<img src="https://user-images.githubusercontent.com/25622653/155894148-31bef5b8-d290-4e00-b12a-3294c2a708b8.png" width=75% height=75%>
+
+<p float="left">
+  <img src="https://user-images.githubusercontent.com/25622653/155894288-bf6be8e6-2461-4f30-a76a-61b009c675b3.png" width=25% height=25%>
+  <img src="https://user-images.githubusercontent.com/25622653/155894231-a14b9893-2a01-4c9a-9ff4-b45d993617c4.png" width=29% height=29%>
+</p>
 
 
 ## FAQ
