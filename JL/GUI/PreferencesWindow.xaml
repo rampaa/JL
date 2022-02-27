@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         mc:Ignorable="d"
-        Title="Preferences" Height="580" Width="666" Topmost="True" Closing="Window_Closing"
+        Title="Preferences" Height="600" Width="666" Topmost="True" Closing="Window_Closing"
         SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Background="Black">
     <Grid>
         <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="20,0,0,20"
@@ -97,6 +97,7 @@
                             <Button x:Name="CheckForJLUpdatesButton" Content="Check for updates"
                                     Width="119" Height="32" HorizontalAlignment="Center" Click="CheckForJLUpdatesButton_Click" />
                         </DockPanel>
+                        <TextBlock x:Name="VersionTextBlock" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
 
                     </StackPanel>
                 </ScrollViewer>

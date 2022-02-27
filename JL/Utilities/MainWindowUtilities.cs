@@ -78,10 +78,10 @@ namespace JL.Utilities
 
             ConfigManager.ApplyPreferences();
 
-            //if (ConfigManager.CheckForJLUpdatesOnStartUp)
-            //{
-            //    Utils.CheckForJLUpdates();
-            //}
+            if (ConfigManager.CheckForJLUpdatesOnStartUp)
+            {
+                Utils.CheckForJLUpdates();
+            }
         }
     }
 }

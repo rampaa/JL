@@ -415,14 +415,20 @@ namespace JL.Utilities
                     await UpdateJL(latestVersion).ConfigureAwait(false);
                 }
             }
+
+            else
+            {
+                MessageBox.Show("JL is up to date", "",
+                MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.Yes,
+                MessageBoxOptions.DefaultDesktopOnly);
+            }
         }
 
         public static async Task UpdateJL(Version latestVersion)
         {
             string architecture = Environment.Is64BitProcess ? "x64" : "x86";
-            string repoName = Storage.RepoUrl[(Storage.RepoUrl.LastIndexOf("/") + 1)..^1];
-            Uri latestReleaseUrl = new(Storage.RepoUrl + "releases/download/" + latestVersion.ToString(2) + repoName + "-" + latestVersion.ToString(2) + "-win-" + architecture + ".zip");
-
+            string repoName = Storage.RepoUrl[(Storage.RepoUrl[..^1].LastIndexOf("/") + 1)..^1];
+            Uri latestReleaseUrl = new(Storage.RepoUrl + "releases/download/" + latestVersion.ToString(2) + "/" + repoName + "-" + latestVersion.ToString(2) + "-win-" + architecture + ".zip");
             HttpRequestMessage request = new(HttpMethod.Get, latestReleaseUrl);
             HttpResponseMessage response = await Storage.Client.SendAsync(request).ConfigureAwait(false);
             if (response.IsSuccessStatusCode)

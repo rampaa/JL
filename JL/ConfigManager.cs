@@ -424,6 +424,8 @@ namespace JL
         {
             CreateDefaultAppConfig();
 
+            preferenceWindow.VersionTextBlock.Text = "v" + Storage.Version.ToString();
+
             preferenceWindow.MiningModeKeyGestureTextBox.Text = Utils.KeyGestureToString(MiningModeKeyGesture);
             preferenceWindow.PlayAudioKeyGestureTextBox.Text = Utils.KeyGestureToString(PlayAudioKeyGesture);
             preferenceWindow.KanjiModeKeyGestureTextBox.Text = Utils.KeyGestureToString(KanjiModeKeyGesture);
