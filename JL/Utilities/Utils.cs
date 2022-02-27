@@ -401,26 +401,39 @@ namespace JL.Utilities
             }
         }
 
-        public static async void CheckForJLUpdates()
+        public static async void CheckForJLUpdates(bool isAutoCheck)
         {
-            HttpResponseMessage response = await Storage.Client.GetAsync(Storage.RepoUrl + "releases/latest");
-            string responseUri = response.RequestMessage.RequestUri.ToString();
-            Version latestVersion = new(responseUri[(responseUri.LastIndexOf("/") + 1)..]);
-            if (latestVersion > Storage.Version)
+            try
             {
-                if (MessageBox.Show("A new version of JL is available. Would you like to download it now?", "",
-                    MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
-                    MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
+                HttpResponseMessage response = await Storage.Client.GetAsync(Storage.RepoUrl + "releases/latest");
+                string responseUri = response.RequestMessage.RequestUri.ToString();
+                Version latestVersion = new(responseUri[(responseUri.LastIndexOf("/") + 1)..]);
+                if (latestVersion > Storage.Version)
                 {
-                    await UpdateJL(latestVersion).ConfigureAwait(false);
+                    if (MessageBox.Show("A new version of JL is available. Would you like to download it now?", "",
+                        MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
+                        MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
+                    {
+                        MessageBox.Show(
+                            $"This may take a while. Please don't manually shut down the program until it's updated.",
+                            "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK,
+                            MessageBoxOptions.DefaultDesktopOnly);
+
+                        await UpdateJL(latestVersion).ConfigureAwait(false);
+                    }
+                }
+
+                else if (!isAutoCheck)
+                {
+                    MessageBox.Show("JL is up to date", "",
+                    MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.Yes,
+                    MessageBoxOptions.DefaultDesktopOnly);
                 }
             }
-
-            else
+            catch
             {
-                MessageBox.Show("JL is up to date", "",
-                MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.Yes,
-                MessageBoxOptions.DefaultDesktopOnly);
+                Logger.Warning("Couldn't update JL.");
+                Alert(AlertLevel.Warning, "Couldn't update JL.");
             }
         }
 
@@ -435,10 +448,18 @@ namespace JL.Utilities
             {
                 Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 ZipArchive archive = new(responseStream);
-                Directory.CreateDirectory(Path.Join(Storage.ApplicationPath, "tmp"));
-                archive.ExtractToDirectory(Path.Join(Storage.ApplicationPath, "tmp"));
+
+                string tmpDirectory = Path.Join(Storage.ApplicationPath, "tmp");
+
+                if (Directory.Exists(tmpDirectory))
+                {
+                    Directory.Delete(tmpDirectory, true);
+                }
+
+                Directory.CreateDirectory(tmpDirectory);
+                archive.ExtractToDirectory(tmpDirectory);
                 Process.Start(new ProcessStartInfo("cmd", $"/c start {Path.Join(Storage.ApplicationPath, "update-helper.cmd")}") { CreateNoWindow = true });
-                Application.Current.Shutdown();
+                Environment.Exit(0);
             }
         }
     }

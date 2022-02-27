@@ -80,7 +80,7 @@ namespace JL.Utilities
 
             if (ConfigManager.CheckForJLUpdatesOnStartUp)
             {
-                Utils.CheckForJLUpdates();
+                Utils.CheckForJLUpdates(true);
             }
         }
     }

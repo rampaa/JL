@@ -372,7 +372,7 @@ namespace JL.GUI
 
         private void CheckForJLUpdatesButton_Click(object sender, RoutedEventArgs e)
         {
-            Utils.CheckForJLUpdates();
+            Utils.CheckForJLUpdates(false);
         }
     }
 }
