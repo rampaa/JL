@@ -62,6 +62,5 @@ Select the folder containing the **unzipped** (so you should have a folder of fi
 * Everything else: JL.dll.config
 ### Will you add machine translation capabilities?
 No.
-
 ## License
-TBD
+Licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
