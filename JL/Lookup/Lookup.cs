@@ -205,8 +205,9 @@ namespace JL.Lookup
                         {
                             case DictType.JMdict:
                                 {
-                                    foreach (JMdictResult dictResult in dictResults.ToList())
+                                    foreach (var result in dictResults.ToList())
                                     {
+                                        var dictResult = (JMdictResult) result;
                                         if (deconjugationResult.Tags.Count == 0 || dictResult.WordClasses.SelectMany(pos => pos).Contains(lastTag))
                                         {
                                             resultsList.Add(dictResult);
@@ -217,8 +218,9 @@ namespace JL.Lookup
 
                             case DictType.CustomWordDictionary:
                                 {
-                                    foreach (CustomWordEntry dictResult in dictResults.ToList())
+                                    foreach (var result in dictResults.ToList())
                                     {
+                                        var dictResult = (CustomWordEntry) result;
                                         if (deconjugationResult.Tags.Count == 0 || dictResult.WordClasses.Contains(lastTag))
                                         {
                                             resultsList.Add(dictResult);
