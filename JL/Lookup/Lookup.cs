@@ -41,15 +41,16 @@ namespace JL.Lookup
             List<string> textInHiraganaList = new();
             List<HashSet<Form>> deconjugationResultsList = new();
 
-            bool needDeconjugation = Storage.Dicts[DictType.JMdict].Active
-                || Storage.Dicts[DictType.CustomWordDictionary].Active
-                || Storage.Dicts[DictType.Daijirin].Active
-                || Storage.Dicts[DictType.Kenkyuusha].Active
-                || Storage.Dicts[DictType.Daijisen].Active
-                || Storage.Dicts[DictType.Gakken].Active
-                || Storage.Dicts[DictType.Kotowaza].Active
-                || Storage.Dicts[DictType.Koujien].Active
-                || Storage.Dicts[DictType.Meikyou].Active;
+            bool needDeconjugation =
+                (Storage.Dicts.TryGetValue(DictType.JMdict, out Dict dictionary) && dictionary.Active)
+                || (Storage.Dicts.TryGetValue(DictType.CustomWordDictionary, out dictionary) && dictionary.Active)
+                || (Storage.Dicts.TryGetValue(DictType.Daijirin, out dictionary) && dictionary.Active)
+                || (Storage.Dicts.TryGetValue(DictType.Kenkyuusha, out dictionary) && dictionary.Active)
+                || (Storage.Dicts.TryGetValue(DictType.Daijisen, out dictionary) && dictionary.Active)
+                || (Storage.Dicts.TryGetValue(DictType.Gakken, out dictionary) && dictionary.Active)
+                || (Storage.Dicts.TryGetValue(DictType.Kotowaza, out dictionary) && dictionary.Active)
+                || (Storage.Dicts.TryGetValue(DictType.Koujien, out dictionary) && dictionary.Active)
+                || (Storage.Dicts.TryGetValue(DictType.Meikyou, out dictionary) && dictionary.Active);
 
             for (int i = 0; i < text.Length; i++)
             {
@@ -207,7 +208,7 @@ namespace JL.Lookup
                                 {
                                     foreach (var result in dictResults.ToList())
                                     {
-                                        var dictResult = (JMdictResult) result;
+                                        var dictResult = (JMdictResult)result;
                                         if (deconjugationResult.Tags.Count == 0 || dictResult.WordClasses.SelectMany(pos => pos).Contains(lastTag))
                                         {
                                             resultsList.Add(dictResult);
@@ -220,7 +221,7 @@ namespace JL.Lookup
                                 {
                                     foreach (var result in dictResults.ToList())
                                     {
-                                        var dictResult = (CustomWordEntry) result;
+                                        var dictResult = (CustomWordEntry)result;
                                         if (deconjugationResult.Tags.Count == 0 || dictResult.WordClasses.Contains(lastTag))
                                         {
                                             resultsList.Add(dictResult);
