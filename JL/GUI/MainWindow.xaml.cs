@@ -37,9 +37,14 @@ namespace JL.GUI
         {
             base.OnSourceInitialized(e);
 
-            var windowClipboardManager = new ClipboardManager(this);
-            windowClipboardManager.ClipboardChanged += ClipboardChanged;
+            AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
+            {
+                Exception e = (Exception)eventArgs.ExceptionObject;
+                Utils.Logger.Error(e.ToString());
+            };
 
+            ClipboardManager windowClipboardManager = new(this);
+            windowClipboardManager.ClipboardChanged += ClipboardChanged;
             CopyFromClipboard();
         }
 
