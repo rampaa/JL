@@ -93,7 +93,7 @@ namespace JL.Anki
 
             else
             {
-                Utils.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
+                // Utils.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
                 Utils.Logger.Error("AnkiConfig.json doesn't exist");
                 return null;
             }
