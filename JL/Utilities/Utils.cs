@@ -281,7 +281,7 @@ namespace JL.Utilities
 
                 if (deserializedDicts != null)
                 {
-                    foreach ((DictType _, Dict dict) in deserializedDicts)
+                    foreach (Dict dict in deserializedDicts.Values)
                     {
                         if (!Storage.Dicts.ContainsKey(dict.Type))
                         {
@@ -378,7 +378,7 @@ namespace JL.Utilities
         {
             try
             {
-                var rand = new Random();
+                Random rand = new();
 
                 string[] filePaths = Directory.GetFiles(motivationFolder);
                 int numFiles = filePaths.Length;
@@ -458,8 +458,10 @@ namespace JL.Utilities
 
                 Directory.CreateDirectory(tmpDirectory);
                 archive.ExtractToDirectory(tmpDirectory);
-                Process.Start(new ProcessStartInfo("cmd", $"/c start {Path.Join(Storage.ApplicationPath, "update-helper.cmd")}") { CreateNoWindow = true });
-                Environment.Exit(0);
+
+                await MainWindow.Instance.Dispatcher.BeginInvoke(ConfigManager.SaveBeforeClosing);
+
+                Process.Start(new ProcessStartInfo("cmd", $"/c start {Path.Join(Storage.ApplicationPath, "update-helper.cmd")} & exit") { UseShellExecute = false, CreateNoWindow = true });
             }
         }
     }

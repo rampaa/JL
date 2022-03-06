@@ -27,10 +27,6 @@ namespace JL.GUI
         public MainWindow()
         {
             InitializeComponent();
-            Instance = this;
-            MainWindowUtilities.InitializeMainWindow();
-            MainTextBox.IsInactiveSelectionHighlightEnabled = true;
-            MainWindowChrome.Freeze();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -45,6 +41,13 @@ namespace JL.GUI
 
             ClipboardManager windowClipboardManager = new(this);
             windowClipboardManager.ClipboardChanged += ClipboardChanged;
+
+            Instance = this;
+
+            MainWindowUtilities.InitializeMainWindow();
+            MainTextBox.IsInactiveSelectionHighlightEnabled = true;
+            MainWindowChrome.Freeze();
+
             CopyFromClipboard();
         }
 
@@ -99,8 +102,10 @@ namespace JL.GUI
                     if (MainTextBox.GetFirstVisibleLineIndex() == 0)
                     {
                         int caretIndex = allBacklogText.Length - MainTextBox.Text.Length;
+
                         MainTextBox.Text =
                             "Character count: " + string.Join("", MainWindowUtilities.Backlog).Length + "\n"
+                            + "Line count: " + allBacklogText.Split("\n").Length + "\n"
                             + allBacklogText;
                         MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
 

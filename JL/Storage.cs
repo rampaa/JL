@@ -60,7 +60,7 @@ namespace JL
             List<Task> tasks = new();
             bool dictRemoved = false;
 
-            foreach ((DictType _, Dict dict) in Dicts.ToList())
+            foreach (Dict dict in Dicts.Values.ToList())
             {
                 switch (dict.Type)
                 {

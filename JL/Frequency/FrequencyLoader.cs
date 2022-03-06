@@ -21,15 +21,18 @@ namespace JL.Frequency
 
             foreach ((string reading, List<List<JsonElement>> value) in frequencyDict)
             {
-                foreach (List<JsonElement> element in value)
+                for (int i = 0; i < value.Count; i++)
                 {
-                    string exactSpelling = element[0].ToString();
-                    element[1].TryGetInt32(out int frequencyRank);
+                    List<JsonElement> elementList = value[i];
+
+                    string exactSpelling = elementList[0].ToString();
+                    elementList[1].TryGetInt32(out int frequencyRank);
                     Debug.Assert(freqDict != null, nameof(freqDict) + " != null");
                     if (freqDict.TryGetValue(reading, out List<FrequencyEntry> readingFreqResult))
                     {
                         readingFreqResult.Add(new FrequencyEntry(exactSpelling, frequencyRank));
                     }
+
                     else
                     {
                         freqDict.Add(reading,
@@ -44,6 +47,7 @@ namespace JL.Frequency
                         {
                             exactSpellingFreqResult.Add(new FrequencyEntry(reading, frequencyRank));
                         }
+
                         else
                         {
                             freqDict.Add(exactSpellingInHiragana,

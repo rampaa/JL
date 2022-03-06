@@ -1,8 +1,8 @@
 @ECHO OFF
-@setlocal enableextensions  
-@cd /d "%~dp0"
-TIMEOUT 5
-Robocopy ".\tmp\ " . /E /Z /MOVE
-rmdir /Q /S  "%CD%\tmp\"
-start "" "%CD%\JL.exe"
-exit /b
+@SETLOCAL enableextensions
+@CD /D "%~dp0"
+TASKKILL /F /T /IM "JL.exe"
+ROBOCOPY ".\tmp\ " . /E /Z /R:30 /W:1 /MOVE
+RMDIR /Q /S  "%CD%\tmp\"
+START "" "%CD%\JL.exe"
+EXIT

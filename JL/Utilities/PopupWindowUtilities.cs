@@ -11,7 +11,7 @@ namespace JL.Utilities
     {
         public static string MakeUiElementReadingsText(List<string> readings, List<string> rOrthographyInfoList)
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new();
             if (readings.Count == 0) return sb.ToString();
 
             for (int index = 0; index < readings.Count; index++)
@@ -43,7 +43,7 @@ namespace JL.Utilities
         public static string MakeUiElementAlternativeSpellingsText(List<string> alternativeSpellings,
             List<string> aOrthographyInfoList)
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new();
             if (alternativeSpellings.Count == 0) return sb.ToString();
 
             sb.Append('(');
@@ -96,8 +96,10 @@ namespace JL.Utilities
             int startPosition = -1;
             int endPosition = -1;
 
-            foreach (string punctuation in japanesePunctuation)
+            for (int i = 0; i < japanesePunctuation.Count; i++)
             {
+                string punctuation = japanesePunctuation[i];
+
                 int tempIndex = text.LastIndexOf(punctuation, position, StringComparison.Ordinal);
 
                 if (tempIndex > startPosition)

@@ -32,7 +32,7 @@ namespace JL.Deconjugation
                 +
                 myRule.DecEnd;
 
-            var newForm = new Form(
+            Form newForm = new(
                 newText,
                 myForm.OriginalText,
                 myForm.Tags.ToList(),
@@ -71,12 +71,12 @@ namespace JL.Deconjugation
             if (myRule.Detail == "" && myForm.Tags.Count == 0)
                 return null;
 
-            var collection = new HashSet<Form>();
+            HashSet<Form> collection = new();
 
             List<string> array = myRule.DecEnd;
             if (array.Count == 1)
             {
-                var virtualRule = new VirtualRule
+                VirtualRule virtualRule = new
                 (
                     myRule.DecEnd.First(),
                     myRule.ConEnd.First(),
@@ -101,7 +101,7 @@ namespace JL.Deconjugation
                     maybeDecTag = myRule.DecTag.ElementAtOrDefault(i) ?? maybeDecTag;
                     maybeConTag = myRule.ConTag.ElementAtOrDefault(i) ?? maybeConTag;
 
-                    var virtualRule = new VirtualRule
+                    VirtualRule virtualRule = new
                     (
                         maybeDecEnd,
                         maybeConEnd,
@@ -163,7 +163,7 @@ namespace JL.Deconjugation
             string newText = new Regex(myRule.ConEnd.First())
                 .Replace(myForm.Text, myRule.DecEnd.First());
 
-            var newForm = new Form(
+            Form newForm = new(
                 newText,
                 myForm.OriginalText,
                 myForm.Tags.ToList(),
@@ -190,7 +190,7 @@ namespace JL.Deconjugation
             if (myForm.Text == "")
                 return null;
 
-            var collection = new HashSet<Form>();
+            HashSet<Form> collection = new();
 
             List<string> array = myRule.DecEnd;
             if (array.Count == 1)
@@ -208,7 +208,7 @@ namespace JL.Deconjugation
                     maybeDecEnd = myRule.DecEnd.ElementAtOrDefault(i) ?? maybeDecEnd;
                     maybeConEnd = myRule.ConEnd.ElementAtOrDefault(i) ?? maybeConEnd;
 
-                    var virtualRule = new Rule
+                    Rule virtualRule = new
                     (
                         myRule.Type,
                         null,
@@ -253,11 +253,12 @@ namespace JL.Deconjugation
                 if (s_cache.TryGet(myText, out HashSet<Form> data))
                     return data;
 
-            var processed = new HashSet<Form>();
-            var novel = new HashSet<Form>();
+            HashSet<Form> processed = new();
+            HashSet<Form> novel = new();
 
-            var startForm =
-                new Form(myText,
+            Form startForm = new
+                (
+                    myText,
                     myText,
                     new List<string>(),
                     new HashSet<string>(),
@@ -267,7 +268,7 @@ namespace JL.Deconjugation
 
             while (novel.Count > 0)
             {
-                var newNovel = new HashSet<Form>();
+                HashSet<Form> newNovel = new();
                 foreach (Form form in novel)
                 {
                     foreach (Rule rule in s_rules)

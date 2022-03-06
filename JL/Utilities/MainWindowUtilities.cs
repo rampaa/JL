@@ -38,9 +38,9 @@ namespace JL.Utilities
         {
             int endPosition = -1;
 
-            foreach (string punctuation in s_japanesePunctuation)
+            for (int i = 0; i < s_japanesePunctuation.Count; i++)
             {
-                int tempIndex = text.IndexOf(punctuation, position, StringComparison.Ordinal);
+                int tempIndex = text.IndexOf(s_japanesePunctuation[i], position, StringComparison.Ordinal);
 
                 if (tempIndex != -1 && (endPosition == -1 || tempIndex < endPosition))
                     endPosition = tempIndex;

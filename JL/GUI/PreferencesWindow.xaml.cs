@@ -166,7 +166,7 @@ namespace JL.GUI
                     JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelFieldNames(modelName)).Result
                         .ToString()!);
 
-                var fields =
+                Dictionary<string, JLField> fields =
                     fieldNames!.ToDictionary(fieldName => fieldName, _ => JLField.Nothing);
 
                 CreateFieldElements(fields);
@@ -185,7 +185,7 @@ namespace JL.GUI
             {
                 foreach ((string fieldName, JLField jlField) in fields)
                 {
-                    var stackPanel = new StackPanel();
+                    StackPanel stackPanel = new();
                     var textBlockFieldName = new TextBlock { Text = fieldName };
                     var comboBoxJLFields = new System.Windows.Controls.ComboBox
                     {
@@ -212,7 +212,7 @@ namespace JL.GUI
                 string deckName = MiningSetupComboBoxDeckNames.SelectionBoxItem.ToString();
                 string modelName = MiningSetupComboBoxModelNames.SelectionBoxItem.ToString();
 
-                var dict = new Dictionary<string, JLField>();
+                Dictionary<string, JLField> dict = new();
                 foreach (StackPanel stackPanel in MiningSetupStackPanelFields.Children)
                 {
                     var textBlock = (TextBlock)stackPanel.Children[0];
@@ -239,7 +239,7 @@ namespace JL.GUI
                     return;
                 }
 
-                var ankiConfig = new AnkiConfig(deckName, modelName, fields, tags);
+                AnkiConfig ankiConfig = new(deckName, modelName, fields, tags);
                 if (await AnkiConfig.WriteAnkiConfig(ankiConfig).ConfigureAwait(false))
                 {
                     Utils.Alert(AlertLevel.Success, "Saved config");

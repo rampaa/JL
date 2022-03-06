@@ -263,8 +263,8 @@ namespace JL.GUI
             int index, int resultsCount)
         {
             var innerStackPanel = new StackPanel { Margin = new Thickness(4, 2, 4, 2), };
-            var top = new WrapPanel();
-            var bottom = new StackPanel();
+            WrapPanel top = new();
+            StackPanel bottom = new();
 
             innerStackPanel.Children.Add(top);
             innerStackPanel.Children.Add(bottom);
@@ -796,7 +796,7 @@ namespace JL.GUI
             MiningMode = false;
             Hide();
 
-            var miningParams = new MiningParams();
+            MiningParams miningParams = new();
 
             var textBlock = (TextBlock)sender;
             var top = (WrapPanel)textBlock.Parent;

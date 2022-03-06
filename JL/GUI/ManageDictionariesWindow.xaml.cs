@@ -64,14 +64,14 @@ namespace JL.GUI
         {
             List<DockPanel> resultDockPanels = new();
 
-            foreach ((DictType _, Dict dict) in Storage.Dicts)
+            foreach (Dict dict in Storage.Dicts.Values.ToList())
             {
-                var dockPanel = new DockPanel();
+                DockPanel dockPanel = new();
 
-                var checkBox = new CheckBox() { Width = 20, IsChecked = dict.Active, Margin = new Thickness(10), };
-                var buttonIncreasePriority = new Button() { Width = 25, Content = "↑", Margin = new Thickness(1), };
-                var buttonDecreasePriority = new Button() { Width = 25, Content = "↓", Margin = new Thickness(1), };
-                var priority = new TextBlock()
+                var checkBox = new CheckBox { Width = 20, IsChecked = dict.Active, Margin = new Thickness(10), };
+                var buttonIncreasePriority = new Button { Width = 25, Content = "↑", Margin = new Thickness(1), };
+                var buttonDecreasePriority = new Button { Width = 25, Content = "↓", Margin = new Thickness(1), };
+                var priority = new TextBlock
                 {
                     Name = "priority",
                     // Width = 20,
@@ -79,13 +79,13 @@ namespace JL.GUI
                     Text = dict.Priority.ToString(),
                     // Margin = new Thickness(10),
                 };
-                var dictTypeDisplay = new TextBlock()
+                var dictTypeDisplay = new TextBlock
                 {
                     Width = 135,
                     Text = dict.Type.ToString(),
                     Margin = new Thickness(10),
                 };
-                var dictPathValidityDisplay = new TextBlock()
+                var dictPathValidityDisplay = new TextBlock
                 {
                     Width = 13,
                     Text = "❌",
@@ -98,7 +98,7 @@ namespace JL.GUI
                         ? Visibility.Visible
                         : Visibility.Collapsed
                 };
-                var dictPathDisplay = new TextBlock()
+                var dictPathDisplay = new TextBlock
                 {
                     Width = 200,
                     Text = dict.Path,
@@ -110,7 +110,7 @@ namespace JL.GUI
                 dictPathDisplay.MouseEnter += (_, _) => dictPathDisplay.TextDecorations = TextDecorations.Underline;
                 dictPathDisplay.MouseLeave += (_, _) => dictPathDisplay.TextDecorations = null;
 
-                var updateButton = new Button()
+                var updateButton = new Button
                 {
                     Width = 75,
                     Height = 30,
@@ -141,7 +141,7 @@ namespace JL.GUI
                     }
                 };
 
-                var buttonRemove = new Button()
+                var buttonRemove = new Button
                 {
                     Width = 75,
                     Height = 30,
@@ -261,7 +261,7 @@ namespace JL.GUI
         // could get rid of this and make users select the index.json file for EPWING dictionaries
         private void BrowseForDictionaryFolder(DictType selectedDictType)
         {
-            using var fbd = new FolderBrowserDialog() { SelectedPath = Storage.ApplicationPath };
+            using var fbd = new FolderBrowserDialog { SelectedPath = Storage.ApplicationPath };
 
             if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK &&
                 !string.IsNullOrWhiteSpace(fbd.SelectedPath))

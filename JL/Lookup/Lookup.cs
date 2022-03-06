@@ -63,7 +63,7 @@ namespace JL.Lookup
                 }
             }
 
-            foreach ((DictType dictType, Dict dict) in Storage.Dicts)
+            foreach ((DictType dictType, Dict dict) in Storage.Dicts.ToList())
             {
                 if (dict.Active)
                 {
@@ -126,9 +126,9 @@ namespace JL.Lookup
 
             if (epwingWordResultsList.Any())
             {
-                foreach (Dictionary<string, IntermediaryResult> epwingWordResult in epwingWordResultsList)
+                for (int i = 0; i < epwingWordResultsList.Count; i++)
                 {
-                    lookupResults.AddRange(EpwingResultBuilder(epwingWordResult));
+                    lookupResults.AddRange(EpwingResultBuilder(epwingWordResultsList[i]));
                 }
             }
 
@@ -174,7 +174,7 @@ namespace JL.Lookup
             Dictionary<string, IntermediaryResult> results,
             HashSet<Form> deconjugationList,
             string text,
-            int i,
+            string foundForm,
             string textInHiragana,
             int succAttempt)
         {
@@ -185,7 +185,7 @@ namespace JL.Lookup
             if (dictionary.TryGetValue(textInHiragana, out List<IResult> tempResult))
             {
                 results.TryAdd(textInHiragana,
-                    new IntermediaryResult(tempResult, new List<List<string>> { new() }, text[..^i],
+                    new IntermediaryResult(tempResult, new List<List<string>> { new() }, foundForm,
                         dictType));
                 tryLongVowelConversion = false;
             }
@@ -206,9 +206,10 @@ namespace JL.Lookup
                         {
                             case DictType.JMdict:
                                 {
-                                    foreach (var result in dictResults.ToList())
+                                    for (int i = 0; i < dictResults.Count; i++)
                                     {
-                                        var dictResult = (JMdictResult)result;
+                                        var dictResult = (JMdictResult)dictResults[i];
+
                                         if (deconjugationResult.Tags.Count == 0 || dictResult.WordClasses.SelectMany(pos => pos).Contains(lastTag))
                                         {
                                             resultsList.Add(dictResult);
@@ -219,9 +220,10 @@ namespace JL.Lookup
 
                             case DictType.CustomWordDictionary:
                                 {
-                                    foreach (var result in dictResults.ToList())
+                                    for (int i = 0; i < dictResults.Count; i++)
                                     {
-                                        var dictResult = (CustomWordEntry)result;
+                                        var dictResult = (CustomWordEntry)dictResults[i];
+
                                         if (deconjugationResult.Tags.Count == 0 || dictResult.WordClasses.Contains(lastTag))
                                         {
                                             resultsList.Add(dictResult);
@@ -238,21 +240,26 @@ namespace JL.Lookup
                             case DictType.Koujien:
                             case DictType.Meikyou:
                                 {
-                                    foreach (EpwingResult dictResult in dictResults.Cast<EpwingResult>())
+                                    for (int i = 0; i < dictResults.Count; i++)
                                     {
+                                        var dictResult = (EpwingResult)dictResults[i];
+
                                         bool noMatchingEntryInJmdictWc = true;
 
                                         if (deconjugationResult.Tags.Count == 0 || dictResult.WordClasses.Contains(lastTag))
                                         {
                                             resultsList.Add(dictResult);
                                         }
+
                                         else if (Storage.WcDict.TryGetValue(deconjugationResult.Text, out List<JmdictWc> jmdictWcResults))
                                         {
-                                            foreach (JmdictWc jmdictWcResult in jmdictWcResults)
+                                            for (int j = 0; j < jmdictWcResults.Count; j++)
                                             {
+                                                JmdictWc jmdictWcResult = jmdictWcResults[j];
+
                                                 if (dictResult.PrimarySpelling == jmdictWcResult.Spelling
                                                     && (jmdictWcResult.Readings?.Contains(dictResult.Reading)
-                                                        ?? string.IsNullOrEmpty(dictResult.Reading)))
+                                                    ?? string.IsNullOrEmpty(dictResult.Reading)))
                                                 {
                                                     noMatchingEntryInJmdictWc = false;
                                                     if (deconjugationResult.Tags.Count == 0 ||
@@ -311,16 +318,17 @@ namespace JL.Lookup
             for (int i = 0; i < text.Length; i++)
             {
                 (bool tryLongVowelConversion, succAttempt) = GetWordResultsHelper(dictType, results,
-                    deconjugationResultsList[i], text, i, textInHiraganaList[i], succAttempt);
+                    deconjugationResultsList[i], text, text[..^i], textInHiraganaList[i], succAttempt);
 
                 if (tryLongVowelConversion && textInHiraganaList[i].Contains('ー') &&
                     textInHiraganaList[i][0] != 'ー')
                 {
                     List<string> textWithoutLongVowelMarkList = Kana.LongVowelMarkConverter(textInHiraganaList[i]);
-                    foreach (string textWithoutLongVowelMark in textWithoutLongVowelMarkList)
+
+                    for (int j = 0; j < textWithoutLongVowelMarkList.Count; j++)
                     {
                         succAttempt = GetWordResultsHelper(dictType, results, deconjugationResultsList[i],
-                            text, i, textWithoutLongVowelMark, succAttempt).succAttempt;
+                            text, text[..^i], textWithoutLongVowelMarkList[j], succAttempt).succAttempt;
                     }
                 }
             }
@@ -364,13 +372,14 @@ namespace JL.Lookup
         private static List<Dictionary<LookupResult, List<string>>> JmdictResultBuilder(
             Dictionary<string, IntermediaryResult> jmdictResults)
         {
-            var results = new List<Dictionary<LookupResult, List<string>>>();
+            List<Dictionary<LookupResult, List<string>>> results = new();
 
-            foreach (KeyValuePair<string, IntermediaryResult> wordResult in jmdictResults)
+            foreach (KeyValuePair<string, IntermediaryResult> wordResult in jmdictResults.ToList())
             {
-                foreach (IResult iResult in wordResult.Value.ResultsList)
+                for (int i = 0; i < wordResult.Value.ResultsList.Count; i++)
                 {
-                    var jMDictResult = (JMdictResult)iResult;
+                    var jMDictResult = (JMdictResult)wordResult.Value.ResultsList[i];
+
                     Dictionary<LookupResult, List<string>> result = new();
 
                     var foundSpelling = new List<string> { jMDictResult.PrimarySpelling };
@@ -400,24 +409,26 @@ namespace JL.Lookup
                     List<string> rOrthographyInfoList = new();
                     List<string> aOrthographyInfoList = new();
 
-                    foreach (List<string> rList in rLists)
+                    for (int j = 0; j < rLists.Count; j++)
                     {
                         StringBuilder formatedROrthographyInfo = new();
-                        foreach (string rOrthographyInfo in rList)
+
+                        for (int k = 0; k < rLists[j].Count; k++)
                         {
-                            formatedROrthographyInfo.Append(rOrthographyInfo);
+                            formatedROrthographyInfo.Append(rLists[j][k]);
                             formatedROrthographyInfo.Append(", ");
                         }
 
                         rOrthographyInfoList.Add(formatedROrthographyInfo.ToString().TrimEnd(", ".ToCharArray()));
                     }
 
-                    foreach (List<string> aList in aLists)
+                    for (int j = 0; j < aLists.Count; j++)
                     {
                         StringBuilder formatedAOrthographyInfo = new();
-                        foreach (string str in aList)
+
+                        for (int k = 0; k < aLists[j].Count; k++)
                         {
-                            formatedAOrthographyInfo.Append(str);
+                            formatedAOrthographyInfo.Append(aLists[j][k]);
                             formatedAOrthographyInfo.Append(", ");
                         }
 
@@ -448,14 +459,15 @@ namespace JL.Lookup
         private static List<Dictionary<LookupResult, List<string>>> JmnedictResultBuilder(
             Dictionary<string, IntermediaryResult> jmnedictResults)
         {
-            var results = new List<Dictionary<LookupResult, List<string>>>();
+            List<Dictionary<LookupResult, List<string>>> results = new();
 
-            foreach (KeyValuePair<string, IntermediaryResult> nameResult in jmnedictResults)
+            foreach (KeyValuePair<string, IntermediaryResult> nameResult in jmnedictResults.ToList())
             {
-                foreach (IResult iResult in nameResult.Value.ResultsList)
+                for (int i = 0; i < nameResult.Value.ResultsList.Count; i++)
                 {
-                    var jMnedictResult = (JMnedictResult)iResult;
-                    var result = new Dictionary<LookupResult, List<string>>();
+                    var jMnedictResult = (JMnedictResult)nameResult.Value.ResultsList[i];
+
+                    Dictionary<LookupResult, List<string>> result = new();
 
                     var foundSpelling = new List<string> { jMnedictResult.PrimarySpelling };
 
@@ -491,8 +503,8 @@ namespace JL.Lookup
         private static List<Dictionary<LookupResult, List<string>>> KanjiResultBuilder(
             Dictionary<string, IntermediaryResult> kanjiResults)
         {
-            var results = new List<Dictionary<LookupResult, List<string>>>();
-            var result = new Dictionary<LookupResult, List<string>>();
+            List<Dictionary<LookupResult, List<string>>> results = new();
+            Dictionary<LookupResult, List<string>> result = new();
 
             if (!kanjiResults.Any())
                 return results;
@@ -536,14 +548,15 @@ namespace JL.Lookup
         private static List<Dictionary<LookupResult, List<string>>> EpwingResultBuilder(
             Dictionary<string, IntermediaryResult> epwingResults)
         {
-            var results = new List<Dictionary<LookupResult, List<string>>>();
+            List<Dictionary<LookupResult, List<string>>> results = new();
 
-            foreach (KeyValuePair<string, IntermediaryResult> wordResult in epwingResults)
+            foreach (KeyValuePair<string, IntermediaryResult> wordResult in epwingResults.ToList())
             {
-                foreach (IResult iResult in wordResult.Value.ResultsList)
+                for (int i = 0; i < wordResult.Value.ResultsList.Count; i++)
                 {
-                    var epwingResult = (EpwingResult)iResult;
-                    var result = new Dictionary<LookupResult, List<string>>();
+                    var epwingResult = (EpwingResult)wordResult.Value.ResultsList[i];
+
+                    Dictionary<LookupResult, List<string>> result = new();
 
                     var foundSpelling = new List<string> { epwingResult.PrimarySpelling };
 
@@ -576,15 +589,15 @@ namespace JL.Lookup
         private static List<Dictionary<LookupResult, List<string>>> CustomWordResultBuilder(
             Dictionary<string, IntermediaryResult> customWordResults)
         {
-            var results = new List<Dictionary<LookupResult, List<string>>>();
+            List<Dictionary<LookupResult, List<string>>> results = new();
 
-            foreach (KeyValuePair<string, IntermediaryResult> wordResult in customWordResults)
+            foreach (KeyValuePair<string, IntermediaryResult> wordResult in customWordResults.ToList())
             {
                 int wordResultCount = wordResult.Value.ResultsList.Count;
                 for (int i = 0; i < wordResultCount; i++)
                 {
                     var customWordDictResult = (CustomWordEntry)wordResult.Value.ResultsList[i];
-                    var result = new Dictionary<LookupResult, List<string>>();
+                    Dictionary<LookupResult, List<string>> result = new();
 
                     var foundSpelling = new List<string> { customWordDictResult.PrimarySpelling };
 
@@ -630,15 +643,15 @@ namespace JL.Lookup
         private static List<Dictionary<LookupResult, List<string>>> CustomNameResultBuilder(
             Dictionary<string, IntermediaryResult> customNameResults)
         {
-            var results = new List<Dictionary<LookupResult, List<string>>>();
+            List<Dictionary<LookupResult, List<string>>> results = new();
 
-            foreach (KeyValuePair<string, IntermediaryResult> customNameResult in customNameResults)
+            foreach (KeyValuePair<string, IntermediaryResult> customNameResult in customNameResults.ToList())
             {
                 int resultCount = customNameResult.Value.ResultsList.Count;
                 for (int i = 0; i < resultCount; i++)
                 {
                     var customNameDictResult = (CustomNameEntry)customNameResult.Value.ResultsList[i];
-                    var result = new Dictionary<LookupResult, List<string>>();
+                    Dictionary<LookupResult, List<string>> result = new();
 
                     var foundSpelling = new List<string> { customNameDictResult.PrimarySpelling };
 
@@ -679,8 +692,10 @@ namespace JL.Lookup
             if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(jMDictResult.PrimarySpelling),
                 out List<FrequencyEntry> freqResults))
             {
-                foreach (FrequencyEntry freqResult in freqResults)
+                for (int i = 0; i < freqResults.Count; i++)
                 {
+                    FrequencyEntry freqResult = freqResults[i];
+
                     if ((jMDictResult.Readings != null && jMDictResult.Readings.Contains(freqResult.Spelling))
                         || (jMDictResult.Readings == null && jMDictResult.PrimarySpelling == freqResult.Spelling))
                     //|| (jMnedictResult.KanaSpellings != null && jMnedictResult.KanaSpellings.Contains(freqResult.Spelling))
@@ -695,15 +710,17 @@ namespace JL.Lookup
 
                 if (freqValue == int.MaxValue && jMDictResult.AlternativeSpellings != null)
                 {
-                    foreach (string alternativeSpelling in jMDictResult.AlternativeSpellings)
+                    for (int i = 0; i < jMDictResult.AlternativeSpellings.Count; i++)
                     {
-                        if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(alternativeSpelling),
+                        if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(jMDictResult.AlternativeSpellings[i]),
                             out List<FrequencyEntry> alternativeSpellingFreqResults))
                         {
-                            foreach (FrequencyEntry alternativeSpellingFreqResult in alternativeSpellingFreqResults)
+                            for (int j = 0; j < alternativeSpellingFreqResults.Count; j++)
                             {
-                                if (jMDictResult.Readings != null &&
-                                    jMDictResult.Readings.Contains(alternativeSpellingFreqResult.Spelling))
+                                FrequencyEntry alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
+
+                                if (jMDictResult.Readings != null
+                                    && jMDictResult.Readings.Contains(alternativeSpellingFreqResult.Spelling))
                                 {
                                     if (freqValue > alternativeSpellingFreqResult.Frequency)
                                     {
@@ -722,15 +739,19 @@ namespace JL.Lookup
 
             else if (jMDictResult.Readings != null)
             {
-                foreach (string reading in jMDictResult.Readings)
+                for (int i = 0; i < jMDictResult.Readings.Count; i++)
                 {
+                    string reading = jMDictResult.Readings[i];
+
                     if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(reading), out List<FrequencyEntry> readingFreqResults))
                     {
-                        foreach (FrequencyEntry readingFreqResult in readingFreqResults)
+                        for (int j = 0; j < readingFreqResults.Count; j++)
                         {
+                            FrequencyEntry readingFreqResult = readingFreqResults[j];
+
                             if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading)
-                                || (jMDictResult.AlternativeSpellings != null &&
-                                    jMDictResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
+                                || (jMDictResult.AlternativeSpellings != null
+                                    && jMDictResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
                             //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                             {
                                 if (freqValue > readingFreqResult.Frequency)
@@ -761,11 +782,13 @@ namespace JL.Lookup
             if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingResult.PrimarySpelling),
                 out List<FrequencyEntry> freqResults))
             {
-                foreach (FrequencyEntry freqResult in freqResults)
+                for (int i = 0; i < freqResults.Count; i++)
                 {
+                    FrequencyEntry freqResult = freqResults[i];
+
                     if (epwingResult.Reading == freqResult.Spelling
-                        || (string.IsNullOrEmpty(epwingResult.Reading) &&
-                            epwingResult.PrimarySpelling == freqResult.Spelling))
+                        || (string.IsNullOrEmpty(epwingResult.Reading)
+                            && epwingResult.PrimarySpelling == freqResult.Spelling))
                     {
                         if (freqValue > freqResult.Frequency)
                         {
@@ -780,8 +803,10 @@ namespace JL.Lookup
                      && freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingResult.Reading),
                          out List<FrequencyEntry> readingFreqResults))
             {
-                foreach (FrequencyEntry readingFreqResult in readingFreqResults)
+                for (int i = 0; i < readingFreqResults.Count; i++)
                 {
+                    FrequencyEntry readingFreqResult = readingFreqResults[i];
+
                     if (epwingResult.Reading == readingFreqResult.Spelling && Kana.IsKatakana(epwingResult.Reading))
                     {
                         if (freqValue > readingFreqResult.Frequency)
@@ -810,11 +835,13 @@ namespace JL.Lookup
             if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(customWordResult.PrimarySpelling),
                 out List<FrequencyEntry> freqResults))
             {
-                foreach (FrequencyEntry freqResult in freqResults)
+                for (int i = 0; i < freqResults.Count; i++)
                 {
+                    FrequencyEntry freqResult = freqResults[i];
+
                     if (customWordResult.Readings != null && customWordResult.Readings.Contains(freqResult.Spelling)
-                        || (customWordResult.Readings == null &&
-                            customWordResult.PrimarySpelling == freqResult.Spelling))
+                        || (customWordResult.Readings == null
+                            && customWordResult.PrimarySpelling == freqResult.Spelling))
                     {
                         if (freqValue > freqResult.Frequency)
                         {
@@ -826,16 +853,18 @@ namespace JL.Lookup
 
                 if (freqValue == int.MaxValue && customWordResult.AlternativeSpellings != null)
                 {
-                    foreach (string alternativeSpelling in customWordResult.AlternativeSpellings)
+                    for (int i = 0; i < customWordResult.AlternativeSpellings.Count; i++)
                     {
-                        if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(alternativeSpelling),
+                        if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(customWordResult.AlternativeSpellings[i]),
                             out List<FrequencyEntry> alternativeSpellingFreqResults))
                         {
-                            foreach (FrequencyEntry alternativeSpellingFreqResult in alternativeSpellingFreqResults)
+                            for (int j = 0; j < alternativeSpellingFreqResults.Count; j++)
                             {
-                                if (customWordResult.Readings != null &&
-                                    customWordResult.Readings.Contains(alternativeSpellingFreqResult.Spelling)
-                                )
+                                FrequencyEntry alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
+
+                                if (customWordResult.Readings != null
+                                    && customWordResult.Readings.Contains(alternativeSpellingFreqResult.Spelling)
+)
                                 {
                                     if (freqValue > alternativeSpellingFreqResult.Frequency)
                                     {
@@ -852,29 +881,32 @@ namespace JL.Lookup
                 }
             }
 
-            else
+            else if (customWordResult.Readings != null)
             {
-                if (customWordResult.Readings != null)
-                    foreach (string reading in customWordResult.Readings)
+                for (int i = 0; i < customWordResult.Readings.Count; i++)
+                {
+                    string reading = customWordResult.Readings[i];
+
+                    if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(reading), out List<FrequencyEntry> readingFreqResults))
                     {
-                        if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(reading), out List<FrequencyEntry> readingFreqResults))
+                        for (int j = 0; j < readingFreqResults.Count; j++)
                         {
-                            foreach (FrequencyEntry readingFreqResult in readingFreqResults)
+                            FrequencyEntry readingFreqResult = readingFreqResults[j];
+
+                            if ((reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
+                                || (customWordResult.AlternativeSpellings != null
+                                    && customWordResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
+                            //|| (customWordResult.KanaSpellings != null && customWordResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                             {
-                                if ((reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
-                                    || (customWordResult.AlternativeSpellings != null &&
-                                        customWordResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
-                                //|| (customWordResult.KanaSpellings != null && customWordResult.KanaSpellings.Contains(readingFreqResults.Spelling))
+                                if (freqValue > readingFreqResult.Frequency)
                                 {
-                                    if (freqValue > readingFreqResult.Frequency)
-                                    {
-                                        freqValue = readingFreqResult.Frequency;
-                                        frequency = new List<string> { readingFreqResult.Frequency.ToString() };
-                                    }
+                                    freqValue = readingFreqResult.Frequency;
+                                    frequency = new List<string> { readingFreqResult.Frequency.ToString() };
                                 }
                             }
                         }
                     }
+                }
             }
 
             return frequency;
@@ -885,7 +917,7 @@ namespace JL.Lookup
         {
             string separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "";
             int count = 1;
-            var defResult = new StringBuilder();
+            StringBuilder defResult = new();
             for (int i = 0; i < jMDictResult.Definitions.Count; i++)
             {
                 if (jMDictResult.WordClasses.Any() && jMDictResult.WordClasses[i].Any())
@@ -948,15 +980,15 @@ namespace JL.Lookup
         private static string BuildJmnedictDefinition(JMnedictResult jMnedictResult)
         {
             int count = 1;
-            var defResult = new StringBuilder();
+            StringBuilder defResult = new();
 
             if (jMnedictResult.NameTypes != null &&
                 (jMnedictResult.NameTypes.Count > 1 || !jMnedictResult.NameTypes.Contains("unclass")))
             {
-                foreach (string nameType in jMnedictResult.NameTypes)
+                for (int i = 0; i < jMnedictResult.NameTypes.Count; i++)
                 {
                     defResult.Append('(');
-                    defResult.Append(nameType);
+                    defResult.Append(jMnedictResult.NameTypes[i]);
                     defResult.Append(") ");
                 }
             }
@@ -978,12 +1010,13 @@ namespace JL.Lookup
 
         private static string BuildEpwingDefinition(EpwingResult epwingResult)
         {
-            var defResult = new StringBuilder();
-            foreach (string definitionPart in epwingResult.Definitions)
+            StringBuilder defResult = new();
+
+            for (int i = 0; i < epwingResult.Definitions.Count; i++)
             {
-                // var separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "; ";
+                //var separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "; ";
                 const string separator = "\n";
-                defResult.Append(definitionPart + separator);
+                defResult.Append(epwingResult.Definitions[i] + separator);
             }
 
             return defResult.ToString().Trim('\n');
@@ -993,7 +1026,7 @@ namespace JL.Lookup
         {
             string separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "";
             int count = 1;
-            var defResult = new StringBuilder();
+            StringBuilder defResult = new();
 
             if (customWordResult.WordClasses.Any())
             {
@@ -1037,25 +1070,27 @@ namespace JL.Lookup
             StringBuilder deconj = new();
             bool first = true;
 
-            foreach (List<string> form in intermediaryResult.ProcessList)
+            for (int i = 0; i < intermediaryResult.ProcessList.Count; i++)
             {
+                List<string> form = intermediaryResult.ProcessList[i];
+
                 StringBuilder formText = new();
                 int added = 0;
 
-                for (int i = form.Count - 1; i >= 0; i--)
+                for (int j = form.Count - 1; j >= 0; j--)
                 {
-                    string info = form[i];
+                    string info = form[j];
 
                     if (info == "")
                         continue;
 
-                    if (info.StartsWith('(') && info.EndsWith(')') && i != 0)
+                    if (info.StartsWith('(') && info.EndsWith(')') && j != 0)
                         continue;
 
                     if (added > 0)
                         formText.Append('→');
 
-                    added++;
+                    ++added;
                     formText.Append(info);
                 }
 

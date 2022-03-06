@@ -12,9 +12,10 @@ namespace JL.Dicts.CustomDict
             {
                 string[] lines = await File.ReadAllLinesAsync(Path.Join(Storage.ApplicationPath, customNameDictPath))
                     .ConfigureAwait(false);
-                foreach (string line in lines)
+
+                for (int i = 0; i < lines.Length; i++)
                 {
-                    string[] lParts = line.Split("\t");
+                    string[] lParts = lines[i].Split("\t");
 
                     if (lParts.Length == 3)
                     {

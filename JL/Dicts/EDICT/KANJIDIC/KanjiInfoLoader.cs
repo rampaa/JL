@@ -28,9 +28,9 @@ namespace JL.Dicts.EDICT.KANJIDIC
                         .ReadAllLinesAsync(Path.Join(Storage.ApplicationPath, "Resources/ids.txt"))
                         .ConfigureAwait(false);
 
-                    foreach (string line in lines)
+                    for (int i = 0; i < lines.Length; i++)
                     {
-                        string[] lParts = line.Split("\t");
+                        string[] lParts = lines[i].Split("\t");
 
                         if (lParts.Length == 3)
                         {
@@ -43,14 +43,14 @@ namespace JL.Dicts.EDICT.KANJIDIC
 
                         else if (lParts.Length > 3)
                         {
-                            for (int i = 2; i < lParts.Length; i++)
+                            for (int j = 2; j < lParts.Length; j++)
                             {
-                                if (lParts[i].Contains('J'))
+                                if (lParts[j].Contains('J'))
                                 {
-                                    int endIndex = lParts[i].IndexOf("[", StringComparison.Ordinal);
+                                    int endIndex = lParts[j].IndexOf("[", StringComparison.Ordinal);
                                     if (endIndex != -1)
                                     {
-                                        kanjiCompositionDictionary.Add(lParts[1], lParts[i][..endIndex]);
+                                        kanjiCompositionDictionary.Add(lParts[1], lParts[j][..endIndex]);
                                         break;
                                     }
                                 }

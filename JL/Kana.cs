@@ -230,9 +230,9 @@ namespace JL
                 {
                     if (vowel != "お" && vowel != "え" && vowel != "オ" && vowel != "エ")
                     {
-                        foreach (StringBuilder stringBuilder in stringBuilders)
+                        for (int j = 0; j < stringBuilders.Count; j++)
                         {
-                            stringBuilder.Append(vowel);
+                            stringBuilders[j].Append(vowel);
                         }
                     }
 
@@ -264,21 +264,21 @@ namespace JL
                         }
 
                         listSize = stringBuilders.Count;
-                        for (int k = 0; k < listSize; k++)
+                        for (int j = 0; j < listSize; j++)
                         {
-                            if (k < listSize / 2)
-                                stringBuilders[k].Append(vowel);
+                            if (j < listSize / 2)
+                                stringBuilders[j].Append(vowel);
                             else
-                                stringBuilders[k].Append(alternativeVowel);
+                                stringBuilders[j].Append(alternativeVowel);
                         }
                     }
                 }
 
                 else
                 {
-                    foreach (StringBuilder stringBuilder in stringBuilders)
+                    for (int j = 0; j < stringBuilders.Count; j++)
                     {
-                        stringBuilder.Append(text[i]);
+                        stringBuilders[j].Append(text[i]);
                     }
                 }
             }

@@ -16,8 +16,10 @@ namespace JL.Dicts.EDICT.JMdict
             Dictionary<string, JMdictResult> resultList = new();
             List<string> alternativeSpellings;
 
-            foreach (KEle kEle in entry.KEleList)
+            for (int i = 0; i < entry.KEleList.Count; i++)
             {
+                KEle kEle = entry.KEleList[i];
+
                 JMdictResult result = new();
                 string key = kEle.Keb;
 
@@ -26,8 +28,10 @@ namespace JL.Dicts.EDICT.JMdict
                 result.POrthographyInfoList = kEle.KeInfList;
                 //result.PriorityList = kEle.KePriList;
 
-                foreach (REle rEle in entry.REleList)
+                for (int j = 0; j < entry.REleList.Count; j++)
                 {
+                    REle rEle = entry.REleList[j];
+
                     if (!rEle.ReRestrList.Any() || rEle.ReRestrList.Contains(key))
                     {
                         result.Readings.Add(rEle.Reb);
@@ -35,8 +39,10 @@ namespace JL.Dicts.EDICT.JMdict
                     }
                 }
 
-                foreach (Sense sense in entry.SenseList)
+                for (int j = 0; j < entry.SenseList.Count; j++)
                 {
+                    Sense sense = entry.SenseList[j];
+
                     if ((!sense.StagKList.Any() && !sense.StagRList.Any())
                         || sense.StagKList.Contains(key)
                         || sense.StagRList.Intersect(result.Readings).Any())
@@ -59,24 +65,28 @@ namespace JL.Dicts.EDICT.JMdict
 
             alternativeSpellings = resultList.Keys.ToList();
 
-            foreach (KeyValuePair<string, JMdictResult> item in resultList)
+            foreach ((string key, JMdictResult result) in resultList)
             {
-                foreach (string spelling in alternativeSpellings)
+                for (int i = 0; i < alternativeSpellings.Count; i++)
                 {
-                    if (item.Key != spelling)
+                    string spelling = alternativeSpellings[i];
+
+                    if (key != spelling)
                     {
-                        item.Value.AlternativeSpellings.Add(spelling);
+                        result.AlternativeSpellings.Add(spelling);
 
                         resultList.TryGetValue(spelling, out JMdictResult tempResult);
                         Debug.Assert(tempResult != null, nameof(tempResult) + " != null");
 
-                        item.Value.AOrthographyInfoList.Add(tempResult.POrthographyInfoList);
+                        result.AOrthographyInfoList.Add(tempResult.POrthographyInfoList);
                     }
                 }
             }
 
-            foreach (REle rEle in entry.REleList)
+            for (int i = 0; i < entry.REleList.Count; i++)
             {
+                REle rEle = entry.REleList[i];
+
                 string key = Kana.KatakanaToHiraganaConverter(rEle.Reb);
 
                 if (resultList.ContainsKey(key))
@@ -97,7 +107,7 @@ namespace JL.Dicts.EDICT.JMdict
                 {
                     result.PrimarySpelling = result.AlternativeSpellings[0];
 
-                    result.AlternativeSpellings.Remove(result.PrimarySpelling);
+                    result.AlternativeSpellings.RemoveAt(0);
 
                     if (resultList.TryGetValue(result.PrimarySpelling, out JMdictResult mainEntry))
                     {
@@ -110,8 +120,10 @@ namespace JL.Dicts.EDICT.JMdict
                 else
                     result.PrimarySpelling = rEle.Reb;
 
-                foreach (Sense sense in entry.SenseList)
+                for (int j = 0; j < entry.SenseList.Count; j++)
                 {
+                    Sense sense = entry.SenseList[j];
+
                     if ((!sense.StagKList.Any() && !sense.StagRList.Any())
                         || sense.StagRList.Contains(rEle.Reb)
                         || sense.StagKList.Contains(result.PrimarySpelling)

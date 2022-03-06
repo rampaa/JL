@@ -46,7 +46,7 @@ namespace JL.Anki
                 Dictionary<string, object>[] video = null;
                 Dictionary<string, object>[] picture = null;
 
-                var note = new Note(deckName, modelName, fields, options, tags, audio, video, picture);
+                Note note = new(deckName, modelName, fields, options, tags, audio, video, picture);
                 Response response = await AnkiConnect.AddNoteToDeck(note).ConfigureAwait(false);
 
                 if (response == null)
@@ -86,7 +86,7 @@ namespace JL.Anki
         private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> fields,
             MiningParams miningParams)
         {
-            var dict = new Dictionary<string, object>();
+            Dictionary<string, object> dict = new();
             foreach ((string key, JLField value) in fields)
             {
                 switch (value)
@@ -150,7 +150,7 @@ namespace JL.Anki
 
         private static List<string> FindAudioFields(Dictionary<string, JLField> fields)
         {
-            var audioFields = new List<string>();
+            List<string> audioFields = new();
             audioFields.AddRange(fields.Keys.Where(key => JLField.Audio.Equals(fields[key])));
 
             return audioFields;

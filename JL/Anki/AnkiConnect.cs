@@ -13,38 +13,38 @@ namespace JL.Anki
     {
         public static async Task<Response> AddNoteToDeck(Note note)
         {
-            var req = new Request("addNote", 6, new Dictionary<string, object> { { "note", note } });
+            Request req = new("addNote", 6, new Dictionary<string, object> { { "note", note } });
             return await Send(req).ConfigureAwait(false);
         }
 
         public static async Task<Response> GetDeckNames()
         {
-            var req = new Request("deckNames", 6);
+            Request req = new("deckNames", 6);
             return await Send(req).ConfigureAwait(false);
         }
 
         public static async Task<Response> GetModelNames()
         {
-            var req = new Request("modelNames", 6);
+            Request req = new("modelNames", 6);
             return await Send(req).ConfigureAwait(false);
         }
 
         public static async Task<Response> GetModelFieldNames(string modelName)
         {
-            var req = new Request("modelFieldNames", 6, new Dictionary<string, object> { { "modelName", modelName } });
+            Request req = new("modelFieldNames", 6, new Dictionary<string, object> { { "modelName", modelName } });
             return await Send(req).ConfigureAwait(false);
         }
 
         public static async Task<Response> StoreMediaFile(string filename, string data)
         {
-            var req = new Request("storeMediaFile", 6,
+            Request req = new("storeMediaFile", 6,
                 new Dictionary<string, object> { { "filename", filename }, { "data", data } });
             return await Send(req).ConfigureAwait(false);
         }
 
         public static async Task<Response> Sync()
         {
-            var req = new Request("sync", 6);
+            Request req = new("sync", 6);
             return await Send(req).ConfigureAwait(false);
         }
 
@@ -63,7 +63,7 @@ namespace JL.Anki
 
         public static async Task<bool> CheckAudioField(long noteId, string audioFieldName)
         {
-            var req = new Request("notesInfo", 6,
+            Request req = new("notesInfo", 6,
                 new Dictionary<string, object> { { "notes", new List<long> { noteId } } });
 
             Response response = await Send(req).ConfigureAwait(false);
@@ -88,7 +88,7 @@ namespace JL.Anki
             try
             {
                 // AnkiConnect doesn't like null values
-                var payload = new StringContent(JsonSerializer.Serialize(req,
+                StringContent payload = new(JsonSerializer.Serialize(req,
                     new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }));
                 Utils.Logger.Information("Sending: " + await payload.ReadAsStringAsync().ConfigureAwait(false));
 

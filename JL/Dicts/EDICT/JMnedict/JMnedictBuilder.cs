@@ -12,16 +12,20 @@ namespace JL.Dicts.EDICT.JMnedict
 
             if (entry.KebList.Any())
             {
-                foreach (string keb in entry.KebList)
+                for (int i = 0; i < entry.KebList.Count; i++)
                 {
+                    string keb = entry.KebList[i];
+
                     JMnedictResult result = new();
                     string key = Kana.KatakanaToHiraganaConverter(keb);
 
                     result.PrimarySpelling = keb;
                     result.Readings = entry.RebList;
 
-                    foreach (Trans trans in entry.TransList)
+                    for (int j = 0; j < entry.TransList.Count; j++)
                     {
+                        Trans trans = entry.TransList[j];
+
                         result.Definitions.AddRange(trans.TransDetList);
                         result.NameTypes.AddRange(trans.NameTypeList);
                         // result.RelatedTerms.AddRange(trans.XRefList);
@@ -34,11 +38,11 @@ namespace JL.Dicts.EDICT.JMnedict
 
                 foreach (KeyValuePair<string, JMnedictResult> item in resultList)
                 {
-                    foreach (string s in alternativeSpellings)
+                    for (int i = 0; i < alternativeSpellings.Count; i++)
                     {
-                        if (item.Key != s)
+                        if (item.Key != alternativeSpellings[i])
                         {
-                            item.Value.AlternativeSpellings.Add(s);
+                            item.Value.AlternativeSpellings.Add(alternativeSpellings[i]);
                         }
                     }
                 }
@@ -46,8 +50,10 @@ namespace JL.Dicts.EDICT.JMnedict
 
             else
             {
-                foreach (string reb in entry.RebList)
+                for (int i = 0; i < entry.RebList.Count; i++)
                 {
+                    string reb = entry.RebList[i];
+
                     string key = Kana.KatakanaToHiraganaConverter(reb);
 
                     if (resultList.ContainsKey(key))
@@ -57,8 +63,10 @@ namespace JL.Dicts.EDICT.JMnedict
 
                     result.PrimarySpelling = reb;
 
-                    foreach (Trans trans in entry.TransList)
+                    for (int j = 0; j < entry.TransList.Count; j++)
                     {
+                        Trans trans = entry.TransList[j];
+
                         result.Definitions.AddRange(trans.TransDetList);
 
                         result.NameTypes.AddRange(trans.NameTypeList);

@@ -21,14 +21,18 @@ namespace JL.PoS
             Storage.WcDict = await JsonSerializer.DeserializeAsync<Dictionary<string, List<JmdictWc>>>(openStream);
             if (Storage.WcDict == null) throw new InvalidOperationException();
 
-            foreach ((string _, List<JmdictWc> value) in Storage.WcDict.ToList())
+            foreach (List<JmdictWc> jmDictWcEntryList in Storage.WcDict.Values.ToList())
             {
-                foreach (JmdictWc jMDictWcEntry in value.ToList())
+                for (int i = 0; i < jmDictWcEntryList.Count; i++)
                 {
+                    JmdictWc jMDictWcEntry = jmDictWcEntryList[i];
+
                     if (jMDictWcEntry.Readings != null)
                     {
-                        foreach (string reading in jMDictWcEntry.Readings)
+                        for (int j = 0; j < jMDictWcEntry.Readings.Count; j++)
                         {
+                            string reading = jMDictWcEntry.Readings[j];
+
                             if (Storage.WcDict.TryGetValue(reading, out List<JmdictWc> result))
                             {
                                 result.Add(jMDictWcEntry);
@@ -59,20 +63,16 @@ namespace JL.PoS
                 "vs-s", "vt", "exp", "vs", "vz"
             };
 
-            foreach ((string _, List<IResult> values) in Storage.Dicts[DictType.JMdict].Contents.ToList())
+            foreach (List<IResult> jMdictResultList in Storage.Dicts[DictType.JMdict].Contents.Values.ToList())
             {
-                foreach (IResult result in values)
+                for (int i = 0; i < jMdictResultList.Count; i++)
                 {
-                    var value = (JMdictResult)result;
+                    var value = (JMdictResult)jMdictResultList[i];
+
                     if (!value.WordClasses?.Any() ?? true)
                         continue;
 
-                    var wordClasses = value.WordClasses?.SelectMany(wc => wc).ToHashSet().ToList();
-
-                    foreach (string unusedWc in unusedWcs)
-                    {
-                        wordClasses.Remove(unusedWc);
-                    }
+                    List<string> wordClasses = value.WordClasses?.SelectMany(wc => wc).ToHashSet().Except(unusedWcs).ToList();
 
                     if (!wordClasses.Any())
                         continue;
@@ -93,8 +93,10 @@ namespace JL.PoS
 
                     if (value.AlternativeSpellings != null)
                     {
-                        foreach (string spelling in value.AlternativeSpellings)
+                        for (int j = 0; j < value.AlternativeSpellings.Count; j++)
                         {
+                            string spelling = value.AlternativeSpellings[j];
+
                             if (jmdictWcDict.TryGetValue(spelling, out List<JmdictWc> asr))
                             {
                                 if (!asr.Any(r =>
