@@ -16,7 +16,8 @@ namespace JL.Dicts.EDICT.JMdict
             Dictionary<string, JMdictResult> resultList = new();
             List<string> alternativeSpellings;
 
-            for (int i = 0; i < entry.KEleList.Count; i++)
+            int kEleListCount = entry.KEleList.Count;
+            for (int i = 0; i < kEleListCount; i++)
             {
                 KEle kEle = entry.KEleList[i];
 
@@ -28,7 +29,8 @@ namespace JL.Dicts.EDICT.JMdict
                 result.POrthographyInfoList = kEle.KeInfList;
                 //result.PriorityList = kEle.KePriList;
 
-                for (int j = 0; j < entry.REleList.Count; j++)
+                int lREleListCount = entry.REleList.Count;
+                for (int j = 0; j < lREleListCount; j++)
                 {
                     REle rEle = entry.REleList[j];
 
@@ -39,7 +41,8 @@ namespace JL.Dicts.EDICT.JMdict
                     }
                 }
 
-                for (int j = 0; j < entry.SenseList.Count; j++)
+                int senseListCount = entry.SenseList.Count;
+                for (int j = 0; j < senseListCount; j++)
                 {
                     Sense sense = entry.SenseList[j];
 
@@ -67,7 +70,8 @@ namespace JL.Dicts.EDICT.JMdict
 
             foreach ((string key, JMdictResult result) in resultList)
             {
-                for (int i = 0; i < alternativeSpellings.Count; i++)
+                int alternativeSpellingsCount = alternativeSpellings.Count;
+                for (int i = 0; i < alternativeSpellingsCount; i++)
                 {
                     string spelling = alternativeSpellings[i];
 
@@ -82,8 +86,8 @@ namespace JL.Dicts.EDICT.JMdict
                     }
                 }
             }
-
-            for (int i = 0; i < entry.REleList.Count; i++)
+            int rEleListCount = entry.REleList.Count;
+            for (int i = 0; i < rEleListCount; i++)
             {
                 REle rEle = entry.REleList[i];
 
@@ -120,7 +124,8 @@ namespace JL.Dicts.EDICT.JMdict
                 else
                     result.PrimarySpelling = rEle.Reb;
 
-                for (int j = 0; j < entry.SenseList.Count; j++)
+                int senseListCount = entry.SenseList.Count;
+                for (int j = 0; j < senseListCount; j++)
                 {
                     Sense sense = entry.SenseList[j];
 

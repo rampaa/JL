@@ -223,7 +223,6 @@ namespace JL
             List<string> unicodeTextList = text.UnicodeIterator().ToList();
             stringBuilders.Add(new StringBuilder(text.Length));
             stringBuilders[0].Append(unicodeTextList[0]);
-
             for (int i = 1; i < unicodeTextList.Count; i++)
             {
                 if (text[i] == 'ー' && s_kanaFinalVowelDict.TryGetValue(unicodeTextList[i - 1], out string vowel))
@@ -257,7 +256,6 @@ namespace JL
                         }
 
                         int listSize = stringBuilders.Count;
-
                         for (int j = 0; j < listSize; j++)
                         {
                             stringBuilders.Add(new StringBuilder(stringBuilders[j].ToString(), text.Length));

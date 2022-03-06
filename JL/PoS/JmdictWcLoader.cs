@@ -23,13 +23,15 @@ namespace JL.PoS
 
             foreach (List<JmdictWc> jmDictWcEntryList in Storage.WcDict.Values.ToList())
             {
-                for (int i = 0; i < jmDictWcEntryList.Count; i++)
+                int jmDictWcEntryListCount = jmDictWcEntryList.Count;
+                for (int i = 0; i < jmDictWcEntryListCount; i++)
                 {
                     JmdictWc jMDictWcEntry = jmDictWcEntryList[i];
 
                     if (jMDictWcEntry.Readings != null)
                     {
-                        for (int j = 0; j < jMDictWcEntry.Readings.Count; j++)
+                        int readingCount = jMDictWcEntry.Readings.Count;
+                        for (int j = 0; j < readingCount; j++)
                         {
                             string reading = jMDictWcEntry.Readings[j];
 
@@ -65,7 +67,8 @@ namespace JL.PoS
 
             foreach (List<IResult> jMdictResultList in Storage.Dicts[DictType.JMdict].Contents.Values.ToList())
             {
-                for (int i = 0; i < jMdictResultList.Count; i++)
+                int jMdictResultListCount = jMdictResultList.Count;
+                for (int i = 0; i < jMdictResultListCount; i++)
                 {
                     var value = (JMdictResult)jMdictResultList[i];
 
@@ -93,7 +96,8 @@ namespace JL.PoS
 
                     if (value.AlternativeSpellings != null)
                     {
-                        for (int j = 0; j < value.AlternativeSpellings.Count; j++)
+                        int alternativeSpellingCount = value.AlternativeSpellings.Count;
+                        for (int j = 0; j < alternativeSpellingCount; j++)
                         {
                             string spelling = value.AlternativeSpellings[j];
 

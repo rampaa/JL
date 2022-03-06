@@ -12,7 +12,8 @@ namespace JL.Dicts.EDICT.JMnedict
 
             if (entry.KebList.Any())
             {
-                for (int i = 0; i < entry.KebList.Count; i++)
+                int kebListCount = entry.KebList.Count;
+                for (int i = 0; i < kebListCount; i++)
                 {
                     string keb = entry.KebList[i];
 
@@ -22,7 +23,8 @@ namespace JL.Dicts.EDICT.JMnedict
                     result.PrimarySpelling = keb;
                     result.Readings = entry.RebList;
 
-                    for (int j = 0; j < entry.TransList.Count; j++)
+                    int transListCount = entry.TransList.Count;
+                    for (int j = 0; j < transListCount; j++)
                     {
                         Trans trans = entry.TransList[j];
 
@@ -38,7 +40,8 @@ namespace JL.Dicts.EDICT.JMnedict
 
                 foreach (KeyValuePair<string, JMnedictResult> item in resultList)
                 {
-                    for (int i = 0; i < alternativeSpellings.Count; i++)
+                    int alternativeSpellingsCount = alternativeSpellings.Count;
+                    for (int i = 0; i < alternativeSpellingsCount; i++)
                     {
                         if (item.Key != alternativeSpellings[i])
                         {
@@ -50,7 +53,8 @@ namespace JL.Dicts.EDICT.JMnedict
 
             else
             {
-                for (int i = 0; i < entry.RebList.Count; i++)
+                int rebListCount = entry.RebList.Count;
+                for (int i = 0; i < rebListCount; i++)
                 {
                     string reb = entry.RebList[i];
 
@@ -63,7 +67,8 @@ namespace JL.Dicts.EDICT.JMnedict
 
                     result.PrimarySpelling = reb;
 
-                    for (int j = 0; j < entry.TransList.Count; j++)
+                    int transListCount = entry.TransList.Count;
+                    for (int j = 0; j < transListCount; j++)
                     {
                         Trans trans = entry.TransList[j];
 

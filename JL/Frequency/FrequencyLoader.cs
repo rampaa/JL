@@ -21,7 +21,8 @@ namespace JL.Frequency
 
             foreach ((string reading, List<List<JsonElement>> value) in frequencyDict)
             {
-                for (int i = 0; i < value.Count; i++)
+                int valueCount = value.Count;
+                for (int i = 0; i < valueCount; i++)
                 {
                     List<JsonElement> elementList = value[i];
 
