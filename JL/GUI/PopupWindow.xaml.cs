@@ -6,7 +6,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Anki;
 using JL.Lookup;
@@ -19,9 +18,6 @@ namespace JL.GUI
     /// </summary>
     public partial class PopupWindow : Window
     {
-        private static readonly System.Windows.Forms.Screen s_activeScreen =
-            System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(MainWindow.Instance).Handle);
-
         private PopupWindow _childPopupWindow;
 
         private int _playAudioIndex;
@@ -192,10 +188,20 @@ namespace JL.GUI
                 Visibility = Visibility.Hidden;
         }
 
+        public static Rect GetCurrentScreenWorkArea(Window window)
+        {
+            var screen = System.Windows.Forms.Screen.FromPoint(new System.Drawing.Point((int)window.Left, (int)window.Top));
+            DpiScale dpiScale = VisualTreeHelper.GetDpi(window);
+
+            return new Rect { Width = screen.WorkingArea.Width / dpiScale.DpiScaleX, Height = screen.WorkingArea.Height / dpiScale.DpiScaleY };
+        }
+
         private void UpdatePosition(Point cursorPosition)
         {
-            bool needsFlipX = ConfigManager.PopupFlipX && cursorPosition.X + Width > s_activeScreen.Bounds.Width;
-            bool needsFlipY = ConfigManager.PopupFlipY && cursorPosition.Y + Height > s_activeScreen.Bounds.Height;
+            Rect workArea = GetCurrentScreenWorkArea(MainWindow.Instance);
+
+            bool needsFlipX = ConfigManager.PopupFlipX && cursorPosition.X + Width > workArea.Width;
+            bool needsFlipY = ConfigManager.PopupFlipY && cursorPosition.Y + Height > workArea.Height;
 
             double newLeft;
             double newTop;
@@ -225,14 +231,14 @@ namespace JL.GUI
             }
 
             // stick to edges if +OOB
-            if (newLeft + Width > s_activeScreen.Bounds.Width)
+            if (newLeft + Width > workArea.Width)
             {
-                newLeft = s_activeScreen.Bounds.Width - Width;
+                newLeft = workArea.Width - Width;
             }
 
-            if (newTop + Height > s_activeScreen.Bounds.Height)
+            if (newTop + Height > workArea.Height)
             {
-                newTop = s_activeScreen.Bounds.Height - Height;
+                newTop = workArea.Height - Height;
             }
 
             Left = newLeft;
@@ -1043,7 +1049,7 @@ namespace JL.GUI
 
         private void OnMouseEnter(object sender, MouseEventArgs e)
         {
-            if (_childPopupWindow is {MiningMode: false})
+            if (_childPopupWindow is { MiningMode: false })
             {
                 _childPopupWindow.Hide();
                 _childPopupWindow.LastText = "";
@@ -1057,7 +1063,7 @@ namespace JL.GUI
 
         private void OnMouseLeave(object sender, MouseEventArgs e)
         {
-            if (_childPopupWindow is {MiningMode: false})
+            if (_childPopupWindow is { MiningMode: false })
             {
                 _childPopupWindow.Hide();
                 _childPopupWindow.LastText = "";
