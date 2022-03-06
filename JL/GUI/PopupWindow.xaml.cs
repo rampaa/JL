@@ -181,9 +181,7 @@ namespace JL.GUI
                 ResultStackPanels.Clear();
 
                 Init();
-
                 Visibility = Visibility.Visible;
-
                 Activate();
                 Focus();
 
@@ -1045,7 +1043,7 @@ namespace JL.GUI
 
         private void OnMouseEnter(object sender, MouseEventArgs e)
         {
-            if (_childPopupWindow != null && !_childPopupWindow.MiningMode)
+            if (_childPopupWindow is {MiningMode: false})
             {
                 _childPopupWindow.Hide();
                 _childPopupWindow.LastText = "";
@@ -1059,7 +1057,7 @@ namespace JL.GUI
 
         private void OnMouseLeave(object sender, MouseEventArgs e)
         {
-            if (_childPopupWindow != null && !_childPopupWindow.MiningMode)
+            if (_childPopupWindow is {MiningMode: false})
             {
                 _childPopupWindow.Hide();
                 _childPopupWindow.LastText = "";

@@ -33,10 +33,10 @@ namespace JL.GUI
         {
             base.OnSourceInitialized(e);
 
-            AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
+            AppDomain.CurrentDomain.UnhandledException += (_, eventArgs) =>
             {
-                Exception e = (Exception)eventArgs.ExceptionObject;
-                Utils.Logger.Error(e.ToString());
+                Exception ex = (Exception)eventArgs.ExceptionObject;
+                Utils.Logger.Error(ex.ToString());
             };
 
             ClipboardManager windowClipboardManager = new(this);
@@ -104,8 +104,8 @@ namespace JL.GUI
                         int caretIndex = allBacklogText.Length - MainTextBox.Text.Length;
 
                         MainTextBox.Text =
-                            "Character count: " + string.Join("", MainWindowUtilities.Backlog).Length + "\n"
-                            + "Line count: " + allBacklogText.Split("\n").Length + "\n"
+                            "Characters: " + string.Join("", MainWindowUtilities.Backlog).Length + " / "
+                            + "Lines: " + MainWindowUtilities.Backlog.Count + "\n"
                             + allBacklogText;
                         MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
 

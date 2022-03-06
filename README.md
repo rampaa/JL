@@ -47,6 +47,8 @@ Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer
 ## FAQ
 ### Why can't I look anything up?
 Make sure you're not in pass-through mode, kanji mode, have lookup-on-select-only enabled, or have disabled lookups.
+### Why can't I scroll down the results list?
+You need to be in mining mode in order to interact with the popup window.
 ### How do I disable pass-through mode?
 Press the opacity slider button located top-left of the main window.
 ### How do I add EPWING dictionaries?

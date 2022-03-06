@@ -32,17 +32,17 @@ namespace JL
         public static readonly Dictionary<string, Dict> BuiltInDicts =
             new()
             {
-                { "JMdict", new Dict(DictType.JMdict, "Resources\\JMdict.xml", true, 0) },
-                { "JMnedict", new Dict(DictType.JMnedict, "Resources\\JMnedict.xml", true, 1) },
-                { "Kanjidic", new Dict(DictType.Kanjidic, "Resources\\kanjidic2.xml", true, 2) },
                 {
                     "CustomWordDictionary",
-                    new Dict(DictType.CustomWordDictionary, "Resources\\custom_words.txt", true, 3)
+                    new Dict(DictType.CustomWordDictionary, "Resources\\custom_words.txt", true, 0)
                 },
                 {
                     "CustomNameDictionary",
-                    new Dict(DictType.CustomNameDictionary, "Resources\\custom_names.txt", true, 4)
-                }
+                    new Dict(DictType.CustomNameDictionary, "Resources\\custom_names.txt", true, 1)
+                },
+                { "JMdict", new Dict(DictType.JMdict, "Resources\\JMdict.xml", true, 2) },
+                { "JMnedict", new Dict(DictType.JMnedict, "Resources\\JMnedict.xml", true, 3) },
+                { "Kanjidic", new Dict(DictType.Kanjidic, "Resources\\kanjidic2.xml", true, 4) }
             };
 
         public static readonly Dictionary<string, string> FrequencyLists = new()
@@ -65,7 +65,6 @@ namespace JL
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
-                        // initial jmdict load
                         if (dict.Active && !Dicts[DictType.JMdict].Contents.Any())
                         {
                             Task jMDictTask = Task.Run(async () =>
@@ -82,7 +81,6 @@ namespace JL
 
                         break;
                     case DictType.JMnedict:
-                        // JMnedict
                         if (dict.Active && !Dicts[DictType.JMnedict].Contents.Any())
                         {
                             tasks.Add(Task.Run(async () => await JMnedictLoader.Load(dict.Path).ConfigureAwait(false)));
@@ -96,7 +94,6 @@ namespace JL
 
                         break;
                     case DictType.Kanjidic:
-                        // KANJIDIC
                         if (dict.Active && !Dicts[DictType.Kanjidic].Contents.Any())
                         {
                             tasks.Add(Task.Run(async () =>

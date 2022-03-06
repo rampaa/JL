@@ -58,18 +58,17 @@ namespace JL.Utilities
 
             foreach (FontFamily fontFamily in Fonts.SystemFontFamilies)
             {
-                ComboBoxItem comboBoxItem = new();
-
-                comboBoxItem.Content = fontFamily.Source;
-                comboBoxItem.FontFamily = fontFamily;
-                comboBoxItem.Foreground = Brushes.White;
+                ComboBoxItem comboBoxItem = new()
+                {
+                    Content = fontFamily.Source, FontFamily = fontFamily, Foreground = Brushes.White
+                };
 
                 if (fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("ja-jp")))
                 {
                     japaneseFonts.Add(comboBoxItem);
                 }
 
-                else if (fontFamily.FamilyNames.Keys != null && fontFamily.FamilyNames.Keys.Count == 1 &&
+                else if (fontFamily.FamilyNames.Keys is {Count: 1} &&
                          fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("en-US")))
                 {
                     bool foundGlyph = false;
@@ -229,11 +228,7 @@ namespace JL.Utilities
 
         public static void CreateDefaultDictsConfig()
         {
-            var jso = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Converters = { new JsonStringEnumConverter(), }
-            };
+            var jso = new JsonSerializerOptions {WriteIndented = true, Converters = {new JsonStringEnumConverter(),}};
 
             try
             {
@@ -254,8 +249,7 @@ namespace JL.Utilities
             {
                 var jso = new JsonSerializerOptions
                 {
-                    WriteIndented = true,
-                    Converters = { new JsonStringEnumConverter(), }
+                    WriteIndented = true, Converters = {new JsonStringEnumConverter(),}
                 };
 
                 File.WriteAllTextAsync(Path.Join(Storage.ApplicationPath, "Config/dicts.json"),
@@ -272,7 +266,7 @@ namespace JL.Utilities
         {
             try
             {
-                var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(), } };
+                var jso = new JsonSerializerOptions {Converters = {new JsonStringEnumConverter(),}};
 
                 Dictionary<DictType, Dict> deserializedDicts = await JsonSerializer
                     .DeserializeAsync<Dictionary<DictType, Dict>>(
@@ -341,8 +335,7 @@ namespace JL.Utilities
         {
             if (selectedText?.Length > 0)
                 Process.Start(new ProcessStartInfo("cmd",
-                    $"/c start https://www.google.com/search?q={selectedText}^&hl=ja")
-                { CreateNoWindow = true });
+                    $"/c start https://www.google.com/search?q={selectedText}^&hl=ja") {CreateNoWindow = true});
         }
 
         public static string GetMd5String(byte[] bytes)
@@ -362,7 +355,7 @@ namespace JL.Utilities
                     s_audioPlayer.Dispose();
                 }
 
-                s_audioPlayer = new WaveOut { Volume = volume };
+                s_audioPlayer = new WaveOut {Volume = volume};
 
                 s_audioPlayer.Init(new Mp3FileReader(new MemoryStream(audio)));
                 s_audioPlayer.Play();
@@ -406,13 +399,14 @@ namespace JL.Utilities
             try
             {
                 HttpResponseMessage response = await Storage.Client.GetAsync(Storage.RepoUrl + "releases/latest");
-                string responseUri = response.RequestMessage.RequestUri.ToString();
-                Version latestVersion = new(responseUri[(responseUri.LastIndexOf("/") + 1)..]);
+                string responseUri = response.RequestMessage!.RequestUri!.ToString();
+                Version latestVersion =
+                    new(responseUri[(responseUri.LastIndexOf("/", StringComparison.Ordinal) + 1)..]);
                 if (latestVersion > Storage.Version)
                 {
                     if (MessageBox.Show("A new version of JL is available. Would you like to download it now?", "",
-                        MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
-                        MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
+                            MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
+                            MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
                     {
                         MessageBox.Show(
                             $"This may take a while. Please don't manually shut down the program until it's updated.",
@@ -426,22 +420,24 @@ namespace JL.Utilities
                 else if (!isAutoCheck)
                 {
                     MessageBox.Show("JL is up to date", "",
-                    MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.Yes,
-                    MessageBoxOptions.DefaultDesktopOnly);
+                        MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.Yes,
+                        MessageBoxOptions.DefaultDesktopOnly);
                 }
             }
             catch
             {
-                Logger.Warning("Couldn't update JL.");
-                Alert(AlertLevel.Warning, "Couldn't update JL.");
+                Logger.Warning("Couldn't update JL");
+                Alert(AlertLevel.Warning, "Couldn't update JL");
             }
         }
 
         public static async Task UpdateJL(Version latestVersion)
         {
             string architecture = Environment.Is64BitProcess ? "x64" : "x86";
-            string repoName = Storage.RepoUrl[(Storage.RepoUrl[..^1].LastIndexOf("/") + 1)..^1];
-            Uri latestReleaseUrl = new(Storage.RepoUrl + "releases/download/" + latestVersion.ToString(2) + "/" + repoName + "-" + latestVersion.ToString(2) + "-win-" + architecture + ".zip");
+            string repoName =
+                Storage.RepoUrl[(Storage.RepoUrl[..^1].LastIndexOf("/", StringComparison.Ordinal) + 1)..^1];
+            Uri latestReleaseUrl = new(Storage.RepoUrl + "releases/download/" + latestVersion.ToString(2) + "/" +
+                                       repoName + "-" + latestVersion.ToString(2) + "-win-" + architecture + ".zip");
             HttpRequestMessage request = new(HttpMethod.Get, latestReleaseUrl);
             HttpResponseMessage response = await Storage.Client.SendAsync(request).ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
