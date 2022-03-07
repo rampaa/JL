@@ -105,6 +105,7 @@ namespace JL.Anki
             return dict;
         }
 
+        // TODO i broke this apparently
         private static List<string> FindAudioFields(Dictionary<string, JLField> fields)
         {
             List<string> audioFields = new();

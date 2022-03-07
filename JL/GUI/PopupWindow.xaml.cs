@@ -821,7 +821,7 @@ namespace JL.GUI
                         switch (result)
                         {
                             case LookupResult.Readings:
-                                miningParams[JLField.Readings] = chi.Text;
+                                miningParams[JLField.Readings] = chi.Text + "<br/>" ;
                                 break;
                             case LookupResult.AlternativeSpellings:
                                 miningParams[JLField.AlternativeSpellings] = chi.Text;
@@ -865,7 +865,7 @@ namespace JL.GUI
             {
                 if (child is TextBox textBox)
                 {
-                    miningParams[JLField.Definitions] += textBox.Text;
+                    miningParams[JLField.Definitions] += textBox.Text.Replace("\n", "<br/>");
                     continue;
                 }
 
@@ -888,13 +888,13 @@ namespace JL.GUI
                             miningParams[JLField.Composition] += textBlock.Text;
                             break;
                         case LookupResult.OnReadings:
-                            miningParams[JLField.Readings] += textBlock.Text + " | ";
+                            miningParams[JLField.Readings] += textBlock.Text + "<br/>" ;
                             break;
                         case LookupResult.KunReadings:
-                            miningParams[JLField.Readings] += textBlock.Text + " | ";
+                            miningParams[JLField.Readings] += textBlock.Text + "<br/>" ;
                             break;
                         case LookupResult.Nanori:
-                            miningParams[JLField.Readings] += textBlock.Text + " | ";
+                            miningParams[JLField.Readings] += textBlock.Text + "<br/>" ;
                             break;
                         default:
                             throw new ArgumentOutOfRangeException(null, "Invalid LookupResult type");
