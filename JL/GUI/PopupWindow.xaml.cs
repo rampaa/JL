@@ -821,7 +821,7 @@ namespace JL.GUI
                         switch (result)
                         {
                             case LookupResult.Readings:
-                                miningParams[JLField.Readings] = chi.Text + "<br/>" ;
+                                miningParams[JLField.Readings] = chi.Text;
                                 break;
                             case LookupResult.AlternativeSpellings:
                                 miningParams[JLField.AlternativeSpellings] = chi.Text;
@@ -888,12 +888,12 @@ namespace JL.GUI
                             miningParams[JLField.Composition] += textBlock.Text;
                             break;
                         case LookupResult.OnReadings:
-                            miningParams[JLField.Readings] += textBlock.Text + "<br/>" ;
-                            break;
                         case LookupResult.KunReadings:
-                            miningParams[JLField.Readings] += textBlock.Text + "<br/>" ;
-                            break;
                         case LookupResult.Nanori:
+                            if (!miningParams[JLField.Readings].EndsWith("<br/>"))
+                            {
+                                miningParams[JLField.Readings] += "<br/>";
+                            }
                             miningParams[JLField.Readings] += textBlock.Text + "<br/>" ;
                             break;
                         default:
