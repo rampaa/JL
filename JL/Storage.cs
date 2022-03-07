@@ -5,6 +5,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Runtime;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
 using JL.Dicts;
 using JL.Dicts.CustomDict;
 using JL.Dicts.EDICT;
@@ -13,6 +16,7 @@ using JL.Dicts.EDICT.JMnedict;
 using JL.Dicts.EDICT.KANJIDIC;
 using JL.Dicts.EPWING;
 using JL.Frequency;
+using JL.GUI;
 using JL.PoS;
 
 namespace JL
@@ -23,6 +27,10 @@ namespace JL
         public static readonly HttpClient Client = new(new HttpClientHandler() { UseProxy = false });
         public static readonly Version Version = new(1, 3);
         public static readonly string RepoUrl = "https://github.com/rampaa/JL/";
+
+        public static readonly System.Windows.Forms.Screen ActiveScreen =
+            System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(MainWindow.Instance).Handle);
+        public static DpiScale Dpi { get; set; } = VisualTreeHelper.GetDpi(MainWindow.Instance);
         public static bool Ready { get; set; } = false;
         public static bool UpdatingJMdict { get; set; } = false;
         public static bool UpdatingJMnedict { get; set; } = false;

@@ -8,7 +8,7 @@
         mc:Ignorable="d" Height="269" Width="800" WindowStyle="None" ResizeMode="CanResize" Topmost="True"
         Closed="MainWindow_Closed" Closing="MainWindow_Closing" KeyDown="MainWindow_KeyDown"
         PreviewKeyDown="MainWindow_PreviewKeyDown" SizeChanged="MainWindow_SizeChanged"
-        PreviewMouseDown="Window_PreviewMouseDown">
+        PreviewMouseDown="Window_PreviewMouseDown" DpiChanged="Window_DpiChanged">
     <Window.Background>
         <SolidColorBrush Color="Black" Opacity="0.3" />
     </Window.Background>

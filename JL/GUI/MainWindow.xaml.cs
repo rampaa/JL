@@ -395,5 +395,10 @@ namespace JL.GUI
                 popupWindow.Hide();
             }
         }
+
+        private void Window_DpiChanged(object sender, DpiChangedEventArgs e)
+        {
+            Storage.Dpi = e.NewDpi;
+        }
     }
 }

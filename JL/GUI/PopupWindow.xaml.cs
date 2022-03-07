@@ -192,20 +192,18 @@ namespace JL.GUI
                 Visibility = Visibility.Hidden;
         }
 
-        public static Rect GetCurrentScreenWorkArea(Window window)
-        {
-            var screen = System.Windows.Forms.Screen.FromPoint(new System.Drawing.Point((int)window.Left, (int)window.Top));
-            DpiScale dpiScale = VisualTreeHelper.GetDpi(window);
-
-            return new Rect { Width = screen.WorkingArea.Width / dpiScale.DpiScaleX, Height = screen.WorkingArea.Height / dpiScale.DpiScaleY };
-        }
-
         private void UpdatePosition(Point cursorPosition)
         {
-            Rect workArea = GetCurrentScreenWorkArea(MainWindow.Instance);
+            double mouseX = cursorPosition.X / Storage.Dpi.DpiScaleX;
+            double mouseY = cursorPosition.Y / Storage.Dpi.DpiScaleY;
+            double workAreaWidth = Storage.ActiveScreen.Bounds.Width / Storage.Dpi.DpiScaleX;
+            double workAreaHeight = Storage.ActiveScreen.Bounds.Height / Storage.Dpi.DpiScaleY;
+            double offsetX = ConfigManager.PopupXOffset / Storage.Dpi.DpiScaleX;
+            double offsetY = ConfigManager.PopupYOffset / Storage.Dpi.DpiScaleY;
 
-            bool needsFlipX = ConfigManager.PopupFlipX && cursorPosition.X + Width > workArea.Width;
-            bool needsFlipY = ConfigManager.PopupFlipY && cursorPosition.Y + Height > workArea.Height;
+
+            bool needsFlipX = ConfigManager.PopupFlipX && mouseX + Width > workAreaWidth;
+            bool needsFlipY = ConfigManager.PopupFlipY && mouseY + Height > workAreaHeight;
 
             double newLeft;
             double newTop;
@@ -213,36 +211,36 @@ namespace JL.GUI
             if (needsFlipX)
             {
                 // flip Leftwards while preventing -OOB
-                newLeft = cursorPosition.X - Width - ConfigManager.PopupXOffset * 2;
+                newLeft = mouseX - Width - offsetX * 2;
                 if (newLeft < 0) newLeft = 0;
             }
             else
             {
                 // no flip
-                newLeft = cursorPosition.X + ConfigManager.PopupXOffset;
+                newLeft = mouseX + offsetX;
             }
 
             if (needsFlipY)
             {
                 // flip Upwards while preventing -OOB
-                newTop = cursorPosition.Y - Height - ConfigManager.PopupYOffset * 2;
+                newTop = mouseY - Height - offsetY * 2;
                 if (newTop < 0) newTop = 0;
             }
             else
             {
                 // no flip
-                newTop = cursorPosition.Y + ConfigManager.PopupYOffset;
+                newTop = mouseY + offsetY;
             }
 
             // stick to edges if +OOB
-            if (newLeft + Width > workArea.Width)
+            if (newLeft + Width > workAreaWidth)
             {
-                newLeft = workArea.Width - Width;
+                newLeft = workAreaWidth - Width;
             }
 
-            if (newTop + Height > workArea.Height)
+            if (newTop + Height > workAreaHeight)
             {
-                newTop = workArea.Height - Height;
+                newTop = workAreaHeight - Height;
             }
 
             Left = newLeft;
