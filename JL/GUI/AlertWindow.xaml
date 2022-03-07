@@ -9,6 +9,7 @@
         ResizeMode="NoResize"
         SizeToContent="Height"
         Focusable="False"
+        ShowInTaskbar="False"
         Title="AlertWindow" MaxHeight="200" Width="500" Topmost="True" Background="{x:Null}" Foreground="{x:Null}">
     <Grid>
         <Border Name="AlertBorder" BorderThickness="2">

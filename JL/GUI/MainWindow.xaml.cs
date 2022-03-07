@@ -268,6 +268,8 @@ namespace JL.GUI
             else if (Utils.KeyGestureComparer(e, ConfigManager.ClosePopupKeyGesture))
             {
                 FirstPopupWindow.MiningMode = false;
+                FirstPopupWindow.TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
+
                 FirstPopupWindow.PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                 FirstPopupWindow.Hide();
             }
@@ -388,6 +390,8 @@ namespace JL.GUI
             foreach (PopupWindow popupWindow in Application.Current.Windows.OfType<PopupWindow>().ToList())
             {
                 popupWindow.MiningMode = false;
+                popupWindow.TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
+
                 popupWindow.Hide();
             }
         }

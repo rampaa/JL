@@ -62,6 +62,9 @@ namespace JL.GUI
                 SizeToContent = SizeToContent.Height;
             else
                 SizeToContent = SizeToContent.Manual;
+
+            TextBlockMiningModeReminder.Text =
+                $"In mining mode. Press {ConfigManager.ClosePopupKeyGesture.Key} or click on the main window to exit.";
         }
 
         private void AddName(object sender, RoutedEventArgs e)
@@ -807,6 +810,7 @@ namespace JL.GUI
                 return;
 
             MiningMode = false;
+            TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
             Hide();
 
             var miningParams = new Dictionary<JLField, string>();
@@ -947,9 +951,10 @@ namespace JL.GUI
             if (Utils.KeyGestureComparer(e, ConfigManager.MiningModeKeyGesture))
             {
                 MiningMode = true;
+                TextBlockMiningModeReminder.Visibility = Visibility.Visible;
+
                 PopUpScrollViewer.ScrollToTop();
                 PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-                // TODO: Tell the user that they are in mining mode
                 Activate();
                 Focus();
 
@@ -1011,6 +1016,8 @@ namespace JL.GUI
             else if (Utils.KeyGestureComparer(e, ConfigManager.ClosePopupKeyGesture))
             {
                 MiningMode = false;
+                TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
+
                 PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                 Hide();
             }

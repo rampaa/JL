@@ -187,13 +187,16 @@ namespace JL.Utilities
                 reading = foundSpelling;
 
             byte[] sound = await AnkiConnect.GetAudioFromJpod101(foundSpelling, reading).ConfigureAwait(false);
-            if (Utils.GetMd5String(sound) == "7e2c2f954ef6051373ba916f000168dc") // jpod101 no audio clip
+            if (sound != null)
             {
-                // TODO sound = shortErrorSound
-                return;
-            }
+                if (Utils.GetMd5String(sound) == "7e2c2f954ef6051373ba916f000168dc") // jpod101 no audio clip
+                {
+                    // TODO sound = shortErrorSound
+                    return;
+                }
 
-            Utils.PlayAudio(sound, volume);
+                Utils.PlayAudio(sound, volume);
+            }
         }
     }
 }

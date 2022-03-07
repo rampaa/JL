@@ -50,15 +50,24 @@ namespace JL.Anki
 
         public static async Task<byte[]> GetAudioFromJpod101(string foundSpelling, string reading)
         {
-            Uri uri = new(
-                "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=" +
-                foundSpelling +
-                "&kana=" +
-                reading
-            );
-            HttpResponseMessage getResponse = await Storage.Client.GetAsync(uri).ConfigureAwait(false);
-            // todo mining storemediafile thingy
-            return await getResponse.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+            try
+            {
+                Uri uri = new(
+                    "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=" +
+                    foundSpelling +
+                    "&kana=" +
+                    reading
+                );
+                HttpResponseMessage getResponse = await Storage.Client.GetAsync(uri).ConfigureAwait(false);
+                // todo mining storemediafile thingy
+                return await getResponse.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                Utils.Alert(AlertLevel.Error, "Error getting audio from jpod101");
+                Utils.Logger.Error(e, "Error getting audio from jpod101");
+                return null;
+            }
         }
 
         public static async Task<bool> CheckAudioField(long noteId, string audioFieldName)

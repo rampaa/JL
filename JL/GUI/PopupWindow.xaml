@@ -11,21 +11,25 @@
         Topmost="True" WindowStyle="None" AllowsTransparency="true" ShowInTaskbar="False"
         KeyDown="Window_KeyDown" Closing="Window_Closing" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave">
 
-    <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Top"
-                  CanContentScroll="True">
-        <ListBox VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False" Foreground="White"
-                 Background="{Binding Path=Background,
+    <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Disabled"
+                  VerticalContentAlignment="Top"
+                  CanContentScroll="False">
+        <StackPanel>
+            <TextBlock Name="TextBlockMiningModeReminder" FontSize="17" Padding="5,0,5,0" Visibility="Collapsed">
+            </TextBlock>
+            <ListBox VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False" Foreground="White"
+                     Background="{Binding Path=Background,
                   RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
-                 PreviewMouseWheel="PopupListBox_PreviewMouseWheel"
-                 x:Name="PopupListBox" ItemsSource="{Binding Path=ResultStackPanels}" Opacity="70">
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="{x:Type ListBoxItem}">
-                    <Setter Property="Focusable" Value="False" />
-                </Style>
-            </ListBox.ItemContainerStyle>
-        </ListBox>
+                     PreviewMouseWheel="PopupListBox_PreviewMouseWheel"
+                     x:Name="PopupListBox" ItemsSource="{Binding Path=ResultStackPanels}" Opacity="70">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListBoxItem}">
+                        <Setter Property="Focusable" Value="False" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
+        </StackPanel>
     </ScrollViewer>
-
     <Window.ContextMenu>
         <ContextMenu Name="PopupContextMenu">
             <MenuItem
