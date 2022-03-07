@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using JL.Anki;
+using JL.Dicts;
 using JL.Lookup;
 using JL.Utilities;
 
@@ -322,10 +323,13 @@ namespace JL.GUI
                         break;
 
                     case LookupResult.DictType:
+                        var dictTypeNames = Enum.GetValues(typeof(DictType)).Cast<DictType>();
+                        DictType dictType = dictTypeNames.First(dictTypeName => dictTypeName.ToString() == value[0]);
+
                         textBlockDictType = new TextBlock
                         {
                             Name = key.ToString(),
-                            Text = value[0],
+                            Text = dictType.GetDescription() ?? value[0],
                             Foreground = ConfigManager.DictTypeColor,
                             FontSize = ConfigManager.DictTypeFontSize,
                             Margin = new Thickness(5, 0, 0, 0),
