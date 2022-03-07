@@ -14,9 +14,14 @@ Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer
 
 ## Features
 * Highly customizable
+* Custom word and name dictionaries
 * Anki mining
 * Pass-through mode 
 * Remembers last window position
+* Recursive lookups
+* Halfwidth -> Fullwidth conversions (and vice-versa)
+* Hiragana -> Katakana conversions (and vice-versa)
+* Chouonpu conversions
 
 ## Supported dictionaries
 
