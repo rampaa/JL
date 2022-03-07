@@ -767,9 +767,14 @@ namespace JL.GUI
 
         private void TextBoxPreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            ManageDictionariesButton.IsEnabled = ConfigManager.Ready;
-            AddNameButton.IsEnabled = ConfigManager.Ready;
-            AddWordButton.IsEnabled = ConfigManager.Ready;
+            ManageDictionariesButton.IsEnabled = Storage.Ready
+                && !Storage.UpdatingJMdict
+                && !Storage.UpdatingJMnedict
+                && !Storage.UpdatingKanjidic;
+
+            AddNameButton.IsEnabled = Storage.Ready;
+            AddWordButton.IsEnabled = Storage.Ready;
+
             _lastSelectedText = ((TextBox)sender).SelectedText;
         }
 
@@ -894,7 +899,7 @@ namespace JL.GUI
                             {
                                 miningParams[JLField.Readings] += "<br/>";
                             }
-                            miningParams[JLField.Readings] += textBlock.Text + "<br/>" ;
+                            miningParams[JLField.Readings] += textBlock.Text + "<br/>";
                             break;
                         default:
                             throw new ArgumentOutOfRangeException(null, "Invalid LookupResult type");
@@ -1022,17 +1027,17 @@ namespace JL.GUI
             }
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
             {
-                if (ConfigManager.Ready)
+                if (Storage.Ready)
                     Utils.ShowAddNameWindow(_lastSelectedText);
             }
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
             {
-                if (ConfigManager.Ready)
+                if (Storage.Ready)
                     Utils.ShowAddWordWindow(_lastSelectedText);
             }
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
             {
-                if (ConfigManager.Ready)
+                if (Storage.Ready)
                     Utils.ShowManageDictionariesWindow();
             }
             else if (Utils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))

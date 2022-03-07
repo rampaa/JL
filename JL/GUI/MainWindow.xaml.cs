@@ -229,20 +229,25 @@ namespace JL.GUI
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
             {
-                if (ConfigManager.Ready)
+                if (Storage.Ready)
                     Utils.ShowAddNameWindow(MainTextBox.SelectedText);
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
             {
-                if (ConfigManager.Ready)
+                if (Storage.Ready)
                     Utils.ShowAddWordWindow(MainTextBox.SelectedText);
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
             {
-                if (ConfigManager.Ready)
+                if (Storage.Ready
+                    && !Storage.UpdatingJMdict
+                    && !Storage.UpdatingJMnedict
+                    && !Storage.UpdatingKanjidic)
+                {
                     Utils.ShowManageDictionariesWindow();
+                }
             }
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))
@@ -355,9 +360,14 @@ namespace JL.GUI
 
         private void MainTextBox_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            AddNameButton.IsEnabled = ConfigManager.Ready;
-            AddWordButton.IsEnabled = ConfigManager.Ready;
-            ManageDictionariesButton.IsEnabled = ConfigManager.Ready;
+            ManageDictionariesButton.IsEnabled = Storage.Ready
+                && !Storage.UpdatingJMdict
+                && !Storage.UpdatingJMnedict
+                && !Storage.UpdatingKanjidic;
+
+            AddNameButton.IsEnabled = Storage.Ready;
+            AddWordButton.IsEnabled = Storage.Ready;
+
         }
 
         private void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

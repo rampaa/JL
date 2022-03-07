@@ -183,7 +183,7 @@ namespace JL.GUI
         {
             MiningSetupStackPanelFields.Children.Clear();
 
-            var jlFieldNames = Enum.GetValues(typeof(JLField)).Cast<JLField>();
+            IEnumerable<JLField> jlFieldNames = Enum.GetValues(typeof(JLField)).Cast<JLField>();
             string[] descriptions = jlFieldNames
                 .Select(jlFieldName => jlFieldName.GetDescription() ?? jlFieldName.ToString()).ToArray();
 
@@ -195,7 +195,8 @@ namespace JL.GUI
                     var textBlockFieldName = new TextBlock { Text = fieldName };
                     var comboBoxJLFields = new System.Windows.Controls.ComboBox
                     {
-                        ItemsSource = descriptions, SelectedItem = jlField.GetDescription() ?? jlField.ToString()
+                        ItemsSource = descriptions,
+                        SelectedItem = jlField.GetDescription() ?? jlField.ToString()
                     };
 
                     stackPanel.Children.Add(textBlockFieldName);
@@ -225,7 +226,7 @@ namespace JL.GUI
 
                     string selectedDescription = comboBox.SelectionBoxItem.ToString();
 
-                    var jlFieldNames = Enum.GetValues(typeof(JLField)).Cast<JLField>();
+                    IEnumerable<JLField> jlFieldNames = Enum.GetValues(typeof(JLField)).Cast<JLField>();
                     JLField result = jlFieldNames.FirstOrDefault(jlFieldName =>
                             (jlFieldName.GetDescription() ?? jlFieldName.ToString()) == selectedDescription,
                         JLField.Nothing);

@@ -23,7 +23,10 @@ namespace JL
         public static readonly HttpClient Client = new(new HttpClientHandler() { UseProxy = false });
         public static readonly Version Version = new(1, 3);
         public static readonly string RepoUrl = "https://github.com/rampaa/JL/";
-
+        public static bool Ready { get; set; } = false;
+        public static bool UpdatingJMdict { get; set; } = false;
+        public static bool UpdatingJMnedict { get; set; } = false;
+        public static bool UpdatingKanjidic { get; set; } = false;
         public static Dictionary<string, List<JmdictWc>> WcDict { get; set; } = new();
         public static Dictionary<string, Dictionary<string, List<FrequencyEntry>>> FreqDicts { get; set; } = new();
 
@@ -55,7 +58,7 @@ namespace JL
 
         public static async Task LoadDictionaries()
         {
-            ConfigManager.Ready = false;
+            Ready = false;
 
             List<Task> tasks = new();
             bool dictRemoved = false;
@@ -65,7 +68,7 @@ namespace JL
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
-                        if (dict.Active && !Dicts[DictType.JMdict].Contents.Any())
+                        if (dict.Active && !Dicts[DictType.JMdict].Contents.Any() && !UpdatingJMdict)
                         {
                             Task jMDictTask = Task.Run(async () =>
                                 await JMdictLoader.Load(dict.Path).ConfigureAwait(false));
@@ -73,7 +76,7 @@ namespace JL
                             tasks.Add(jMDictTask);
                         }
 
-                        else if (!dict.Active && Dicts[DictType.JMdict].Contents.Any())
+                        else if (!dict.Active && Dicts[DictType.JMdict].Contents.Any() && !UpdatingJMdict)
                         {
                             dict.Contents.Clear();
                             dictRemoved = true;
@@ -81,12 +84,12 @@ namespace JL
 
                         break;
                     case DictType.JMnedict:
-                        if (dict.Active && !Dicts[DictType.JMnedict].Contents.Any())
+                        if (dict.Active && !Dicts[DictType.JMnedict].Contents.Any() && !UpdatingJMnedict)
                         {
                             tasks.Add(Task.Run(async () => await JMnedictLoader.Load(dict.Path).ConfigureAwait(false)));
                         }
 
-                        else if (!dict.Active && Dicts[DictType.JMnedict].Contents.Any())
+                        else if (!dict.Active && Dicts[DictType.JMnedict].Contents.Any() && !UpdatingJMnedict)
                         {
                             dict.Contents.Clear();
                             dictRemoved = true;
@@ -94,13 +97,13 @@ namespace JL
 
                         break;
                     case DictType.Kanjidic:
-                        if (dict.Active && !Dicts[DictType.Kanjidic].Contents.Any())
+                        if (dict.Active && !Dicts[DictType.Kanjidic].Contents.Any() && !UpdatingKanjidic)
                         {
                             tasks.Add(Task.Run(async () =>
                                 await KanjiInfoLoader.Load(dict.Path).ConfigureAwait(false)));
                         }
 
-                        else if (!dict.Active && Dicts[DictType.Kanjidic].Contents.Any())
+                        else if (!dict.Active && Dicts[DictType.Kanjidic].Contents.Any() && !UpdatingKanjidic)
                         {
                             dict.Contents.Clear();
                             dictRemoved = true;
@@ -255,7 +258,7 @@ namespace JL
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
             }
 
-            ConfigManager.Ready = true;
+            Ready = true;
         }
 
         public static async Task InitializePoS()

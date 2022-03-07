@@ -331,7 +331,7 @@ namespace JL.GUI
 
         private static async Task UpdateJMdict()
         {
-            ConfigManager.Ready = false;
+            Storage.UpdatingJMdict = true;
 
             bool isDownloaded = await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMdict].Path,
                     new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
@@ -358,12 +358,12 @@ namespace JL.GUI
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
             }
 
-            ConfigManager.Ready = true;
+            Storage.UpdatingJMdict = false;
         }
 
         private static async Task UpdateJMnedict()
         {
-            ConfigManager.Ready = false;
+            Storage.UpdatingJMnedict = true;
 
             bool isDownloaded = await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMnedict].Path,
                     new Uri("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz"),
@@ -384,12 +384,12 @@ namespace JL.GUI
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
             }
 
-            ConfigManager.Ready = true;
+            Storage.UpdatingJMnedict = false;
         }
 
         private static async Task UpdateKanjidic()
         {
-            ConfigManager.Ready = false;
+            Storage.UpdatingKanjidic = true;
 
             bool isDownloaded = await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.Kanjidic].Path,
                     new Uri("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz"),
@@ -410,7 +410,7 @@ namespace JL.GUI
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
             }
 
-            ConfigManager.Ready = true;
+            Storage.UpdatingKanjidic = false;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)

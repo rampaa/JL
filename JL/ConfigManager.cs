@@ -80,7 +80,6 @@ namespace JL
 
         // consider making this dictionary specific
         public static bool NewlineBetweenDefinitions { get; set; } = false;
-        public static bool Ready { get; set; } = false;
         public static bool CheckForJLUpdatesOnStartUp { get; set; } = true;
 
         public static void ApplyPreferences()
