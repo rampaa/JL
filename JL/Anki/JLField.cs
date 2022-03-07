@@ -1,22 +1,24 @@
-﻿namespace JL.Anki
+﻿using System.ComponentModel;
+
+namespace JL.Anki
 {
     public enum JLField
     {
         Nothing,
-        FoundSpelling,
+        [Description("Found Spelling")] FoundSpelling,
         Readings,
         Definitions,
-        FoundForm,
+        [Description("Found Form")] FoundForm,
         Context,
         Audio,
-        EdictID,
-        TimeLocal,
-        AlternativeSpellings,
+        [Description("Edict ID")] EdictID,
+        [Description("Time (Local)")] TimeLocal,
+        [Description("Alternative Spellings")] AlternativeSpellings,
         Frequency,
-        StrokeCount,
+        [Description("Stroke Count")] StrokeCount,
         Grade,
         Composition,
-        DictType,
+        [Description("Dict Type")] DictType,
         Process,
         // Source
     }

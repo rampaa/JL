@@ -1,4 +1,6 @@
-﻿namespace JL.Dicts
+﻿using System.ComponentModel;
+
+namespace JL.Dicts
 {
     public enum DictType
     {
@@ -6,7 +8,9 @@
         JMdict,
         JMnedict,
         Kanjidic,
+        [Description("Custom Word Dictionary")]
         CustomWordDictionary,
+        [Description("Custom Name Dictionary")]
         CustomNameDictionary,
 
         // user-added

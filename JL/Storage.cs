@@ -33,11 +33,11 @@ namespace JL
             new()
             {
                 {
-                    "CustomWordDictionary",
+                    "Custom Word Dictionary",
                     new Dict(DictType.CustomWordDictionary, "Resources\\custom_words.txt", true, 0)
                 },
                 {
-                    "CustomNameDictionary",
+                    "Custom Name Dictionary",
                     new Dict(DictType.CustomNameDictionary, "Resources\\custom_names.txt", true, 1)
                 },
                 { "JMdict", new Dict(DictType.JMdict, "Resources\\JMdict.xml", true, 2) },

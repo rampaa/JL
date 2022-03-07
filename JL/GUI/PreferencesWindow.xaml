@@ -83,21 +83,25 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Highlight the longest match"
-                                       Cursor="Help" TextWrapping="Wrap" ToolTip="Ignored if lookup mode is set to text select" />
+                                       Cursor="Help" TextWrapping="Wrap"
+                                       ToolTip="Ignored if lookup mode is set to text select" />
                             <CheckBox x:Name="HighlightLongestMatchCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Check for updates on start up"
                                        TextWrapping="Wrap" />
-                            <CheckBox x:Name="CheckForJLUpdatesOnStartUpCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="CheckForJLUpdatesOnStartUpCheckBox" Content=""
+                                      HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <Button x:Name="CheckForJLUpdatesButton" Content="Check for updates"
-                                    Width="119" Height="32" HorizontalAlignment="Center" Click="CheckForJLUpdatesButton_Click" />
+                                    Width="119" Height="32" HorizontalAlignment="Center"
+                                    Click="CheckForJLUpdatesButton_Click" />
                         </DockPanel>
-                        <TextBlock x:Name="VersionTextBlock" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                        <TextBlock x:Name="VersionTextBlock" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                   VerticalAlignment="Bottom" />
 
                     </StackPanel>
                 </ScrollViewer>
@@ -110,6 +114,15 @@
                                 <Setter Property="Margin" Value="0,10,0,0" />
                             </Style>
                         </StackPanel.Resources>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Font"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <ComboBox x:Name="MainWindowFontComboBox" HorizontalAlignment="Right"
+                                      Width="210" SelectedValuePath="Content"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                        </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Height"
@@ -161,15 +174,6 @@
                             <hc:NumericUpDown x:Name="TextboxOpacityNumericUpDown" Maximum="100" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Font"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <ComboBox x:Name="MainWindowFontComboBox" HorizontalAlignment="Right"
-                                      Width="210" SelectedValuePath="Content"
-                                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                      ScrollViewer.VerticalScrollBarVisibility="Auto" />
-                        </DockPanel>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -191,13 +195,15 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max height"
-                                       Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center" ToolTip="Setting this more than half of your available height might cause popup window to flicker." />
+                                       Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"
+                                       ToolTip="Setting this more than half of your available height might cause popup window to flicker." />
                             <hc:NumericUpDown x:Name="PopupMaxHeightNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max width"
-                                       Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center" ToolTip="Setting this more than half of your available width might cause popup window to flicker." />
+                                       Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"
+                                       ToolTip="Setting this more than half of your available width might cause popup window to flicker." />
                             <hc:NumericUpDown x:Name="PopupMaxWidthNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
@@ -419,14 +425,19 @@
                                            TextWrapping="Wrap" />
                                 <ComboBox x:Name="MiningSetupComboBoxModelNames" Width="200" Margin="0,10,0,0" />
 
-                                <Separator Height="29" />
+                                <Separator Height="15" />
 
                                 <Button x:Name="MiningSetupButtonGetFields" Click="MiningSetupButtonGetFields_Click"
                                         Width="150"
                                         Content="Get Fields" FontSize="16" Height="35" />
                                 <StackPanel x:Name="MiningSetupStackPanelFields" Margin="10" />
 
-                                <Separator Height="29" />
+                                <Separator Height="15" />
+
+                                <TextBlock HorizontalAlignment="Center" Text="Tags:"
+                                           TextWrapping="Wrap" />
+                                <TextBox x:Name="TagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
+                                         Cursor="Help" ToolTip="Separated by a comma" />
 
                                 <Button x:Name="MiningSetupButtonSave" Click="MiningSetupButtonSave_Click"
                                         Content="Save AnkiConfig" Height="35" FontSize="16" Width="140" />
@@ -567,22 +578,22 @@
 
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
-                                Click="ClosePopupKeyGestureTextBoxButton_Click" />
+                                    Click="ClosePopupKeyGestureTextBoxButton_Click" />
                             <TextBox x:Name="ClosePopupKeyGestureTextBox" AutomationProperties.Name=""
-                                 PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                 HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Close popup" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                   VerticalAlignment="Center" />
+                                       VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
-                                Click="MotivationKeyGestureTextBoxButton_Click" />
+                                    Click="MotivationKeyGestureTextBoxButton_Click" />
                             <TextBox x:Name="MotivationKeyGestureTextBox" AutomationProperties.Name=""
-                                 PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                 HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="???" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                   VerticalAlignment="Center" />
+                                       VerticalAlignment="Center" />
                         </DockPanel>
                     </StackPanel>
                 </ScrollViewer>

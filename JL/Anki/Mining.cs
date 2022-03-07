@@ -8,8 +8,10 @@ namespace JL.Anki
 {
     public static class Mining
     {
-        public static async Task<bool> Mine(MiningParams miningParams)
+        public static async Task<bool> Mine(Dictionary<JLField, string> miningParams)
         {
+            string foundSpelling = miningParams[JLField.FoundSpelling];
+
             try
             {
                 AnkiConfig ankiConfig = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
@@ -18,17 +20,16 @@ namespace JL.Anki
                 string deckName = ankiConfig.DeckName;
                 string modelName = ankiConfig.ModelName;
 
-                Dictionary<string, JLField> rawFields = ankiConfig.Fields;
-                Dictionary<string, object> fields = ConvertFields(rawFields, miningParams);
+                Dictionary<string, JLField> userFields = ankiConfig.Fields;
+                Dictionary<string, object> fields = ConvertFields(userFields, miningParams);
 
                 Dictionary<string, object> options = new() { { "allowDuplicate", ConfigManager.AllowDuplicateCards }, };
                 string[] tags = ankiConfig.Tags;
 
                 // idk if this gets the right audio for every word
-                string miningParamsReadingsClone = miningParams.Readings;
-                miningParamsReadingsClone ??= "";
-                string reading = miningParamsReadingsClone.Split(",")[0];
-                if (reading == "") reading = miningParams.FoundSpelling;
+                string reading = miningParams[JLField.Readings].Split(",")[0];
+                if (reading == "")
+                    reading = foundSpelling;
 
                 Dictionary<string, object>[] audio =
                 {
@@ -36,11 +37,11 @@ namespace JL.Anki
                     {
                         {
                             "url",
-                            $"http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={miningParams.FoundSpelling}&kana={reading}"
+                            $"http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={foundSpelling}&kana={reading}"
                         },
-                        { "filename", $"JL_audio_{reading}_{miningParams.FoundSpelling}.mp3" },
+                        { "filename", $"JL_audio_{reading}_{foundSpelling}.mp3" },
                         { "skipHash", "7e2c2f954ef6051373ba916f000168dc" },
-                        { "fields", FindAudioFields(rawFields) },
+                        { "fields", FindAudioFields(userFields) },
                     }
                 };
                 Dictionary<string, object>[] video = null;
@@ -51,24 +52,24 @@ namespace JL.Anki
 
                 if (response == null)
                 {
-                    Utils.Alert(AlertLevel.Error, $"Mining failed for {miningParams.FoundSpelling}");
-                    Utils.Logger.Error($"Mining failed for {miningParams.FoundSpelling}");
+                    Utils.Alert(AlertLevel.Error, $"Mining failed for {foundSpelling}");
+                    Utils.Logger.Error($"Mining failed for {foundSpelling}");
                     return false;
                 }
                 else
                 {
                     bool hasAudio = await AnkiConnect.CheckAudioField(Convert.ToInt64(response.Result.ToString()),
-                        FindAudioFields(rawFields)[0]);
+                        FindAudioFields(userFields)[0]);
 
                     if (hasAudio)
                     {
-                        Utils.Alert(AlertLevel.Success, $"Mined {miningParams.FoundSpelling}");
-                        Utils.Logger.Information($"Mined {miningParams.FoundSpelling}");
+                        Utils.Alert(AlertLevel.Success, $"Mined {foundSpelling}");
+                        Utils.Logger.Information($"Mined {foundSpelling}");
                     }
                     else
                     {
-                        Utils.Alert(AlertLevel.Warning, $"Mined {miningParams.FoundSpelling} (no audio)");
-                        Utils.Logger.Information($"Mined {miningParams.FoundSpelling} (no audio)");
+                        Utils.Alert(AlertLevel.Warning, $"Mined {foundSpelling} (no audio)");
+                        Utils.Logger.Information($"Mined {foundSpelling} (no audio)");
                     }
 
                     if (ConfigManager.ForceSyncAnki) await AnkiConnect.Sync();
@@ -77,75 +78,31 @@ namespace JL.Anki
             }
             catch (Exception e)
             {
-                Utils.Alert(AlertLevel.Error, $"Mining failed for {miningParams.FoundSpelling}");
-                Utils.Logger.Information(e, $"Mining failed for {miningParams.FoundSpelling}");
+                Utils.Alert(AlertLevel.Error, $"Mining failed for {foundSpelling}");
+                Utils.Logger.Information(e, $"Mining failed for {foundSpelling}");
                 return false;
             }
         }
 
-        private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> fields,
-            MiningParams miningParams)
+        /// <summary>
+        /// Converts JLField,Value pairs to UserField,Value pairs <br/>
+        /// JLField is our internal name of a mining field <br/>
+        /// Value is the actual content of a mining field (e.g. if the field name is TimeLocal, then it should contain the current time) <br/>
+        /// UserField is the name of the user's field in Anki (e.g. Expression) <br/>
+        /// </summary>
+        private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> userFields,
+            Dictionary<JLField, string> miningParams)
         {
             Dictionary<string, object> dict = new();
-            foreach ((string key, JLField value) in fields)
+            foreach ((string key, JLField value) in userFields)
             {
-                switch (value)
+                if (!string.IsNullOrEmpty(miningParams[value]))
                 {
-                    case JLField.Nothing:
-                        break;
-                    case JLField.FoundSpelling:
-                        dict.Add(key, miningParams.FoundSpelling);
-                        break;
-                    case JLField.Readings:
-                        dict.Add(key, miningParams.Readings);
-                        break;
-                    case JLField.Definitions:
-                        dict.Add(key, miningParams.Definitions);
-                        break;
-                    case JLField.FoundForm:
-                        dict.Add(key, miningParams.FoundForm);
-                        break;
-                    case JLField.Context:
-                        dict.Add(key, miningParams.Context);
-                        break;
-                    case JLField.Audio:
-                        // needs to be handled separately (by FindAudioFields())
-                        break;
-                    case JLField.EdictID:
-                        dict.Add(key, miningParams.EdictID);
-                        break;
-                    case JLField.TimeLocal:
-                        dict.Add(key, miningParams.TimeLocal);
-                        break;
-                    case JLField.AlternativeSpellings:
-                        dict.Add(key, miningParams.AlternativeSpellings);
-                        break;
-                    case JLField.Frequency:
-                        dict.Add(key, miningParams.Frequency);
-                        break;
-                    case JLField.StrokeCount:
-                        dict.Add(key, miningParams.StrokeCount);
-                        break;
-                    case JLField.Grade:
-                        dict.Add(key, miningParams.Grade);
-                        break;
-                    case JLField.Composition:
-                        dict.Add(key, miningParams.Composition);
-                        break;
-                    case JLField.DictType:
-                        dict.Add(key, miningParams.DictType);
-                        break;
-                    case JLField.Process:
-                        dict.Add(key, miningParams.Process);
-                        break;
-                    default:
-                        return null;
+                    dict.Add(key, miningParams[value]);
                 }
             }
 
-            return dict
-                .Where(kvp => kvp.Value != null)
-                .ToDictionary(x => x.Key, x => x.Value);
+            return dict;
         }
 
         private static List<string> FindAudioFields(Dictionary<string, JLField> fields)

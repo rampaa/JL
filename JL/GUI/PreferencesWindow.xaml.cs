@@ -106,6 +106,7 @@ namespace JL.GUI
                 MiningSetupComboBoxDeckNames.SelectedIndex = 0;
                 MiningSetupComboBoxModelNames.ItemsSource = new List<string> { ankiConfig.ModelName };
                 MiningSetupComboBoxModelNames.SelectedIndex = 0;
+                TagsTextBox.Text = string.Join(",", ankiConfig.Tags);
                 CreateFieldElements(ankiConfig.Fields);
             }
             catch (Exception e)
@@ -181,6 +182,11 @@ namespace JL.GUI
         private void CreateFieldElements(Dictionary<string, JLField> fields)
         {
             MiningSetupStackPanelFields.Children.Clear();
+
+            var jlFieldNames = Enum.GetValues(typeof(JLField)).Cast<JLField>();
+            string[] descriptions = jlFieldNames
+                .Select(jlFieldName => jlFieldName.GetDescription() ?? jlFieldName.ToString()).ToArray();
+
             try
             {
                 foreach ((string fieldName, JLField jlField) in fields)
@@ -189,8 +195,7 @@ namespace JL.GUI
                     var textBlockFieldName = new TextBlock { Text = fieldName };
                     var comboBoxJLFields = new System.Windows.Controls.ComboBox
                     {
-                        ItemsSource = Enum.GetValues(typeof(JLField)),
-                        SelectedItem = jlField
+                        ItemsSource = descriptions, SelectedItem = jlField.GetDescription() ?? jlField.ToString()
                     };
 
                     stackPanel.Children.Add(textBlockFieldName);
@@ -218,18 +223,22 @@ namespace JL.GUI
                     var textBlock = (TextBlock)stackPanel.Children[0];
                     var comboBox = (System.Windows.Controls.ComboBox)stackPanel.Children[1];
 
-                    if (Enum.TryParse<JLField>(comboBox.SelectionBoxItem.ToString(), out JLField result))
-                    {
-                        dict.Add(textBlock.Text, result);
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException();
-                    }
+                    string selectedDescription = comboBox.SelectionBoxItem.ToString();
+
+                    var jlFieldNames = Enum.GetValues(typeof(JLField)).Cast<JLField>();
+                    JLField result = jlFieldNames.FirstOrDefault(jlFieldName =>
+                            (jlFieldName.GetDescription() ?? jlFieldName.ToString()) == selectedDescription,
+                        JLField.Nothing);
+
+                    dict.Add(textBlock.Text, result);
                 }
 
                 Dictionary<string, JLField> fields = dict;
-                string[] tags = { "JL" };
+
+                string rawTags = TagsTextBox.Text;
+                string[] tags = string.IsNullOrEmpty(rawTags)
+                    ? Array.Empty<string>()
+                    : rawTags.Split(',').Select(s => s.Trim()).ToArray();
 
                 if (MiningSetupComboBoxDeckNames.SelectedItem == null ||
                     MiningSetupComboBoxModelNames.SelectedItem == null)
@@ -242,19 +251,14 @@ namespace JL.GUI
                 AnkiConfig ankiConfig = new(deckName, modelName, fields, tags);
                 if (await AnkiConfig.WriteAnkiConfig(ankiConfig).ConfigureAwait(false))
                 {
-                    Utils.Alert(AlertLevel.Success, "Saved config");
-                    Utils.Logger.Information("Saved config");
-                }
-                else
-                {
-                    Utils.Alert(AlertLevel.Error, "Error saving config");
-                    Utils.Logger.Error("Error saving config");
+                    Utils.Alert(AlertLevel.Success, "Saved AnkiConfig");
+                    Utils.Logger.Information("Saved AnkiConfig");
                 }
             }
             catch (Exception exception)
             {
-                Utils.Alert(AlertLevel.Error, "Error saving Anki config");
-                Utils.Logger.Error(exception, "Error saving Anki config");
+                Utils.Alert(AlertLevel.Error, "Error saving AnkiConfig");
+                Utils.Logger.Error(exception, "Error saving AnkiConfig");
             }
         }
 

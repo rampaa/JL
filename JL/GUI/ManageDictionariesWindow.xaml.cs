@@ -82,7 +82,7 @@ namespace JL.GUI
                 var dictTypeDisplay = new TextBlock
                 {
                     Width = 135,
-                    Text = dict.Type.ToString(),
+                    Text = dict.Type.GetDescription() ?? dict.Type.ToString(),
                     Margin = new Thickness(10),
                 };
                 var dictPathValidityDisplay = new TextBlock
@@ -170,10 +170,10 @@ namespace JL.GUI
                 buttonRemove.Click += (_, _) =>
                 {
                     if (System.Windows.MessageBox.Show("Really remove dictionary?", "Confirmation",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question,
-                        MessageBoxResult.No,
-                        MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Question,
+                            MessageBoxResult.No,
+                            MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
                     {
                         dict.Contents.Clear();
                         Storage.Dicts.Remove(dict.Type);
@@ -183,6 +183,7 @@ namespace JL.GUI
                         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
                     }
                 };
+                resultDockPanels.Add(dockPanel);
 
                 dockPanel.Children.Add(checkBox);
                 dockPanel.Children.Add(buttonIncreasePriority);
@@ -193,8 +194,6 @@ namespace JL.GUI
                 dockPanel.Children.Add(dictPathDisplay);
                 dockPanel.Children.Add(updateButton);
                 dockPanel.Children.Add(buttonRemove);
-
-                resultDockPanels.Add(dockPanel);
             }
 
             // TODO: AddDictionaryWindow

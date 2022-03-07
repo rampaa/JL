@@ -800,7 +800,11 @@ namespace JL.GUI
             MiningMode = false;
             Hide();
 
-            MiningParams miningParams = new();
+            var miningParams = new Dictionary<JLField, string>();
+            foreach (JLField jlf in Enum.GetValues(typeof(JLField)))
+            {
+                miningParams[jlf] = "";
+            }
 
             var textBlock = (TextBlock)sender;
             var top = (WrapPanel)textBlock.Parent;
@@ -813,10 +817,10 @@ namespace JL.GUI
                         switch (result)
                         {
                             case LookupResult.Readings:
-                                miningParams.Readings = chi.Text;
+                                miningParams[JLField.Readings] = chi.Text;
                                 break;
                             case LookupResult.AlternativeSpellings:
-                                miningParams.AlternativeSpellings = chi.Text;
+                                miningParams[JLField.AlternativeSpellings] = chi.Text;
                                 break;
                         }
                     }
@@ -829,22 +833,22 @@ namespace JL.GUI
                         switch (result)
                         {
                             case LookupResult.FoundSpelling:
-                                miningParams.FoundSpelling = ch.Text;
+                                miningParams[JLField.FoundSpelling] = ch.Text;
                                 break;
                             case LookupResult.FoundForm:
-                                miningParams.FoundForm = ch.Text;
+                                miningParams[JLField.FoundForm] = ch.Text;
                                 break;
                             case LookupResult.EdictID:
-                                miningParams.EdictID = ch.Text;
+                                miningParams[JLField.EdictID] = ch.Text;
                                 break;
                             case LookupResult.Frequency:
-                                miningParams.Frequency = ch.Text;
+                                miningParams[JLField.Frequency] = ch.Text;
                                 break;
                             case LookupResult.DictType:
-                                miningParams.DictType = ch.Text;
+                                miningParams[JLField.DictType] = ch.Text;
                                 break;
                             case LookupResult.Process:
-                                miningParams.Process = ch.Text;
+                                miningParams[JLField.Process] = ch.Text;
                                 break;
                         }
                     }
@@ -857,7 +861,7 @@ namespace JL.GUI
             {
                 if (child is TextBox textBox)
                 {
-                    miningParams.Definitions += textBox.Text;
+                    miningParams[JLField.Definitions] += textBox.Text;
                     continue;
                 }
 
@@ -871,22 +875,22 @@ namespace JL.GUI
                     switch (result)
                     {
                         case LookupResult.StrokeCount:
-                            miningParams.StrokeCount += textBlock.Text;
+                            miningParams[JLField.StrokeCount] += textBlock.Text;
                             break;
                         case LookupResult.Grade:
-                            miningParams.Grade += textBlock.Text;
+                            miningParams[JLField.Grade] += textBlock.Text;
                             break;
                         case LookupResult.Composition:
-                            miningParams.Composition += textBlock.Text;
+                            miningParams[JLField.Composition] += textBlock.Text;
                             break;
                         case LookupResult.OnReadings:
-                            miningParams.Readings += textBlock.Text + " | ";
+                            miningParams[JLField.Readings] += textBlock.Text + " | ";
                             break;
                         case LookupResult.KunReadings:
-                            miningParams.Readings += textBlock.Text + " | ";
+                            miningParams[JLField.Readings] += textBlock.Text + " | ";
                             break;
                         case LookupResult.Nanori:
-                            miningParams.Readings += textBlock.Text + " | ";
+                            miningParams[JLField.Readings] += textBlock.Text + " | ";
                             break;
                         default:
                             throw new ArgumentOutOfRangeException(null, "Invalid LookupResult type");
@@ -894,8 +898,8 @@ namespace JL.GUI
                 }
             }
 
-            miningParams.Context = PopupWindowUtilities.FindSentence(_currentText, _currentCharPosition);
-            miningParams.TimeLocal = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
+            miningParams[JLField.Context] = PopupWindowUtilities.FindSentence(_currentText, _currentCharPosition);
+            miningParams[JLField.TimeLocal] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
 
             await Mining.Mine(miningParams).ConfigureAwait(false);
         }

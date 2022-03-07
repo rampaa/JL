@@ -415,28 +415,28 @@ namespace JL.Lookup
 
                     for (int j = 0; j < rLists.Count; j++)
                     {
-                        StringBuilder formatedROrthographyInfo = new();
+                        StringBuilder formattedROrthographyInfo = new();
 
                         for (int k = 0; k < rLists[j].Count; k++)
                         {
-                            formatedROrthographyInfo.Append(rLists[j][k]);
-                            formatedROrthographyInfo.Append(", ");
+                            formattedROrthographyInfo.Append(rLists[j][k]);
+                            formattedROrthographyInfo.Append(", ");
                         }
 
-                        rOrthographyInfoList.Add(formatedROrthographyInfo.ToString().TrimEnd(", ".ToCharArray()));
+                        rOrthographyInfoList.Add(formattedROrthographyInfo.ToString().TrimEnd(", ".ToCharArray()));
                     }
 
                     for (int j = 0; j < aLists.Count; j++)
                     {
-                        StringBuilder formatedAOrthographyInfo = new();
+                        StringBuilder formattedAOrthographyInfo = new();
 
                         for (int k = 0; k < aLists[j].Count; k++)
                         {
-                            formatedAOrthographyInfo.Append(aLists[j][k]);
-                            formatedAOrthographyInfo.Append(", ");
+                            formattedAOrthographyInfo.Append(aLists[j][k]);
+                            formattedAOrthographyInfo.Append(", ");
                         }
 
-                        aOrthographyInfoList.Add(formatedAOrthographyInfo.ToString().TrimEnd(", ".ToCharArray()));
+                        aOrthographyInfoList.Add(formattedAOrthographyInfo.ToString().TrimEnd(", ".ToCharArray()));
                     }
 
                     result.Add(LookupResult.FoundSpelling, foundSpelling);

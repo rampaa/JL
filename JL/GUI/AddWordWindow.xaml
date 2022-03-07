@@ -12,15 +12,15 @@
                 <TextBlock Foreground="White" Text="Spellings" TextWrapping="Wrap" Margin="0,0,0,10"
                            Cursor="Help" ToolTip="Separated by a semicolon" />
                 <TextBox x:Name="SpellingsTextBox" TextWrapping="Wrap" Width="300" Margin="0,0,0,40"
-                         ToolTip="Separated by a semicolon" />
+                         Cursor="Help" ToolTip="Separated by a semicolon" />
                 <TextBlock Foreground="White" Text="Readings" TextWrapping="Wrap" Margin="0,0,0,10"
-                           ToolTip="Separated by a semicolon" />
+                           Cursor="Help" ToolTip="Separated by a semicolon" />
                 <TextBox x:Name="ReadingsTextBox" TextWrapping="Wrap" Width="300" Margin="0,0,0,40"
-                         ToolTip="Separated by a semicolon" />
+                         Cursor="Help" ToolTip="Separated by a semicolon" />
                 <TextBlock Foreground="White" Text="Definitions" TextWrapping="Wrap" Margin="0,0,0,10"
-                           ToolTip="Separated by a semicolon" />
+                           Cursor="Help" ToolTip="Separated by a semicolon" />
                 <TextBox x:Name="DefinitionsTextBox" TextWrapping="Wrap" Width="300" Margin="0,0,0,50"
-                         ToolTip="Separated by a semicolon" />
+                         Cursor="Help" ToolTip="Separated by a semicolon" />
             </StackPanel>
 
             <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom"
