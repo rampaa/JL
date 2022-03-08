@@ -13,11 +13,19 @@
 
     <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Disabled"
                   VerticalContentAlignment="Top"
-                  CanContentScroll="False">
-        <StackPanel>
-            <TextBlock Name="TextBlockMiningModeReminder" FontSize="17" Padding="5,0,5,0" Visibility="Collapsed">
+                  CanContentScroll="True">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Name="TextBlockMiningModeReminder" FontSize="17" Padding="5,1,0,1"
+                       Visibility="Collapsed"
+                       Background="{Binding Path=Background,
+                  RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
             </TextBlock>
-            <ListBox VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False" Foreground="White"
+            <ListBox Grid.Row="1" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
+                     Foreground="White"
                      Background="{Binding Path=Background,
                   RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
                      PreviewMouseWheel="PopupListBox_PreviewMouseWheel"
@@ -28,7 +36,7 @@
                     </Style>
                 </ListBox.ItemContainerStyle>
             </ListBox>
-        </StackPanel>
+        </Grid>
     </ScrollViewer>
     <Window.ContextMenu>
         <ContextMenu Name="PopupContextMenu">
@@ -52,7 +60,7 @@
                 Header="Manage dictionaries"
                 Click="ShowManageDictionariesWindow" />
             <MenuItem
-                Name="PreferencesButtons"
+                Name="PreferencesButton"
                 Header="Preferences"
                 Click="ShowPreferences" />
         </ContextMenu>
