@@ -194,16 +194,11 @@ namespace JL.GUI
 
         private void UpdatePosition(Point cursorPosition)
         {
-            double mouseX = cursorPosition.X / Storage.Dpi.DpiScaleX;
-            double mouseY = cursorPosition.Y / Storage.Dpi.DpiScaleY;
-            double workAreaWidth = Storage.ActiveScreen.Bounds.Width / Storage.Dpi.DpiScaleX;
-            double workAreaHeight = Storage.ActiveScreen.Bounds.Height / Storage.Dpi.DpiScaleY;
-            double offsetX = ConfigManager.PopupXOffset / Storage.Dpi.DpiScaleX;
-            double offsetY = ConfigManager.PopupYOffset / Storage.Dpi.DpiScaleY;
+            double mouseX = cursorPosition.X / Utils.Dpi.DpiScaleX;
+            double mouseY = cursorPosition.Y / Utils.Dpi.DpiScaleY;
 
-
-            bool needsFlipX = ConfigManager.PopupFlipX && mouseX + Width > workAreaWidth;
-            bool needsFlipY = ConfigManager.PopupFlipY && mouseY + Height > workAreaHeight;
+            bool needsFlipX = ConfigManager.PopupFlipX && mouseX + Width > Utils.WorkAreaWidth;
+            bool needsFlipY = ConfigManager.PopupFlipY && mouseY + Height > Utils.WorkAreaHeight;
 
             double newLeft;
             double newTop;
@@ -211,36 +206,36 @@ namespace JL.GUI
             if (needsFlipX)
             {
                 // flip Leftwards while preventing -OOB
-                newLeft = mouseX - Width - offsetX * 2;
+                newLeft = mouseX - Width - Utils.DpiAwareXOffset * 2;
                 if (newLeft < 0) newLeft = 0;
             }
             else
             {
                 // no flip
-                newLeft = mouseX + offsetX;
+                newLeft = mouseX + Utils.DpiAwareXOffset;
             }
 
             if (needsFlipY)
             {
                 // flip Upwards while preventing -OOB
-                newTop = mouseY - Height - offsetY * 2;
+                newTop = mouseY - Height - Utils.DpiAwareYOffset * 2;
                 if (newTop < 0) newTop = 0;
             }
             else
             {
                 // no flip
-                newTop = mouseY + offsetY;
+                newTop = mouseY + Utils.DpiAwareYOffset;
             }
 
             // stick to edges if +OOB
-            if (newLeft + Width > workAreaWidth)
+            if (newLeft + Width > Utils.WorkAreaWidth)
             {
-                newLeft = workAreaWidth - Width;
+                newLeft = Utils.WorkAreaWidth - Width;
             }
 
-            if (newTop + Height > workAreaHeight)
+            if (newTop + Height > Utils.WorkAreaHeight)
             {
-                newTop = workAreaHeight - Height;
+                newTop = Utils.WorkAreaHeight - Height;
             }
 
             Left = newLeft;
@@ -324,7 +319,7 @@ namespace JL.GUI
                         break;
 
                     case LookupResult.DictType:
-                        var dictTypeNames = Enum.GetValues(typeof(DictType)).Cast<DictType>();
+                        IEnumerable<DictType> dictTypeNames = Enum.GetValues(typeof(DictType)).Cast<DictType>();
                         DictType dictType = dictTypeNames.First(dictTypeName => dictTypeName.ToString() == value[0]);
 
                         textBlockDictType = new TextBlock

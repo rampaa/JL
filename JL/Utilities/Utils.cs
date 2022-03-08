@@ -34,6 +34,16 @@ namespace JL.Utilities
                 shared: true)
             .CreateLogger();
 
+        public static System.Windows.Forms.Screen ActiveScreen { get; set; } =
+            System.Windows.Forms.Screen.FromHandle(
+                new System.Windows.Interop.WindowInteropHelper(MainWindow.Instance).Handle);
+
+        public static DpiScale Dpi { get; set; } = VisualTreeHelper.GetDpi(MainWindow.Instance);
+        public static double WorkAreaWidth { get; set; } = ActiveScreen.Bounds.Width / Dpi.DpiScaleX;
+        public static double WorkAreaHeight { get; set; } = ActiveScreen.Bounds.Height / Dpi.DpiScaleY;
+        public static double DpiAwareXOffset { get; set; } = ConfigManager.PopupXOffset / Dpi.DpiScaleX;
+        public static double DpiAwareYOffset { get; set; } = ConfigManager.PopupYOffset / Dpi.DpiScaleY;
+
         private static WaveOut s_audioPlayer;
 
         public static string GetDescription(this Enum value)
@@ -81,7 +91,9 @@ namespace JL.Utilities
             {
                 ComboBoxItem comboBoxItem = new()
                 {
-                    Content = fontFamily.Source, FontFamily = fontFamily, Foreground = Brushes.White
+                    Content = fontFamily.Source,
+                    FontFamily = fontFamily,
+                    Foreground = Brushes.White
                 };
 
                 if (fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("ja-jp")))
@@ -89,7 +101,7 @@ namespace JL.Utilities
                     japaneseFonts.Add(comboBoxItem);
                 }
 
-                else if (fontFamily.FamilyNames.Keys is {Count: 1} &&
+                else if (fontFamily.FamilyNames.Keys is { Count: 1 } &&
                          fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("en-US")))
                 {
                     bool foundGlyph = false;
@@ -249,7 +261,7 @@ namespace JL.Utilities
 
         public static void CreateDefaultDictsConfig()
         {
-            var jso = new JsonSerializerOptions {WriteIndented = true, Converters = {new JsonStringEnumConverter(),}};
+            var jso = new JsonSerializerOptions { WriteIndented = true, Converters = { new JsonStringEnumConverter(), } };
 
             try
             {
@@ -270,7 +282,8 @@ namespace JL.Utilities
             {
                 var jso = new JsonSerializerOptions
                 {
-                    WriteIndented = true, Converters = {new JsonStringEnumConverter(),}
+                    WriteIndented = true,
+                    Converters = { new JsonStringEnumConverter(), }
                 };
 
                 File.WriteAllTextAsync(Path.Join(Storage.ApplicationPath, "Config/dicts.json"),
@@ -287,7 +300,7 @@ namespace JL.Utilities
         {
             try
             {
-                var jso = new JsonSerializerOptions {Converters = {new JsonStringEnumConverter(),}};
+                var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(), } };
 
                 Dictionary<DictType, Dict> deserializedDicts = await JsonSerializer
                     .DeserializeAsync<Dictionary<DictType, Dict>>(
@@ -356,7 +369,8 @@ namespace JL.Utilities
         {
             if (selectedText?.Length > 0)
                 Process.Start(new ProcessStartInfo("cmd",
-                    $"/c start https://www.google.com/search?q={selectedText}^&hl=ja") {CreateNoWindow = true});
+                    $"/c start https://www.google.com/search?q={selectedText}^&hl=ja")
+                { CreateNoWindow = true });
         }
 
         public static string GetMd5String(byte[] bytes)
@@ -376,7 +390,7 @@ namespace JL.Utilities
                     s_audioPlayer.Dispose();
                 }
 
-                s_audioPlayer = new WaveOut {Volume = volume};
+                s_audioPlayer = new WaveOut { Volume = volume };
 
                 s_audioPlayer.Init(new Mp3FileReader(new MemoryStream(audio)));
                 s_audioPlayer.Play();

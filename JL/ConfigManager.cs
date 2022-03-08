@@ -219,10 +219,15 @@ namespace JL
                 .Get("DeconjugationInfoFontSize")!), DeconjugationInfoFontSize, "DeconjugationInfoFontSize");
             Utils.Try(() => DictTypeFontSize = int.Parse(ConfigurationManager.AppSettings
                 .Get("DictTypeFontSize")!), DictTypeFontSize, "DictTypeFontSize");
+
             Utils.Try(() => PopupXOffset = int.Parse(ConfigurationManager.AppSettings
                 .Get("PopupXOffset")!), PopupXOffset, "PopupXOffset");
             Utils.Try(() => PopupYOffset = int.Parse(ConfigurationManager.AppSettings
                 .Get("PopupYOffset")!), PopupYOffset, "PopupYOffset");
+
+            Utils.DpiAwareXOffset = PopupXOffset / Utils.Dpi.DpiScaleX;
+            Utils.DpiAwareYOffset = PopupYOffset / Utils.Dpi.DpiScaleY;
+
             Utils.Try(() => PopupMaxWidth = int.Parse(ConfigurationManager.AppSettings
                 .Get("PopupMaxWidth")!), PopupMaxWidth, "PopupMaxWidth");
             Utils.Try(() => PopupMaxHeight = int.Parse(ConfigurationManager.AppSettings

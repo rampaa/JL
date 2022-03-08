@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Utilities;
 
@@ -398,7 +399,12 @@ namespace JL.GUI
 
         private void Window_DpiChanged(object sender, DpiChangedEventArgs e)
         {
-            Storage.Dpi = e.NewDpi;
+            Utils.Dpi = e.NewDpi;
+            Utils.ActiveScreen = System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(this).Handle);
+            Utils.WorkAreaWidth = Utils.ActiveScreen.Bounds.Width / e.NewDpi.DpiScaleX;
+            Utils.WorkAreaHeight = Utils.ActiveScreen.Bounds.Height / e.NewDpi.DpiScaleY;
+            Utils.DpiAwareXOffset = ConfigManager.PopupXOffset / e.NewDpi.DpiScaleX;
+            Utils.DpiAwareYOffset = ConfigManager.PopupYOffset / e.NewDpi.DpiScaleY;
         }
     }
 }
