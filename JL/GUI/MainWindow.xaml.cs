@@ -223,6 +223,9 @@ namespace JL.GUI
 
             else if (Utils.KeyGestureComparer(e, ConfigManager.KanjiModeKeyGesture))
             {
+                // fixes double toggling KanjiMode
+                e.Handled = true;
+
                 ConfigManager.KanjiMode = !ConfigManager.KanjiMode;
                 FirstPopupWindow.LastText = "";
                 MainTextBox_MouseMove(null, null);
