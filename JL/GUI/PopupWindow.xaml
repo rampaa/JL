@@ -19,7 +19,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Name="TextBlockMiningModeReminder" FontSize="17" Padding="5,1,0,1"
+            <TextBlock Grid.Row="0" Name="TextBlockMiningModeReminder" FontSize="13" Padding="5,1,0,1"
                        Visibility="Collapsed" TextWrapping="Wrap"
                        Background="{Binding Path=Background,
                   RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">

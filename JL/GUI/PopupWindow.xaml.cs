@@ -64,8 +64,8 @@ namespace JL.GUI
                 SizeToContent = SizeToContent.Manual;
 
             TextBlockMiningModeReminder.Text =
-                $"In mining mode. Click on an entry's main spelling to mine it," +
-                $" or press {ConfigManager.ClosePopupKeyGesture.Key} or click on the main window to exit.";
+                $"Click on an entry's main spelling to mine it," + Environment.NewLine +
+                $"or press {ConfigManager.ClosePopupKeyGesture.Key} or click on the main window to exit.";
         }
 
         private void AddName(object sender, RoutedEventArgs e)
