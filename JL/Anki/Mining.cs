@@ -15,7 +15,11 @@ namespace JL.Anki
             try
             {
                 AnkiConfig ankiConfig = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
-                if (ankiConfig == null) return false;
+                if (ankiConfig == null)
+                {
+                    Utils.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
+                    return false;
+                }
 
                 string deckName = ankiConfig.DeckName;
                 string modelName = ankiConfig.ModelName;

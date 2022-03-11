@@ -221,6 +221,15 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Focus on lookup"
+                                       TextWrapping="Wrap"
+                                       Cursor="Help"
+                                       ToolTip="Attempt to set focus on the popup window when you mouse over text.
+&#10;Required if you want to be able to use hotkeys without clicking on the window first." />
+                            <CheckBox x:Name="PopupFocusOnLookupCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Background color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="PopupBackgroundColorButton" Content="" HorizontalAlignment="Right"

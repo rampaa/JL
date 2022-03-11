@@ -44,12 +44,12 @@ namespace JL.GUI
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            bool isValidated = true;
+            bool isValid = true;
 
             if (!MainWindowUtilities.JapaneseRegex.IsMatch(SpellingsTextBox.Text))
             {
                 SpellingsTextBox.BorderBrush = Brushes.Red;
-                isValidated = false;
+                isValid = false;
             }
             else if (SpellingsTextBox.BorderBrush == Brushes.Red)
             {
@@ -59,7 +59,7 @@ namespace JL.GUI
             if (ReadingsTextBox.Text == "")
             {
                 ReadingsTextBox.BorderBrush = Brushes.Red;
-                isValidated = false;
+                isValid = false;
             }
             else if (ReadingsTextBox.BorderBrush == Brushes.Red)
             {
@@ -69,14 +69,14 @@ namespace JL.GUI
             if (DefinitionsTextBox.Text == "")
             {
                 DefinitionsTextBox.BorderBrush = Brushes.Red;
-                isValidated = false;
+                isValid = false;
             }
             else if (DefinitionsTextBox.BorderBrush == Brushes.Red)
             {
                 DefinitionsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
             }
 
-            if (isValidated)
+            if (isValid)
             {
                 string rawSpellings = SpellingsTextBox.Text;
                 string rawReadings = ReadingsTextBox.Text;

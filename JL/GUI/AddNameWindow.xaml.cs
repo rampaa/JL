@@ -43,12 +43,12 @@ namespace JL.GUI
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            bool isValidated = true;
+            bool isValid = true;
 
             if (!MainWindowUtilities.JapaneseRegex.IsMatch(SpellingTextBox.Text))
             {
                 SpellingTextBox.BorderBrush = Brushes.Red;
-                isValidated = false;
+                isValid = false;
             }
             else if (SpellingTextBox.BorderBrush == Brushes.Red)
             {
@@ -58,21 +58,21 @@ namespace JL.GUI
             if (ReadingTextBox.Text == "")
             {
                 ReadingTextBox.BorderBrush = Brushes.Red;
-                isValidated = false;
+                isValid = false;
             }
             else if (ReadingTextBox.BorderBrush == Brushes.Red)
             {
                 ReadingTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
             }
 
-            if (isValidated)
+            if (isValid)
             {
                 string nameType =
                     NameTypeStackPanel.Children.OfType<RadioButton>()
                         .FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString();
                 string spelling = SpellingTextBox.Text;
                 string reading = ReadingTextBox.Text;
-                CustomNameLoader.AddToDictionary(spelling.Trim(), reading.Trim(), nameType.Trim());
+                CustomNameLoader.AddToDictionary(spelling.Trim(), reading.Trim(), nameType!.Trim());
                 Close();
                 await WriteToFile(spelling, reading, nameType).ConfigureAwait(false);
             }

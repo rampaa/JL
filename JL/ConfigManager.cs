@@ -28,9 +28,6 @@ namespace JL
         public static bool AllowDuplicateCards { get; set; } = false;
         public static int LookupRate { get; set; } = 0;
 
-        public static bool PopupDynamicHeight { get; set; } = true;
-        public static bool PopupDynamicWidth { get; set; } = true;
-
         public static Brush MainWindowTextColor { get; set; } = Brushes.White;
         public static Brush MainWindowBacklogTextColor { get; set; } = Brushes.Bisque;
         public static Brush PrimarySpellingColor { get; set; } = Brushes.Chocolate;
@@ -72,6 +69,9 @@ namespace JL
 
         public static int PopupMaxWidth { get; set; } = 700;
         public static int PopupMaxHeight { get; set; } = 520;
+        public static bool PopupDynamicHeight { get; set; } = true;
+        public static bool PopupDynamicWidth { get; set; } = true;
+        public static bool PopupFocusOnLookup { get; set; } = false;
         public static int PopupXOffset { get; set; } = 10;
         public static int PopupYOffset { get; set; } = 20;
         public static bool PopupFlipX { get; set; } = true;
@@ -109,7 +109,7 @@ namespace JL
                 HighlightLongestMatch, "HighlightLongestMatch");
 
             Utils.Try(() => CheckForJLUpdatesOnStartUp =
-                bool.Parse(ConfigurationManager.AppSettings.Get("CheckForJLUpdatesOnStartUp")!),
+                    bool.Parse(ConfigurationManager.AppSettings.Get("CheckForJLUpdatesOnStartUp")!),
                 CheckForJLUpdatesOnStartUp, "CheckForJLUpdatesOnStartUp");
 
             Utils.Try(() => MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength")!),
@@ -220,6 +220,8 @@ namespace JL
             Utils.Try(() => DictTypeFontSize = int.Parse(ConfigurationManager.AppSettings
                 .Get("DictTypeFontSize")!), DictTypeFontSize, "DictTypeFontSize");
 
+            Utils.Try(() => PopupFocusOnLookup = bool.Parse(ConfigurationManager.AppSettings
+                .Get("PopupFocusOnLookup")!), PopupFocusOnLookup, "PopupFocusOnLookup");
             Utils.Try(() => PopupXOffset = int.Parse(ConfigurationManager.AppSettings
                 .Get("PopupXOffset")!), PopupXOffset, "PopupXOffset");
             Utils.Try(() => PopupYOffset = int.Parse(ConfigurationManager.AppSettings
@@ -522,10 +524,12 @@ namespace JL
 
             preferenceWindow.SeparatorColorButton.Background = SeparatorColor;
             preferenceWindow.DictTypeColorButton.Background = DictTypeColor;
+
+            preferenceWindow.PopupFocusOnLookupCheckBox.IsChecked = PopupFocusOnLookup;
             preferenceWindow.PopupXOffsetNumericUpDown.Value = PopupXOffset;
             preferenceWindow.PopupYOffsetNumericUpDown.Value = PopupYOffset;
-
             preferenceWindow.PopupFlipComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("PopupFlip");
+
             preferenceWindow.LookupModeComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("LookupMode");
             preferenceWindow.LookupKeyComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("LookupKey");
         }
@@ -647,6 +651,8 @@ namespace JL
             config.AppSettings.Settings["DictTypeColor"].Value =
                 preferenceWindow.DictTypeColorButton.Background.ToString();
 
+            config.AppSettings.Settings["PopupFocusOnLookup"].Value =
+                preferenceWindow.PopupFocusOnLookupCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["PopupXOffset"].Value =
                 preferenceWindow.PopupXOffsetNumericUpDown.Value.ToString();
             config.AppSettings.Settings["PopupYOffset"].Value =

@@ -98,7 +98,7 @@ namespace JL.GUI
             if (MiningMode || ConfigManager.InactiveLookupMode
                            || (ConfigManager.RequireLookupKeyPress
                                && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
-            )
+               )
                 return;
 
             UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
@@ -132,16 +132,24 @@ namespace JL.GUI
                     if (ConfigManager.HighlightLongestMatch)
                     {
                         double verticalOffset = tb.VerticalOffset;
-                        tb.Focus();
+
+                        if (ConfigManager.PopupFocusOnLookup)
+                        {
+                            Focus();
+                        }
+
                         tb.Select(charPosition, lookupResults[0][LookupResult.FoundForm][0].Length);
                         tb.ScrollToVerticalOffset(verticalOffset);
                     }
 
                     Init();
-
                     Visibility = Visibility.Visible;
-                    Activate();
-                    Focus();
+
+                    if (ConfigManager.PopupFocusOnLookup)
+                    {
+                        Activate();
+                        Focus();
+                    }
 
                     _lastLookupResults = lookupResults;
                     DisplayResults(false);
@@ -183,14 +191,20 @@ namespace JL.GUI
 
                 Init();
                 Visibility = Visibility.Visible;
-                Activate();
-                Focus();
+
+                if (ConfigManager.PopupFocusOnLookup)
+                {
+                    Activate();
+                    Focus();
+                }
 
                 _lastLookupResults = lookupResults;
                 DisplayResults(true);
             }
             else
+            {
                 Visibility = Visibility.Hidden;
+            }
         }
 
         private void UpdatePosition(Point cursorPosition)
@@ -300,9 +314,7 @@ namespace JL.GUI
                     case LookupResult.FoundForm:
                         textBlockFoundForm = new TextBlock
                         {
-                            Name = key.ToString(),
-                            Text = string.Join("", value),
-                            Visibility = Visibility.Collapsed,
+                            Name = key.ToString(), Text = string.Join("", value), Visibility = Visibility.Collapsed,
                         };
                         break;
 
@@ -765,9 +777,9 @@ namespace JL.GUI
         private void TextBoxPreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             ManageDictionariesButton.IsEnabled = Storage.Ready
-                && !Storage.UpdatingJMdict
-                && !Storage.UpdatingJMnedict
-                && !Storage.UpdatingKanjidic;
+                                                 && !Storage.UpdatingJMdict
+                                                 && !Storage.UpdatingJMnedict
+                                                 && !Storage.UpdatingKanjidic;
 
             AddNameButton.IsEnabled = Storage.Ready;
             AddWordButton.IsEnabled = Storage.Ready;
@@ -897,6 +909,7 @@ namespace JL.GUI
                             {
                                 miningParams[JLField.Readings] += "<br/>";
                             }
+
                             miningParams[JLField.Readings] += textBlock.Text + "<br/>";
                             break;
                         default:
@@ -923,8 +936,7 @@ namespace JL.GUI
 
             MouseWheelEventArgs e2 = new(e.MouseDevice, e.Timestamp, e.Delta)
             {
-                RoutedEvent = ListBox.MouseWheelEvent,
-                Source = e.Source
+                RoutedEvent = ListBox.MouseWheelEvent, Source = e.Source
             };
             PopupListBox.RaiseEvent(e2);
         }
@@ -949,11 +961,11 @@ namespace JL.GUI
 
                 PopUpScrollViewer.ScrollToTop();
                 PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+
                 Activate();
                 Focus();
 
                 ResultStackPanels.Clear();
-
                 DisplayResults(true);
             }
             else if (Utils.KeyGestureComparer(e, ConfigManager.PlayAudioKeyGesture))

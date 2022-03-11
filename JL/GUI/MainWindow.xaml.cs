@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -367,13 +369,12 @@ namespace JL.GUI
         private void MainTextBox_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             ManageDictionariesButton.IsEnabled = Storage.Ready
-                && !Storage.UpdatingJMdict
-                && !Storage.UpdatingJMnedict
-                && !Storage.UpdatingKanjidic;
+                                                 && !Storage.UpdatingJMdict
+                                                 && !Storage.UpdatingJMnedict
+                                                 && !Storage.UpdatingKanjidic;
 
             AddNameButton.IsEnabled = Storage.Ready;
             AddWordButton.IsEnabled = Storage.Ready;
-
         }
 
         private void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

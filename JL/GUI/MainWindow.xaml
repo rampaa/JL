@@ -102,6 +102,10 @@
                    Margin="0,3,30,0" Text="―" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="18" Width="10"
                    Height="20" Foreground="White" MouseLeftButtonUp="MinimizeButton_MouseLeftButtonUp"
                    MouseEnter="MinimizeButton_MouseEnter" MouseLeave="MinimizeButton_MouseLeave" ToolTip="Minimize" />
+
+        <!-- <Ellipse x:Name="FocusEllipse" Margin="7,1,1,5" HorizontalAlignment="Left" VerticalAlignment="Bottom" -->
+        <!--          ToolTip="Window Focus" Width="10" Height="10" /> -->
+
         <TextBlock x:Name="FontSizeButton" WindowChrome.IsHitTestVisibleInChrome="True" HorizontalAlignment="Left"
                    Margin="37,0,0,0" Text="T" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White"
                    Width="15" Height="20" FontSize="15" RenderTransformOrigin="-0.222,0.567"
