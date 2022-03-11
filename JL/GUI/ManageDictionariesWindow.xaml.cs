@@ -324,6 +324,15 @@ namespace JL.GUI
                 case DictType.Kotowaza:
                     BrowseForDictionaryFolder(selectedDictType);
                     break;
+                case DictType.DaijirinNazeka:
+                    BrowseForDictionaryFile(selectedDictType, "Daijirin file|*.json");
+                    break;
+                case DictType.KenkyuushaNazeka:
+                    BrowseForDictionaryFile(selectedDictType, "Kenkyuusha file|*.json");
+                    break;
+                case DictType.ShinmeikaiNazeka:
+                    BrowseForDictionaryFile(selectedDictType, "Shinmeikai file|*.json");
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(null, "Invalid DictType");
             }

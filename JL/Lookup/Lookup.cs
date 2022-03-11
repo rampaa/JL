@@ -10,6 +10,7 @@ using JL.Dicts.EDICT.JMdict;
 using JL.Dicts.EDICT.JMnedict;
 using JL.Dicts.EDICT.KANJIDIC;
 using JL.Dicts.EPWING;
+using JL.Dicts.EPWING.EpwingNazeka;
 using JL.Frequency;
 using JL.PoS;
 using JL.Utilities;
@@ -34,6 +35,7 @@ namespace JL.Lookup
             Dictionary<string, IntermediaryResult> jMdictResults = new();
             Dictionary<string, IntermediaryResult> jMnedictResults = new();
             List<Dictionary<string, IntermediaryResult>> epwingWordResultsList = new();
+            List<Dictionary<string, IntermediaryResult>> epwingNazekaWordResultsList = new();
             Dictionary<string, IntermediaryResult> kanjiResult = new();
             Dictionary<string, IntermediaryResult> customWordResults = new();
             Dictionary<string, IntermediaryResult> customNameResults = new();
@@ -50,7 +52,12 @@ namespace JL.Lookup
                 || (Storage.Dicts.TryGetValue(DictType.Gakken, out dictionary) && dictionary.Active)
                 || (Storage.Dicts.TryGetValue(DictType.Kotowaza, out dictionary) && dictionary.Active)
                 || (Storage.Dicts.TryGetValue(DictType.Koujien, out dictionary) && dictionary.Active)
-                || (Storage.Dicts.TryGetValue(DictType.Meikyou, out dictionary) && dictionary.Active);
+                || (Storage.Dicts.TryGetValue(DictType.Meikyou, out dictionary) && dictionary.Active)
+                || (Storage.Dicts.TryGetValue(DictType.DaijirinNazeka, out dictionary) && dictionary.Active)
+                || (Storage.Dicts.TryGetValue(DictType.KenkyuushaNazeka, out dictionary) && dictionary.Active)
+                || (Storage.Dicts.TryGetValue(DictType.ShinmeikaiNazeka, out dictionary) && dictionary.Active)
+                ;
+
 
             for (int i = 0; i < text.Length; i++)
             {
@@ -113,6 +120,18 @@ namespace JL.Lookup
                         case DictType.CustomNameDictionary:
                             customNameResults = GetNameResults(text, textInHiraganaList, dictType);
                             break;
+                        case DictType.DaijirinNazeka:
+                            epwingNazekaWordResultsList.Add(GetWordResults(text, textInHiraganaList,
+                                deconjugationResultsList, dictType));
+                            break;
+                        case DictType.KenkyuushaNazeka:
+                            epwingNazekaWordResultsList.Add(GetWordResults(text, textInHiraganaList,
+                                deconjugationResultsList, dictType));
+                            break;
+                        case DictType.ShinmeikaiNazeka:
+                            epwingNazekaWordResultsList.Add(GetWordResults(text, textInHiraganaList,
+                                deconjugationResultsList, dictType));
+                            break;
                         default:
                             throw new ArgumentOutOfRangeException(null, "Invalid DictType");
                     }
@@ -143,6 +162,14 @@ namespace JL.Lookup
 
             if (customNameResults.Any())
                 lookupResults.AddRange(CustomNameResultBuilder(customNameResults));
+
+            if (epwingNazekaWordResultsList.Any())
+            {
+                for (int i = 0; i < epwingNazekaWordResultsList.Count; i++)
+                {
+                    lookupResults.AddRange(EpwingNazekaResultBuilder(epwingNazekaWordResultsList[i]));
+                }
+            }
 
             if (lookupResults.Any())
                 lookupResults = SortLookupResults(lookupResults);
@@ -283,6 +310,48 @@ namespace JL.Lookup
                                     }
                                 }
                                 break;
+
+                            case DictType.DaijirinNazeka:
+                            case DictType.KenkyuushaNazeka:
+                            case DictType.ShinmeikaiNazeka:
+                                {
+                                    int dictResultsCount = dictResults.Count;
+                                    for (int i = 0; i < dictResultsCount; i++)
+                                    {
+                                        var dictResult = (EpwingNazekaResult)dictResults[i];
+
+                                        bool noMatchingEntryInJmdictWc = true;
+
+                                        if (Storage.WcDict.TryGetValue(deconjugationResult.Text, out List<JmdictWc> jmdictWcResults))
+                                        {
+                                            for (int j = 0; j < jmdictWcResults.Count; j++)
+                                            {
+                                                JmdictWc jmdictWcResult = jmdictWcResults[j];
+
+                                                if (dictResult.PrimarySpelling == jmdictWcResult.Spelling
+                                                    && (jmdictWcResult.Readings?.Contains(dictResult.Reading)
+                                                    ?? string.IsNullOrEmpty(dictResult.Reading)))
+                                                {
+                                                    noMatchingEntryInJmdictWc = false;
+                                                    if (deconjugationResult.Tags.Count == 0 ||
+                                                        jmdictWcResult.WordClasses.Contains(lastTag))
+                                                    {
+                                                        resultsList.Add(dictResult);
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        if (deconjugationResult.Tags.Count == 0 || noMatchingEntryInJmdictWc)
+                                        {
+                                            resultsList.Add(dictResult);
+                                        }
+                                    }
+                                }
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException(null, "Invalid DictType");
                         }
 
                         if (resultsList.Any())
@@ -576,7 +645,7 @@ namespace JL.Lookup
 
                     var dictType = new List<string> { wordResult.DictType.ToString() };
 
-                    var definitions = new List<string> { BuildEpwingDefinition(epwingResult) };
+                    var definitions = new List<string> { BuildEpwingDefinition(epwingResult.Definitions) };
 
                     result.Add(LookupResult.FoundSpelling, foundSpelling);
                     result.Add(LookupResult.Readings, reading);
@@ -592,6 +661,53 @@ namespace JL.Lookup
 
             return results;
         }
+
+        private static List<Dictionary<LookupResult, List<string>>> EpwingNazekaResultBuilder(
+            Dictionary<string, IntermediaryResult> epwingNazekaResults)
+        {
+            List<Dictionary<LookupResult, List<string>>> results = new();
+
+            foreach (IntermediaryResult wordResult in epwingNazekaResults.Values.ToList())
+            {
+                int resultListCount = wordResult.ResultsList.Count;
+                for (int i = 0; i < resultListCount; i++)
+                {
+                    var epwingResult = (EpwingNazekaResult)wordResult.ResultsList[i];
+
+                    Dictionary<LookupResult, List<string>> result = new();
+
+                    var foundSpelling = new List<string> { epwingResult.PrimarySpelling };
+
+                    var reading = new List<string> { epwingResult.Reading };
+
+                    var foundForm = new List<string> { wordResult.FoundForm };
+
+                    List<string> process = ProcessProcess(wordResult);
+
+                    List<string> frequency = GetEpwingNazekaFreq(epwingResult);
+
+                    List<string> alternativeSpellings = epwingResult.AlternativeSpellings ?? new List<string>();
+
+                    var dictType = new List<string> { wordResult.DictType.ToString() };
+
+                    var definitions = new List<string> { BuildEpwingDefinition(epwingResult.Definitions) };
+
+                    result.Add(LookupResult.FoundSpelling, foundSpelling);
+                    result.Add(LookupResult.AlternativeSpellings, alternativeSpellings);
+                    result.Add(LookupResult.Readings, reading);
+                    result.Add(LookupResult.Definitions, definitions);
+                    result.Add(LookupResult.FoundForm, foundForm);
+                    result.Add(LookupResult.Process, process);
+                    result.Add(LookupResult.Frequency, frequency);
+                    result.Add(LookupResult.DictType, dictType);
+
+                    results.Add(result);
+                }
+            }
+
+            return results;
+        }
+
         private static List<Dictionary<LookupResult, List<string>>> CustomWordResultBuilder(
             Dictionary<string, IntermediaryResult> customWordResults)
         {
@@ -770,6 +886,95 @@ namespace JL.Lookup
                                     freqValue = readingFreqResult.Frequency;
                                     frequency = new List<string> { readingFreqResult.Frequency.ToString() };
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return frequency;
+        }
+
+        private static List<string> GetEpwingNazekaFreq(EpwingNazekaResult epwingNazekaResult)
+        {
+            List<string> frequency = new() { MainWindowUtilities.FakeFrequency };
+
+            int freqValue = int.MaxValue;
+
+            Storage.FreqDicts.TryGetValue(ConfigManager.FrequencyListName, out Dictionary<string, List<FrequencyEntry>> freqDict);
+
+            if (freqDict == null)
+                return frequency;
+
+            if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingNazekaResult.PrimarySpelling),
+                out List<FrequencyEntry> freqResults))
+            {
+                int freqResultsCount = freqResults.Count;
+                for (int i = 0; i < freqResultsCount; i++)
+                {
+                    FrequencyEntry freqResult = freqResults[i];
+
+                    if ((epwingNazekaResult.Reading == freqResult.Spelling)
+                        || (epwingNazekaResult.Reading == null && epwingNazekaResult.PrimarySpelling == freqResult.Spelling))
+                    {
+                        if (freqValue > freqResult.Frequency)
+                        {
+                            freqValue = freqResult.Frequency;
+                            frequency = new List<string> { freqResult.Frequency.ToString() };
+                        }
+                    }
+                }
+
+                if (freqValue == int.MaxValue && epwingNazekaResult.AlternativeSpellings != null)
+                {
+                    int alternativeSpellingsCount = epwingNazekaResult.AlternativeSpellings.Count;
+                    for (int i = 0; i < alternativeSpellingsCount; i++)
+                    {
+                        if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingNazekaResult.AlternativeSpellings[i]),
+                            out List<FrequencyEntry> alternativeSpellingFreqResults))
+                        {
+                            int alternativeSpellingFreqResultsCount = alternativeSpellingFreqResults.Count;
+                            for (int j = 0; j < alternativeSpellingFreqResultsCount; j++)
+                            {
+                                FrequencyEntry alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
+
+                                if (epwingNazekaResult.Reading == alternativeSpellingFreqResult.Spelling)
+                                {
+                                    if (freqValue > alternativeSpellingFreqResult.Frequency)
+                                    {
+                                        freqValue = alternativeSpellingFreqResult.Frequency;
+                                        frequency = new List<string>
+                                        {
+                                            alternativeSpellingFreqResult.Frequency.ToString()
+                                        };
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            else if (epwingNazekaResult.Reading != null)
+            {
+                string reading = epwingNazekaResult.Reading;
+
+                if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(reading), out List<FrequencyEntry> readingFreqResults))
+                {
+                    int readingFreqResultsCount = readingFreqResults.Count;
+                    for (int j = 0; j < readingFreqResultsCount; j++)
+                    {
+                        FrequencyEntry readingFreqResult = readingFreqResults[j];
+
+                        if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading)
+                            || (epwingNazekaResult.AlternativeSpellings != null
+                                && epwingNazekaResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
+                        //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
+                        {
+                            if (freqValue > readingFreqResult.Frequency)
+                            {
+                                freqValue = readingFreqResult.Frequency;
+                                frequency = new List<string> { readingFreqResult.Frequency.ToString() };
                             }
                         }
                     }
@@ -1027,15 +1232,15 @@ namespace JL.Lookup
             return defResult.ToString();
         }
 
-        private static string BuildEpwingDefinition(EpwingResult epwingResult)
+        private static string BuildEpwingDefinition(List<string> epwingDefinitions)
         {
             StringBuilder defResult = new();
 
-            for (int i = 0; i < epwingResult.Definitions.Count; i++)
+            for (int i = 0; i < epwingDefinitions.Count; i++)
             {
                 //var separator = ConfigManager.NewlineBetweenDefinitions ? "\n" : "; ";
                 const string separator = "\n";
-                defResult.Append(epwingResult.Definitions[i] + separator);
+                defResult.Append(epwingDefinitions[i] + separator);
             }
 
             return defResult.ToString().Trim('\n');

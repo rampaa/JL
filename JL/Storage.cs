@@ -12,6 +12,7 @@ using JL.Dicts.EDICT.JMdict;
 using JL.Dicts.EDICT.JMnedict;
 using JL.Dicts.EDICT.KANJIDIC;
 using JL.Dicts.EPWING;
+using JL.Dicts.EPWING.EpwingNazeka;
 using JL.Frequency;
 using JL.PoS;
 
@@ -235,6 +236,54 @@ namespace JL
                         }
 
                         else if (!dict.Active && Dicts[DictType.CustomNameDictionary].Contents.Any())
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
+                        }
+
+                        break;
+
+                    case DictType.DaijirinNazeka:
+                        if (dict.Active && !Dicts[DictType.DaijirinNazeka].Contents.Any())
+                        {
+                            tasks.Add(Task.Run(async () =>
+                                await EpwingNazekaLoader.Load(DictType.DaijirinNazeka, Dicts[DictType.DaijirinNazeka].Path)
+                                    .ConfigureAwait(false)));
+                        }
+
+                        else if (!dict.Active && Dicts[DictType.DaijirinNazeka].Contents.Any())
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
+                        }
+
+                        break;
+
+                    case DictType.KenkyuushaNazeka:
+                        if (dict.Active && !Dicts[DictType.KenkyuushaNazeka].Contents.Any())
+                        {
+                            tasks.Add(Task.Run(async () =>
+                                await EpwingNazekaLoader.Load(DictType.KenkyuushaNazeka, Dicts[DictType.KenkyuushaNazeka].Path)
+                                    .ConfigureAwait(false)));
+                        }
+
+                        else if (!dict.Active && Dicts[DictType.KenkyuushaNazeka].Contents.Any())
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
+                        }
+
+                        break;
+
+                    case DictType.ShinmeikaiNazeka:
+                        if (dict.Active && !Dicts[DictType.ShinmeikaiNazeka].Contents.Any())
+                        {
+                            tasks.Add(Task.Run(async () =>
+                                await EpwingNazekaLoader.Load(DictType.ShinmeikaiNazeka, Dicts[DictType.ShinmeikaiNazeka].Path)
+                                    .ConfigureAwait(false)));
+                        }
+
+                        else if (!dict.Active && Dicts[DictType.ShinmeikaiNazeka].Contents.Any())
                         {
                             dict.Contents.Clear();
                             dictRemoved = true;

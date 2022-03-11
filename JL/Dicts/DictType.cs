@@ -14,12 +14,26 @@ namespace JL.Dicts
         CustomNameDictionary,
 
         // user-added
+        [Description("Kenkyuusha (Yomichan)")]
         Kenkyuusha,
+        [Description("Daijirin (Yomichan)")]
         Daijirin,
+        [Description("Daijisen (Yomichan)")]
         Daijisen,
+        [Description("Koujien (Yomichan)")]
         Koujien,
+        [Description("Meikyou (Yomichan)")]
         Meikyou,
+        [Description("Gakken (Yomichan)")]
         Gakken,
+        [Description("Kotowaza (Yomichan)")]
         Kotowaza,
+
+        [Description("Kenkyuusha (Nazeka)")]
+        KenkyuushaNazeka,
+        [Description("Daijirin (Nazeka)")]
+        DaijirinNazeka,
+        [Description("Shinmeikai (Nazeka)")]
+        ShinmeikaiNazeka,
     }
 }
