@@ -292,7 +292,7 @@ namespace JL.Lookup
                                                     if (jmdictWcResult.WordClasses.Contains(lastTag))
                                                     {
                                                         resultsList.Add(dictResult);
-                                                        continue;
+                                                        break;
                                                     }
                                                 }
                                             }
