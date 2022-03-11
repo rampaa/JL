@@ -274,8 +274,6 @@ namespace JL.Lookup
                                     {
                                         var dictResult = (EpwingResult)dictResults[i];
 
-                                        bool noMatchingEntryInJmdictWc = true;
-
                                         if (deconjugationResult.Tags.Count == 0 || dictResult.WordClasses.Contains(lastTag))
                                         {
                                             resultsList.Add(dictResult);
@@ -291,21 +289,13 @@ namespace JL.Lookup
                                                     && (jmdictWcResult.Readings?.Contains(dictResult.Reading)
                                                     ?? string.IsNullOrEmpty(dictResult.Reading)))
                                                 {
-                                                    noMatchingEntryInJmdictWc = false;
-                                                    if (deconjugationResult.Tags.Count == 0 ||
-                                                        jmdictWcResult.WordClasses.Contains(lastTag))
+                                                    if (jmdictWcResult.WordClasses.Contains(lastTag))
                                                     {
                                                         resultsList.Add(dictResult);
-                                                        break;
+                                                        continue;
                                                     }
                                                 }
                                             }
-                                        }
-
-                                        if (deconjugationResult.Tags.Count != 0 && !dictResult.WordClasses.Any() &&
-                                            noMatchingEntryInJmdictWc)
-                                        {
-                                            resultsList.Add(dictResult);
                                         }
                                     }
                                 }
@@ -320,9 +310,12 @@ namespace JL.Lookup
                                     {
                                         var dictResult = (EpwingNazekaResult)dictResults[i];
 
-                                        bool noMatchingEntryInJmdictWc = true;
+                                        if (deconjugationResult.Tags.Count == 0)
+                                        {
+                                            resultsList.Add(dictResult);
+                                        }
 
-                                        if (Storage.WcDict.TryGetValue(deconjugationResult.Text, out List<JmdictWc> jmdictWcResults))
+                                        else if (Storage.WcDict.TryGetValue(deconjugationResult.Text, out List<JmdictWc> jmdictWcResults))
                                         {
                                             for (int j = 0; j < jmdictWcResults.Count; j++)
                                             {
@@ -332,9 +325,7 @@ namespace JL.Lookup
                                                     && (jmdictWcResult.Readings?.Contains(dictResult.Reading)
                                                     ?? string.IsNullOrEmpty(dictResult.Reading)))
                                                 {
-                                                    noMatchingEntryInJmdictWc = false;
-                                                    if (deconjugationResult.Tags.Count == 0 ||
-                                                        jmdictWcResult.WordClasses.Contains(lastTag))
+                                                    if (jmdictWcResult.WordClasses.Contains(lastTag))
                                                     {
                                                         resultsList.Add(dictResult);
                                                         break;
@@ -342,14 +333,10 @@ namespace JL.Lookup
                                                 }
                                             }
                                         }
-
-                                        if (deconjugationResult.Tags.Count == 0 || noMatchingEntryInJmdictWc)
-                                        {
-                                            resultsList.Add(dictResult);
-                                        }
                                     }
                                 }
                                 break;
+
                             default:
                                 throw new ArgumentOutOfRangeException(null, "Invalid DictType");
                         }
@@ -969,7 +956,6 @@ namespace JL.Lookup
                         if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading)
                             || (epwingNazekaResult.AlternativeSpellings != null
                                 && epwingNazekaResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
-                        //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                         {
                             if (freqValue > readingFreqResult.Frequency)
                             {
