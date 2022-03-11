@@ -135,7 +135,7 @@ namespace JL.GUI
 
                         if (ConfigManager.PopupFocusOnLookup)
                         {
-                            Focus();
+                            tb.Focus();
                         }
 
                         tb.Select(charPosition, lookupResults[0][LookupResult.FoundForm][0].Length);
