@@ -19,7 +19,11 @@ namespace JL.GUI
     /// </summary>
     public partial class PopupWindow : Window
     {
+        private readonly PopupWindow _parentPopUp;
+
         private PopupWindow _childPopupWindow;
+
+        private TextBox _lastTextBox;
 
         private int _playAudioIndex;
 
@@ -45,6 +49,11 @@ namespace JL.GUI
             // need to initialize window (position) for later
             Show();
             Hide();
+        }
+
+        public PopupWindow(PopupWindow parentPopUp) : this()
+        {
+            _parentPopUp = parentPopUp;
         }
 
         public void Init()
@@ -100,6 +109,8 @@ namespace JL.GUI
                                && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
                )
                 return;
+
+            _lastTextBox = tb;
 
             UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
@@ -181,15 +192,22 @@ namespace JL.GUI
             if (string.IsNullOrWhiteSpace(tb.SelectedText))
                 return;
 
+            _lastTextBox = tb;
+
+            PopUpScrollViewer.ScrollToTop();
+
             UpdatePosition(tb.PointToScreen(tb.GetRectFromCharacterIndex(tb.SelectionStart).BottomLeft));
 
             List<Dictionary<LookupResult, List<string>>> lookupResults = Lookup.Lookup.LookupText(tb.SelectedText);
 
-            if (lookupResults != null && lookupResults.Any())
+            if (lookupResults?.Any() ?? false)
             {
                 ResultStackPanels.Clear();
 
                 Init();
+
+                PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+
                 Visibility = Visibility.Visible;
 
                 if (ConfigManager.PopupFocusOnLookup)
@@ -203,6 +221,7 @@ namespace JL.GUI
             }
             else
             {
+                PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                 Visibility = Visibility.Hidden;
             }
         }
@@ -408,6 +427,7 @@ namespace JL.GUI
                                 ContextMenu = PopupContextMenu,
                             };
 
+                            uiElementReadings.PreviewMouseLeftButtonUp += UiElement_PreviewMouseLeftButtonUp;
                             uiElementReadings.MouseMove += PopupMouseMove;
                             uiElementReadings.LostFocus += Unselect;
                             uiElementReadings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
@@ -449,21 +469,7 @@ namespace JL.GUI
                                 ContextMenu = PopupContextMenu,
                             };
 
-                            uiElementDefinitions.PreviewMouseLeftButtonUp += (sender, _) =>
-                            {
-                                if (!ConfigManager.LookupOnSelectOnly
-                                    || Background.Opacity == 0
-                                    || ConfigManager.InactiveLookupMode)
-                                    return;
-
-                                //if (ConfigManager.RequireLookupKeyPress
-                                //    && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
-                                //    return;
-
-                                _childPopupWindow ??= new PopupWindow();
-
-                                _childPopupWindow.LookupOnSelect((TextBox)sender);
-                            };
+                            uiElementDefinitions.PreviewMouseLeftButtonUp += UiElement_PreviewMouseLeftButtonUp;
 
                             uiElementDefinitions.MouseMove += PopupMouseMove;
                             uiElementDefinitions.LostFocus += Unselect;
@@ -527,6 +533,7 @@ namespace JL.GUI
                                 ContextMenu = PopupContextMenu,
                             };
 
+                            uiElementAlternativeSpellings.PreviewMouseLeftButtonUp += UiElement_PreviewMouseLeftButtonUp;
                             uiElementAlternativeSpellings.MouseMove += PopupMouseMove;
                             uiElementAlternativeSpellings.LostFocus += Unselect;
                             uiElementAlternativeSpellings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
@@ -794,7 +801,7 @@ namespace JL.GUI
             if (ConfigManager.LookupOnSelectOnly)
                 return;
 
-            _childPopupWindow ??= new PopupWindow();
+            _childPopupWindow ??= new PopupWindow(this);
 
             // prevents stray PopupWindows being created when you move your mouse too fast
             if (MiningMode)
@@ -814,7 +821,7 @@ namespace JL.GUI
 
         private async void FoundSpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (!MiningMode)
+            if (!MiningMode && !ConfigManager.LookupOnSelectOnly)
                 return;
 
             MiningMode = false;
@@ -1027,7 +1034,19 @@ namespace JL.GUI
                 MiningMode = false;
                 TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
 
+                PopUpScrollViewer.ScrollToTop();
                 PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+
+                if (ConfigManager.LookupOnSelectOnly && _parentPopUp == null)
+                {
+                    Unselect(MainWindow.Instance.MainTextBox);
+                }
+
+                else if (ConfigManager.LookupOnSelectOnly && _lastTextBox != null)
+                {
+                    Unselect(_lastTextBox);
+                }
+
                 Hide();
             }
             else if (Utils.KeyGestureComparer(e, ConfigManager.KanjiModeKeyGesture))
@@ -1078,7 +1097,7 @@ namespace JL.GUI
 
         private void OnMouseEnter(object sender, MouseEventArgs e)
         {
-            if (_childPopupWindow is { MiningMode: false })
+            if (!ConfigManager.LookupOnSelectOnly && _childPopupWindow is { MiningMode: false })
             {
                 _childPopupWindow.Hide();
                 _childPopupWindow.LastText = "";
@@ -1090,9 +1109,25 @@ namespace JL.GUI
             LastText = "";
         }
 
+        private void UiElement_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!ConfigManager.LookupOnSelectOnly
+                || Background.Opacity == 0
+                || ConfigManager.InactiveLookupMode)
+                return;
+
+            //if (ConfigManager.RequireLookupKeyPress
+            //    && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
+            //    return;
+
+            _childPopupWindow ??= new PopupWindow(this);
+
+            _childPopupWindow.LookupOnSelect((TextBox)sender);
+        }
+
         private void OnMouseLeave(object sender, MouseEventArgs e)
         {
-            if (_childPopupWindow is { MiningMode: false })
+            if (!ConfigManager.LookupOnSelectOnly && _childPopupWindow is { MiningMode: false })
             {
                 _childPopupWindow.Hide();
                 _childPopupWindow.LastText = "";

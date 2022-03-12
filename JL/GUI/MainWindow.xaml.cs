@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -105,7 +106,7 @@ namespace JL.GUI
                         int caretIndex = allBacklogText.Length - MainTextBox.Text.Length;
 
                         MainTextBox.Text =
-                            "Characters: " + string.Join("", MainWindowUtilities.Backlog).Length + " / "
+                            "Characters: " + new StringInfo(string.Join("", MainWindowUtilities.Backlog)).LengthInTextElements + " / "
                             + "Lines: " + MainWindowUtilities.Backlog.Count + "\n"
                             + allBacklogText;
                         MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
@@ -407,6 +408,16 @@ namespace JL.GUI
             Utils.WorkAreaHeight = Utils.ActiveScreen.Bounds.Height / e.NewDpi.DpiScaleY;
             Utils.DpiAwareXOffset = ConfigManager.PopupXOffset / e.NewDpi.DpiScaleX;
             Utils.DpiAwareYOffset = ConfigManager.PopupYOffset / e.NewDpi.DpiScaleY;
+        }
+
+        private void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (ConfigManager.LookupOnSelectOnly)
+            {
+                double verticalOffset = MainTextBox.VerticalOffset;
+                MainTextBox.Select(0, 0);
+                MainTextBox.ScrollToVerticalOffset(verticalOffset);
+            }
         }
     }
 }

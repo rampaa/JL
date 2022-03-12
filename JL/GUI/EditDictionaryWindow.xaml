@@ -9,11 +9,11 @@
     <Grid Background="Black">
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,20">
             <TextBlock Foreground="White" Text="Dict Type" TextWrapping="Wrap" Margin="0,0,0,10" />
-            <ComboBox Name="ComboBoxDictType" Width="140" Margin="10" HorizontalAlignment="Left" IsEnabled="False" />
+            <ComboBox Name="ComboBoxDictType" Width="200" Margin="10" HorizontalAlignment="Left" IsEnabled="False" />
 
             <TextBlock Foreground="White" Text="Path" TextWrapping="Wrap" Margin="0,10,0,10" />
             <WrapPanel>
-                <TextBox Name="TextBlockPath" Foreground="White" Width="170"
+                <TextBox Name="TextBlockPath" Foreground="White" Width="200"
                          Text=""
                          Margin="10"
                          IsReadOnly="True" />
