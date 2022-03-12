@@ -22,7 +22,7 @@ namespace JL.Dicts.EPWING.EpwingNazeka
             {
                 string reading = jsonObj.GetProperty("r").ToString();
                 List<string> spellings = jsonObj.GetProperty("s").ToString().TrimStart('[').TrimEnd(']').Split("\",", StringSplitOptions.RemoveEmptyEntries).Select(select => select.Trim('\n', ' ', '"')).ToList();
-                List<string> definitions = jsonObj.GetProperty("l").ToString().TrimStart('[').TrimEnd(']').Split("\",", StringSplitOptions.RemoveEmptyEntries).Select(select => select.TrimStart('\n', ' ', '"')).ToList();
+                List<string> definitions = jsonObj.GetProperty("l").ToString().TrimStart('[').TrimEnd(']').Split("\",", StringSplitOptions.RemoveEmptyEntries).Select(select => select.Trim('\n', ' ', '"')).ToList();
 
                 if (spellings.Count == 1 && spellings[0] == "")
                 {
