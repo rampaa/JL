@@ -1,0 +1,44 @@
+﻿<Window x:Class="JL.GUI.AddDictionaryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Edit Dictionary" Height="300" Width="500" ResizeMode="NoResize" SizeToContent="Height"
+        Topmost="True" Loaded="Window_Loaded">
+    <Grid Background="Black">
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,20">
+            <TextBlock Foreground="White" Text="Dict Type" TextWrapping="Wrap" Margin="0,0,0,10" />
+            <ComboBox Name="ComboBoxDictType" Width="140" Margin="10" HorizontalAlignment="Left" />
+
+            <TextBlock Foreground="White" Text="Path" TextWrapping="Wrap" Margin="0,10,0,10" />
+            <WrapPanel>
+                <TextBox Name="TextBlockPath" Foreground="White" Width="170"
+                         Text=""
+                         Margin="10"
+                         IsReadOnly="True" />
+                <Button Name="BrowsePathButton" Content="..." Click="BrowsePathButton_OnClick"
+                        IsEnabled="{Binding ElementName=ComboBoxDictType,Path=Text.Length}">
+                </Button>
+            </WrapPanel>
+        </StackPanel>
+
+        <StackPanel x:Name="DictFormatStackPanel" HorizontalAlignment="Right" VerticalAlignment="Top"
+                    Margin="0,20,20,70">
+            <TextBlock Text="Dict Format" Foreground="White" HorizontalAlignment="Stretch" Margin="0,0,0,10" />
+            <RadioButton Click="RadioButtonYomichanImport_OnClick" Name="RadioButtonYomichanImport"
+                         Content="Yomichan Import" HorizontalAlignment="Stretch"
+                         FontSize="16" Height="40" />
+            <RadioButton Click="RadioButtonNazekaEpwingConverter_OnClick" Name="RadioButtonNazekaEpwingConverter"
+                         Content="Nazeka Epwing Converter" HorizontalAlignment="Stretch"
+                         FontSize="16" Height="40" />
+        </StackPanel>
+
+        <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="20,120,20,20">
+            <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                    Margin="0,100,50,0" FontSize="16" Width="70" Height="35" Click="CancelButton_Click" />
+            <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                    Margin="50,100,0,0" FontSize="16" Width="70" Height="35" Click="SaveButton_Click" />
+        </WrapPanel>
+    </Grid>
+</Window>

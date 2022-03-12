@@ -7,7 +7,6 @@ using System.Runtime;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using JL.Dicts;
@@ -22,7 +21,6 @@ using CheckBox = System.Windows.Controls.CheckBox;
 using Cursors = System.Windows.Input.Cursors;
 using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using MessageBoxOptions = System.Windows.MessageBoxOptions;
-using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Path = System.IO.Path;
 
 namespace JL.GUI
@@ -100,17 +98,14 @@ namespace JL.GUI
                 };
                 var dictPathDisplay = new TextBlock
                 {
-                    Width = 200,
-                    Text = dict.Path,
-                    Margin = new Thickness(10),
-                    Cursor = Cursors.Hand
+                    Width = 200, Text = dict.Path, Margin = new Thickness(10), Cursor = Cursors.Hand
                 };
 
                 dictPathDisplay.PreviewMouseLeftButtonUp += PathTextbox_PreviewMouseLeftButtonUp;
                 dictPathDisplay.MouseEnter += (_, _) => dictPathDisplay.TextDecorations = TextDecorations.Underline;
                 dictPathDisplay.MouseLeave += (_, _) => dictPathDisplay.TextDecorations = null;
 
-                var updateButton = new Button
+                var buttonUpdate = new Button
                 {
                     Width = 75,
                     Height = 30,
@@ -125,7 +120,7 @@ namespace JL.GUI
                         : Visibility.Visible,
                 };
 
-                updateButton.Click += async (_, _) =>
+                buttonUpdate.Click += async (_, _) =>
                 {
                     switch (dict.Type)
                     {
@@ -149,6 +144,21 @@ namespace JL.GUI
                     Foreground = Brushes.White,
                     Background = Brushes.Red,
                     BorderThickness = new Thickness(1),
+                    Visibility = Storage.BuiltInDicts.Values
+                        .Select(t => t.Type).ToList().Contains(dict.Type)
+                        ? Visibility.Collapsed
+                        : Visibility.Visible,
+                };
+
+                var buttonEdit = new Button
+                {
+                    Width = 45,
+                    Height = 30,
+                    Content = "Edit",
+                    Foreground = Brushes.White,
+                    Background = Brushes.DodgerBlue,
+                    BorderThickness = new Thickness(1),
+                    Margin = new Thickness(0,0,5,0),
                     Visibility = Storage.BuiltInDicts.Values
                         .Select(t => t.Type).ToList().Contains(dict.Type)
                         ? Visibility.Collapsed
@@ -183,6 +193,12 @@ namespace JL.GUI
                         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
                     }
                 };
+                buttonEdit.Click += (_, _) =>
+                {
+                    new EditDictionaryWindow(Storage.Dicts[dict.Type]).ShowDialog();
+                    UpdateDictionariesDisplay();
+                };
+
                 resultDockPanels.Add(dockPanel);
 
                 dockPanel.Children.Add(checkBox);
@@ -192,14 +208,11 @@ namespace JL.GUI
                 dockPanel.Children.Add(dictTypeDisplay);
                 dockPanel.Children.Add(dictPathValidityDisplay);
                 dockPanel.Children.Add(dictPathDisplay);
-                dockPanel.Children.Add(updateButton);
+                dockPanel.Children.Add(buttonEdit);
+                dockPanel.Children.Add(buttonUpdate);
                 dockPanel.Children.Add(buttonRemove);
             }
 
-            // TODO: AddDictionaryWindow
-            List<DictType> allDictTypes = Enum.GetValues(typeof(DictType)).Cast<DictType>().ToList();
-            List<DictType> loadedDictTypes = Storage.Dicts.Keys.ToList();
-            ComboBoxAddDictionary.ItemsSource = allDictTypes.Except(loadedDictTypes);
             DictionariesDisplay.ItemsSource = resultDockPanels.OrderBy(dockPanel =>
                 dockPanel.Children
                     .OfType<TextBlock>()
@@ -240,102 +253,10 @@ namespace JL.GUI
             Storage.Dicts[typeToBeUnPrioritized].Priority += 1;
         }
 
-        private void BrowseForDictionaryFile(DictType selectedDictType, string filter)
-        {
-            OpenFileDialog openFileDialog = new() { InitialDirectory = Storage.ApplicationPath, Filter = filter };
-
-            if (openFileDialog.ShowDialog() == true)
-            {
-                // lowest priority means highest number
-                int lowestPriority = Storage.Dicts.Select(dict => dict.Value.Priority).Max();
-
-                string relativePath = Path.GetRelativePath(Storage.ApplicationPath, openFileDialog.FileName);
-                Storage.Dicts.Add(selectedDictType,
-                    new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
-                Storage.Dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
-                UpdateDictionariesDisplay();
-            }
-        }
-
-        // could get rid of this and make users select the index.json file for EPWING dictionaries
-        private void BrowseForDictionaryFolder(DictType selectedDictType)
-        {
-            using var fbd = new FolderBrowserDialog { SelectedPath = Storage.ApplicationPath };
-
-            if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK &&
-                !string.IsNullOrWhiteSpace(fbd.SelectedPath))
-            {
-                // lowest priority means highest number
-                int lowestPriority = Storage.Dicts.Select(dict => dict.Value.Priority).Max();
-
-                string relativePath = Path.GetRelativePath(Storage.ApplicationPath, fbd.SelectedPath);
-                Storage.Dicts.Add(selectedDictType,
-                    new Dict(selectedDictType, relativePath, true, lowestPriority + 1));
-                Storage.Dicts[selectedDictType].Contents = new Dictionary<string, List<IResult>>();
-                UpdateDictionariesDisplay();
-            }
-        }
-
         private void ButtonAddDictionary_OnClick(object sender, RoutedEventArgs e)
         {
-            if (ComboBoxAddDictionary.SelectionBoxItem.ToString() == "") return;
-
-            DictType selectedDictType =
-                Enum.Parse<DictType>(ComboBoxAddDictionary.SelectionBoxItem.ToString() ??
-                                     throw new InvalidOperationException());
-
-            switch (selectedDictType)
-            {
-                case DictType.JMdict:
-                    // not providing a description for the filter causes the filename returned to be empty, lmfao microsoft
-                    // BrowseForDictionaryFile(selectedDictType, "|JMdict.xml");
-                    BrowseForDictionaryFile(selectedDictType, "JMdict file|JMdict.xml");
-                    break;
-                case DictType.JMnedict:
-                    BrowseForDictionaryFile(selectedDictType, "JMnedict file|JMnedict.xml");
-                    break;
-                case DictType.Kanjidic:
-                    BrowseForDictionaryFile(selectedDictType, "Kanjidic2 file|Kanjidic2.xml");
-                    break;
-                case DictType.CustomWordDictionary:
-                    BrowseForDictionaryFile(selectedDictType, "CustomWordDict file|custom_words.txt");
-                    break;
-                case DictType.CustomNameDictionary:
-                    BrowseForDictionaryFile(selectedDictType, "CustomNameDict file|custom_names.txt");
-                    break;
-                case DictType.Kenkyuusha:
-                    BrowseForDictionaryFolder(selectedDictType);
-                    break;
-                case DictType.Daijirin:
-                    BrowseForDictionaryFolder(selectedDictType);
-                    break;
-                case DictType.Daijisen:
-                    BrowseForDictionaryFolder(selectedDictType);
-                    break;
-                case DictType.Koujien:
-                    BrowseForDictionaryFolder(selectedDictType);
-                    break;
-                case DictType.Meikyou:
-                    BrowseForDictionaryFolder(selectedDictType);
-                    break;
-                case DictType.Gakken:
-                    BrowseForDictionaryFolder(selectedDictType);
-                    break;
-                case DictType.Kotowaza:
-                    BrowseForDictionaryFolder(selectedDictType);
-                    break;
-                case DictType.DaijirinNazeka:
-                    BrowseForDictionaryFile(selectedDictType, "Daijirin file|*.json");
-                    break;
-                case DictType.KenkyuushaNazeka:
-                    BrowseForDictionaryFile(selectedDictType, "Kenkyuusha file|*.json");
-                    break;
-                case DictType.ShinmeikaiNazeka:
-                    BrowseForDictionaryFile(selectedDictType, "Shinmeikai file|*.json");
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(null, "Invalid DictType");
-            }
+            new AddDictionaryWindow().ShowDialog();
+            UpdateDictionariesDisplay();
         }
 
         private static async Task UpdateJMdict()

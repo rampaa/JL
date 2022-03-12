@@ -57,6 +57,22 @@ namespace JL
             { "None", "" }
         };
 
+        public static readonly List<DictType> YomichanDictTypes = new()
+        {
+            DictType.Kenkyuusha,
+            DictType.Daijirin,
+            DictType.Daijisen,
+            DictType.Koujien,
+            DictType.Meikyou,
+            DictType.Gakken,
+            DictType.Kotowaza,
+        };
+
+        public static readonly List<DictType> NazekaDictTypes = new()
+        {
+            DictType.KenkyuushaNazeka, DictType.DaijirinNazeka, DictType.ShinmeikaiNazeka
+        };
+
         public static async Task LoadDictionaries()
         {
             Ready = false;

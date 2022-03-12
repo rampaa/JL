@@ -13,7 +13,7 @@ namespace JL.Dicts
         [Description("Custom Name Dictionary")]
         CustomNameDictionary,
 
-        // user-added
+        // Yomichan Import
         [Description("Kenkyuusha (Yomichan)")]
         Kenkyuusha,
         [Description("Daijirin (Yomichan)")]
@@ -29,6 +29,7 @@ namespace JL.Dicts
         [Description("Kotowaza (Yomichan)")]
         Kotowaza,
 
+        // Nazeka Epwing Converter
         [Description("Kenkyuusha (Nazeka)")]
         KenkyuushaNazeka,
         [Description("Daijirin (Nazeka)")]

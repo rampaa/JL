@@ -2,7 +2,7 @@
 
 namespace JL.Dicts.EPWING.EpwingNazeka
 {
-    internal class EpwingNazekaResult : IResult
+    public class EpwingNazekaResult : IResult
     {
         public string PrimarySpelling { get; set; }
         public string Reading { get; set; }

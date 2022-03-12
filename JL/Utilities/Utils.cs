@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -45,43 +43,6 @@ namespace JL.Utilities
         public static double DpiAwareYOffset { get; set; } = ConfigManager.PopupYOffset / Dpi.DpiScaleY;
 
         private static WaveOut s_audioPlayer;
-
-        public static string GetDescription(this Enum value)
-        {
-            Type type = value.GetType();
-            string name = Enum.GetName(type, value);
-            if (name != null)
-            {
-                FieldInfo field = type.GetField(name);
-                if (field != null)
-                {
-                    if (Attribute.GetCustomAttribute(field,
-                            typeof(DescriptionAttribute)) is DescriptionAttribute attr)
-                    {
-                        return attr.Description;
-                    }
-                }
-            }
-            return null;
-        }
-
-        public static IEnumerable<string> UnicodeIterator(this string s)
-        {
-            for (int i = 0; i < s.Length; ++i)
-            {
-                if (char.IsHighSurrogate(s, i)
-                    && s.Length > i + 1
-                    && char.IsLowSurrogate(s, i + 1))
-                {
-                    yield return char.ConvertFromUtf32(char.ConvertToUtf32(s, i));
-                    ++i;
-                }
-                else
-                {
-                    yield return s[i].ToString();
-                }
-            }
-        }
 
         public static List<ComboBoxItem> FindJapaneseFonts()
         {
