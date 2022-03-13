@@ -3,7 +3,7 @@ JL is a program for looking up Japanese words and expressions. Inspired by [Naze
 
 Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer the x86 version for 50-80% less memory usage.
 
-IMPORTANT: If you are using Winsows 7, you MUST use the x86 version because of a .NET bug. See the [link](https://github.com/dotnet/runtime/issues/66272) for more details.
+IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries, you MUST use the x86 version because of a .NET bug. See the [link](https://github.com/dotnet/runtime/issues/66272) for more details.
 
 
 ## Screenshots
@@ -34,16 +34,17 @@ IMPORTANT: If you are using Winsows 7, you MUST use the x86 version because of a
 * JMnedict - Full support
 * KANJIDIC - Full support (w/ composition data)
 
-### EPWING ([yomichan-import](https://github.com/FooSoft/yomichan-import/) format)
+### EPWING
 
 
-* Daijirin - Basic+ support
-* Kenkyuusha - Basic+ support
-* Daijisen - Basic support
-* Gakken - Basic support
-* Kotowaza - Basic support
-* Koujien - Basic support
-* Meikyou - Basic support
+* Daijirin - Basic+ support ([Yomichan Import](https://github.com/FooSoft/yomichan-import/) and [Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter) format)
+* Kenkyuusha - Basic+ support ([Yomichan Import](https://github.com/FooSoft/yomichan-import/) and [Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter) format)
+* Daijisen - Basic support ([Yomichan Import](https://github.com/FooSoft/yomichan-import/) and [Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter) format)
+* Shinmeikai - Basic support ([Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter) format)
+* Gakken - Basic support ([Yomichan Import](https://github.com/FooSoft/yomichan-import/) format)
+* Kotowaza - Basic support ([Yomichan Import](https://github.com/FooSoft/yomichan-import/) format)
+* Koujien - Basic support ([Yomichan Import](https://github.com/FooSoft/yomichan-import/) format)
+* Meikyou - Basic support ([Yomichan Import](https://github.com/FooSoft/yomichan-import/) format)
 
 ## Credits
 * [Nazeka](https://github.com/wareya/nazeka): Deconjugation rules, deconjugator, frequency lists
