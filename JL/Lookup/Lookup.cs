@@ -43,31 +43,12 @@ namespace JL.Lookup
             List<string> textInHiraganaList = new();
             List<HashSet<Form>> deconjugationResultsList = new();
 
-            bool needDeconjugation =
-                (Storage.Dicts.TryGetValue(DictType.JMdict, out Dict dictionary) && dictionary.Active)
-                || (Storage.Dicts.TryGetValue(DictType.CustomWordDictionary, out dictionary) && dictionary.Active)
-                || (Storage.Dicts.TryGetValue(DictType.Daijirin, out dictionary) && dictionary.Active)
-                || (Storage.Dicts.TryGetValue(DictType.Kenkyuusha, out dictionary) && dictionary.Active)
-                || (Storage.Dicts.TryGetValue(DictType.Daijisen, out dictionary) && dictionary.Active)
-                || (Storage.Dicts.TryGetValue(DictType.Gakken, out dictionary) && dictionary.Active)
-                || (Storage.Dicts.TryGetValue(DictType.Kotowaza, out dictionary) && dictionary.Active)
-                || (Storage.Dicts.TryGetValue(DictType.Koujien, out dictionary) && dictionary.Active)
-                || (Storage.Dicts.TryGetValue(DictType.Meikyou, out dictionary) && dictionary.Active)
-                || (Storage.Dicts.TryGetValue(DictType.DaijirinNazeka, out dictionary) && dictionary.Active)
-                || (Storage.Dicts.TryGetValue(DictType.KenkyuushaNazeka, out dictionary) && dictionary.Active)
-                || (Storage.Dicts.TryGetValue(DictType.ShinmeikaiNazeka, out dictionary) && dictionary.Active)
-                ;
-
-
             for (int i = 0; i < text.Length; i++)
             {
                 string textInHiragana = Kana.KatakanaToHiraganaConverter(text[..^i]);
                 textInHiraganaList.Add(textInHiragana);
 
-                if (needDeconjugation)
-                {
-                    deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
-                }
+                deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
             }
 
             foreach ((DictType dictType, Dict dict) in Storage.Dicts.ToList())

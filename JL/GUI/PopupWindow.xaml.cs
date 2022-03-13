@@ -448,6 +448,9 @@ namespace JL.GUI
                         break;
 
                     case LookupResult.Definitions:
+                        if (value?.Any() != true)
+                            break;
+
                         if (MiningMode || ConfigManager.LookupOnSelectOnly)
                         {
                             uiElementDefinitions = new TextBox
@@ -733,7 +736,8 @@ namespace JL.GUI
                 }
             }
 
-            bottom.Children.Add(uiElementDefinitions);
+            if (uiElementDefinitions != null)
+                bottom.Children.Add(uiElementDefinitions);
 
             TextBlock[] babiesKanji =
             {
@@ -935,8 +939,7 @@ namespace JL.GUI
 
         private void Definitions_MouseMove(TextBox tb)
         {
-            if (MainWindowUtilities.JapaneseRegex.IsMatch(tb.Text))
-                TextBox_MouseMove(tb);
+            TextBox_MouseMove(tb);
         }
 
         private void PopupListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
