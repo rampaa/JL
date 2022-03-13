@@ -71,7 +71,7 @@ namespace JL
         public static int PopupMaxHeight { get; set; } = 520;
         public static bool PopupDynamicHeight { get; set; } = true;
         public static bool PopupDynamicWidth { get; set; } = true;
-        public static bool PopupFocusOnLookup { get; set; } = false;
+        public static bool PopupFocusOnLookup { get; set; } = true;
         public static int PopupXOffset { get; set; } = 10;
         public static int PopupYOffset { get; set; } = 20;
         public static bool PopupFlipX { get; set; } = true;

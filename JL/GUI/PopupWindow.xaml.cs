@@ -19,7 +19,7 @@ namespace JL.GUI
     /// </summary>
     public partial class PopupWindow : Window
     {
-        private readonly PopupWindow _parentPopUp;
+        private readonly PopupWindow _parentPopupWindow;
 
         private PopupWindow _childPopupWindow;
 
@@ -53,7 +53,7 @@ namespace JL.GUI
 
         public PopupWindow(PopupWindow parentPopUp) : this()
         {
-            _parentPopUp = parentPopUp;
+            _parentPopupWindow = parentPopUp;
         }
 
         public void Init()
@@ -1037,7 +1037,7 @@ namespace JL.GUI
                 PopUpScrollViewer.ScrollToTop();
                 PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
 
-                if (ConfigManager.LookupOnSelectOnly && _parentPopUp == null)
+                if (ConfigManager.LookupOnSelectOnly && _parentPopupWindow == null)
                 {
                     Unselect(MainWindow.Instance.MainTextBox);
                 }
