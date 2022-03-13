@@ -3,6 +3,9 @@ JL is a program for looking up Japanese words and expressions. Inspired by [Naze
 
 Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer the x86 version for 50-80% less memory usage.
 
+IMPORTANT: If you are using Winsows 7, you MUST use the x86 version because of a .NET bug. See the [link](https://github.com/dotnet/runtime/issues/66272) for more details.
+
+
 ## Screenshots
 
 <img src="https://user-images.githubusercontent.com/25622653/155894148-31bef5b8-d290-4e00-b12a-3294c2a708b8.png" width=75% height=75%>
