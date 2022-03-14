@@ -222,6 +222,12 @@ namespace JL.GUI
                 Keyboard.ClearFocus();
             }
 
+            else if (Utils.KeyGestureComparer(e, ConfigManager.InvisibleToggleModeKeyGesture))
+            {
+                ConfigManager.InvisibleMode = !ConfigManager.InvisibleMode;
+                MainWindow.Instance.MainGrid.Opacity = Convert.ToInt32(!ConfigManager.InvisibleMode);
+            }
+
             else if (Utils.KeyGestureComparer(e, ConfigManager.KanjiModeKeyGesture))
             {
                 // fixes double toggling KanjiMode
@@ -387,6 +393,15 @@ namespace JL.GUI
             //    return;
 
             FirstPopupWindow.LookupOnSelect(MainTextBox);
+        }
+        private void Button_Click(object sender, EventArgs e)
+        {
+            if(ConfigManager.InvisibleMode){
+                MainWindow.Instance.MainGrid.Opacity = 0;
+            }
+            else{
+                MainWindow.Instance.MainGrid.Opacity = 1;
+            }
         }
 
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)

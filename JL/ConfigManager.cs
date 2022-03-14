@@ -27,6 +27,7 @@ namespace JL
         public static bool ForceSyncAnki { get; set; } = false;
         public static bool AllowDuplicateCards { get; set; } = false;
         public static int LookupRate { get; set; } = 0;
+        public static bool InvisibleMode { get; set; } = false;
 
         public static Brush MainWindowTextColor { get; set; } = Brushes.White;
         public static Brush MainWindowBacklogTextColor { get; set; } = Brushes.Bisque;
@@ -53,6 +54,7 @@ namespace JL
         public static KeyGesture ShowAddWordWindowKeyGesture { get; set; } = new(Key.W, ModifierKeys.Windows);
         public static KeyGesture SearchWithBrowserKeyGesture { get; set; } = new(Key.S, ModifierKeys.Windows);
         public static KeyGesture MousePassThroughModeKeyGesture { get; set; } = new(Key.T, ModifierKeys.Windows);
+        public static KeyGesture InvisibleToggleModeKeyGesture { get; set; } = new(Key.I, ModifierKeys.Windows);
         public static KeyGesture SteppedBacklogBackwardsKeyGesture { get; set; } = new(Key.Left, ModifierKeys.Windows);
         public static KeyGesture SteppedBacklogForwardsKeyGesture { get; set; } = new(Key.Right, ModifierKeys.Windows);
         public static KeyGesture InactiveLookupModeKeyGesture { get; set; } = new(Key.Q, ModifierKeys.Windows);
@@ -313,6 +315,8 @@ namespace JL
                 Utils.KeyGestureSetter("SearchWithBrowserKeyGesture", SearchWithBrowserKeyGesture);
             MousePassThroughModeKeyGesture =
                 Utils.KeyGestureSetter("MousePassThroughModeKeyGesture", MousePassThroughModeKeyGesture);
+            InvisibleToggleModeKeyGesture =
+                Utils.KeyGestureSetter("InvisibleToggleModeKeyGesture", InvisibleToggleModeKeyGesture);
             SteppedBacklogBackwardsKeyGesture = Utils.KeyGestureSetter("SteppedBacklogBackwardsKeyGesture",
                 SteppedBacklogBackwardsKeyGesture);
             SteppedBacklogForwardsKeyGesture =
@@ -448,6 +452,8 @@ namespace JL
                 Utils.KeyGestureToString(SearchWithBrowserKeyGesture);
             preferenceWindow.MousePassThroughModeKeyGestureTextBox.Text =
                 Utils.KeyGestureToString(MousePassThroughModeKeyGesture);
+            preferenceWindow.InvisibleToggleModeKeyGestureTextBox.Text =
+                Utils.KeyGestureToString(InvisibleToggleModeKeyGesture);
             preferenceWindow.SteppedBacklogBackwardsKeyGestureTextBox.Text =
                 Utils.KeyGestureToString(SteppedBacklogBackwardsKeyGesture);
             preferenceWindow.SteppedBacklogForwardsKeyGestureTextBox.Text =
@@ -552,6 +558,8 @@ namespace JL
                 preferenceWindow.SearchWithBrowserKeyGestureTextBox.Text);
             Utils.KeyGestureSaver("MousePassThroughModeKeyGesture",
                 preferenceWindow.MousePassThroughModeKeyGestureTextBox.Text);
+            Utils.KeyGestureSaver("InvisibleToggleModeKeyGesture",
+                preferenceWindow.InvisibleToggleModeKeyGestureTextBox.Text);
             Utils.KeyGestureSaver("SteppedBacklogBackwardsKeyGesture",
                 preferenceWindow.SteppedBacklogBackwardsKeyGestureTextBox.Text);
             Utils.KeyGestureSaver("SteppedBacklogForwardsKeyGesture",
