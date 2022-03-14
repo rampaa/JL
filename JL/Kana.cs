@@ -181,7 +181,7 @@ namespace JL
         public static string KatakanaToHiraganaConverter(string text)
         {
             StringBuilder textInHiragana = new();
-            List<string> unicodeCharacters = text.UnicodeIterator().ToList();
+            List<string> unicodeCharacters = text.Normalize(NormalizationForm.FormKC).UnicodeIterator().ToList();
             int listLength = unicodeCharacters.Count;
             for (int i = 0; i < listLength; i++)
             {

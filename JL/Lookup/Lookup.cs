@@ -181,7 +181,6 @@ namespace JL.Lookup
         private static (bool tryLongVowelConversion, int succAttempt) GetWordResultsHelper(DictType dictType,
             Dictionary<string, IntermediaryResult> results,
             HashSet<Form> deconjugationList,
-            string text,
             string foundForm,
             string textInHiragana,
             int succAttempt)
@@ -333,7 +332,7 @@ namespace JL.Lookup
                             {
                                 results.Add(deconjugationResult.Text,
                                     new IntermediaryResult(resultsList, new List<List<string>> { deconjugationResult.Process },
-                                        text[..deconjugationResult.OriginalText.Length],
+                                        foundForm,
                                         dictType)
                                 );
                             }
@@ -358,7 +357,7 @@ namespace JL.Lookup
             for (int i = 0; i < text.Length; i++)
             {
                 (bool tryLongVowelConversion, succAttempt) = GetWordResultsHelper(dictType, results,
-                    deconjugationResultsList[i], text, text[..^i], textInHiraganaList[i], succAttempt);
+                    deconjugationResultsList[i], text[..^i], textInHiraganaList[i], succAttempt);
 
                 if (tryLongVowelConversion && textInHiraganaList[i].Contains('ー') &&
                     textInHiraganaList[i][0] != 'ー')
@@ -368,7 +367,7 @@ namespace JL.Lookup
                     for (int j = 0; j < textWithoutLongVowelMarkList.Count; j++)
                     {
                         succAttempt = GetWordResultsHelper(dictType, results, deconjugationResultsList[i],
-                            text, text[..^i], textWithoutLongVowelMarkList[j], succAttempt).succAttempt;
+                            text[..^i], textWithoutLongVowelMarkList[j], succAttempt).succAttempt;
                     }
                 }
             }
