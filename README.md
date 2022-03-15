@@ -30,21 +30,26 @@ IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries,
 
 ### EDICT
 
-* JMdict - Full support
-* JMnedict - Full support
-* KANJIDIC - Full support (w/ composition data)
+* JMdict
+* JMnedict
+* KANJIDIC (w/ composition data)
 
 ### EPWING
 
+#### [Yomichan Import](https://github.com/FooSoft/yomichan-import/) format
 
-* Daijirin - Basic+ support ([Yomichan Import](https://github.com/FooSoft/yomichan-import/) and [Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter) format)
-* Kenkyuusha - Basic+ support ([Yomichan Import](https://github.com/FooSoft/yomichan-import/) and [Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter) format)
-* Daijisen - Basic support ([Yomichan Import](https://github.com/FooSoft/yomichan-import/) and [Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter) format)
-* Shinmeikai - Basic support ([Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter) format)
-* Gakken - Basic support ([Yomichan Import](https://github.com/FooSoft/yomichan-import/) format)
-* Kotowaza - Basic support ([Yomichan Import](https://github.com/FooSoft/yomichan-import/) format)
-* Koujien - Basic support ([Yomichan Import](https://github.com/FooSoft/yomichan-import/) format)
-* Meikyou - Basic support ([Yomichan Import](https://github.com/FooSoft/yomichan-import/) format)
+* Daijirin
+* Kenkyuusha
+* Daijisen
+* Gakken
+* Kotowaza
+* Koujien
+* Meikyou
+
+#### [Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter) format
+* Daijirin 
+* Kenkyuusha
+* Shinmeikai
 
 ## Credits
 * [Nazeka](https://github.com/wareya/nazeka): Deconjugation rules, deconjugator, frequency lists
