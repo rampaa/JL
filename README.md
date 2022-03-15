@@ -65,8 +65,14 @@ Make sure you're not in pass-through mode, kanji mode, have lookup-on-select-onl
 You need to be in mining mode in order to interact with the popup window.
 ### How do I disable pass-through mode?
 Press the opacity slider button located top-left of the main window.
+
 ### How do I add EPWING dictionaries?
-Select the folder containing the **unzipped** (so you should have a folder of files named like term_bank_1.json, term_bank_2.json...)  contents of a dictionary converted with [yomichan-import](https://github.com/FooSoft/yomichan-import/), on the Manage Dictionaries window.
+
+#### [Yomichan Import]
+Select the folder containing the **unzipped** (so you should have a folder of files named like term_bank_1.json, term_bank_2.json...)  contents of a dictionary converted with [Yomichan Import](https://github.com/FooSoft/yomichan-import/), on the Manage Dictionaries window.
+#### [Nazeka EPWING Converter]
+Select the file you got from [Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter), on the Manage Dictionaries window.
+
 ### Where are my settings stored?
 * Anki settings: Config/AnkiConfig.json
 * Dictionary settings: Config/dicts.json
