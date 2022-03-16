@@ -33,7 +33,7 @@ jobs:
           tag=$(git describe --tags --abbrev=0)
           release_name="JL-$tag-${{ matrix.target }}"
           # Build everything
-          dotnet publish JL/JL.csproj --framework net6.0-windows --runtime "${{ matrix.target }}" --no-self-contained -c Release -o "$release_name"
+          dotnet publish JL.Windows/JL.Windows.csproj --framework net6.0-windows --runtime "${{ matrix.target }}" --no-self-contained -c Release -o "$release_name"
           # Pack files
           7z a -tzip "${release_name}.zip" "./${release_name}/*"
           # Delete output directory
