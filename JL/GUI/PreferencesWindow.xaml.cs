@@ -317,6 +317,10 @@ namespace JL.GUI
         {
             MousePassThroughModeKeyGestureTextBox.Text = "None";
         }
+        private void InvisibleToggleModeKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            InvisibleToggleModeKeyGestureTextBox.Text = "None";
+        }
 
         private void PlayAudioKeyGestureTextBoxButton_Click(object sender, RoutedEventArgs e)
         {
