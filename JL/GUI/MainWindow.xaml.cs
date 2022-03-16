@@ -394,16 +394,7 @@ namespace JL.GUI
 
             FirstPopupWindow.LookupOnSelect(MainTextBox);
         }
-        private void Button_Click(object sender, EventArgs e)
-        {
-            if(ConfigManager.InvisibleMode){
-                MainWindow.Instance.MainGrid.Opacity = 0;
-            }
-            else{
-                MainWindow.Instance.MainGrid.Opacity = 1;
-            }
-        }
-
+        
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             foreach (PopupWindow popupWindow in Application.Current.Windows.OfType<PopupWindow>().ToList())
