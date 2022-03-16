@@ -55,8 +55,8 @@ namespace JL.Core.Dicts.EDICT
 
         private static async Task GzipStreamDecompressor(Stream stream, string filePath)
         {
-            using FileStream decompressedFileStream = File.Create(filePath);
-            using GZipStream decompressionStream = new(stream, CompressionMode.Decompress);
+            await using FileStream decompressedFileStream = File.Create(filePath);
+            await using GZipStream decompressionStream = new(stream, CompressionMode.Decompress);
             await decompressionStream.CopyToAsync(decompressedFileStream).ConfigureAwait(false);
         }
     }

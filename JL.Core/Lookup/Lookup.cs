@@ -323,7 +323,7 @@ namespace JL.Core.Lookup
                             if (results.TryGetValue(deconjugationResult.Text, out IntermediaryResult r))
                             {
                                 if (r.FoundForm == deconjugationResult.OriginalText)
-                                    r.ProcessList.Add(deconjugationResult.Process);
+                                    r.ProcessListList.Add(deconjugationResult.Process);
                             }
                             else
                             {
@@ -1255,10 +1255,10 @@ namespace JL.Core.Lookup
             StringBuilder deconj = new();
             bool first = true;
 
-            int processListCount = intermediaryResult.ProcessList.Count;
-            for (int i = 0; i < processListCount; i++)
+            int processListListCount = intermediaryResult.ProcessListList.Count;
+            for (int i = 0; i < processListListCount; i++)
             {
-                List<string> form = intermediaryResult.ProcessList[i];
+                List<string> form = intermediaryResult.ProcessListList[i];
 
                 StringBuilder formText = new();
                 int added = 0;

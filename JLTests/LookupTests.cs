@@ -15,11 +15,6 @@ namespace JLTests
     [TestFixture]
     public class LookupTests
     {
-        private static readonly JsonSerializerOptions s_jso = new()
-        {
-            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-        };
-
         [OneTimeSetUp]
         public void ClassInit()
         {
@@ -52,7 +47,7 @@ namespace JLTests
             // Act
             List<Dictionary<LookupResult, List<string>>> result = Lookup.LookupText(
                 text);
-            string actual = JsonSerializer.Serialize(result, s_jso);
+            string actual = JsonSerializer.Serialize(result, Storage.JsoUnsafeEscaping);
 
             // Assert
             StringAssert.AreEqualIgnoringCase(expected, actual);

@@ -1,4 +1,5 @@
 ﻿using System.Runtime;
+using System.Text.Json;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomDict;
 using JL.Core.Dicts.EDICT;
@@ -17,7 +18,7 @@ namespace JL.Core
         public static IFrontend Frontend { get; set; } = new UnimplementedFrontend();
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
         // public static readonly string ResourcesPath = Path.Join(Directory.GetCurrentDirectory(), "Resources");
-        public static readonly HttpClient Client = new(new HttpClientHandler() { UseProxy = false });
+        public static readonly HttpClient Client = new(new HttpClientHandler { UseProxy = false });
         public static readonly Version Version = new(1, 5);
         public static readonly string RepoUrl = "https://github.com/rampaa/JL/";
         public static bool Ready { get; set; } = false;
@@ -67,6 +68,11 @@ namespace JL.Core
         public static readonly List<DictType> NazekaDictTypes = new()
         {
             DictType.KenkyuushaNazeka, DictType.DaijirinNazeka, DictType.ShinmeikaiNazeka
+        };
+
+        public static readonly JsonSerializerOptions JsoUnsafeEscaping = new()
+        {
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         };
 
         public static async Task LoadDictionaries()
