@@ -41,6 +41,33 @@ namespace JLTests
         }
 
         [Test]
+        public void KatakanaToHiraganaConverter_NormalizesText()
+        {
+            // Arrange
+            string expected1 = "か";
+            string text1 = "㋕";
+
+            string expected2 = "あぱーと";
+            string text2 = "㌀";
+
+            string expected3 = "㋿";
+            string text3 = "㋿";
+
+            // Act
+            string result1 = Kana.KatakanaToHiraganaConverter(
+                text1);
+            string result2 = Kana.KatakanaToHiraganaConverter(
+                text2);
+            string result3 = Kana.KatakanaToHiraganaConverter(
+                text3);
+
+            // Assert
+            StringAssert.AreEqualIgnoringCase(expected1, result1);
+            StringAssert.AreEqualIgnoringCase(expected2, result2);
+            StringAssert.AreEqualIgnoringCase(expected3, result3);
+        }
+
+        [Test]
         public void LongVowelMarkConverter_オーToオオAndオウ()
         {
             // Arrange
