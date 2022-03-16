@@ -50,7 +50,7 @@ namespace JLTests
             string expected2 = "あぱーと";
             string text2 = "㌀";
 
-            string expected3 = "㋿";
+            string expected3 = "令和";
             string text3 = "㋿";
 
             // Act
