@@ -249,7 +249,7 @@ namespace JL.Windows.GUI
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.InvisibleToggleModeKeyGesture))
             {
                 ConfigManager.InvisibleMode = !ConfigManager.InvisibleMode;
-                MainWindow.Instance.MainGrid.Opacity = Convert.ToInt32(!ConfigManager.InvisibleMode);
+                MainGrid.Opacity = ConfigManager.InvisibleMode ? 0 : 1;
             }
 
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.KanjiModeKeyGesture))
