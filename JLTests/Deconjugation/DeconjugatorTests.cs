@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Text.Json;
-using JL.Deconjugation;
+using JL.Core.Deconjugation;
 using NUnit.Framework;
 
 namespace JLTests.Deconjugation

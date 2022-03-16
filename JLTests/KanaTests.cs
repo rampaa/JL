@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using JL;
+using JL.Windows;
+using JL.Core;
 using NUnit.Framework;
 
 namespace JLTests

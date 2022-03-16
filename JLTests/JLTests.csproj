@@ -32,7 +32,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\JL\JL.csproj" />
+	  <ProjectReference Include="..\JL.Windows\JL.Windows.csproj" />
 	</ItemGroup>
 
 </Project>
