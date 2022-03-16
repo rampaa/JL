@@ -1,0 +1,118 @@
+﻿<Window x:Class="JL.Windows.GUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        Title="JL"
+        AllowsTransparency="True"
+        mc:Ignorable="d" Height="269" Width="800" WindowStyle="None" ResizeMode="CanResize" Topmost="True"
+        Closed="MainWindow_Closed" Closing="MainWindow_Closing" KeyDown="MainWindow_KeyDown"
+        PreviewKeyDown="MainWindow_PreviewKeyDown" SizeChanged="MainWindow_SizeChanged"
+        PreviewMouseDown="Window_PreviewMouseDown" DpiChanged="Window_DpiChanged" PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown">
+    <Window.Background>
+        <SolidColorBrush Color="Black" Opacity="0.3" />
+    </Window.Background>
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome
+            CaptionHeight="20"
+            CornerRadius="0"
+            ResizeBorderThickness="3"
+            GlassFrameThickness="0"
+            x:Name="MainWindowChrome" />
+    </WindowChrome.WindowChrome>
+
+    <Grid x:Name="MainGrid">
+        <TextBox x:Name="MainTextBox" Margin="0,25,0,0" TextWrapping="Wrap" VerticalContentAlignment="Top"
+                 Background="Transparent" Opacity="1" FontSize="{Binding Value, ElementName=FontSizeSlider}"
+                 Foreground="White" SelectionTextBrush="Black"
+                 IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"
+                 VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
+                 MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow"
+                 FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled="True" IsUndoEnabled="False"
+                 PreviewMouseRightButtonUp="MainTextBox_PreviewMouseRightButtonUp"
+                 PreviewMouseLeftButtonUp="MainTextBox_PreviewMouseLeftButtonUp">
+
+            <TextBox.ContextMenu>
+                <ContextMenu Name="MainTextboxContextMenu">
+                    <MenuItem
+                        Name="AddNameButton"
+                        Header="Add name"
+                        Click="AddName" />
+                    <MenuItem
+                        Name="AddWordButton"
+                        Header="Add word"
+                        Click="AddWord" />
+                    <MenuItem
+                        Header="Copy"
+                        Command="Copy" />
+                    <MenuItem
+                        Name="SearchButton"
+                        Header="Search"
+                        Click="SearchWithBrowser" />
+                    <MenuItem
+                        Name="ManageDictionariesButton"
+                        Header="Manage dictionaries"
+                        Click="ShowManageDictionariesWindow" />
+                    <MenuItem
+                        Name="PreferencesButton"
+                        Header="Preferences"
+                        Click="ShowPreferences" />
+                </ContextMenu>
+            </TextBox.ContextMenu>
+        </TextBox>
+
+
+        <Slider x:Name="OpacitySlider" HorizontalAlignment="Left" Margin="-42,70,0,0" VerticalAlignment="Top"
+                Width="120" RenderTransformOrigin="0.5,0.5" Maximum="100" Value="30" Visibility="Collapsed"
+                Minimum="1" ToolTip="{Binding Value, ElementName=OpacitySlider}"
+                ValueChanged="OpacitySlider_ValueChanged" LostMouseCapture="OpacitySlider_LostMouseCapture"
+                IsMoveToPointEnabled="True" IsSnapToTickEnabled="True"
+                ScrollViewer.VerticalScrollBarVisibility="Disabled" LostFocus="OpacitySlider_LostFocus">
+            <Slider.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform />
+                    <SkewTransform />
+                    <RotateTransform Angle="-90" />
+                    <TranslateTransform />
+                </TransformGroup>
+            </Slider.RenderTransform>
+        </Slider>
+        <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="-19,70,0,0" VerticalAlignment="Top"
+                Width="120" RenderTransformOrigin="0.5,0.5" Value="50" Maximum="300" Minimum="1"
+                ToolTip="{Binding Value, ElementName=FontSizeSlider}" Visibility="Collapsed"
+                ValueChanged="FontSizeSlider_ValueChanged" LostMouseCapture="FontSizeSlider_LostMouseCapture"
+                IsMoveToPointEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                IsSnapToTickEnabled="True" LostFocus="FontSizeSlider_LostFocus">
+            <Slider.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform />
+                    <SkewTransform />
+                    <RotateTransform Angle="-90" />
+                    <TranslateTransform />
+                </TransformGroup>
+            </Slider.RenderTransform>
+        </Slider>
+        <TextBlock x:Name="CloseButton" WindowChrome.IsHitTestVisibleInChrome="True" HorizontalAlignment="Right"
+                   Margin="0,3,10,0" Text="x" TextWrapping="NoWrap" VerticalAlignment="Top" Foreground="White"
+                   Width="10" Height="20" FontSize="18" ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                   MouseLeftButtonUp="CloseButton_MouseLeftButtonUp" MouseEnter="CloseButton_MouseEnter"
+                   MouseLeave="CloseButton_MouseLeave" ToolTip="Close" />
+        <TextBlock x:Name="MinimizeButton" WindowChrome.IsHitTestVisibleInChrome="True" HorizontalAlignment="Right"
+                   Margin="0,3,30,0" Text="―" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="18" Width="10"
+                   Height="20" Foreground="White" MouseLeftButtonUp="MinimizeButton_MouseLeftButtonUp"
+                   MouseEnter="MinimizeButton_MouseEnter" MouseLeave="MinimizeButton_MouseLeave" ToolTip="Minimize" />
+
+        <!-- <Ellipse x:Name="FocusEllipse" Margin="7,1,1,5" HorizontalAlignment="Left" VerticalAlignment="Bottom" -->
+        <!--          ToolTip="Window Focus" Width="10" Height="10" /> -->
+
+        <TextBlock x:Name="FontSizeButton" WindowChrome.IsHitTestVisibleInChrome="True" HorizontalAlignment="Left"
+                   Margin="37,2,0,0" Text="T" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White"
+                   Width="9" Height="17" FontSize="15" RenderTransformOrigin="-0.222,0.567"
+                   MouseLeftButtonDown="FontSizeButton_MouseLeftButtonDown" ToolTip="Font Size" />
+        <TextBlock x:Name="OpacityButton" HorizontalAlignment="Left" WindowChrome.IsHitTestVisibleInChrome="True"
+                   Margin="10,4,0,0" Text="☯" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" Width="15"
+                   Height="15" FontFamily="MS Gothic" Padding="0,0,0,0"
+                   MouseLeftButtonDown="OpacityButton_MouseLeftButtonDown" ToolTip="Opacity" />
+    </Grid>
+</Window>

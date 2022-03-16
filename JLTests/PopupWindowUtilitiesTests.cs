@@ -1,4 +1,4 @@
-﻿using JL.Utilities;
+﻿using JL.Core.Utilities;
 using NUnit.Framework;
 
 namespace JLTests

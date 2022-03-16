@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using JL;
-using JL.Dicts;
-using JL.Dicts.EDICT;
-using JL.Dicts.EDICT.JMdict;
-using JL.Lookup;
+using JL.Windows;
+using JL.Core;
+using JL.Core.Dicts;
+using JL.Core.Dicts.EDICT;
+using JL.Core.Dicts.EDICT.JMdict;
+using JL.Core.Lookup;
 using NUnit.Framework;
 
 namespace JLTests
@@ -22,12 +23,14 @@ namespace JLTests
         [OneTimeSetUp]
         public void ClassInit()
         {
+            Storage.Frontend = new DummyFrontend();
+
             string jmdictPath = Storage.BuiltInDicts["JMdict"].Path;
 
             Storage.Dicts.Add(DictType.JMdict, new Dict(DictType.JMdict, jmdictPath, true, 0));
             Storage.Dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();
 
-            if (!File.Exists(Path.Join(Storage.ApplicationPath, jmdictPath)))
+            if (!File.Exists(jmdictPath))
             {
                 ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMdict].Path,
                     new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
