@@ -528,7 +528,7 @@ namespace JL.Core.Lookup
                     result.Add(LookupResult.Definitions, definitions);
 
                     result.Add(LookupResult.FoundForm, foundForm);
-                    result.Add(LookupResult.Frequency, new List<string> { MainWindowUtilities.FakeFrequency });
+                    result.Add(LookupResult.Frequency, new List<string> { Storage.FakeFrequency });
                     result.Add(LookupResult.DictType, dictType);
 
                     results.Add(result);
@@ -703,7 +703,7 @@ namespace JL.Core.Lookup
                     List<string> process = ProcessProcess(wordResult);
 
                     List<string> frequency = GetCustomWordFreq(customWordDictResult);
-                    if (frequency.First() == MainWindowUtilities.FakeFrequency)
+                    if (frequency.First() == Storage.FakeFrequency)
                         frequency = new List<string> { (wordResultCount - i).ToString() };
 
                     var dictType = new List<string> { wordResult.DictType.ToString() };
@@ -766,7 +766,7 @@ namespace JL.Core.Lookup
 
         private static List<string> GetJMDictFreq(JMdictResult jMDictResult)
         {
-            List<string> frequency = new() { MainWindowUtilities.FakeFrequency };
+            List<string> frequency = new() { Storage.FakeFrequency };
 
             int freqValue = int.MaxValue;
 
@@ -861,7 +861,7 @@ namespace JL.Core.Lookup
 
         private static List<string> GetEpwingNazekaFreq(EpwingNazekaResult epwingNazekaResult)
         {
-            List<string> frequency = new() { MainWindowUtilities.FakeFrequency };
+            List<string> frequency = new() { Storage.FakeFrequency };
 
             int freqValue = int.MaxValue;
 
@@ -949,7 +949,7 @@ namespace JL.Core.Lookup
 
         private static List<string> GetEpwingFreq(EpwingResult epwingResult)
         {
-            List<string> frequency = new() { MainWindowUtilities.FakeFrequency };
+            List<string> frequency = new() { Storage.FakeFrequency };
 
             int freqValue = int.MaxValue;
 
@@ -1004,7 +1004,7 @@ namespace JL.Core.Lookup
 
         private static List<string> GetCustomWordFreq(CustomWordEntry customWordResult)
         {
-            List<string> frequency = new() { MainWindowUtilities.FakeFrequency };
+            List<string> frequency = new() { Storage.FakeFrequency };
 
             int freqValue = int.MaxValue;
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
@@ -20,8 +21,11 @@ namespace JL.Windows.GUI
         #region Interface members
 
         public CoreConfig CoreConfig { get; set; } = ConfigManager.Instance;
+
         public void PlayAudio(byte[] sound, float volume) => WindowsUtils.PlayAudio(sound, volume);
+
         public void Alert(AlertLevel alertLevel, string message) => WindowsUtils.Alert(alertLevel, message);
+
         public bool ShowYesNoDialog(string text, string caption)
         {
             return MessageBox.Show(
@@ -37,6 +41,8 @@ namespace JL.Windows.GUI
         }
 
         #endregion
+
+        public static readonly List<string> Backlog = new();
 
         private int _currentTextIndex;
 
@@ -85,13 +91,13 @@ namespace JL.Windows.GUI
                 {
                     string text = Clipboard.GetText();
                     gotTextFromClipboard = true;
-                    if (MainWindowUtilities.JapaneseRegex.IsMatch(text))
+                    if (Storage.JapaneseRegex.IsMatch(text))
                     {
                         text = text.Trim();
-                        MainWindowUtilities.Backlog.Add(text);
+                        MainWindow.Backlog.Add(text);
                         MainTextBox.Text = text;
                         MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
-                        _currentTextIndex = MainWindowUtilities.Backlog.Count - 1;
+                        _currentTextIndex = MainWindow.Backlog.Count - 1;
                     }
                 }
                 catch (Exception e)
@@ -121,7 +127,7 @@ namespace JL.Windows.GUI
         {
             if (e.Delta > 0)
             {
-                string allBacklogText = string.Join("\n", MainWindowUtilities.Backlog);
+                string allBacklogText = string.Join("\n", MainWindow.Backlog);
                 if (MainTextBox.Text != allBacklogText)
                 {
                     if (MainTextBox.GetFirstVisibleLineIndex() == 0)
@@ -129,9 +135,9 @@ namespace JL.Windows.GUI
                         int caretIndex = allBacklogText.Length - MainTextBox.Text.Length;
 
                         MainTextBox.Text =
-                            "Characters: " + new StringInfo(string.Join("", MainWindowUtilities.Backlog))
+                            "Characters: " + new StringInfo(string.Join("", MainWindow.Backlog))
                                 .LengthInTextElements + " / "
-                            + "Lines: " + MainWindowUtilities.Backlog.Count + "\n"
+                            + "Lines: " + MainWindow.Backlog.Count + "\n"
                             + allBacklogText;
                         MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
 
@@ -350,22 +356,22 @@ namespace JL.Windows.GUI
                     MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
                 }
 
-                MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
+                MainTextBox.Text = MainWindow.Backlog[_currentTextIndex];
             }
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.SteppedBacklogForwardsKeyGesture))
             {
-                if (_currentTextIndex < MainWindowUtilities.Backlog.Count - 1)
+                if (_currentTextIndex < MainWindow.Backlog.Count - 1)
                 {
                     _currentTextIndex++;
                     MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
                 }
 
-                if (_currentTextIndex == MainWindowUtilities.Backlog.Count - 1)
+                if (_currentTextIndex == MainWindow.Backlog.Count - 1)
                 {
                     MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
                 }
 
-                MainTextBox.Text = MainWindowUtilities.Backlog[_currentTextIndex];
+                MainTextBox.Text = MainWindow.Backlog[_currentTextIndex];
             }
         }
 

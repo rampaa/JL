@@ -68,7 +68,7 @@ namespace JL.Core.Dicts.EPWING
                     return false;
             }
 
-            if (!MainWindowUtilities.JapaneseRegex.IsMatch(result.PrimarySpelling))
+            if (!Storage.JapaneseRegex.IsMatch(result.PrimarySpelling))
                 return false;
 
             switch (dictType)
@@ -146,7 +146,7 @@ namespace JL.Core.Dicts.EPWING
                         return false;
 
                     // english definitions
-                    if (!result.Definitions.Any(def => MainWindowUtilities.JapaneseRegex.IsMatch(def)))
+                    if (!result.Definitions.Any(def => Storage.JapaneseRegex.IsMatch(def)))
                         return false;
                     break;
 

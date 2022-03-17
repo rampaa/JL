@@ -117,7 +117,7 @@ namespace JL.Core.Dicts.EPWING.EpwingNazeka
                     return false;
             }
 
-            if (!MainWindowUtilities.JapaneseRegex.IsMatch(result.PrimarySpelling))
+            if (!Storage.JapaneseRegex.IsMatch(result.PrimarySpelling))
                 return false;
 
             // TODO

@@ -4,7 +4,7 @@ using JL.Core;
 using JL.Core.Deconjugation;
 using NUnit.Framework;
 
-namespace JLTests.Deconjugation
+namespace JL.Core.Tests.Deconjugation
 {
     [TestFixture]
     public class DeconjugatorTests

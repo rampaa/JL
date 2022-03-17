@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using JL.Windows;
-using JL.Core;
 using NUnit.Framework;
 
-namespace JLTests
+namespace JL.Core.Tests
 {
     [TestFixture]
     public class KanaTests

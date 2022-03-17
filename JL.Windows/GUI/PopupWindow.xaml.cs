@@ -125,7 +125,7 @@ namespace JL.Windows.GUI
                 _currentText = tb.Text;
                 _currentCharPosition = charPosition;
 
-                int endPosition = MainWindowUtilities.FindWordBoundary(tb.Text, charPosition);
+                int endPosition = Utils.FindWordBoundary(tb.Text, charPosition);
 
                 string text;
                 if (endPosition - charPosition <= ConfigManager.MaxSearchLength)
@@ -717,7 +717,7 @@ namespace JL.Windows.GUI
                         continue;
 
                     // Frequency check
-                    if ((textBlock.Text == ("#" + MainWindowUtilities.FakeFrequency)) || textBlock.Text == "#0")
+                    if ((textBlock.Text == ("#" + Storage.FakeFrequency)) || textBlock.Text == "#0")
                         continue;
 
                     baby.MouseLeave += OnMouseLeave;
@@ -933,7 +933,7 @@ namespace JL.Windows.GUI
                 }
             }
 
-            miningParams[JLField.Context] = PopupWindowUtilities.FindSentence(_currentText, _currentCharPosition);
+            miningParams[JLField.Context] = Utils.FindSentence(_currentText, _currentCharPosition);
             miningParams[JLField.TimeLocal] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
 
             await Mining.Mine(miningParams).ConfigureAwait(false);
@@ -1032,7 +1032,7 @@ namespace JL.Windows.GUI
                     }
                 }
 
-                await PopupWindowUtilities.GetAndPlayAudioFromJpod101(foundSpelling, reading, 1).ConfigureAwait(false);
+                await Utils.GetAndPlayAudioFromJpod101(foundSpelling, reading, 1).ConfigureAwait(false);
             }
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ClosePopupKeyGesture))
             {

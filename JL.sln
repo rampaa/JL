@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JL.Windows", "JL.Windows\JL.Windows.csproj", "{3FF98028-42A1-4FB8-BC28-FCBBEE92A053}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLTests", "JLTests\JLTests.csproj", "{7B653E95-D5AB-4A70-9A77-AB2BF7419FDC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JL.Core.Tests", "JL.Core.Tests\JL.Core.Tests.csproj", "{7B653E95-D5AB-4A70-9A77-AB2BF7419FDC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JL.Core", "JL.Core\JL.Core.csproj", "{74A02D98-CA94-4A80-B43A-7DF4600126A8}"
 EndProject

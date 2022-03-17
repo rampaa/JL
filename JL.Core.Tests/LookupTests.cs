@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using JL.Windows;
-using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.EDICT;
 using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Lookup;
 using NUnit.Framework;
 
-namespace JLTests
+namespace JL.Core.Tests
 {
     [TestFixture]
     public class LookupTests
@@ -45,7 +43,7 @@ namespace JLTests
             string text = "始まる";
 
             // Act
-            List<Dictionary<LookupResult, List<string>>> result = Lookup.LookupText(
+            List<Dictionary<LookupResult, List<string>>> result = Lookup.Lookup.LookupText(
                 text);
             string actual = JsonSerializer.Serialize(result, Storage.JsoUnsafeEscaping);
 

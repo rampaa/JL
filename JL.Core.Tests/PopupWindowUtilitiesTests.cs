@@ -1,7 +1,7 @@
 ﻿using JL.Core.Utilities;
 using NUnit.Framework;
 
-namespace JLTests
+namespace JL.Core.Tests
 {
     [TestFixture]
     public class PopupWindowUtilitiesTests
@@ -17,7 +17,7 @@ namespace JLTests
             int position = 0;
 
             // Act
-            string result = PopupWindowUtilities.FindSentence(
+            string result = Utils.FindSentence(
                 text,
                 position);
 
@@ -36,7 +36,7 @@ namespace JLTests
             int position = 97;
 
             // Act
-            string result = PopupWindowUtilities.FindSentence(
+            string result = Utils.FindSentence(
                 text,
                 position);
 
@@ -55,7 +55,7 @@ namespace JLTests
             int position = 0;
 
             // Act
-            string result = PopupWindowUtilities.FindSentence(
+            string result = Utils.FindSentence(
                 text,
                 position);
 
@@ -74,7 +74,7 @@ namespace JLTests
             int position = 0;
 
             // Act
-            string result = PopupWindowUtilities.FindSentence(
+            string result = Utils.FindSentence(
                 text,
                 position);
 
@@ -93,7 +93,7 @@ namespace JLTests
             int position = 15;
 
             // Act
-            string result = PopupWindowUtilities.FindSentence(
+            string result = Utils.FindSentence(
                 text,
                 position);
 
@@ -112,7 +112,7 @@ namespace JLTests
             int position = 0;
 
             // Act
-            string result = PopupWindowUtilities.FindSentence(
+            string result = Utils.FindSentence(
                 text,
                 position);
 
@@ -131,7 +131,7 @@ namespace JLTests
             int position = 0;
 
             // Act
-            string result = PopupWindowUtilities.FindSentence(
+            string result = Utils.FindSentence(
                 text,
                 position);
 
@@ -150,7 +150,7 @@ namespace JLTests
             int position = 0;
 
             // Act
-            string result = PopupWindowUtilities.FindSentence(
+            string result = Utils.FindSentence(
                 text,
                 position);
 
@@ -169,7 +169,7 @@ namespace JLTests
             int position = 0;
 
             // Act
-            string result = PopupWindowUtilities.FindSentence(
+            string result = Utils.FindSentence(
                 text,
                 position);
 
@@ -188,7 +188,7 @@ namespace JLTests
             int position = 8;
 
             // Act
-            string result = PopupWindowUtilities.FindSentence(
+            string result = Utils.FindSentence(
                 text,
                 position);
 
@@ -207,7 +207,7 @@ namespace JLTests
             int position = 72;
 
             // Act
-            string result = PopupWindowUtilities.FindSentence(
+            string result = Utils.FindSentence(
                 text,
                 position);
 
@@ -226,7 +226,7 @@ namespace JLTests
             int position = 10;
 
             // Act
-            string result = PopupWindowUtilities.FindSentence(
+            string result = Utils.FindSentence(
                 text,
                 position);
 

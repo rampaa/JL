@@ -46,7 +46,7 @@ namespace JL.Windows.GUI
         {
             bool isValid = true;
 
-            if (!MainWindowUtilities.JapaneseRegex.IsMatch(SpellingTextBox.Text))
+            if (!Storage.JapaneseRegex.IsMatch(SpellingTextBox.Text))
             {
                 SpellingTextBox.BorderBrush = Brushes.Red;
                 isValid = false;
