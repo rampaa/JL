@@ -73,6 +73,9 @@ namespace JL.Windows
 
         public static int PopupMaxWidth { get; set; } = 700;
         public static int PopupMaxHeight { get; set; } = 520;
+        public static bool FixedPopupPositioning { get; set; } = false;
+        public static int FixedPopupXPosition { get; set; } = 0;
+        public static int FixedPopupYPosition { get; set; } = 0;
         public static bool PopupDynamicHeight { get; set; } = true;
         public static bool PopupDynamicWidth { get; set; } = true;
         public static bool PopupFocusOnLookup { get; set; } = true;
@@ -244,6 +247,17 @@ namespace JL.Windows
                 .Get("PopupMaxWidth")!), PopupMaxWidth, "PopupMaxWidth");
             WindowsUtils.Try(() => PopupMaxHeight = int.Parse(ConfigurationManager.AppSettings
                 .Get("PopupMaxHeight")!), PopupMaxHeight, "PopupMaxHeight");
+
+            WindowsUtils.Try(() => FixedPopupPositioning = bool.Parse(ConfigurationManager.AppSettings
+                .Get("FixedPopupPositioning")!), FixedPopupPositioning, "FixedPopupPositioning");
+
+            WindowsUtils.Try(() => FixedPopupXPosition = int.Parse(ConfigurationManager.AppSettings
+                .Get("FixedPopupXPosition")!), FixedPopupXPosition, "FixedPopupXPosition");
+            WindowsUtils.Try(() => FixedPopupYPosition = int.Parse(ConfigurationManager.AppSettings
+                .Get("FixedPopupYPosition")!), FixedPopupYPosition, "FixedPopupYPosition");
+
+            WindowsUtils.DpiAwareFixedPopupXPosition = FixedPopupXPosition / WindowsUtils.Dpi.DpiScaleX;
+            WindowsUtils.DpiAwareFixedPopupYPosition = FixedPopupYPosition / WindowsUtils.Dpi.DpiScaleY;
 
             tempStr = ConfigurationManager.AppSettings.Get("PopupFlip");
 
@@ -490,7 +504,6 @@ namespace JL.Windows
 
             preferenceWindow.MainWindowHeightNumericUpDown.Value = MainWindowHeight;
             preferenceWindow.MainWindowWidthNumericUpDown.Value = MainWindowWidth;
-
             preferenceWindow.HighlightColorButton.Background = HighlightColor;
 
             WindowsUtils.Try(() => preferenceWindow.TextboxBackgroundColorButton.Background =
@@ -513,6 +526,9 @@ namespace JL.Windows
 
             preferenceWindow.PopupMaxHeightNumericUpDown.Value = PopupMaxHeight;
             preferenceWindow.PopupMaxWidthNumericUpDown.Value = PopupMaxWidth;
+            preferenceWindow.FixedPopupPositioningCheckBox.IsChecked = FixedPopupPositioning;
+            preferenceWindow.FixedPopupXPositionNumericUpDown.Value = FixedPopupXPosition;
+            preferenceWindow.FixedPopupYPositionNumericUpDown.Value = FixedPopupYPosition;
             preferenceWindow.PopupDynamicHeightCheckBox.IsChecked = PopupDynamicHeight;
             preferenceWindow.PopupDynamicWidthCheckBox.IsChecked = PopupDynamicWidth;
             preferenceWindow.AlternativeSpellingsColorButton.Background = AlternativeSpellingsColor;
@@ -631,6 +647,12 @@ namespace JL.Windows
                 preferenceWindow.PopupMaxWidthNumericUpDown.Value.ToString();
             config.AppSettings.Settings["PopupMaxHeight"].Value =
                 preferenceWindow.PopupMaxHeightNumericUpDown.Value.ToString();
+            config.AppSettings.Settings["FixedPopupPositioning"].Value =
+                preferenceWindow.FixedPopupPositioningCheckBox.IsChecked.ToString();
+            config.AppSettings.Settings["FixedPopupXPosition"].Value =
+                preferenceWindow.FixedPopupXPositionNumericUpDown.Value.ToString();
+            config.AppSettings.Settings["FixedPopupYPosition"].Value =
+                preferenceWindow.FixedPopupYPositionNumericUpDown.Value.ToString();
             config.AppSettings.Settings["PopupDynamicHeight"].Value =
                 preferenceWindow.PopupDynamicHeightCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["PopupDynamicWidth"].Value =

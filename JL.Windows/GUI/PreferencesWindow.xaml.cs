@@ -317,10 +317,10 @@ namespace JL.Windows.GUI
 
         private void ClearKeyGestureButton_Click(object sender, RoutedEventArgs e)
         {
-           var button = (Button)sender;
-           var dockPanel = (DockPanel)button.Parent;
-           var textBox = dockPanel.Children.OfType<TextBox>().ToArray()[0];
-           textBox.Text = "None";
+            var button = (Button)sender;
+            var dockPanel = (DockPanel)button.Parent;
+            TextBox textBox = dockPanel.Children.OfType<TextBox>().ToArray()[0];
+            textBox.Text = "None";
         }
 
         #endregion

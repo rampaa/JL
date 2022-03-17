@@ -34,19 +34,19 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Frequency List"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <ComboBox x:Name="FrequencyListComboBox" HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Kanji mode"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="KanjiModeCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Lookup throttle (ms)"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="LookupRateNumericUpDown" Maximum="20" Minimum="0"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
@@ -83,14 +83,14 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Highlight the longest match"
-                                       Cursor="Help" TextWrapping="Wrap"
+                                       Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"
                                        ToolTip="Ignored if lookup mode is set to text select" />
                             <CheckBox x:Name="HighlightLongestMatchCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Check for updates on start up"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="CheckForJLUpdatesOnStartUpCheckBox" Content=""
                                       HorizontalAlignment="Right" />
                         </DockPanel>
@@ -210,19 +210,41 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Dynamic height"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="PopupDynamicHeightCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Dynamic width"
-                                       TextWrapping="Wrap" />
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="PopupDynamicWidthCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Fixed positioning"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="FixedPopupPositioningCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Fixed X position"
+                                       Cursor="Help" ToolTip="Only takes effect if fixed positioning is enabled."
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="FixedPopupXPositionNumericUpDown"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Fixed Y position"
+                                       Cursor="Help" ToolTip="Only takes effect if fixed positioning is enabled."
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="FixedPopupYPositionNumericUpDown"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Focus on lookup"
-                                       TextWrapping="Wrap"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
                                        Cursor="Help"
                                        ToolTip="Attempt to set focus on the popup window when you mouse over text.
 &#10;Required if you want to be able to use hotkeys without clicking on the window first." />

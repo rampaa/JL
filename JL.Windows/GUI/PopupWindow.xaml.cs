@@ -114,7 +114,10 @@ namespace JL.Windows.GUI
 
             _lastTextBox = tb;
 
-            UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+            if (ConfigManager.FixedPopupPositioning)
+                UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+            else
+                UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
             int charPosition = tb.GetCharacterIndexFromPoint(Mouse.GetPosition(tb), false);
             if (charPosition != -1)
@@ -198,7 +201,10 @@ namespace JL.Windows.GUI
 
             PopUpScrollViewer.ScrollToTop();
 
-            UpdatePosition(tb.PointToScreen(tb.GetRectFromCharacterIndex(tb.SelectionStart).BottomLeft));
+            if (ConfigManager.FixedPopupPositioning)
+                UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+            else
+                UpdatePosition(tb.PointToScreen(tb.GetRectFromCharacterIndex(tb.SelectionStart).BottomLeft));
 
             List<Dictionary<LookupResult, List<string>>> lookupResults = Lookup.LookupText(tb.SelectedText);
 
@@ -233,8 +239,8 @@ namespace JL.Windows.GUI
             double mouseX = cursorPosition.X / WindowsUtils.Dpi.DpiScaleX;
             double mouseY = cursorPosition.Y / WindowsUtils.Dpi.DpiScaleY;
 
-            bool needsFlipX = ConfigManager.PopupFlipX && mouseX + Width > WindowsUtils.WorkAreaWidth;
-            bool needsFlipY = ConfigManager.PopupFlipY && mouseY + Height > WindowsUtils.WorkAreaHeight;
+            bool needsFlipX = ConfigManager.PopupFlipX && mouseX + Width > WindowsUtils.DpiAwareWorkAreaWidth;
+            bool needsFlipY = ConfigManager.PopupFlipY && mouseY + Height > WindowsUtils.DpiAwareWorkAreaHeight;
 
             double newLeft;
             double newTop;
@@ -264,18 +270,24 @@ namespace JL.Windows.GUI
             }
 
             // stick to edges if +OOB
-            if (newLeft + Width > WindowsUtils.WorkAreaWidth)
+            if (newLeft + Width > WindowsUtils.DpiAwareWorkAreaWidth)
             {
-                newLeft = WindowsUtils.WorkAreaWidth - Width;
+                newLeft = WindowsUtils.DpiAwareWorkAreaWidth - Width;
             }
 
-            if (newTop + Height > WindowsUtils.WorkAreaHeight)
+            if (newTop + Height > WindowsUtils.DpiAwareWorkAreaHeight)
             {
-                newTop = WindowsUtils.WorkAreaHeight - Height;
+                newTop = WindowsUtils.DpiAwareWorkAreaHeight - Height;
             }
 
             Left = newLeft;
             Top = newTop;
+        }
+
+        private void UpdatePosition(double x, double y)
+        {
+            Left = x;
+            Top = y;
         }
 
         private void DisplayResults(bool generateAllResults)
@@ -1103,13 +1115,13 @@ namespace JL.Windows.GUI
 
         private void OnMouseEnter(object sender, MouseEventArgs e)
         {
-            if (!ConfigManager.LookupOnSelectOnly && _childPopupWindow is { MiningMode: false })
+            if (!ConfigManager.LookupOnSelectOnly && !ConfigManager.FixedPopupPositioning && _childPopupWindow is { MiningMode: false })
             {
                 _childPopupWindow.Hide();
                 _childPopupWindow.LastText = "";
             }
 
-            if (MiningMode || ConfigManager.LookupOnSelectOnly) return;
+            if (MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning) return;
 
             Hide();
             LastText = "";
@@ -1133,13 +1145,13 @@ namespace JL.Windows.GUI
 
         private void OnMouseLeave(object sender, MouseEventArgs e)
         {
-            if (!ConfigManager.LookupOnSelectOnly && _childPopupWindow is { MiningMode: false })
+            if (!ConfigManager.LookupOnSelectOnly & !ConfigManager.FixedPopupPositioning && _childPopupWindow is { MiningMode: false })
             {
                 _childPopupWindow.Hide();
                 _childPopupWindow.LastText = "";
             }
 
-            if (MiningMode || ConfigManager.LookupOnSelectOnly) return;
+            if (MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning) return;
 
             Hide();
             LastText = "";

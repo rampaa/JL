@@ -39,10 +39,12 @@ public static class WindowsUtils
             new WindowInteropHelper(MainWindow.Instance).Handle);
 
     public static DpiScale Dpi { get; set; } = VisualTreeHelper.GetDpi(MainWindow.Instance);
-    public static double WorkAreaWidth { get; set; } = ActiveScreen.Bounds.Width / Dpi.DpiScaleX;
-    public static double WorkAreaHeight { get; set; } = ActiveScreen.Bounds.Height / Dpi.DpiScaleY;
+    public static double DpiAwareWorkAreaWidth { get; set; } = ActiveScreen.Bounds.Width / Dpi.DpiScaleX;
+    public static double DpiAwareWorkAreaHeight { get; set; } = ActiveScreen.Bounds.Height / Dpi.DpiScaleY;
     public static double DpiAwareXOffset { get; set; } = ConfigManager.PopupXOffset / Dpi.DpiScaleX;
     public static double DpiAwareYOffset { get; set; } = ConfigManager.PopupYOffset / Dpi.DpiScaleY;
+    public static double DpiAwareFixedPopupXPosition { get; set; } = ConfigManager.FixedPopupXPosition / Dpi.DpiScaleX;
+    public static double DpiAwareFixedPopupYPosition { get; set; } = ConfigManager.FixedPopupYPosition / Dpi.DpiScaleX;
 
     public static bool KeyGestureComparer(KeyEventArgs e, KeyGesture keyGesture)
     {
@@ -372,7 +374,7 @@ public static class WindowsUtils
 
                 AlertWindow alertWindow = new();
 
-                alertWindow.Left = WorkAreaWidth - alertWindow.Width - 30;
+                alertWindow.Left = DpiAwareWorkAreaWidth - alertWindow.Width - 30;
                 alertWindow.Top =
                     alertWindowList.Count * ((alertWindowList.LastOrDefault()?.ActualHeight ?? 0) + 2) + 30;
 

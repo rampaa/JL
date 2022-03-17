@@ -170,7 +170,7 @@ namespace JL.Windows.GUI
             //OpacitySlider.Visibility = Visibility.Collapsed;
             //FontSizeSlider.Visibility = Visibility.Collapsed;
 
-            if (FirstPopupWindow.MiningMode || ConfigManager.LookupOnSelectOnly) return;
+            if (FirstPopupWindow.MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning) return;
 
             FirstPopupWindow.Hide();
             FirstPopupWindow.LastText = "";
@@ -443,10 +443,12 @@ namespace JL.Windows.GUI
         {
             WindowsUtils.Dpi = e.NewDpi;
             WindowsUtils.ActiveScreen = System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(this).Handle);
-            WindowsUtils.WorkAreaWidth = WindowsUtils.ActiveScreen.Bounds.Width / e.NewDpi.DpiScaleX;
-            WindowsUtils.WorkAreaHeight = WindowsUtils.ActiveScreen.Bounds.Height / e.NewDpi.DpiScaleY;
+            WindowsUtils.DpiAwareWorkAreaWidth = WindowsUtils.ActiveScreen.Bounds.Width / e.NewDpi.DpiScaleX;
+            WindowsUtils.DpiAwareWorkAreaHeight = WindowsUtils.ActiveScreen.Bounds.Height / e.NewDpi.DpiScaleY;
             WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / e.NewDpi.DpiScaleX;
             WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset / e.NewDpi.DpiScaleY;
+            WindowsUtils.DpiAwareFixedPopupXPosition = ConfigManager.FixedPopupXPosition / e.NewDpi.DpiScaleX;
+            WindowsUtils.DpiAwareFixedPopupYPosition = ConfigManager.FixedPopupYPosition / e.NewDpi.DpiScaleY;
         }
 
         private void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
