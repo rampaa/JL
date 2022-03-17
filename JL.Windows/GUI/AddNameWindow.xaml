@@ -6,7 +6,7 @@
     xmlns:hc="https://handyorg.github.io/handycontrol" x:Class="JL.Windows.GUI.AddNameWindow"
     mc:Ignorable="d"
     Title="Add Name" Height="350" Width="400" Topmost="True" SizeToContent="Height" ResizeMode="NoResize"
-    MaxHeight="600" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded">
+    MaxHeight="600" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" ShowInTaskbar="False">
 
     <ScrollViewer>
         <Grid Background="Black">

@@ -50,7 +50,7 @@ namespace JL.Windows.GUI
             if (isValid)
             {
                 //todo this will break on DictTypes without descriptions
-                var type = typeString.GetEnum<DictType>();
+                DictType type = typeString.GetEnum<DictType>();
 
                 if (Storage.Dicts[type].Type != type || Storage.Dicts[type].Path != path)
                 {
@@ -98,7 +98,7 @@ namespace JL.Windows.GUI
         {
             string typeString = ComboBoxDictType.SelectionBoxItem.ToString();
             //todo this will break on DictTypes without descriptions
-            var selectedDictType = typeString.GetEnum<DictType>();
+            DictType selectedDictType = typeString.GetEnum<DictType>();
 
             switch (selectedDictType)
             {

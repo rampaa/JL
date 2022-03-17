@@ -99,7 +99,10 @@ namespace JL.Windows.GUI
                 };
                 var dictPathDisplay = new TextBlock
                 {
-                    Width = 200, Text = dict.Path, Margin = new Thickness(10), Cursor = Cursors.Hand
+                    Width = 200,
+                    Text = dict.Path,
+                    Margin = new Thickness(10),
+                    Cursor = Cursors.Hand
                 };
 
                 dictPathDisplay.PreviewMouseLeftButtonUp += PathTextbox_PreviewMouseLeftButtonUp;
@@ -159,7 +162,7 @@ namespace JL.Windows.GUI
                     Foreground = Brushes.White,
                     Background = Brushes.DodgerBlue,
                     BorderThickness = new Thickness(1),
-                    Margin = new Thickness(0,0,5,0),
+                    Margin = new Thickness(0, 0, 5, 0),
                     Visibility = Storage.BuiltInDicts.Values
                         .Select(t => t.Type).ToList().Contains(dict.Type)
                         ? Visibility.Collapsed

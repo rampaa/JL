@@ -112,7 +112,9 @@ public static class WindowsUtils
         {
             ComboBoxItem comboBoxItem = new()
             {
-                Content = fontFamily.Source, FontFamily = fontFamily, Foreground = Brushes.White
+                Content = fontFamily.Source,
+                FontFamily = fontFamily,
+                Foreground = Brushes.White
             };
 
             if (fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("ja-jp")))
@@ -157,6 +159,7 @@ public static class WindowsUtils
     {
         AddNameWindow addNameWindowInstance = AddNameWindow.Instance;
         addNameWindowInstance.SpellingTextBox.Text = selectedText;
+        addNameWindowInstance.Owner = MainWindow.Instance;
         addNameWindowInstance.ShowDialog();
     }
 
@@ -164,12 +167,14 @@ public static class WindowsUtils
     {
         AddWordWindow addWordWindowInstance = AddWordWindow.Instance;
         addWordWindowInstance.SpellingsTextBox.Text = selectedText;
+        addWordWindowInstance.Owner = MainWindow.Instance;
         addWordWindowInstance.ShowDialog();
     }
 
     public static void ShowPreferencesWindow()
     {
         ConfigManager.Instance.LoadPreferences(PreferencesWindow.Instance);
+        PreferencesWindow.Instance.Owner = MainWindow.Instance;
         PreferencesWindow.Instance.ShowDialog();
     }
 
@@ -184,6 +189,7 @@ public static class WindowsUtils
         if (!File.Exists($"Resources/custom_names.txt"))
             File.Create($"Resources/custom_names.txt").Dispose();
 
+        ManageDictionariesWindow.Instance.Owner = MainWindow.Instance;
         ManageDictionariesWindow.Instance.ShowDialog();
     }
 
@@ -191,7 +197,8 @@ public static class WindowsUtils
     {
         if (selectedText?.Length > 0)
             Process.Start(new ProcessStartInfo("cmd",
-                $"/c start https://www.google.com/search?q={selectedText}^&hl=ja") { CreateNoWindow = true });
+                $"/c start https://www.google.com/search?q={selectedText}^&hl=ja")
+            { CreateNoWindow = true });
     }
 
     public static async Task UpdateJL(Version latestVersion)
@@ -224,7 +231,8 @@ public static class WindowsUtils
                 new ProcessStartInfo("cmd",
                     $"/c start {Path.Join(Storage.ApplicationPath, "update-helper.cmd")} & exit")
                 {
-                    UseShellExecute = false, CreateNoWindow = true
+                    UseShellExecute = false,
+                    CreateNoWindow = true
                 });
         }
     }
@@ -364,7 +372,7 @@ public static class WindowsUtils
 
                 AlertWindow alertWindow = new();
 
-                alertWindow.Left = SystemParameters.WorkArea.Width - alertWindow.Width - 30;
+                alertWindow.Left = WorkAreaWidth - alertWindow.Width - 30;
                 alertWindow.Top =
                     alertWindowList.Count * ((alertWindowList.LastOrDefault()?.ActualHeight ?? 0) + 2) + 30;
 
