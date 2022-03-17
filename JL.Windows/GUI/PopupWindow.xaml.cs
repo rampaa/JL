@@ -941,7 +941,8 @@ namespace JL.Windows.GUI
 
         private void Definitions_MouseMove(TextBox tb)
         {
-            TextBox_MouseMove(tb);
+            if (Storage.JapaneseRegex.IsMatch(tb.Text))
+                TextBox_MouseMove(tb);
         }
 
         private void PopupListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)

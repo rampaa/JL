@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text.Json;
-using JL.Core;
 using JL.Core.Deconjugation;
 using NUnit.Framework;
 
@@ -44,7 +43,7 @@ namespace JL.Core.Tests.Deconjugation
         {
             // Arrange
             int iterations = 100;
-            double expected = 75000000 + 8000000;
+            double expected = 75000000 + 800000;
 
             // Act
             double start = GC.GetAllocatedBytesForCurrentThread();
@@ -73,7 +72,7 @@ namespace JL.Core.Tests.Deconjugation
         {
             // Arrange
             int iterations = 1000;
-            double expected = 750000000 + 80000000;
+            double expected = 750000000 + 8000000;
 
             // Act
             double start = GC.GetAllocatedBytesForCurrentThread();
@@ -102,7 +101,7 @@ namespace JL.Core.Tests.Deconjugation
         {
             // Arrange
             int iterations = 10000;
-            double expected = 7500000000 + 800000000;
+            double expected = 7500000000 + 80000000;
 
             // Act
             double start = GC.GetAllocatedBytesForCurrentThread();
