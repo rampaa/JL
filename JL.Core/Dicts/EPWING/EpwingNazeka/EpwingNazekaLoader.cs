@@ -99,7 +99,10 @@ namespace JL.Core.Dicts.EPWING.EpwingNazeka
                         }
                     }
                 }
+
+                nazekaEpwingDict.TrimExcess();
             }
+
             catch (Exception e)
             {
                 Utils.Logger.Fatal(e, "Error loading nazeka dict");

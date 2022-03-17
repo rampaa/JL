@@ -54,6 +54,8 @@ namespace JL.Core.Frequency
                     }
                 }
             }
+
+            freqDict.TrimExcess();
         }
     }
 }

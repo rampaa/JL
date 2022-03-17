@@ -43,6 +43,8 @@ namespace JL.Core.PoS
                     }
                 }
             }
+
+            Storage.WcDict.TrimExcess();
         }
 
         public static async Task JmdictWordClassSerializer()
