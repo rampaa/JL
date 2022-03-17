@@ -19,4 +19,6 @@ public class DummyFrontend : IFrontend
     public void ShowOkDialog(string text, string caption)
     {
     }
+
+    public Task UpdateJL(Version latestVersion) => Task.CompletedTask;
 }

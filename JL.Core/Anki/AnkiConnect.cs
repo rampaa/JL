@@ -44,28 +44,6 @@ namespace JL.Core.Anki
             return await Send(req).ConfigureAwait(false);
         }
 
-        public static async Task<byte[]> GetAudioFromJpod101(string foundSpelling, string reading)
-        {
-            try
-            {
-                Uri uri = new(
-                    "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=" +
-                    foundSpelling +
-                    "&kana=" +
-                    reading
-                );
-                HttpResponseMessage getResponse = await Storage.Client.GetAsync(uri).ConfigureAwait(false);
-                // todo mining storemediafile thingy
-                return await getResponse.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-            }
-            catch (Exception e)
-            {
-                Storage.Frontend.Alert(AlertLevel.Error, "Error getting audio from jpod101");
-                Utils.Logger.Error(e, "Error getting audio from jpod101");
-                return null;
-            }
-        }
-
         public static async Task<bool> CheckAudioField(long noteId, string audioFieldName)
         {
             Request req = new("notesInfo", 6,
@@ -97,13 +75,15 @@ namespace JL.Core.Anki
                     new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }));
                 Utils.Logger.Information("Sending: " + await payload.ReadAsStringAsync().ConfigureAwait(false));
 
-                HttpResponseMessage postResponse = await Storage.Client.PostAsync(Storage.Frontend.CoreConfig.AnkiConnectUri, payload)
+                HttpResponseMessage postResponse = await Storage.Client
+                    .PostAsync(Storage.Frontend.CoreConfig.AnkiConnectUri, payload)
                     .ConfigureAwait(false);
 
                 Response json = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);
                 Utils.Logger.Information("json result: " + json!.Result);
 
-                if (json!.Error == null) return json;
+                if (json!.Error == null)
+                    return json;
 
                 Storage.Frontend.Alert(AlertLevel.Error, json.Error.ToString());
                 Utils.Logger.Error(json.Error.ToString());

@@ -23,4 +23,7 @@ public class UnimplementedFrontend : IFrontend
 
     public void ShowOkDialog(string text, string caption) =>
         throw new NotImplementedException("Please set a frontend in order to use this method.");
+
+    public Task UpdateJL(Version latestVersion) =>
+        throw new NotImplementedException("Please set a frontend in order to use this method.");
 }

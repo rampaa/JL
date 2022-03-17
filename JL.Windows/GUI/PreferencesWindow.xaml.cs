@@ -12,6 +12,7 @@ using HandyControl.Controls;
 using HandyControl.Tools;
 using JL.Core;
 using JL.Core.Anki;
+using JL.Core.Network;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using Button = System.Windows.Controls.Button;
@@ -383,7 +384,7 @@ namespace JL.Windows.GUI
 
         private void CheckForJLUpdatesButton_Click(object sender, RoutedEventArgs e)
         {
-            WindowsUtils.CheckForJLUpdates(false);
+            Networking.CheckForJLUpdates(false);
         }
     }
 }

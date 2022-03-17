@@ -23,7 +23,10 @@ namespace JL.Core.Anki
                 Dictionary<string, JLField> userFields = ankiConfig.Fields;
                 Dictionary<string, object> fields = ConvertFields(userFields, miningParams);
 
-                Dictionary<string, object> options = new() { { "allowDuplicate", Storage.Frontend.CoreConfig.AllowDuplicateCards }, };
+                Dictionary<string, object> options = new()
+                {
+                    { "allowDuplicate", Storage.Frontend.CoreConfig.AllowDuplicateCards },
+                };
                 string[] tags = ankiConfig.Tags;
 
                 // idk if this gets the right audio for every word
@@ -105,10 +108,10 @@ namespace JL.Core.Anki
             return dict;
         }
 
-        private static List<string> FindAudioFields(Dictionary<string, JLField> fields)
+        private static List<string> FindAudioFields(Dictionary<string, JLField> userFields)
         {
             List<string> audioFields = new();
-            audioFields.AddRange(fields.Keys.Where(key => JLField.Audio.Equals(fields[key])));
+            audioFields.AddRange(userFields.Keys.Where(key => JLField.Audio.Equals(userFields[key])));
 
             return audioFields;
         }

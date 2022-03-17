@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using JL.Core.Anki;
 using JL.Core.Dicts;
+using JL.Core.Network;
 using Serilog;
 using Serilog.Core;
 
@@ -226,7 +227,7 @@ namespace JL.Core.Utilities
             if (string.IsNullOrEmpty(reading))
                 reading = foundSpelling;
 
-            byte[] sound = await AnkiConnect.GetAudioFromJpod101(foundSpelling, reading).ConfigureAwait(false);
+            byte[] sound = await Networking.GetAudioFromJpod101(foundSpelling, reading).ConfigureAwait(false);
             if (sound != null)
             {
                 if (Utils.GetMd5String(sound) == "7e2c2f954ef6051373ba916f000168dc") // jpod101 no audio clip

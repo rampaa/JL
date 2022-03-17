@@ -9,4 +9,5 @@ public interface IFrontend
     public void Alert(AlertLevel alertLevel, string message);
     public bool ShowYesNoDialog(string text, string caption);
     public void ShowOkDialog(string text, string caption);
+    public Task UpdateJL(Version latestVersion);
 }

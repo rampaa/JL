@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -39,6 +40,8 @@ namespace JL.Windows.GUI
             MessageBox.Show(text, caption, MessageBoxButton.OK,
                 MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
         }
+
+        public Task UpdateJL(Version latestVersion) => WindowsUtils.UpdateJL(latestVersion);
 
         #endregion
 

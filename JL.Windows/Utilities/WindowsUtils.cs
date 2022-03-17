@@ -19,6 +19,7 @@ using System.Windows.Interop;
 using System.Windows.Markup;
 using System.Windows.Media;
 using JL.Core;
+using JL.Core.Network;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
 using NAudio.Wave;
@@ -193,44 +194,6 @@ public static class WindowsUtils
                 $"/c start https://www.google.com/search?q={selectedText}^&hl=ja") { CreateNoWindow = true });
     }
 
-    // todo move to core
-    public static async void CheckForJLUpdates(bool isAutoCheck)
-    {
-        try
-        {
-            HttpResponseMessage response = await Storage.Client.GetAsync(Storage.RepoUrl + "releases/latest");
-            string responseUri = response.RequestMessage!.RequestUri!.ToString();
-            Version latestVersion =
-                new(responseUri[(responseUri.LastIndexOf("/", StringComparison.Ordinal) + 1)..]);
-            if (latestVersion > Storage.Version)
-            {
-                if (MessageBox.Show("A new version of JL is available. Would you like to download it now?", "",
-                        MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
-                        MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
-                {
-                    MessageBox.Show(
-                        $"This may take a while. Please don't manually shut down the program until it's updated.",
-                        "", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK,
-                        MessageBoxOptions.DefaultDesktopOnly);
-
-                    await UpdateJL(latestVersion).ConfigureAwait(false);
-                }
-            }
-
-            else if (!isAutoCheck)
-            {
-                MessageBox.Show("JL is up to date", "",
-                    MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.Yes,
-                    MessageBoxOptions.DefaultDesktopOnly);
-            }
-        }
-        catch
-        {
-            Utils.Logger.Warning("Couldn't update JL");
-            Alert(AlertLevel.Warning, "Couldn't update JL");
-        }
-    }
-
     public static async Task UpdateJL(Version latestVersion)
     {
         string architecture = Environment.Is64BitProcess ? "x64" : "x86";
@@ -296,7 +259,7 @@ public static class WindowsUtils
 
         if (ConfigManager.CheckForJLUpdatesOnStartUp)
         {
-            WindowsUtils.CheckForJLUpdates(true);
+            Networking.CheckForJLUpdates(true);
         }
     }
 
