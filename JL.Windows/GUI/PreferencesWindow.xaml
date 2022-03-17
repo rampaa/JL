@@ -402,56 +402,66 @@
                         </StackPanel.Resources>
 
                         <DockPanel Margin="0,10,0,0">
-                            <TextBlock HorizontalAlignment="Left" Text="AnkiConnect server address"
+                            <TextBlock HorizontalAlignment="Left" Text="Enable Anki integration"
                                        TextWrapping="Wrap" />
-                            <TextBox x:Name="AnkiUriTextBox" HorizontalAlignment="Right"
-                                     TextWrapping="NoWrap" Width="210" />
+                            <CheckBox x:Name="AnkiIntegrationCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
 
-                        <DockPanel Margin="0,10,0,0">
-                            <TextBlock HorizontalAlignment="Left" Text="Force sync after mining"
-                                       TextWrapping="Wrap" />
-                            <CheckBox x:Name="ForceSyncAnkiCheckBox" Content="" HorizontalAlignment="Right" />
-                        </DockPanel>
+                        <StackPanel IsEnabled="{Binding ElementName=AnkiIntegrationCheckBox,Path=IsChecked}">
 
-                        <DockPanel Margin="0,10,0,0">
-                            <TextBlock HorizontalAlignment="Left" Text="Allow duplicate cards"
-                                       TextWrapping="Wrap" />
-                            <CheckBox x:Name="AllowDuplicateCardsCheckBox" Content="" HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <Grid Margin="10,10,10,10">
-                            <StackPanel Margin="10">
-                                <TextBlock HorizontalAlignment="Center" Text="Deck:"
+                            <DockPanel Margin="0,10,0,0">
+                                <TextBlock HorizontalAlignment="Left" Text="AnkiConnect server address"
                                            TextWrapping="Wrap" />
-                                <ComboBox x:Name="MiningSetupComboBoxDeckNames" Width="200" Margin="0,10,0,0" />
-                                <Button x:Name="MiningSetupButtonRefresh" Click="MiningSetupButtonRefresh_Click"
-                                        Width="100"
-                                        Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
-                                    Refresh
-                                </Button>
-                                <TextBlock HorizontalAlignment="Center" Text="Model:"
+                                <TextBox x:Name="AnkiUriTextBox" HorizontalAlignment="Right"
+                                         TextWrapping="NoWrap" Width="210" />
+                            </DockPanel>
+
+                            <DockPanel Margin="0,10,0,0">
+                                <TextBlock HorizontalAlignment="Left" Text="Force sync after mining"
                                            TextWrapping="Wrap" />
-                                <ComboBox x:Name="MiningSetupComboBoxModelNames" Width="200" Margin="0,10,0,0" />
+                                <CheckBox x:Name="ForceSyncAnkiCheckBox" Content="" HorizontalAlignment="Right" />
+                            </DockPanel>
 
-                                <Separator Height="15" />
-
-                                <Button x:Name="MiningSetupButtonGetFields" Click="MiningSetupButtonGetFields_Click"
-                                        Width="150"
-                                        Content="Get Fields" FontSize="16" Height="35" />
-                                <StackPanel x:Name="MiningSetupStackPanelFields" Margin="10" />
-
-                                <Separator Height="15" />
-
-                                <TextBlock HorizontalAlignment="Center" Text="Tags:"
+                            <DockPanel Margin="0,10,0,0">
+                                <TextBlock HorizontalAlignment="Left" Text="Allow duplicate cards"
                                            TextWrapping="Wrap" />
-                                <TextBox x:Name="TagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
-                                         Cursor="Help" ToolTip="Separated by a comma" />
+                                <CheckBox x:Name="AllowDuplicateCardsCheckBox" Content="" HorizontalAlignment="Right" />
+                            </DockPanel>
 
-                                <Button x:Name="MiningSetupButtonSave" Click="MiningSetupButtonSave_Click"
-                                        Content="Save AnkiConfig" Height="35" FontSize="16" Width="140" />
-                            </StackPanel>
-                        </Grid>
+                            <Grid Margin="10,10,10,10">
+                                <StackPanel Margin="10">
+                                    <TextBlock HorizontalAlignment="Center" Text="Deck:"
+                                               TextWrapping="Wrap" />
+                                    <ComboBox x:Name="MiningSetupComboBoxDeckNames" Width="200" Margin="0,10,0,0" />
+                                    <Button x:Name="MiningSetupButtonRefresh" Click="MiningSetupButtonRefresh_Click"
+                                            Width="100"
+                                            Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
+                                        Refresh
+                                    </Button>
+                                    <TextBlock HorizontalAlignment="Center" Text="Model:"
+                                               TextWrapping="Wrap" />
+                                    <ComboBox x:Name="MiningSetupComboBoxModelNames" Width="200" Margin="0,10,0,0" />
+
+                                    <Separator Height="15" />
+
+                                    <Button x:Name="MiningSetupButtonGetFields"
+                                            Click="MiningSetupButtonGetFields_Click"
+                                            Width="150"
+                                            Content="Get Fields" FontSize="16" Height="35" />
+                                    <StackPanel x:Name="MiningSetupStackPanelFields" Margin="10" />
+
+                                    <Separator Height="15" />
+
+                                    <TextBlock HorizontalAlignment="Center" Text="Tags:"
+                                               TextWrapping="Wrap" />
+                                    <TextBox x:Name="TagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
+                                             Cursor="Help" ToolTip="Separated by a comma" />
+
+                                    <Button x:Name="MiningSetupButtonSave" Click="MiningSetupButtonSave_Click"
+                                            Content="Save AnkiConfig" Height="35" FontSize="16" Width="140" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

@@ -78,20 +78,28 @@ namespace JL.Windows.GUI
         private async void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var itemTab = (System.Windows.Controls.TabItem)TabControl.SelectedItem;
-            if (itemTab == null) return;
+            if (itemTab == null)
+                return;
 
             switch (itemTab.Header)
             {
                 case "Anki":
-                    if (!_setAnkiConfig)
+                    if (ConfigManager.Instance.AnkiIntegration && !_setAnkiConfig)
                     {
                         await SetPreviousMiningConfig();
-                        if (MiningSetupComboBoxDeckNames.SelectedItem == null) await PopulateDeckAndModelNames();
+                        if (MiningSetupComboBoxDeckNames.SelectedItem == null)
+                            await PopulateDeckAndModelNames();
+
                         _setAnkiConfig = true;
                     }
 
                     break;
             }
+        }
+
+        private void CheckForJLUpdatesButton_Click(object sender, RoutedEventArgs e)
+        {
+            Networking.CheckForJLUpdates(false);
         }
 
         #endregion
@@ -103,7 +111,8 @@ namespace JL.Windows.GUI
             try
             {
                 AnkiConfig ankiConfig = await AnkiConfig.ReadAnkiConfig();
-                if (ankiConfig == null) return;
+                if (ankiConfig == null)
+                    return;
 
                 MiningSetupComboBoxDeckNames.ItemsSource = new List<string> { ankiConfig.DeckName };
                 MiningSetupComboBoxDeckNames.SelectedIndex = 0;
@@ -178,7 +187,7 @@ namespace JL.Windows.GUI
             catch (Exception exception)
             {
                 WindowsUtils.Alert(AlertLevel.Error, "Error getting fields from AnkiConnect");
-                Utils.Logger.Information(exception, "Error getting fields from AnkiConnect");
+                Utils.Logger.Error(exception, "Error getting fields from AnkiConnect");
             }
         }
 
@@ -210,7 +219,7 @@ namespace JL.Windows.GUI
             catch (Exception exception)
             {
                 WindowsUtils.Alert(AlertLevel.Error, "Error creating field elements");
-                Utils.Logger.Information(exception, "Error creating field elements");
+                Utils.Logger.Error(exception, "Error creating field elements");
             }
         }
 
@@ -381,10 +390,5 @@ namespace JL.Windows.GUI
         }
 
         #endregion
-
-        private void CheckForJLUpdatesButton_Click(object sender, RoutedEventArgs e)
-        {
-            Networking.CheckForJLUpdates(false);
-        }
     }
 }

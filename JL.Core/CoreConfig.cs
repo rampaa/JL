@@ -2,6 +2,7 @@
 
 public class CoreConfig
 {
+    public bool AnkiIntegration { get; set; } = false;
     public string AnkiConnectUri { get; set; } = "http://localhost:8765";
     public string FrequencyListName { get; set; } = "VN";
     public bool KanjiMode { get; set; } = false;

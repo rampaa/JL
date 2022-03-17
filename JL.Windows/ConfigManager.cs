@@ -114,6 +114,10 @@ namespace JL.Windows
                     bool.Parse(ConfigurationManager.AppSettings.Get("CheckForJLUpdatesOnStartUp")!),
                 CheckForJLUpdatesOnStartUp, "CheckForJLUpdatesOnStartUp");
 
+            WindowsUtils.Try(() => AnkiIntegration =
+                    bool.Parse(ConfigurationManager.AppSettings.Get("AnkiIntegration")!),
+                AnkiIntegration, "AnkiIntegration");
+
             WindowsUtils.Try(
                 () => MaxSearchLength = int.Parse(ConfigurationManager.AppSettings.Get("MaxSearchLength")!),
                 MaxSearchLength, "MaxSearchLength");
@@ -479,6 +483,7 @@ namespace JL.Windows
             preferenceWindow.KanjiModeCheckBox.IsChecked = KanjiMode;
             preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
             preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = CheckForJLUpdatesOnStartUp;
+            preferenceWindow.AnkiIntegrationCheckBox.IsChecked = AnkiIntegration;
             preferenceWindow.FrequencyListComboBox.ItemsSource = Storage.FrequencyLists.Keys;
             preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyListName;
             preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
@@ -617,6 +622,8 @@ namespace JL.Windows
                 preferenceWindow.HighlightLongestMatchCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["CheckForJLUpdatesOnStartUp"].Value =
                 preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked.ToString();
+            config.AppSettings.Settings["AnkiIntegration"].Value =
+                preferenceWindow.AnkiIntegrationCheckBox.IsChecked.ToString();
             config.AppSettings.Settings["HighlightColor"].Value =
                 preferenceWindow.HighlightColorButton.Background.ToString();
 

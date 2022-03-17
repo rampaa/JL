@@ -260,6 +260,7 @@ namespace JL.Windows.GUI
             UpdateDictionariesDisplay();
         }
 
+        //todo move to core
         private static async Task UpdateJMdict()
         {
             Storage.UpdatingJMdict = true;
