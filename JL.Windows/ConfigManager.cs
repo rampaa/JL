@@ -20,29 +20,70 @@ namespace JL.Windows
             get { return s_instance ??= new ConfigManager(); }
         }
 
+        #region General
+
         public static int MaxSearchLength { get; set; } = 37;
+        public static bool InactiveLookupMode { get; set; } = false; // todo checkbox?
+        public static bool InvisibleMode { get; set; } = false; // todo checkbox?
+        public static Brush HighlightColor { get; set; } = Brushes.AliceBlue;
+        public static bool RequireLookupKeyPress { get; set; } = false;
+        public static bool LookupOnSelectOnly { get; set; } = false;
+        public static ModifierKeys LookupKey { get; set; } = ModifierKeys.Alt;
+        public static bool HighlightLongestMatch { get; set; } = false;
+        public static bool CheckForJLUpdatesOnStartUp { get; set; } = true;
+
+        #endregion
+
+        // todo switch height and width orders
+
+        #region Textbox
 
         public static double MainWindowHeight { get; set; } = 200;
         public static double MainWindowWidth { get; set; } = 800;
-
-        public static bool HighlightLongestMatch { get; set; } = false;
-        public static bool LookupOnSelectOnly { get; set; } = false;
-        public static bool RequireLookupKeyPress { get; set; } = false;
-        public static bool InactiveLookupMode { get; set; } = false;
-        public static bool InvisibleMode { get; set; } = false;
-
         public static Brush MainWindowTextColor { get; set; } = Brushes.White;
         public static Brush MainWindowBacklogTextColor { get; set; } = Brushes.Bisque;
-        public static Brush PrimarySpellingColor { get; set; } = Brushes.Chocolate;
-        public static Brush ReadingsColor { get; set; } = Brushes.Goldenrod;
-        public static Brush DefinitionsColor { get; set; } = Brushes.White;
-        public static Brush DeconjugationInfoColor { get; set; } = Brushes.White;
-        public static Brush FrequencyColor { get; set; } = Brushes.White;
-        public static Brush AlternativeSpellingsColor { get; set; } = Brushes.White;
-        public static Brush SeparatorColor { get; set; } = Brushes.White;
+
+        #endregion
+
+        #region Popup
+
+        public static FontFamily PopupFont { get; set; } = new("Meiryo");
+        public static int PopupMaxHeight { get; set; } = 520;
+        public static int PopupMaxWidth { get; set; } = 700;
+        public static bool PopupDynamicHeight { get; set; } = true;
+        public static bool PopupDynamicWidth { get; set; } = true;
+        public static bool FixedPopupPositioning { get; set; } = false;
+        public static int FixedPopupXPosition { get; set; } = 0;
+        public static int FixedPopupYPosition { get; set; } = 0;
+        public static bool PopupFocusOnLookup { get; set; } = true;
         public static Brush PopupBackgroundColor { get; set; } = Brushes.Black;
+        public static int PopupXOffset { get; set; } = 10;
+        public static int PopupYOffset { get; set; } = 20;
+        public static bool PopupFlipX { get; set; } = true;
+        public static bool PopupFlipY { get; set; } = true;
+        public static Brush PrimarySpellingColor { get; set; } = Brushes.Chocolate;
+        public static int PrimarySpellingFontSize { get; set; } = 21;
+        public static Brush ReadingsColor { get; set; } = Brushes.Goldenrod;
+        public static int ReadingsFontSize { get; set; } = 19;
+        public static Brush AlternativeSpellingsColor { get; set; } = Brushes.White;
+        public static int AlternativeSpellingsFontSize { get; set; } = 17;
+        public static Brush DefinitionsColor { get; set; } = Brushes.White;
+        public static int DefinitionsFontSize { get; set; } = 17;
+        public static Brush FrequencyColor { get; set; } = Brushes.White;
+        public static int FrequencyFontSize { get; set; } = 17;
+        public static Brush DeconjugationInfoColor { get; set; } = Brushes.White;
+        public static int DeconjugationInfoFontSize { get; set; } = 17;
         public static Brush DictTypeColor { get; set; } = Brushes.LightBlue;
-        public static Brush HighlightColor { get; set; } = Brushes.AliceBlue;
+        public static int DictTypeFontSize { get; set; } = 15;
+        public static Brush SeparatorColor { get; set; } = Brushes.White;
+
+        #endregion
+
+        #region Anki
+
+        #endregion
+
+        #region Hotkeys
 
         public static KeyGesture MiningModeKeyGesture { get; set; } = new(Key.M, ModifierKeys.Windows);
         public static KeyGesture PlayAudioKeyGesture { get; set; } = new(Key.P, ModifierKeys.Windows);
@@ -62,30 +103,8 @@ namespace JL.Windows
         public static KeyGesture InactiveLookupModeKeyGesture { get; set; } = new(Key.Q, ModifierKeys.Windows);
         public static KeyGesture MotivationKeyGesture { get; set; } = new(Key.O, ModifierKeys.Windows);
         public static KeyGesture ClosePopupKeyGesture { get; set; } = new(Key.Escape, ModifierKeys.Windows);
-        public static ModifierKeys LookupKey { get; set; } = ModifierKeys.Alt;
-        public static int PrimarySpellingFontSize { get; set; } = 21;
-        public static int ReadingsFontSize { get; set; } = 19;
-        public static int DefinitionsFontSize { get; set; } = 17;
-        public static int DeconjugationInfoFontSize { get; set; } = 17;
-        public static int FrequencyFontSize { get; set; } = 17;
-        public static int AlternativeSpellingsFontSize { get; set; } = 17;
-        public static int DictTypeFontSize { get; set; } = 15;
 
-        public static int PopupMaxWidth { get; set; } = 700;
-        public static int PopupMaxHeight { get; set; } = 520;
-        public static bool FixedPopupPositioning { get; set; } = false;
-        public static int FixedPopupXPosition { get; set; } = 0;
-        public static int FixedPopupYPosition { get; set; } = 0;
-        public static bool PopupDynamicHeight { get; set; } = true;
-        public static bool PopupDynamicWidth { get; set; } = true;
-        public static bool PopupFocusOnLookup { get; set; } = true;
-        public static int PopupXOffset { get; set; } = 10;
-        public static int PopupYOffset { get; set; } = 20;
-        public static bool PopupFlipX { get; set; } = true;
-        public static bool PopupFlipY { get; set; } = true;
-        public static FontFamily PopupFont { get; set; } = new("Meiryo");
-
-        public static bool CheckForJLUpdatesOnStartUp { get; set; } = true;
+        #endregion
 
         public void ApplyPreferences()
         {
