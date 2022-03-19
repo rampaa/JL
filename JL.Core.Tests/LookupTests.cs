@@ -56,8 +56,6 @@ namespace JL.Core.Tests
         [Test]
         public void Freq_た_他()
         {
-            Storage.LoadFrequency().Wait();
-
             // Arrange
             string expected = "294";
 
@@ -77,8 +75,6 @@ namespace JL.Core.Tests
         [Test]
         public void Freq_た_多()
         {
-            Storage.LoadFrequency().Wait();
-
             // Arrange
             string expected = "9844";
 
@@ -98,8 +94,6 @@ namespace JL.Core.Tests
         [Test]
         public void Freq_た_田()
         {
-            Storage.LoadFrequency().Wait();
-
             // Arrange
             string expected = "21431";
 
@@ -119,8 +113,6 @@ namespace JL.Core.Tests
         [Test]
         public void Freq_日_ひ()
         {
-            Storage.LoadFrequency().Wait();
-
             // Arrange
             string expected = "227";
 
@@ -140,8 +132,6 @@ namespace JL.Core.Tests
         [Test]
         public void Freq_日_にち()
         {
-            Storage.LoadFrequency().Wait();
-
             // Arrange
             string expected = "777";
 
@@ -161,8 +151,6 @@ namespace JL.Core.Tests
         [Test]
         public void Freq_日_か()
         {
-            Storage.LoadFrequency().Wait();
-
             // Arrange
             string expected = "1105";
 
@@ -182,8 +170,6 @@ namespace JL.Core.Tests
         [Test]
         public void Freq_あんまり_余り()
         {
-            Storage.LoadFrequency().Wait();
-
             // Arrange
             string expected = "284";
 
@@ -203,8 +189,6 @@ namespace JL.Core.Tests
         [Test]
         public void Freq_懐かしい_いだく()
         {
-            Storage.LoadFrequency().Wait();
-
             // Arrange
             string expected = "903";
 
@@ -224,8 +208,6 @@ namespace JL.Core.Tests
         [Test]
         public void Freq_廃虚_はいきょ()
         {
-            Storage.LoadFrequency().Wait();
-
             // Arrange
             string expected = "8560";
 
@@ -245,8 +227,6 @@ namespace JL.Core.Tests
         [Test]
         public void Freq_廃墟_はいきょ()
         {
-            Storage.LoadFrequency().Wait();
-
             // Arrange
             string expected = "8560";
 
