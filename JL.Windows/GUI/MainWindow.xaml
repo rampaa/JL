@@ -58,6 +58,11 @@
                         Name="PreferencesButton"
                         Header="Preferences"
                         Click="ShowPreferences" />
+                    <!-- todo hotkey -->
+                    <MenuItem
+                        Name="StatsButton"
+                        Header="Stats"
+                        Click="ShowStats" />
                 </ContextMenu>
             </TextBox.ContextMenu>
         </TextBox>

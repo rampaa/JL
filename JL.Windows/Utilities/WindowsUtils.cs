@@ -192,6 +192,12 @@ public static class WindowsUtils
         ManageDictionariesWindow.Instance.ShowDialog();
     }
 
+    public static void ShowStatsWindow()
+    {
+        StatsWindow.Instance.Owner = MainWindow.Instance;
+        StatsWindow.Instance.ShowDialog();
+    }
+
     public static void SearchWithBrowser(string selectedText)
     {
         if (selectedText?.Length > 0)
@@ -274,15 +280,18 @@ public static class WindowsUtils
     {
         try
         {
-            if (s_audioPlayer != null)
+            Application.Current.Dispatcher.BeginInvoke(() =>
             {
-                s_audioPlayer.Dispose();
-            }
+                if (s_audioPlayer != null)
+                {
+                    s_audioPlayer.Dispose();
+                }
 
-            s_audioPlayer = new WaveOut { Volume = volume };
+                s_audioPlayer = new WaveOut { Volume = volume };
 
-            s_audioPlayer.Init(new Mp3FileReader(new MemoryStream(audio)));
-            s_audioPlayer.Play();
+                s_audioPlayer.Init(new Mp3FileReader(new MemoryStream(audio)));
+                s_audioPlayer.Play();
+            });
         }
         catch (Exception e)
         {
@@ -310,6 +319,7 @@ public static class WindowsUtils
             string randomFilePath = filePaths[rand.Next(numFiles)];
             byte[] randomFile = File.ReadAllBytes(randomFilePath);
             PlayAudio(randomFile, 1);
+            Storage.SessionStats.Imoutos += 1;
         }
         catch (Exception e)
         {

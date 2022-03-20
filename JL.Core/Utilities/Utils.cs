@@ -238,6 +238,7 @@ namespace JL.Core.Utilities
                 }
 
                 Storage.Frontend.PlayAudio(sound, volume);
+                Storage.SessionStats.TimesPlayedAudio += 1;
             }
         }
     }

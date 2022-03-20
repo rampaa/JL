@@ -1,4 +1,4 @@
-﻿using System.Runtime;
+using System.Runtime;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -19,6 +19,7 @@ namespace JL.Core
     public static class Storage
     {
         public const string Jpod101NoAudioMd5Hash = "7e2c2f954ef6051373ba916f000168dc";
+        public static Stats SessionStats { get; set; } = new();
         public static IFrontend Frontend { get; set; } = new UnimplementedFrontend();
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
 

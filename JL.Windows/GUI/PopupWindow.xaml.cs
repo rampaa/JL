@@ -106,6 +106,11 @@ namespace JL.Windows.GUI
             WindowsUtils.ShowManageDictionariesWindow();
         }
 
+        private void ShowStats(object sender, RoutedEventArgs e)
+        {
+            WindowsUtils.ShowStatsWindow();
+        }
+
         public void TextBox_MouseMove(TextBox tb)
         {
             if (MiningMode || ConfigManager.InactiveLookupMode
@@ -1162,7 +1167,12 @@ namespace JL.Windows.GUI
             miningParams[JLField.Context] = Utils.FindSentence(_currentText, _currentCharPosition);
             miningParams[JLField.TimeLocal] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
 
-            await Mining.Mine(miningParams).ConfigureAwait(false);
+           bool miningResult = await Mining.Mine(miningParams).ConfigureAwait(false);
+
+           if (miningResult)
+           {
+               Storage.SessionStats.CardsMined += 1;
+           }
         }
 
         private void Definitions_MouseMove(TextBox tb)
