@@ -6,7 +6,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Mime;
 using System.Runtime;
 using System.Text;
 using System.Text.Json;
@@ -25,8 +24,6 @@ using JL.Windows.GUI;
 using NAudio.Wave;
 using Application = System.Windows.Application;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
-using MessageBox = System.Windows.MessageBox;
-using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
 namespace JL.Windows.Utilities;
 
@@ -384,5 +381,20 @@ public static class WindowsUtils
                 alertWindow.Close();
             });
         }
+    }
+
+    public static Size MeasureTextSize(string text, int fontSize)
+    {
+        FormattedText formattedText = new(
+            text,
+            System.Globalization.CultureInfo.CurrentCulture,
+            System.Windows.FlowDirection.LeftToRight,
+            new Typeface(ConfigManager.PopupFont.Source),
+            fontSize,
+            Brushes.Transparent,
+            new NumberSubstitution(),
+            Dpi.PixelsPerDip);
+
+        return new Size(formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
     }
 }

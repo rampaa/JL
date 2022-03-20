@@ -28,6 +28,8 @@ namespace JL.Core.Dicts
         Gakken,
         [Description("Kotowaza (Yomichan)")]
         Kotowaza,
+        [Description("Kanjium (Yomichan)")]
+        Kanjium,
 
         // Nazeka Epwing Converter
         [Description("Kenkyuusha (Nazeka)")]

@@ -10,7 +10,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using HandyControl.Controls;
 using HandyControl.Tools;
-using JL.Core;
 using JL.Core.Anki;
 using JL.Core.Network;
 using JL.Core.Utilities;

@@ -1,7 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using JL.Core.Anki;
 using JL.Core.Dicts;
 using JL.Core.Network;
 using Serilog;
@@ -21,7 +20,8 @@ namespace JL.Core.Utilities
         {
             var jso = new JsonSerializerOptions
             {
-                WriteIndented = true, Converters = { new JsonStringEnumConverter(), }
+                WriteIndented = true,
+                Converters = { new JsonStringEnumConverter(), }
             };
 
             try
@@ -43,7 +43,8 @@ namespace JL.Core.Utilities
             {
                 var jso = new JsonSerializerOptions
                 {
-                    WriteIndented = true, Converters = { new JsonStringEnumConverter(), }
+                    WriteIndented = true,
+                    Converters = { new JsonStringEnumConverter(), }
                 };
 
                 File.WriteAllTextAsync(Path.Join(Storage.ApplicationPath, "Config/dicts.json"),

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Text;
+﻿using System.Text;
 using JL.Core.Utilities;
 
 namespace JL.Core
@@ -30,6 +29,8 @@ namespace JL.Core
 
             { "ぁ", "ァ" }, { "ぃ", "ィ" }, { "ぅ", "ゥ" }, { "ぇ", "ェ" }, { "ぉ", "ォ" },
             { "ゃ", "ャ" }, { "ゅ", "ュ" }, { "ょ", "ョ" },
+            
+            { "ゎ", "ヮ" },
 
             { "ゕ", "ヵ" }, { "ゖ", "ヶ" }, { "ゔ", "ヴ" },
             { "ゝ", "ヽ" }, { "ゞ", "ヾ" }, { "っ", "ッ" },
@@ -62,6 +63,8 @@ namespace JL.Core
             { "ァ", "ぁ" }, { "ィ", "ぃ" }, { "ゥ", "ぅ" }, { "ェ", "ぇ" }, { "ォ", "ぉ" },
             { "ャ", "ゃ" }, { "ュ", "ゅ" }, { "ョ", "ょ" },
 
+            { "ヮ", "ゎ" },
+
             { "ヴ", "ゔ" }, { "ヽ", "ゝ" }, { "ヾ", "ゞ" }, { "ッ", "っ" },
 
             { "ヸ", "ゐ゙" }, { "ヹ", "ゑ゙" }, { "ヺ", "を゙" }
@@ -75,7 +78,8 @@ namespace JL.Core
             { "ア", "ア" }, { "カ", "ア" }, { "サ", "ア" }, { "タ", "ア" }, { "ナ", "ア" }, { "ハ", "ア" },
             { "マ", "ア" }, { "ラ", "ア" }, { "ガ", "ア" }, { "ザ", "ア" }, { "ダ", "ア" }, { "バ", "ア" },
             { "パ", "ア" }, { "ワ", "ア" }, { "ヤ", "ア" }, { "ァ", "ア" }, { "ャ", "ア" }, { "ヵ", "ア" },
-
+            { "ヮ", "ア" },
+            
             { "イ", "イ" }, { "キ", "イ" }, { "シ", "イ" }, { "チ", "イ" }, { "ニ", "イ" }, { "ヰ", "イ" },
             { "ヒ", "イ" }, { "ミ", "イ" }, { "リ", "イ" }, { "ギ", "イ" }, { "ジ", "イ" }, { "ヂ", "イ" },
             { "ビ", "イ" }, { "ピ", "イ" }, { "ィ", "イ" }, { "ヸ", "イ" },
@@ -96,6 +100,7 @@ namespace JL.Core
             { "あ", "あ" }, { "か", "あ" }, { "さ", "あ" }, { "た", "あ" }, { "な", "あ" }, { "は", "あ" },
             { "ま", "あ" }, { "ら", "あ" }, { "が", "あ" }, { "ざ", "あ" }, { "だ", "あ" }, { "ば", "あ" },
             { "ぱ", "あ" }, { "わ", "あ" }, { "や", "あ" }, { "ぁ", "あ" }, { "ゃ", "あ" }, { "ゕ", "あ" },
+            { "ゎ", "あ" },
 
             { "い", "い" }, { "き", "い" }, { "し", "い" }, { "ち", "い" }, { "に", "い" }, { "ひ", "い" },
             { "み", "い" }, { "り", "い" }, { "ぎ", "い" }, { "じ", "い" }, { "ぢ", "い" }, { "び", "い" },
@@ -177,10 +182,33 @@ namespace JL.Core
             #pragma warning restore format
         };
 
+        private static readonly HashSet<string> s_smallCombiningKanaSet = new()
+        {
+            #pragma warning disable format
+            "ァ", "ィ", "ゥ", "ェ", "ォ", "ヮ",
+            "ャ", "ュ", "ョ",
+
+            "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゎ",
+            "ゃ", "ゅ", "ょ",
+            #pragma warning restore format
+        };
+
         public static string KatakanaToHiraganaConverter(string text)
         {
             StringBuilder textInHiragana = new();
-            List<string> unicodeCharacters = text.Normalize(NormalizationForm.FormKC).UnicodeIterator().ToList();
+
+            List<string> unicodeCharacters;
+
+            if (!char.IsHighSurrogate(text.Last()))
+            {
+                unicodeCharacters = text.Normalize(NormalizationForm.FormKC).UnicodeIterator().ToList();
+            }
+
+            else
+            {
+                unicodeCharacters = text.UnicodeIterator().ToList();
+            }
+
             int listLength = unicodeCharacters.Count;
             for (int i = 0; i < listLength; i++)
             {
@@ -281,6 +309,29 @@ namespace JL.Core
             }
 
             return stringBuilders.ConvertAll(sb => sb.ToString());
+        }
+
+        public static List<string> CreateCombinedForm(string text)
+        {
+            List<string> unicodeCharacterList = text.UnicodeIterator().ToList();
+            List<string> combinedForm = new();
+
+            for (int i = 0; i < unicodeCharacterList.Count; i++)
+            {
+                if (i + 1 < unicodeCharacterList.Count
+                    && s_smallCombiningKanaSet.Contains(unicodeCharacterList[i + 1]))
+                {
+                    combinedForm.Add(unicodeCharacterList[i] + unicodeCharacterList[i + 1]);
+                    ++i;
+                }
+
+                else
+                {
+                    combinedForm.Add(unicodeCharacterList[i]);
+                }
+            }
+
+            return combinedForm;
         }
 
         public static bool IsHiragana(string text)

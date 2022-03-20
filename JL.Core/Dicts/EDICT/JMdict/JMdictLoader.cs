@@ -93,9 +93,9 @@ namespace JL.Core.Dicts.EDICT.JMdict
                             kEle.KeInfList.Add(ReadEntity(edictXml));
                             break;
 
-                        //case "ke_pri":
-                        //    kEle.KePriList.Add(edictXml.ReadString());
-                        //    break;
+                            //case "ke_pri":
+                            //    kEle.KePriList.Add(edictXml.ReadString());
+                            //    break;
                     }
                 }
             }
@@ -127,9 +127,9 @@ namespace JL.Core.Dicts.EDICT.JMdict
                             rEle.ReInfList.Add(ReadEntity(jMDictXML));
                             break;
 
-                        //case "re_pri":
-                        //    rEle.RePriList.Add(jMDictXML.ReadString());
-                        //    break;
+                            //case "re_pri":
+                            //    rEle.RePriList.Add(jMDictXML.ReadString());
+                            //    break;
                     }
                 }
             }
@@ -181,13 +181,13 @@ namespace JL.Core.Dicts.EDICT.JMdict
                             sense.GlossList.Add(jMDictXML.ReadString());
                             break;
 
-                        //case "xref":
-                        //    sense.XRefList.Add(jMDictXML.ReadString());
-                        //    break;
+                            //case "xref":
+                            //    sense.XRefList.Add(jMDictXML.ReadString());
+                            //    break;
 
-                        //case "ant":
-                        //    sense.AntList.Add(jMDictXML.ReadString());
-                        //    break;
+                            //case "ant":
+                            //    sense.AntList.Add(jMDictXML.ReadString());
+                            //    break;
                     }
                 }
             }

@@ -411,6 +411,15 @@
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
                         </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Pitch Accent Marker Color"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <Button x:Name="PitchAccentMarkerColorButton" Content="" HorizontalAlignment="Right"
+                                    Width="60" BorderThickness="5,5,5,5"
+                                    Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
+                        </DockPanel>
+
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

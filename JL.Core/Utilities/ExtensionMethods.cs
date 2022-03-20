@@ -27,7 +27,7 @@ public static class ExtensionMethods
 
     public static T GetEnum<T>(this string description) where T : Enum
     {
-        foreach (var field in typeof(T).GetFields())
+        foreach (FieldInfo field in typeof(T).GetFields())
         {
             if (Attribute.GetCustomAttribute(field,
                     typeof(DescriptionAttribute)) is DescriptionAttribute attribute)

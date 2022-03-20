@@ -10,6 +10,7 @@ using JL.Core.Dicts.EDICT.JMnedict;
 using JL.Core.Dicts.EDICT.KANJIDIC;
 using JL.Core.Dicts.EPWING;
 using JL.Core.Dicts.EPWING.EpwingNazeka;
+using JL.Core.Dicts.Kanjium;
 using JL.Core.Frequency;
 using JL.Core.PoS;
 
@@ -66,11 +67,14 @@ namespace JL.Core
             DictType.Meikyou,
             DictType.Gakken,
             DictType.Kotowaza,
+            DictType.Kanjium,
         };
 
         public static readonly List<DictType> NazekaDictTypes = new()
         {
-            DictType.KenkyuushaNazeka, DictType.DaijirinNazeka, DictType.ShinmeikaiNazeka
+            DictType.KenkyuushaNazeka,
+            DictType.DaijirinNazeka,
+            DictType.ShinmeikaiNazeka,
         };
 
         public static readonly JsonSerializerOptions JsoUnsafeEscaping = new()
@@ -334,6 +338,21 @@ namespace JL.Core
                         }
 
                         else if (!dict.Active && Dicts[DictType.ShinmeikaiNazeka].Contents.Any())
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
+                        }
+
+                        break;
+
+                    case DictType.Kanjium:
+                        if (dict.Active && !Dicts[DictType.Kanjium].Contents.Any())
+                        {
+                            tasks.Add(Task.Run(async () =>
+                                await KanjiumLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                        }
+
+                        else if (!dict.Active && Dicts[DictType.Kanjium].Contents.Any())
                         {
                             dict.Contents.Clear();
                             dictRemoved = true;

@@ -110,6 +110,8 @@ namespace JL.Core.Lookup
                             epwingNazekaWordResultsList.Add(GetWordResults(text, textInHiraganaList,
                                 deconjugationResultsList, dictType));
                             break;
+                        case DictType.Kanjium:
+                            break;
                         default:
                             throw new ArgumentOutOfRangeException(null, "Invalid DictType");
                     }
@@ -312,6 +314,9 @@ namespace JL.Core.Lookup
                                         }
                                     }
                                 }
+                                break;
+
+                            case DictType.Kanjium:
                                 break;
 
                             default:

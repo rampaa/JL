@@ -8,8 +8,8 @@ using System.Windows.Media;
 using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Utilities;
-using Path = System.IO.Path;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using Path = System.IO.Path;
 
 namespace JL.Windows.GUI
 {
@@ -57,7 +57,7 @@ namespace JL.Windows.GUI
             if (isValid)
             {
                 //todo this will break on DictTypes without descriptions
-                var type = typeString.GetEnum<DictType>();
+                DictType type = typeString.GetEnum<DictType>();
 
                 // lowest priority means highest number
                 int lowestPriority = Storage.Dicts.Select(dict => dict.Value.Priority).Max();
@@ -112,7 +112,7 @@ namespace JL.Windows.GUI
         private void FillDictTypesCombobox(IEnumerable<DictType> types, DictType? currentDictType)
         {
             List<DictType> loadedDictTypes = Storage.Dicts.Keys.ToList();
-            var validTypes = currentDictType == null
+            IEnumerable<DictType> validTypes = currentDictType == null
                 ? types.Except(loadedDictTypes)
                 : types.Except(loadedDictTypes.Except(new[] { (DictType)currentDictType }));
 
@@ -123,7 +123,7 @@ namespace JL.Windows.GUI
         {
             string typeString = ComboBoxDictType.SelectionBoxItem.ToString();
             //todo this will break on DictTypes without descriptions
-            var selectedDictType = typeString.GetEnum<DictType>();
+            DictType selectedDictType = typeString.GetEnum<DictType>();
 
             switch (selectedDictType)
             {
@@ -147,6 +147,9 @@ namespace JL.Windows.GUI
                     BrowseForDictionaryFolder();
                     break;
                 case DictType.Kotowaza:
+                    BrowseForDictionaryFolder();
+                    break;
+                case DictType.Kanjium:
                     BrowseForDictionaryFolder();
                     break;
                 case DictType.DaijirinNazeka:

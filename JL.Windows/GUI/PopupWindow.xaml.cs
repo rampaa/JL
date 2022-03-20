@@ -7,9 +7,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using JL.Core;
 using JL.Core.Anki;
 using JL.Core.Dicts;
+using JL.Core.Dicts.Kanjium;
 using JL.Core.Lookup;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
@@ -714,8 +716,11 @@ namespace JL.Windows.GUI
                 textBlockFoundSpelling, textBlockPOrthographyInfo, uiElementReadings, uiElementAlternativeSpellings,
                 textBlockProcess, textBlockFoundForm, textBlockEdictID, textBlockFrequency, textBlockDictType
             };
-            foreach (UIElement baby in babies)
+
+            for (int i = 0; i < babies.Length; i++)
             {
+                UIElement baby = babies[i];
+
                 if (baby is TextBlock textBlock)
                 {
                     if (textBlock == null) continue;
@@ -734,8 +739,45 @@ namespace JL.Windows.GUI
 
                     baby.MouseLeave += OnMouseLeave;
 
-                    top.Children.Add(baby);
+                    // 0 = textBlockFoundSpelling, 2 = uiElementReadings
+                    if ((i == 0 || i == 2) && Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict kanjiumDict) && kanjiumDict.Active)
+                    {
+                        List<string> readings = result[LookupResult.Readings];
+
+                        if (i == 0 && readings.Any())
+                        {
+                            top.Children.Add(baby);
+                        }
+
+                        else
+                        {
+                            List<string> alternativeSpellings =
+                                result.ContainsKey(LookupResult.AlternativeSpellings)
+                                ? result[LookupResult.AlternativeSpellings]
+                                : null;
+
+                            Grid pitchAccentGrid = CreatePitchAccentGrid(result[LookupResult.FoundSpelling][0],
+                                alternativeSpellings,
+                                result[LookupResult.Readings],
+                                textBlock.Text.Split(", ").ToList());
+
+                            if (pitchAccentGrid.Children.Count == 0)
+                            {
+                                top.Children.Add(baby);
+                            }
+
+                            else
+                            {
+                                pitchAccentGrid.Children.Add(baby);
+                                top.Children.Add(pitchAccentGrid);
+                            }
+                        }
+                    }
+
+                    else
+                        top.Children.Add(baby);
                 }
+
                 else if (baby is TextBox textBox)
                 {
                     if (textBox == null) continue;
@@ -746,7 +788,42 @@ namespace JL.Windows.GUI
 
                     baby.MouseLeave += OnMouseLeave;
 
-                    top.Children.Add(baby);
+                    if ((i == 0 || i == 2) && Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict kanjiumDict) && kanjiumDict.Active)
+                    {
+                        List<string> readings = result[LookupResult.Readings];
+
+                        if (i == 0 && readings.Any())
+                        {
+                            top.Children.Add(baby);
+                        }
+
+                        else
+                        {
+                            List<string> alternativeSpellings =
+                                result.ContainsKey(LookupResult.AlternativeSpellings)
+                                ? result[LookupResult.AlternativeSpellings]
+                                : null;
+
+                            Grid pitchAccentGrid = CreatePitchAccentGrid(result[LookupResult.FoundSpelling][0],
+                                alternativeSpellings,
+                                result[LookupResult.Readings],
+                                textBox.Text.Split(", ").ToList());
+
+                            if (pitchAccentGrid.Children.Count == 0)
+                            {
+                                top.Children.Add(baby);
+                            }
+
+                            else
+                            {
+                                pitchAccentGrid.Children.Add(baby);
+                                top.Children.Add(pitchAccentGrid);
+                            }
+                        }
+                    }
+
+                    else
+                        top.Children.Add(baby);
                 }
             }
 
@@ -786,6 +863,86 @@ namespace JL.Windows.GUI
             bottom.MouseLeave += OnMouseLeave;
 
             return innerStackPanel;
+        }
+
+        private static Grid CreatePitchAccentGrid(string foundSpelling, List<string> alternativeSpellings, List<string> readings, List<string> splitReadingsWithRInfo)
+        {
+            Dictionary<string, List<IResult>> kanjiumDict = Storage.Dicts[DictType.Kanjium].Contents;
+            Grid pitchAccentGrid = new();
+
+            bool hasReading = readings.Any();
+
+            List<string> expressions = hasReading ? readings : new List<string> { foundSpelling };
+
+            double horizontalOffsetForReaading = WindowsUtils.MeasureTextSize(" ", ConfigManager.ReadingsFontSize).Width;
+
+            for (int i = 0; i < expressions.Count; i++)
+            {
+                string expression = expressions[i];
+                List<string> combinedFormList = Kana.CreateCombinedForm(expression);
+
+                if (i > 0)
+                {
+                    horizontalOffsetForReaading += WindowsUtils.MeasureTextSize(splitReadingsWithRInfo[i - 1] + ", ", ConfigManager.ReadingsFontSize).Width;
+                }
+
+                if (kanjiumDict.TryGetValue(expression, out List<IResult> kanjiumListResult))
+                {
+                    for (int j = 0; j < kanjiumListResult.Count; j++)
+                    {
+                        var kanjiumResult = (KanjiumResult)kanjiumListResult[j];
+
+                        if (foundSpelling == kanjiumResult.Spelling || (alternativeSpellings?.Contains(kanjiumResult.Spelling) ?? false))
+                        {
+                            if (hasReading && expression != kanjiumResult.Reading)
+                                continue;
+
+                            Polyline polyline = new()
+                            {
+                                StrokeThickness = 2,
+                                Stroke = ConfigManager.PitchAccentMarkerColor,
+                                StrokeDashArray = new DoubleCollection { 1, 3 },
+                            };
+
+                            bool lowPitch = false;
+                            double horizontalOffsetForChar = horizontalOffsetForReaading;
+                            for (int k = 0; k < combinedFormList.Count; k++)
+                            {
+                                Size charSize = WindowsUtils.MeasureTextSize(combinedFormList[k], ConfigManager.ReadingsFontSize);
+
+                                if (kanjiumResult.Position - 1 == k)
+                                {
+                                    polyline.Points.Add(new Point(horizontalOffsetForChar, 0));
+                                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
+                                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charSize.Height));
+
+                                    lowPitch = true;
+                                }
+
+                                else if (k == 0)
+                                {
+                                    polyline.Points.Add(new Point(horizontalOffsetForChar, charSize.Height));
+                                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charSize.Height));
+                                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
+                                }
+
+                                else
+                                {
+                                    double charHeight = lowPitch ? charSize.Height : 0;
+                                    polyline.Points.Add(new Point(horizontalOffsetForChar, charHeight));
+                                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charHeight));
+                                }
+
+                                horizontalOffsetForChar += charSize.Width;
+                            }
+
+                            pitchAccentGrid.Children.Add(polyline);
+                        }
+                    }
+                }
+            }
+
+            return pitchAccentGrid;
         }
 
         private void Unselect(object sender, RoutedEventArgs e)
@@ -853,7 +1010,19 @@ namespace JL.Windows.GUI
             }
 
             var textBlock = (TextBlock)sender;
-            var top = (WrapPanel)textBlock.Parent;
+
+            WrapPanel top;
+
+            if (textBlock.Parent is Grid foundSpellingGrid)
+            {
+                top = (WrapPanel)foundSpellingGrid.Parent;
+            }
+
+            else
+            {
+                top = (WrapPanel)textBlock.Parent;
+            }
+
             foreach (UIElement child in top.Children)
             {
                 if (child is TextBox chi)
@@ -872,7 +1041,7 @@ namespace JL.Windows.GUI
                     }
                 }
 
-                if (child is TextBlock ch)
+                else if (child is TextBlock ch)
                 {
                     if (Enum.TryParse(ch.Name, out LookupResult result))
                     {
@@ -899,6 +1068,39 @@ namespace JL.Windows.GUI
                         }
                     }
                 }
+
+                else if (child is Grid grid)
+                {
+                    foreach (UIElement uiElement in grid.Children)
+                    {
+                        if (uiElement is TextBlock textBlockCG)
+                        {
+                            if (Enum.TryParse(textBlockCG.Name, out LookupResult result))
+                            {
+                                switch (result)
+                                {
+                                    case LookupResult.FoundSpelling:
+                                        miningParams[JLField.FoundSpelling] = textBlockCG.Text;
+                                        break;
+                                }
+                            }
+                        }
+
+                        else if (uiElement is TextBox textBoxCG)
+                        {
+                            if (Enum.TryParse(textBoxCG.Name, out LookupResult result))
+                            {
+                                switch (result)
+                                {
+                                    case LookupResult.Readings:
+                                        miningParams[JLField.Readings] = textBoxCG.Text;
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
 
             var innerStackPanel = (StackPanel)top.Parent;
@@ -1028,7 +1230,7 @@ namespace JL.Windows.GUI
                         }
                     }
 
-                    if (child is TextBlock ch)
+                    else if (child is TextBlock ch)
                     {
                         if (Enum.TryParse(ch.Name, out LookupResult result))
                         {
@@ -1041,6 +1243,42 @@ namespace JL.Windows.GUI
                                     reading = ch.Text.Split(",")[0];
                                     break;
                             }
+                        }
+                    }
+
+                    else if (child is Grid grid)
+                    {
+                        foreach (UIElement uiElement in grid.Children)
+                        {
+                            if (uiElement is TextBlock textBlockCG)
+                            {
+                                if (Enum.TryParse(textBlockCG.Name, out LookupResult result))
+                                {
+                                    switch (result)
+                                    {
+                                        case LookupResult.FoundSpelling:
+                                            foundSpelling = textBlockCG.Text;
+                                            break;
+                                        case LookupResult.Readings:
+                                            reading = textBlockCG.Text.Split(",")[0];
+                                            break;
+                                    }
+                                }
+                            }
+
+                            else if (uiElement is TextBox textBoxCG)
+                            {
+                                if (Enum.TryParse(textBoxCG.Name, out LookupResult result))
+                                {
+                                    switch (result)
+                                    {
+                                        case LookupResult.Readings:
+                                            reading = textBoxCG.Text.Split(",")[0];
+                                            break;
+                                    }
+                                }
+                            }
+
                         }
                     }
                 }
@@ -1145,7 +1383,7 @@ namespace JL.Windows.GUI
 
         private void OnMouseLeave(object sender, MouseEventArgs e)
         {
-            if (!ConfigManager.LookupOnSelectOnly && !ConfigManager.FixedPopupPositioning && _childPopupWindow is { MiningMode: false })
+            if (!ConfigManager.LookupOnSelectOnly && _childPopupWindow is { MiningMode: false })
             {
                 _childPopupWindow.Hide();
                 _childPopupWindow.LastText = "";

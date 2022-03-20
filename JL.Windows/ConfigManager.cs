@@ -76,6 +76,7 @@ namespace JL.Windows
         public static Brush DictTypeColor { get; set; } = Brushes.LightBlue;
         public static int DictTypeFontSize { get; set; } = 15;
         public static Brush SeparatorColor { get; set; } = Brushes.White;
+        public static Brush PitchAccentMarkerColor { get; set; } = Brushes.LightGreen;
 
         #endregion
 
@@ -215,6 +216,12 @@ namespace JL.Windows
                         .ConvertFrom(ConfigurationManager.AppSettings.Get("SeparatorColor")),
                 SeparatorColor, "SeparatorColor");
             SeparatorColor!.Freeze();
+
+            WindowsUtils.Try(() =>
+                    PitchAccentMarkerColor = (SolidColorBrush)new BrushConverter()
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("PitchAccentMarkerColor")),
+                PitchAccentMarkerColor, "PitchAccentMarkerColor");
+            PitchAccentMarkerColor!.Freeze();
 
             WindowsUtils.Try(() =>
                     DictTypeColor = (SolidColorBrush)new BrushConverter()
@@ -575,6 +582,8 @@ namespace JL.Windows
                 preferenceWindow.PopupOpacityNumericUpDown.Value, "PopupOpacity");
 
             preferenceWindow.SeparatorColorButton.Background = SeparatorColor;
+            preferenceWindow.PitchAccentMarkerColorButton.Background = PitchAccentMarkerColor;
+
             preferenceWindow.DictTypeColorButton.Background = DictTypeColor;
 
             preferenceWindow.PopupFocusOnLookupCheckBox.IsChecked = PopupFocusOnLookup;
@@ -709,6 +718,9 @@ namespace JL.Windows
 
             config.AppSettings.Settings["SeparatorColor"].Value =
                 preferenceWindow.SeparatorColorButton.Background.ToString();
+
+            config.AppSettings.Settings["PitchAccentMarkerColor"].Value =
+                preferenceWindow.PitchAccentMarkerColorButton.Background.ToString();
 
             config.AppSettings.Settings["DictTypeColor"].Value =
                 preferenceWindow.DictTypeColorButton.Background.ToString();

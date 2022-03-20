@@ -7,22 +7,20 @@ namespace JL.Core.Utilities
         public static string MakeUiElementReadingsText(List<string> readings, List<string> rOrthographyInfoList)
         {
             StringBuilder sb = new();
-            if (readings.Count == 0) return sb.ToString();
+            if (readings.Count == 0) return "";
 
             for (int index = 0; index < readings.Count; index++)
             {
                 sb.Append(readings[index]);
 
-                if (rOrthographyInfoList != null)
+                if (index < rOrthographyInfoList?.Count)
                 {
-                    if (index < rOrthographyInfoList.Count)
+                    if (!string.IsNullOrEmpty(rOrthographyInfoList[index]))
                     {
-                        string readingOrtho = "(" + rOrthographyInfoList[index] + ")";
-                        if (readingOrtho != "()")
-                        {
-                            sb.Append(' ');
-                            sb.Append(readingOrtho);
-                        }
+                        sb.Append(' ');
+                        sb.Append('(');
+                        sb.Append(rOrthographyInfoList[index]);
+                        sb.Append(')');
                     }
                 }
 
@@ -39,7 +37,7 @@ namespace JL.Core.Utilities
             List<string> aOrthographyInfoList)
         {
             StringBuilder sb = new();
-            if (alternativeSpellings.Count == 0) return sb.ToString();
+            if (alternativeSpellings.Count == 0) return "";
 
             sb.Append('(');
 
@@ -47,16 +45,14 @@ namespace JL.Core.Utilities
             {
                 sb.Append(alternativeSpellings[index]);
 
-                if (aOrthographyInfoList != null)
+                if (index < aOrthographyInfoList?.Count)
                 {
-                    if (index < aOrthographyInfoList.Count)
+                    if (!string.IsNullOrEmpty(aOrthographyInfoList[index]))
                     {
-                        string altOrtho = "(" + aOrthographyInfoList[index] + ")";
-                        if (altOrtho != "()")
-                        {
-                            sb.Append(' ');
-                            sb.Append(altOrtho);
-                        }
+                        sb.Append(' ');
+                        sb.Append('(');
+                        sb.Append(aOrthographyInfoList[index]);
+                        sb.Append(')');
                     }
                 }
 
