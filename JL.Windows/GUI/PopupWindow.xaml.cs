@@ -745,9 +745,8 @@ namespace JL.Windows.GUI
 
                     baby.MouseLeave += OnMouseLeave;
 
-                    // 0 = textBlockFoundSpelling, 2 = uiElementReadings
-                    if ((i is 0 or 2) && Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict kanjiumDict) &&
-                        kanjiumDict.Active)
+                    if ((textBlock.Name is "FoundSpelling" or "Readings") &&
+                        Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict kanjiumDict) && kanjiumDict.Active)
                     {
                         List<string> readings = result[LookupResult.Readings];
 
@@ -795,8 +794,8 @@ namespace JL.Windows.GUI
 
                     baby.MouseLeave += OnMouseLeave;
 
-                    if ((i is 0 or 2) && Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict kanjiumDict) &&
-                        kanjiumDict.Active)
+                    if ((textBox.Name is "FoundSpelling" or "Readings") &&
+                        Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict kanjiumDict) && kanjiumDict.Active)
                     {
                         List<string> readings = result[LookupResult.Readings];
 
