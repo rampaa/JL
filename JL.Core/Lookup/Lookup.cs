@@ -21,7 +21,7 @@ namespace JL.Core.Lookup
         public static List<Dictionary<LookupResult, List<string>>> LookupText(string text)
         {
             DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
-            if ((preciseTimeNow - s_lastLookupTime).Milliseconds < Storage.Frontend.CoreConfig.LookupRate) return null;
+            if ((preciseTimeNow - s_lastLookupTime).TotalMilliseconds < Storage.Frontend.CoreConfig.LookupRate) return null;
             s_lastLookupTime = preciseTimeNow;
 
             if (Storage.Frontend.CoreConfig.KanjiMode)

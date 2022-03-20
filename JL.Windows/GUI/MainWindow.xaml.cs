@@ -119,7 +119,8 @@ namespace JL.Windows.GUI
         private void ClipboardChanged(object sender, EventArgs e)
         {
             DateTime currentTime = new(Stopwatch.GetTimestamp());
-            if ((currentTime - _lastClipboardChangeTime).Milliseconds > 5)
+
+            if ((currentTime - _lastClipboardChangeTime).TotalMilliseconds > 5)
             {
                 _lastClipboardChangeTime = currentTime;
                 CopyFromClipboard();
