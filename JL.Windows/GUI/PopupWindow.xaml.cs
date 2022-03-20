@@ -751,7 +751,7 @@ namespace JL.Windows.GUI
                     {
                         List<string> readings = result[LookupResult.Readings];
 
-                        if (i == 0 && readings.Any())
+                        if (textBlock.Name is "FoundSpelling" && readings.Any())
                         {
                             top.Children.Add(baby);
                         }
@@ -800,7 +800,7 @@ namespace JL.Windows.GUI
                     {
                         List<string> readings = result[LookupResult.Readings];
 
-                        if (i == 0 && readings.Any())
+                        if (textBox.Name is "FoundSpelling" && readings.Any())
                         {
                             top.Children.Add(baby);
                         }
