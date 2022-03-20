@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -51,6 +52,8 @@ namespace JL.Windows.GUI
 
         private static PopupWindow s_firstPopupWindow;
 
+        private DateTime _lastClipboardChangeTime;
+
         public static PopupWindow FirstPopupWindow
         {
             get { return s_firstPopupWindow ??= new PopupWindow(); }
@@ -81,7 +84,7 @@ namespace JL.Windows.GUI
             WindowsUtils.InitializeMainWindow();
             MainTextBox.IsInactiveSelectionHighlightEnabled = true;
             MainWindowChrome.Freeze();
-
+            _lastClipboardChangeTime = new(Stopwatch.GetTimestamp());
             CopyFromClipboard();
         }
 
@@ -112,7 +115,12 @@ namespace JL.Windows.GUI
 
         private void ClipboardChanged(object sender, EventArgs e)
         {
-            CopyFromClipboard();
+            DateTime currentTime = new(Stopwatch.GetTimestamp());
+            if ((currentTime - _lastClipboardChangeTime).Milliseconds > 5)
+            {
+                _lastClipboardChangeTime = currentTime;
+                CopyFromClipboard();
+            }
         }
 
         public void MainTextBox_MouseMove(object sender, MouseEventArgs e)
