@@ -6,8 +6,9 @@ namespace JL.Core.Utilities
     {
         public static string MakeUiElementReadingsText(List<string> readings, List<string> rOrthographyInfoList)
         {
-            StringBuilder sb = new();
             if (readings.Count == 0) return "";
+
+            StringBuilder sb = new();
 
             for (int index = 0; index < readings.Count; index++)
             {
@@ -36,8 +37,9 @@ namespace JL.Core.Utilities
         public static string MakeUiElementAlternativeSpellingsText(List<string> alternativeSpellings,
             List<string> aOrthographyInfoList)
         {
-            StringBuilder sb = new();
             if (alternativeSpellings.Count == 0) return "";
+
+            StringBuilder sb = new();
 
             sb.Append('(');
 

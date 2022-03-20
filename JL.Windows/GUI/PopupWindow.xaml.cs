@@ -1383,7 +1383,7 @@ namespace JL.Windows.GUI
 
         private void OnMouseLeave(object sender, MouseEventArgs e)
         {
-            if (!ConfigManager.LookupOnSelectOnly && _childPopupWindow is { MiningMode: false })
+            if (!ConfigManager.LookupOnSelectOnly && !ConfigManager.FixedPopupPositioning && _childPopupWindow is { MiningMode: false })
             {
                 _childPopupWindow.Hide();
                 _childPopupWindow.LastText = "";
