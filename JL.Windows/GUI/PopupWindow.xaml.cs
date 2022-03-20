@@ -872,9 +872,15 @@ namespace JL.Windows.GUI
 
             bool hasReading = readings.Any();
 
+            int fontSize = hasReading
+                ? ConfigManager.ReadingsFontSize
+                : ConfigManager.PrimarySpellingFontSize;
+
             List<string> expressions = hasReading ? readings : new List<string> { foundSpelling };
 
-            double horizontalOffsetForReaading = WindowsUtils.MeasureTextSize(" ", ConfigManager.ReadingsFontSize).Width;
+            double horizontalOffsetForReaading = hasReading
+                ? WindowsUtils.MeasureTextSize(" ", fontSize).Width
+                : 0;
 
             for (int i = 0; i < expressions.Count; i++)
             {
@@ -883,7 +889,7 @@ namespace JL.Windows.GUI
 
                 if (i > 0)
                 {
-                    horizontalOffsetForReaading += WindowsUtils.MeasureTextSize(splitReadingsWithRInfo[i - 1] + ", ", ConfigManager.ReadingsFontSize).Width;
+                    horizontalOffsetForReaading += WindowsUtils.MeasureTextSize(splitReadingsWithRInfo[i - 1] + ", ", fontSize).Width;
                 }
 
                 if (kanjiumDict.TryGetValue(expression, out List<IResult> kanjiumListResult))
@@ -908,7 +914,7 @@ namespace JL.Windows.GUI
                             double horizontalOffsetForChar = horizontalOffsetForReaading;
                             for (int k = 0; k < combinedFormList.Count; k++)
                             {
-                                Size charSize = WindowsUtils.MeasureTextSize(combinedFormList[k], ConfigManager.ReadingsFontSize);
+                                Size charSize = WindowsUtils.MeasureTextSize(combinedFormList[k], fontSize);
 
                                 if (kanjiumResult.Position - 1 == k)
                                 {
