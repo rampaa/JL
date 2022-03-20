@@ -117,6 +117,7 @@ namespace JL.Windows.GUI
             if (MiningMode || ConfigManager.InactiveLookupMode
                            || (ConfigManager.RequireLookupKeyPress
                                && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
+                           || (ConfigManager.FixedPopupPositioning && _parentPopupWindow != null)
                )
                 return;
 
@@ -1390,7 +1391,8 @@ namespace JL.Windows.GUI
         {
             if (!ConfigManager.LookupOnSelectOnly
                 || Background.Opacity == 0
-                || ConfigManager.InactiveLookupMode)
+                || ConfigManager.InactiveLookupMode
+                || (ConfigManager.FixedPopupPositioning && _parentPopupWindow != null))
                 return;
 
             //if (ConfigManager.RequireLookupKeyPress
