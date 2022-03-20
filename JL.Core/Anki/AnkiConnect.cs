@@ -31,39 +31,17 @@ namespace JL.Core.Anki
             return await Send(req).ConfigureAwait(false);
         }
 
-        public static async Task<Response> StoreMediaFile(string filename, string data)
-        {
-            Request req = new("storeMediaFile", 6,
-                new Dictionary<string, object> { { "filename", filename }, { "data", data } });
-            return await Send(req).ConfigureAwait(false);
-        }
+        // public static async Task<Response> StoreMediaFile(string filename, string data)
+        // {
+        //     Request req = new("storeMediaFile", 6,
+        //         new Dictionary<string, object> { { "filename", filename }, { "data", data } });
+        //     return await Send(req).ConfigureAwait(false);
+        // }
 
         public static async Task<Response> Sync()
         {
             Request req = new("sync", 6);
             return await Send(req).ConfigureAwait(false);
-        }
-
-        public static async Task<bool> CheckAudioField(long noteId, string audioFieldName)
-        {
-            Request req = new("notesInfo", 6,
-                new Dictionary<string, object> { { "notes", new List<long> { noteId } } });
-
-            Response response = await Send(req).ConfigureAwait(false);
-            if (response != null)
-            {
-                Dictionary<string, Dictionary<string, object>> fields =
-                    JsonSerializer.Deserialize<List<NotesInfoResult>>(
-                        response.Result.ToString()!)![0].Fields;
-
-                return fields[audioFieldName]["value"].ToString() != "";
-            }
-            else
-            {
-                Storage.Frontend.Alert(AlertLevel.Error, "Error checking audio field");
-                Utils.Logger.Error("Error checking audio field");
-                return false;
-            }
         }
 
         private static async Task<Response> Send(Request req)

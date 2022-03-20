@@ -15,7 +15,6 @@ public static class Networking
                 reading
             );
             HttpResponseMessage getResponse = await Storage.Client.GetAsync(uri).ConfigureAwait(false);
-            // todo mining storemediafile thingy
             return await getResponse.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
         }
         catch (Exception e)

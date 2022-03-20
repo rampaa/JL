@@ -231,7 +231,7 @@ namespace JL.Core.Utilities
             byte[] sound = await Networking.GetAudioFromJpod101(foundSpelling, reading).ConfigureAwait(false);
             if (sound != null)
             {
-                if (Utils.GetMd5String(sound) == "7e2c2f954ef6051373ba916f000168dc") // jpod101 no audio clip
+                if (Utils.GetMd5String(sound) == Storage.Jpod101NoAudioMd5Hash)
                 {
                     // TODO sound = shortErrorSound
                     return;

@@ -1,4 +1,5 @@
-﻿using JL.Core.Utilities;
+﻿using JL.Core.Network;
+using JL.Core.Utilities;
 
 namespace JL.Core.Anki
 {
@@ -34,16 +35,15 @@ namespace JL.Core.Anki
                 if (reading == "")
                     reading = foundSpelling;
 
+                byte[] audioRes = await Networking.GetAudioFromJpod101(foundSpelling, reading);
+
                 Dictionary<string, object>[] audio =
                 {
                     new()
                     {
-                        {
-                            "url",
-                            $"http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={foundSpelling}&kana={reading}"
-                        },
+                        { "data", audioRes },
                         { "filename", $"JL_audio_{reading}_{foundSpelling}.mp3" },
-                        { "skipHash", "7e2c2f954ef6051373ba916f000168dc" },
+                        { "skipHash", Storage.Jpod101NoAudioMd5Hash },
                         { "fields", FindAudioFields(userFields) },
                     }
                 };
@@ -61,10 +61,7 @@ namespace JL.Core.Anki
                 }
                 else
                 {
-                    bool hasAudio = await AnkiConnect.CheckAudioField(Convert.ToInt64(response.Result.ToString()),
-                        FindAudioFields(userFields)[0]);
-
-                    if (hasAudio)
+                    if (Utils.GetMd5String(audioRes) != Storage.Jpod101NoAudioMd5Hash)
                     {
                         Storage.Frontend.Alert(AlertLevel.Success, $"Mined {foundSpelling}");
                         Utils.Logger.Information($"Mined {foundSpelling}");
@@ -75,7 +72,9 @@ namespace JL.Core.Anki
                         Utils.Logger.Information($"Mined {foundSpelling} (no audio)");
                     }
 
-                    if (Storage.Frontend.CoreConfig.ForceSyncAnki) await AnkiConnect.Sync();
+                    if (Storage.Frontend.CoreConfig.ForceSyncAnki)
+                        await AnkiConnect.Sync();
+
                     return true;
                 }
             }

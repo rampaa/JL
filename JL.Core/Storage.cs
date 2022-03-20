@@ -18,6 +18,7 @@ namespace JL.Core
 {
     public static class Storage
     {
+        public const string Jpod101NoAudioMd5Hash = "7e2c2f954ef6051373ba916f000168dc";
         public static IFrontend Frontend { get; set; } = new UnimplementedFrontend();
         public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
 
