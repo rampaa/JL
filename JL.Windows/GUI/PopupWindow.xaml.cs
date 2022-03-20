@@ -758,7 +758,7 @@ namespace JL.Windows.GUI
 
                             Grid pitchAccentGrid = CreatePitchAccentGrid(result[LookupResult.FoundSpelling][0],
                                 alternativeSpellings,
-                                result[LookupResult.Readings],
+                                readings,
                                 textBlock.Text.Split(", ").ToList());
 
                             if (pitchAccentGrid.Children.Count == 0)
@@ -806,7 +806,7 @@ namespace JL.Windows.GUI
 
                             Grid pitchAccentGrid = CreatePitchAccentGrid(result[LookupResult.FoundSpelling][0],
                                 alternativeSpellings,
-                                result[LookupResult.Readings],
+                                readings,
                                 textBox.Text.Split(", ").ToList());
 
                             if (pitchAccentGrid.Children.Count == 0)
