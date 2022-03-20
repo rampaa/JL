@@ -894,8 +894,8 @@ namespace JL.Windows.GUI
 
             for (int i = 0; i < expressions.Count; i++)
             {
-                string expression = expressions[i];
-                List<string> combinedFormList = Kana.CreateCombinedForm(expression);
+                string expressionInHiragana = Kana.KatakanaToHiraganaConverter(expressions[i]);
+                List<string> combinedFormList = Kana.CreateCombinedForm(expressionInHiragana);
 
                 if (i > 0)
                 {
@@ -903,7 +903,7 @@ namespace JL.Windows.GUI
                         WindowsUtils.MeasureTextSize(splitReadingsWithRInfo[i - 1] + ", ", fontSize).Width;
                 }
 
-                if (kanjiumDict.TryGetValue(expression, out List<IResult> kanjiumListResult))
+                if (kanjiumDict.TryGetValue(expressionInHiragana, out List<IResult> kanjiumListResult))
                 {
                     for (int j = 0; j < kanjiumListResult.Count; j++)
                     {
@@ -912,7 +912,8 @@ namespace JL.Windows.GUI
                         if (foundSpelling == kanjiumResult.Spelling ||
                             (alternativeSpellings?.Contains(kanjiumResult.Spelling) ?? false))
                         {
-                            if (hasReading && expression != kanjiumResult.Reading)
+                            if (hasReading
+                                && expressionInHiragana != Kana.KatakanaToHiraganaConverter(kanjiumResult.Reading))
                                 continue;
 
                             Polyline polyline = new()

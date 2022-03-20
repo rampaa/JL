@@ -23,26 +23,30 @@ namespace JL.Core.Dicts.Kanjium
                 {
                     KanjiumResult newEntry = new(jsonObject);
 
-                    if (kanjiumDict.TryGetValue(newEntry.Spelling, out List<IResult> result))
+                    string spellingInHiragana = Kana.KatakanaToHiraganaConverter(newEntry.Spelling);
+
+                    if (kanjiumDict.TryGetValue(spellingInHiragana, out List<IResult> result))
                     {
                         result.Add(newEntry);
                     }
 
                     else
                     {
-                        kanjiumDict[newEntry.Spelling] = new List<IResult> { newEntry };
+                        kanjiumDict[spellingInHiragana] = new List<IResult> { newEntry };
                     }
 
                     if (!string.IsNullOrEmpty(newEntry.Reading))
                     {
-                        if (kanjiumDict.TryGetValue(newEntry.Reading, out List<IResult> readingResult))
+                        string readingInHiragana = Kana.KatakanaToHiraganaConverter(newEntry.Reading);
+
+                        if (kanjiumDict.TryGetValue(readingInHiragana, out List<IResult> readingResult))
                         {
                             readingResult.Add(newEntry);
                         }
 
                         else
                         {
-                            kanjiumDict[newEntry.Reading] = new List<IResult> { newEntry };
+                            kanjiumDict[readingInHiragana] = new List<IResult> { newEntry };
                         }
                     }
                 }
