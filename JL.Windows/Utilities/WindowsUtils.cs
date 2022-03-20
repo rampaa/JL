@@ -407,4 +407,13 @@ public static class WindowsUtils
 
         return new Size(formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
     }
+
+    public static void SetInputGestureText(MenuItem menuItem, KeyGesture keyGesture)
+    {
+        string keyGestureString = KeyGestureToString(keyGesture);
+
+        menuItem.InputGestureText = keyGestureString != "None"
+            ? keyGestureString
+            : "";
+    }
 }

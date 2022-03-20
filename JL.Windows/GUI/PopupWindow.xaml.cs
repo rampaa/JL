@@ -76,6 +76,12 @@ namespace JL.Windows.GUI
             else
                 SizeToContent = SizeToContent.Manual;
 
+            WindowsUtils.SetInputGestureText(AddNameButton, ConfigManager.ShowAddNameWindowKeyGesture);
+            WindowsUtils.SetInputGestureText(AddWordButton, ConfigManager.ShowAddWordWindowKeyGesture);
+            WindowsUtils.SetInputGestureText(SearchButton, ConfigManager.SearchWithBrowserKeyGesture);
+            WindowsUtils.SetInputGestureText(ManageDictionariesButton, ConfigManager.ShowManageDictionariesWindowKeyGesture);
+            WindowsUtils.SetInputGestureText(StatsButton, ConfigManager.ShowStatsKeyGesture);
+
             TextBlockMiningModeReminder.Text =
                 $"Click on an entry's main spelling to mine it," + Environment.NewLine +
                 $"or press {ConfigManager.ClosePopupKeyGesture.Key} or click on the main window to exit.";
@@ -89,11 +95,6 @@ namespace JL.Windows.GUI
         private void AddWord(object sender, RoutedEventArgs e)
         {
             WindowsUtils.ShowAddWordWindow(_lastSelectedText);
-        }
-
-        private void ShowPreferences(object sender, RoutedEventArgs e)
-        {
-            WindowsUtils.ShowPreferencesWindow();
         }
 
         private void SearchWithBrowser(object sender, RoutedEventArgs e)
@@ -1166,12 +1167,12 @@ namespace JL.Windows.GUI
             miningParams[JLField.Context] = Utils.FindSentence(_currentText, _currentCharPosition);
             miningParams[JLField.TimeLocal] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
 
-           bool miningResult = await Mining.Mine(miningParams).ConfigureAwait(false);
+            bool miningResult = await Mining.Mine(miningParams).ConfigureAwait(false);
 
-           if (miningResult)
-           {
-               Storage.SessionStats.CardsMined += 1;
-           }
+            if (miningResult)
+            {
+                Storage.SessionStats.CardsMined += 1;
+            }
         }
 
         private void Definitions_MouseMove(TextBox tb)
@@ -1331,10 +1332,6 @@ namespace JL.Windows.GUI
                 //todo will only work for the FirstPopupWindow
                 MainWindow.Instance.MainTextBox_MouseMove(null, null);
             }
-            else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowPreferencesWindowKeyGesture))
-            {
-                WindowsUtils.ShowPreferencesWindow();
-            }
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
             {
                 if (Storage.Ready)
@@ -1361,6 +1358,10 @@ namespace JL.Windows.GUI
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.MotivationKeyGesture))
             {
                 WindowsUtils.Motivate($"Resources/Motivation");
+            }
+            else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowStatsKeyGesture))
+            {
+                WindowsUtils.ShowStatsWindow();
             }
         }
 

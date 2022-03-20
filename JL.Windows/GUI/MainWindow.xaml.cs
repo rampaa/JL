@@ -324,6 +324,11 @@ namespace JL.Windows.GUI
                 FirstPopupWindow.PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                 FirstPopupWindow.Hide();
             }
+
+            else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowStatsKeyGesture))
+            {
+                WindowsUtils.ShowStatsWindow();
+            }
         }
 
         private void AddName(object sender, RoutedEventArgs e)

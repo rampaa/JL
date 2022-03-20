@@ -104,6 +104,7 @@ namespace JL.Windows
         public static KeyGesture InactiveLookupModeKeyGesture { get; set; } = new(Key.Q, ModifierKeys.Windows);
         public static KeyGesture MotivationKeyGesture { get; set; } = new(Key.O, ModifierKeys.Windows);
         public static KeyGesture ClosePopupKeyGesture { get; set; } = new(Key.Escape, ModifierKeys.Windows);
+        public static KeyGesture ShowStatsKeyGesture { get; set; } = new(Key.Y, ModifierKeys.Windows);
 
         #endregion
 
@@ -376,35 +377,14 @@ namespace JL.Windows
 
             ClosePopupKeyGesture = WindowsUtils.KeyGestureSetter("ClosePopupKeyGesture", ClosePopupKeyGesture);
 
-            if (WindowsUtils.KeyGestureToString(ShowAddNameWindowKeyGesture) == "None")
-                MainWindow.Instance.AddNameButton.InputGestureText = "";
-            else
-                MainWindow.Instance.AddNameButton.InputGestureText =
-                    WindowsUtils.KeyGestureToString(ShowAddNameWindowKeyGesture);
+            ShowStatsKeyGesture = WindowsUtils.KeyGestureSetter("ShowStatsKeyGesture", ShowStatsKeyGesture);
 
-            if (WindowsUtils.KeyGestureToString(ShowAddWordWindowKeyGesture) == "None")
-                MainWindow.Instance.AddWordButton.InputGestureText = "";
-            else
-                MainWindow.Instance.AddWordButton.InputGestureText =
-                    WindowsUtils.KeyGestureToString(ShowAddWordWindowKeyGesture);
-
-            if (WindowsUtils.KeyGestureToString(SearchWithBrowserKeyGesture) == "None")
-                MainWindow.Instance.SearchButton.InputGestureText = "";
-            else
-                MainWindow.Instance.SearchButton.InputGestureText =
-                    WindowsUtils.KeyGestureToString(SearchWithBrowserKeyGesture);
-
-            if (WindowsUtils.KeyGestureToString(ShowPreferencesWindowKeyGesture) == "None")
-                MainWindow.Instance.PreferencesButton.InputGestureText = "";
-            else
-                MainWindow.Instance.PreferencesButton.InputGestureText =
-                    WindowsUtils.KeyGestureToString(ShowPreferencesWindowKeyGesture);
-
-            if (WindowsUtils.KeyGestureToString(ShowManageDictionariesWindowKeyGesture) == "None")
-                MainWindow.Instance.ManageDictionariesButton.InputGestureText = "";
-            else
-                MainWindow.Instance.ManageDictionariesButton.InputGestureText =
-                    WindowsUtils.KeyGestureToString(ShowManageDictionariesWindowKeyGesture);
+            WindowsUtils.SetInputGestureText(MainWindow.Instance.AddNameButton, ShowAddNameWindowKeyGesture);
+            WindowsUtils.SetInputGestureText(MainWindow.Instance.AddWordButton, ShowAddWordWindowKeyGesture);
+            WindowsUtils.SetInputGestureText(MainWindow.Instance.SearchButton, SearchWithBrowserKeyGesture);
+            WindowsUtils.SetInputGestureText(MainWindow.Instance.PreferencesButton, ShowPreferencesWindowKeyGesture);
+            WindowsUtils.SetInputGestureText(MainWindow.Instance.ManageDictionariesButton, ShowManageDictionariesWindowKeyGesture);
+            WindowsUtils.SetInputGestureText(MainWindow.Instance.StatsButton, ShowStatsKeyGesture);
 
             WindowsUtils.Try(() => MainWindow.Instance.OpacitySlider.Value = double.Parse(ConfigurationManager
                 .AppSettings
@@ -475,6 +455,12 @@ namespace JL.Windows
 
                 else
                     popupWindow.SizeToContent = SizeToContent.Manual;
+
+                WindowsUtils.SetInputGestureText(popupWindow.AddNameButton, ShowAddNameWindowKeyGesture);
+                WindowsUtils.SetInputGestureText(popupWindow.AddWordButton, ShowAddWordWindowKeyGesture);
+                WindowsUtils.SetInputGestureText(popupWindow.SearchButton, SearchWithBrowserKeyGesture);
+                WindowsUtils.SetInputGestureText(popupWindow.ManageDictionariesButton, ShowManageDictionariesWindowKeyGesture);
+                WindowsUtils.SetInputGestureText(popupWindow.StatsButton, ShowStatsKeyGesture);
             }
 
             Storage.LoadFrequency().ConfigureAwait(false);
@@ -514,6 +500,9 @@ namespace JL.Windows
                 WindowsUtils.KeyGestureToString(MotivationKeyGesture);
             preferenceWindow.ClosePopupKeyGestureTextBox.Text =
                 WindowsUtils.KeyGestureToString(ClosePopupKeyGesture);
+            preferenceWindow.ShowStatsKeyGestureTextBox.Text =
+                WindowsUtils.KeyGestureToString(ShowStatsKeyGesture);
+
 
             preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
             preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri;
@@ -625,6 +614,8 @@ namespace JL.Windows
                 preferenceWindow.MotivationKeyGestureTextBox.Text);
             WindowsUtils.KeyGestureSaver("ClosePopupKeyGesture",
                 preferenceWindow.ClosePopupKeyGestureTextBox.Text);
+            WindowsUtils.KeyGestureSaver("ShowStatsKeyGesture",
+                preferenceWindow.ShowStatsKeyGestureTextBox.Text);
 
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 

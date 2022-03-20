@@ -51,6 +51,10 @@
                         Header="Search"
                         Click="SearchWithBrowser" />
                     <MenuItem
+                        Name="StatsButton"
+                        Header="Stats"
+                        Click="ShowStats" />
+                    <MenuItem
                         Name="ManageDictionariesButton"
                         Header="Manage dictionaries"
                         Click="ShowManageDictionariesWindow" />
@@ -58,11 +62,6 @@
                         Name="PreferencesButton"
                         Header="Preferences"
                         Click="ShowPreferences" />
-                    <!-- todo hotkey -->
-                    <MenuItem
-                        Name="StatsButton"
-                        Header="Stats"
-                        Click="ShowStats" />
                 </ContextMenu>
             </TextBox.ContextMenu>
         </TextBox>
