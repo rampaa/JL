@@ -4,9 +4,9 @@
     {
         public static async Task Load(string customWordDictPath)
         {
-            if (File.Exists(Path.Join(Storage.ApplicationPath, customWordDictPath)))
+            if (File.Exists(customWordDictPath))
             {
-                string[] lines = await File.ReadAllLinesAsync(Path.Join(Storage.ApplicationPath, customWordDictPath))
+                string[] lines = await File.ReadAllLinesAsync(customWordDictPath)
                     .ConfigureAwait(false);
 
                 for (int i = 0; i < lines.Length; i++)

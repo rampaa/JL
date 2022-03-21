@@ -21,9 +21,9 @@ namespace JL.Core
         public const string Jpod101NoAudioMd5Hash = "7e2c2f954ef6051373ba916f000168dc";
         public static Stats SessionStats { get; set; } = new();
         public static IFrontend Frontend { get; set; } = new UnimplementedFrontend();
-        public static readonly string ApplicationPath = Directory.GetCurrentDirectory();
-
-        // public static readonly string ResourcesPath = Path.Join(Directory.GetCurrentDirectory(), "Resources");
+        public static readonly string ApplicationPath = AppContext.BaseDirectory;
+        public static readonly string ResourcesPath = Path.Join(AppContext.BaseDirectory, "Resources");
+        public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
         public static readonly HttpClient Client = new(new HttpClientHandler { UseProxy = false });
         public static readonly Version Version = new(1, 7);
         public static readonly string RepoUrl = "https://github.com/rampaa/JL/";
@@ -41,22 +41,22 @@ namespace JL.Core
             {
                 {
                     "CustomWordDictionary",
-                    new Dict(DictType.CustomWordDictionary, $"Resources\\custom_words.txt", true, 0)
+                    new Dict(DictType.CustomWordDictionary, $"{ResourcesPath}\\custom_words.txt", true, 0)
                 },
                 {
                     "CustomNameDictionary",
-                    new Dict(DictType.CustomNameDictionary, $"Resources\\custom_names.txt", true, 1)
+                    new Dict(DictType.CustomNameDictionary, $"{ResourcesPath}\\custom_names.txt", true, 1)
                 },
-                { "JMdict", new Dict(DictType.JMdict, $"Resources\\JMdict.xml", true, 2) },
-                { "JMnedict", new Dict(DictType.JMnedict, $"Resources\\JMnedict.xml", true, 3) },
-                { "Kanjidic", new Dict(DictType.Kanjidic, $"Resources\\kanjidic2.xml", true, 4) }
+                { "JMdict", new Dict(DictType.JMdict, $"{ResourcesPath}\\JMdict.xml", true, 2) },
+                { "JMnedict", new Dict(DictType.JMnedict, $"{ResourcesPath}\\JMnedict.xml", true, 3) },
+                { "Kanjidic", new Dict(DictType.Kanjidic, $"{ResourcesPath}\\kanjidic2.xml", true, 4) }
             };
 
         public static readonly Dictionary<string, string> FrequencyLists = new()
         {
-            { "VN", $"Resources/freqlist_vns.json" },
-            { "Novel", $"Resources/freqlist_novels.json" },
-            { "Narou", $"Resources/freqlist_narou.json" },
+            { "VN", $"{ResourcesPath}/freqlist_vns.json" },
+            { "Novel", $"{ResourcesPath}/freqlist_novels.json" },
+            { "Narou", $"{ResourcesPath}/freqlist_narou.json" },
             { "None", "" }
         };
 
@@ -383,7 +383,7 @@ namespace JL.Core
 
         public static async Task InitializePoS()
         {
-            if (!File.Exists($"Resources/PoS.json"))
+            if (!File.Exists($"{Storage.ResourcesPath}/PoS.json"))
             {
                 if (Dicts[DictType.JMdict].Active)
                 {
@@ -393,7 +393,7 @@ namespace JL.Core
                 else
                 {
                     bool deleteJmdictFile = false;
-                    if (!File.Exists(Path.Join(Storage.ApplicationPath, Dicts[DictType.JMdict].Path)))
+                    if (!File.Exists(Dicts[DictType.JMdict].Path))
                     {
                         deleteJmdictFile = true;
                         await ResourceUpdater.UpdateResource(Dicts[DictType.JMdict].Path,
@@ -407,7 +407,7 @@ namespace JL.Core
                     Dicts[DictType.JMdict].Contents.Clear();
 
                     if (deleteJmdictFile)
-                        File.Delete(Path.Join(Storage.ApplicationPath, Dicts[DictType.JMdict].Path));
+                        File.Delete(Dicts[DictType.JMdict].Path);
                 }
             }
 
@@ -430,8 +430,7 @@ namespace JL.Core
                     taskNewFreqlist = Task.Run(async () =>
                     {
                         FrequencyLoader.BuildFreqDict(await FrequencyLoader
-                            .LoadJson(Path.Join(Storage.ApplicationPath,
-                                Storage.FrequencyLists[Storage.Frontend.CoreConfig.FrequencyListName]))
+                            .LoadJson(Storage.FrequencyLists[Storage.Frontend.CoreConfig.FrequencyListName])
                             .ConfigureAwait(false));
                     });
                 }

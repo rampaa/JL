@@ -6,9 +6,9 @@ namespace JL.Core.Dicts.EDICT.JMdict
     {
         public static async Task Load(string dictPath)
         {
-            if (File.Exists(Path.Join(Storage.ApplicationPath, dictPath)))
+            if (File.Exists(dictPath))
             {
-                using XmlTextReader edictXml = new(Path.Join(Storage.ApplicationPath, dictPath))
+                using XmlTextReader edictXml = new(dictPath)
                 {
                     DtdProcessing = DtdProcessing.Parse,
                     WhitespaceHandling = WhitespaceHandling.None,

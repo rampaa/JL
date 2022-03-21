@@ -314,7 +314,7 @@ namespace JL.Windows.GUI
 
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.MotivationKeyGesture))
             {
-                WindowsUtils.Motivate($"Resources/Motivation");
+                WindowsUtils.Motivate($"{Storage.ResourcesPath}/Motivation");
             }
 
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ClosePopupKeyGesture))

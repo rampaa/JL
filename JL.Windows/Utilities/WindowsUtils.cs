@@ -179,14 +179,14 @@ public static class WindowsUtils
 
     public static void ShowManageDictionariesWindow()
     {
-        if (!File.Exists(Path.Join(Storage.ApplicationPath, "Config/dicts.json")))
+        if (!File.Exists(Path.Join(Storage.ConfigPath, "dicts.json")))
             Utils.CreateDefaultDictsConfig();
 
-        if (!File.Exists($"Resources/custom_words.txt"))
-            File.Create($"Resources/custom_words.txt").Dispose();
+        if (!File.Exists($"{Storage.ResourcesPath}/custom_words.txt"))
+            File.Create($"{Storage.ResourcesPath}/custom_words.txt").Dispose();
 
-        if (!File.Exists($"Resources/custom_names.txt"))
-            File.Create($"Resources/custom_names.txt").Dispose();
+        if (!File.Exists($"{Storage.ResourcesPath}/custom_names.txt"))
+            File.Create($"{Storage.ResourcesPath}/custom_names.txt").Dispose();
 
         ManageDictionariesWindow.Instance.Owner = MainWindow.Instance;
         ManageDictionariesWindow.Instance.ShowDialog();
@@ -246,27 +246,7 @@ public static class WindowsUtils
     {
         Storage.Frontend = MainWindow.Instance;
 
-        if (!File.Exists(Path.Join(Storage.ApplicationPath, "Config/dicts.json")))
-            Utils.CreateDefaultDictsConfig();
-
-        if (!File.Exists($"Resources/custom_words.txt"))
-            File.Create($"Resources/custom_words.txt").Dispose();
-
-        if (!File.Exists($"Resources/custom_names.txt"))
-            File.Create($"Resources/custom_names.txt").Dispose();
-
-        Utils.DeserializeDicts().ContinueWith(_ =>
-        {
-            Storage.LoadDictionaries().ContinueWith(_ =>
-                {
-                    Storage.InitializePoS().ContinueWith(_ =>
-                    {
-                        GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-                    }).ConfigureAwait(false);
-                }
-            ).ConfigureAwait(false);
-        }).ConfigureAwait(false);
+        Utils.CoreInitialize();
 
         ConfigManager.Instance.ApplyPreferences();
 

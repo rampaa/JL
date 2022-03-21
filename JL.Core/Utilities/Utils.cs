@@ -1,4 +1,6 @@
-﻿using System.Security.Cryptography;
+﻿using System.Runtime;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using JL.Core.Dicts;
@@ -26,8 +28,8 @@ namespace JL.Core.Utilities
 
             try
             {
-                Directory.CreateDirectory(Path.Join(Storage.ApplicationPath, "Config"));
-                File.WriteAllText(Path.Join(Storage.ApplicationPath, "Config/dicts.json"),
+                Directory.CreateDirectory(Storage.ConfigPath);
+                File.WriteAllText(Path.Join(Storage.ConfigPath, "dicts.json"),
                     JsonSerializer.Serialize(Storage.BuiltInDicts, jso));
             }
             catch (Exception e)
@@ -47,7 +49,7 @@ namespace JL.Core.Utilities
                     Converters = { new JsonStringEnumConverter(), }
                 };
 
-                File.WriteAllTextAsync(Path.Join(Storage.ApplicationPath, "Config/dicts.json"),
+                File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "dicts.json"),
                     JsonSerializer.Serialize(Storage.Dicts, jso));
             }
             catch (Exception e)
@@ -65,7 +67,7 @@ namespace JL.Core.Utilities
 
                 Dictionary<DictType, Dict> deserializedDicts = await JsonSerializer
                     .DeserializeAsync<Dictionary<DictType, Dict>>(
-                        new StreamReader(Path.Join(Storage.ApplicationPath, "Config/dicts.json")).BaseStream, jso)
+                        new StreamReader(Path.Join(Storage.ConfigPath, "dicts.json")).BaseStream, jso)
                     .ConfigureAwait(false);
 
                 if (deserializedDicts != null)
@@ -240,6 +242,31 @@ namespace JL.Core.Utilities
                 Storage.Frontend.PlayAudio(sound, volume);
                 Storage.SessionStats.TimesPlayedAudio += 1;
             }
+        }
+
+        public static void CoreInitialize()
+        {
+            if (!File.Exists($"{Storage.ConfigPath}/dicts.json"))
+                Utils.CreateDefaultDictsConfig();
+
+            if (!File.Exists($"{Storage.ResourcesPath}/custom_words.txt"))
+                File.Create($"{Storage.ResourcesPath}/custom_words.txt").Dispose();
+
+            if (!File.Exists($"{Storage.ResourcesPath}/custom_names.txt"))
+                File.Create($"{Storage.ResourcesPath}/custom_names.txt").Dispose();
+
+            Utils.DeserializeDicts().ContinueWith(_ =>
+            {
+                Storage.LoadDictionaries().ContinueWith(_ =>
+                    {
+                        Storage.InitializePoS().ContinueWith(_ =>
+                        {
+                            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+                        }).ConfigureAwait(false);
+                    }
+                ).ConfigureAwait(false);
+            }).ConfigureAwait(false);
         }
     }
 }

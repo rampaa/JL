@@ -8,7 +8,7 @@ namespace JL.Core.Deconjugation
     public static class Deconjugator
     {
         private static readonly string s_file =
-            System.IO.File.ReadAllText($"Resources/deconjugator_edited_arrays.json");
+            File.ReadAllText($"{Storage.ResourcesPath}/deconjugator_edited_arrays.json");
 
         private static readonly Rule[] s_rules = JsonSerializer.Deserialize<Rule[]>(s_file);
 

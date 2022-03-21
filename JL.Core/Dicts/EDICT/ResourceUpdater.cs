@@ -14,9 +14,9 @@ namespace JL.Core.Dicts.EDICT
             {
                 HttpRequestMessage request = new(HttpMethod.Get, resourceDownloadUri);
 
-                if (File.Exists(Path.Join(Storage.ApplicationPath, resourcePath)))
+                if (File.Exists(resourcePath))
                     request.Headers.IfModifiedSince =
-                        File.GetLastWriteTime(Path.Join(Storage.ApplicationPath, resourcePath));
+                        File.GetLastWriteTime(resourcePath);
 
                 if (!noPrompt)
                     Storage.Frontend.ShowOkDialog(
@@ -27,7 +27,7 @@ namespace JL.Core.Dicts.EDICT
                 if (response.IsSuccessStatusCode)
                 {
                     Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                    await GzipStreamDecompressor(responseStream, Path.Join(Storage.ApplicationPath, resourcePath))
+                    await GzipStreamDecompressor(responseStream, resourcePath)
                         .ConfigureAwait(false);
 
                     if (!noPrompt)

@@ -109,8 +109,7 @@ namespace JL.Windows.GUI
             stringBuilder.Append(Environment.NewLine);
 
             string customWordDictPath = Storage.Dicts[DictType.CustomWordDictionary].Path;
-            await File.AppendAllTextAsync(
-                Path.Join(Storage.ApplicationPath, customWordDictPath),
+            await File.AppendAllTextAsync(customWordDictPath,
                 stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);
         }
 

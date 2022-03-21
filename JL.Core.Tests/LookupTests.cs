@@ -39,18 +39,45 @@ namespace JL.Core.Tests
         public void LookupText_始まる()
         {
             // Arrange
-            string expected =
-                "[{\"foundSpelling\":[\"始まる\"],\"readings\":[\"はじまる\"],\"definitions\":[\"(v5r, vi) (1) to begin; to start; to commence (v5r, vi) (2) to happen (again); to begin (anew) (v5r, vi) (3) to date (from); to originate (in) \"],\"foundForm\":[\"始まる\"],\"EdictID\":[\"1307500\"],\"alternativeSpellings\":[],\"process\":[],\"frequency\":[\"759\"],\"pOrthographyInfoList\":[],\"rOrthographyInfoList\":[\"\"],\"aOrthographyInfoList\":[],\"DictType\":[\"JMdict\"]}]";
+            List<LookupResult> expected =
+                new()
+                {
+                    new LookupResult
+                    {
+                        FoundForm = new List<string> { "始まる" },
+                        Frequency = new List<string> { "759" },
+                        DictType = new List<string> { "JMdict" },
+                        FoundSpelling = new List<string> { "始まる" },
+                        Readings = new List<string> { "はじまる" },
+                        Definitions =
+                            new List<string>
+                            {
+                                "(v5r, vi) (1) to begin; to start; to commence (v5r, vi) (2) to happen (again); to begin (anew) (v5r, vi) (3) to date (from); to originate (in) "
+                            },
+                        EdictID = new List<string> { "1307500" },
+                        AlternativeSpellings = new List<string> { },
+                        Process = new List<string> { },
+                        POrthographyInfoList = new List<string> { },
+                        ROrthographyInfoList = new List<string> { "" },
+                        AOrthographyInfoList = new List<string> { },
+                        OnReadings = null,
+                        KunReadings = null,
+                        Nanori = null,
+                        StrokeCount = null,
+                        Composition = null,
+                        Grade = null,
+                    }
+                };
 
             string text = "始まる";
 
             // Act
-            List<Dictionary<LookupResult, List<string>>> result = Lookup.Lookup.LookupText(
+            List<LookupResult> result = Lookup.Lookup.LookupText(
                 text);
-            string actual = JsonSerializer.Serialize(result, Storage.JsoUnsafeEscaping);
+            List<LookupResult> actual = result;
 
             // Assert
-            StringAssert.AreEqualIgnoringCase(expected, actual);
+            StringAssert.AreEqualIgnoringCase(JsonSerializer.Serialize(expected), JsonSerializer.Serialize(actual));
         }
 
         [Test]
@@ -62,16 +89,17 @@ namespace JL.Core.Tests
             string text = "た";
 
             // Act
-            List<Dictionary<LookupResult, List<string>>> result = Lookup.Lookup.LookupText(
+            List<LookupResult> result = Lookup.Lookup.LookupText(
                 text);
             string actual =
                 result.First(x =>
-                    x[LookupResult.FoundSpelling].Contains("他"))[LookupResult.Frequency][0];
+                    x.FoundSpelling.Contains("他")).Frequency[0];
 
             // Assert
             StringAssert.AreEqualIgnoringCase(expected, actual);
         }
 
+        //todo
         [Test]
         public void Freq_た_多()
         {
@@ -81,11 +109,11 @@ namespace JL.Core.Tests
             string text = "た";
 
             // Act
-            List<Dictionary<LookupResult, List<string>>> result = Lookup.Lookup.LookupText(
+            List<LookupResult> result = Lookup.Lookup.LookupText(
                 text);
             string actual =
                 result.First(x =>
-                    x[LookupResult.FoundSpelling].Contains("多"))[LookupResult.Frequency][0];
+                    x.FoundSpelling.Contains("多")).Frequency[0];
 
             // Assert
             StringAssert.AreEqualIgnoringCase(expected, actual);
@@ -100,11 +128,11 @@ namespace JL.Core.Tests
             string text = "た";
 
             // Act
-            List<Dictionary<LookupResult, List<string>>> result = Lookup.Lookup.LookupText(
+            List<LookupResult> result = Lookup.Lookup.LookupText(
                 text);
             string actual =
                 result.First(x =>
-                    x[LookupResult.FoundSpelling].Contains("田"))[LookupResult.Frequency][0];
+                    x.FoundSpelling.Contains("田")).Frequency[0];
 
             // Assert
             StringAssert.AreEqualIgnoringCase(expected, actual);
@@ -119,11 +147,11 @@ namespace JL.Core.Tests
             string text = "日";
 
             // Act
-            List<Dictionary<LookupResult, List<string>>> result = Lookup.Lookup.LookupText(
+            List<LookupResult> result = Lookup.Lookup.LookupText(
                 text);
             string actual =
                 result.First(x =>
-                    x[LookupResult.Readings].Contains("ひ"))[LookupResult.Frequency][0];
+                    x.Readings.Contains("ひ")).Frequency[0];
 
             // Assert
             StringAssert.AreEqualIgnoringCase(expected, actual);
@@ -138,11 +166,11 @@ namespace JL.Core.Tests
             string text = "日";
 
             // Act
-            List<Dictionary<LookupResult, List<string>>> result = Lookup.Lookup.LookupText(
+            List<LookupResult> result = Lookup.Lookup.LookupText(
                 text);
             string actual =
                 result.First(x =>
-                    x[LookupResult.Readings].Contains("にち"))[LookupResult.Frequency][0];
+                    x.Readings.Contains("にち")).Frequency[0];
 
             // Assert
             StringAssert.AreEqualIgnoringCase(expected, actual);
@@ -157,11 +185,11 @@ namespace JL.Core.Tests
             string text = "日";
 
             // Act
-            List<Dictionary<LookupResult, List<string>>> result = Lookup.Lookup.LookupText(
+            List<LookupResult> result = Lookup.Lookup.LookupText(
                 text);
             string actual =
                 result.First(x =>
-                    x[LookupResult.Readings].Contains("か"))[LookupResult.Frequency][0];
+                    x.Readings.Contains("か")).Frequency[0];
 
             // Assert
             StringAssert.AreEqualIgnoringCase(expected, actual);
@@ -176,11 +204,11 @@ namespace JL.Core.Tests
             string text = "余り";
 
             // Act
-            List<Dictionary<LookupResult, List<string>>> result = Lookup.Lookup.LookupText(
+            List<LookupResult> result = Lookup.Lookup.LookupText(
                 text);
             string actual =
                 result.First(x =>
-                    x[LookupResult.FoundSpelling].Contains("余り"))[LookupResult.Frequency][0];
+                    x.FoundSpelling.Contains("余り")).Frequency[0];
 
             // Assert
             StringAssert.AreEqualIgnoringCase(expected, actual);
@@ -195,11 +223,11 @@ namespace JL.Core.Tests
             string text = "懐かしい";
 
             // Act
-            List<Dictionary<LookupResult, List<string>>> result = Lookup.Lookup.LookupText(
+            List<LookupResult> result = Lookup.Lookup.LookupText(
                 text);
             string actual =
                 result.First(x =>
-                    x[LookupResult.Readings].Contains("いだく"))[LookupResult.Frequency][0];
+                    x.Readings.Contains("いだく")).Frequency[0];
 
             // Assert
             StringAssert.AreEqualIgnoringCase(expected, actual);
@@ -214,11 +242,11 @@ namespace JL.Core.Tests
             string text = "廃虚";
 
             // Act
-            List<Dictionary<LookupResult, List<string>>> result = Lookup.Lookup.LookupText(
+            List<LookupResult> result = Lookup.Lookup.LookupText(
                 text);
             string actual =
                 result.First(x =>
-                    x[LookupResult.Readings].Contains("はいきょ"))[LookupResult.Frequency][0];
+                    x.Readings.Contains("はいきょ")).Frequency[0];
 
             // Assert
             StringAssert.AreEqualIgnoringCase(expected, actual);
@@ -233,11 +261,11 @@ namespace JL.Core.Tests
             string text = "廃墟";
 
             // Act
-            List<Dictionary<LookupResult, List<string>>> result = Lookup.Lookup.LookupText(
+            List<LookupResult> result = Lookup.Lookup.LookupText(
                 text);
             string actual =
                 result.First(x =>
-                    x[LookupResult.Readings].Contains("はいきょ"))[LookupResult.Frequency][0];
+                    x.Readings.Contains("はいきょ")).Frequency[0];
 
             // Assert
             StringAssert.AreEqualIgnoringCase(expected, actual);

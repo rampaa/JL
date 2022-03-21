@@ -89,8 +89,7 @@ namespace JL.Windows.GUI
             stringBuilder.Append(Environment.NewLine);
 
             string customNameDictPath = Storage.Dicts[DictType.CustomNameDictionary].Path;
-            await File.AppendAllTextAsync(
-                Path.Join(Storage.ApplicationPath, customNameDictPath),
+            await File.AppendAllTextAsync(customNameDictPath,
                 stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);
         }
 

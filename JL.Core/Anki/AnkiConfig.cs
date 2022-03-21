@@ -46,8 +46,8 @@ namespace JL.Core.Anki
         {
             try
             {
-                Directory.CreateDirectory(Path.Join(Storage.ApplicationPath, "Config"));
-                await File.WriteAllTextAsync(Path.Join(Storage.ApplicationPath, "Config/AnkiConfig.json"),
+                Directory.CreateDirectory(Storage.ConfigPath);
+                await File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "AnkiConfig.json"),
                     JsonSerializer.Serialize(ankiConfig,
                         new JsonSerializerOptions
                         {
@@ -69,12 +69,12 @@ namespace JL.Core.Anki
 
         public static async Task<AnkiConfig> ReadAnkiConfig()
         {
-            if (File.Exists(Path.Join(Storage.ApplicationPath, "Config/AnkiConfig.json")))
+            if (File.Exists(Path.Join(Storage.ConfigPath, "AnkiConfig.json")))
             {
                 try
                 {
                     return JsonSerializer.Deserialize<AnkiConfig>(
-                        await File.ReadAllTextAsync(Path.Join(Storage.ApplicationPath, "Config/AnkiConfig.json"))
+                        await File.ReadAllTextAsync(Path.Join(Storage.ConfigPath, "AnkiConfig.json"))
                             .ConfigureAwait(false),
                         new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } });
                 }
