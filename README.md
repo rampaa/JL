@@ -19,7 +19,9 @@ IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries,
 * Highly customizable
 * Custom word and name dictionaries
 * Anki mining
-* Pass-through mode 
+* Pass-through mode
+* Invisible mode (see https://github.com/rampaa/JL/pull/7#issuecomment-1069236589)
+* Pitch accent (needs [Kanjium](https://foosoft.net/projects/yomichan/#dictionaries))
 * Remembers last window position
 * Recursive lookups
 * Halfwidth -> Fullwidth conversions (and vice-versa)
