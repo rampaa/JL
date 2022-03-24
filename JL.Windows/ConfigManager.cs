@@ -28,7 +28,8 @@ namespace JL.Windows
         public static Brush HighlightColor { get; set; } = Brushes.AliceBlue;
         public static bool RequireLookupKeyPress { get; set; } = false;
         public static bool LookupOnSelectOnly { get; set; } = false;
-        public static ModifierKeys LookupKey { get; set; } = ModifierKeys.Alt;
+        // Using alt as the lookup key cause focusing bugs. Consider making this key a KeyGesture.
+        public static ModifierKeys LookupKey { get; set; } = ModifierKeys.Shift;
         public static bool HighlightLongestMatch { get; set; } = false;
         public static bool CheckForJLUpdatesOnStartUp { get; set; } = true;
 
@@ -439,11 +440,6 @@ namespace JL.Windows
 
             foreach (PopupWindow popupWindow in Application.Current.Windows.OfType<PopupWindow>().ToList())
             {
-                popupWindow.Background = PopupBackgroundColor;
-                popupWindow.MaxHeight = PopupMaxHeight;
-                popupWindow.MaxWidth = PopupMaxWidth;
-                popupWindow.FontFamily = PopupFont;
-
                 if (PopupDynamicWidth && PopupDynamicHeight)
                     popupWindow.SizeToContent = SizeToContent.WidthAndHeight;
 
@@ -455,6 +451,11 @@ namespace JL.Windows
 
                 else
                     popupWindow.SizeToContent = SizeToContent.Manual;
+
+                popupWindow.MaxHeight = PopupMaxHeight;
+                popupWindow.MaxWidth = PopupMaxWidth;
+                popupWindow.Background = PopupBackgroundColor;
+                popupWindow.FontFamily = PopupFont;
 
                 WindowsUtils.SetInputGestureText(popupWindow.AddNameButton, ShowAddNameWindowKeyGesture);
                 WindowsUtils.SetInputGestureText(popupWindow.AddWordButton, ShowAddWordWindowKeyGesture);

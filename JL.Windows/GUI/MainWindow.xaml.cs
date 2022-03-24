@@ -129,8 +129,23 @@ namespace JL.Windows.GUI
 
         public void MainTextBox_MouseMove(object sender, MouseEventArgs e)
         {
-            if (ConfigManager.LookupOnSelectOnly || Background.Opacity == 0 || MainTextboxContextMenu.IsVisible) return;
+            if (ConfigManager.LookupOnSelectOnly
+                || Background.Opacity == 0
+                || MainTextboxContextMenu.IsVisible
+                || FirstPopupWindow.MiningMode
+                || (ConfigManager.RequireLookupKeyPress && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))) return;
+
             FirstPopupWindow.TextBox_MouseMove(MainTextBox);
+
+            if (ConfigManager.FixedPopupPositioning)
+            {
+                FirstPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+            }
+
+            else
+            {
+                FirstPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+            }
         }
 
         private void MainWindow_Closed(object sender, EventArgs e)
@@ -437,13 +452,20 @@ namespace JL.Windows.GUI
         {
             if (!ConfigManager.LookupOnSelectOnly
                 || Background.Opacity == 0
-                || ConfigManager.InactiveLookupMode) return;
-
-            //if (ConfigManager.RequireLookupKeyPress
-            //    && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
-            //    return;
+                || ConfigManager.InactiveLookupMode
+                || FirstPopupWindow.MiningMode) return;
 
             FirstPopupWindow.LookupOnSelect(MainTextBox);
+
+            if (ConfigManager.FixedPopupPositioning)
+            {
+                FirstPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+            }
+
+            else
+            {
+                FirstPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+            }
         }
 
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
