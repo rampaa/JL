@@ -62,11 +62,6 @@ namespace JL.Windows.GUI
 
         public void Init()
         {
-            MaxHeight = ConfigManager.PopupMaxHeight;
-            MaxWidth = ConfigManager.PopupMaxWidth;
-            Background = ConfigManager.PopupBackgroundColor;
-            FontFamily = ConfigManager.PopupFont;
-
             if (ConfigManager.PopupDynamicWidth && ConfigManager.PopupDynamicHeight)
                 SizeToContent = SizeToContent.WidthAndHeight;
             else if (ConfigManager.PopupDynamicWidth)
@@ -75,6 +70,11 @@ namespace JL.Windows.GUI
                 SizeToContent = SizeToContent.Height;
             else
                 SizeToContent = SizeToContent.Manual;
+
+            MaxHeight = ConfigManager.PopupMaxHeight;
+            MaxWidth = ConfigManager.PopupMaxWidth;
+            Background = ConfigManager.PopupBackgroundColor;
+            FontFamily = ConfigManager.PopupFont;
 
             WindowsUtils.SetInputGestureText(AddNameButton, ConfigManager.ShowAddNameWindowKeyGesture);
             WindowsUtils.SetInputGestureText(AddWordButton, ConfigManager.ShowAddWordWindowKeyGesture);
@@ -123,11 +123,6 @@ namespace JL.Windows.GUI
                 return;
 
             _lastTextBox = tb;
-
-            if (ConfigManager.FixedPopupPositioning)
-                UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
-            else
-                UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
 
             int charPosition = tb.GetCharacterIndexFromPoint(Mouse.GetPosition(tb), false);
             if (charPosition != -1)
@@ -211,11 +206,6 @@ namespace JL.Windows.GUI
 
             PopUpScrollViewer.ScrollToTop();
 
-            if (ConfigManager.FixedPopupPositioning)
-                UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
-            else
-                UpdatePosition(tb.PointToScreen(tb.GetRectFromCharacterIndex(tb.SelectionStart).BottomLeft));
-
             List<LookupResult> lookupResults = Lookup.LookupText(tb.SelectedText);
 
             if (lookupResults?.Any() ?? false)
@@ -244,7 +234,7 @@ namespace JL.Windows.GUI
             }
         }
 
-        private void UpdatePosition(Point cursorPosition)
+        public void UpdatePosition(Point cursorPosition)
         {
             double mouseX = cursorPosition.X / WindowsUtils.Dpi.DpiScaleX;
             double mouseY = cursorPosition.Y / WindowsUtils.Dpi.DpiScaleY;
@@ -294,7 +284,7 @@ namespace JL.Windows.GUI
             Top = newTop;
         }
 
-        private void UpdatePosition(double x, double y)
+        public void UpdatePosition(double x, double y)
         {
             Left = x;
             Top = y;
@@ -316,6 +306,8 @@ namespace JL.Windows.GUI
 
                 ResultStackPanels.Add(MakeResultStackPanel(_lastLookupResults[index], index, resultCount));
             }
+
+            UpdateLayout();
         }
 
         private StackPanel MakeResultStackPanel(LookupResult result,
@@ -405,7 +397,7 @@ namespace JL.Windows.GUI
 
             if (result.Readings != null && result.Readings.Any())
             {
-                var rOrthographyInfoList = result.ROrthographyInfoList ??= new List<string>();
+                List<string> rOrthographyInfoList = result.ROrthographyInfoList ??= new();
                 List<string> readings = result.Readings;
                 string readingsText =
                     PopupWindowUtilities.MakeUiElementReadingsText(readings, rOrthographyInfoList);
@@ -940,14 +932,37 @@ namespace JL.Windows.GUI
 
         private void PopupMouseMove(object sender, MouseEventArgs e)
         {
-            if (ConfigManager.LookupOnSelectOnly)
+            if (ConfigManager.LookupOnSelectOnly
+                || (ConfigManager.RequireLookupKeyPress
+                && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey)))
                 return;
 
             _childPopupWindow ??= new PopupWindow(this);
 
+            if (_childPopupWindow.MiningMode)
+                return;
+
+
             // prevents stray PopupWindows being created when you move your mouse too fast
             if (MiningMode)
+            {
                 _childPopupWindow.Definitions_MouseMove((TextBox)sender);
+
+                if (!_childPopupWindow.MiningMode)
+                {
+                    if (ConfigManager.FixedPopupPositioning)
+                    {
+                        _childPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+                    }
+
+                    else
+                    {
+                        _childPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+                    }
+                }
+
+                _childPopupWindow.Focus();
+            }
         }
 
         private void FoundSpelling_MouseEnter(object sender, MouseEventArgs e)
@@ -1123,7 +1138,8 @@ namespace JL.Windows.GUI
 
             MouseWheelEventArgs e2 = new(e.MouseDevice, e.Timestamp, e.Delta)
             {
-                RoutedEvent = ListBox.MouseWheelEvent, Source = e.Source
+                RoutedEvent = MouseWheelEvent,
+                Source = e.Source
             };
             PopupListBox.RaiseEvent(e2);
         }
@@ -1324,6 +1340,16 @@ namespace JL.Windows.GUI
             _childPopupWindow ??= new PopupWindow(this);
 
             _childPopupWindow.LookupOnSelect((TextBox)sender);
+
+            if (ConfigManager.FixedPopupPositioning)
+            {
+                _childPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+            }
+
+            else
+            {
+                _childPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+            }
         }
 
         private void OnMouseLeave(object sender, MouseEventArgs e)
