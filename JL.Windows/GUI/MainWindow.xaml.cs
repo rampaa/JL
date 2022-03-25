@@ -76,6 +76,11 @@ namespace JL.Windows.GUI
                 Utils.Logger.Error(ex.ToString());
             };
 
+            TaskScheduler.UnobservedTaskException += (_, eventArgs) =>
+            {
+                Utils.Logger.Error(eventArgs.Exception.ToString());
+            };
+
             ClipboardManager windowClipboardManager = new(this);
             windowClipboardManager.ClipboardChanged += ClipboardChanged;
 

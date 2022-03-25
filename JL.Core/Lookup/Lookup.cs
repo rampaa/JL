@@ -621,7 +621,9 @@ namespace JL.Core.Lookup
 
                     var dictType = new List<string> { wordResult.DictType.ToString() };
 
-                    var definitions = new List<string> { BuildEpwingDefinition(epwingResult.Definitions) };
+                    List<string> definitions = epwingResult.Definitions != null
+                        ? new() { BuildEpwingDefinition(epwingResult.Definitions) }
+                        : new();
 
                     result.FoundSpelling = foundSpelling;
                     result.Readings = reading;
@@ -798,7 +800,7 @@ namespace JL.Core.Lookup
 
                     if ((jMDictResult.Readings != null && jMDictResult.Readings.Contains(freqResult.Spelling))
                         || (jMDictResult.Readings == null && jMDictResult.PrimarySpelling == freqResult.Spelling))
-                        //|| (jMnedictResult.KanaSpellings != null && jMnedictResult.KanaSpellings.Contains(freqResult.Spelling))
+                    //|| (jMnedictResult.KanaSpellings != null && jMnedictResult.KanaSpellings.Contains(freqResult.Spelling))
                     {
                         if (freqValue > freqResult.Frequency)
                         {
@@ -857,7 +859,7 @@ namespace JL.Core.Lookup
                             if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading)
                                 || (jMDictResult.AlternativeSpellings != null
                                     && jMDictResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
-                                //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
+                            //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                             {
                                 if (freqValue > readingFreqResult.Frequency)
                                 {
@@ -1104,7 +1106,7 @@ namespace JL.Core.Lookup
                             if ((reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
                                 || (customWordResult.AlternativeSpellings != null
                                     && customWordResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
-                                //|| (customWordResult.KanaSpellings != null && customWordResult.KanaSpellings.Contains(readingFreqResults.Spelling))
+                            //|| (customWordResult.KanaSpellings != null && customWordResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                             {
                                 if (freqValue > readingFreqResult.Frequency)
                                 {
@@ -1219,6 +1221,9 @@ namespace JL.Core.Lookup
 
         private static string BuildEpwingDefinition(List<string> epwingDefinitions)
         {
+            if (epwingDefinitions == null)
+                return null;
+
             StringBuilder defResult = new();
 
             for (int i = 0; i < epwingDefinitions.Count; i++)

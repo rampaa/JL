@@ -960,8 +960,6 @@ namespace JL.Windows.GUI
                         _childPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
                     }
                 }
-
-                _childPopupWindow.Focus();
             }
         }
 

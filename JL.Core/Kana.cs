@@ -195,6 +195,9 @@ namespace JL.Core
 
         public static string KatakanaToHiraganaConverter(string text)
         {
+            if (text == null)
+                return null;
+
             StringBuilder textInHiragana = new();
 
             List<string> unicodeCharacters;
@@ -232,6 +235,9 @@ namespace JL.Core
 
         public static string HiraganaToKatakanaConverter(string text)
         {
+            if (text == null)
+                return null;
+
             StringBuilder textInKatakana = new();
             foreach (string str in text.UnicodeIterator().ToList())
             {
@@ -246,6 +252,9 @@ namespace JL.Core
 
         public static List<string> LongVowelMarkConverter(string text)
         {
+            if (text == null)
+                return null;
+
             List<StringBuilder> stringBuilders = new();
             List<string> unicodeTextList = text.UnicodeIterator().ToList();
             stringBuilders.Add(new StringBuilder(text.Length));
@@ -313,6 +322,9 @@ namespace JL.Core
 
         public static List<string> CreateCombinedForm(string text)
         {
+            if (text == null)
+                return null;
+
             List<string> unicodeCharacterList = text.UnicodeIterator().ToList();
             List<string> combinedForm = new();
 
