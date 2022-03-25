@@ -84,6 +84,10 @@ namespace JL.Core.Dicts.EDICT.JMdict
                     }
                 }
             }
+
+            List<string> allReadings = entry.REleList.Select(rEle => rEle.Reb).ToList();
+            List<List<string>> allROrthographyInfoLists = entry.REleList.Select(rEle => rEle.ReInfList).ToList();
+
             int rEleListCount = entry.REleList.Count;
             for (int i = 0; i < rEleListCount; i++)
             {
@@ -120,7 +124,16 @@ namespace JL.Core.Dicts.EDICT.JMdict
                 }
 
                 else
+                {
                     result.PrimarySpelling = rEle.Reb;
+                    result.POrthographyInfoList = rEle.ReInfList;
+
+                    result.AlternativeSpellings = allReadings.ToList();
+                    result.AlternativeSpellings.RemoveAt(i);
+
+                    result.AOrthographyInfoList = allROrthographyInfoLists.ToList();
+                    result.AOrthographyInfoList.RemoveAt(i);
+                }
 
                 int senseListCount = entry.SenseList.Count;
                 for (int j = 0; j < senseListCount; j++)
