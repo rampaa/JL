@@ -831,8 +831,8 @@ namespace JL.Windows.GUI
 
             for (int i = 0; i < expressions.Count; i++)
             {
-                string expressionInHiragana = Kana.KatakanaToHiraganaConverter(expressions[i]);
-                List<string> combinedFormList = Kana.CreateCombinedForm(expressionInHiragana);
+                string normalizedExpression = Kana.KatakanaToHiraganaConverter(expressions[i]);
+                List<string> combinedFormList = Kana.CreateCombinedForm(normalizedExpression);
 
                 if (i > 0)
                 {
@@ -840,63 +840,75 @@ namespace JL.Windows.GUI
                         WindowsUtils.MeasureTextSize(splitReadingsWithRInfo[i - 1] + ", ", fontSize).Width;
                 }
 
-                if (kanjiumDict.TryGetValue(expressionInHiragana, out List<IResult> kanjiumListResult))
+                if (kanjiumDict.TryGetValue(normalizedExpression, out List<IResult> kanjiumResultList))
                 {
-                    for (int j = 0; j < kanjiumListResult.Count; j++)
+                    KanjiumResult chosenKanjiumResult = null;
+
+                    for (int j = 0; j < kanjiumResultList.Count; j++)
                     {
-                        var kanjiumResult = (KanjiumResult)kanjiumListResult[j];
+                        var kanjiumResult = (KanjiumResult)kanjiumResultList[j];
 
-                        if (foundSpelling == kanjiumResult.Spelling ||
-                            (alternativeSpellings?.Contains(kanjiumResult.Spelling) ?? false))
+                        if (!hasReading || normalizedExpression == Kana.KatakanaToHiraganaConverter(kanjiumResult.Reading))
                         {
-                            if (hasReading
-                                && expressionInHiragana != Kana.KatakanaToHiraganaConverter(kanjiumResult.Reading))
-                                continue;
-
-                            Polyline polyline = new()
+                            if (foundSpelling == kanjiumResult.Spelling)
                             {
-                                StrokeThickness = 2,
-                                Stroke = ConfigManager.PitchAccentMarkerColor,
-                                StrokeDashArray = new DoubleCollection { 1, 3 },
-                            };
-
-                            bool lowPitch = false;
-                            double horizontalOffsetForChar = horizontalOffsetForReading;
-                            for (int k = 0; k < combinedFormList.Count; k++)
-                            {
-                                Size charSize = WindowsUtils.MeasureTextSize(combinedFormList[k], fontSize);
-
-                                if (kanjiumResult.Position - 1 == k)
-                                {
-                                    polyline.Points.Add(new Point(horizontalOffsetForChar, 0));
-                                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
-                                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width,
-                                        charSize.Height));
-
-                                    lowPitch = true;
-                                }
-
-                                else if (k == 0)
-                                {
-                                    polyline.Points.Add(new Point(horizontalOffsetForChar, charSize.Height));
-                                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width,
-                                        charSize.Height));
-                                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
-                                }
-
-                                else
-                                {
-                                    double charHeight = lowPitch ? charSize.Height : 0;
-                                    polyline.Points.Add(new Point(horizontalOffsetForChar, charHeight));
-                                    polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width,
-                                        charHeight));
-                                }
-
-                                horizontalOffsetForChar += charSize.Width;
+                                chosenKanjiumResult = kanjiumResult;
+                                break;
                             }
 
-                            pitchAccentGrid.Children.Add(polyline);
+                            else if (alternativeSpellings?.Contains(kanjiumResult.Spelling) ?? false)
+                            {
+                                if (chosenKanjiumResult == null)
+                                    chosenKanjiumResult = kanjiumResult;
+                            }
                         }
+                    }
+
+                    if (chosenKanjiumResult != null)
+                    {
+                        Polyline polyline = new()
+                        {
+                            StrokeThickness = 2,
+                            Stroke = ConfigManager.PitchAccentMarkerColor,
+                            StrokeDashArray = new DoubleCollection { 1, 3 },
+                        };
+
+                        bool lowPitch = false;
+                        double horizontalOffsetForChar = horizontalOffsetForReading;
+                        for (int j = 0; j < combinedFormList.Count; j++)
+                        {
+                            Size charSize = WindowsUtils.MeasureTextSize(combinedFormList[j], fontSize);
+
+                            if (chosenKanjiumResult.Position - 1 == j)
+                            {
+                                polyline.Points.Add(new Point(horizontalOffsetForChar, 0));
+                                polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
+                                polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width,
+                                    charSize.Height));
+
+                                lowPitch = true;
+                            }
+
+                            else if (j == 0)
+                            {
+                                polyline.Points.Add(new Point(horizontalOffsetForChar, charSize.Height));
+                                polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width,
+                                    charSize.Height));
+                                polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
+                            }
+
+                            else
+                            {
+                                double charHeight = lowPitch ? charSize.Height : 0;
+                                polyline.Points.Add(new Point(horizontalOffsetForChar, charHeight));
+                                polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width,
+                                    charHeight));
+                            }
+
+                            horizontalOffsetForChar += charSize.Width;
+                        }
+
+                        pitchAccentGrid.Children.Add(polyline);
                     }
                 }
             }
