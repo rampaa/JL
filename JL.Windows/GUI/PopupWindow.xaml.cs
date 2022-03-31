@@ -715,7 +715,8 @@ namespace JL.Windows.GUI
                             Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling[0],
                                 result.AlternativeSpellings,
                                 readings,
-                                textBlock.Text.Split(", ").ToList());
+                                textBlock.Text.Split(", ").ToList(),
+                                textBlock.Margin.Left);
 
                             if (pitchAccentGrid.Children.Count == 0)
                             {
@@ -755,7 +756,8 @@ namespace JL.Windows.GUI
                             Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling[0],
                                 result.AlternativeSpellings,
                                 readings,
-                                textBox.Text.Split(", ").ToList());
+                                textBox.Text.Split(", ").ToList(),
+                                textBox.Margin.Left);
 
                             if (pitchAccentGrid.Children.Count == 0)
                             {
@@ -812,7 +814,7 @@ namespace JL.Windows.GUI
         }
 
         private static Grid CreatePitchAccentGrid(string foundSpelling, List<string> alternativeSpellings,
-            List<string> readings, List<string> splitReadingsWithRInfo)
+            List<string> readings, List<string> splitReadingsWithRInfo, double leftMargin)
         {
             Dictionary<string, List<IResult>> kanjiumDict = Storage.Dicts[DictType.Kanjium].Contents;
             Grid pitchAccentGrid = new();
@@ -825,14 +827,12 @@ namespace JL.Windows.GUI
 
             List<string> expressions = hasReading ? readings : new List<string> { foundSpelling };
 
-            double horizontalOffsetForReading = hasReading
-                ? WindowsUtils.MeasureTextSize(" ", fontSize).Width
-                : 0;
+            double horizontalOffsetForReading = leftMargin;
 
             for (int i = 0; i < expressions.Count; i++)
             {
                 string normalizedExpression = Kana.KatakanaToHiraganaConverter(expressions[i]);
-                List<string> combinedFormList = Kana.CreateCombinedForm(normalizedExpression);
+                List<string> combinedFormList = Kana.CreateCombinedForm(expressions[i]);
 
                 if (i > 0)
                 {
@@ -870,7 +870,7 @@ namespace JL.Windows.GUI
                         {
                             StrokeThickness = 2,
                             Stroke = ConfigManager.PitchAccentMarkerColor,
-                            StrokeDashArray = new DoubleCollection { 1, 3 },
+                            StrokeDashArray = new DoubleCollection { 1, 1 }
                         };
 
                         bool lowPitch = false;
