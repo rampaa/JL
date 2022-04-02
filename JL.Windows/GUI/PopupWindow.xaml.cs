@@ -1272,6 +1272,16 @@ namespace JL.Windows.GUI
                     Unselect(_lastTextBox);
                 }
 
+                if (_parentPopupWindow != null)
+                {
+                    _parentPopupWindow.Focus();
+                }
+
+                else
+                {
+                    MainWindow.Instance.Focus();
+                }
+
                 Hide();
             }
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.KanjiModeKeyGesture))

@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using JL.Core;
-using JL.Core.Dicts;
-using JL.Core.Dicts.CustomDict;
-using JL.Core.Utilities;
-using Path = System.IO.Path;
 
 namespace JL.Windows.GUI
 {

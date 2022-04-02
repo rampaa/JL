@@ -4,21 +4,19 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Manage Dictionaries" Height="700" Width="699" Closing="Window_Closing"
+        Title="Manage Dictionaries" Height="700" Width="700" Closing="Window_Closing" ResizeMode="NoResize"
         SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Background="Black" Topmost="True" ShowInTaskbar="False">
     <Grid>
-        <ScrollViewer HorizontalScrollBarVisibility="Auto">
-            <StackPanel Background="Black" Margin="20,10,20,10">
-                <StackPanel.Resources>
-                    <Style TargetType="{x:Type DockPanel}">
-                        <Setter Property="Margin" Value="0,10,0,0" />
-                    </Style>
-                </StackPanel.Resources>
-                <Button Name="ButtonAddDictionary" Margin="10" Click="ButtonAddDictionary_OnClick">Add dictionary</Button>
+        <StackPanel Background="Black" Margin="20,10,20,10">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type DockPanel}">
+                    <Setter Property="Margin" Value="0,10,0,0" />
+                </Style>
+            </StackPanel.Resources>
+            <Button Name="ButtonAddDictionary" Margin="10" Click="ButtonAddDictionary_OnClick">Add dictionary</Button>
 
-                <ListBox x:Name="DictionariesDisplay" Focusable="False" Margin="10" />
-            </StackPanel>
-        </ScrollViewer>
+            <ListBox x:Name="DictionariesDisplay" Focusable="False" Margin="10" Height="520" />
+        </StackPanel>
         <Button Content="Close" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20" FontSize="16"
                 Height="35" Click="CloseButton_Click" Width="70" />
     </Grid>

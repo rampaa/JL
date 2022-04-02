@@ -10,7 +10,6 @@ using System.Windows.Media;
 using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomDict;
-using Path = System.IO.Path;
 
 namespace JL.Windows.GUI
 {

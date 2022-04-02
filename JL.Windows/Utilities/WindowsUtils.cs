@@ -6,7 +6,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -242,7 +241,7 @@ public static class WindowsUtils
         }
     }
 
-    public static void InitializeMainWindow()
+    public static async void InitializeMainWindow()
     {
         Storage.Frontend = MainWindow.Instance;
 
@@ -252,7 +251,9 @@ public static class WindowsUtils
 
         if (ConfigManager.CheckForJLUpdatesOnStartUp)
         {
-            Networking.CheckForJLUpdates(true);
+            PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = false;
+            await Networking.CheckForJLUpdates(true);
+            PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = true;
         }
     }
 

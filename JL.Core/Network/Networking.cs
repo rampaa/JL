@@ -25,7 +25,7 @@ public static class Networking
         }
     }
 
-    public static async void CheckForJLUpdates(bool isAutoCheck)
+    public static async Task CheckForJLUpdates(bool isAutoCheck)
     {
         try
         {

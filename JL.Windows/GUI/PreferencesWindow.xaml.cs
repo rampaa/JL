@@ -61,6 +61,7 @@ namespace JL.Windows.GUI
         {
             Visibility = Visibility.Collapsed;
             ConfigManager.Instance.SavePreferences(this);
+            MainWindow.Instance.Focus();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -72,6 +73,7 @@ namespace JL.Windows.GUI
         {
             e.Cancel = true;
             Visibility = Visibility.Collapsed;
+            MainWindow.Instance.Focus();
         }
 
         private async void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -96,9 +98,11 @@ namespace JL.Windows.GUI
             }
         }
 
-        private void CheckForJLUpdatesButton_Click(object sender, RoutedEventArgs e)
+        private async void CheckForJLUpdatesButton_Click(object sender, RoutedEventArgs e)
         {
-            Networking.CheckForJLUpdates(false);
+            CheckForJLUpdatesButton.IsEnabled = false;
+            await Networking.CheckForJLUpdates(false);
+            CheckForJLUpdatesButton.IsEnabled = true;
         }
 
         #endregion

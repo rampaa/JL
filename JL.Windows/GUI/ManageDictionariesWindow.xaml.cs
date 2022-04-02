@@ -20,7 +20,6 @@ using JL.Core.Utilities;
 using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
 using Cursors = System.Windows.Input.Cursors;
-using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using MessageBoxOptions = System.Windows.MessageBoxOptions;
 using Path = System.IO.Path;
 
@@ -84,19 +83,19 @@ namespace JL.Windows.GUI
                     Text = dict.Type.GetDescription() ?? dict.Type.ToString(),
                     Margin = new Thickness(10),
                 };
-                var dictPathValidityDisplay = new TextBlock
-                {
-                    Width = 13,
-                    Text = "❌",
-                    ToolTip = "Invalid Path",
-                    Foreground = Brushes.Crimson,
-                    Margin = new Thickness(1),
-                    VerticalAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    Visibility = !Directory.Exists(dict.Path) && !File.Exists(dict.Path)
-                        ? Visibility.Visible
-                        : Visibility.Collapsed
-                };
+                //var dictPathValidityDisplay = new TextBlock
+                //{
+                //    Width = 13,
+                //    Text = "❌",
+                //    ToolTip = "Invalid Path",
+                //    Foreground = Brushes.Crimson,
+                //    Margin = new Thickness(1),
+                //    VerticalAlignment = VerticalAlignment.Center,
+                //    HorizontalAlignment = HorizontalAlignment.Right,
+                //    Visibility = !Directory.Exists(dict.Path) && !File.Exists(dict.Path)
+                //        ? Visibility.Visible
+                //        : Visibility.Collapsed
+                //};
                 var dictPathDisplay = new TextBlock
                 {
                     Width = 200,
@@ -118,14 +117,16 @@ namespace JL.Windows.GUI
                     Background = Brushes.DarkGreen,
                     BorderThickness = new Thickness(1),
                     Visibility = (dict.Type != DictType.JMdict
-                                  && dict.Type != DictType.JMnedict
-                                  && dict.Type != DictType.Kanjidic)
-                        ? Visibility.Collapsed
-                        : Visibility.Visible,
+                              && dict.Type != DictType.JMnedict
+                              && dict.Type != DictType.Kanjidic)
+                    ? Visibility.Collapsed
+                    : Visibility.Visible,
                 };
 
-                buttonUpdate.Click += async (_, _) =>
+                buttonUpdate.Click += async (object sender, RoutedEventArgs e) =>
                 {
+                    ((Button)sender).IsEnabled = false;
+
                     switch (dict.Type)
                     {
                         case DictType.JMdict:
@@ -138,6 +139,8 @@ namespace JL.Windows.GUI
                             await UpdateKanjidic();
                             break;
                     }
+
+                    UpdateDictionariesDisplay();
                 };
 
                 var buttonRemove = new Button
@@ -210,7 +213,7 @@ namespace JL.Windows.GUI
                 dockPanel.Children.Add(buttonDecreasePriority);
                 dockPanel.Children.Add(priority);
                 dockPanel.Children.Add(dictTypeDisplay);
-                dockPanel.Children.Add(dictPathValidityDisplay);
+                //dockPanel.Children.Add(dictPathValidityDisplay);
                 dockPanel.Children.Add(dictPathDisplay);
                 dockPanel.Children.Add(buttonEdit);
                 dockPanel.Children.Add(buttonUpdate);
@@ -218,10 +221,10 @@ namespace JL.Windows.GUI
             }
 
             DictionariesDisplay.ItemsSource = resultDockPanels.OrderBy(dockPanel =>
-                dockPanel.Children
-                    .OfType<TextBlock>()
-                    .Where(textBlock => textBlock.Name == "priority")
-                    .Select(textBlockPriority => Convert.ToInt32(textBlockPriority.Text)).First());
+                    dockPanel.Children
+                        .OfType<TextBlock>()
+                        .Where(textBlock => textBlock.Name == "priority")
+                        .Select(textBlockPriority => Convert.ToInt32(textBlockPriority.Text)).First());
         }
 
         private void PathTextbox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

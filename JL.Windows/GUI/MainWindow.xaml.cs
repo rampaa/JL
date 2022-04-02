@@ -87,7 +87,6 @@ namespace JL.Windows.GUI
             Instance = this;
 
             WindowsUtils.InitializeMainWindow();
-            MainTextBox.IsInactiveSelectionHighlightEnabled = true;
             MainWindowChrome.Freeze();
             _lastClipboardChangeTime = new(Stopwatch.GetTimestamp());
             CopyFromClipboard();
