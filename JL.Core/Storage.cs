@@ -25,7 +25,7 @@ namespace JL.Core
         public static readonly string ResourcesPath = Path.Join(AppContext.BaseDirectory, "Resources");
         public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
         public static readonly HttpClient Client = new(new HttpClientHandler { UseProxy = false });
-        public static readonly Version Version = new(1, 7);
+        public static readonly Version Version = new(1, 8);
         public static readonly string RepoUrl = "https://github.com/rampaa/JL/";
         public static bool Ready { get; set; } = false;
         public static bool UpdatingJMdict { get; set; } = false;
