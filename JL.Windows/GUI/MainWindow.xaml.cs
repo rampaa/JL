@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -197,7 +196,8 @@ namespace JL.Windows.GUI
             //OpacitySlider.Visibility = Visibility.Collapsed;
             //FontSizeSlider.Visibility = Visibility.Collapsed;
 
-            if (FirstPopupWindow.MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning) return;
+            if (FirstPopupWindow.MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning || (FirstPopupWindow.UnavoidableMouseEnter && FirstPopupWindow.IsMouseOver))
+                return;
 
             FirstPopupWindow.Hide();
             FirstPopupWindow.LastText = "";
@@ -474,12 +474,15 @@ namespace JL.Windows.GUI
 
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            foreach (PopupWindow popupWindow in Application.Current.Windows.OfType<PopupWindow>().ToList())
-            {
-                popupWindow.MiningMode = false;
-                popupWindow.TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
+            PopupWindow currentPopupWindow = FirstPopupWindow;
 
-                popupWindow.Hide();
+            while (currentPopupWindow != null)
+            {
+                currentPopupWindow.MiningMode = false;
+                currentPopupWindow.TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
+                currentPopupWindow.Hide();
+
+                currentPopupWindow = currentPopupWindow.ChildPopupWindow;
             }
         }
 

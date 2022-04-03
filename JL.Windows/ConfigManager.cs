@@ -1,6 +1,5 @@
 ﻿using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -438,30 +437,49 @@ namespace JL.Windows
             WindowsUtils.Try(() => PopupDynamicWidth = bool.Parse(ConfigurationManager.AppSettings
                 .Get("PopupDynamicWidth")!), PopupDynamicWidth, "PopupDynamicWidth");
 
-            foreach (PopupWindow popupWindow in Application.Current.Windows.OfType<PopupWindow>().ToList())
+            PopupWindow currentPopupWindow = MainWindow.FirstPopupWindow;
+
+            while (currentPopupWindow != null)
             {
+                currentPopupWindow.Background = PopupBackgroundColor;
+                currentPopupWindow.FontFamily = PopupFont;
+
+                currentPopupWindow.MaxHeight = PopupMaxHeight;
+                currentPopupWindow.MaxWidth = PopupMaxWidth;
+
                 if (PopupDynamicWidth && PopupDynamicHeight)
-                    popupWindow.SizeToContent = SizeToContent.WidthAndHeight;
+                {
+                    currentPopupWindow.SizeToContent = SizeToContent.WidthAndHeight;
+                }
+
 
                 else if (PopupDynamicWidth)
-                    popupWindow.SizeToContent = SizeToContent.Width;
+                {
+                    currentPopupWindow.SizeToContent = SizeToContent.Width;
+                    currentPopupWindow.Height = PopupMaxHeight;
+                }
+
 
                 else if (PopupDynamicHeight)
-                    popupWindow.SizeToContent = SizeToContent.Height;
+                {
+                    currentPopupWindow.SizeToContent = SizeToContent.Height;
+                    currentPopupWindow.Width = PopupMaxWidth;
+                }
 
                 else
-                    popupWindow.SizeToContent = SizeToContent.Manual;
+                {
+                    currentPopupWindow.SizeToContent = SizeToContent.Manual;
+                    currentPopupWindow.Height = PopupMaxHeight;
+                    currentPopupWindow.Width = PopupMaxWidth;
+                }
 
-                popupWindow.MaxHeight = PopupMaxHeight;
-                popupWindow.MaxWidth = PopupMaxWidth;
-                popupWindow.Background = PopupBackgroundColor;
-                popupWindow.FontFamily = PopupFont;
+                WindowsUtils.SetInputGestureText(currentPopupWindow.AddNameButton, ShowAddNameWindowKeyGesture);
+                WindowsUtils.SetInputGestureText(currentPopupWindow.AddWordButton, ShowAddWordWindowKeyGesture);
+                WindowsUtils.SetInputGestureText(currentPopupWindow.SearchButton, SearchWithBrowserKeyGesture);
+                WindowsUtils.SetInputGestureText(currentPopupWindow.ManageDictionariesButton, ShowManageDictionariesWindowKeyGesture);
+                WindowsUtils.SetInputGestureText(currentPopupWindow.StatsButton, ShowStatsKeyGesture);
 
-                WindowsUtils.SetInputGestureText(popupWindow.AddNameButton, ShowAddNameWindowKeyGesture);
-                WindowsUtils.SetInputGestureText(popupWindow.AddWordButton, ShowAddWordWindowKeyGesture);
-                WindowsUtils.SetInputGestureText(popupWindow.SearchButton, SearchWithBrowserKeyGesture);
-                WindowsUtils.SetInputGestureText(popupWindow.ManageDictionariesButton, ShowManageDictionariesWindowKeyGesture);
-                WindowsUtils.SetInputGestureText(popupWindow.StatsButton, ShowStatsKeyGesture);
+                currentPopupWindow = currentPopupWindow.ChildPopupWindow;
             }
 
             Storage.LoadFrequency().ConfigureAwait(false);
@@ -539,6 +557,9 @@ namespace JL.Windows
             preferenceWindow.PopupFontComboBox.ItemsSource = UiControls.PopupJapaneseFonts;
             preferenceWindow.PopupFontComboBox.SelectedIndex =
                 UiControls.PopupJapaneseFonts.FindIndex(f => f.Content.ToString() == PopupFont.Source);
+
+            preferenceWindow.PopupMaxHeightNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Height;
+            preferenceWindow.PopupMaxWidthNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;
 
             preferenceWindow.PopupMaxHeightNumericUpDown.Value = PopupMaxHeight;
             preferenceWindow.PopupMaxWidthNumericUpDown.Value = PopupMaxWidth;

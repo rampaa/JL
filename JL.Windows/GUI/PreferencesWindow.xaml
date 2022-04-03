@@ -195,15 +195,13 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max height"
-                                       Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"
-                                       ToolTip="Setting this more than half of your available height might cause popup window to flicker." />
+                                       Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupMaxHeightNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max width"
-                                       Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"
-                                       ToolTip="Setting this more than half of your available width might cause popup window to flicker." />
+                                       Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupMaxWidthNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>

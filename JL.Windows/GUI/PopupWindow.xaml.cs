@@ -24,8 +24,7 @@ namespace JL.Windows.GUI
     public partial class PopupWindow : Window
     {
         private readonly PopupWindow _parentPopupWindow;
-
-        private PopupWindow _childPopupWindow;
+        public PopupWindow ChildPopupWindow { get; set; }
 
         private TextBox _lastTextBox;
 
@@ -38,6 +37,8 @@ namespace JL.Windows.GUI
         private string _lastSelectedText;
 
         private List<LookupResult> _lastLookupResults = new();
+
+        public bool UnavoidableMouseEnter { get; set; }
 
         public string LastText { get; set; }
 
@@ -62,19 +63,36 @@ namespace JL.Windows.GUI
 
         public void Init()
         {
-            if (ConfigManager.PopupDynamicWidth && ConfigManager.PopupDynamicHeight)
-                SizeToContent = SizeToContent.WidthAndHeight;
-            else if (ConfigManager.PopupDynamicWidth)
-                SizeToContent = SizeToContent.Width;
-            else if (ConfigManager.PopupDynamicHeight)
-                SizeToContent = SizeToContent.Height;
-            else
-                SizeToContent = SizeToContent.Manual;
+            Background = ConfigManager.PopupBackgroundColor;
+            FontFamily = ConfigManager.PopupFont;
 
             MaxHeight = ConfigManager.PopupMaxHeight;
             MaxWidth = ConfigManager.PopupMaxWidth;
-            Background = ConfigManager.PopupBackgroundColor;
-            FontFamily = ConfigManager.PopupFont;
+
+            if (ConfigManager.PopupDynamicWidth && ConfigManager.PopupDynamicHeight)
+            {
+                SizeToContent = SizeToContent.WidthAndHeight;
+            }
+
+            else if (ConfigManager.PopupDynamicWidth)
+            {
+                SizeToContent = SizeToContent.Width;
+                Height = ConfigManager.PopupMaxHeight;
+            }
+
+            else if (ConfigManager.PopupDynamicHeight)
+            {
+                SizeToContent = SizeToContent.Height;
+                Width = ConfigManager.PopupMaxWidth;
+            }
+
+            else
+            {
+                SizeToContent = SizeToContent.Manual;
+                Height = ConfigManager.PopupMaxHeight;
+                Width = ConfigManager.PopupMaxWidth;
+            }
+
 
             WindowsUtils.SetInputGestureText(AddNameButton, ConfigManager.ShowAddNameWindowKeyGesture);
             WindowsUtils.SetInputGestureText(AddWordButton, ConfigManager.ShowAddWordWindowKeyGesture);
@@ -245,6 +263,8 @@ namespace JL.Windows.GUI
             double newLeft;
             double newTop;
 
+            UnavoidableMouseEnter = false;
+
             if (needsFlipX)
             {
                 // flip Leftwards while preventing -OOB
@@ -278,6 +298,11 @@ namespace JL.Windows.GUI
             if (newTop + Height > WindowsUtils.DpiAwareWorkAreaHeight)
             {
                 newTop = WindowsUtils.DpiAwareWorkAreaHeight - Height;
+            }
+
+            if (mouseX >= newLeft && mouseX <= newLeft + Width && mouseY >= newTop && mouseY <= newTop + Height)
+            {
+                UnavoidableMouseEnter = true;
             }
 
             Left = newLeft;
@@ -949,27 +974,27 @@ namespace JL.Windows.GUI
                 && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey)))
                 return;
 
-            _childPopupWindow ??= new PopupWindow(this);
+            ChildPopupWindow ??= new PopupWindow(this);
 
-            if (_childPopupWindow.MiningMode)
+            if (ChildPopupWindow.MiningMode)
                 return;
 
 
             // prevents stray PopupWindows being created when you move your mouse too fast
             if (MiningMode)
             {
-                _childPopupWindow.Definitions_MouseMove((TextBox)sender);
+                ChildPopupWindow.Definitions_MouseMove((TextBox)sender);
 
-                if (!_childPopupWindow.MiningMode)
+                if (!ChildPopupWindow.MiningMode)
                 {
                     if (ConfigManager.FixedPopupPositioning)
                     {
-                        _childPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+                        ChildPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
                     }
 
                     else
                     {
-                        _childPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+                        ChildPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
                     }
                 }
             }
@@ -1333,13 +1358,13 @@ namespace JL.Windows.GUI
         private void OnMouseEnter(object sender, MouseEventArgs e)
         {
             if (!ConfigManager.LookupOnSelectOnly && !ConfigManager.FixedPopupPositioning &&
-                _childPopupWindow is { MiningMode: false })
+                ChildPopupWindow is { MiningMode: false })
             {
-                _childPopupWindow.Hide();
-                _childPopupWindow.LastText = "";
+                ChildPopupWindow.Hide();
+                ChildPopupWindow.LastText = "";
             }
 
-            if (MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning) return;
+            if (MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning || UnavoidableMouseEnter) return;
 
             Hide();
             LastText = "";
@@ -1357,31 +1382,31 @@ namespace JL.Windows.GUI
             //    && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
             //    return;
 
-            _childPopupWindow ??= new PopupWindow(this);
+            ChildPopupWindow ??= new PopupWindow(this);
 
-            _childPopupWindow.LookupOnSelect((TextBox)sender);
+            ChildPopupWindow.LookupOnSelect((TextBox)sender);
 
             if (ConfigManager.FixedPopupPositioning)
             {
-                _childPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+                ChildPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
             }
 
             else
             {
-                _childPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+                ChildPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
             }
         }
 
         private void OnMouseLeave(object sender, MouseEventArgs e)
         {
             if (!ConfigManager.LookupOnSelectOnly && !ConfigManager.FixedPopupPositioning &&
-                _childPopupWindow is { MiningMode: false })
+                ChildPopupWindow is { MiningMode: false, UnavoidableMouseEnter: false })
             {
-                _childPopupWindow.Hide();
-                _childPopupWindow.LastText = "";
+                ChildPopupWindow.Hide();
+                ChildPopupWindow.LastText = "";
             }
 
-            if (MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning) return;
+            if (MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning || IsMouseOver) return;
 
             Hide();
             LastText = "";
