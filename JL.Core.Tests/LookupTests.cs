@@ -55,7 +55,7 @@ namespace JL.Core.Tests
                         AlternativeSpellings = new List<string> { },
                         Process = null,
                         POrthographyInfoList = new List<string> { },
-                        ROrthographyInfoList = new List<string> { "" },
+                        ROrthographyInfoList = new List<string> { },
                         AOrthographyInfoList = new List<string> { },
                         OnReadings = null,
                         KunReadings = null,

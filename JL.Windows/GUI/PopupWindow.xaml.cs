@@ -716,10 +716,6 @@ namespace JL.Windows.GUI
                     if (textBlock.Text == "")
                         continue;
 
-                    // POrthographyInfo check
-                    if (textBlock.Text == "()")
-                        continue;
-
                     textBlock.MouseLeave += OnMouseLeave;
 
                     if ((textBlock.Name is "FoundSpelling" or "Readings") &&
