@@ -167,7 +167,7 @@ namespace JL.Windows.GUI
 
                 if (lookupResults != null && lookupResults.Any())
                 {
-                    _lastSelectedText = lookupResults[0].FoundForm[0];
+                    _lastSelectedText = lookupResults[0].FoundForm;
                     if (ConfigManager.HighlightLongestMatch)
                     {
                         double verticalOffset = tb.VerticalOffset;
@@ -177,7 +177,7 @@ namespace JL.Windows.GUI
                             tb.Focus();
                         }
 
-                        tb.Select(charPosition, lookupResults[0].FoundForm[0].Length);
+                        tb.Select(charPosition, lookupResults[0].FoundForm.Length);
                         tb.ScrollToVerticalOffset(verticalOffset);
                     }
 
@@ -365,22 +365,22 @@ namespace JL.Windows.GUI
             TextBlock textBlockGrade = null;
             TextBlock textBlockComposition = null;
 
-            if (result.FoundForm != null && result.FoundForm.Any())
+            if (result.FoundForm != null)
             {
                 textBlockFoundForm = new TextBlock
                 {
                     Name = nameof(result.FoundForm),
-                    Text = string.Join("", result.FoundForm),
+                    Text = result.FoundForm,
                     Visibility = Visibility.Collapsed,
                 };
             }
 
-            if (result.Frequency != null && result.Frequency.Any())
+            if (result.Frequency != int.MaxValue && result.Frequency > 0)
             {
                 textBlockFrequency = new TextBlock
                 {
                     Name = nameof(result.Frequency),
-                    Text = "#" + string.Join(", ", result.Frequency),
+                    Text = "#" + result.Frequency,
                     Foreground = ConfigManager.FrequencyColor,
                     FontSize = ConfigManager.FrequencyFontSize,
                     Margin = new Thickness(5, 0, 0, 0),
@@ -388,15 +388,15 @@ namespace JL.Windows.GUI
                 };
             }
 
-            if (result.DictType != null && result.DictType.Any())
+            if (result.DictType != null)
             {
                 IEnumerable<DictType> dictTypeNames = Enum.GetValues(typeof(DictType)).Cast<DictType>();
-                DictType dictType = dictTypeNames.First(dictTypeName => dictTypeName.ToString() == result.DictType[0]);
+                DictType dictType = dictTypeNames.First(dictTypeName => dictTypeName.ToString() == result.DictType);
 
                 textBlockDictType = new TextBlock
                 {
                     Name = nameof(result.DictType),
-                    Text = dictType.GetDescription() ?? result.DictType[0],
+                    Text = dictType.GetDescription() ?? result.DictType,
                     Foreground = ConfigManager.DictTypeColor,
                     FontSize = ConfigManager.DictTypeFontSize,
                     Margin = new Thickness(5, 0, 0, 0),
@@ -404,12 +404,12 @@ namespace JL.Windows.GUI
                 };
             }
 
-            if (result.FoundSpelling != null && result.FoundSpelling.Any())
+            if (result.FoundSpelling != null)
             {
                 textBlockFoundSpelling = new TextBlock
                 {
                     Name = nameof(result.FoundSpelling),
-                    Text = result.FoundSpelling[0],
+                    Text = result.FoundSpelling,
                     Tag = index, // for audio
                     Foreground = ConfigManager.PrimarySpellingColor,
                     FontSize = ConfigManager.PrimarySpellingFontSize,
@@ -470,14 +470,14 @@ namespace JL.Windows.GUI
                 }
             }
 
-            if (result.Definitions != null && result.Definitions.Any())
+            if (result.FormattedDefinitions != null && result.FormattedDefinitions.Any())
             {
                 if (MiningMode || ConfigManager.LookupOnSelectOnly)
                 {
                     uiElementDefinitions = new TextBox
                     {
-                        Name = nameof(result.Definitions),
-                        Text = string.Join(", ", result.Definitions),
+                        Name = nameof(result.FormattedDefinitions),
+                        Text = result.FormattedDefinitions,
                         TextWrapping = TextWrapping.Wrap,
                         Background = Brushes.Transparent,
                         Foreground = ConfigManager.DefinitionsColor,
@@ -503,8 +503,8 @@ namespace JL.Windows.GUI
                 {
                     uiElementDefinitions = new TextBlock
                     {
-                        Name = nameof(result.Definitions),
-                        Text = string.Join(", ", result.Definitions),
+                        Name = nameof(result.FormattedDefinitions),
+                        Text = result.FormattedDefinitions,
                         TextWrapping = TextWrapping.Wrap,
                         Foreground = ConfigManager.DefinitionsColor,
                         FontSize = ConfigManager.DefinitionsFontSize,
@@ -513,12 +513,12 @@ namespace JL.Windows.GUI
                 }
             }
 
-            if (result.EdictID != null && result.EdictID.Any())
+            if (result.EdictID != null)
             {
                 textBlockEdictID = new TextBlock
                 {
                     Name = nameof(result.EdictID),
-                    Text = string.Join(", ", result.EdictID),
+                    Text = result.EdictID,
                     Visibility = Visibility.Collapsed,
                 };
             }
@@ -575,12 +575,12 @@ namespace JL.Windows.GUI
                 }
             }
 
-            if (result.Process != null && result.Process.Any())
+            if (result.Process != null)
             {
                 textBlockProcess = new TextBlock
                 {
                     Name = nameof(result.Process),
-                    Text = string.Join(", ", result.Process),
+                    Text = result.Process,
                     Foreground = ConfigManager.DeconjugationInfoColor,
                     FontSize = ConfigManager.DeconjugationInfoFontSize,
                     Margin = new Thickness(5, 0, 0, 0),
@@ -641,23 +641,23 @@ namespace JL.Windows.GUI
                 };
             }
 
-            if (result.StrokeCount != null && result.StrokeCount.Any())
+            if (result.StrokeCount > 0)
             {
                 textBlockStrokeCount = new TextBlock
                 {
                     Name = nameof(result.StrokeCount),
-                    Text = "Strokes" + ": " + string.Join(", ", result.StrokeCount),
-                    // Foreground = ConfigManager. Color,
+                    Text = "Strokes" + ": " + result.StrokeCount,
+                    Foreground = ConfigManager.DefinitionsColor,
                     FontSize = ConfigManager.DefinitionsFontSize,
                     Margin = new Thickness(2, 2, 2, 2),
                     TextWrapping = TextWrapping.Wrap,
                 };
             }
 
-            if (result.Grade != null && result.Grade.Any())
+            if (result.Grade > 0)
             {
                 string gradeString = "";
-                int gradeInt = Convert.ToInt32(result.Grade[0]);
+                int gradeInt = result.Grade;
                 switch (gradeInt)
                 {
                     case 0:
@@ -678,7 +678,7 @@ namespace JL.Windows.GUI
                 {
                     Name = nameof(result.Grade),
                     Text = nameof(result.Grade) + ": " + gradeString,
-                    // Foreground = ConfigManager. Color,
+                    Foreground = ConfigManager.DefinitionsColor,
                     FontSize = ConfigManager.DefinitionsFontSize,
                     Margin = new Thickness(2, 2, 2, 2),
                     TextWrapping = TextWrapping.Wrap,
@@ -690,9 +690,9 @@ namespace JL.Windows.GUI
                 textBlockComposition = new TextBlock
                 {
                     Name = nameof(result.Composition),
-                    Text = nameof(result.Composition) + ": " + string.Join(", ", result.Composition),
-                    // Foreground = ConfigManager. Color,
-                    FontSize = ConfigManager.ReadingsFontSize,
+                    Text = nameof(result.Composition) + ": " + result.Composition,
+                    Foreground = ConfigManager.DefinitionsColor,
+                    FontSize = ConfigManager.DefinitionsFontSize,
                     Margin = new Thickness(2, 2, 2, 2),
                     TextWrapping = TextWrapping.Wrap,
                 };
@@ -720,11 +720,7 @@ namespace JL.Windows.GUI
                     if (textBlock.Text == "()")
                         continue;
 
-                    // Frequency check
-                    if ((textBlock.Text == ("#" + Storage.FakeFrequency)) || textBlock.Text == "#0")
-                        continue;
-
-                    baby.MouseLeave += OnMouseLeave;
+                    textBlock.MouseLeave += OnMouseLeave;
 
                     if ((textBlock.Name is "FoundSpelling" or "Readings") &&
                         Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict kanjiumDict) && kanjiumDict.Active)
@@ -733,11 +729,11 @@ namespace JL.Windows.GUI
 
                         if (textBlock.Name is "FoundSpelling" && readings.Any())
                         {
-                            top.Children.Add(baby);
+                            top.Children.Add(textBlock);
                         }
                         else
                         {
-                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling[0],
+                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling,
                                 result.AlternativeSpellings,
                                 readings,
                                 textBlock.Text.Split(", ").ToList(),
@@ -745,17 +741,17 @@ namespace JL.Windows.GUI
 
                             if (pitchAccentGrid.Children.Count == 0)
                             {
-                                top.Children.Add(baby);
+                                top.Children.Add(textBlock);
                             }
                             else
                             {
-                                pitchAccentGrid.Children.Add(baby);
+                                pitchAccentGrid.Children.Add(textBlock);
                                 top.Children.Add(pitchAccentGrid);
                             }
                         }
                     }
                     else
-                        top.Children.Add(baby);
+                        top.Children.Add(textBlock);
                 }
                 else if (baby is TextBox textBox)
                 {
@@ -765,7 +761,7 @@ namespace JL.Windows.GUI
                     if (textBox.Text == "")
                         continue;
 
-                    baby.MouseLeave += OnMouseLeave;
+                    textBox.MouseLeave += OnMouseLeave;
 
                     if ((textBox.Name is "FoundSpelling" or "Readings") &&
                         Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict kanjiumDict) && kanjiumDict.Active)
@@ -774,11 +770,11 @@ namespace JL.Windows.GUI
 
                         if (textBox.Name is "FoundSpelling" && readings.Any())
                         {
-                            top.Children.Add(baby);
+                            top.Children.Add(textBox);
                         }
                         else
                         {
-                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling[0],
+                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling,
                                 result.AlternativeSpellings,
                                 readings,
                                 textBox.Text.Split(", ").ToList(),
@@ -786,17 +782,17 @@ namespace JL.Windows.GUI
 
                             if (pitchAccentGrid.Children.Count == 0)
                             {
-                                top.Children.Add(baby);
+                                top.Children.Add(textBox);
                             }
                             else
                             {
-                                pitchAccentGrid.Children.Add(baby);
+                                pitchAccentGrid.Children.Add(textBox);
                                 top.Children.Add(pitchAccentGrid);
                             }
                         }
                     }
                     else
-                        top.Children.Add(baby);
+                        top.Children.Add(textBox);
                 }
             }
 

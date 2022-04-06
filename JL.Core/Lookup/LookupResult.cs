@@ -3,16 +3,16 @@
 public class LookupResult
 {
     // common (required for sorting)
-    public List<string> FoundForm { get; set; } // todo rename foundform to foundtext
-    public List<string> Frequency { get; set; }
-    public List<string> DictType { get; set; }
-    public List<string> FoundSpelling { get; set; }
+    public string FoundForm { get; set; } // todo rename foundform to foundtext
+    public int Frequency { get; set; }
+    public string DictType { get; set; }
+    public string FoundSpelling { get; set; }
 
     public List<string> Readings { get; set; }
-    public List<string> Definitions { get; set; }
-    public List<string> EdictID { get; set; }
+    public string FormattedDefinitions { get; set; }
+    public string EdictID { get; set; }
     public List<string> AlternativeSpellings { get; set; }
-    public List<string> Process { get; set; }
+    public string Process { get; set; }
     public List<string> POrthographyInfoList { get; set; }
     public List<string> ROrthographyInfoList { get; set; }
     public List<string> AOrthographyInfoList { get; set; }
@@ -21,7 +21,14 @@ public class LookupResult
     public List<string> OnReadings { get; set; }
     public List<string> KunReadings { get; set; }
     public List<string> Nanori { get; set; }
-    public List<string> StrokeCount { get; set; }
-    public List<string> Composition { get; set; }
-    public List<string> Grade { get; set; }
+    public int StrokeCount { get; set; }
+    public string Composition { get; set; }
+    public int Grade { get; set; }
+
+    public LookupResult()
+    {
+        Frequency = int.MaxValue;
+        StrokeCount = 0;
+        Grade = 0;
+    }
 }

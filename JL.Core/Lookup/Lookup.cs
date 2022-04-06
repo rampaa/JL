@@ -163,16 +163,16 @@ namespace JL.Core.Lookup
             List<LookupResult> lookupResults)
         {
             List<LookupResult> sortedLookupResults = lookupResults
-                .OrderByDescending(dict => dict.FoundForm[0].Length)
-                .ThenBy(dict => Enum.TryParse(dict.DictType[0], out DictType dictType)
+                .OrderByDescending(dict => dict.FoundForm.Length)
+                .ThenBy(dict => Enum.TryParse(dict.DictType, out DictType dictType)
                     ? Storage.Dicts[dictType].Priority
                     : int.MaxValue)
-                .ThenBy(dict => Convert.ToInt32(dict.Frequency[0])).ToList();
+                .ThenBy(dict => dict.Frequency).ToList();
 
-            string longestFoundForm = sortedLookupResults.First().FoundForm[0];
+            string longestFoundForm = sortedLookupResults.First().FoundForm;
 
             sortedLookupResults = sortedLookupResults
-                .OrderByDescending(dict => longestFoundForm == dict.FoundSpelling[0])
+                .OrderByDescending(dict => longestFoundForm == dict.FoundSpelling)
                 .ThenByDescending(dict => dict.Readings.Contains(longestFoundForm))
                 .ToList();
 
@@ -432,27 +432,7 @@ namespace JL.Core.Lookup
 
                     LookupResult result = new();
 
-                    var foundSpelling = new List<string> { jMDictResult.PrimarySpelling };
-
                     //var kanaSpellings = jMDictResult.KanaSpellings ?? new List<string>();
-
-                    List<string> readings = jMDictResult.Readings ?? new();
-
-                    var foundForm = new List<string> { wordResult.FoundForm };
-
-                    var edictID = new List<string> { jMDictResult.Id };
-
-                    List<string> alternativeSpellings = jMDictResult.AlternativeSpellings ?? new();
-
-                    List<string> process = ProcessProcess(wordResult);
-
-                    List<string> frequency = GetJMDictFreq(jMDictResult);
-
-                    var dictType = new List<string> { wordResult.DictType.ToString() };
-
-                    var definitions = new List<string> { BuildJmdictDefinition(jMDictResult) };
-
-                    List<string> pOrthographyInfoList = jMDictResult.POrthographyInfoList ?? new();
 
                     List<List<string>> rLists = jMDictResult.ROrthographyInfoList ?? new();
                     List<List<string>> aLists = jMDictResult.AOrthographyInfoList ?? new();
@@ -485,19 +465,21 @@ namespace JL.Core.Lookup
                         aOrthographyInfoList.Add(formattedAOrthographyInfo.ToString().TrimEnd(", ".ToCharArray()));
                     }
 
-                    result.FoundSpelling = foundSpelling;
+                    result.FoundSpelling = jMDictResult.PrimarySpelling;
                     //result.KanaSpellings, kanaSpellings);
-                    result.Readings = readings;
-                    result.Definitions = definitions;
-                    result.FoundForm = foundForm;
-                    result.EdictID = edictID;
-                    result.AlternativeSpellings = alternativeSpellings;
-                    result.Process = process;
-                    result.Frequency = frequency;
-                    result.POrthographyInfoList = pOrthographyInfoList;
-                    result.ROrthographyInfoList = rOrthographyInfoList;
-                    result.AOrthographyInfoList = aOrthographyInfoList;
-                    result.DictType = dictType;
+                    result.Readings = jMDictResult.Readings ?? new();
+                    result.FoundForm = wordResult.FoundForm;
+                    result.EdictID = jMDictResult.Id;
+                    result.AlternativeSpellings = jMDictResult.AlternativeSpellings ?? new();
+                    result.Process = ProcessProcess(wordResult);
+                    result.Frequency = GetJMDictFreq(jMDictResult);
+                    result.POrthographyInfoList = jMDictResult.POrthographyInfoList ?? new();
+                    result.ROrthographyInfoList = rOrthographyInfoList ?? new();
+                    result.AOrthographyInfoList = aOrthographyInfoList ?? new();
+                    result.DictType = wordResult.DictType.ToString();
+                    result.FormattedDefinitions = jMDictResult != null
+                        ? BuildJmdictDefinition(jMDictResult)
+                        : null;
 
                     results.Add(result);
                 }
@@ -520,28 +502,15 @@ namespace JL.Core.Lookup
 
                     LookupResult result = new();
 
-                    var foundSpelling = new List<string> { jMnedictResult.PrimarySpelling };
-
-                    List<string> readings = jMnedictResult.Readings ?? new List<string>();
-
-                    var foundForm = new List<string> { nameResult.FoundForm };
-
-                    var edictID = new List<string> { jMnedictResult.Id };
-
-                    var dictType = new List<string> { nameResult.DictType.ToString() };
-
-                    List<string> alternativeSpellings = jMnedictResult.AlternativeSpellings ?? new List<string>();
-
-                    var definitions = new List<string> { BuildJmnedictDefinition(jMnedictResult) };
-
-                    result.EdictID = edictID;
-                    result.FoundSpelling = foundSpelling;
-                    result.AlternativeSpellings = alternativeSpellings;
-                    result.Readings = readings;
-                    result.Definitions = definitions;
-                    result.FoundForm = foundForm;
-                    result.Frequency = new List<string> { Storage.FakeFrequency };
-                    result.DictType = dictType;
+                    result.EdictID = jMnedictResult.Id;
+                    result.FoundSpelling = jMnedictResult.PrimarySpelling;
+                    result.AlternativeSpellings = jMnedictResult.AlternativeSpellings ?? new();
+                    result.Readings = jMnedictResult.Readings ?? new();
+                    result.FoundForm = nameResult.FoundForm;
+                    result.DictType = nameResult.DictType.ToString();
+                    result.FormattedDefinitions = jMnedictResult != null
+                        ? BuildJmnedictDefinition(jMnedictResult)
+                        : null;
 
                     results.Add(result);
                 }
@@ -562,21 +531,19 @@ namespace JL.Core.Lookup
             List<IResult> iResult = kanjiResults.First().Value.ResultsList;
             KanjiResult kanjiResult = (KanjiResult)iResult.First();
 
-            var dictType = new List<string> { kanjiResults.First().Value.DictType.ToString() };
-
-            result.FoundSpelling = new List<string> { kanjiResults.First().Key };
-            result.Definitions = kanjiResult.Meanings;
-            result.OnReadings = kanjiResult.OnReadings;
-            result.KunReadings = kanjiResult.KunReadings;
-            result.Nanori = kanjiResult.Nanori;
-            result.StrokeCount = new List<string> { kanjiResult.StrokeCount.ToString() };
-            result.Grade = new List<string> { kanjiResult.Grade.ToString() };
-            result.Composition = new List<string> { kanjiResult.Composition };
-            result.Frequency = new List<string> { kanjiResult.Frequency.ToString() };
-
-            var foundForm = new List<string> { kanjiResults.First().Value.FoundForm };
-            result.FoundForm = foundForm;
-            result.DictType = dictType;
+            result.FoundSpelling = kanjiResults.First().Key;
+            result.OnReadings = kanjiResult.OnReadings ?? new();
+            result.KunReadings = kanjiResult.KunReadings ?? new();
+            result.Nanori = kanjiResult.Nanori ?? new();
+            result.StrokeCount = kanjiResult.StrokeCount;
+            result.Grade = kanjiResult.Grade;
+            result.Composition = kanjiResult.Composition;
+            result.Frequency = kanjiResult.Frequency;
+            result.FoundForm = kanjiResults.First().Value.FoundForm;
+            result.DictType = kanjiResults.First().Value.DictType.ToString();
+            result.FormattedDefinitions = kanjiResult.Meanings != null
+                ? string.Join(", ", kanjiResult.Meanings)
+                : null;
 
             List<string> allReadings = new();
 
@@ -609,29 +576,19 @@ namespace JL.Core.Lookup
 
                     LookupResult result = new();
 
-                    var foundSpelling = new List<string> { epwingResult.PrimarySpelling };
+                    result.FoundSpelling = epwingResult.PrimarySpelling;
+                    result.FoundForm = wordResult.FoundForm;
+                    result.Process = ProcessProcess(wordResult);
+                    result.Frequency = GetEpwingFreq(epwingResult);
+                    result.DictType = wordResult.DictType.ToString();
 
-                    var reading = new List<string> { epwingResult.Reading };
-
-                    var foundForm = new List<string> { wordResult.FoundForm };
-
-                    List<string> process = ProcessProcess(wordResult);
-
-                    List<string> frequency = GetEpwingFreq(epwingResult);
-
-                    var dictType = new List<string> { wordResult.DictType.ToString() };
-
-                    List<string> definitions = epwingResult.Definitions != null
-                        ? new() { BuildEpwingDefinition(epwingResult.Definitions) }
+                    result.Readings = epwingResult.Reading != null
+                        ? new List<string> { epwingResult.Reading }
                         : new();
 
-                    result.FoundSpelling = foundSpelling;
-                    result.Readings = reading;
-                    result.Definitions = definitions;
-                    result.FoundForm = foundForm;
-                    result.Process = process;
-                    result.Frequency = frequency;
-                    result.DictType = dictType;
+                    result.FormattedDefinitions = epwingResult.Definitions != null
+                        ? BuildEpwingDefinition(epwingResult.Definitions)
+                        : null;
 
                     results.Add(result);
                 }
@@ -654,30 +611,20 @@ namespace JL.Core.Lookup
 
                     LookupResult result = new();
 
-                    var foundSpelling = new List<string> { epwingResult.PrimarySpelling };
+                    result.FoundSpelling = epwingResult.PrimarySpelling;
+                    result.AlternativeSpellings = epwingResult.AlternativeSpellings ?? new();
+                    result.FoundForm = wordResult.FoundForm;
+                    result.Process = ProcessProcess(wordResult);
+                    result.Frequency = GetEpwingNazekaFreq(epwingResult);
+                    result.DictType = wordResult.DictType.ToString();
 
-                    var reading = new List<string> { epwingResult.Reading };
+                    result.Readings = epwingResult.Reading != null
+                        ? new List<string> { epwingResult.Reading }
+                        : new();
 
-                    var foundForm = new List<string> { wordResult.FoundForm };
-
-                    List<string> process = ProcessProcess(wordResult);
-
-                    List<string> frequency = GetEpwingNazekaFreq(epwingResult);
-
-                    List<string> alternativeSpellings = epwingResult.AlternativeSpellings ?? new List<string>();
-
-                    var dictType = new List<string> { wordResult.DictType.ToString() };
-
-                    var definitions = new List<string> { BuildEpwingDefinition(epwingResult.Definitions) };
-
-                    result.FoundSpelling = foundSpelling;
-                    result.AlternativeSpellings = alternativeSpellings;
-                    result.Readings = reading;
-                    result.Definitions = definitions;
-                    result.FoundForm = foundForm;
-                    result.Process = process;
-                    result.Frequency = frequency;
-                    result.DictType = dictType;
+                    result.FormattedDefinitions = epwingResult.Definitions != null
+                        ? BuildEpwingDefinition(epwingResult.Definitions)
+                        : null;
 
                     results.Add(result);
                 }
@@ -699,39 +646,22 @@ namespace JL.Core.Lookup
                     var customWordDictResult = (CustomWordEntry)wordResult.ResultsList[i];
                     LookupResult result = new();
 
-                    var foundSpelling = new List<string> { customWordDictResult.PrimarySpelling };
+                    int frequency = GetCustomWordFreq(customWordDictResult);
 
-                    List<string> readings = customWordDictResult.Readings != null
-                        ? customWordDictResult.Readings.ToList()
-                        : new List<string>();
+                    if (frequency == int.MaxValue)
+                        frequency = wordResultCount - i;
 
-                    var foundForm = new List<string> { wordResult.FoundForm };
-
-                    List<string> alternativeSpellings;
-
-                    if (customWordDictResult.AlternativeSpellings != null)
-                        alternativeSpellings = customWordDictResult.AlternativeSpellings.ToList();
-                    else
-                        alternativeSpellings = new();
-
-                    List<string> process = ProcessProcess(wordResult);
-
-                    List<string> frequency = GetCustomWordFreq(customWordDictResult);
-                    if (frequency.First() == Storage.FakeFrequency)
-                        frequency = new List<string> { (wordResultCount - i).ToString() };
-
-                    var dictType = new List<string> { wordResult.DictType.ToString() };
-
-                    var definitions = new List<string> { BuildCustomWordDefinition(customWordDictResult) };
-
-                    result.FoundSpelling = foundSpelling;
-                    result.Readings = readings;
-                    result.Definitions = definitions;
-                    result.FoundForm = foundForm;
-                    result.AlternativeSpellings = alternativeSpellings;
-                    result.Process = process;
                     result.Frequency = frequency;
-                    result.DictType = dictType;
+                    result.FoundSpelling = customWordDictResult.PrimarySpelling;
+                    result.FoundForm = wordResult.FoundForm;
+                    result.Process = ProcessProcess(wordResult);
+                    result.DictType = wordResult.DictType.ToString();
+
+                    result.Readings = customWordDictResult.Readings ?? new();
+                    result.AlternativeSpellings = customWordDictResult.AlternativeSpellings ?? new();
+                    result.FormattedDefinitions = customWordDictResult != null
+                        ? BuildCustomWordDefinition(customWordDictResult)
+                        : null;
 
                     results.Add(result);
                 }
@@ -753,23 +683,18 @@ namespace JL.Core.Lookup
                     var customNameDictResult = (CustomNameEntry)customNameResult.Value.ResultsList[i];
                     LookupResult result = new();
 
-                    var foundSpelling = new List<string> { customNameDictResult.PrimarySpelling };
+                    result.FoundSpelling = customNameDictResult.PrimarySpelling;
+                    result.FoundForm = customNameResult.Value.FoundForm;
+                    result.Frequency = resultCount - i;
+                    result.DictType = customNameResult.Value.DictType.ToString();
 
-                    var readings = new List<string> { customNameDictResult.Reading };
+                    result.Readings = customNameDictResult.Reading != null
+                        ? new List<string> { customNameDictResult.Reading }
+                        : new();
 
-                    var foundForm = new List<string> { customNameResult.Value.FoundForm };
-
-                    var dictType = new List<string> { customNameResult.Value.DictType.ToString() };
-
-                    var definitions = new List<string> { BuildCustomNameDefinition(customNameDictResult) };
-
-                    result.FoundSpelling = foundSpelling;
-                    result.Readings = readings;
-                    result.Definitions = definitions;
-
-                    result.FoundForm = foundForm;
-                    result.Frequency = new List<string> { (resultCount - i).ToString() };
-                    result.DictType = dictType;
+                    result.FormattedDefinitions = customNameDictResult != null
+                        ? BuildCustomNameDefinition(customNameDictResult)
+                        : null;
 
                     results.Add(result);
                 }
@@ -778,11 +703,9 @@ namespace JL.Core.Lookup
             return results;
         }
 
-        private static List<string> GetJMDictFreq(JMdictResult jMDictResult)
+        private static int GetJMDictFreq(JMdictResult jMDictResult)
         {
-            List<string> frequency = new() { Storage.FakeFrequency };
-
-            int freqValue = int.MaxValue;
+            int frequency = int.MaxValue;
 
             Storage.FreqDicts.TryGetValue(Storage.Frontend.CoreConfig.FrequencyListName,
                 out Dictionary<string, List<FrequencyEntry>> freqDict);
@@ -802,15 +725,14 @@ namespace JL.Core.Lookup
                         || (jMDictResult.Readings == null && jMDictResult.PrimarySpelling == freqResult.Spelling))
                     //|| (jMnedictResult.KanaSpellings != null && jMnedictResult.KanaSpellings.Contains(freqResult.Spelling))
                     {
-                        if (freqValue > freqResult.Frequency)
+                        if (frequency > freqResult.Frequency)
                         {
-                            freqValue = freqResult.Frequency;
-                            frequency = new List<string> { freqResult.Frequency.ToString() };
+                            frequency = freqResult.Frequency;
                         }
                     }
                 }
 
-                if (freqValue == int.MaxValue && jMDictResult.AlternativeSpellings != null)
+                if (frequency == int.MaxValue && jMDictResult.AlternativeSpellings != null)
                 {
                     int alternativeSpellingsCount = jMDictResult.AlternativeSpellings.Count;
                     for (int i = 0; i < alternativeSpellingsCount; i++)
@@ -826,13 +748,9 @@ namespace JL.Core.Lookup
                                 if (jMDictResult.Readings != null
                                     && jMDictResult.Readings.Contains(alternativeSpellingFreqResult.Spelling))
                                 {
-                                    if (freqValue > alternativeSpellingFreqResult.Frequency)
+                                    if (frequency > alternativeSpellingFreqResult.Frequency)
                                     {
-                                        freqValue = alternativeSpellingFreqResult.Frequency;
-                                        frequency = new List<string>
-                                        {
-                                            alternativeSpellingFreqResult.Frequency.ToString()
-                                        };
+                                        frequency = alternativeSpellingFreqResult.Frequency;
                                     }
                                 }
                             }
@@ -861,10 +779,9 @@ namespace JL.Core.Lookup
                                     && jMDictResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
                             //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                             {
-                                if (freqValue > readingFreqResult.Frequency)
+                                if (frequency > readingFreqResult.Frequency)
                                 {
-                                    freqValue = readingFreqResult.Frequency;
-                                    frequency = new List<string> { readingFreqResult.Frequency.ToString() };
+                                    frequency = readingFreqResult.Frequency;
                                 }
                             }
                         }
@@ -875,11 +792,9 @@ namespace JL.Core.Lookup
             return frequency;
         }
 
-        private static List<string> GetEpwingNazekaFreq(EpwingNazekaResult epwingNazekaResult)
+        private static int GetEpwingNazekaFreq(EpwingNazekaResult epwingNazekaResult)
         {
-            List<string> frequency = new() { Storage.FakeFrequency };
-
-            int freqValue = int.MaxValue;
+            int frequency = int.MaxValue;
 
             Storage.FreqDicts.TryGetValue(Storage.Frontend.CoreConfig.FrequencyListName,
                 out Dictionary<string, List<FrequencyEntry>> freqDict);
@@ -899,15 +814,14 @@ namespace JL.Core.Lookup
                         || (epwingNazekaResult.Reading == null &&
                             epwingNazekaResult.PrimarySpelling == freqResult.Spelling))
                     {
-                        if (freqValue > freqResult.Frequency)
+                        if (frequency > freqResult.Frequency)
                         {
-                            freqValue = freqResult.Frequency;
-                            frequency = new List<string> { freqResult.Frequency.ToString() };
+                            frequency = freqResult.Frequency;
                         }
                     }
                 }
 
-                if (freqValue == int.MaxValue && epwingNazekaResult.AlternativeSpellings != null)
+                if (frequency == int.MaxValue && epwingNazekaResult.AlternativeSpellings != null)
                 {
                     int alternativeSpellingsCount = epwingNazekaResult.AlternativeSpellings.Count;
                     for (int i = 0; i < alternativeSpellingsCount; i++)
@@ -923,13 +837,9 @@ namespace JL.Core.Lookup
 
                                 if (epwingNazekaResult.Reading == alternativeSpellingFreqResult.Spelling)
                                 {
-                                    if (freqValue > alternativeSpellingFreqResult.Frequency)
+                                    if (frequency > alternativeSpellingFreqResult.Frequency)
                                     {
-                                        freqValue = alternativeSpellingFreqResult.Frequency;
-                                        frequency = new List<string>
-                                        {
-                                            alternativeSpellingFreqResult.Frequency.ToString()
-                                        };
+                                        frequency = alternativeSpellingFreqResult.Frequency;
                                     }
                                 }
                             }
@@ -954,10 +864,9 @@ namespace JL.Core.Lookup
                             || (epwingNazekaResult.AlternativeSpellings != null
                                 && epwingNazekaResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
                         {
-                            if (freqValue > readingFreqResult.Frequency)
+                            if (frequency > readingFreqResult.Frequency)
                             {
-                                freqValue = readingFreqResult.Frequency;
-                                frequency = new List<string> { readingFreqResult.Frequency.ToString() };
+                                frequency = readingFreqResult.Frequency;
                             }
                         }
                     }
@@ -967,11 +876,9 @@ namespace JL.Core.Lookup
             return frequency;
         }
 
-        private static List<string> GetEpwingFreq(EpwingResult epwingResult)
+        private static int GetEpwingFreq(EpwingResult epwingResult)
         {
-            List<string> frequency = new() { Storage.FakeFrequency };
-
-            int freqValue = int.MaxValue;
+            int frequency = int.MaxValue;
 
             Storage.FreqDicts.TryGetValue(Storage.Frontend.CoreConfig.FrequencyListName,
                 out Dictionary<string, List<FrequencyEntry>> freqDict);
@@ -991,10 +898,9 @@ namespace JL.Core.Lookup
                         || (string.IsNullOrEmpty(epwingResult.Reading)
                             && epwingResult.PrimarySpelling == freqResult.Spelling))
                     {
-                        if (freqValue > freqResult.Frequency)
+                        if (frequency > freqResult.Frequency)
                         {
-                            freqValue = freqResult.Frequency;
-                            frequency = new List<string> { freqResult.Frequency.ToString() };
+                            frequency = freqResult.Frequency;
                         }
                     }
                 }
@@ -1011,10 +917,9 @@ namespace JL.Core.Lookup
 
                     if (epwingResult.Reading == readingFreqResult.Spelling && Kana.IsKatakana(epwingResult.Reading))
                     {
-                        if (freqValue > readingFreqResult.Frequency)
+                        if (frequency > readingFreqResult.Frequency)
                         {
-                            freqValue = readingFreqResult.Frequency;
-                            frequency = new List<string> { readingFreqResult.Frequency.ToString() };
+                            frequency = readingFreqResult.Frequency;
                         }
                     }
                 }
@@ -1023,11 +928,9 @@ namespace JL.Core.Lookup
             return frequency;
         }
 
-        private static List<string> GetCustomWordFreq(CustomWordEntry customWordResult)
+        private static int GetCustomWordFreq(CustomWordEntry customWordResult)
         {
-            List<string> frequency = new() { Storage.FakeFrequency };
-
-            int freqValue = int.MaxValue;
+            int frequency = int.MaxValue;
 
             Storage.FreqDicts.TryGetValue(Storage.Frontend.CoreConfig.FrequencyListName,
                 out Dictionary<string, List<FrequencyEntry>> freqDict);
@@ -1047,15 +950,14 @@ namespace JL.Core.Lookup
                         || (customWordResult.Readings == null
                             && customWordResult.PrimarySpelling == freqResult.Spelling))
                     {
-                        if (freqValue > freqResult.Frequency)
+                        if (frequency > freqResult.Frequency)
                         {
-                            freqValue = freqResult.Frequency;
-                            frequency = new List<string> { freqResult.Frequency.ToString() };
+                            frequency = freqResult.Frequency;
                         }
                     }
                 }
 
-                if (freqValue == int.MaxValue && customWordResult.AlternativeSpellings != null)
+                if (frequency == int.MaxValue && customWordResult.AlternativeSpellings != null)
                 {
                     int alternativeSpellingsCount = customWordResult.AlternativeSpellings.Count;
                     for (int i = 0; i < alternativeSpellingsCount; i++)
@@ -1073,13 +975,9 @@ namespace JL.Core.Lookup
                                     && customWordResult.Readings.Contains(alternativeSpellingFreqResult.Spelling)
                                    )
                                 {
-                                    if (freqValue > alternativeSpellingFreqResult.Frequency)
+                                    if (frequency > alternativeSpellingFreqResult.Frequency)
                                     {
-                                        freqValue = alternativeSpellingFreqResult.Frequency;
-                                        frequency = new List<string>
-                                        {
-                                            alternativeSpellingFreqResult.Frequency.ToString()
-                                        };
+                                        frequency = alternativeSpellingFreqResult.Frequency;
                                     }
                                 }
                             }
@@ -1108,10 +1006,9 @@ namespace JL.Core.Lookup
                                     && customWordResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
                             //|| (customWordResult.KanaSpellings != null && customWordResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                             {
-                                if (freqValue > readingFreqResult.Frequency)
+                                if (frequency > readingFreqResult.Frequency)
                                 {
-                                    freqValue = readingFreqResult.Frequency;
-                                    frequency = new List<string> { readingFreqResult.Frequency.ToString() };
+                                    frequency = readingFreqResult.Frequency;
                                 }
                             }
                         }
@@ -1131,58 +1028,73 @@ namespace JL.Core.Lookup
 
             for (int i = 0; i < jMDictResult.Definitions.Count; i++)
             {
-                if (jMDictResult.WordClasses.Any() && jMDictResult.WordClasses[i].Any())
+                if (Storage.Frontend.CoreConfig.NewlineBetweenDefinitions)
+                    defResult.Append($"({count}) ");
+
+                if (jMDictResult.WordClasses != null && jMDictResult.WordClasses.Any() && jMDictResult.WordClasses[i].Any())
                 {
                     defResult.Append('(');
                     defResult.Append(string.Join(", ", jMDictResult.WordClasses[i]));
                     defResult.Append(") ");
                 }
 
-                if (jMDictResult.Definitions.Any())
-                {
+                if (!Storage.Frontend.CoreConfig.NewlineBetweenDefinitions)
                     defResult.Append($"({count}) ");
 
-                    if (jMDictResult.SpellingInfo.Any() && jMDictResult.SpellingInfo[i] != null)
-                    {
-                        defResult.Append('(');
-                        defResult.Append(jMDictResult.SpellingInfo[i]);
-                        defResult.Append(") ");
-                    }
-
-                    if (jMDictResult.MiscList.Any() && jMDictResult.MiscList[i].Any())
-                    {
-                        defResult.Append('(');
-                        defResult.Append(string.Join(", ", jMDictResult.MiscList[i]));
-                        defResult.Append(") ");
-                    }
-
-                    defResult.Append(string.Join("; ", jMDictResult.Definitions[i]) + " ");
-
-                    if (jMDictResult.RRestrictions != null && jMDictResult.RRestrictions[i].Any()
-                        || jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
-                    {
-                        defResult.Append("(only applies to ");
-
-                        if (jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
-                        {
-                            defResult.Append(string.Join("; ", jMDictResult.KRestrictions[i]));
-                        }
-
-                        if (jMDictResult.RRestrictions != null && jMDictResult.RRestrictions[i].Any())
-                        {
-                            if (jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
-                                defResult.Append("; ");
-
-                            defResult.Append(string.Join("; ", jMDictResult.RRestrictions[i]));
-                        }
-
-                        defResult.Append(") ");
-                    }
-
-                    defResult.Append(separator);
-
-                    ++count;
+                if (jMDictResult.Dialects != null && jMDictResult.Dialects.Any() && jMDictResult.Dialects[i].Any())
+                {
+                    defResult.Append('(');
+                    defResult.Append(string.Join(", ", jMDictResult.Dialects[i]));
+                    defResult.Append(") ");
                 }
+
+                if (jMDictResult.SpellingInfo != null && jMDictResult.SpellingInfo.Any() && jMDictResult.SpellingInfo[i] != null)
+                {
+                    defResult.Append('(');
+                    defResult.Append(jMDictResult.SpellingInfo[i]);
+                    defResult.Append(") ");
+                }
+
+                if (jMDictResult.MiscList != null && jMDictResult.MiscList.Any() && jMDictResult.MiscList[i].Any())
+                {
+                    defResult.Append('(');
+                    defResult.Append(string.Join(", ", jMDictResult.MiscList[i]));
+                    defResult.Append(") ");
+                }
+
+                if (jMDictResult.TypeList != null && jMDictResult.TypeList.Any() && jMDictResult.TypeList[i].Any())
+                {
+                    defResult.Append('(');
+                    defResult.Append(string.Join(", ", jMDictResult.TypeList[i]));
+                    defResult.Append(") ");
+                }
+
+                defResult.Append(string.Join("; ", jMDictResult.Definitions[i]) + " ");
+
+                if (jMDictResult.RRestrictions != null && jMDictResult.RRestrictions[i].Any()
+                    || jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
+                {
+                    defResult.Append("(only applies to ");
+
+                    if (jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
+                    {
+                        defResult.Append(string.Join("; ", jMDictResult.KRestrictions[i]));
+                    }
+
+                    if (jMDictResult.RRestrictions != null && jMDictResult.RRestrictions[i].Any())
+                    {
+                        if (jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
+                            defResult.Append("; ");
+
+                        defResult.Append(string.Join("; ", jMDictResult.RRestrictions[i]));
+                    }
+
+                    defResult.Append(") ");
+                }
+
+                defResult.Append(separator);
+
+                ++count;
             }
 
             return defResult.ToString().Trim('\n');
@@ -1277,7 +1189,7 @@ namespace JL.Core.Lookup
             return $"({customNameDictResult.NameType.ToLower()}) {customNameDictResult.Reading}";
         }
 
-        public static List<string> ProcessProcess(IntermediaryResult intermediaryResult)
+        public static string ProcessProcess(IntermediaryResult intermediaryResult)
         {
             StringBuilder deconj = new();
             bool first = true;
@@ -1320,7 +1232,7 @@ namespace JL.Core.Lookup
                 first = false;
             }
 
-            return deconj.Length == 0 ? new List<string>() : new List<string> { deconj.ToString() };
+            return deconj.Length == 0 ? null : deconj.ToString();
         }
     }
 }

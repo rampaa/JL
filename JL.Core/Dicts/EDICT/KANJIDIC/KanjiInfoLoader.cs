@@ -135,13 +135,13 @@ namespace JL.Core.Dicts.EDICT.KANJIDIC
                 }
             }
 
-            if (!entry.Nanori.Any())
+            if (!entry.Nanori.Any() || entry.Nanori.All(l => !l.Any()))
                 entry.Nanori = null;
-            if (!entry.Meanings.Any())
+            if (!entry.Meanings.Any() || entry.Meanings.All(l => !l.Any()))
                 entry.Meanings = null;
-            if (!entry.OnReadings.Any())
+            if (!entry.OnReadings.Any() || entry.OnReadings.All(l => !l.Any()))
                 entry.OnReadings = null;
-            if (!entry.KunReadings.Any())
+            if (!entry.KunReadings.Any() || entry.KunReadings.All(l => !l.Any()))
                 entry.KunReadings = null;
 
             Storage.Dicts[DictType.Kanjidic].Contents.Add(key, new List<IResult> { entry });

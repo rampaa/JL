@@ -15,8 +15,7 @@
         public List<List<string>> TypeList { get; set; } // e.g. "martial arts"
         public List<List<string>> MiscList { get; set; } // e.g. "abbr" +
         public List<string> SpellingInfo { get; set; } // e.g. "often derog" +
-
-        public List<string> Dialects { get; set; } // e.g. ksb
+        public List<List<string>> Dialects { get; set; } // e.g. ksb
 
         // public List<string> KanaSpellings { get; set; }
         public string PrimarySpelling { get; set; }
@@ -39,7 +38,7 @@
             TypeList = new List<List<string>>();
             MiscList = new List<List<string>>();
             SpellingInfo = new List<string>();
-            Dialects = new List<string>();
+            Dialects = new List<List<string>>();
             //FrequencyDict = new Dictionary<string, Frequency>();
             //KanaSpellings = new List<string>();
             PrimarySpelling = null;

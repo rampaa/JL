@@ -54,7 +54,7 @@ namespace JL.Core.Dicts.EDICT.JMdict
                         result.WordClasses.Add(sense.PosList);
                         result.TypeList.Add(sense.FieldList);
                         result.MiscList.Add(sense.MiscList);
-                        result.Dialects.AddRange(sense.DialList);
+                        result.Dialects.Add(sense.DialList);
                         result.SpellingInfo.Add(sense.SInf);
                         // result.RelatedTerms.AddRange(sense.XRefList);
                         // result.Antonyms.AddRange(sense.AntList);
@@ -151,7 +151,7 @@ namespace JL.Core.Dicts.EDICT.JMdict
                         result.WordClasses.Add(sense.PosList);
                         result.TypeList.Add(sense.FieldList);
                         result.MiscList.Add(sense.MiscList);
-                        result.Dialects.AddRange(sense.DialList);
+                        result.Dialects.Add(sense.DialList);
                         result.SpellingInfo.Add(sense.SInf);
                         // result.RelatedTerms.AddRange(sense.XRefList);
                         // result.Antonyms.AddRange(sense.AntList);
@@ -177,46 +177,46 @@ namespace JL.Core.Dicts.EDICT.JMdict
 
             foreach (KeyValuePair<string, JMdictResult> rl in resultList)
             {
-                if (!rl.Value.Readings.Any())
+                if (!rl.Value.Readings.Any() || rl.Value.Readings.All(s => string.IsNullOrEmpty(s)))
                     rl.Value.Readings = null;
 
                 if (!rl.Value.AlternativeSpellings.Any())
                     rl.Value.AlternativeSpellings = null;
 
-                if (!rl.Value.Definitions.Any())
+                if (!rl.Value.Definitions.Any() || rl.Value.Definitions.All(l => !l.Any()))
                     rl.Value.Definitions = null;
 
-                if (!rl.Value.RRestrictions.Any())
+                if (!rl.Value.RRestrictions.Any() || rl.Value.RRestrictions.All(l => !l.Any()))
                     rl.Value.RRestrictions = null;
 
-                if (!rl.Value.KRestrictions.Any())
+                if (!rl.Value.KRestrictions.Any() || rl.Value.KRestrictions.All(l => !l.Any()))
                     rl.Value.KRestrictions = null;
 
-                if (!rl.Value.Dialects.Any())
+                if (!rl.Value.Dialects.Any() || !rl.Value.Dialects.All(l => !l.Any()))
                     rl.Value.Dialects = null;
 
                 //if (!rl.Value.KanaSpellings.Any())
                 //    rl.Value.KanaSpellings = null;
 
-                if (!rl.Value.MiscList.Any())
+                if (!rl.Value.MiscList.Any() || rl.Value.MiscList.All(l => !l.Any()))
                     rl.Value.MiscList = null;
 
                 if (!rl.Value.POrthographyInfoList.Any())
                     rl.Value.POrthographyInfoList = null;
 
-                if (!rl.Value.AOrthographyInfoList.Any())
+                if (!rl.Value.AOrthographyInfoList.Any() || rl.Value.AOrthographyInfoList.All(l => !l.Any()))
                     rl.Value.AOrthographyInfoList = null;
 
-                if (!rl.Value.ROrthographyInfoList.Any())
+                if (!rl.Value.ROrthographyInfoList.Any() || rl.Value.ROrthographyInfoList.All(l => !l.Any()))
                     rl.Value.ROrthographyInfoList = null;
 
-                if (!rl.Value.SpellingInfo.Any())
+                if (!rl.Value.SpellingInfo.Any() || rl.Value.SpellingInfo.All(s => string.IsNullOrEmpty(s)))
                     rl.Value.SpellingInfo = null;
 
-                if (!rl.Value.TypeList.Any())
+                if (!rl.Value.TypeList.Any() || rl.Value.TypeList.All(l => !l.Any()))
                     rl.Value.TypeList = null;
 
-                if (!rl.Value.WordClasses.Any())
+                if (!rl.Value.WordClasses.Any() || rl.Value.WordClasses.All(l => !l.Any()))
                     rl.Value.WordClasses = null;
 
                 rl.Value.Id = entry.Id;

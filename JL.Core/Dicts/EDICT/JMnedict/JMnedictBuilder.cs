@@ -94,9 +94,6 @@
                 if (!rl.Value.NameTypes.Any())
                     rl.Value.NameTypes = null;
 
-                if (!rl.Value.PrimarySpelling.Any())
-                    rl.Value.PrimarySpelling = null;
-
                 if (!rl.Value.Readings.Any())
                     rl.Value.Readings = null;
 
