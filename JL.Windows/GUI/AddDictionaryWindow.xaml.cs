@@ -32,7 +32,7 @@ namespace JL.Windows.GUI
         {
             bool isValid = true;
 
-            string typeString = ComboBoxDictType.SelectionBoxItem.ToString();
+            string? typeString = ComboBoxDictType.SelectionBoxItem.ToString();
             if (string.IsNullOrEmpty(typeString))
             {
                 ComboBoxDictType.BorderBrush = Brushes.Red;
@@ -40,7 +40,7 @@ namespace JL.Windows.GUI
             }
             else if (ComboBoxDictType.BorderBrush == Brushes.Red)
             {
-                ComboBoxDictType.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
+                ComboBoxDictType.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
             }
 
             string path = TextBlockPath.Text;
@@ -51,13 +51,13 @@ namespace JL.Windows.GUI
             }
             else if (TextBlockPath.BorderBrush == Brushes.Red)
             {
-                TextBlockPath.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
+                TextBlockPath.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
             }
 
             if (isValid)
             {
                 //todo this will break on DictTypes without descriptions
-                DictType type = typeString.GetEnum<DictType>();
+                DictType type = typeString!.GetEnum<DictType>();
 
                 // lowest priority means highest number
                 int lowestPriority = Storage.Dicts.Select(dict => dict.Value.Priority).Max();
@@ -121,7 +121,7 @@ namespace JL.Windows.GUI
 
         private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)
         {
-            string typeString = ComboBoxDictType.SelectionBoxItem.ToString();
+            string typeString = ComboBoxDictType.SelectionBoxItem.ToString()!;
             //todo this will break on DictTypes without descriptions
             DictType selectedDictType = typeString.GetEnum<DictType>();
 

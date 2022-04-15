@@ -17,12 +17,12 @@
             Process = process;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null)
                 return false;
 
-            Form form = obj as Form;
+            Form form = (obj as Form)!;
 
             return Text == form.Text
                    && OriginalText == form.OriginalText

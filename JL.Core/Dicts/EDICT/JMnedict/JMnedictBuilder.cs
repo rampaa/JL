@@ -25,8 +25,8 @@
                     {
                         Trans trans = entry.TransList[j];
 
-                        result.Definitions.AddRange(trans.TransDetList);
-                        result.NameTypes.AddRange(trans.NameTypeList);
+                        result.Definitions!.AddRange(trans.TransDetList);
+                        result.NameTypes!.AddRange(trans.NameTypeList);
                         // result.RelatedTerms.AddRange(trans.XRefList);
                     }
 
@@ -42,7 +42,7 @@
                     {
                         if (item.Key != alternativeSpellings[i])
                         {
-                            item.Value.AlternativeSpellings.Add(alternativeSpellings[i]);
+                            item.Value.AlternativeSpellings!.Add(alternativeSpellings[i]);
                         }
                     }
                 }
@@ -69,9 +69,9 @@
                     {
                         Trans trans = entry.TransList[j];
 
-                        result.Definitions.AddRange(trans.TransDetList);
+                        result.Definitions!.AddRange(trans.TransDetList);
 
-                        result.NameTypes.AddRange(trans.NameTypeList);
+                        result.NameTypes!.AddRange(trans.NameTypeList);
 
                         //result.RelatedTerms.AddRange(trans.XRefList);
                     }
@@ -85,19 +85,19 @@
                 rl.Value.Id = entry.Id;
                 string key = rl.Key;
 
-                if (!rl.Value.AlternativeSpellings.Any())
+                if (!rl.Value.AlternativeSpellings!.Any())
                     rl.Value.AlternativeSpellings = null;
 
-                if (!rl.Value.Definitions.Any())
+                if (!rl.Value.Definitions!.Any())
                     rl.Value.Definitions = null;
 
-                if (!rl.Value.NameTypes.Any())
+                if (!rl.Value.NameTypes!.Any())
                     rl.Value.NameTypes = null;
 
-                if (!rl.Value.Readings.Any())
+                if (!rl.Value.Readings!.Any())
                     rl.Value.Readings = null;
 
-                if (jMnedictDictionary.TryGetValue(key, out List<IResult> tempList))
+                if (jMnedictDictionary.TryGetValue(key, out List<IResult>? tempList))
                     tempList.Add(rl.Value);
                 else
                     tempList = new() { rl.Value };

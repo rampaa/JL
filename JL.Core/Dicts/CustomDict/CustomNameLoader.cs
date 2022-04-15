@@ -27,7 +27,7 @@
 
             Dictionary<string, List<IResult>> customNameDictionary = Storage.Dicts[DictType.CustomNameDictionary].Contents;
 
-            if (customNameDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out List<IResult> entry))
+            if (customNameDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out List<IResult>? entry))
             {
                 if (!entry.Contains(newNameEntry))
                 {

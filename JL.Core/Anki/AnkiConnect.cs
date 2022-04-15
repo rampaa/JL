@@ -7,25 +7,25 @@ namespace JL.Core.Anki
 {
     public static class AnkiConnect
     {
-        public static async Task<Response> AddNoteToDeck(Note note)
+        public static async Task<Response?> AddNoteToDeck(Note note)
         {
             Request req = new("addNote", 6, new Dictionary<string, object> { { "note", note } });
             return await Send(req).ConfigureAwait(false);
         }
 
-        public static async Task<Response> GetDeckNames()
+        public static async Task<Response?> GetDeckNames()
         {
             Request req = new("deckNames", 6);
             return await Send(req).ConfigureAwait(false);
         }
 
-        public static async Task<Response> GetModelNames()
+        public static async Task<Response?> GetModelNames()
         {
             Request req = new("modelNames", 6);
             return await Send(req).ConfigureAwait(false);
         }
 
-        public static async Task<Response> GetModelFieldNames(string modelName)
+        public static async Task<Response?> GetModelFieldNames(string modelName)
         {
             Request req = new("modelFieldNames", 6, new Dictionary<string, object> { { "modelName", modelName } });
             return await Send(req).ConfigureAwait(false);
@@ -38,13 +38,13 @@ namespace JL.Core.Anki
         //     return await Send(req).ConfigureAwait(false);
         // }
 
-        public static async Task<Response> Sync()
+        public static async Task<Response?> Sync()
         {
             Request req = new("sync", 6);
             return await Send(req).ConfigureAwait(false);
         }
 
-        private static async Task<Response> Send(Request req)
+        private static async Task<Response?> Send(Request req)
         {
             try
             {
@@ -57,13 +57,13 @@ namespace JL.Core.Anki
                     .PostAsync(Storage.Frontend.CoreConfig.AnkiConnectUri, payload)
                     .ConfigureAwait(false);
 
-                Response json = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);
-                Utils.Logger.Information("json result: " + json!.Result);
+                Response json = (await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false))!;
+                Utils.Logger.Information("json result: " + json.Result);
 
-                if (json!.Error == null)
+                if (json.Error == null)
                     return json;
 
-                Storage.Frontend.Alert(AlertLevel.Error, json.Error.ToString());
+                Storage.Frontend.Alert(AlertLevel.Error, json.Error.ToString()!);
                 Utils.Logger.Error(json.Error.ToString());
                 return null;
             }

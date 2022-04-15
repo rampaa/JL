@@ -18,7 +18,7 @@ namespace JL.Windows
             public static extern bool AddClipboardFormatListener(IntPtr hwnd);
         }
 
-        public event EventHandler ClipboardChanged;
+        public event EventHandler? ClipboardChanged;
 
         public ClipboardManager(Window windowSource)
         {

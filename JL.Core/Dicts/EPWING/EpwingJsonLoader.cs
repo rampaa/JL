@@ -15,7 +15,7 @@ namespace JL.Core.Dicts.EPWING
             foreach (string jsonFile in jsonFiles)
             {
                 await using FileStream openStream = File.OpenRead(jsonFile);
-                List<List<JsonElement>> jsonObjects = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream)
+                List<List<JsonElement>>? jsonObjects = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream)
                     .ConfigureAwait(false);
 
                 Debug.Assert(jsonObjects != null, nameof(jsonObjects) + " != null");
@@ -45,13 +45,13 @@ namespace JL.Core.Dicts.EPWING
                 //if (hiraganaReading != entry.Reading)
                 //    result.KanaSpelling = entry.Reading;
 
-                if (epwingDictionary.TryGetValue(hiraganaReading, out List<IResult> tempList2))
+                if (epwingDictionary.TryGetValue(hiraganaReading, out List<IResult>? tempList2))
                     tempList2.Add(result);
                 else
                     epwingDictionary.Add(hiraganaReading, new List<IResult> { result });
             }
 
-            if (epwingDictionary.TryGetValue(hiraganaExpression, out List<IResult> tempList))
+            if (epwingDictionary.TryGetValue(hiraganaExpression, out List<IResult>? tempList))
                 tempList.Add(result);
             else
                 epwingDictionary.Add(hiraganaExpression, new List<IResult> { result });
@@ -76,7 +76,7 @@ namespace JL.Core.Dicts.EPWING
 
                     // TODO: Make this configurable?
                     // Remove all example sentences
-                    if (result.Definitions.Count > 2)
+                    if (result.Definitions?.Count > 2)
                     {
                         for (int i = 2; i < result.Definitions.Count; i++)
                         {
@@ -116,13 +116,13 @@ namespace JL.Core.Dicts.EPWING
                     // Filter duplicate entries.
                     // If an entry has reading info while others don't, keep the one with the reading info.
                     if (Storage.Dicts[DictType.Kenkyuusha].Contents.TryGetValue(
-                        Kana.KatakanaToHiraganaConverter(result.PrimarySpelling), out List<IResult> kenkyuushaResults))
+                        Kana.KatakanaToHiraganaConverter(result.PrimarySpelling), out List<IResult>? kenkyuushaResults))
                     {
                         for (int i = 0; i < kenkyuushaResults.Count; i++)
                         {
                             var kenkyuushaResult = (EpwingResult)kenkyuushaResults[i];
 
-                            if (kenkyuushaResult.Definitions.SequenceEqual(result.Definitions))
+                            if (kenkyuushaResult.Definitions?.SequenceEqual(result.Definitions ?? new()) ?? false)
                             {
                                 if (string.IsNullOrEmpty(kenkyuushaResult.Reading) &&
                                     !string.IsNullOrEmpty(result.Reading))
@@ -140,18 +140,22 @@ namespace JL.Core.Dicts.EPWING
 
                     break;
                 case DictType.Daijirin:
-                    // english definitions
-                    if (result.Definitions.Any(def => def.Contains("→英和") || def.Contains("\\u003")))
-                        return false;
+                    if (result.Definitions != null)
+                    {
+                        // english definitions
+                        if (result.Definitions.Any(def => def.Contains("→英和") || def.Contains("\\u003")))
+                            return false;
 
-                    // english definitions
-                    if (!result.Definitions.Any(def => Storage.JapaneseRegex.IsMatch(def)))
-                        return false;
+                        // english definitions
+                        if (!result.Definitions.Any(def => Storage.JapaneseRegex.IsMatch(def)))
+                            return false;
+                    }
+
                     break;
 
                 case DictType.Daijisen:
                     // kanji definitions
-                    if (result.Definitions.Any(def => def.Contains("［音］")))
+                    if (result.Definitions?.Any(def => def.Contains("［音］")) ?? false)
                         return false;
                     break;
 

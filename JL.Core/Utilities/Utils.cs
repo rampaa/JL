@@ -64,7 +64,7 @@ namespace JL.Core.Utilities
             {
                 var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(), } };
 
-                Dictionary<DictType, Dict> deserializedDicts = await JsonSerializer
+                Dictionary<DictType, Dict>? deserializedDicts = await JsonSerializer
                     .DeserializeAsync<Dictionary<DictType, Dict>>(
                         new StreamReader(Path.Join(Storage.ConfigPath, "dicts.json")).BaseStream, jso)
                     .ConfigureAwait(false);
@@ -95,7 +95,7 @@ namespace JL.Core.Utilities
 
         public static string GetMd5String(byte[] bytes)
         {
-            byte[] hash = ((HashAlgorithm)CryptoConfig.CreateFromName("MD5"))!.ComputeHash(bytes);
+            byte[] hash = ((HashAlgorithm)CryptoConfig.CreateFromName("MD5")!).ComputeHash(bytes);
             string encoded = BitConverter.ToString(hash).Replace("-", string.Empty).ToLower();
 
             return encoded;
@@ -121,9 +121,6 @@ namespace JL.Core.Utilities
 
         public static string FindSentence(string text, int position)
         {
-            if (text == null)
-                return null;
-
             List<string> japanesePunctuationLite = new()
             {
                 "。",
@@ -183,7 +180,7 @@ namespace JL.Core.Utilities
                     sentence = sentence[..^1];
                 }
 
-                if (japaneseParentheses.TryGetValue(sentence.FirstOrDefault().ToString(), out string rightParenthesis))
+                if (japaneseParentheses.TryGetValue(sentence.FirstOrDefault().ToString(), out string? rightParenthesis))
                 {
                     if (sentence.Last().ToString() == rightParenthesis)
                         sentence = sentence[1..^1];
@@ -222,14 +219,14 @@ namespace JL.Core.Utilities
             return sentence;
         }
 
-        public static async Task GetAndPlayAudioFromJpod101(string foundSpelling, string reading, float volume)
+        public static async Task GetAndPlayAudioFromJpod101(string foundSpelling, string? reading, float volume)
         {
             Utils.Logger.Information("Attempting to play audio from jpod101: " + foundSpelling + " " + reading);
 
             if (string.IsNullOrEmpty(reading))
                 reading = foundSpelling;
 
-            byte[] sound = await Networking.GetAudioFromJpod101(foundSpelling, reading).ConfigureAwait(false);
+            byte[]? sound = await Networking.GetAudioFromJpod101(foundSpelling, reading).ConfigureAwait(false);
             if (sound != null)
             {
                 if (Utils.GetMd5String(sound) == Storage.Jpod101NoAudioMd5Hash)

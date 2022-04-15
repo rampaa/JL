@@ -11,7 +11,7 @@ namespace JL.Core.Anki
 
             try
             {
-                AnkiConfig ankiConfig = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
+                AnkiConfig? ankiConfig = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
                 if (ankiConfig == null)
                 {
                     Storage.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
@@ -31,13 +31,13 @@ namespace JL.Core.Anki
                 string[] tags = ankiConfig.Tags;
 
                 // idk if this gets the right audio for every word
-                string reading = miningParams[JLField.Readings].Split(",")[0];
-                if (reading == "")
+                string? reading = miningParams[JLField.Readings]?.Split(",")[0] ?? null;
+                if (string.IsNullOrEmpty(reading))
                     reading = foundSpelling;
 
-                byte[] audioRes = await Networking.GetAudioFromJpod101(foundSpelling, reading);
+                byte[]? audioRes = await Networking.GetAudioFromJpod101(foundSpelling, reading);
 
-                Dictionary<string, object>[] audio =
+                Dictionary<string, object?>[] audio =
                 {
                     new()
                     {
@@ -47,11 +47,11 @@ namespace JL.Core.Anki
                         { "fields", FindAudioFields(userFields) },
                     }
                 };
-                Dictionary<string, object>[] video = null;
-                Dictionary<string, object>[] picture = null;
+                Dictionary<string, object>[]? video = null;
+                Dictionary<string, object>[]? picture = null;
 
                 Note note = new(deckName, modelName, fields, options, tags, audio, video, picture);
-                Response response = await AnkiConnect.AddNoteToDeck(note).ConfigureAwait(false);
+                Response? response = await AnkiConnect.AddNoteToDeck(note).ConfigureAwait(false);
 
                 if (response == null)
                 {
@@ -61,15 +61,16 @@ namespace JL.Core.Anki
                 }
                 else
                 {
-                    if (Utils.GetMd5String(audioRes) != Storage.Jpod101NoAudioMd5Hash)
-                    {
-                        Storage.Frontend.Alert(AlertLevel.Success, $"Mined {foundSpelling}");
-                        Utils.Logger.Information($"Mined {foundSpelling}");
-                    }
-                    else
+                    if (audioRes == null || Utils.GetMd5String(audioRes) == Storage.Jpod101NoAudioMd5Hash)
                     {
                         Storage.Frontend.Alert(AlertLevel.Warning, $"Mined {foundSpelling} (no audio)");
                         Utils.Logger.Information($"Mined {foundSpelling} (no audio)");
+                    }
+
+                    else
+                    {
+                        Storage.Frontend.Alert(AlertLevel.Success, $"Mined {foundSpelling}");
+                        Utils.Logger.Information($"Mined {foundSpelling}");
                     }
 
                     if (Storage.Frontend.CoreConfig.ForceSyncAnki)

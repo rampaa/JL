@@ -25,12 +25,12 @@ namespace JL.Windows.GUI
     /// </summary>
     public partial class PreferencesWindow : System.Windows.Window
     {
-        private static PreferencesWindow s_instance;
+        private static PreferencesWindow? s_instance;
         private bool _setAnkiConfig;
 
         public static PreferencesWindow Instance
         {
-            get { return s_instance ??= new PreferencesWindow(); }
+            get { return s_instance ??= new(); }
         }
 
         public PreferencesWindow()
@@ -113,7 +113,8 @@ namespace JL.Windows.GUI
         {
             try
             {
-                AnkiConfig ankiConfig = await AnkiConfig.ReadAnkiConfig();
+                AnkiConfig? ankiConfig = await AnkiConfig.ReadAnkiConfig();
+
                 if (ankiConfig == null)
                     return;
 
@@ -133,20 +134,20 @@ namespace JL.Windows.GUI
 
         private async Task PopulateDeckAndModelNames()
         {
-            Response getNameResponse = await AnkiConnect.GetDeckNames();
-            Response getModelResponse = await AnkiConnect.GetModelNames();
+            Response? getNameResponse = await AnkiConnect.GetDeckNames();
+            Response? getModelResponse = await AnkiConnect.GetModelNames();
 
             if (getNameResponse != null && getModelResponse != null)
             {
                 try
                 {
                     List<string> deckNamesList =
-                        JsonSerializer.Deserialize<List<string>>(getNameResponse.Result.ToString()!);
+                        JsonSerializer.Deserialize<List<string>>(getNameResponse.Result.ToString()!)!;
 
                     MiningSetupComboBoxDeckNames.ItemsSource = deckNamesList;
 
                     List<string> modelNamesList =
-                        JsonSerializer.Deserialize<List<string>>(getModelResponse.Result.ToString()!);
+                        JsonSerializer.Deserialize<List<string>>(getModelResponse.Result.ToString()!)!;
                     MiningSetupComboBoxModelNames.ItemsSource = modelNamesList;
                 }
 
@@ -177,13 +178,14 @@ namespace JL.Windows.GUI
         {
             try
             {
-                string modelName = MiningSetupComboBoxModelNames.SelectionBoxItem.ToString();
+                string modelName = MiningSetupComboBoxModelNames.SelectionBoxItem.ToString()!;
+
                 List<string> fieldNames =
-                    JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelFieldNames(modelName)).Result
-                        .ToString()!);
+                    JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelFieldNames(modelName))!.Result
+                        .ToString()!)!;
 
                 Dictionary<string, JLField> fields =
-                    fieldNames!.ToDictionary(fieldName => fieldName, _ => JLField.Nothing);
+                    fieldNames.ToDictionary(fieldName => fieldName, _ => JLField.Nothing);
 
                 CreateFieldElements(fields);
             }
@@ -230,8 +232,8 @@ namespace JL.Windows.GUI
         {
             try
             {
-                string deckName = MiningSetupComboBoxDeckNames.SelectionBoxItem.ToString();
-                string modelName = MiningSetupComboBoxModelNames.SelectionBoxItem.ToString();
+                string deckName = MiningSetupComboBoxDeckNames.SelectionBoxItem.ToString()!;
+                string modelName = MiningSetupComboBoxModelNames.SelectionBoxItem.ToString()!;
 
                 Dictionary<string, JLField> dict = new();
                 foreach (StackPanel stackPanel in MiningSetupStackPanelFields.Children)
@@ -239,7 +241,7 @@ namespace JL.Windows.GUI
                     var textBlock = (TextBlock)stackPanel.Children[0];
                     var comboBox = (System.Windows.Controls.ComboBox)stackPanel.Children[1];
 
-                    string selectedDescription = comboBox.SelectionBoxItem.ToString();
+                    string selectedDescription = comboBox.SelectionBoxItem.ToString()!;
 
                     IEnumerable<JLField> jlFieldNames = Enum.GetValues(typeof(JLField)).Cast<JLField>();
                     JLField result = jlFieldNames.FirstOrDefault(jlFieldName =>

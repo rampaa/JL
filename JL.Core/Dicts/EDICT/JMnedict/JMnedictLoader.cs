@@ -99,7 +99,7 @@ namespace JL.Core.Dicts.EDICT.JMnedict
                     switch (jMneDictXML.Name)
                     {
                         case "name_type":
-                            trans.NameTypeList.Add(ReadEntity(jMneDictXML));
+                            trans.NameTypeList.Add(ReadEntity(jMneDictXML)!);
                             break;
 
                         case "trans_det":
@@ -116,7 +116,7 @@ namespace JL.Core.Dicts.EDICT.JMnedict
             entry.TransList.Add(trans);
         }
 
-        private static string ReadEntity(XmlTextReader jMDictXML)
+        private static string? ReadEntity(XmlTextReader jMDictXML)
         {
             jMDictXML.Read();
             if (jMDictXML.NodeType == XmlNodeType.EntityReference)

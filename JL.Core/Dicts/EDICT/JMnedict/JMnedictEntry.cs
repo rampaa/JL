@@ -9,7 +9,7 @@
 
         public JMnedictEntry()
         {
-            Id = null;
+            Id = string.Empty;
             KebList = new List<string>();
             RebList = new List<string>();
             TransList = new List<Trans>();

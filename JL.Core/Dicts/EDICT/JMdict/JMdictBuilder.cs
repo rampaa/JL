@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace JL.Core.Dicts.EDICT.JMdict
+﻿namespace JL.Core.Dicts.EDICT.JMdict
 {
     internal static class JMdictBuilder
     {
@@ -20,7 +18,7 @@ namespace JL.Core.Dicts.EDICT.JMdict
                 KEle kEle = entry.KEleList[i];
 
                 JMdictResult result = new();
-                string key = kEle.Keb;
+                string key = kEle.Keb!;
 
                 result.PrimarySpelling = key;
 
@@ -32,10 +30,10 @@ namespace JL.Core.Dicts.EDICT.JMdict
                 {
                     REle rEle = entry.REleList[j];
 
-                    if (!rEle.ReRestrList.Any() || rEle.ReRestrList.Contains(key))
+                    if (!rEle.ReRestrList!.Any() || rEle.ReRestrList!.Contains(key))
                     {
-                        result.Readings.Add(rEle.Reb);
-                        result.ROrthographyInfoList.Add(rEle.ReInfList);
+                        result.Readings?.Add(rEle.Reb!);
+                        result.ROrthographyInfoList?.Add(rEle.ReInfList);
                     }
                 }
 
@@ -46,16 +44,16 @@ namespace JL.Core.Dicts.EDICT.JMdict
 
                     if ((!sense.StagKList.Any() && !sense.StagRList.Any())
                         || sense.StagKList.Contains(key)
-                        || sense.StagRList.Intersect(result.Readings).Any())
+                        || sense.StagRList.Intersect(result.Readings!).Any())
                     {
                         result.Definitions.Add(sense.GlossList);
-                        result.RRestrictions.Add(sense.StagRList);
-                        result.KRestrictions.Add(sense.StagKList);
-                        result.WordClasses.Add(sense.PosList);
-                        result.TypeList.Add(sense.FieldList);
-                        result.MiscList.Add(sense.MiscList);
-                        result.Dialects.Add(sense.DialList);
-                        result.SpellingInfo.Add(sense.SInf);
+                        result.RRestrictions!.Add(sense.StagRList.All(i => i == null) ? null : sense.StagRList);
+                        result.KRestrictions!.Add(sense.StagKList.All(i => i == null) ? null : sense.StagRList);
+                        result.WordClasses!.Add(sense.PosList.All(i => i == null) ? null : sense.PosList);
+                        result.TypeList!.Add(sense.FieldList.All(i => i == null) ? null : sense.FieldList);
+                        result.MiscList!.Add(sense.MiscList.All(i => i == null) ? null : sense.MiscList);
+                        result.Dialects!.Add(sense.DialList.All(i => i == null) ? null : sense.DialList);
+                        result.DefinitionInfo!.Add(sense.SInf);
                         // result.RelatedTerms.AddRange(sense.XRefList);
                         // result.Antonyms.AddRange(sense.AntList);
                     }
@@ -75,12 +73,16 @@ namespace JL.Core.Dicts.EDICT.JMdict
 
                     if (key != spelling)
                     {
-                        result.AlternativeSpellings.Add(spelling);
+                        result.AlternativeSpellings!.Add(spelling);
 
-                        resultList.TryGetValue(spelling, out JMdictResult tempResult);
-                        Debug.Assert(tempResult != null, nameof(tempResult) + " != null");
+                        if (resultList.TryGetValue(spelling, out JMdictResult? tempResult))
+                        {
+                            if (tempResult.POrthographyInfoList!.All(i => i == null))
+                                result.AOrthographyInfoList!.Add(null);
 
-                        result.AOrthographyInfoList.Add(tempResult.POrthographyInfoList);
+                            else
+                                result.AOrthographyInfoList!.Add(tempResult.POrthographyInfoList);
+                        }
                     }
                 }
             }
@@ -115,7 +117,7 @@ namespace JL.Core.Dicts.EDICT.JMdict
 
                     result.AlternativeSpellings.RemoveAt(0);
 
-                    if (resultList.TryGetValue(result.PrimarySpelling, out JMdictResult mainEntry))
+                    if (resultList.TryGetValue(result.PrimarySpelling, out JMdictResult? mainEntry))
                     {
                         result.Readings = mainEntry.Readings;
                         result.AOrthographyInfoList = mainEntry.AOrthographyInfoList;
@@ -131,7 +133,7 @@ namespace JL.Core.Dicts.EDICT.JMdict
                     result.AlternativeSpellings = allReadings.ToList();
                     result.AlternativeSpellings.RemoveAt(i);
 
-                    result.AOrthographyInfoList = allROrthographyInfoLists.ToList();
+                    result.AOrthographyInfoList = allROrthographyInfoLists.ToList()!;
                     result.AOrthographyInfoList.RemoveAt(i);
                 }
 
@@ -145,14 +147,14 @@ namespace JL.Core.Dicts.EDICT.JMdict
                         || sense.StagKList.Contains(result.PrimarySpelling)
                         || sense.StagKList.Intersect(result.AlternativeSpellings).Any())
                     {
-                        result.Definitions.Add(sense.GlossList);
-                        result.RRestrictions.Add(sense.StagRList);
-                        result.KRestrictions.Add(sense.StagKList);
-                        result.WordClasses.Add(sense.PosList);
-                        result.TypeList.Add(sense.FieldList);
-                        result.MiscList.Add(sense.MiscList);
-                        result.Dialects.Add(sense.DialList);
-                        result.SpellingInfo.Add(sense.SInf);
+                        result.Definitions!.Add(sense.GlossList);
+                        result.RRestrictions!.Add(sense.StagRList);
+                        result.KRestrictions!.Add(sense.StagKList);
+                        result.WordClasses!.Add(sense.PosList);
+                        result.TypeList!.Add(sense.FieldList);
+                        result.MiscList!.Add(sense.MiscList);
+                        result.Dialects!.Add(sense.DialList);
+                        result.DefinitionInfo!.Add(sense.SInf);
                         // result.RelatedTerms.AddRange(sense.XRefList);
                         // result.Antonyms.AddRange(sense.AntList);
                     }
@@ -177,52 +179,49 @@ namespace JL.Core.Dicts.EDICT.JMdict
 
             foreach (KeyValuePair<string, JMdictResult> rl in resultList)
             {
-                if (!rl.Value.Readings.Any() || rl.Value.Readings.All(s => string.IsNullOrEmpty(s)))
+                if (!rl.Value.Readings!.Any() || rl.Value.Readings!.All(s => string.IsNullOrEmpty(s)))
                     rl.Value.Readings = null;
 
-                if (!rl.Value.AlternativeSpellings.Any())
+                if (!rl.Value.AlternativeSpellings!.Any())
                     rl.Value.AlternativeSpellings = null;
 
-                if (!rl.Value.Definitions.Any() || rl.Value.Definitions.All(l => !l.Any()))
-                    rl.Value.Definitions = null;
-
-                if (!rl.Value.RRestrictions.Any() || rl.Value.RRestrictions.All(l => !l.Any()))
+                if (!rl.Value.RRestrictions!.Any() || rl.Value.RRestrictions!.All(l => l == null || !l.Any()))
                     rl.Value.RRestrictions = null;
 
-                if (!rl.Value.KRestrictions.Any() || rl.Value.KRestrictions.All(l => !l.Any()))
+                if (!rl.Value.KRestrictions!.Any() || rl.Value.KRestrictions!.All(l => l == null || !l.Any()))
                     rl.Value.KRestrictions = null;
 
-                if (!rl.Value.Dialects.Any() || !rl.Value.Dialects.All(l => !l.Any()))
+                if (!rl.Value.Dialects!.Any() || !rl.Value.Dialects!.All(l => l == null || !l.Any()))
                     rl.Value.Dialects = null;
 
                 //if (!rl.Value.KanaSpellings.Any())
                 //    rl.Value.KanaSpellings = null;
 
-                if (!rl.Value.MiscList.Any() || rl.Value.MiscList.All(l => !l.Any()))
+                if (!rl.Value.MiscList!.Any() || rl.Value.MiscList!.All(l => l == null || !l.Any()))
                     rl.Value.MiscList = null;
 
-                if (!rl.Value.POrthographyInfoList.Any())
+                if (!rl.Value.POrthographyInfoList!.Any() || rl.Value.POrthographyInfoList!.All(s => s == null || string.IsNullOrEmpty(s)))
                     rl.Value.POrthographyInfoList = null;
 
-                if (!rl.Value.AOrthographyInfoList.Any() || rl.Value.AOrthographyInfoList.All(l => !l.Any()))
+                if (!rl.Value.AOrthographyInfoList!.Any() || rl.Value.AOrthographyInfoList!.All(l => l == null || !l.Any()))
                     rl.Value.AOrthographyInfoList = null;
 
-                if (!rl.Value.ROrthographyInfoList.Any() || rl.Value.ROrthographyInfoList.All(l => !l.Any()))
+                if (!rl.Value.ROrthographyInfoList!.Any() || rl.Value.ROrthographyInfoList!.All(l => l == null || !l.Any()))
                     rl.Value.ROrthographyInfoList = null;
 
-                if (!rl.Value.SpellingInfo.Any() || rl.Value.SpellingInfo.All(s => string.IsNullOrEmpty(s)))
-                    rl.Value.SpellingInfo = null;
+                if (!rl.Value.DefinitionInfo!.Any() || rl.Value.DefinitionInfo!.All(s => s == null || string.IsNullOrEmpty(s)))
+                    rl.Value.DefinitionInfo = null;
 
-                if (!rl.Value.TypeList.Any() || rl.Value.TypeList.All(l => !l.Any()))
+                if (!rl.Value.TypeList!.Any() || rl.Value.TypeList!.All(l => l == null || !l.Any()))
                     rl.Value.TypeList = null;
 
-                if (!rl.Value.WordClasses.Any() || rl.Value.WordClasses.All(l => !l.Any()))
+                if (!rl.Value.WordClasses!.Any() || rl.Value.WordClasses!.All(l => l == null || !l.Any()))
                     rl.Value.WordClasses = null;
 
                 rl.Value.Id = entry.Id;
                 string key = Kana.KatakanaToHiraganaConverter(rl.Key);
 
-                if (jMdictDictionary.TryGetValue(key, out List<IResult> tempResultList))
+                if (jMdictDictionary.TryGetValue(key, out List<IResult>? tempResultList))
                     tempResultList.Add(rl.Value);
                 else
                     tempResultList = new() { rl.Value };

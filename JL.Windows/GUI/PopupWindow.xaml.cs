@@ -23,24 +23,24 @@ namespace JL.Windows.GUI
     /// </summary>
     public partial class PopupWindow : Window
     {
-        private readonly PopupWindow _parentPopupWindow;
-        public PopupWindow ChildPopupWindow { get; set; }
+        private readonly PopupWindow? _parentPopupWindow;
+        public PopupWindow? ChildPopupWindow { get; set; }
 
-        private TextBox _lastTextBox;
+        private TextBox? _lastTextBox;
 
         private int _playAudioIndex;
 
         private int _currentCharPosition;
 
-        private string _currentText;
+        private string? _currentText;
 
-        private string _lastSelectedText;
+        private string? _lastSelectedText;
 
         private List<LookupResult> _lastLookupResults = new();
 
-        public bool UnavoidableMouseEnter { get; set; }
+        public bool UnavoidableMouseEnter { get; set; } = false;
 
-        public string LastText { get; set; }
+        public string? LastText { get; set; }
 
         public bool MiningMode { get; set; }
 
@@ -163,7 +163,7 @@ namespace JL.Windows.GUI
                 LastText = text;
 
                 ResultStackPanels.Clear();
-                List<LookupResult> lookupResults = Lookup.LookupText(text);
+                List<LookupResult>? lookupResults = Lookup.LookupText(text);
 
                 if (lookupResults != null && lookupResults.Any())
                 {
@@ -224,7 +224,7 @@ namespace JL.Windows.GUI
 
             PopUpScrollViewer.ScrollToTop();
 
-            List<LookupResult> lookupResults = Lookup.LookupText(tb.SelectedText);
+            List<LookupResult>? lookupResults = Lookup.LookupText(tb.SelectedText);
 
             if (lookupResults?.Any() ?? false)
             {
@@ -346,24 +346,24 @@ namespace JL.Windows.GUI
             innerStackPanel.Children.Add(bottom);
 
             // top
-            TextBlock textBlockFoundSpelling = null;
-            TextBlock textBlockPOrthographyInfo = null;
-            UIElement uiElementReadings = null;
-            UIElement uiElementAlternativeSpellings = null;
-            TextBlock textBlockProcess = null;
-            TextBlock textBlockFrequency = null;
-            TextBlock textBlockFoundForm = null;
-            TextBlock textBlockDictType = null;
-            TextBlock textBlockEdictID = null;
+            TextBlock? textBlockFoundSpelling = null;
+            TextBlock? textBlockPOrthographyInfo = null;
+            UIElement? uiElementReadings = null;
+            UIElement? uiElementAlternativeSpellings = null;
+            TextBlock? textBlockProcess = null;
+            TextBlock? textBlockFrequency = null;
+            TextBlock? textBlockFoundForm = null;
+            TextBlock? textBlockDictType = null;
+            TextBlock? textBlockEdictID = null;
 
             // bottom
-            UIElement uiElementDefinitions = null;
-            TextBlock textBlockNanori = null;
-            TextBlock textBlockOnReadings = null;
-            TextBlock textBlockKunReadings = null;
-            TextBlock textBlockStrokeCount = null;
-            TextBlock textBlockGrade = null;
-            TextBlock textBlockComposition = null;
+            UIElement? uiElementDefinitions = null;
+            TextBlock? textBlockNanori = null;
+            TextBlock? textBlockOnReadings = null;
+            TextBlock? textBlockKunReadings = null;
+            TextBlock? textBlockStrokeCount = null;
+            TextBlock? textBlockGrade = null;
+            TextBlock? textBlockComposition = null;
 
             if (result.FoundForm != null)
             {
@@ -698,7 +698,7 @@ namespace JL.Windows.GUI
                 };
             }
 
-            UIElement[] babies =
+            UIElement?[] babies =
             {
                 textBlockFoundSpelling, textBlockPOrthographyInfo, uiElementReadings, uiElementAlternativeSpellings,
                 textBlockProcess, textBlockFoundForm, textBlockEdictID, textBlockFrequency, textBlockDictType
@@ -706,7 +706,7 @@ namespace JL.Windows.GUI
 
             for (int i = 0; i < babies.Length; i++)
             {
-                UIElement baby = babies[i];
+                UIElement? baby = babies[i];
 
                 if (baby is TextBlock textBlock)
                 {
@@ -719,19 +719,19 @@ namespace JL.Windows.GUI
                     textBlock.MouseLeave += OnMouseLeave;
 
                     if ((textBlock.Name is "FoundSpelling" or "Readings") &&
-                        Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict kanjiumDict) && kanjiumDict.Active)
+                        Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict? kanjiumDict) && (kanjiumDict?.Active ?? false))
                     {
-                        List<string> readings = result.Readings;
+                        List<string>? readings = result.Readings;
 
-                        if (textBlock.Name is "FoundSpelling" && readings.Any())
+                        if (textBlock.Name is "FoundSpelling" && (readings?.Any() ?? false))
                         {
                             top.Children.Add(textBlock);
                         }
                         else
                         {
-                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling,
-                                result.AlternativeSpellings,
-                                readings,
+                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling ?? string.Empty,
+                                result.AlternativeSpellings ?? new(),
+                                readings ?? new(),
                                 textBlock.Text.Split(", ").ToList(),
                                 textBlock.Margin.Left);
 
@@ -760,19 +760,19 @@ namespace JL.Windows.GUI
                     textBox.MouseLeave += OnMouseLeave;
 
                     if ((textBox.Name is "FoundSpelling" or "Readings") &&
-                        Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict kanjiumDict) && kanjiumDict.Active)
+                        Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict? kanjiumDict) && (kanjiumDict?.Active ?? false))
                     {
-                        List<string> readings = result.Readings;
+                        List<string>? readings = result.Readings;
 
-                        if (textBox.Name is "FoundSpelling" && readings.Any())
+                        if (textBox.Name is "FoundSpelling" && (readings?.Any() ?? false))
                         {
                             top.Children.Add(textBox);
                         }
                         else
                         {
-                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling,
-                                result.AlternativeSpellings,
-                                readings,
+                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling ?? string.Empty,
+                                result.AlternativeSpellings ?? new(),
+                                readings ?? new(),
                                 textBox.Text.Split(", ").ToList(),
                                 textBox.Margin.Left);
 
@@ -795,12 +795,12 @@ namespace JL.Windows.GUI
             if (uiElementDefinitions != null)
                 bottom.Children.Add(uiElementDefinitions);
 
-            TextBlock[] babiesKanji =
+            TextBlock?[] babiesKanji =
             {
                 textBlockOnReadings, textBlockKunReadings, textBlockNanori, textBlockGrade, textBlockStrokeCount,
                 textBlockComposition,
             };
-            foreach (TextBlock baby in babiesKanji)
+            foreach (TextBlock? baby in babiesKanji)
             {
                 if (baby == null) continue;
 
@@ -857,15 +857,15 @@ namespace JL.Windows.GUI
                         WindowsUtils.MeasureTextSize(splitReadingsWithRInfo[i - 1] + ", ", fontSize).Width;
                 }
 
-                if (kanjiumDict.TryGetValue(normalizedExpression, out List<IResult> kanjiumResultList))
+                if (kanjiumDict.TryGetValue(normalizedExpression, out List<IResult>? kanjiumResultList))
                 {
-                    KanjiumResult chosenKanjiumResult = null;
+                    KanjiumResult? chosenKanjiumResult = null;
 
                     for (int j = 0; j < kanjiumResultList.Count; j++)
                     {
                         var kanjiumResult = (KanjiumResult)kanjiumResultList[j];
 
-                        if (!hasReading || normalizedExpression == Kana.KatakanaToHiraganaConverter(kanjiumResult.Reading))
+                        if (!hasReading || normalizedExpression == Kana.KatakanaToHiraganaConverter(kanjiumResult.Reading ?? string.Empty))
                         {
                             if (foundSpelling == kanjiumResult.Spelling)
                             {
@@ -1142,7 +1142,7 @@ namespace JL.Windows.GUI
                 }
             }
 
-            miningParams[JLField.Context] = Utils.FindSentence(_currentText, _currentCharPosition);
+            miningParams[JLField.Context] = Utils.FindSentence(_currentText ?? string.Empty, _currentCharPosition);
             miningParams[JLField.TimeLocal] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
 
             bool miningResult = await Mining.Mine(miningParams).ConfigureAwait(false);
@@ -1209,8 +1209,8 @@ namespace JL.Windows.GUI
 
                 //var innerStackPanel = (StackPanel)PopupListBox.Items[index];
 
-                string foundSpelling = null;
-                string reading = null;
+                string? foundSpelling = null;
+                string? reading = null;
 
                 var innerStackPanel = (StackPanel)PopupListBox.Items[_playAudioIndex];
                 var top = (WrapPanel)innerStackPanel.Children[0];
@@ -1269,7 +1269,10 @@ namespace JL.Windows.GUI
                     }
                 }
 
-                await Utils.GetAndPlayAudioFromJpod101(foundSpelling, reading, 1).ConfigureAwait(false);
+                if (foundSpelling != null)
+                {
+                    await Utils.GetAndPlayAudioFromJpod101(foundSpelling, reading, 1).ConfigureAwait(false);
+                }
             }
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ClosePopupKeyGesture))
             {

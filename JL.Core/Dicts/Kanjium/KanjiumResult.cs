@@ -5,10 +5,10 @@ namespace JL.Core.Dicts.Kanjium
     public class KanjiumResult : IResult
     {
         public string Spelling { get; set; }
-        public string Reading { get; set; }
+        public string? Reading { get; set; }
         public int Position { get; set; }
 
-        public KanjiumResult(string spelling, string reading, int position)
+        public KanjiumResult(string spelling, string? reading, int position)
         {
             Spelling = spelling;
             Reading = reading;

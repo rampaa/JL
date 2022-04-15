@@ -4,9 +4,9 @@ namespace JL.Core.Dicts.EPWING
 {
     public class EpwingResult : IResult
     {
-        public List<string> Definitions { get; }
+        public List<string>? Definitions { get; }
         public string Reading { get; }
-        public List<string> WordClasses { get; }
+        public List<string>? WordClasses { get; }
         public string PrimarySpelling { get; }
 
         //public string KanaSpelling { get; set; }

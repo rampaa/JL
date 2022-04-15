@@ -2,7 +2,7 @@
 {
     public class JMdictEntry
     {
-        public string Id { get; set; }
+        public string? Id { get; set; }
         public List<KEle> KEleList { get; set; }
         public List<REle> REleList { get; set; }
         public List<Sense> SenseList { get; set; }

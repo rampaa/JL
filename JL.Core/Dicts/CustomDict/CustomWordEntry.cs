@@ -25,7 +25,7 @@ namespace JL.Core.Dicts.CustomDict
             if (obj == null)
                 return false;
 
-            CustomWordEntry customWordEntryObj = obj as CustomWordEntry;
+            CustomWordEntry customWordEntryObj = (obj as CustomWordEntry)!;
 
             Debug.Assert(customWordEntryObj != null, nameof(customWordEntryObj) + " != null");
             return PrimarySpelling == customWordEntryObj.PrimarySpelling

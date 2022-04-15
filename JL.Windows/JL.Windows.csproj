@@ -4,7 +4,6 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
-    <UseWindowsForms>true</UseWindowsForms>
     <Platforms>AnyCPU;x86</Platforms>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <ApplicationIcon>icon.ico</ApplicationIcon>
@@ -12,6 +11,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PackageId>JL.Windows</PackageId>
     <AssemblyName>JL</AssemblyName>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

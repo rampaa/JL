@@ -18,14 +18,14 @@ namespace JL.Windows.GUI
     /// </summary>
     public partial class AddWordWindow : Window
     {
-        private static AddWordWindow s_instance;
+        private static AddWordWindow? s_instance;
 
         public static AddWordWindow Instance
         {
             get
             {
                 if (s_instance == null || !s_instance.IsLoaded)
-                    s_instance = new AddWordWindow();
+                    s_instance = new();
 
                 return s_instance;
             }
@@ -52,7 +52,7 @@ namespace JL.Windows.GUI
             }
             else if (SpellingsTextBox.BorderBrush == Brushes.Red)
             {
-                SpellingsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
+                SpellingsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
             }
 
             if (ReadingsTextBox.Text == "")
@@ -62,7 +62,7 @@ namespace JL.Windows.GUI
             }
             else if (ReadingsTextBox.BorderBrush == Brushes.Red)
             {
-                ReadingsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
+                ReadingsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
             }
 
             if (DefinitionsTextBox.Text == "")
@@ -72,7 +72,7 @@ namespace JL.Windows.GUI
             }
             else if (DefinitionsTextBox.BorderBrush == Brushes.Red)
             {
-                DefinitionsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
+                DefinitionsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
             }
 
             if (isValid)
@@ -81,7 +81,7 @@ namespace JL.Windows.GUI
                 string rawReadings = ReadingsTextBox.Text;
                 string rawDefinitions = DefinitionsTextBox.Text;
                 string rawWordClass = WordClassStackPanel.Children.OfType<RadioButton>()
-                    .FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString();
+                    .FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
 
                 string[] spellings = rawSpellings.Split(';').Select(s => s.Trim()).ToArray();
                 List<string> readings = rawReadings.Split(';').Select(r => r.Trim()).ToList();

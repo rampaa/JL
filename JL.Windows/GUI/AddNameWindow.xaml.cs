@@ -17,14 +17,14 @@ namespace JL.Windows.GUI
     /// </summary>
     public partial class AddNameWindow : Window
     {
-        private static AddNameWindow s_instance;
+        private static AddNameWindow? s_instance;
 
         public static AddNameWindow Instance
         {
             get
             {
                 if (s_instance == null || !s_instance.IsLoaded)
-                    s_instance = new AddNameWindow();
+                    s_instance = new();
 
                 return s_instance;
             }
@@ -51,7 +51,7 @@ namespace JL.Windows.GUI
             }
             else if (SpellingTextBox.BorderBrush == Brushes.Red)
             {
-                SpellingTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
+                SpellingTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
             }
 
             if (ReadingTextBox.Text == "")
@@ -61,14 +61,14 @@ namespace JL.Windows.GUI
             }
             else if (ReadingTextBox.BorderBrush == Brushes.Red)
             {
-                ReadingTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
+                ReadingTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
             }
 
             if (isValid)
             {
                 string nameType =
                     NameTypeStackPanel.Children.OfType<RadioButton>()
-                        .FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString();
+                        .FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
                 string spelling = SpellingTextBox.Text;
                 string reading = ReadingTextBox.Text;
                 CustomNameLoader.AddToDictionary(spelling.Trim(), reading.Trim(), nameType!.Trim());

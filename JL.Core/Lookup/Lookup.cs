@@ -18,7 +18,7 @@ namespace JL.Core.Lookup
     {
         private static DateTime s_lastLookupTime;
 
-        public static List<LookupResult> LookupText(string text)
+        public static List<LookupResult>? LookupText(string text)
         {
             DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
             if ((preciseTimeNow - s_lastLookupTime).TotalMilliseconds < Storage.Frontend.CoreConfig.LookupRate)
@@ -173,7 +173,7 @@ namespace JL.Core.Lookup
 
             sortedLookupResults = sortedLookupResults
                 .OrderByDescending(dict => longestFoundForm == dict.FoundSpelling)
-                .ThenByDescending(dict => dict.Readings.Contains(longestFoundForm))
+                .ThenByDescending(dict => dict.Readings?.Contains(longestFoundForm))
                 .ToList();
 
             return sortedLookupResults.ToList();
@@ -190,7 +190,7 @@ namespace JL.Core.Lookup
 
             bool tryLongVowelConversion = true;
 
-            if (dictionary.TryGetValue(textInHiragana, out List<IResult> tempResult))
+            if (dictionary.TryGetValue(textInHiragana, out List<IResult>? tempResult))
             {
                 results.TryAdd(textInHiragana,
                     new IntermediaryResult(tempResult, new List<List<string>> { new() }, foundForm,
@@ -206,7 +206,7 @@ namespace JL.Core.Lookup
                     if (deconjugationResult.Tags.Count > 0)
                         lastTag = deconjugationResult.Tags.Last();
 
-                    if (dictionary.TryGetValue(deconjugationResult.Text, out List<IResult> dictResults))
+                    if (dictionary.TryGetValue(deconjugationResult.Text, out List<IResult>? dictResults))
                     {
                         List<IResult> resultsList = new();
 
@@ -219,8 +219,8 @@ namespace JL.Core.Lookup
                                     {
                                         var dictResult = (JMdictResult)dictResults[i];
 
-                                        if (deconjugationResult.Tags.Count == 0 || dictResult.WordClasses
-                                                .SelectMany(pos => pos).Contains(lastTag))
+                                        if (deconjugationResult.Tags.Count == 0 || (dictResult.WordClasses?.Where(pos => pos != null)
+                                                .SelectMany(pos => pos!).Contains(lastTag) ?? false))
                                         {
                                             resultsList.Add(dictResult);
                                         }
@@ -258,13 +258,13 @@ namespace JL.Core.Lookup
                                         var dictResult = (EpwingResult)dictResults[i];
 
                                         if (deconjugationResult.Tags.Count == 0 ||
-                                            dictResult.WordClasses.Contains(lastTag))
+                                            (dictResult.WordClasses?.Contains(lastTag) ?? false))
                                         {
                                             resultsList.Add(dictResult);
                                         }
 
-                                        else if (Storage.WcDict.TryGetValue(deconjugationResult.Text,
-                                                     out List<JmdictWc> jmdictWcResults))
+                                        else if (Storage.WcDict!.TryGetValue(deconjugationResult.Text,
+                                                     out List<JmdictWc>? jmdictWcResults))
                                         {
                                             for (int j = 0; j < jmdictWcResults.Count; j++)
                                             {
@@ -300,15 +300,15 @@ namespace JL.Core.Lookup
                                             resultsList.Add(dictResult);
                                         }
 
-                                        else if (Storage.WcDict.TryGetValue(deconjugationResult.Text,
-                                                     out List<JmdictWc> jmdictWcResults))
+                                        else if (Storage.WcDict!.TryGetValue(deconjugationResult.Text,
+                                                     out List<JmdictWc>? jmdictWcResults))
                                         {
                                             for (int j = 0; j < jmdictWcResults.Count; j++)
                                             {
                                                 JmdictWc jmdictWcResult = jmdictWcResults[j];
 
                                                 if (dictResult.PrimarySpelling == jmdictWcResult.Spelling
-                                                    && (jmdictWcResult.Readings?.Contains(dictResult.Reading)
+                                                    && (jmdictWcResult.Readings?.Contains(dictResult.Reading ?? "")
                                                         ?? string.IsNullOrEmpty(dictResult.Reading)))
                                                 {
                                                     if (jmdictWcResult.WordClasses.Contains(lastTag))
@@ -332,7 +332,7 @@ namespace JL.Core.Lookup
 
                         if (resultsList.Any())
                         {
-                            if (results.TryGetValue(deconjugationResult.Text, out IntermediaryResult r))
+                            if (results.TryGetValue(deconjugationResult.Text, out IntermediaryResult? r))
                             {
                                 if (r.FoundForm == deconjugationResult.OriginalText)
                                     r.ProcessListList.Add(deconjugationResult.Process);
@@ -393,7 +393,7 @@ namespace JL.Core.Lookup
             for (int i = 0; i < text.Length; i++)
             {
                 if (Storage.Dicts[dictType].Contents
-                    .TryGetValue(textInHiraganaList[i], out List<IResult> result))
+                    .TryGetValue(textInHiraganaList[i], out List<IResult>? result))
                 {
                     nameResults.TryAdd(textInHiraganaList[i],
                         new IntermediaryResult(result, new List<List<string>>(), text[..^i], dictType));
@@ -408,7 +408,7 @@ namespace JL.Core.Lookup
             Dictionary<string, IntermediaryResult> kanjiResults = new();
 
             if (Storage.Dicts[DictType.Kanjidic].Contents.TryGetValue(
-                    text.UnicodeIterator().DefaultIfEmpty(string.Empty).First(), out List<IResult> result))
+                    text.UnicodeIterator().DefaultIfEmpty(string.Empty).First(), out List<IResult>? result))
             {
                 kanjiResults.Add(text.UnicodeIterator().First(),
                     new IntermediaryResult(result, new List<List<string>>(), text.UnicodeIterator().First(),
@@ -434,8 +434,8 @@ namespace JL.Core.Lookup
 
                     //var kanaSpellings = jMDictResult.KanaSpellings ?? new List<string>();
 
-                    List<List<string>> rLists = jMDictResult.ROrthographyInfoList ?? new();
-                    List<List<string>> aLists = jMDictResult.AOrthographyInfoList ?? new();
+                    List<List<string>?> rLists = jMDictResult.ROrthographyInfoList ?? new();
+                    List<List<string>?> aLists = jMDictResult.AOrthographyInfoList ?? new();
                     List<string> rOrthographyInfoList = new();
                     List<string> aOrthographyInfoList = new();
 
@@ -443,9 +443,9 @@ namespace JL.Core.Lookup
                     {
                         StringBuilder formattedROrthographyInfo = new();
 
-                        for (int k = 0; k < rLists[j].Count; k++)
+                        for (int k = 0; k < rLists[j]?.Count; k++)
                         {
-                            formattedROrthographyInfo.Append(rLists[j][k]);
+                            formattedROrthographyInfo.Append(rLists[j]![k]);
                             formattedROrthographyInfo.Append(", ");
                         }
 
@@ -456,9 +456,9 @@ namespace JL.Core.Lookup
                     {
                         StringBuilder formattedAOrthographyInfo = new();
 
-                        for (int k = 0; k < aLists[j].Count; k++)
+                        for (int k = 0; k < aLists[j]?.Count; k++)
                         {
-                            formattedAOrthographyInfo.Append(aLists[j][k]);
+                            formattedAOrthographyInfo.Append(aLists[j]![k]);
                             formattedAOrthographyInfo.Append(", ");
                         }
 
@@ -708,13 +708,13 @@ namespace JL.Core.Lookup
             int frequency = int.MaxValue;
 
             Storage.FreqDicts.TryGetValue(Storage.Frontend.CoreConfig.FrequencyListName,
-                out Dictionary<string, List<FrequencyEntry>> freqDict);
+                out Dictionary<string, List<FrequencyEntry>>? freqDict);
 
             if (freqDict == null)
                 return frequency;
 
             if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(jMDictResult.PrimarySpelling),
-                    out List<FrequencyEntry> freqResults))
+                    out List<FrequencyEntry>? freqResults))
             {
                 int freqResultsCount = freqResults.Count;
                 for (int i = 0; i < freqResultsCount; i++)
@@ -738,7 +738,7 @@ namespace JL.Core.Lookup
                     for (int i = 0; i < alternativeSpellingsCount; i++)
                     {
                         if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(jMDictResult.AlternativeSpellings[i]),
-                                out List<FrequencyEntry> alternativeSpellingFreqResults))
+                                out List<FrequencyEntry>? alternativeSpellingFreqResults))
                         {
                             int alternativeSpellingFreqResultsCount = alternativeSpellingFreqResults.Count;
                             for (int j = 0; j < alternativeSpellingFreqResultsCount; j++)
@@ -767,7 +767,7 @@ namespace JL.Core.Lookup
                     string reading = jMDictResult.Readings[i];
 
                     if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(reading),
-                            out List<FrequencyEntry> readingFreqResults))
+                            out List<FrequencyEntry>? readingFreqResults))
                     {
                         int readingFreqResultsCount = readingFreqResults.Count;
                         for (int j = 0; j < readingFreqResultsCount; j++)
@@ -797,13 +797,13 @@ namespace JL.Core.Lookup
             int frequency = int.MaxValue;
 
             Storage.FreqDicts.TryGetValue(Storage.Frontend.CoreConfig.FrequencyListName,
-                out Dictionary<string, List<FrequencyEntry>> freqDict);
+                out Dictionary<string, List<FrequencyEntry>>? freqDict);
 
             if (freqDict == null)
                 return frequency;
 
             if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingNazekaResult.PrimarySpelling),
-                    out List<FrequencyEntry> freqResults))
+                    out List<FrequencyEntry>? freqResults))
             {
                 int freqResultsCount = freqResults.Count;
                 for (int i = 0; i < freqResultsCount; i++)
@@ -828,7 +828,7 @@ namespace JL.Core.Lookup
                     {
                         if (freqDict.TryGetValue(
                                 Kana.KatakanaToHiraganaConverter(epwingNazekaResult.AlternativeSpellings[i]),
-                                out List<FrequencyEntry> alternativeSpellingFreqResults))
+                                out List<FrequencyEntry>? alternativeSpellingFreqResults))
                         {
                             int alternativeSpellingFreqResultsCount = alternativeSpellingFreqResults.Count;
                             for (int j = 0; j < alternativeSpellingFreqResultsCount; j++)
@@ -853,7 +853,7 @@ namespace JL.Core.Lookup
                 string reading = epwingNazekaResult.Reading;
 
                 if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(reading),
-                        out List<FrequencyEntry> readingFreqResults))
+                        out List<FrequencyEntry>? readingFreqResults))
                 {
                     int readingFreqResultsCount = readingFreqResults.Count;
                     for (int j = 0; j < readingFreqResultsCount; j++)
@@ -881,13 +881,13 @@ namespace JL.Core.Lookup
             int frequency = int.MaxValue;
 
             Storage.FreqDicts.TryGetValue(Storage.Frontend.CoreConfig.FrequencyListName,
-                out Dictionary<string, List<FrequencyEntry>> freqDict);
+                out Dictionary<string, List<FrequencyEntry>>? freqDict);
 
             if (freqDict == null)
                 return frequency;
 
             if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingResult.PrimarySpelling),
-                    out List<FrequencyEntry> freqResults))
+                    out List<FrequencyEntry>? freqResults))
             {
                 int freqResultsCount = freqResults.Count;
                 for (int i = 0; i < freqResultsCount; i++)
@@ -908,7 +908,7 @@ namespace JL.Core.Lookup
 
             else if (!string.IsNullOrEmpty(epwingResult.Reading)
                      && freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingResult.Reading),
-                         out List<FrequencyEntry> readingFreqResults))
+                         out List<FrequencyEntry>? readingFreqResults))
             {
                 int readingFreqResultsCount = readingFreqResults.Count;
                 for (int i = 0; i < readingFreqResultsCount; i++)
@@ -933,13 +933,13 @@ namespace JL.Core.Lookup
             int frequency = int.MaxValue;
 
             Storage.FreqDicts.TryGetValue(Storage.Frontend.CoreConfig.FrequencyListName,
-                out Dictionary<string, List<FrequencyEntry>> freqDict);
+                out Dictionary<string, List<FrequencyEntry>>? freqDict);
 
             if (freqDict == null)
                 return frequency;
 
             if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(customWordResult.PrimarySpelling),
-                    out List<FrequencyEntry> freqResults))
+                    out List<FrequencyEntry>? freqResults))
             {
                 int freqResultsCount = freqResults.Count;
                 for (int i = 0; i < freqResultsCount; i++)
@@ -964,7 +964,7 @@ namespace JL.Core.Lookup
                     {
                         if (freqDict.TryGetValue(
                                 Kana.KatakanaToHiraganaConverter(customWordResult.AlternativeSpellings[i]),
-                                out List<FrequencyEntry> alternativeSpellingFreqResults))
+                                out List<FrequencyEntry>? alternativeSpellingFreqResults))
                         {
                             int alternativeSpellingFreqResultsCount = alternativeSpellingFreqResults.Count;
                             for (int j = 0; j < alternativeSpellingFreqResultsCount; j++)
@@ -994,7 +994,7 @@ namespace JL.Core.Lookup
                     string reading = customWordResult.Readings[i];
 
                     if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(reading),
-                            out List<FrequencyEntry> readingFreqResults))
+                            out List<FrequencyEntry>? readingFreqResults))
                     {
                         int readingFreqResultsCount = readingFreqResults.Count;
                         for (int j = 0; j < readingFreqResultsCount; j++)
@@ -1031,62 +1031,61 @@ namespace JL.Core.Lookup
                 if (Storage.Frontend.CoreConfig.NewlineBetweenDefinitions)
                     defResult.Append($"({count}) ");
 
-                if (jMDictResult.WordClasses != null && jMDictResult.WordClasses.Any() && jMDictResult.WordClasses[i].Any())
+                if (jMDictResult.WordClasses?[i]?.Any() ?? false)
                 {
                     defResult.Append('(');
-                    defResult.Append(string.Join(", ", jMDictResult.WordClasses[i]));
+                    defResult.Append(string.Join(", ", jMDictResult.WordClasses[i]!));
                     defResult.Append(") ");
                 }
 
                 if (!Storage.Frontend.CoreConfig.NewlineBetweenDefinitions)
                     defResult.Append($"({count}) ");
 
-                if (jMDictResult.Dialects != null && jMDictResult.Dialects.Any() && jMDictResult.Dialects[i].Any())
+                if (jMDictResult.Dialects?[i]?.Any() ?? false)
                 {
                     defResult.Append('(');
-                    defResult.Append(string.Join(", ", jMDictResult.Dialects[i]));
+                    defResult.Append(string.Join(", ", jMDictResult.Dialects[i]!));
                     defResult.Append(") ");
                 }
 
-                if (jMDictResult.SpellingInfo != null && jMDictResult.SpellingInfo.Any() && jMDictResult.SpellingInfo[i] != null)
+                if (jMDictResult.DefinitionInfo != null && jMDictResult.DefinitionInfo.Any() && jMDictResult.DefinitionInfo[i] != null)
                 {
                     defResult.Append('(');
-                    defResult.Append(jMDictResult.SpellingInfo[i]);
+                    defResult.Append(jMDictResult.DefinitionInfo[i]);
                     defResult.Append(") ");
                 }
 
-                if (jMDictResult.MiscList != null && jMDictResult.MiscList.Any() && jMDictResult.MiscList[i].Any())
+                if (jMDictResult.MiscList?[i]?.Any() ?? false)
                 {
                     defResult.Append('(');
-                    defResult.Append(string.Join(", ", jMDictResult.MiscList[i]));
+                    defResult.Append(string.Join(", ", jMDictResult.MiscList[i]!));
                     defResult.Append(") ");
                 }
 
-                if (jMDictResult.TypeList != null && jMDictResult.TypeList.Any() && jMDictResult.TypeList[i].Any())
+                if (jMDictResult.TypeList?[i]?.Any() ?? false)
                 {
                     defResult.Append('(');
-                    defResult.Append(string.Join(", ", jMDictResult.TypeList[i]));
+                    defResult.Append(string.Join(", ", jMDictResult.TypeList[i]!));
                     defResult.Append(") ");
                 }
 
                 defResult.Append(string.Join("; ", jMDictResult.Definitions[i]) + " ");
 
-                if (jMDictResult.RRestrictions != null && jMDictResult.RRestrictions[i].Any()
-                    || jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
+                if ((jMDictResult.RRestrictions?[i]?.Any() ?? false) || (jMDictResult.KRestrictions?[i]?.Any() ?? false))
                 {
                     defResult.Append("(only applies to ");
 
-                    if (jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
+                    if (jMDictResult.KRestrictions?[i]?.Any() ?? false)
                     {
-                        defResult.Append(string.Join("; ", jMDictResult.KRestrictions[i]));
+                        defResult.Append(string.Join("; ", jMDictResult.KRestrictions[i]!));
                     }
 
-                    if (jMDictResult.RRestrictions != null && jMDictResult.RRestrictions[i].Any())
+                    if (jMDictResult.RRestrictions?[i]?.Any() ?? false)
                     {
-                        if (jMDictResult.KRestrictions != null && jMDictResult.KRestrictions[i].Any())
+                        if (jMDictResult.KRestrictions?[i]?.Any() ?? false)
                             defResult.Append("; ");
 
-                        defResult.Append(string.Join("; ", jMDictResult.RRestrictions[i]));
+                        defResult.Append(string.Join("; ", jMDictResult.RRestrictions[i]!));
                     }
 
                     defResult.Append(") ");
@@ -1116,7 +1115,7 @@ namespace JL.Core.Lookup
                 }
             }
 
-            for (int i = 0; i < jMnedictResult.Definitions.Count; i++)
+            for (int i = 0; i < jMnedictResult.Definitions?.Count; i++)
             {
                 if (jMnedictResult.Definitions.Any())
                 {
@@ -1131,7 +1130,7 @@ namespace JL.Core.Lookup
             return defResult.ToString();
         }
 
-        private static string BuildEpwingDefinition(List<string> epwingDefinitions)
+        private static string? BuildEpwingDefinition(List<string> epwingDefinitions)
         {
             if (epwingDefinitions == null)
                 return null;
@@ -1189,7 +1188,7 @@ namespace JL.Core.Lookup
             return $"({customNameDictResult.NameType.ToLower()}) {customNameDictResult.Reading}";
         }
 
-        public static string ProcessProcess(IntermediaryResult intermediaryResult)
+        public static string? ProcessProcess(IntermediaryResult intermediaryResult)
         {
             StringBuilder deconj = new();
             bool first = true;

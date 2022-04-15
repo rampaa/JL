@@ -15,8 +15,7 @@ namespace JL.Core.Tests
             string text = "あ";
 
             // Act
-            string result = Kana.HiraganaToKatakanaConverter(
-                text);
+            string result = Kana.HiraganaToKatakanaConverter(text);
 
             // Assert
             StringAssert.AreEqualIgnoringCase(expected, result);

@@ -31,7 +31,7 @@ namespace JL.Core
         public static bool UpdatingJMdict { get; set; } = false;
         public static bool UpdatingJMnedict { get; set; } = false;
         public static bool UpdatingKanjidic { get; set; } = false;
-        public static Dictionary<string, List<JmdictWc>> WcDict { get; set; } = new();
+        public static Dictionary<string, List<JmdictWc>>? WcDict { get; set; } = new();
         public static Dictionary<string, Dictionary<string, List<FrequencyEntry>>> FreqDicts { get; set; } = new();
 
         public static readonly Dictionary<DictType, Dict> Dicts = new();
@@ -417,7 +417,7 @@ namespace JL.Core
             if (!FreqDicts.ContainsKey(Storage.Frontend.CoreConfig.FrequencyListName))
             {
                 bool callGc = false;
-                Task taskNewFreqlist = null;
+                Task? taskNewFreqlist = null;
                 if (Storage.Frontend.CoreConfig.FrequencyListName != "None")
                 {
                     callGc = true;
@@ -427,9 +427,9 @@ namespace JL.Core
 
                     taskNewFreqlist = Task.Run(async () =>
                     {
-                        FrequencyLoader.BuildFreqDict(await FrequencyLoader
+                        FrequencyLoader.BuildFreqDict((await FrequencyLoader
                             .LoadJson(Storage.FrequencyLists[Storage.Frontend.CoreConfig.FrequencyListName])
-                            .ConfigureAwait(false));
+                            .ConfigureAwait(false))!);
                     });
                 }
 

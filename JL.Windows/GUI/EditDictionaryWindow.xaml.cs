@@ -34,7 +34,7 @@ namespace JL.Windows.GUI
         {
             bool isValid = true;
 
-            string typeString = ComboBoxDictType.SelectionBoxItem.ToString();
+            string typeString = ComboBoxDictType.SelectionBoxItem.ToString()!;
 
             string path = TextBlockPath.Text;
             if (string.IsNullOrEmpty(path) || (!Directory.Exists(path) && !File.Exists(path)))
@@ -44,7 +44,7 @@ namespace JL.Windows.GUI
             }
             else if (TextBlockPath.BorderBrush == Brushes.Red)
             {
-                TextBlockPath.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46");
+                TextBlockPath.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
             }
 
             if (isValid)
@@ -96,7 +96,7 @@ namespace JL.Windows.GUI
 
         private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)
         {
-            string typeString = ComboBoxDictType.SelectionBoxItem.ToString();
+            string typeString = ComboBoxDictType.SelectionBoxItem.ToString()!;
             //todo this will break on DictTypes without descriptions
             DictType selectedDictType = typeString.GetEnum<DictType>();
 

@@ -90,7 +90,7 @@ namespace JL.Core.Dicts.EDICT.JMdict
                             break;
 
                         case "ke_inf":
-                            kEle.KeInfList.Add(ReadEntity(edictXml));
+                            kEle.KeInfList.Add(ReadEntity(edictXml)!);
                             break;
 
                             //case "ke_pri":
@@ -124,7 +124,7 @@ namespace JL.Core.Dicts.EDICT.JMdict
                             break;
 
                         case "re_inf":
-                            rEle.ReInfList.Add(ReadEntity(jMDictXML));
+                            rEle.ReInfList.Add(ReadEntity(jMDictXML)!);
                             break;
 
                             //case "re_pri":
@@ -150,23 +150,23 @@ namespace JL.Core.Dicts.EDICT.JMdict
                     switch (jMDictXML.Name)
                     {
                         case "stagk":
-                            sense.StagKList.Add(jMDictXML.ReadString());
+                            sense.StagKList!.Add(jMDictXML.ReadString());
                             break;
 
                         case "stagr":
-                            sense.StagRList.Add(jMDictXML.ReadString());
+                            sense.StagRList!.Add(jMDictXML.ReadString());
                             break;
 
                         case "pos":
-                            sense.PosList.Add(ReadEntity(jMDictXML));
+                            sense.PosList!.Add(ReadEntity(jMDictXML)!);
                             break;
 
                         case "field":
-                            sense.FieldList.Add(ReadEntity(jMDictXML));
+                            sense.FieldList!.Add(ReadEntity(jMDictXML)!);
                             break;
 
                         case "misc":
-                            sense.MiscList.Add(ReadEntity(jMDictXML));
+                            sense.MiscList!.Add(ReadEntity(jMDictXML)!);
                             break;
 
                         case "s_inf":
@@ -174,7 +174,7 @@ namespace JL.Core.Dicts.EDICT.JMdict
                             break;
 
                         case "dial":
-                            sense.DialList.Add(ReadEntity(jMDictXML));
+                            sense.DialList!.Add(ReadEntity(jMDictXML)!);
                             break;
 
                         case "gloss":
@@ -195,7 +195,7 @@ namespace JL.Core.Dicts.EDICT.JMdict
             entry.SenseList.Add(sense);
         }
 
-        private static string ReadEntity(XmlTextReader jMDictXML)
+        private static string? ReadEntity(XmlTextReader jMDictXML)
         {
             jMDictXML.Read();
             if (jMDictXML.NodeType == XmlNodeType.EntityReference)

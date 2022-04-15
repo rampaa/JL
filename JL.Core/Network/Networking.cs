@@ -4,7 +4,7 @@ namespace JL.Core.Network;
 
 public static class Networking
 {
-    public static async Task<byte[]> GetAudioFromJpod101(string foundSpelling, string reading)
+    public static async Task<byte[]?> GetAudioFromJpod101(string foundSpelling, string reading)
     {
         try
         {

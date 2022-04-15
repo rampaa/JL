@@ -15,12 +15,12 @@ namespace JL.Core.Dicts.CustomDict
             NameType = nameType;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null)
                 return false;
 
-            CustomNameEntry customNameEntryObj = obj as CustomNameEntry;
+            CustomNameEntry customNameEntryObj = (obj as CustomNameEntry)!;
 
             Debug.Assert(customNameEntryObj != null, nameof(customNameEntryObj) + " != null");
             return PrimarySpelling == customNameEntryObj.PrimarySpelling

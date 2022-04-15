@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title="JL"
         AllowsTransparency="True"
-        mc:Ignorable="d" Height="269" Width="800" WindowStyle="None" ResizeMode="CanResize" Topmost="True"
+        mc:Ignorable="d" Height="269" Width="800" WindowStyle="None" ResizeMode="NoResize" Topmost="True"
         Closed="MainWindow_Closed" Closing="MainWindow_Closing" KeyDown="MainWindow_KeyDown"
         PreviewKeyDown="MainWindow_PreviewKeyDown" SizeChanged="MainWindow_SizeChanged"
         PreviewMouseDown="Window_PreviewMouseDown" DpiChanged="Window_DpiChanged" PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown">
@@ -13,25 +13,26 @@
         <SolidColorBrush Color="Black" Opacity="0.3" />
     </Window.Background>
 
-    <WindowChrome.WindowChrome>
-        <WindowChrome
-            CaptionHeight="20"
-            CornerRadius="0"
-            ResizeBorderThickness="3"
-            GlassFrameThickness="0"
-            x:Name="MainWindowChrome" />
-    </WindowChrome.WindowChrome>
-
     <Grid x:Name="MainGrid">
-        <TextBox x:Name="MainTextBox" Margin="0,25,0,0" TextWrapping="Wrap" VerticalContentAlignment="Top"
-                 Background="Transparent" Opacity="1" FontSize="{Binding Value, ElementName=FontSizeSlider}"
-                 Foreground="White" SelectionTextBrush="Black"
+
+        <Border Name="TopBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="7" Background="Transparent"/>
+        <Border Name="RightBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="7" Background="Transparent"/>
+        <Border Name="LeftBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="7" Background="Transparent"/>
+        <Border Name="ButtomBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="7" Background="Transparent"/>
+        <Border Name="TopRightBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Top" HorizontalAlignment="Right" Width="7" Height="7" Background="Transparent"/>
+        <Border Name="ButtomLeftBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="7" Height="7" Background="Transparent"/>
+        <Border Name="ButtomRightBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="7" Height="7" Background="Transparent"/>
+        <Border Name="TopLeftBorder"  MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Top" HorizontalAlignment="left" Height="7" Width="7" Background="Transparent"/>
+        <Rectangle Name="TitleBar" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="17" Margin="7,7,7,7" Opacity="1" Fill="Transparent"/>
+
+        <TextBox x:Name="MainTextBox" Margin="7,24,7,7" TextWrapping="Wrap" VerticalContentAlignment="Top"
+                 Background="Transparent" FontSize="{Binding Value, ElementName=FontSizeSlider}"
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"
                  VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
                  MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow"
                  FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled="True" IsUndoEnabled="False"
                  PreviewMouseRightButtonUp="MainTextBox_PreviewMouseRightButtonUp"
-                 PreviewMouseLeftButtonUp="MainTextBox_PreviewMouseLeftButtonUp">
+                 PreviewMouseLeftButtonUp="MainTextBox_PreviewMouseLeftButtonUp" MinWidth="100" MinHeight="100">
 
             <TextBox.ContextMenu>
                 <ContextMenu Name="MainTextboxContextMenu">
@@ -97,25 +98,26 @@
                 </TransformGroup>
             </Slider.RenderTransform>
         </Slider>
-        <TextBlock x:Name="CloseButton" WindowChrome.IsHitTestVisibleInChrome="True" HorizontalAlignment="Right"
-                   Margin="0,3,10,0" Text="x" TextWrapping="NoWrap" VerticalAlignment="Top" Foreground="White"
+
+        <TextBlock x:Name="CloseButton" HorizontalAlignment="Right"
+                   Margin="0,0,10,0" Text="x" TextWrapping="NoWrap" VerticalAlignment="Top" Foreground="White"
                    Width="10" Height="20" FontSize="18" ScrollViewer.VerticalScrollBarVisibility="Disabled"
                    MouseLeftButtonUp="CloseButton_MouseLeftButtonUp" MouseEnter="CloseButton_MouseEnter"
-                   MouseLeave="CloseButton_MouseLeave" ToolTip="Close" />
-        <TextBlock x:Name="MinimizeButton" WindowChrome.IsHitTestVisibleInChrome="True" HorizontalAlignment="Right"
-                   Margin="0,3,30,0" Text="―" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="18" Width="10"
-                   Height="20" Foreground="White" MouseLeftButtonUp="MinimizeButton_MouseLeftButtonUp"
+                   MouseLeave="CloseButton_MouseLeave" ToolTip="Close" FontFamily="Segoe UI" />
+        <TextBlock x:Name="MinimizeButton" HorizontalAlignment="Right"
+                   Margin="0,0.5,30,0" Text="―" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="18" Width="10"
+                   Height="20" Foreground="White" MouseLeftButtonUp="MinimizeButton_MouseLeftButtonUp" FontFamily="Segoe UI"
                    MouseEnter="MinimizeButton_MouseEnter" MouseLeave="MinimizeButton_MouseLeave" ToolTip="Minimize" />
 
         <!-- <Ellipse x:Name="FocusEllipse" Margin="7,1,1,5" HorizontalAlignment="Left" VerticalAlignment="Bottom" -->
         <!--          ToolTip="Window Focus" Width="10" Height="10" /> -->
 
-        <TextBlock x:Name="FontSizeButton" WindowChrome.IsHitTestVisibleInChrome="True" HorizontalAlignment="Left"
-                   Margin="37,2,0,0" Text="T" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White"
-                   Width="9" Height="17" FontSize="15" RenderTransformOrigin="-0.222,0.567"
+        <TextBlock x:Name="FontSizeButton" HorizontalAlignment="Left"
+                   Margin="37,3,0,0" Text="T" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White"
+                   Width="9" Height="17" FontSize="15" RenderTransformOrigin="-0.222,0.567" FontFamily="Segoe UI"
                    MouseLeftButtonDown="FontSizeButton_MouseLeftButtonDown" ToolTip="Font Size" />
-        <TextBlock x:Name="OpacityButton" HorizontalAlignment="Left" WindowChrome.IsHitTestVisibleInChrome="True"
-                   Margin="10,4,0,0" Text="☯" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" Width="15"
+        <TextBlock x:Name="OpacityButton" HorizontalAlignment="Left"
+                   Margin="10,5,0,0" Text="☯" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" Width="15"
                    Height="15" FontFamily="MS Gothic" Padding="0,0,0,0"
                    MouseLeftButtonDown="OpacityButton_MouseLeftButtonDown" ToolTip="Opacity" />
     </Grid>

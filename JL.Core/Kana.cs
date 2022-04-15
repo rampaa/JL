@@ -195,9 +195,6 @@ namespace JL.Core
 
         public static string KatakanaToHiraganaConverter(string text)
         {
-            if (text == null)
-                return null;
-
             StringBuilder textInHiragana = new();
 
             List<string> unicodeCharacters;
@@ -217,14 +214,14 @@ namespace JL.Core
             {
                 if (listLength > i + 1
                     && s_compositeHalfWidthKatakanaToFullWidthHiraganaDict.TryGetValue(
-                        unicodeCharacters[i] + unicodeCharacters[i + 1], out string compositeStr))
+                        unicodeCharacters[i] + unicodeCharacters[i + 1], out string? compositeStr))
                 {
                     textInHiragana.Append(compositeStr);
                     ++i;
                 }
-                else if (s_katakanaToHiraganaDict.TryGetValue(unicodeCharacters[i], out string hiraganaStr))
+                else if (s_katakanaToHiraganaDict.TryGetValue(unicodeCharacters[i], out string? hiraganaStr))
                     textInHiragana.Append(hiraganaStr);
-                else if (s_halfWidthToFullWidthDict.TryGetValue(unicodeCharacters[i], out string fullWidthStr))
+                else if (s_halfWidthToFullWidthDict.TryGetValue(unicodeCharacters[i], out string? fullWidthStr))
                     textInHiragana.Append(fullWidthStr);
                 else
                     textInHiragana.Append(unicodeCharacters[i]);
@@ -235,13 +232,10 @@ namespace JL.Core
 
         public static string HiraganaToKatakanaConverter(string text)
         {
-            if (text == null)
-                return null;
-
             StringBuilder textInKatakana = new();
             foreach (string str in text.UnicodeIterator().ToList())
             {
-                if (s_hiraganaToKatakanaDict.TryGetValue(str, out string hiraganaStr))
+                if (s_hiraganaToKatakanaDict.TryGetValue(str, out string? hiraganaStr))
                     textInKatakana.Append(hiraganaStr);
                 else
                     textInKatakana.Append(str);
@@ -252,16 +246,13 @@ namespace JL.Core
 
         public static List<string> LongVowelMarkConverter(string text)
         {
-            if (text == null)
-                return null;
-
             List<StringBuilder> stringBuilders = new();
             List<string> unicodeTextList = text.UnicodeIterator().ToList();
             stringBuilders.Add(new StringBuilder(text.Length));
             stringBuilders[0].Append(unicodeTextList[0]);
             for (int i = 1; i < unicodeTextList.Count; i++)
             {
-                if (text[i] == 'ー' && s_kanaFinalVowelDict.TryGetValue(unicodeTextList[i - 1], out string vowel))
+                if (text[i] == 'ー' && s_kanaFinalVowelDict.TryGetValue(unicodeTextList[i - 1], out string? vowel))
                 {
                     if (vowel != "お" && vowel != "え" && vowel != "オ" && vowel != "エ")
                     {
@@ -322,9 +313,6 @@ namespace JL.Core
 
         public static List<string> CreateCombinedForm(string text)
         {
-            if (text == null)
-                return null;
-
             List<string> unicodeCharacterList = text.UnicodeIterator().ToList();
             List<string> combinedForm = new();
 

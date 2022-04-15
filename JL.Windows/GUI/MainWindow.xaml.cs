@@ -5,12 +5,14 @@ using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Core;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
+using Microsoft.Win32;
 
 namespace JL.Windows.GUI
 {
@@ -45,24 +47,30 @@ namespace JL.Windows.GUI
 
         #endregion
 
-        private static readonly List<string> s_backlog = new();
+        private readonly List<string> _backlog = new();
 
         private int _currentTextIndex;
 
-        private static PopupWindow s_firstPopupWindow;
-
         private DateTime _lastClipboardChangeTime;
+        private WindowResizer? _windowResizer;
 
-        public static PopupWindow FirstPopupWindow
+        public PopupWindow FirstPopupWindow { get; init; } = new();
+
+        private static MainWindow? s_instance;
+        public static MainWindow Instance
         {
-            get { return s_firstPopupWindow ??= new PopupWindow(); }
+            get { return s_instance ??= new(); }
         }
 
-        public static MainWindow Instance { get; set; }
+        public double LeftPositionBeforeResolutionChange { get; set; }
+        public double TopPositionBeforeResolutionChange { get; set; }
+        public double HeightBeforeResolutionChange { get; set; }
+        public double WidthBeforeResolutionChange { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
+            s_instance = this;
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -80,13 +88,16 @@ namespace JL.Windows.GUI
                 Utils.Logger.Error(eventArgs.Exception.ToString());
             };
 
+            SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
+
             ClipboardManager windowClipboardManager = new(this);
             windowClipboardManager.ClipboardChanged += ClipboardChanged;
 
-            Instance = this;
+            _windowResizer = new(this);
 
             WindowsUtils.InitializeMainWindow();
-            MainWindowChrome.Freeze();
+
+            //MainWindowChrome.Freeze();
             _lastClipboardChangeTime = new(Stopwatch.GetTimestamp());
             CopyFromClipboard();
         }
@@ -106,8 +117,8 @@ namespace JL.Windows.GUI
                         MainTextBox.Text = text;
                         MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
 
-                        s_backlog.Add(text);
-                        _currentTextIndex = s_backlog.Count - 1;
+                        _backlog.Add(text);
+                        _currentTextIndex = _backlog.Count - 1;
                         Storage.SessionStats.Characters += new StringInfo(text).LengthInTextElements;
                         Storage.SessionStats.Lines += 1;
                     }
@@ -119,7 +130,7 @@ namespace JL.Windows.GUI
             }
         }
 
-        private void ClipboardChanged(object sender, EventArgs e)
+        private void ClipboardChanged(object? sender, EventArgs? e)
         {
             DateTime currentTime = new(Stopwatch.GetTimestamp());
 
@@ -130,7 +141,7 @@ namespace JL.Windows.GUI
             }
         }
 
-        public void MainTextBox_MouseMove(object sender, MouseEventArgs e)
+        public void MainTextBox_MouseMove(object? sender, MouseEventArgs? e)
         {
             if (ConfigManager.LookupOnSelectOnly
                 || Background.Opacity == 0
@@ -153,14 +164,15 @@ namespace JL.Windows.GUI
 
         private void MainWindow_Closed(object sender, EventArgs e)
         {
+            SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
             Application.Current.Shutdown();
         }
 
         private void MainTextBox_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (e.Delta > 0)
+            if (e.Delta > 0 && !Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
             {
-                string allBacklogText = string.Join("\n", s_backlog);
+                string allBacklogText = string.Join("\n", _backlog);
                 if (MainTextBox.Text != allBacklogText)
                 {
                     if (MainTextBox.GetFirstVisibleLineIndex() == 0)
@@ -176,6 +188,16 @@ namespace JL.Windows.GUI
                         MainTextBox.ScrollToEnd();
                     }
                 }
+            }
+
+            else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Delta > 0)
+            {
+                FontSizeSlider.Value += 5;
+            }
+
+            else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Delta < 0)
+            {
+                FontSizeSlider.Value -= 5;
             }
         }
 
@@ -396,22 +418,22 @@ namespace JL.Windows.GUI
                     MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
                 }
 
-                MainTextBox.Text = s_backlog[_currentTextIndex];
+                MainTextBox.Text = _backlog[_currentTextIndex];
             }
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.SteppedBacklogForwardsKeyGesture))
             {
-                if (_currentTextIndex < s_backlog.Count - 1)
+                if (_currentTextIndex < _backlog.Count - 1)
                 {
                     _currentTextIndex++;
                     MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
                 }
 
-                if (_currentTextIndex == s_backlog.Count - 1)
+                if (_currentTextIndex == _backlog.Count - 1)
                 {
                     MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
                 }
 
-                MainTextBox.Text = s_backlog[_currentTextIndex];
+                MainTextBox.Text = _backlog[_currentTextIndex];
             }
         }
 
@@ -474,7 +496,7 @@ namespace JL.Windows.GUI
 
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            PopupWindow currentPopupWindow = FirstPopupWindow;
+            PopupWindow? currentPopupWindow = FirstPopupWindow;
 
             while (currentPopupWindow != null)
             {
@@ -483,6 +505,62 @@ namespace JL.Windows.GUI
                 currentPopupWindow.Hide();
 
                 currentPopupWindow = currentPopupWindow.ChildPopupWindow;
+            }
+        }
+
+        private void DisplaySettingsChanged(object? sender, EventArgs? e)
+        {
+            Size oldResolution = new(WindowsUtils.ActiveScreen.Bounds.Width / WindowsUtils.Dpi.DpiScaleX, WindowsUtils.ActiveScreen.Bounds.Height / WindowsUtils.Dpi.DpiScaleY);
+            WindowsUtils.ActiveScreen = System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(this).Handle);
+            WindowsUtils.Dpi = VisualTreeHelper.GetDpi(this);
+            WindowsUtils.DpiAwareWorkAreaWidth = WindowsUtils.ActiveScreen.Bounds.Width / WindowsUtils.Dpi.DpiScaleX;
+            WindowsUtils.DpiAwareWorkAreaHeight = WindowsUtils.ActiveScreen.Bounds.Height / WindowsUtils.Dpi.DpiScaleY;
+
+            if (oldResolution.Width != WindowsUtils.DpiAwareWorkAreaWidth || oldResolution.Height != WindowsUtils.DpiAwareWorkAreaHeight)
+            {
+                double ratioX = oldResolution.Width / WindowsUtils.DpiAwareWorkAreaWidth;
+                double ratioY = oldResolution.Height / WindowsUtils.DpiAwareWorkAreaHeight;
+
+                double fontScale = ratioX * ratioY > 1
+                    ? Math.Min(ratioX, ratioY) * 0.75
+                    : Math.Max(ratioX, ratioY) / 0.75;
+
+                FontSizeSlider.Value = (int)Math.Round(FontSizeSlider.Value / fontScale);
+
+                Left = LeftPositionBeforeResolutionChange / ratioX;
+                LeftPositionBeforeResolutionChange = Left;
+
+                Top = TopPositionBeforeResolutionChange / ratioY;
+                TopPositionBeforeResolutionChange = Top;
+
+                Width = (int)Math.Round(WidthBeforeResolutionChange / ratioX);
+                WidthBeforeResolutionChange = Width;
+
+                Height = (int)Math.Round(HeightBeforeResolutionChange / ratioY);
+                HeightBeforeResolutionChange = Height;
+
+                PreferencesWindow.Instance.PopupMaxHeightNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Height;
+                PreferencesWindow.Instance.PopupMaxWidthNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;
+                ConfigManager.PopupMaxHeight = (int)Math.Round(ConfigManager.PopupMaxHeight / ratioY);
+                ConfigManager.PopupMaxWidth = (int)Math.Round(ConfigManager.PopupMaxWidth / ratioX);
+
+                ConfigManager.PopupYOffset = (int)Math.Round(ConfigManager.PopupYOffset / ratioY);
+                ConfigManager.PopupXOffset = (int)Math.Round(ConfigManager.PopupXOffset / ratioX);
+                WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
+                WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
+
+                ConfigManager.FixedPopupYPosition = (int)Math.Round(ConfigManager.FixedPopupYPosition / ratioY);
+                ConfigManager.FixedPopupXPosition = (int)Math.Round(ConfigManager.FixedPopupXPosition / ratioX);
+                WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
+                WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
+
+                ConfigManager.AlternativeSpellingsFontSize = (int)Math.Round(ConfigManager.AlternativeSpellingsFontSize / fontScale);
+                ConfigManager.DeconjugationInfoFontSize = (int)Math.Round(ConfigManager.DeconjugationInfoFontSize / fontScale);
+                ConfigManager.DefinitionsFontSize = (int)Math.Round(ConfigManager.DefinitionsFontSize / fontScale);
+                ConfigManager.DictTypeFontSize = (int)Math.Round(ConfigManager.DictTypeFontSize / fontScale);
+                ConfigManager.FrequencyFontSize = (int)Math.Round(ConfigManager.FrequencyFontSize / fontScale);
+                ConfigManager.PrimarySpellingFontSize = (int)Math.Round(ConfigManager.PrimarySpellingFontSize / fontScale);
+                ConfigManager.ReadingsFontSize = (int)Math.Round(ConfigManager.ReadingsFontSize / fontScale);
             }
         }
 
@@ -506,6 +584,88 @@ namespace JL.Windows.GUI
                 MainTextBox.Select(0, 0);
                 MainTextBox.ScrollToVerticalOffset(verticalOffset);
             }
+        }
+
+        private void Border_OnMouseEnter(object sender, MouseEventArgs e)
+        {
+            var border = (Border)sender;
+
+            switch (border.Name)
+            {
+                case "LeftBorder":
+                    Mouse.OverrideCursor = Cursors.SizeWE;
+                    break;
+                case "RightBorder":
+                    Mouse.OverrideCursor = Cursors.SizeWE;
+                    break;
+                case "TopBorder":
+                    Mouse.OverrideCursor = Cursors.SizeNS;
+                    break;
+                case "TopRightBorder":
+                    Mouse.OverrideCursor = Cursors.SizeNESW;
+                    break;
+                case "ButtomBorder":
+                    Mouse.OverrideCursor = Cursors.SizeNS;
+                    break;
+                case "ButtomLeftBorder":
+                    Mouse.OverrideCursor = Cursors.SizeNESW;
+                    break;
+                case "ButtomRightBorder":
+                    Mouse.OverrideCursor = Cursors.SizeNWSE;
+                    break;
+                case "TopLeftBorder":
+                    Mouse.OverrideCursor = Cursors.SizeNWSE;
+                    break;
+            }
+        }
+        private void Border_OnMouseLeave(object sender, MouseEventArgs e)
+        {
+            if (Mouse.LeftButton == MouseButtonState.Released)
+            {
+                Mouse.OverrideCursor = Cursors.Arrow;
+            }
+        }
+
+        //private void Resize(object sender, DragDeltaEventArgs e)
+        //{
+        //Left += e.HorizontalChange;
+        //Top += e.VerticalChange;
+        //            WindowResizer.SetWindowPos(_windowResizer.windowHandle, IntPtr.Zero, Convert.ToInt32(Left + e.HorizontalChange), Convert.ToInt32(Top + e.VerticalChange), Convert.ToInt32(Width), Convert.ToInt32(Height),
+        //WindowResizer.SetWindowPosFlags.SWP_SHOWWINDOW | WindowResizer.SetWindowPosFlags.SWP_NOREDRAW);
+        //}
+        private void ResizeWindow(object sender, MouseButtonEventArgs e)
+        {
+            _windowResizer?.ResizeWindow(sender as Border ?? new());
+
+            LeftPositionBeforeResolutionChange = Left;
+            TopPositionBeforeResolutionChange = Top;
+            HeightBeforeResolutionChange = Height;
+            WidthBeforeResolutionChange = Width;
+        }
+
+        public bool IsMouseOnTitleBar(int lParam)
+        {
+            int x = lParam << 16 >> 16;
+            int y = lParam >> 16;
+            Point cursorPoint = PointFromScreen(new Point(x, y));
+
+            HitTestResult hitTestResult = VisualTreeHelper.HitTest(MainGrid, cursorPoint);
+
+            if (hitTestResult != null)
+            {
+                return hitTestResult.VisualHit == TitleBar;
+            }
+
+            return false;
+        }
+
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (Background.Opacity == 0)
+                Background.Opacity = OpacitySlider.Value / 100;
+
+            LeftPositionBeforeResolutionChange = Left;
+            TopPositionBeforeResolutionChange = Top;
         }
     }
 }

@@ -67,7 +67,7 @@ namespace JL.Core.Anki
             }
         }
 
-        public static async Task<AnkiConfig> ReadAnkiConfig()
+        public static async Task<AnkiConfig?> ReadAnkiConfig()
         {
             if (File.Exists(Path.Join(Storage.ConfigPath, "AnkiConfig.json")))
             {

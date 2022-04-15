@@ -11,9 +11,9 @@
         // public List<string> RePriList { get; set; } // e.g. ichi1
         public REle()
         {
-            Reb = null;
             ReRestrList = new List<string>();
             ReInfList = new List<string>();
+            Reb = string.Empty;
             // ReNokanji = false;
             // RePriList = new List<string>();
         }

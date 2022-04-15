@@ -5,13 +5,13 @@ namespace JL.Core.Utilities;
 
 public static class ExtensionMethods
 {
-    public static string GetDescription(this Enum value)
+    public static string? GetDescription(this Enum value)
     {
         Type type = value.GetType();
-        string name = Enum.GetName(type, value);
+        string? name = Enum.GetName(type, value);
         if (name != null)
         {
-            FieldInfo field = type.GetField(name);
+            FieldInfo? field = type.GetField(name);
             if (field != null)
             {
                 if (Attribute.GetCustomAttribute(field,
@@ -33,12 +33,12 @@ public static class ExtensionMethods
                     typeof(DescriptionAttribute)) is DescriptionAttribute attribute)
             {
                 if (attribute.Description == description)
-                    return (T)field.GetValue(null);
+                    return (T)field.GetValue(null)!;
             }
             else
             {
                 if (field.Name == description)
-                    return (T)field.GetValue(null);
+                    return (T)field.GetValue(null)!;
             }
         }
 

@@ -12,7 +12,7 @@ namespace JL.Windows
 {
     public class ConfigManager : CoreConfig
     {
-        private static ConfigManager s_instance;
+        private static ConfigManager? s_instance;
 
         public static ConfigManager Instance
         {
@@ -27,8 +27,10 @@ namespace JL.Windows
         public static Brush HighlightColor { get; set; } = Brushes.AliceBlue;
         public static bool RequireLookupKeyPress { get; set; } = false;
         public static bool LookupOnSelectOnly { get; set; } = false;
+
         // Using alt as the lookup key cause focusing bugs. Consider making this key a KeyGesture.
         public static ModifierKeys LookupKey { get; set; } = ModifierKeys.Shift;
+
         public static bool HighlightLongestMatch { get; set; } = false;
         public static bool CheckForJLUpdatesOnStartUp { get; set; } = true;
 
@@ -110,7 +112,7 @@ namespace JL.Windows
 
         public void ApplyPreferences()
         {
-            string tempStr = ConfigurationManager.AppSettings.Get("FrequencyListName");
+            string? tempStr = ConfigurationManager.AppSettings.Get("FrequencyListName");
 
             if (tempStr == null)
             {
@@ -166,73 +168,73 @@ namespace JL.Windows
             // OR THE PROGRAM WILL CRASH AND BURN
             WindowsUtils.Try(() =>
                     MainWindowTextColor = (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowTextColor")),
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowTextColor")!)!,
                 MainWindowTextColor, "MainWindowTextColor");
             MainWindowTextColor.Freeze();
 
             WindowsUtils.Try(() =>
                     MainWindowBacklogTextColor = (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowBacklogTextColor")),
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowBacklogTextColor")!)!,
                 MainWindowBacklogTextColor, "MainWindowBacklogTextColor");
             MainWindowBacklogTextColor.Freeze();
 
             WindowsUtils.Try(() =>
                     PrimarySpellingColor = (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("PrimarySpellingColor")),
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("PrimarySpellingColor")!)!,
                 PrimarySpellingColor, "PrimarySpellingColor");
             PrimarySpellingColor.Freeze();
 
             WindowsUtils.Try(() =>
                     ReadingsColor = (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("ReadingsColor")),
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("ReadingsColor")!)!,
                 ReadingsColor, "ReadingsColor");
             ReadingsColor.Freeze();
 
             WindowsUtils.Try(() =>
                     AlternativeSpellingsColor = (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("AlternativeSpellingsColor")),
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("AlternativeSpellingsColor")!)!,
                 AlternativeSpellingsColor, "AlternativeSpellingsColor");
             AlternativeSpellingsColor.Freeze();
 
             WindowsUtils.Try(() =>
                     DefinitionsColor = (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("DefinitionsColor")),
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("DefinitionsColor")!)!,
                 DefinitionsColor, "DefinitionsColor");
             DefinitionsColor.Freeze();
 
             WindowsUtils.Try(() =>
                     FrequencyColor = (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("FrequencyColor")),
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("FrequencyColor")!)!,
                 FrequencyColor, "FrequencyColor");
             FrequencyColor.Freeze();
 
             WindowsUtils.Try(() =>
                     DeconjugationInfoColor = (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("DeconjugationInfoColor")),
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("DeconjugationInfoColor")!)!,
                 DeconjugationInfoColor, "DeconjugationInfoColor");
             DeconjugationInfoColor.Freeze();
 
             WindowsUtils.Try(() =>
                     SeparatorColor = (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("SeparatorColor")),
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("SeparatorColor")!)!,
                 SeparatorColor, "SeparatorColor");
             SeparatorColor!.Freeze();
 
             WindowsUtils.Try(() =>
                     PitchAccentMarkerColor = (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("PitchAccentMarkerColor")),
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("PitchAccentMarkerColor")!)!,
                 PitchAccentMarkerColor, "PitchAccentMarkerColor");
             PitchAccentMarkerColor!.Freeze();
 
             WindowsUtils.Try(() =>
                     DictTypeColor = (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("DictTypeColor")),
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("DictTypeColor")!)!,
                 DictTypeColor, "DictTypeColor");
             DictTypeColor!.Freeze();
 
             WindowsUtils.Try(() =>
                     HighlightColor = (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("HighlightColor")),
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("HighlightColor")!)!,
                 HighlightColor, "HighlightColor");
             HighlightColor.Freeze();
             MainWindow.Instance.MainTextBox.SelectionBrush = HighlightColor;
@@ -240,7 +242,7 @@ namespace JL.Windows
             WindowsUtils.Try(() =>
                 PopupBackgroundColor = (SolidColorBrush)new BrushConverter()
                     .ConvertFrom(ConfigurationManager.AppSettings
-                        .Get("PopupBackgroundColor")), PopupBackgroundColor, "PopupBackgroundColor");
+                        .Get("PopupBackgroundColor")!)!, PopupBackgroundColor, "PopupBackgroundColor");
             WindowsUtils.Try(() => PopupBackgroundColor.Opacity = double.Parse(ConfigurationManager.AppSettings
                 .Get("PopupOpacity")!) / 100, 70, "PopupOpacity");
             PopupBackgroundColor.Freeze();
@@ -405,7 +407,7 @@ namespace JL.Windows
 
             WindowsUtils.Try(() =>
                     MainWindow.Instance.Background = (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor")),
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor")!)!,
                 MainWindow.Instance.Background, "MainWindowBackgroundColor");
             MainWindow.Instance.Background.Opacity = MainWindow.Instance.OpacitySlider.Value / 100;
 
@@ -414,16 +416,20 @@ namespace JL.Windows
             WindowsUtils.Try(() => MainWindowHeight = double.Parse(ConfigurationManager.AppSettings
                 .Get("MainWindowHeight")!), MainWindowHeight, "MainWindowHeight");
             MainWindow.Instance.Height = MainWindowHeight;
+            MainWindow.Instance.HeightBeforeResolutionChange = MainWindowHeight;
 
             WindowsUtils.Try(() => MainWindowWidth = double.Parse(ConfigurationManager.AppSettings
                 .Get("MainWindowWidth")!), MainWindowWidth, "MainWindowWidth");
             MainWindow.Instance.Width = MainWindowWidth;
+            MainWindow.Instance.WidthBeforeResolutionChange = MainWindowWidth;
 
             WindowsUtils.Try(() => MainWindow.Instance.Top = double.Parse(ConfigurationManager.AppSettings
                 .Get("MainWindowTopPosition")!), MainWindow.Instance.Top, "MainWindowTopPosition");
+            MainWindow.Instance.TopPositionBeforeResolutionChange = MainWindow.Instance.Top;
 
             WindowsUtils.Try(() => MainWindow.Instance.Left = double.Parse(ConfigurationManager.AppSettings
                 .Get("MainWindowLeftPosition")!), MainWindow.Instance.Left, "MainWindowLeftPosition");
+            MainWindow.Instance.LeftPositionBeforeResolutionChange = MainWindow.Instance.Left;
 
             tempStr = ConfigurationManager.AppSettings.Get("PopupFont");
 
@@ -437,7 +443,7 @@ namespace JL.Windows
             WindowsUtils.Try(() => PopupDynamicWidth = bool.Parse(ConfigurationManager.AppSettings
                 .Get("PopupDynamicWidth")!), PopupDynamicWidth, "PopupDynamicWidth");
 
-            PopupWindow currentPopupWindow = MainWindow.FirstPopupWindow;
+            PopupWindow? currentPopupWindow = MainWindow.Instance.FirstPopupWindow;
 
             while (currentPopupWindow != null)
             {
@@ -542,7 +548,7 @@ namespace JL.Windows
 
             WindowsUtils.Try(() => preferenceWindow.TextboxBackgroundColorButton.Background =
                     (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor")),
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor")!)!,
                 preferenceWindow.TextboxBackgroundColorButton.Background, "MainWindowBackgroundColor");
 
             preferenceWindow.TextboxTextColorButton.Background = MainWindowTextColor;
@@ -585,7 +591,7 @@ namespace JL.Windows
             // Button background color has to be opaque, so we cannot use PopupBackgroundColor here
             WindowsUtils.Try(() => preferenceWindow.PopupBackgroundColorButton.Background =
                     (SolidColorBrush)new BrushConverter()
-                        .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor")),
+                        .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor")!)!,
                 preferenceWindow.PopupBackgroundColorButton.Background, "PopupBackgroundColor");
 
             WindowsUtils.Try(() => preferenceWindow.PopupOpacityNumericUpDown.Value = int.Parse(
@@ -753,11 +759,6 @@ namespace JL.Windows
             config.AppSettings.Settings["LookupKey"].Value =
                 preferenceWindow.LookupKeyComboBox.SelectedValue.ToString();
 
-            config.AppSettings.Settings["MainWindowHeight"].Value =
-                preferenceWindow.MainWindowHeightNumericUpDown.Value.ToString();
-            config.AppSettings.Settings["MainWindowWidth"].Value =
-                preferenceWindow.MainWindowWidthNumericUpDown.Value.ToString();
-
             config.AppSettings.Settings["MainWindowTopPosition"].Value = MainWindow.Instance.Top.ToString();
             config.AppSettings.Settings["MainWindowLeftPosition"].Value = MainWindow.Instance.Left.ToString();
 
@@ -776,10 +777,22 @@ namespace JL.Windows
             config.AppSettings.Settings["MainWindowFontSize"].Value =
                 MainWindow.Instance.FontSizeSlider.Value.ToString();
             config.AppSettings.Settings["MainWindowOpacity"].Value = MainWindow.Instance.OpacitySlider.Value.ToString();
-            config.AppSettings.Settings["MainWindowHeight"].Value = MainWindowHeight.ToString();
-            config.AppSettings.Settings["MainWindowWidth"].Value = MainWindowWidth.ToString();
-            config.AppSettings.Settings["MainWindowTopPosition"].Value = MainWindow.Instance.Top.ToString();
-            config.AppSettings.Settings["MainWindowLeftPosition"].Value = MainWindow.Instance.Left.ToString();
+
+            config.AppSettings.Settings["MainWindowHeight"].Value = MainWindowHeight > MainWindow.Instance.MinHeight
+                ? MainWindowHeight.ToString()
+                : MainWindow.Instance.MinHeight.ToString();
+
+            config.AppSettings.Settings["MainWindowWidth"].Value = MainWindowWidth > MainWindow.Instance.MinWidth
+                ? MainWindowWidth.ToString()
+                : MainWindow.Instance.MinWidth.ToString();
+
+            config.AppSettings.Settings["MainWindowTopPosition"].Value = MainWindowHeight + MainWindow.Instance.Top > MainWindow.Instance.MinHeight
+                ? MainWindow.Instance.Top.ToString()
+                : "0";
+
+            config.AppSettings.Settings["MainWindowLeftPosition"].Value = MainWindowWidth + MainWindow.Instance.Left > MainWindow.Instance.MinWidth
+                ? MainWindow.Instance.Left.ToString()
+                : "0";
 
             config.Save(ConfigurationSaveMode.Modified);
         }

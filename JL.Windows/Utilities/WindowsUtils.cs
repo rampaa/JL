@@ -28,7 +28,7 @@ namespace JL.Windows.Utilities;
 
 public static class WindowsUtils
 {
-    private static WaveOut s_audioPlayer;
+    private static WaveOut? s_audioPlayer;
 
     public static Screen ActiveScreen { get; set; } =
         Screen.FromHandle(
@@ -79,16 +79,16 @@ public static class WindowsUtils
 
     public static KeyGesture KeyGestureSetter(string keyGestureName, KeyGesture keyGesture)
     {
-        string rawKeyGesture = ConfigurationManager.AppSettings.Get(keyGestureName);
+        string? rawKeyGesture = ConfigurationManager.AppSettings.Get(keyGestureName);
 
         if (rawKeyGesture != null)
         {
             KeyGestureConverter keyGestureConverter = new();
             if (!rawKeyGesture!.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
                 !rawKeyGesture.StartsWith("Alt+"))
-                return (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture);
+                return (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture)!;
             else
-                return (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture);
+                return (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture)!;
         }
 
         else
@@ -153,7 +153,7 @@ public static class WindowsUtils
         return japaneseFonts;
     }
 
-    public static void ShowAddNameWindow(string selectedText)
+    public static void ShowAddNameWindow(string? selectedText)
     {
         AddNameWindow addNameWindowInstance = AddNameWindow.Instance;
         addNameWindowInstance.SpellingTextBox.Text = selectedText;
@@ -161,7 +161,7 @@ public static class WindowsUtils
         addNameWindowInstance.ShowDialog();
     }
 
-    public static void ShowAddWordWindow(string selectedText)
+    public static void ShowAddWordWindow(string? selectedText)
     {
         AddWordWindow addWordWindowInstance = AddWordWindow.Instance;
         addWordWindowInstance.SpellingsTextBox.Text = selectedText;
@@ -197,7 +197,7 @@ public static class WindowsUtils
         StatsWindow.Instance.ShowDialog();
     }
 
-    public static void SearchWithBrowser(string selectedText)
+    public static void SearchWithBrowser(string? selectedText)
     {
         if (selectedText?.Length > 0)
             Process.Start(new ProcessStartInfo("cmd",
@@ -246,6 +246,10 @@ public static class WindowsUtils
         Storage.Frontend = MainWindow.Instance;
 
         Utils.CoreInitialize();
+
+        //MainWindow.Instance.CloseButton.FontFamily = new("Segoe UI");
+        //MainWindow.Instance.MinimizeButton.FontFamily = new("Segoe UI");
+        //MainWindow.Instance.FontSizeSlider.FontFamily = new("Segoe UI");
 
         ConfigManager.Instance.ApplyPreferences();
 

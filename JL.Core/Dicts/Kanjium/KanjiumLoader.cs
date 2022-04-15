@@ -16,8 +16,11 @@ namespace JL.Core.Dicts.Kanjium
             foreach (string jsonFile in jsonFiles)
             {
                 await using FileStream openStream = File.OpenRead(jsonFile);
-                List<List<JsonElement>> jsonObjects = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream)
+                List<List<JsonElement>>? jsonObjects = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream)
                     .ConfigureAwait(false);
+
+                if (jsonObjects == null)
+                    continue;
 
                 foreach (List<JsonElement> jsonObject in jsonObjects)
                 {
@@ -25,7 +28,7 @@ namespace JL.Core.Dicts.Kanjium
 
                     string spellingInHiragana = Kana.KatakanaToHiraganaConverter(newEntry.Spelling);
 
-                    if (kanjiumDict.TryGetValue(spellingInHiragana, out List<IResult> result))
+                    if (kanjiumDict.TryGetValue(spellingInHiragana, out List<IResult>? result))
                     {
                         result.Add(newEntry);
                     }
@@ -39,7 +42,7 @@ namespace JL.Core.Dicts.Kanjium
                     {
                         string readingInHiragana = Kana.KatakanaToHiraganaConverter(newEntry.Reading);
 
-                        if (kanjiumDict.TryGetValue(readingInHiragana, out List<IResult> readingResult))
+                        if (kanjiumDict.TryGetValue(readingInHiragana, out List<IResult>? readingResult))
                         {
                             readingResult.Add(newEntry);
                         }

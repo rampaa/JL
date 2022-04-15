@@ -69,9 +69,8 @@ namespace JL.Core.Tests
             string text = "始まる";
 
             // Act
-            List<LookupResult> result = Lookup.Lookup.LookupText(
-                text);
-            List<LookupResult> actual = result;
+            List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+            List<LookupResult>? actual = result;
 
             // Assert
             StringAssert.AreEqualIgnoringCase(JsonSerializer.Serialize(expected), JsonSerializer.Serialize(actual));
@@ -86,11 +85,10 @@ namespace JL.Core.Tests
             string text = "た";
 
             // Act
-            List<LookupResult> result = Lookup.Lookup.LookupText(
-                text);
-            int actual =
-                result.First(x =>
-                    x.FoundSpelling == "他").Frequency;
+            List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+            int actual = result != null
+                ? result.First(x => x.FoundSpelling == "他").Frequency
+                : int.MaxValue;
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -106,11 +104,10 @@ namespace JL.Core.Tests
             string text = "た";
 
             // Act
-            List<LookupResult> result = Lookup.Lookup.LookupText(
-                text);
-            int actual =
-                result.First(x =>
-                    x.FoundSpelling == "多").Frequency;
+            List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+            int actual = result != null
+                ? result.First(x => x.FoundSpelling == "多").Frequency
+                : int.MaxValue;
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -125,11 +122,10 @@ namespace JL.Core.Tests
             string text = "た";
 
             // Act
-            List<LookupResult> result = Lookup.Lookup.LookupText(
-                text);
-            int actual =
-                result.First(x =>
-                    x.FoundSpelling == "田").Frequency;
+            List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+            int actual = result != null
+                ? result.First(x => x.FoundSpelling == "田").Frequency
+                : int.MaxValue;
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -144,11 +140,10 @@ namespace JL.Core.Tests
             string text = "日";
 
             // Act
-            List<LookupResult> result = Lookup.Lookup.LookupText(
-                text);
-            int actual =
-                result.First(x =>
-                    x.Readings.Contains("ひ")).Frequency;
+            List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+            int actual = result != null
+                ? result.First(x => x.Readings?.Contains("ひ") ?? false).Frequency
+                : int.MaxValue;
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -163,11 +158,10 @@ namespace JL.Core.Tests
             string text = "日";
 
             // Act
-            List<LookupResult> result = Lookup.Lookup.LookupText(
-                text);
-            int actual =
-                result.First(x =>
-                    x.Readings.Contains("にち")).Frequency;
+            List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+            int actual = result != null
+                ? result.First(x => x.Readings?.Contains("にち") ?? false).Frequency
+                : int.MaxValue;
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -182,11 +176,11 @@ namespace JL.Core.Tests
             string text = "日";
 
             // Act
-            List<LookupResult> result = Lookup.Lookup.LookupText(
-                text);
-            int actual =
-                result.First(x =>
-                    x.Readings.Contains("か")).Frequency;
+            List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+
+            int actual = result != null
+                ? result.First(x => x.Readings?.Contains("か") ?? false).Frequency
+                : int.MaxValue;
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -201,11 +195,11 @@ namespace JL.Core.Tests
             string text = "余り";
 
             // Act
-            List<LookupResult> result = Lookup.Lookup.LookupText(
-                text);
-            int actual =
-                result.First(x =>
-                    x.FoundSpelling == "余り").Frequency;
+            List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+
+            int actual = result != null
+                ? result.First(x => x.FoundSpelling == "余り").Frequency
+                : int.MaxValue;
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -220,11 +214,11 @@ namespace JL.Core.Tests
             string text = "懐かしい";
 
             // Act
-            List<LookupResult> result = Lookup.Lookup.LookupText(
-                text);
-            int actual =
-                result.First(x =>
-                    x.Readings.Contains("いだく")).Frequency;
+            List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+
+            int actual = result != null
+                ? result.First(x => x.Readings?.Contains("いだく") ?? false).Frequency
+                : int.MaxValue;
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -239,11 +233,11 @@ namespace JL.Core.Tests
             string text = "廃虚";
 
             // Act
-            List<LookupResult> result = Lookup.Lookup.LookupText(
-                text);
-            int actual =
-                result.First(x =>
-                    x.Readings.Contains("はいきょ")).Frequency;
+            List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+
+            int actual = result != null
+                ? result.First(x => x.Readings?.Contains("はいきょ") ?? false).Frequency
+                : int.MaxValue;
 
             // Assert
             Assert.AreEqual(expected, actual);
@@ -258,11 +252,11 @@ namespace JL.Core.Tests
             string text = "廃墟";
 
             // Act
-            List<LookupResult> result = Lookup.Lookup.LookupText(
-                text);
-            int actual =
-                result.First(x =>
-                    x.Readings.Contains("はいきょ")).Frequency;
+            List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+
+            int actual = result != null
+                ? result.First(x => x.Readings?.Contains("はいきょ") ?? false).Frequency
+                : int.MaxValue;
 
             // Assert
             Assert.AreEqual(expected, actual);

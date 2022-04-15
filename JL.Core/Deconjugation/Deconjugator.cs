@@ -7,14 +7,11 @@ namespace JL.Core.Deconjugation
     // translated from https://github.com/wareya/nazeka/blob/master/background-script.js
     public static class Deconjugator
     {
-        private static readonly string s_file =
-            File.ReadAllText($"{Storage.ResourcesPath}/deconjugator_edited_arrays.json");
-
-        private static readonly Rule[] s_rules = JsonSerializer.Deserialize<Rule[]>(s_file);
+        private static readonly Rule[] s_rules = JsonSerializer.Deserialize<Rule[]>(File.ReadAllText($"{Storage.ResourcesPath}/deconjugator_edited_arrays.json"))!;
 
         private static readonly LRUCache<string, HashSet<Form>> s_cache = new(777, 88);
 
-        private static Form StdruleDeconjugateInner(Form myForm, VirtualRule myRule)
+        private static Form? StdruleDeconjugateInner(Form myForm, VirtualRule myRule)
         {
             // tag doesn't match
             if (myForm.Tags.Count > 0 && myForm.Tags[^1] != myRule.ConTag)
@@ -51,7 +48,7 @@ namespace JL.Core.Deconjugation
             return newForm;
         }
 
-        private static HashSet<Form> StdruleDeconjugate(Form myForm,
+        private static HashSet<Form>? StdruleDeconjugate(Form myForm,
             Rule myRule)
         {
             // can't deconjugate nothingness
@@ -76,19 +73,19 @@ namespace JL.Core.Deconjugation
                 (
                     myRule.DecEnd.First(),
                     myRule.ConEnd.First(),
-                    myRule.DecTag.First(),
-                    myRule.ConTag.First(),
+                    myRule.DecTag!.First(),
+                    myRule.ConTag!.First(),
                     myRule.Detail
                 );
-                Form result = StdruleDeconjugateInner(myForm, virtualRule);
+                Form? result = StdruleDeconjugateInner(myForm, virtualRule);
                 if (result != null) collection.Add(result);
             }
             else if (array.Count > 1)
             {
                 string maybeDecEnd = myRule.DecEnd[0];
                 string maybeConEnd = myRule.ConEnd[0];
-                string maybeDecTag = myRule.DecTag[0];
-                string maybeConTag = myRule.ConTag[0];
+                string maybeDecTag = myRule.DecTag![0];
+                string maybeConTag = myRule.ConTag![0];
 
                 for (int i = 0; i < array.Count; i++)
                 {
@@ -105,7 +102,7 @@ namespace JL.Core.Deconjugation
                         maybeConTag,
                         myRule.Detail
                     );
-                    Form ret = StdruleDeconjugateInner(myForm, virtualRule);
+                    Form? ret = StdruleDeconjugateInner(myForm, virtualRule);
                     if (ret != null) collection.Add(ret);
                 }
             }
@@ -113,7 +110,7 @@ namespace JL.Core.Deconjugation
             return collection;
         }
 
-        private static HashSet<Form> RewriteruleDeconjugate(Form myForm, Rule myRule)
+        private static HashSet<Form>? RewriteruleDeconjugate(Form myForm, Rule myRule)
         {
             if (myForm.Text != myRule.ConEnd.First())
                 return null;
@@ -121,7 +118,7 @@ namespace JL.Core.Deconjugation
             return StdruleDeconjugate(myForm, myRule);
         }
 
-        private static HashSet<Form> OnlyfinalruleDeconjugate(Form myForm, Rule myRule)
+        private static HashSet<Form>? OnlyfinalruleDeconjugate(Form myForm, Rule myRule)
         {
             if (myForm.Tags.Count != 0)
                 return null;
@@ -129,7 +126,7 @@ namespace JL.Core.Deconjugation
             return StdruleDeconjugate(myForm, myRule);
         }
 
-        private static HashSet<Form> NeverfinalruleDeconjugate(Form myForm, Rule myRule)
+        private static HashSet<Form>? NeverfinalruleDeconjugate(Form myForm, Rule myRule)
         {
             if (myForm.Tags.Count == 0)
                 return null;
@@ -137,7 +134,7 @@ namespace JL.Core.Deconjugation
             return StdruleDeconjugate(myForm, myRule);
         }
 
-        private static HashSet<Form> ContextruleDeconjugate(Form myForm, Rule myRule)
+        private static HashSet<Form>? ContextruleDeconjugate(Form myForm, Rule myRule)
         {
             bool result = myRule.Contextrule switch
             {
@@ -151,7 +148,7 @@ namespace JL.Core.Deconjugation
             return StdruleDeconjugate(myForm, myRule);
         }
 
-        private static Form SubstitutionInner(Form myForm, Rule myRule)
+        private static Form? SubstitutionInner(Form myForm, Rule myRule)
         {
             if (!myForm.Text.Contains(myRule.ConEnd.First()))
                 return null;
@@ -177,7 +174,7 @@ namespace JL.Core.Deconjugation
             return newForm;
         }
 
-        private static HashSet<Form> SubstitutionDeconjugate(Form myForm, Rule myRule)
+        private static HashSet<Form>? SubstitutionDeconjugate(Form myForm, Rule myRule)
         {
             if (myForm.Process.Count != 0)
                 return null;
@@ -191,7 +188,7 @@ namespace JL.Core.Deconjugation
             List<string> array = myRule.DecEnd;
             if (array.Count == 1)
             {
-                Form result = SubstitutionInner(myForm, myRule);
+                Form? result = SubstitutionInner(myForm, myRule);
                 if (result != null) collection.Add(result);
             }
             else if (array.Count > 1)
@@ -215,7 +212,7 @@ namespace JL.Core.Deconjugation
                         myRule.Detail
                     );
 
-                    Form ret = SubstitutionInner(myForm, virtualRule);
+                    Form? ret = SubstitutionInner(myForm, virtualRule);
                     if (ret != null) collection.Add(ret);
                 }
             }
@@ -269,7 +266,7 @@ namespace JL.Core.Deconjugation
                 {
                     foreach (Rule rule in s_rules)
                     {
-                        HashSet<Form> newForm = rule.Type switch
+                        HashSet<Form>? newForm = rule.Type switch
                         {
                             "stdrule" => StdruleDeconjugate(form, rule),
                             "rewriterule" => RewriteruleDeconjugate(form, rule),

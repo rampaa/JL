@@ -9,7 +9,7 @@ namespace JL.Windows.GUI
     /// </summary>
     public partial class StatsWindow : Window
     {
-        private static StatsWindow s_instance;
+        private static StatsWindow? s_instance;
 
         public static StatsWindow Instance
         {

@@ -30,7 +30,7 @@ namespace JL.Windows.GUI
     /// </summary>
     public partial class ManageDictionariesWindow : Window
     {
-        private static ManageDictionariesWindow s_instance;
+        private static ManageDictionariesWindow? s_instance;
 
         public static ManageDictionariesWindow Instance
         {
@@ -234,7 +234,7 @@ namespace JL.Windows.GUI
             if (File.Exists(path) || Directory.Exists(path))
             {
                 if (File.Exists(path))
-                    path = Path.GetDirectoryName(path);
+                    path = Path.GetDirectoryName(path)!;
 
                 Process.Start("explorer.exe", path ?? throw new InvalidOperationException());
             }
@@ -285,7 +285,7 @@ namespace JL.Windows.GUI
 
                 await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
 
-                Storage.WcDict.Clear();
+                Storage.WcDict?.Clear();
 
                 await JmdictWcLoader.Load().ConfigureAwait(false);
 

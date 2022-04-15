@@ -14,11 +14,11 @@ namespace JL.Core.Anki
 
         [JsonPropertyName("tags")] public string[] Tags { get; set; }
 
-        [JsonPropertyName("audio")] public Dictionary<string, object>[] Audio { get; set; }
+        [JsonPropertyName("audio")] public Dictionary<string, object>[]? Audio { get; set; }
 
-        [JsonPropertyName("video")] public Dictionary<string, object>[] Video { get; set; }
+        [JsonPropertyName("video")] public Dictionary<string, object>[]? Video { get; set; }
 
-        [JsonPropertyName("picture")] public Dictionary<string, object>[] Picture { get; set; }
+        [JsonPropertyName("picture")] public Dictionary<string, object>[]? Picture { get; set; }
 
         public Note(
             string deckName,
@@ -26,9 +26,9 @@ namespace JL.Core.Anki
             Dictionary<string, object> fields,
             Dictionary<string, object> options,
             string[] tags,
-            Dictionary<string, object>[] audio,
-            Dictionary<string, object>[] video,
-            Dictionary<string, object>[] picture
+            Dictionary<string, object?>[] audio,
+            Dictionary<string, object>[]? video,
+            Dictionary<string, object>[]? picture
         )
         {
             DeckName = deckName;
