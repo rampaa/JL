@@ -12,6 +12,7 @@
     <PackageId>JL.Windows</PackageId>
     <AssemblyName>JL</AssemblyName>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>

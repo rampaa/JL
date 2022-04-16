@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
+﻿using System.Text.Json;
 using JL.Core.Dicts;
 using JL.Core.Dicts.EDICT;
 using JL.Core.Dicts.EDICT.JMdict;
