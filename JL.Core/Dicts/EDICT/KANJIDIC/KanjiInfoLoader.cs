@@ -111,22 +111,22 @@ namespace JL.Core.Dicts.EDICT.KANJIDIC
 
                         case "meaning":
                             if (!kanjiDicXml.HasAttributes)
-                                entry.Meanings.Add(kanjiDicXml.ReadString());
+                                entry.Meanings!.Add(kanjiDicXml.ReadString());
                             break;
 
                         case "nanori":
-                            entry.Nanori.Add(kanjiDicXml.ReadString());
+                            entry.Nanori!.Add(kanjiDicXml.ReadString());
                             break;
 
                         case "reading":
                             switch (kanjiDicXml.GetAttribute("r_type"))
                             {
                                 case "ja_on":
-                                    entry.OnReadings.Add(kanjiDicXml.ReadString());
+                                    entry.OnReadings!.Add(kanjiDicXml.ReadString());
                                     break;
 
                                 case "ja_kun":
-                                    entry.KunReadings.Add(kanjiDicXml.ReadString());
+                                    entry.KunReadings!.Add(kanjiDicXml.ReadString());
                                     break;
                             }
 

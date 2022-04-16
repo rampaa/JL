@@ -10,8 +10,8 @@ namespace JL.Core.Anki
         //   an array of (JSON) objects
         //   an array of booleans
         // /shrug
-        [JsonPropertyName("result")] public object Result { get; set; }
+        [JsonPropertyName("result")] public object? Result { get; set; }
 
-        [JsonPropertyName("error")] public object Error { get; set; }
+        [JsonPropertyName("error")] public object? Error { get; set; }
     }
 }

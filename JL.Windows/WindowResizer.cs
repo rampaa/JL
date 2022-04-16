@@ -9,7 +9,6 @@ namespace JL.Windows
 {
     internal class WindowResizer
     {
-        public bool drag = false;
         private const int WM_ERASEBKGND = 0x0014;
         private const int WM_SYSCOMMAND = 0x0112;
         private const int WM_NCCALCSIZE = 0x0083;

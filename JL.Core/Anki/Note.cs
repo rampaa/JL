@@ -14,7 +14,7 @@ namespace JL.Core.Anki
 
         [JsonPropertyName("tags")] public string[] Tags { get; set; }
 
-        [JsonPropertyName("audio")] public Dictionary<string, object>[]? Audio { get; set; }
+        [JsonPropertyName("audio")] public Dictionary<string, object?>[] Audio { get; set; }
 
         [JsonPropertyName("video")] public Dictionary<string, object>[]? Video { get; set; }
 

@@ -12,7 +12,7 @@ namespace JL.Core.Dicts
 
         public int Priority { get; set; }
 
-        [JsonIgnore] public Dictionary<string, List<IResult>> Contents { get; set; }
+        [JsonIgnore] public Dictionary<string, List<IResult>> Contents { get; set; } = new();
 
         public Dict(DictType type, string path, bool active, int priority)
         {

@@ -142,12 +142,12 @@ namespace JL.Windows.GUI
                 try
                 {
                     List<string> deckNamesList =
-                        JsonSerializer.Deserialize<List<string>>(getNameResponse.Result.ToString()!)!;
+                        JsonSerializer.Deserialize<List<string>>(getNameResponse.Result?.ToString()!)!;
 
                     MiningSetupComboBoxDeckNames.ItemsSource = deckNamesList;
 
                     List<string> modelNamesList =
-                        JsonSerializer.Deserialize<List<string>>(getModelResponse.Result.ToString()!)!;
+                        JsonSerializer.Deserialize<List<string>>(getModelResponse.Result?.ToString()!)!;
                     MiningSetupComboBoxModelNames.ItemsSource = modelNamesList;
                 }
 
@@ -181,7 +181,7 @@ namespace JL.Windows.GUI
                 string modelName = MiningSetupComboBoxModelNames.SelectionBoxItem.ToString()!;
 
                 List<string> fieldNames =
-                    JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelFieldNames(modelName))!.Result
+                    JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelFieldNames(modelName))?.Result?
                         .ToString()!)!;
 
                 Dictionary<string, JLField> fields =

@@ -247,10 +247,6 @@ public static class WindowsUtils
 
         Utils.CoreInitialize();
 
-        //MainWindow.Instance.CloseButton.FontFamily = new("Segoe UI");
-        //MainWindow.Instance.MinimizeButton.FontFamily = new("Segoe UI");
-        //MainWindow.Instance.FontSizeSlider.FontFamily = new("Segoe UI");
-
         ConfigManager.Instance.ApplyPreferences();
 
         if (ConfigManager.CheckForJLUpdatesOnStartUp)

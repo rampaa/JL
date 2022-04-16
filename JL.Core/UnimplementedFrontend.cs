@@ -4,7 +4,7 @@ namespace JL.Core;
 
 public class UnimplementedFrontend : IFrontend
 {
-    private CoreConfig _coreConfig;
+    private CoreConfig? _coreConfig;
 
     public CoreConfig CoreConfig
     {
