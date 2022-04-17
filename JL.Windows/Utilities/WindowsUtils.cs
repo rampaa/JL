@@ -196,9 +196,11 @@ public static class WindowsUtils
     public static void SearchWithBrowser(string? selectedText)
     {
         if (selectedText?.Length > 0)
+        {
             Process.Start(new ProcessStartInfo("cmd",
-                $"/c start https://www.google.com/search?q={selectedText}^&hl=ja")
+                $"/c start https://www.google.com/search?q={selectedText.ReplaceLineEndings("")}^&hl=ja")
             { CreateNoWindow = true });
+        }
     }
 
     public static async Task UpdateJL(Version latestVersion)

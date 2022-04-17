@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace JL.Core.Dicts.CustomDict
+﻿namespace JL.Core.Dicts.CustomDict
 {
     public class CustomWordEntry : IResult
     {
@@ -27,7 +25,6 @@ namespace JL.Core.Dicts.CustomDict
 
             CustomWordEntry customWordEntryObj = (obj as CustomWordEntry)!;
 
-            Debug.Assert(customWordEntryObj != null, nameof(customWordEntryObj) + " != null");
             return PrimarySpelling == customWordEntryObj.PrimarySpelling
                    && (customWordEntryObj.AlternativeSpellings?.SequenceEqual(AlternativeSpellings) ?? false)
                    && (customWordEntryObj.Readings?.SequenceEqual(Readings) ?? false)

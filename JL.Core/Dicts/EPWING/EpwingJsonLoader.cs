@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace JL.Core.Dicts.EPWING
 {
@@ -18,7 +17,9 @@ namespace JL.Core.Dicts.EPWING
                 List<List<JsonElement>>? jsonObjects = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream)
                     .ConfigureAwait(false);
 
-                Debug.Assert(jsonObjects != null, nameof(jsonObjects) + " != null");
+                if (jsonObjects == null)
+                    continue;
+
                 foreach (List<JsonElement> jsonObj in jsonObjects)
                 {
                     DictionaryBuilder(new EpwingResult(jsonObj), Storage.Dicts[dictType].Contents, dictType);

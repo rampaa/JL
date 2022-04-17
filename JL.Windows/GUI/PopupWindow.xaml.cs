@@ -183,7 +183,9 @@ namespace JL.Windows.GUI
 
                     if (ConfigManager.PopupFocusOnLookup)
                     {
+                        tb.Focus();
                         Activate();
+                        Keyboard.Focus(this);
                         Focus();
                     }
 
@@ -235,7 +237,9 @@ namespace JL.Windows.GUI
 
                 if (ConfigManager.PopupFocusOnLookup)
                 {
+                    tb.Focus();
                     Activate();
+                    Keyboard.Focus(this);
                     Focus();
                 }
 
@@ -1407,6 +1411,17 @@ namespace JL.Windows.GUI
             {
                 Unselect(MainWindow.Instance.MainTextBox);
             }
+        }
+
+        private void Window_Deactivated(object sender, EventArgs e)
+        {
+            //if (!IsKeyboardFocusWithin && (!ChildPopupWindow?.IsVisible ?? true))
+            //    MainWindow.Instance.FocusEllipse.Fill = Brushes.Transparent;
+        }
+
+        private void Window_Activated(object sender, EventArgs e)
+        {
+            //MainWindow.Instance.FocusEllipse.Fill = Brushes.Green;
         }
     }
 }

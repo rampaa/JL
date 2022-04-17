@@ -142,6 +142,8 @@ namespace JL.Windows.GUI
             if (ConfigManager.LookupOnSelectOnly
                 || Background.Opacity == 0
                 || MainTextboxContextMenu.IsVisible
+                || FontSizeSlider.IsVisible
+                || OpacitySlider.IsVisible
                 || FirstPopupWindow.MiningMode
                 || (ConfigManager.RequireLookupKeyPress && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))) return;
 
@@ -204,9 +206,9 @@ namespace JL.Windows.GUI
             WindowState = WindowState.Minimized;
         }
 
-        private void MinimizeButton_MouseEnter(object sender, MouseEventArgs e)
+        private void Button_MouseEnter(object sender, MouseEventArgs e)
         {
-            MinimizeButton.Foreground = new SolidColorBrush(Colors.SteelBlue);
+            ((TextBlock)sender).Foreground = Brushes.SteelBlue;
         }
 
         private void MainTextBox_MouseLeave(object sender, MouseEventArgs e)
@@ -221,24 +223,14 @@ namespace JL.Windows.GUI
             FirstPopupWindow.LastText = "";
         }
 
-        private void MinimizeButton_MouseLeave(object sender, MouseEventArgs e)
+        private void Button_MouseLeave(object sender, MouseEventArgs e)
         {
-            MinimizeButton.Foreground = new SolidColorBrush(Colors.White);
+            ((TextBlock)sender).Foreground = Brushes.White;
         }
 
         private void CloseButton_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             Close();
-        }
-
-        private void CloseButton_MouseEnter(object sender, MouseEventArgs e)
-        {
-            CloseButton.Foreground = new SolidColorBrush(Colors.SteelBlue);
-        }
-
-        private void CloseButton_MouseLeave(object sender, MouseEventArgs e)
-        {
-            CloseButton.Foreground = new SolidColorBrush(Colors.White);
         }
 
         private void OpacityButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -657,11 +649,20 @@ namespace JL.Windows.GUI
 
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (Background.Opacity == 0)
-                Background.Opacity = OpacitySlider.Value / 100;
-
             LeftPositionBeforeResolutionChange = Left;
             TopPositionBeforeResolutionChange = Top;
+        }
+
+        private void Window_Deactivated(object sender, EventArgs e)
+        {
+            //if (!FirstPopupWindow.IsVisible)
+            //    FocusEllipse.Fill = Brushes.Transparent;
+        }
+
+        private void Window_Activated(object sender, EventArgs e)
+        {
+            //FocusEllipse.Fill = Brushes.Green;
+            //FocusEllipse.Opacity = Background.Opacity;
         }
     }
 }

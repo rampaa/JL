@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace JL.Core.Dicts.CustomDict
+﻿namespace JL.Core.Dicts.CustomDict
 {
     public class CustomNameEntry : IResult
     {
@@ -22,7 +20,6 @@ namespace JL.Core.Dicts.CustomDict
 
             CustomNameEntry customNameEntryObj = (obj as CustomNameEntry)!;
 
-            Debug.Assert(customNameEntryObj != null, nameof(customNameEntryObj) + " != null");
             return PrimarySpelling == customNameEntryObj.PrimarySpelling
                    && Reading == customNameEntryObj.Reading
                    && NameType == customNameEntryObj.NameType;
