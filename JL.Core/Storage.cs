@@ -120,30 +120,6 @@ namespace JL.Core
                 "\n"
             };
 
-        // todo
-        // public static readonly Dictionary<DictOptionType, List<DictType>> DictOptionsDict = GenerateDictOptions();
-        //
-        // private static Dictionary<DictOptionType, List<DictType>> GenerateDictOptions()
-        // {
-        //     Dictionary<DictOptionType, List<DictType>> dict = new();
-        //     foreach (DictOptionType dictOptionType in Enum.GetValues<DictOptionType>())
-        //     {
-        //         switch (dictOptionType)
-        //         {
-        //             case DictOptionType.NewlineBetweenDefinitions:
-        //                 dict[DictOptionType.NewlineBetweenDefinitions] = Enum.GetValues<DictType>().ToList();
-        //                 break;
-        //             case DictOptionType.Examples:
-        //                 dict[DictOptionType.Examples] = new List<DictType> { DictType.Kenkyuusha };
-        //                 break;
-        //             default:
-        //                 throw new ArgumentOutOfRangeException();
-        //         }
-        //     }
-        //
-        //     return dict;
-        // }
-
         public static async Task LoadDictionaries()
         {
             Ready = false;

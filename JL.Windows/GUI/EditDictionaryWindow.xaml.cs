@@ -115,7 +115,6 @@ namespace JL.Windows.GUI
 
         private void GenerateDictOptionsElements(Dict dict)
         {
-            //todo
             if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dict.Type))
             {
                 var status = dict.Options?.NewlineBetweenDefinitions;
@@ -124,18 +123,6 @@ namespace JL.Windows.GUI
                     !Storage.BuiltInDicts.ContainsKey(
                         dict.Type.ToString()); // default to true for epwings, false otherwise
                 DockPanelNewline.Visibility = Visibility.Visible;
-
-                //todo
-                // DockPanel dockPanel = new();
-                // WrapPanelOptions.Children.Add(dockPanel);
-                // var checkBox = new CheckBox
-                // {
-                //     Width = 20,
-                //     IsChecked = Status?.Value == NewlineBetweenDefinitionsOptionValue.True,
-                //     Margin = new Thickness(10),
-                // };
-                //
-                // dockPanel.Children.Add(checkBox);
             }
 
             if (ExamplesOption.ValidDictTypes.Contains(dict.Type))

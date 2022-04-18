@@ -25,18 +25,4 @@ namespace JL.Core.Dicts
             Options = options;
         }
     }
-
-    //todo
-    // public struct DictOption
-    //      {
-    //          public DictOptionType Type { get; set; }
-    //
-    //          public string Value { get; set; }
-    //      }
-    //
-    // public enum DictOptionType
-    // {
-    //     NewlineBetweenDefinitions,
-    //     Examples
-    // }
 }
