@@ -49,7 +49,7 @@ namespace JL.Core
                 {
                     "CustomNameDictionary", new Dict(DictType.CustomNameDictionary,
                         $"{ResourcesPath}\\custom_names.txt", true, 1,
-                        new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null))
+                        new DictOptions(null, null))
                 },
                 {
                     "JMdict", new Dict(DictType.JMdict, $"{ResourcesPath}\\JMdict.xml", true, 2,
@@ -61,7 +61,7 @@ namespace JL.Core
                 },
                 {
                     "Kanjidic", new Dict(DictType.Kanjidic, $"{ResourcesPath}\\kanjidic2.xml", true, 4,
-                        new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null))
+                        new DictOptions(null, null))
                 }
             };
 
