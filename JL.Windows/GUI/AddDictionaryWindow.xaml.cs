@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Windows.Media;
 using JL.Core;
 using JL.Core.Dicts;
+using JL.Core.Dicts.Options;
 using JL.Core.Utilities;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Path = System.IO.Path;
@@ -59,8 +60,18 @@ namespace JL.Windows.GUI
                 // lowest priority means highest number
                 int lowestPriority = Storage.Dicts.Select(dict => dict.Value.Priority).Max();
 
+                // bool isEpwing = Storage.YomichanDictTypes.Concat(Storage.NazekaDictTypes).Contains(type);
+                //
+                // ExamplesOption? eo = null;
+                // // if (examples) //todo
+                // // {  Enum.TryParse<ExamplesOptionValue>(ComboBoxExamples.SelectedValue?.ToString(), out var eov);
+                // //    eo = new ExamplesOption() { Value = eov };
+                // // }
+                //
+                // var options = new DictOptions(new NewlineBetweenDefinitionsOption { Value = isEpwing }, eo);
+
                 Storage.Dicts.Add(type,
-                    new Dict(type, path, true, lowestPriority + 1));
+                    new Dict(type, path, true, lowestPriority + 1, new DictOptions(null, null)));
                 Storage.Dicts[type].Contents = new Dictionary<string, List<IResult>>();
 
                 Close();

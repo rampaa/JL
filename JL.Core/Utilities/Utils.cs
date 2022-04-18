@@ -45,7 +45,8 @@ namespace JL.Core.Utilities
                 var jso = new JsonSerializerOptions
                 {
                     WriteIndented = true,
-                    Converters = { new JsonStringEnumConverter(), }
+                    Converters = { new JsonStringEnumConverter(), },
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
                 };
 
                 File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "dicts.json"),

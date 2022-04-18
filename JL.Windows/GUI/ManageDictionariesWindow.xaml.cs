@@ -79,19 +79,19 @@ namespace JL.Windows.GUI
                     Text = dict.Type.GetDescription() ?? dict.Type.ToString(),
                     Margin = new Thickness(10),
                 };
-                //var dictPathValidityDisplay = new TextBlock
-                //{
-                //    Width = 13,
-                //    Text = "❌",
-                //    ToolTip = "Invalid Path",
-                //    Foreground = Brushes.Crimson,
-                //    Margin = new Thickness(1),
-                //    VerticalAlignment = VerticalAlignment.Center,
-                //    HorizontalAlignment = HorizontalAlignment.Right,
-                //    Visibility = !Directory.Exists(dict.Path) && !File.Exists(dict.Path)
-                //        ? Visibility.Visible
-                //        : Visibility.Collapsed
-                //};
+                var dictPathValidityDisplay = new TextBlock
+                {
+                    Width = 13,
+                    Text = "❌",
+                    ToolTip = "Invalid Path",
+                    Foreground = Brushes.Crimson,
+                    Margin = new Thickness(1),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    Visibility = !Directory.Exists(dict.Path) && !File.Exists(dict.Path)
+                        ? Visibility.Visible
+                        : Visibility.Collapsed
+                };
                 var dictPathDisplay = new TextBlock
                 {
                     Width = 200,
@@ -119,7 +119,7 @@ namespace JL.Windows.GUI
                     : Visibility.Visible,
                 };
 
-                buttonUpdate.Click += async (object sender, RoutedEventArgs e) =>
+                buttonUpdate.Click += async (sender, _) =>
                 {
                     ((Button)sender).IsEnabled = false;
 
@@ -162,10 +162,10 @@ namespace JL.Windows.GUI
                     Background = Brushes.DodgerBlue,
                     BorderThickness = new Thickness(1),
                     Margin = new Thickness(0, 0, 5, 0),
-                    Visibility = Storage.BuiltInDicts.Values
-                        .Select(t => t.Type).ToList().Contains(dict.Type)
-                        ? Visibility.Collapsed
-                        : Visibility.Visible,
+                    // Visibility = Storage.BuiltInDicts.Values
+                    //     .Select(t => t.Type).ToList().Contains(dict.Type)
+                    //     ? Visibility.Collapsed
+                    //     : Visibility.Visible,
                 };
 
                 checkBox.Unchecked += (_, _) => dict.Active = false;
@@ -209,7 +209,7 @@ namespace JL.Windows.GUI
                 dockPanel.Children.Add(buttonDecreasePriority);
                 dockPanel.Children.Add(priority);
                 dockPanel.Children.Add(dictTypeDisplay);
-                //dockPanel.Children.Add(dictPathValidityDisplay);
+                dockPanel.Children.Add(dictPathValidityDisplay);
                 dockPanel.Children.Add(dictPathDisplay);
                 dockPanel.Children.Add(buttonEdit);
                 dockPanel.Children.Add(buttonUpdate);

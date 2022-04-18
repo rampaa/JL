@@ -2,6 +2,7 @@
 using JL.Core.Dicts;
 using JL.Core.Dicts.EDICT;
 using JL.Core.Dicts.EDICT.JMdict;
+using JL.Core.Dicts.Options;
 using JL.Core.Lookup;
 using NUnit.Framework;
 
@@ -17,7 +18,9 @@ namespace JL.Core.Tests
 
             string jmdictPath = Storage.BuiltInDicts["JMdict"].Path;
 
-            Storage.Dicts.Add(DictType.JMdict, new Dict(DictType.JMdict, jmdictPath, true, 0));
+            Storage.Dicts.Add(DictType.JMdict,
+                new Dict(DictType.JMdict, jmdictPath, true, 0,
+                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null)));
             Storage.Dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();
 
             if (!File.Exists(jmdictPath))
@@ -48,11 +51,11 @@ namespace JL.Core.Tests
                         FormattedDefinitions =
                             "(v5r, vi) (1) to begin; to start; to commence (v5r, vi) (2) to happen (again); to begin (anew) (v5r, vi) (3) to date (from); to originate (in) ",
                         EdictID = "1307500",
-                        AlternativeSpellings = new List<string> { },
+                        AlternativeSpellings = new List<string>(),
                         Process = null,
-                        POrthographyInfoList = new List<string> { },
-                        ROrthographyInfoList = new List<string> { },
-                        AOrthographyInfoList = new List<string> { },
+                        POrthographyInfoList = new List<string>(),
+                        ROrthographyInfoList = new List<string>(),
+                        AOrthographyInfoList = new List<string>(),
                         OnReadings = null,
                         KunReadings = null,
                         Nanori = null,
@@ -188,7 +191,7 @@ namespace JL.Core.Tests
             // Arrange
             int expected = 284;
 
-            string text = "余り";
+            string text = "あんまり";
 
             // Act
             List<LookupResult>? result = Lookup.Lookup.LookupText(text);

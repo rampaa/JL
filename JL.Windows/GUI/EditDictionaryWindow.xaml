@@ -21,15 +21,32 @@
                         IsEnabled="{Binding ElementName=ComboBoxDictType,Path=Text.Length}">
                 </Button>
             </WrapPanel>
+
+            <StackPanel Name="StackPanelOptions" Visibility="Collapsed">
+                <TextBlock Foreground="White" Text="Options" TextWrapping="Wrap" Margin="0,10,0,10" />
+
+                <DockPanel Name="DockPanelNewline" Visibility="Collapsed">
+                    <CheckBox Name="CheckBoxNewline" Margin="10"></CheckBox>
+                    <TextBlock Foreground="White" Text="Newline between definitions" TextWrapping="Wrap"
+                               VerticalAlignment="Center"
+                               Margin="0,10,0,10" />
+                </DockPanel>
+
+                <DockPanel Name="DockPanelExamples" Visibility="Collapsed">
+                    <ComboBox Name="ComboBoxExamples" Margin="10" Width="100"> </ComboBox>
+                    <TextBlock Foreground="White" Text="Examples" TextWrapping="Wrap"
+                               VerticalAlignment="Center"
+                               Margin="0,10,0,10" />
+                </DockPanel>
+
+            </StackPanel>
         </StackPanel>
 
-        <!-- TODO options -->
-
-        <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="20,120,20,20">
+        <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="20,320,20,20">
             <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                    Margin="0,100,50,0" FontSize="16" Width="70" Height="35" Click="CancelButton_Click" />
+                    Margin="0,20,20,0" FontSize="16" Width="70" Height="35" Click="CancelButton_Click" />
             <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                    Margin="50,100,0,0" FontSize="16" Width="70" Height="35" Click="SaveButton_Click" />
+                    Margin="20,20,0,0" FontSize="16" Width="70" Height="35" Click="SaveButton_Click" />
         </WrapPanel>
     </Grid>
 </Window>
