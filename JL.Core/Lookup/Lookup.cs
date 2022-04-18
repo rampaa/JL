@@ -219,7 +219,8 @@ namespace JL.Core.Lookup
                                     {
                                         var dictResult = (JMdictResult)dictResults[i];
 
-                                        if (deconjugationResult.Tags.Count == 0 || (dictResult.WordClasses?.Where(pos => pos != null)
+                                        if (deconjugationResult.Tags.Count == 0 || (dictResult.WordClasses
+                                                ?.Where(pos => pos != null)
                                                 .SelectMany(pos => pos!).Contains(lastTag) ?? false))
                                         {
                                             resultsList.Add(dictResult);
@@ -478,7 +479,7 @@ namespace JL.Core.Lookup
                     result.AOrthographyInfoList = aOrthographyInfoList ?? new();
                     result.DictType = wordResult.DictType.ToString();
                     result.FormattedDefinitions = jMDictResult != null
-                        ? BuildJmdictDefinition(jMDictResult)
+                        ? BuildJmdictDefinition(jMDictResult, wordResult.DictType)
                         : null;
 
                     results.Add(result);
@@ -587,7 +588,7 @@ namespace JL.Core.Lookup
                         : new();
 
                     result.FormattedDefinitions = epwingResult.Definitions != null
-                        ? BuildEpwingDefinition(epwingResult.Definitions)
+                        ? BuildEpwingDefinition(epwingResult.Definitions, wordResult.DictType)
                         : null;
 
                     results.Add(result);
@@ -623,7 +624,7 @@ namespace JL.Core.Lookup
                         : new();
 
                     result.FormattedDefinitions = epwingResult.Definitions != null
-                        ? BuildEpwingDefinition(epwingResult.Definitions)
+                        ? BuildEpwingDefinition(epwingResult.Definitions, wordResult.DictType)
                         : null;
 
                     results.Add(result);
@@ -660,7 +661,7 @@ namespace JL.Core.Lookup
                     result.Readings = customWordDictResult.Readings ?? new();
                     result.AlternativeSpellings = customWordDictResult.AlternativeSpellings ?? new();
                     result.FormattedDefinitions = customWordDictResult != null
-                        ? BuildCustomWordDefinition(customWordDictResult)
+                        ? BuildCustomWordDefinition(customWordDictResult, wordResult.DictType)
                         : null;
 
                     results.Add(result);
@@ -723,7 +724,7 @@ namespace JL.Core.Lookup
 
                     if ((jMDictResult.Readings != null && jMDictResult.Readings.Contains(freqResult.Spelling))
                         || (jMDictResult.Readings == null && jMDictResult.PrimarySpelling == freqResult.Spelling))
-                    //|| (jMnedictResult.KanaSpellings != null && jMnedictResult.KanaSpellings.Contains(freqResult.Spelling))
+                        //|| (jMnedictResult.KanaSpellings != null && jMnedictResult.KanaSpellings.Contains(freqResult.Spelling))
                     {
                         if (frequency > freqResult.Frequency)
                         {
@@ -777,7 +778,7 @@ namespace JL.Core.Lookup
                             if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading)
                                 || (jMDictResult.AlternativeSpellings != null
                                     && jMDictResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
-                            //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
+                                //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                             {
                                 if (frequency > readingFreqResult.Frequency)
                                 {
@@ -1004,7 +1005,7 @@ namespace JL.Core.Lookup
                             if ((reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
                                 || (customWordResult.AlternativeSpellings != null
                                     && customWordResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
-                            //|| (customWordResult.KanaSpellings != null && customWordResult.KanaSpellings.Contains(readingFreqResults.Spelling))
+                                //|| (customWordResult.KanaSpellings != null && customWordResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                             {
                                 if (frequency > readingFreqResult.Frequency)
                                 {
@@ -1019,16 +1020,18 @@ namespace JL.Core.Lookup
             return frequency;
         }
 
-
-        private static string BuildJmdictDefinition(JMdictResult jMDictResult)
+        private static string BuildJmdictDefinition(JMdictResult jMDictResult, DictType dictType)
         {
-            string separator = Storage.Frontend.CoreConfig.NewlineBetweenDefinitions ? "\n" : "";
+            bool newlines = Storage.Dicts[dictType].Options is { NewlineBetweenDefinitions.Value: true };
+            string separator = newlines
+                ? "\n"
+                : "";
             int count = 1;
             StringBuilder defResult = new();
 
             for (int i = 0; i < jMDictResult.Definitions.Count; i++)
             {
-                if (Storage.Frontend.CoreConfig.NewlineBetweenDefinitions)
+                if (newlines)
                     defResult.Append($"({count}) ");
 
                 if (jMDictResult.WordClasses?[i]?.Any() ?? false)
@@ -1038,7 +1041,7 @@ namespace JL.Core.Lookup
                     defResult.Append(") ");
                 }
 
-                if (!Storage.Frontend.CoreConfig.NewlineBetweenDefinitions)
+                if (!newlines)
                     defResult.Append($"({count}) ");
 
                 if (jMDictResult.Dialects?[i]?.Any() ?? false)
@@ -1048,7 +1051,8 @@ namespace JL.Core.Lookup
                     defResult.Append(") ");
                 }
 
-                if (jMDictResult.DefinitionInfo != null && jMDictResult.DefinitionInfo.Any() && jMDictResult.DefinitionInfo[i] != null)
+                if (jMDictResult.DefinitionInfo != null && jMDictResult.DefinitionInfo.Any() &&
+                    jMDictResult.DefinitionInfo[i] != null)
                 {
                     defResult.Append('(');
                     defResult.Append(jMDictResult.DefinitionInfo[i]);
@@ -1071,7 +1075,8 @@ namespace JL.Core.Lookup
 
                 defResult.Append(string.Join("; ", jMDictResult.Definitions[i]) + " ");
 
-                if ((jMDictResult.RRestrictions?[i]?.Any() ?? false) || (jMDictResult.KRestrictions?[i]?.Any() ?? false))
+                if ((jMDictResult.RRestrictions?[i]?.Any() ?? false) ||
+                    (jMDictResult.KRestrictions?[i]?.Any() ?? false))
                 {
                     defResult.Append("(only applies to ");
 
@@ -1130,26 +1135,30 @@ namespace JL.Core.Lookup
             return defResult.ToString();
         }
 
-        private static string? BuildEpwingDefinition(List<string> epwingDefinitions)
+        private static string? BuildEpwingDefinition(List<string> epwingDefinitions, DictType dictType)
         {
             if (epwingDefinitions == null)
                 return null;
 
             StringBuilder defResult = new();
 
+            string separator = Storage.Dicts[dictType].Options is { NewlineBetweenDefinitions.Value: true }
+                ? "\n"
+                : "; ";
+
             for (int i = 0; i < epwingDefinitions.Count; i++)
             {
-                //var separator = Storage.Frontend.Storage.Frontend.CoreConfig.NewlineBetweenDefinitions ? "\n" : "; ";
-                const string separator = "\n";
                 defResult.Append(epwingDefinitions[i] + separator);
             }
 
             return defResult.ToString().Trim('\n');
         }
 
-        private static string BuildCustomWordDefinition(CustomWordEntry customWordResult)
+        private static string BuildCustomWordDefinition(CustomWordEntry customWordResult, DictType dictType)
         {
-            string separator = Storage.Frontend.CoreConfig.NewlineBetweenDefinitions ? "\n" : "";
+            string separator = Storage.Dicts[dictType].Options is { NewlineBetweenDefinitions.Value: true }
+                ? "\n"
+                : "";
             int count = 1;
             StringBuilder defResult = new();
 

@@ -1,4 +1,4 @@
-using System.Runtime;
+﻿using System.Runtime;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -11,6 +11,7 @@ using JL.Core.Dicts.EDICT.KANJIDIC;
 using JL.Core.Dicts.EPWING;
 using JL.Core.Dicts.EPWING.EpwingNazeka;
 using JL.Core.Dicts.Kanjium;
+using JL.Core.Dicts.Options;
 using JL.Core.Frequency;
 using JL.Core.PoS;
 
@@ -40,16 +41,28 @@ namespace JL.Core
             new()
             {
                 {
-                    "CustomWordDictionary",
-                    new Dict(DictType.CustomWordDictionary, $"{ResourcesPath}\\custom_words.txt", true, 0)
+                    "CustomWordDictionary", new Dict(DictType.CustomWordDictionary,
+                        $"{ResourcesPath}\\custom_words.txt",
+                        true, 0,
+                        new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null))
                 },
                 {
-                    "CustomNameDictionary",
-                    new Dict(DictType.CustomNameDictionary, $"{ResourcesPath}\\custom_names.txt", true, 1)
+                    "CustomNameDictionary", new Dict(DictType.CustomNameDictionary,
+                        $"{ResourcesPath}\\custom_names.txt", true, 1,
+                        new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null))
                 },
-                { "JMdict", new Dict(DictType.JMdict, $"{ResourcesPath}\\JMdict.xml", true, 2) },
-                { "JMnedict", new Dict(DictType.JMnedict, $"{ResourcesPath}\\JMnedict.xml", true, 3) },
-                { "Kanjidic", new Dict(DictType.Kanjidic, $"{ResourcesPath}\\kanjidic2.xml", true, 4) }
+                {
+                    "JMdict", new Dict(DictType.JMdict, $"{ResourcesPath}\\JMdict.xml", true, 2,
+                        new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null))
+                },
+                {
+                    "JMnedict", new Dict(DictType.JMnedict, $"{ResourcesPath}\\JMnedict.xml", true, 3,
+                        new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null))
+                },
+                {
+                    "Kanjidic", new Dict(DictType.Kanjidic, $"{ResourcesPath}\\kanjidic2.xml", true, 4,
+                        new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null))
+                }
             };
 
         public static readonly Dictionary<string, string> FrequencyLists = new()
@@ -106,6 +119,30 @@ namespace JL.Core
                 "）",
                 "\n"
             };
+
+        // todo
+        // public static readonly Dictionary<DictOptionType, List<DictType>> DictOptionsDict = GenerateDictOptions();
+        //
+        // private static Dictionary<DictOptionType, List<DictType>> GenerateDictOptions()
+        // {
+        //     Dictionary<DictOptionType, List<DictType>> dict = new();
+        //     foreach (DictOptionType dictOptionType in Enum.GetValues<DictOptionType>())
+        //     {
+        //         switch (dictOptionType)
+        //         {
+        //             case DictOptionType.NewlineBetweenDefinitions:
+        //                 dict[DictOptionType.NewlineBetweenDefinitions] = Enum.GetValues<DictType>().ToList();
+        //                 break;
+        //             case DictOptionType.Examples:
+        //                 dict[DictOptionType.Examples] = new List<DictType> { DictType.Kenkyuusha };
+        //                 break;
+        //             default:
+        //                 throw new ArgumentOutOfRangeException();
+        //         }
+        //     }
+        //
+        //     return dict;
+        // }
 
         public static async Task LoadDictionaries()
         {

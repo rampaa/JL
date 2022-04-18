@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Windows.Media;
 using JL.Core;
 using JL.Core.Dicts;
+using JL.Core.Dicts.Options;
 using JL.Core.Utilities;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Path = System.IO.Path;
@@ -15,11 +16,11 @@ namespace JL.Windows.GUI
     /// </summary>
     public partial class EditDictionaryWindow : Window
     {
-        private readonly Dict _oldDict;
+        private readonly Dict _dict;
 
-        public EditDictionaryWindow(Dict oldDict)
+        public EditDictionaryWindow(Dict dict)
         {
-            _oldDict = oldDict;
+            _dict = dict;
             InitializeComponent();
         }
 
@@ -50,12 +51,31 @@ namespace JL.Windows.GUI
                 //todo this will break on DictTypes without descriptions
                 DictType type = typeString.GetEnum<DictType>();
 
-                if (Storage.Dicts[type].Type != type || Storage.Dicts[type].Path != path)
+                if (Storage.Dicts[type].Path != path)
                 {
-                    Storage.Dicts[type].Type = type;
                     Storage.Dicts[type].Path = path;
                     Storage.Dicts[type].Contents = new Dictionary<string, List<IResult>>();
                 }
+
+                NewlineBetweenDefinitionsOption? newlineOption = null;
+                if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(type))
+                {
+                    newlineOption = new NewlineBetweenDefinitionsOption { Value = CheckBoxNewline.IsChecked!.Value };
+                }
+
+                ExamplesOption? examplesOption = null;
+                if (ExamplesOption.ValidDictTypes.Contains(type))
+                {
+                    Enum.TryParse<ExamplesOptionValue>(ComboBoxExamples.SelectedValue?.ToString(), out var eov);
+                    examplesOption = new ExamplesOption { Value = eov };
+                }
+
+                var options =
+                    new DictOptions(
+                        newlineOption,
+                        examplesOption);
+
+                Storage.Dicts[type].Options = options;
 
                 Close();
             }
@@ -86,10 +106,52 @@ namespace JL.Windows.GUI
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            string type = _oldDict.Type.GetDescription() ?? _oldDict.Type.ToString();
+            string type = _dict.Type.GetDescription() ?? _dict.Type.ToString();
             ComboBoxDictType.Items.Add(type);
             ComboBoxDictType.SelectedValue = type;
-            TextBlockPath.Text = _oldDict.Path;
+            TextBlockPath.Text = _dict.Path;
+            GenerateDictOptionsElements(_dict);
+        }
+
+        private void GenerateDictOptionsElements(Dict dict)
+        {
+            //todo
+            if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dict.Type))
+            {
+                var status = dict.Options?.NewlineBetweenDefinitions;
+                CheckBoxNewline.IsChecked =
+                    status?.Value ??
+                    !Storage.BuiltInDicts.ContainsKey(
+                        dict.Type.ToString()); // default to true for epwings, false otherwise
+                DockPanelNewline.Visibility = Visibility.Visible;
+
+                //todo
+                // DockPanel dockPanel = new();
+                // WrapPanelOptions.Children.Add(dockPanel);
+                // var checkBox = new CheckBox
+                // {
+                //     Width = 20,
+                //     IsChecked = Status?.Value == NewlineBetweenDefinitionsOptionValue.True,
+                //     Margin = new Thickness(10),
+                // };
+                //
+                // dockPanel.Children.Add(checkBox);
+            }
+
+            if (ExamplesOption.ValidDictTypes.Contains(dict.Type))
+            {
+                ComboBoxExamples.ItemsSource = Enum.GetValues<ExamplesOptionValue>().ToArray();
+                var examples = dict.Options?.Examples;
+                ComboBoxExamples.SelectedValue = examples?.Value ?? ExamplesOptionValue.All;
+
+                DockPanelExamples.Visibility = Visibility.Visible;
+            }
+
+            if (DockPanelNewline.Visibility == Visibility.Visible ||
+                DockPanelExamples.Visibility == Visibility.Visible)
+            {
+                StackPanelOptions.Visibility = Visibility.Visible;
+            }
         }
 
         private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)

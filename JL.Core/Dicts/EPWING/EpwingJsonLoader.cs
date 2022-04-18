@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using JL.Core.Dicts.Options;
 
 namespace JL.Core.Dicts.EPWING
 {
@@ -14,7 +15,8 @@ namespace JL.Core.Dicts.EPWING
             foreach (string jsonFile in jsonFiles)
             {
                 await using FileStream openStream = File.OpenRead(jsonFile);
-                List<List<JsonElement>>? jsonObjects = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream)
+                List<List<JsonElement>>? jsonObjects = await JsonSerializer
+                    .DeserializeAsync<List<List<JsonElement>>>(openStream)
                     .ConfigureAwait(false);
 
                 if (jsonObjects == null)
@@ -74,50 +76,55 @@ namespace JL.Core.Dicts.EPWING
             switch (dictType)
             {
                 case DictType.Kenkyuusha:
-
-                    // TODO: Make this configurable?
-                    // Remove all example sentences
-                    if (result.Definitions?.Count > 2)
+                    if (Storage.Dicts[dictType].Options is { Examples.Value: ExamplesOptionValue.None })
                     {
-                        for (int i = 2; i < result.Definitions.Count; i++)
+                        if (result.Definitions?.Count > 2)
                         {
-                            if (!char.IsDigit(result.Definitions[i][0]))
+                            for (int i = 2; i < result.Definitions.Count; i++)
                             {
-                                result.Definitions.RemoveAt(i);
-                                --i;
+                                if (!char.IsDigit(result.Definitions[i][0]))
+                                {
+                                    result.Definitions.RemoveAt(i);
+                                    --i;
+                                }
                             }
                         }
                     }
+                    else if (Storage.Dicts[dictType].Options is { Examples.Value: ExamplesOptionValue.One })
+                    {
+                        if (result.Definitions?.Count > 2)
+                        {
+                            bool isMainExample = true;
 
-                    // Only keep one example sentence per definition
-                    //if (result.Definitions.Count > 2)
-                    //{
-                    //    bool isMainExample = true;
+                            for (int i = 2; i < result.Definitions.Count; i++)
+                            {
+                                if (char.IsDigit(result.Definitions[i][0]))
+                                {
+                                    isMainExample = true;
+                                }
 
-                    //    for (int i = 2; i < result.Definitions.Count; i++)
-                    //    {
-                    //        if (char.IsDigit(result.Definitions[i][0]))
-                    //        {
-                    //            isMainExample = true;
-                    //        }
+                                else
+                                {
+                                    if (!isMainExample)
+                                    {
+                                        result.Definitions.RemoveAt(i);
+                                        --i;
+                                    }
 
-                    //        else
-                    //        {
-                    //            if (!isMainExample)
-                    //            {
-                    //                result.Definitions.RemoveAt(i);
-                    //                --i;
-                    //            }
-
-                    //            isMainExample = false;
-                    //        }
-                    //    }
-                    //}
+                                    isMainExample = false;
+                                }
+                            }
+                        }
+                    }
+                    else if (Storage.Dicts[dictType].Options is { Examples.Value: ExamplesOptionValue.All })
+                    {
+                    }
 
                     // Filter duplicate entries.
                     // If an entry has reading info while others don't, keep the one with the reading info.
                     if (Storage.Dicts[DictType.Kenkyuusha].Contents.TryGetValue(
-                        Kana.KatakanaToHiraganaConverter(result.PrimarySpelling), out List<IResult>? kenkyuushaResults))
+                            Kana.KatakanaToHiraganaConverter(result.PrimarySpelling),
+                            out List<IResult>? kenkyuushaResults))
                     {
                         for (int i = 0; i < kenkyuushaResults.Count; i++)
                         {
