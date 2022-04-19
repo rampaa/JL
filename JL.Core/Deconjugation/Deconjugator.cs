@@ -29,7 +29,7 @@ namespace JL.Core.Deconjugation
                 newText,
                 myForm.OriginalText,
                 myForm.Tags.ToList(),
-                myForm.Seentext.ToHashSet(),
+                myForm.SeenText.ToHashSet(),
                 myForm.Process.ToList()
             );
 
@@ -40,10 +40,10 @@ namespace JL.Core.Deconjugation
 
             newForm.Tags.Add(myRule.DecTag);
 
-            if (newForm.Seentext.Count == 0)
-                newForm.Seentext.Add(myForm.Text);
+            if (newForm.SeenText.Count == 0)
+                newForm.SeenText.Add(myForm.Text);
 
-            newForm.Seentext.Add(newText);
+            newForm.SeenText.Add(newText);
 
             return newForm;
         }
@@ -136,7 +136,7 @@ namespace JL.Core.Deconjugation
 
         private static HashSet<Form>? ContextruleDeconjugate(Form myForm, Rule myRule)
         {
-            bool result = myRule.Contextrule switch
+            bool result = myRule.ContextRule switch
             {
                 "v1inftrap" => V1InftrapCheck(myForm),
                 "saspecial" => SaspecialCheck(myForm, myRule),
@@ -160,16 +160,16 @@ namespace JL.Core.Deconjugation
                 newText,
                 myForm.OriginalText,
                 myForm.Tags.ToList(),
-                myForm.Seentext.ToHashSet(),
+                myForm.SeenText.ToHashSet(),
                 myForm.Process.ToList()
             );
 
             newForm.Process.Add(myRule.Detail);
 
-            if (newForm.Seentext.Count == 0)
-                newForm.Seentext.Add(myForm.Text);
+            if (newForm.SeenText.Count == 0)
+                newForm.SeenText.Add(myForm.Text);
 
-            newForm.Seentext.Add(newText);
+            newForm.SeenText.Add(newText);
 
             return newForm;
         }
@@ -281,8 +281,7 @@ namespace JL.Core.Deconjugation
 
                         foreach (Form myForm in newForm)
                         {
-                            if (myForm != null &&
-                                !processed.Contains(myForm) &&
+                            if (!processed.Contains(myForm) &&
                                 !novel.Contains(myForm) &&
                                 !newNovel.Contains(myForm))
                             {

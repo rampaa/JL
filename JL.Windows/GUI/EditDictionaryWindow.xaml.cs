@@ -65,8 +65,8 @@ namespace JL.Windows.GUI
                 ExamplesOption? examplesOption = null;
                 if (ExamplesOption.ValidDictTypes.Contains(type))
                 {
-                    Enum.TryParse<ExamplesOptionValue>(ComboBoxExamples.SelectedValue?.ToString(), out var eov);
-                    examplesOption = new ExamplesOption { Value = eov };
+                    if (Enum.TryParse(ComboBoxExamples.SelectedValue?.ToString(), out ExamplesOptionValue eov))
+                        examplesOption = new ExamplesOption { Value = eov };
                 }
 
                 var options =
@@ -117,16 +117,14 @@ namespace JL.Windows.GUI
             if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dict.Type))
             {
                 bool isEpwing = !Storage.BuiltInDicts.ContainsKey(dict.Type.ToString());
-                var status = dict.Options?.NewlineBetweenDefinitions;
-                CheckBoxNewline.IsChecked = status?.Value ?? isEpwing;
+                CheckBoxNewline.IsChecked = dict.Options?.NewlineBetweenDefinitions?.Value ?? isEpwing;
                 DockPanelNewline.Visibility = Visibility.Visible;
             }
 
             if (ExamplesOption.ValidDictTypes.Contains(dict.Type))
             {
                 ComboBoxExamples.ItemsSource = Enum.GetValues<ExamplesOptionValue>().ToArray();
-                var examples = dict.Options?.Examples;
-                ComboBoxExamples.SelectedValue = examples?.Value ?? ExamplesOptionValue.All;
+                ComboBoxExamples.SelectedValue = dict.Options?.Examples?.Value ?? ExamplesOptionValue.All;
 
                 DockPanelExamples.Visibility = Visibility.Visible;
             }

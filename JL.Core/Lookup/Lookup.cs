@@ -272,7 +272,7 @@ namespace JL.Core.Lookup
                                                 JmdictWc jmdictWcResult = jmdictWcResults[j];
 
                                                 if (dictResult.PrimarySpelling == jmdictWcResult.Spelling
-                                                    && (jmdictWcResult.Readings?.Contains(dictResult.Reading)
+                                                    && (jmdictWcResult.Readings?.Contains(dictResult.Reading ?? string.Empty)
                                                         ?? string.IsNullOrEmpty(dictResult.Reading)))
                                                 {
                                                     if (jmdictWcResult.WordClasses.Contains(lastTag))
@@ -408,10 +408,11 @@ namespace JL.Core.Lookup
         {
             Dictionary<string, IntermediaryResult> kanjiResults = new();
 
-            if (Storage.Dicts[DictType.Kanjidic].Contents.TryGetValue(
-                    text.UnicodeIterator().DefaultIfEmpty(string.Empty).First(), out List<IResult>? result))
+            string? kanji = text.UnicodeIterator().FirstOrDefault();
+
+            if (kanji != null && Storage.Dicts[DictType.Kanjidic].Contents.TryGetValue(kanji, out List<IResult>? result))
             {
-                kanjiResults.Add(text.UnicodeIterator().First(),
+                kanjiResults.Add(kanji,
                     new IntermediaryResult(result, new List<List<string>>(), text.UnicodeIterator().First(),
                         dictType));
             }
@@ -724,7 +725,7 @@ namespace JL.Core.Lookup
 
                     if ((jMDictResult.Readings != null && jMDictResult.Readings.Contains(freqResult.Spelling))
                         || (jMDictResult.Readings == null && jMDictResult.PrimarySpelling == freqResult.Spelling))
-                        //|| (jMnedictResult.KanaSpellings != null && jMnedictResult.KanaSpellings.Contains(freqResult.Spelling))
+                    //|| (jMnedictResult.KanaSpellings != null && jMnedictResult.KanaSpellings.Contains(freqResult.Spelling))
                     {
                         if (frequency > freqResult.Frequency)
                         {
@@ -778,7 +779,7 @@ namespace JL.Core.Lookup
                             if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading)
                                 || (jMDictResult.AlternativeSpellings != null
                                     && jMDictResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
-                                //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
+                            //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                             {
                                 if (frequency > readingFreqResult.Frequency)
                                 {
@@ -1005,7 +1006,7 @@ namespace JL.Core.Lookup
                             if ((reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
                                 || (customWordResult.AlternativeSpellings != null
                                     && customWordResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
-                                //|| (customWordResult.KanaSpellings != null && customWordResult.KanaSpellings.Contains(readingFreqResults.Spelling))
+                            //|| (customWordResult.KanaSpellings != null && customWordResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                             {
                                 if (frequency > readingFreqResult.Frequency)
                                 {

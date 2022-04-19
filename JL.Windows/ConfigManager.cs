@@ -218,19 +218,19 @@ namespace JL.Windows
                     SeparatorColor = (SolidColorBrush)new BrushConverter()
                         .ConvertFrom(ConfigurationManager.AppSettings.Get("SeparatorColor")!)!,
                 SeparatorColor, "SeparatorColor");
-            SeparatorColor!.Freeze();
+            SeparatorColor.Freeze();
 
             WindowsUtils.Try(() =>
                     PitchAccentMarkerColor = (SolidColorBrush)new BrushConverter()
                         .ConvertFrom(ConfigurationManager.AppSettings.Get("PitchAccentMarkerColor")!)!,
                 PitchAccentMarkerColor, "PitchAccentMarkerColor");
-            PitchAccentMarkerColor!.Freeze();
+            PitchAccentMarkerColor.Freeze();
 
             WindowsUtils.Try(() =>
                     DictTypeColor = (SolidColorBrush)new BrushConverter()
                         .ConvertFrom(ConfigurationManager.AppSettings.Get("DictTypeColor")!)!,
                 DictTypeColor, "DictTypeColor");
-            DictTypeColor!.Freeze();
+            DictTypeColor.Freeze();
 
             WindowsUtils.Try(() =>
                     HighlightColor = (SolidColorBrush)new BrushConverter()
@@ -495,7 +495,7 @@ namespace JL.Windows
         {
             CreateDefaultAppConfig();
 
-            preferenceWindow.VersionTextBlock.Text = "v" + Storage.Version.ToString();
+            preferenceWindow.VersionTextBlock.Text = "v" + Storage.Version;
 
             preferenceWindow.MiningModeKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(MiningModeKeyGesture);
             preferenceWindow.PlayAudioKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(PlayAudioKeyGesture);
@@ -772,6 +772,7 @@ namespace JL.Windows
         {
             CreateDefaultAppConfig();
 
+
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
             config.AppSettings.Settings["MainWindowFontSize"].Value =
@@ -786,11 +787,11 @@ namespace JL.Windows
                 ? MainWindowWidth.ToString()
                 : MainWindow.Instance.MinWidth.ToString();
 
-            config.AppSettings.Settings["MainWindowTopPosition"].Value = MainWindowHeight + MainWindow.Instance.Top > MainWindow.Instance.MinHeight
+            config.AppSettings.Settings["MainWindowTopPosition"].Value = MainWindow.Instance.Top >= SystemParameters.VirtualScreenTop
                 ? MainWindow.Instance.Top.ToString()
                 : "0";
 
-            config.AppSettings.Settings["MainWindowLeftPosition"].Value = MainWindowWidth + MainWindow.Instance.Left > MainWindow.Instance.MinWidth
+            config.AppSettings.Settings["MainWindowLeftPosition"].Value = MainWindow.Instance.Left >= SystemParameters.VirtualScreenLeft
                 ? MainWindow.Instance.Left.ToString()
                 : "0";
 

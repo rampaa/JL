@@ -6,7 +6,7 @@ public class LookupResult
     public string FoundForm { get; set; } // todo rename foundform to foundtext
     public int Frequency { get; set; }
     public string? DictType { get; set; }
-    public string? FoundSpelling { get; set; }
+    public string FoundSpelling { get; set; }
 
     public List<string>? Readings { get; set; }
     public string? FormattedDefinitions { get; set; }
@@ -31,5 +31,6 @@ public class LookupResult
         StrokeCount = 0;
         Grade = 0;
         FoundForm = string.Empty;
+        FoundSpelling = string.Empty;
     }
 }

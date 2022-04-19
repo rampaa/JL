@@ -2,7 +2,7 @@
 {
     public class JMdictResult : IResult
     {
-        public string? Id { get; set; }
+        public string Id { get; set; }
         public List<string>? AlternativeSpellings { get; set; }
         public List<List<string>> Definitions { get; set; }
         public List<List<string>?>? RRestrictions { get; set; }
@@ -39,6 +39,7 @@
             MiscList = new List<List<string>?>();
             DefinitionInfo = new List<string?>();
             Dialects = new List<List<string>?>();
+            Id = string.Empty;
             //FrequencyDict = new Dictionary<string, Frequency>();
             //KanaSpellings = new List<string>();
             //PriorityList = new List<string>();

@@ -82,7 +82,7 @@ namespace JL.Core.Dicts.EPWING.EpwingNazeka
                     else
                     {
                         string primarySpelling = reading;
-                        string key = Kana.KatakanaToHiraganaConverter(primarySpelling)!;
+                        string key = Kana.KatakanaToHiraganaConverter(primarySpelling);
 
                         EpwingNazekaResult tempResult = new(primarySpelling, null, null, definitions);
 

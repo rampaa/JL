@@ -5,15 +5,15 @@
         public string Text { get; }
         public string OriginalText { get; }
         public List<string> Tags { get; }
-        public HashSet<string> Seentext { get; }
+        public HashSet<string> SeenText { get; }
         public List<string> Process { get; }
-        public Form(string text, string originalText, List<string> tags, HashSet<string> seentext,
+        public Form(string text, string originalText, List<string> tags, HashSet<string> seenText,
             List<string> process)
         {
             Text = text;
             OriginalText = originalText;
             Tags = tags;
-            Seentext = seentext;
+            SeenText = seenText;
             Process = process;
         }
 
@@ -27,7 +27,7 @@
             return Text == form.Text
                    && OriginalText == form.OriginalText
                    && Tags.SequenceEqual(form.Tags)
-                   && Seentext.SetEquals(form.Seentext)
+                   && SeenText.SetEquals(form.SeenText)
                    && Process.SequenceEqual(form.Process);
         }
 
@@ -37,29 +37,17 @@
             {
                 int hash = 17;
 
-                hash = hash * 37 + Text?.GetHashCode() ?? 0;
-                hash = hash * 37 + OriginalText?.GetHashCode() ?? 0;
+                hash = hash * 37 + Text.GetHashCode();
+                hash = hash * 37 + OriginalText.GetHashCode();
 
-                if (Tags == null)
-                    hash *= 37;
+                foreach (string tag in Tags)
+                        hash = hash * 37 + tag.GetHashCode();
 
-                else
-                    foreach (string tag in Tags)
-                        hash = hash * 37 + tag?.GetHashCode() ?? 0;
+                foreach (string process in Process)
+                        hash = hash * 37 + process.GetHashCode();
 
-                if (Process == null)
-                    hash *= 37;
-
-                else
-                    foreach (string process in Process)
-                        hash = hash * 37 + process?.GetHashCode() ?? 0;
-
-                if (Seentext == null)
-                    hash *= 37;
-
-                else
-                    foreach (string seenText in Seentext)
-                        hash = hash * 37 + seenText?.GetHashCode() ?? 0;
+                foreach (string seenText in SeenText)
+                        hash = hash * 37 + seenText.GetHashCode();
 
                 return hash;
             }

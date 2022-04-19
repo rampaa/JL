@@ -28,7 +28,7 @@ namespace JL.Core.Dicts.EDICT.JMdict
                          ""))
             {
                 await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMdict].Path,
-                    new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
+                    Storage.JmdictUrl,
                     DictType.JMdict.ToString(), false, false).ConfigureAwait(false);
                 await Load(Storage.Dicts[DictType.JMdict].Path).ConfigureAwait(false);
             }
@@ -150,23 +150,23 @@ namespace JL.Core.Dicts.EDICT.JMdict
                     switch (jMDictXML.Name)
                     {
                         case "stagk":
-                            sense.StagKList!.Add(jMDictXML.ReadString());
+                            sense.StagKList.Add(jMDictXML.ReadString());
                             break;
 
                         case "stagr":
-                            sense.StagRList!.Add(jMDictXML.ReadString());
+                            sense.StagRList.Add(jMDictXML.ReadString());
                             break;
 
                         case "pos":
-                            sense.PosList!.Add(ReadEntity(jMDictXML)!);
+                            sense.PosList.Add(ReadEntity(jMDictXML)!);
                             break;
 
                         case "field":
-                            sense.FieldList!.Add(ReadEntity(jMDictXML)!);
+                            sense.FieldList.Add(ReadEntity(jMDictXML)!);
                             break;
 
                         case "misc":
-                            sense.MiscList!.Add(ReadEntity(jMDictXML)!);
+                            sense.MiscList.Add(ReadEntity(jMDictXML)!);
                             break;
 
                         case "s_inf":
@@ -174,7 +174,7 @@ namespace JL.Core.Dicts.EDICT.JMdict
                             break;
 
                         case "dial":
-                            sense.DialList!.Add(ReadEntity(jMDictXML)!);
+                            sense.DialList.Add(ReadEntity(jMDictXML)!);
                             break;
 
                         case "gloss":

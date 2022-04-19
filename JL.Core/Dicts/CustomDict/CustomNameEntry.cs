@@ -27,16 +27,7 @@
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                int hash = 17;
-
-                hash = hash * 37 + PrimarySpelling?.GetHashCode() ?? 0;
-                hash = hash * 37 + Reading?.GetHashCode() ?? 0;
-                hash = hash * 37 + NameType?.GetHashCode() ?? 0;
-
-                return hash;
-            }
+            return HashCode.Combine(PrimarySpelling, Reading, NameType);
         }
     }
 }

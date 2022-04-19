@@ -27,7 +27,7 @@ namespace JL.Core.Dicts.EDICT.JMnedict
                          ""))
             {
                 await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMnedict].Path,
-                    new Uri("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz"),
+                    Storage.Jmnedict,
                     DictType.JMnedict.ToString(), false, false).ConfigureAwait(false);
                 await Load(Storage.Dicts[DictType.JMnedict].Path).ConfigureAwait(false);
             }

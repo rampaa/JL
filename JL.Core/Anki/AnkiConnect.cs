@@ -51,20 +51,20 @@ namespace JL.Core.Anki
                 // AnkiConnect doesn't like null values
                 StringContent payload = new(JsonSerializer.Serialize(req,
                     new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }));
-                Utils.Logger.Information("Sending: " + await payload.ReadAsStringAsync().ConfigureAwait(false));
+                Utils.Logger.Information("Sending: {Payload}", await payload.ReadAsStringAsync().ConfigureAwait(false));
 
                 HttpResponseMessage postResponse = await Storage.Client
                     .PostAsync(Storage.Frontend.CoreConfig.AnkiConnectUri, payload)
                     .ConfigureAwait(false);
 
                 Response json = (await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false))!;
-                Utils.Logger.Information("json result: " + json.Result);
+                Utils.Logger.Information("json result: {JsonResult}", json.Result);
 
                 if (json.Error == null)
                     return json;
 
                 Storage.Frontend.Alert(AlertLevel.Error, json.Error.ToString()!);
-                Utils.Logger.Error(json.Error.ToString());
+                Utils.Logger.Error("{JsonError}",json.Error.ToString());
                 return null;
             }
             catch (HttpRequestException e)

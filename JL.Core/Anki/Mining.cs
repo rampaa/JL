@@ -31,7 +31,7 @@ namespace JL.Core.Anki
                 string[] tags = ankiConfig.Tags;
 
                 // idk if this gets the right audio for every word
-                string? reading = miningParams[JLField.Readings]?.Split(",")[0] ?? null;
+                string reading = miningParams[JLField.Readings].Split(",")[0];
                 if (string.IsNullOrEmpty(reading))
                     reading = foundSpelling;
 
@@ -56,7 +56,7 @@ namespace JL.Core.Anki
                 if (response == null)
                 {
                     Storage.Frontend.Alert(AlertLevel.Error, $"Mining failed for {foundSpelling}");
-                    Utils.Logger.Error($"Mining failed for {foundSpelling}");
+                    Utils.Logger.Error("Mining failed for {FoundSpelling}", foundSpelling);
                     return false;
                 }
                 else
@@ -64,13 +64,13 @@ namespace JL.Core.Anki
                     if (audioRes == null || Utils.GetMd5String(audioRes) == Storage.Jpod101NoAudioMd5Hash)
                     {
                         Storage.Frontend.Alert(AlertLevel.Warning, $"Mined {foundSpelling} (no audio)");
-                        Utils.Logger.Information($"Mined {foundSpelling} (no audio)");
+                        Utils.Logger.Information("Mined {FoundSpelling} (no audio)", foundSpelling);
                     }
 
                     else
                     {
                         Storage.Frontend.Alert(AlertLevel.Success, $"Mined {foundSpelling}");
-                        Utils.Logger.Information($"Mined {foundSpelling}");
+                        Utils.Logger.Information("Mined {FoundSpelling}", foundSpelling);
                     }
 
                     if (Storage.Frontend.CoreConfig.ForceSyncAnki)
@@ -82,7 +82,7 @@ namespace JL.Core.Anki
             catch (Exception e)
             {
                 Storage.Frontend.Alert(AlertLevel.Error, $"Mining failed for {foundSpelling}");
-                Utils.Logger.Information(e, $"Mining failed for {foundSpelling}");
+                Utils.Logger.Information(e, "Mining failed for {FoundSpelling}", foundSpelling);
                 return false;
             }
         }

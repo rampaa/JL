@@ -28,6 +28,8 @@ namespace JL.Core
         public static readonly HttpClient Client = new(new HttpClientHandler { UseProxy = false });
         public static readonly Version Version = new(1, 9);
         public static readonly string RepoUrl = "https://github.com/rampaa/JL/";
+        public static readonly Uri JmdictUrl = new("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz");
+        public static readonly Uri Jmnedict = new("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
         public static bool Ready { get; set; } = false;
         public static bool UpdatingJMdict { get; set; } = false;
         public static bool UpdatingJMnedict { get; set; } = false;
@@ -41,26 +43,31 @@ namespace JL.Core
             new()
             {
                 {
-                    "CustomWordDictionary", new Dict(DictType.CustomWordDictionary,
+                    "CustomWordDictionary",
+                    new Dict(DictType.CustomWordDictionary,
                         $"{ResourcesPath}\\custom_words.txt",
                         true, 0,
                         new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null))
                 },
                 {
-                    "CustomNameDictionary", new Dict(DictType.CustomNameDictionary,
+                    "CustomNameDictionary",
+                    new Dict(DictType.CustomNameDictionary,
                         $"{ResourcesPath}\\custom_names.txt", true, 1,
                         new DictOptions(null, null))
                 },
                 {
-                    "JMdict", new Dict(DictType.JMdict, $"{ResourcesPath}\\JMdict.xml", true, 2,
+                    "JMdict",
+                    new Dict(DictType.JMdict, $"{ResourcesPath}\\JMdict.xml", true, 2,
                         new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null))
                 },
                 {
-                    "JMnedict", new Dict(DictType.JMnedict, $"{ResourcesPath}\\JMnedict.xml", true, 3,
+                    "JMnedict",
+                    new Dict(DictType.JMnedict, $"{ResourcesPath}\\JMnedict.xml", true, 3,
                         new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null))
                 },
                 {
-                    "Kanjidic", new Dict(DictType.Kanjidic, $"{ResourcesPath}\\kanjidic2.xml", true, 4,
+                    "Kanjidic",
+                    new Dict(DictType.Kanjidic, $"{ResourcesPath}\\kanjidic2.xml", true, 4,
                         new DictOptions(null, null))
                 }
             };
@@ -408,7 +415,7 @@ namespace JL.Core
                     {
                         deleteJmdictFile = true;
                         await ResourceUpdater.UpdateResource(Dicts[DictType.JMdict].Path,
-                            new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
+                            JmdictUrl,
                             DictType.JMdict.ToString(), false, true).ConfigureAwait(false);
                     }
 

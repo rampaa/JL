@@ -26,10 +26,10 @@
             CustomWordEntry customWordEntryObj = (obj as CustomWordEntry)!;
 
             return PrimarySpelling == customWordEntryObj.PrimarySpelling
-                   && (customWordEntryObj.AlternativeSpellings?.SequenceEqual(AlternativeSpellings) ?? false)
-                   && (customWordEntryObj.Readings?.SequenceEqual(Readings) ?? false)
-                   && (customWordEntryObj.Definitions?.SequenceEqual(Definitions) ?? false)
-                   && (customWordEntryObj.WordClasses?.SequenceEqual(WordClasses) ?? false);
+                   && customWordEntryObj.AlternativeSpellings.SequenceEqual(AlternativeSpellings)
+                   && customWordEntryObj.Readings.SequenceEqual(Readings)
+                   && customWordEntryObj.Definitions.SequenceEqual(Definitions)
+                   && customWordEntryObj.WordClasses.SequenceEqual(WordClasses);
         }
 
         public override int GetHashCode()
@@ -38,33 +38,19 @@
             {
                 int hash = 17;
 
-                hash = hash * 37 + PrimarySpelling?.GetHashCode() ?? 0;
+                hash = hash * 37 + PrimarySpelling.GetHashCode();
 
-                if (AlternativeSpellings == null)
-                    hash *= 37;
+                foreach (string spelling in AlternativeSpellings)
+                        hash = hash * 37 + spelling.GetHashCode();
 
-                else
-                    foreach (string spelling in AlternativeSpellings)
-                        hash = hash * 37 + spelling?.GetHashCode() ?? 0;
+                foreach (string readings in Readings)
+                        hash = hash * 37 + readings.GetHashCode();
 
-                if (Readings == null)
-                    hash *= 37;
+                foreach (string definition in Definitions)
+                        hash = hash * 37 + definition.GetHashCode();
 
-                else
-                    foreach (string readings in Readings)
-                        hash = hash * 37 + readings?.GetHashCode() ?? 0;
-
-                if (Definitions == null)
-                    hash *= 37;
-                else
-                    foreach (string definition in Definitions)
-                        hash = hash * 37 + definition?.GetHashCode() ?? 0;
-
-                if (WordClasses == null)
-                    hash *= 37;
-                else
-                    foreach (string wordClass in WordClasses)
-                        hash = hash * 37 + wordClass?.GetHashCode() ?? 0;
+                foreach (string wordClass in WordClasses)
+                        hash = hash * 37 + wordClass.GetHashCode();
 
                 return hash;
             }

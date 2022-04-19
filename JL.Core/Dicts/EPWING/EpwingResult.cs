@@ -5,7 +5,7 @@ namespace JL.Core.Dicts.EPWING
     public class EpwingResult : IResult
     {
         public List<string>? Definitions { get; }
-        public string Reading { get; }
+        public string? Reading { get; }
         public List<string>? WordClasses { get; }
         public string PrimarySpelling { get; }
 
@@ -19,6 +19,10 @@ namespace JL.Core.Dicts.EPWING
         {
             PrimarySpelling = jsonElement[0].ToString();
             Reading = jsonElement[1].ToString();
+
+            if (Reading == "")
+                Reading = null;
+
             //DefinitionTags = jsonElement[2].ToString();
 
             WordClasses = jsonElement[3].ToString().Split(" ").ToList();

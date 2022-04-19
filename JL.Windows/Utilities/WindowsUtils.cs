@@ -80,7 +80,7 @@ public static class WindowsUtils
         if (rawKeyGesture != null)
         {
             KeyGestureConverter keyGestureConverter = new();
-            if (!rawKeyGesture!.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
+            if (!rawKeyGesture.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
                 !rawKeyGesture.StartsWith("Alt+"))
                 return (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture)!;
             else
@@ -274,7 +274,7 @@ public static class WindowsUtils
         }
         catch (Exception e)
         {
-            Utils.Logger.Error(e, "Error playing audio: " + JsonSerializer.Serialize(audio));
+            Utils.Logger.Error(e, "Error playing audio: {Audio}",  JsonSerializer.Serialize(audio));
             Alert(AlertLevel.Error, "Error playing audio");
         }
     }

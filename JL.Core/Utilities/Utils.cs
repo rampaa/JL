@@ -222,7 +222,7 @@ namespace JL.Core.Utilities
 
         public static async Task GetAndPlayAudioFromJpod101(string foundSpelling, string? reading, float volume)
         {
-            Utils.Logger.Information("Attempting to play audio from jpod101: " + foundSpelling + " " + reading);
+            Utils.Logger.Information("Attempting to play audio from jpod101: {FoundSpelling} {Reading}", foundSpelling, reading);
 
             if (string.IsNullOrEmpty(reading))
                 reading = foundSpelling;

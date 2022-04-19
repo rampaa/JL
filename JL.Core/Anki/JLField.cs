@@ -11,7 +11,7 @@ namespace JL.Core.Anki
         [Description("Found Form")] FoundForm,
         Context,
         Audio,
-        [Description("Edict ID")] EdictID,
+        [Description("Edict ID")] EdictId,
         [Description("Time (Local)")] TimeLocal,
         [Description("Alternative Spellings")] AlternativeSpellings,
         Frequency,

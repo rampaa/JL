@@ -5,7 +5,6 @@
         public static void BuildDictionary(JMnedictEntry entry, Dictionary<string, List<IResult>> jMnedictDictionary)
         {
             Dictionary<string, JMnedictResult> resultList = new();
-            List<string> alternativeSpellings;
 
             if (entry.KebList.Any())
             {
@@ -33,7 +32,7 @@
                     resultList.TryAdd(key, result);
                 }
 
-                alternativeSpellings = resultList.Keys.ToList();
+                List<string> alternativeSpellings = resultList.Keys.ToList();
 
                 foreach (KeyValuePair<string, JMnedictResult> item in resultList)
                 {
@@ -60,9 +59,7 @@
                     if (resultList.ContainsKey(key))
                         continue;
 
-                    JMnedictResult result = new();
-
-                    result.PrimarySpelling = reb;
+                    JMnedictResult result = new() {PrimarySpelling = reb};
 
                     int transListCount = entry.TransList.Count;
                     for (int j = 0; j < transListCount; j++)

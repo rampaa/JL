@@ -10,7 +10,6 @@
             // sense (stagk*, stagr*, pos*, xref*, ant*, field*, misc*, s_inf*, dial*, gloss*)
 
             Dictionary<string, JMdictResult> resultList = new();
-            List<string> alternativeSpellings;
 
             int kEleListCount = entry.KEleList.Count;
             for (int i = 0; i < kEleListCount; i++)
@@ -30,9 +29,9 @@
                 {
                     REle rEle = entry.REleList[j];
 
-                    if (!rEle.ReRestrList!.Any() || rEle.ReRestrList!.Contains(key))
+                    if (!rEle.ReRestrList.Any() || rEle.ReRestrList.Contains(key))
                     {
-                        result.Readings?.Add(rEle.Reb!);
+                        result.Readings?.Add(rEle.Reb);
                         result.ROrthographyInfoList?.Add(rEle.ReInfList);
                     }
                 }
@@ -47,12 +46,12 @@
                         || sense.StagRList.Intersect(result.Readings!).Any())
                     {
                         result.Definitions.Add(sense.GlossList);
-                        result.RRestrictions!.Add(sense.StagRList.All(i => i == null) ? null : sense.StagRList);
-                        result.KRestrictions!.Add(sense.StagKList.All(i => i == null) ? null : sense.StagRList);
-                        result.WordClasses!.Add(sense.PosList.All(i => i == null) ? null : sense.PosList);
-                        result.TypeList!.Add(sense.FieldList.All(i => i == null) ? null : sense.FieldList);
-                        result.MiscList!.Add(sense.MiscList.All(i => i == null) ? null : sense.MiscList);
-                        result.Dialects!.Add(sense.DialList.All(i => i == null) ? null : sense.DialList);
+                        result.RRestrictions!.Add(sense.StagRList);
+                        result.KRestrictions!.Add(sense.StagKList);
+                        result.WordClasses!.Add(sense.PosList);
+                        result.TypeList!.Add(sense.FieldList);
+                        result.MiscList!.Add(sense.MiscList);
+                        result.Dialects!.Add(sense.DialList);
                         result.DefinitionInfo!.Add(sense.SInf);
                         // result.RelatedTerms.AddRange(sense.XRefList);
                         // result.Antonyms.AddRange(sense.AntList);
@@ -62,7 +61,7 @@
                 resultList.Add(key, result);
             }
 
-            alternativeSpellings = resultList.Keys.ToList();
+            List<string> alternativeSpellings = resultList.Keys.ToList();
 
             foreach ((string key, JMdictResult result) in resultList)
             {
@@ -77,11 +76,7 @@
 
                         if (resultList.TryGetValue(spelling, out JMdictResult? tempResult))
                         {
-                            if (tempResult.POrthographyInfoList!.All(i => i == null))
-                                result.AOrthographyInfoList!.Add(null);
-
-                            else
-                                result.AOrthographyInfoList!.Add(tempResult.POrthographyInfoList);
+                            result.AOrthographyInfoList!.Add(tempResult.POrthographyInfoList);
                         }
                     }
                 }
@@ -102,14 +97,13 @@
                     continue;
                 }
 
-                JMdictResult result = new();
+                JMdictResult result = new() {
+                    AlternativeSpellings = rEle.ReRestrList.Any()
+                    ? rEle.ReRestrList
+                    : new List<string>(alternativeSpellings)
+                };
 
                 //result.KanaSpellings.Add(rEle.Reb);
-
-                if (rEle.ReRestrList.Any())
-                    result.AlternativeSpellings = rEle.ReRestrList;
-                else
-                    result.AlternativeSpellings = new List<string>(alternativeSpellings);
 
                 if (result.AlternativeSpellings.Any())
                 {
@@ -147,7 +141,7 @@
                         || sense.StagKList.Contains(result.PrimarySpelling)
                         || sense.StagKList.Intersect(result.AlternativeSpellings).Any())
                     {
-                        result.Definitions!.Add(sense.GlossList);
+                        result.Definitions.Add(sense.GlossList);
                         result.RRestrictions!.Add(sense.StagRList);
                         result.KRestrictions!.Add(sense.StagKList);
                         result.WordClasses!.Add(sense.PosList);
@@ -179,7 +173,7 @@
 
             foreach (KeyValuePair<string, JMdictResult> rl in resultList)
             {
-                if (!rl.Value.Readings!.Any() || rl.Value.Readings!.All(s => string.IsNullOrEmpty(s)))
+                if (!rl.Value.Readings!.Any() || rl.Value.Readings!.All(string.IsNullOrEmpty))
                     rl.Value.Readings = null;
 
                 if (!rl.Value.AlternativeSpellings!.Any())
@@ -200,7 +194,7 @@
                 if (!rl.Value.MiscList!.Any() || rl.Value.MiscList!.All(l => l == null || !l.Any()))
                     rl.Value.MiscList = null;
 
-                if (!rl.Value.POrthographyInfoList!.Any() || rl.Value.POrthographyInfoList!.All(s => s == null || string.IsNullOrEmpty(s)))
+                if (!rl.Value.POrthographyInfoList!.Any() || rl.Value.POrthographyInfoList!.All(string.IsNullOrEmpty))
                     rl.Value.POrthographyInfoList = null;
 
                 if (!rl.Value.AOrthographyInfoList!.Any() || rl.Value.AOrthographyInfoList!.All(l => l == null || !l.Any()))

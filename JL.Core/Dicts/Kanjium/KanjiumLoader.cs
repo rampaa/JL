@@ -2,7 +2,7 @@
 
 namespace JL.Core.Dicts.Kanjium
 {
-    public class KanjiumLoader
+    public static class KanjiumLoader
     {
         public static async Task Load(DictType dictType, string dictPath)
         {

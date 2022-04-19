@@ -29,7 +29,7 @@ namespace JL.Core.Anki
                     "Japanese JL-Basic",
                     new Dictionary<string, JLField>
                     {
-                        { "Edict ID", JLField.EdictID },
+                        { "Edict ID", JLField.EdictId },
                         { "Expression", JLField.FoundSpelling },
                         { "Reading", JLField.Readings },
                         { "Gloss", JLField.Definitions },

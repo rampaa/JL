@@ -75,6 +75,7 @@ namespace JL.Windows.GUI
         private async void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var itemTab = (System.Windows.Controls.TabItem)TabControl.SelectedItem;
+
             if (itemTab == null)
                 return;
 

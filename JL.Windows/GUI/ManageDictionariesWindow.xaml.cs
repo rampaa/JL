@@ -182,7 +182,7 @@ namespace JL.Windows.GUI
                 };
                 buttonRemove.Click += (_, _) =>
                 {
-                    if (System.Windows.MessageBox.Show("Really remove dictionary?", "Confirmation",
+                    if (MessageBox.Show("Really remove dictionary?", "Confirmation",
                             MessageBoxButton.YesNo,
                             MessageBoxImage.Question,
                             MessageBoxResult.No,

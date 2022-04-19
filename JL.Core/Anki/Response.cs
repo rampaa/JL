@@ -4,7 +4,7 @@ namespace JL.Core.Anki
 {
     public class Response
     {
-        // result can be: 
+        // result can be:
         //   a number
         //   an array of strings
         //   an array of (JSON) objects

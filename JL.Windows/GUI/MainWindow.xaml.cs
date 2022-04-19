@@ -76,12 +76,12 @@ namespace JL.Windows.GUI
             AppDomain.CurrentDomain.UnhandledException += (_, eventArgs) =>
             {
                 Exception ex = (Exception)eventArgs.ExceptionObject;
-                Utils.Logger.Error(ex.ToString());
+                Utils.Logger.Error("{UnhandledExceptionMessage}",ex.ToString());
             };
 
             TaskScheduler.UnobservedTaskException += (_, eventArgs) =>
             {
-                Utils.Logger.Error(eventArgs.Exception.ToString());
+                Utils.Logger.Error("{UnobservedTaskExceptionMessage}", eventArgs.Exception.ToString());
             };
 
             SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;

@@ -68,7 +68,7 @@ namespace JL.Windows.GUI
                         .FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
                 string spelling = SpellingTextBox.Text;
                 string reading = ReadingTextBox.Text;
-                CustomNameLoader.AddToDictionary(spelling.Trim(), reading.Trim(), nameType!.Trim());
+                CustomNameLoader.AddToDictionary(spelling.Trim(), reading.Trim(), nameType.Trim());
                 Close();
                 await WriteToFile(spelling, reading, nameType).ConfigureAwait(false);
             }

@@ -21,7 +21,7 @@ namespace JL.Windows.GUI
     public partial class PopupWindow : Window
     {
         private readonly PopupWindow? _parentPopupWindow;
-        public PopupWindow? ChildPopupWindow { get; set; }
+        public PopupWindow? ChildPopupWindow { get; private set; }
 
         private TextBox? _lastTextBox;
 
@@ -35,7 +35,7 @@ namespace JL.Windows.GUI
 
         private List<LookupResult> _lastLookupResults = new();
 
-        public bool UnavoidableMouseEnter { get; set; } = false;
+        public bool UnavoidableMouseEnter { get; private set; } = false;
 
         public string? LastText { get; set; }
 
@@ -53,12 +53,12 @@ namespace JL.Windows.GUI
             Hide();
         }
 
-        public PopupWindow(PopupWindow parentPopUp) : this()
+        private PopupWindow(PopupWindow parentPopUp) : this()
         {
             _parentPopupWindow = parentPopUp;
         }
 
-        public void Init()
+        private void Init()
         {
             Background = ConfigManager.PopupBackgroundColor;
             FontFamily = ConfigManager.PopupFont;
@@ -150,11 +150,9 @@ namespace JL.Windows.GUI
 
                 int endPosition = Utils.FindWordBoundary(tb.Text, charPosition);
 
-                string text;
-                if (endPosition - charPosition <= ConfigManager.MaxSearchLength)
-                    text = tb.Text[charPosition..endPosition];
-                else
-                    text = tb.Text[charPosition..(charPosition + ConfigManager.MaxSearchLength)];
+                string text = endPosition - charPosition <= ConfigManager.MaxSearchLength
+                    ? tb.Text[charPosition..endPosition]
+                    : tb.Text[charPosition..(charPosition + ConfigManager.MaxSearchLength)];
 
                 if (text == LastText) return;
                 LastText = text;
@@ -347,15 +345,30 @@ namespace JL.Windows.GUI
             innerStackPanel.Children.Add(bottom);
 
             // top
-            TextBlock? textBlockFoundSpelling = null;
             TextBlock? textBlockPOrthographyInfo = null;
             UIElement? uiElementReadings = null;
             UIElement? uiElementAlternativeSpellings = null;
             TextBlock? textBlockProcess = null;
             TextBlock? textBlockFrequency = null;
-            TextBlock? textBlockFoundForm = null;
             TextBlock? textBlockDictType = null;
-            TextBlock? textBlockEdictID = null;
+            TextBlock? textBlockEdictId = null;
+
+            var textBlockFoundForm = new TextBlock
+            {
+                Name = nameof(result.FoundForm),
+                Text = result.FoundForm,
+                Visibility = Visibility.Collapsed,
+            };
+
+            var textBlockFoundSpelling = new TextBlock
+            {
+                Name = nameof(result.FoundSpelling),
+                Text = result.FoundSpelling,
+                Tag = index, // for audio
+                Foreground = ConfigManager.PrimarySpellingColor,
+                FontSize = ConfigManager.PrimarySpellingFontSize,
+                TextWrapping = TextWrapping.Wrap,
+            };
 
             // bottom
             UIElement? uiElementDefinitions = null;
@@ -365,16 +378,6 @@ namespace JL.Windows.GUI
             TextBlock? textBlockStrokeCount = null;
             TextBlock? textBlockGrade = null;
             TextBlock? textBlockComposition = null;
-
-            if (result.FoundForm != null)
-            {
-                textBlockFoundForm = new TextBlock
-                {
-                    Name = nameof(result.FoundForm),
-                    Text = result.FoundForm,
-                    Visibility = Visibility.Collapsed,
-                };
-            }
 
             if (result.Frequency != int.MaxValue && result.Frequency > 0)
             {
@@ -405,21 +408,9 @@ namespace JL.Windows.GUI
                 };
             }
 
-            if (result.FoundSpelling != null)
-            {
-                textBlockFoundSpelling = new TextBlock
-                {
-                    Name = nameof(result.FoundSpelling),
-                    Text = result.FoundSpelling,
-                    Tag = index, // for audio
-                    Foreground = ConfigManager.PrimarySpellingColor,
-                    FontSize = ConfigManager.PrimarySpellingFontSize,
-                    TextWrapping = TextWrapping.Wrap,
-                };
-                textBlockFoundSpelling.MouseEnter += FoundSpelling_MouseEnter; // for audio
-                textBlockFoundSpelling.MouseLeave += FoundSpelling_MouseLeave; // for audio
-                textBlockFoundSpelling.PreviewMouseUp += FoundSpelling_PreviewMouseUp; // for mining
-            }
+            textBlockFoundSpelling.MouseEnter += FoundSpelling_MouseEnter; // for audio
+            textBlockFoundSpelling.MouseLeave += FoundSpelling_MouseLeave; // for audio
+            textBlockFoundSpelling.PreviewMouseUp += FoundSpelling_PreviewMouseUp; // for mining
 
             if (result.Readings != null && result.Readings.Any())
             {
@@ -516,7 +507,7 @@ namespace JL.Windows.GUI
 
             if (result.EdictID != null)
             {
-                textBlockEdictID = new TextBlock
+                textBlockEdictId = new TextBlock
                 {
                     Name = nameof(result.EdictID),
                     Text = result.EdictID,
@@ -702,17 +693,17 @@ namespace JL.Windows.GUI
             UIElement?[] babies =
             {
                 textBlockFoundSpelling, textBlockPOrthographyInfo, uiElementReadings, uiElementAlternativeSpellings,
-                textBlockProcess, textBlockFoundForm, textBlockEdictID, textBlockFrequency, textBlockDictType
+                textBlockProcess, textBlockFoundForm, textBlockEdictId, textBlockFrequency, textBlockDictType
             };
 
             for (int i = 0; i < babies.Length; i++)
             {
                 UIElement? baby = babies[i];
 
+                if (baby == null) continue;
+
                 if (baby is TextBlock textBlock)
                 {
-                    if (textBlock == null) continue;
-
                     // common emptiness check
                     if (textBlock.Text == "")
                         continue;
@@ -720,7 +711,7 @@ namespace JL.Windows.GUI
                     textBlock.MouseLeave += OnMouseLeave;
 
                     if ((textBlock.Name is "FoundSpelling" or "Readings") &&
-                        Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict? kanjiumDict) && (kanjiumDict?.Active ?? false))
+                        Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict? kanjiumDict) && (kanjiumDict.Active))
                     {
                         List<string>? readings = result.Readings;
 
@@ -730,7 +721,7 @@ namespace JL.Windows.GUI
                         }
                         else
                         {
-                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling ?? string.Empty,
+                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling,
                                 result.AlternativeSpellings ?? new(),
                                 readings ?? new(),
                                 textBlock.Text.Split(", ").ToList(),
@@ -740,6 +731,7 @@ namespace JL.Windows.GUI
                             {
                                 top.Children.Add(textBlock);
                             }
+
                             else
                             {
                                 pitchAccentGrid.Children.Add(textBlock);
@@ -752,8 +744,6 @@ namespace JL.Windows.GUI
                 }
                 else if (baby is TextBox textBox)
                 {
-                    if (textBox == null) continue;
-
                     // common emptiness check
                     if (textBox.Text == "")
                         continue;
@@ -761,7 +751,7 @@ namespace JL.Windows.GUI
                     textBox.MouseLeave += OnMouseLeave;
 
                     if ((textBox.Name is "FoundSpelling" or "Readings") &&
-                        Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict? kanjiumDict) && (kanjiumDict?.Active ?? false))
+                        Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict? kanjiumDict) && kanjiumDict.Active)
                     {
                         List<string>? readings = result.Readings;
 
@@ -771,7 +761,7 @@ namespace JL.Windows.GUI
                         }
                         else
                         {
-                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling ?? string.Empty,
+                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling,
                                 result.AlternativeSpellings ?? new(),
                                 readings ?? new(),
                                 textBox.Text.Split(", ").ToList(),
@@ -866,7 +856,7 @@ namespace JL.Windows.GUI
                     {
                         var kanjiumResult = (KanjiumResult)kanjiumResultList[j];
 
-                        if (!hasReading || normalizedExpression == Kana.KatakanaToHiraganaConverter(kanjiumResult.Reading ?? string.Empty))
+                        if (!hasReading || (kanjiumResult.Reading != null && normalizedExpression == Kana.KatakanaToHiraganaConverter(kanjiumResult.Reading)))
                         {
                             if (foundSpelling == kanjiumResult.Spelling)
                             {
@@ -876,8 +866,7 @@ namespace JL.Windows.GUI
 
                             else if (alternativeSpellings?.Contains(kanjiumResult.Spelling) ?? false)
                             {
-                                if (chosenKanjiumResult == null)
-                                    chosenKanjiumResult = kanjiumResult;
+                                chosenKanjiumResult ??= kanjiumResult;
                             }
                         }
                     }
@@ -1059,7 +1048,7 @@ namespace JL.Windows.GUI
                                 miningParams[JLField.FoundForm] = ch.Text;
                                 break;
                             case nameof(LookupResult.EdictID):
-                                miningParams[JLField.EdictID] = ch.Text;
+                                miningParams[JLField.EdictId] = ch.Text;
                                 break;
                             case nameof(LookupResult.Frequency):
                                 miningParams[JLField.Frequency] = ch.Text;
@@ -1112,10 +1101,10 @@ namespace JL.Windows.GUI
                     continue;
                 }
 
-                if (child is not TextBlock)
+                if (child is not TextBlock tb)
                     continue;
 
-                textBlock = (TextBlock)child;
+                textBlock = tb;
 
                 switch (textBlock.Name)
                 {
@@ -1143,7 +1132,9 @@ namespace JL.Windows.GUI
                 }
             }
 
-            miningParams[JLField.Context] = Utils.FindSentence(_currentText ?? string.Empty, _currentCharPosition);
+            miningParams[JLField.Context] = _currentText != null
+                ? Utils.FindSentence(_currentText, _currentCharPosition)
+                : "";
             miningParams[JLField.TimeLocal] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
 
             bool miningResult = await Mining.Mine(miningParams).ConfigureAwait(false);
