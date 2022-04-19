@@ -184,6 +184,9 @@ namespace JL.Windows.GUI
                 case DictType.Kotowaza:
                     BrowseForDictionaryFolder();
                     break;
+                case DictType.Kanjium:
+                    BrowseForDictionaryFolder();
+                    break;
                 case DictType.DaijirinNazeka:
                     BrowseForDictionaryFile("Daijirin file|*.json");
                     break;
