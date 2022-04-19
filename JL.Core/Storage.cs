@@ -29,7 +29,7 @@ namespace JL.Core
         public static readonly Version Version = new(1, 9);
         public static readonly string RepoUrl = "https://github.com/rampaa/JL/";
         public static readonly Uri JmdictUrl = new("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz");
-        public static readonly Uri Jmnedict = new("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
+        public static readonly Uri JmnedictUrl = new("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
         public static bool Ready { get; set; } = false;
         public static bool UpdatingJMdict { get; set; } = false;
         public static bool UpdatingJMnedict { get; set; } = false;

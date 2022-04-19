@@ -41,16 +41,16 @@
                 hash = hash * 37 + PrimarySpelling.GetHashCode();
 
                 foreach (string spelling in AlternativeSpellings)
-                        hash = hash * 37 + spelling.GetHashCode();
+                    hash = hash * 37 + spelling.GetHashCode();
 
                 foreach (string readings in Readings)
-                        hash = hash * 37 + readings.GetHashCode();
+                    hash = hash * 37 + readings.GetHashCode();
 
                 foreach (string definition in Definitions)
-                        hash = hash * 37 + definition.GetHashCode();
+                    hash = hash * 37 + definition.GetHashCode();
 
                 foreach (string wordClass in WordClasses)
-                        hash = hash * 37 + wordClass.GetHashCode();
+                    hash = hash * 37 + wordClass.GetHashCode();
 
                 return hash;
             }

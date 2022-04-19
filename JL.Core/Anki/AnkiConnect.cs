@@ -64,7 +64,7 @@ namespace JL.Core.Anki
                     return json;
 
                 Storage.Frontend.Alert(AlertLevel.Error, json.Error.ToString()!);
-                Utils.Logger.Error("{JsonError}",json.Error.ToString());
+                Utils.Logger.Error("{JsonError}", json.Error.ToString());
                 return null;
             }
             catch (HttpRequestException e)

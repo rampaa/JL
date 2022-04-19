@@ -41,13 +41,13 @@
                 hash = hash * 37 + OriginalText.GetHashCode();
 
                 foreach (string tag in Tags)
-                        hash = hash * 37 + tag.GetHashCode();
+                    hash = hash * 37 + tag.GetHashCode();
 
                 foreach (string process in Process)
-                        hash = hash * 37 + process.GetHashCode();
+                    hash = hash * 37 + process.GetHashCode();
 
                 foreach (string seenText in SeenText)
-                        hash = hash * 37 + seenText.GetHashCode();
+                    hash = hash * 37 + seenText.GetHashCode();
 
                 return hash;
             }

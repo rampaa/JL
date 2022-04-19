@@ -4,7 +4,8 @@ namespace JL.Core.Dicts.Options;
 
 public class NewlineBetweenDefinitionsOption
 {
-    [JsonIgnore] public static readonly DictType[] ValidDictTypes =
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes =
         Enum.GetValues<DictType>().Except(new[] { DictType.Kanjium, DictType.Kanjidic, DictType.CustomNameDictionary })
             .ToArray();
 

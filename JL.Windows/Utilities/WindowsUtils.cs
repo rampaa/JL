@@ -274,7 +274,7 @@ public static class WindowsUtils
         }
         catch (Exception e)
         {
-            Utils.Logger.Error(e, "Error playing audio: {Audio}",  JsonSerializer.Serialize(audio));
+            Utils.Logger.Error(e, "Error playing audio: {Audio}", JsonSerializer.Serialize(audio));
             Alert(AlertLevel.Error, "Error playing audio");
         }
     }

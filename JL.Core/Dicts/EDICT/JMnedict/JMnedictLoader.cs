@@ -27,7 +27,7 @@ namespace JL.Core.Dicts.EDICT.JMnedict
                          ""))
             {
                 await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMnedict].Path,
-                    Storage.Jmnedict,
+                    Storage.JmnedictUrl,
                     DictType.JMnedict.ToString(), false, false).ConfigureAwait(false);
                 await Load(Storage.Dicts[DictType.JMnedict].Path).ConfigureAwait(false);
             }

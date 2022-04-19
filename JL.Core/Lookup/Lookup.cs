@@ -413,7 +413,7 @@ namespace JL.Core.Lookup
             if (kanji != null && Storage.Dicts[DictType.Kanjidic].Contents.TryGetValue(kanji, out List<IResult>? result))
             {
                 kanjiResults.Add(kanji,
-                    new IntermediaryResult(result, new List<List<string>>(), text.UnicodeIterator().First(),
+                    new IntermediaryResult(result, new List<List<string>>(), kanji,
                         dictType));
             }
 
@@ -502,17 +502,18 @@ namespace JL.Core.Lookup
                 {
                     var jMnedictResult = (JMnedictResult)nameResult.ResultsList[i];
 
-                    LookupResult result = new();
-
-                    result.EdictID = jMnedictResult.Id;
-                    result.FoundSpelling = jMnedictResult.PrimarySpelling;
-                    result.AlternativeSpellings = jMnedictResult.AlternativeSpellings ?? new();
-                    result.Readings = jMnedictResult.Readings ?? new();
-                    result.FoundForm = nameResult.FoundForm;
-                    result.DictType = nameResult.DictType.ToString();
-                    result.FormattedDefinitions = jMnedictResult != null
-                        ? BuildJmnedictDefinition(jMnedictResult)
-                        : null;
+                    LookupResult result = new()
+                    {
+                        EdictID = jMnedictResult.Id,
+                        FoundSpelling = jMnedictResult.PrimarySpelling,
+                        AlternativeSpellings = jMnedictResult.AlternativeSpellings ?? new(),
+                        Readings = jMnedictResult.Readings ?? new(),
+                        FoundForm = nameResult.FoundForm,
+                        DictType = nameResult.DictType.ToString(),
+                        FormattedDefinitions = jMnedictResult != null
+                                ? BuildJmnedictDefinition(jMnedictResult)
+                                : null
+                    };
 
                     results.Add(result);
                 }
@@ -576,21 +577,20 @@ namespace JL.Core.Lookup
                 {
                     var epwingResult = (EpwingResult)wordResult.ResultsList[i];
 
-                    LookupResult result = new();
-
-                    result.FoundSpelling = epwingResult.PrimarySpelling;
-                    result.FoundForm = wordResult.FoundForm;
-                    result.Process = ProcessProcess(wordResult);
-                    result.Frequency = GetEpwingFreq(epwingResult);
-                    result.DictType = wordResult.DictType.ToString();
-
-                    result.Readings = epwingResult.Reading != null
-                        ? new List<string> { epwingResult.Reading }
-                        : new();
-
-                    result.FormattedDefinitions = epwingResult.Definitions != null
-                        ? BuildEpwingDefinition(epwingResult.Definitions, wordResult.DictType)
-                        : null;
+                    LookupResult result = new()
+                    {
+                        FoundSpelling = epwingResult.PrimarySpelling,
+                        FoundForm = wordResult.FoundForm,
+                        Process = ProcessProcess(wordResult),
+                        Frequency = GetEpwingFreq(epwingResult),
+                        DictType = wordResult.DictType.ToString(),
+                        Readings = epwingResult.Reading != null
+                                ? new List<string> { epwingResult.Reading }
+                                : new(),
+                        FormattedDefinitions = epwingResult.Definitions != null
+                                ? BuildEpwingDefinition(epwingResult.Definitions, wordResult.DictType)
+                                : null
+                    };
 
                     results.Add(result);
                 }
@@ -611,22 +611,21 @@ namespace JL.Core.Lookup
                 {
                     var epwingResult = (EpwingNazekaResult)wordResult.ResultsList[i];
 
-                    LookupResult result = new();
-
-                    result.FoundSpelling = epwingResult.PrimarySpelling;
-                    result.AlternativeSpellings = epwingResult.AlternativeSpellings ?? new();
-                    result.FoundForm = wordResult.FoundForm;
-                    result.Process = ProcessProcess(wordResult);
-                    result.Frequency = GetEpwingNazekaFreq(epwingResult);
-                    result.DictType = wordResult.DictType.ToString();
-
-                    result.Readings = epwingResult.Reading != null
-                        ? new List<string> { epwingResult.Reading }
-                        : new();
-
-                    result.FormattedDefinitions = epwingResult.Definitions != null
-                        ? BuildEpwingDefinition(epwingResult.Definitions, wordResult.DictType)
-                        : null;
+                    LookupResult result = new()
+                    {
+                        FoundSpelling = epwingResult.PrimarySpelling,
+                        AlternativeSpellings = epwingResult.AlternativeSpellings ?? new(),
+                        FoundForm = wordResult.FoundForm,
+                        Process = ProcessProcess(wordResult),
+                        Frequency = GetEpwingNazekaFreq(epwingResult),
+                        DictType = wordResult.DictType.ToString(),
+                        Readings = epwingResult.Reading != null
+                                ? new List<string> { epwingResult.Reading }
+                                : new(),
+                        FormattedDefinitions = epwingResult.Definitions != null
+                                ? BuildEpwingDefinition(epwingResult.Definitions, wordResult.DictType)
+                                : null
+                    };
 
                     results.Add(result);
                 }
@@ -683,20 +682,19 @@ namespace JL.Core.Lookup
                 for (int i = 0; i < resultCount; i++)
                 {
                     var customNameDictResult = (CustomNameEntry)customNameResult.Value.ResultsList[i];
-                    LookupResult result = new();
-
-                    result.FoundSpelling = customNameDictResult.PrimarySpelling;
-                    result.FoundForm = customNameResult.Value.FoundForm;
-                    result.Frequency = resultCount - i;
-                    result.DictType = customNameResult.Value.DictType.ToString();
-
-                    result.Readings = customNameDictResult.Reading != null
-                        ? new List<string> { customNameDictResult.Reading }
-                        : new();
-
-                    result.FormattedDefinitions = customNameDictResult != null
-                        ? BuildCustomNameDefinition(customNameDictResult)
-                        : null;
+                    LookupResult result = new()
+                    {
+                        FoundSpelling = customNameDictResult.PrimarySpelling,
+                        FoundForm = customNameResult.Value.FoundForm,
+                        Frequency = resultCount - i,
+                        DictType = customNameResult.Value.DictType.ToString(),
+                        Readings = customNameDictResult.Reading != null
+                                ? new List<string> { customNameDictResult.Reading }
+                                : new(),
+                        FormattedDefinitions = customNameDictResult != null
+                                ? BuildCustomNameDefinition(customNameDictResult)
+                                : null
+                    };
 
                     results.Add(result);
                 }
@@ -1198,7 +1196,7 @@ namespace JL.Core.Lookup
             return $"({customNameDictResult.NameType.ToLower()}) {customNameDictResult.Reading}";
         }
 
-        public static string? ProcessProcess(IntermediaryResult intermediaryResult)
+        private static string? ProcessProcess(IntermediaryResult intermediaryResult)
         {
             StringBuilder deconj = new();
             bool first = true;

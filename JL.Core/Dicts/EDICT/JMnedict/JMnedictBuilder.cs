@@ -59,7 +59,7 @@
                     if (resultList.ContainsKey(key))
                         continue;
 
-                    JMnedictResult result = new() {PrimarySpelling = reb};
+                    JMnedictResult result = new() { PrimarySpelling = reb };
 
                     int transListCount = entry.TransList.Count;
                     for (int j = 0; j < transListCount; j++)

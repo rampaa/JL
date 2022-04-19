@@ -97,7 +97,8 @@
                     continue;
                 }
 
-                JMdictResult result = new() {
+                JMdictResult result = new()
+                {
                     AlternativeSpellings = rEle.ReRestrList.Any()
                     ? rEle.ReRestrList
                     : new List<string>(alternativeSpellings)

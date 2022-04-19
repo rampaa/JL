@@ -76,7 +76,7 @@ namespace JL.Windows.GUI
             AppDomain.CurrentDomain.UnhandledException += (_, eventArgs) =>
             {
                 Exception ex = (Exception)eventArgs.ExceptionObject;
-                Utils.Logger.Error("{UnhandledExceptionMessage}",ex.ToString());
+                Utils.Logger.Error("{UnhandledExceptionMessage}", ex.ToString());
             };
 
             TaskScheduler.UnobservedTaskException += (_, eventArgs) =>
