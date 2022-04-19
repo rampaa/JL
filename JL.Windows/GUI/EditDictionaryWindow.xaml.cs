@@ -48,7 +48,6 @@ namespace JL.Windows.GUI
 
             if (isValid)
             {
-                //todo this will break on DictTypes without descriptions
                 DictType type = typeString.GetEnum<DictType>();
 
                 if (Storage.Dicts[type].Path != path)
@@ -142,7 +141,6 @@ namespace JL.Windows.GUI
         private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)
         {
             string typeString = ComboBoxDictType.SelectionBoxItem.ToString()!;
-            //todo this will break on DictTypes without descriptions
             DictType selectedDictType = typeString.GetEnum<DictType>();
 
             switch (selectedDictType)
