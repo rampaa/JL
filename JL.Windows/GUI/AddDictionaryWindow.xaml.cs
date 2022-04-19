@@ -60,18 +60,27 @@ namespace JL.Windows.GUI
                 // lowest priority means highest number
                 int lowestPriority = Storage.Dicts.Select(dict => dict.Value.Priority).Max();
 
-                // bool isEpwing = Storage.YomichanDictTypes.Concat(Storage.NazekaDictTypes).Contains(type);
-                //
-                // ExamplesOption? eo = null;
-                // // if (examples) //todo
-                // // {  Enum.TryParse<ExamplesOptionValue>(ComboBoxExamples.SelectedValue?.ToString(), out var eov);
-                // //    eo = new ExamplesOption() { Value = eov };
-                // // }
-                //
-                // var options = new DictOptions(new NewlineBetweenDefinitionsOption { Value = isEpwing }, eo);
+                NewlineBetweenDefinitionsOption? newlineOption = null;
+                if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(type))
+                {
+                    bool isEpwing = !Storage.BuiltInDicts.ContainsKey(type.ToString());
+                    newlineOption = new NewlineBetweenDefinitionsOption { Value = isEpwing };
+                }
+
+                ExamplesOption? examplesOption = null;
+                // if (ExamplesOption.ValidDictTypes.Contains(type)) //todo
+                // {
+                //     Enum.TryParse<ExamplesOptionValue>(ComboBoxExamples.SelectedValue?.ToString(), out var eov);
+                //     examplesOption = new ExamplesOption { Value = eov };
+                // }
+
+                var options =
+                    new DictOptions(
+                        newlineOption,
+                        examplesOption);
 
                 Storage.Dicts.Add(type,
-                    new Dict(type, path, true, lowestPriority + 1, new DictOptions(null, null)));
+                    new Dict(type, path, true, lowestPriority + 1, options));
                 Storage.Dicts[type].Contents = new Dictionary<string, List<IResult>>();
 
                 Close();

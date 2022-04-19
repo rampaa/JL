@@ -117,11 +117,9 @@ namespace JL.Windows.GUI
         {
             if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dict.Type))
             {
+                bool isEpwing = !Storage.BuiltInDicts.ContainsKey(dict.Type.ToString());
                 var status = dict.Options?.NewlineBetweenDefinitions;
-                CheckBoxNewline.IsChecked =
-                    status?.Value ??
-                    !Storage.BuiltInDicts.ContainsKey(
-                        dict.Type.ToString()); // default to true for epwings, false otherwise
+                CheckBoxNewline.IsChecked = status?.Value ?? isEpwing;
                 DockPanelNewline.Visibility = Visibility.Visible;
             }
 
