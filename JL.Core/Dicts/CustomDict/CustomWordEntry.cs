@@ -3,12 +3,12 @@
     public class CustomWordEntry : IResult
     {
         public string PrimarySpelling { get; }
-        public List<string> AlternativeSpellings { get; }
-        public List<string> Readings { get; }
+        public List<string>? AlternativeSpellings { get; }
+        public List<string>? Readings { get; }
         public List<string> Definitions { get; }
         public List<string> WordClasses { get; }
 
-        public CustomWordEntry(string primarySpelling, List<string> alternativeSpellings, List<string> readings,
+        public CustomWordEntry(string primarySpelling, List<string>? alternativeSpellings, List<string>? readings,
             List<string> definitions, List<string> wordClasses)
         {
             PrimarySpelling = primarySpelling;
@@ -26,8 +26,8 @@
             CustomWordEntry customWordEntryObj = (obj as CustomWordEntry)!;
 
             return PrimarySpelling == customWordEntryObj.PrimarySpelling
-                   && customWordEntryObj.AlternativeSpellings.SequenceEqual(AlternativeSpellings)
-                   && customWordEntryObj.Readings.SequenceEqual(Readings)
+                   && ((customWordEntryObj.AlternativeSpellings?.SequenceEqual(AlternativeSpellings ?? new())) ?? AlternativeSpellings == null)
+                   && ((customWordEntryObj.Readings?.SequenceEqual(Readings ?? new())) ?? Readings == null)
                    && customWordEntryObj.Definitions.SequenceEqual(Definitions)
                    && customWordEntryObj.WordClasses.SequenceEqual(WordClasses);
         }
@@ -40,11 +40,27 @@
 
                 hash = hash * 37 + PrimarySpelling.GetHashCode();
 
-                foreach (string spelling in AlternativeSpellings)
-                    hash = hash * 37 + spelling.GetHashCode();
+                if (AlternativeSpellings != null)
+                {
+                    foreach (string spelling in AlternativeSpellings)
+                        hash = hash * 37 + spelling.GetHashCode();
+                }
+                else
+                {
+                    hash *= 37;
+                }
 
-                foreach (string readings in Readings)
-                    hash = hash * 37 + readings.GetHashCode();
+
+                if (Readings != null)
+                {
+                    foreach (string readings in Readings)
+                        hash = hash * 37 + readings.GetHashCode();
+                }
+
+                else
+                {
+                    hash *= 37;
+                }
 
                 foreach (string definition in Definitions)
                     hash = hash * 37 + definition.GetHashCode();

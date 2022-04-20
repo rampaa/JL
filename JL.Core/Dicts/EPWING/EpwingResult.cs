@@ -9,7 +9,6 @@ namespace JL.Core.Dicts.EPWING
         public List<string>? WordClasses { get; }
         public string PrimarySpelling { get; }
 
-        //public string KanaSpelling { get; set; }
         //public string DefinitionTags { get; init; }
         //public int Score { get; init; }
         //public int Sequence { get; init; }
@@ -51,7 +50,6 @@ namespace JL.Core.Dicts.EPWING
             Reading = reading;
             WordClasses = wordClasses;
             PrimarySpelling = primarySpelling;
-            // KanaSpelling = null;
         }
     }
 }

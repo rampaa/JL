@@ -39,14 +39,9 @@ namespace JL.Core.Dicts.EPWING
 
             string hiraganaExpression = Kana.KatakanaToHiraganaConverter(result.PrimarySpelling);
 
-            //if (hiraganaExpression != entry.Expression && string.IsNullOrEmpty(entry.Reading))
-            //    result.KanaSpelling = entry.Expression;
-
             if (!string.IsNullOrEmpty(result.Reading))
             {
                 string hiraganaReading = Kana.KatakanaToHiraganaConverter(result.Reading);
-                //if (hiraganaReading != entry.Reading)
-                //    result.KanaSpelling = entry.Reading;
 
                 if (epwingDictionary.TryGetValue(hiraganaReading, out List<IResult>? tempList2))
                     tempList2.Add(result);

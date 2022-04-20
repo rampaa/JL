@@ -45,7 +45,7 @@
                         || sense.StagKList.Contains(key)
                         || sense.StagRList.Intersect(result.Readings!).Any())
                     {
-                        result.Definitions.Add(sense.GlossList);
+                        result.Definitions!.Add(sense.GlossList);
                         result.RRestrictions!.Add(sense.StagRList);
                         result.KRestrictions!.Add(sense.StagKList);
                         result.WordClasses!.Add(sense.PosList);
@@ -104,8 +104,6 @@
                     : new List<string>(alternativeSpellings)
                 };
 
-                //result.KanaSpellings.Add(rEle.Reb);
-
                 if (result.AlternativeSpellings.Any())
                 {
                     result.PrimarySpelling = result.AlternativeSpellings[0];
@@ -142,7 +140,7 @@
                         || sense.StagKList.Contains(result.PrimarySpelling)
                         || sense.StagKList.Intersect(result.AlternativeSpellings).Any())
                     {
-                        result.Definitions.Add(sense.GlossList);
+                        result.Definitions!.Add(sense.GlossList);
                         result.RRestrictions!.Add(sense.StagRList);
                         result.KRestrictions!.Add(sense.StagKList);
                         result.WordClasses!.Add(sense.PosList);
@@ -157,20 +155,6 @@
 
                 resultList.Add(key, result);
             }
-
-            //if(!alternativeSpellings.Any())
-            //{
-            //    foreach (KeyValuePair<string, EdictResult> item in resultList)
-            //    {
-            //        foreach (string spelling in resultList.Keys)
-            //        {
-            //            if (item.Key != spelling)
-            //            {
-            //                item.Value.AlternativeSpellings.Add(spelling);
-            //            }
-            //        }
-            //    }
-            //}
 
             foreach (KeyValuePair<string, JMdictResult> rl in resultList)
             {
@@ -189,9 +173,6 @@
                 if (!rl.Value.Dialects!.Any() || !rl.Value.Dialects!.All(l => l == null || !l.Any()))
                     rl.Value.Dialects = null;
 
-                //if (!rl.Value.KanaSpellings.Any())
-                //    rl.Value.KanaSpellings = null;
-
                 if (!rl.Value.MiscList!.Any() || rl.Value.MiscList!.All(l => l == null || !l.Any()))
                     rl.Value.MiscList = null;
 
@@ -203,6 +184,9 @@
 
                 if (!rl.Value.ROrthographyInfoList!.Any() || rl.Value.ROrthographyInfoList!.All(l => l == null || !l.Any()))
                     rl.Value.ROrthographyInfoList = null;
+
+                if (!rl.Value.Definitions!.Any() || rl.Value.Definitions!.All(l => l == null || !l.Any()))
+                    rl.Value.Definitions = null;
 
                 if (!rl.Value.DefinitionInfo!.Any() || rl.Value.DefinitionInfo!.All(s => s == null || string.IsNullOrEmpty(s)))
                     rl.Value.DefinitionInfo = null;

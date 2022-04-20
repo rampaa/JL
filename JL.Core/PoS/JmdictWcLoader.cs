@@ -52,6 +52,7 @@ namespace JL.Core.PoS
         {
             Dictionary<string, List<JmdictWc>> jmdictWcDict = new();
 
+            // TODO
             string[] unusedWcs =
             {
                 "adj-f", "adj-ix", "adj-kari", "adj-ku", "adj-nari", "adj-no", "adj-pn", "adj-shiku", "adj-t",

@@ -213,9 +213,6 @@ namespace JL.Windows.GUI
 
         private void MainTextBox_MouseLeave(object sender, MouseEventArgs e)
         {
-            //OpacitySlider.Visibility = Visibility.Collapsed;
-            //FontSizeSlider.Visibility = Visibility.Collapsed;
-
             if (FirstPopupWindow.MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning || (FirstPopupWindow.UnavoidableMouseEnter && FirstPopupWindow.IsMouseOver))
                 return;
 

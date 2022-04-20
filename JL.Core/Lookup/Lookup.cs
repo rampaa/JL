@@ -193,7 +193,7 @@ namespace JL.Core.Lookup
             if (dictionary.TryGetValue(textInHiragana, out List<IResult>? tempResult))
             {
                 results.TryAdd(textInHiragana,
-                    new IntermediaryResult(tempResult, new List<List<string>> { new() }, foundForm,
+                    new IntermediaryResult(tempResult, null, foundForm,
                         dictType));
                 tryLongVowelConversion = false;
             }
@@ -336,7 +336,7 @@ namespace JL.Core.Lookup
                             if (results.TryGetValue(deconjugationResult.Text, out IntermediaryResult? r))
                             {
                                 if (r.FoundForm == deconjugationResult.OriginalText)
-                                    r.ProcessListList.Add(deconjugationResult.Process);
+                                    r.ProcessListList?.Add(deconjugationResult.Process);
                             }
                             else
                             {
@@ -397,7 +397,7 @@ namespace JL.Core.Lookup
                     .TryGetValue(textInHiraganaList[i], out List<IResult>? result))
                 {
                     nameResults.TryAdd(textInHiraganaList[i],
-                        new IntermediaryResult(result, new List<List<string>>(), text[..^i], dictType));
+                        new IntermediaryResult(result, null, text[..^i], dictType));
                 }
             }
 
@@ -413,8 +413,7 @@ namespace JL.Core.Lookup
             if (kanji != null && Storage.Dicts[DictType.Kanjidic].Contents.TryGetValue(kanji, out List<IResult>? result))
             {
                 kanjiResults.Add(kanji,
-                    new IntermediaryResult(result, new List<List<string>>(), kanji,
-                        dictType));
+                    new IntermediaryResult(result, null, kanji, dictType));
             }
 
             return kanjiResults;
@@ -433,8 +432,6 @@ namespace JL.Core.Lookup
                     var jMDictResult = (JMdictResult)wordResult.ResultsList[i];
 
                     LookupResult result = new();
-
-                    //var kanaSpellings = jMDictResult.KanaSpellings ?? new List<string>();
 
                     List<List<string>?> rLists = jMDictResult.ROrthographyInfoList ?? new();
                     List<List<string>?> aLists = jMDictResult.AOrthographyInfoList ?? new();
@@ -468,7 +465,6 @@ namespace JL.Core.Lookup
                     }
 
                     result.FoundSpelling = jMDictResult.PrimarySpelling;
-                    //result.KanaSpellings, kanaSpellings);
                     result.Readings = jMDictResult.Readings ?? new();
                     result.FoundForm = wordResult.FoundForm;
                     result.EdictID = jMDictResult.Id;
@@ -476,10 +472,10 @@ namespace JL.Core.Lookup
                     result.Process = ProcessProcess(wordResult);
                     result.Frequency = GetJMDictFreq(jMDictResult);
                     result.POrthographyInfoList = jMDictResult.POrthographyInfoList ?? new();
-                    result.ROrthographyInfoList = rOrthographyInfoList ?? new();
-                    result.AOrthographyInfoList = aOrthographyInfoList ?? new();
+                    result.ROrthographyInfoList = rOrthographyInfoList;
+                    result.AOrthographyInfoList = aOrthographyInfoList;
                     result.DictType = wordResult.DictType.ToString();
-                    result.FormattedDefinitions = jMDictResult != null
+                    result.FormattedDefinitions = jMDictResult.Definitions != null
                         ? BuildJmdictDefinition(jMDictResult, wordResult.DictType)
                         : null;
 
@@ -510,7 +506,7 @@ namespace JL.Core.Lookup
                         Readings = jMnedictResult.Readings ?? new(),
                         FoundForm = nameResult.FoundForm,
                         DictType = nameResult.DictType.ToString(),
-                        FormattedDefinitions = jMnedictResult != null
+                        FormattedDefinitions = jMnedictResult.Definitions != null
                                 ? BuildJmnedictDefinition(jMnedictResult)
                                 : null
                     };
@@ -688,14 +684,9 @@ namespace JL.Core.Lookup
                         FoundForm = customNameResult.Value.FoundForm,
                         Frequency = resultCount - i,
                         DictType = customNameResult.Value.DictType.ToString(),
-                        Readings = customNameDictResult.Reading != null
-                                ? new List<string> { customNameDictResult.Reading }
-                                : new(),
-                        FormattedDefinitions = customNameDictResult != null
-                                ? BuildCustomNameDefinition(customNameDictResult)
-                                : null
+                        Readings = new List<string> { customNameDictResult.Reading },
+                        FormattedDefinitions = BuildCustomNameDefinition(customNameDictResult),
                     };
-
                     results.Add(result);
                 }
             }
@@ -723,7 +714,6 @@ namespace JL.Core.Lookup
 
                     if ((jMDictResult.Readings != null && jMDictResult.Readings.Contains(freqResult.Spelling))
                         || (jMDictResult.Readings == null && jMDictResult.PrimarySpelling == freqResult.Spelling))
-                    //|| (jMnedictResult.KanaSpellings != null && jMnedictResult.KanaSpellings.Contains(freqResult.Spelling))
                     {
                         if (frequency > freqResult.Frequency)
                         {
@@ -777,7 +767,6 @@ namespace JL.Core.Lookup
                             if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading)
                                 || (jMDictResult.AlternativeSpellings != null
                                     && jMDictResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
-                            //|| (jMDictResult.KanaSpellings != null && jMDictResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                             {
                                 if (frequency > readingFreqResult.Frequency)
                                 {
@@ -1004,7 +993,6 @@ namespace JL.Core.Lookup
                             if ((reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
                                 || (customWordResult.AlternativeSpellings != null
                                     && customWordResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
-                            //|| (customWordResult.KanaSpellings != null && customWordResult.KanaSpellings.Contains(readingFreqResults.Spelling))
                             {
                                 if (frequency > readingFreqResult.Frequency)
                                 {
@@ -1028,7 +1016,9 @@ namespace JL.Core.Lookup
             int count = 1;
             StringBuilder defResult = new();
 
-            for (int i = 0; i < jMDictResult.Definitions.Count; i++)
+            int definitionCount = jMDictResult.Definitions?.Count ?? 0;
+
+            for (int i = 0; i < definitionCount; i++)
             {
                 if (newlines)
                     defResult.Append($"({count}) ");
@@ -1072,7 +1062,7 @@ namespace JL.Core.Lookup
                     defResult.Append(") ");
                 }
 
-                defResult.Append(string.Join("; ", jMDictResult.Definitions[i]) + " ");
+                defResult.Append(string.Join("; ", jMDictResult.Definitions![i]) + " ");
 
                 if ((jMDictResult.RRestrictions?[i]?.Any() ?? false) ||
                     (jMDictResult.KRestrictions?[i]?.Any() ?? false))
@@ -1201,10 +1191,10 @@ namespace JL.Core.Lookup
             StringBuilder deconj = new();
             bool first = true;
 
-            int processListListCount = intermediaryResult.ProcessListList.Count;
+            int processListListCount = intermediaryResult.ProcessListList?.Count ?? 0;
             for (int i = 0; i < processListListCount; i++)
             {
-                List<string> form = intermediaryResult.ProcessListList[i];
+                List<string> form = intermediaryResult.ProcessListList![i];
 
                 StringBuilder formText = new();
                 int added = 0;

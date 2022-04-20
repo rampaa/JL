@@ -18,9 +18,11 @@ namespace JL.Core.Dicts.EPWING.EpwingNazeka
                 foreach (JsonElement jsonObj in jsonObjects!.Skip(1))
                 {
                     string reading = jsonObj.GetProperty("r").ToString();
+
                     List<string>? spellings = jsonObj.GetProperty("s").ToString().TrimStart('[').TrimEnd(']')
                         .Split("\",", StringSplitOptions.RemoveEmptyEntries)
                         .Select(select => select.Trim('\n', ' ', '"')).ToList();
+
                     List<string> definitions = jsonObj.GetProperty("l").ToString().TrimStart('[').TrimEnd(']')
                         .Split("\",", StringSplitOptions.RemoveEmptyEntries)
                         .Select(select => select.Trim('\n', ' ', '"')).ToList();

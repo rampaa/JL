@@ -16,7 +16,12 @@
                     if (lParts.Length == 4)
                     {
                         string[] spellings = lParts[0].Split(';').Select(s => s.Trim()).ToArray();
-                        List<string> readings = lParts[1].Split(';').Select(r => r.Trim()).ToList();
+
+                        List<string>? readings = lParts[1].Split(';').Select(r => r.Trim()).ToList();
+
+                        if (!readings.Any())
+                            readings = null;
+
                         List<string> definitions = lParts[2].Split(';').Select(d => d.Trim()).ToList();
                         string wordClass = lParts[3].Trim();
 
@@ -26,18 +31,23 @@
             }
         }
 
-        public static void AddToDictionary(string[] spellings, List<string> readings, List<string> definitions,
+        public static void AddToDictionary(string[] spellings, List<string>? readings, List<string> definitions,
             string rawWordClass)
         {
             for (int i = 0; i < spellings.Length; i++)
             {
-                List<string> alternativeSpellings = spellings.ToList();
+                List<string>? alternativeSpellings = spellings.ToList();
                 alternativeSpellings.RemoveAt(i);
+
+                if (!alternativeSpellings.Any())
+                    alternativeSpellings = null;
 
                 string spelling = spellings[i];
 
                 List<string> wordClass = new();
 
+
+                // TODO
                 if (rawWordClass == "Verb")
                 {
                     wordClass.Add("v1");

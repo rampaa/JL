@@ -71,6 +71,7 @@ namespace JL.Windows.GUI
                     // Width = 20,
                     Width = 0,
                     Text = dict.Priority.ToString(),
+                    Visibility = Visibility.Collapsed,
                     // Margin = new Thickness(10),
                 };
                 var dictTypeDisplay = new TextBlock
