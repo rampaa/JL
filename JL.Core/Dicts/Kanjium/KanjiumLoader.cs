@@ -1,61 +1,60 @@
 ﻿using System.Text.Json;
 
-namespace JL.Core.Dicts.Kanjium
+namespace JL.Core.Dicts.Kanjium;
+
+public static class KanjiumLoader
 {
-    public static class KanjiumLoader
+    public static async Task Load(DictType dictType, string dictPath)
     {
-        public static async Task Load(DictType dictType, string dictPath)
+        if (!Directory.Exists(dictPath) && !File.Exists(dictPath))
+            return;
+
+        Dictionary<string, List<IResult>> kanjiumDict = Storage.Dicts[dictType].Contents;
+
+        string[] jsonFiles = Directory.GetFiles(dictPath, "term_meta_bank_*.json");
+
+        foreach (string jsonFile in jsonFiles)
         {
-            if (!Directory.Exists(dictPath) && !File.Exists(dictPath))
-                return;
+            await using FileStream openStream = File.OpenRead(jsonFile);
+            List<List<JsonElement>>? jsonObjects = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream)
+                .ConfigureAwait(false);
 
-            Dictionary<string, List<IResult>> kanjiumDict = Storage.Dicts[dictType].Contents;
+            if (jsonObjects == null)
+                continue;
 
-            string[] jsonFiles = Directory.GetFiles(dictPath, "term_meta_bank_*.json");
-
-            foreach (string jsonFile in jsonFiles)
+            foreach (List<JsonElement> jsonObject in jsonObjects)
             {
-                await using FileStream openStream = File.OpenRead(jsonFile);
-                List<List<JsonElement>>? jsonObjects = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream)
-                    .ConfigureAwait(false);
+                KanjiumResult newEntry = new(jsonObject);
 
-                if (jsonObjects == null)
-                    continue;
+                string spellingInHiragana = Kana.KatakanaToHiraganaConverter(newEntry.Spelling);
 
-                foreach (List<JsonElement> jsonObject in jsonObjects)
+                if (kanjiumDict.TryGetValue(spellingInHiragana, out List<IResult>? result))
                 {
-                    KanjiumResult newEntry = new(jsonObject);
+                    result.Add(newEntry);
+                }
 
-                    string spellingInHiragana = Kana.KatakanaToHiraganaConverter(newEntry.Spelling);
+                else
+                {
+                    kanjiumDict[spellingInHiragana] = new List<IResult> { newEntry };
+                }
 
-                    if (kanjiumDict.TryGetValue(spellingInHiragana, out List<IResult>? result))
+                if (!string.IsNullOrEmpty(newEntry.Reading))
+                {
+                    string readingInHiragana = Kana.KatakanaToHiraganaConverter(newEntry.Reading);
+
+                    if (kanjiumDict.TryGetValue(readingInHiragana, out List<IResult>? readingResult))
                     {
-                        result.Add(newEntry);
+                        readingResult.Add(newEntry);
                     }
 
                     else
                     {
-                        kanjiumDict[spellingInHiragana] = new List<IResult> { newEntry };
-                    }
-
-                    if (!string.IsNullOrEmpty(newEntry.Reading))
-                    {
-                        string readingInHiragana = Kana.KatakanaToHiraganaConverter(newEntry.Reading);
-
-                        if (kanjiumDict.TryGetValue(readingInHiragana, out List<IResult>? readingResult))
-                        {
-                            readingResult.Add(newEntry);
-                        }
-
-                        else
-                        {
-                            kanjiumDict[readingInHiragana] = new List<IResult> { newEntry };
-                        }
+                        kanjiumDict[readingInHiragana] = new List<IResult> { newEntry };
                     }
                 }
             }
-
-            kanjiumDict.TrimExcess();
         }
+
+        kanjiumDict.TrimExcess();
     }
 }

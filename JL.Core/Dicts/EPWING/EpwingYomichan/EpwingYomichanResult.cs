@@ -1,55 +1,54 @@
 ﻿using System.Text.Json;
 
-namespace JL.Core.Dicts.EPWING.EpwingYomichan
+namespace JL.Core.Dicts.EPWING.EpwingYomichan;
+
+public class EpwingYomichanResult : IResult
 {
-    public class EpwingYomichanResult : IResult
+    public List<string>? Definitions { get; }
+    public string? Reading { get; }
+    public List<string>? WordClasses { get; }
+    public string PrimarySpelling { get; }
+
+    //public string DefinitionTags { get; init; }
+    //public int Score { get; init; }
+    //public int Sequence { get; init; }
+    //public string TermTags { get; init; }
+
+    public EpwingYomichanResult(List<JsonElement> jsonElement)
     {
-        public List<string>? Definitions { get; }
-        public string? Reading { get; }
-        public List<string>? WordClasses { get; }
-        public string PrimarySpelling { get; }
+        PrimarySpelling = jsonElement[0].ToString();
+        Reading = jsonElement[1].ToString();
 
-        //public string DefinitionTags { get; init; }
-        //public int Score { get; init; }
-        //public int Sequence { get; init; }
-        //public string TermTags { get; init; }
+        if (Reading == "")
+            Reading = null;
 
-        public EpwingYomichanResult(List<JsonElement> jsonElement)
-        {
-            PrimarySpelling = jsonElement[0].ToString();
-            Reading = jsonElement[1].ToString();
+        //DefinitionTags = jsonElement[2].ToString();
 
-            if (Reading == "")
-                Reading = null;
+        WordClasses = jsonElement[3].ToString().Split(" ").ToList();
 
-            //DefinitionTags = jsonElement[2].ToString();
+        if (!WordClasses.Any())
+            WordClasses = null;
 
-            WordClasses = jsonElement[3].ToString().Split(" ").ToList();
+        //jsonElement[4].TryGetInt32(out int score);
+        //Score = score;
 
-            if (!WordClasses.Any())
-                WordClasses = null;
+        Definitions = jsonElement[5].ToString()[2..^2]
+            .Split("\\n", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Replace("\\\"", "\"")).ToList();
 
-            //jsonElement[4].TryGetInt32(out int score);
-            //Score = score;
+        if (!Definitions.Any())
+            Definitions = null;
 
-            Definitions = jsonElement[5].ToString()[2..^2]
-                .Split("\\n", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Replace("\\\"", "\"")).ToList();
+        //jsonElement[6].TryGetInt32(out int sequence);
+        //Sequence = sequence;
 
-            if (!Definitions.Any())
-                Definitions = null;
+        //TermTags = jsonElement[7].ToString();
+    }
 
-            //jsonElement[6].TryGetInt32(out int sequence);
-            //Sequence = sequence;
-
-            //TermTags = jsonElement[7].ToString();
-        }
-
-        public EpwingYomichanResult(string primarySpelling, string reading, List<string> definitions, List<string> wordClasses)
-        {
-            Definitions = definitions;
-            Reading = reading;
-            WordClasses = wordClasses;
-            PrimarySpelling = primarySpelling;
-        }
+    public EpwingYomichanResult(string primarySpelling, string reading, List<string> definitions, List<string> wordClasses)
+    {
+        Definitions = definitions;
+        Reading = reading;
+        WordClasses = wordClasses;
+        PrimarySpelling = primarySpelling;
     }
 }

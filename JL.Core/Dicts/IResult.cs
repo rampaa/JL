@@ -1,6 +1,5 @@
-﻿namespace JL.Core.Dicts
+﻿namespace JL.Core.Dicts;
+
+public interface IResult
 {
-    public interface IResult
-    {
-    }
 }

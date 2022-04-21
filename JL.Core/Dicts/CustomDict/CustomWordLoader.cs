@@ -1,109 +1,108 @@
-﻿namespace JL.Core.Dicts.CustomDict
+﻿namespace JL.Core.Dicts.CustomDict;
+
+public static class CustomWordLoader
 {
-    public static class CustomWordLoader
+    public static async Task Load(string customWordDictPath)
     {
-        public static async Task Load(string customWordDictPath)
+        if (File.Exists(customWordDictPath))
         {
-            if (File.Exists(customWordDictPath))
+            string[] lines = await File.ReadAllLinesAsync(customWordDictPath)
+                .ConfigureAwait(false);
+
+            for (int i = 0; i < lines.Length; i++)
             {
-                string[] lines = await File.ReadAllLinesAsync(customWordDictPath)
-                    .ConfigureAwait(false);
+                string[] lParts = lines[i].Split("\t");
 
-                for (int i = 0; i < lines.Length; i++)
+                if (lParts.Length == 4)
                 {
-                    string[] lParts = lines[i].Split("\t");
+                    string[] spellings = lParts[0].Split(';').Select(s => s.Trim()).ToArray();
 
-                    if (lParts.Length == 4)
-                    {
-                        string[] spellings = lParts[0].Split(';').Select(s => s.Trim()).ToArray();
+                    List<string>? readings = lParts[1].Split(';').Select(r => r.Trim()).ToList();
 
-                        List<string>? readings = lParts[1].Split(';').Select(r => r.Trim()).ToList();
+                    if (!readings.Any())
+                        readings = null;
 
-                        if (!readings.Any())
-                            readings = null;
+                    List<string> definitions = lParts[2].Split(';').Select(d => d.Trim()).ToList();
+                    string wordClass = lParts[3].Trim();
 
-                        List<string> definitions = lParts[2].Split(';').Select(d => d.Trim()).ToList();
-                        string wordClass = lParts[3].Trim();
-
-                        AddToDictionary(spellings, readings, definitions, wordClass);
-                    }
+                    AddToDictionary(spellings, readings, definitions, wordClass);
                 }
             }
         }
+    }
 
-        public static void AddToDictionary(string[] spellings, List<string>? readings, List<string> definitions,
-            string rawWordClass)
+    public static void AddToDictionary(string[] spellings, List<string>? readings, List<string> definitions,
+        string rawWordClass)
+    {
+        for (int i = 0; i < spellings.Length; i++)
         {
-            for (int i = 0; i < spellings.Length; i++)
+            List<string>? alternativeSpellings = spellings.ToList();
+            alternativeSpellings.RemoveAt(i);
+
+            if (!alternativeSpellings.Any())
+                alternativeSpellings = null;
+
+            string spelling = spellings[i];
+
+            List<string> wordClass = new();
+
+
+            // TODO
+            if (rawWordClass == "Verb")
             {
-                List<string>? alternativeSpellings = spellings.ToList();
-                alternativeSpellings.RemoveAt(i);
+                wordClass.Add("v1");
+                wordClass.Add("v1-s");
+                wordClass.Add("v5aru");
+                wordClass.Add("v5b");
+                wordClass.Add("v5g");
+                wordClass.Add("v5k");
+                wordClass.Add("v5k-s");
+                wordClass.Add("v5m");
+                wordClass.Add("v5n");
+                wordClass.Add("v5r");
+                wordClass.Add("v5r-i");
+                wordClass.Add("v5s");
+                wordClass.Add("v5t");
+                wordClass.Add("v5u");
+                wordClass.Add("v5u-s");
+                wordClass.Add("vi");
+                wordClass.Add("vk");
+                wordClass.Add("vs");
+                wordClass.Add("vz");
+            }
+            else if (rawWordClass == "Adjective")
+            {
+                wordClass.Add("adj-i");
+                wordClass.Add("adj-na");
+            }
+            else if (rawWordClass == "Noun")
+            {
+                wordClass.Add("noun");
+            }
+            else
+            {
+                wordClass.Add("other");
+            }
 
-                if (!alternativeSpellings.Any())
-                    alternativeSpellings = null;
+            CustomWordEntry newWordEntry = new(spelling, alternativeSpellings, readings, definitions, wordClass);
 
-                string spelling = spellings[i];
+            Dictionary<string, List<IResult>> customWordDictionary = Storage.Dicts[DictType.CustomWordDictionary].Contents;
 
-                List<string> wordClass = new();
-
-
-                // TODO
-                if (rawWordClass == "Verb")
+            if (customWordDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out List<IResult>? result))
+            {
+                if (result.Contains(newWordEntry))
                 {
-                    wordClass.Add("v1");
-                    wordClass.Add("v1-s");
-                    wordClass.Add("v5aru");
-                    wordClass.Add("v5b");
-                    wordClass.Add("v5g");
-                    wordClass.Add("v5k");
-                    wordClass.Add("v5k-s");
-                    wordClass.Add("v5m");
-                    wordClass.Add("v5n");
-                    wordClass.Add("v5r");
-                    wordClass.Add("v5r-i");
-                    wordClass.Add("v5s");
-                    wordClass.Add("v5t");
-                    wordClass.Add("v5u");
-                    wordClass.Add("v5u-s");
-                    wordClass.Add("vi");
-                    wordClass.Add("vk");
-                    wordClass.Add("vs");
-                    wordClass.Add("vz");
-                }
-                else if (rawWordClass == "Adjective")
-                {
-                    wordClass.Add("adj-i");
-                    wordClass.Add("adj-na");
-                }
-                else if (rawWordClass == "Noun")
-                {
-                    wordClass.Add("noun");
-                }
-                else
-                {
-                    wordClass.Add("other");
-                }
-
-                CustomWordEntry newWordEntry = new(spelling, alternativeSpellings, readings, definitions, wordClass);
-
-                Dictionary<string, List<IResult>> customWordDictionary = Storage.Dicts[DictType.CustomWordDictionary].Contents;
-
-                if (customWordDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out List<IResult>? result))
-                {
-                    if (result.Contains(newWordEntry))
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        result.Add(newWordEntry);
-                    }
+                    break;
                 }
                 else
                 {
-                    customWordDictionary.Add(Kana.KatakanaToHiraganaConverter(spelling),
-                        new List<IResult> { newWordEntry });
+                    result.Add(newWordEntry);
                 }
+            }
+            else
+            {
+                customWordDictionary.Add(Kana.KatakanaToHiraganaConverter(spelling),
+                    new List<IResult> { newWordEntry });
             }
         }
     }

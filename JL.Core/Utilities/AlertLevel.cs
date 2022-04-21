@@ -1,10 +1,9 @@
-﻿namespace JL.Core.Utilities
+﻿namespace JL.Core.Utilities;
+
+public enum AlertLevel
 {
-    public enum AlertLevel
-    {
-        Error,
-        Warning,
-        Information,
-        Success
-    }
+    Error,
+    Warning,
+    Information,
+    Success
 }

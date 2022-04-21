@@ -1,32 +1,31 @@
 ﻿using System.Text.Json;
 
-namespace JL.Core.Dicts.Kanjium
+namespace JL.Core.Dicts.Kanjium;
+
+public class KanjiumResult : IResult
 {
-    public class KanjiumResult : IResult
+    public string Spelling { get; set; }
+    public string? Reading { get; set; }
+    public int Position { get; set; }
+
+    public KanjiumResult(string spelling, string? reading, int position)
     {
-        public string Spelling { get; set; }
-        public string? Reading { get; set; }
-        public int Position { get; set; }
+        Spelling = spelling;
+        Reading = reading;
+        Position = position;
+    }
 
-        public KanjiumResult(string spelling, string? reading, int position)
-        {
-            Spelling = spelling;
-            Reading = reading;
-            Position = position;
-        }
+    public KanjiumResult(List<JsonElement> jsonObject)
+    {
+        Spelling = jsonObject[0].ToString();
 
-        public KanjiumResult(List<JsonElement> jsonObject)
-        {
-            Spelling = jsonObject[0].ToString();
+        JsonElement jO = jsonObject[2];
 
-            JsonElement jO = jsonObject[2];
+        Reading = jO.GetProperty("reading").ToString();
 
-            Reading = jO.GetProperty("reading").ToString();
+        if (Spelling == Reading)
+            Reading = null;
 
-            if (Spelling == Reading)
-                Reading = null;
-
-            Position = jO.GetProperty("pitches")[0].GetProperty("position").GetInt32();
-        }
+        Position = jO.GetProperty("pitches")[0].GetProperty("position").GetInt32();
     }
 }

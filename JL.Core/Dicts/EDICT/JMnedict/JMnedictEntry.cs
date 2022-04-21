@@ -1,18 +1,17 @@
-﻿namespace JL.Core.Dicts.EDICT.JMnedict
-{
-    public class JMnedictEntry
-    {
-        public string Id { get; set; }
-        public List<string> KebList { get; set; }
-        public List<string> RebList { get; set; }
-        public List<Trans> TransList { get; set; }
+﻿namespace JL.Core.Dicts.EDICT.JMnedict;
 
-        public JMnedictEntry()
-        {
-            Id = string.Empty;
-            KebList = new List<string>();
-            RebList = new List<string>();
-            TransList = new List<Trans>();
-        }
+public class JMnedictEntry
+{
+    public string Id { get; set; }
+    public List<string> KebList { get; set; }
+    public List<string> RebList { get; set; }
+    public List<Trans> TransList { get; set; }
+
+    public JMnedictEntry()
+    {
+        Id = string.Empty;
+        KebList = new List<string>();
+        RebList = new List<string>();
+        TransList = new List<Trans>();
     }
 }
