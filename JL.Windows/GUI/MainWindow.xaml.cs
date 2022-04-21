@@ -110,7 +110,7 @@ namespace JL.Windows.GUI
                     if (Storage.JapaneseRegex.IsMatch(text))
                     {
                         text = text.Trim();
-                        MainTextBox.Text = text;
+                        MainTextBox!.Text = text;
                         MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
 
                         _backlog.Add(text);
@@ -140,14 +140,14 @@ namespace JL.Windows.GUI
         public void MainTextBox_MouseMove(object? sender, MouseEventArgs? e)
         {
             if (ConfigManager.LookupOnSelectOnly
-                || Background.Opacity == 0
-                || MainTextboxContextMenu.IsVisible
-                || FontSizeSlider.IsVisible
-                || OpacitySlider.IsVisible
+                || Background!.Opacity == 0
+                || MainTextboxContextMenu!.IsVisible
+                || FontSizeSlider!.IsVisible
+                || OpacitySlider!.IsVisible
                 || FirstPopupWindow.MiningMode
                 || (ConfigManager.RequireLookupKeyPress && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))) return;
 
-            FirstPopupWindow.TextBox_MouseMove(MainTextBox);
+            FirstPopupWindow.TextBox_MouseMove(MainTextBox!);
 
             if (ConfigManager.FixedPopupPositioning)
             {
@@ -163,7 +163,7 @@ namespace JL.Windows.GUI
         private void MainWindow_Closed(object sender, EventArgs e)
         {
             SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
-            Application.Current.Shutdown();
+            Application.Current!.Shutdown();
         }
 
         private void MainTextBox_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -171,7 +171,7 @@ namespace JL.Windows.GUI
             if (e.Delta > 0 && !Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
             {
                 string allBacklogText = string.Join("\n", _backlog);
-                if (MainTextBox.Text != allBacklogText)
+                if (MainTextBox!.Text != allBacklogText)
                 {
                     if (MainTextBox.GetFirstVisibleLineIndex() == 0)
                     {
@@ -190,19 +190,19 @@ namespace JL.Windows.GUI
 
             else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Delta > 0)
             {
-                FontSizeSlider.Value += 5;
+                FontSizeSlider!.Value += 5;
             }
 
             else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Delta < 0)
             {
-                FontSizeSlider.Value -= 5;
+                FontSizeSlider!.Value -= 5;
             }
         }
 
         private void MinimizeButton_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            OpacitySlider.Visibility = Visibility.Collapsed;
-            FontSizeSlider.Visibility = Visibility.Collapsed;
+            OpacitySlider!.Visibility = Visibility.Collapsed;
+            FontSizeSlider!.Visibility = Visibility.Collapsed;
             WindowState = WindowState.Minimized;
         }
 
@@ -232,12 +232,12 @@ namespace JL.Windows.GUI
 
         private void OpacityButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            FontSizeSlider.Visibility = Visibility.Collapsed;
+            FontSizeSlider!.Visibility = Visibility.Collapsed;
 
-            if (Background.Opacity == 0)
-                Background.Opacity = OpacitySlider.Value / 100;
+            if (Background!.Opacity == 0)
+                Background.Opacity = OpacitySlider!.Value / 100;
 
-            else if (OpacitySlider.Visibility == Visibility.Collapsed)
+            else if (OpacitySlider!.Visibility == Visibility.Collapsed)
             {
                 OpacitySlider.Visibility = Visibility.Visible;
                 OpacitySlider.Focus();
@@ -249,9 +249,9 @@ namespace JL.Windows.GUI
 
         private void FontSizeButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            OpacitySlider.Visibility = Visibility.Collapsed;
+            OpacitySlider!.Visibility = Visibility.Collapsed;
 
-            if (FontSizeSlider.Visibility == Visibility.Collapsed)
+            if (FontSizeSlider!.Visibility == Visibility.Collapsed)
             {
                 FontSizeSlider.Visibility = Visibility.Visible;
                 FontSizeSlider.Focus();
@@ -268,12 +268,12 @@ namespace JL.Windows.GUI
 
         private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            Background.Opacity = OpacitySlider.Value / 100;
+            Background!.Opacity = OpacitySlider!.Value / 100;
         }
 
         private void FontSizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            MainTextBox.FontSize = FontSizeSlider.Value;
+            MainTextBox!.FontSize = FontSizeSlider!.Value;
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
@@ -285,14 +285,14 @@ namespace JL.Windows.GUI
 
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.MousePassThroughModeKeyGesture))
             {
-                Background.Opacity = 0;
+                Background!.Opacity = 0;
                 Keyboard.ClearFocus();
             }
 
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.InvisibleToggleModeKeyGesture))
             {
                 ConfigManager.InvisibleMode = !ConfigManager.InvisibleMode;
-                MainGrid.Opacity = ConfigManager.InvisibleMode ? 0 : 1;
+                MainGrid!.Opacity = ConfigManager.InvisibleMode ? 0 : 1;
             }
 
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.KanjiModeKeyGesture))
@@ -308,13 +308,13 @@ namespace JL.Windows.GUI
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
             {
                 if (Storage.Ready)
-                    WindowsUtils.ShowAddNameWindow(MainTextBox.SelectedText);
+                    WindowsUtils.ShowAddNameWindow(MainTextBox!.SelectedText);
             }
 
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
             {
                 if (Storage.Ready)
-                    WindowsUtils.ShowAddWordWindow(MainTextBox.SelectedText);
+                    WindowsUtils.ShowAddWordWindow(MainTextBox!.SelectedText);
             }
 
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
@@ -330,7 +330,7 @@ namespace JL.Windows.GUI
 
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))
             {
-                WindowsUtils.SearchWithBrowser(MainTextBox.SelectedText);
+                WindowsUtils.SearchWithBrowser(MainTextBox!.SelectedText);
             }
 
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.InactiveLookupModeKeyGesture))
@@ -346,9 +346,9 @@ namespace JL.Windows.GUI
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ClosePopupKeyGesture))
             {
                 FirstPopupWindow.MiningMode = false;
-                FirstPopupWindow.TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
+                FirstPopupWindow.TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
 
-                FirstPopupWindow.PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                FirstPopupWindow.PopUpScrollViewer!.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                 FirstPopupWindow.Hide();
             }
 
@@ -360,12 +360,12 @@ namespace JL.Windows.GUI
 
         private void AddName(object sender, RoutedEventArgs e)
         {
-            WindowsUtils.ShowAddNameWindow(MainTextBox.SelectedText);
+            WindowsUtils.ShowAddNameWindow(MainTextBox!.SelectedText);
         }
 
         private void AddWord(object sender, RoutedEventArgs e)
         {
-            WindowsUtils.ShowAddWordWindow(MainTextBox.SelectedText);
+            WindowsUtils.ShowAddWordWindow(MainTextBox!.SelectedText);
         }
 
         private void ShowPreferences(object sender, RoutedEventArgs e)
@@ -375,7 +375,7 @@ namespace JL.Windows.GUI
 
         private void SearchWithBrowser(object sender, RoutedEventArgs e)
         {
-            WindowsUtils.SearchWithBrowser(MainTextBox.SelectedText);
+            WindowsUtils.SearchWithBrowser(MainTextBox!.SelectedText);
         }
 
         private void ShowManageDictionariesWindow(object sender, RoutedEventArgs e)
@@ -400,46 +400,46 @@ namespace JL.Windows.GUI
                 if (_currentTextIndex != 0)
                 {
                     _currentTextIndex--;
-                    MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
+                    MainTextBox!.Foreground = ConfigManager.MainWindowBacklogTextColor;
                 }
 
-                MainTextBox.Text = _backlog[_currentTextIndex];
+                MainTextBox!.Text = _backlog[_currentTextIndex];
             }
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.SteppedBacklogForwardsKeyGesture))
             {
                 if (_currentTextIndex < _backlog.Count - 1)
                 {
                     _currentTextIndex++;
-                    MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
+                    MainTextBox!.Foreground = ConfigManager.MainWindowBacklogTextColor;
                 }
 
                 if (_currentTextIndex == _backlog.Count - 1)
                 {
-                    MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+                    MainTextBox!.Foreground = ConfigManager.MainWindowTextColor;
                 }
 
-                MainTextBox.Text = _backlog[_currentTextIndex];
+                MainTextBox!.Text = _backlog[_currentTextIndex];
             }
         }
 
         private void OpacitySlider_LostMouseCapture(object sender, MouseEventArgs e)
         {
-            OpacitySlider.Visibility = Visibility.Collapsed;
+            OpacitySlider!.Visibility = Visibility.Collapsed;
         }
 
         private void OpacitySlider_LostFocus(object sender, RoutedEventArgs e)
         {
-            OpacitySlider.Visibility = Visibility.Collapsed;
+            OpacitySlider!.Visibility = Visibility.Collapsed;
         }
 
         private void FontSizeSlider_LostMouseCapture(object sender, MouseEventArgs e)
         {
-            FontSizeSlider.Visibility = Visibility.Collapsed;
+            FontSizeSlider!.Visibility = Visibility.Collapsed;
         }
 
         private void FontSizeSlider_LostFocus(object sender, RoutedEventArgs e)
         {
-            FontSizeSlider.Visibility = Visibility.Collapsed;
+            FontSizeSlider!.Visibility = Visibility.Collapsed;
         }
 
         private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -450,23 +450,23 @@ namespace JL.Windows.GUI
 
         private void MainTextBox_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            ManageDictionariesButton.IsEnabled = Storage.Ready
+            ManageDictionariesButton!.IsEnabled = Storage.Ready
                                                  && !Storage.UpdatingJMdict
                                                  && !Storage.UpdatingJMnedict
                                                  && !Storage.UpdatingKanjidic;
 
-            AddNameButton.IsEnabled = Storage.Ready;
-            AddWordButton.IsEnabled = Storage.Ready;
+            AddNameButton!.IsEnabled = Storage.Ready;
+            AddWordButton!.IsEnabled = Storage.Ready;
         }
 
         private void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (!ConfigManager.LookupOnSelectOnly
-                || Background.Opacity == 0
+                || Background!.Opacity == 0
                 || ConfigManager.InactiveLookupMode
                 || FirstPopupWindow.MiningMode) return;
 
-            FirstPopupWindow.LookupOnSelect(MainTextBox);
+            FirstPopupWindow.LookupOnSelect(MainTextBox!);
 
             if (ConfigManager.FixedPopupPositioning)
             {
@@ -486,7 +486,7 @@ namespace JL.Windows.GUI
             while (currentPopupWindow != null)
             {
                 currentPopupWindow.MiningMode = false;
-                currentPopupWindow.TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
+                currentPopupWindow.TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
                 currentPopupWindow.Hide();
 
                 currentPopupWindow = currentPopupWindow.ChildPopupWindow;
@@ -510,7 +510,7 @@ namespace JL.Windows.GUI
                     ? Math.Min(ratioX, ratioY) * 0.75
                     : Math.Max(ratioX, ratioY) / 0.75;
 
-                FontSizeSlider.Value = (int)Math.Round(FontSizeSlider.Value / fontScale);
+                FontSizeSlider!.Value = (int)Math.Round(FontSizeSlider.Value / fontScale);
 
                 Left = LeftPositionBeforeResolutionChange / ratioX;
                 LeftPositionBeforeResolutionChange = Left;
@@ -524,8 +524,8 @@ namespace JL.Windows.GUI
                 Height = (int)Math.Round(HeightBeforeResolutionChange / ratioY);
                 HeightBeforeResolutionChange = Height;
 
-                PreferencesWindow.Instance.PopupMaxHeightNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Height;
-                PreferencesWindow.Instance.PopupMaxWidthNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;
+                PreferencesWindow.Instance.PopupMaxHeightNumericUpDown!.Maximum = WindowsUtils.ActiveScreen.Bounds.Height;
+                PreferencesWindow.Instance.PopupMaxWidthNumericUpDown!.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;
                 ConfigManager.PopupMaxHeight = (int)Math.Round(ConfigManager.PopupMaxHeight / ratioY);
                 ConfigManager.PopupMaxWidth = (int)Math.Round(ConfigManager.PopupMaxWidth / ratioX);
 
@@ -565,7 +565,7 @@ namespace JL.Windows.GUI
         {
             if (ConfigManager.LookupOnSelectOnly)
             {
-                double verticalOffset = MainTextBox.VerticalOffset;
+                double verticalOffset = MainTextBox!.VerticalOffset;
                 MainTextBox.Select(0, 0);
                 MainTextBox.ScrollToVerticalOffset(verticalOffset);
             }
@@ -589,13 +589,13 @@ namespace JL.Windows.GUI
                 case "TopRightBorder":
                     Mouse.OverrideCursor = Cursors.SizeNESW;
                     break;
-                case "ButtomBorder":
+                case "BottomBorder":
                     Mouse.OverrideCursor = Cursors.SizeNS;
                     break;
-                case "ButtomLeftBorder":
+                case "BottomLeftBorder":
                     Mouse.OverrideCursor = Cursors.SizeNESW;
                     break;
-                case "ButtomRightBorder":
+                case "BottomRightBorder":
                     Mouse.OverrideCursor = Cursors.SizeNWSE;
                     break;
                 case "TopLeftBorder":
@@ -634,7 +634,7 @@ namespace JL.Windows.GUI
             int y = lParam >> 16;
             Point cursorPoint = PointFromScreen(new Point(x, y));
 
-            HitTestResult hitTestResult = VisualTreeHelper.HitTest(MainGrid, cursorPoint);
+            HitTestResult? hitTestResult = VisualTreeHelper.HitTest(MainGrid!, cursorPoint);
 
             if (hitTestResult != null)
             {

@@ -242,9 +242,8 @@ namespace JL.Core.Deconjugation
 
         public static HashSet<Form> Deconjugate(string myText, bool useCache = true)
         {
-            if (useCache)
-                if (s_cache.TryGet(myText, out HashSet<Form> data))
-                    return data;
+            if (useCache && s_cache.TryGet(myText, out HashSet<Form> data))
+                return data!;
 
             HashSet<Form> processed = new();
             HashSet<Form> novel = new();

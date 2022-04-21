@@ -6,8 +6,8 @@ using JL.Core.Dicts.CustomDict;
 using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Dicts.EDICT.JMnedict;
 using JL.Core.Dicts.EDICT.KANJIDIC;
-using JL.Core.Dicts.EPWING;
 using JL.Core.Dicts.EPWING.EpwingNazeka;
+using JL.Core.Dicts.EPWING.EpwingYomichan;
 using JL.Core.Frequency;
 using JL.Core.PoS;
 using JL.Core.Utilities;
@@ -32,7 +32,7 @@ namespace JL.Core.Lookup
 
             Dictionary<string, IntermediaryResult> jMdictResults = new();
             Dictionary<string, IntermediaryResult> jMnedictResults = new();
-            List<Dictionary<string, IntermediaryResult>> epwingWordResultsList = new();
+            List<Dictionary<string, IntermediaryResult>> epwingYomichanWordResultsList = new();
             List<Dictionary<string, IntermediaryResult>> epwingNazekaWordResultsList = new();
             Dictionary<string, IntermediaryResult> kanjiResult = new();
             Dictionary<string, IntermediaryResult> customWordResults = new();
@@ -66,31 +66,31 @@ namespace JL.Core.Lookup
                             kanjiResult = GetKanjidicResults(text, DictType.Kanjidic);
                             break;
                         case DictType.Kenkyuusha:
-                            epwingWordResultsList.Add(GetWordResults(text, textInHiraganaList,
+                            epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
                                 deconjugationResultsList, dictType));
                             break;
                         case DictType.Daijirin:
-                            epwingWordResultsList.Add(GetWordResults(text, textInHiraganaList,
+                            epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
                                 deconjugationResultsList, dictType));
                             break;
                         case DictType.Daijisen:
-                            epwingWordResultsList.Add(GetWordResults(text, textInHiraganaList,
+                            epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
                                 deconjugationResultsList, dictType));
                             break;
                         case DictType.Koujien:
-                            epwingWordResultsList.Add(GetWordResults(text, textInHiraganaList,
+                            epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
                                 deconjugationResultsList, dictType));
                             break;
                         case DictType.Meikyou:
-                            epwingWordResultsList.Add(GetWordResults(text, textInHiraganaList,
+                            epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
                                 deconjugationResultsList, dictType));
                             break;
                         case DictType.Gakken:
-                            epwingWordResultsList.Add(GetWordResults(text, textInHiraganaList,
+                            epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
                                 deconjugationResultsList, dictType));
                             break;
                         case DictType.Kotowaza:
-                            epwingWordResultsList.Add(GetWordResults(text, textInHiraganaList,
+                            epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
                                 deconjugationResultsList, dictType));
                             break;
                         case DictType.CustomWordDictionary:
@@ -125,11 +125,11 @@ namespace JL.Core.Lookup
             if (jMdictResults.Any())
                 lookupResults.AddRange(JmdictResultBuilder(jMdictResults));
 
-            if (epwingWordResultsList.Any())
+            if (epwingYomichanWordResultsList.Any())
             {
-                for (int i = 0; i < epwingWordResultsList.Count; i++)
+                for (int i = 0; i < epwingYomichanWordResultsList.Count; i++)
                 {
-                    lookupResults.AddRange(EpwingResultBuilder(epwingWordResultsList[i]));
+                    lookupResults.AddRange(EpwingYomichanResultBuilder(epwingYomichanWordResultsList[i]));
                 }
             }
 
@@ -256,7 +256,7 @@ namespace JL.Core.Lookup
                                     int dictResultsCount = dictResults.Count;
                                     for (int i = 0; i < dictResultsCount; i++)
                                     {
-                                        var dictResult = (EpwingResult)dictResults[i];
+                                        var dictResult = (EpwingYomichanResult)dictResults[i];
 
                                         if (deconjugationResult.Tags.Count == 0 ||
                                             (dictResult.WordClasses?.Contains(lastTag) ?? false))
@@ -561,7 +561,7 @@ namespace JL.Core.Lookup
             return results;
         }
 
-        private static IEnumerable<LookupResult> EpwingResultBuilder(
+        private static IEnumerable<LookupResult> EpwingYomichanResultBuilder(
             Dictionary<string, IntermediaryResult> epwingResults)
         {
             List<LookupResult> results = new();
@@ -571,7 +571,7 @@ namespace JL.Core.Lookup
                 int resultListCount = wordResult.ResultsList.Count;
                 for (int i = 0; i < resultListCount; i++)
                 {
-                    var epwingResult = (EpwingResult)wordResult.ResultsList[i];
+                    var epwingResult = (EpwingYomichanResult)wordResult.ResultsList[i];
 
                     LookupResult result = new()
                     {
@@ -656,9 +656,7 @@ namespace JL.Core.Lookup
 
                     result.Readings = customWordDictResult.Readings ?? new();
                     result.AlternativeSpellings = customWordDictResult.AlternativeSpellings ?? new();
-                    result.FormattedDefinitions = customWordDictResult != null
-                        ? BuildCustomWordDefinition(customWordDictResult, wordResult.DictType)
-                        : null;
+                    result.FormattedDefinitions = BuildCustomWordDefinition(customWordDictResult, wordResult.DictType);
 
                     results.Add(result);
                 }
@@ -865,7 +863,7 @@ namespace JL.Core.Lookup
             return frequency;
         }
 
-        private static int GetEpwingFreq(EpwingResult epwingResult)
+        private static int GetEpwingFreq(EpwingYomichanResult epwingYomichanResult)
         {
             int frequency = int.MaxValue;
 
@@ -875,7 +873,7 @@ namespace JL.Core.Lookup
             if (freqDict == null)
                 return frequency;
 
-            if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingResult.PrimarySpelling),
+            if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingYomichanResult.PrimarySpelling),
                     out List<FrequencyEntry>? freqResults))
             {
                 int freqResultsCount = freqResults.Count;
@@ -883,9 +881,9 @@ namespace JL.Core.Lookup
                 {
                     FrequencyEntry freqResult = freqResults[i];
 
-                    if (epwingResult.Reading == freqResult.Spelling
-                        || (string.IsNullOrEmpty(epwingResult.Reading)
-                            && epwingResult.PrimarySpelling == freqResult.Spelling))
+                    if (epwingYomichanResult.Reading == freqResult.Spelling
+                        || (string.IsNullOrEmpty(epwingYomichanResult.Reading)
+                            && epwingYomichanResult.PrimarySpelling == freqResult.Spelling))
                     {
                         if (frequency > freqResult.Frequency)
                         {
@@ -895,8 +893,8 @@ namespace JL.Core.Lookup
                 }
             }
 
-            else if (!string.IsNullOrEmpty(epwingResult.Reading)
-                     && freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingResult.Reading),
+            else if (!string.IsNullOrEmpty(epwingYomichanResult.Reading)
+                     && freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingYomichanResult.Reading),
                          out List<FrequencyEntry>? readingFreqResults))
             {
                 int readingFreqResultsCount = readingFreqResults.Count;
@@ -904,7 +902,7 @@ namespace JL.Core.Lookup
                 {
                     FrequencyEntry readingFreqResult = readingFreqResults[i];
 
-                    if (epwingResult.Reading == readingFreqResult.Spelling && Kana.IsKatakana(epwingResult.Reading))
+                    if (epwingYomichanResult.Reading == readingFreqResult.Spelling && Kana.IsKatakana(epwingYomichanResult.Reading))
                     {
                         if (frequency > readingFreqResult.Frequency)
                         {
@@ -1124,7 +1122,7 @@ namespace JL.Core.Lookup
             return defResult.ToString();
         }
 
-        private static string? BuildEpwingDefinition(List<string> epwingDefinitions, DictType dictType)
+        private static string? BuildEpwingDefinition(List<string>? epwingDefinitions, DictType dictType)
         {
             if (epwingDefinitions == null)
                 return null;

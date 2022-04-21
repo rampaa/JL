@@ -29,7 +29,7 @@ namespace JL.Core
 
             { "ぁ", "ァ" }, { "ぃ", "ィ" }, { "ぅ", "ゥ" }, { "ぇ", "ェ" }, { "ぉ", "ォ" },
             { "ゃ", "ャ" }, { "ゅ", "ュ" }, { "ょ", "ョ" },
-            
+
             { "ゎ", "ヮ" },
 
             { "ゕ", "ヵ" }, { "ゖ", "ヶ" }, { "ゔ", "ヴ" },
@@ -79,7 +79,7 @@ namespace JL.Core
             { "マ", "ア" }, { "ラ", "ア" }, { "ガ", "ア" }, { "ザ", "ア" }, { "ダ", "ア" }, { "バ", "ア" },
             { "パ", "ア" }, { "ワ", "ア" }, { "ヤ", "ア" }, { "ァ", "ア" }, { "ャ", "ア" }, { "ヵ", "ア" },
             { "ヮ", "ア" },
-            
+
             { "イ", "イ" }, { "キ", "イ" }, { "シ", "イ" }, { "チ", "イ" }, { "ニ", "イ" }, { "ヰ", "イ" },
             { "ヒ", "イ" }, { "ミ", "イ" }, { "リ", "イ" }, { "ギ", "イ" }, { "ジ", "イ" }, { "ヂ", "イ" },
             { "ビ", "イ" }, { "ピ", "イ" }, { "ィ", "イ" }, { "ヸ", "イ" },
@@ -197,17 +197,9 @@ namespace JL.Core
         {
             StringBuilder textInHiragana = new();
 
-            List<string> unicodeCharacters;
-
-            if (!char.IsHighSurrogate(text.Last()))
-            {
-                unicodeCharacters = text.Normalize(NormalizationForm.FormKC).UnicodeIterator().ToList();
-            }
-
-            else
-            {
-                unicodeCharacters = text.UnicodeIterator().ToList();
-            }
+            List<string> unicodeCharacters = !char.IsHighSurrogate(text.Last())
+                ? text.Normalize(NormalizationForm.FormKC).UnicodeIterator().ToList()
+                : text.UnicodeIterator().ToList();
 
             int listLength = unicodeCharacters.Count;
             for (int i = 0; i < listLength; i++)
@@ -235,10 +227,9 @@ namespace JL.Core
             StringBuilder textInKatakana = new();
             foreach (string str in text.UnicodeIterator().ToList())
             {
-                if (s_hiraganaToKatakanaDict.TryGetValue(str, out string? hiraganaStr))
-                    textInKatakana.Append(hiraganaStr);
-                else
-                    textInKatakana.Append(str);
+                textInKatakana.Append(s_hiraganaToKatakanaDict.TryGetValue(str, out string? hiraganaStr)
+                    ? hiraganaStr
+                    : str);
             }
 
             return textInKatakana.ToString();

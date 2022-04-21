@@ -2,97 +2,96 @@
 using System.Text.Json.Serialization;
 using JL.Core.Utilities;
 
-namespace JL.Core.Anki
+namespace JL.Core.Anki;
+
+public class AnkiConfig
 {
-    public class AnkiConfig
+    [JsonPropertyName("deckName")] public string DeckName { get; set; }
+
+    [JsonPropertyName("modelName")] public string ModelName { get; set; }
+
+    [JsonPropertyName("fields")] public Dictionary<string, JLField> Fields { get; set; }
+
+    [JsonPropertyName("tags")] public string[] Tags { get; set; }
+
+    public AnkiConfig(string deckName, string modelName, Dictionary<string, JLField> fields, string[] tags)
     {
-        [JsonPropertyName("deckName")] public string DeckName { get; set; }
+        DeckName = deckName;
+        ModelName = modelName;
+        Fields = fields;
+        Tags = tags;
+    }
 
-        [JsonPropertyName("modelName")] public string ModelName { get; set; }
+    public static async Task CreateDefaultAnkiConfig()
+    {
+        await WriteAnkiConfig(new AnkiConfig(
+                "JLDeck",
+                "Japanese JL-Basic",
+                new Dictionary<string, JLField>
+                {
+                    { "Edict ID", JLField.EdictId },
+                    { "Expression", JLField.FoundSpelling },
+                    { "Reading", JLField.Readings },
+                    { "Gloss", JLField.Definitions },
+                    { "Sentence", JLField.Context },
+                    { "Audio", JLField.Audio },
+                    { "Time", JLField.TimeLocal },
+                },
+                new[] { "JL" }
+            )
+        ).ConfigureAwait(false);
+    }
 
-        [JsonPropertyName("fields")] public Dictionary<string, JLField> Fields { get; set; }
-
-        [JsonPropertyName("tags")] public string[] Tags { get; set; }
-
-        public AnkiConfig(string deckName, string modelName, Dictionary<string, JLField> fields, string[] tags)
+    public static async Task<bool> WriteAnkiConfig(AnkiConfig ankiConfig)
+    {
+        try
         {
-            DeckName = deckName;
-            ModelName = modelName;
-            Fields = fields;
-            Tags = tags;
-        }
-
-        public static async Task CreateDefaultAnkiConfig()
-        {
-            await WriteAnkiConfig(new AnkiConfig(
-                    "JLDeck",
-                    "Japanese JL-Basic",
-                    new Dictionary<string, JLField>
+            Directory.CreateDirectory(Storage.ConfigPath);
+            await File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "AnkiConfig.json"),
+                JsonSerializer.Serialize(ankiConfig,
+                    new JsonSerializerOptions
                     {
-                        { "Edict ID", JLField.EdictId },
-                        { "Expression", JLField.FoundSpelling },
-                        { "Reading", JLField.Readings },
-                        { "Gloss", JLField.Definitions },
-                        { "Sentence", JLField.Context },
-                        { "Audio", JLField.Audio },
-                        { "Time", JLField.TimeLocal },
-                    },
-                    new[] { "JL" }
-                )
+                        // Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                        WriteIndented = true,
+                        Converters = { new JsonStringEnumConverter() }
+                    })
             ).ConfigureAwait(false);
-        }
 
-        public static async Task<bool> WriteAnkiConfig(AnkiConfig ankiConfig)
+            return true;
+        }
+        catch (Exception e)
+        {
+            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't write AnkiConfig");
+            Utils.Logger.Error(e, "Couldn't write AnkiConfig");
+            return false;
+        }
+    }
+
+    public static async Task<AnkiConfig?> ReadAnkiConfig()
+    {
+        if (File.Exists(Path.Join(Storage.ConfigPath, "AnkiConfig.json")))
         {
             try
             {
-                Directory.CreateDirectory(Storage.ConfigPath);
-                await File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "AnkiConfig.json"),
-                    JsonSerializer.Serialize(ankiConfig,
-                        new JsonSerializerOptions
-                        {
-                            // Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                            WriteIndented = true,
-                            Converters = { new JsonStringEnumConverter() }
-                        })
-                ).ConfigureAwait(false);
-
-                return true;
+                return JsonSerializer.Deserialize<AnkiConfig>(
+                    await File.ReadAllTextAsync(Path.Join(Storage.ConfigPath, "AnkiConfig.json"))
+                        .ConfigureAwait(false),
+                    new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } });
             }
-            catch (Exception e)
+
+            catch
             {
-                Storage.Frontend.Alert(AlertLevel.Error, "Couldn't write AnkiConfig");
-                Utils.Logger.Error(e, "Couldn't write AnkiConfig");
-                return false;
+                Storage.Frontend.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
+                Utils.Logger.Error("Couldn't read AnkiConfig");
+                return null;
             }
         }
 
-        public static async Task<AnkiConfig?> ReadAnkiConfig()
+        else
         {
-            if (File.Exists(Path.Join(Storage.ConfigPath, "AnkiConfig.json")))
-            {
-                try
-                {
-                    return JsonSerializer.Deserialize<AnkiConfig>(
-                        await File.ReadAllTextAsync(Path.Join(Storage.ConfigPath, "AnkiConfig.json"))
-                            .ConfigureAwait(false),
-                        new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } });
-                }
-
-                catch
-                {
-                    Storage.Frontend.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
-                    Utils.Logger.Error("Couldn't read AnkiConfig");
-                    return null;
-                }
-            }
-
-            else
-            {
-                // Storage.FrontEnd.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
-                Utils.Logger.Error("AnkiConfig.json doesn't exist");
-                return null;
-            }
+            // Storage.FrontEnd.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
+            Utils.Logger.Error("AnkiConfig.json doesn't exist");
+            return null;
         }
     }
 }

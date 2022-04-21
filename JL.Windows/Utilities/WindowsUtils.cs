@@ -108,7 +108,7 @@ public static class WindowsUtils
                 Foreground = Brushes.White
             };
 
-            if (fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("ja-jp")))
+            if (fontFamily.FamilyNames!.ContainsKey(XmlLanguage.GetLanguage("ja-jp")))
             {
                 japaneseFonts.Add(comboBoxItem);
             }
@@ -121,7 +121,7 @@ public static class WindowsUtils
                 {
                     if (typeFace.TryGetGlyphTypeface(out GlyphTypeface glyphTypeFace))
                     {
-                        if (glyphTypeFace.CharacterToGlyphMap.ContainsKey(20685))
+                        if (glyphTypeFace!.CharacterToGlyphMap!.ContainsKey(20685))
                         {
                             japaneseFonts.Add(comboBoxItem);
                             foundGlyph = true;
@@ -157,7 +157,7 @@ public static class WindowsUtils
     public static void ShowAddWordWindow(string? selectedText)
     {
         AddWordWindow addWordWindowInstance = AddWordWindow.Instance;
-        addWordWindowInstance.SpellingsTextBox.Text = selectedText;
+        addWordWindowInstance.SpellingsTextBox!.Text = selectedText;
         addWordWindowInstance.Owner = MainWindow.Instance;
         addWordWindowInstance.ShowDialog();
     }
@@ -224,7 +224,7 @@ public static class WindowsUtils
             Directory.CreateDirectory(tmpDirectory);
             archive.ExtractToDirectory(tmpDirectory);
 
-            await MainWindow.Instance.Dispatcher.BeginInvoke(ConfigManager.SaveBeforeClosing);
+            await MainWindow.Instance.Dispatcher!.BeginInvoke(ConfigManager.SaveBeforeClosing);
 
             Process.Start(
                 new ProcessStartInfo("cmd",
@@ -246,7 +246,7 @@ public static class WindowsUtils
 
         if (ConfigManager.CheckForJLUpdatesOnStartUp)
         {
-            PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = false;
+            PreferencesWindow.Instance.CheckForJLUpdatesButton!.IsEnabled = false;
             await Networking.CheckForJLUpdates(true);
             PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = true;
         }
@@ -256,7 +256,7 @@ public static class WindowsUtils
     {
         try
         {
-            Application.Current.Dispatcher.BeginInvoke(() =>
+            Application.Current!.Dispatcher!.BeginInvoke(() =>
             {
                 if (s_audioPlayer != null)
                 {
@@ -338,10 +338,9 @@ public static class WindowsUtils
         Configuration config =
             ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
-        if (rawKeyGesture.StartsWith("Win+"))
-            config.AppSettings.Settings[key].Value = rawKeyGesture[4..];
-        else
-            config.AppSettings.Settings[key].Value = rawKeyGesture;
+        config.AppSettings.Settings[key].Value = rawKeyGesture.StartsWith("Win+")
+            ? rawKeyGesture[4..]
+            : rawKeyGesture;
 
         config.Save(ConfigurationSaveMode.Modified);
         ConfigurationManager.RefreshSection("appSettings");
@@ -351,7 +350,7 @@ public static class WindowsUtils
     {
         if (Application.Current != null)
         {
-            Application.Current.Dispatcher.Invoke((Action)async delegate
+            Application.Current.Dispatcher!.Invoke((Action)async delegate
             {
                 List<AlertWindow> alertWindowList = Application.Current.Windows.OfType<AlertWindow>().ToList();
 
@@ -375,7 +374,7 @@ public static class WindowsUtils
             text,
             System.Globalization.CultureInfo.CurrentCulture,
             System.Windows.FlowDirection.LeftToRight,
-            new Typeface(ConfigManager.PopupFont.Source),
+            new Typeface(ConfigManager.PopupFont.Source!),
             fontSize,
             Brushes.Transparent,
             new NumberSubstitution(),

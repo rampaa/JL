@@ -11,11 +11,11 @@ namespace JL.Core.Utilities
 {
     public static class Utils
     {
-        public static readonly Logger Logger = new LoggerConfiguration().WriteTo.File("Logs/log.txt",
+        public static readonly Logger Logger = new LoggerConfiguration().WriteTo!.File("Logs/log.txt",
                 rollingInterval: RollingInterval.Day,
                 retainedFileTimeLimit: TimeSpan.FromDays(90),
                 shared: true)
-            .CreateLogger();
+            .CreateLogger()!;
 
         public static void CreateDefaultDictsConfig()
         {
@@ -59,7 +59,7 @@ namespace JL.Core.Utilities
             }
         }
 
-        public static async Task DeserializeDicts()
+        private static async Task DeserializeDicts()
         {
             try
             {
@@ -157,17 +157,9 @@ namespace JL.Core.Utilities
             if (endPosition == -1)
                 endPosition = text.Length - 1;
 
-            string sentence;
-
-            if (startPosition < endPosition)
-            {
-                sentence = text[startPosition..(endPosition + 1)].Trim('\n', '\t', '\r', ' ', '　');
-            }
-
-            else
-            {
-                sentence = "";
-            }
+            string sentence = startPosition < endPosition
+                ? text[startPosition..(endPosition + 1)].Trim('\n', '\t', '\r', ' ', '　')
+                : "";
 
             if (sentence.Length > 1)
             {

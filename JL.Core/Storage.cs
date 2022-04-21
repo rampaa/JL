@@ -8,8 +8,8 @@ using JL.Core.Dicts.EDICT;
 using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Dicts.EDICT.JMnedict;
 using JL.Core.Dicts.EDICT.KANJIDIC;
-using JL.Core.Dicts.EPWING;
 using JL.Core.Dicts.EPWING.EpwingNazeka;
+using JL.Core.Dicts.EPWING.EpwingYomichan;
 using JL.Core.Dicts.Kanjium;
 using JL.Core.Dicts.Options;
 using JL.Core.Frequency;
@@ -30,6 +30,7 @@ namespace JL.Core
         public static readonly string RepoUrl = "https://github.com/rampaa/JL/";
         public static readonly Uri JmdictUrl = new("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz");
         public static readonly Uri JmnedictUrl = new("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
+        public static readonly Uri KanjidicUrl = new("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
         public static bool Ready { get; set; } = false;
         public static bool UpdatingJMdict { get; set; } = false;
         public static bool UpdatingJMnedict { get; set; } = false;
@@ -186,7 +187,7 @@ namespace JL.Core
                         if (dict.Active && !Dicts[DictType.Kenkyuusha].Contents.Any())
                         {
                             tasks.Add(Task.Run(async () =>
-                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                                await EpwingYomichanLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
                         }
 
                         else if (!dict.Active && Dicts[DictType.Kenkyuusha].Contents.Any())
@@ -200,7 +201,7 @@ namespace JL.Core
                         if (dict.Active && !Dicts[DictType.Daijirin].Contents.Any())
                         {
                             tasks.Add(Task.Run(async () =>
-                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                                await EpwingYomichanLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
                         }
 
                         else if (!dict.Active && Dicts[DictType.Daijirin].Contents.Any())
@@ -214,7 +215,7 @@ namespace JL.Core
                         if (dict.Active && !Dicts[DictType.Daijisen].Contents.Any())
                         {
                             tasks.Add(Task.Run(async () =>
-                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                                await EpwingYomichanLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
                         }
 
                         else if (!dict.Active && Dicts[DictType.Daijisen].Contents.Any())
@@ -228,7 +229,7 @@ namespace JL.Core
                         if (dict.Active && !Dicts[DictType.Koujien].Contents.Any())
                         {
                             tasks.Add(Task.Run(async () =>
-                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                                await EpwingYomichanLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
                         }
 
                         else if (!dict.Active && Dicts[DictType.Koujien].Contents.Any())
@@ -242,7 +243,7 @@ namespace JL.Core
                         if (dict.Active && !Dicts[DictType.Meikyou].Contents.Any())
                         {
                             tasks.Add(Task.Run(async () =>
-                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                                await EpwingYomichanLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
                         }
 
                         else if (!dict.Active && Dicts[DictType.Meikyou].Contents.Any())
@@ -257,7 +258,7 @@ namespace JL.Core
                         if (dict.Active && !Dicts[DictType.Gakken].Contents.Any())
                         {
                             tasks.Add(Task.Run(async () =>
-                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                                await EpwingYomichanLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
                         }
 
                         else if (!dict.Active && Dicts[DictType.Gakken].Contents.Any())
@@ -272,7 +273,7 @@ namespace JL.Core
                         if (dict.Active && !Dicts[DictType.Kotowaza].Contents.Any())
                         {
                             tasks.Add(Task.Run(async () =>
-                                await EpwingJsonLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                                await EpwingYomichanLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
                         }
 
                         else if (!dict.Active && Dicts[DictType.Kotowaza].Contents.Any())

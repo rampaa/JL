@@ -2,7 +2,7 @@
 
 namespace JL.Core.Dicts.EPWING.EpwingYomichan
 {
-    public class EpwingResult : IResult
+    public class EpwingYomichanResult : IResult
     {
         public List<string>? Definitions { get; }
         public string? Reading { get; }
@@ -14,7 +14,7 @@ namespace JL.Core.Dicts.EPWING.EpwingYomichan
         //public int Sequence { get; init; }
         //public string TermTags { get; init; }
 
-        public EpwingResult(List<JsonElement> jsonElement)
+        public EpwingYomichanResult(List<JsonElement> jsonElement)
         {
             PrimarySpelling = jsonElement[0].ToString();
             Reading = jsonElement[1].ToString();
@@ -44,7 +44,7 @@ namespace JL.Core.Dicts.EPWING.EpwingYomichan
             //TermTags = jsonElement[7].ToString();
         }
 
-        public EpwingResult(string primarySpelling, string reading, List<string> definitions, List<string> wordClasses)
+        public EpwingYomichanResult(string primarySpelling, string reading, List<string> definitions, List<string> wordClasses)
         {
             Definitions = definitions;
             Reading = reading;

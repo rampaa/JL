@@ -217,7 +217,7 @@ namespace JL.Windows.GUI
                 dockPanel.Children.Add(buttonRemove);
             }
 
-            DictionariesDisplay.ItemsSource = resultDockPanels.OrderBy(dockPanel =>
+            DictionariesDisplay!.ItemsSource = resultDockPanels.OrderBy(dockPanel =>
                     dockPanel.Children
                         .OfType<TextBlock>()
                         .Where(textBlock => textBlock.Name == "priority")
@@ -269,7 +269,7 @@ namespace JL.Windows.GUI
             Storage.UpdatingJMdict = true;
 
             bool isDownloaded = await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMdict].Path,
-                    new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
+                    Storage.JmdictUrl,
                     DictType.JMdict.ToString(), true, false)
                 .ConfigureAwait(false);
 
@@ -301,7 +301,7 @@ namespace JL.Windows.GUI
             Storage.UpdatingJMnedict = true;
 
             bool isDownloaded = await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMnedict].Path,
-                    new Uri("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz"),
+                    Storage.JmnedictUrl,
                     DictType.JMnedict.ToString(), true, false)
                 .ConfigureAwait(false);
 
@@ -327,7 +327,7 @@ namespace JL.Windows.GUI
             Storage.UpdatingKanjidic = true;
 
             bool isDownloaded = await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.Kanjidic].Path,
-                    new Uri("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz"),
+                    Storage.KanjidicUrl,
                     DictType.Kanjidic.ToString(), true, false)
                 .ConfigureAwait(false);
 

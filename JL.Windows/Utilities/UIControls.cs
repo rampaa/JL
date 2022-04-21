@@ -7,7 +7,7 @@ namespace JL.Windows.Utilities
     public static class UiControls
     {
         public static readonly List<ComboBoxItem> JapaneseFonts =
-            WindowsUtils.FindJapaneseFonts().OrderByDescending(f => f.Foreground.ToString()).ThenBy(font => font.Content)
+            WindowsUtils.FindJapaneseFonts().OrderByDescending(f => f.Foreground!.ToString()).ThenBy(font => font.Content)
                 .ToList();
 
         public static readonly List<ComboBoxItem> PopupJapaneseFonts =

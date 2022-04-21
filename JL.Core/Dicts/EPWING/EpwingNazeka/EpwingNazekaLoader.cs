@@ -23,9 +23,14 @@ namespace JL.Core.Dicts.EPWING.EpwingNazeka
                         .Split("\",", StringSplitOptions.RemoveEmptyEntries)
                         .Select(select => select.Trim('\n', ' ', '"')).ToList();
 
-                    List<string> definitions = jsonObj.GetProperty("l").ToString().TrimStart('[').TrimEnd(']')
+                    List<string>? definitions = jsonObj.GetProperty("l").ToString().TrimStart('[').TrimEnd(']')
                         .Split("\",", StringSplitOptions.RemoveEmptyEntries)
                         .Select(select => select.Trim('\n', ' ', '"')).ToList();
+
+                    if (!definitions.Any())
+                    {
+                        definitions = null;
+                    }
 
                     if (spellings.Count == 1 && spellings[0] == "")
                     {

@@ -26,7 +26,7 @@ namespace JL.Core.Tests
             if (!File.Exists(jmdictPath))
             {
                 ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMdict].Path,
-                    new Uri("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz"),
+                    Storage.JmdictUrl,
                     DictType.JMdict.ToString(), false, true).Wait();
             }
 

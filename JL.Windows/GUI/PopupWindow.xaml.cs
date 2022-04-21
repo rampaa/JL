@@ -91,14 +91,14 @@ namespace JL.Windows.GUI
             }
 
 
-            WindowsUtils.SetInputGestureText(AddNameButton, ConfigManager.ShowAddNameWindowKeyGesture);
-            WindowsUtils.SetInputGestureText(AddWordButton, ConfigManager.ShowAddWordWindowKeyGesture);
-            WindowsUtils.SetInputGestureText(SearchButton, ConfigManager.SearchWithBrowserKeyGesture);
-            WindowsUtils.SetInputGestureText(ManageDictionariesButton,
+            WindowsUtils.SetInputGestureText(AddNameButton!, ConfigManager.ShowAddNameWindowKeyGesture);
+            WindowsUtils.SetInputGestureText(AddWordButton!, ConfigManager.ShowAddWordWindowKeyGesture);
+            WindowsUtils.SetInputGestureText(SearchButton!, ConfigManager.SearchWithBrowserKeyGesture);
+            WindowsUtils.SetInputGestureText(ManageDictionariesButton!,
                 ConfigManager.ShowManageDictionariesWindowKeyGesture);
-            WindowsUtils.SetInputGestureText(StatsButton, ConfigManager.ShowStatsKeyGesture);
+            WindowsUtils.SetInputGestureText(StatsButton!, ConfigManager.ShowStatsKeyGesture);
 
-            TextBlockMiningModeReminder.Text =
+            TextBlockMiningModeReminder!.Text =
                 $"Click on an entry's main spelling to mine it," + Environment.NewLine +
                 $"or press {ConfigManager.ClosePopupKeyGesture.Key} or click on the main window to exit.";
         }
@@ -219,7 +219,7 @@ namespace JL.Windows.GUI
 
             _lastTextBox = tb;
 
-            PopUpScrollViewer.ScrollToTop();
+            PopUpScrollViewer!.ScrollToTop();
 
             List<LookupResult>? lookupResults = Lookup.LookupText(tb.SelectedText);
 
@@ -888,7 +888,7 @@ namespace JL.Windows.GUI
 
                             if (chosenKanjiumResult.Position - 1 == j)
                             {
-                                polyline.Points.Add(new Point(horizontalOffsetForChar, 0));
+                                polyline.Points!.Add(new Point(horizontalOffsetForChar, 0));
                                 polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
                                 polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width,
                                     charSize.Height));
@@ -898,7 +898,7 @@ namespace JL.Windows.GUI
 
                             else if (j == 0)
                             {
-                                polyline.Points.Add(new Point(horizontalOffsetForChar, charSize.Height));
+                                polyline.Points!.Add(new Point(horizontalOffsetForChar, charSize.Height));
                                 polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width,
                                     charSize.Height));
                                 polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
@@ -907,7 +907,7 @@ namespace JL.Windows.GUI
                             else
                             {
                                 double charHeight = lowPitch ? charSize.Height : 0;
-                                polyline.Points.Add(new Point(horizontalOffsetForChar, charHeight));
+                                polyline.Points!.Add(new Point(horizontalOffsetForChar, charHeight));
                                 polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width,
                                     charHeight));
                             }
@@ -938,13 +938,13 @@ namespace JL.Windows.GUI
 
         private void TextBoxPreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            ManageDictionariesButton.IsEnabled = Storage.Ready
+            ManageDictionariesButton!.IsEnabled = Storage.Ready
                                                  && !Storage.UpdatingJMdict
                                                  && !Storage.UpdatingJMnedict
                                                  && !Storage.UpdatingKanjidic;
 
-            AddNameButton.IsEnabled = Storage.Ready;
-            AddWordButton.IsEnabled = Storage.Ready;
+            AddNameButton!.IsEnabled = Storage.Ready;
+            AddWordButton!.IsEnabled = Storage.Ready;
 
             _lastSelectedText = ((TextBox)sender).SelectedText;
         }
@@ -999,7 +999,7 @@ namespace JL.Windows.GUI
                 return;
 
             MiningMode = false;
-            TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
+            TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
             Hide();
 
             var miningParams = new Dictionary<JLField, string>();
@@ -1071,7 +1071,7 @@ namespace JL.Windows.GUI
                                     switch (textBlockCg.Name)
                                     {
                                         case nameof(LookupResult.FoundSpelling):
-                                            miningParams[JLField.FoundSpelling] = textBlockCg.Text;
+                                            miningParams[JLField.FoundSpelling] = textBlockCg.Text!;
                                             break;
                                     }
                                 }
@@ -1155,12 +1155,12 @@ namespace JL.Windows.GUI
         {
             e.Handled = true;
 
-            MouseWheelEventArgs e2 = new(e.MouseDevice, e.Timestamp, e.Delta)
+            MouseWheelEventArgs e2 = new(e.MouseDevice!, e.Timestamp, e.Delta)
             {
                 RoutedEvent = MouseWheelEvent,
                 Source = e.Source
             };
-            PopupListBox.RaiseEvent(e2);
+            PopupListBox!.RaiseEvent(e2);
         }
 
         private async void Window_KeyDown(object sender, KeyEventArgs e)
@@ -1179,9 +1179,9 @@ namespace JL.Windows.GUI
             if (WindowsUtils.KeyGestureComparer(e, ConfigManager.MiningModeKeyGesture))
             {
                 MiningMode = true;
-                TextBlockMiningModeReminder.Visibility = Visibility.Visible;
+                TextBlockMiningModeReminder!.Visibility = Visibility.Visible;
 
-                PopUpScrollViewer.ScrollToTop();
+                PopUpScrollViewer!.ScrollToTop();
                 PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
 
                 Activate();
@@ -1269,14 +1269,14 @@ namespace JL.Windows.GUI
             else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ClosePopupKeyGesture))
             {
                 MiningMode = false;
-                TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
+                TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
 
-                PopUpScrollViewer.ScrollToTop();
+                PopUpScrollViewer!.ScrollToTop();
                 PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
 
                 if (ConfigManager.LookupOnSelectOnly && _parentPopupWindow == null)
                 {
-                    Unselect(MainWindow.Instance.MainTextBox);
+                    Unselect(MainWindow.Instance.MainTextBox!);
                 }
 
                 else if (ConfigManager.LookupOnSelectOnly && _lastTextBox != null)
@@ -1360,7 +1360,7 @@ namespace JL.Windows.GUI
         private void UiElement_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (!ConfigManager.LookupOnSelectOnly
-                || Background.Opacity == 0
+                || Background!.Opacity == 0
                 || ConfigManager.InactiveLookupMode
                 || (ConfigManager.FixedPopupPositioning && _parentPopupWindow != null))
                 return;
@@ -1400,7 +1400,7 @@ namespace JL.Windows.GUI
 
             if (ConfigManager.HighlightLongestMatch)
             {
-                Unselect(MainWindow.Instance.MainTextBox);
+                Unselect(MainWindow.Instance.MainTextBox!);
             }
         }
 

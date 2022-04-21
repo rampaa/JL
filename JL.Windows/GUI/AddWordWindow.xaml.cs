@@ -41,7 +41,7 @@ namespace JL.Windows.GUI
         {
             bool isValid = true;
 
-            if (!Storage.JapaneseRegex.IsMatch(SpellingsTextBox.Text))
+            if (!Storage.JapaneseRegex.IsMatch(SpellingsTextBox!.Text))
             {
                 SpellingsTextBox.BorderBrush = Brushes.Red;
                 isValid = false;
@@ -51,7 +51,7 @@ namespace JL.Windows.GUI
                 SpellingsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
             }
 
-            if (ReadingsTextBox.Text == "")
+            if (ReadingsTextBox!.Text == "")
             {
                 ReadingsTextBox.BorderBrush = Brushes.Red;
                 isValid = false;
@@ -61,7 +61,7 @@ namespace JL.Windows.GUI
                 ReadingsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
             }
 
-            if (DefinitionsTextBox.Text == "")
+            if (DefinitionsTextBox!.Text == "")
             {
                 DefinitionsTextBox.BorderBrush = Brushes.Red;
                 isValid = false;
@@ -76,7 +76,7 @@ namespace JL.Windows.GUI
                 string rawSpellings = SpellingsTextBox.Text;
                 string rawReadings = ReadingsTextBox.Text;
                 string rawDefinitions = DefinitionsTextBox.Text;
-                string rawWordClass = WordClassStackPanel.Children.OfType<RadioButton>()
+                string rawWordClass = WordClassStackPanel!.Children.OfType<RadioButton>()
                     .FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
 
                 string[] spellings = rawSpellings.Split(';').Select(s => s.Trim()).ToArray();
@@ -110,7 +110,7 @@ namespace JL.Windows.GUI
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            OtherRadioButton.IsChecked = true;
+            OtherRadioButton!.IsChecked = true;
         }
     }
 }

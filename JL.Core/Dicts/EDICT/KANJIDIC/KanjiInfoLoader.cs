@@ -29,10 +29,9 @@ namespace JL.Core.Dicts.EDICT.KANJIDIC
                         if (lParts.Length == 3)
                         {
                             int endIndex = lParts[2].IndexOf("[", StringComparison.Ordinal);
-                            if (endIndex == -1)
-                                kanjiCompositionDictionary.Add(lParts[1], lParts[2]);
-                            else
-                                kanjiCompositionDictionary.Add(lParts[1], lParts[2][..endIndex]);
+
+                            kanjiCompositionDictionary.Add(lParts[1],
+                                endIndex == -1 ? lParts[2] : lParts[2][..endIndex]);
                         }
 
                         else if (lParts.Length > 3)
@@ -67,7 +66,7 @@ namespace JL.Core.Dicts.EDICT.KANJIDIC
                          ""))
             {
                 await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.Kanjidic].Path,
-                    new Uri("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz"),
+                    Storage.KanjidicUrl,
                     DictType.Kanjidic.ToString(), false, false).ConfigureAwait(false);
                 await Load(Storage.Dicts[DictType.Kanjidic].Path).ConfigureAwait(false);
             }
