@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace JL.Core.Dicts.EPWING
+namespace JL.Core.Dicts.EPWING.EpwingYomichan
 {
     public class EpwingResult : IResult
     {
