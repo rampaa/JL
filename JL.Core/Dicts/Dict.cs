@@ -14,6 +14,7 @@ public class Dict
     public int Priority { get; set; }
 
     [JsonIgnore] public Dictionary<string, List<IResult>> Contents { get; set; } = new();
+
     public DictOptions? Options { get; set; } // can be null for dicts.json files generated before version 1.10
 
     public Dict(DictType type, string path, bool active, int priority, DictOptions options)

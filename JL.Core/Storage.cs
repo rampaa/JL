@@ -48,28 +48,28 @@ public static class Storage
                 new Dict(DictType.CustomWordDictionary,
                     $"{ResourcesPath}\\custom_words.txt",
                     true, 0,
-                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null))
+                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null, null))
             },
             {
                 "CustomNameDictionary",
                 new Dict(DictType.CustomNameDictionary,
                     $"{ResourcesPath}\\custom_names.txt", true, 1,
-                    new DictOptions(null, null))
+                    new DictOptions(null, null, null))
             },
             {
                 "JMdict",
                 new Dict(DictType.JMdict, $"{ResourcesPath}\\JMdict.xml", true, 2,
-                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null))
+                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null, null))
             },
             {
                 "JMnedict",
                 new Dict(DictType.JMnedict, $"{ResourcesPath}\\JMnedict.xml", true, 3,
-                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null))
+                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null, null))
             },
             {
                 "Kanjidic",
                 new Dict(DictType.Kanjidic, $"{ResourcesPath}\\kanjidic2.xml", true, 4,
-                    new DictOptions(null, null))
+                    new DictOptions(null, null, new RequireKanjiModeOption { Value = false }))
             }
         };
 

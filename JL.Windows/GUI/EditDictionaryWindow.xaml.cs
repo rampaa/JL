@@ -69,10 +69,17 @@ public partial class EditDictionaryWindow : Window
                     examplesOption = new ExamplesOption { Value = eov };
             }
 
+            RequireKanjiModeOption? kanjiOption = null;
+            if (RequireKanjiModeOption.ValidDictTypes.Contains(type))
+            {
+                kanjiOption = new RequireKanjiModeOption { Value = CheckBoxKanji.IsChecked!.Value };
+            }
+
             var options =
                 new DictOptions(
                     newlineOption,
-                    examplesOption);
+                    examplesOption,
+                    kanjiOption);
 
             Storage.Dicts[type].Options = options;
 
@@ -129,8 +136,15 @@ public partial class EditDictionaryWindow : Window
             DockPanelExamples.Visibility = Visibility.Visible;
         }
 
+        if (RequireKanjiModeOption.ValidDictTypes.Contains(dict.Type))
+        {
+            CheckBoxKanji.IsChecked = dict.Options?.RequireKanjiMode?.Value ?? false;
+            DockPanelKanji.Visibility = Visibility.Visible;
+        }
+
         if (DockPanelNewline.Visibility == Visibility.Visible ||
-            DockPanelExamples.Visibility == Visibility.Visible)
+            DockPanelExamples.Visibility == Visibility.Visible ||
+            DockPanelKanji.Visibility == Visibility.Visible)
         {
             StackPanelOptions.Visibility = Visibility.Visible;
         }

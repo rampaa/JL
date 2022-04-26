@@ -73,10 +73,13 @@ public partial class AddDictionaryWindow : Window
             //     examplesOption = new ExamplesOption { Value = eov };
             // }
 
+            RequireKanjiModeOption? kanjiOption = null;
+
             var options =
                 new DictOptions(
                     newlineOption,
-                    examplesOption);
+                    examplesOption,
+                    kanjiOption);
 
             Storage.Dicts.Add(type,
                 new Dict(type, path, true, lowestPriority + 1, options));

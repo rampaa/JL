@@ -20,7 +20,7 @@ public class LookupTests
 
         Storage.Dicts.Add(DictType.JMdict,
             new Dict(DictType.JMdict, jmdictPath, true, 0,
-                new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null)));
+                new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null, null)));
         Storage.Dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();
 
         if (!File.Exists(jmdictPath))

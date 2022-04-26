@@ -63,7 +63,8 @@ public static class Lookup
                         jMnedictResults = GetNameResults(text, textInHiraganaList, dictType);
                         break;
                     case DictType.Kanjidic:
-                        kanjiResult = GetKanjidicResults(text, DictType.Kanjidic);
+                        if (dict.Options is not { RequireKanjiMode.Value: true })
+                            kanjiResult = GetKanjidicResults(text, DictType.Kanjidic);
                         break;
                     case DictType.Kenkyuusha:
                         epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
