@@ -2,7 +2,7 @@
 
 namespace JL.Core.Anki;
 
-public class Response
+public readonly struct Response
 {
     // result can be:
     //   a number
@@ -10,7 +10,7 @@ public class Response
     //   an array of (JSON) objects
     //   an array of booleans
     // /shrug
-    [JsonPropertyName("result")] public object? Result { get; set; }
+    [JsonPropertyName("result")] public object? Result { get; init; }
 
-    [JsonPropertyName("error")] public object? Error { get; set; }
+    [JsonPropertyName("error")] public object? Error { get; init; }
 }

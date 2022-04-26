@@ -126,13 +126,13 @@ internal class WindowResizer
             case "TopRightBorder":
                 wParam = (IntPtr)ResizeDirection.TopRight;
                 break;
-            case "ButtomBorder":
+            case "BottomBorder":
                 wParam = (IntPtr)ResizeDirection.Bottom;
                 break;
-            case "ButtomLeftBorder":
+            case "BottomLeftBorder":
                 wParam = (IntPtr)ResizeDirection.BottomLeft;
                 break;
-            case "ButtomRightBorder":
+            case "BottomRightBorder":
                 wParam = (IntPtr)ResizeDirection.BottomRight;
                 break;
             case "TopLeftBorder":

@@ -74,7 +74,7 @@ public partial class PreferencesWindow : System.Windows.Window
 
     private async void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        var itemTab = (System.Windows.Controls.TabItem)TabControl.SelectedItem;
+        var itemTab = (System.Windows.Controls.TabItem?)TabControl.SelectedItem;
 
         if (itemTab == null)
             return;
@@ -139,12 +139,12 @@ public partial class PreferencesWindow : System.Windows.Window
             try
             {
                 List<string> deckNamesList =
-                    JsonSerializer.Deserialize<List<string>>(getNameResponse.Result?.ToString()!)!;
+                    JsonSerializer.Deserialize<List<string>>(getNameResponse.Value.Result?.ToString()!)!;
 
                 MiningSetupComboBoxDeckNames.ItemsSource = deckNamesList;
 
                 List<string> modelNamesList =
-                    JsonSerializer.Deserialize<List<string>>(getModelResponse.Result?.ToString()!)!;
+                    JsonSerializer.Deserialize<List<string>>(getModelResponse.Value.Result?.ToString()!)!;
                 MiningSetupComboBoxModelNames.ItemsSource = modelNamesList;
             }
 

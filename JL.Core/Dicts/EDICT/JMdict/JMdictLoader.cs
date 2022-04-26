@@ -75,7 +75,7 @@ public static class JMdictLoader
 
     private static void ReadKEle(XmlTextReader edictXml, JMdictEntry entry)
     {
-        KEle kEle = new();
+        KanjiElement kanjiElement = new();
         while (edictXml.Read())
         {
             if (edictXml.Name == "k_ele" && edictXml.NodeType == XmlNodeType.EndElement)
@@ -86,26 +86,26 @@ public static class JMdictLoader
                 switch (edictXml.Name)
                 {
                     case "keb":
-                        kEle.Keb = edictXml.ReadString();
+                        kanjiElement.Keb = edictXml.ReadString();
                         break;
 
                     case "ke_inf":
-                        kEle.KeInfList.Add(ReadEntity(edictXml)!);
+                        kanjiElement.KeInfList.Add(ReadEntity(edictXml)!);
                         break;
 
                         //case "ke_pri":
-                        //    kEle.KePriList.Add(edictXml.ReadString());
+                        //    kanjiElement.KePriList.Add(edictXml.ReadString());
                         //    break;
                 }
             }
         }
 
-        entry.KEleList.Add(kEle);
+        entry.KanjiElements.Add(kanjiElement);
     }
 
     private static void ReadREle(XmlTextReader jMDictXML, JMdictEntry entry)
     {
-        REle rEle = new();
+        ReadingElement readingElement = new();
         while (jMDictXML.Read())
         {
             if (jMDictXML.Name == "r_ele" && jMDictXML.NodeType == XmlNodeType.EndElement)
@@ -116,25 +116,25 @@ public static class JMdictLoader
                 switch (jMDictXML.Name)
                 {
                     case "reb":
-                        rEle.Reb = jMDictXML.ReadString();
+                        readingElement.Reb = jMDictXML.ReadString();
                         break;
 
                     case "re_restr":
-                        rEle.ReRestrList.Add(jMDictXML.ReadString());
+                        readingElement.ReRestrList.Add(jMDictXML.ReadString());
                         break;
 
                     case "re_inf":
-                        rEle.ReInfList.Add(ReadEntity(jMDictXML)!);
+                        readingElement.ReInfList.Add(ReadEntity(jMDictXML)!);
                         break;
 
                         //case "re_pri":
-                        //    rEle.RePriList.Add(jMDictXML.ReadString());
+                        //    readingElement.RePriList.Add(jMDictXML.ReadString());
                         //    break;
                 }
             }
         }
 
-        entry.REleList.Add(rEle);
+        entry.ReadingElements.Add(readingElement);
     }
 
     private static void ReadSense(XmlTextReader jMDictXML, JMdictEntry entry)

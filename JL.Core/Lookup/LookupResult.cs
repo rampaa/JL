@@ -10,7 +10,7 @@ public class LookupResult
 
     public List<string>? Readings { get; set; }
     public string? FormattedDefinitions { get; set; }
-    public string? EdictID { get; set; }
+    public string? EdictId { get; set; }
     public List<string>? AlternativeSpellings { get; set; }
     public string? Process { get; set; }
     public List<string>? POrthographyInfoList { get; set; }

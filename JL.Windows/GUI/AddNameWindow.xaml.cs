@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using JL.Core;
 using JL.Core.Dicts;
-using JL.Core.Dicts.CustomDict;
+using JL.Core.Dicts.CustomNameDict;
 
 namespace JL.Windows.GUI;
 

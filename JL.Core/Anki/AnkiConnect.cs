@@ -57,7 +57,7 @@ public static class AnkiConnect
                 .PostAsync(Storage.Frontend.CoreConfig.AnkiConnectUri, payload)
                 .ConfigureAwait(false);
 
-            Response json = (await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false))!;
+            Response json = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);
             Utils.Logger.Information("json result: {JsonResult}", json.Result ?? "null");
 
             if (json.Error == null)

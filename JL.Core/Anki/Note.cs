@@ -2,23 +2,23 @@
 
 namespace JL.Core.Anki;
 
-public class Note
+ public class Note
 {
-    [JsonPropertyName("deckName")] public string DeckName { get; set; }
+    [JsonPropertyName("deckName")] public string DeckName { get; }
 
-    [JsonPropertyName("modelName")] public string ModelName { get; set; }
+    [JsonPropertyName("modelName")] public string ModelName { get; }
 
-    [JsonPropertyName("fields")] public Dictionary<string, object> Fields { get; set; }
+    [JsonPropertyName("fields")] public Dictionary<string, object> Fields { get; }
 
-    [JsonPropertyName("options")] public Dictionary<string, object> Options { get; set; }
+    [JsonPropertyName("options")] public Dictionary<string, object> Options { get; }
 
-    [JsonPropertyName("tags")] public string[] Tags { get; set; }
+    [JsonPropertyName("tags")] public string[] Tags { get; }
 
-    [JsonPropertyName("audio")] public Dictionary<string, object?>[] Audio { get; set; }
+    [JsonPropertyName("audio")] public Dictionary<string, object?>[] Audio { get; }
 
-    [JsonPropertyName("video")] public Dictionary<string, object>[]? Video { get; set; }
+    [JsonPropertyName("video")] public Dictionary<string, object>[]? Video { get; }
 
-    [JsonPropertyName("picture")] public Dictionary<string, object>[]? Picture { get; set; }
+    [JsonPropertyName("picture")] public Dictionary<string, object>[]? Picture { get; }
 
     public Note(
         string deckName,

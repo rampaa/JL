@@ -2,7 +2,8 @@ using System.Diagnostics;
 using System.Text;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
-using JL.Core.Dicts.CustomDict;
+using JL.Core.Dicts.CustomNameDict;
+using JL.Core.Dicts.CustomWordDict;
 using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Dicts.EDICT.JMnedict;
 using JL.Core.Dicts.EDICT.KANJIDIC;
@@ -468,7 +469,7 @@ public static class Lookup
                 result.FoundSpelling = jMDictResult.PrimarySpelling;
                 result.Readings = jMDictResult.Readings ?? new();
                 result.FoundForm = wordResult.FoundForm;
-                result.EdictID = jMDictResult.Id;
+                result.EdictId = jMDictResult.Id;
                 result.AlternativeSpellings = jMDictResult.AlternativeSpellings ?? new();
                 result.Process = ProcessProcess(wordResult);
                 result.Frequency = GetJMDictFreq(jMDictResult);
@@ -501,7 +502,7 @@ public static class Lookup
 
                 LookupResult result = new()
                 {
-                    EdictID = jMnedictResult.Id,
+                    EdictId = jMnedictResult.Id,
                     FoundSpelling = jMnedictResult.PrimarySpelling,
                     AlternativeSpellings = jMnedictResult.AlternativeSpellings ?? new(),
                     Readings = jMnedictResult.Readings ?? new(),

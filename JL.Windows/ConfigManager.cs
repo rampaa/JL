@@ -24,15 +24,15 @@ public class ConfigManager : CoreConfig
     public static int MaxSearchLength { get; set; } = 37;
     public static bool InactiveLookupMode { get; set; } = false; // todo checkbox?
     public static bool InvisibleMode { get; set; } = false; // todo checkbox?
-    public static Brush HighlightColor { get; set; } = Brushes.AliceBlue;
-    public static bool RequireLookupKeyPress { get; set; } = false;
-    public static bool LookupOnSelectOnly { get; set; } = false;
+    public static Brush HighlightColor { get; private set; } = Brushes.AliceBlue;
+    public static bool RequireLookupKeyPress { get; private set; } = false;
+    public static bool LookupOnSelectOnly { get; private set; } = false;
 
     // Using alt as the lookup key cause focusing bugs. Consider making this key a KeyGesture.
-    public static ModifierKeys LookupKey { get; set; } = ModifierKeys.Shift;
+    public static ModifierKeys LookupKey { get; private set; } = ModifierKeys.Shift;
 
-    public static bool HighlightLongestMatch { get; set; } = false;
-    public static bool CheckForJLUpdatesOnStartUp { get; set; } = true;
+    public static bool HighlightLongestMatch { get; private set; } = false;
+    public static bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
 
     #endregion
 
@@ -42,43 +42,43 @@ public class ConfigManager : CoreConfig
 
     public static double MainWindowHeight { get; set; } = 200;
     public static double MainWindowWidth { get; set; } = 800;
-    public static Brush MainWindowTextColor { get; set; } = Brushes.White;
-    public static Brush MainWindowBacklogTextColor { get; set; } = Brushes.Bisque;
+    public static Brush MainWindowTextColor { get; private set; } = Brushes.White;
+    public static Brush MainWindowBacklogTextColor { get; private set; } = Brushes.Bisque;
 
     #endregion
 
     #region Popup
 
-    public static FontFamily PopupFont { get; set; } = new("Meiryo");
+    public static FontFamily PopupFont { get; private set; } = new("Meiryo");
     public static int PopupMaxHeight { get; set; } = 520;
     public static int PopupMaxWidth { get; set; } = 700;
-    public static bool PopupDynamicHeight { get; set; } = true;
-    public static bool PopupDynamicWidth { get; set; } = true;
-    public static bool FixedPopupPositioning { get; set; } = false;
+    public static bool PopupDynamicHeight { get; private set; } = true;
+    public static bool PopupDynamicWidth { get; private set; } = true;
+    public static bool FixedPopupPositioning { get; private set; } = false;
     public static int FixedPopupXPosition { get; set; } = 0;
     public static int FixedPopupYPosition { get; set; } = 0;
-    public static bool PopupFocusOnLookup { get; set; } = true;
-    public static Brush PopupBackgroundColor { get; set; } = Brushes.Black;
+    public static bool PopupFocusOnLookup { get; private set; } = true;
+    public static Brush PopupBackgroundColor { get; private set; } = Brushes.Black;
     public static int PopupXOffset { get; set; } = 10;
     public static int PopupYOffset { get; set; } = 20;
-    public static bool PopupFlipX { get; set; } = true;
-    public static bool PopupFlipY { get; set; } = true;
-    public static Brush PrimarySpellingColor { get; set; } = Brushes.Chocolate;
+    public static bool PopupFlipX { get; private set; } = true;
+    public static bool PopupFlipY { get; private set; } = true;
+    public static Brush PrimarySpellingColor { get; private set; } = Brushes.Chocolate;
     public static int PrimarySpellingFontSize { get; set; } = 21;
-    public static Brush ReadingsColor { get; set; } = Brushes.Goldenrod;
+    public static Brush ReadingsColor { get; private set; } = Brushes.Goldenrod;
     public static int ReadingsFontSize { get; set; } = 19;
-    public static Brush AlternativeSpellingsColor { get; set; } = Brushes.White;
+    public static Brush AlternativeSpellingsColor { get; private set; } = Brushes.White;
     public static int AlternativeSpellingsFontSize { get; set; } = 17;
-    public static Brush DefinitionsColor { get; set; } = Brushes.White;
+    public static Brush DefinitionsColor { get; private set; } = Brushes.White;
     public static int DefinitionsFontSize { get; set; } = 17;
-    public static Brush FrequencyColor { get; set; } = Brushes.White;
+    public static Brush FrequencyColor { get; private set; } = Brushes.White;
     public static int FrequencyFontSize { get; set; } = 17;
-    public static Brush DeconjugationInfoColor { get; set; } = Brushes.White;
+    public static Brush DeconjugationInfoColor { get; private set; } = Brushes.White;
     public static int DeconjugationInfoFontSize { get; set; } = 17;
-    public static Brush DictTypeColor { get; set; } = Brushes.LightBlue;
+    public static Brush DictTypeColor { get; private set; } = Brushes.LightBlue;
     public static int DictTypeFontSize { get; set; } = 15;
-    public static Brush SeparatorColor { get; set; } = Brushes.White;
-    public static Brush PitchAccentMarkerColor { get; set; } = Brushes.LightGreen;
+    public static Brush SeparatorColor { get; private set; } = Brushes.White;
+    public static Brush PitchAccentMarkerColor { get; private set; } = Brushes.LightGreen;
 
     #endregion
 
@@ -88,25 +88,25 @@ public class ConfigManager : CoreConfig
 
     #region Hotkeys
 
-    public static KeyGesture MiningModeKeyGesture { get; set; } = new(Key.M, ModifierKeys.Windows);
-    public static KeyGesture PlayAudioKeyGesture { get; set; } = new(Key.P, ModifierKeys.Windows);
-    public static KeyGesture KanjiModeKeyGesture { get; set; } = new(Key.K, ModifierKeys.Windows);
+    public static KeyGesture MiningModeKeyGesture { get; private set; } = new(Key.M, ModifierKeys.Windows);
+    public static KeyGesture PlayAudioKeyGesture { get; private set; } = new(Key.P, ModifierKeys.Windows);
+    public static KeyGesture KanjiModeKeyGesture { get; private set; } = new(Key.K, ModifierKeys.Windows);
 
-    public static KeyGesture ShowManageDictionariesWindowKeyGesture { get; set; } =
+    public static KeyGesture ShowManageDictionariesWindowKeyGesture { get; private set; } =
         new(Key.D, ModifierKeys.Windows);
 
-    public static KeyGesture ShowPreferencesWindowKeyGesture { get; set; } = new(Key.L, ModifierKeys.Windows);
-    public static KeyGesture ShowAddNameWindowKeyGesture { get; set; } = new(Key.N, ModifierKeys.Windows);
-    public static KeyGesture ShowAddWordWindowKeyGesture { get; set; } = new(Key.W, ModifierKeys.Windows);
-    public static KeyGesture SearchWithBrowserKeyGesture { get; set; } = new(Key.S, ModifierKeys.Windows);
-    public static KeyGesture MousePassThroughModeKeyGesture { get; set; } = new(Key.T, ModifierKeys.Windows);
-    public static KeyGesture InvisibleToggleModeKeyGesture { get; set; } = new(Key.I, ModifierKeys.Windows);
-    public static KeyGesture SteppedBacklogBackwardsKeyGesture { get; set; } = new(Key.Left, ModifierKeys.Windows);
-    public static KeyGesture SteppedBacklogForwardsKeyGesture { get; set; } = new(Key.Right, ModifierKeys.Windows);
-    public static KeyGesture InactiveLookupModeKeyGesture { get; set; } = new(Key.Q, ModifierKeys.Windows);
-    public static KeyGesture MotivationKeyGesture { get; set; } = new(Key.O, ModifierKeys.Windows);
-    public static KeyGesture ClosePopupKeyGesture { get; set; } = new(Key.Escape, ModifierKeys.Windows);
-    public static KeyGesture ShowStatsKeyGesture { get; set; } = new(Key.Y, ModifierKeys.Windows);
+    public static KeyGesture ShowPreferencesWindowKeyGesture { get; private set; } = new(Key.L, ModifierKeys.Windows);
+    public static KeyGesture ShowAddNameWindowKeyGesture { get; private set; } = new(Key.N, ModifierKeys.Windows);
+    public static KeyGesture ShowAddWordWindowKeyGesture { get; private set; } = new(Key.W, ModifierKeys.Windows);
+    public static KeyGesture SearchWithBrowserKeyGesture { get; private set; } = new(Key.S, ModifierKeys.Windows);
+    public static KeyGesture MousePassThroughModeKeyGesture { get; private set; } = new(Key.T, ModifierKeys.Windows);
+    public static KeyGesture InvisibleToggleModeKeyGesture { get; private set; } = new(Key.I, ModifierKeys.Windows);
+    public static KeyGesture SteppedBacklogBackwardsKeyGesture { get; private set; } = new(Key.Left, ModifierKeys.Windows);
+    public static KeyGesture SteppedBacklogForwardsKeyGesture { get; private set; } = new(Key.Right, ModifierKeys.Windows);
+    public static KeyGesture InactiveLookupModeKeyGesture { get; private set; } = new(Key.Q, ModifierKeys.Windows);
+    public static KeyGesture MotivationKeyGesture { get; private set; } = new(Key.O, ModifierKeys.Windows);
+    public static KeyGesture ClosePopupKeyGesture { get; private set; } = new(Key.Escape, ModifierKeys.Windows);
+    public static KeyGesture ShowStatsKeyGesture { get; private set; } = new(Key.Y, ModifierKeys.Windows);
 
     #endregion
 

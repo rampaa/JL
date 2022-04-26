@@ -1,4 +1,4 @@
-﻿namespace JL.Core.Dicts.CustomDict;
+﻿namespace JL.Core.Dicts.CustomWordDict;
 
 public class CustomWordEntry : IResult
 {

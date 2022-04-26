@@ -11,28 +11,28 @@ internal static class JMdictBuilder
 
         Dictionary<string, JMdictResult> resultList = new();
 
-        int kEleListCount = entry.KEleList.Count;
+        int kEleListCount = entry.KanjiElements.Count;
         for (int i = 0; i < kEleListCount; i++)
         {
-            KEle kEle = entry.KEleList[i];
+            KanjiElement kanjiElement = entry.KanjiElements[i];
 
             JMdictResult result = new();
-            string key = kEle.Keb!;
+            string key = kanjiElement.Keb!;
 
             result.PrimarySpelling = key;
 
-            result.POrthographyInfoList = kEle.KeInfList;
-            //result.PriorityList = kEle.KePriList;
+            result.POrthographyInfoList = kanjiElement.KeInfList;
+            //result.PriorityList = kanjiElement.KePriList;
 
-            int lREleListCount = entry.REleList.Count;
+            int lREleListCount = entry.ReadingElements.Count;
             for (int j = 0; j < lREleListCount; j++)
             {
-                REle rEle = entry.REleList[j];
+                ReadingElement readingElement = entry.ReadingElements[j];
 
-                if (!rEle.ReRestrList.Any() || rEle.ReRestrList.Contains(key))
+                if (!readingElement.ReRestrList.Any() || readingElement.ReRestrList.Contains(key))
                 {
-                    result.Readings?.Add(rEle.Reb);
-                    result.ROrthographyInfoList?.Add(rEle.ReInfList);
+                    result.Readings?.Add(readingElement.Reb);
+                    result.ROrthographyInfoList?.Add(readingElement.ReInfList);
                 }
             }
 
@@ -82,15 +82,15 @@ internal static class JMdictBuilder
             }
         }
 
-        List<string> allReadings = entry.REleList.Select(rEle => rEle.Reb).ToList();
-        List<List<string>> allROrthographyInfoLists = entry.REleList.Select(rEle => rEle.ReInfList).ToList();
+        List<string> allReadings = entry.ReadingElements.Select(rEle => rEle.Reb).ToList();
+        List<List<string>> allROrthographyInfoLists = entry.ReadingElements.Select(rEle => rEle.ReInfList).ToList();
 
-        int rEleListCount = entry.REleList.Count;
+        int rEleListCount = entry.ReadingElements.Count;
         for (int i = 0; i < rEleListCount; i++)
         {
-            REle rEle = entry.REleList[i];
+            ReadingElement readingElement = entry.ReadingElements[i];
 
-            string key = Kana.KatakanaToHiraganaConverter(rEle.Reb);
+            string key = Kana.KatakanaToHiraganaConverter(readingElement.Reb);
 
             if (resultList.ContainsKey(key))
             {
@@ -99,8 +99,8 @@ internal static class JMdictBuilder
 
             JMdictResult result = new()
             {
-                AlternativeSpellings = rEle.ReRestrList.Any()
-                    ? rEle.ReRestrList
+                AlternativeSpellings = readingElement.ReRestrList.Any()
+                    ? readingElement.ReRestrList
                     : new List<string>(alternativeSpellings)
             };
 
@@ -120,8 +120,8 @@ internal static class JMdictBuilder
 
             else
             {
-                result.PrimarySpelling = rEle.Reb;
-                result.POrthographyInfoList = rEle.ReInfList;
+                result.PrimarySpelling = readingElement.Reb;
+                result.POrthographyInfoList = readingElement.ReInfList;
 
                 result.AlternativeSpellings = allReadings.ToList();
                 result.AlternativeSpellings.RemoveAt(i);
@@ -136,7 +136,7 @@ internal static class JMdictBuilder
                 Sense sense = entry.SenseList[j];
 
                 if ((!sense.StagKList.Any() && !sense.StagRList.Any())
-                    || sense.StagRList.Contains(rEle.Reb)
+                    || sense.StagRList.Contains(readingElement.Reb)
                     || sense.StagKList.Contains(result.PrimarySpelling)
                     || sense.StagKList.Intersect(result.AlternativeSpellings).Any())
                 {

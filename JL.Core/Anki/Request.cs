@@ -4,11 +4,11 @@ namespace JL.Core.Anki;
 
 public class Request
 {
-    [JsonPropertyName("action")] public string Action { get; set; }
+    [JsonPropertyName("action")] public string Action { get; }
 
-    [JsonPropertyName("version")] public int Version { get; set; }
+    [JsonPropertyName("version")] public int Version { get; }
 
-    [JsonPropertyName("params")] public Dictionary<string, object>? Params { get; set; }
+    [JsonPropertyName("params")] public Dictionary<string, object>? Params { get; }
 
     public Request(string action, int version, Dictionary<string, object>? @params = null)
     {

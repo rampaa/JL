@@ -350,7 +350,7 @@ public static class WindowsUtils
     {
         if (Application.Current != null)
         {
-            Application.Current.Dispatcher!.Invoke((Action)async delegate
+            Application.Current.Dispatcher!.InvokeAsync(async delegate
             {
                 List<AlertWindow> alertWindowList = Application.Current.Windows.OfType<AlertWindow>().ToList();
 

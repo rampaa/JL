@@ -505,12 +505,12 @@ public partial class PopupWindow : Window
             }
         }
 
-        if (result.EdictID != null)
+        if (result.EdictId != null)
         {
             textBlockEdictId = new TextBlock
             {
-                Name = nameof(result.EdictID),
-                Text = result.EdictID,
+                Name = nameof(result.EdictId),
+                Text = result.EdictId,
                 Visibility = Visibility.Collapsed,
             };
         }
@@ -1047,7 +1047,7 @@ public partial class PopupWindow : Window
                         case nameof(LookupResult.FoundForm):
                             miningParams[JLField.FoundForm] = ch.Text;
                             break;
-                        case nameof(LookupResult.EdictID):
+                        case nameof(LookupResult.EdictId):
                             miningParams[JLField.EdictId] = ch.Text;
                             break;
                         case nameof(LookupResult.Frequency):
