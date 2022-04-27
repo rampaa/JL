@@ -261,9 +261,9 @@ public partial class MainWindow : Window, IFrontend
             FontSizeSlider.Visibility = Visibility.Collapsed;
     }
 
-    private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private async void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        Stats.UpdateLifetimeStats();
+        await Stats.UpdateLifetimeStats().ConfigureAwait(false);
         ConfigManager.SaveBeforeClosing();
     }
 
