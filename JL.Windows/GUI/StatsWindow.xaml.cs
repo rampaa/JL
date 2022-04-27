@@ -58,11 +58,11 @@ public partial class StatsWindow : Window
                 case StatsMode.Session:
                     await Stats.UpdateLifetimeStats();
                     UpdateStatsDisplay(StatsMode.Lifetime);
-                    button.Content = "Lifetime";
+                    button.Content = StatsMode.Lifetime.ToString();
                     break;
                 case StatsMode.Lifetime:
                     UpdateStatsDisplay(StatsMode.Session);
-                    button.Content = "Session";
+                    button.Content = StatsMode.Session.ToString();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

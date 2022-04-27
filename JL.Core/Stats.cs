@@ -18,7 +18,7 @@ public class Stats
 
     [JsonIgnore] public static Stats SessionStats { get; set; } = new();
 
-    [JsonIgnore] public static Stats LifetimeStats { get; set; } = ReadLifetimeStats().Result!;
+    [JsonIgnore] public static Stats LifetimeStats { get; set; } = ReadLifetimeStats()!;
 
     public static void IncrementStat(StatType type, int amount = 1)
     {
@@ -73,14 +73,14 @@ public class Stats
         }
     }
 
-    private static async Task<Stats?> ReadLifetimeStats()
+    private static Stats? ReadLifetimeStats()
     {
         if (File.Exists(Path.Join(Storage.ConfigPath, "Stats.json")))
         {
             try
             {
                 return JsonSerializer.Deserialize<Stats>(
-                    await File.ReadAllTextAsync(Path.Join(Storage.ConfigPath, "Stats.json")).ConfigureAwait(false));
+                   File.ReadAllText(Path.Join(Storage.ConfigPath, "Stats.json")));
             }
 
             catch
@@ -95,7 +95,7 @@ public class Stats
             Utils.Logger.Warning("Stats.json doesn't exist, creating it");
 
             var lifetimeStats = new Stats();
-            await WriteLifetimeStats(lifetimeStats);
+            WriteLifetimeStats(lifetimeStats).Wait();
             return lifetimeStats;
         }
     }
