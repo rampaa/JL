@@ -15,13 +15,14 @@ using JL.Core.Dicts.Kanjium;
 using JL.Core.Dicts.Options;
 using JL.Core.Frequency;
 using JL.Core.PoS;
+using Timer = System.Timers.Timer;
 
 namespace JL.Core;
 
 public static class Storage
 {
+    public static Timer Timer { get; } = new();
     public const string Jpod101NoAudioMd5Hash = "7e2c2f954ef6051373ba916f000168dc";
-    public static Stats SessionStats { get; set; } = new();
     public static IFrontend Frontend { get; set; } = new UnimplementedFrontend();
     public static readonly string ApplicationPath = AppContext.BaseDirectory;
     public static readonly string ResourcesPath = Path.Join(AppContext.BaseDirectory, "Resources");

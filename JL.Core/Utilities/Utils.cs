@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Timers;
 using JL.Core.Dicts;
 using JL.Core.Network;
 using Serilog;
@@ -229,12 +230,14 @@ public static class Utils
             }
 
             Storage.Frontend.PlayAudio(sound, volume);
-            Storage.SessionStats.TimesPlayedAudio += 1;
+            Stats.IncrementStat(StatType.TimesPlayedAudio);
         }
     }
 
     public static void CoreInitialize()
     {
+        SetTimer();
+
         if (!File.Exists($"{Storage.ConfigPath}/dicts.json"))
             Utils.CreateDefaultDictsConfig();
 
@@ -256,5 +259,18 @@ public static class Utils
                 }
             ).ConfigureAwait(false);
         }).ConfigureAwait(false);
+    }
+
+    private static void SetTimer()
+    {
+        Storage.Timer.Interval = TimeSpan.FromMinutes(5).TotalMilliseconds;
+        Storage.Timer.Elapsed += OnTimedEvent;
+        Storage.Timer.AutoReset = true;
+        Storage.Timer.Enabled = true;
+    }
+
+    private static async void OnTimedEvent(object? sender, ElapsedEventArgs e)
+    {
+       await Stats.UpdateLifetimeStats();
     }
 }

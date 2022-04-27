@@ -49,7 +49,7 @@ IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries,
 * Meikyou
 
 #### [Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter) format
-* Daijirin 
+* Daijirin
 * Kenkyuusha
 * Shinmeikai
 
@@ -78,6 +78,7 @@ Select the file you got from [Nazeka EPWING Converter](https://github.com/wareya
 ### Where are my settings stored?
 * Anki settings: Config/AnkiConfig.json
 * Dictionary settings: Config/dicts.json
+* Stats: Config/Stats.json
 * Everything else: JL.dll.config
 ### Will you add machine translation capabilities?
 No.

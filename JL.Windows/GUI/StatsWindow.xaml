@@ -7,11 +7,12 @@
         Title="Stats" Height="250" ResizeMode="NoResize" Width="260" SizeToContent="Height" MaxHeight="600"
         Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False">
 
-    <TabControl TabStripPlacement="Top" VerticalContentAlignment="Stretch" Margin="0,0,0,0"
-                Background="#F3000000" SelectionChanged="TabControl_OnSelectionChanged" Name="TabControl">
-        <TabItem Header="This session">
             <ScrollViewer HorizontalScrollBarVisibility="Auto">
                 <Grid Background="Black">
+                    <Button Name="ButtonSwapStats" Click="ButtonSwapStats_OnClick" HorizontalAlignment="Right"
+                            VerticalAlignment="Top" Margin="20,20,20,20">
+                        Session
+                    </Button>
                     <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,20">
                         <DockPanel>
                             <TextBlock Foreground="White" Text="Characters: " TextWrapping="Wrap" Margin="0,0,0,10" />
@@ -48,6 +49,4 @@
                     </StackPanel>
                 </Grid>
             </ScrollViewer>
-        </TabItem>
-    </TabControl>
 </Window>

@@ -295,7 +295,7 @@ public static class WindowsUtils
             string randomFilePath = filePaths[rand.Next(numFiles)];
             byte[] randomFile = File.ReadAllBytes(randomFilePath);
             PlayAudio(randomFile, 1);
-            Storage.SessionStats.Imoutos += 1;
+            Stats.IncrementStat(StatType.Imoutos);
         }
         catch (Exception e)
         {

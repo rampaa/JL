@@ -29,20 +29,50 @@ public partial class StatsWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        UpdateStatsDisplay();
+        UpdateStatsDisplay(StatsMode.Session);
     }
 
-    public void UpdateStatsDisplay()
+    private void UpdateStatsDisplay(StatsMode mode)
     {
-        TextBlockCharacters.Text = Storage.SessionStats.Characters.ToString();
-        TextBlockLines.Text = Storage.SessionStats.Lines.ToString();
-        TextBlockCardsMined.Text = Storage.SessionStats.CardsMined.ToString();
-        TextBlockTimesPlayedAudio.Text = Storage.SessionStats.TimesPlayedAudio.ToString();
-        TextBlockImoutos.Text = Storage.SessionStats.Imoutos.ToString();
+        Stats stats = mode switch
+        {
+            StatsMode.Session => Stats.SessionStats,
+            StatsMode.Lifetime => Stats.LifetimeStats,
+            _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null)
+        };
+
+        TextBlockCharacters.Text = stats.Characters.ToString();
+        TextBlockLines.Text = stats.Lines.ToString();
+        TextBlockCardsMined.Text = stats.CardsMined.ToString();
+        TextBlockTimesPlayedAudio.Text = stats.TimesPlayedAudio.ToString();
+        TextBlockImoutos.Text = stats.Imoutos.ToString();
     }
 
-    private void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async void ButtonSwapStats_OnClick(object sender, RoutedEventArgs e)
     {
-
+        var button = (Button)sender;
+        if (Enum.TryParse(button.Content.ToString(), out StatsMode mode))
+        {
+            switch (mode)
+            {
+                case StatsMode.Session:
+                    await Stats.UpdateLifetimeStats();
+                    UpdateStatsDisplay(StatsMode.Lifetime);
+                    button.Content = "Lifetime";
+                    break;
+                case StatsMode.Lifetime:
+                    UpdateStatsDisplay(StatsMode.Session);
+                    button.Content = "Session";
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
+}
+
+internal enum StatsMode
+{
+    Session,
+    Lifetime
 }

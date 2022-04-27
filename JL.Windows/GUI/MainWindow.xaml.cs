@@ -115,8 +115,8 @@ public partial class MainWindow : Window, IFrontend
 
                     _backlog.Add(text);
                     _currentTextIndex = _backlog.Count - 1;
-                    Storage.SessionStats.Characters += new StringInfo(text).LengthInTextElements;
-                    Storage.SessionStats.Lines += 1;
+                    Stats.IncrementStat(StatType.Characters, new StringInfo(text).LengthInTextElements);
+                    Stats.IncrementStat(StatType.Lines);
                 }
             }
             catch (Exception e)
@@ -263,6 +263,7 @@ public partial class MainWindow : Window, IFrontend
 
     private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
+        Stats.UpdateLifetimeStats();
         ConfigManager.SaveBeforeClosing();
     }
 

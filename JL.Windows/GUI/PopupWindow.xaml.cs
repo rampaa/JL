@@ -1141,7 +1141,7 @@ public partial class PopupWindow : Window
 
         if (miningResult)
         {
-            Storage.SessionStats.CardsMined += 1;
+            Stats.IncrementStat(StatType.CardsMined);
         }
     }
 
