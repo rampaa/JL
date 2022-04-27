@@ -263,8 +263,8 @@ public partial class MainWindow : Window, IFrontend
 
     private async void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        await Stats.UpdateLifetimeStats().ConfigureAwait(false);
         ConfigManager.SaveBeforeClosing();
+        await Stats.UpdateLifetimeStats().ConfigureAwait(false);
     }
 
     private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
