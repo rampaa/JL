@@ -43,6 +43,8 @@ public partial class PopupWindow : Window
 
     public ObservableCollection<StackPanel> ResultStackPanels { get; } = new();
 
+    public ObservableCollection<Button> DictTypeButtons { get; } = new();
+
     public PopupWindow()
     {
         InitializeComponent();
@@ -1000,6 +1002,7 @@ public partial class PopupWindow : Window
 
         MiningMode = false;
         TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
+        ItemsControlButtons.Visibility = Visibility.Collapsed;
         Hide();
 
         var miningParams = new Dictionary<JLField, string>();
@@ -1178,6 +1181,9 @@ public partial class PopupWindow : Window
 
         if (WindowsUtils.KeyGestureComparer(e, ConfigManager.MiningModeKeyGesture))
         {
+            ItemsControlButtons.Visibility = Visibility.Visible;
+            GenerateDictTypeButtons();
+
             MiningMode = true;
             TextBlockMiningModeReminder!.Visibility = Visibility.Visible;
 
@@ -1204,7 +1210,13 @@ public partial class PopupWindow : Window
             string? foundSpelling = null;
             string? reading = null;
 
-            var innerStackPanel = (StackPanel)PopupListBox.Items[_playAudioIndex];
+            var visibleStackPanels = PopupListBox.Items.Cast<StackPanel>()
+                .Where(stackPanel => stackPanel.Visibility == Visibility.Visible).ToArray();
+
+            if (visibleStackPanels.Length == 0)
+                return;
+
+            var innerStackPanel = visibleStackPanels[_playAudioIndex];
             var top = (WrapPanel)innerStackPanel.Children[0];
 
             foreach (UIElement child in top.Children)
@@ -1270,6 +1282,7 @@ public partial class PopupWindow : Window
         {
             MiningMode = false;
             TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
+            ItemsControlButtons.Visibility = Visibility.Collapsed;
 
             PopUpScrollViewer!.ScrollToTop();
             PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
@@ -1413,5 +1426,78 @@ public partial class PopupWindow : Window
     private void Window_Activated(object sender, EventArgs e)
     {
         //MainWindow.Instance.FocusEllipse.Fill = Brushes.Green;
+    }
+
+    private void GenerateDictTypeButtons()
+    {
+        DictTypeButtons.Clear();
+
+        var buttonAll = new Button { Content = "All", Margin = new Thickness(1), Background = Brushes.DodgerBlue };
+        buttonAll.Click += ButtonAllOnClick;
+        DictTypeButtons.Add(buttonAll);
+
+        foreach ((DictType dictType, Dict dict) in Storage.Dicts.OrderBy(d => d.Value.Priority))
+        {
+            if (!dict.Active || dictType == DictType.Kanjium)
+                continue;
+
+            var button = new Button { Content = dictType.GetDescription(), Margin = new Thickness(1) };
+            button.Click += DictTypeButtonOnClick;
+            DictTypeButtons.Add(button);
+        }
+    }
+
+    private void ButtonAllOnClick(object sender, RoutedEventArgs e)
+    {
+        var button = (Button)sender;
+        var brush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF2D2D30")!; // "Dark"
+        brush.Freeze();
+        foreach (Button btn in ItemsControlButtons.Items)
+        {
+            btn.Background = brush;
+        }
+
+        button.Background = Brushes.DodgerBlue;
+
+        foreach (var stackPanel in ResultStackPanels)
+        {
+            stackPanel.Visibility = Visibility.Visible;
+        }
+    }
+
+    private void DictTypeButtonOnClick(object sender, RoutedEventArgs e)
+    {
+        var button = (Button)sender;
+        var brush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF2D2D30")!; // "Dark"
+        brush.Freeze();
+        foreach (Button btn in ItemsControlButtons.Items)
+        {
+            btn.Background = brush;
+        }
+
+        button.Background = Brushes.DodgerBlue;
+
+        var requestedDictType = button.Content.ToString()!.GetEnum<DictType>();
+        foreach (StackPanel stackPanel in ResultStackPanels)
+        {
+            WrapPanel wrapPanel = (WrapPanel)stackPanel.Children[0];
+            UIElementCollection uiElementCollection = wrapPanel.Children;
+
+            foreach (UIElement uiElement in uiElementCollection)
+            {
+                if (uiElement is TextBlock { Name: "DictType" } textBlock)
+                {
+                    var foundDictType = textBlock.Text.GetEnum<DictType>();
+                    if (foundDictType == requestedDictType)
+                    {
+                        stackPanel.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        stackPanel.Visibility = Visibility.Collapsed;
+                    }
+                }
+            }
+        }
     }
 }

@@ -8,7 +8,8 @@
         Title="PopupWindow"
         Width="Auto" Height="Auto" SizeToContent="Height" MaxWidth="700" MaxHeight="520"
         Background="#FF2C2B2B" Foreground="White"
-        Topmost="True" WindowStyle="None" AllowsTransparency="true" ShowInTaskbar="False" Deactivated="Window_Deactivated"
+        Topmost="True" WindowStyle="None" AllowsTransparency="true" ShowInTaskbar="False"
+        Deactivated="Window_Deactivated"
         KeyDown="Window_KeyDown" Closing="Window_Closing" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave">
 
     <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Disabled"
@@ -17,14 +18,28 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
+
             <TextBlock Grid.Row="0" Name="TextBlockMiningModeReminder" FontSize="13" Padding="5,1,0,1"
                        Visibility="Collapsed" TextWrapping="Wrap"
                        Background="{Binding Path=Background,
                   RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
             </TextBlock>
-            <ListBox Grid.Row="1" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
+
+            <ItemsControl Grid.Row="1" Name="ItemsControlButtons" Visibility="Collapsed"
+                          ItemsSource="{Binding Path=DictTypeButtons}"
+                          Background="{Binding Path=Background,
+                  RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+
+            <ListBox Grid.Row="2" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
                      Foreground="White"
                      Background="{Binding Path=Background,
                   RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
@@ -36,6 +51,7 @@
                     </Style>
                 </ListBox.ItemContainerStyle>
             </ListBox>
+
         </Grid>
     </ScrollViewer>
     <Window.ContextMenu>

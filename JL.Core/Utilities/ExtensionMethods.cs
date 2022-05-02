@@ -19,6 +19,10 @@ public static class ExtensionMethods
                 {
                     return attr.Description;
                 }
+                else
+                {
+                    return name;
+                }
             }
         }
 
