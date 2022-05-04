@@ -125,7 +125,7 @@ public partial class MainWindow : Window, IFrontend
                     Stats.IncrementStat(StatType.Lines);
 
                     if (Storage.Ready && ConfigManager.Precaching
-                                      && MainTextBox!.Text.Length < ConfigManager.MaxSearchLength * 30)
+                                      && MainTextBox!.Text.Length < Storage.CacheSize)
                     {
                         Dispatcher.Invoke(DispatcherPriority.Render, delegate() { }); // let MainTextBox text update
                         await Precache(MainTextBox!.Text);
