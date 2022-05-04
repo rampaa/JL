@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text;
+using Caching;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomNameDict;
@@ -19,12 +20,18 @@ public static class Lookup
 {
     private static DateTime s_lastLookupTime;
 
-    public static List<LookupResult>? LookupText(string text)
+    // public static readonly LRUCache<string, List<LookupResult>?> LookupResultCache = new(
+    //     Storage.CacheSize, Storage.CacheSize / 8);
+
+    public static List<LookupResult>? LookupText(string text, bool useCache = true)
     {
         DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
         if ((preciseTimeNow - s_lastLookupTime).TotalMilliseconds < Storage.Frontend.CoreConfig.LookupRate)
             return null;
         s_lastLookupTime = preciseTimeNow;
+
+        // if (useCache && LookupResultCache.TryGet(text, out List<LookupResult>? data))
+        //     return data;
 
         if (Storage.Frontend.CoreConfig.KanjiMode)
         {
@@ -158,6 +165,9 @@ public static class Lookup
         if (lookupResults.Any())
             lookupResults = SortLookupResults(lookupResults);
 
+        // if (useCache)
+        //     LookupResultCache.AddReplace(text, lookupResults.ToList());
+
         return lookupResults;
     }
 
@@ -178,7 +188,7 @@ public static class Lookup
             .ThenByDescending(dict => dict.Readings?.Contains(longestFoundForm))
             .ToList();
 
-        return sortedLookupResults.ToList();
+        return sortedLookupResults;
     }
 
     private static (bool tryLongVowelConversion, int succAttempt) GetWordResultsHelper(DictType dictType,

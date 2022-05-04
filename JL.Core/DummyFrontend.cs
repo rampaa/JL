@@ -21,4 +21,8 @@ public class DummyFrontend : IFrontend
     }
 
     public Task UpdateJL(Version latestVersion) => Task.CompletedTask;
+
+    public void InvalidateDisplayCache()
+    {
+    }
 }

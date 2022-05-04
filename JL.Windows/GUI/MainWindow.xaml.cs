@@ -5,7 +5,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Threading;
 using JL.Core;
+using JL.Core.Lookup;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using Microsoft.Win32;
@@ -17,7 +19,7 @@ namespace JL.Windows.GUI;
 /// </summary>
 public partial class MainWindow : Window, IFrontend
 {
-    #region Interface members
+    #region IFrontend implementation
 
     public CoreConfig CoreConfig { get; set; } = ConfigManager.Instance;
 
@@ -41,6 +43,8 @@ public partial class MainWindow : Window, IFrontend
 
     public Task UpdateJL(Version latestVersion) => WindowsUtils.UpdateJL(latestVersion);
 
+    public void InvalidateDisplayCache() => PopupWindow.StackPanelCache.Clear();
+
     #endregion
 
     private readonly List<string> _backlog = new();
@@ -62,6 +66,8 @@ public partial class MainWindow : Window, IFrontend
     public double TopPositionBeforeResolutionChange { get; set; }
     public double HeightBeforeResolutionChange { get; set; }
     public double WidthBeforeResolutionChange { get; set; }
+
+    public CancellationTokenSource PrecacheCancellationToken { get; set; } = new();
 
     public MainWindow()
     {
@@ -98,7 +104,7 @@ public partial class MainWindow : Window, IFrontend
         CopyFromClipboard();
     }
 
-    private void CopyFromClipboard()
+    private async void CopyFromClipboard()
     {
         bool gotTextFromClipboard = false;
         while (Clipboard.ContainsText() && !gotTextFromClipboard)
@@ -117,11 +123,80 @@ public partial class MainWindow : Window, IFrontend
                     _currentTextIndex = _backlog.Count - 1;
                     Stats.IncrementStat(StatType.Characters, new StringInfo(text).LengthInTextElements);
                     Stats.IncrementStat(StatType.Lines);
+
+                    if (Storage.Ready && ConfigManager.Precaching
+                                      && MainTextBox!.Text.Length < ConfigManager.MaxSearchLength * 30)
+                    {
+                        Dispatcher.Invoke(DispatcherPriority.Render, delegate() { }); // let MainTextBox text update
+                        await Precache(MainTextBox!.Text);
+                    }
                 }
             }
             catch (Exception e)
             {
                 Utils.Logger.Warning(e, "CopyFromClipboard failed");
+            }
+        }
+    }
+
+    [STAThread]
+    public async Task Precache(string input)
+    {
+        if (Debugger.IsAttached)
+            PrecacheProgress.Visibility = Visibility.Visible;
+
+        int added = 0;
+        for (int charPosition = 0; charPosition < input.Length; charPosition++)
+        {
+            if (PrecacheCancellationToken.IsCancellationRequested)
+            {
+                if (charPosition == 0)
+                {
+                    PrecacheCancellationToken = new CancellationTokenSource();
+                }
+                else
+                {
+                    PrecacheCancellationToken = new CancellationTokenSource();
+                    return;
+                }
+            }
+
+            if (charPosition > 0 && char.IsHighSurrogate(input[charPosition - 1]))
+                --charPosition;
+
+            PrecacheProgress.Text = $"{charPosition + 1}/{input.Length} ({added} new)";
+            if (charPosition % 10 == 0)
+            {
+                await Task.Delay(1); // let user interact with the GUI while this method is running
+            }
+
+            int endPosition = Utils.FindWordBoundary(input, charPosition);
+
+            string text = endPosition - charPosition <= ConfigManager.MaxSearchLength
+                ? input[charPosition..endPosition]
+                : input[charPosition..(charPosition + ConfigManager.MaxSearchLength)];
+
+            if (!PopupWindow.StackPanelCache.Contains(text))
+            {
+                List<LookupResult>? lookupResults = Lookup.LookupText(text);
+                if (lookupResults is { Count: > 0 })
+                {
+                    var stackPanels = new List<StackPanel>();
+                    for (int i = 0; i < lookupResults.Count; i++)
+                    {
+                        if (i > ConfigManager.MaxNumResultsNotInMiningMode)
+                        {
+                            break;
+                        }
+
+                        var lookupResult = lookupResults[i];
+                        var stackPanel = FirstPopupWindow.MakeResultStackPanel(lookupResult, i, lookupResults.Count);
+                        stackPanels.Add(stackPanel);
+                    }
+
+                    PopupWindow.StackPanelCache.AddReplace(text, stackPanels.ToArray());
+                    added += added == 0 ? 2 : 1;
+                }
             }
         }
     }
@@ -147,6 +222,7 @@ public partial class MainWindow : Window, IFrontend
             || FirstPopupWindow.MiningMode
             || (ConfigManager.RequireLookupKeyPress && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))) return;
 
+        PrecacheCancellationToken.Cancel();
         FirstPopupWindow.TextBox_MouseMove(MainTextBox!);
 
         if (ConfigManager.FixedPopupPositioning)

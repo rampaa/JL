@@ -21,7 +21,6 @@ public class ConfigManager : CoreConfig
 
     #region General
 
-    public static int MaxSearchLength { get; set; } = 37;
     public static bool InactiveLookupMode { get; set; } = false; // todo checkbox?
     public static bool InvisibleMode { get; set; } = false; // todo checkbox?
     public static Brush HighlightColor { get; private set; } = Brushes.AliceBlue;
@@ -32,16 +31,15 @@ public class ConfigManager : CoreConfig
     public static ModifierKeys LookupKey { get; private set; } = ModifierKeys.Shift;
 
     public static bool HighlightLongestMatch { get; private set; } = false;
+
     public static bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
 
     #endregion
 
-    // todo switch height and width orders
-
     #region Textbox
 
-    public static double MainWindowHeight { get; set; } = 200;
     public static double MainWindowWidth { get; set; } = 800;
+    public static double MainWindowHeight { get; set; } = 200;
     public static Brush MainWindowTextColor { get; private set; } = Brushes.White;
     public static Brush MainWindowBacklogTextColor { get; private set; } = Brushes.Bisque;
 
@@ -50,8 +48,8 @@ public class ConfigManager : CoreConfig
     #region Popup
 
     public static FontFamily PopupFont { get; private set; } = new("Meiryo");
-    public static int PopupMaxHeight { get; set; } = 520;
     public static int PopupMaxWidth { get; set; } = 700;
+    public static int PopupMaxHeight { get; set; } = 520;
     public static bool PopupDynamicHeight { get; private set; } = true;
     public static bool PopupDynamicWidth { get; private set; } = true;
     public static bool FixedPopupPositioning { get; private set; } = false;
@@ -110,6 +108,16 @@ public class ConfigManager : CoreConfig
 
     #endregion
 
+    #region Advanced
+
+    public static int MaxSearchLength { get; set; } = 37;
+
+    public static int MaxNumResultsNotInMiningMode { get; set; } = 7;
+
+    public static bool Precaching { get; set; } = false;
+
+    #endregion
+
     public void ApplyPreferences()
     {
         string? tempStr = ConfigurationManager.AppSettings.Get("FrequencyListName");
@@ -135,6 +143,11 @@ public class ConfigManager : CoreConfig
             () => HighlightLongestMatch =
                 bool.Parse(ConfigurationManager.AppSettings.Get("HighlightLongestMatch")!),
             HighlightLongestMatch, "HighlightLongestMatch");
+
+        WindowsUtils.Try(
+            () => Precaching =
+                bool.Parse(ConfigurationManager.AppSettings.Get(nameof(Precaching))!),
+            Precaching, nameof(Precaching));
 
         WindowsUtils.Try(() => CheckForJLUpdatesOnStartUp =
                 bool.Parse(ConfigurationManager.AppSettings.Get("CheckForJLUpdatesOnStartUp")!),
@@ -261,6 +274,9 @@ public class ConfigManager : CoreConfig
             .Get("DeconjugationInfoFontSize")!), DeconjugationInfoFontSize, "DeconjugationInfoFontSize");
         WindowsUtils.Try(() => DictTypeFontSize = int.Parse(ConfigurationManager.AppSettings
             .Get("DictTypeFontSize")!), DictTypeFontSize, "DictTypeFontSize");
+
+        WindowsUtils.Try(() => MaxNumResultsNotInMiningMode = int.Parse(ConfigurationManager.AppSettings
+            .Get(nameof(MaxNumResultsNotInMiningMode))!), MaxNumResultsNotInMiningMode, nameof(MaxNumResultsNotInMiningMode));
 
         WindowsUtils.Try(() => PopupFocusOnLookup = bool.Parse(ConfigurationManager.AppSettings
             .Get("PopupFocusOnLookup")!), PopupFocusOnLookup, "PopupFocusOnLookup");
@@ -537,6 +553,8 @@ public class ConfigManager : CoreConfig
         preferenceWindow.KanjiModeCheckBox.IsChecked = KanjiMode;
         preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
         preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = CheckForJLUpdatesOnStartUp;
+        preferenceWindow.PrecachingCheckBox.IsChecked = Precaching;
+
         preferenceWindow.AnkiIntegrationCheckBox.IsChecked = AnkiIntegration;
         preferenceWindow.FrequencyListComboBox.ItemsSource = Storage.FrequencyLists.Keys;
         preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyListName;
@@ -566,6 +584,8 @@ public class ConfigManager : CoreConfig
 
         preferenceWindow.PopupMaxHeightNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Height;
         preferenceWindow.PopupMaxWidthNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;
+
+        preferenceWindow.MaxNumResultsNotInMiningModeNumericUpDown.Value = MaxNumResultsNotInMiningMode;
 
         preferenceWindow.PopupMaxHeightNumericUpDown.Value = PopupMaxHeight;
         preferenceWindow.PopupMaxWidthNumericUpDown.Value = PopupMaxWidth;
@@ -683,12 +703,18 @@ public class ConfigManager : CoreConfig
             preferenceWindow.LookupRateNumericUpDown.Value.ToString();
         config.AppSettings.Settings["HighlightLongestMatch"].Value =
             preferenceWindow.HighlightLongestMatchCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings[nameof(Precaching)].Value =
+            preferenceWindow.PrecachingCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["CheckForJLUpdatesOnStartUp"].Value =
             preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked.ToString();
+
         config.AppSettings.Settings["AnkiIntegration"].Value =
             preferenceWindow.AnkiIntegrationCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["HighlightColor"].Value =
             preferenceWindow.HighlightColorButton.Background.ToString();
+
+        config.AppSettings.Settings[nameof(MaxNumResultsNotInMiningMode)].Value =
+            preferenceWindow.MaxNumResultsNotInMiningModeNumericUpDown.Value.ToString();
 
         config.AppSettings.Settings["PopupMaxWidth"].Value =
             preferenceWindow.PopupMaxWidthNumericUpDown.Value.ToString();

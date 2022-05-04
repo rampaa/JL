@@ -25,6 +25,8 @@
             <TextBlock Grid.Row="0" Name="TextBlockMiningModeReminder" FontSize="13" Padding="5,1,0,1"
                        Visibility="Collapsed" TextWrapping="Wrap"
                        Background="{Binding Path=Background,
+                  RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
+                       Foreground="{Binding Path=Foreground,
                   RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
             </TextBlock>
 

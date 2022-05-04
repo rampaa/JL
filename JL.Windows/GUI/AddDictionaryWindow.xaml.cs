@@ -115,25 +115,23 @@ public partial class AddDictionaryWindow : Window
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         RadioButtonYomichanImport.IsChecked = true;
-        FillDictTypesCombobox(Storage.YomichanDictTypes, null);
+        FillDictTypesCombobox(Storage.YomichanDictTypes);
     }
 
     private void RadioButtonYomichanImport_OnClick(object sender, RoutedEventArgs e)
     {
-        FillDictTypesCombobox(Storage.YomichanDictTypes, null);
+        FillDictTypesCombobox(Storage.YomichanDictTypes);
     }
 
     private void RadioButtonNazekaEpwingConverter_OnClick(object sender, RoutedEventArgs e)
     {
-        FillDictTypesCombobox(Storage.NazekaDictTypes, null);
+        FillDictTypesCombobox(Storage.NazekaDictTypes);
     }
 
-    private void FillDictTypesCombobox(IEnumerable<DictType> types, DictType? currentDictType)
+    private void FillDictTypesCombobox(IEnumerable<DictType> types)
     {
         List<DictType> loadedDictTypes = Storage.Dicts.Keys.ToList();
-        IEnumerable<DictType> validTypes = currentDictType == null
-            ? types.Except(loadedDictTypes)
-            : types.Except(loadedDictTypes.Except(new[] { (DictType)currentDictType }));
+        IEnumerable<DictType> validTypes = types.Except(loadedDictTypes);
 
         ComboBoxDictType.ItemsSource = validTypes.Select(d => d.GetDescription() ?? d.ToString());
     }

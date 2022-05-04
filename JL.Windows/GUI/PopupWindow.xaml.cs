@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Caching;
 using JL.Core;
 using JL.Core.Anki;
 using JL.Core.Dicts;
@@ -44,6 +45,9 @@ public partial class PopupWindow : Window
     public ObservableCollection<StackPanel> ResultStackPanels { get; } = new();
 
     public ObservableCollection<Button> DictTypeButtons { get; } = new();
+
+    public static LRUCache<string, StackPanel[]> StackPanelCache { get; } = new(
+        Storage.CacheSize, Storage.CacheSize / 8);
 
     public PopupWindow()
     {
@@ -92,7 +96,6 @@ public partial class PopupWindow : Window
             Width = ConfigManager.PopupMaxWidth;
         }
 
-
         WindowsUtils.SetInputGestureText(AddNameButton!, ConfigManager.ShowAddNameWindowKeyGesture);
         WindowsUtils.SetInputGestureText(AddWordButton!, ConfigManager.ShowAddWordWindowKeyGesture);
         WindowsUtils.SetInputGestureText(SearchButton!, ConfigManager.SearchWithBrowserKeyGesture);
@@ -133,8 +136,7 @@ public partial class PopupWindow : Window
     public void TextBox_MouseMove(TextBox tb)
     {
         if (MiningMode || ConfigManager.InactiveLookupMode
-                       || (ConfigManager.RequireLookupKeyPress
-                           && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
+                       || (ConfigManager.RequireLookupKeyPress && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
                        || (ConfigManager.FixedPopupPositioning && _parentPopupWindow != null)
            )
             return;
@@ -162,7 +164,7 @@ public partial class PopupWindow : Window
             ResultStackPanels.Clear();
             List<LookupResult>? lookupResults = Lookup.LookupText(text);
 
-            if (lookupResults != null && lookupResults.Any())
+            if (lookupResults is { Count: > 0 })
             {
                 _lastSelectedText = lookupResults[0].FoundForm;
                 if (ConfigManager.HighlightLongestMatch)
@@ -190,10 +192,11 @@ public partial class PopupWindow : Window
                 }
 
                 _lastLookupResults = lookupResults;
-                DisplayResults(false);
+                DisplayResults(false, text);
             }
             else
             {
+                LastText = "";
                 Visibility = Visibility.Hidden;
 
                 if (ConfigManager.HighlightLongestMatch)
@@ -244,7 +247,7 @@ public partial class PopupWindow : Window
             }
 
             _lastLookupResults = lookupResults;
-            DisplayResults(true);
+            DisplayResults(true, tb.SelectedText);
         }
         else
         {
@@ -316,27 +319,43 @@ public partial class PopupWindow : Window
         Top = y;
     }
 
-    private void DisplayResults(bool generateAllResults)
+    private void DisplayResults(bool generateAllResults, string? text = null)
     {
-        int resultCount = _lastLookupResults.Count;
+        if (text != null && !generateAllResults && StackPanelCache.TryGet(text, out var data))
+        {
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (i > ConfigManager.MaxNumResultsNotInMiningMode)
+                {
+                    break;
+                }
 
+                StackPanel stackPanel = data[i];
+                ResultStackPanels.Add(stackPanel);
+            }
+
+            return;
+        }
+
+        int resultCount = _lastLookupResults.Count;
         for (int index = 0; index < resultCount; index++)
         {
-            // if (!generateAllResults && index > 0)
-            // {
-            //     PopupListBox.UpdateLayout();
-            //
-            //     if (PopupListBox.ActualHeight >= MaxHeight - 30)
-            //         return;
-            // }
+            if (!generateAllResults && index > ConfigManager.MaxNumResultsNotInMiningMode)
+            {
+                break;
+            }
 
             ResultStackPanels.Add(MakeResultStackPanel(_lastLookupResults[index], index, resultCount));
         }
 
-        UpdateLayout();
+        // we might cache incomplete results if we don't wait until all dicts are loaded
+        if (text != null && Storage.Ready)
+        {
+            StackPanelCache.AddReplace(text, ResultStackPanels.ToArray());
+        }
     }
 
-    private StackPanel MakeResultStackPanel(LookupResult result,
+    public StackPanel MakeResultStackPanel(LookupResult result,
         int index, int resultsCount)
     {
         var innerStackPanel = new StackPanel { Margin = new Thickness(4, 2, 4, 2), };
@@ -357,9 +376,7 @@ public partial class PopupWindow : Window
 
         var textBlockFoundForm = new TextBlock
         {
-            Name = nameof(result.FoundForm),
-            Text = result.FoundForm,
-            Visibility = Visibility.Collapsed,
+            Name = nameof(result.FoundForm), Text = result.FoundForm, Visibility = Visibility.Collapsed,
         };
 
         var textBlockFoundSpelling = new TextBlock
@@ -511,9 +528,7 @@ public partial class PopupWindow : Window
         {
             textBlockEdictId = new TextBlock
             {
-                Name = nameof(result.EdictId),
-                Text = result.EdictId,
-                Visibility = Visibility.Collapsed,
+                Name = nameof(result.EdictId), Text = result.EdictId, Visibility = Visibility.Collapsed,
             };
         }
 
@@ -858,7 +873,9 @@ public partial class PopupWindow : Window
                 {
                     var kanjiumResult = (KanjiumResult)kanjiumResultList[j];
 
-                    if (!hasReading || (kanjiumResult.Reading != null && normalizedExpression == Kana.KatakanaToHiraganaConverter(kanjiumResult.Reading)))
+                    if (!hasReading || (kanjiumResult.Reading != null &&
+                                        normalizedExpression ==
+                                        Kana.KatakanaToHiraganaConverter(kanjiumResult.Reading)))
                     {
                         if (foundSpelling == kanjiumResult.Spelling)
                         {
@@ -973,7 +990,8 @@ public partial class PopupWindow : Window
             {
                 if (ConfigManager.FixedPopupPositioning)
                 {
-                    ChildPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+                    ChildPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition,
+                        WindowsUtils.DpiAwareFixedPopupYPosition);
                 }
 
                 else
@@ -1160,8 +1178,7 @@ public partial class PopupWindow : Window
 
         MouseWheelEventArgs e2 = new(e.MouseDevice!, e.Timestamp, e.Delta)
         {
-            RoutedEvent = MouseWheelEvent,
-            Source = e.Source
+            RoutedEvent = MouseWheelEvent, Source = e.Source
         };
         PopupListBox!.RaiseEvent(e2);
     }
@@ -1364,7 +1381,8 @@ public partial class PopupWindow : Window
             ChildPopupWindow.LastText = "";
         }
 
-        if (MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning || UnavoidableMouseEnter) return;
+        if (MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning ||
+            UnavoidableMouseEnter) return;
 
         Hide();
         LastText = "";
@@ -1388,7 +1406,8 @@ public partial class PopupWindow : Window
 
         if (ConfigManager.FixedPopupPositioning)
         {
-            ChildPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+            ChildPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition,
+                WindowsUtils.DpiAwareFixedPopupYPosition);
         }
 
         else
@@ -1406,7 +1425,11 @@ public partial class PopupWindow : Window
             ChildPopupWindow.LastText = "";
         }
 
-        if (MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning || IsMouseOver) return;
+        if (MiningMode ||
+            ConfigManager.LookupOnSelectOnly ||
+            ConfigManager.FixedPopupPositioning ||
+            IsMouseOver)
+            return;
 
         Hide();
         LastText = "";

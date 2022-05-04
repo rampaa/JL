@@ -25,14 +25,6 @@
                         </StackPanel.Resources>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Maximum Search Length"
-                                       TextWrapping="Wrap"
-                                       Height="26" Width="175" />
-                            <hc:NumericUpDown x:Name="MaxSearchLengthNumericUpDown" Maximum="100" Minimum="1"
-                                              HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Frequency List"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <ComboBox x:Name="FrequencyListComboBox" HorizontalAlignment="Right" />
@@ -42,13 +34,6 @@
                             <TextBlock HorizontalAlignment="Left" Text="Kanji mode"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="KanjiModeCheckBox" Content="" HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Lookup throttle (ms)"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="LookupRateNumericUpDown" Maximum="50" Minimum="0"
-                                              HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -125,15 +110,16 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Height"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="MainWindowHeightNumericUpDown" Minimum="1"
-                                              HorizontalAlignment="Right" />
-                        </DockPanel>
-                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Width"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="MainWindowWidthNumericUpDown" Minimum="1"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Height"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="MainWindowHeightNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -194,12 +180,6 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Max height"
-                                       Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="PopupMaxHeightNumericUpDown" Minimum="1"
-                                              HorizontalAlignment="Right" />
-                        </DockPanel>
-                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max width"
                                        Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupMaxWidthNumericUpDown" Minimum="1"
@@ -207,15 +187,22 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Dynamic height"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="PopupDynamicHeightCheckBox" Content="" HorizontalAlignment="Right" />
+                            <TextBlock HorizontalAlignment="Left" Text="Max height"
+                                       Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="PopupMaxHeightNumericUpDown" Minimum="1"
+                                              HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Dynamic width"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="PopupDynamicWidthCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Dynamic height"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="PopupDynamicHeightCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -667,6 +654,55 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
+            <TabItem Header="Advanced">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                    <StackPanel Background="Black" Margin="20,10,20,10">
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type DockPanel}">
+                                <Setter Property="Margin" Value="0,10,0,0" />
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Maximum Search Length"
+                                       TextWrapping="Wrap"
+                                       Height="26" Width="175" />
+                            <hc:NumericUpDown x:Name="MaxSearchLengthNumericUpDown" Maximum="100" Minimum="1"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Lookup throttle (ms)"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="LookupRateNumericUpDown" Maximum="50" Minimum="0"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Max number of results when not in mining mode"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       ToolTip="Improves performance when using a lot of dictionaries at the same time"
+                                       Cursor="Help"/>
+                            <hc:NumericUpDown x:Name="MaxNumResultsNotInMiningModeNumericUpDown" Maximum="100"
+                                              Minimum="1"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel Margin="0,10,0,0">
+                            <TextBlock HorizontalAlignment="Left" Text="Precache results on text change"
+                                       TextWrapping="Wrap"
+                                       ToolTip="Generate all possible results for the text in the main window before you mouse over anything.
+&#10;Improves performance when using a lot of dictionaries at the same time, as long as you don't try to
+&#10;look up something immediately after the text changes.
+&#10;Not recommended unless you feel that lookup is slow."
+                                       Cursor="Help"/>
+                            <CheckBox x:Name="PrecachingCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
         </TabControl>
     </Grid>
 </Window>

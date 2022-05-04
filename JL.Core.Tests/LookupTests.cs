@@ -93,7 +93,6 @@ public class LookupTests
         Assert.AreEqual(expected, actual);
     }
 
-    //todo
     [Test]
     public void Freq_た_多()
     {

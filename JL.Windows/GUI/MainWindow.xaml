@@ -109,6 +109,9 @@
         <!-- <Ellipse x:Name="FocusEllipse" Margin="7,1,1,5" HorizontalAlignment="Left" VerticalAlignment="Bottom" -->
         <!--          ToolTip="Window Focus" Width="10" Height="10" /> -->
 
+        <TextBlock x:Name="PrecacheProgress" Margin="1,1,15,15" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                   Visibility="Collapsed" Width="120" Height="17" Foreground="White" />
+
         <TextBlock x:Name="FontSizeButton" HorizontalAlignment="Left"
                    Margin="37,0,10,0" Text="T" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" RenderTransformOrigin="-0.222,0.567" FontFamily="Meiryo UI"
                    MouseLeftButtonDown="FontSizeButton_MouseLeftButtonDown" ToolTip="Font Size" FontSize="18" />

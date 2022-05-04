@@ -23,7 +23,7 @@ public static class Storage
 {
     public static Timer Timer { get; } = new();
     public const string Jpod101NoAudioMd5Hash = "7e2c2f954ef6051373ba916f000168dc";
-    public static IFrontend Frontend { get; set; } = new UnimplementedFrontend();
+    public static IFrontend Frontend { get; set; } = new DummyFrontend();
     public static readonly string ApplicationPath = AppContext.BaseDirectory;
     public static readonly string ResourcesPath = Path.Join(AppContext.BaseDirectory, "Resources");
     public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
@@ -129,6 +129,8 @@ public static class Storage
             "）",
             "\n"
         };
+
+    public static int CacheSize { get; set; } = 1000;
 
     public static async Task LoadDictionaries()
     {
@@ -394,6 +396,8 @@ public static class Storage
             {
                 await Task.WhenAll(tasks.ToArray()).ConfigureAwait(false);
             }
+
+            Storage.Frontend.InvalidateDisplayCache();
 
             GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
