@@ -30,16 +30,11 @@
                   RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
             </TextBlock>
 
-            <ItemsControl Grid.Row="1" Name="ItemsControlButtons" Visibility="Collapsed"
-                          ItemsSource="{Binding Path=DictTypeButtons}"
-                          Background="{Binding Path=Background,
+            <TabControl Grid.Row="1" Name="TabControlDictTypes" Visibility="Collapsed"
+                        ItemsSource="{Binding Path=DictTypeTabItems}"
+                        Background="{Binding Path=Background,
                   RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
+            </TabControl>
 
             <ListBox Grid.Row="2" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
                      Foreground="White"
