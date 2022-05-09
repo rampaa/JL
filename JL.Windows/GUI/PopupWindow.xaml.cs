@@ -1462,8 +1462,10 @@ public partial class PopupWindow : Window
                     var btn = (Button)ItemsControlButtons.Items[i];
                     if (btn.IsEnabled)
                     {
+                        _filteredDict = btn.Content.ToString()!.GetEnum<DictType>();
                         btn.Background = Brushes.DodgerBlue;
                         ((Button)ItemsControlButtons.Items[0]).Background = brush;
+                        PopupListBox.Items.Filter = DictFilter;
                         break;
                     }
                 }
