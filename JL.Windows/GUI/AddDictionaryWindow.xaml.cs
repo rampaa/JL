@@ -62,7 +62,7 @@ public partial class AddDictionaryWindow : Window
             NewlineBetweenDefinitionsOption? newlineOption = null;
             if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(type))
             {
-                bool isEpwing = !Storage.BuiltInDicts.ContainsKey(type.ToString());
+                bool isEpwing = Storage.YomichanDictTypes.Concat(Storage.NazekaDictTypes).All(dt => dt != type);
                 newlineOption = new NewlineBetweenDefinitionsOption { Value = isEpwing };
             }
 

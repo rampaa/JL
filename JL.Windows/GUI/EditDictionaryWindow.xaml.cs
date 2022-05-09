@@ -161,6 +161,7 @@ public partial class EditDictionaryWindow : Window
                     );
 
             Storage.Dicts[type].Options = options;
+            Storage.Frontend.InvalidateDisplayCache();
 
             Close();
         }
@@ -202,7 +203,7 @@ public partial class EditDictionaryWindow : Window
     {
         if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dict.Type))
         {
-            bool isEpwing = !Storage.BuiltInDicts.ContainsKey(dict.Type.ToString());
+            bool isEpwing = Storage.YomichanDictTypes.Concat(Storage.NazekaDictTypes).All(dt => dt != dict.Type);
             NewlineCheckBox.IsChecked = dict.Options?.NewlineBetweenDefinitions?.Value ?? isEpwing;
             NewlineCheckBox.Visibility = Visibility.Visible;
         }
