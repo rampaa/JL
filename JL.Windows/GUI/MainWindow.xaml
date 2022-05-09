@@ -10,7 +10,7 @@
         PreviewKeyDown="MainWindow_PreviewKeyDown" SizeChanged="MainWindow_SizeChanged"
         PreviewMouseDown="Window_PreviewMouseDown" DpiChanged="Window_DpiChanged" PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown" Deactivated="Window_Deactivated" Activated="Window_Activated">
     <Window.Background>
-        <SolidColorBrush Color="Transparent" Opacity="0.3" />
+        <SolidColorBrush Color="Black" Opacity="0.3" />
     </Window.Background>
 
     <Grid x:Name="MainGrid">
