@@ -1209,9 +1209,6 @@ public partial class PopupWindow : Window
 
         if (WindowsUtils.KeyGestureComparer(e, ConfigManager.MiningModeKeyGesture))
         {
-            ItemsControlButtons.Visibility = Visibility.Visible;
-            GenerateDictTypeButtons();
-
             MiningMode = true;
             TextBlockMiningModeReminder!.Visibility = Visibility.Visible;
 
@@ -1223,6 +1220,9 @@ public partial class PopupWindow : Window
 
             ResultStackPanels.Clear();
             DisplayResults(true);
+
+            ItemsControlButtons.Visibility = Visibility.Visible;
+            GenerateDictTypeButtons();
         }
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.PlayAudioKeyGesture))
         {
@@ -1470,6 +1470,23 @@ public partial class PopupWindow : Window
         buttonAll.Click += ButtonAllOnClick;
         DictTypeButtons.Add(buttonAll);
 
+        var foundDictTypes = new List<DictType>();
+
+        foreach (StackPanel stackPanel in ResultStackPanels)
+        {
+            WrapPanel wrapPanel = (WrapPanel)stackPanel.Children[0];
+            UIElementCollection uiElementCollection = wrapPanel.Children;
+
+            foreach (UIElement uiElement in uiElementCollection)
+            {
+                if (uiElement is TextBlock { Name: "DictType" } textBlock)
+                {
+                    DictType foundDictType = textBlock.Text.GetEnum<DictType>();
+                    foundDictTypes.Add(foundDictType);
+                }
+            }
+        }
+
         foreach ((DictType dictType, Dict dict) in Storage.Dicts.OrderBy(d => d.Value.Priority))
         {
             if (!dict.Active || dictType == DictType.Kanjium)
@@ -1477,6 +1494,12 @@ public partial class PopupWindow : Window
 
             var button = new Button { Content = dictType.GetDescription(), Margin = new Thickness(1) };
             button.Click += DictTypeButtonOnClick;
+
+            if (!foundDictTypes.Contains(dictType))
+            {
+                button.IsEnabled = false;
+            }
+
             DictTypeButtons.Add(button);
         }
     }
