@@ -362,8 +362,11 @@ public partial class MainWindow : Window, IFrontend
 
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.MousePassThroughModeKeyGesture))
         {
-            Background!.Opacity = 0;
-            Keyboard.ClearFocus();
+            if (!ConfigManager.InvisibleMode)
+            {
+                Background!.Opacity = 0;
+                Keyboard.ClearFocus();
+            }
         }
 
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.InvisibleToggleModeKeyGesture))
