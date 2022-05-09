@@ -203,7 +203,7 @@ public partial class EditDictionaryWindow : Window
     {
         if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dict.Type))
         {
-            bool isEpwing = Storage.YomichanDictTypes.Concat(Storage.NazekaDictTypes).All(dt => dt != dict.Type);
+            bool isEpwing = Storage.YomichanDictTypes.Concat(Storage.NazekaDictTypes).Contains(dict.Type);
             NewlineCheckBox.IsChecked = dict.Options?.NewlineBetweenDefinitions?.Value ?? isEpwing;
             NewlineCheckBox.Visibility = Visibility.Visible;
         }
