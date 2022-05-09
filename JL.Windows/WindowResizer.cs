@@ -6,7 +6,7 @@ using JL.Windows.GUI;
 
 namespace JL.Windows;
 
-internal class WindowResizer
+public class WindowResizer
 {
     private const int WM_ERASEBKGND = 0x0014;
     private const int WM_SYSCOMMAND = 0x0112;
