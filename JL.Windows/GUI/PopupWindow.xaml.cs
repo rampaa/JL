@@ -847,7 +847,7 @@ public partial class PopupWindow : Window
         top.MouseLeave += OnMouseLeave;
         bottom.MouseLeave += OnMouseLeave;
 
-        PopupListBox.Items.Filter = NotInAlltDictFilter;
+        PopupListBox.Items.Filter = NoAllDictFilter;
 
         return innerStackPanel;
     }
@@ -1514,7 +1514,7 @@ public partial class PopupWindow : Window
 
         button.Background = Brushes.DodgerBlue;
 
-        PopupListBox.Items.Filter = NotInAlltDictFilter;
+        PopupListBox.Items.Filter = NoAllDictFilter;
     }
 
     private void DictTypeButtonOnClick(object sender, RoutedEventArgs e)
@@ -1540,11 +1540,18 @@ public partial class PopupWindow : Window
         return (DictType)Items.Tag == _filteredDict;
     }
 
-    private bool NotInAlltDictFilter(object item)
+    private bool NoAllDictFilter(object item)
     {
-        StackPanel Items = (StackPanel)item;
-        return Storage.Dicts.Where(dict => (!dict.Value.Options?.NoAll?.Value) ?? true)
-            .Select(dict => dict.Key).ToList()
-            .Contains((DictType)Items.Tag);
+        var dictType = (DictType)((StackPanel)item).Tag;
+
+        foreach (KeyValuePair<DictType, Dict> dict in Storage.Dicts)
+        {
+            if (dict.Key == dictType)
+            {
+                return (!dict.Value.Options?.NoAll?.Value) ?? true;
+            }
+        }
+
+        return true;
     }
 }
