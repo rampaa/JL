@@ -847,17 +847,9 @@ public partial class PopupWindow : Window
         top.MouseLeave += OnMouseLeave;
         bottom.MouseLeave += OnMouseLeave;
 
-        ApplyNoAllOption(dictType, innerStackPanel);
+        PopupListBox.Items.Filter = NotInAlltDictFilter;
 
         return innerStackPanel;
-    }
-
-    private static void ApplyNoAllOption(DictType type, StackPanel stackPanel)
-    {
-        if (Storage.Dicts[type].Options is { NoAll.Value: true })
-        {
-            stackPanel.Visibility = Visibility.Collapsed;
-        }
     }
 
     private static Grid CreatePitchAccentGrid(string foundSpelling, List<string> alternativeSpellings,
@@ -1522,7 +1514,7 @@ public partial class PopupWindow : Window
 
         button.Background = Brushes.DodgerBlue;
 
-        PopupListBox.Items.Filter = null;
+        PopupListBox.Items.Filter = NotInAlltDictFilter;
     }
 
     private void DictTypeButtonOnClick(object sender, RoutedEventArgs e)
@@ -1546,5 +1538,13 @@ public partial class PopupWindow : Window
     {
         StackPanel Items = (StackPanel)item;
         return (DictType)Items.Tag == _filteredDict;
+    }
+
+    private bool NotInAlltDictFilter(object item)
+    {
+        StackPanel Items = (StackPanel)item;
+        return Storage.Dicts.Where(dict => (!dict.Value.Options?.NoAll?.Value) ?? true)
+            .Select(dict => dict.Key).ToList()
+            .Contains((DictType)Items.Tag);
     }
 }
