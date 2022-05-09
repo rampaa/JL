@@ -36,6 +36,8 @@ public partial class PopupWindow : Window
 
     private List<LookupResult> _lastLookupResults = new();
 
+    private DictType? _filteredDict = null;
+
     public bool UnavoidableMouseEnter { get; private set; } = false;
 
     public string? LastText { get; set; }
@@ -361,7 +363,7 @@ public partial class PopupWindow : Window
         IEnumerable<DictType> dictTypeNames = Enum.GetValues(typeof(DictType)).Cast<DictType>();
         DictType dictType = dictTypeNames.First(dictTypeName => dictTypeName.ToString() == result.DictType);
 
-        var innerStackPanel = new StackPanel { Margin = new Thickness(4, 2, 4, 2), Tag = dictType};
+        var innerStackPanel = new StackPanel { Margin = new Thickness(4, 2, 4, 2), Tag = dictType };
         WrapPanel top = new();
         StackPanel bottom = new();
 
@@ -850,7 +852,7 @@ public partial class PopupWindow : Window
         return innerStackPanel;
     }
 
-    private void ApplyNoAllOption(DictType type, StackPanel stackPanel)
+    private static void ApplyNoAllOption(DictType type, StackPanel stackPanel)
     {
         if (Storage.Dicts[type].Options is { NoAll.Value: true })
         {
@@ -1520,12 +1522,7 @@ public partial class PopupWindow : Window
 
         button.Background = Brushes.DodgerBlue;
 
-        foreach (StackPanel stackPanel in ResultStackPanels)
-        {
-            stackPanel.Visibility = Visibility.Visible;
-            DictType foundDictType = (DictType)stackPanel.Tag;
-            ApplyNoAllOption(foundDictType, stackPanel);
-        }
+        PopupListBox.Items.Filter = null;
     }
 
     private void DictTypeButtonOnClick(object sender, RoutedEventArgs e)
@@ -1533,6 +1530,7 @@ public partial class PopupWindow : Window
         var button = (Button)sender;
         var brush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF2D2D30")!; // "Dark"
         brush.Freeze();
+
         foreach (Button btn in ItemsControlButtons.Items)
         {
             btn.Background = brush;
@@ -1540,17 +1538,13 @@ public partial class PopupWindow : Window
 
         button.Background = Brushes.DodgerBlue;
 
-        DictType requestedDictType = button.Content.ToString()!.GetEnum<DictType>();
-        foreach (StackPanel stackPanel in ResultStackPanels)
-        {
-            if ((DictType)stackPanel.Tag == requestedDictType)
-            {
-                stackPanel.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                stackPanel.Visibility = Visibility.Collapsed;
-            }
-        }
+        _filteredDict = button.Content.ToString()!.GetEnum<DictType>();
+
+        PopupListBox.Items.Filter = DictFilter;
+    }
+    private bool DictFilter(object item)
+    {
+        StackPanel Items = (StackPanel)item;
+        return (DictType)Items.Tag == _filteredDict;
     }
 }
