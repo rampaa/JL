@@ -427,7 +427,7 @@ public partial class MainWindow : Window, IFrontend
         {
             FirstPopupWindow.MiningMode = false;
             FirstPopupWindow.TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
-            FirstPopupWindow.TabControlDictTypes.Visibility = Visibility.Collapsed;
+            FirstPopupWindow.ItemsControlButtons.Visibility = Visibility.Collapsed;
 
             FirstPopupWindow.PopUpScrollViewer!.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
             FirstPopupWindow.Hide();
@@ -568,7 +568,7 @@ public partial class MainWindow : Window, IFrontend
         {
             currentPopupWindow.MiningMode = false;
             currentPopupWindow.TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
-            currentPopupWindow.TabControlDictTypes.Visibility = Visibility.Collapsed;
+            currentPopupWindow.ItemsControlButtons.Visibility = Visibility.Collapsed;
             currentPopupWindow.Hide();
 
             currentPopupWindow = currentPopupWindow.ChildPopupWindow;

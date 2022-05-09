@@ -44,7 +44,7 @@ public partial class PopupWindow : Window
 
     public ObservableCollection<StackPanel> ResultStackPanels { get; } = new();
 
-    public ObservableCollection<TabItem> DictTypeTabItems { get; } = new();
+    public ObservableCollection<Button> DictTypeButtons { get; } = new();
 
     public static LRUCache<string, StackPanel[]> StackPanelCache { get; } = new(
         Storage.CacheSize, Storage.CacheSize / 8);
@@ -1030,7 +1030,7 @@ public partial class PopupWindow : Window
 
         MiningMode = false;
         TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
-        TabControlDictTypes.Visibility = Visibility.Collapsed;
+        ItemsControlButtons.Visibility = Visibility.Collapsed;
         Hide();
 
         var miningParams = new Dictionary<JLField, string>();
@@ -1209,8 +1209,8 @@ public partial class PopupWindow : Window
 
         if (WindowsUtils.KeyGestureComparer(e, ConfigManager.MiningModeKeyGesture))
         {
-            TabControlDictTypes.Visibility = Visibility.Visible;
-            GenerateDictTypeTabItems();
+            ItemsControlButtons.Visibility = Visibility.Visible;
+            GenerateDictTypeButtons();
 
             MiningMode = true;
             TextBlockMiningModeReminder!.Visibility = Visibility.Visible;
@@ -1310,7 +1310,7 @@ public partial class PopupWindow : Window
         {
             MiningMode = false;
             TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
-            TabControlDictTypes.Visibility = Visibility.Collapsed;
+            ItemsControlButtons.Visibility = Visibility.Collapsed;
 
             PopUpScrollViewer!.ScrollToTop();
             PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
@@ -1462,38 +1462,56 @@ public partial class PopupWindow : Window
         //MainWindow.Instance.FocusEllipse.Fill = Brushes.Green;
     }
 
-    private void GenerateDictTypeTabItems()
+    private void GenerateDictTypeButtons()
     {
-        DictTypeTabItems.Clear();
+        DictTypeButtons.Clear();
 
-        var tabItemAll = new TabItem { Header = "All", };
-        tabItemAll.PreviewMouseLeftButtonUp += TabItemAllOnPreviewMouseLeftButtonUp;
-        DictTypeTabItems.Add(tabItemAll);
+        var buttonAll = new Button { Content = "All", Margin = new Thickness(1), Background = Brushes.DodgerBlue };
+        buttonAll.Click += ButtonAllOnClick;
+        DictTypeButtons.Add(buttonAll);
 
         foreach ((DictType dictType, Dict dict) in Storage.Dicts.OrderBy(d => d.Value.Priority))
         {
             if (!dict.Active || dictType == DictType.Kanjium)
                 continue;
 
-            var tabItem = new TabItem { Header = dictType.GetDescription(), };
-            tabItem.PreviewMouseLeftButtonUp += DictTypeTabItemOnPreviewMouseLeftButtonUp;
-            DictTypeTabItems.Add(tabItem);
+            var button = new Button { Content = dictType.GetDescription(), Margin = new Thickness(1) };
+            button.Click += DictTypeButtonOnClick;
+            DictTypeButtons.Add(button);
         }
     }
 
-    private void TabItemAllOnPreviewMouseLeftButtonUp(object sender, RoutedEventArgs e)
+    private void ButtonAllOnClick(object sender, RoutedEventArgs e)
     {
-        foreach (StackPanel stackPanel in ResultStackPanels)
+        var button = (Button)sender;
+        var brush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF2D2D30")!; // "Dark"
+        brush.Freeze();
+        foreach (Button btn in ItemsControlButtons.Items)
+        {
+            btn.Background = brush;
+        }
+
+        button.Background = Brushes.DodgerBlue;
+
+        foreach (var stackPanel in ResultStackPanels)
         {
             stackPanel.Visibility = Visibility.Visible;
         }
     }
 
-    private void DictTypeTabItemOnPreviewMouseLeftButtonUp(object sender, RoutedEventArgs e)
+    private void DictTypeButtonOnClick(object sender, RoutedEventArgs e)
     {
-        var tabItem = (TabItem)sender;
+        var button = (Button)sender;
+        var brush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF2D2D30")!; // "Dark"
+        brush.Freeze();
+        foreach (Button btn in ItemsControlButtons.Items)
+        {
+            btn.Background = brush;
+        }
 
-        DictType requestedDictType = tabItem.Header.ToString()!.GetEnum<DictType>();
+        button.Background = Brushes.DodgerBlue;
+
+        var requestedDictType = button.Content.ToString()!.GetEnum<DictType>();
         foreach (StackPanel stackPanel in ResultStackPanels)
         {
             WrapPanel wrapPanel = (WrapPanel)stackPanel.Children[0];
