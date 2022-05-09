@@ -1382,6 +1382,93 @@ public partial class PopupWindow : Window
         {
             WindowsUtils.ShowStatsWindow();
         }
+        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.NextDictKeyGesture))
+        {
+            bool foundSelectedButton = false;
+            bool movedToNextDict = false;
+
+            int dictCount = ItemsControlButtons.Items.Count;
+            for (int i = 0; i < dictCount; i++)
+            {
+                var button = (Button)ItemsControlButtons.Items[i];
+
+                if (button.Background == Brushes.DodgerBlue)
+                {
+                    var brush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF2D2D30")!; // "Dark"
+                    brush.Freeze();
+                    button.Background = brush;
+
+                    foundSelectedButton = true;
+                    continue;
+                }
+
+                if (foundSelectedButton && button.IsEnabled)
+                {
+                    _filteredDict = button.Content.ToString()!.GetEnum<DictType>();
+                    movedToNextDict = true;
+                    button.Background = Brushes.DodgerBlue;
+                    PopupListBox.Items.Filter = DictFilter;
+                    break;
+                }
+            }
+
+            if (!movedToNextDict)
+            {
+                ((Button)ItemsControlButtons.Items[0]).Background = Brushes.DodgerBlue;
+                PopupListBox.Items.Filter = NoAllDictFilter;
+            }
+        }
+        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.PreviousDictKeyGesture))
+        {
+            bool foundSelectedButton = false;
+            bool movedToPreviousDict = false;
+
+            var brush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF2D2D30")!; // "Dark"
+            brush.Freeze();
+
+            int dictCount = ItemsControlButtons.Items.Count;
+            for (int i = dictCount - 1; i > 0; i--)
+            {
+                var button = (Button)ItemsControlButtons.Items[i];
+
+                if (button.Background == Brushes.DodgerBlue)
+                {
+                    button.Background = brush;
+
+                    foundSelectedButton = true;
+                    continue;
+                }
+
+                if (foundSelectedButton && button.IsEnabled)
+                {
+                    _filteredDict = button.Content.ToString()!.GetEnum<DictType>();
+                    button.Background = Brushes.DodgerBlue;
+                    movedToPreviousDict = true;
+                    PopupListBox.Items.Filter = DictFilter;
+                    break;
+                }
+            }
+
+            if (foundSelectedButton && !movedToPreviousDict)
+            {
+                ((Button)ItemsControlButtons.Items[0]).Background = Brushes.DodgerBlue;
+                PopupListBox.Items.Filter = NoAllDictFilter;
+            }
+
+            else if (!foundSelectedButton)
+            {
+                for (int i = dictCount - 1; i > 0; i--)
+                {
+                    var btn = (Button)ItemsControlButtons.Items[i];
+                    if (btn.IsEnabled)
+                    {
+                        btn.Background = Brushes.DodgerBlue;
+                        ((Button)ItemsControlButtons.Items[0]).Background = brush;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

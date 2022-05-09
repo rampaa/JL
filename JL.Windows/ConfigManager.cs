@@ -118,6 +118,8 @@ public class ConfigManager : CoreConfig
     public static KeyGesture MotivationKeyGesture { get; private set; } = new(Key.O, ModifierKeys.Windows);
     public static KeyGesture ClosePopupKeyGesture { get; private set; } = new(Key.Escape, ModifierKeys.Windows);
     public static KeyGesture ShowStatsKeyGesture { get; private set; } = new(Key.Y, ModifierKeys.Windows);
+    public static KeyGesture NextDictKeyGesture { get; private set; } = new(Key.PageDown, ModifierKeys.Windows);
+    public static KeyGesture PreviousDictKeyGesture { get; private set; } = new(Key.PageUp, ModifierKeys.Windows);
 
     #endregion
 
@@ -410,6 +412,9 @@ public class ConfigManager : CoreConfig
 
         ShowStatsKeyGesture = WindowsUtils.KeyGestureSetter("ShowStatsKeyGesture", ShowStatsKeyGesture);
 
+        NextDictKeyGesture = WindowsUtils.KeyGestureSetter("NextDictKeyGesture", NextDictKeyGesture);
+        PreviousDictKeyGesture = WindowsUtils.KeyGestureSetter("PreviousDictKeyGesture", PreviousDictKeyGesture);
+
         WindowsUtils.SetInputGestureText(MainWindow.Instance.AddNameButton, ShowAddNameWindowKeyGesture);
         WindowsUtils.SetInputGestureText(MainWindow.Instance.AddWordButton, ShowAddWordWindowKeyGesture);
         WindowsUtils.SetInputGestureText(MainWindow.Instance.SearchButton, SearchWithBrowserKeyGesture);
@@ -556,7 +561,10 @@ public class ConfigManager : CoreConfig
             WindowsUtils.KeyGestureToString(ClosePopupKeyGesture);
         preferenceWindow.ShowStatsKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(ShowStatsKeyGesture);
-
+        preferenceWindow.NextDictKeyGestureTextBox.Text =
+            WindowsUtils.KeyGestureToString(NextDictKeyGesture);
+        preferenceWindow.PreviousDictKeyGestureTextBox.Text =
+            WindowsUtils.KeyGestureToString(PreviousDictKeyGesture);
 
         preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
         preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri;
@@ -677,6 +685,10 @@ public class ConfigManager : CoreConfig
             preferenceWindow.ClosePopupKeyGestureTextBox.Text);
         WindowsUtils.KeyGestureSaver("ShowStatsKeyGesture",
             preferenceWindow.ShowStatsKeyGestureTextBox.Text);
+        WindowsUtils.KeyGestureSaver("NextDictKeyGesture",
+            preferenceWindow.NextDictKeyGestureTextBox.Text);
+        WindowsUtils.KeyGestureSaver("PreviousDictKeyGesture",
+            preferenceWindow.PreviousDictKeyGestureTextBox.Text);
 
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
