@@ -361,7 +361,7 @@ public partial class PopupWindow : Window
         IEnumerable<DictType> dictTypeNames = Enum.GetValues(typeof(DictType)).Cast<DictType>();
         DictType dictType = dictTypeNames.First(dictTypeName => dictTypeName.ToString() == result.DictType);
 
-        var innerStackPanel = new StackPanel { Margin = new Thickness(4, 2, 4, 2), };
+        var innerStackPanel = new StackPanel { Margin = new Thickness(4, 2, 4, 2), Tag = dictType};
         WrapPanel top = new();
         StackPanel bottom = new();
 
@@ -1487,17 +1487,8 @@ public partial class PopupWindow : Window
 
         foreach (StackPanel stackPanel in ResultStackPanels)
         {
-            WrapPanel wrapPanel = (WrapPanel)stackPanel.Children[0];
-            UIElementCollection uiElementCollection = wrapPanel.Children;
-
-            foreach (UIElement uiElement in uiElementCollection)
-            {
-                if (uiElement is TextBlock { Name: "DictType" } textBlock)
-                {
-                    DictType foundDictType = textBlock.Text.GetEnum<DictType>();
-                    foundDictTypes.Add(foundDictType);
-                }
-            }
+            DictType foundDictType = (DictType)stackPanel.Tag;
+            foundDictTypes.Add(foundDictType);
         }
 
         foreach ((DictType dictType, Dict dict) in Storage.Dicts.OrderBy(d => d.Value.Priority))
@@ -1531,18 +1522,9 @@ public partial class PopupWindow : Window
 
         foreach (StackPanel stackPanel in ResultStackPanels)
         {
-            WrapPanel wrapPanel = (WrapPanel)stackPanel.Children[0];
-            UIElementCollection uiElementCollection = wrapPanel.Children;
-
-            foreach (UIElement uiElement in uiElementCollection)
-            {
-                if (uiElement is TextBlock { Name: "DictType" } textBlock)
-                {
-                    stackPanel.Visibility = Visibility.Visible;
-                    DictType foundDictType = textBlock.Text.GetEnum<DictType>();
-                    ApplyNoAllOption(foundDictType, stackPanel);
-                }
-            }
+            stackPanel.Visibility = Visibility.Visible;
+            DictType foundDictType = (DictType)stackPanel.Tag;
+            ApplyNoAllOption(foundDictType, stackPanel);
         }
     }
 
@@ -1561,23 +1543,13 @@ public partial class PopupWindow : Window
         DictType requestedDictType = button.Content.ToString()!.GetEnum<DictType>();
         foreach (StackPanel stackPanel in ResultStackPanels)
         {
-            WrapPanel wrapPanel = (WrapPanel)stackPanel.Children[0];
-            UIElementCollection uiElementCollection = wrapPanel.Children;
-
-            foreach (UIElement uiElement in uiElementCollection)
+            if ((DictType)stackPanel.Tag == requestedDictType)
             {
-                if (uiElement is TextBlock { Name: "DictType" } textBlock)
-                {
-                    DictType foundDictType = textBlock.Text.GetEnum<DictType>();
-                    if (foundDictType == requestedDictType)
-                    {
-                        stackPanel.Visibility = Visibility.Visible;
-                    }
-                    else
-                    {
-                        stackPanel.Visibility = Visibility.Collapsed;
-                    }
-                }
+                stackPanel.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                stackPanel.Visibility = Visibility.Collapsed;
             }
         }
     }
