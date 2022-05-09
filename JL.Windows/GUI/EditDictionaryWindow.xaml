@@ -30,9 +30,10 @@
                         <TextBlock Foreground="White" Text="Newline between definitions" TextWrapping="Wrap"/>
                     </CheckBox>
 
-                    <ComboBox Name="ExamplesComboBox" Margin="10" Width="100" Visibility="Collapsed" HorizontalAlignment="Left" FlowDirection="RightToLeft">
-                        <TextBlock Foreground="White" Text="Examples" TextWrapping="Wrap"/>
-                    </ComboBox>
+                    <DockPanel Name="ExamplesDockPanel" Visibility="Collapsed">
+                        <TextBlock Foreground="White" Text="Examples" TextWrapping="Wrap" Margin="10, 10, 5, 10" FontSize="12"/>
+                        <ComboBox Name="ExamplesComboBox" Margin="0, 0, 10, 0" Height="30" Width="80" HorizontalAlignment="Left" FontSize="12"/>
+                    </DockPanel>
 
                     <CheckBox Name="RequireKanjiModeCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left" FlowDirection="RightToLeft">
                         <TextBlock Foreground="White" Text="Don't show results unless in Kanji Mode" TextWrapping="Wrap" />

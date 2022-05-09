@@ -212,7 +212,7 @@ public partial class EditDictionaryWindow : Window
             ExamplesComboBox.ItemsSource = Enum.GetValues<ExamplesOptionValue>().ToArray();
             ExamplesComboBox.SelectedValue = dict.Options?.Examples?.Value ?? ExamplesOptionValue.All;
 
-            ExamplesComboBox.Visibility = Visibility.Visible;
+            ExamplesDockPanel.Visibility = Visibility.Visible;
         }
 
         if (RequireKanjiModeOption.ValidDictTypes.Contains(dict.Type))
@@ -290,7 +290,8 @@ public partial class EditDictionaryWindow : Window
         }
 
         if (NewlineCheckBox.Visibility == Visibility.Visible
-            || ExamplesComboBox.Visibility == Visibility.Visible
+            || ExamplesDockPanel.Visibility == Visibility.Visible
+            || RequireKanjiModeCheckBox.Visibility == Visibility.Visible
             || WordClassInfoCheckBox.Visibility == Visibility.Visible
             //|| DialectInfoCheckBox.Visibility == Visibility.Visible
             //|| POrthographyInfoCheckBox.Visibility == Visibility.Visible
