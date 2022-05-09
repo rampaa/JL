@@ -47,8 +47,7 @@ public static class Utils
             {
                 WriteIndented = true,
                 Converters = { new JsonStringEnumConverter(), },
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
-
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             };
 
             File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "dicts.json"),
