@@ -949,6 +949,9 @@ public partial class PopupWindow : Window
             }
         }
 
+        pitchAccentGrid.VerticalAlignment = VerticalAlignment.Center;
+        pitchAccentGrid.HorizontalAlignment = HorizontalAlignment.Center;
+
         return pitchAccentGrid;
     }
 
@@ -1516,7 +1519,7 @@ public partial class PopupWindow : Window
 
         button.Background = Brushes.DodgerBlue;
 
-        foreach (var stackPanel in ResultStackPanels)
+        foreach (StackPanel stackPanel in ResultStackPanels)
         {
             stackPanel.Visibility = Visibility.Visible;
         }
@@ -1534,7 +1537,7 @@ public partial class PopupWindow : Window
 
         button.Background = Brushes.DodgerBlue;
 
-        var requestedDictType = button.Content.ToString()!.GetEnum<DictType>();
+        DictType requestedDictType = button.Content.ToString()!.GetEnum<DictType>();
         foreach (StackPanel stackPanel in ResultStackPanels)
         {
             WrapPanel wrapPanel = (WrapPanel)stackPanel.Children[0];

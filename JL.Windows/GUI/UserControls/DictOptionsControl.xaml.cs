@@ -228,16 +228,16 @@ public partial class DictOptionsControl : UserControl
             || ExamplesDockPanel.Visibility == Visibility.Visible
             || RequireKanjiModeCheckBox.Visibility == Visibility.Visible
             || WordClassInfoCheckBox.Visibility == Visibility.Visible
-            //|| DialectInfoCheckBox.Visibility == Visibility.Visible
-            //|| POrthographyInfoCheckBox.Visibility == Visibility.Visible
-            //|| POrthographyInfoColorDockPanel.Visibility == Visibility.Visible
-            //|| POrthographyInfoFontSizeNumericUpDown.Visibility == Visibility.Visible
-            //|| AOrthographyInfoCheckBox.Visibility == Visibility.Visible
-            //|| ROrthographyInfoCheckBox.Visibility == Visibility.Visible
-            //|| WordTypeInfoCheckBox.Visibility == Visibility.Visible
-            //|| SpellingRestrictionInfoCheckBox.Visibility == Visibility.Visible
-            //|| ExtraDefinitionInfoCheckBox.Visibility == Visibility.Visible
-            //|| MiscInfoCheckBox.Visibility == Visibility.Visible
+           //|| DialectInfoCheckBox.Visibility == Visibility.Visible
+           //|| POrthographyInfoCheckBox.Visibility == Visibility.Visible
+           //|| POrthographyInfoColorDockPanel.Visibility == Visibility.Visible
+           //|| POrthographyInfoFontSizeNumericUpDown.Visibility == Visibility.Visible
+           //|| AOrthographyInfoCheckBox.Visibility == Visibility.Visible
+           //|| ROrthographyInfoCheckBox.Visibility == Visibility.Visible
+           //|| WordTypeInfoCheckBox.Visibility == Visibility.Visible
+           //|| SpellingRestrictionInfoCheckBox.Visibility == Visibility.Visible
+           //|| ExtraDefinitionInfoCheckBox.Visibility == Visibility.Visible
+           //|| MiscInfoCheckBox.Visibility == Visibility.Visible
            )
         {
             OptionsTextBlock.Visibility = Visibility.Visible;
