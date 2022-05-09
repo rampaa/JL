@@ -35,10 +35,10 @@ public partial class DictOptionsControl : UserControl
                 examplesOption = new ExamplesOption { Value = eov };
         }
 
-        RequireKanjiModeOption? kanjiOption = null;
-        if (RequireKanjiModeOption.ValidDictTypes.Contains(type))
+        NoAllOption? noAllOption = null;
+        if (NoAllOption.ValidDictTypes.Contains(type))
         {
-            kanjiOption = new RequireKanjiModeOption { Value = RequireKanjiModeCheckBox.IsChecked!.Value };
+            noAllOption = new NoAllOption { Value = NoAllCheckBox.IsChecked!.Value };
         }
 
         WordClassInfoOption? wordClassOption = null;
@@ -115,7 +115,7 @@ public partial class DictOptionsControl : UserControl
             new DictOptions(
                 newlineOption,
                 examplesOption,
-                kanjiOption,
+                noAllOption,
                 wordClassOption,
                 dialectOption,
                 pOrthographyInfoOption,
@@ -149,10 +149,10 @@ public partial class DictOptionsControl : UserControl
             ExamplesDockPanel.Visibility = Visibility.Visible;
         }
 
-        if (RequireKanjiModeOption.ValidDictTypes.Contains(dict.Type))
+        if (NoAllOption.ValidDictTypes.Contains(dict.Type))
         {
-            RequireKanjiModeCheckBox.IsChecked = dict.Options?.RequireKanjiMode?.Value ?? false;
-            RequireKanjiModeCheckBox.Visibility = Visibility.Visible;
+            NoAllCheckBox.IsChecked = dict.Options?.NoAll?.Value ?? false;
+            NoAllCheckBox.Visibility = Visibility.Visible;
         }
 
         if (WordClassInfoOption.ValidDictTypes.Contains(dict.Type))
@@ -226,7 +226,7 @@ public partial class DictOptionsControl : UserControl
 
         if (NewlineCheckBox.Visibility == Visibility.Visible
             || ExamplesDockPanel.Visibility == Visibility.Visible
-            || RequireKanjiModeCheckBox.Visibility == Visibility.Visible
+            || NoAllCheckBox.Visibility == Visibility.Visible
             || WordClassInfoCheckBox.Visibility == Visibility.Visible
            //|| DialectInfoCheckBox.Visibility == Visibility.Visible
            //|| POrthographyInfoCheckBox.Visibility == Visibility.Visible

@@ -5,6 +5,7 @@ namespace JL.Core.Utilities;
 
 public static class ExtensionMethods
 {
+    // Fallsback to name
     public static string? GetDescription(this Enum value)
     {
         Type type = value.GetType();
@@ -29,6 +30,7 @@ public static class ExtensionMethods
         return null;
     }
 
+    // Fallsback to name
     public static T GetEnum<T>(this string description) where T : Enum
     {
         foreach (FieldInfo field in typeof(T).GetFields())

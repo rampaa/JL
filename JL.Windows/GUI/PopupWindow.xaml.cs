@@ -358,6 +358,9 @@ public partial class PopupWindow : Window
     public StackPanel MakeResultStackPanel(LookupResult result,
         int index, int resultsCount)
     {
+        IEnumerable<DictType> dictTypeNames = Enum.GetValues(typeof(DictType)).Cast<DictType>();
+        DictType dictType = dictTypeNames.First(dictTypeName => dictTypeName.ToString() == result.DictType);
+
         var innerStackPanel = new StackPanel { Margin = new Thickness(4, 2, 4, 2), };
         WrapPanel top = new();
         StackPanel bottom = new();
@@ -415,9 +418,6 @@ public partial class PopupWindow : Window
 
         if (result.DictType != null)
         {
-            IEnumerable<DictType> dictTypeNames = Enum.GetValues(typeof(DictType)).Cast<DictType>();
-            DictType dictType = dictTypeNames.First(dictTypeName => dictTypeName.ToString() == result.DictType);
-
             textBlockDictType = new TextBlock
             {
                 Name = nameof(result.DictType),
@@ -845,7 +845,17 @@ public partial class PopupWindow : Window
         top.MouseLeave += OnMouseLeave;
         bottom.MouseLeave += OnMouseLeave;
 
+        ApplyNoAllOption(dictType, innerStackPanel);
+
         return innerStackPanel;
+    }
+
+    private void ApplyNoAllOption(DictType type, StackPanel stackPanel)
+    {
+        if (Storage.Dicts[type].Options is { NoAll.Value: true })
+        {
+            stackPanel.Visibility = Visibility.Collapsed;
+        }
     }
 
     private static Grid CreatePitchAccentGrid(string foundSpelling, List<string> alternativeSpellings,
@@ -1521,7 +1531,18 @@ public partial class PopupWindow : Window
 
         foreach (StackPanel stackPanel in ResultStackPanels)
         {
-            stackPanel.Visibility = Visibility.Visible;
+            WrapPanel wrapPanel = (WrapPanel)stackPanel.Children[0];
+            UIElementCollection uiElementCollection = wrapPanel.Children;
+
+            foreach (UIElement uiElement in uiElementCollection)
+            {
+                if (uiElement is TextBlock { Name: "DictType" } textBlock)
+                {
+                    stackPanel.Visibility = Visibility.Visible;
+                    DictType foundDictType = textBlock.Text.GetEnum<DictType>();
+                    ApplyNoAllOption(foundDictType, stackPanel);
+                }
+            }
         }
     }
 

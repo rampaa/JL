@@ -25,9 +25,10 @@ public readonly struct NewlineBetweenDefinitionsOption
     public bool Value { get; init; }
 }
 
-public readonly struct RequireKanjiModeOption
+public readonly struct NoAllOption
 {
-    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.Kanjidic };
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = Enum.GetValues<DictType>()
+        .Except(new[] { DictType.Kanjium }).ToArray();
 
     public bool Value { get; init; }
 }

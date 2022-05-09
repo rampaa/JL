@@ -4,7 +4,7 @@ public class DictOptions
 {
     public NewlineBetweenDefinitionsOption? NewlineBetweenDefinitions { get; }
     public ExamplesOption? Examples { get; }
-    public RequireKanjiModeOption? RequireKanjiMode { get; }
+    public NoAllOption? NoAll { get; }
     public WordClassInfoOption? WordClassInfo { get; }
     public DialectInfoOption? DialectInfo { get; }
     public POrthographyInfoOption? POrthographyInfo { get; }
@@ -21,7 +21,7 @@ public class DictOptions
         (
         NewlineBetweenDefinitionsOption? newlineBetweenDefinitions = null,
         ExamplesOption? examples = null,
-        RequireKanjiModeOption? requireKanjiMode = null,
+        NoAllOption? noAll = null,
         WordClassInfoOption? wordClassInfo = null,
         DialectInfoOption? dialectInfo = null,
         POrthographyInfoOption? pOrthographyInfo = null,
@@ -37,7 +37,7 @@ public class DictOptions
     {
         NewlineBetweenDefinitions = newlineBetweenDefinitions;
         Examples = examples;
-        RequireKanjiMode = requireKanjiMode;
+        NoAll = noAll;
         WordClassInfo = wordClassInfo;
         DialectInfo = dialectInfo;
         POrthographyInfo = pOrthographyInfo;

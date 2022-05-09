@@ -82,7 +82,7 @@ public static class Storage
             {
                 "Kanjidic",
                 new Dict(DictType.Kanjidic, $"{ResourcesPath}\\kanjidic2.xml", true, 4,
-                    new DictOptions(requireKanjiMode: new() { Value = false }))
+                    new DictOptions(noAll: new() { Value = false }))
             }
         };
 

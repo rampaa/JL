@@ -23,9 +23,9 @@
                               HorizontalAlignment="Left" FontSize="12" />
                 </DockPanel>
 
-                <CheckBox Name="RequireKanjiModeCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left"
+                <CheckBox Name="NoAllCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left"
                           FlowDirection="RightToLeft">
-                    <TextBlock Foreground="White" Text="Don't show results unless in Kanji Mode" TextWrapping="Wrap" />
+                    <TextBlock Foreground="White" Text="Don't show results under All" TextWrapping="Wrap" />
                 </CheckBox>
 
                 <CheckBox Name="WordClassInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left"
