@@ -2,7 +2,7 @@
 
 namespace JL.Core.Anki;
 
- public class Note
+public class Note
 {
     [JsonPropertyName("deckName")] public string DeckName { get; }
 

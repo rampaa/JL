@@ -18,8 +18,7 @@ public static class PopupWindowUtilities
             {
                 if (!string.IsNullOrEmpty(rOrthographyInfoList[index]))
                 {
-                    sb.Append(' ');
-                    sb.Append('(');
+                    sb.Append(" (");
                     sb.Append(rOrthographyInfoList[index]);
                     sb.Append(')');
                 }
@@ -51,8 +50,7 @@ public static class PopupWindowUtilities
             {
                 if (!string.IsNullOrEmpty(aOrthographyInfoList[index]))
                 {
-                    sb.Append(' ');
-                    sb.Append('(');
+                    sb.Append(" (");
                     sb.Append(aOrthographyInfoList[index]);
                     sb.Append(')');
                 }

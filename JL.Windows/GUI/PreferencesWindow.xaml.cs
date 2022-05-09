@@ -3,9 +3,6 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using HandyControl.Controls;
-using HandyControl.Tools;
 using JL.Core.Anki;
 using JL.Core.Network;
 using JL.Core.Utilities;
@@ -38,19 +35,7 @@ public partial class PreferencesWindow : System.Windows.Window
 
     private void ShowColorPicker(object sender, RoutedEventArgs e)
     {
-        ColorPicker picker = SingleOpenHelper.CreateControl<ColorPicker>();
-        var window = new HandyControl.Controls.PopupWindow { PopupElement = picker, };
-        picker.Canceled += delegate { window.Close(); };
-        picker.Confirmed += delegate { ColorSetter((Button)sender, picker.SelectedBrush, window); };
-
-        window.ShowDialog(picker, false);
-    }
-
-    private static void ColorSetter(Button sender, SolidColorBrush selectedColor,
-        HandyControl.Controls.PopupWindow window)
-    {
-        sender.Background = selectedColor;
-        window.Close();
+        WindowsUtils.ShowColorPicker(sender, e);
     }
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -74,7 +59,7 @@ public partial class PreferencesWindow : System.Windows.Window
 
     private async void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        var itemTab = (System.Windows.Controls.TabItem?)TabControl.SelectedItem;
+        var itemTab = (TabItem?)TabControl.SelectedItem;
 
         if (itemTab == null)
             return;
@@ -207,7 +192,7 @@ public partial class PreferencesWindow : System.Windows.Window
             {
                 StackPanel stackPanel = new();
                 var textBlockFieldName = new TextBlock { Text = fieldName };
-                var comboBoxJLFields = new System.Windows.Controls.ComboBox
+                var comboBoxJLFields = new ComboBox
                 {
                     ItemsSource = descriptions,
                     SelectedItem = jlField.GetDescription() ?? jlField.ToString()
@@ -236,7 +221,7 @@ public partial class PreferencesWindow : System.Windows.Window
             foreach (StackPanel stackPanel in MiningSetupStackPanelFields.Children)
             {
                 var textBlock = (TextBlock)stackPanel.Children[0];
-                var comboBox = (System.Windows.Controls.ComboBox)stackPanel.Children[1];
+                var comboBox = (ComboBox)stackPanel.Children[1];
 
                 string selectedDescription = comboBox.SelectionBoxItem.ToString()!;
 

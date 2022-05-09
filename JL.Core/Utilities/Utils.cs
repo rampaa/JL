@@ -47,7 +47,8 @@ public static class Utils
             {
                 WriteIndented = true,
                 Converters = { new JsonStringEnumConverter(), },
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+
             };
 
             File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "dicts.json"),
@@ -271,6 +272,6 @@ public static class Utils
 
     private static async void OnTimedEvent(object? sender, ElapsedEventArgs e)
     {
-       await Stats.UpdateLifetimeStats();
+        await Stats.UpdateLifetimeStats();
     }
 }

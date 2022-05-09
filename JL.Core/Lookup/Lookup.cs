@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Text;
-using Caching;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomNameDict;
@@ -1033,7 +1032,7 @@ public static class Lookup
             if (newlines)
                 defResult.Append($"({count}) ");
 
-            if (jMDictResult.WordClasses?[i]?.Any() ?? false)
+            if (Storage.Dicts[dictType].Options is { WordClassInfo.Value: true } && (jMDictResult.WordClasses?[i]?.Any() ?? false))
             {
                 defResult.Append('(');
                 defResult.Append(string.Join(", ", jMDictResult.WordClasses[i]!));
@@ -1043,29 +1042,30 @@ public static class Lookup
             if (!newlines)
                 defResult.Append($"({count}) ");
 
-            if (jMDictResult.Dialects?[i]?.Any() ?? false)
+            if (Storage.Dicts[dictType].Options is { DialectInfo.Value: true } && (jMDictResult.Dialects?[i]?.Any() ?? false))
             {
                 defResult.Append('(');
                 defResult.Append(string.Join(", ", jMDictResult.Dialects[i]!));
                 defResult.Append(") ");
             }
 
-            if (jMDictResult.DefinitionInfo != null && jMDictResult.DefinitionInfo.Any() &&
-                jMDictResult.DefinitionInfo[i] != null)
+            if (Storage.Dicts[dictType].Options is { ExtraDefinitionInfo.Value: true }
+                && (jMDictResult.DefinitionInfo?.Any() ?? false)
+                && jMDictResult.DefinitionInfo[i] != null)
             {
                 defResult.Append('(');
                 defResult.Append(jMDictResult.DefinitionInfo[i]);
                 defResult.Append(") ");
             }
 
-            if (jMDictResult.MiscList?[i]?.Any() ?? false)
+            if (Storage.Dicts[dictType].Options is { MiscInfo.Value: true } && (jMDictResult.MiscList?[i]?.Any() ?? false))
             {
                 defResult.Append('(');
                 defResult.Append(string.Join(", ", jMDictResult.MiscList[i]!));
                 defResult.Append(") ");
             }
 
-            if (jMDictResult.TypeList?[i]?.Any() ?? false)
+            if (Storage.Dicts[dictType].Options is { WordTypeInfo.Value: true } && (jMDictResult.TypeList?[i]?.Any() ?? false))
             {
                 defResult.Append('(');
                 defResult.Append(string.Join(", ", jMDictResult.TypeList[i]!));
@@ -1074,8 +1074,9 @@ public static class Lookup
 
             defResult.Append(string.Join("; ", jMDictResult.Definitions![i]) + " ");
 
-            if ((jMDictResult.RRestrictions?[i]?.Any() ?? false) ||
-                (jMDictResult.KRestrictions?[i]?.Any() ?? false))
+            if (Storage.Dicts[dictType].Options is { SpellingRestrictionInfo.Value: true }
+                && ((jMDictResult.RRestrictions?[i]?.Any() ?? false)
+                    || (jMDictResult.KRestrictions?[i]?.Any() ?? false)))
             {
                 defResult.Append("(only applies to ");
 

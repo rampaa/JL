@@ -65,7 +65,7 @@ public partial class StatsWindow : Window
                     button.Content = StatsMode.Session.ToString();
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(null, "StatsMode out of range");
             }
         }
     }

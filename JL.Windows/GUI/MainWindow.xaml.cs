@@ -127,7 +127,7 @@ public partial class MainWindow : Window, IFrontend
                     if (Storage.Ready && ConfigManager.Precaching
                                       && MainTextBox!.Text.Length < Storage.CacheSize)
                     {
-                        Dispatcher.Invoke(DispatcherPriority.Render, delegate() { }); // let MainTextBox text update
+                        Dispatcher.Invoke(DispatcherPriority.Render, delegate () { }); // let MainTextBox text update
                         await Precache(MainTextBox!.Text);
                     }
                 }
@@ -189,8 +189,8 @@ public partial class MainWindow : Window, IFrontend
                             break;
                         }
 
-                        var lookupResult = lookupResults[i];
-                        var stackPanel = FirstPopupWindow.MakeResultStackPanel(lookupResult, i, lookupResults.Count);
+                        LookupResult lookupResult = lookupResults[i];
+                        StackPanel stackPanel = FirstPopupWindow.MakeResultStackPanel(lookupResult, i, lookupResults.Count);
                         stackPanels.Add(stackPanel);
                     }
 

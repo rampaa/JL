@@ -2,18 +2,52 @@
 
 public class DictOptions
 {
-    public DictOptions(NewlineBetweenDefinitionsOption? newlineBetweenDefinitions,
-        ExamplesOption? examples,
-        RequireKanjiModeOption? requireKanjiMode)
+    public NewlineBetweenDefinitionsOption? NewlineBetweenDefinitions { get; }
+    public ExamplesOption? Examples { get; }
+    public RequireKanjiModeOption? RequireKanjiMode { get; }
+    public WordClassInfoOption? WordClassInfo { get; }
+    public DialectInfoOption? DialectInfo { get; }
+    public POrthographyInfoOption? POrthographyInfo { get; }
+    public POrthographyInfoColorOption? POrthographyInfoColor { get; }
+    public POrthographyInfoFontSizeOption? POrthographyInfoFontSize { get; }
+    public AOrthographyInfoOption? AOrthographyInfo { get; }
+    public ROrthographyInfoOption? ROrthographyInfo { get; }
+    public WordTypeInfoOption? WordTypeInfo { get; }
+    public SpellingRestrictionInfoOption? SpellingRestrictionInfo { get; }
+    public ExtraDefinitionInfoOption? ExtraDefinitionInfo { get; }
+    public MiscInfoOption? MiscInfo { get; }
+
+    public DictOptions
+        (
+        NewlineBetweenDefinitionsOption? newlineBetweenDefinitions = null,
+        ExamplesOption? examples = null,
+        RequireKanjiModeOption? requireKanjiMode = null,
+        WordClassInfoOption? wordClassInfo = null,
+        DialectInfoOption? dialectInfo = null,
+        POrthographyInfoOption? pOrthographyInfo = null,
+        POrthographyInfoColorOption? pOrthographyInfoColor = null,
+        POrthographyInfoFontSizeOption? pOrthographyInfoFontSize = null,
+        AOrthographyInfoOption? aOrthographyInfo = null,
+        ROrthographyInfoOption? rOrthographyInfo = null,
+        WordTypeInfoOption? wordTypeInfo = null,
+        SpellingRestrictionInfoOption? spellingRestrictionInfo = null,
+        ExtraDefinitionInfoOption? extraDefinitionInfo = null,
+        MiscInfoOption? miscInfo = null
+        )
     {
         NewlineBetweenDefinitions = newlineBetweenDefinitions;
         Examples = examples;
         RequireKanjiMode = requireKanjiMode;
+        WordClassInfo = wordClassInfo;
+        DialectInfo = dialectInfo;
+        POrthographyInfo = pOrthographyInfo;
+        POrthographyInfoColor = pOrthographyInfoColor;
+        POrthographyInfoFontSize = pOrthographyInfoFontSize;
+        AOrthographyInfo = aOrthographyInfo;
+        ROrthographyInfo = rOrthographyInfo;
+        WordTypeInfo = wordTypeInfo;
+        SpellingRestrictionInfo = spellingRestrictionInfo;
+        ExtraDefinitionInfo = extraDefinitionInfo;
+        MiscInfo = miscInfo;
     }
-
-    public NewlineBetweenDefinitionsOption? NewlineBetweenDefinitions { get; }
-
-    public ExamplesOption? Examples { get; }
-
-    public RequireKanjiModeOption? RequireKanjiMode { get; }
 }

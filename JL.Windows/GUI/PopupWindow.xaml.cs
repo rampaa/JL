@@ -152,11 +152,11 @@ public partial class PopupWindow : Window
             _currentText = tb.Text;
             _currentCharPosition = charPosition;
 
-            int endPosition = Utils.FindWordBoundary(tb.Text, charPosition);
+            int endPosition = tb.Text.Length - charPosition > ConfigManager.MaxSearchLength
+                ? Utils.FindWordBoundary(tb.Text[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
+                : Utils.FindWordBoundary(tb.Text, charPosition);
 
-            string text = endPosition - charPosition <= ConfigManager.MaxSearchLength
-                ? tb.Text[charPosition..endPosition]
-                : tb.Text[charPosition..(charPosition + ConfigManager.MaxSearchLength)];
+            string text = tb.Text[charPosition..endPosition];
 
             if (text == LastText) return;
             LastText = text;
@@ -321,7 +321,7 @@ public partial class PopupWindow : Window
 
     private void DisplayResults(bool generateAllResults, string? text = null)
     {
-        if (text != null && !generateAllResults && StackPanelCache.TryGet(text, out var data))
+        if (text != null && !generateAllResults && StackPanelCache.TryGet(text, out StackPanel[] data))
         {
             for (int i = 0; i < data.Length; i++)
             {
@@ -376,7 +376,9 @@ public partial class PopupWindow : Window
 
         var textBlockFoundForm = new TextBlock
         {
-            Name = nameof(result.FoundForm), Text = result.FoundForm, Visibility = Visibility.Collapsed,
+            Name = nameof(result.FoundForm),
+            Text = result.FoundForm,
+            Visibility = Visibility.Collapsed,
         };
 
         var textBlockFoundSpelling = new TextBlock
@@ -435,8 +437,9 @@ public partial class PopupWindow : Window
         {
             List<string> rOrthographyInfoList = result.ROrthographyInfoList ??= new();
             List<string> readings = result.Readings;
-            string readingsText =
-                PopupWindowUtilities.MakeUiElementReadingsText(readings, rOrthographyInfoList);
+            string readingsText = Storage.Dicts[DictType.JMdict].Options is { ROrthographyInfo.Value: true } && rOrthographyInfoList.Any()
+                ? PopupWindowUtilities.MakeUiElementReadingsText(readings, rOrthographyInfoList)
+                : string.Join(", ", result.Readings);
 
             if (readingsText != "")
             {
@@ -528,7 +531,9 @@ public partial class PopupWindow : Window
         {
             textBlockEdictId = new TextBlock
             {
-                Name = nameof(result.EdictId), Text = result.EdictId, Visibility = Visibility.Collapsed,
+                Name = nameof(result.EdictId),
+                Text = result.EdictId,
+                Visibility = Visibility.Collapsed,
             };
         }
 
@@ -536,9 +541,9 @@ public partial class PopupWindow : Window
         {
             List<string> aOrthographyInfoList = result.AOrthographyInfoList ??= new List<string>();
             List<string> alternativeSpellings = result.AlternativeSpellings;
-            string alternativeSpellingsText =
-                PopupWindowUtilities.MakeUiElementAlternativeSpellingsText(alternativeSpellings,
-                    aOrthographyInfoList);
+            string alternativeSpellingsText = Storage.Dicts[DictType.JMdict].Options is { AOrthographyInfo.Value: true } && aOrthographyInfoList.Any()
+                ? PopupWindowUtilities.MakeUiElementAlternativeSpellingsText(alternativeSpellings, aOrthographyInfoList)
+                : "(" + string.Join(", ", alternativeSpellings) + ")";
 
             if (alternativeSpellingsText != "")
             {
@@ -597,14 +602,19 @@ public partial class PopupWindow : Window
             };
         }
 
-        if (result.POrthographyInfoList != null && result.POrthographyInfoList.Any())
+        if (Storage.Dicts[DictType.JMdict].Options is { POrthographyInfo.Value: true }
+            && (result.POrthographyInfoList?.Any() ?? false))
         {
             textBlockPOrthographyInfo = new TextBlock
             {
                 Name = nameof(result.POrthographyInfoList),
-                Text = $"({string.Join(",", result.POrthographyInfoList)})",
-                Foreground = ConfigManager.PrimarySpellingColor,
-                FontSize = ConfigManager.PrimarySpellingFontSize,
+                Text = $"({string.Join(", ", result.POrthographyInfoList)})",
+
+                Foreground = (SolidColorBrush)new BrushConverter()
+                    .ConvertFrom(Storage.Dicts[DictType.JMdict].Options?.POrthographyInfoColor?.Value
+                        ?? ConfigManager.PrimarySpellingColor.ToString())!,
+
+                FontSize = Storage.Dicts[DictType.JMdict].Options?.POrthographyInfoFontSize?.Value ?? 15,
                 Margin = new Thickness(5, 0, 0, 0),
                 TextWrapping = TextWrapping.Wrap,
             };
@@ -1178,7 +1188,8 @@ public partial class PopupWindow : Window
 
         MouseWheelEventArgs e2 = new(e.MouseDevice!, e.Timestamp, e.Delta)
         {
-            RoutedEvent = MouseWheelEvent, Source = e.Source
+            RoutedEvent = MouseWheelEvent,
+            Source = e.Source
         };
         PopupListBox!.RaiseEvent(e2);
     }
@@ -1227,13 +1238,13 @@ public partial class PopupWindow : Window
             string? foundSpelling = null;
             string? reading = null;
 
-            var visibleStackPanels = PopupListBox.Items.Cast<StackPanel>()
+            StackPanel[] visibleStackPanels = PopupListBox.Items.Cast<StackPanel>()
                 .Where(stackPanel => stackPanel.Visibility == Visibility.Visible).ToArray();
 
             if (visibleStackPanels.Length == 0)
                 return;
 
-            var innerStackPanel = visibleStackPanels[_playAudioIndex];
+            StackPanel innerStackPanel = visibleStackPanels[_playAudioIndex];
             var top = (WrapPanel)innerStackPanel.Children[0];
 
             foreach (UIElement child in top.Children)
@@ -1472,7 +1483,7 @@ public partial class PopupWindow : Window
 
     private void TabItemAllOnPreviewMouseLeftButtonUp(object sender, RoutedEventArgs e)
     {
-        foreach (var stackPanel in ResultStackPanels)
+        foreach (StackPanel stackPanel in ResultStackPanels)
         {
             stackPanel.Visibility = Visibility.Visible;
         }
@@ -1482,7 +1493,7 @@ public partial class PopupWindow : Window
     {
         var tabItem = (TabItem)sender;
 
-        var requestedDictType = tabItem.Header.ToString()!.GetEnum<DictType>();
+        DictType requestedDictType = tabItem.Header.ToString()!.GetEnum<DictType>();
         foreach (StackPanel stackPanel in ResultStackPanels)
         {
             WrapPanel wrapPanel = (WrapPanel)stackPanel.Children[0];
@@ -1492,7 +1503,7 @@ public partial class PopupWindow : Window
             {
                 if (uiElement is TextBlock { Name: "DictType" } textBlock)
                 {
-                    var foundDictType = textBlock.Text.GetEnum<DictType>();
+                    DictType foundDictType = textBlock.Text.GetEnum<DictType>();
                     if (foundDictType == requestedDictType)
                     {
                         stackPanel.Visibility = Visibility.Visible;

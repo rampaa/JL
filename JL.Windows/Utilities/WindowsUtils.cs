@@ -12,12 +12,15 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Markup;
 using System.Windows.Media;
+using HandyControl.Controls;
+using HandyControl.Tools;
 using JL.Core;
 using JL.Core.Network;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
 using NAudio.Wave;
 using Application = System.Windows.Application;
+using Button = System.Windows.Controls.Button;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace JL.Windows.Utilities;
@@ -390,5 +393,22 @@ public static class WindowsUtils
         menuItem.InputGestureText = keyGestureString != "None"
             ? keyGestureString
             : "";
+    }
+
+    public static void ShowColorPicker(object sender, RoutedEventArgs e)
+    {
+        ColorPicker picker = SingleOpenHelper.CreateControl<ColorPicker>();
+        var window = new HandyControl.Controls.PopupWindow { PopupElement = picker, };
+        picker.Canceled += delegate { window.Close(); };
+        picker.Confirmed += delegate { ColorSetter((Button)sender, picker.SelectedBrush, window); };
+
+        window.ShowDialog(picker, false);
+    }
+
+    public static void ColorSetter(Button sender, SolidColorBrush selectedColor,
+    HandyControl.Controls.PopupWindow window)
+    {
+        sender.Background = selectedColor;
+        window.Close();
     }
 }

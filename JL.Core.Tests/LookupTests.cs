@@ -20,7 +20,19 @@ public class LookupTests
 
         Storage.Dicts.Add(DictType.JMdict,
             new Dict(DictType.JMdict, jmdictPath, true, 0,
-                new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }, null, null)));
+                    new DictOptions(
+                        newlineBetweenDefinitions: new() { Value = false },
+                        wordClassInfo: new() { Value = true },
+                        dialectInfo: new() { Value = true },
+                        pOrthographyInfo: new() { Value = true },
+                        pOrthographyInfoColor: new() { Value = "#FFD2691E" },
+                        pOrthographyInfoFontSize: new() { Value = 15 },
+                        aOrthographyInfo: new() { Value = true },
+                        rOrthographyInfo: new() { Value = true },
+                        wordTypeInfo: new() { Value = true },
+                        miscInfo: new() { Value = true }
+                        )));
+
         Storage.Dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();
 
         if (!File.Exists(jmdictPath))
