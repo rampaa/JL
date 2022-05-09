@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
@@ -20,6 +21,16 @@ public class ConfigManager : CoreConfig
     }
 
     #region General
+
+    public static readonly List<ComboBoxItem> JapaneseFonts =
+        WindowsUtils.FindJapaneseFonts().OrderByDescending(f => f.Foreground!.ToString()).ThenBy(font => font.Content)
+            .ToList();
+
+    public static readonly List<ComboBoxItem> PopupJapaneseFonts =
+        JapaneseFonts.ConvertAll(f => new ComboBoxItem()
+        {
+            Content = f.Content, FontFamily = f.FontFamily, Foreground = f.Foreground
+        });
 
     public static bool InactiveLookupMode { get; set; } = false; // todo checkbox?
     public static bool InvisibleMode { get; set; } = false; // todo checkbox?
@@ -574,13 +585,13 @@ public class ConfigManager : CoreConfig
         preferenceWindow.TextboxFontSizeNumericUpDown.Value = MainWindow.Instance.FontSizeSlider.Value;
         preferenceWindow.TextboxOpacityNumericUpDown.Value = MainWindow.Instance.OpacitySlider.Value;
 
-        preferenceWindow.MainWindowFontComboBox.ItemsSource = UiControls.JapaneseFonts;
-        preferenceWindow.MainWindowFontComboBox.SelectedIndex = UiControls.JapaneseFonts.FindIndex(f =>
+        preferenceWindow.MainWindowFontComboBox.ItemsSource = JapaneseFonts;
+        preferenceWindow.MainWindowFontComboBox.SelectedIndex = JapaneseFonts.FindIndex(f =>
             f.Content.ToString() == MainWindow.Instance.MainTextBox.FontFamily.Source);
 
-        preferenceWindow.PopupFontComboBox.ItemsSource = UiControls.PopupJapaneseFonts;
+        preferenceWindow.PopupFontComboBox.ItemsSource = PopupJapaneseFonts;
         preferenceWindow.PopupFontComboBox.SelectedIndex =
-            UiControls.PopupJapaneseFonts.FindIndex(f => f.Content.ToString() == PopupFont.Source);
+            PopupJapaneseFonts.FindIndex(f => f.Content.ToString() == PopupFont.Source);
 
         preferenceWindow.PopupMaxHeightNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Height;
         preferenceWindow.PopupMaxWidthNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;
