@@ -51,6 +51,7 @@ public partial class ManageDictionariesWindow : Window
         Visibility = Visibility.Collapsed;
         Utils.SerializeDicts();
         await Storage.LoadDictionaries().ConfigureAwait(false);
+        Storage.Frontend.InvalidateDisplayCache();
     }
 
     // probably should be split into several methods
