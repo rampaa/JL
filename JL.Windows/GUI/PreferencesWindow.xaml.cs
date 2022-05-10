@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
@@ -6,6 +6,7 @@ using System.Windows.Input;
 using JL.Core.Anki;
 using JL.Core.Network;
 using JL.Core.Utilities;
+using JL.Core;
 using JL.Windows.Utilities;
 using Button = System.Windows.Controls.Button;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
