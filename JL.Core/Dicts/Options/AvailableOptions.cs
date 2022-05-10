@@ -27,7 +27,8 @@ public readonly struct NewlineBetweenDefinitionsOption
 
 public readonly struct NoAllOption
 {
-    [JsonIgnore] public static readonly DictType[] ValidDictTypes = Enum.GetValues<DictType>()
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes = Enum.GetValues<DictType>()
         .Except(new[] { DictType.Kanjium }).ToArray();
 
     public bool Value { get; init; }
@@ -107,4 +108,11 @@ public readonly struct MiscInfoOption
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
     public bool Value { get; init; }
+}
+
+public readonly struct PitchAccentMarkerColorOption
+{
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes = { DictType.Kanjium };
+    public string Value { get; init; }
 }

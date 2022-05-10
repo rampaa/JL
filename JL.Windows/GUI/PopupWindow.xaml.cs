@@ -909,7 +909,9 @@ public partial class PopupWindow : Window
                     Polyline polyline = new()
                     {
                         StrokeThickness = 2,
-                        Stroke = ConfigManager.PitchAccentMarkerColor,
+                        Stroke = (SolidColorBrush)new BrushConverter()
+                            .ConvertFrom(Storage.Dicts[DictType.Kanjium].Options?.PitchAccentMarkerColor?.Value
+                            ?? Colors.DeepSkyBlue.ToString())!,
                         StrokeDashArray = new DoubleCollection { 1, 1 }
                     };
 

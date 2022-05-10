@@ -42,6 +42,7 @@ public partial class PreferencesWindow : System.Windows.Window
     {
         Visibility = Visibility.Collapsed;
         ConfigManager.Instance.SavePreferences(this);
+        PopupWindow.StackPanelCache.Clear();
         MainWindow.Instance.Focus();
     }
 

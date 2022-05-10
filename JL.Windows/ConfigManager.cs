@@ -89,7 +89,6 @@ public class ConfigManager : CoreConfig
     public static Brush DictTypeColor { get; private set; } = Brushes.LightBlue;
     public static int DictTypeFontSize { get; set; } = 15;
     public static Brush SeparatorColor { get; private set; } = Brushes.White;
-    public static Brush PitchAccentMarkerColor { get; private set; } = Brushes.LightGreen;
 
     #endregion
 
@@ -247,12 +246,6 @@ public class ConfigManager : CoreConfig
                     .ConvertFrom(ConfigurationManager.AppSettings.Get("SeparatorColor")!)!,
             SeparatorColor, "SeparatorColor");
         SeparatorColor.Freeze();
-
-        WindowsUtils.Try(() =>
-                PitchAccentMarkerColor = (SolidColorBrush)new BrushConverter()
-                    .ConvertFrom(ConfigurationManager.AppSettings.Get("PitchAccentMarkerColor")!)!,
-            PitchAccentMarkerColor, "PitchAccentMarkerColor");
-        PitchAccentMarkerColor.Freeze();
 
         WindowsUtils.Try(() =>
                 DictTypeColor = (SolidColorBrush)new BrushConverter()
@@ -640,7 +633,6 @@ public class ConfigManager : CoreConfig
             preferenceWindow.PopupOpacityNumericUpDown.Value, "PopupOpacity");
 
         preferenceWindow.SeparatorColorButton.Background = SeparatorColor;
-        preferenceWindow.PitchAccentMarkerColorButton.Background = PitchAccentMarkerColor;
 
         preferenceWindow.DictTypeColorButton.Background = DictTypeColor;
 
@@ -788,9 +780,6 @@ public class ConfigManager : CoreConfig
 
         config.AppSettings.Settings["SeparatorColor"].Value =
             preferenceWindow.SeparatorColorButton.Background.ToString();
-
-        config.AppSettings.Settings["PitchAccentMarkerColor"].Value =
-            preferenceWindow.PitchAccentMarkerColorButton.Background.ToString();
 
         config.AppSettings.Settings["DictTypeColor"].Value =
             preferenceWindow.DictTypeColorButton.Background.ToString();

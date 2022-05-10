@@ -97,6 +97,16 @@
                     <TextBlock Foreground="White" Text="Show misc info" TextWrapping="Wrap" />
                 </CheckBox>
 
+                <DockPanel x:Name="PitchAccentMarkerColorDockPanel" Visibility="Collapsed">
+                    <TextBlock HorizontalAlignment="Left" Text="Pitch Accent Marker Color"
+                               Margin="10, 10, 5, 10"
+                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" Foreground="White" />
+                    <Button x:Name="PitchAccentMarkerColorButton" Content="" HorizontalAlignment="Left"
+                            Width="50" Height="25" Click="ShowColorPicker" Margin="0, 0, 10, 0"
+                            VerticalAlignment="Center"
+                            BorderThickness="2" BorderBrush="#FF707070" />
+                </DockPanel>
+
             </StackPanel>
         </ScrollViewer>
     </StackPanel>

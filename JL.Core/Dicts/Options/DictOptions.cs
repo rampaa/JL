@@ -16,6 +16,7 @@ public class DictOptions
     public SpellingRestrictionInfoOption? SpellingRestrictionInfo { get; }
     public ExtraDefinitionInfoOption? ExtraDefinitionInfo { get; }
     public MiscInfoOption? MiscInfo { get; }
+    public PitchAccentMarkerColorOption? PitchAccentMarkerColor { get; }
 
     public DictOptions
         (
@@ -32,7 +33,8 @@ public class DictOptions
         WordTypeInfoOption? wordTypeInfo = null,
         SpellingRestrictionInfoOption? spellingRestrictionInfo = null,
         ExtraDefinitionInfoOption? extraDefinitionInfo = null,
-        MiscInfoOption? miscInfo = null
+        MiscInfoOption? miscInfo = null,
+        PitchAccentMarkerColorOption? pitchAccentMarkerColor = null
         )
     {
         NewlineBetweenDefinitions = newlineBetweenDefinitions;
@@ -49,5 +51,6 @@ public class DictOptions
         SpellingRestrictionInfo = spellingRestrictionInfo;
         ExtraDefinitionInfo = extraDefinitionInfo;
         MiscInfo = miscInfo;
+        PitchAccentMarkerColor = pitchAccentMarkerColor;
     }
 }

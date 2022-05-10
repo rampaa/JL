@@ -111,6 +111,12 @@ public partial class DictOptionsControl : UserControl
             miscInfoOption = new MiscInfoOption { Value = MiscInfoCheckBox.IsChecked!.Value };
         }
 
+        PitchAccentMarkerColorOption? pitchAccentMarkerColorOption = null;
+        if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(type))
+        {
+            pitchAccentMarkerColorOption = new PitchAccentMarkerColorOption { Value = PitchAccentMarkerColorButton.Background.ToString() };
+        }
+
         var options =
             new DictOptions(
                 newlineOption,
@@ -126,7 +132,8 @@ public partial class DictOptionsControl : UserControl
                 wordTypeOption,
                 spellingRestrictionInfo,
                 extraDefinitionInfo,
-                miscInfoOption
+                miscInfoOption,
+                pitchAccentMarkerColorOption
             );
 
         return options;
@@ -224,10 +231,20 @@ public partial class DictOptionsControl : UserControl
             MiscInfoCheckBox.Visibility = Visibility.Visible;
         }
 
+        if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(dict.Type))
+        {
+            PitchAccentMarkerColorButton.Background = (SolidColorBrush)new BrushConverter()
+                .ConvertFrom(dict.Options?.PitchAccentMarkerColor?.Value
+                ?? Colors.DeepSkyBlue.ToString())!;
+
+            PitchAccentMarkerColorDockPanel.Visibility = Visibility.Visible;
+        }
+
         if (NewlineCheckBox.Visibility == Visibility.Visible
             || ExamplesDockPanel.Visibility == Visibility.Visible
             || NoAllCheckBox.Visibility == Visibility.Visible
             || WordClassInfoCheckBox.Visibility == Visibility.Visible
+            || PitchAccentMarkerColorDockPanel.Visibility == Visibility.Visible
            //|| DialectInfoCheckBox.Visibility == Visibility.Visible
            //|| POrthographyInfoCheckBox.Visibility == Visibility.Visible
            //|| POrthographyInfoColorDockPanel.Visibility == Visibility.Visible
