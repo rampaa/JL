@@ -139,7 +139,6 @@ public partial class MainWindow : Window, IFrontend
         }
     }
 
-    [STAThread]
     public async Task Precache(string input)
     {
         if (Debugger.IsAttached)
@@ -170,11 +169,11 @@ public partial class MainWindow : Window, IFrontend
                 await Task.Delay(1); // let user interact with the GUI while this method is running
             }
 
-            int endPosition = Utils.FindWordBoundary(input, charPosition);
+            int endPosition = input.Length - charPosition > ConfigManager.MaxSearchLength
+                ? Utils.FindWordBoundary(input[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
+                : Utils.FindWordBoundary(input, charPosition);
 
-            string text = endPosition - charPosition <= ConfigManager.MaxSearchLength
-                ? input[charPosition..endPosition]
-                : input[charPosition..(charPosition + ConfigManager.MaxSearchLength)];
+            string text = input[charPosition..endPosition];
 
             if (!PopupWindow.StackPanelCache.Contains(text))
             {
