@@ -45,13 +45,13 @@ internal static class JMdictBuilder
                     || sense.StagKList.Contains(key)
                     || sense.StagRList.Intersect(result.Readings!).Any())
                 {
-                    result.Definitions!.Add(sense.GlossList);
-                    result.RRestrictions!.Add(sense.StagRList);
-                    result.KRestrictions!.Add(sense.StagKList);
-                    result.WordClasses!.Add(sense.PosList);
-                    result.FieldList!.Add(sense.FieldList);
-                    result.MiscList!.Add(sense.MiscList);
-                    result.Dialects!.Add(sense.DialList);
+                    result.Definitions.Add(sense.GlossList);
+                    result.RRestrictions!.Add(sense.StagRList.Any() ? sense.StagRList : null);
+                    result.KRestrictions!.Add(sense.StagKList.Any() ? sense.StagKList : null);
+                    result.WordClasses!.Add(sense.PosList.Any() ? sense.PosList : null);
+                    result.FieldList!.Add(sense.FieldList.Any() ? sense.FieldList : null);
+                    result.MiscList!.Add(sense.MiscList.Any() ? sense.MiscList : null);
+                    result.Dialects!.Add(sense.DialList.Any() ? sense.DialList : null);
                     result.DefinitionInfo!.Add(sense.SInf);
                     // result.RelatedTerms.AddRange(sense.XRefList);
                     // result.Antonyms.AddRange(sense.AntList);
@@ -140,13 +140,13 @@ internal static class JMdictBuilder
                     || sense.StagKList.Contains(result.PrimarySpelling)
                     || sense.StagKList.Intersect(result.AlternativeSpellings).Any())
                 {
-                    result.Definitions!.Add(sense.GlossList);
-                    result.RRestrictions!.Add(sense.StagRList);
-                    result.KRestrictions!.Add(sense.StagKList);
-                    result.WordClasses!.Add(sense.PosList);
-                    result.FieldList!.Add(sense.FieldList);
-                    result.MiscList!.Add(sense.MiscList);
-                    result.Dialects!.Add(sense.DialList);
+                    result.Definitions.Add(sense.GlossList);
+                    result.RRestrictions!.Add(sense.StagRList.Any() ? sense.StagRList : null);
+                    result.KRestrictions!.Add(sense.StagKList.Any() ? sense.StagKList : null);
+                    result.WordClasses!.Add(sense.PosList.Any() ? sense.PosList : null);
+                    result.FieldList!.Add(sense.FieldList.Any() ? sense.FieldList : null);
+                    result.MiscList!.Add(sense.MiscList.Any() ? sense.MiscList : null);
+                    result.Dialects!.Add(sense.DialList.Any() ? sense.DialList : null);
                     result.DefinitionInfo!.Add(sense.SInf);
                     // result.RelatedTerms.AddRange(sense.XRefList);
                     // result.Antonyms.AddRange(sense.AntList);
@@ -158,6 +158,14 @@ internal static class JMdictBuilder
 
         foreach (KeyValuePair<string, JMdictResult> rl in resultList)
         {
+            rl.Value.Definitions.TrimExcess();
+
+            int definitionCounter = rl.Value.Definitions.Count;
+            for (int i = 0; i < definitionCounter; i++)
+            {
+                rl.Value.Definitions[i].TrimExcess();
+            }
+
             if (!rl.Value.Readings!.Any() || rl.Value.Readings!.All(string.IsNullOrEmpty))
                 rl.Value.Readings = null;
             else
@@ -248,19 +256,6 @@ internal static class JMdictBuilder
                 for (int i = 0; i < counter; i++)
                 {
                     rl.Value.ROrthographyInfoList[i]?.TrimExcess();
-                }
-            }
-
-            if (!rl.Value.Definitions!.Any() || rl.Value.Definitions!.All(l => !l.Any()))
-                rl.Value.Definitions = null;
-            else
-            {
-                rl.Value.Definitions!.TrimExcess();
-
-                int counter = rl.Value.Definitions.Count;
-                for (int i = 0; i < counter; i++)
-                {
-                    rl.Value.Definitions[i].TrimExcess();
                 }
             }
 

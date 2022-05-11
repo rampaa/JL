@@ -485,9 +485,7 @@ public static class Lookup
                 result.ROrthographyInfoList = rOrthographyInfoList;
                 result.AOrthographyInfoList = aOrthographyInfoList;
                 result.DictType = wordResult.DictType.ToString();
-                result.FormattedDefinitions = jMDictResult.Definitions != null
-                    ? BuildJmdictDefinition(jMDictResult, wordResult.DictType)
-                    : null;
+                result.FormattedDefinitions = BuildJmdictDefinition(jMDictResult, wordResult.DictType);
 
                 results.Add(result);
             }
@@ -1024,7 +1022,7 @@ public static class Lookup
         int count = 1;
         StringBuilder defResult = new();
 
-        int definitionCount = jMDictResult.Definitions?.Count ?? 0;
+        int definitionCount = jMDictResult.Definitions.Count;
 
         for (int i = 0; i < definitionCount; i++)
         {
@@ -1071,7 +1069,7 @@ public static class Lookup
                 defResult.Append(") ");
             }
 
-            defResult.Append(string.Join("; ", jMDictResult.Definitions![i]) + " ");
+            defResult.Append(string.Join("; ", jMDictResult.Definitions[i]) + " ");
 
             if (Storage.Dicts[dictType].Options is { SpellingRestrictionInfo.Value: true }
                 && ((jMDictResult.RRestrictions?[i]?.Any() ?? false)
