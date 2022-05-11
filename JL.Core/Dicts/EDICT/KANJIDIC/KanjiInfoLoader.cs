@@ -60,7 +60,6 @@ public static class KanjiInfoLoader
             }
 
             kanjidic.Contents.TrimExcess();
-            System.Diagnostics.Debug.WriteLine("Kanjidic count: " + kanjidic.Contents.Count);
         }
 
         else if (Storage.Frontend.ShowYesNoDialog(

@@ -108,7 +108,6 @@ internal static class EpwingNazekaLoader
             }
 
             nazekaEpwingDict.TrimExcess();
-            System.Diagnostics.Debug.WriteLine(nazekaEpwingDict.Count);
         }
 
         catch (Exception e)

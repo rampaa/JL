@@ -56,6 +56,5 @@ public static class KanjiumLoader
         }
 
         kanjiumDict.TrimExcess();
-        System.Diagnostics.Debug.WriteLine(kanjiumDict.Count);
     }
 }

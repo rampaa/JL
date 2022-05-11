@@ -29,7 +29,6 @@ public static class EpwingYomichanLoader
         }
 
         Storage.Dicts[dictType].Contents.TrimExcess();
-        System.Diagnostics.Debug.WriteLine(Storage.Dicts[dictType].Contents.Count);
     }
 
     private static void DictionaryBuilder(EpwingYomichanResult yomichanResult,
