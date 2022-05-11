@@ -49,7 +49,7 @@ internal static class JMdictBuilder
                     result.RRestrictions!.Add(sense.StagRList);
                     result.KRestrictions!.Add(sense.StagKList);
                     result.WordClasses!.Add(sense.PosList);
-                    result.TypeList!.Add(sense.FieldList);
+                    result.FieldList!.Add(sense.FieldList);
                     result.MiscList!.Add(sense.MiscList);
                     result.Dialects!.Add(sense.DialList);
                     result.DefinitionInfo!.Add(sense.SInf);
@@ -144,7 +144,7 @@ internal static class JMdictBuilder
                     result.RRestrictions!.Add(sense.StagRList);
                     result.KRestrictions!.Add(sense.StagKList);
                     result.WordClasses!.Add(sense.PosList);
-                    result.TypeList!.Add(sense.FieldList);
+                    result.FieldList!.Add(sense.FieldList);
                     result.MiscList!.Add(sense.MiscList);
                     result.Dialects!.Add(sense.DialList);
                     result.DefinitionInfo!.Add(sense.SInf);
@@ -160,42 +160,140 @@ internal static class JMdictBuilder
         {
             if (!rl.Value.Readings!.Any() || rl.Value.Readings!.All(string.IsNullOrEmpty))
                 rl.Value.Readings = null;
+            else
+                rl.Value.Readings!.TrimExcess();
 
             if (!rl.Value.AlternativeSpellings!.Any())
                 rl.Value.AlternativeSpellings = null;
+            else
+                rl.Value.AlternativeSpellings!.TrimExcess();
 
             if (!rl.Value.RRestrictions!.Any() || rl.Value.RRestrictions!.All(l => l == null || !l.Any()))
                 rl.Value.RRestrictions = null;
+            else
+            {
+                rl.Value.RRestrictions!.TrimExcess();
+
+                int counter = rl.Value.RRestrictions.Count;
+                for (int i = 0; i < counter; i++)
+                {
+                    rl.Value.RRestrictions[i]?.TrimExcess();
+                }
+            }
 
             if (!rl.Value.KRestrictions!.Any() || rl.Value.KRestrictions!.All(l => l == null || !l.Any()))
                 rl.Value.KRestrictions = null;
+            else
+            {
+                rl.Value.KRestrictions!.TrimExcess();
+
+                int counter = rl.Value.KRestrictions.Count;
+                for (int i = 0; i < counter; i++)
+                {
+                    rl.Value.KRestrictions[i]?.TrimExcess();
+                }
+            }
 
             if (!rl.Value.Dialects!.Any() || !rl.Value.Dialects!.All(l => l == null || !l.Any()))
                 rl.Value.Dialects = null;
+            else
+            {
+                rl.Value.Dialects!.TrimExcess();
+
+                int counter = rl.Value.Dialects.Count;
+                for (int i = 0; i < counter; i++)
+                {
+                    rl.Value.Dialects[i]?.TrimExcess();
+                }
+            }
 
             if (!rl.Value.MiscList!.Any() || rl.Value.MiscList!.All(l => l == null || !l.Any()))
                 rl.Value.MiscList = null;
+            else
+            {
+                rl.Value.MiscList!.TrimExcess();
+
+                int counter = rl.Value.MiscList.Count;
+                for (int i = 0; i < counter; i++)
+                {
+                    rl.Value.MiscList[i]?.TrimExcess();
+                }
+            }
 
             if (!rl.Value.POrthographyInfoList!.Any() || rl.Value.POrthographyInfoList!.All(string.IsNullOrEmpty))
                 rl.Value.POrthographyInfoList = null;
+            else
+                rl.Value.POrthographyInfoList!.TrimExcess();
 
             if (!rl.Value.AOrthographyInfoList!.Any() || rl.Value.AOrthographyInfoList!.All(l => l == null || !l.Any()))
                 rl.Value.AOrthographyInfoList = null;
+            else
+            {
+                rl.Value.AOrthographyInfoList!.TrimExcess();
+
+                int counter = rl.Value.AOrthographyInfoList.Count;
+                for (int i = 0; i < counter; i++)
+                {
+                    rl.Value.AOrthographyInfoList[i]?.TrimExcess();
+                }
+            }
 
             if (!rl.Value.ROrthographyInfoList!.Any() || rl.Value.ROrthographyInfoList!.All(l => l == null || !l.Any()))
                 rl.Value.ROrthographyInfoList = null;
+            else
+            {
+                rl.Value.ROrthographyInfoList!.TrimExcess();
+
+                int counter = rl.Value.ROrthographyInfoList.Count;
+                for (int i = 0; i < counter; i++)
+                {
+                    rl.Value.ROrthographyInfoList[i]?.TrimExcess();
+                }
+            }
 
             if (!rl.Value.Definitions!.Any() || rl.Value.Definitions!.All(l => !l.Any()))
                 rl.Value.Definitions = null;
+            else
+            {
+                rl.Value.Definitions!.TrimExcess();
+
+                int counter = rl.Value.Definitions.Count;
+                for (int i = 0; i < counter; i++)
+                {
+                    rl.Value.Definitions[i].TrimExcess();
+                }
+            }
 
             if (!rl.Value.DefinitionInfo!.Any() || rl.Value.DefinitionInfo!.All(s => s == null || string.IsNullOrEmpty(s)))
                 rl.Value.DefinitionInfo = null;
+            else
+                rl.Value.DefinitionInfo!.TrimExcess();
 
-            if (!rl.Value.TypeList!.Any() || rl.Value.TypeList!.All(l => l == null || !l.Any()))
-                rl.Value.TypeList = null;
+            if (!rl.Value.FieldList!.Any() || rl.Value.FieldList!.All(l => l == null || !l.Any()))
+                rl.Value.FieldList = null;
+            else
+            {
+                rl.Value.FieldList!.TrimExcess();
+
+                int counter = rl.Value.FieldList.Count;
+                for (int i = 0; i < counter; i++)
+                {
+                    rl.Value.FieldList[i]?.TrimExcess();
+                }
+            }
 
             if (!rl.Value.WordClasses!.Any() || rl.Value.WordClasses!.All(l => l == null || !l.Any()))
                 rl.Value.WordClasses = null;
+            else
+            {
+                rl.Value.WordClasses!.TrimExcess();
+
+                int counter = rl.Value.WordClasses.Count;
+                for (int i = 0; i < counter; i++)
+                {
+                    rl.Value.WordClasses[i]?.TrimExcess();
+                }
+            }
 
             rl.Value.Id = entry.Id;
             string key = Kana.KatakanaToHiraganaConverter(rl.Key);

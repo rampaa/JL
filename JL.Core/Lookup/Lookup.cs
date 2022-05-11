@@ -274,7 +274,7 @@ public static class Lookup
                                         resultsList.Add(dictResult);
                                     }
 
-                                    else if (Storage.WcDict!.TryGetValue(deconjugationResult.Text,
+                                    else if (Storage.WcDict.TryGetValue(deconjugationResult.Text,
                                                  out List<JmdictWc>? jmdictWcResults))
                                     {
                                         for (int j = 0; j < jmdictWcResults.Count; j++)
@@ -311,7 +311,7 @@ public static class Lookup
                                         resultsList.Add(dictResult);
                                     }
 
-                                    else if (Storage.WcDict!.TryGetValue(deconjugationResult.Text,
+                                    else if (Storage.WcDict.TryGetValue(deconjugationResult.Text,
                                                  out List<JmdictWc>? jmdictWcResults))
                                     {
                                         for (int j = 0; j < jmdictWcResults.Count; j++)
@@ -1064,10 +1064,10 @@ public static class Lookup
                 defResult.Append(") ");
             }
 
-            if (Storage.Dicts[dictType].Options is { WordTypeInfo.Value: true } && (jMDictResult.TypeList?[i]?.Any() ?? false))
+            if (Storage.Dicts[dictType].Options is { WordTypeInfo.Value: true } && (jMDictResult.FieldList?[i]?.Any() ?? false))
             {
                 defResult.Append('(');
-                defResult.Append(string.Join(", ", jMDictResult.TypeList[i]!));
+                defResult.Append(string.Join(", ", jMDictResult.FieldList[i]!));
                 defResult.Append(") ");
             }
 

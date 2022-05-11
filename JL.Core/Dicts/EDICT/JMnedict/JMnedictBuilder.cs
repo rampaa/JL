@@ -84,15 +84,23 @@ public static class JMnedictBuilder
 
             if (!rl.Value.AlternativeSpellings!.Any())
                 rl.Value.AlternativeSpellings = null;
+            else
+                rl.Value.AlternativeSpellings!.TrimExcess();
 
             if (!rl.Value.Definitions!.Any())
                 rl.Value.Definitions = null;
+            else
+                rl.Value.Definitions!.TrimExcess();
 
             if (!rl.Value.NameTypes!.Any())
                 rl.Value.NameTypes = null;
+            else
+                rl.Value.NameTypes!.TrimExcess();
 
             if (!rl.Value.Readings!.Any())
                 rl.Value.Readings = null;
+            else
+                rl.Value.Readings!.TrimExcess();
 
             if (jMnedictDictionary.TryGetValue(key, out List<IResult>? tempList))
                 tempList.Add(rl.Value);

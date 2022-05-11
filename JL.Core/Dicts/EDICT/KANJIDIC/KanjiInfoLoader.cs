@@ -6,6 +6,7 @@ public static class KanjiInfoLoader
 {
     public static async Task Load(string dictPath)
     {
+        Dict kanjidic = Storage.Dicts[DictType.Kanjidic];
         if (File.Exists(dictPath))
         {
             using XmlTextReader edictXml = new(dictPath)
@@ -52,28 +53,29 @@ public static class KanjiInfoLoader
                 }
             }
 
-            Storage.Dicts[DictType.Kanjidic].Contents = new Dictionary<string, List<IResult>>();
+            kanjidic.Contents = new Dictionary<string, List<IResult>>();
             while (edictXml.ReadToFollowing("literal"))
             {
                 ReadCharacter(edictXml, kanjiCompositionDictionary);
             }
 
-            Storage.Dicts[DictType.Kanjidic].Contents.TrimExcess();
+            kanjidic.Contents.TrimExcess();
+            System.Diagnostics.Debug.WriteLine("Kanjidic count: " + kanjidic.Contents.Count);
         }
 
         else if (Storage.Frontend.ShowYesNoDialog(
                      "Couldn't find kanjidic2.xml. Would you like to download it now?",
                      ""))
         {
-            await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.Kanjidic].Path,
+            await ResourceUpdater.UpdateResource(kanjidic.Path,
                 Storage.KanjidicUrl,
                 DictType.Kanjidic.ToString(), false, false).ConfigureAwait(false);
-            await Load(Storage.Dicts[DictType.Kanjidic].Path).ConfigureAwait(false);
+            await Load(kanjidic.Path).ConfigureAwait(false);
         }
 
         else
         {
-            Storage.Dicts[DictType.Kanjidic].Active = false;
+            kanjidic.Active = false;
         }
     }
 
@@ -128,7 +130,6 @@ public static class KanjiInfoLoader
                                 entry.KunReadings!.Add(kanjiDicXml.ReadString());
                                 break;
                         }
-
                         break;
                 }
             }
@@ -136,12 +137,23 @@ public static class KanjiInfoLoader
 
         if (!entry.Nanori!.Any() || entry.Nanori!.All(l => !l.Any()))
             entry.Nanori = null;
+        else
+            entry.Nanori!.TrimExcess();
+
         if (!entry.Meanings!.Any() || entry.Meanings!.All(l => !l.Any()))
             entry.Meanings = null;
+        else
+            entry.Meanings!.TrimExcess();
+
         if (!entry.OnReadings!.Any() || entry.OnReadings!.All(l => !l.Any()))
             entry.OnReadings = null;
+        else
+            entry.OnReadings!.TrimExcess();
+
         if (!entry.KunReadings!.Any() || entry.KunReadings!.All(l => !l.Any()))
             entry.KunReadings = null;
+        else
+            entry.KunReadings!.TrimExcess();
 
         Storage.Dicts[DictType.Kanjidic].Contents.Add(key, new List<IResult> { entry });
     }

@@ -37,7 +37,7 @@ public static class Storage
     public static bool UpdatingJMdict { get; set; } = false;
     public static bool UpdatingJMnedict { get; set; } = false;
     public static bool UpdatingKanjidic { get; set; } = false;
-    public static Dictionary<string, List<JmdictWc>>? WcDict { get; set; } = new();
+    public static Dictionary<string, List<JmdictWc>> WcDict { get; set; } = new();
     public static Dictionary<string, Dictionary<string, List<FrequencyEntry>>> FreqDicts { get; set; } = new();
 
     public static readonly Dictionary<DictType, Dict> Dicts = new();

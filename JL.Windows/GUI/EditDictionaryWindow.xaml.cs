@@ -60,7 +60,7 @@ public partial class EditDictionaryWindow : Window
                 Storage.Dicts[type].Contents = new Dictionary<string, List<IResult>>();
             }
 
-            Core.Dicts.Options.DictOptions? options = _dictOptionsControl.GetDictOptions(type);
+            Core.Dicts.Options.DictOptions options = _dictOptionsControl.GetDictOptions(type);
             Storage.Dicts[type].Options = options;
             Storage.Frontend.InvalidateDisplayCache();
 

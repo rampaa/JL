@@ -12,7 +12,7 @@ public class JMdictResult : IResult
     public List<List<string>?>? AOrthographyInfoList { get; set; }
     public List<List<string>?>? ROrthographyInfoList { get; set; }
     public List<List<string>?>? WordClasses { get; set; } //e.g. noun +
-    public List<List<string>?>? TypeList { get; set; } // e.g. "martial arts"
+    public List<List<string>?>? FieldList { get; set; } // e.g. "martial arts"
     public List<List<string>?>? MiscList { get; set; } // e.g. "abbr" +
     public List<string?>? DefinitionInfo { get; set; } // e.g. "often derog" +
     public List<List<string>?>? Dialects { get; set; } // e.g. ksb
@@ -35,7 +35,7 @@ public class JMdictResult : IResult
         AOrthographyInfoList = new List<List<string>?>();
         ROrthographyInfoList = new List<List<string>?>();
         WordClasses = new List<List<string>?>();
-        TypeList = new List<List<string>?>();
+        FieldList = new List<List<string>?>();
         MiscList = new List<List<string>?>();
         DefinitionInfo = new List<string?>();
         Dialects = new List<List<string>?>();

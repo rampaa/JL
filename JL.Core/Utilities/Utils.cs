@@ -77,7 +77,24 @@ public static class Utils
                 {
                     if (!Storage.Dicts.ContainsKey(dict.Type))
                     {
-                        dict.Contents = new Dictionary<string, List<IResult>>();
+                        dict.Contents = dict.Type switch
+                        {
+                            DictType.JMdict => new Dictionary<string, List<IResult>>(524288), //2022/05/11: 394949
+                            DictType.JMnedict => new Dictionary<string, List<IResult>>(1048576), //2022/05/11: 608833
+                            DictType.Kanjidic => new Dictionary<string, List<IResult>>(16384), //2022/05/11: 13108
+                            DictType.Kanjium => new Dictionary<string, List<IResult>>(186243),
+                            DictType.Kenkyuusha => new Dictionary<string, List<IResult>>(303677),
+                            DictType.KenkyuushaNazeka => new Dictionary<string, List<IResult>>(191804),
+                            DictType.Daijirin => new Dictionary<string, List<IResult>>(357227),
+                            //DictType.DaijirinNazeka => new Dictionary<string, List<IResult>>(),
+                            DictType.Daijisen => new Dictionary<string, List<IResult>>(317546),
+                            DictType.Koujien => new Dictionary<string, List<IResult>>(363280),
+                            DictType.Meikyou => new Dictionary<string, List<IResult>>(96845),
+                            DictType.Gakken => new Dictionary<string, List<IResult>>(254292),
+                            DictType.Kotowaza => new Dictionary<string, List<IResult>>(30846),
+                            //DictType.ShinmeikaiNazeka => new Dictionary<string, List<IResult>>(),
+                            _ => new Dictionary<string, List<IResult>>(),
+                        };
                         Storage.Dicts.Add(dict.Type, dict);
                     }
                 }

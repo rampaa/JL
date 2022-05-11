@@ -283,7 +283,7 @@ public partial class ManageDictionariesWindow : Window
 
             await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
 
-            Storage.WcDict?.Clear();
+            Storage.WcDict.Clear();
 
             await JmdictWcLoader.Load().ConfigureAwait(false);
 

@@ -11,11 +11,8 @@ public static class JmdictWcLoader
 {
     public static async Task Load()
     {
-        await using FileStream openStream =
-            File.OpenRead($"{Storage.ResourcesPath}/PoS.json");
-        Storage.WcDict = await JsonSerializer.DeserializeAsync<Dictionary<string, List<JmdictWc>>>(openStream);
-
-        if (Storage.WcDict == null) throw new InvalidOperationException();
+        await using FileStream openStream = File.OpenRead($"{Storage.ResourcesPath}/PoS.json");
+        Storage.WcDict = (await JsonSerializer.DeserializeAsync<Dictionary<string, List<JmdictWc>>>(openStream))!;
 
         foreach (List<JmdictWc> jmDictWcEntryList in Storage.WcDict.Values.ToList())
         {
@@ -71,7 +68,7 @@ public static class JmdictWcLoader
             {
                 var value = (JMdictResult)jMdictResultList[i];
 
-                if (!value.WordClasses?.Any() ?? true)
+                if ((!value.WordClasses?.Any()) ?? true)
                     continue;
 
                 List<string> wordClasses = value.WordClasses?.Where(wc => wc != null).SelectMany(wc => wc!).ToHashSet().Except(unusedWcs).ToList() ?? new();
