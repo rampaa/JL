@@ -105,9 +105,12 @@ public partial class PopupWindow : Window
             ConfigManager.ShowManageDictionariesWindowKeyGesture);
         WindowsUtils.SetInputGestureText(StatsButton!, ConfigManager.ShowStatsKeyGesture);
 
-        TextBlockMiningModeReminder!.Text =
-            $"Click on an entry's main spelling to mine it," + Environment.NewLine +
-            $"or press {ConfigManager.ClosePopupKeyGesture.Key} or click on the main window to exit.";
+        if (ConfigManager.ShowMiningModeReminder)
+        {
+            TextBlockMiningModeReminder!.Text =
+                $"Click on an entry's main spelling to mine it," + Environment.NewLine +
+                $"or press {ConfigManager.ClosePopupKeyGesture.Key} or click on the main window to exit.";
+        }
     }
 
     private void AddName(object sender, RoutedEventArgs e)
@@ -183,6 +186,10 @@ public partial class PopupWindow : Window
                 }
 
                 Init();
+
+                _lastLookupResults = lookupResults;
+                DisplayResults(false, text);
+
                 Visibility = Visibility.Visible;
 
                 if (ConfigManager.PopupFocusOnLookup)
@@ -192,9 +199,6 @@ public partial class PopupWindow : Window
                     Keyboard.Focus(this);
                     Focus();
                 }
-
-                _lastLookupResults = lookupResults;
-                DisplayResults(false, text);
             }
             else
             {
@@ -238,6 +242,9 @@ public partial class PopupWindow : Window
 
             PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
 
+            _lastLookupResults = lookupResults;
+            DisplayResults(true, tb.SelectedText);
+
             Visibility = Visibility.Visible;
 
             if (ConfigManager.PopupFocusOnLookup)
@@ -247,9 +254,6 @@ public partial class PopupWindow : Window
                 Keyboard.Focus(this);
                 Focus();
             }
-
-            _lastLookupResults = lookupResults;
-            DisplayResults(true, tb.SelectedText);
         }
         else
         {
@@ -323,6 +327,9 @@ public partial class PopupWindow : Window
 
     private void DisplayResults(bool generateAllResults, string? text = null)
     {
+        // TODO: Should be configurable
+        PopupListBox.Items.Filter = NoAllDictFilter;
+
         if (text != null && !generateAllResults && StackPanelCache.TryGet(text, out StackPanel[] data))
         {
             for (int i = 0; i < data.Length; i++)
@@ -336,6 +343,7 @@ public partial class PopupWindow : Window
                 ResultStackPanels.Add(stackPanel);
             }
 
+            GenerateDictTypeButtons();
             return;
         }
 
@@ -349,6 +357,8 @@ public partial class PopupWindow : Window
 
             ResultStackPanels.Add(MakeResultStackPanel(_lastLookupResults[index], index, resultCount));
         }
+
+        GenerateDictTypeButtons();
 
         // we might cache incomplete results if we don't wait until all dicts are loaded
         if (text != null && Storage.Ready)
@@ -1219,7 +1229,11 @@ public partial class PopupWindow : Window
         if (WindowsUtils.KeyGestureComparer(e, ConfigManager.MiningModeKeyGesture))
         {
             MiningMode = true;
-            TextBlockMiningModeReminder!.Visibility = Visibility.Visible;
+
+            if (ConfigManager.ShowMiningModeReminder)
+            {
+                TextBlockMiningModeReminder!.Visibility = Visibility.Visible;
+            }
 
             PopUpScrollViewer!.ScrollToTop();
             PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
@@ -1231,7 +1245,6 @@ public partial class PopupWindow : Window
             DisplayResults(true);
 
             ItemsControlButtons.Visibility = Visibility.Visible;
-            GenerateDictTypeButtons();
         }
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.PlayAudioKeyGesture))
         {

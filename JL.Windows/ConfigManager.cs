@@ -89,6 +89,7 @@ public class ConfigManager : CoreConfig
     public static Brush DictTypeColor { get; private set; } = Brushes.LightBlue;
     public static int DictTypeFontSize { get; set; } = 15;
     public static Brush SeparatorColor { get; private set; } = Brushes.White;
+    public static bool ShowMiningModeReminder { get; private set; } = true;
 
     #endregion
 
@@ -292,6 +293,9 @@ public class ConfigManager : CoreConfig
             .Get("PopupXOffset")!), PopupXOffset, "PopupXOffset");
         WindowsUtils.Try(() => PopupYOffset = int.Parse(ConfigurationManager.AppSettings
             .Get("PopupYOffset")!), PopupYOffset, "PopupYOffset");
+
+        WindowsUtils.Try(() => ShowMiningModeReminder = bool.Parse(ConfigurationManager.AppSettings
+            .Get("ShowMiningModeReminder")!), ShowMiningModeReminder, "ShowMiningModeReminder");
 
         WindowsUtils.DpiAwareXOffset = PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
         WindowsUtils.DpiAwareYOffset = PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
@@ -643,6 +647,8 @@ public class ConfigManager : CoreConfig
 
         preferenceWindow.LookupModeComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("LookupMode");
         preferenceWindow.LookupKeyComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("LookupKey");
+
+        preferenceWindow.ShowMiningModeReminderCheckBox.IsChecked = ShowMiningModeReminder;
     }
 
     public void SavePreferences(PreferencesWindow preferenceWindow)
@@ -792,6 +798,9 @@ public class ConfigManager : CoreConfig
             preferenceWindow.PopupYOffsetNumericUpDown.Value.ToString();
         config.AppSettings.Settings["PopupFlip"].Value =
             preferenceWindow.PopupFlipComboBox.SelectedValue.ToString();
+
+        config.AppSettings.Settings["ShowMiningModeReminder"].Value =
+            preferenceWindow.ShowMiningModeReminderCheckBox.IsChecked.ToString();
 
         config.AppSettings.Settings["LookupMode"].Value =
             preferenceWindow.LookupModeComboBox.SelectedValue.ToString();

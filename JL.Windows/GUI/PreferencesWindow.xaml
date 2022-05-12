@@ -397,6 +397,12 @@
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
                         </DockPanel>
 
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Show mining mode reminder"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="ShowMiningModeReminderCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
+
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
