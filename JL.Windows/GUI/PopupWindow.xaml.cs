@@ -883,10 +883,10 @@ public partial class PopupWindow : Window
         {
             bottom.Children.Add(new Separator
             {
-                Width = ActualWidth,
+                // TODO: Fix width differing from one separator to another
                 Height = 2,
                 Background = ConfigManager.SeparatorColor,
-                HorizontalAlignment = HorizontalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Center,
             });
         }
