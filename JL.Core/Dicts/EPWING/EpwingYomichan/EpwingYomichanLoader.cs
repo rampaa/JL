@@ -71,7 +71,7 @@ public static class EpwingYomichanLoader
         switch (dictType)
         {
             case DictType.Kenkyuusha:
-                if (Storage.Dicts[dictType].Options is { Examples.Value: ExamplesOptionValue.None })
+                if ((Storage.Dicts[dictType].Options?.Examples?.Value ?? ExamplesOptionValue.None) == ExamplesOptionValue.None)
                 {
                     if (yomichanResult.Definitions?.Count > 2)
                     {
@@ -110,9 +110,6 @@ public static class EpwingYomichanLoader
                             }
                         }
                     }
-                }
-                else if (Storage.Dicts[dictType].Options is { Examples.Value: ExamplesOptionValue.All })
-                {
                 }
 
                 // Filter duplicate entries.

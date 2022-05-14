@@ -151,7 +151,7 @@ public partial class DictOptionsControl : UserControl
         if (ExamplesOption.ValidDictTypes.Contains(dict.Type))
         {
             ExamplesComboBox.ItemsSource = Enum.GetValues<ExamplesOptionValue>().ToArray();
-            ExamplesComboBox.SelectedValue = dict.Options?.Examples?.Value ?? ExamplesOptionValue.All;
+            ExamplesComboBox.SelectedValue = dict.Options?.Examples?.Value ?? ExamplesOptionValue.None;
 
             ExamplesDockPanel.Visibility = Visibility.Visible;
         }
