@@ -394,6 +394,8 @@ public partial class PopupWindow : Window
             Name = nameof(result.FoundForm),
             Text = result.FoundForm,
             Visibility = Visibility.Collapsed,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center,
         };
 
         var textBlockFoundSpelling = new TextBlock
@@ -404,6 +406,8 @@ public partial class PopupWindow : Window
             Foreground = ConfigManager.PrimarySpellingColor,
             FontSize = ConfigManager.PrimarySpellingFontSize,
             TextWrapping = TextWrapping.Wrap,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center,
         };
 
         // bottom
@@ -425,6 +429,8 @@ public partial class PopupWindow : Window
                 FontSize = ConfigManager.FrequencyFontSize,
                 Margin = new Thickness(5, 0, 0, 0),
                 TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
             };
         }
 
@@ -438,6 +444,8 @@ public partial class PopupWindow : Window
                 FontSize = ConfigManager.DictTypeFontSize,
                 Margin = new Thickness(5, 0, 0, 0),
                 TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
             };
         }
 
@@ -449,7 +457,7 @@ public partial class PopupWindow : Window
         {
             List<string> rOrthographyInfoList = result.ROrthographyInfoList ??= new();
             List<string> readings = result.Readings;
-            string readingsText = Storage.Dicts[DictType.JMdict].Options is { ROrthographyInfo.Value: true } && rOrthographyInfoList.Any()
+            string readingsText = (Storage.Dicts[DictType.JMdict].Options?.ROrthographyInfo?.Value ?? true) && rOrthographyInfoList.Any()
                 ? PopupWindowUtilities.MakeUiElementReadingsText(readings, rOrthographyInfoList)
                 : string.Join(", ", result.Readings);
 
@@ -474,6 +482,8 @@ public partial class PopupWindow : Window
                         SelectionBrush = ConfigManager.HighlightColor,
                         IsInactiveSelectionHighlightEnabled = true,
                         ContextMenu = PopupContextMenu,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        VerticalAlignment = VerticalAlignment.Center,
                     };
 
                     uiElementReadings.PreviewMouseLeftButtonUp += UiElement_PreviewMouseLeftButtonUp;
@@ -491,6 +501,8 @@ public partial class PopupWindow : Window
                         Foreground = ConfigManager.ReadingsColor,
                         FontSize = ConfigManager.ReadingsFontSize,
                         Margin = new Thickness(5, 0, 0, 0),
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        VerticalAlignment = VerticalAlignment.Center,
                     };
                 }
             }
@@ -517,6 +529,8 @@ public partial class PopupWindow : Window
                     SelectionBrush = ConfigManager.HighlightColor,
                     IsInactiveSelectionHighlightEnabled = true,
                     ContextMenu = PopupContextMenu,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center,
                 };
 
                 uiElementDefinitions.PreviewMouseLeftButtonUp += UiElement_PreviewMouseLeftButtonUp;
@@ -535,6 +549,8 @@ public partial class PopupWindow : Window
                     Foreground = ConfigManager.DefinitionsColor,
                     FontSize = ConfigManager.DefinitionsFontSize,
                     Margin = new Thickness(2, 2, 2, 2),
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center,
                 };
             }
         }
@@ -553,7 +569,7 @@ public partial class PopupWindow : Window
         {
             List<string> aOrthographyInfoList = result.AOrthographyInfoList ??= new List<string>();
             List<string> alternativeSpellings = result.AlternativeSpellings;
-            string alternativeSpellingsText = Storage.Dicts[DictType.JMdict].Options is { AOrthographyInfo.Value: true } && aOrthographyInfoList.Any()
+            string alternativeSpellingsText = (Storage.Dicts[DictType.JMdict].Options?.AOrthographyInfo?.Value ?? true) && aOrthographyInfoList.Any()
                 ? PopupWindowUtilities.MakeUiElementAlternativeSpellingsText(alternativeSpellings, aOrthographyInfoList)
                 : "(" + string.Join(", ", alternativeSpellings) + ")";
 
@@ -578,6 +594,8 @@ public partial class PopupWindow : Window
                         SelectionBrush = ConfigManager.HighlightColor,
                         IsInactiveSelectionHighlightEnabled = true,
                         ContextMenu = PopupContextMenu,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        VerticalAlignment = VerticalAlignment.Center,
                     };
 
                     uiElementAlternativeSpellings.PreviewMouseLeftButtonUp +=
@@ -596,6 +614,8 @@ public partial class PopupWindow : Window
                         Foreground = ConfigManager.AlternativeSpellingsColor,
                         FontSize = ConfigManager.AlternativeSpellingsFontSize,
                         Margin = new Thickness(5, 0, 0, 0),
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        VerticalAlignment = VerticalAlignment.Center,
                     };
                 }
             }
@@ -611,10 +631,12 @@ public partial class PopupWindow : Window
                 FontSize = ConfigManager.DeconjugationInfoFontSize,
                 Margin = new Thickness(5, 0, 0, 0),
                 TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
             };
         }
 
-        if (Storage.Dicts[DictType.JMdict].Options is { POrthographyInfo.Value: true }
+        if ((Storage.Dicts[DictType.JMdict].Options?.POrthographyInfo?.Value ?? true)
             && (result.POrthographyInfoList?.Any() ?? false))
         {
             textBlockPOrthographyInfo = new TextBlock
@@ -629,6 +651,8 @@ public partial class PopupWindow : Window
                 FontSize = Storage.Dicts[DictType.JMdict].Options?.POrthographyInfoFontSize?.Value ?? 15,
                 Margin = new Thickness(5, 0, 0, 0),
                 TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
             };
         }
 
@@ -643,6 +667,8 @@ public partial class PopupWindow : Window
                 FontSize = ConfigManager.ReadingsFontSize,
                 Margin = new Thickness(2, 0, 0, 0),
                 TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
             };
         }
 
@@ -656,6 +682,8 @@ public partial class PopupWindow : Window
                 FontSize = ConfigManager.ReadingsFontSize,
                 Margin = new Thickness(2, 0, 0, 0),
                 TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
             };
         }
 
@@ -669,6 +697,8 @@ public partial class PopupWindow : Window
                 FontSize = ConfigManager.ReadingsFontSize,
                 Margin = new Thickness(2, 0, 0, 0),
                 TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
             };
         }
 
@@ -682,6 +712,8 @@ public partial class PopupWindow : Window
                 FontSize = ConfigManager.DefinitionsFontSize,
                 Margin = new Thickness(2, 2, 2, 2),
                 TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
             };
         }
 
@@ -713,6 +745,8 @@ public partial class PopupWindow : Window
                 FontSize = ConfigManager.DefinitionsFontSize,
                 Margin = new Thickness(2, 2, 2, 2),
                 TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
             };
         }
 
@@ -726,6 +760,8 @@ public partial class PopupWindow : Window
                 FontSize = ConfigManager.DefinitionsFontSize,
                 Margin = new Thickness(2, 2, 2, 2),
                 TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
             };
         }
 
@@ -847,9 +883,11 @@ public partial class PopupWindow : Window
         {
             bottom.Children.Add(new Separator
             {
-                // TODO: Fix thickness' differing from one separator to another
-                // Width = PopupWindow.Width,
-                Background = ConfigManager.SeparatorColor
+                Width = ActualWidth,
+                Height = 2,
+                Background = ConfigManager.SeparatorColor,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
             });
         }
 
@@ -966,7 +1004,7 @@ public partial class PopupWindow : Window
         }
 
         pitchAccentGrid.VerticalAlignment = VerticalAlignment.Center;
-        pitchAccentGrid.HorizontalAlignment = HorizontalAlignment.Center;
+        pitchAccentGrid.HorizontalAlignment = HorizontalAlignment.Left;
 
         return pitchAccentGrid;
     }
