@@ -157,6 +157,14 @@ public partial class PopupWindow : Window
             _currentText = tb.Text;
             _currentCharPosition = charPosition;
 
+            if (_parentPopupWindow != null
+                && ConfigManager.DisableLookupForHalfWidthCharsOnPopup
+                && !Storage.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString()))
+            {
+                Visibility = Visibility.Hidden;
+                return;
+            }
+
             int endPosition = tb.Text.Length - charPosition > ConfigManager.MaxSearchLength
                 ? Utils.FindWordBoundary(tb.Text[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
                 : Utils.FindWordBoundary(tb.Text, charPosition);

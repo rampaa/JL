@@ -403,6 +403,12 @@
                             <CheckBox x:Name="ShowMiningModeReminderCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
 
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Disable lookup for half-width characters"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="DisableLookupForHalfWidthCharsOnPopupCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
+
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

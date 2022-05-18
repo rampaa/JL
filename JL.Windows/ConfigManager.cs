@@ -90,6 +90,7 @@ public class ConfigManager : CoreConfig
     public static int DictTypeFontSize { get; set; } = 15;
     public static Brush SeparatorColor { get; private set; } = Brushes.White;
     public static bool ShowMiningModeReminder { get; private set; } = true;
+    public static bool DisableLookupForHalfWidthCharsOnPopup { get; private set; } = true;
 
     #endregion
 
@@ -296,6 +297,9 @@ public class ConfigManager : CoreConfig
 
         WindowsUtils.Try(() => ShowMiningModeReminder = bool.Parse(ConfigurationManager.AppSettings
             .Get("ShowMiningModeReminder")!), ShowMiningModeReminder, "ShowMiningModeReminder");
+
+        WindowsUtils.Try(() => DisableLookupForHalfWidthCharsOnPopup = bool.Parse(ConfigurationManager.AppSettings
+            .Get("DisableLookupForHalfWidthCharsOnPopup")!), DisableLookupForHalfWidthCharsOnPopup, "DisableLookupForHalfWidthCharsOnPopup");
 
         WindowsUtils.DpiAwareXOffset = PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
         WindowsUtils.DpiAwareYOffset = PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
@@ -649,6 +653,7 @@ public class ConfigManager : CoreConfig
         preferenceWindow.LookupKeyComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("LookupKey");
 
         preferenceWindow.ShowMiningModeReminderCheckBox.IsChecked = ShowMiningModeReminder;
+        preferenceWindow.DisableLookupForHalfWidthCharsOnPopupCheckBox.IsChecked = DisableLookupForHalfWidthCharsOnPopup;
     }
 
     public void SavePreferences(PreferencesWindow preferenceWindow)
@@ -801,6 +806,9 @@ public class ConfigManager : CoreConfig
 
         config.AppSettings.Settings["ShowMiningModeReminder"].Value =
             preferenceWindow.ShowMiningModeReminderCheckBox.IsChecked.ToString();
+
+        config.AppSettings.Settings["DisableLookupForNonJapaneseCharsOnPopup"].Value =
+            preferenceWindow.DisableLookupForHalfWidthCharsOnPopupCheckBox.IsChecked.ToString();
 
         config.AppSettings.Settings["LookupMode"].Value =
             preferenceWindow.LookupModeComboBox.SelectedValue.ToString();
