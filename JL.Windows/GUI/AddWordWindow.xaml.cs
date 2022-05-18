@@ -73,15 +73,15 @@ public partial class AddWordWindow : Window
 
         if (isValid)
         {
-            string rawSpellings = SpellingsTextBox.Text;
-            string rawReadings = ReadingsTextBox.Text;
-            string rawDefinitions = DefinitionsTextBox.Text;
+            string rawSpellings = SpellingsTextBox.Text.Replace("\t", "  ");
+            string rawReadings = ReadingsTextBox.Text.Replace("\t", "  ");
+            string rawDefinitions = DefinitionsTextBox.Text.Replace("\t", "  ");
             string rawWordClass = WordClassStackPanel!.Children.OfType<RadioButton>()
                 .FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
 
-            string[] spellings = rawSpellings.Split(';').Select(s => s.Trim()).ToArray();
-            List<string> readings = rawReadings.Split(';').Select(r => r.Trim()).ToList();
-            List<string> definitions = rawDefinitions.Split(';').Select(s => s.Trim()).ToList();
+            string[] spellings = rawSpellings.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
+            List<string> readings = rawReadings.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(r => r.Trim()).ToList();
+            List<string> definitions = rawDefinitions.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
 
             CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawWordClass);
 
