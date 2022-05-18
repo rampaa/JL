@@ -69,6 +69,7 @@ public partial class AddNameWindow : Window
             string spelling = SpellingTextBox.Text.Replace("\t", "  ").Trim();
             string reading = ReadingTextBox.Text.Replace("\t", "  ").Trim();
             CustomNameLoader.AddToDictionary(spelling, reading, nameType);
+            Storage.Frontend.InvalidateDisplayCache();
             Close();
             await WriteToFile(spelling, reading, nameType).ConfigureAwait(false);
         }

@@ -84,6 +84,7 @@ public partial class AddWordWindow : Window
             List<string> definitions = rawDefinitions.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
 
             CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawWordClass);
+            Storage.Frontend.InvalidateDisplayCache();
 
             Close();
 

@@ -807,7 +807,7 @@ public class ConfigManager : CoreConfig
         config.AppSettings.Settings["ShowMiningModeReminder"].Value =
             preferenceWindow.ShowMiningModeReminderCheckBox.IsChecked.ToString();
 
-        config.AppSettings.Settings["DisableLookupForNonJapaneseCharsOnPopup"].Value =
+        config.AppSettings.Settings["DisableLookupForHalfWidthCharsOnPopup"].Value =
             preferenceWindow.DisableLookupForHalfWidthCharsOnPopupCheckBox.IsChecked.ToString();
 
         config.AppSettings.Settings["LookupMode"].Value =

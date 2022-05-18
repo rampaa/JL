@@ -688,7 +688,7 @@ public static class Lookup
                 {
                     FoundSpelling = customNameDictResult.PrimarySpelling,
                     FoundForm = customNameResult.Value.FoundForm,
-                    Frequency = resultCount - i,
+                    Frequency = -i,
                     DictType = customNameResult.Value.DictType.ToString(),
                     Readings = new List<string> { customNameDictResult.Reading },
                     FormattedDefinitions = BuildCustomNameDefinition(customNameDictResult),

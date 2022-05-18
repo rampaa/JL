@@ -405,7 +405,7 @@ public static class WindowsUtils
         window.ShowDialog(picker, false);
     }
 
-    public static void ColorSetter(Button sender, SolidColorBrush selectedColor,
+    private static void ColorSetter(Button sender, SolidColorBrush selectedColor,
     HandyControl.Controls.PopupWindow window)
     {
         sender.Background = selectedColor;
