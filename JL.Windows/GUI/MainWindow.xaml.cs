@@ -41,7 +41,7 @@ public partial class MainWindow : Window, IFrontend
             MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
     }
 
-    public Task UpdateJL(Version latestVersion) => WindowsUtils.UpdateJL(latestVersion);
+    public Task UpdateJL() => WindowsUtils.UpdateJL();
 
     public void InvalidateDisplayCache() => PopupWindow.StackPanelCache.Clear();
 

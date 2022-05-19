@@ -14,7 +14,7 @@ public interface IFrontend
 
     public void ShowOkDialog(string text, string caption);
 
-    public Task UpdateJL(Version latestVersion);
+    public Task UpdateJL();
 
     public void InvalidateDisplayCache();
 }

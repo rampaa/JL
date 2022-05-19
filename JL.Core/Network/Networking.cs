@@ -41,7 +41,7 @@ public static class Networking
                     Storage.Frontend.ShowOkDialog(
                         "This may take a while. Please don't manually shut down the program until it's updated.", "");
 
-                    await Storage.Frontend.UpdateJL(latestVersion).ConfigureAwait(false);
+                    await Storage.Frontend.UpdateJL().ConfigureAwait(false);
                 }
             }
 

@@ -203,39 +203,73 @@ public static class WindowsUtils
         }
     }
 
-    public static async Task UpdateJL(Version latestVersion)
+    public static async Task UpdateJL()
     {
         string architecture = Environment.Is64BitProcess ? "x64" : "x86";
-        string repoName =
-            Storage.RepoUrl[(Storage.RepoUrl[..^1].LastIndexOf("/", StringComparison.Ordinal) + 1)..^1];
-        Uri latestReleaseUrl = new(Storage.RepoUrl + "releases/download/" + latestVersion.ToString(2) + "/" +
-                                   repoName + "-" + latestVersion.ToString(2) + "-win-" + architecture + ".zip");
-        HttpRequestMessage request = new(HttpMethod.Get, latestReleaseUrl);
-        HttpResponseMessage response = await Storage.Client.SendAsync(request).ConfigureAwait(false);
-        if (response.IsSuccessStatusCode)
+
+        HttpRequestMessage gitHubApiRequest = new(HttpMethod.Get, new Uri($"https://api.github.com/repos/{Storage.Repo}/releases/latest"));
+        gitHubApiRequest.Headers.Add("User-Agent", "JL");
+
+        HttpResponseMessage gitHubApiResponse = await Storage.Client.SendAsync(gitHubApiRequest).ConfigureAwait(false);
+
+        if (gitHubApiResponse.IsSuccessStatusCode)
         {
-            Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            ZipArchive archive = new(responseStream);
+            Stream githubApiResultStream = await gitHubApiResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            JsonDocument jsonDocument = await JsonDocument.ParseAsync(githubApiResultStream).ConfigureAwait(false);
+            JsonElement assets = jsonDocument.RootElement.GetProperty("assets");
 
-            string tmpDirectory = Path.Join(Storage.ApplicationPath, "tmp");
-
-            if (Directory.Exists(tmpDirectory))
+            foreach (JsonElement asset in assets.EnumerateArray())
             {
-                Directory.Delete(tmpDirectory, true);
+                string latestReleaseUrl = asset.GetProperty("browser_download_url").ToString();
+
+                // Add OS check?
+                if (latestReleaseUrl.Contains(architecture))
+                {
+                    HttpRequestMessage downloadRequest = new(HttpMethod.Get, latestReleaseUrl);
+                    HttpResponseMessage downloadResponse = await Storage.Client.SendAsync(downloadRequest).ConfigureAwait(false);
+
+                    if (downloadResponse.IsSuccessStatusCode)
+                    {
+                        Stream downloadResponseStream = await downloadResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                        ZipArchive archive = new(downloadResponseStream);
+
+                        string tmpDirectory = Path.Join(Storage.ApplicationPath, "tmp");
+
+                        if (Directory.Exists(tmpDirectory))
+                        {
+                            Directory.Delete(tmpDirectory, true);
+                        }
+
+                        Directory.CreateDirectory(tmpDirectory);
+                        archive.ExtractToDirectory(tmpDirectory);
+
+                        await MainWindow.Instance.Dispatcher!.BeginInvoke(ConfigManager.SaveBeforeClosing);
+
+                        Process.Start(
+                            new ProcessStartInfo("cmd",
+                                $"/c start {Path.Join(Storage.ApplicationPath, "update-helper.cmd")} & exit")
+                            {
+                                UseShellExecute = false,
+                                CreateNoWindow = true
+                            });
+                    }
+
+                    else
+                    {
+                        Utils.Logger.Error("Couldn't update JL. GitHub API Problem.");
+                        Storage.Frontend.Alert(AlertLevel.Error, "Couldn't update JL");
+                    }
+
+                    break;
+                }
             }
 
-            Directory.CreateDirectory(tmpDirectory);
-            archive.ExtractToDirectory(tmpDirectory);
+        }
 
-            await MainWindow.Instance.Dispatcher!.BeginInvoke(ConfigManager.SaveBeforeClosing);
-
-            Process.Start(
-                new ProcessStartInfo("cmd",
-                    $"/c start {Path.Join(Storage.ApplicationPath, "update-helper.cmd")} & exit")
-                {
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                });
+        else
+        {
+            Utils.Logger.Error("Couldn't update JL. GitHub API problem.");
+            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't update JL");
         }
     }
 
