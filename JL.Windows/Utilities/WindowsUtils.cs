@@ -236,7 +236,7 @@ public static class WindowsUtils
 
         else
         {
-            Utils.Logger.Error($"Couldn't update JL. {downloadResponse.StatusCode} {downloadResponse.ReasonPhrase}");
+            Utils.Logger.Error("Couldn't update JL. {StatusCode} {ReasonPhrase}", downloadResponse.StatusCode, downloadResponse.ReasonPhrase);
             Storage.Frontend.Alert(AlertLevel.Error, "Couldn't update JL");
         }
     }
