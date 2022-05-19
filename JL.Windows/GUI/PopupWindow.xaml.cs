@@ -151,7 +151,7 @@ public partial class PopupWindow : Window
             _currentCharPosition = charPosition;
 
             if (_parentPopupWindow != null
-                && ConfigManager.DisableLookupForHalfWidthCharsOnPopup
+                && ConfigManager.DisableLookupsForNonJapaneseCharsInPopups
                 && !Storage.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString()))
             {
                 Visibility = Visibility.Hidden;

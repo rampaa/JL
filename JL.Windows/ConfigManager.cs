@@ -69,6 +69,8 @@ public class ConfigManager : CoreConfig
     public static int FixedPopupXPosition { get; set; } = 0;
     public static int FixedPopupYPosition { get; set; } = 0;
     public static bool PopupFocusOnLookup { get; private set; } = true;
+    public static bool ShowMiningModeReminder { get; private set; } = true;
+    public static bool DisableLookupsForNonJapaneseCharsInPopups { get; private set; } = true;
     public static Brush PopupBackgroundColor { get; private set; } = Brushes.Black;
     public static int PopupXOffset { get; set; } = 10;
     public static int PopupYOffset { get; set; } = 20;
@@ -89,8 +91,6 @@ public class ConfigManager : CoreConfig
     public static Brush DictTypeColor { get; private set; } = Brushes.LightBlue;
     public static int DictTypeFontSize { get; set; } = 15;
     public static Brush SeparatorColor { get; private set; } = Brushes.White;
-    public static bool ShowMiningModeReminder { get; private set; } = true;
-    public static bool DisableLookupForHalfWidthCharsOnPopup { get; private set; } = true;
 
     #endregion
 
@@ -298,8 +298,8 @@ public class ConfigManager : CoreConfig
         WindowsUtils.Try(() => ShowMiningModeReminder = bool.Parse(ConfigurationManager.AppSettings
             .Get("ShowMiningModeReminder")!), ShowMiningModeReminder, "ShowMiningModeReminder");
 
-        WindowsUtils.Try(() => DisableLookupForHalfWidthCharsOnPopup = bool.Parse(ConfigurationManager.AppSettings
-            .Get("DisableLookupForHalfWidthCharsOnPopup")!), DisableLookupForHalfWidthCharsOnPopup, "DisableLookupForHalfWidthCharsOnPopup");
+        WindowsUtils.Try(() => DisableLookupsForNonJapaneseCharsInPopups = bool.Parse(ConfigurationManager.AppSettings
+            .Get("DisableLookupsForNonJapaneseCharsInPopups")!), DisableLookupsForNonJapaneseCharsInPopups, "DisableLookupsForNonJapaneseCharsInPopups");
 
         WindowsUtils.DpiAwareXOffset = PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
         WindowsUtils.DpiAwareYOffset = PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
@@ -652,7 +652,7 @@ public class ConfigManager : CoreConfig
         preferenceWindow.LookupKeyComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("LookupKey");
 
         preferenceWindow.ShowMiningModeReminderCheckBox.IsChecked = ShowMiningModeReminder;
-        preferenceWindow.DisableLookupForHalfWidthCharsOnPopupCheckBox.IsChecked = DisableLookupForHalfWidthCharsOnPopup;
+        preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInPopups;
     }
 
     public void SavePreferences(PreferencesWindow preferenceWindow)
@@ -806,8 +806,8 @@ public class ConfigManager : CoreConfig
         config.AppSettings.Settings["ShowMiningModeReminder"].Value =
             preferenceWindow.ShowMiningModeReminderCheckBox.IsChecked.ToString();
 
-        config.AppSettings.Settings["DisableLookupForHalfWidthCharsOnPopup"].Value =
-            preferenceWindow.DisableLookupForHalfWidthCharsOnPopupCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings["DisableLookupsForNonJapaneseCharsInPopups"].Value =
+            preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked.ToString();
 
         config.AppSettings.Settings["LookupMode"].Value =
             preferenceWindow.LookupModeComboBox.SelectedValue.ToString();
