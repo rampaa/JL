@@ -205,8 +205,6 @@ public static class WindowsUtils
 
     public static async Task UpdateJL()
     {
-        string architecture = Environment.Is64BitProcess ? "x64" : "x86";
-
         HttpRequestMessage gitHubApiRequest = new(HttpMethod.Get, new Uri($"https://api.github.com/repos/{Storage.Repo}/releases/latest"));
         gitHubApiRequest.Headers.Add("User-Agent", "JL");
 
@@ -214,6 +212,8 @@ public static class WindowsUtils
 
         if (gitHubApiResponse.IsSuccessStatusCode)
         {
+            string architecture = Environment.Is64BitProcess ? "x64" : "x86";
+
             Stream githubApiResultStream = await gitHubApiResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
             JsonDocument jsonDocument = await JsonDocument.ParseAsync(githubApiResultStream).ConfigureAwait(false);
             JsonElement assets = jsonDocument.RootElement.GetProperty("assets");
@@ -256,7 +256,7 @@ public static class WindowsUtils
 
                     else
                     {
-                        Utils.Logger.Error("Couldn't update JL. GitHub API problem.");
+                        Utils.Logger.Error($"Couldn't update JL. {downloadResponse.StatusCode} {downloadResponse.ReasonPhrase}");
                         Storage.Frontend.Alert(AlertLevel.Error, "Couldn't update JL");
                     }
 
@@ -268,7 +268,7 @@ public static class WindowsUtils
 
         else
         {
-            Utils.Logger.Error("Couldn't update JL. GitHub API problem.");
+            Utils.Logger.Error($"Couldn't update JL. GitHub API problem. {gitHubApiResponse.StatusCode} {gitHubApiResponse.ReasonPhrase}");
             Storage.Frontend.Alert(AlertLevel.Error, "Couldn't update JL");
         }
     }
