@@ -101,8 +101,6 @@ public partial class PopupWindow : Window
         WindowsUtils.SetInputGestureText(AddNameButton!, ConfigManager.ShowAddNameWindowKeyGesture);
         WindowsUtils.SetInputGestureText(AddWordButton!, ConfigManager.ShowAddWordWindowKeyGesture);
         WindowsUtils.SetInputGestureText(SearchButton!, ConfigManager.SearchWithBrowserKeyGesture);
-        WindowsUtils.SetInputGestureText(ManageDictionariesButton!,
-            ConfigManager.ShowManageDictionariesWindowKeyGesture);
         WindowsUtils.SetInputGestureText(StatsButton!, ConfigManager.ShowStatsKeyGesture);
 
         if (ConfigManager.ShowMiningModeReminder)
@@ -126,11 +124,6 @@ public partial class PopupWindow : Window
     private void SearchWithBrowser(object sender, RoutedEventArgs e)
     {
         WindowsUtils.SearchWithBrowser(_lastSelectedText);
-    }
-
-    private void ShowManageDictionariesWindow(object sender, RoutedEventArgs e)
-    {
-        WindowsUtils.ShowManageDictionariesWindow();
     }
 
     private void ShowStats(object sender, RoutedEventArgs e)
@@ -1032,11 +1025,6 @@ public partial class PopupWindow : Window
 
     private void TextBoxPreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
-        ManageDictionariesButton!.IsEnabled = Storage.Ready
-                                              && !Storage.UpdatingJMdict
-                                              && !Storage.UpdatingJMnedict
-                                              && !Storage.UpdatingKanjidic;
-
         AddNameButton!.IsEnabled = Storage.Ready;
         AddWordButton!.IsEnabled = Storage.Ready;
 
@@ -1421,11 +1409,6 @@ public partial class PopupWindow : Window
         {
             if (Storage.Ready)
                 WindowsUtils.ShowAddWordWindow(_lastSelectedText);
-        }
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
-        {
-            if (Storage.Ready)
-                WindowsUtils.ShowManageDictionariesWindow();
         }
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))
         {

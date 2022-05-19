@@ -77,10 +77,6 @@
                 Name="StatsButton"
                 Header="Stats"
                 Click="ShowStats" />
-            <MenuItem
-                Name="ManageDictionariesButton"
-                Header="Manage dictionaries"
-                Click="ShowManageDictionariesWindow" />
         </ContextMenu>
     </Window.ContextMenu>
 </Window>

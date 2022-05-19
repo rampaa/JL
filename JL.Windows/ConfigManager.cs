@@ -517,7 +517,6 @@ public class ConfigManager : CoreConfig
             WindowsUtils.SetInputGestureText(currentPopupWindow.AddNameButton, ShowAddNameWindowKeyGesture);
             WindowsUtils.SetInputGestureText(currentPopupWindow.AddWordButton, ShowAddWordWindowKeyGesture);
             WindowsUtils.SetInputGestureText(currentPopupWindow.SearchButton, SearchWithBrowserKeyGesture);
-            WindowsUtils.SetInputGestureText(currentPopupWindow.ManageDictionariesButton, ShowManageDictionariesWindowKeyGesture);
             WindowsUtils.SetInputGestureText(currentPopupWindow.StatsButton, ShowStatsKeyGesture);
 
             currentPopupWindow = currentPopupWindow.ChildPopupWindow;
