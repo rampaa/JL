@@ -256,7 +256,7 @@ public static class WindowsUtils
 
                     else
                     {
-                        Utils.Logger.Error("Couldn't update JL. GitHub API Problem.");
+                        Utils.Logger.Error("Couldn't update JL. GitHub API problem.");
                         Storage.Frontend.Alert(AlertLevel.Error, "Couldn't update JL");
                     }
 
