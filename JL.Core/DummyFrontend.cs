@@ -20,7 +20,7 @@ public class DummyFrontend : IFrontend
     {
     }
 
-    public Task UpdateJL() => Task.CompletedTask;
+    public Task UpdateJL(Uri downloadUrlOfLatestJLRelease) => Task.CompletedTask;
 
     public void InvalidateDisplayCache()
     {

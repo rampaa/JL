@@ -203,72 +203,40 @@ public static class WindowsUtils
         }
     }
 
-    public static async Task UpdateJL()
+    public static async Task UpdateJL(Uri latestReleaseUrl)
     {
-        HttpRequestMessage gitHubApiRequest = new(HttpMethod.Get, new Uri($"https://api.github.com/repos/{Storage.Repo}/releases/latest"));
-        gitHubApiRequest.Headers.Add("User-Agent", "JL");
+        HttpRequestMessage downloadRequest = new(HttpMethod.Get, latestReleaseUrl);
+        HttpResponseMessage downloadResponse = await Storage.Client.SendAsync(downloadRequest).ConfigureAwait(false);
 
-        HttpResponseMessage gitHubApiResponse = await Storage.Client.SendAsync(gitHubApiRequest).ConfigureAwait(false);
-
-        if (gitHubApiResponse.IsSuccessStatusCode)
+        if (downloadResponse.IsSuccessStatusCode)
         {
-            string architecture = Environment.Is64BitProcess ? "x64" : "x86";
+            Stream downloadResponseStream = await downloadResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            ZipArchive archive = new(downloadResponseStream);
 
-            Stream githubApiResultStream = await gitHubApiResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            JsonDocument jsonDocument = await JsonDocument.ParseAsync(githubApiResultStream).ConfigureAwait(false);
-            JsonElement assets = jsonDocument.RootElement.GetProperty("assets");
+            string tmpDirectory = Path.Join(Storage.ApplicationPath, "tmp");
 
-            foreach (JsonElement asset in assets.EnumerateArray())
+            if (Directory.Exists(tmpDirectory))
             {
-                string latestReleaseUrl = asset.GetProperty("browser_download_url").ToString();
-
-                // Add OS check?
-                if (latestReleaseUrl.Contains(architecture))
-                {
-                    HttpRequestMessage downloadRequest = new(HttpMethod.Get, latestReleaseUrl);
-                    HttpResponseMessage downloadResponse = await Storage.Client.SendAsync(downloadRequest).ConfigureAwait(false);
-
-                    if (downloadResponse.IsSuccessStatusCode)
-                    {
-                        Stream downloadResponseStream = await downloadResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                        ZipArchive archive = new(downloadResponseStream);
-
-                        string tmpDirectory = Path.Join(Storage.ApplicationPath, "tmp");
-
-                        if (Directory.Exists(tmpDirectory))
-                        {
-                            Directory.Delete(tmpDirectory, true);
-                        }
-
-                        Directory.CreateDirectory(tmpDirectory);
-                        archive.ExtractToDirectory(tmpDirectory);
-
-                        await MainWindow.Instance.Dispatcher!.BeginInvoke(ConfigManager.SaveBeforeClosing);
-
-                        Process.Start(
-                            new ProcessStartInfo("cmd",
-                                $"/c start {Path.Join(Storage.ApplicationPath, "update-helper.cmd")} & exit")
-                            {
-                                UseShellExecute = false,
-                                CreateNoWindow = true
-                            });
-                    }
-
-                    else
-                    {
-                        Utils.Logger.Error($"Couldn't update JL. {downloadResponse.StatusCode} {downloadResponse.ReasonPhrase}");
-                        Storage.Frontend.Alert(AlertLevel.Error, "Couldn't update JL");
-                    }
-
-                    break;
-                }
+                Directory.Delete(tmpDirectory, true);
             }
 
+            Directory.CreateDirectory(tmpDirectory);
+            archive.ExtractToDirectory(tmpDirectory);
+
+            await MainWindow.Instance.Dispatcher!.BeginInvoke(ConfigManager.SaveBeforeClosing);
+
+            Process.Start(
+                new ProcessStartInfo("cmd",
+                    $"/c start {Path.Join(Storage.ApplicationPath, "update-helper.cmd")} & exit")
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                });
         }
 
         else
         {
-            Utils.Logger.Error($"Couldn't update JL. GitHub API problem. {gitHubApiResponse.StatusCode} {gitHubApiResponse.ReasonPhrase}");
+            Utils.Logger.Error($"Couldn't update JL. {downloadResponse.StatusCode} {downloadResponse.ReasonPhrase}");
             Storage.Frontend.Alert(AlertLevel.Error, "Couldn't update JL");
         }
     }
