@@ -39,7 +39,7 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock Foreground="White" Text="Imoutos: " TextWrapping="Wrap" Margin="0,0,0,10" />
+                            <TextBlock Foreground="White" Text="???: " TextWrapping="Wrap" Margin="0,0,0,10" />
                             <TextBlock Foreground="White" Name="TextBlockImoutos" TextWrapping="Wrap" Margin="0,0,0,10" />
                         </DockPanel>
 
