@@ -1015,11 +1015,14 @@ public static class Lookup
 
     private static string BuildJmdictDefinition(JMdictResult jMDictResult, DictType dictType)
     {
-        bool newlines = Storage.Dicts[dictType].Options is { NewlineBetweenDefinitions.Value: true };
-        string separator = newlines
-            ? "\n"
-            : "";
+        Dict dict = Storage.Dicts[dictType];
+
+        bool newlines = dict.Options is { NewlineBetweenDefinitions.Value: true };
+
+        string separator = newlines ? "\n" : "";
+
         int count = 1;
+
         StringBuilder defResult = new();
 
         int definitionCount = jMDictResult.Definitions.Count;
@@ -1029,7 +1032,7 @@ public static class Lookup
             if (newlines)
                 defResult.Append($"({count}) ");
 
-            if ((Storage.Dicts[dictType].Options?.WordClassInfo?.Value ?? true) && (jMDictResult.WordClasses?[i]?.Any() ?? false))
+            if ((dict.Options?.WordClassInfo?.Value ?? true) && (jMDictResult.WordClasses?[i]?.Any() ?? false))
             {
                 defResult.Append('(');
                 defResult.Append(string.Join(", ", jMDictResult.WordClasses[i]!));
@@ -1039,14 +1042,14 @@ public static class Lookup
             if (!newlines)
                 defResult.Append($"({count}) ");
 
-            if ((Storage.Dicts[dictType].Options?.DialectInfo?.Value ?? true) && (jMDictResult.Dialects?[i]?.Any() ?? false))
+            if ((dict.Options?.DialectInfo?.Value ?? true) && (jMDictResult.Dialects?[i]?.Any() ?? false))
             {
                 defResult.Append('(');
                 defResult.Append(string.Join(", ", jMDictResult.Dialects[i]!));
                 defResult.Append(") ");
             }
 
-            if ((Storage.Dicts[dictType].Options?.ExtraDefinitionInfo?.Value ?? true)
+            if ((dict.Options?.ExtraDefinitionInfo?.Value ?? true)
                 && (jMDictResult.DefinitionInfo?.Any() ?? false)
                 && jMDictResult.DefinitionInfo[i] != null)
             {
@@ -1055,14 +1058,14 @@ public static class Lookup
                 defResult.Append(") ");
             }
 
-            if ((Storage.Dicts[dictType].Options?.MiscInfo?.Value ?? true) && (jMDictResult.MiscList?[i]?.Any() ?? false))
+            if ((dict.Options?.MiscInfo?.Value ?? true) && (jMDictResult.MiscList?[i]?.Any() ?? false))
             {
                 defResult.Append('(');
                 defResult.Append(string.Join(", ", jMDictResult.MiscList[i]!));
                 defResult.Append(") ");
             }
 
-            if ((Storage.Dicts[dictType].Options?.WordTypeInfo?.Value ?? true) && (jMDictResult.FieldList?[i]?.Any() ?? false))
+            if ((dict.Options?.WordTypeInfo?.Value ?? true) && (jMDictResult.FieldList?[i]?.Any() ?? false))
             {
                 defResult.Append('(');
                 defResult.Append(string.Join(", ", jMDictResult.FieldList[i]!));
@@ -1071,7 +1074,7 @@ public static class Lookup
 
             defResult.Append(string.Join("; ", jMDictResult.Definitions[i]) + " ");
 
-            if ((Storage.Dicts[dictType].Options?.SpellingRestrictionInfo?.Value ?? true)
+            if ((dict.Options?.SpellingRestrictionInfo?.Value ?? true)
                 && ((jMDictResult.RRestrictions?[i]?.Any() ?? false)
                     || (jMDictResult.KRestrictions?[i]?.Any() ?? false)))
             {
@@ -1093,12 +1096,26 @@ public static class Lookup
                 defResult.Append(") ");
             }
 
+            if ((dict.Options?.RelatedTerm?.Value ?? false) && (jMDictResult.RelatedTerms?[i]?.Any() ?? false))
+            {
+                defResult.Append("(related terms: ");
+                defResult.Append(string.Join(", ", jMDictResult.RelatedTerms[i]!));
+                defResult.Append(") ");
+            }
+
+            if ((dict.Options?.Antonym?.Value ?? false) && (jMDictResult.Antonyms?[i]?.Any() ?? false))
+            {
+                defResult.Append("(antonyms: ");
+                defResult.Append(string.Join(", ", jMDictResult.Antonyms[i]!));
+                defResult.Append(") ");
+            }
+
             defResult.Append(separator);
 
             ++count;
         }
 
-        return defResult.ToString().Trim('\n');
+        return defResult.ToString().TrimEnd('\n');
     }
 
     private static string BuildJmnedictDefinition(JMnedictResult jMnedictResult)
@@ -1148,7 +1165,7 @@ public static class Lookup
             defResult.Append(epwingDefinitions[i] + separator);
         }
 
-        return defResult.ToString().Trim('\n');
+        return defResult.ToString().TrimEnd('\n');
     }
 
     private static string BuildCustomWordDefinition(CustomWordEntry customWordResult, DictType dictType)
@@ -1186,7 +1203,7 @@ public static class Lookup
             }
         }
 
-        return defResult.ToString().Trim('\n');
+        return defResult.ToString().TrimEnd('\n');
     }
 
     private static string BuildCustomNameDefinition(CustomNameEntry customNameDictResult)

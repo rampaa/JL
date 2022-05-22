@@ -87,6 +87,14 @@
                     <TextBlock Foreground="White" Text="Show misc info" TextWrapping="Wrap" />
                 </CheckBox>
 
+                <CheckBox Name="RelatedTermCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Foreground="White" Text="Show related terms" TextWrapping="Wrap" />
+                </CheckBox>
+
+                <CheckBox Name="AntonymCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Foreground="White" Text="Show antonyms" TextWrapping="Wrap" />
+                </CheckBox>
+
                 <DockPanel x:Name="PitchAccentMarkerColorDockPanel" Visibility="Collapsed">
                     <Button x:Name="PitchAccentMarkerColorButton" Content="" HorizontalAlignment="Left"
                             Width="50" Height="25" Click="ShowColorPicker" Margin="10, 0, 0, 0"

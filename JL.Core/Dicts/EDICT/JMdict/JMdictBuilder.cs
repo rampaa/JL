@@ -53,8 +53,8 @@ internal static class JMdictBuilder
                     result.MiscList!.Add(sense.MiscList.Any() ? sense.MiscList : null);
                     result.Dialects!.Add(sense.DialList.Any() ? sense.DialList : null);
                     result.DefinitionInfo!.Add(sense.SInf);
-                    // result.RelatedTerms.AddRange(sense.XRefList);
-                    // result.Antonyms.AddRange(sense.AntList);
+                    result.RelatedTerms!.Add(sense.XRefList.Any() ? sense.XRefList : null);
+                    result.Antonyms!.Add(sense.AntList.Any() ? sense.AntList : null);
                 }
             }
 
@@ -148,8 +148,8 @@ internal static class JMdictBuilder
                     result.MiscList!.Add(sense.MiscList.Any() ? sense.MiscList : null);
                     result.Dialects!.Add(sense.DialList.Any() ? sense.DialList : null);
                     result.DefinitionInfo!.Add(sense.SInf);
-                    // result.RelatedTerms.AddRange(sense.XRefList);
-                    // result.Antonyms.AddRange(sense.AntList);
+                    result.RelatedTerms!.Add(sense.XRefList.Any() ? sense.XRefList : null);
+                    result.Antonyms!.Add(sense.AntList.Any() ? sense.AntList : null);
                 }
             }
 
@@ -287,6 +287,32 @@ internal static class JMdictBuilder
                 for (int i = 0; i < counter; i++)
                 {
                     rl.Value.WordClasses[i]?.TrimExcess();
+                }
+            }
+
+            if (!rl.Value.RelatedTerms!.Any() || rl.Value.RelatedTerms!.All(l => l == null || !l.Any()))
+                rl.Value.RelatedTerms = null;
+            else
+            {
+                rl.Value.RelatedTerms!.TrimExcess();
+
+                int counter = rl.Value.RelatedTerms.Count;
+                for (int i = 0; i < counter; i++)
+                {
+                    rl.Value.RelatedTerms[i]?.TrimExcess();
+                }
+            }
+
+            if (!rl.Value.Antonyms!.Any() || rl.Value.Antonyms!.All(l => l == null || !l.Any()))
+                rl.Value.Antonyms = null;
+            else
+            {
+                rl.Value.Antonyms!.TrimExcess();
+
+                int counter = rl.Value.Antonyms.Count;
+                for (int i = 0; i < counter; i++)
+                {
+                    rl.Value.Antonyms[i]?.TrimExcess();
                 }
             }
 

@@ -71,7 +71,9 @@ public static class Storage
                         aOrthographyInfo: new() { Value = true },
                         rOrthographyInfo: new() { Value = true },
                         wordTypeInfo: new() { Value = true },
-                        miscInfo: new() { Value = true }
+                        miscInfo: new() { Value = true },
+                        relatedTerm: new() { Value = false },
+                        antonym: new() { Value = false }
                         ))
             },
             {

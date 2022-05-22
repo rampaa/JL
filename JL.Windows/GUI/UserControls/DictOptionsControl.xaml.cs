@@ -111,6 +111,18 @@ public partial class DictOptionsControl : UserControl
             miscInfoOption = new MiscInfoOption { Value = MiscInfoCheckBox.IsChecked!.Value };
         }
 
+        RelatedTermOption? relatedTermOption = null;
+        if (RelatedTermOption.ValidDictTypes.Contains(type))
+        {
+            relatedTermOption = new RelatedTermOption { Value = RelatedTermCheckBox.IsChecked!.Value };
+        }
+
+        AntonymOption? antonymOption = null;
+        if (AntonymOption.ValidDictTypes.Contains(type))
+        {
+            antonymOption = new AntonymOption { Value = AntonymCheckBox.IsChecked!.Value };
+        }
+
         PitchAccentMarkerColorOption? pitchAccentMarkerColorOption = null;
         if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(type))
         {
@@ -133,6 +145,8 @@ public partial class DictOptionsControl : UserControl
                 spellingRestrictionInfo,
                 extraDefinitionInfo,
                 miscInfoOption,
+                relatedTermOption,
+                antonymOption,
                 pitchAccentMarkerColorOption
             );
 
@@ -231,6 +245,18 @@ public partial class DictOptionsControl : UserControl
             MiscInfoCheckBox.Visibility = Visibility.Visible;
         }
 
+        if (RelatedTermOption.ValidDictTypes.Contains(dict.Type))
+        {
+            RelatedTermCheckBox.IsChecked = dict.Options?.RelatedTerm?.Value ?? false;
+            RelatedTermCheckBox.Visibility = Visibility.Visible;
+        }
+
+        if (AntonymOption.ValidDictTypes.Contains(dict.Type))
+        {
+            AntonymCheckBox.IsChecked = dict.Options?.Antonym?.Value ?? false;
+            AntonymCheckBox.Visibility = Visibility.Visible;
+        }
+
         if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(dict.Type))
         {
             PitchAccentMarkerColorButton.Background = (SolidColorBrush)new BrushConverter()
@@ -255,6 +281,8 @@ public partial class DictOptionsControl : UserControl
            //|| SpellingRestrictionInfoCheckBox.Visibility == Visibility.Visible
            //|| ExtraDefinitionInfoCheckBox.Visibility == Visibility.Visible
            //|| MiscInfoCheckBox.Visibility == Visibility.Visible
+           //|| RelatedTermCheckBox.Visibility == Visibility.Visible
+           //|| AntonymCheckBox.Visibility == Visibility.Visible
            )
         {
             OptionsTextBlock.Visibility = Visibility.Visible;

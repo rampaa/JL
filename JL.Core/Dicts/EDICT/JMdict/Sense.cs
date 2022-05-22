@@ -11,8 +11,8 @@ public class Sense
     public List<string> DialList { get; set; } // e.g. ksb
 
     public List<string> GlossList { get; set; } // English meaning
-    // public List<string> XRefList { get; set; } // Related terms
-    // public List<string> AntList { get; set; } // Antonyms
+    public List<string> XRefList { get; set; } // Related terms
+    public List<string> AntList { get; set; } // Antonyms
 
     public Sense()
     {
@@ -23,7 +23,7 @@ public class Sense
         MiscList = new List<string>();
         DialList = new List<string>();
         GlossList = new List<string>();
-        // XRefList = new List<string>();
-        // AntList = new List<string>();
+        XRefList = new List<string>();
+        AntList = new List<string>();
     }
 }

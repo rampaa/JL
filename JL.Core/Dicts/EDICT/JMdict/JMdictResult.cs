@@ -19,8 +19,8 @@ public class JMdictResult : IResult
 
     public string PrimarySpelling { get; set; }
     //public List<string> PriorityList { get; set; } // e.g. gai1
-    //public List<string> Antonyms { get; set; }
-    //public List<string> RelatedTerms { get; set; }
+    public List<List<string>?>? RelatedTerms { get; set; }
+    public List<List<string>?>? Antonyms { get; set; }
 
     public JMdictResult()
     {
@@ -39,9 +39,8 @@ public class JMdictResult : IResult
         MiscList = new List<List<string>?>();
         DefinitionInfo = new List<string?>();
         Dialects = new List<List<string>?>();
-        //FrequencyDict = new Dictionary<string, Frequency>();
         //PriorityList = new List<string>();
-        //RelatedTerms = new List<string>();
-        //Antonyms = new List<string>();
+        RelatedTerms = new List<List<string>?>();
+        Antonyms = new List<List<string>?>();
     }
 }

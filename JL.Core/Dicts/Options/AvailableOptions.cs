@@ -110,6 +110,20 @@ public readonly struct MiscInfoOption
     public bool Value { get; init; }
 }
 
+public readonly struct RelatedTermOption
+{
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
+    public bool Value { get; init; }
+}
+
+public readonly struct AntonymOption
+{
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
+    public bool Value { get; init; }
+}
+
 public readonly struct PitchAccentMarkerColorOption
 {
     [JsonIgnore]

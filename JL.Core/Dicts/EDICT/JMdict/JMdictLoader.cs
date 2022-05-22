@@ -181,13 +181,13 @@ public static class JMdictLoader
                         sense.GlossList.Add(jMDictXML.ReadString());
                         break;
 
-                        //case "xref":
-                        //    sense.XRefList.Add(jMDictXML.ReadString());
-                        //    break;
+                    case "xref":
+                        sense.XRefList.Add(jMDictXML.ReadString());
+                        break;
 
-                        //case "ant":
-                        //    sense.AntList.Add(jMDictXML.ReadString());
-                        //    break;
+                    case "ant":
+                        sense.AntList.Add(jMDictXML.ReadString());
+                        break;
                 }
             }
         }

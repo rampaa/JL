@@ -16,6 +16,8 @@ public class DictOptions
     public SpellingRestrictionInfoOption? SpellingRestrictionInfo { get; }
     public ExtraDefinitionInfoOption? ExtraDefinitionInfo { get; }
     public MiscInfoOption? MiscInfo { get; }
+    public RelatedTermOption? RelatedTerm { get; }
+    public AntonymOption? Antonym { get; }
     public PitchAccentMarkerColorOption? PitchAccentMarkerColor { get; }
 
     public DictOptions
@@ -34,6 +36,8 @@ public class DictOptions
         SpellingRestrictionInfoOption? spellingRestrictionInfo = null,
         ExtraDefinitionInfoOption? extraDefinitionInfo = null,
         MiscInfoOption? miscInfo = null,
+        RelatedTermOption? relatedTerm = null,
+        AntonymOption? antonym = null,
         PitchAccentMarkerColorOption? pitchAccentMarkerColor = null
         )
     {
@@ -51,6 +55,8 @@ public class DictOptions
         SpellingRestrictionInfo = spellingRestrictionInfo;
         ExtraDefinitionInfo = extraDefinitionInfo;
         MiscInfo = miscInfo;
+        RelatedTerm = relatedTerm;
+        Antonym = antonym;
         PitchAccentMarkerColor = pitchAccentMarkerColor;
     }
 }
