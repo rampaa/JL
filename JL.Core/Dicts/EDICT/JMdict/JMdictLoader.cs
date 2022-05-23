@@ -103,28 +103,28 @@ public static class JMdictLoader
         entry.KanjiElements.Add(kanjiElement);
     }
 
-    private static void ReadREle(XmlTextReader jMDictXML, JMdictEntry entry)
+    private static void ReadREle(XmlTextReader jmdictXml, JMdictEntry entry)
     {
         ReadingElement readingElement = new();
-        while (jMDictXML.Read())
+        while (jmdictXml.Read())
         {
-            if (jMDictXML.Name == "r_ele" && jMDictXML.NodeType == XmlNodeType.EndElement)
+            if (jmdictXml.Name == "r_ele" && jmdictXml.NodeType == XmlNodeType.EndElement)
                 break;
 
-            if (jMDictXML.NodeType == XmlNodeType.Element)
+            if (jmdictXml.NodeType == XmlNodeType.Element)
             {
-                switch (jMDictXML.Name)
+                switch (jmdictXml.Name)
                 {
                     case "reb":
-                        readingElement.Reb = jMDictXML.ReadString();
+                        readingElement.Reb = jmdictXml.ReadString();
                         break;
 
                     case "re_restr":
-                        readingElement.ReRestrList.Add(jMDictXML.ReadString());
+                        readingElement.ReRestrList.Add(jmdictXml.ReadString());
                         break;
 
                     case "re_inf":
-                        readingElement.ReInfList.Add(ReadEntity(jMDictXML)!);
+                        readingElement.ReInfList.Add(ReadEntity(jmdictXml)!);
                         break;
 
                         //case "re_pri":
@@ -137,56 +137,68 @@ public static class JMdictLoader
         entry.ReadingElements.Add(readingElement);
     }
 
-    private static void ReadSense(XmlTextReader jMDictXML, JMdictEntry entry)
+    private static void ReadSense(XmlTextReader jmdictXml, JMdictEntry entry)
     {
         Sense sense = new();
-        while (jMDictXML.Read())
+        while (jmdictXml.Read())
         {
-            if (jMDictXML.Name == "sense" && jMDictXML.NodeType == XmlNodeType.EndElement)
+            if (jmdictXml.Name == "sense" && jmdictXml.NodeType == XmlNodeType.EndElement)
                 break;
 
-            if (jMDictXML.NodeType == XmlNodeType.Element)
+            if (jmdictXml.NodeType == XmlNodeType.Element)
             {
-                switch (jMDictXML.Name)
+                switch (jmdictXml.Name)
                 {
                     case "stagk":
-                        sense.StagKList.Add(jMDictXML.ReadString());
+                        sense.StagKList.Add(jmdictXml.ReadString());
                         break;
 
                     case "stagr":
-                        sense.StagRList.Add(jMDictXML.ReadString());
+                        sense.StagRList.Add(jmdictXml.ReadString());
                         break;
 
                     case "pos":
-                        sense.PosList.Add(ReadEntity(jMDictXML)!);
+                        sense.PosList.Add(ReadEntity(jmdictXml)!);
                         break;
 
                     case "field":
-                        sense.FieldList.Add(ReadEntity(jMDictXML)!);
+                        sense.FieldList.Add(ReadEntity(jmdictXml)!);
                         break;
 
                     case "misc":
-                        sense.MiscList.Add(ReadEntity(jMDictXML)!);
+                        sense.MiscList.Add(ReadEntity(jmdictXml)!);
                         break;
 
                     case "s_inf":
-                        sense.SInf = jMDictXML.ReadString();
+                        sense.SInf = jmdictXml.ReadString();
                         break;
 
                     case "dial":
-                        sense.DialList.Add(ReadEntity(jMDictXML)!);
+                        sense.DialList.Add(ReadEntity(jmdictXml)!);
                         break;
 
                     case "gloss":
-                        sense.GlossList.Add(jMDictXML.ReadString());
+                        string gloss = "";
+
+                        if (jmdictXml.HasAttributes)
+                        {
+                            string? glossType = jmdictXml.GetAttribute("g_type");
+
+                            if (glossType != null)
+                                gloss = "(" + glossType + ".) ";
+                        }
+
+                        gloss += jmdictXml.ReadString();
+
+                        sense.GlossList.Add(gloss);
                         break;
 
                     case "xref":
-                        sense.XRefList.Add(jMDictXML.ReadString());
+                        sense.XRefList.Add(jmdictXml.ReadString());
                         break;
 
                     case "ant":
-                        sense.AntList.Add(jMDictXML.ReadString());
+                        sense.AntList.Add(jmdictXml.ReadString());
                         break;
                 }
             }
@@ -195,13 +207,13 @@ public static class JMdictLoader
         entry.SenseList.Add(sense);
     }
 
-    private static string? ReadEntity(XmlTextReader jMDictXML)
+    private static string? ReadEntity(XmlTextReader jmdictXml)
     {
-        jMDictXML.Read();
-        if (jMDictXML.NodeType == XmlNodeType.EntityReference)
+        jmdictXml.Read();
+        if (jmdictXml.NodeType == XmlNodeType.EntityReference)
         {
             //jMDictXML.ResolveEntity();
-            return jMDictXML.Name;
+            return jmdictXml.Name;
         }
         else return null;
     }
