@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using JL.Core.Dicts;
-using JL.Core.Dicts.EDICT;
 using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Dicts.Options;
 using JL.Core.Lookup;

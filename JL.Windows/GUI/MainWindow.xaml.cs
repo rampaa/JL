@@ -52,7 +52,7 @@ public partial class MainWindow : Window, IFrontend
     private int _currentTextIndex;
 
     private DateTime _lastClipboardChangeTime;
-    private WindowResizer? _windowResizer;
+    private WinApi? _winApi;
 
     public PopupWindow FirstPopupWindow { get; init; } = new();
 
@@ -92,10 +92,8 @@ public partial class MainWindow : Window, IFrontend
 
         SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
 
-        ClipboardManager windowClipboardManager = new(this);
-        windowClipboardManager.ClipboardChanged += ClipboardChanged;
-
-        _windowResizer = new(this);
+        _winApi = new(this);
+        _winApi.ClipboardChanged += ClipboardChanged;
 
         WindowsUtils.InitializeMainWindow();
 
@@ -701,7 +699,7 @@ public partial class MainWindow : Window, IFrontend
     //}
     private void ResizeWindow(object sender, MouseButtonEventArgs e)
     {
-        _windowResizer?.ResizeWindow(sender as Border ?? new());
+        _winApi?.ResizeWindow(sender as Border ?? new());
 
         LeftPositionBeforeResolutionChange = Left;
         TopPositionBeforeResolutionChange = Top;
