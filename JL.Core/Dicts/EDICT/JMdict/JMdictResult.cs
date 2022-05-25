@@ -21,6 +21,7 @@ public class JMdictResult : IResult
     //public List<string> PriorityList { get; set; } // e.g. gai1
     public List<List<string>?>? RelatedTerms { get; set; }
     public List<List<string>?>? Antonyms { get; set; }
+    public List<List<LSource>?>? LoanwordEtymology { get; set; }
 
     public JMdictResult()
     {
@@ -42,5 +43,6 @@ public class JMdictResult : IResult
         //PriorityList = new List<string>();
         RelatedTerms = new List<List<string>?>();
         Antonyms = new List<List<string>?>();
+        LoanwordEtymology = new List<List<LSource>?>();
     }
 }

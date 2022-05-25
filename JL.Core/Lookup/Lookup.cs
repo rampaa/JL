@@ -480,7 +480,7 @@ public static class Lookup
                 result.EdictId = jMDictResult.Id;
                 result.AlternativeSpellings = jMDictResult.AlternativeSpellings ?? new();
                 result.Process = ProcessProcess(wordResult);
-                result.Frequency = GetJMDictFreq(jMDictResult);
+                result.Frequency = GetJmdictFreq(jMDictResult);
                 result.POrthographyInfoList = jMDictResult.POrthographyInfoList ?? new();
                 result.ROrthographyInfoList = rOrthographyInfoList;
                 result.AOrthographyInfoList = aOrthographyInfoList;
@@ -700,7 +700,7 @@ public static class Lookup
         return results;
     }
 
-    private static int GetJMDictFreq(JMdictResult jMDictResult)
+    private static int GetJmdictFreq(JMdictResult jmdictResult)
     {
         int frequency = int.MaxValue;
 
@@ -710,7 +710,7 @@ public static class Lookup
         if (freqDict == null)
             return frequency;
 
-        if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(jMDictResult.PrimarySpelling),
+        if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(jmdictResult.PrimarySpelling),
                 out List<FrequencyEntry>? freqResults))
         {
             int freqResultsCount = freqResults.Count;
@@ -718,8 +718,8 @@ public static class Lookup
             {
                 FrequencyEntry freqResult = freqResults[i];
 
-                if ((jMDictResult.Readings != null && jMDictResult.Readings.Contains(freqResult.Spelling))
-                    || (jMDictResult.Readings == null && jMDictResult.PrimarySpelling == freqResult.Spelling))
+                if ((jmdictResult.Readings != null && jmdictResult.Readings.Contains(freqResult.Spelling))
+                    || (jmdictResult.Readings == null && jmdictResult.PrimarySpelling == freqResult.Spelling))
                 {
                     if (frequency > freqResult.Frequency)
                     {
@@ -728,12 +728,12 @@ public static class Lookup
                 }
             }
 
-            if (frequency == int.MaxValue && jMDictResult.AlternativeSpellings != null)
+            if (frequency == int.MaxValue && jmdictResult.AlternativeSpellings != null)
             {
-                int alternativeSpellingsCount = jMDictResult.AlternativeSpellings.Count;
+                int alternativeSpellingsCount = jmdictResult.AlternativeSpellings.Count;
                 for (int i = 0; i < alternativeSpellingsCount; i++)
                 {
-                    if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(jMDictResult.AlternativeSpellings[i]),
+                    if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(jmdictResult.AlternativeSpellings[i]),
                             out List<FrequencyEntry>? alternativeSpellingFreqResults))
                     {
                         int alternativeSpellingFreqResultsCount = alternativeSpellingFreqResults.Count;
@@ -741,8 +741,8 @@ public static class Lookup
                         {
                             FrequencyEntry alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
 
-                            if (jMDictResult.Readings != null
-                                && jMDictResult.Readings.Contains(alternativeSpellingFreqResult.Spelling))
+                            if (jmdictResult.Readings != null
+                                && jmdictResult.Readings.Contains(alternativeSpellingFreqResult.Spelling))
                             {
                                 if (frequency > alternativeSpellingFreqResult.Frequency)
                                 {
@@ -755,12 +755,12 @@ public static class Lookup
             }
         }
 
-        else if (jMDictResult.Readings != null)
+        else if (jmdictResult.Readings != null)
         {
-            int readingCount = jMDictResult.Readings.Count;
+            int readingCount = jmdictResult.Readings.Count;
             for (int i = 0; i < readingCount; i++)
             {
-                string reading = jMDictResult.Readings[i];
+                string reading = jmdictResult.Readings[i];
 
                 if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(reading),
                         out List<FrequencyEntry>? readingFreqResults))
@@ -771,8 +771,8 @@ public static class Lookup
                         FrequencyEntry readingFreqResult = readingFreqResults[j];
 
                         if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading)
-                            || (jMDictResult.AlternativeSpellings != null
-                                && jMDictResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
+                            || (jmdictResult.AlternativeSpellings != null
+                                && jmdictResult.AlternativeSpellings.Contains(readingFreqResult.Spelling)))
                         {
                             if (frequency > readingFreqResult.Frequency)
                             {
@@ -1096,6 +1096,35 @@ public static class Lookup
                 defResult.Append(") ");
             }
 
+            if ((dict.Options?.LoanwordEtymology?.Value ?? true) && (jMDictResult.LoanwordEtymology?[i]?.Any() ?? false))
+            {
+                defResult.Append('(');
+
+                List<LSource> lSources = jMDictResult.LoanwordEtymology[i]!;
+
+                int lSourceCount = lSources.Count;
+                for (int j = 0; j < lSourceCount; j++)
+                {
+                    if (lSources[j].IsWasei)
+                        defResult.Append("Wasei ");
+
+                    defResult.Append(lSources[j].Language);
+
+                    if (lSources[j].OriginalWord != null)
+                    {
+                        defResult.Append(": ");
+                        defResult.Append(lSources[j].OriginalWord);
+                    }
+
+                    if (j + 1 < lSourceCount)
+                    {
+                        defResult.Append(lSources[j].IsPart ? " + " : ", ");
+                    }
+                }
+
+                defResult.Append(") ");
+            }
+
             if ((dict.Options?.RelatedTerm?.Value ?? false) && (jMDictResult.RelatedTerms?[i]?.Any() ?? false))
             {
                 defResult.Append("(related terms: ");
@@ -1115,7 +1144,7 @@ public static class Lookup
             ++count;
         }
 
-        return defResult.ToString().TrimEnd('\n');
+        return defResult.ToString().TrimEnd(' ', '\n');
     }
 
     private static string BuildJmnedictDefinition(JMnedictResult jMnedictResult)
@@ -1165,7 +1194,7 @@ public static class Lookup
             defResult.Append(epwingDefinitions[i] + separator);
         }
 
-        return defResult.ToString().TrimEnd('\n');
+        return defResult.ToString().TrimEnd(' ', '\n');
     }
 
     private static string BuildCustomWordDefinition(CustomWordEntry customWordResult, DictType dictType)
@@ -1203,7 +1232,7 @@ public static class Lookup
             }
         }
 
-        return defResult.ToString().TrimEnd('\n');
+        return defResult.ToString().TrimEnd(' ', '\n');
     }
 
     private static string BuildCustomNameDefinition(CustomNameEntry customNameDictResult)

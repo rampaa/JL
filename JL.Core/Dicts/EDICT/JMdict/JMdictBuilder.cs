@@ -45,16 +45,7 @@ internal static class JMdictBuilder
                     || sense.StagKList.Contains(key)
                     || sense.StagRList.Intersect(result.Readings!).Any())
                 {
-                    result.Definitions.Add(sense.GlossList);
-                    result.RRestrictions!.Add(sense.StagRList.Any() ? sense.StagRList : null);
-                    result.KRestrictions!.Add(sense.StagKList.Any() ? sense.StagKList : null);
-                    result.WordClasses!.Add(sense.PosList.Any() ? sense.PosList : null);
-                    result.FieldList!.Add(sense.FieldList.Any() ? sense.FieldList : null);
-                    result.MiscList!.Add(sense.MiscList.Any() ? sense.MiscList : null);
-                    result.Dialects!.Add(sense.DialList.Any() ? sense.DialList : null);
-                    result.DefinitionInfo!.Add(sense.SInf);
-                    result.RelatedTerms!.Add(sense.XRefList.Any() ? sense.XRefList : null);
-                    result.Antonyms!.Add(sense.AntList.Any() ? sense.AntList : null);
+                    ProcessSense(result, sense);
                 }
             }
 
@@ -140,16 +131,7 @@ internal static class JMdictBuilder
                     || sense.StagKList.Contains(result.PrimarySpelling)
                     || sense.StagKList.Intersect(result.AlternativeSpellings).Any())
                 {
-                    result.Definitions.Add(sense.GlossList);
-                    result.RRestrictions!.Add(sense.StagRList.Any() ? sense.StagRList : null);
-                    result.KRestrictions!.Add(sense.StagKList.Any() ? sense.StagKList : null);
-                    result.WordClasses!.Add(sense.PosList.Any() ? sense.PosList : null);
-                    result.FieldList!.Add(sense.FieldList.Any() ? sense.FieldList : null);
-                    result.MiscList!.Add(sense.MiscList.Any() ? sense.MiscList : null);
-                    result.Dialects!.Add(sense.DialList.Any() ? sense.DialList : null);
-                    result.DefinitionInfo!.Add(sense.SInf);
-                    result.RelatedTerms!.Add(sense.XRefList.Any() ? sense.XRefList : null);
-                    result.Antonyms!.Add(sense.AntList.Any() ? sense.AntList : null);
+                    ProcessSense(result, sense);
                 }
             }
 
@@ -158,163 +140,22 @@ internal static class JMdictBuilder
 
         foreach (KeyValuePair<string, JMdictResult> rl in resultList)
         {
-            rl.Value.Definitions.TrimExcess();
-
-            int definitionCounter = rl.Value.Definitions.Count;
-            for (int i = 0; i < definitionCounter; i++)
-            {
-                rl.Value.Definitions[i].TrimExcess();
-            }
-
-            if (!rl.Value.Readings!.Any() || rl.Value.Readings!.All(string.IsNullOrEmpty))
-                rl.Value.Readings = null;
-            else
-                rl.Value.Readings!.TrimExcess();
-
-            if (!rl.Value.AlternativeSpellings!.Any())
-                rl.Value.AlternativeSpellings = null;
-            else
-                rl.Value.AlternativeSpellings!.TrimExcess();
-
-            if (!rl.Value.RRestrictions!.Any() || rl.Value.RRestrictions!.All(l => l == null || !l.Any()))
-                rl.Value.RRestrictions = null;
-            else
-            {
-                rl.Value.RRestrictions!.TrimExcess();
-
-                int counter = rl.Value.RRestrictions.Count;
-                for (int i = 0; i < counter; i++)
-                {
-                    rl.Value.RRestrictions[i]?.TrimExcess();
-                }
-            }
-
-            if (!rl.Value.KRestrictions!.Any() || rl.Value.KRestrictions!.All(l => l == null || !l.Any()))
-                rl.Value.KRestrictions = null;
-            else
-            {
-                rl.Value.KRestrictions!.TrimExcess();
-
-                int counter = rl.Value.KRestrictions.Count;
-                for (int i = 0; i < counter; i++)
-                {
-                    rl.Value.KRestrictions[i]?.TrimExcess();
-                }
-            }
-
-            if (!rl.Value.Dialects!.Any() || !rl.Value.Dialects!.All(l => l == null || !l.Any()))
-                rl.Value.Dialects = null;
-            else
-            {
-                rl.Value.Dialects!.TrimExcess();
-
-                int counter = rl.Value.Dialects.Count;
-                for (int i = 0; i < counter; i++)
-                {
-                    rl.Value.Dialects[i]?.TrimExcess();
-                }
-            }
-
-            if (!rl.Value.MiscList!.Any() || rl.Value.MiscList!.All(l => l == null || !l.Any()))
-                rl.Value.MiscList = null;
-            else
-            {
-                rl.Value.MiscList!.TrimExcess();
-
-                int counter = rl.Value.MiscList.Count;
-                for (int i = 0; i < counter; i++)
-                {
-                    rl.Value.MiscList[i]?.TrimExcess();
-                }
-            }
-
-            if (!rl.Value.POrthographyInfoList!.Any() || rl.Value.POrthographyInfoList!.All(string.IsNullOrEmpty))
-                rl.Value.POrthographyInfoList = null;
-            else
-                rl.Value.POrthographyInfoList!.TrimExcess();
-
-            if (!rl.Value.AOrthographyInfoList!.Any() || rl.Value.AOrthographyInfoList!.All(l => l == null || !l.Any()))
-                rl.Value.AOrthographyInfoList = null;
-            else
-            {
-                rl.Value.AOrthographyInfoList!.TrimExcess();
-
-                int counter = rl.Value.AOrthographyInfoList.Count;
-                for (int i = 0; i < counter; i++)
-                {
-                    rl.Value.AOrthographyInfoList[i]?.TrimExcess();
-                }
-            }
-
-            if (!rl.Value.ROrthographyInfoList!.Any() || rl.Value.ROrthographyInfoList!.All(l => l == null || !l.Any()))
-                rl.Value.ROrthographyInfoList = null;
-            else
-            {
-                rl.Value.ROrthographyInfoList!.TrimExcess();
-
-                int counter = rl.Value.ROrthographyInfoList.Count;
-                for (int i = 0; i < counter; i++)
-                {
-                    rl.Value.ROrthographyInfoList[i]?.TrimExcess();
-                }
-            }
-
-            if (!rl.Value.DefinitionInfo!.Any() || rl.Value.DefinitionInfo!.All(s => s == null || string.IsNullOrEmpty(s)))
-                rl.Value.DefinitionInfo = null;
-            else
-                rl.Value.DefinitionInfo!.TrimExcess();
-
-            if (!rl.Value.FieldList!.Any() || rl.Value.FieldList!.All(l => l == null || !l.Any()))
-                rl.Value.FieldList = null;
-            else
-            {
-                rl.Value.FieldList!.TrimExcess();
-
-                int counter = rl.Value.FieldList.Count;
-                for (int i = 0; i < counter; i++)
-                {
-                    rl.Value.FieldList[i]?.TrimExcess();
-                }
-            }
-
-            if (!rl.Value.WordClasses!.Any() || rl.Value.WordClasses!.All(l => l == null || !l.Any()))
-                rl.Value.WordClasses = null;
-            else
-            {
-                rl.Value.WordClasses!.TrimExcess();
-
-                int counter = rl.Value.WordClasses.Count;
-                for (int i = 0; i < counter; i++)
-                {
-                    rl.Value.WordClasses[i]?.TrimExcess();
-                }
-            }
-
-            if (!rl.Value.RelatedTerms!.Any() || rl.Value.RelatedTerms!.All(l => l == null || !l.Any()))
-                rl.Value.RelatedTerms = null;
-            else
-            {
-                rl.Value.RelatedTerms!.TrimExcess();
-
-                int counter = rl.Value.RelatedTerms.Count;
-                for (int i = 0; i < counter; i++)
-                {
-                    rl.Value.RelatedTerms[i]?.TrimExcess();
-                }
-            }
-
-            if (!rl.Value.Antonyms!.Any() || rl.Value.Antonyms!.All(l => l == null || !l.Any()))
-                rl.Value.Antonyms = null;
-            else
-            {
-                rl.Value.Antonyms!.TrimExcess();
-
-                int counter = rl.Value.Antonyms.Count;
-                for (int i = 0; i < counter; i++)
-                {
-                    rl.Value.Antonyms[i]?.TrimExcess();
-                }
-            }
+            rl.Value.Readings = TrimList(rl.Value.Readings);
+            rl.Value.AlternativeSpellings = TrimList(rl.Value.AlternativeSpellings);
+            rl.Value.POrthographyInfoList = TrimList(rl.Value.POrthographyInfoList);
+            rl.Value.DefinitionInfo = TrimList(rl.Value.DefinitionInfo!)!;
+            rl.Value.Definitions = TrimListOfLists(rl.Value.Definitions!)!;
+            rl.Value.RRestrictions = TrimListOfLists(rl.Value.RRestrictions);
+            rl.Value.KRestrictions = TrimListOfLists(rl.Value.KRestrictions);
+            rl.Value.Dialects = TrimListOfLists(rl.Value.Dialects);
+            rl.Value.MiscList = TrimListOfLists(rl.Value.MiscList);
+            rl.Value.AOrthographyInfoList = TrimListOfLists(rl.Value.AOrthographyInfoList);
+            rl.Value.ROrthographyInfoList = TrimListOfLists(rl.Value.ROrthographyInfoList);
+            rl.Value.FieldList = TrimListOfLists(rl.Value.FieldList);
+            rl.Value.WordClasses = TrimListOfLists(rl.Value.WordClasses);
+            rl.Value.RelatedTerms = TrimListOfLists(rl.Value.RelatedTerms);
+            rl.Value.Antonyms = TrimListOfLists(rl.Value.Antonyms);
+            rl.Value.LoanwordEtymology = TrimListOfLists(rl.Value.LoanwordEtymology);
 
             rl.Value.Id = entry.Id;
             string key = Kana.KatakanaToHiraganaConverter(rl.Key);
@@ -326,5 +167,52 @@ internal static class JMdictBuilder
 
             jMdictDictionary[key] = tempResultList;
         }
+    }
+
+    private static void ProcessSense(JMdictResult jmdictResult, Sense sense)
+    {
+        jmdictResult.Definitions.Add(sense.GlossList);
+        jmdictResult.RRestrictions!.Add(sense.StagRList.Any() ? sense.StagRList : null);
+        jmdictResult.KRestrictions!.Add(sense.StagKList.Any() ? sense.StagKList : null);
+        jmdictResult.WordClasses!.Add(sense.PosList.Any() ? sense.PosList : null);
+        jmdictResult.FieldList!.Add(sense.FieldList.Any() ? sense.FieldList : null);
+        jmdictResult.MiscList!.Add(sense.MiscList.Any() ? sense.MiscList : null);
+        jmdictResult.Dialects!.Add(sense.DialList.Any() ? sense.DialList : null);
+        jmdictResult.DefinitionInfo!.Add(sense.SInf);
+        jmdictResult.RelatedTerms!.Add(sense.XRefList.Any() ? sense.XRefList : null);
+        jmdictResult.Antonyms!.Add(sense.AntList.Any() ? sense.AntList : null);
+        jmdictResult.LoanwordEtymology!.Add(sense.LSourceList.Any() ? sense.LSourceList : null);
+    }
+
+    private static List<List<T>?>? TrimListOfLists<T>(List<List<T>?>? listOfLists)
+    {
+        List<List<T>?>? listOfListClone = listOfLists;
+
+        if (!listOfListClone!.Any() || listOfListClone!.All(l => l == null || !l.Any()))
+            listOfListClone = null;
+        else
+        {
+            listOfListClone!.TrimExcess();
+
+            int counter = listOfListClone.Count;
+            for (int i = 0; i < counter; i++)
+            {
+                listOfListClone[i]?.TrimExcess();
+            }
+        }
+
+        return listOfListClone;
+    }
+
+    private static List<string>? TrimList(List<string>? list)
+    {
+        List<string>? listClone = list;
+
+        if (!listClone!.Any() || listClone!.All(string.IsNullOrEmpty))
+            listClone = null;
+        else
+            listClone!.TrimExcess();
+
+        return listClone;
     }
 }

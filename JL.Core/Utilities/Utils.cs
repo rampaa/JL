@@ -18,6 +18,16 @@ public static class Utils
             shared: true)
         .CreateLogger()!;
 
+    public static readonly Dictionary<string, string> Iso6392TTo2B = new()
+    {
+        #pragma warning disable format
+        { "tib", "bod" }, { "cze", "ces" }, { "wel", "cym" }, { "ger", "deu" }, { "gre", "ell" },
+        { "baq", "eus" }, { "per", "fas" }, { "fre", "fra" }, { "arm", "hye" }, { "ice", "isl" },
+        { "geo", "kat" }, { "mac", "mkd" }, { "mao", "mri" }, { "may", "msa" }, { "bur", "mya" },
+        { "dut", "nld" }, { "rum", "ron" }, { "slo", "slk" }, { "alb", "sqi" }, { "chi", "zho" }
+        #pragma warning restore format
+    };
+
     public static void CreateDefaultDictsConfig()
     {
         var jso = new JsonSerializerOptions

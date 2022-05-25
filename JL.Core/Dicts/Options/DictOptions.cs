@@ -18,6 +18,7 @@ public class DictOptions
     public MiscInfoOption? MiscInfo { get; }
     public RelatedTermOption? RelatedTerm { get; }
     public AntonymOption? Antonym { get; }
+    public LoanwordEtymologyOption? LoanwordEtymology { get; }
     public PitchAccentMarkerColorOption? PitchAccentMarkerColor { get; }
 
     public DictOptions
@@ -38,6 +39,7 @@ public class DictOptions
         MiscInfoOption? miscInfo = null,
         RelatedTermOption? relatedTerm = null,
         AntonymOption? antonym = null,
+        LoanwordEtymologyOption? loanwordEtymology = null,
         PitchAccentMarkerColorOption? pitchAccentMarkerColor = null
         )
     {
@@ -57,6 +59,7 @@ public class DictOptions
         MiscInfo = miscInfo;
         RelatedTerm = relatedTerm;
         Antonym = antonym;
+        LoanwordEtymology = loanwordEtymology;
         PitchAccentMarkerColor = pitchAccentMarkerColor;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Globalization;
+using System.Xml;
 
 namespace JL.Core.Dicts.EDICT.JMdict;
 
@@ -199,6 +200,33 @@ public static class JMdictLoader
 
                     case "ant":
                         sense.AntList.Add(jmdictXml.ReadString());
+                        break;
+
+                    case "lsource":
+                        string? lang = jmdictXml.GetAttribute("xml:lang");
+
+                        if (lang != null)
+                        {
+                            if (Utilities.Utils.Iso6392TTo2B.TryGetValue(lang, out string? langCode))
+                            {
+                                lang = langCode;
+                            }
+
+                            lang = new CultureInfo(lang).EnglishName;
+                        }
+
+                        else
+                        {
+                            lang = "English";
+                        }
+
+                        bool isPart = jmdictXml.GetAttribute("ls_type") == "part";
+                        bool isWasei = jmdictXml.GetAttribute("ls_wasei") != null;
+
+                        string? originalWord = jmdictXml.ReadString();
+                        originalWord = originalWord != "" ? originalWord : null;
+
+                        sense.LSourceList.Add(new LSource(lang, isPart, isWasei, originalWord));
                         break;
                 }
             }

@@ -67,7 +67,7 @@ public partial class MainWindow : Window, IFrontend
     public double HeightBeforeResolutionChange { get; set; }
     public double WidthBeforeResolutionChange { get; set; }
 
-    public CancellationTokenSource PrecacheCancellationToken { get; set; } = new();
+    private CancellationTokenSource PrecacheCancellationToken { get; set; } = new();
 
     public MainWindow()
     {
@@ -139,7 +139,7 @@ public partial class MainWindow : Window, IFrontend
         }
     }
 
-    public async Task Precache(string input)
+    private async Task Precache(string input)
     {
         if (Debugger.IsAttached)
             PrecacheProgress.Visibility = Visibility.Visible;

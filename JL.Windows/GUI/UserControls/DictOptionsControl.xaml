@@ -95,6 +95,10 @@
                     <TextBlock Foreground="White" Text="Show antonyms" TextWrapping="Wrap" />
                 </CheckBox>
 
+                <CheckBox Name="LoanwordEtymologyCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Foreground="White" Text="Show the etymology of loanwords" TextWrapping="Wrap" />
+                </CheckBox>
+
                 <DockPanel x:Name="PitchAccentMarkerColorDockPanel" Visibility="Collapsed">
                     <Button x:Name="PitchAccentMarkerColorButton" Content="" HorizontalAlignment="Left"
                             Width="50" Height="25" Click="ShowColorPicker" Margin="10, 0, 0, 0"

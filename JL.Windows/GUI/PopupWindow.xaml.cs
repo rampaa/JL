@@ -1669,8 +1669,8 @@ public partial class PopupWindow : Window
     }
     private bool DictFilter(object item)
     {
-        StackPanel Items = (StackPanel)item;
-        return (DictType)Items.Tag == _filteredDict;
+        StackPanel items = (StackPanel)item;
+        return (DictType)items.Tag == _filteredDict;
     }
 
     private bool NoAllDictFilter(object item)

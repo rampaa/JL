@@ -48,19 +48,19 @@ public static class Storage
             {
                 "CustomWordDictionary",
                 new Dict(DictType.CustomWordDictionary,
-                    $"{ResourcesPath}\\custom_words.txt",
+                    $"{ResourcesPath}/custom_words.txt",
                     true, 0,
                     new DictOptions(newlineBetweenDefinitions: new() { Value = false }))
             },
             {
                 "CustomNameDictionary",
                 new Dict(DictType.CustomNameDictionary,
-                    $"{ResourcesPath}\\custom_names.txt", true, 1,
+                    $"{ResourcesPath}/custom_names.txt", true, 1,
                     new DictOptions())
             },
             {
                 "JMdict",
-                new Dict(DictType.JMdict, $"{ResourcesPath}\\JMdict.xml", true, 2,
+                new Dict(DictType.JMdict, $"{ResourcesPath}/JMdict.xml", true, 2,
                     new DictOptions(
                         newlineBetweenDefinitions: new() { Value = false },
                         wordClassInfo: new() { Value = true },
@@ -73,17 +73,18 @@ public static class Storage
                         wordTypeInfo: new() { Value = true },
                         miscInfo: new() { Value = true },
                         relatedTerm: new() { Value = false },
-                        antonym: new() { Value = false }
+                        antonym: new() { Value = false },
+                        loanwordEtymology: new () { Value = true}
                         ))
             },
             {
                 "JMnedict",
-                new Dict(DictType.JMnedict, $"{ResourcesPath}\\JMnedict.xml", true, 3,
+                new Dict(DictType.JMnedict, $"{ResourcesPath}/JMnedict.xml", true, 3,
                     new DictOptions(newlineBetweenDefinitions: new() { Value = false }))
             },
             {
                 "Kanjidic",
-                new Dict(DictType.Kanjidic, $"{ResourcesPath}\\kanjidic2.xml", true, 4,
+                new Dict(DictType.Kanjidic, $"{ResourcesPath}/kanjidic2.xml", true, 4,
                     new DictOptions(noAll: new() { Value = false }))
             }
         };

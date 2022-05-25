@@ -123,6 +123,12 @@ public partial class DictOptionsControl : UserControl
             antonymOption = new AntonymOption { Value = AntonymCheckBox.IsChecked!.Value };
         }
 
+        LoanwordEtymologyOption? loanwordEtymology = null;
+        if (LoanwordEtymologyOption.ValidDictTypes.Contains(type))
+        {
+            loanwordEtymology = new LoanwordEtymologyOption { Value = LoanwordEtymologyCheckBox.IsChecked!.Value };
+        }
+
         PitchAccentMarkerColorOption? pitchAccentMarkerColorOption = null;
         if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(type))
         {
@@ -147,6 +153,7 @@ public partial class DictOptionsControl : UserControl
                 miscInfoOption,
                 relatedTermOption,
                 antonymOption,
+                loanwordEtymology,
                 pitchAccentMarkerColorOption
             );
 
@@ -257,6 +264,12 @@ public partial class DictOptionsControl : UserControl
             AntonymCheckBox.Visibility = Visibility.Visible;
         }
 
+        if (LoanwordEtymologyOption.ValidDictTypes.Contains(dict.Type))
+        {
+            LoanwordEtymologyCheckBox.IsChecked = dict.Options?.LoanwordEtymology?.Value ?? true;
+            LoanwordEtymologyCheckBox.Visibility = Visibility.Visible;
+        }
+
         if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(dict.Type))
         {
             PitchAccentMarkerColorButton.Background = (SolidColorBrush)new BrushConverter()
@@ -266,23 +279,9 @@ public partial class DictOptionsControl : UserControl
             PitchAccentMarkerColorDockPanel.Visibility = Visibility.Visible;
         }
 
-        if (NewlineCheckBox.Visibility == Visibility.Visible
-            || ExamplesDockPanel.Visibility == Visibility.Visible
-            || NoAllCheckBox.Visibility == Visibility.Visible
-            || WordClassInfoCheckBox.Visibility == Visibility.Visible
+        if (
+            NoAllCheckBox.Visibility == Visibility.Visible
             || PitchAccentMarkerColorDockPanel.Visibility == Visibility.Visible
-           //|| DialectInfoCheckBox.Visibility == Visibility.Visible
-           //|| POrthographyInfoCheckBox.Visibility == Visibility.Visible
-           //|| POrthographyInfoColorDockPanel.Visibility == Visibility.Visible
-           //|| POrthographyInfoFontSizeNumericUpDown.Visibility == Visibility.Visible
-           //|| AOrthographyInfoCheckBox.Visibility == Visibility.Visible
-           //|| ROrthographyInfoCheckBox.Visibility == Visibility.Visible
-           //|| WordTypeInfoCheckBox.Visibility == Visibility.Visible
-           //|| SpellingRestrictionInfoCheckBox.Visibility == Visibility.Visible
-           //|| ExtraDefinitionInfoCheckBox.Visibility == Visibility.Visible
-           //|| MiscInfoCheckBox.Visibility == Visibility.Visible
-           //|| RelatedTermCheckBox.Visibility == Visibility.Visible
-           //|| AntonymCheckBox.Visibility == Visibility.Visible
            )
         {
             OptionsTextBlock.Visibility = Visibility.Visible;

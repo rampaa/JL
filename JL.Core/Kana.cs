@@ -7,7 +7,7 @@ public static class Kana
 {
     private static readonly Dictionary<string, string> s_hiraganaToKatakanaDict = new()
     {
-#pragma warning disable format
+        #pragma warning disable format
         { "あ", "ア" }, { "い", "イ" }, { "う", "ウ" }, { "え", "エ" }, { "お", "オ" },
         { "か", "カ" }, { "き", "キ" }, { "く", "ク" }, { "け", "ケ" }, { "こ", "コ" },
         { "さ", "サ" }, { "し", "シ" }, { "す", "ス" }, { "せ", "セ" }, { "そ", "ソ" },
@@ -35,12 +35,12 @@ public static class Kana
         { "ゕ", "ヵ" }, { "ゖ", "ヶ" }, { "ゔ", "ヴ" },
         { "ゝ", "ヽ" }, { "ゞ", "ヾ" }, { "っ", "ッ" },
         { "ゐ゙", "ヸ" }, { "ゑ゙", "ヹ" }, { "を゙", "ヺ" }
-#pragma warning restore format
+        #pragma warning restore format
     };
 
     private static readonly Dictionary<string, string> s_katakanaToHiraganaDict = new()
     {
-#pragma warning disable format
+        #pragma warning disable format
         { "ア", "あ" }, { "イ", "い" }, { "ウ", "う" }, { "エ", "え" }, { "オ", "お" },
         { "カ", "か" }, { "キ", "き" }, { "ク", "く" }, { "ケ", "け" }, { "コ", "こ" },
         { "サ", "さ" }, { "シ", "し" }, { "ス", "す" }, { "セ", "せ" }, { "ソ", "そ" },
@@ -68,12 +68,12 @@ public static class Kana
         { "ヴ", "ゔ" }, { "ヽ", "ゝ" }, { "ヾ", "ゞ" }, { "ッ", "っ" },
 
         { "ヸ", "ゐ゙" }, { "ヹ", "ゑ゙" }, { "ヺ", "を゙" }
-#pragma warning restore format
+        #pragma warning restore format
     };
 
     private static readonly Dictionary<string, string> s_kanaFinalVowelDict = new()
     {
-#pragma warning disable format
+        #pragma warning disable format
         // Katakana
         { "ア", "ア" }, { "カ", "ア" }, { "サ", "ア" }, { "タ", "ア" }, { "ナ", "ア" }, { "ハ", "ア" },
         { "マ", "ア" }, { "ラ", "ア" }, { "ガ", "ア" }, { "ザ", "ア" }, { "ダ", "ア" }, { "バ", "ア" },
@@ -117,12 +117,12 @@ public static class Kana
         { "お", "お" }, { "こ", "お" }, { "そ", "お" }, { "と", "お" }, { "の", "お" }, { "ほ", "お" },
         { "も", "お" }, { "ろ", "お" }, { "ご", "お" }, { "ぞ", "お" }, { "ど", "お" }, { "ぼ", "お" },
         { "ぽ", "お" }, { "を", "お" }, { "よ", "お" }, { "ぉ", "お" }, { "ょ", "お" }, { "を゙", "オ" }
-#pragma warning restore format
+        #pragma warning restore format
     };
 
     private static readonly Dictionary<string, string> s_halfWidthToFullWidthDict = new()
     {
-#pragma warning disable format
+        #pragma warning disable format
         // Half-width katakana
         { "ｱ", "あ" }, { "ｲ", "い" }, { "ｳ", "う" }, { "ｴ", "え" }, { "ｵ", "お" },
         { "ｶ", "か" }, { "ｷ", "き" }, { "ｸ", "く" }, { "ｹ", "け" }, { "ｺ", "こ" },
@@ -167,30 +167,30 @@ public static class Kana
         { "@", "＠" }, { "[", "［" }, { "\\", "＼" }, { "]", "］" }, { "^", "＾" }, { "{", "｛" },
         { "|", "｜" }, { "}", "｝" }, { "~", "～" }, { "ｰ", "ー" }
         // ，－ ．＿｀｟｡｢｣､･￠￡
-#pragma warning restore format
+        #pragma warning restore format
     };
 
     private static readonly Dictionary<string, string> s_compositeHalfWidthKatakanaToFullWidthHiraganaDict = new()
     {
-#pragma warning disable format
+        #pragma warning disable format
         { "ｶﾞ", "が" }, { "ｷﾞ", "ぎ" }, { "ｸﾞ", "ぐ" }, { "ｹﾞ", "げ" }, { "ｺﾞ", "ご" },
         { "ｻﾞ", "ざ" }, { "ｼﾞ", "じ" }, { "ｽﾞ", "ず" }, { "ｾﾞ", "ぜ" }, { "ｿﾞ", "ぞ" },
         { "ﾀﾞ", "だ" }, { "ﾁﾞ", "ぢ" }, { "ﾂﾞ", "づ" }, { "ﾃﾞ", "で" }, { "ﾄﾞ", "ど" },
         { "ﾊﾞ", "ば" }, { "ﾋﾞ", "び" }, { "ﾌﾞ", "ぶ" }, { "ﾍﾞ", "べ" }, { "ﾎﾞ", "ぼ" },
         { "ﾊﾟ", "ぱ" }, { "ﾋﾟ", "ぴ" }, { "ﾌﾟ", "ぷ" }, { "ﾍﾟ", "ぺ" }, { "ﾎﾟ", "ぽ" },
         { "ｳﾞ", "ゔ" }
-#pragma warning restore format
+        #pragma warning restore format
     };
 
     private static readonly HashSet<string> s_smallCombiningKanaSet = new()
     {
-#pragma warning disable format
+        #pragma warning disable format
         "ァ", "ィ", "ゥ", "ェ", "ォ", "ヮ",
         "ャ", "ュ", "ョ",
 
         "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゎ",
         "ゃ", "ゅ", "ょ",
-#pragma warning restore format
+        #pragma warning restore format
     };
 
     public static string KatakanaToHiraganaConverter(string text)

@@ -12,11 +12,7 @@ public class Sense
     public List<string> GlossList { get; set; } // English meaning
     public List<string> XRefList { get; set; } // Related terms
     public List<string> AntList { get; set; } // Antonyms
-
-    //TODO: lsource
-    //<lsource ls_type="part" ls_wasei="y">sub</lsource>
-    //<lsource xml:lang="ger" ls_type="part" ls_wasei="y">Sack</lsource>
-    //(Wasei English: Sub + Wasei German: Sack)
+    public List<LSource> LSourceList { get; set; }
 
     public Sense()
     {
@@ -29,5 +25,6 @@ public class Sense
         GlossList = new List<string>();
         XRefList = new List<string>();
         AntList = new List<string>();
+        LSourceList = new List<LSource>();
     }
 }

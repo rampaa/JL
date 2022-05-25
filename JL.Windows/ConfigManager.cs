@@ -22,12 +22,12 @@ public class ConfigManager : CoreConfig
 
     #region General
 
-    public static readonly List<ComboBoxItem> JapaneseFonts =
+    private static readonly List<ComboBoxItem> s_japaneseFonts =
         WindowsUtils.FindJapaneseFonts().OrderByDescending(f => f.Foreground!.ToString()).ThenBy(font => font.Content)
             .ToList();
 
-    public static readonly List<ComboBoxItem> PopupJapaneseFonts =
-        JapaneseFonts.ConvertAll(f => new ComboBoxItem()
+    private static readonly List<ComboBoxItem> s_popupJapaneseFonts =
+        s_japaneseFonts.ConvertAll(f => new ComboBoxItem()
         {
             Content = f.Content,
             FontFamily = f.FontFamily,
@@ -126,11 +126,11 @@ public class ConfigManager : CoreConfig
 
     #region Advanced
 
-    public static int MaxSearchLength { get; set; } = 37;
+    public static int MaxSearchLength { get; private set; } = 37;
 
-    public static int MaxNumResultsNotInMiningMode { get; set; } = 7;
+    public static int MaxNumResultsNotInMiningMode { get; private set; } = 7;
 
-    public static bool Precaching { get; set; } = false;
+    public static bool Precaching { get; private set; } = false;
 
     #endregion
 
@@ -595,13 +595,13 @@ public class ConfigManager : CoreConfig
         preferenceWindow.TextboxFontSizeNumericUpDown.Value = MainWindow.Instance.FontSizeSlider.Value;
         preferenceWindow.TextboxOpacityNumericUpDown.Value = MainWindow.Instance.OpacitySlider.Value;
 
-        preferenceWindow.MainWindowFontComboBox.ItemsSource = JapaneseFonts;
-        preferenceWindow.MainWindowFontComboBox.SelectedIndex = JapaneseFonts.FindIndex(f =>
+        preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
+        preferenceWindow.MainWindowFontComboBox.SelectedIndex = s_japaneseFonts.FindIndex(f =>
             f.Content.ToString() == MainWindow.Instance.MainTextBox.FontFamily.Source);
 
-        preferenceWindow.PopupFontComboBox.ItemsSource = PopupJapaneseFonts;
+        preferenceWindow.PopupFontComboBox.ItemsSource = s_popupJapaneseFonts;
         preferenceWindow.PopupFontComboBox.SelectedIndex =
-            PopupJapaneseFonts.FindIndex(f => f.Content.ToString() == PopupFont.Source);
+            s_popupJapaneseFonts.FindIndex(f => f.Content.ToString() == PopupFont.Source);
 
         preferenceWindow.PopupMaxHeightNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Height;
         preferenceWindow.PopupMaxWidthNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;

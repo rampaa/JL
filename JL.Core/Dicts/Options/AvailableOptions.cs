@@ -124,6 +124,13 @@ public readonly struct AntonymOption
     public bool Value { get; init; }
 }
 
+public readonly struct LoanwordEtymologyOption
+{
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
+    public bool Value { get; init; }
+}
+
 public readonly struct PitchAccentMarkerColorOption
 {
     [JsonIgnore]

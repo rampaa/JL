@@ -72,42 +72,42 @@ public static class JMnedictLoader
         JMnedictBuilder.BuildDictionary(entry, Storage.Dicts[DictType.JMnedict].Contents);
     }
 
-    private static void ReadKEle(XmlTextReader jMneDictXML, JMnedictEntry entry)
+    private static void ReadKEle(XmlTextReader jmnedictXml, JMnedictEntry entry)
     {
-        jMneDictXML.ReadToFollowing("keb");
-        entry.KebList.Add(jMneDictXML.ReadString());
-        //jMneDictXML.ReadToFollowing("k_ele");
+        jmnedictXml.ReadToFollowing("keb");
+        entry.KebList.Add(jmnedictXml.ReadString());
+        //jmnedictXml.ReadToFollowing("k_ele");
     }
 
-    private static void ReadREle(XmlTextReader jMneDictXML, JMnedictEntry entry)
+    private static void ReadREle(XmlTextReader jmnedictXml, JMnedictEntry entry)
     {
-        jMneDictXML.ReadToFollowing("reb");
-        entry.RebList.Add(jMneDictXML.ReadString());
-        //jMneDictXML.ReadToFollowing("r_ele");
+        jmnedictXml.ReadToFollowing("reb");
+        entry.RebList.Add(jmnedictXml.ReadString());
+        //jmnedictXml.ReadToFollowing("r_ele");
     }
 
-    private static void ReadTrans(XmlTextReader jMneDictXML, JMnedictEntry entry)
+    private static void ReadTrans(XmlTextReader jmnedictXml, JMnedictEntry entry)
     {
         Trans trans = new();
-        while (jMneDictXML.Read())
+        while (jmnedictXml.Read())
         {
-            if (jMneDictXML.Name == "trans" && jMneDictXML.NodeType == XmlNodeType.EndElement)
+            if (jmnedictXml.Name == "trans" && jmnedictXml.NodeType == XmlNodeType.EndElement)
                 break;
 
-            if (jMneDictXML.NodeType == XmlNodeType.Element)
+            if (jmnedictXml.NodeType == XmlNodeType.Element)
             {
-                switch (jMneDictXML.Name)
+                switch (jmnedictXml.Name)
                 {
                     case "name_type":
-                        trans.NameTypeList.Add(ReadEntity(jMneDictXML)!);
+                        trans.NameTypeList.Add(ReadEntity(jmnedictXml)!);
                         break;
 
                     case "trans_det":
-                        trans.TransDetList.Add(jMneDictXML.ReadString());
+                        trans.TransDetList.Add(jmnedictXml.ReadString());
                         break;
 
                         //case "xref":
-                        //    trans.XRefList.Add(jMneDictXML.ReadString());
+                        //    trans.XRefList.Add(jmnedictXml.ReadString());
                         //    break;
                 }
             }
@@ -116,14 +116,15 @@ public static class JMnedictLoader
         entry.TransList.Add(trans);
     }
 
-    private static string? ReadEntity(XmlTextReader jMDictXML)
+    private static string? ReadEntity(XmlTextReader jmnedictXml)
     {
-        jMDictXML.Read();
-        if (jMDictXML.NodeType == XmlNodeType.EntityReference)
+        jmnedictXml.Read();
+        if (jmnedictXml.NodeType == XmlNodeType.EntityReference)
         {
-            //jMDictXML.ResolveEntity();
-            return jMDictXML.Name;
+            //jmnedictXml.ResolveEntity();
+            return jmnedictXml.Name;
         }
-        else return null;
+
+        return null;
     }
 }

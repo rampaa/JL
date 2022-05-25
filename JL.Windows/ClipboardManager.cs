@@ -6,7 +6,7 @@ namespace JL.Windows;
 
 public class ClipboardManager
 {
-    internal static class NativeMethods
+    private static class NativeMethods
     {
         // See http://msdn.microsoft.com/en-us/library/ms649021%28v=vs.85%29.aspx
         public const int WM_CLIPBOARDUPDATE = 0x031D;
