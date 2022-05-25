@@ -16,7 +16,7 @@ public class LookupTests
     {
         Storage.Frontend = new DummyFrontend();
 
-        string jmdictPath = Storage.BuiltInDicts["JMdict"].Path;
+        string jmdictPath = Path.Join(AppContext.BaseDirectory, "Resources/MockJMdict.xml");
 
         Storage.Dicts.Add(DictType.JMdict,
             new Dict(DictType.JMdict, jmdictPath, true, 0,
@@ -30,17 +30,13 @@ public class LookupTests
                         aOrthographyInfo: new() { Value = true },
                         rOrthographyInfo: new() { Value = true },
                         wordTypeInfo: new() { Value = true },
-                        miscInfo: new() { Value = true }
+                        miscInfo: new() { Value = true },
+                        relatedTerm: new() { Value = false },
+                        antonym: new() { Value = false },
+                        loanwordEtymology: new() { Value = true }
                         )));
 
         Storage.Dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();
-
-        if (!File.Exists(jmdictPath))
-        {
-            ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMdict].Path,
-                Storage.JmdictUrl,
-                DictType.JMdict.ToString(), false, true).Wait();
-        }
 
         JMdictLoader.Load(Storage.Dicts[DictType.JMdict].Path).Wait();
         Storage.LoadFrequency().Wait();
@@ -61,7 +57,7 @@ public class LookupTests
                     FoundSpelling = "始まる",
                     Readings = new List<string> { "はじまる" },
                     FormattedDefinitions =
-                        "(v5r, vi) (1) to begin; to start; to commence (v5r, vi) (2) to happen (again); to begin (anew) (v5r, vi) (3) to date (from); to originate (in) ",
+                        "(v5r, vi) (1) to begin; to start; to commence (v5r, vi) (2) to happen (again); to begin (anew) (v5r, vi) (3) to date (from); to originate (in)",
                     EdictId = "1307500",
                     AlternativeSpellings = new List<string>(),
                     Process = null,
