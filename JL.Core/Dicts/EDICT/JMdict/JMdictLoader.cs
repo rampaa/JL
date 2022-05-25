@@ -207,7 +207,7 @@ public static class JMdictLoader
 
                         if (lang != null)
                         {
-                            if (Utilities.Utils.Iso6392TTo2B.TryGetValue(lang, out string? langCode))
+                            if (Utilities.Utils.Iso6392BTo2T.TryGetValue(lang, out string? langCode))
                             {
                                 lang = langCode;
                             }

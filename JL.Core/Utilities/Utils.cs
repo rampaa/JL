@@ -18,7 +18,7 @@ public static class Utils
             shared: true)
         .CreateLogger()!;
 
-    public static readonly Dictionary<string, string> Iso6392TTo2B = new()
+    public static readonly Dictionary<string, string> Iso6392BTo2T = new()
     {
         #pragma warning disable format
         { "tib", "bod" }, { "cze", "ces" }, { "wel", "cym" }, { "ger", "deu" }, { "gre", "ell" },
