@@ -6,9 +6,12 @@ public static class FrequencyLoader
 {
     public static async Task<Dictionary<string, List<List<JsonElement>>>?> LoadJson(string path)
     {
-        await using FileStream openStream = File.OpenRead(path);
-        return await JsonSerializer.DeserializeAsync<Dictionary<string, List<List<JsonElement>>>>(openStream)
-            .ConfigureAwait(false);
+        FileStream openStream = File.OpenRead(path);
+        await using (openStream.ConfigureAwait(false))
+        {
+            return await JsonSerializer.DeserializeAsync<Dictionary<string, List<List<JsonElement>>>>(openStream)
+                .ConfigureAwait(false);
+        }
     }
 
     public static void BuildFreqDict(Dictionary<string, List<List<JsonElement>>> frequencyDict)

@@ -11,8 +11,11 @@ public static class JmdictWcLoader
 {
     public static async Task Load()
     {
-        await using FileStream openStream = File.OpenRead($"{Storage.ResourcesPath}/PoS.json");
-        Storage.WcDict = (await JsonSerializer.DeserializeAsync<Dictionary<string, List<JmdictWc>>>(openStream))!;
+        FileStream openStream = File.OpenRead($"{Storage.ResourcesPath}/PoS.json");
+        await using (openStream.ConfigureAwait(false))
+        {
+            Storage.WcDict = (await JsonSerializer.DeserializeAsync<Dictionary<string, List<JmdictWc>>>(openStream))!;
+        }
 
         foreach (List<JmdictWc> jmDictWcEntryList in Storage.WcDict.Values.ToList())
         {
@@ -122,6 +125,6 @@ public static class JmdictWcLoader
         };
 
         await File.WriteAllBytesAsync($"{Storage.ResourcesPath}/PoS.json",
-            JsonSerializer.SerializeToUtf8Bytes(jmdictWcDict, options));
+            JsonSerializer.SerializeToUtf8Bytes(jmdictWcDict, options)).ConfigureAwait(false);
     }
 }

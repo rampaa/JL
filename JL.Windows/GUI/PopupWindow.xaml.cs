@@ -362,7 +362,7 @@ public partial class PopupWindow : Window
         GenerateDictTypeButtons();
 
         // we might cache incomplete results if we don't wait until all dicts are loaded
-        if (text != null && Storage.Ready)
+        if (text != null && Storage.Ready && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic)
         {
             StackPanelCache.AddReplace(text, ResultStackPanels.ToArray());
         }

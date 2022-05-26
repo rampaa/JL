@@ -55,8 +55,14 @@ public static class ResourceUpdater
 
     private static async Task GzipStreamDecompressor(Stream stream, string filePath)
     {
-        await using FileStream decompressedFileStream = File.Create(filePath);
-        await using GZipStream decompressionStream = new(stream, CompressionMode.Decompress);
-        await decompressionStream.CopyToAsync(decompressedFileStream).ConfigureAwait(false);
+        FileStream decompressedFileStream = File.Create(filePath);
+        await using (decompressedFileStream.ConfigureAwait(false))
+        {
+            GZipStream decompressionStream = new(stream, CompressionMode.Decompress);
+            await using (decompressionStream.ConfigureAwait(false))
+            {
+                await decompressionStream.CopyToAsync(decompressedFileStream).ConfigureAwait(false);
+            }
+        }
     }
 }

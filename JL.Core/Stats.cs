@@ -51,7 +51,7 @@ public class Stats
 
     public static async Task UpdateLifetimeStats()
     {
-        await WriteLifetimeStats(LifetimeStats);
+        await WriteLifetimeStats(LifetimeStats).ConfigureAwait(false);
     }
 
     private static async Task<bool> WriteLifetimeStats(Stats lifetimeStats)

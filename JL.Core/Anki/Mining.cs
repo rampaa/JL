@@ -35,7 +35,7 @@ public static class Mining
             if (string.IsNullOrEmpty(reading))
                 reading = foundSpelling;
 
-            byte[]? audioRes = await Networking.GetAudioFromJpod101(foundSpelling, reading);
+            byte[]? audioRes = await Networking.GetAudioFromJpod101(foundSpelling, reading).ConfigureAwait(false);
 
             Dictionary<string, object?>[] audio =
             {
@@ -74,7 +74,7 @@ public static class Mining
                 }
 
                 if (Storage.Frontend.CoreConfig.ForceSyncAnki)
-                    await AnkiConnect.Sync();
+                    await AnkiConnect.Sync().ConfigureAwait(false);
 
                 return true;
             }

@@ -298,6 +298,6 @@ public static class Utils
 
     private static async void OnTimedEvent(object? sender, ElapsedEventArgs e)
     {
-        await Stats.UpdateLifetimeStats();
+        await Stats.UpdateLifetimeStats().ConfigureAwait(false);
     }
 }

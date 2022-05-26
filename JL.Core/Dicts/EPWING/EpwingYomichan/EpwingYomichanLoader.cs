@@ -14,10 +14,15 @@ public static class EpwingYomichanLoader
 
         foreach (string jsonFile in jsonFiles)
         {
-            await using FileStream openStream = File.OpenRead(jsonFile);
-            List<List<JsonElement>>? jsonObjects = await JsonSerializer
-                .DeserializeAsync<List<List<JsonElement>>>(openStream)
-                .ConfigureAwait(false);
+            List<List<JsonElement>>? jsonObjects;
+
+            FileStream openStream = File.OpenRead(jsonFile);
+            await using (openStream.ConfigureAwait(false))
+            {
+                jsonObjects = await JsonSerializer
+                    .DeserializeAsync<List<List<JsonElement>>>(openStream)
+                    .ConfigureAwait(false);
+            }
 
             if (jsonObjects == null)
                 continue;

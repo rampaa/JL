@@ -122,11 +122,11 @@ public partial class MainWindow : Window, IFrontend
                     Stats.IncrementStat(StatType.Characters, new StringInfo(text).LengthInTextElements);
                     Stats.IncrementStat(StatType.Lines);
 
-                    if (Storage.Ready && ConfigManager.Precaching
-                                      && MainTextBox!.Text.Length < Storage.CacheSize)
+                    if (Storage.Ready && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic
+                        && ConfigManager.Precaching && MainTextBox!.Text.Length < Storage.CacheSize)
                     {
                         Dispatcher.Invoke(DispatcherPriority.Render, delegate () { }); // let MainTextBox text update
-                        await Precache(MainTextBox!.Text);
+                        await Precache(MainTextBox!.Text).ConfigureAwait(false);
                     }
                 }
             }

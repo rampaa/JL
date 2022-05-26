@@ -9,9 +9,14 @@ internal static class EpwingNazekaLoader
     {
         try
         {
-            await using FileStream openStream = File.OpenRead(dictPath);
-            List<object>? jsonObjects = await JsonSerializer.DeserializeAsync<List<object>>(openStream)
-                .ConfigureAwait(false);
+            List<object>? jsonObjects;
+
+            FileStream openStream = File.OpenRead(dictPath);
+            await using (openStream.ConfigureAwait(false))
+            {
+                jsonObjects = await JsonSerializer.DeserializeAsync<List<object>>(openStream)
+                    .ConfigureAwait(false);
+            }
 
             Dictionary<string, List<IResult>> nazekaEpwingDict = Storage.Dicts[dictType].Contents;
 
