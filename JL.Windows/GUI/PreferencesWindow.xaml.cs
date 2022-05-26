@@ -209,7 +209,7 @@ public partial class PreferencesWindow : Window
         catch (Exception exception)
         {
             WindowsUtils.Alert(AlertLevel.Error, "Error creating field elements for Anki setup");
-            Utils.Logger.Error(exception, "Error creating field elements for Anki for Anki setup");
+            Utils.Logger.Error(exception, "Error creating field elements for Anki setup");
         }
     }
 
