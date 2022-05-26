@@ -17,10 +17,10 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for PreferenceWindow.xaml
 /// </summary>
-public partial class PreferencesWindow : System.Windows.Window
+public partial class PreferencesWindow : Window
 {
     private static PreferencesWindow? s_instance;
-    private bool _setAnkiConfig;
+    private bool _setAnkiConfig = false;
 
     public static PreferencesWindow Instance
     {
@@ -138,8 +138,8 @@ public partial class PreferencesWindow : System.Windows.Window
 
             catch
             {
-                WindowsUtils.Alert(AlertLevel.Error, "Error getting deck and model names");
-                Utils.Logger.Error("Error getting deck and model names");
+                WindowsUtils.Alert(AlertLevel.Error, "Error getting deck and model names form Anki");
+                Utils.Logger.Error("Error getting deck and model names fron Anki");
                 MiningSetupComboBoxDeckNames.ItemsSource = "";
                 MiningSetupComboBoxModelNames.ItemsSource = "";
             }
@@ -147,8 +147,8 @@ public partial class PreferencesWindow : System.Windows.Window
 
         else
         {
-            WindowsUtils.Alert(AlertLevel.Error, "Error getting deck and model names");
-            Utils.Logger.Error("Error getting deck and model names");
+            WindowsUtils.Alert(AlertLevel.Error, "Error getting deck and model names from Anki");
+            Utils.Logger.Error("Error getting deck and model names from Anki");
             MiningSetupComboBoxDeckNames.ItemsSource = "";
             MiningSetupComboBoxModelNames.ItemsSource = "";
         }
@@ -208,8 +208,8 @@ public partial class PreferencesWindow : System.Windows.Window
         }
         catch (Exception exception)
         {
-            WindowsUtils.Alert(AlertLevel.Error, "Error creating field elements");
-            Utils.Logger.Error(exception, "Error creating field elements");
+            WindowsUtils.Alert(AlertLevel.Error, "Error creating field elements for Anki setup");
+            Utils.Logger.Error(exception, "Error creating field elements for Anki for Anki setup");
         }
     }
 
@@ -246,8 +246,8 @@ public partial class PreferencesWindow : System.Windows.Window
             if (MiningSetupComboBoxDeckNames.SelectedItem == null ||
                 MiningSetupComboBoxModelNames.SelectedItem == null)
             {
-                WindowsUtils.Alert(AlertLevel.Error, "Save failed: Incomplete config");
-                Utils.Logger.Error("Save failed: Incomplete config");
+                WindowsUtils.Alert(AlertLevel.Error, "Save failed: Incomplete Anki config");
+                Utils.Logger.Error("Save failed: Incomplete Anki config");
                 return;
             }
 
