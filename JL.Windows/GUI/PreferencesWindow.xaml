@@ -475,9 +475,6 @@
                                                TextWrapping="Wrap" />
                                     <TextBox x:Name="TagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
                                              Cursor="Help" ToolTip="Separated by a comma" />
-
-                                    <Button x:Name="MiningSetupButtonSave" Click="MiningSetupButtonSave_Click"
-                                            Content="Save AnkiConfig" Height="35" FontSize="16" Width="140" />
                                 </StackPanel>
                             </Grid>
                         </StackPanel>

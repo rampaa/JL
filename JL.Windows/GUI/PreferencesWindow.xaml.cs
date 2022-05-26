@@ -69,11 +69,12 @@ public partial class PreferencesWindow : System.Windows.Window
         switch (itemTab.Header)
         {
             case "Anki":
-                if (ConfigManager.Instance.AnkiIntegration && !_setAnkiConfig)
+                if (ConfigManager.AnkiIntegration && !_setAnkiConfig)
                 {
                     await SetPreviousMiningConfig();
+
                     if (MiningSetupComboBoxDeckNames.SelectedItem == null)
-                        await PopulateDeckAndModelNames();
+                        await PopulateDeckAndModelNames().ConfigureAwait(false);
 
                     _setAnkiConfig = true;
                 }
@@ -155,7 +156,7 @@ public partial class PreferencesWindow : System.Windows.Window
 
     private async void MiningSetupButtonRefresh_Click(object sender, RoutedEventArgs e)
     {
-        await PopulateDeckAndModelNames();
+        await PopulateDeckAndModelNames().ConfigureAwait(false);
     }
 
     private async void MiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
@@ -212,7 +213,7 @@ public partial class PreferencesWindow : System.Windows.Window
         }
     }
 
-    private async void MiningSetupButtonSave_Click(object sender, RoutedEventArgs e)
+    public async void SaveMiningSetup()
     {
         try
         {
@@ -251,11 +252,14 @@ public partial class PreferencesWindow : System.Windows.Window
             }
 
             AnkiConfig ankiConfig = new(deckName, modelName, fields, tags);
-            if (await AnkiConfig.WriteAnkiConfig(ankiConfig).ConfigureAwait(false))
-            {
-                WindowsUtils.Alert(AlertLevel.Success, "Saved AnkiConfig");
-                Utils.Logger.Information("Saved AnkiConfig");
-            }
+
+            await AnkiConfig.WriteAnkiConfig(ankiConfig).ConfigureAwait(false);
+
+            //if (await AnkiConfig.WriteAnkiConfig(ankiConfig).ConfigureAwait(false))
+            //{
+            //    WindowsUtils.Alert(AlertLevel.Success, "Saved AnkiConfig");
+            //    Utils.Logger.Information("Saved AnkiConfig");
+            //}
         }
         catch (Exception exception)
         {
