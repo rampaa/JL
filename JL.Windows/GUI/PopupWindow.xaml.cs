@@ -131,7 +131,7 @@ public partial class PopupWindow : Window
         WindowsUtils.ShowStatsWindow();
     }
 
-    public void TextBox_MouseMove(TextBox tb)
+    public async void TextBox_MouseMove(TextBox tb)
     {
         if (MiningMode || ConfigManager.InactiveLookupMode
                        || (ConfigManager.RequireLookupKeyPress && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
@@ -199,6 +199,11 @@ public partial class PopupWindow : Window
                     Activate();
                     Keyboard.Focus(this);
                     Focus();
+                }
+
+                if (ConfigManager.AutoPlayAudio)
+                {
+                    await PlayAudio().ConfigureAwait(false);
                 }
             }
             else
@@ -1282,85 +1287,7 @@ public partial class PopupWindow : Window
         }
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.PlayAudioKeyGesture))
         {
-            //int index = numericKeyValue != -1 ? numericKeyValue : _playAudioIndex;
-            //if (index > PopupListBox.Items.Count - 1)
-            //{
-            //    WindowsUtils.Alert(AlertLevel.Error, "Index out of range");
-            //    return;
-            //}
-
-            //var innerStackPanel = (StackPanel)PopupListBox.Items[index];
-
-            string? foundSpelling = null;
-            string? reading = null;
-
-            StackPanel[] visibleStackPanels = PopupListBox.Items.Cast<StackPanel>()
-                .Where(stackPanel => stackPanel.Visibility == Visibility.Visible).ToArray();
-
-            if (visibleStackPanels.Length == 0)
-                return;
-
-            StackPanel innerStackPanel = visibleStackPanels[_playAudioIndex];
-            var top = (WrapPanel)innerStackPanel.Children[0];
-
-            foreach (UIElement child in top.Children)
-            {
-                if (child is TextBox chi)
-                {
-                    switch (chi.Name)
-                    {
-                        case nameof(LookupResult.Readings):
-                            reading = chi.Text.Split(",")[0];
-                            break;
-                    }
-                }
-
-                else if (child is TextBlock ch)
-                {
-                    switch (ch.Name)
-                    {
-                        case nameof(LookupResult.FoundSpelling):
-                            foundSpelling = ch.Text;
-                            break;
-                        case nameof(LookupResult.Readings):
-                            reading = ch.Text.Split(",")[0];
-                            break;
-                    }
-                }
-
-                else if (child is Grid grid)
-                {
-                    foreach (UIElement uiElement in grid.Children)
-                    {
-                        if (uiElement is TextBlock textBlockCg)
-                        {
-                            switch (textBlockCg.Name)
-                            {
-                                case nameof(LookupResult.FoundSpelling):
-                                    foundSpelling = textBlockCg.Text;
-                                    break;
-                                case nameof(LookupResult.Readings):
-                                    reading = textBlockCg.Text.Split(",")[0];
-                                    break;
-                            }
-                        }
-                        else if (uiElement is TextBox textBoxCg)
-                        {
-                            switch (textBoxCg.Name)
-                            {
-                                case nameof(LookupResult.Readings):
-                                    reading = textBoxCg.Text.Split(",")[0];
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (foundSpelling != null)
-            {
-                await Utils.GetAndPlayAudioFromJpod101(foundSpelling, reading, 1).ConfigureAwait(false);
-            }
+            await PlayAudio();
         }
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ClosePopupKeyGesture))
         {
@@ -1514,6 +1441,89 @@ public partial class PopupWindow : Window
                     }
                 }
             }
+        }
+    }
+
+    private async Task PlayAudio()
+    {
+        //int index = numericKeyValue != -1 ? numericKeyValue : _playAudioIndex;
+        //if (index > PopupListBox.Items.Count - 1)
+        //{
+        //    WindowsUtils.Alert(AlertLevel.Error, "Index out of range");
+        //    return;
+        //}
+
+        //var innerStackPanel = (StackPanel)PopupListBox.Items[index];
+
+        string? foundSpelling = null;
+        string? reading = null;
+
+        StackPanel[] visibleStackPanels = PopupListBox.Items.Cast<StackPanel>()
+            .Where(stackPanel => stackPanel.Visibility == Visibility.Visible).ToArray();
+
+        if (visibleStackPanels.Length == 0)
+            return;
+
+        StackPanel innerStackPanel = visibleStackPanels[_playAudioIndex];
+        var top = (WrapPanel)innerStackPanel.Children[0];
+
+        foreach (UIElement child in top.Children)
+        {
+            if (child is TextBox chi)
+            {
+                switch (chi.Name)
+                {
+                    case nameof(LookupResult.Readings):
+                        reading = chi.Text.Split(",")[0];
+                        break;
+                }
+            }
+
+            else if (child is TextBlock ch)
+            {
+                switch (ch.Name)
+                {
+                    case nameof(LookupResult.FoundSpelling):
+                        foundSpelling = ch.Text;
+                        break;
+                    case nameof(LookupResult.Readings):
+                        reading = ch.Text.Split(",")[0];
+                        break;
+                }
+            }
+
+            else if (child is Grid grid)
+            {
+                foreach (UIElement uiElement in grid.Children)
+                {
+                    if (uiElement is TextBlock textBlockCg)
+                    {
+                        switch (textBlockCg.Name)
+                        {
+                            case nameof(LookupResult.FoundSpelling):
+                                foundSpelling = textBlockCg.Text;
+                                break;
+                            case nameof(LookupResult.Readings):
+                                reading = textBlockCg.Text.Split(",")[0];
+                                break;
+                        }
+                    }
+                    else if (uiElement is TextBox textBoxCg)
+                    {
+                        switch (textBoxCg.Name)
+                        {
+                            case nameof(LookupResult.Readings):
+                                reading = textBoxCg.Text.Split(",")[0];
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (foundSpelling != null)
+        {
+            await Utils.GetAndPlayAudioFromJpod101(foundSpelling, reading, 1).ConfigureAwait(false);
         }
     }
 

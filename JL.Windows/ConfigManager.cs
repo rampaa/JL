@@ -42,8 +42,8 @@ public class ConfigManager : CoreConfig
 
     // Using alt as the lookup key cause focusing bugs. Consider making this key a KeyGesture.
     public static ModifierKeys LookupKey { get; private set; } = ModifierKeys.Shift;
-
     public static bool HighlightLongestMatch { get; private set; } = false;
+    public static bool AutoPlayAudio { get; private set; } = false;
 
     public static bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
 
@@ -161,6 +161,11 @@ public class ConfigManager : CoreConfig
             () => HighlightLongestMatch =
                 bool.Parse(ConfigurationManager.AppSettings.Get("HighlightLongestMatch")!),
             HighlightLongestMatch, "HighlightLongestMatch");
+
+        WindowsUtils.Try(
+            () => AutoPlayAudio =
+                bool.Parse(ConfigurationManager.AppSettings.Get("AutoPlayAudio")!),
+            AutoPlayAudio, "AutoPlayAudio");
 
         WindowsUtils.Try(
             () => Precaching =
@@ -577,6 +582,7 @@ public class ConfigManager : CoreConfig
         preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
         preferenceWindow.KanjiModeCheckBox.IsChecked = KanjiMode;
         preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
+        preferenceWindow.AutoPlayAudioCheckBox.IsChecked = AutoPlayAudio;
         preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = CheckForJLUpdatesOnStartUp;
         preferenceWindow.PrecachingCheckBox.IsChecked = Precaching;
 
@@ -734,6 +740,8 @@ public class ConfigManager : CoreConfig
             preferenceWindow.LookupRateNumericUpDown.Value.ToString();
         config.AppSettings.Settings["HighlightLongestMatch"].Value =
             preferenceWindow.HighlightLongestMatchCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings["AutoPlayAudio"].Value =
+            preferenceWindow.AutoPlayAudioCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(Precaching)].Value =
             preferenceWindow.PrecachingCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["CheckForJLUpdatesOnStartUp"].Value =
