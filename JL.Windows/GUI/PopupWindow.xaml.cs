@@ -229,7 +229,7 @@ public partial class PopupWindow : Window
         }
     }
 
-    public void LookupOnSelect(TextBox tb)
+    public async void LookupOnSelect(TextBox tb)
     {
         if (string.IsNullOrWhiteSpace(tb.SelectedText))
             return;
@@ -259,6 +259,11 @@ public partial class PopupWindow : Window
                 Activate();
                 Keyboard.Focus(this);
                 Focus();
+            }
+
+            if (ConfigManager.AutoPlayAudio)
+            {
+                await PlayAudio();
             }
         }
         else
