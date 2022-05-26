@@ -136,12 +136,11 @@ public class WinApi
             case NativeMethods.WM_NCCALCSIZE:
                 if (wParam != IntPtr.Zero)
                 {
-                    handled = true;
                     var calcSizeParams = (NativeMethods.NCCALCSIZE_PARAMS)Marshal.PtrToStructure(lParam, typeof(NativeMethods.NCCALCSIZE_PARAMS))!;
                     calcSizeParams.rgrc1.left = 1;
                     calcSizeParams.rgrc2.left = 1;
-
                     Marshal.StructureToPtr(calcSizeParams, lParam, true);
+                    handled = true;
                     return (IntPtr)NativeMethods.WVR_VALIDRECTS;
                 }
                 break;
@@ -156,7 +155,7 @@ public class WinApi
                     handled = true;
                     return (IntPtr)2; // HTCAPTION
                 }
-                return IntPtr.Zero;
+                break;
         }
 
         return IntPtr.Zero;
