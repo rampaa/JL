@@ -165,15 +165,19 @@ public static class EpwingYomichanLoader
                 break;
 
             case DictType.Koujien:
-                break;
-
             case DictType.Meikyou:
-                break;
-
             case DictType.Gakken:
-                break;
-
             case DictType.Kotowaza:
+            case DictType.IwanamiYomichan:
+            case DictType.JitsuyouYomichan:
+            case DictType.ShinmeikaiYomichan:
+            case DictType.NikkokuYomichan:
+            case DictType.ShinjirinYomichan:
+            case DictType.OubunshaYomichan:
+            case DictType.ZokugoYomichan:
+            case DictType.WeblioKogoYomichan:
+            case DictType.GakkenYojijukugoYomichan:
+            case DictType.ShinmeikaiYojijukugoYomichan:
                 break;
 
             default:

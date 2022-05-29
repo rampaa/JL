@@ -139,11 +139,12 @@ internal static class EpwingNazekaLoader
         switch (dictType)
         {
             case DictType.KenkyuushaNazeka:
-                break;
             case DictType.DaijirinNazeka:
-                break;
             case DictType.ShinmeikaiNazeka:
                 break;
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(dictType), dictType, null);
         }
 
         return true;

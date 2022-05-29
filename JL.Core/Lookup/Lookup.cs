@@ -66,61 +66,55 @@ public static class Lookup
                         jMdictResults = GetWordResults(text, textInHiraganaList, deconjugationResultsList,
                             dictType);
                         break;
+
                     case DictType.JMnedict:
                         jMnedictResults = GetNameResults(text, textInHiraganaList, dictType);
                         break;
+
                     case DictType.Kanjidic:
                         kanjiResult = GetKanjidicResults(text, dictType);
                         break;
-                    case DictType.Kenkyuusha:
-                        epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
-                            deconjugationResultsList, dictType));
-                        break;
-                    case DictType.Daijirin:
-                        epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
-                            deconjugationResultsList, dictType));
-                        break;
-                    case DictType.Daijisen:
-                        epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
-                            deconjugationResultsList, dictType));
-                        break;
-                    case DictType.Koujien:
-                        epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
-                            deconjugationResultsList, dictType));
-                        break;
-                    case DictType.Meikyou:
-                        epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
-                            deconjugationResultsList, dictType));
-                        break;
-                    case DictType.Gakken:
-                        epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
-                            deconjugationResultsList, dictType));
-                        break;
-                    case DictType.Kotowaza:
-                        epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
-                            deconjugationResultsList, dictType));
-                        break;
+
                     case DictType.CustomWordDictionary:
                         customWordResults = GetWordResults(text, textInHiraganaList,
                             deconjugationResultsList, dictType);
                         break;
+
                     case DictType.CustomNameDictionary:
                         customNameResults = GetNameResults(text, textInHiraganaList, dictType);
                         break;
+
+                    case DictType.Kenkyuusha:
+                    case DictType.Daijirin:
+                    case DictType.Daijisen:
+                    case DictType.Koujien:
+                    case DictType.Meikyou:
+                    case DictType.Gakken:
+                    case DictType.Kotowaza:
+                    case DictType.IwanamiYomichan:
+                    case DictType.JitsuyouYomichan:
+                    case DictType.ShinmeikaiYomichan:
+                    case DictType.NikkokuYomichan:
+                    case DictType.ShinjirinYomichan:
+                    case DictType.OubunshaYomichan:
+                    case DictType.ZokugoYomichan:
+                    case DictType.WeblioKogoYomichan:
+                    case DictType.GakkenYojijukugoYomichan:
+                    case DictType.ShinmeikaiYojijukugoYomichan:
+                        epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
+                            deconjugationResultsList, dictType));
+                        break;
+
                     case DictType.DaijirinNazeka:
-                        epwingNazekaWordResultsList.Add(GetWordResults(text, textInHiraganaList,
-                            deconjugationResultsList, dictType));
-                        break;
                     case DictType.KenkyuushaNazeka:
-                        epwingNazekaWordResultsList.Add(GetWordResults(text, textInHiraganaList,
-                            deconjugationResultsList, dictType));
-                        break;
                     case DictType.ShinmeikaiNazeka:
                         epwingNazekaWordResultsList.Add(GetWordResults(text, textInHiraganaList,
                             deconjugationResultsList, dictType));
                         break;
+
                     case DictType.Kanjium:
                         break;
+
                     default:
                         throw new ArgumentOutOfRangeException(null, "Invalid DictType");
                 }
@@ -262,6 +256,16 @@ public static class Lookup
                         case DictType.Kotowaza:
                         case DictType.Koujien:
                         case DictType.Meikyou:
+                        case DictType.IwanamiYomichan:
+                        case DictType.JitsuyouYomichan:
+                        case DictType.ShinmeikaiYomichan:
+                        case DictType.NikkokuYomichan:
+                        case DictType.ShinjirinYomichan:
+                        case DictType.OubunshaYomichan:
+                        case DictType.ZokugoYomichan:
+                        case DictType.WeblioKogoYomichan:
+                        case DictType.GakkenYojijukugoYomichan:
+                        case DictType.ShinmeikaiYojijukugoYomichan:
                             {
                                 int dictResultsCount = dictResults.Count;
                                 for (int i = 0; i < dictResultsCount; i++)

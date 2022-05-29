@@ -106,6 +106,16 @@ public static class Storage
         DictType.Meikyou,
         DictType.Gakken,
         DictType.Kotowaza,
+        DictType.IwanamiYomichan,
+        DictType.JitsuyouYomichan,
+        DictType.ShinmeikaiYomichan,
+        DictType.NikkokuYomichan,
+        DictType.ShinjirinYomichan,
+        DictType.OubunshaYomichan,
+        DictType.ZokugoYomichan,
+        DictType.WeblioKogoYomichan,
+        DictType.GakkenYojijukugoYomichan,
+        DictType.ShinmeikaiYojijukugoYomichan,
         DictType.Kanjium,
     };
 
@@ -158,7 +168,7 @@ public static class Storage
             switch (dict.Type)
             {
                 case DictType.JMdict:
-                    if (dict.Active && !Dicts[DictType.JMdict].Contents.Any() && !UpdatingJMdict)
+                    if (dict.Active && !dict.Contents.Any() && !UpdatingJMdict)
                     {
                         Task jMDictTask = Task.Run(async () =>
                             await JMdictLoader.Load(dict.Path).ConfigureAwait(false));
@@ -166,7 +176,7 @@ public static class Storage
                         tasks.Add(jMDictTask);
                     }
 
-                    else if (!dict.Active && Dicts[DictType.JMdict].Contents.Any() && !UpdatingJMdict)
+                    else if (!dict.Active && dict.Contents.Any() && !UpdatingJMdict)
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
@@ -174,13 +184,13 @@ public static class Storage
 
                     break;
                 case DictType.JMnedict:
-                    if (dict.Active && !Dicts[DictType.JMnedict].Contents.Any() && !UpdatingJMnedict)
+                    if (dict.Active && !dict.Contents.Any() && !UpdatingJMnedict)
                     {
                         tasks.Add(Task.Run(async () =>
                             await JMnedictLoader.Load(dict.Path).ConfigureAwait(false)));
                     }
 
-                    else if (!dict.Active && Dicts[DictType.JMnedict].Contents.Any() && !UpdatingJMnedict)
+                    else if (!dict.Active && dict.Contents.Any() && !UpdatingJMnedict)
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
@@ -188,144 +198,71 @@ public static class Storage
 
                     break;
                 case DictType.Kanjidic:
-                    if (dict.Active && !Dicts[DictType.Kanjidic].Contents.Any() && !UpdatingKanjidic)
+                    if (dict.Active && !dict.Contents.Any() && !UpdatingKanjidic)
                     {
                         tasks.Add(Task.Run(async () =>
                             await KanjiInfoLoader.Load(dict.Path).ConfigureAwait(false)));
                     }
 
-                    else if (!dict.Active && Dicts[DictType.Kanjidic].Contents.Any() && !UpdatingKanjidic)
+                    else if (!dict.Active && dict.Contents.Any() && !UpdatingKanjidic)
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
                     }
-
                     break;
+
                 case DictType.Kenkyuusha:
-                    if (dict.Active && !Dicts[DictType.Kenkyuusha].Contents.Any())
-                    {
-                        tasks.Add(Task.Run(async () =>
-                            await EpwingYomichanLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
-                    }
-
-                    else if (!dict.Active && Dicts[DictType.Kenkyuusha].Contents.Any())
-                    {
-                        dict.Contents.Clear();
-                        dictRemoved = true;
-                    }
-
-                    break;
                 case DictType.Daijirin:
-                    if (dict.Active && !Dicts[DictType.Daijirin].Contents.Any())
-                    {
-                        tasks.Add(Task.Run(async () =>
-                            await EpwingYomichanLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
-                    }
-
-                    else if (!dict.Active && Dicts[DictType.Daijirin].Contents.Any())
-                    {
-                        dict.Contents.Clear();
-                        dictRemoved = true;
-                    }
-
-                    break;
                 case DictType.Daijisen:
-                    if (dict.Active && !Dicts[DictType.Daijisen].Contents.Any())
-                    {
-                        tasks.Add(Task.Run(async () =>
-                            await EpwingYomichanLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
-                    }
-
-                    else if (!dict.Active && Dicts[DictType.Daijisen].Contents.Any())
-                    {
-                        dict.Contents.Clear();
-                        dictRemoved = true;
-                    }
-
-                    break;
                 case DictType.Koujien:
-                    if (dict.Active && !Dicts[DictType.Koujien].Contents.Any())
-                    {
-                        tasks.Add(Task.Run(async () =>
-                            await EpwingYomichanLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
-                    }
-
-                    else if (!dict.Active && Dicts[DictType.Koujien].Contents.Any())
-                    {
-                        dict.Contents.Clear();
-                        dictRemoved = true;
-                    }
-
-                    break;
                 case DictType.Meikyou:
-                    if (dict.Active && !Dicts[DictType.Meikyou].Contents.Any())
-                    {
-                        tasks.Add(Task.Run(async () =>
-                            await EpwingYomichanLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
-                    }
-
-                    else if (!dict.Active && Dicts[DictType.Meikyou].Contents.Any())
-                    {
-                        dict.Contents.Clear();
-                        dictRemoved = true;
-                    }
-
-                    break;
-
                 case DictType.Gakken:
-                    if (dict.Active && !Dicts[DictType.Gakken].Contents.Any())
-                    {
-                        tasks.Add(Task.Run(async () =>
-                            await EpwingYomichanLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
-                    }
-
-                    else if (!dict.Active && Dicts[DictType.Gakken].Contents.Any())
-                    {
-                        dict.Contents.Clear();
-                        dictRemoved = true;
-                    }
-
-                    break;
-
                 case DictType.Kotowaza:
-                    if (dict.Active && !Dicts[DictType.Kotowaza].Contents.Any())
+                case DictType.IwanamiYomichan:
+                case DictType.JitsuyouYomichan:
+                case DictType.ShinmeikaiYomichan:
+                case DictType.NikkokuYomichan:
+                case DictType.ShinjirinYomichan:
+                case DictType.OubunshaYomichan:
+                case DictType.ZokugoYomichan:
+                case DictType.WeblioKogoYomichan:
+                case DictType.GakkenYojijukugoYomichan:
+                case DictType.ShinmeikaiYojijukugoYomichan:
+                    if (dict.Active && !dict.Contents.Any())
                     {
                         tasks.Add(Task.Run(async () =>
                             await EpwingYomichanLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
                     }
 
-                    else if (!dict.Active && Dicts[DictType.Kotowaza].Contents.Any())
+                    else if (!dict.Active && dict.Contents.Any())
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
                     }
-
                     break;
 
                 case DictType.CustomWordDictionary:
-                    if (dict.Active && !Dicts[DictType.CustomWordDictionary].Contents.Any())
+                    if (dict.Active && !dict.Contents.Any())
                     {
-                        tasks.Add(Task.Run(async () => await CustomWordLoader
-                            .Load(Dicts[DictType.CustomWordDictionary].Path)
-                            .ConfigureAwait(false)));
+                        tasks.Add(Task.Run(async () =>
+                            await CustomWordLoader.Load(dict.Path).ConfigureAwait(false)));
                     }
 
-                    else if (!dict.Active && Dicts[DictType.CustomWordDictionary].Contents.Any())
+                    else if (!dict.Active && dict.Contents.Any())
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
                     }
-
                     break;
+
                 case DictType.CustomNameDictionary:
-                    if (dict.Active && !Dicts[DictType.CustomNameDictionary].Contents.Any())
+                    if (dict.Active && !dict.Contents.Any())
                     {
                         tasks.Add(Task.Run(async () =>
-                            await CustomNameLoader.Load(Dicts[DictType.CustomNameDictionary].Path)
-                                .ConfigureAwait(false)));
+                            await CustomNameLoader.Load(dict.Path).ConfigureAwait(false)));
                     }
 
-                    else if (!dict.Active && Dicts[DictType.CustomNameDictionary].Contents.Any())
+                    else if (!dict.Active && dict.Contents.Any())
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
@@ -334,69 +271,33 @@ public static class Storage
                     break;
 
                 case DictType.DaijirinNazeka:
-                    if (dict.Active && !Dicts[DictType.DaijirinNazeka].Contents.Any())
-                    {
-                        tasks.Add(Task.Run(async () =>
-                            await EpwingNazekaLoader
-                                .Load(DictType.DaijirinNazeka, Dicts[DictType.DaijirinNazeka].Path)
-                                .ConfigureAwait(false)));
-                    }
-
-                    else if (!dict.Active && Dicts[DictType.DaijirinNazeka].Contents.Any())
-                    {
-                        dict.Contents.Clear();
-                        dictRemoved = true;
-                    }
-
-                    break;
-
                 case DictType.KenkyuushaNazeka:
-                    if (dict.Active && !Dicts[DictType.KenkyuushaNazeka].Contents.Any())
-                    {
-                        tasks.Add(Task.Run(async () =>
-                            await EpwingNazekaLoader.Load(DictType.KenkyuushaNazeka,
-                                    Dicts[DictType.KenkyuushaNazeka].Path)
-                                .ConfigureAwait(false)));
-                    }
-
-                    else if (!dict.Active && Dicts[DictType.KenkyuushaNazeka].Contents.Any())
-                    {
-                        dict.Contents.Clear();
-                        dictRemoved = true;
-                    }
-
-                    break;
-
                 case DictType.ShinmeikaiNazeka:
-                    if (dict.Active && !Dicts[DictType.ShinmeikaiNazeka].Contents.Any())
+                    if (dict.Active && !dict.Contents.Any())
                     {
                         tasks.Add(Task.Run(async () =>
-                            await EpwingNazekaLoader.Load(DictType.ShinmeikaiNazeka,
-                                    Dicts[DictType.ShinmeikaiNazeka].Path)
-                                .ConfigureAwait(false)));
+                            await EpwingNazekaLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
                     }
 
-                    else if (!dict.Active && Dicts[DictType.ShinmeikaiNazeka].Contents.Any())
+                    else if (!dict.Active && dict.Contents.Any())
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
                     }
-
                     break;
 
                 case DictType.Kanjium:
-                    if (dict.Active && !Dicts[DictType.Kanjium].Contents.Any())
+                    if (dict.Active && !dict.Contents.Any())
                     {
                         tasks.Add(Task.Run(async () =>
                             await KanjiumLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
                     }
 
-                    else if (!dict.Active && Dicts[DictType.Kanjium].Contents.Any())
+                    else if (!dict.Active && dict.Contents.Any())
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
                     }
-
                     break;
 
                 default:

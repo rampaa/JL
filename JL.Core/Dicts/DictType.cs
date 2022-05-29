@@ -30,6 +30,26 @@ public enum DictType
     Kotowaza,
     [Description("Kanjium (Yomichan)")]
     Kanjium,
+    [Description("Iwanami (Yomichan)")]
+    IwanamiYomichan,
+    [Description("Jitsuyou (Yomichan)")]
+    JitsuyouYomichan,
+    [Description("Shinmeikai (Yomichan)")]
+    ShinmeikaiYomichan,
+    [Description("Nikkoku (Yomichan)")]
+    NikkokuYomichan,
+    [Description("Shinjirin (Yomichan)")]
+    ShinjirinYomichan,
+    [Description("Oubunsha (Yomichan)")]
+    OubunshaYomichan,
+    [Description("Zokugo (Yomichan)")]
+    ZokugoYomichan,
+    [Description("Weblio Kogo (Yomichan)")]
+    WeblioKogoYomichan,
+    [Description("Gakken Yojijukugo (Yomichan)")]
+    GakkenYojijukugoYomichan,
+    [Description("Shinmeikai Yojijukugo (Yomichan)")]
+    ShinmeikaiYojijukugoYomichan,
 
     // Nazeka Epwing Converter
     [Description("Kenkyuusha (Nazeka)")]

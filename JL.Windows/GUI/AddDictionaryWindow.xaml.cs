@@ -143,29 +143,29 @@ public partial class AddDictionaryWindow : Window
         {
             // not providing a description for the filter causes the filename returned to be empty
             case DictType.Kenkyuusha:
-                BrowseForDictionaryFolder();
-                break;
             case DictType.Daijirin:
-                BrowseForDictionaryFolder();
-                break;
             case DictType.Daijisen:
-                BrowseForDictionaryFolder();
-                break;
             case DictType.Koujien:
-                BrowseForDictionaryFolder();
-                break;
             case DictType.Meikyou:
-                BrowseForDictionaryFolder();
-                break;
             case DictType.Gakken:
-                BrowseForDictionaryFolder();
-                break;
             case DictType.Kotowaza:
+            case DictType.IwanamiYomichan:
+            case DictType.JitsuyouYomichan:
+            case DictType.ShinmeikaiYomichan:
+            case DictType.NikkokuYomichan:
+            case DictType.ShinjirinYomichan:
+            case DictType.OubunshaYomichan:
+            case DictType.ZokugoYomichan:
+            case DictType.WeblioKogoYomichan:
+            case DictType.GakkenYojijukugoYomichan:
+            case DictType.ShinmeikaiYojijukugoYomichan:
                 BrowseForDictionaryFolder();
                 break;
+
             case DictType.Kanjium:
                 BrowseForDictionaryFolder();
                 break;
+
             case DictType.DaijirinNazeka:
                 BrowseForDictionaryFile("Daijirin file|*.json");
                 break;
@@ -175,6 +175,7 @@ public partial class AddDictionaryWindow : Window
             case DictType.ShinmeikaiNazeka:
                 BrowseForDictionaryFile("Shinmeikai file|*.json");
                 break;
+
             default:
                 throw new ArgumentOutOfRangeException(null, "Invalid DictType (Add)");
         }
