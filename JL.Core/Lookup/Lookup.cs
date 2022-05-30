@@ -34,7 +34,7 @@ public static class Lookup
 
         if (Storage.Frontend.CoreConfig.KanjiMode)
         {
-            return KanjiResultBuilder(GetKanjidicResults(text, DictType.Kanjidic));
+            return KanjiResultBuilder(GetKanjidicResults(text, Storage.Dicts[DictType.Kanjidic]));
         }
 
         Dictionary<string, IntermediaryResult> jMdictResults = new();
@@ -64,24 +64,24 @@ public static class Lookup
                 {
                     case DictType.JMdict:
                         jMdictResults = GetWordResults(text, textInHiraganaList, deconjugationResultsList,
-                            dictType);
+                            dict);
                         break;
 
                     case DictType.JMnedict:
-                        jMnedictResults = GetNameResults(text, textInHiraganaList, dictType);
+                        jMnedictResults = GetNameResults(text, textInHiraganaList, dict);
                         break;
 
                     case DictType.Kanjidic:
-                        kanjiResult = GetKanjidicResults(text, dictType);
+                        kanjiResult = GetKanjidicResults(text, dict);
                         break;
 
                     case DictType.CustomWordDictionary:
                         customWordResults = GetWordResults(text, textInHiraganaList,
-                            deconjugationResultsList, dictType);
+                            deconjugationResultsList, dict);
                         break;
 
                     case DictType.CustomNameDictionary:
-                        customNameResults = GetNameResults(text, textInHiraganaList, dictType);
+                        customNameResults = GetNameResults(text, textInHiraganaList, dict);
                         break;
 
                     case DictType.Kenkyuusha:
@@ -102,14 +102,14 @@ public static class Lookup
                     case DictType.GakkenYojijukugoYomichan:
                     case DictType.ShinmeikaiYojijukugoYomichan:
                         epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
-                            deconjugationResultsList, dictType));
+                            deconjugationResultsList, dict));
                         break;
 
                     case DictType.DaijirinNazeka:
                     case DictType.KenkyuushaNazeka:
                     case DictType.ShinmeikaiNazeka:
                         epwingNazekaWordResultsList.Add(GetWordResults(text, textInHiraganaList,
-                            deconjugationResultsList, dictType));
+                            deconjugationResultsList, dict));
                         break;
 
                     case DictType.Kanjium:
@@ -168,9 +168,7 @@ public static class Lookup
     {
         List<LookupResult> sortedLookupResults = lookupResults
             .OrderByDescending(dict => dict.FoundForm.Length)
-            .ThenBy(dict => Enum.TryParse(dict.DictType, out DictType dictType)
-                ? Storage.Dicts[dictType].Priority
-                : int.MaxValue)
+            .ThenBy(dict => dict.Dict?.Priority ?? int.MaxValue)
             .ThenBy(dict => dict.Frequency).ToList();
 
         string longestFoundForm = sortedLookupResults.First().FoundForm;
@@ -183,14 +181,14 @@ public static class Lookup
         return sortedLookupResults;
     }
 
-    private static (bool tryLongVowelConversion, int succAttempt) GetWordResultsHelper(DictType dictType,
+    private static (bool tryLongVowelConversion, int succAttempt) GetWordResultsHelper(Dict dict,
         Dictionary<string, IntermediaryResult> results,
         HashSet<Form> deconjugationList,
         string foundForm,
         string textInHiragana,
         int succAttempt)
     {
-        Dictionary<string, List<IResult>> dictionary = Storage.Dicts[dictType].Contents;
+        Dictionary<string, List<IResult>> dictionary = dict.Contents;
 
         bool tryLongVowelConversion = true;
 
@@ -198,7 +196,7 @@ public static class Lookup
         {
             results.TryAdd(textInHiragana,
                 new IntermediaryResult(tempResult, null, foundForm,
-                    dictType));
+                    dict));
             tryLongVowelConversion = false;
         }
 
@@ -214,7 +212,7 @@ public static class Lookup
                 {
                     List<IResult> resultsList = new();
 
-                    switch (dictType)
+                    switch (dict.Type)
                     {
                         case DictType.JMdict:
                             {
@@ -358,7 +356,7 @@ public static class Lookup
                                 new IntermediaryResult(resultsList,
                                     new List<List<string>> { deconjugationResult.Process },
                                     foundForm,
-                                    dictType)
+                                    dict)
                             );
                         }
 
@@ -373,7 +371,7 @@ public static class Lookup
     }
 
     private static Dictionary<string, IntermediaryResult> GetWordResults(string text,
-        List<string> textInHiraganaList, List<HashSet<Form>> deconjugationResultsList, DictType dictType)
+        List<string> textInHiraganaList, List<HashSet<Form>> deconjugationResultsList, Dict dict)
     {
         Dictionary<string, IntermediaryResult> results = new();
 
@@ -381,7 +379,7 @@ public static class Lookup
 
         for (int i = 0; i < text.Length; i++)
         {
-            (bool tryLongVowelConversion, succAttempt) = GetWordResultsHelper(dictType, results,
+            (bool tryLongVowelConversion, succAttempt) = GetWordResultsHelper(dict, results,
                 deconjugationResultsList[i], text[..^i], textInHiraganaList[i], succAttempt);
 
             if (tryLongVowelConversion && textInHiraganaList[i].Contains('ー') &&
@@ -391,7 +389,7 @@ public static class Lookup
 
                 for (int j = 0; j < textWithoutLongVowelMarkList.Count; j++)
                 {
-                    succAttempt = GetWordResultsHelper(dictType, results, deconjugationResultsList[i],
+                    succAttempt = GetWordResultsHelper(dict, results, deconjugationResultsList[i],
                         text[..^i], textWithoutLongVowelMarkList[j], succAttempt).succAttempt;
                 }
             }
@@ -401,24 +399,24 @@ public static class Lookup
     }
 
     private static Dictionary<string, IntermediaryResult> GetNameResults(string text,
-        List<string> textInHiraganaList, DictType dictType)
+        List<string> textInHiraganaList, Dict dict)
     {
         Dictionary<string, IntermediaryResult> nameResults = new();
 
         for (int i = 0; i < text.Length; i++)
         {
-            if (Storage.Dicts[dictType].Contents
+            if (dict.Contents
                 .TryGetValue(textInHiraganaList[i], out List<IResult>? result))
             {
                 nameResults.TryAdd(textInHiraganaList[i],
-                    new IntermediaryResult(result, null, text[..^i], dictType));
+                    new IntermediaryResult(result, null, text[..^i], dict));
             }
         }
 
         return nameResults;
     }
 
-    private static Dictionary<string, IntermediaryResult> GetKanjidicResults(string text, DictType dictType)
+    private static Dictionary<string, IntermediaryResult> GetKanjidicResults(string text, Dict dict)
     {
         Dictionary<string, IntermediaryResult> kanjiResults = new();
 
@@ -427,7 +425,7 @@ public static class Lookup
         if (kanji != null && Storage.Dicts[DictType.Kanjidic].Contents.TryGetValue(kanji, out List<IResult>? result))
         {
             kanjiResults.Add(kanji,
-                new IntermediaryResult(result, null, kanji, dictType));
+                new IntermediaryResult(result, null, kanji, dict));
         }
 
         return kanjiResults;
@@ -444,8 +442,6 @@ public static class Lookup
             for (int i = 0; i < resultListCount; i++)
             {
                 var jMDictResult = (JMdictResult)wordResult.ResultsList[i];
-
-                LookupResult result = new();
 
                 List<List<string>?> rLists = jMDictResult.ROrthographyInfoList ?? new();
                 List<List<string>?> aLists = jMDictResult.AOrthographyInfoList ?? new();
@@ -478,18 +474,21 @@ public static class Lookup
                     aOrthographyInfoList.Add(formattedAOrthographyInfo.ToString().TrimEnd(", ".ToCharArray()));
                 }
 
-                result.FoundSpelling = jMDictResult.PrimarySpelling;
-                result.Readings = jMDictResult.Readings ?? new();
-                result.FoundForm = wordResult.FoundForm;
-                result.EdictId = jMDictResult.Id;
-                result.AlternativeSpellings = jMDictResult.AlternativeSpellings ?? new();
-                result.Process = ProcessProcess(wordResult);
-                result.Frequency = GetJmdictFreq(jMDictResult);
-                result.POrthographyInfoList = jMDictResult.POrthographyInfoList ?? new();
-                result.ROrthographyInfoList = rOrthographyInfoList;
-                result.AOrthographyInfoList = aOrthographyInfoList;
-                result.DictType = wordResult.DictType.ToString();
-                result.FormattedDefinitions = BuildJmdictDefinition(jMDictResult, wordResult.DictType);
+                LookupResult result = new()
+                {
+                    FoundSpelling = jMDictResult.PrimarySpelling,
+                    Readings = jMDictResult.Readings ?? new(),
+                    FoundForm = wordResult.FoundForm,
+                    EdictId = jMDictResult.Id,
+                    AlternativeSpellings = jMDictResult.AlternativeSpellings ?? new(),
+                    Process = ProcessProcess(wordResult),
+                    Frequency = GetJmdictFreq(jMDictResult),
+                    POrthographyInfoList = jMDictResult.POrthographyInfoList ?? new(),
+                    ROrthographyInfoList = rOrthographyInfoList,
+                    AOrthographyInfoList = aOrthographyInfoList,
+                    Dict = wordResult.Dict,
+                    FormattedDefinitions = BuildJmdictDefinition(jMDictResult, wordResult.Dict),
+                };
 
                 results.Add(result);
             }
@@ -517,7 +516,7 @@ public static class Lookup
                     AlternativeSpellings = jMnedictResult.AlternativeSpellings ?? new(),
                     Readings = jMnedictResult.Readings ?? new(),
                     FoundForm = nameResult.FoundForm,
-                    DictType = nameResult.DictType.ToString(),
+                    Dict = nameResult.Dict,
                     FormattedDefinitions = jMnedictResult.Definitions != null
                         ? BuildJmnedictDefinition(jMnedictResult)
                         : null
@@ -534,27 +533,12 @@ public static class Lookup
         Dictionary<string, IntermediaryResult> kanjiResults)
     {
         List<LookupResult> results = new();
-        LookupResult result = new();
 
         if (!kanjiResults.Any())
             return results;
 
         List<IResult> iResult = kanjiResults.First().Value.ResultsList;
         KanjiResult kanjiResult = (KanjiResult)iResult.First();
-
-        result.FoundSpelling = kanjiResults.First().Key;
-        result.OnReadings = kanjiResult.OnReadings ?? new();
-        result.KunReadings = kanjiResult.KunReadings ?? new();
-        result.Nanori = kanjiResult.Nanori ?? new();
-        result.StrokeCount = kanjiResult.StrokeCount;
-        result.Grade = kanjiResult.Grade;
-        result.Composition = kanjiResult.Composition;
-        result.Frequency = kanjiResult.Frequency;
-        result.FoundForm = kanjiResults.First().Value.FoundForm;
-        result.DictType = kanjiResults.First().Value.DictType.ToString();
-        result.FormattedDefinitions = kanjiResult.Meanings != null
-            ? string.Join(", ", kanjiResult.Meanings)
-            : null;
 
         List<string> allReadings = new();
 
@@ -567,7 +551,23 @@ public static class Lookup
         if (kanjiResult.Nanori != null)
             allReadings.AddRange(kanjiResult.Nanori);
 
-        result.Readings = allReadings;
+        LookupResult result = new()
+        {
+            FoundSpelling = kanjiResults.First().Key,
+            Readings = allReadings,
+            OnReadings = kanjiResult.OnReadings ?? new(),
+            KunReadings = kanjiResult.KunReadings ?? new(),
+            Nanori = kanjiResult.Nanori ?? new(),
+            StrokeCount = kanjiResult.StrokeCount,
+            Grade = kanjiResult.Grade,
+            Composition = kanjiResult.Composition,
+            Frequency = kanjiResult.Frequency,
+            FoundForm = kanjiResults.First().Value.FoundForm,
+            Dict = kanjiResults.First().Value.Dict,
+            FormattedDefinitions = kanjiResult.Meanings != null
+            ? string.Join(", ", kanjiResult.Meanings)
+            : null,
+        };
 
         results.Add(result);
         return results;
@@ -591,12 +591,12 @@ public static class Lookup
                     FoundForm = wordResult.FoundForm,
                     Process = ProcessProcess(wordResult),
                     Frequency = GetEpwingFreq(epwingResult),
-                    DictType = wordResult.DictType.ToString(),
+                    Dict = wordResult.Dict,
                     Readings = epwingResult.Reading != null
                         ? new List<string> { epwingResult.Reading }
                         : new(),
                     FormattedDefinitions = epwingResult.Definitions != null
-                        ? BuildEpwingDefinition(epwingResult.Definitions, wordResult.DictType)
+                        ? BuildEpwingDefinition(epwingResult.Definitions, wordResult.Dict)
                         : null
                 };
 
@@ -626,12 +626,12 @@ public static class Lookup
                     FoundForm = wordResult.FoundForm,
                     Process = ProcessProcess(wordResult),
                     Frequency = GetEpwingNazekaFreq(epwingResult),
-                    DictType = wordResult.DictType.ToString(),
+                    Dict = wordResult.Dict,
                     Readings = epwingResult.Reading != null
                         ? new List<string> { epwingResult.Reading }
                         : new(),
                     FormattedDefinitions = epwingResult.Definitions != null
-                        ? BuildEpwingDefinition(epwingResult.Definitions, wordResult.DictType)
+                        ? BuildEpwingDefinition(epwingResult.Definitions, wordResult.Dict)
                         : null
                 };
 
@@ -653,22 +653,22 @@ public static class Lookup
             for (int i = 0; i < wordResultCount; i++)
             {
                 var customWordDictResult = (CustomWordEntry)wordResult.ResultsList[i];
-                LookupResult result = new();
-
                 int frequency = GetCustomWordFreq(customWordDictResult);
 
                 if (frequency == int.MaxValue)
                     frequency = wordResultCount - i;
 
-                result.Frequency = frequency;
-                result.FoundSpelling = customWordDictResult.PrimarySpelling;
-                result.FoundForm = wordResult.FoundForm;
-                result.Process = ProcessProcess(wordResult);
-                result.DictType = wordResult.DictType.ToString();
-
-                result.Readings = customWordDictResult.Readings ?? new();
-                result.AlternativeSpellings = customWordDictResult.AlternativeSpellings ?? new();
-                result.FormattedDefinitions = BuildCustomWordDefinition(customWordDictResult, wordResult.DictType);
+                LookupResult result = new()
+                {
+                    Frequency = frequency,
+                    FoundSpelling = customWordDictResult.PrimarySpelling,
+                    FoundForm = wordResult.FoundForm,
+                    Process = ProcessProcess(wordResult),
+                    Dict = wordResult.Dict,
+                    Readings = customWordDictResult.Readings ?? new(),
+                    AlternativeSpellings = customWordDictResult.AlternativeSpellings ?? new(),
+                    FormattedDefinitions = BuildCustomWordDefinition(customWordDictResult, wordResult.Dict),
+                };
 
                 results.Add(result);
             }
@@ -693,7 +693,7 @@ public static class Lookup
                     FoundSpelling = customNameDictResult.PrimarySpelling,
                     FoundForm = customNameResult.Value.FoundForm,
                     Frequency = -i,
-                    DictType = customNameResult.Value.DictType.ToString(),
+                    Dict = customNameResult.Value.Dict,
                     Readings = new List<string> { customNameDictResult.Reading },
                     FormattedDefinitions = BuildCustomNameDefinition(customNameDictResult),
                 };
@@ -1017,10 +1017,8 @@ public static class Lookup
         return frequency;
     }
 
-    private static string BuildJmdictDefinition(JMdictResult jMDictResult, DictType dictType)
+    private static string BuildJmdictDefinition(JMdictResult jMDictResult, Dict dict)
     {
-        Dict dict = Storage.Dicts[dictType];
-
         bool newlines = dict.Options is { NewlineBetweenDefinitions.Value: true };
 
         string separator = newlines ? "\n" : "";
@@ -1182,14 +1180,14 @@ public static class Lookup
         return defResult.ToString();
     }
 
-    private static string? BuildEpwingDefinition(List<string>? epwingDefinitions, DictType dictType)
+    private static string? BuildEpwingDefinition(List<string>? epwingDefinitions, Dict dict)
     {
         if (epwingDefinitions == null)
             return null;
 
         StringBuilder defResult = new();
 
-        string separator = Storage.Dicts[dictType].Options?.NewlineBetweenDefinitions?.Value ?? true
+        string separator = dict.Options?.NewlineBetweenDefinitions?.Value ?? true
             ? "\n"
             : "; ";
 
@@ -1201,9 +1199,9 @@ public static class Lookup
         return defResult.ToString().TrimEnd(' ', '\n');
     }
 
-    private static string BuildCustomWordDefinition(CustomWordEntry customWordResult, DictType dictType)
+    private static string BuildCustomWordDefinition(CustomWordEntry customWordResult, Dict dict)
     {
-        string separator = Storage.Dicts[dictType].Options is { NewlineBetweenDefinitions.Value: true }
+        string separator = dict.Options is { NewlineBetweenDefinitions.Value: true }
             ? "\n"
             : "";
         int count = 1;

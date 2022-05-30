@@ -51,8 +51,8 @@ public class LookupTests
                 new LookupResult
                 {
                     FoundForm = "始まる",
+                    Dict = Storage.Dicts[DictType.JMdict],
                     Frequency = 759,
-                    DictType = "JMdict",
                     FoundSpelling = "始まる",
                     Readings = new List<string> { "はじまる" },
                     FormattedDefinitions =

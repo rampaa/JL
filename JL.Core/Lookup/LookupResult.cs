@@ -1,11 +1,13 @@
-﻿namespace JL.Core.Lookup;
+﻿using JL.Core.Dicts;
+
+namespace JL.Core.Lookup;
 
 public class LookupResult
 {
     // common (required for sorting)
     public string FoundForm { get; set; } // todo rename foundform to foundtext
     public int Frequency { get; set; }
-    public string? DictType { get; set; } // todo make non-nullable
+    public Dict? Dict { get; set; }
     public string FoundSpelling { get; set; }
 
     public List<string>? Readings { get; set; }

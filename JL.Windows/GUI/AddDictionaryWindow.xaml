@@ -4,16 +4,16 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Add Dictionary" Height="370" Width="550" ResizeMode="NoResize" SizeToContent="Height"
+        Title="Add Dictionary" Height="350" Width="600" ResizeMode="NoResize" SizeToContent="Height"
         Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False">
     <Grid Background="Black">
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,20">
             <TextBlock Foreground="White" Text="Dict Type" TextWrapping="Wrap" Margin="0,0,0,10" />
-            <ComboBox Name="ComboBoxDictType" Width="230" Margin="10" HorizontalAlignment="Left" />
+            <ComboBox Name="ComboBoxDictType" Width="285" Margin="10" HorizontalAlignment="Left" />
 
             <TextBlock Foreground="White" Text="Path" TextWrapping="Wrap" Margin="0,10,0,10" />
             <WrapPanel>
-                <TextBox Name="TextBlockPath" Foreground="White" Width="230"
+                <TextBox Name="TextBlockPath" Foreground="White" Width="285"
                          Text=""
                          Margin="10"
                          IsReadOnly="True" />
@@ -23,7 +23,7 @@
             </WrapPanel>
 
             <TextBlock Foreground="White" Text="Name" TextWrapping="Wrap" Margin="0,0,0,10" />
-            <TextBox Name="NameTextBox" Width="230" Margin="10" HorizontalAlignment="Left" />
+            <TextBox Name="NameTextBox" Width="285" Margin="10" HorizontalAlignment="Left" />
 
         </StackPanel>
 
@@ -40,9 +40,9 @@
 
         <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="20,120,20,20">
             <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                    Margin="0,100,50,0" FontSize="16" Width="70" Height="35" Click="CancelButton_Click" />
+                    Margin="0,200,50,0" FontSize="16" Width="70" Height="35" Click="CancelButton_Click" />
             <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                    Margin="50,100,0,0" FontSize="16" Width="70" Height="35" Click="SaveButton_Click" />
+                    Margin="50,200,0,0" FontSize="16" Width="70" Height="35" Click="SaveButton_Click" />
         </WrapPanel>
     </Grid>
 </Window>

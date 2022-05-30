@@ -36,7 +36,7 @@ public partial class PopupWindow : Window
 
     private List<LookupResult> _lastLookupResults = new();
 
-    private DictType? _filteredDict = null;
+    private Dict? _filteredDict = null;
 
     public bool UnavoidableMouseEnter { get; private set; } = false;
 
@@ -381,10 +381,7 @@ public partial class PopupWindow : Window
     public StackPanel MakeResultStackPanel(LookupResult result,
         int index, int resultsCount)
     {
-        IEnumerable<DictType> dictTypeNames = Enum.GetValues(typeof(DictType)).Cast<DictType>();
-        DictType dictType = dictTypeNames.First(dictTypeName => dictTypeName.ToString() == result.DictType);
-
-        var innerStackPanel = new StackPanel { Margin = new Thickness(4, 2, 4, 2), Tag = dictType };
+        var innerStackPanel = new StackPanel { Margin = new Thickness(4, 2, 4, 2), Tag = result.Dict };
         WrapPanel top = new();
         StackPanel bottom = new();
 
@@ -445,12 +442,12 @@ public partial class PopupWindow : Window
             };
         }
 
-        if (result.DictType != null)
+        if (result.Dict != null)
         {
             textBlockDictType = new TextBlock
             {
-                Name = nameof(result.DictType),
-                Text = dictType.GetDescription() ?? result.DictType,
+                Name = nameof(result.Dict.Name),
+                Text = result.Dict.Name,
                 Foreground = ConfigManager.DictTypeColor,
                 FontSize = ConfigManager.DictTypeFontSize,
                 Margin = new Thickness(5, 0, 0, 0),
@@ -1147,7 +1144,7 @@ public partial class PopupWindow : Window
                         case nameof(LookupResult.Frequency):
                             miningParams[JLField.Frequency] = ch.Text;
                             break;
-                        case nameof(LookupResult.DictType):
+                        case nameof(LookupResult.Dict.Name):
                             miningParams[JLField.DictType] = ch.Text;
                             break;
                         case nameof(LookupResult.Process):
@@ -1380,7 +1377,7 @@ public partial class PopupWindow : Window
 
                 if (foundSelectedButton && button.IsEnabled)
                 {
-                    _filteredDict = button.Content.ToString()!.GetEnum<DictType>();
+                    _filteredDict = (Dict)button.Tag;
                     movedToNextDict = true;
                     button.Background = Brushes.DodgerBlue;
                     PopupListBox.Items.Filter = DictFilter;
@@ -1417,7 +1414,7 @@ public partial class PopupWindow : Window
 
                 if (foundSelectedButton && button.IsEnabled)
                 {
-                    _filteredDict = button.Content.ToString()!.GetEnum<DictType>();
+                    _filteredDict = (Dict)button.Tag;
                     button.Background = Brushes.DodgerBlue;
                     movedToPreviousDict = true;
                     PopupListBox.Items.Filter = DictFilter;
@@ -1438,7 +1435,7 @@ public partial class PopupWindow : Window
                     var btn = (Button)ItemsControlButtons.Items[i];
                     if (btn.IsEnabled)
                     {
-                        _filteredDict = btn.Content.ToString()!.GetEnum<DictType>();
+                        _filteredDict = (Dict)btn.Tag;
                         btn.Background = Brushes.DodgerBlue;
                         ((Button)ItemsControlButtons.Items[0]).Background = brush;
                         PopupListBox.Items.Filter = DictFilter;
@@ -1625,12 +1622,12 @@ public partial class PopupWindow : Window
         buttonAll.Click += ButtonAllOnClick;
         DictTypeButtons.Add(buttonAll);
 
-        var foundDictTypes = new List<DictType>();
+        List<Dict> foundDicts = new();
 
         foreach (StackPanel stackPanel in ResultStackPanels)
         {
-            DictType foundDictType = (DictType)stackPanel.Tag;
-            foundDictTypes.Add(foundDictType);
+            Dict foundDict = (Dict)stackPanel.Tag;
+            foundDicts.Add(foundDict);
         }
 
         foreach ((DictType dictType, Dict dict) in Storage.Dicts.OrderBy(d => d.Value.Priority))
@@ -1638,10 +1635,10 @@ public partial class PopupWindow : Window
             if (!dict.Active || dictType == DictType.Kanjium)
                 continue;
 
-            var button = new Button { Content = dictType.GetDescription(), Margin = new Thickness(1) };
+            var button = new Button { Content = dictType.GetDescription(), Margin = new Thickness(1), Tag = dict };
             button.Click += DictTypeButtonOnClick;
 
-            if (!foundDictTypes.Contains(dictType))
+            if (!foundDicts.Contains(dict))
             {
                 button.IsEnabled = false;
             }
@@ -1678,28 +1675,20 @@ public partial class PopupWindow : Window
 
         button.Background = Brushes.DodgerBlue;
 
-        _filteredDict = button.Content.ToString()!.GetEnum<DictType>();
+        _filteredDict = (Dict)button.Tag;
 
         PopupListBox.Items.Filter = DictFilter;
     }
     private bool DictFilter(object item)
     {
         StackPanel items = (StackPanel)item;
-        return (DictType)items.Tag == _filteredDict;
+        return (Dict)items.Tag == _filteredDict;
     }
 
     private bool NoAllDictFilter(object item)
     {
-        var dictType = (DictType)((StackPanel)item).Tag;
+        var dict = (Dict)((StackPanel)item).Tag;
 
-        foreach (KeyValuePair<DictType, Dict> dict in Storage.Dicts)
-        {
-            if (dict.Key == dictType)
-            {
-                return (!dict.Value.Options?.NoAll?.Value) ?? true;
-            }
-        }
-
-        return true;
+        return (!dict?.Options?.NoAll?.Value) ?? true;
     }
 }
