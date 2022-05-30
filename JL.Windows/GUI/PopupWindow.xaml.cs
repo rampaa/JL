@@ -1635,7 +1635,7 @@ public partial class PopupWindow : Window
             if (!dict.Active || dictType == DictType.Kanjium)
                 continue;
 
-            var button = new Button { Content = dictType.GetDescription(), Margin = new Thickness(1), Tag = dict };
+            var button = new Button { Content = dict.Name, Margin = new Thickness(1), Tag = dict };
             button.Click += DictTypeButtonOnClick;
 
             if (!foundDicts.Contains(dict))
