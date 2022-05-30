@@ -78,7 +78,7 @@ public partial class ManageDictionariesWindow : Window
             var dictTypeDisplay = new TextBlock
             {
                 Width = 177,
-                Text = dict.Type.GetDescription() ?? dict.Type.ToString(),
+                Text = dict.Name ?? dict.Type.GetDescription() ?? dict.Type.ToString(),
                 Margin = new Thickness(10),
             };
             var dictPathValidityDisplay = new TextBlock

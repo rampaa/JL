@@ -52,6 +52,17 @@ public partial class AddDictionaryWindow : Window
             TextBlockPath.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
         }
 
+        string name = NameTextBox.Text;
+        if (string.IsNullOrEmpty(name))
+        {
+            NameTextBox.BorderBrush = Brushes.Red;
+            isValid = false;
+        }
+        else if (NameTextBox.BorderBrush == Brushes.Red)
+        {
+            NameTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
+        }
+
         if (isValid)
         {
             DictType type = typeString!.GetEnum<DictType>();
@@ -80,7 +91,7 @@ public partial class AddDictionaryWindow : Window
                     examplesOption);
 
             Storage.Dicts.Add(type,
-                new Dict(type, path, true, lowestPriority + 1, options));
+                new Dict(type, name, path, true, lowestPriority + 1, options));
             Storage.Dicts[type].Contents = new Dictionary<string, List<IResult>>();
 
             Close();

@@ -50,18 +50,32 @@ public partial class EditDictionaryWindow : Window
             TextBlockPath.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
         }
 
+        string name = NameTextBox.Text;
+        if (string.IsNullOrEmpty(name))
+        {
+            NameTextBox.BorderBrush = Brushes.Red;
+            isValid = false;
+        }
+        else if (NameTextBox.BorderBrush == Brushes.Red)
+        {
+            NameTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
+        }
+
         if (isValid)
         {
             DictType type = typeString.GetEnum<DictType>();
+            Dict dict = Storage.Dicts[type];
 
-            if (Storage.Dicts[type].Path != path)
+            if (dict.Path != path)
             {
-                Storage.Dicts[type].Path = path;
-                Storage.Dicts[type].Contents = new Dictionary<string, List<IResult>>();
+                dict.Path = path;
+                dict.Contents.Clear();
             }
 
+            dict.Name = name;
+
             Core.Dicts.Options.DictOptions options = _dictOptionsControl.GetDictOptions(type);
-            Storage.Dicts[type].Options = options;
+            dict.Options = options;
             Storage.Frontend.InvalidateDisplayCache();
 
             Close();
@@ -97,6 +111,7 @@ public partial class EditDictionaryWindow : Window
         ComboBoxDictType.Items.Add(type);
         ComboBoxDictType.SelectedValue = type;
         TextBlockPath.Text = _dict.Path;
+        NameTextBox.Text = _dict.Name;
         _dictOptionsControl.GenerateDictOptionsElements(_dict);
     }
 

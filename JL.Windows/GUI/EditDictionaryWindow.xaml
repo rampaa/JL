@@ -21,6 +21,10 @@
                         IsEnabled="{Binding ElementName=ComboBoxDictType,Path=Text.Length}">
                 </Button>
             </WrapPanel>
+
+            <TextBlock Foreground="White" Text="Name" TextWrapping="Wrap" Margin="0,0,0,10" />
+            <TextBox Name="NameTextBox" Width="230" Margin="10" HorizontalAlignment="Left" />
+
         </StackPanel>
 
         <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="20,320,20,20">

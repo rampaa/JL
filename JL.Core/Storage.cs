@@ -48,6 +48,7 @@ public static class Storage
             {
                 "CustomWordDictionary",
                 new Dict(DictType.CustomWordDictionary,
+                    "Custom Word Dictionary",
                     $"{ResourcesPath}/custom_words.txt",
                     true, 0,
                     new DictOptions(newlineBetweenDefinitions: new() { Value = false }))
@@ -55,12 +56,13 @@ public static class Storage
             {
                 "CustomNameDictionary",
                 new Dict(DictType.CustomNameDictionary,
+                    "Custom Name Dictionary",
                     $"{ResourcesPath}/custom_names.txt", true, 1,
                     new DictOptions())
             },
             {
                 "JMdict",
-                new Dict(DictType.JMdict, $"{ResourcesPath}/JMdict.xml", true, 2,
+                new Dict(DictType.JMdict, "JMdict", $"{ResourcesPath}/JMdict.xml", true, 2,
                     new DictOptions(
                         newlineBetweenDefinitions: new() { Value = false },
                         wordClassInfo: new() { Value = true },
@@ -79,12 +81,12 @@ public static class Storage
             },
             {
                 "JMnedict",
-                new Dict(DictType.JMnedict, $"{ResourcesPath}/JMnedict.xml", true, 3,
+                new Dict(DictType.JMnedict, "JMnedict", $"{ResourcesPath}/JMnedict.xml", true, 3,
                     new DictOptions(newlineBetweenDefinitions: new() { Value = false }))
             },
             {
                 "Kanjidic",
-                new Dict(DictType.Kanjidic, $"{ResourcesPath}/kanjidic2.xml", true, 4,
+                new Dict(DictType.Kanjidic, "Kanjidic", $"{ResourcesPath}/kanjidic2.xml", true, 4,
                     new DictOptions(noAll: new() { Value = false }))
             }
         };
@@ -181,8 +183,8 @@ public static class Storage
                         dict.Contents.Clear();
                         dictRemoved = true;
                     }
-
                     break;
+
                 case DictType.JMnedict:
                     if (dict.Active && !dict.Contents.Any() && !UpdatingJMnedict)
                     {
@@ -267,7 +269,6 @@ public static class Storage
                         dict.Contents.Clear();
                         dictRemoved = true;
                     }
-
                     break;
 
                 case DictType.DaijirinNazeka:

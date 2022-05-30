@@ -18,7 +18,7 @@ public class LookupTests
         string jmdictPath = Path.Join(AppContext.BaseDirectory, "Resources/MockJMdict.xml");
 
         Storage.Dicts.Add(DictType.JMdict,
-            new Dict(DictType.JMdict, jmdictPath, true, 0,
+            new Dict(DictType.JMdict, "JMdict", jmdictPath, true, 0,
                     new DictOptions(
                         newlineBetweenDefinitions: new() { Value = false },
                         wordClassInfo: new() { Value = true },
