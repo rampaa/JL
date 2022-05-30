@@ -33,7 +33,7 @@ public static class Storage
     public static readonly Uri JmdictUrl = new("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz");
     public static readonly Uri JmnedictUrl = new("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     public static readonly Uri KanjidicUrl = new("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
-    public static bool Ready { get; set; } = false;
+    public static bool Ready { get; private set; } = false;
     public static bool UpdatingJMdict { get; set; } = false;
     public static bool UpdatingJMnedict { get; set; } = false;
     public static bool UpdatingKanjidic { get; set; } = false;

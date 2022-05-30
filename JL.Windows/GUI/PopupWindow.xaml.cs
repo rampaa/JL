@@ -463,7 +463,7 @@ public partial class PopupWindow : Window
 
         if (result.Readings != null && result.Readings.Any())
         {
-            List<string> rOrthographyInfoList = result.ROrthographyInfoList ??= new();
+            List<string> rOrthographyInfoList = result.ROrthographyInfoList ?? new();
             List<string> readings = result.Readings;
             string readingsText = (Storage.Dicts[DictType.JMdict].Options?.ROrthographyInfo?.Value ?? true) && rOrthographyInfoList.Any()
                 ? PopupWindowUtilities.MakeUiElementReadingsText(readings, rOrthographyInfoList)
@@ -575,7 +575,7 @@ public partial class PopupWindow : Window
 
         if (result.AlternativeSpellings != null && result.AlternativeSpellings.Any())
         {
-            List<string> aOrthographyInfoList = result.AOrthographyInfoList ??= new List<string>();
+            List<string> aOrthographyInfoList = result.AOrthographyInfoList ?? new List<string>();
             List<string> alternativeSpellings = result.AlternativeSpellings;
             string alternativeSpellingsText = (Storage.Dicts[DictType.JMdict].Options?.AOrthographyInfo?.Value ?? true) && aOrthographyInfoList.Any()
                 ? PopupWindowUtilities.MakeUiElementAlternativeSpellingsText(alternativeSpellings, aOrthographyInfoList)

@@ -5,27 +5,27 @@ namespace JL.Core.Lookup;
 public class LookupResult
 {
     // common (required for sorting)
-    public string FoundForm { get; set; } // todo rename foundform to foundtext
-    public int Frequency { get; set; }
-    public Dict? Dict { get; set; }
-    public string FoundSpelling { get; set; }
+    public string FoundForm { get; init; } // todo rename foundform to foundtext
+    public int Frequency { get; init; }
+    public Dict? Dict { get; init; }
+    public string FoundSpelling { get; init; }
 
-    public List<string>? Readings { get; set; }
-    public string? FormattedDefinitions { get; set; }
-    public string? EdictId { get; set; }
-    public List<string>? AlternativeSpellings { get; set; }
-    public string? Process { get; set; }
-    public List<string>? POrthographyInfoList { get; set; }
-    public List<string>? ROrthographyInfoList { get; set; }
-    public List<string>? AOrthographyInfoList { get; set; }
+    public List<string>? Readings { get; init; }
+    public string? FormattedDefinitions { get; init; }
+    public string? EdictId { get; init; }
+    public List<string>? AlternativeSpellings { get; init; }
+    public string? Process { get; init; }
+    public List<string>? POrthographyInfoList { get; init; }
+    public List<string>? ROrthographyInfoList { get; init; }
+    public List<string>? AOrthographyInfoList { get; init; }
 
     // KANJIDIC
-    public List<string>? OnReadings { get; set; }
-    public List<string>? KunReadings { get; set; }
-    public List<string>? Nanori { get; set; }
-    public int StrokeCount { get; set; }
-    public string? Composition { get; set; }
-    public int Grade { get; set; }
+    public List<string>? OnReadings { get; init; }
+    public List<string>? KunReadings { get; init; }
+    public List<string>? Nanori { get; init; }
+    public int StrokeCount { get; init; }
+    public string? Composition { get; init; }
+    public int Grade { get; init; }
 
     public LookupResult()
     {

@@ -95,7 +95,7 @@ public class ConfigManager : CoreConfig
     #endregion
 
     #region Anki
-    public static bool AnkiIntegration { get; set; } = false;
+    public static bool AnkiIntegration { get; private set; } = false;
     #endregion
 
     #region Hotkeys

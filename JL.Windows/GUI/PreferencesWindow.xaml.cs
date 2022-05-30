@@ -139,7 +139,7 @@ public partial class PreferencesWindow : Window
             catch
             {
                 WindowsUtils.Alert(AlertLevel.Error, "Error getting deck and model names form Anki");
-                Utils.Logger.Error("Error getting deck and model names fron Anki");
+                Utils.Logger.Error("Error getting deck and model names from Anki");
                 MiningSetupComboBoxDeckNames.ItemsSource = "";
                 MiningSetupComboBoxModelNames.ItemsSource = "";
             }
