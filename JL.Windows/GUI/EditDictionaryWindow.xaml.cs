@@ -37,8 +37,6 @@ public partial class EditDictionaryWindow : Window
     {
         bool isValid = true;
 
-        string typeString = ComboBoxDictType.SelectionBoxItem.ToString()!;
-
         string path = TextBlockPath.Text;
         if (string.IsNullOrEmpty(path) || (!Directory.Exists(path) && !File.Exists(path)))
         {
@@ -51,7 +49,7 @@ public partial class EditDictionaryWindow : Window
         }
 
         string name = NameTextBox.Text;
-        if (string.IsNullOrEmpty(name))
+        if (string.IsNullOrEmpty(name) || Storage.Dicts.Values.Count(dict => dict.Name == name) > 1)
         {
             NameTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -63,19 +61,16 @@ public partial class EditDictionaryWindow : Window
 
         if (isValid)
         {
-            DictType type = typeString.GetEnum<DictType>();
-            Dict dict = Storage.Dicts[type];
-
-            if (dict.Path != path)
+            if (_dict.Path != path)
             {
-                dict.Path = path;
-                dict.Contents.Clear();
+                _dict.Path = path;
+                _dict.Contents.Clear();
             }
 
-            dict.Name = name;
+            _dict.Name = name;
 
-            Core.Dicts.Options.DictOptions options = _dictOptionsControl.GetDictOptions(type);
-            dict.Options = options;
+            Core.Dicts.Options.DictOptions options = _dictOptionsControl.GetDictOptions(_dict.Type);
+            _dict.Options = options;
             Storage.Frontend.InvalidateDisplayCache();
 
             Close();
@@ -156,6 +151,7 @@ public partial class EditDictionaryWindow : Window
             case DictType.WeblioKogoYomichan:
             case DictType.GakkenYojijukugoYomichan:
             case DictType.ShinmeikaiYojijukugoYomichan:
+            case DictType.NonspecificYomichan:
                 BrowseForDictionaryFolder();
                 break;
 
@@ -170,6 +166,9 @@ public partial class EditDictionaryWindow : Window
                 break;
             case DictType.ShinmeikaiNazeka:
                 BrowseForDictionaryFile("Shinmeikai file|*.json");
+                break;
+            case DictType.NonspecificNazeka:
+                BrowseForDictionaryFile("Nazeka file|*.json");
                 break;
 
             default:

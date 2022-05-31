@@ -4,11 +4,11 @@ namespace JL.Core.Dicts.EDICT.JMnedict;
 
 public static class JMnedictLoader
 {
-    public static async Task Load(string dictPath)
+    public static async Task Load(Dict dict)
     {
-        if (File.Exists(dictPath))
+        if (File.Exists(dict.Path))
         {
-            using XmlTextReader edictXml = new(dictPath)
+            using XmlTextReader edictXml = new(dict.Path)
             {
                 DtdProcessing = DtdProcessing.Parse,
                 WhitespaceHandling = WhitespaceHandling.None,
@@ -17,28 +17,28 @@ public static class JMnedictLoader
 
             while (edictXml.ReadToFollowing("entry"))
             {
-                ReadEntry(edictXml);
+                ReadEntry(edictXml, dict);
             }
 
-            Storage.Dicts[DictType.JMnedict].Contents.TrimExcess();
+            dict.Contents.TrimExcess();
         }
 
         else if (Storage.Frontend.ShowYesNoDialog("Couldn't find JMnedict.xml. Would you like to download it now?",
                      ""))
         {
-            await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMnedict].Path,
+            await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.JmnedictUrl,
                 DictType.JMnedict.ToString(), false, false).ConfigureAwait(false);
-            await Load(Storage.Dicts[DictType.JMnedict].Path).ConfigureAwait(false);
+            await Load(dict).ConfigureAwait(false);
         }
 
         else
         {
-            Storage.Dicts[DictType.JMnedict].Active = false;
+            dict.Active = false;
         }
     }
 
-    private static void ReadEntry(XmlTextReader edictXml)
+    private static void ReadEntry(XmlTextReader edictXml, Dict dict)
     {
         JMnedictEntry entry = new();
         while (edictXml.Read())
@@ -69,7 +69,7 @@ public static class JMnedictLoader
             }
         }
 
-        JMnedictBuilder.BuildDictionary(entry, Storage.Dicts[DictType.JMnedict].Contents);
+        JMnedictBuilder.BuildDictionary(entry, dict.Contents);
     }
 
     private static void ReadKEle(XmlTextReader jmnedictXml, JMnedictEntry entry)

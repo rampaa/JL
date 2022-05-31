@@ -5,12 +5,12 @@ namespace JL.Core.Dicts.EPWING.EpwingYomichan;
 
 public static class EpwingYomichanLoader
 {
-    public static async Task Load(DictType dictType, string dictPath)
+    public static async Task Load(Dict dict)
     {
-        if (!Directory.Exists(dictPath) && !File.Exists(dictPath))
+        if (!Directory.Exists(dict.Path) && !File.Exists(dict.Path))
             return;
 
-        string[] jsonFiles = Directory.GetFiles(dictPath, "*_bank_*.json");
+        string[] jsonFiles = Directory.GetFiles(dict.Path, "*_bank_*.json");
 
         foreach (string jsonFile in jsonFiles)
         {
@@ -29,17 +29,16 @@ public static class EpwingYomichanLoader
 
             foreach (List<JsonElement> jsonObj in jsonObjects)
             {
-                DictionaryBuilder(new EpwingYomichanResult(jsonObj), Storage.Dicts[dictType].Contents, dictType);
+                DictionaryBuilder(new EpwingYomichanResult(jsonObj), dict);
             }
         }
 
-        Storage.Dicts[dictType].Contents.TrimExcess();
+        dict.Contents.TrimExcess();
     }
 
-    private static void DictionaryBuilder(EpwingYomichanResult yomichanResult,
-        Dictionary<string, List<IResult>> epwingDictionary, DictType dictType)
+    private static void DictionaryBuilder(EpwingYomichanResult yomichanResult, Dict dict)
     {
-        if (!IsValidEpwingResultForDictType(yomichanResult, dictType))
+        if (!IsValidEpwingResultForDictType(yomichanResult, dict))
             return;
 
         string hiraganaExpression = Kana.KatakanaToHiraganaConverter(yomichanResult.PrimarySpelling);
@@ -48,19 +47,19 @@ public static class EpwingYomichanLoader
         {
             string hiraganaReading = Kana.KatakanaToHiraganaConverter(yomichanResult.Reading);
 
-            if (epwingDictionary.TryGetValue(hiraganaReading, out List<IResult>? tempList2))
+            if (dict.Contents.TryGetValue(hiraganaReading, out List<IResult>? tempList2))
                 tempList2.Add(yomichanResult);
             else
-                epwingDictionary.Add(hiraganaReading, new List<IResult> { yomichanResult });
+                dict.Contents.Add(hiraganaReading, new List<IResult> { yomichanResult });
         }
 
-        if (epwingDictionary.TryGetValue(hiraganaExpression, out List<IResult>? tempList))
+        if (dict.Contents.TryGetValue(hiraganaExpression, out List<IResult>? tempList))
             tempList.Add(yomichanResult);
         else
-            epwingDictionary.Add(hiraganaExpression, new List<IResult> { yomichanResult });
+            dict.Contents.Add(hiraganaExpression, new List<IResult> { yomichanResult });
     }
 
-    private static bool IsValidEpwingResultForDictType(EpwingYomichanResult yomichanResult, DictType dictType)
+    private static bool IsValidEpwingResultForDictType(EpwingYomichanResult yomichanResult, Dict dict)
     {
         string[] badCharacters = { "�", "(", "=", "＝", "［", "〔", "「", "『", "（", "【", "[" };
 
@@ -73,10 +72,10 @@ public static class EpwingYomichanLoader
         if (!Storage.JapaneseRegex.IsMatch(yomichanResult.PrimarySpelling))
             return false;
 
-        switch (dictType)
+        switch (dict.Type)
         {
             case DictType.Kenkyuusha:
-                if ((Storage.Dicts[dictType].Options?.Examples?.Value ?? ExamplesOptionValue.None) == ExamplesOptionValue.None)
+                if ((dict.Options?.Examples?.Value ?? ExamplesOptionValue.None) == ExamplesOptionValue.None)
                 {
                     if (yomichanResult.Definitions?.Count > 2)
                     {
@@ -90,7 +89,7 @@ public static class EpwingYomichanLoader
                         }
                     }
                 }
-                else if (Storage.Dicts[dictType].Options is { Examples.Value: ExamplesOptionValue.One })
+                else if (dict.Options is { Examples.Value: ExamplesOptionValue.One })
                 {
                     if (yomichanResult.Definitions?.Count > 2)
                     {
@@ -119,7 +118,7 @@ public static class EpwingYomichanLoader
 
                 // Filter duplicate entries.
                 // If an entry has reading info while others don't, keep the one with the reading info.
-                if (Storage.Dicts[DictType.Kenkyuusha].Contents.TryGetValue(
+                if (dict.Contents.TryGetValue(
                         Kana.KatakanaToHiraganaConverter(yomichanResult.PrimarySpelling),
                         out List<IResult>? kenkyuushaResults))
                 {
@@ -178,10 +177,11 @@ public static class EpwingYomichanLoader
             case DictType.WeblioKogoYomichan:
             case DictType.GakkenYojijukugoYomichan:
             case DictType.ShinmeikaiYojijukugoYomichan:
+            case DictType.NonspecificYomichan:
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException(nameof(dictType), dictType, null);
+                throw new ArgumentOutOfRangeException(nameof(dict), dict.Name, null);
         }
 
         return true;

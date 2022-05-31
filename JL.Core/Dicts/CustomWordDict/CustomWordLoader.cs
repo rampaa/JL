@@ -86,7 +86,7 @@ public static class CustomWordLoader
 
             CustomWordEntry newWordEntry = new(spelling, alternativeSpellings, readings, definitions, wordClass);
 
-            Dictionary<string, List<IResult>> customWordDictionary = Storage.Dicts[DictType.CustomWordDictionary].Contents;
+            Dictionary<string, List<IResult>> customWordDictionary = Storage.Dicts.Values.First(dict => dict.Type == DictType.CustomWordDictionary).Contents;
 
             if (customWordDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out List<IResult>? result))
             {

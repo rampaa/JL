@@ -4,12 +4,11 @@ namespace JL.Core.Dicts.EDICT.KANJIDIC;
 
 public static class KanjiInfoLoader
 {
-    public static async Task Load(string dictPath)
+    public static async Task Load(Dict dict)
     {
-        Dict kanjidic = Storage.Dicts[DictType.Kanjidic];
-        if (File.Exists(dictPath))
+        if (File.Exists(dict.Path))
         {
-            using XmlTextReader edictXml = new(dictPath)
+            using XmlTextReader edictXml = new(dict.Path)
             {
                 DtdProcessing = DtdProcessing.Parse,
                 WhitespaceHandling = WhitespaceHandling.None,
@@ -53,32 +52,32 @@ public static class KanjiInfoLoader
                 }
             }
 
-            kanjidic.Contents = new Dictionary<string, List<IResult>>();
+            dict.Contents = new Dictionary<string, List<IResult>>();
             while (edictXml.ReadToFollowing("literal"))
             {
-                ReadCharacter(edictXml, kanjiCompositionDictionary);
+                ReadCharacter(edictXml, kanjiCompositionDictionary, dict);
             }
 
-            kanjidic.Contents.TrimExcess();
+            dict.Contents.TrimExcess();
         }
 
         else if (Storage.Frontend.ShowYesNoDialog(
                      "Couldn't find kanjidic2.xml. Would you like to download it now?",
                      ""))
         {
-            await ResourceUpdater.UpdateResource(kanjidic.Path,
+            await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.KanjidicUrl,
                 DictType.Kanjidic.ToString(), false, false).ConfigureAwait(false);
-            await Load(kanjidic.Path).ConfigureAwait(false);
+            await Load(dict).ConfigureAwait(false);
         }
 
         else
         {
-            kanjidic.Active = false;
+            dict.Active = false;
         }
     }
 
-    private static void ReadCharacter(XmlReader kanjiDicXml, Dictionary<string, string> kanjiCompositionDictionary)
+    private static void ReadCharacter(XmlReader kanjiDicXml, Dictionary<string, string> kanjiCompositionDictionary, Dict dict)
     {
         string key = kanjiDicXml.ReadString();
 
@@ -154,6 +153,6 @@ public static class KanjiInfoLoader
         else
             entry.KunReadings!.TrimExcess();
 
-        Storage.Dicts[DictType.Kanjidic].Contents.Add(key, new List<IResult> { entry });
+        dict.Contents.Add(key, new List<IResult> { entry });
     }
 }

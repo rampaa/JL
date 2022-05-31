@@ -85,7 +85,7 @@ public partial class AddNameWindow : Window
         stringBuilder.Append(type);
         stringBuilder.Append(Environment.NewLine);
 
-        string customNameDictPath = Storage.Dicts[DictType.CustomNameDictionary].Path;
+        string customNameDictPath = Storage.Dicts.Values.First(dict => dict.Type == DictType.CustomNameDictionary).Path;
         await File.AppendAllTextAsync(customNameDictPath,
             stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);
     }

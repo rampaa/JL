@@ -17,7 +17,7 @@ public class LookupTests
 
         string jmdictPath = Path.Join(AppContext.BaseDirectory, "Resources/MockJMdict.xml");
 
-        Storage.Dicts.Add(DictType.JMdict,
+        Storage.Dicts.Add("JMdict",
             new Dict(DictType.JMdict, "JMdict", jmdictPath, true, 0,
                     new DictOptions(
                         newlineBetweenDefinitions: new() { Value = false },
@@ -35,9 +35,7 @@ public class LookupTests
                         loanwordEtymology: new() { Value = true }
                         )));
 
-        Storage.Dicts[DictType.JMdict].Contents = new Dictionary<string, List<IResult>>();
-
-        JMdictLoader.Load(Storage.Dicts[DictType.JMdict].Path).Wait();
+        JMdictLoader.Load(Storage.Dicts.Values.First(dict => dict.Type == DictType.JMdict)).Wait();
         Storage.LoadFrequency().Wait();
     }
 
@@ -51,7 +49,7 @@ public class LookupTests
                 new LookupResult
                 {
                     FoundForm = "始まる",
-                    Dict = Storage.Dicts[DictType.JMdict],
+                    Dict = Storage.Dicts.Values.First(dict => dict.Type == DictType.JMdict),
                     Frequency = 759,
                     FoundSpelling = "始まる",
                     Readings = new List<string> { "はじまる" },

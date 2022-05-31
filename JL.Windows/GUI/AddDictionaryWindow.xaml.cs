@@ -53,7 +53,7 @@ public partial class AddDictionaryWindow : Window
         }
 
         string name = NameTextBox.Text;
-        if (string.IsNullOrEmpty(name))
+        if (string.IsNullOrEmpty(name) || Storage.Dicts.Values.Select(dict => dict.Name).Contains(name))
         {
             NameTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -90,9 +90,8 @@ public partial class AddDictionaryWindow : Window
                     newlineOption,
                     examplesOption);
 
-            Storage.Dicts.Add(type,
+            Storage.Dicts.Add(name,
                 new Dict(type, name, path, true, lowestPriority + 1, options));
-            Storage.Dicts[type].Contents = new Dictionary<string, List<IResult>>();
 
             Close();
         }
@@ -139,8 +138,8 @@ public partial class AddDictionaryWindow : Window
 
     private void FillDictTypesCombobox(IEnumerable<DictType> types)
     {
-        List<DictType> loadedDictTypes = Storage.Dicts.Keys.ToList();
-        IEnumerable<DictType> validTypes = types.Except(loadedDictTypes);
+        IEnumerable<DictType> loadedDictTypes = Storage.Dicts.Values.Select(dict => dict.Type);
+        IEnumerable<DictType> validTypes = types.Except(loadedDictTypes.Except(Storage.NonspecificDictTypes));
 
         ComboBoxDictType.ItemsSource = validTypes.Select(d => d.GetDescription() ?? d.ToString());
     }
@@ -170,6 +169,7 @@ public partial class AddDictionaryWindow : Window
             case DictType.WeblioKogoYomichan:
             case DictType.GakkenYojijukugoYomichan:
             case DictType.ShinmeikaiYojijukugoYomichan:
+            case DictType.NonspecificYomichan:
                 BrowseForDictionaryFolder();
                 break;
 
@@ -185,6 +185,9 @@ public partial class AddDictionaryWindow : Window
                 break;
             case DictType.ShinmeikaiNazeka:
                 BrowseForDictionaryFile("Shinmeikai file|*.json");
+                break;
+            case DictType.NonspecificNazeka:
+                BrowseForDictionaryFile("Nazeka file|*.json");
                 break;
 
             default:

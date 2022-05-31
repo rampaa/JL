@@ -5,11 +5,11 @@ namespace JL.Core.Dicts.EDICT.JMdict;
 
 public static class JMdictLoader
 {
-    public static async Task Load(string dictPath)
+    public static async Task Load(Dict dict)
     {
-        if (File.Exists(dictPath))
+        if (File.Exists(dict.Path))
         {
-            using XmlTextReader edictXml = new(dictPath)
+            using XmlTextReader edictXml = new(dict.Path)
             {
                 DtdProcessing = DtdProcessing.Parse,
                 WhitespaceHandling = WhitespaceHandling.None,
@@ -18,29 +18,29 @@ public static class JMdictLoader
 
             while (edictXml.ReadToFollowing("entry"))
             {
-                ReadEntry(edictXml);
+                ReadEntry(edictXml, dict);
             }
 
-            Storage.Dicts[DictType.JMdict].Contents.TrimExcess();
+            dict.Contents.TrimExcess();
         }
 
         else if (Storage.Frontend.ShowYesNoDialog(
                      "Couldn't find JMdict.xml. Would you like to download it now?",
                      ""))
         {
-            await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMdict].Path,
+            await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.JmdictUrl,
                 DictType.JMdict.ToString(), false, false).ConfigureAwait(false);
-            await Load(Storage.Dicts[DictType.JMdict].Path).ConfigureAwait(false);
+            await Load(dict).ConfigureAwait(false);
         }
 
         else
         {
-            Storage.Dicts[DictType.JMdict].Active = false;
+            dict.Active = false;
         }
     }
 
-    private static void ReadEntry(XmlTextReader edictXml)
+    private static void ReadEntry(XmlTextReader edictXml, Dict dict)
     {
         JMdictEntry entry = new();
         while (edictXml.Read())
@@ -71,7 +71,7 @@ public static class JMdictLoader
             }
         }
 
-        JMdictBuilder.BuildDictionary(entry, Storage.Dicts[DictType.JMdict].Contents);
+        JMdictBuilder.BuildDictionary(entry, dict.Contents);
     }
 
     private static void ReadKEle(XmlTextReader edictXml, JMdictEntry entry)

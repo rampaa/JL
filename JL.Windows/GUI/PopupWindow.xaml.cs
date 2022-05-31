@@ -465,7 +465,7 @@ public partial class PopupWindow : Window
         {
             List<string> rOrthographyInfoList = result.ROrthographyInfoList ?? new();
             List<string> readings = result.Readings;
-            string readingsText = (Storage.Dicts[DictType.JMdict].Options?.ROrthographyInfo?.Value ?? true) && rOrthographyInfoList.Any()
+            string readingsText = rOrthographyInfoList.Any() && (result.Dict?.Options?.ROrthographyInfo?.Value ?? true)
                 ? PopupWindowUtilities.MakeUiElementReadingsText(readings, rOrthographyInfoList)
                 : string.Join(", ", result.Readings);
 
@@ -577,7 +577,7 @@ public partial class PopupWindow : Window
         {
             List<string> aOrthographyInfoList = result.AOrthographyInfoList ?? new List<string>();
             List<string> alternativeSpellings = result.AlternativeSpellings;
-            string alternativeSpellingsText = (Storage.Dicts[DictType.JMdict].Options?.AOrthographyInfo?.Value ?? true) && aOrthographyInfoList.Any()
+            string alternativeSpellingsText = aOrthographyInfoList.Any() && (result.Dict?.Options?.AOrthographyInfo?.Value ?? true)
                 ? PopupWindowUtilities.MakeUiElementAlternativeSpellingsText(alternativeSpellings, aOrthographyInfoList)
                 : "(" + string.Join(", ", alternativeSpellings) + ")";
 
@@ -644,8 +644,8 @@ public partial class PopupWindow : Window
             };
         }
 
-        if ((Storage.Dicts[DictType.JMdict].Options?.POrthographyInfo?.Value ?? true)
-            && (result.POrthographyInfoList?.Any() ?? false))
+        if ((result.POrthographyInfoList?.Any() ?? false)
+            && (result.Dict?.Options?.POrthographyInfo?.Value ?? true))
         {
             textBlockPOrthographyInfo = new TextBlock
             {
@@ -653,10 +653,10 @@ public partial class PopupWindow : Window
                 Text = $"({string.Join(", ", result.POrthographyInfoList)})",
 
                 Foreground = (SolidColorBrush)new BrushConverter()
-                    .ConvertFrom(Storage.Dicts[DictType.JMdict].Options?.POrthographyInfoColor?.Value
+                    .ConvertFrom(result.Dict?.Options?.POrthographyInfoColor?.Value
                         ?? ConfigManager.PrimarySpellingColor.ToString())!,
 
-                FontSize = Storage.Dicts[DictType.JMdict].Options?.POrthographyInfoFontSize?.Value ?? 15,
+                FontSize = result.Dict?.Options?.POrthographyInfoFontSize?.Value ?? 15,
                 Margin = new Thickness(5, 0, 0, 0),
                 TextWrapping = TextWrapping.Wrap,
                 HorizontalAlignment = HorizontalAlignment.Left,
@@ -793,34 +793,40 @@ public partial class PopupWindow : Window
 
                 textBlock.MouseLeave += OnMouseLeave;
 
-                if ((textBlock.Name is "FoundSpelling" or "Readings") &&
-                    Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict? kanjiumDict) && (kanjiumDict.Active))
+                if ((textBlock.Name is "FoundSpelling" or "Readings"))
                 {
-                    List<string>? readings = result.Readings;
-
-                    if (textBlock.Name is "FoundSpelling" && (readings?.Any() ?? false))
+                    if (Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.Kanjium)?.Active ?? false)
                     {
-                        top.Children.Add(textBlock);
-                    }
-                    else
-                    {
-                        Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling,
-                            result.AlternativeSpellings ?? new(),
-                            readings ?? new(),
-                            textBlock.Text.Split(", ").ToList(),
-                            textBlock.Margin.Left);
+                        List<string>? readings = result.Readings;
 
-                        if (pitchAccentGrid.Children.Count == 0)
+                        if (textBlock.Name is "FoundSpelling" && (readings?.Any() ?? false))
                         {
                             top.Children.Add(textBlock);
                         }
-
                         else
                         {
-                            pitchAccentGrid.Children.Add(textBlock);
-                            top.Children.Add(pitchAccentGrid);
+                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling,
+                                result.AlternativeSpellings ?? new(),
+                                readings ?? new(),
+                                textBlock.Text.Split(", ").ToList(),
+                                textBlock.Margin.Left,
+                                result.Dict!);
+
+                            if (pitchAccentGrid.Children.Count == 0)
+                            {
+                                top.Children.Add(textBlock);
+                            }
+
+                            else
+                            {
+                                pitchAccentGrid.Children.Add(textBlock);
+                                top.Children.Add(pitchAccentGrid);
+                            }
                         }
                     }
+
+                    else
+                        top.Children.Add(textBlock);
                 }
                 else
                     top.Children.Add(textBlock);
@@ -833,33 +839,38 @@ public partial class PopupWindow : Window
 
                 textBox.MouseLeave += OnMouseLeave;
 
-                if ((textBox.Name is "FoundSpelling" or "Readings") &&
-                    Storage.Dicts.TryGetValue(DictType.Kanjium, out Dict? kanjiumDict) && kanjiumDict.Active)
+                if ((textBox.Name is "FoundSpelling" or "Readings"))
                 {
-                    List<string>? readings = result.Readings;
-
-                    if (textBox.Name is "FoundSpelling" && (readings?.Any() ?? false))
+                    if (Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.Kanjium)?.Active ?? false)
                     {
-                        top.Children.Add(textBox);
-                    }
-                    else
-                    {
-                        Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling,
-                            result.AlternativeSpellings ?? new(),
-                            readings ?? new(),
-                            textBox.Text.Split(", ").ToList(),
-                            textBox.Margin.Left);
+                        List<string>? readings = result.Readings;
 
-                        if (pitchAccentGrid.Children.Count == 0)
+                        if (textBox.Name is "FoundSpelling" && (readings?.Any() ?? false))
                         {
                             top.Children.Add(textBox);
                         }
                         else
                         {
-                            pitchAccentGrid.Children.Add(textBox);
-                            top.Children.Add(pitchAccentGrid);
+                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling,
+                                result.AlternativeSpellings ?? new(),
+                                readings ?? new(),
+                                textBox.Text.Split(", ").ToList(),
+                                textBox.Margin.Left,
+                                result.Dict!);
+
+                            if (pitchAccentGrid.Children.Count == 0)
+                            {
+                                top.Children.Add(textBox);
+                            }
+                            else
+                            {
+                                pitchAccentGrid.Children.Add(textBox);
+                                top.Children.Add(pitchAccentGrid);
+                            }
                         }
                     }
+                    else
+                        top.Children.Add(textBox);
                 }
                 else
                     top.Children.Add(textBox);
@@ -909,9 +920,8 @@ public partial class PopupWindow : Window
     }
 
     private static Grid CreatePitchAccentGrid(string foundSpelling, List<string> alternativeSpellings,
-        List<string> readings, List<string> splitReadingsWithRInfo, double leftMargin)
+        List<string> readings, List<string> splitReadingsWithRInfo, double leftMargin, Dict dict)
     {
-        Dictionary<string, List<IResult>> kanjiumDict = Storage.Dicts[DictType.Kanjium].Contents;
         Grid pitchAccentGrid = new();
 
         bool hasReading = readings.Any();
@@ -935,7 +945,7 @@ public partial class PopupWindow : Window
                     WindowsUtils.MeasureTextSize(splitReadingsWithRInfo[i - 1] + ", ", fontSize).Width;
             }
 
-            if (kanjiumDict.TryGetValue(normalizedExpression, out List<IResult>? kanjiumResultList))
+            if (dict.Contents.TryGetValue(normalizedExpression, out List<IResult>? kanjiumResultList))
             {
                 KanjiumResult? chosenKanjiumResult = null;
 
@@ -966,7 +976,7 @@ public partial class PopupWindow : Window
                     {
                         StrokeThickness = 2,
                         Stroke = (SolidColorBrush)new BrushConverter()
-                            .ConvertFrom(Storage.Dicts[DictType.Kanjium].Options?.PitchAccentMarkerColor?.Value
+                            .ConvertFrom(dict.Options?.PitchAccentMarkerColor?.Value
                             ?? Colors.DeepSkyBlue.ToString())!,
                         StrokeDashArray = new DoubleCollection { 1, 1 }
                     };
@@ -1630,9 +1640,9 @@ public partial class PopupWindow : Window
             foundDicts.Add(foundDict);
         }
 
-        foreach ((DictType dictType, Dict dict) in Storage.Dicts.OrderBy(d => d.Value.Priority))
+        foreach (Dict dict in Storage.Dicts.Values.OrderBy(dict => dict.Priority).ToList())
         {
-            if (!dict.Active || dictType == DictType.Kanjium)
+            if (!dict.Active || dict.Type == DictType.Kanjium)
                 continue;
 
             var button = new Button { Content = dict.Name, Margin = new Thickness(1), Tag = dict };

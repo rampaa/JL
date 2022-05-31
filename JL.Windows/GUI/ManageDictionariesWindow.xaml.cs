@@ -174,12 +174,12 @@ public partial class ManageDictionariesWindow : Window
             checkBox.Checked += (_, _) => dict.Active = true;
             buttonIncreasePriority.Click += (_, _) =>
             {
-                PrioritizeDict(Storage.Dicts, dict.Type);
+                PrioritizeDict(dict);
                 UpdateDictionariesDisplay();
             };
             buttonDecreasePriority.Click += (_, _) =>
             {
-                UnPrioritizeDict(Storage.Dicts, dict.Type);
+                UnPrioritizeDict(dict);
                 UpdateDictionariesDisplay();
             };
             buttonRemove.Click += (_, _) =>
@@ -191,7 +191,7 @@ public partial class ManageDictionariesWindow : Window
                         MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
                 {
                     dict.Contents.Clear();
-                    Storage.Dicts.Remove(dict.Type);
+                    Storage.Dicts.Remove(dict.Name);
                     UpdateDictionariesDisplay();
 
                     GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
@@ -200,7 +200,7 @@ public partial class ManageDictionariesWindow : Window
             };
             buttonEdit.Click += (_, _) =>
             {
-                new EditDictionaryWindow(Storage.Dicts[dict.Type]).ShowDialog();
+                new EditDictionaryWindow(dict).ShowDialog();
                 UpdateDictionariesDisplay();
             };
 
@@ -238,24 +238,22 @@ public partial class ManageDictionariesWindow : Window
         }
     }
 
-    private static void PrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBePrioritized)
+    private static void PrioritizeDict(Dict dict)
     {
-        if (Storage.Dicts[typeToBePrioritized].Priority == 0) return;
+        if (dict.Priority == 0) return;
 
-        dicts.Single(dict => dict.Value.Priority == Storage.Dicts[typeToBePrioritized].Priority - 1).Value
-            .Priority += 1;
-        Storage.Dicts[typeToBePrioritized].Priority -= 1;
+        Storage.Dicts.Single(d => d.Value.Priority == dict.Priority - 1).Value.Priority += 1;
+        dict.Priority -= 1;
     }
 
-    private static void UnPrioritizeDict(Dictionary<DictType, Dict> dicts, DictType typeToBeUnPrioritized)
+    private static void UnPrioritizeDict(Dict dict)
     {
         // lowest priority means highest number
-        int lowestPriority = Storage.Dicts.Select(dict => dict.Value.Priority).Max();
-        if (Storage.Dicts[typeToBeUnPrioritized].Priority == lowestPriority) return;
+        int lowestPriority = Storage.Dicts.Select(d => d.Value.Priority).Max();
+        if (dict.Priority == lowestPriority) return;
 
-        dicts.Single(dict => dict.Value.Priority == Storage.Dicts[typeToBeUnPrioritized].Priority + 1).Value
-            .Priority -= 1;
-        Storage.Dicts[typeToBeUnPrioritized].Priority += 1;
+        Storage.Dicts.Single(d => d.Value.Priority == dict.Priority + 1).Value.Priority -= 1;
+        dict.Priority += 1;
     }
 
     private void ButtonAddDictionary_OnClick(object sender, RoutedEventArgs e)
@@ -269,17 +267,18 @@ public partial class ManageDictionariesWindow : Window
     {
         Storage.UpdatingJMdict = true;
 
-        bool isDownloaded = await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMdict].Path,
+        Dict dict = Storage.Dicts.Values.First(dict => dict.Type == DictType.JMdict);
+        bool isDownloaded = await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.JmdictUrl,
                 DictType.JMdict.ToString(), true, false)
             .ConfigureAwait(false);
 
         if (isDownloaded)
         {
-            Storage.Dicts[DictType.JMdict].Contents.Clear();
+            dict.Contents.Clear();
 
             await Task.Run(async () => await JMdictLoader
-                .Load(Storage.Dicts[DictType.JMdict].Path).ConfigureAwait(false));
+                .Load(dict).ConfigureAwait(false));
 
             await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
 
@@ -287,8 +286,8 @@ public partial class ManageDictionariesWindow : Window
 
             await JmdictWcLoader.Load().ConfigureAwait(false);
 
-            if (!Storage.Dicts[DictType.JMdict].Active)
-                Storage.Dicts[DictType.JMdict].Contents.Clear();
+            if (!dict.Active)
+                dict.Contents.Clear();
 
             GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
@@ -301,20 +300,21 @@ public partial class ManageDictionariesWindow : Window
     {
         Storage.UpdatingJMnedict = true;
 
-        bool isDownloaded = await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.JMnedict].Path,
+        Dict dict = Storage.Dicts.Values.First(dict => dict.Type == DictType.JMnedict);
+        bool isDownloaded = await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.JmnedictUrl,
                 DictType.JMnedict.ToString(), true, false)
             .ConfigureAwait(false);
 
         if (isDownloaded)
         {
-            Storage.Dicts[DictType.JMnedict].Contents.Clear();
+            dict.Contents.Clear();
 
             await Task.Run(async () => await JMnedictLoader
-                .Load(Storage.Dicts[DictType.JMnedict].Path).ConfigureAwait(false));
+                .Load(dict).ConfigureAwait(false));
 
-            if (!Storage.Dicts[DictType.JMnedict].Active)
-                Storage.Dicts[DictType.JMnedict].Contents.Clear();
+            if (!dict.Active)
+                dict.Contents.Clear();
 
             GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
@@ -326,21 +326,21 @@ public partial class ManageDictionariesWindow : Window
     private static async Task UpdateKanjidic()
     {
         Storage.UpdatingKanjidic = true;
-
-        bool isDownloaded = await ResourceUpdater.UpdateResource(Storage.Dicts[DictType.Kanjidic].Path,
+        Dict dict = Storage.Dicts.Values.First(dict => dict.Type == DictType.Kanjidic);
+        bool isDownloaded = await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.KanjidicUrl,
                 DictType.Kanjidic.ToString(), true, false)
             .ConfigureAwait(false);
 
         if (isDownloaded)
         {
-            Storage.Dicts[DictType.Kanjidic].Contents.Clear();
+            dict.Contents.Clear();
 
             await Task.Run(async () => await KanjiInfoLoader
-                .Load(Storage.Dicts[DictType.Kanjidic].Path).ConfigureAwait(false));
+                .Load(dict).ConfigureAwait(false));
 
-            if (!Storage.Dicts[DictType.Kanjidic].Active)
-                Storage.Dicts[DictType.Kanjidic].Contents.Clear();
+            if (!dict.Active)
+                dict.Contents.Clear();
 
             GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);

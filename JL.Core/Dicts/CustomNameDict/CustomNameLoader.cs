@@ -25,7 +25,7 @@ public static class CustomNameLoader
     {
         CustomNameEntry newNameEntry = new(spelling, reading, nameType);
 
-        Dictionary<string, List<IResult>> customNameDictionary = Storage.Dicts[DictType.CustomNameDictionary].Contents;
+        Dictionary<string, List<IResult>> customNameDictionary = Storage.Dicts.Values.First(dict => dict.Type == DictType.CustomNameDictionary).Contents;
 
         if (customNameDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out List<IResult>? entry))
         {

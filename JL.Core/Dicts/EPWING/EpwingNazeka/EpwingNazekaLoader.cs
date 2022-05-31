@@ -5,20 +5,20 @@ namespace JL.Core.Dicts.EPWING.EpwingNazeka;
 
 internal static class EpwingNazekaLoader
 {
-    public static async Task Load(DictType dictType, string dictPath)
+    public static async Task Load(Dict dict)
     {
         try
         {
             List<object>? jsonObjects;
 
-            FileStream openStream = File.OpenRead(dictPath);
+            FileStream openStream = File.OpenRead(dict.Path);
             await using (openStream.ConfigureAwait(false))
             {
                 jsonObjects = await JsonSerializer.DeserializeAsync<List<object>>(openStream)
                     .ConfigureAwait(false);
             }
 
-            Dictionary<string, List<IResult>> nazekaEpwingDict = Storage.Dicts[dictType].Contents;
+            Dictionary<string, List<IResult>> nazekaEpwingDict = dict.Contents;
 
             foreach (JsonElement jsonObj in jsonObjects!.Skip(1))
             {
@@ -77,7 +77,7 @@ internal static class EpwingNazekaLoader
 
                         tempResult = new(primarySpelling, reading, alternativeSpellings, definitions);
 
-                        if (!IsValidEpwingResultForDictType(tempResult, dictType))
+                        if (!IsValidEpwingResultForDictType(tempResult, dict))
                             continue;
 
                         if (nazekaEpwingDict.TryGetValue(key, out result))
@@ -98,7 +98,7 @@ internal static class EpwingNazekaLoader
 
                     EpwingNazekaResult tempResult = new(primarySpelling, null, null, definitions);
 
-                    if (!IsValidEpwingResultForDictType(tempResult, dictType))
+                    if (!IsValidEpwingResultForDictType(tempResult, dict))
                         continue;
 
                     if (nazekaEpwingDict.TryGetValue(key, out List<IResult>? result))
@@ -122,7 +122,7 @@ internal static class EpwingNazekaLoader
         }
     }
 
-    private static bool IsValidEpwingResultForDictType(EpwingNazekaResult result, DictType dictType)
+    private static bool IsValidEpwingResultForDictType(EpwingNazekaResult result, Dict dict)
     {
         string[] badCharacters = { "�", "(", "=", "＝", "［", "〔", "「", "『", "（", "【", "[" };
 
@@ -136,15 +136,16 @@ internal static class EpwingNazekaLoader
             return false;
 
         // TODO
-        switch (dictType)
+        switch (dict.Type)
         {
             case DictType.KenkyuushaNazeka:
             case DictType.DaijirinNazeka:
             case DictType.ShinmeikaiNazeka:
+            case DictType.NonspecificNazeka:
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException(nameof(dictType), dictType, null);
+                throw new ArgumentOutOfRangeException(nameof(dict), dict.Type, null);
         }
 
         return true;

@@ -64,7 +64,7 @@ public static class JmdictWcLoader
             "vs-s", "vt", "exp", "vs", "vz"
         };
 
-        foreach (List<IResult> jMdictResultList in Storage.Dicts[DictType.JMdict].Contents.Values.ToList())
+        foreach (List<IResult> jMdictResultList in Storage.Dicts.Values.First(dict => dict.Type == DictType.JMdict).Contents.Values.ToList())
         {
             int jMdictResultListCount = jMdictResultList.Count;
             for (int i = 0; i < jMdictResultListCount; i++)

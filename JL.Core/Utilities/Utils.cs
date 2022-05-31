@@ -76,8 +76,8 @@ public static class Utils
         {
             var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(), } };
 
-            Dictionary<DictType, Dict>? deserializedDicts = await JsonSerializer
-                .DeserializeAsync<Dictionary<DictType, Dict>>(
+            Dictionary<string, Dict>? deserializedDicts = await JsonSerializer
+                .DeserializeAsync<Dictionary<string, Dict>>(
                     new StreamReader(Path.Join(Storage.ConfigPath, "dicts.json")).BaseStream, jso)
                 .ConfigureAwait(false);
 
@@ -85,7 +85,7 @@ public static class Utils
             {
                 foreach (Dict dict in deserializedDicts.Values)
                 {
-                    if (!Storage.Dicts.ContainsKey(dict.Type))
+                    if (!Storage.Dicts.ContainsKey(dict.Name))
                     {
                         dict.Contents = dict.Type switch
                         {
@@ -105,7 +105,7 @@ public static class Utils
                             //DictType.ShinmeikaiNazeka => new Dictionary<string, List<IResult>>(),
                             _ => new Dictionary<string, List<IResult>>(),
                         };
-                        Storage.Dicts.Add(dict.Type, dict);
+                        Storage.Dicts.Add(dict.Name, dict);
                     }
                 }
             }

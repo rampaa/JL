@@ -50,6 +50,8 @@ public enum DictType
     GakkenYojijukugoYomichan,
     [Description("Shinmeikai Yojijukugo (Yomichan)")]
     ShinmeikaiYojijukugoYomichan,
+    [Description("Nonspecific (Yomichan)")]
+    NonspecificYomichan,
 
     // Nazeka Epwing Converter
     [Description("Kenkyuusha (Nazeka)")]
@@ -58,4 +60,6 @@ public enum DictType
     DaijirinNazeka,
     [Description("Shinmeikai (Nazeka)")]
     ShinmeikaiNazeka,
+    [Description("Nonspecific (Nazeka)")]
+    NonspecificNazeka,
 }

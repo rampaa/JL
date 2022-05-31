@@ -4,14 +4,14 @@ namespace JL.Core.Dicts.Kanjium;
 
 public static class KanjiumLoader
 {
-    public static async Task Load(DictType dictType, string dictPath)
+    public static async Task Load(Dict dict)
     {
-        if (!Directory.Exists(dictPath) && !File.Exists(dictPath))
+        if (!Directory.Exists(dict.Path) && !File.Exists(dict.Path))
             return;
 
-        Dictionary<string, List<IResult>> kanjiumDict = Storage.Dicts[dictType].Contents;
+        Dictionary<string, List<IResult>> kanjiumDict = dict.Contents;
 
-        string[] jsonFiles = Directory.GetFiles(dictPath, "term_meta_bank_*.json");
+        string[] jsonFiles = Directory.GetFiles(dict.Path, "term_meta_bank_*.json");
 
         foreach (string jsonFile in jsonFiles)
         {

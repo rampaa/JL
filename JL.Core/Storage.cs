@@ -27,7 +27,7 @@ public static class Storage
     public static readonly string ApplicationPath = AppContext.BaseDirectory;
     public static readonly string ResourcesPath = Path.Join(AppContext.BaseDirectory, "Resources");
     public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
-    public static readonly HttpClient Client = new(new HttpClientHandler { UseProxy = false });
+    public static readonly HttpClient Client = new(new HttpClientHandler { UseProxy = false }) { Timeout = TimeSpan.FromMinutes(10) };
     public static readonly Version Version = new(1, 10);
     public static readonly string GitHubApiUrlForLatestJLRelease = "https://api.github.com/repos/rampaa/JL/releases/latest";
     public static readonly Uri JmdictUrl = new("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz");
@@ -40,7 +40,7 @@ public static class Storage
     public static Dictionary<string, List<JmdictWc>> WcDict { get; set; } = new();
     public static Dictionary<string, Dictionary<string, List<FrequencyEntry>>> FreqDicts { get; set; } = new();
 
-    public static readonly Dictionary<DictType, Dict> Dicts = new();
+    public static readonly Dictionary<string, Dict> Dicts = new();
 
     public static readonly Dictionary<string, Dict> BuiltInDicts =
         new()
@@ -119,6 +119,7 @@ public static class Storage
         DictType.GakkenYojijukugoYomichan,
         DictType.ShinmeikaiYojijukugoYomichan,
         DictType.Kanjium,
+        DictType.NonspecificYomichan,
     };
 
     public static readonly List<DictType> NazekaDictTypes = new()
@@ -126,6 +127,13 @@ public static class Storage
         DictType.KenkyuushaNazeka,
         DictType.DaijirinNazeka,
         DictType.ShinmeikaiNazeka,
+        DictType.NonspecificNazeka,
+    };
+
+    public static readonly List<DictType> NonspecificDictTypes = new()
+    {
+        DictType.NonspecificYomichan,
+        DictType.NonspecificNazeka,
     };
 
     public static readonly JsonSerializerOptions JsoUnsafeEscaping = new()
@@ -173,7 +181,7 @@ public static class Storage
                     if (dict.Active && !dict.Contents.Any() && !UpdatingJMdict)
                     {
                         Task jMDictTask = Task.Run(async () =>
-                            await JMdictLoader.Load(dict.Path).ConfigureAwait(false));
+                            await JMdictLoader.Load(dict).ConfigureAwait(false));
 
                         tasks.Add(jMDictTask);
                     }
@@ -189,7 +197,7 @@ public static class Storage
                     if (dict.Active && !dict.Contents.Any() && !UpdatingJMnedict)
                     {
                         tasks.Add(Task.Run(async () =>
-                            await JMnedictLoader.Load(dict.Path).ConfigureAwait(false)));
+                            await JMnedictLoader.Load(dict).ConfigureAwait(false)));
                     }
 
                     else if (!dict.Active && dict.Contents.Any() && !UpdatingJMnedict)
@@ -203,7 +211,7 @@ public static class Storage
                     if (dict.Active && !dict.Contents.Any() && !UpdatingKanjidic)
                     {
                         tasks.Add(Task.Run(async () =>
-                            await KanjiInfoLoader.Load(dict.Path).ConfigureAwait(false)));
+                            await KanjiInfoLoader.Load(dict).ConfigureAwait(false)));
                     }
 
                     else if (!dict.Active && dict.Contents.Any() && !UpdatingKanjidic)
@@ -230,10 +238,11 @@ public static class Storage
                 case DictType.WeblioKogoYomichan:
                 case DictType.GakkenYojijukugoYomichan:
                 case DictType.ShinmeikaiYojijukugoYomichan:
+                case DictType.NonspecificYomichan:
                     if (dict.Active && !dict.Contents.Any())
                     {
                         tasks.Add(Task.Run(async () =>
-                            await EpwingYomichanLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                            await EpwingYomichanLoader.Load(dict).ConfigureAwait(false)));
                     }
 
                     else if (!dict.Active && dict.Contents.Any())
@@ -274,10 +283,11 @@ public static class Storage
                 case DictType.DaijirinNazeka:
                 case DictType.KenkyuushaNazeka:
                 case DictType.ShinmeikaiNazeka:
+                case DictType.NonspecificNazeka:
                     if (dict.Active && !dict.Contents.Any())
                     {
                         tasks.Add(Task.Run(async () =>
-                            await EpwingNazekaLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                            await EpwingNazekaLoader.Load(dict).ConfigureAwait(false)));
                     }
 
                     else if (!dict.Active && dict.Contents.Any())
@@ -291,7 +301,7 @@ public static class Storage
                     if (dict.Active && !dict.Contents.Any())
                     {
                         tasks.Add(Task.Run(async () =>
-                            await KanjiumLoader.Load(dict.Type, dict.Path).ConfigureAwait(false)));
+                            await KanjiumLoader.Load(dict).ConfigureAwait(false)));
                     }
 
                     else if (!dict.Active && dict.Contents.Any())
@@ -324,9 +334,10 @@ public static class Storage
 
     public static async Task InitializePoS()
     {
+        Dict dict = Dicts.Values.First(dict => dict.Type == DictType.JMdict);
         if (!File.Exists($"{Storage.ResourcesPath}/PoS.json"))
         {
-            if (Dicts[DictType.JMdict].Active)
+            if (dict.Active)
             {
                 await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
             }
@@ -334,21 +345,21 @@ public static class Storage
             else
             {
                 bool deleteJmdictFile = false;
-                if (!File.Exists(Dicts[DictType.JMdict].Path))
+                if (!File.Exists(dict.Path))
                 {
                     deleteJmdictFile = true;
-                    await ResourceUpdater.UpdateResource(Dicts[DictType.JMdict].Path,
+                    await ResourceUpdater.UpdateResource(dict.Path,
                         JmdictUrl,
-                        DictType.JMdict.ToString(), false, true).ConfigureAwait(false);
+                        dict.Type.ToString(), false, true).ConfigureAwait(false);
                 }
 
                 await Task.Run((async () =>
-                    await JMdictLoader.Load(Dicts[DictType.JMdict].Path).ConfigureAwait(false)));
+                    await JMdictLoader.Load(dict).ConfigureAwait(false)));
                 await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
-                Dicts[DictType.JMdict].Contents.Clear();
+                dict.Contents.Clear();
 
                 if (deleteJmdictFile)
-                    File.Delete(Dicts[DictType.JMdict].Path);
+                    File.Delete(dict.Path);
             }
         }
 

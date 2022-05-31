@@ -8,46 +8,53 @@ public static class ResourceUpdater
     public static async Task<bool> UpdateResource(string resourcePath, Uri resourceDownloadUri, string resourceName,
         bool isUpdate, bool noPrompt)
     {
-        if (!isUpdate ||
-            Storage.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {resourceName}?",
-                "Update dictionary?"))
+        try
         {
-            HttpRequestMessage request = new(HttpMethod.Get, resourceDownloadUri);
-
-            if (File.Exists(resourcePath))
-                request.Headers.IfModifiedSince =
-                    File.GetLastWriteTime(resourcePath);
-
-            if (!noPrompt)
-                Storage.Frontend.ShowOkDialog(
-                    $"This may take a while. Please don't shut down the program until {resourceName} is downloaded.",
-                    "");
-
-            HttpResponseMessage response = await Storage.Client.SendAsync(request).ConfigureAwait(false);
-            if (response.IsSuccessStatusCode)
+            if (!isUpdate || Storage.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {resourceName}?",
+                "Update dictionary?"))
             {
-                Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                await GzipStreamDecompressor(responseStream, resourcePath)
-                    .ConfigureAwait(false);
+                HttpRequestMessage request = new(HttpMethod.Get, resourceDownloadUri);
+
+                if (File.Exists(resourcePath))
+                    request.Headers.IfModifiedSince =
+                        File.GetLastWriteTime(resourcePath);
 
                 if (!noPrompt)
-                    Storage.Frontend.ShowOkDialog($"{resourceName} has been downloaded successfully.",
+                    Storage.Frontend.ShowOkDialog(
+                        $"This may take a while. Please don't shut down the program until {resourceName} is downloaded.",
                         "");
 
-                return true;
-            }
+                HttpResponseMessage response = await Storage.Client.SendAsync(request).ConfigureAwait(false);
+                if (response.IsSuccessStatusCode)
+                {
+                    Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                    await GzipStreamDecompressor(responseStream, resourcePath)
+                        .ConfigureAwait(false);
 
-            else if (response.StatusCode == HttpStatusCode.NotModified && !noPrompt)
-            {
-                Storage.Frontend.ShowOkDialog($"{resourceName} is up to date.",
-                    "");
-            }
+                    if (!noPrompt)
+                        Storage.Frontend.ShowOkDialog($"{resourceName} has been downloaded successfully.",
+                            "");
 
-            else if (!noPrompt)
-            {
-                Storage.Frontend.ShowOkDialog($"Unexpected error while downloading {resourceName}.",
-                    "");
+                    return true;
+                }
+
+                else if (response.StatusCode == HttpStatusCode.NotModified && !noPrompt)
+                {
+                    Storage.Frontend.ShowOkDialog($"{resourceName} is up to date.",
+                        "");
+                }
+
+                else if (!noPrompt)
+                {
+                    Storage.Frontend.ShowOkDialog($"Unexpected error while downloading {resourceName}.",
+                        "");
+                }
             }
+        }
+
+        catch
+        {
+            Storage.Frontend.ShowOkDialog($"Unexpected error while downloading {resourceName}.", "");
         }
 
         return false;

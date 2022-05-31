@@ -104,7 +104,7 @@ public partial class AddWordWindow : Window
         stringBuilder.Append(wordClass);
         stringBuilder.Append(Environment.NewLine);
 
-        string customWordDictPath = Storage.Dicts[DictType.CustomWordDictionary].Path;
+        string customWordDictPath = Storage.Dicts.Values.First(dict => dict.Type == DictType.CustomWordDictionary).Path;
         await File.AppendAllTextAsync(customWordDictPath,
             stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);
     }

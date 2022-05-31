@@ -34,7 +34,7 @@ public static class Lookup
 
         if (Storage.Frontend.CoreConfig.KanjiMode)
         {
-            return KanjiResultBuilder(GetKanjidicResults(text, Storage.Dicts[DictType.Kanjidic]));
+            return KanjiResultBuilder(GetKanjidicResults(text, Storage.Dicts.Values.First(dict => dict.Type == DictType.Kanjidic)));
         }
 
         Dictionary<string, IntermediaryResult> jMdictResults = new();
@@ -56,11 +56,11 @@ public static class Lookup
             deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
         }
 
-        foreach ((DictType dictType, Dict dict) in Storage.Dicts.ToList())
+        foreach (Dict dict in Storage.Dicts.Values.ToList())
         {
             if (dict.Active)
             {
-                switch (dictType)
+                switch (dict.Type)
                 {
                     case DictType.JMdict:
                         jMdictResults = GetWordResults(text, textInHiraganaList, deconjugationResultsList,
@@ -101,6 +101,7 @@ public static class Lookup
                     case DictType.WeblioKogoYomichan:
                     case DictType.GakkenYojijukugoYomichan:
                     case DictType.ShinmeikaiYojijukugoYomichan:
+                    case DictType.NonspecificYomichan:
                         epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
                             deconjugationResultsList, dict));
                         break;
@@ -108,6 +109,7 @@ public static class Lookup
                     case DictType.DaijirinNazeka:
                     case DictType.KenkyuushaNazeka:
                     case DictType.ShinmeikaiNazeka:
+                    case DictType.NonspecificNazeka:
                         epwingNazekaWordResultsList.Add(GetWordResults(text, textInHiraganaList,
                             deconjugationResultsList, dict));
                         break;
@@ -264,6 +266,7 @@ public static class Lookup
                         case DictType.WeblioKogoYomichan:
                         case DictType.GakkenYojijukugoYomichan:
                         case DictType.ShinmeikaiYojijukugoYomichan:
+                        case DictType.NonspecificYomichan:
                             {
                                 int dictResultsCount = dictResults.Count;
                                 for (int i = 0; i < dictResultsCount; i++)
@@ -302,6 +305,7 @@ public static class Lookup
                         case DictType.DaijirinNazeka:
                         case DictType.KenkyuushaNazeka:
                         case DictType.ShinmeikaiNazeka:
+                        case DictType.NonspecificNazeka:
                             {
                                 int dictResultsCount = dictResults.Count;
                                 for (int i = 0; i < dictResultsCount; i++)
@@ -422,7 +426,7 @@ public static class Lookup
 
         string? kanji = text.UnicodeIterator().FirstOrDefault();
 
-        if (kanji != null && Storage.Dicts[DictType.Kanjidic].Contents.TryGetValue(kanji, out List<IResult>? result))
+        if (kanji != null && dict.Contents.TryGetValue(kanji, out List<IResult>? result))
         {
             kanjiResults.Add(kanji,
                 new IntermediaryResult(result, null, kanji, dict));
