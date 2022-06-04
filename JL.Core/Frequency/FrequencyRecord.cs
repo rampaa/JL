@@ -1,11 +1,11 @@
 ﻿namespace JL.Core.Frequency;
 
-public class FrequencyEntry
+public class FrequencyRecord
 {
     public string Spelling { get; init; }
     public int Frequency { get; init; }
 
-    public FrequencyEntry(string spelling, int frequency)
+    public FrequencyRecord(string spelling, int frequency)
     {
         Spelling = spelling;
         Frequency = frequency;

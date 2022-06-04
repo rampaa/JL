@@ -14,6 +14,8 @@ using JL.Core.Dicts.EPWING.EpwingYomichan;
 using JL.Core.Dicts.Kanjium;
 using JL.Core.Dicts.Options;
 using JL.Core.Frequency;
+using JL.Core.Frequency.FreqNazeka;
+using JL.Core.Frequency.FreqYomichan;
 using JL.Core.PoS;
 using Timer = System.Timers.Timer;
 
@@ -33,12 +35,13 @@ public static class Storage
     public static readonly Uri JmdictUrl = new("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz");
     public static readonly Uri JmnedictUrl = new("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     public static readonly Uri KanjidicUrl = new("http://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
-    public static bool Ready { get; private set; } = false;
+    public static bool DictsReady { get; private set; } = false;
     public static bool UpdatingJMdict { get; set; } = false;
     public static bool UpdatingJMnedict { get; set; } = false;
     public static bool UpdatingKanjidic { get; set; } = false;
+    public static bool FreqsReady { get; set; } = false;
     public static Dictionary<string, List<JmdictWc>> WcDict { get; set; } = new();
-    public static Dictionary<string, Dictionary<string, List<FrequencyEntry>>> FreqDicts { get; set; } = new();
+    public static Dictionary<string, Freq> FreqDicts { get; set; } = new();
 
     public static readonly Dictionary<string, Dict> Dicts = new();
 
@@ -91,12 +94,22 @@ public static class Storage
             }
         };
 
-    public static readonly Dictionary<string, string> FrequencyLists = new()
+    public static readonly Dictionary<string, Freq> BuiltInFreqs = new()
     {
-        { "VN", $"{ResourcesPath}/freqlist_vns.json" },
-        { "Novel", $"{ResourcesPath}/freqlist_novels.json" },
-        { "Narou", $"{ResourcesPath}/freqlist_narou.json" },
-        { "None", "" }
+        {
+            "VN (Nazeka)",
+            new Freq(FreqType.Nazeka, "VN (Nazeka)", $"{ResourcesPath}/freqlist_vns.json", true, 0)
+        },
+
+        {
+            "Narou (Nazeka)",
+            new Freq(FreqType.Nazeka, "Narou (Nazeka)", $"{ResourcesPath}/freqlist_narou.json", false, 1)
+        },
+
+        {
+            "Novel (Nazeka)",
+            new Freq(FreqType.Nazeka, "Novel (Nazeka)", $"{ResourcesPath}/freqlist_novels.json", false, 2)
+        },
     };
 
     public static readonly List<DictType> YomichanDictTypes = new()
@@ -136,11 +149,6 @@ public static class Storage
         DictType.NonspecificNazeka,
     };
 
-    public static readonly JsonSerializerOptions JsoUnsafeEscaping = new()
-    {
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-    };
-
     public static readonly Regex JapaneseRegex =
         new(
             @"[\u2e80-\u30ff\u31c0-\u4dbf\u4e00-\u9fff\uf900-\ufaff\ufe30-\ufe4f\uff00-\uffef]|\ud82c[\udc00-\udcff]|\ud83c[\ude00-\udeff]|\ud840[\udc00-\udfff]|[\ud841-\ud868][\udc00-\udfff]|\ud869[\udc00-\udedf]|\ud869[\udf00-\udfff]|[\ud86a-\ud879][\udc00-\udfff]|\ud87a[\udc00-\udfef]|\ud87e[\udc00-\ude1f]|\ud880[\udc00-\udfff]|[\ud881-\ud883][\udc00-\udfff]|\ud884[\udc00-\udf4f]");
@@ -168,7 +176,7 @@ public static class Storage
 
     public static async Task LoadDictionaries()
     {
-        Ready = false;
+        DictsReady = false;
 
         List<Task> tasks = new();
         bool dictRemoved = false;
@@ -329,7 +337,71 @@ public static class Storage
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
         }
 
-        Ready = true;
+        DictsReady = true;
+    }
+
+    public static async Task LoadFrequencies()
+    {
+        FreqsReady = false;
+
+        List<Task> tasks = new();
+        bool freqRemoved = false;
+
+        foreach (Freq freq in FreqDicts.Values.ToList())
+        {
+            switch (freq.Type)
+            {
+                case FreqType.Nazeka:
+                    if (freq.Active && !freq.Contents.Any())
+                    {
+                        Task nazekaFreqTask = Task.Run(async () =>
+                            await FrequencyNazekaLoader.Load(freq).ConfigureAwait(false));
+
+                        tasks.Add(nazekaFreqTask);
+                    }
+
+                    else if (!freq.Active && freq.Contents.Any())
+                    {
+                        freq.Contents.Clear();
+                        freqRemoved = true;
+                    }
+                    break;
+
+                case FreqType.Yomichan:
+                    if (freq.Active && !freq.Contents.Any())
+                    {
+                        Task yomichanFreqTask = Task.Run(async () =>
+                            await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false));
+
+                        tasks.Add(yomichanFreqTask);
+                    }
+
+                    else if (!freq.Active && freq.Contents.Any())
+                    {
+                        freq.Contents.Clear();
+                        freqRemoved = true;
+                    }
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        if (tasks.Any() || freqRemoved)
+        {
+            if (tasks.Any())
+            {
+                await Task.WhenAll(tasks.ToArray()).ConfigureAwait(false);
+            }
+
+            Storage.Frontend.InvalidateDisplayCache();
+
+            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+        }
+
+        FreqsReady = true;
     }
 
     public static async Task InitializePoS()
@@ -364,43 +436,5 @@ public static class Storage
         }
 
         await JmdictWcLoader.Load().ConfigureAwait(false);
-    }
-
-    public static async Task LoadFrequency()
-    {
-        if (!FreqDicts.ContainsKey(Storage.Frontend.CoreConfig.FrequencyListName))
-        {
-            bool callGc = false;
-            Task? taskNewFreqlist = null;
-            if (Storage.Frontend.CoreConfig.FrequencyListName != "None")
-            {
-                callGc = true;
-                FreqDicts.Clear();
-                FreqDicts.Add(Storage.Frontend.CoreConfig.FrequencyListName,
-                    new Dictionary<string, List<FrequencyEntry>>());
-
-                taskNewFreqlist = Task.Run(async () =>
-                {
-                    FrequencyLoader.BuildFreqDict((await FrequencyLoader
-                        .LoadJson(Storage.FrequencyLists[Storage.Frontend.CoreConfig.FrequencyListName])
-                        .ConfigureAwait(false))!);
-                });
-            }
-
-            else if (FreqDicts.Any())
-            {
-                callGc = true;
-                FreqDicts.Clear();
-            }
-
-            if (callGc)
-            {
-                if (taskNewFreqlist != null)
-                    await taskNewFreqlist.ConfigureAwait(false);
-
-                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-            }
-        }
     }
 }

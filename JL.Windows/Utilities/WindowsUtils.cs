@@ -187,6 +187,15 @@ public static class WindowsUtils
         ManageDictionariesWindow.Instance.ShowDialog();
     }
 
+    public static void ShowManageFrequenciesWindow()
+    {
+        if (!File.Exists(Path.Join(Storage.ConfigPath, "freqs.json")))
+            Utils.CreateDefaultFreqsConfig();
+
+        ManageFrequenciesWindow.Instance.Owner = MainWindow.Instance;
+        ManageFrequenciesWindow.Instance.ShowDialog();
+    }
+
     public static void ShowStatsWindow()
     {
         StatsWindow.Instance.Owner = MainWindow.Instance;

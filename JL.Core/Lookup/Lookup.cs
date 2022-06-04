@@ -171,7 +171,8 @@ public static class Lookup
         List<LookupResult> sortedLookupResults = lookupResults
             .OrderByDescending(dict => dict.FoundForm.Length)
             .ThenBy(dict => dict.Dict?.Priority ?? int.MaxValue)
-            .ThenBy(dict => dict.Frequency).ToList();
+            .ThenBy(dict => dict.Frequencies.Count > 0 ? dict.Frequencies.First().Freq : int.MaxValue)
+            .ToList();
 
         string longestFoundForm = sortedLookupResults.First().FoundForm;
 
@@ -486,7 +487,7 @@ public static class Lookup
                     EdictId = jMDictResult.Id,
                     AlternativeSpellings = jMDictResult.AlternativeSpellings ?? new(),
                     Process = ProcessProcess(wordResult),
-                    Frequency = GetJmdictFreq(jMDictResult),
+                    Frequencies = GetFrequencies(jMDictResult, wordResult.Dict),
                     POrthographyInfoList = jMDictResult.POrthographyInfoList ?? new(),
                     ROrthographyInfoList = rOrthographyInfoList,
                     AOrthographyInfoList = aOrthographyInfoList,
@@ -565,7 +566,7 @@ public static class Lookup
             StrokeCount = kanjiResult.StrokeCount,
             Grade = kanjiResult.Grade,
             Composition = kanjiResult.Composition,
-            Frequency = kanjiResult.Frequency,
+            Frequencies = new () { new(kanjiResults.First().Value.Dict.Name, kanjiResult.Frequency) },
             FoundForm = kanjiResults.First().Value.FoundForm,
             Dict = kanjiResults.First().Value.Dict,
             FormattedDefinitions = kanjiResult.Meanings != null
@@ -594,7 +595,7 @@ public static class Lookup
                     FoundSpelling = epwingResult.PrimarySpelling,
                     FoundForm = wordResult.FoundForm,
                     Process = ProcessProcess(wordResult),
-                    Frequency = GetEpwingFreq(epwingResult),
+                    Frequencies = GetFrequencies(epwingResult, wordResult.Dict),
                     Dict = wordResult.Dict,
                     Readings = epwingResult.Reading != null
                         ? new List<string> { epwingResult.Reading }
@@ -629,7 +630,7 @@ public static class Lookup
                     AlternativeSpellings = epwingResult.AlternativeSpellings ?? new(),
                     FoundForm = wordResult.FoundForm,
                     Process = ProcessProcess(wordResult),
-                    Frequency = GetEpwingNazekaFreq(epwingResult),
+                    Frequencies = GetFrequencies(epwingResult, wordResult.Dict),
                     Dict = wordResult.Dict,
                     Readings = epwingResult.Reading != null
                         ? new List<string> { epwingResult.Reading }
@@ -657,14 +658,17 @@ public static class Lookup
             for (int i = 0; i < wordResultCount; i++)
             {
                 var customWordDictResult = (CustomWordEntry)wordResult.ResultsList[i];
-                int frequency = GetCustomWordFreq(customWordDictResult);
 
-                if (frequency == int.MaxValue)
-                    frequency = wordResultCount - i;
+                List<LookupFrequencyResult> freqs = GetFrequencies(customWordDictResult, wordResult.Dict);
+                foreach (LookupFrequencyResult freqResult in freqs)
+                {
+                    if (freqResult.Freq == int.MaxValue)
+                        freqResult.Freq = -i;
+                }
 
                 LookupResult result = new()
                 {
-                    Frequency = frequency,
+                    Frequencies = freqs,
                     FoundSpelling = customWordDictResult.PrimarySpelling,
                     FoundForm = wordResult.FoundForm,
                     Process = ProcessProcess(wordResult),
@@ -696,7 +700,7 @@ public static class Lookup
                 {
                     FoundSpelling = customNameDictResult.PrimarySpelling,
                     FoundForm = customNameResult.Value.FoundForm,
-                    Frequency = -i,
+                    Frequencies = new() { new(customNameResult.Value.Dict.Name, -i) },
                     Dict = customNameResult.Value.Dict,
                     Readings = new List<string> { customNameDictResult.Reading },
                     FormattedDefinitions = BuildCustomNameDefinition(customNameDictResult),
@@ -708,23 +712,68 @@ public static class Lookup
         return results;
     }
 
-    private static int GetJmdictFreq(JMdictResult jmdictResult)
+    private static List<LookupFrequencyResult> GetFrequencies(IResult result, Dict dict)
+    {
+        List<LookupFrequencyResult> freqsList = new();
+
+        foreach (Freq freq in Storage.FreqDicts.Values)
+        {
+            if (freq.Active)
+            {
+                switch (dict.Type)
+                {
+                    case DictType.CustomWordDictionary:
+                        freqsList.Add(new(freq.Name, GetCustomWordFreq((CustomWordEntry)result, freq)));
+                        break;
+
+                    case DictType.JMdict:
+                        freqsList.Add(new(freq.Name, GetJmdictFreq((JMdictResult)result, freq)));
+                        break;
+
+                    case DictType.DaijirinNazeka:
+                    case DictType.KenkyuushaNazeka:
+                    case DictType.ShinmeikaiNazeka:
+                    case DictType.NonspecificNazeka:
+                        freqsList.Add(new(freq.Name, GetEpwingNazekaFreq((EpwingNazekaResult)result, freq)));
+                        break;
+
+                    case DictType.Kenkyuusha:
+                    case DictType.Daijirin:
+                    case DictType.Daijisen:
+                    case DictType.Koujien:
+                    case DictType.Meikyou:
+                    case DictType.Gakken:
+                    case DictType.Kotowaza:
+                    case DictType.IwanamiYomichan:
+                    case DictType.JitsuyouYomichan:
+                    case DictType.ShinmeikaiYomichan:
+                    case DictType.NikkokuYomichan:
+                    case DictType.ShinjirinYomichan:
+                    case DictType.OubunshaYomichan:
+                    case DictType.ZokugoYomichan:
+                    case DictType.WeblioKogoYomichan:
+                    case DictType.GakkenYojijukugoYomichan:
+                    case DictType.ShinmeikaiYojijukugoYomichan:
+                    case DictType.NonspecificYomichan:
+                        freqsList.Add(new(freq.Name, GetEpwingFreq((EpwingYomichanResult)result, freq)));
+                        break;
+                }
+            }
+        }
+
+        return freqsList;
+    }
+
+    private static int GetJmdictFreq(JMdictResult jmdictResult, Freq freq)
     {
         int frequency = int.MaxValue;
-
-        Storage.FreqDicts.TryGetValue(Storage.Frontend.CoreConfig.FrequencyListName,
-            out Dictionary<string, List<FrequencyEntry>>? freqDict);
-
-        if (freqDict == null)
-            return frequency;
-
-        if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(jmdictResult.PrimarySpelling),
-                out List<FrequencyEntry>? freqResults))
+        if (freq.Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(jmdictResult.PrimarySpelling),
+                out List<FrequencyRecord>? freqResults))
         {
             int freqResultsCount = freqResults.Count;
             for (int i = 0; i < freqResultsCount; i++)
             {
-                FrequencyEntry freqResult = freqResults[i];
+                FrequencyRecord freqResult = freqResults[i];
 
                 if ((jmdictResult.Readings != null && jmdictResult.Readings.Contains(freqResult.Spelling))
                     || (jmdictResult.Readings == null && jmdictResult.PrimarySpelling == freqResult.Spelling))
@@ -741,13 +790,13 @@ public static class Lookup
                 int alternativeSpellingsCount = jmdictResult.AlternativeSpellings.Count;
                 for (int i = 0; i < alternativeSpellingsCount; i++)
                 {
-                    if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(jmdictResult.AlternativeSpellings[i]),
-                            out List<FrequencyEntry>? alternativeSpellingFreqResults))
+                    if (freq.Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(jmdictResult.AlternativeSpellings[i]),
+                            out List<FrequencyRecord>? alternativeSpellingFreqResults))
                     {
                         int alternativeSpellingFreqResultsCount = alternativeSpellingFreqResults.Count;
                         for (int j = 0; j < alternativeSpellingFreqResultsCount; j++)
                         {
-                            FrequencyEntry alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
+                            FrequencyRecord alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
 
                             if (jmdictResult.Readings != null
                                 && jmdictResult.Readings.Contains(alternativeSpellingFreqResult.Spelling))
@@ -770,13 +819,13 @@ public static class Lookup
             {
                 string reading = jmdictResult.Readings[i];
 
-                if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(reading),
-                        out List<FrequencyEntry>? readingFreqResults))
+                if (freq.Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(reading),
+                        out List<FrequencyRecord>? readingFreqResults))
                 {
                     int readingFreqResultsCount = readingFreqResults.Count;
                     for (int j = 0; j < readingFreqResultsCount; j++)
                     {
-                        FrequencyEntry readingFreqResult = readingFreqResults[j];
+                        FrequencyRecord readingFreqResult = readingFreqResults[j];
 
                         if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading)
                             || (jmdictResult.AlternativeSpellings != null
@@ -795,23 +844,17 @@ public static class Lookup
         return frequency;
     }
 
-    private static int GetEpwingNazekaFreq(EpwingNazekaResult epwingNazekaResult)
+    private static int GetEpwingNazekaFreq(EpwingNazekaResult epwingNazekaResult, Freq freq)
     {
         int frequency = int.MaxValue;
 
-        Storage.FreqDicts.TryGetValue(Storage.Frontend.CoreConfig.FrequencyListName,
-            out Dictionary<string, List<FrequencyEntry>>? freqDict);
-
-        if (freqDict == null)
-            return frequency;
-
-        if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingNazekaResult.PrimarySpelling),
-                out List<FrequencyEntry>? freqResults))
+        if (freq.Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingNazekaResult.PrimarySpelling),
+                out List<FrequencyRecord>? freqResults))
         {
             int freqResultsCount = freqResults.Count;
             for (int i = 0; i < freqResultsCount; i++)
             {
-                FrequencyEntry freqResult = freqResults[i];
+                FrequencyRecord freqResult = freqResults[i];
 
                 if ((epwingNazekaResult.Reading == freqResult.Spelling)
                     || (epwingNazekaResult.Reading == null &&
@@ -829,14 +872,14 @@ public static class Lookup
                 int alternativeSpellingsCount = epwingNazekaResult.AlternativeSpellings.Count;
                 for (int i = 0; i < alternativeSpellingsCount; i++)
                 {
-                    if (freqDict.TryGetValue(
+                    if (freq.Contents.TryGetValue(
                             Kana.KatakanaToHiraganaConverter(epwingNazekaResult.AlternativeSpellings[i]),
-                            out List<FrequencyEntry>? alternativeSpellingFreqResults))
+                            out List<FrequencyRecord>? alternativeSpellingFreqResults))
                     {
                         int alternativeSpellingFreqResultsCount = alternativeSpellingFreqResults.Count;
                         for (int j = 0; j < alternativeSpellingFreqResultsCount; j++)
                         {
-                            FrequencyEntry alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
+                            FrequencyRecord alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
 
                             if (epwingNazekaResult.Reading == alternativeSpellingFreqResult.Spelling)
                             {
@@ -855,13 +898,13 @@ public static class Lookup
         {
             string reading = epwingNazekaResult.Reading;
 
-            if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(reading),
-                    out List<FrequencyEntry>? readingFreqResults))
+            if (freq.Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(reading),
+                    out List<FrequencyRecord>? readingFreqResults))
             {
                 int readingFreqResultsCount = readingFreqResults.Count;
                 for (int j = 0; j < readingFreqResultsCount; j++)
                 {
-                    FrequencyEntry readingFreqResult = readingFreqResults[j];
+                    FrequencyRecord readingFreqResult = readingFreqResults[j];
 
                     if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading)
                         || (epwingNazekaResult.AlternativeSpellings != null
@@ -879,23 +922,17 @@ public static class Lookup
         return frequency;
     }
 
-    private static int GetEpwingFreq(EpwingYomichanResult epwingYomichanResult)
+    private static int GetEpwingFreq(EpwingYomichanResult epwingYomichanResult, Freq freq)
     {
         int frequency = int.MaxValue;
 
-        Storage.FreqDicts.TryGetValue(Storage.Frontend.CoreConfig.FrequencyListName,
-            out Dictionary<string, List<FrequencyEntry>>? freqDict);
-
-        if (freqDict == null)
-            return frequency;
-
-        if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingYomichanResult.PrimarySpelling),
-                out List<FrequencyEntry>? freqResults))
+        if (freq.Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingYomichanResult.PrimarySpelling),
+                out List<FrequencyRecord>? freqResults))
         {
             int freqResultsCount = freqResults.Count;
             for (int i = 0; i < freqResultsCount; i++)
             {
-                FrequencyEntry freqResult = freqResults[i];
+                FrequencyRecord freqResult = freqResults[i];
 
                 if (epwingYomichanResult.Reading == freqResult.Spelling
                     || (string.IsNullOrEmpty(epwingYomichanResult.Reading)
@@ -910,13 +947,13 @@ public static class Lookup
         }
 
         else if (!string.IsNullOrEmpty(epwingYomichanResult.Reading)
-                 && freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingYomichanResult.Reading),
-                     out List<FrequencyEntry>? readingFreqResults))
+                 && freq.Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(epwingYomichanResult.Reading),
+                     out List<FrequencyRecord>? readingFreqResults))
         {
             int readingFreqResultsCount = readingFreqResults.Count;
             for (int i = 0; i < readingFreqResultsCount; i++)
             {
-                FrequencyEntry readingFreqResult = readingFreqResults[i];
+                FrequencyRecord readingFreqResult = readingFreqResults[i];
 
                 if (epwingYomichanResult.Reading == readingFreqResult.Spelling && Kana.IsKatakana(epwingYomichanResult.Reading))
                 {
@@ -931,23 +968,17 @@ public static class Lookup
         return frequency;
     }
 
-    private static int GetCustomWordFreq(CustomWordEntry customWordResult)
+    private static int GetCustomWordFreq(CustomWordEntry customWordResult, Freq freq)
     {
         int frequency = int.MaxValue;
 
-        Storage.FreqDicts.TryGetValue(Storage.Frontend.CoreConfig.FrequencyListName,
-            out Dictionary<string, List<FrequencyEntry>>? freqDict);
-
-        if (freqDict == null)
-            return frequency;
-
-        if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(customWordResult.PrimarySpelling),
-                out List<FrequencyEntry>? freqResults))
+        if (freq.Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(customWordResult.PrimarySpelling),
+                out List<FrequencyRecord>? freqResults))
         {
             int freqResultsCount = freqResults.Count;
             for (int i = 0; i < freqResultsCount; i++)
             {
-                FrequencyEntry freqResult = freqResults[i];
+                FrequencyRecord freqResult = freqResults[i];
 
                 if (customWordResult.Readings != null && customWordResult.Readings.Contains(freqResult.Spelling)
                     || (customWordResult.Readings == null
@@ -965,14 +996,14 @@ public static class Lookup
                 int alternativeSpellingsCount = customWordResult.AlternativeSpellings.Count;
                 for (int i = 0; i < alternativeSpellingsCount; i++)
                 {
-                    if (freqDict.TryGetValue(
+                    if (freq.Contents.TryGetValue(
                             Kana.KatakanaToHiraganaConverter(customWordResult.AlternativeSpellings[i]),
-                            out List<FrequencyEntry>? alternativeSpellingFreqResults))
+                            out List<FrequencyRecord>? alternativeSpellingFreqResults))
                     {
                         int alternativeSpellingFreqResultsCount = alternativeSpellingFreqResults.Count;
                         for (int j = 0; j < alternativeSpellingFreqResultsCount; j++)
                         {
-                            FrequencyEntry alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
+                            FrequencyRecord alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
 
                             if (customWordResult.Readings != null
                                 && customWordResult.Readings.Contains(alternativeSpellingFreqResult.Spelling)
@@ -996,13 +1027,13 @@ public static class Lookup
             {
                 string reading = customWordResult.Readings[i];
 
-                if (freqDict.TryGetValue(Kana.KatakanaToHiraganaConverter(reading),
-                        out List<FrequencyEntry>? readingFreqResults))
+                if (freq.Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(reading),
+                        out List<FrequencyRecord>? readingFreqResults))
                 {
                     int readingFreqResultsCount = readingFreqResults.Count;
                     for (int j = 0; j < readingFreqResultsCount; j++)
                     {
-                        FrequencyEntry readingFreqResult = readingFreqResults[j];
+                        FrequencyRecord readingFreqResult = readingFreqResults[j];
 
                         if ((reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
                             || (customWordResult.AlternativeSpellings != null

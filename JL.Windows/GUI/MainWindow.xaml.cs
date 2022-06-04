@@ -122,7 +122,7 @@ public partial class MainWindow : Window, IFrontend
                     Stats.IncrementStat(StatType.Characters, new StringInfo(text).LengthInTextElements);
                     Stats.IncrementStat(StatType.Lines);
 
-                    if (Storage.Ready && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic
+                    if (Storage.DictsReady && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic && Storage.FreqsReady
                         && ConfigManager.Precaching && MainTextBox!.Text.Length < Storage.CacheSize)
                     {
                         Dispatcher.Invoke(DispatcherPriority.Render, delegate () { }); // let MainTextBox text update
@@ -384,19 +384,19 @@ public partial class MainWindow : Window, IFrontend
 
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
         {
-            if (Storage.Ready)
+            if (Storage.DictsReady)
                 WindowsUtils.ShowAddNameWindow(MainTextBox!.SelectedText);
         }
 
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
         {
-            if (Storage.Ready)
+            if (Storage.DictsReady)
                 WindowsUtils.ShowAddWordWindow(MainTextBox!.SelectedText);
         }
 
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
         {
-            if (Storage.Ready
+            if (Storage.DictsReady
                 && !Storage.UpdatingJMdict
                 && !Storage.UpdatingJMnedict
                 && !Storage.UpdatingKanjidic)
@@ -459,6 +459,11 @@ public partial class MainWindow : Window, IFrontend
     private void ShowManageDictionariesWindow(object sender, RoutedEventArgs e)
     {
         WindowsUtils.ShowManageDictionariesWindow();
+    }
+
+    private void ShowManageFrequenciesWindow(object sender, RoutedEventArgs e)
+    {
+        WindowsUtils.ShowManageFrequenciesWindow();
     }
 
     private void ShowStats(object sender, RoutedEventArgs e)
@@ -528,13 +533,15 @@ public partial class MainWindow : Window, IFrontend
 
     private void MainTextBox_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
-        ManageDictionariesButton!.IsEnabled = Storage.Ready
+        ManageDictionariesButton!.IsEnabled = Storage.DictsReady
                                               && !Storage.UpdatingJMdict
                                               && !Storage.UpdatingJMnedict
                                               && !Storage.UpdatingKanjidic;
 
-        AddNameButton!.IsEnabled = Storage.Ready;
-        AddWordButton!.IsEnabled = Storage.Ready;
+        ManageFrequenciesButton!.IsEnabled = Storage.FreqsReady;
+
+        AddNameButton!.IsEnabled = Storage.DictsReady;
+        AddWordButton!.IsEnabled = Storage.DictsReady;
     }
 
     private void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

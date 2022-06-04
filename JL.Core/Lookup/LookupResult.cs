@@ -6,7 +6,7 @@ public class LookupResult
 {
     // common (required for sorting)
     public string FoundForm { get; init; } // todo rename foundform to foundtext
-    public int Frequency { get; init; }
+    public List<LookupFrequencyResult> Frequencies { get; init; }
     public Dict? Dict { get; init; }
     public string FoundSpelling { get; init; }
 
@@ -29,7 +29,7 @@ public class LookupResult
 
     public LookupResult()
     {
-        Frequency = int.MaxValue;
+        Frequencies = new List<LookupFrequencyResult>();
         StrokeCount = 0;
         Grade = 0;
         FoundForm = string.Empty;

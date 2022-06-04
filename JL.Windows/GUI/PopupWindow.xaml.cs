@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -372,7 +373,7 @@ public partial class PopupWindow : Window
         GenerateDictTypeButtons();
 
         // we might cache incomplete results if we don't wait until all dicts are loaded
-        if (text != null && Storage.Ready && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic)
+        if (text != null && Storage.DictsReady && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic)
         {
             StackPanelCache.AddReplace(text, ResultStackPanels.ToArray());
         }
@@ -427,12 +428,34 @@ public partial class PopupWindow : Window
         TextBlock? textBlockGrade = null;
         TextBlock? textBlockComposition = null;
 
-        if (result.Frequency != int.MaxValue && result.Frequency > 0)
+        if (result.Frequencies.Count > 0 && result.Frequencies[0].Freq > 0 && result.Frequencies[0].Freq != int.MaxValue)
         {
+            string freqStr;
+
+            if (result.Frequencies.Count == 1)
+            {
+                freqStr = "#" + result.Frequencies.First().Freq;
+            }
+
+            else
+            {
+                StringBuilder freqStrBuilder = new();
+                foreach (LookupFrequencyResult lookupFreqResult in result.Frequencies)
+                {
+                    freqStrBuilder.Append(lookupFreqResult.Name);
+                    freqStrBuilder.Append(": #");
+                    freqStrBuilder.Append(lookupFreqResult.Freq);
+                    freqStrBuilder.Append(", ");
+                }
+                freqStrBuilder.Remove(freqStrBuilder.Length - 2, 1);
+
+                freqStr = freqStrBuilder.ToString();
+            }
+
             textBlockFrequency = new TextBlock
             {
-                Name = nameof(result.Frequency),
-                Text = "#" + result.Frequency,
+                Name = nameof(result.Frequencies),
+                Text = freqStr,
                 Foreground = ConfigManager.FrequencyColor,
                 FontSize = ConfigManager.FrequencyFontSize,
                 Margin = new Thickness(5, 0, 0, 0),
@@ -1042,8 +1065,8 @@ public partial class PopupWindow : Window
 
     private void TextBoxPreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
-        AddNameButton!.IsEnabled = Storage.Ready;
-        AddWordButton!.IsEnabled = Storage.Ready;
+        AddNameButton!.IsEnabled = Storage.DictsReady;
+        AddWordButton!.IsEnabled = Storage.DictsReady;
 
         _lastSelectedText = ((TextBox)sender).SelectedText;
     }
@@ -1151,7 +1174,7 @@ public partial class PopupWindow : Window
                         case nameof(LookupResult.EdictId):
                             miningParams[JLField.EdictId] = ch.Text;
                             break;
-                        case nameof(LookupResult.Frequency):
+                        case nameof(LookupResult.Frequencies):
                             miningParams[JLField.Frequency] = ch.Text;
                             break;
                         case nameof(LookupResult.Dict.Name):
@@ -1341,12 +1364,12 @@ public partial class PopupWindow : Window
         }
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
         {
-            if (Storage.Ready)
+            if (Storage.DictsReady)
                 WindowsUtils.ShowAddNameWindow(_lastSelectedText);
         }
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
         {
-            if (Storage.Ready)
+            if (Storage.DictsReady)
                 WindowsUtils.ShowAddWordWindow(_lastSelectedText);
         }
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))

@@ -150,7 +150,7 @@ public partial class ManageDictionariesWindow : Window
                 Background = Brushes.Red,
                 BorderThickness = new Thickness(1),
                 Visibility = Storage.BuiltInDicts.Values
-                    .Select(t => t.Type).ToList().Contains(dict.Type)
+                    .Select(t => t.Name).ToList().Contains(dict.Name)
                     ? Visibility.Collapsed
                     : Visibility.Visible,
             };

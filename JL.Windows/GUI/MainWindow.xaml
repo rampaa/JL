@@ -56,6 +56,10 @@
                         Header="Stats"
                         Click="ShowStats" />
                     <MenuItem
+                        Name="ManageFrequenciesButton"
+                        Header="Manage frequencies"
+                        Click="ShowManageFrequenciesWindow" />
+                    <MenuItem
                         Name="ManageDictionariesButton"
                         Header="Manage dictionaries"
                         Click="ShowManageDictionariesWindow" />

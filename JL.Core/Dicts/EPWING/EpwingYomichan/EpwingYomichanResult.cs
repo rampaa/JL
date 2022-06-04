@@ -32,6 +32,7 @@ public class EpwingYomichanResult : IResult
         //jsonElement[4].TryGetInt32(out int score);
         //Score = score;
 
+        //TODO Grammar Dicts?
         Definitions = jsonElement[5].ToString()[2..^2]
             .Split("\\n", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Replace("\\\"", "\"")).ToList();
 

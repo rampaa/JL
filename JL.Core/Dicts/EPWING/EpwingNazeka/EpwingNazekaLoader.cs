@@ -145,7 +145,7 @@ internal static class EpwingNazekaLoader
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException(nameof(dict), dict.Type, null);
+                throw new ArgumentOutOfRangeException(nameof(dict), dict.Name, null);
         }
 
         return true;

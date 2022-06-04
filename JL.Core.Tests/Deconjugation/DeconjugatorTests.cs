@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text.Encodings.Web;
+using System.Text.Json;
 using JL.Core.Deconjugation;
 using NUnit.Framework;
 
@@ -7,6 +8,11 @@ namespace JL.Core.Tests.Deconjugation;
 [TestFixture]
 public class DeconjugatorTests
 {
+    public readonly JsonSerializerOptions JsoUnsafeEscaping = new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
+
     [Test]
     public void Deconjugate_わからない()
     {
@@ -16,7 +22,7 @@ public class DeconjugatorTests
 
         // Act
         HashSet<Form> result = Deconjugator.Deconjugate("わからない");
-        string actual = JsonSerializer.Serialize(result, Storage.JsoUnsafeEscaping);
+        string actual = JsonSerializer.Serialize(result, JsoUnsafeEscaping);
 
         // Assert
         StringAssert.AreEqualIgnoringCase(expected, actual);
@@ -31,7 +37,7 @@ public class DeconjugatorTests
 
         // Act
         HashSet<Form> result = Deconjugator.Deconjugate("このスレってよくなくなくなくなくなくなくなくないじゃなくなくなくなくない");
-        string actual = JsonSerializer.Serialize(result, Storage.JsoUnsafeEscaping);
+        string actual = JsonSerializer.Serialize(result, JsoUnsafeEscaping);
 
         // Assert
         StringAssert.AreEqualIgnoringCase(expected, actual);

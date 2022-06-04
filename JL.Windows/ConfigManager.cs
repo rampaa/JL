@@ -107,6 +107,9 @@ public class ConfigManager : CoreConfig
     public static KeyGesture ShowManageDictionariesWindowKeyGesture { get; private set; } =
         new(Key.D, ModifierKeys.Windows);
 
+    public static KeyGesture ShowManageFrequenciesWindowKeyGesture { get; private set; } =
+        new(Key.F, ModifierKeys.Windows);
+
     public static KeyGesture ShowPreferencesWindowKeyGesture { get; private set; } = new(Key.L, ModifierKeys.Windows);
     public static KeyGesture ShowAddNameWindowKeyGesture { get; private set; } = new(Key.N, ModifierKeys.Windows);
     public static KeyGesture ShowAddWordWindowKeyGesture { get; private set; } = new(Key.W, ModifierKeys.Windows);
@@ -138,17 +141,7 @@ public class ConfigManager : CoreConfig
     {
         MainWindow mainWindow = MainWindow.Instance;
 
-        string? tempStr = ConfigurationManager.AppSettings.Get("FrequencyListName");
-
-        if (tempStr == null)
-        {
-            tempStr = "VN";
-            WindowsUtils.AddToConfig("FrequencyListName", tempStr);
-        }
-
-        FrequencyListName = tempStr;
-
-        tempStr = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
+        string? tempStr = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
         if (tempStr == null)
         {
             tempStr = "http://localhost:8765";
@@ -395,6 +388,10 @@ public class ConfigManager : CoreConfig
             WindowsUtils.KeyGestureSetter("ShowManageDictionariesWindowKeyGesture",
                 ShowManageDictionariesWindowKeyGesture);
 
+        ShowManageFrequenciesWindowKeyGesture =
+            WindowsUtils.KeyGestureSetter("ShowManageFrequenciesWindowKeyGesture",
+                ShowManageFrequenciesWindowKeyGesture);
+
         ShowPreferencesWindowKeyGesture =
             WindowsUtils.KeyGestureSetter("ShowPreferencesWindowKeyGesture", ShowPreferencesWindowKeyGesture);
         ShowAddNameWindowKeyGesture =
@@ -428,6 +425,7 @@ public class ConfigManager : CoreConfig
         WindowsUtils.SetInputGestureText(mainWindow.SearchButton, SearchWithBrowserKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.PreferencesButton, ShowPreferencesWindowKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.ManageDictionariesButton, ShowManageDictionariesWindowKeyGesture);
+        WindowsUtils.SetInputGestureText(mainWindow.ManageFrequenciesButton, ShowManageFrequenciesWindowKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.StatsButton, ShowStatsKeyGesture);
 
         WindowsUtils.Try(() => mainWindow.OpacitySlider.Value = double.Parse(ConfigurationManager
@@ -528,8 +526,6 @@ public class ConfigManager : CoreConfig
 
             currentPopupWindow = currentPopupWindow.ChildPopupWindow;
         }
-
-        Storage.LoadFrequency().ConfigureAwait(false);
     }
 
     public void LoadPreferences(PreferencesWindow preferenceWindow)
@@ -546,6 +542,8 @@ public class ConfigManager : CoreConfig
 
         preferenceWindow.ShowManageDictionariesWindowKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(ShowManageDictionariesWindowKeyGesture);
+        preferenceWindow.ShowManageFrequenciesWindowKeyGestureTextBox.Text =
+            WindowsUtils.KeyGestureToString(ShowManageFrequenciesWindowKeyGesture);
         preferenceWindow.ShowPreferencesWindowKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(ShowPreferencesWindowKeyGesture);
         preferenceWindow.ShowAddNameWindowKeyGestureTextBox.Text =
@@ -587,8 +585,6 @@ public class ConfigManager : CoreConfig
         preferenceWindow.PrecachingCheckBox.IsChecked = Precaching;
 
         preferenceWindow.AnkiIntegrationCheckBox.IsChecked = AnkiIntegration;
-        preferenceWindow.FrequencyListComboBox.ItemsSource = Storage.FrequencyLists.Keys;
-        preferenceWindow.FrequencyListComboBox.SelectedItem = FrequencyListName;
         preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
 
         preferenceWindow.MainWindowHeightNumericUpDown.Value = MainWindowHeight;
@@ -673,6 +669,8 @@ public class ConfigManager : CoreConfig
 
         WindowsUtils.KeyGestureSaver("ShowManageDictionariesWindowKeyGesture",
             preferenceWindow.ShowManageDictionariesWindowKeyGestureTextBox.Text);
+        WindowsUtils.KeyGestureSaver("ShowManageFrequenciesWindowKeyGesture",
+            preferenceWindow.ShowManageFrequenciesWindowKeyGestureTextBox.Text);
         WindowsUtils.KeyGestureSaver("ShowPreferencesWindowKeyGesture",
             preferenceWindow.ShowPreferencesWindowKeyGestureTextBox.Text);
         WindowsUtils.KeyGestureSaver("ShowAddNameWindowKeyGesture",
@@ -727,8 +725,6 @@ public class ConfigManager : CoreConfig
             preferenceWindow.MainWindowFontComboBox.SelectedValue.ToString();
         config.AppSettings.Settings["PopupFont"].Value =
             preferenceWindow.PopupFontComboBox.SelectedValue.ToString();
-        config.AppSettings.Settings["FrequencyListName"].Value =
-            preferenceWindow.FrequencyListComboBox.SelectedValue.ToString();
 
         config.AppSettings.Settings["KanjiMode"].Value =
             preferenceWindow.KanjiModeCheckBox.IsChecked.ToString();

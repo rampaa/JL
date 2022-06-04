@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Timers;
 using JL.Core.Dicts;
+using JL.Core.Frequency;
 using JL.Core.Network;
 using Serilog;
 using Serilog.Core;
@@ -49,6 +50,27 @@ public static class Utils
         }
     }
 
+    public static void CreateDefaultFreqsConfig()
+    {
+        var jso = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            Converters = { new JsonStringEnumConverter(), }
+        };
+
+        try
+        {
+            Directory.CreateDirectory(Storage.ConfigPath);
+            File.WriteAllText(Path.Join(Storage.ConfigPath, "freqs.json"),
+                JsonSerializer.Serialize(Storage.BuiltInFreqs, jso));
+        }
+        catch (Exception e)
+        {
+            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't write default Freqs config");
+            Logger.Error(e, "Couldn't write default Freqs config");
+        }
+    }
+
     public static void SerializeDicts()
     {
         try
@@ -66,6 +88,27 @@ public static class Utils
         catch (Exception e)
         {
             Logger.Fatal(e, "SerializeDicts failed");
+            throw;
+        }
+    }
+
+    public static void SerializeFreqs()
+    {
+        try
+        {
+            var jso = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Converters = { new JsonStringEnumConverter(), },
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            };
+
+            File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "freqs.json"),
+                JsonSerializer.Serialize(Storage.FreqDicts, jso));
+        }
+        catch (Exception e)
+        {
+            Logger.Fatal(e, "SerializeFreqs failed");
             throw;
         }
     }
@@ -118,6 +161,40 @@ public static class Utils
         catch (Exception e)
         {
             Utils.Logger.Fatal(e, "DeserializeDicts failed");
+            throw;
+        }
+    }
+
+    private static async Task DeserializeFreqs()
+    {
+        try
+        {
+            var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(), } };
+
+            Dictionary<string, Freq>? deserializedFreqs = await JsonSerializer
+                .DeserializeAsync<Dictionary<string, Freq>>(
+                    new StreamReader(Path.Join(Storage.ConfigPath, "freqs.json")).BaseStream, jso)
+                .ConfigureAwait(false);
+
+            if (deserializedFreqs != null)
+            {
+                foreach (Freq freq in deserializedFreqs.Values)
+                {
+                    if (!Storage.FreqDicts.ContainsKey(freq.Name))
+                    {
+                        Storage.FreqDicts.Add(freq.Name, freq);
+                    }
+                }
+            }
+            else
+            {
+                Storage.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/freqs.json");
+                Utils.Logger.Error("Couldn't load Config/freqs.json");
+            }
+        }
+        catch (Exception e)
+        {
+            Utils.Logger.Fatal(e, "DeserializeFreqs failed");
             throw;
         }
     }
@@ -268,6 +345,9 @@ public static class Utils
         if (!File.Exists($"{Storage.ConfigPath}/dicts.json"))
             Utils.CreateDefaultDictsConfig();
 
+        if (!File.Exists($"{Storage.ConfigPath}/freqs.json"))
+            Utils.CreateDefaultFreqsConfig();
+
         if (!File.Exists($"{Storage.ResourcesPath}/custom_words.txt"))
             File.Create($"{Storage.ResourcesPath}/custom_words.txt").Dispose();
 
@@ -286,6 +366,9 @@ public static class Utils
                 }
             ).ConfigureAwait(false);
         }).ConfigureAwait(false);
+
+        DeserializeFreqs().ContinueWith(_ => Storage.LoadFrequencies().ConfigureAwait(false))
+            .ConfigureAwait(false);
     }
 
     private static void SetTimer()
