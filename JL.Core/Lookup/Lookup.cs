@@ -566,7 +566,7 @@ public static class Lookup
             StrokeCount = kanjiResult.StrokeCount,
             Grade = kanjiResult.Grade,
             Composition = kanjiResult.Composition,
-            Frequencies = new () { new(kanjiResults.First().Value.Dict.Name, kanjiResult.Frequency) },
+            Frequencies = new() { new(kanjiResults.First().Value.Dict.Name, kanjiResult.Frequency) },
             FoundForm = kanjiResults.First().Value.FoundForm,
             Dict = kanjiResults.First().Value.Dict,
             FormattedDefinitions = kanjiResult.Meanings != null
