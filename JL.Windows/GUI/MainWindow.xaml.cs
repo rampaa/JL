@@ -405,6 +405,14 @@ public partial class MainWindow : Window, IFrontend
             }
         }
 
+        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowManageFrequenciesWindowKeyGesture))
+        {
+            if (Storage.FreqsReady)
+            {
+                WindowsUtils.ShowManageFrequenciesWindow();
+            }
+        }
+
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))
         {
             WindowsUtils.SearchWithBrowser(MainTextBox!.SelectedText);
