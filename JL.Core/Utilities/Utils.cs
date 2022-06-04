@@ -1,5 +1,6 @@
 ﻿using System.Runtime;
 using System.Security.Cryptography;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Timers;
@@ -34,7 +35,7 @@ public static class Utils
         var jso = new JsonSerializerOptions
         {
             WriteIndented = true,
-            Converters = { new JsonStringEnumConverter(), }
+            Converters = { new JsonStringEnumConverter(), },
         };
 
         try
@@ -55,7 +56,7 @@ public static class Utils
         var jso = new JsonSerializerOptions
         {
             WriteIndented = true,
-            Converters = { new JsonStringEnumConverter(), }
+            Converters = { new JsonStringEnumConverter(), },
         };
 
         try
@@ -79,6 +80,7 @@ public static class Utils
             {
                 WriteIndented = true,
                 Converters = { new JsonStringEnumConverter(), },
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             };
 
@@ -99,8 +101,8 @@ public static class Utils
             var jso = new JsonSerializerOptions
             {
                 WriteIndented = true,
-                Converters = { new JsonStringEnumConverter(), },
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             };
 
             File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "freqs.json"),
@@ -117,7 +119,7 @@ public static class Utils
     {
         try
         {
-            var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(), } };
+            var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(), }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
 
             Dictionary<string, Dict>? deserializedDicts = await JsonSerializer
                 .DeserializeAsync<Dictionary<string, Dict>>(
@@ -169,7 +171,7 @@ public static class Utils
     {
         try
         {
-            var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(), } };
+            var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(), }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
 
             Dictionary<string, Freq>? deserializedFreqs = await JsonSerializer
                 .DeserializeAsync<Dictionary<string, Freq>>(

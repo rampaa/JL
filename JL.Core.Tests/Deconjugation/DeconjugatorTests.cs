@@ -8,11 +8,6 @@ namespace JL.Core.Tests.Deconjugation;
 [TestFixture]
 public class DeconjugatorTests
 {
-    public readonly JsonSerializerOptions JsoUnsafeEscaping = new()
-    {
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-    };
-
     [Test]
     public void Deconjugate_わからない()
     {
@@ -22,7 +17,7 @@ public class DeconjugatorTests
 
         // Act
         HashSet<Form> result = Deconjugator.Deconjugate("わからない");
-        string actual = JsonSerializer.Serialize(result, JsoUnsafeEscaping);
+        string actual = JsonSerializer.Serialize(result, new JsonSerializerOptions() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
 
         // Assert
         StringAssert.AreEqualIgnoringCase(expected, actual);
@@ -37,7 +32,7 @@ public class DeconjugatorTests
 
         // Act
         HashSet<Form> result = Deconjugator.Deconjugate("このスレってよくなくなくなくなくなくなくなくないじゃなくなくなくなくない");
-        string actual = JsonSerializer.Serialize(result, JsoUnsafeEscaping);
+        string actual = JsonSerializer.Serialize(result, new JsonSerializerOptions() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
 
         // Assert
         StringAssert.AreEqualIgnoringCase(expected, actual);
