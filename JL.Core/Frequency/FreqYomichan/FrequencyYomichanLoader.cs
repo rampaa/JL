@@ -40,9 +40,9 @@ public class FrequencyYomichanLoader
                 {
                     reading = readingValue.ToString();
                     JsonElement freqElement = thirdElement.GetProperty("frequency");
-                    if (freqElement.TryGetInt32(out int freqValue))
+                    if (freqElement.ValueKind == JsonValueKind.Number)
                     {
-                        frequency = freqValue;
+                        frequency = freqElement.GetInt32();
                     }
 
                     else

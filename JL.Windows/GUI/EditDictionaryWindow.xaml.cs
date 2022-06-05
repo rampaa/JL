@@ -69,6 +69,15 @@ public partial class EditDictionaryWindow : Window
 
             _dict.Name = name;
 
+            foreach (KeyValuePair<string, Dict> builtInDicts in Storage.BuiltInDicts)
+            {
+                if (builtInDicts.Value.Type == _dict.Type)
+                {
+                    builtInDicts.Value.Name = name;
+                    break;
+                }
+            }
+
             Core.Dicts.Options.DictOptions options = _dictOptionsControl.GetDictOptions(_dict.Type);
             _dict.Options = options;
             Storage.Frontend.InvalidateDisplayCache();
