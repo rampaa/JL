@@ -69,9 +69,6 @@ public static class EpwingYomichanLoader
                 return false;
         }
 
-        if (!Storage.JapaneseRegex.IsMatch(yomichanResult.PrimarySpelling))
-            return false;
-
         switch (dict.Type)
         {
             case DictType.Kenkyuusha:
@@ -142,6 +139,11 @@ public static class EpwingYomichanLoader
                     }
                 }
 
+                if (yomichanResult.Definitions != null)
+                {
+                    yomichanResult.Definitions = yomichanResult.Definitions?.Select(def => def.Replace("┏", "")).ToList();
+                }
+
                 break;
             case DictType.Daijirin:
                 if (yomichanResult.Definitions != null)
@@ -154,7 +156,6 @@ public static class EpwingYomichanLoader
                     if (!yomichanResult.Definitions.Any(def => Storage.JapaneseRegex.IsMatch(def)))
                         return false;
                 }
-
                 break;
 
             case DictType.Daijisen:
