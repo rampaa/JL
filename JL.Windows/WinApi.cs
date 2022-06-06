@@ -16,6 +16,10 @@ public class WinApi
         internal const int WM_NCCALCSIZE = 0x0083;
         internal const int WVR_VALIDRECTS = 0x0400;
         internal const int WM_NCHITTEST = 0x0084;
+        internal const int SWP_NOSIZE = 0x0001;
+        internal const int SWP_NOMOVE = 0x0002;
+        internal const int SWP_SHOWWINDOW = 0x0040;
+        public static readonly IntPtr HWND_TOPMOST = new(-1);
 
         //RECT Structure
         [StructLayout(LayoutKind.Sequential)]
@@ -48,6 +52,9 @@ public class WinApi
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         internal static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        internal static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
     }
 
     private enum ResizeDirection
@@ -122,6 +129,11 @@ public class WinApi
         }
 
         NativeMethods.SendMessage(_windowHandle, NativeMethods.WM_SYSCOMMAND, wParam, IntPtr.Zero);
+    }
+
+    public void KeepTopmost()
+    {
+        NativeMethods.SetWindowPos(_windowHandle, NativeMethods.HWND_TOPMOST, 0, 0, 0, 0, NativeMethods.SWP_NOMOVE | NativeMethods.SWP_NOSIZE | NativeMethods.SWP_SHOWWINDOW);
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)

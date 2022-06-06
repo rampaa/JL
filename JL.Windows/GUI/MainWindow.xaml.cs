@@ -207,6 +207,8 @@ public partial class MainWindow : Window, IFrontend
             _lastClipboardChangeTime = currentTime;
             CopyFromClipboard();
         }
+
+        _winApi?.KeepTopmost();
     }
 
     public void MainTextBox_MouseMove(object? sender, MouseEventArgs? e)
