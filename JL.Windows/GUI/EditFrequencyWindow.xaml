@@ -23,7 +23,8 @@
             </WrapPanel>
 
             <TextBlock Foreground="White" Text="Name" TextWrapping="Wrap" Margin="0,0,0,10" />
-            <TextBox Name="NameTextBox" Width="285" Margin="10" HorizontalAlignment="Left" />
+            <TextBox Name="NameTextBox" Width="285" Margin="10" HorizontalAlignment="Left"
+                     Cursor="Help" ToolTip="Frequency dictionary name must be unique"/>
 
         </StackPanel>
 

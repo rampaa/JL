@@ -10,8 +10,8 @@ using Caching;
 using JL.Core;
 using JL.Core.Anki;
 using JL.Core.Dicts;
-using JL.Core.Dicts.Kanjium;
 using JL.Core.Lookup;
+using JL.Core.Pitch;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 
@@ -818,7 +818,8 @@ public partial class PopupWindow : Window
 
                 if ((textBlock.Name is "FoundSpelling" or "Readings"))
                 {
-                    if (Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.Kanjium)?.Active ?? false)
+                    Dict? pitchDict = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.Kanjium);
+                    if (pitchDict?.Active ?? false)
                     {
                         List<string>? readings = result.Readings;
 
@@ -826,6 +827,7 @@ public partial class PopupWindow : Window
                         {
                             top.Children.Add(textBlock);
                         }
+
                         else
                         {
                             Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling,
@@ -833,7 +835,7 @@ public partial class PopupWindow : Window
                                 readings ?? new(),
                                 textBlock.Text.Split(", ").ToList(),
                                 textBlock.Margin.Left,
-                                result.Dict!);
+                                pitchDict);
 
                             if (pitchAccentGrid.Children.Count == 0)
                             {
@@ -970,11 +972,11 @@ public partial class PopupWindow : Window
 
             if (dict.Contents.TryGetValue(normalizedExpression, out List<IResult>? kanjiumResultList))
             {
-                KanjiumResult? chosenKanjiumResult = null;
+                PitchResult? chosenKanjiumResult = null;
 
                 for (int j = 0; j < kanjiumResultList.Count; j++)
                 {
-                    var kanjiumResult = (KanjiumResult)kanjiumResultList[j];
+                    var kanjiumResult = (PitchResult)kanjiumResultList[j];
 
                     if (!hasReading || (kanjiumResult.Reading != null &&
                                         normalizedExpression ==

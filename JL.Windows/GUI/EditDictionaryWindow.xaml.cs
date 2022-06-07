@@ -70,6 +70,12 @@ public partial class EditDictionaryWindow : Window
             _dict.Name = name;
 
             Core.Dicts.Options.DictOptions options = _dictOptionsControl.GetDictOptions(_dict.Type);
+
+            if (_dict.Options?.Examples?.Value != options?.Examples?.Value)
+            {
+                _dict.Contents.Clear();
+            }
+
             _dict.Options = options;
             Storage.Frontend.InvalidateDisplayCache();
 
@@ -79,7 +85,7 @@ public partial class EditDictionaryWindow : Window
 
     private void BrowseForDictionaryFile(string filter)
     {
-        OpenFileDialog openFileDialog = new() { InitialDirectory = Storage.ApplicationPath, Filter = filter };
+        OpenFileDialog openFileDialog = new() { InitialDirectory = File.Exists(TextBlockPath.Text) ? new FileInfo(TextBlockPath.Text).Directory!.FullName : Storage.ApplicationPath, Filter = filter };
 
         if (openFileDialog.ShowDialog() == true)
         {
@@ -90,7 +96,7 @@ public partial class EditDictionaryWindow : Window
 
     private void BrowseForDictionaryFolder()
     {
-        using var fbd = new FolderBrowserDialog { SelectedPath = Storage.ApplicationPath };
+        using var fbd = new FolderBrowserDialog { SelectedPath = Directory.Exists(TextBlockPath.Text) ? TextBlockPath.Text : Storage.ApplicationPath };
 
         if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK &&
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))

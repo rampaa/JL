@@ -9,11 +9,11 @@ using JL.Core.Dicts.EDICT.JMnedict;
 using JL.Core.Dicts.EDICT.KANJIDIC;
 using JL.Core.Dicts.EPWING.EpwingNazeka;
 using JL.Core.Dicts.EPWING.EpwingYomichan;
-using JL.Core.Dicts.Kanjium;
 using JL.Core.Dicts.Options;
 using JL.Core.Frequency;
 using JL.Core.Frequency.FreqNazeka;
 using JL.Core.Frequency.FreqYomichan;
+using JL.Core.Pitch;
 using JL.Core.PoS;
 using Timer = System.Timers.Timer;
 
@@ -307,7 +307,7 @@ public static class Storage
                     if (dict.Active && !dict.Contents.Any())
                     {
                         tasks.Add(Task.Run(async () =>
-                            await KanjiumLoader.Load(dict).ConfigureAwait(false)));
+                            await PitchLoader.Load(dict).ConfigureAwait(false)));
                     }
 
                     else if (!dict.Active && dict.Contents.Any())

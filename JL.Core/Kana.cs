@@ -197,7 +197,7 @@ public static class Kana
     {
         StringBuilder textInHiragana = new();
 
-        List<string> unicodeCharacters = !char.IsHighSurrogate(text.Last())
+        List<string> unicodeCharacters = !char.IsHighSurrogate(text.LastOrDefault())
             ? text.Normalize(NormalizationForm.FormKC).UnicodeIterator().ToList()
             : text.UnicodeIterator().ToList();
 

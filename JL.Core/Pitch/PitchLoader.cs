@@ -1,8 +1,9 @@
 ﻿using System.Text.Json;
+using JL.Core.Dicts;
 
-namespace JL.Core.Dicts.Kanjium;
+namespace JL.Core.Pitch;
 
-public static class KanjiumLoader
+public static class PitchLoader
 {
     public static async Task Load(Dict dict)
     {
@@ -11,7 +12,7 @@ public static class KanjiumLoader
 
         Dictionary<string, List<IResult>> kanjiumDict = dict.Contents;
 
-        string[] jsonFiles = Directory.GetFiles(dict.Path, "term_meta_bank_*.json");
+        string[] jsonFiles = Directory.GetFiles(dict.Path, "term*bank_*.json");
 
         foreach (string jsonFile in jsonFiles)
         {
@@ -29,7 +30,10 @@ public static class KanjiumLoader
 
             foreach (List<JsonElement> jsonObject in jsonObjects)
             {
-                KanjiumResult newEntry = new(jsonObject);
+                PitchResult newEntry = new(jsonObject);
+
+                if (newEntry.Position == -1)
+                    continue;
 
                 string spellingInHiragana = Kana.KatakanaToHiraganaConverter(newEntry.Spelling);
 
