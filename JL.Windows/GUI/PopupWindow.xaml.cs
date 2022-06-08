@@ -866,7 +866,8 @@ public partial class PopupWindow : Window
 
                 if ((textBox.Name is "FoundSpelling" or "Readings"))
                 {
-                    if (Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.Kanjium)?.Active ?? false)
+                    Dict? pitchDict = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.Kanjium);
+                    if (pitchDict?.Active ?? false)
                     {
                         List<string>? readings = result.Readings;
 
@@ -881,7 +882,7 @@ public partial class PopupWindow : Window
                                 readings ?? new(),
                                 textBox.Text.Split(", ").ToList(),
                                 textBox.Margin.Left,
-                                result.Dict!);
+                                pitchDict);
 
                             if (pitchAccentGrid.Children.Count == 0)
                             {
