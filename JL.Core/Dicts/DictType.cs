@@ -28,8 +28,8 @@ public enum DictType
     Gakken,
     [Description("Kotowaza (Yomichan)")]
     Kotowaza,
-    [Description("Kanjium (Yomichan)")]
-    Kanjium,
+    [Description("Pitch Accent (Yomichan)")]
+    PitchAccentYomichan,
     [Description("Iwanami (Yomichan)")]
     IwanamiYomichan,
     [Description("Jitsuyou (Yomichan)")]
@@ -52,6 +52,7 @@ public enum DictType
     ShinmeikaiYojijukugoYomichan,
     [Description("Nonspecific (Yomichan)")]
     NonspecificYomichan,
+    Kanjium,
 
     // Nazeka Epwing Converter
     [Description("Kenkyuusha (Nazeka)")]

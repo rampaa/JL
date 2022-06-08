@@ -130,14 +130,13 @@ public static class Utils
             {
                 foreach (Dict dict in deserializedDicts.Values)
                 {
-                    if (!Storage.Dicts.ContainsKey(dict.Name))
+                    if (!Storage.ObsoleteDictTypes.Contains(dict.Type) && !Storage.Dicts.ContainsKey(dict.Name))
                     {
                         dict.Contents = dict.Type switch
                         {
                             DictType.JMdict => new Dictionary<string, List<IResult>>(524288), //2022/05/11: 394949
                             DictType.JMnedict => new Dictionary<string, List<IResult>>(1048576), //2022/05/11: 608833
                             DictType.Kanjidic => new Dictionary<string, List<IResult>>(16384), //2022/05/11: 13108
-                            DictType.Kanjium => new Dictionary<string, List<IResult>>(186243),
                             DictType.Kenkyuusha => new Dictionary<string, List<IResult>>(303677),
                             DictType.KenkyuushaNazeka => new Dictionary<string, List<IResult>>(191804),
                             DictType.Daijirin => new Dictionary<string, List<IResult>>(357227),

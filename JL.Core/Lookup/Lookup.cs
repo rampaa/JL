@@ -114,7 +114,7 @@ public static class Lookup
                             deconjugationResultsList, dict));
                         break;
 
-                    case DictType.Kanjium:
+                    case DictType.PitchAccentYomichan:
                         break;
 
                     default:
@@ -341,7 +341,7 @@ public static class Lookup
                             }
                             break;
 
-                        case DictType.Kanjium:
+                        case DictType.PitchAccentYomichan:
                             break;
 
                         default:

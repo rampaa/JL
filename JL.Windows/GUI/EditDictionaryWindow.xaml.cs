@@ -161,7 +161,7 @@ public partial class EditDictionaryWindow : Window
                 BrowseForDictionaryFolder();
                 break;
 
-            case DictType.Kanjium:
+            case DictType.PitchAccentYomichan:
                 BrowseForDictionaryFolder();
                 break;
             case DictType.DaijirinNazeka:

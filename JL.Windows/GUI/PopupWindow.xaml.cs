@@ -818,7 +818,7 @@ public partial class PopupWindow : Window
 
                 if ((textBlock.Name is "FoundSpelling" or "Readings"))
                 {
-                    Dict? pitchDict = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.Kanjium);
+                    Dict? pitchDict = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.PitchAccentYomichan);
                     if (pitchDict?.Active ?? false)
                     {
                         List<string>? readings = result.Readings;
@@ -866,7 +866,7 @@ public partial class PopupWindow : Window
 
                 if ((textBox.Name is "FoundSpelling" or "Readings"))
                 {
-                    Dict? pitchDict = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.Kanjium);
+                    Dict? pitchDict = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.PitchAccentYomichan);
                     if (pitchDict?.Active ?? false)
                     {
                         List<string>? readings = result.Readings;
@@ -1668,7 +1668,7 @@ public partial class PopupWindow : Window
 
         foreach (Dict dict in Storage.Dicts.Values.OrderBy(dict => dict.Priority).ToList())
         {
-            if (!dict.Active || dict.Type == DictType.Kanjium)
+            if (!dict.Active || dict.Type == DictType.PitchAccentYomichan)
                 continue;
 
             var button = new Button { Content = dict.Name, Margin = new Thickness(1), Tag = dict };

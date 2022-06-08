@@ -129,7 +129,7 @@ public static class Storage
         DictType.WeblioKogoYomichan,
         DictType.GakkenYojijukugoYomichan,
         DictType.ShinmeikaiYojijukugoYomichan,
-        DictType.Kanjium,
+        DictType.PitchAccentYomichan,
         DictType.NonspecificYomichan,
     };
 
@@ -145,6 +145,11 @@ public static class Storage
     {
         DictType.NonspecificYomichan,
         DictType.NonspecificNazeka,
+    };
+
+    public static readonly List<DictType> ObsoleteDictTypes = new()
+    {
+        DictType.Kanjium,
     };
 
     public static readonly Regex JapaneseRegex =
@@ -303,7 +308,7 @@ public static class Storage
                     }
                     break;
 
-                case DictType.Kanjium:
+                case DictType.PitchAccentYomichan:
                     if (dict.Active && !dict.Contents.Any())
                     {
                         tasks.Add(Task.Run(async () =>

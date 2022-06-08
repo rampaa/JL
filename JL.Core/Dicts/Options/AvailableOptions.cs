@@ -20,7 +20,7 @@ public readonly struct NewlineBetweenDefinitionsOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes =
-        Enum.GetValues<DictType>().Except(new[] { DictType.Kanjium, DictType.Kanjidic, DictType.CustomNameDictionary })
+        Enum.GetValues<DictType>().Except(new[] { DictType.PitchAccentYomichan, DictType.Kanjidic, DictType.CustomNameDictionary })
             .ToArray();
     public bool Value { get; init; }
 }
@@ -29,7 +29,7 @@ public readonly struct NoAllOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = Enum.GetValues<DictType>()
-        .Except(new[] { DictType.Kanjium }).ToArray();
+        .Except(new[] { DictType.PitchAccentYomichan }).ToArray();
 
     public bool Value { get; init; }
 }
@@ -134,6 +134,6 @@ public readonly struct LoanwordEtymologyOption
 public readonly struct PitchAccentMarkerColorOption
 {
     [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.Kanjium };
+    public static readonly DictType[] ValidDictTypes = { DictType.PitchAccentYomichan };
     public string Value { get; init; }
 }

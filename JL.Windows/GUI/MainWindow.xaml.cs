@@ -208,15 +208,14 @@ public partial class MainWindow : Window, IFrontend
             CopyFromClipboard();
         }
 
-
         // Add an option?
         if (FirstPopupWindow.Visibility != Visibility.Visible
-            || ManageDictionariesWindow.Instance.Visibility != Visibility.Visible
-            || ManageFrequenciesWindow.Instance.Visibility != Visibility.Visible
-            || AddNameWindow.Instance.Visibility != Visibility.Visible
-            || AddWordWindow.Instance.Visibility != Visibility.Visible
-            || PreferencesWindow.Instance.Visibility != Visibility.Visible
-            || StatsWindow.Instance.Visibility != Visibility.Visible)
+            && ManageDictionariesWindow.Instance.Visibility != Visibility.Visible
+            && ManageFrequenciesWindow.Instance.Visibility != Visibility.Visible
+            && AddNameWindow.Instance.Visibility != Visibility.Visible
+            && AddWordWindow.Instance.Visibility != Visibility.Visible
+            && PreferencesWindow.Instance.Visibility != Visibility.Visible
+            && StatsWindow.Instance.Visibility != Visibility.Visible)
         {
             _winApi!.KeepTopmost();
         }

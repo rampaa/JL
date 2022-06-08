@@ -173,7 +173,7 @@ public partial class AddDictionaryWindow : Window
                 BrowseForDictionaryFolder();
                 break;
 
-            case DictType.Kanjium:
+            case DictType.PitchAccentYomichan:
                 BrowseForDictionaryFolder();
                 break;
 
