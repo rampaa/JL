@@ -52,6 +52,7 @@ public enum DictType
     ShinmeikaiYojijukugoYomichan,
     [Description("Nonspecific (Yomichan)")]
     NonspecificYomichan,
+    [Obsolete("Superseded by PitchAccentYomichan. Will be deleted later on.")]
     Kanjium,
 
     // Nazeka Epwing Converter
