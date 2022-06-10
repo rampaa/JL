@@ -30,7 +30,7 @@ public class FrequencyYomichanLoader
                 string spellling = value[0].ToString();
                 string spellingInHiragana = Kana.KatakanaToHiraganaConverter(spellling);
                 string reading = "";
-                int frequency;
+                int frequency = int.MaxValue;
                 JsonElement thirdElement = value[2];
 
                 if (int.TryParse(value[2].ToString().Split('/').First(), out int parsedFreq))
@@ -58,48 +58,56 @@ public class FrequencyYomichanLoader
                     frequency = freqValue.GetInt32();
                 }
 
-                else
+                else if (thirdElement.ValueKind == JsonValueKind.Array)
                 {
                     reading = thirdElement[0].ToString();
                     frequency = thirdElement[1].GetInt32();
                 }
 
-                if (reading == "")
+                else if (thirdElement.ValueKind == JsonValueKind.Number)
                 {
-                    if (freqDict.TryGetValue(spellingInHiragana, out List<FrequencyRecord>? spellingFreqResult))
-                    {
-                        spellingFreqResult.Add(new(spellling, frequency));
-                    }
-
-                    else
-                    {
-                        freqDict.Add(spellingInHiragana, new() { new(spellling, frequency) });
-                    }
+                    frequency = thirdElement.GetInt32();
                 }
 
-                else
+                if (frequency != int.MaxValue)
                 {
-                    string readingInHiragana = Kana.KatakanaToHiraganaConverter(reading);
-                    if (freqDict.TryGetValue(readingInHiragana, out List<FrequencyRecord>? readingFreqResult))
-                    {
-                        readingFreqResult.Add(new(spellling, frequency));
-                    }
-
-                    else
-                    {
-                        freqDict.Add(readingInHiragana, new() { new(spellling, frequency) });
-                    }
-
-                    if (reading != spellling)
+                    if (reading == "")
                     {
                         if (freqDict.TryGetValue(spellingInHiragana, out List<FrequencyRecord>? spellingFreqResult))
                         {
-                            spellingFreqResult.Add(new(reading, frequency));
+                            spellingFreqResult.Add(new(spellling, frequency));
                         }
 
                         else
                         {
-                            freqDict.Add(spellingInHiragana, new() { new(reading, frequency) });
+                            freqDict.Add(spellingInHiragana, new() { new(spellling, frequency) });
+                        }
+                    }
+
+                    else
+                    {
+                        string readingInHiragana = Kana.KatakanaToHiraganaConverter(reading);
+                        if (freqDict.TryGetValue(readingInHiragana, out List<FrequencyRecord>? readingFreqResult))
+                        {
+                            readingFreqResult.Add(new(spellling, frequency));
+                        }
+
+                        else
+                        {
+                            freqDict.Add(readingInHiragana, new() { new(spellling, frequency) });
+                        }
+
+                        if (reading != spellling)
+                        {
+                            if (freqDict.TryGetValue(spellingInHiragana, out List<FrequencyRecord>? spellingFreqResult))
+                            {
+                                spellingFreqResult.Add(new(reading, frequency));
+                            }
+
+                            else
+                            {
+                                freqDict.Add(spellingInHiragana, new() { new(reading, frequency) });
+                            }
                         }
                     }
                 }
