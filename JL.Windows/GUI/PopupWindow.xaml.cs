@@ -428,41 +428,54 @@ public partial class PopupWindow : Window
         TextBlock? textBlockGrade = null;
         TextBlock? textBlockComposition = null;
 
-        if (result.Frequencies.Count > 0 && result.Frequencies[0].Freq > 0 && result.Frequencies[0].Freq != int.MaxValue)
+        if (result.Frequencies.Count > 0)
         {
-            string freqStr;
+            string freqStr = "";
 
-            if (result.Frequencies.Count == 1)
+            if (result.Frequencies.Count == 1 && result.Frequencies[0].Freq > 0 && result.Frequencies[0].Freq != int.MaxValue)
             {
                 freqStr = "#" + result.Frequencies.First().Freq;
             }
 
-            else
+            else if (result.Frequencies.Count > 1)
             {
+                int freqResultCount = 0;
                 StringBuilder freqStrBuilder = new();
                 foreach (LookupFrequencyResult lookupFreqResult in result.Frequencies)
                 {
+                    if (lookupFreqResult.Freq == int.MaxValue
+                        || lookupFreqResult.Freq <= 0)
+                        continue;
+
                     freqStrBuilder.Append(lookupFreqResult.Name);
                     freqStrBuilder.Append(": #");
                     freqStrBuilder.Append(lookupFreqResult.Freq);
                     freqStrBuilder.Append(", ");
+                    freqResultCount++;
                 }
-                freqStrBuilder.Remove(freqStrBuilder.Length - 2, 1);
 
-                freqStr = freqStrBuilder.ToString();
+                if (freqResultCount > 0)
+                {
+                    freqStrBuilder.Remove(freqStrBuilder.Length - 2, 1);
+
+                    freqStr = freqStrBuilder.ToString();
+                }
             }
 
-            textBlockFrequency = new TextBlock
+            if (freqStr != "")
             {
-                Name = nameof(result.Frequencies),
-                Text = freqStr,
-                Foreground = ConfigManager.FrequencyColor,
-                FontSize = ConfigManager.FrequencyFontSize,
-                Margin = new Thickness(5, 0, 0, 0),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Top,
-            };
+                textBlockFrequency = new TextBlock
+                {
+                    Name = nameof(result.Frequencies),
+                    Text = freqStr,
+                    Foreground = ConfigManager.FrequencyColor,
+                    FontSize = ConfigManager.FrequencyFontSize,
+                    Margin = new Thickness(5, 0, 0, 0),
+                    TextWrapping = TextWrapping.Wrap,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Top,
+                };
+            }
         }
 
         if (result.Dict != null)

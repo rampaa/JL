@@ -10,7 +10,9 @@ public static class EpwingYomichanLoader
         if (!Directory.Exists(dict.Path) && !File.Exists(dict.Path))
             return;
 
-        string[] jsonFiles = Directory.GetFiles(dict.Path, "*_bank_*.json");
+        string[] jsonFiles = Directory.EnumerateFiles(dict.Path, "*_bank_*.json", SearchOption.TopDirectoryOnly)
+            .Where(s => s.Contains("term") || s.Contains("kanji"))
+            .ToArray();
 
         foreach (string jsonFile in jsonFiles)
         {

@@ -12,7 +12,9 @@ public class FrequencyYomichanLoader
         Dictionary<string, List<FrequencyRecord>> freqDict = freq.Contents;
         List<List<JsonElement>>? frequencyJson;
 
-        string[] jsonFiles = Directory.GetFiles(freq.Path, "*_bank_*.json");
+        string[] jsonFiles = Directory.EnumerateFiles(freq.Path, "*_bank_*.json", SearchOption.TopDirectoryOnly)
+            .Where(s => s.Contains("term") || s.Contains("kanji"))
+            .ToArray();
 
         foreach (string jsonFile in jsonFiles)
         {
