@@ -32,7 +32,7 @@ public static class Utils
 
     public static readonly Dictionary<string, string> Iso6392ToLanguageNameForWindows7 = new()
     {
-        { "por", "Portuguese" },
+        { "por", "Portuguese" }, {"spa", "Spanish"},
     };
 
     public static void CreateDefaultDictsConfig()
