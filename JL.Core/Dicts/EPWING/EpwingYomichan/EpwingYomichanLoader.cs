@@ -49,10 +49,13 @@ public static class EpwingYomichanLoader
         {
             string hiraganaReading = Kana.KatakanaToHiraganaConverter(yomichanResult.Reading);
 
-            if (dict.Contents.TryGetValue(hiraganaReading, out List<IResult>? tempList2))
-                tempList2.Add(yomichanResult);
-            else
-                dict.Contents.Add(hiraganaReading, new List<IResult> { yomichanResult });
+            if (hiraganaExpression != hiraganaReading)
+            {
+                if (dict.Contents.TryGetValue(hiraganaReading, out List<IResult>? tempList2))
+                    tempList2.Add(yomichanResult);
+                else
+                    dict.Contents.Add(hiraganaReading, new List<IResult> { yomichanResult });
+            }
         }
 
         if (dict.Contents.TryGetValue(hiraganaExpression, out List<IResult>? tempList))
