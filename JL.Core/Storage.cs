@@ -266,6 +266,7 @@ public static class Storage
 
                             catch (Exception ex)
                             {
+                                Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 Utils.Logger.Error("Couldn't import {DictType}: {Exception}", dict.Type, ex.ToString());
                                 Dicts.Remove(dict.Name);
                                 dictRemoved = true;
@@ -399,6 +400,7 @@ public static class Storage
 
                             catch (Exception ex)
                             {
+                                Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
                                 Utils.Logger.Error("Couldn't import {FreqName}: {Exception}", freq.Name, ex.ToString());
                                 FreqDicts.Remove(freq.Name);
                                 freqRemoved = true;
