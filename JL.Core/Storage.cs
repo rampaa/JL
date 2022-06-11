@@ -29,7 +29,7 @@ public static class Storage
     public static readonly string ResourcesPath = Path.Join(AppContext.BaseDirectory, "Resources");
     public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
     public static readonly HttpClient Client = new(new HttpClientHandler { UseProxy = false }) { Timeout = TimeSpan.FromMinutes(10) };
-    public static readonly Version Version = new(1, 10);
+    public static readonly Version Version = new(1, 11, 0);
     public static readonly string GitHubApiUrlForLatestJLRelease = "https://api.github.com/repos/rampaa/JL/releases/latest";
     public static readonly Uri JmdictUrl = new("http://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz");
     public static readonly Uri JmnedictUrl = new("http://ftp.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
@@ -128,8 +128,8 @@ public static class Storage
         DictType.NikkokuYomichan,
         DictType.OubunshaYomichan,
         DictType.ShinjirinYomichan,
-        DictType.ShinmeikaiYojijukugoYomichan,
         DictType.ShinmeikaiYomichan,
+        DictType.ShinmeikaiYojijukugoYomichan,
         DictType.WeblioKogoYomichan,
         DictType.ZokugoYomichan,
         DictType.PitchAccentYomichan,
