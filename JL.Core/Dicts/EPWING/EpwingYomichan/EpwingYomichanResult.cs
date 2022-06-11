@@ -19,7 +19,7 @@ public class EpwingYomichanResult : IResult
         PrimarySpelling = jsonElement[0].ToString();
         Reading = jsonElement[1].ToString();
 
-        if (Reading == "")
+        if (Reading == "" || Reading == PrimarySpelling)
             Reading = null;
 
         //DefinitionTags = jsonElement[2].ToString();
