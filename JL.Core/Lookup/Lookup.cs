@@ -101,6 +101,8 @@ public static class Lookup
                     case DictType.WeblioKogoYomichan:
                     case DictType.GakkenYojijukugoYomichan:
                     case DictType.ShinmeikaiYojijukugoYomichan:
+                    case DictType.KanjigenYomichan:
+                    case DictType.KireiCakeYomichan:
                     case DictType.NonspecificYomichan:
                         epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
                             deconjugationResultsList, dict));
@@ -267,6 +269,8 @@ public static class Lookup
                         case DictType.WeblioKogoYomichan:
                         case DictType.GakkenYojijukugoYomichan:
                         case DictType.ShinmeikaiYojijukugoYomichan:
+                        case DictType.KanjigenYomichan:
+                        case DictType.KireiCakeYomichan:
                         case DictType.NonspecificYomichan:
                             {
                                 int dictResultsCount = dictResults.Count;
@@ -754,6 +758,8 @@ public static class Lookup
                     case DictType.WeblioKogoYomichan:
                     case DictType.GakkenYojijukugoYomichan:
                     case DictType.ShinmeikaiYojijukugoYomichan:
+                    case DictType.KanjigenYomichan:
+                    case DictType.KireiCakeYomichan:
                     case DictType.NonspecificYomichan:
                         freqsList.Add(new(freq.Name, GetEpwingFreq((EpwingYomichanResult)result, freq)));
                         break;

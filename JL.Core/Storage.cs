@@ -112,31 +112,33 @@ public static class Storage
 
     public static readonly List<DictType> YomichanDictTypes = new()
     {
-        DictType.Kenkyuusha,
         DictType.Daijirin,
         DictType.Daijisen,
-        DictType.Koujien,
-        DictType.Meikyou,
         DictType.Gakken,
-        DictType.Kotowaza,
+        DictType.GakkenYojijukugoYomichan,
         DictType.IwanamiYomichan,
         DictType.JitsuyouYomichan,
-        DictType.ShinmeikaiYomichan,
+        DictType.KanjigenYomichan,
+        DictType.Kenkyuusha,
+        DictType.KireiCakeYomichan,
+        DictType.Kotowaza,
+        DictType.Koujien,
+        DictType.Meikyou,
         DictType.NikkokuYomichan,
-        DictType.ShinjirinYomichan,
         DictType.OubunshaYomichan,
-        DictType.ZokugoYomichan,
-        DictType.WeblioKogoYomichan,
-        DictType.GakkenYojijukugoYomichan,
+        DictType.ShinjirinYomichan,
         DictType.ShinmeikaiYojijukugoYomichan,
+        DictType.ShinmeikaiYomichan,
+        DictType.WeblioKogoYomichan,
+        DictType.ZokugoYomichan,
         DictType.PitchAccentYomichan,
         DictType.NonspecificYomichan,
     };
 
     public static readonly List<DictType> NazekaDictTypes = new()
     {
-        DictType.KenkyuushaNazeka,
         DictType.DaijirinNazeka,
+        DictType.KenkyuushaNazeka,
         DictType.ShinmeikaiNazeka,
         DictType.NonspecificNazeka,
     };
@@ -249,6 +251,8 @@ public static class Storage
                 case DictType.WeblioKogoYomichan:
                 case DictType.GakkenYojijukugoYomichan:
                 case DictType.ShinmeikaiYojijukugoYomichan:
+                case DictType.KanjigenYomichan:
+                case DictType.KireiCakeYomichan:
                 case DictType.NonspecificYomichan:
                     if (dict.Active && !dict.Contents.Any())
                     {

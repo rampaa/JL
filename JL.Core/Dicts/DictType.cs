@@ -50,6 +50,10 @@ public enum DictType
     GakkenYojijukugoYomichan,
     [Description("Shinmeikai Yojijukugo (Yomichan)")]
     ShinmeikaiYojijukugoYomichan,
+    [Description("Kirei Cake (Yomichan)")]
+    KireiCakeYomichan,
+    [Description("Kanjigen (Yomichan)")]
+    KanjigenYomichan,
     [Description("Nonspecific (Yomichan)")]
     NonspecificYomichan,
     [Obsolete("Superseded by PitchAccentYomichan. Will be deleted later on.")]

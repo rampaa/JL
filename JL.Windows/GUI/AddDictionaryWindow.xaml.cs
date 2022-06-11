@@ -169,6 +169,8 @@ public partial class AddDictionaryWindow : Window
             case DictType.WeblioKogoYomichan:
             case DictType.GakkenYojijukugoYomichan:
             case DictType.ShinmeikaiYojijukugoYomichan:
+            case DictType.KanjigenYomichan:
+            case DictType.KireiCakeYomichan:
             case DictType.NonspecificYomichan:
                 BrowseForDictionaryFolder();
                 break;
