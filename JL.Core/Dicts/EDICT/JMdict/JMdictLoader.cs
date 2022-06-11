@@ -210,15 +210,15 @@ public static class JMdictLoader
 
                         if (lang != null)
                         {
-                            if (Utilities.Utils.Iso6392BTo2T.TryGetValue(lang, out string? langCode))
-                            {
-                                lang = langCode;
-                            }
-
                             try
                             {
                                 if (s_canHandleCulture)
                                 {
+                                    if (Utils.Iso6392BTo2T.TryGetValue(lang, out string? langCode))
+                                    {
+                                        lang = langCode;
+                                    }
+
                                     lang = new CultureInfo(lang).EnglishName;
                                 }
                             }
