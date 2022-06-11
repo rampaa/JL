@@ -30,6 +30,11 @@ public static class Utils
         #pragma warning restore format
     };
 
+    public static readonly Dictionary<string, string> Iso6392ToLanguageNameForWindows7 = new()
+    {
+        { "por", "Portuguese" },
+    };
+
     public static void CreateDefaultDictsConfig()
     {
         var jso = new JsonSerializerOptions

@@ -212,7 +212,15 @@ public static class JMdictLoader
                                 lang = langCode;
                             }
 
-                            lang = new CultureInfo(lang).EnglishName;
+                            if (Utilities.Utils.Iso6392ToLanguageNameForWindows7.TryGetValue(lang, out string? langName))
+                            {
+                                lang = langName;
+                            }
+
+                            else
+                            {
+                                lang = new CultureInfo(lang).EnglishName;
+                            }
                         }
 
                         else
