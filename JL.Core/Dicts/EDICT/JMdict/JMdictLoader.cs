@@ -1,10 +1,13 @@
 ﻿using System.Globalization;
 using System.Xml;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EDICT.JMdict;
 
 public static class JMdictLoader
 {
+    private static bool s_canHandleCulture = true;
+
     public static async Task Load(Dict dict)
     {
         if (File.Exists(dict.Path))
@@ -212,14 +215,18 @@ public static class JMdictLoader
                                 lang = langCode;
                             }
 
-                            if (Utilities.Utils.Iso6392ToLanguageNameForWindows7.TryGetValue(lang, out string? langName))
+                            try
                             {
-                                lang = langName;
+                                if (s_canHandleCulture)
+                                {
+                                    lang = new CultureInfo(lang).EnglishName;
+                                }
                             }
 
-                            else
+                            catch(Exception ex)
                             {
-                                lang = new CultureInfo(lang).EnglishName;
+                                Utils.Logger.Error(ex.ToString());
+                                s_canHandleCulture = false;
                             }
                         }
 
