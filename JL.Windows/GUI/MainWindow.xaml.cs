@@ -391,6 +391,7 @@ public partial class MainWindow : Window, IFrontend
 
             ConfigManager.Instance.KanjiMode = !ConfigManager.Instance.KanjiMode;
             FirstPopupWindow.LastText = "";
+            Storage.Frontend.InvalidateDisplayCache();
             MainTextBox_MouseMove(null, null);
         }
 

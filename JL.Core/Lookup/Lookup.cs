@@ -32,16 +32,32 @@ public static class Lookup
         // if (useCache && LookupResultCache.TryGet(text, out List<LookupResult>? data))
         //     return data;
 
+        List<LookupResult> lookupResults = new();
+
         if (Storage.Frontend.CoreConfig.KanjiMode)
         {
-            return KanjiResultBuilder(GetKanjidicResults(text, Storage.Dicts.Values.First(dict => dict.Type == DictType.Kanjidic)));
+            Dict? kanjidic = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.Kanjidic);
+            Dict? kanjigen = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.KanjigenYomichan);
+
+            if (kanjidic?.Active ?? false)
+            {
+                lookupResults.AddRange(KanjidicResultBuilder(GetKanjiResults(text, kanjidic)));
+            }
+
+            if (kanjigen?.Active ?? false)
+            {
+                lookupResults.AddRange(EpwingYomichanResultBuilder(GetKanjiResults(text, kanjigen)));
+            }
+
+            return lookupResults.Any() ? SortLookupResults(lookupResults) : null;
         }
 
         Dictionary<string, IntermediaryResult> jMdictResults = new();
         Dictionary<string, IntermediaryResult> jMnedictResults = new();
         List<Dictionary<string, IntermediaryResult>> epwingYomichanWordResultsList = new();
         List<Dictionary<string, IntermediaryResult>> epwingNazekaWordResultsList = new();
-        Dictionary<string, IntermediaryResult> kanjiResult = new();
+        List<Dictionary<string, IntermediaryResult>> epwingYomichanKanjiResultsList = new();
+        Dictionary<string, IntermediaryResult> kanjidicResults = new();
         Dictionary<string, IntermediaryResult> customWordResults = new();
         Dictionary<string, IntermediaryResult> customNameResults = new();
 
@@ -72,7 +88,11 @@ public static class Lookup
                         break;
 
                     case DictType.Kanjidic:
-                        kanjiResult = GetKanjidicResults(text, dict);
+                        kanjidicResults = GetKanjiResults(text, dict);
+                        break;
+
+                    case DictType.KanjigenYomichan:
+                        epwingYomichanKanjiResultsList.Add(GetKanjiResults(text, dict));
                         break;
 
                     case DictType.CustomWordDictionary:
@@ -101,7 +121,6 @@ public static class Lookup
                     case DictType.WeblioKogoYomichan:
                     case DictType.GakkenYojijukugoYomichan:
                     case DictType.ShinmeikaiYojijukugoYomichan:
-                    case DictType.KanjigenYomichan:
                     case DictType.KireiCakeYomichan:
                     case DictType.NonspecificYomichan:
                         epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
@@ -125,8 +144,6 @@ public static class Lookup
             }
         }
 
-        List<LookupResult> lookupResults = new();
-
         if (jMdictResults.Any())
             lookupResults.AddRange(JmdictResultBuilder(jMdictResults));
 
@@ -141,8 +158,16 @@ public static class Lookup
         if (jMnedictResults.Any())
             lookupResults.AddRange(JmnedictResultBuilder(jMnedictResults));
 
-        if (kanjiResult.Any())
-            lookupResults.AddRange(KanjiResultBuilder(kanjiResult));
+        if (kanjidicResults.Any())
+            lookupResults.AddRange(KanjidicResultBuilder(kanjidicResults));
+
+        if (epwingYomichanKanjiResultsList.Any())
+        {
+            for (int i = 0; i < epwingYomichanKanjiResultsList.Count; i++)
+            {
+                lookupResults.AddRange(EpwingYomichanResultBuilder(epwingYomichanKanjiResultsList[i]));
+            }
+        }
 
         if (customWordResults.Any())
             lookupResults.AddRange(CustomWordResultBuilder(customWordResults));
@@ -425,7 +450,7 @@ public static class Lookup
         return nameResults;
     }
 
-    private static Dictionary<string, IntermediaryResult> GetKanjidicResults(string text, Dict dict)
+    private static Dictionary<string, IntermediaryResult> GetKanjiResults(string text, Dict dict)
     {
         Dictionary<string, IntermediaryResult> kanjiResults = new();
 
@@ -538,7 +563,7 @@ public static class Lookup
         return results;
     }
 
-    private static List<LookupResult> KanjiResultBuilder(
+    private static List<LookupResult> KanjidicResultBuilder(
         Dictionary<string, IntermediaryResult> kanjiResults)
     {
         List<LookupResult> results = new();

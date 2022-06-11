@@ -1375,6 +1375,7 @@ public partial class PopupWindow : Window
         {
             ConfigManager.Instance.KanjiMode = !ConfigManager.Instance.KanjiMode;
             LastText = "";
+            Storage.Frontend.InvalidateDisplayCache();
             //todo will only work for the FirstPopupWindow
             MainWindow.Instance.MainTextBox_MouseMove(null, null);
         }
