@@ -15,6 +15,7 @@ using JL.Core.Frequency.FreqNazeka;
 using JL.Core.Frequency.FreqYomichan;
 using JL.Core.Pitch;
 using JL.Core.PoS;
+using JL.Core.Utilities;
 using Timer = System.Timers.Timer;
 
 namespace JL.Core;
@@ -257,7 +258,19 @@ public static class Storage
                     if (dict.Active && !dict.Contents.Any())
                     {
                         tasks.Add(Task.Run(async () =>
-                            await EpwingYomichanLoader.Load(dict).ConfigureAwait(false)));
+                        {
+                            try
+                            {
+                                await EpwingYomichanLoader.Load(dict).ConfigureAwait(false);
+                            }
+
+                            catch (Exception ex)
+                            {
+                                Utils.Logger.Error("Couldn't import {DictType}: {Exception}", dict.Type, ex.ToString());
+                                Dicts.Remove(dict.Name);
+                                dictRemoved = true;
+                            }
+                        }));
                     }
 
                     else if (!dict.Active && dict.Contents.Any())
@@ -378,7 +391,19 @@ public static class Storage
                     if (freq.Active && !freq.Contents.Any())
                     {
                         Task yomichanFreqTask = Task.Run(async () =>
-                            await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false));
+                        {
+                            try
+                            {
+                                await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false);
+                            }
+
+                            catch (Exception ex)
+                            {
+                                Utils.Logger.Error("Couldn't import {FreqName}: {Exception}", freq.Name, ex.ToString());
+                                FreqDicts.Remove(freq.Name);
+                                freqRemoved = true;
+                            }
+                        });
 
                         tasks.Add(yomichanFreqTask);
                     }
