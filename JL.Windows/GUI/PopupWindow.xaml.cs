@@ -178,7 +178,7 @@ public partial class PopupWindow : Window
                 {
                     double verticalOffset = tb.VerticalOffset;
 
-                    if (ConfigManager.PopupFocusOnLookup)
+                    if (ConfigManager.PopupFocusOnLookup || (ConfigManager.HighlightLongestMatch && _parentPopupWindow != null))
                     {
                         tb.Focus();
                     }
@@ -194,7 +194,7 @@ public partial class PopupWindow : Window
 
                 Visibility = Visibility.Visible;
 
-                if (ConfigManager.PopupFocusOnLookup)
+                if (ConfigManager.PopupFocusOnLookup || (ConfigManager.HighlightLongestMatch && _parentPopupWindow != null))
                 {
                     tb.Focus();
                     Activate();
@@ -254,13 +254,10 @@ public partial class PopupWindow : Window
 
             Visibility = Visibility.Visible;
 
-            if (ConfigManager.PopupFocusOnLookup)
-            {
-                tb.Focus();
-                Activate();
-                Keyboard.Focus(this);
-                Focus();
-            }
+            tb.Focus();
+            Activate();
+            Keyboard.Focus(this);
+            Focus();
 
             if (ConfigManager.AutoPlayAudio)
             {

@@ -68,7 +68,7 @@ public class ConfigManager : CoreConfig
     public static bool FixedPopupPositioning { get; private set; } = false;
     public static int FixedPopupXPosition { get; set; } = 0;
     public static int FixedPopupYPosition { get; set; } = 0;
-    public static bool PopupFocusOnLookup { get; private set; } = true;
+    public static bool PopupFocusOnLookup { get; private set; } = false;
     public static bool ShowMiningModeReminder { get; private set; } = true;
     public static bool DisableLookupsForNonJapaneseCharsInPopups { get; private set; } = true;
     public static Brush PopupBackgroundColor { get; private set; } = Brushes.Black;
