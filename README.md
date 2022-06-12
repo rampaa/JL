@@ -83,21 +83,22 @@ IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries,
 * BCCWJ-SUW
 * Innocent Ranked
 * JPDB
+* Kokugojiten
 * Monodicts 206k
-* Narou Freq
+* Narou
 * Netflix
 * Nier
 * Novels
 * VN
 * Wikipedia
 * Youtube
-* Kokugojiten
 * And probably all other frequency dictionaries that Yomichan currently supports
 
 #### Nazeka format
-* VN
 * Narou
 * Novels
+* VN
+
 
 ## Credits
 * [Nazeka](https://github.com/wareya/nazeka): Deconjugation rules, deconjugator, frequency lists
