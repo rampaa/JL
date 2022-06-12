@@ -422,4 +422,14 @@ public static class WindowsUtils
         sender.Background = selectedColor;
         window.Close();
     }
+
+    public static void Unselect(System.Windows.Controls.TextBox? tb)
+    {
+        if (tb == null)
+            return;
+
+        double verticalOffset = tb.VerticalOffset;
+        tb.Select(0, 0);
+        tb.ScrollToVerticalOffset(verticalOffset);
+    }
 }

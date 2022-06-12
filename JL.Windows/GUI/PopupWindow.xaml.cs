@@ -140,8 +140,6 @@ public partial class PopupWindow : Window
            )
             return;
 
-        _lastTextBox = tb;
-
         int charPosition = tb.GetCharacterIndexFromPoint(Mouse.GetPosition(tb), false);
         if (charPosition != -1)
         {
@@ -155,6 +153,11 @@ public partial class PopupWindow : Window
                 && ConfigManager.DisableLookupsForNonJapaneseCharsInPopups
                 && !Storage.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString()))
             {
+                if (ConfigManager.HighlightLongestMatch)
+                {
+                    WindowsUtils.Unselect(_lastTextBox);
+                }
+
                 Visibility = Visibility.Hidden;
                 return;
             }
@@ -173,12 +176,13 @@ public partial class PopupWindow : Window
 
             if (lookupResults is { Count: > 0 })
             {
+                _lastTextBox = tb;
                 _lastSelectedText = lookupResults[0].FoundForm;
                 if (ConfigManager.HighlightLongestMatch)
                 {
                     double verticalOffset = tb.VerticalOffset;
 
-                    if (ConfigManager.PopupFocusOnLookup || (ConfigManager.HighlightLongestMatch && _parentPopupWindow != null))
+                    if (ConfigManager.PopupFocusOnLookup || _parentPopupWindow != null)
                     {
                         tb.Focus();
                     }
@@ -194,7 +198,7 @@ public partial class PopupWindow : Window
 
                 Visibility = Visibility.Visible;
 
-                if (ConfigManager.PopupFocusOnLookup || (ConfigManager.HighlightLongestMatch && _parentPopupWindow != null))
+                if (ConfigManager.PopupFocusOnLookup || _parentPopupWindow != null)
                 {
                     tb.Focus();
                     Activate();
@@ -225,7 +229,7 @@ public partial class PopupWindow : Window
 
             if (ConfigManager.HighlightLongestMatch)
             {
-                Unselect(tb);
+                WindowsUtils.Unselect(tb);
             }
         }
     }
@@ -1065,15 +1069,7 @@ public partial class PopupWindow : Window
 
     private void Unselect(object sender, RoutedEventArgs e)
     {
-        Unselect((TextBox)sender);
-        //((TextBox)sender).Select(0, 0);
-    }
-
-    private static void Unselect(TextBox tb)
-    {
-        double verticalOffset = tb.VerticalOffset;
-        tb.Select(0, 0);
-        tb.ScrollToVerticalOffset(verticalOffset);
+        WindowsUtils.Unselect((TextBox)sender);
     }
 
     private void TextBoxPreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
@@ -1285,7 +1281,14 @@ public partial class PopupWindow : Window
     private void Definitions_MouseMove(TextBox tb)
     {
         if (Storage.JapaneseRegex.IsMatch(tb.Text))
+        {
             TextBox_MouseMove(tb);
+        }
+
+        else if (ConfigManager.HighlightLongestMatch)
+        {
+            WindowsUtils.Unselect(_lastTextBox);
+        }
     }
 
     private void PopupListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -1346,14 +1349,9 @@ public partial class PopupWindow : Window
             PopUpScrollViewer!.ScrollToTop();
             PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
 
-            if (ConfigManager.LookupOnSelectOnly && _parentPopupWindow == null)
+            if (ConfigManager.LookupOnSelectOnly)
             {
-                Unselect(MainWindow.Instance.MainTextBox!);
-            }
-
-            else if (ConfigManager.LookupOnSelectOnly && _lastTextBox != null)
-            {
-                Unselect(_lastTextBox);
+                WindowsUtils.Unselect(_lastTextBox);
             }
 
             if (_parentPopupWindow != null)
@@ -1646,7 +1644,7 @@ public partial class PopupWindow : Window
 
         if (ConfigManager.HighlightLongestMatch)
         {
-            Unselect(MainWindow.Instance.MainTextBox!);
+            WindowsUtils.Unselect(_lastTextBox!);
         }
     }
 

@@ -73,6 +73,7 @@ public partial class MainWindow : Window, IFrontend
     {
         InitializeComponent();
         s_instance = this;
+        MainTextBox.Focus();
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -303,6 +304,7 @@ public partial class MainWindow : Window, IFrontend
 
         FirstPopupWindow.Hide();
         FirstPopupWindow.LastText = "";
+        WindowsUtils.Unselect(MainTextBox);
     }
 
     private void Button_MouseLeave(object sender, MouseEventArgs e)
