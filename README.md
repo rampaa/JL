@@ -1,7 +1,7 @@
 # JL
 JL is a program for looking up Japanese words and expressions. Inspired by [Nazeka](https://github.com/wareya/nazeka) and [Chiitrans Lite](https://github.com/alexbft/chiitrans).
 
-Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer the x86 version for 50-80% less memory usage.
+Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer the x86 version for 50-80% less memory usage. Prefer the x64 version if you intend to use *lots of* dictionaries together, because x86 programs cannot use more than 2 GB of RAM.
 
 IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries, you MUST use the x86 version because of a .NET bug. See the [link](https://github.com/dotnet/runtime/issues/66272) for more details.
 
@@ -25,12 +25,13 @@ IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries,
 * Anki mining
 * Pass-through mode
 * Invisible mode (see https://github.com/rampaa/JL/pull/7#issuecomment-1069236589)
-* Pitch accent (needs [Kanjium](https://foosoft.net/projects/yomichan/#dictionaries))
+* Pitch accent (needs a pitch accent dictionary such as [Kanjium](https://foosoft.net/projects/yomichan/#dictionaries))
 * Remembers last window position
 * Recursive lookups
 * Halfwidth -> Fullwidth conversions (and vice-versa)
 * Hiragana -> Katakana conversions (and vice-versa)
 * Chouonpu conversions
+* Can keep itself as the topmost window (i.e. JL can be used with programs like [Magpie](https://github.com/Blinue/Magpie))
 
 ## Supported dictionaries
 
@@ -45,17 +46,58 @@ IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries,
 #### [Yomichan Import](https://github.com/FooSoft/yomichan-import/) format
 
 * Daijirin
-* Kenkyuusha
 * Daijisen
 * Gakken
+* Gakken Yojijukugo
+* Iwanami
+* Jitsuyou
+* Kanjigen
+* Kenkyuusha
+* Kirei Cake
 * Kotowaza
 * Koujien
 * Meikyou
+* Nikkoku
+* Oubunsha (without images)
+* Shinjirin
+* Shinmeikai
+* Shinmeikai Yojijukugo
+* Weblio Kogo
+* Zokugo
+* Pitch accent dictionaries (e.g. [Kanjium](https://foosoft.net/projects/yomichan/#dictionaries)) through "Pitch Accent (Yomichan)" type
+* Other dictionaries (such as grammar dictionaries) through "Nonspecific (Yomichan)" type
+
 
 #### [Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter) format
 * Daijirin
 * Kenkyuusha
 * Shinmeikai
+
+
+### Frequency Dictionaries
+
+#### Yomichan Import format
+* Anime & J-drama
+* BCCWJ
+* BCCWJ-LUW
+* BCCWJ-SUW
+* Innocent Ranked
+* JPDB
+* Monodicts 206k
+* Narou Freq
+* Netflix
+* Nier
+* Novels
+* VN
+* Wikipedia
+* Youtube
+* Kokugojiten
+* And probably all other frequency dictionaries that Yomichan currently supports
+
+#### Nazeka format
+* VN
+* Narou
+* Novels
 
 ## Credits
 * [Nazeka](https://github.com/wareya/nazeka): Deconjugation rules, deconjugator, frequency lists
@@ -82,6 +124,7 @@ Select the file you got from [Nazeka EPWING Converter](https://github.com/wareya
 ### Where are my settings stored?
 * Anki settings: Config/AnkiConfig.json
 * Dictionary settings: Config/dicts.json
+* Frequency settings: Config/freqs.json
 * Stats: Config/Stats.json
 * Everything else: JL.dll.config
 ### Will you add machine translation capabilities?
