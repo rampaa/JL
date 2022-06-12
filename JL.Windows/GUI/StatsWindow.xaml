@@ -4,49 +4,43 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Stats" Height="250" ResizeMode="NoResize" Width="260" SizeToContent="Height" MaxHeight="600"
+        Title="Stats" ResizeMode="NoResize" SizeToContent="WidthAndHeight" MaxHeight="600" MaxWidth="800"
         Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False">
 
-            <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                <Grid Background="Black">
-                    <Button Name="ButtonSwapStats" Click="ButtonSwapStats_OnClick" HorizontalAlignment="Right"
-                            VerticalAlignment="Top" Margin="20,20,20,20">
-                        Session
-                    </Button>
-                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,20">
-                        <DockPanel>
-                            <TextBlock Foreground="White" Text="Characters: " TextWrapping="Wrap" Margin="0,0,0,10" />
-                            <TextBlock Foreground="White" Name="TextBlockCharacters" TextWrapping="Wrap"
+    <ScrollViewer HorizontalScrollBarVisibility="Auto">
+        <Grid Background="Black">
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,10">
+                <Button Name="ButtonSwapStats" Click="ButtonSwapStats_OnClick" HorizontalAlignment="Left"
+                            VerticalAlignment="Top" Margin="0,0,0,20" Content="Session"/>
+                <DockPanel>
+                    <TextBlock Foreground="White" Text="Characters: " TextWrapping="Wrap" Margin="0,0,0,10" />
+                    <TextBlock Foreground="White" Name="TextBlockCharacters" TextWrapping="Wrap"
+                                       Margin="0,0,20,10" />
+                </DockPanel>
+
+                <DockPanel>
+                    <TextBlock Foreground="White" Text="Lines: " TextWrapping="Wrap" Margin="0,0,0,10" />
+                    <TextBlock Foreground="White" Name="TextBlockLines" TextWrapping="Wrap" Margin="0,0,0,10" />
+                </DockPanel>
+
+                <DockPanel>
+                    <TextBlock Foreground="White" Text="Cards mined: " TextWrapping="Wrap" Margin="0,0,0,10" />
+                    <TextBlock Foreground="White" Name="TextBlockCardsMined" TextWrapping="Wrap"
                                        Margin="0,0,0,10" />
-                        </DockPanel>
+                </DockPanel>
 
-                        <DockPanel>
-                            <TextBlock Foreground="White" Text="Lines: " TextWrapping="Wrap" Margin="0,0,0,10" />
-                            <TextBlock Foreground="White" Name="TextBlockLines" TextWrapping="Wrap" Margin="0,0,0,10" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock Foreground="White" Text="Cards mined: " TextWrapping="Wrap" Margin="0,0,0,10" />
-                            <TextBlock Foreground="White" Name="TextBlockCardsMined" TextWrapping="Wrap"
+                <DockPanel>
+                    <TextBlock Foreground="White" Text="Times played audio: " TextWrapping="Wrap"
                                        Margin="0,0,0,10" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock Foreground="White" Text="Times played audio: " TextWrapping="Wrap"
+                    <TextBlock Foreground="White" Name="TextBlockTimesPlayedAudio" TextWrapping="Wrap"
                                        Margin="0,0,0,10" />
-                            <TextBlock Foreground="White" Name="TextBlockTimesPlayedAudio" TextWrapping="Wrap"
-                                       Margin="0,0,0,10" />
-                        </DockPanel>
+                </DockPanel>
 
-                        <DockPanel>
-                            <TextBlock Foreground="White" Text="???: " TextWrapping="Wrap" Margin="0,0,0,10" />
-                            <TextBlock Foreground="White" Name="TextBlockImoutos" TextWrapping="Wrap" Margin="0,0,0,10" />
-                        </DockPanel>
-
-                        <!-- <DockPanel> -->
-                        <!-- -->
-                        <!-- </DockPanel> -->
-                    </StackPanel>
-                </Grid>
-            </ScrollViewer>
+                <DockPanel>
+                    <TextBlock Foreground="White" Text="???: " TextWrapping="Wrap" Margin="0,0,0,10" />
+                    <TextBlock Foreground="White" Name="TextBlockImoutos" TextWrapping="Wrap" Margin="0,0,0,10" />
+                </DockPanel>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
 </Window>
