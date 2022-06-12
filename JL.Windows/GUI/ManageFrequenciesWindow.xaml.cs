@@ -42,6 +42,7 @@ public partial class ManageFrequenciesWindow : Window
         Utils.SerializeFreqs();
         await Storage.LoadFrequencies().ConfigureAwait(false);
         Storage.Frontend.InvalidateDisplayCache();
+        MainWindow.Instance.Focus();
     }
 
     // probably should be split into several methods

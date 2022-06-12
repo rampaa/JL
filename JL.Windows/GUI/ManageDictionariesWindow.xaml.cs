@@ -52,6 +52,7 @@ public partial class ManageDictionariesWindow : Window
         Utils.SerializeDicts();
         await Storage.LoadDictionaries().ConfigureAwait(false);
         Storage.Frontend.InvalidateDisplayCache();
+        MainWindow.Instance.Focus();
     }
 
     // probably should be split into several methods
