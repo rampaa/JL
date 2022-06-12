@@ -1644,7 +1644,7 @@ public partial class PopupWindow : Window
 
         if (ConfigManager.HighlightLongestMatch)
         {
-            WindowsUtils.Unselect(_lastTextBox!);
+            WindowsUtils.Unselect(_lastTextBox);
         }
     }
 

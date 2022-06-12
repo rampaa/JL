@@ -304,7 +304,11 @@ public partial class MainWindow : Window, IFrontend
 
         FirstPopupWindow.Hide();
         FirstPopupWindow.LastText = "";
-        WindowsUtils.Unselect(MainTextBox);
+
+        if (ConfigManager.HighlightLongestMatch)
+        {
+            WindowsUtils.Unselect(MainTextBox);
+        }
     }
 
     private void Button_MouseLeave(object sender, MouseEventArgs e)
