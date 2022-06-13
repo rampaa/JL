@@ -121,9 +121,12 @@ public static class EpwingYomichanLoader
                         Kana.KatakanaToHiraganaConverter(yomichanResult.PrimarySpelling),
                         out List<IResult>? kenkyuushaResults))
                 {
-                    for (int i = 0; i < kenkyuushaResults.Count; i++)
+                    int kenkyuushaResultCount = kenkyuushaResults.Count;
+                    for (int i = 0; i < kenkyuushaResultCount; i++)
                     {
                         var kenkyuushaResult = (EpwingYomichanResult)kenkyuushaResults[i];
+
+                        yomichanResult.Definitions = yomichanResult.Definitions?.Select(def => def.Replace("┏", "")).ToList();
 
                         if (kenkyuushaResult.Definitions?.SequenceEqual(yomichanResult.Definitions ?? new()) ?? false)
                         {
@@ -141,12 +144,12 @@ public static class EpwingYomichanLoader
                     }
                 }
 
-                if (yomichanResult.Definitions != null)
+                else if (yomichanResult.Definitions != null)
                 {
                     yomichanResult.Definitions = yomichanResult.Definitions?.Select(def => def.Replace("┏", "")).ToList();
                 }
-
                 break;
+
             case DictType.Daijirin:
                 if (yomichanResult.Definitions != null)
                 {
