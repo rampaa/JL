@@ -126,19 +126,22 @@ public static class EpwingYomichanLoader
                     {
                         var kenkyuushaResult = (EpwingYomichanResult)kenkyuushaResults[i];
 
-                        yomichanResult.Definitions = yomichanResult.Definitions?.Select(def => def.Replace("┏", "")).ToList();
-
-                        if (kenkyuushaResult.Definitions?.SequenceEqual(yomichanResult.Definitions ?? new()) ?? false)
+                        if (yomichanResult.Definitions != null)
                         {
-                            if (string.IsNullOrEmpty(kenkyuushaResult.Reading) &&
-                                !string.IsNullOrEmpty(yomichanResult.Reading))
+                            yomichanResult.Definitions = yomichanResult.Definitions.Select(def => def.Replace("┏", "")).ToList();
+
+                            if (kenkyuushaResult.Definitions?.SequenceEqual(yomichanResult.Definitions) ?? false)
                             {
-                                kenkyuushaResults.RemoveAt(i);
-                                break;
-                            }
-                            else
-                            {
-                                return false;
+                                if (string.IsNullOrEmpty(kenkyuushaResult.Reading) &&
+                                    !string.IsNullOrEmpty(yomichanResult.Reading))
+                                {
+                                    kenkyuushaResults.RemoveAt(i);
+                                    break;
+                                }
+                                else
+                                {
+                                    return false;
+                                }
                             }
                         }
                     }
@@ -146,7 +149,7 @@ public static class EpwingYomichanLoader
 
                 else if (yomichanResult.Definitions != null)
                 {
-                    yomichanResult.Definitions = yomichanResult.Definitions?.Select(def => def.Replace("┏", "")).ToList();
+                    yomichanResult.Definitions = yomichanResult.Definitions.Select(def => def.Replace("┏", "")).ToList();
                 }
                 break;
 

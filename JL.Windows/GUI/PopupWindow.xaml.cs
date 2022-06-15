@@ -72,8 +72,8 @@ public partial class PopupWindow : Window
         Background = ConfigManager.PopupBackgroundColor;
         FontFamily = ConfigManager.PopupFont;
 
-        MaxHeight = ConfigManager.PopupMaxHeight;
-        MaxWidth = ConfigManager.PopupMaxWidth;
+        MaxHeight = WindowsUtils.DpiAwarePopupMaxHeight;
+        MaxWidth = WindowsUtils.DpiAwarePopupMaxWidth;
 
         if (ConfigManager.PopupDynamicWidth && ConfigManager.PopupDynamicHeight)
         {
@@ -83,20 +83,20 @@ public partial class PopupWindow : Window
         else if (ConfigManager.PopupDynamicWidth)
         {
             SizeToContent = SizeToContent.Width;
-            Height = ConfigManager.PopupMaxHeight;
+            Height = WindowsUtils.DpiAwarePopupMaxHeight;
         }
 
         else if (ConfigManager.PopupDynamicHeight)
         {
             SizeToContent = SizeToContent.Height;
-            Width = ConfigManager.PopupMaxWidth;
+            Width = WindowsUtils.DpiAwarePopupMaxWidth;
         }
 
         else
         {
             SizeToContent = SizeToContent.Manual;
-            Height = ConfigManager.PopupMaxHeight;
-            Width = ConfigManager.PopupMaxWidth;
+            Height = WindowsUtils.DpiAwarePopupMaxHeight;
+            Width = WindowsUtils.DpiAwarePopupMaxWidth;
         }
 
         WindowsUtils.SetInputGestureText(AddNameButton!, ConfigManager.ShowAddNameWindowKeyGesture);

@@ -308,6 +308,8 @@ public class ConfigManager : CoreConfig
             .Get("PopupMaxWidth")!), PopupMaxWidth, "PopupMaxWidth");
         WindowsUtils.Try(() => PopupMaxHeight = int.Parse(ConfigurationManager.AppSettings
             .Get("PopupMaxHeight")!), PopupMaxHeight, "PopupMaxHeight");
+        WindowsUtils.DpiAwarePopupMaxWidth = PopupMaxWidth / WindowsUtils.Dpi.DpiScaleX;
+        WindowsUtils.DpiAwarePopupMaxHeight = PopupMaxHeight / WindowsUtils.Dpi.DpiScaleY;
 
         WindowsUtils.Try(() => FixedPopupPositioning = bool.Parse(ConfigurationManager.AppSettings
             .Get("FixedPopupPositioning")!), FixedPopupPositioning, "FixedPopupPositioning");
@@ -490,8 +492,8 @@ public class ConfigManager : CoreConfig
             currentPopupWindow.Background = PopupBackgroundColor;
             currentPopupWindow.FontFamily = PopupFont;
 
-            currentPopupWindow.MaxHeight = PopupMaxHeight;
-            currentPopupWindow.MaxWidth = PopupMaxWidth;
+            currentPopupWindow.MaxHeight = WindowsUtils.DpiAwarePopupMaxHeight;
+            currentPopupWindow.MaxWidth = WindowsUtils.DpiAwarePopupMaxWidth;
 
             if (PopupDynamicWidth && PopupDynamicHeight)
             {
@@ -502,21 +504,21 @@ public class ConfigManager : CoreConfig
             else if (PopupDynamicWidth)
             {
                 currentPopupWindow.SizeToContent = SizeToContent.Width;
-                currentPopupWindow.Height = PopupMaxHeight;
+                currentPopupWindow.Height = WindowsUtils.DpiAwarePopupMaxHeight;
             }
 
 
             else if (PopupDynamicHeight)
             {
                 currentPopupWindow.SizeToContent = SizeToContent.Height;
-                currentPopupWindow.Width = PopupMaxWidth;
+                currentPopupWindow.Width = WindowsUtils.DpiAwarePopupMaxWidth;
             }
 
             else
             {
                 currentPopupWindow.SizeToContent = SizeToContent.Manual;
-                currentPopupWindow.Height = PopupMaxHeight;
-                currentPopupWindow.Width = PopupMaxWidth;
+                currentPopupWindow.Height = WindowsUtils.DpiAwarePopupMaxHeight;
+                currentPopupWindow.Width = WindowsUtils.DpiAwarePopupMaxWidth;
             }
 
             WindowsUtils.SetInputGestureText(currentPopupWindow.AddNameButton, ShowAddNameWindowKeyGesture);
