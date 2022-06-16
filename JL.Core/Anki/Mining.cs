@@ -35,7 +35,12 @@ public static class Mining
             if (string.IsNullOrEmpty(reading))
                 reading = foundSpelling;
 
-            byte[]? audioRes = await Networking.GetAudioFromJpod101(foundSpelling, reading).ConfigureAwait(false);
+            byte[]? audioRes = null;
+
+            if (userFields.Values.Any(jlField => jlField == JLField.Audio))
+            {
+                audioRes = await Networking.GetAudioFromJpod101(foundSpelling, reading).ConfigureAwait(false);
+            }
 
             Dictionary<string, object?>[] audio =
             {
@@ -47,6 +52,7 @@ public static class Mining
                     { "fields", FindAudioFields(userFields) },
                 }
             };
+
             Dictionary<string, object>[]? video = null;
             Dictionary<string, object>[]? picture = null;
 
@@ -110,6 +116,6 @@ public static class Mining
 
     private static List<string> FindAudioFields(Dictionary<string, JLField> userFields)
     {
-        return userFields.Keys.Where(key => JLField.Audio.Equals(userFields[key])).ToList();
+        return userFields.Keys.Where(key => JLField.Audio == userFields[key]).ToList();
     }
 }

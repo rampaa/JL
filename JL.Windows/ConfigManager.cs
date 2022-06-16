@@ -832,9 +832,9 @@ public class ConfigManager : CoreConfig
         config.Save(ConfigurationSaveMode.Modified);
         ConfigurationManager.RefreshSection("appSettings");
 
-        await preferenceWindow.SaveMiningSetup().ConfigureAwait(false);
-
         ApplyPreferences();
+
+        await preferenceWindow.SaveMiningSetup().ConfigureAwait(false);
     }
 
     public static void SaveBeforeClosing()
