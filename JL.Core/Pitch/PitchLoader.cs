@@ -10,7 +10,7 @@ public static class PitchLoader
         if (!Directory.Exists(dict.Path) && !File.Exists(dict.Path))
             return;
 
-        Dictionary<string, List<IResult>> kanjiumDict = dict.Contents;
+        Dictionary<string, List<IResult>> pitchDict = dict.Contents;
 
         string[] jsonFiles = Directory.GetFiles(dict.Path, "term*bank_*.json");
 
@@ -37,33 +37,33 @@ public static class PitchLoader
 
                 string spellingInHiragana = Kana.KatakanaToHiraganaConverter(newEntry.Spelling);
 
-                if (kanjiumDict.TryGetValue(spellingInHiragana, out List<IResult>? result))
+                if (pitchDict.TryGetValue(spellingInHiragana, out List<IResult>? result))
                 {
                     result.Add(newEntry);
                 }
 
                 else
                 {
-                    kanjiumDict[spellingInHiragana] = new List<IResult> { newEntry };
+                    pitchDict[spellingInHiragana] = new List<IResult> { newEntry };
                 }
 
                 if (!string.IsNullOrEmpty(newEntry.Reading))
                 {
                     string readingInHiragana = Kana.KatakanaToHiraganaConverter(newEntry.Reading);
 
-                    if (kanjiumDict.TryGetValue(readingInHiragana, out List<IResult>? readingResult))
+                    if (pitchDict.TryGetValue(readingInHiragana, out List<IResult>? readingResult))
                     {
                         readingResult.Add(newEntry);
                     }
 
                     else
                     {
-                        kanjiumDict[readingInHiragana] = new List<IResult> { newEntry };
+                        pitchDict[readingInHiragana] = new List<IResult> { newEntry };
                     }
                 }
             }
         }
 
-        kanjiumDict.TrimExcess();
+        pitchDict.TrimExcess();
     }
 }

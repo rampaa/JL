@@ -10,7 +10,6 @@ public class FrequencyYomichanLoader
             return;
 
         Dictionary<string, List<FrequencyRecord>> freqDict = freq.Contents;
-        List<List<JsonElement>>? frequencyJson;
 
         string[] jsonFiles = Directory.EnumerateFiles(freq.Path, "*_bank_*.json", SearchOption.TopDirectoryOnly)
             .Where(s => s.Contains("term") || s.Contains("kanji"))
@@ -19,6 +18,7 @@ public class FrequencyYomichanLoader
         foreach (string jsonFile in jsonFiles)
         {
             FileStream openStream = File.OpenRead(jsonFile);
+            List<List<JsonElement>>? frequencyJson;
             await using (openStream.ConfigureAwait(false))
             {
                 frequencyJson = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream)

@@ -225,7 +225,7 @@ public static class JMdictLoader
 
                             catch(Exception ex)
                             {
-                                Utils.Logger.Error(ex.ToString());
+                                Utils.Logger.Error("{CultureInfoException}", ex.ToString());
                                 s_canHandleCulture = false;
                             }
                         }
