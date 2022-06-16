@@ -110,9 +110,6 @@ public static class Mining
 
     private static List<string> FindAudioFields(Dictionary<string, JLField> userFields)
     {
-        List<string> audioFields = new();
-        audioFields.AddRange(userFields.Keys.Where(key => JLField.Audio.Equals(userFields[key])));
-
-        return audioFields;
+        return userFields.Keys.Where(key => JLField.Audio.Equals(userFields[key])).ToList();
     }
 }

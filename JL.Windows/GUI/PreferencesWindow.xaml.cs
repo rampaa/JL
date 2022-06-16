@@ -39,12 +39,12 @@ public partial class PreferencesWindow : Window
         WindowsUtils.ShowColorPicker(sender, e);
     }
 
-    private void SaveButton_Click(object sender, RoutedEventArgs e)
+    private async void SaveButton_Click(object sender, RoutedEventArgs e)
     {
         Visibility = Visibility.Collapsed;
-        ConfigManager.Instance.SavePreferences(this);
         Storage.Frontend.InvalidateDisplayCache();
         MainWindow.Instance.Focus();
+        await ConfigManager.Instance.SavePreferences(this).ConfigureAwait(false);
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -213,10 +213,13 @@ public partial class PreferencesWindow : Window
         }
     }
 
-    public async void SaveMiningSetup()
+    public async Task SaveMiningSetup()
     {
         try
         {
+            if (!ConfigManager.AnkiIntegration)
+                return;
+
             string deckName = MiningSetupComboBoxDeckNames.SelectionBoxItem.ToString()!;
             string modelName = MiningSetupComboBoxModelNames.SelectionBoxItem.ToString()!;
 

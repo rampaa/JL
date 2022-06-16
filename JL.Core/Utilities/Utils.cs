@@ -72,7 +72,7 @@ public static class Utils
         }
     }
 
-    public static void SerializeDicts()
+    public static async Task SerializeDicts()
     {
         try
         {
@@ -84,8 +84,8 @@ public static class Utils
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             };
 
-            File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "dicts.json"),
-                JsonSerializer.Serialize(Storage.Dicts, jso));
+            await File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "dicts.json"),
+                JsonSerializer.Serialize(Storage.Dicts, jso)).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -94,7 +94,7 @@ public static class Utils
         }
     }
 
-    public static void SerializeFreqs()
+    public static async Task SerializeFreqs()
     {
         try
         {
@@ -105,8 +105,8 @@ public static class Utils
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             };
 
-            File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "freqs.json"),
-                JsonSerializer.Serialize(Storage.FreqDicts, jso));
+            await File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "freqs.json"),
+                JsonSerializer.Serialize(Storage.FreqDicts, jso)).ConfigureAwait(false);
         }
         catch (Exception e)
         {

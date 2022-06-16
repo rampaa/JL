@@ -663,7 +663,7 @@ public class ConfigManager : CoreConfig
         preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInPopups;
     }
 
-    public void SavePreferences(PreferencesWindow preferenceWindow)
+    public async Task SavePreferences(PreferencesWindow preferenceWindow)
     {
         WindowsUtils.KeyGestureSaver("MiningModeKeyGesture", preferenceWindow.MiningModeKeyGestureTextBox.Text);
         WindowsUtils.KeyGestureSaver("PlayAudioKeyGesture", preferenceWindow.PlayAudioKeyGestureTextBox.Text);
@@ -832,7 +832,7 @@ public class ConfigManager : CoreConfig
         config.Save(ConfigurationSaveMode.Modified);
         ConfigurationManager.RefreshSection("appSettings");
 
-        preferenceWindow.SaveMiningSetup();
+        await preferenceWindow.SaveMiningSetup().ConfigureAwait(false);
 
         ApplyPreferences();
     }

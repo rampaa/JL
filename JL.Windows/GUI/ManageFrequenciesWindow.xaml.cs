@@ -39,10 +39,10 @@ public partial class ManageFrequenciesWindow : Window
     {
         e.Cancel = true;
         Visibility = Visibility.Collapsed;
-        Utils.SerializeFreqs();
-        await Storage.LoadFrequencies().ConfigureAwait(false);
         Storage.Frontend.InvalidateDisplayCache();
         MainWindow.Instance.Focus();
+        await Utils.SerializeFreqs().ConfigureAwait(false);
+        await Storage.LoadFrequencies().ConfigureAwait(false);
     }
 
     // probably should be split into several methods

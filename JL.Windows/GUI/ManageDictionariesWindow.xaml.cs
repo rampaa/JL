@@ -49,10 +49,10 @@ public partial class ManageDictionariesWindow : Window
     {
         e.Cancel = true;
         Visibility = Visibility.Collapsed;
-        Utils.SerializeDicts();
-        await Storage.LoadDictionaries().ConfigureAwait(false);
         Storage.Frontend.InvalidateDisplayCache();
         MainWindow.Instance.Focus();
+        await Utils.SerializeDicts().ConfigureAwait(false);
+        await Storage.LoadDictionaries().ConfigureAwait(false);
     }
 
     // probably should be split into several methods
