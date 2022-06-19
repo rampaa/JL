@@ -34,6 +34,15 @@ jobs:
           release_name="JL-$tag-${{ matrix.target }}"
           # Build everything
           dotnet publish JL.Windows/JL.Windows.csproj --framework net6.0-windows --runtime "${{ matrix.target }}" --no-self-contained -c Release -o "$release_name"
+          # Mark JL as LARGEADDRESSAWARE
+          if [ "${{ matrix.target }}" = "win-x86" ]
+          then
+          vswhere_path="C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe"
+          read -r vc_tools_version<"$("$vswhere_path" -latest -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find "VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt")"
+          vc_tools_version="${vc_tools_version//$'\r'/}"
+          editbin_path=$("${vswhere_path}" -latest -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find "VC/Tools/MSVC/${vc_tools_version}/bin/Hostx64/x64/editbin.exe")
+          "${editbin_path}" //NOLOGO //LARGEADDRESSAWARE ${release_name}/JL.exe
+          fi
           # Pack files
           7z a -tzip "${release_name}.zip" "./${release_name}/*"
           # Delete output directory
