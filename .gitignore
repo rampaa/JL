@@ -366,7 +366,7 @@ FodyWeavers.xsd
 
 .vscode
 
-/JL/App.config
-/JL/Resources/JMdict.xml
-/JL/Resources/JMnedict.xml
-/JL/Resources/kanjidic2.xml
+/JL.Windows/App.config
+/JL.Core/Resources/JMdict.xml
+/JL.Core/Resources/JMnedict.xml
+/JL.Core/Resources/kanjidic2.xml
