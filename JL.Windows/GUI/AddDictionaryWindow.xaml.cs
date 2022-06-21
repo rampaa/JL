@@ -42,7 +42,9 @@ public partial class AddDictionaryWindow : Window
         }
 
         string path = TextBlockPath.Text;
-        if (string.IsNullOrEmpty(path) || (!Directory.Exists(path) && !File.Exists(path)))
+        if (string.IsNullOrEmpty(path)
+            || (!Directory.Exists(path) && !File.Exists(path))
+            || Storage.Dicts.Values.Select(freq => freq.Path).Contains(path))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
             isValid = false;

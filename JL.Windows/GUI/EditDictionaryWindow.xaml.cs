@@ -38,7 +38,9 @@ public partial class EditDictionaryWindow : Window
         bool isValid = true;
 
         string path = TextBlockPath.Text;
-        if (string.IsNullOrEmpty(path) || (!Directory.Exists(path) && !File.Exists(path)))
+        if (string.IsNullOrEmpty(path)
+            || (!Directory.Exists(path) && !File.Exists(path))
+            || Storage.Dicts.Values.Count(dict => dict.Path == path) > 1)
         {
             TextBlockPath.BorderBrush = Brushes.Red;
             isValid = false;
