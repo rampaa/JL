@@ -56,6 +56,8 @@ public class ConfigManager : CoreConfig
     public static Brush MainWindowTextColor { get; private set; } = Brushes.White;
     public static Brush MainWindowBacklogTextColor { get; private set; } = Brushes.Bisque;
     public static bool TextOnlyVisibleOnHover { get; set; } = false;
+    public static bool ChangeMainWindowBackgroundOpacityOnUnhover { get; set; } = false;
+    public static double MainWindowBackgroundOpacityOnUnhover { get; set; } = 1; // 1-100
 
     #endregion
 
@@ -176,11 +178,6 @@ public class ConfigManager : CoreConfig
                 bool.Parse(ConfigurationManager.AppSettings.Get("AlwaysOnTop")!),
             AlwaysOnTop, "AlwaysOnTop");
         mainWindow.Topmost = AlwaysOnTop;
-
-        WindowsUtils.Try(() => TextOnlyVisibleOnHover =
-                bool.Parse(ConfigurationManager.AppSettings.Get("TextOnlyVisibleOnHover")!),
-            TextOnlyVisibleOnHover, "TextOnlyVisibleOnHover");
-        mainWindow.MainTextBox.Opacity = TextOnlyVisibleOnHover ? 0 : 1;
 
         WindowsUtils.Try(() => AnkiIntegration =
                 bool.Parse(ConfigurationManager.AppSettings.Get("AnkiIntegration")!),
@@ -447,11 +444,10 @@ public class ConfigManager : CoreConfig
         WindowsUtils.SetInputGestureText(mainWindow.StatsButton, ShowStatsKeyGesture);
 
         WindowsUtils.Try(() => mainWindow.OpacitySlider.Value = double.Parse(ConfigurationManager
-            .AppSettings
-            .Get("MainWindowOpacity")!), mainWindow.OpacitySlider.Value, "MainWindowOpacity");
+            .AppSettings.Get("MainWindowOpacity")!), mainWindow.OpacitySlider.Value, "MainWindowOpacity");
+
         WindowsUtils.Try(() => mainWindow.FontSizeSlider.Value = double.Parse(ConfigurationManager
-            .AppSettings
-            .Get("MainWindowFontSize")!), mainWindow.FontSizeSlider.Value, "MainWindowFontSize");
+            .AppSettings.Get("MainWindowFontSize")!), mainWindow.FontSizeSlider.Value, "MainWindowFontSize");
 
         tempStr = ConfigurationManager.AppSettings.Get("MainWindowFont");
 
@@ -470,6 +466,24 @@ public class ConfigManager : CoreConfig
         mainWindow.Background.Opacity = mainWindow.OpacitySlider.Value / 100;
 
         mainWindow.MainTextBox.Foreground = MainWindowTextColor;
+
+        WindowsUtils.Try(() => TextOnlyVisibleOnHover =
+            bool.Parse(ConfigurationManager.AppSettings.Get("TextOnlyVisibleOnHover")!),
+            TextOnlyVisibleOnHover, "TextOnlyVisibleOnHover");
+        mainWindow.MainTextBox.Opacity = TextOnlyVisibleOnHover ? 0 : 1;
+
+        WindowsUtils.Try(() => ChangeMainWindowBackgroundOpacityOnUnhover =
+            bool.Parse(ConfigurationManager.AppSettings.Get("ChangeMainWindowBackgroundOpacityOnUnhover")!),
+            ChangeMainWindowBackgroundOpacityOnUnhover, "ChangeMainWindowBackgroundOpacityOnUnhover");
+
+        WindowsUtils.Try(() => MainWindowBackgroundOpacityOnUnhover =
+            int.Parse(ConfigurationManager.AppSettings.Get("MainWindowBackgroundOpacityOnUnhover")!),
+            MainWindowBackgroundOpacityOnUnhover, "MainWindowBackgroundOpacityOnUnhover");
+
+        if (ChangeMainWindowBackgroundOpacityOnUnhover)
+        {
+            mainWindow.Background.Opacity = MainWindowBackgroundOpacityOnUnhover / 100;
+        }
 
         WindowsUtils.Try(() => MainWindowHeight = double.Parse(ConfigurationManager.AppSettings
             .Get("MainWindowHeight")!), MainWindowHeight, "MainWindowHeight");
@@ -625,6 +639,9 @@ public class ConfigManager : CoreConfig
         preferenceWindow.TextboxFontSizeNumericUpDown.Value = mainWindow.FontSizeSlider.Value;
         preferenceWindow.TextboxOpacityNumericUpDown.Value = mainWindow.OpacitySlider.Value;
 
+        preferenceWindow.ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox.IsChecked = ChangeMainWindowBackgroundOpacityOnUnhover;
+        preferenceWindow.MainWindowBackgroundOpacityOnUnhoverNumericUpDown.Value = MainWindowBackgroundOpacityOnUnhover;
+
         preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
         preferenceWindow.MainWindowFontComboBox.SelectedIndex = s_japaneseFonts.FindIndex(f =>
             f.Content.ToString() == mainWindow.MainTextBox.FontFamily.Source);
@@ -742,6 +759,12 @@ public class ConfigManager : CoreConfig
             preferenceWindow.MainWindowHeightNumericUpDown.Value.ToString();
         config.AppSettings.Settings["MainWindowBackgroundColor"].Value =
             preferenceWindow.TextboxBackgroundColorButton.Background.ToString();
+
+        config.AppSettings.Settings["ChangeMainWindowBackgroundOpacityOnUnhover"].Value =
+            preferenceWindow.ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings["MainWindowBackgroundOpacityOnUnhover"].Value =
+            preferenceWindow.MainWindowBackgroundOpacityOnUnhoverNumericUpDown.Value.ToString();
+
         config.AppSettings.Settings["MainWindowTextColor"].Value =
             preferenceWindow.TextboxTextColorButton.Background.ToString();
         config.AppSettings.Settings["MainWindowBacklogTextColor"].Value =

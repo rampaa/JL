@@ -313,6 +313,11 @@ public partial class MainWindow : Window, IFrontend
             MainTextBox.Opacity = 0;
         }
 
+        if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+        {
+            Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
+        }
+
         if (FirstPopupWindow.MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning || (FirstPopupWindow.UnavoidableMouseEnter && FirstPopupWindow.IsMouseOver))
             return;
 
@@ -330,6 +335,11 @@ public partial class MainWindow : Window, IFrontend
         if (ConfigManager.TextOnlyVisibleOnHover)
         {
             MainTextBox.Opacity = 1;
+        }
+
+        if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+        {
+            Background.Opacity = OpacitySlider.Value / 100;
         }
     }
 
