@@ -44,8 +44,8 @@ public class ConfigManager : CoreConfig
     public static ModifierKeys LookupKey { get; private set; } = ModifierKeys.Shift;
     public static bool HighlightLongestMatch { get; private set; } = false;
     public static bool AutoPlayAudio { get; private set; } = false;
-
     public static bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
+    public static bool AlwaysOnTop { get; set; } = true;
 
     #endregion
 
@@ -55,6 +55,7 @@ public class ConfigManager : CoreConfig
     public static double MainWindowHeight { get; set; } = 200;
     public static Brush MainWindowTextColor { get; private set; } = Brushes.White;
     public static Brush MainWindowBacklogTextColor { get; private set; } = Brushes.Bisque;
+    public static bool TextOnlyVisibleOnHover { get; set; } = false;
 
     #endregion
 
@@ -124,6 +125,8 @@ public class ConfigManager : CoreConfig
     public static KeyGesture ShowStatsKeyGesture { get; private set; } = new(Key.Y, ModifierKeys.Windows);
     public static KeyGesture NextDictKeyGesture { get; private set; } = new(Key.PageDown, ModifierKeys.Windows);
     public static KeyGesture PreviousDictKeyGesture { get; private set; } = new(Key.PageUp, ModifierKeys.Windows);
+    public static KeyGesture AlwaysOnTopKeyGesture { get; private set; } = new(Key.R, ModifierKeys.Windows);
+    public static KeyGesture TextOnlyVisibleOnHoverKeyGesture { get; private set; } = new(Key.E, ModifierKeys.Windows);
 
     #endregion
 
@@ -168,6 +171,16 @@ public class ConfigManager : CoreConfig
         WindowsUtils.Try(() => CheckForJLUpdatesOnStartUp =
                 bool.Parse(ConfigurationManager.AppSettings.Get("CheckForJLUpdatesOnStartUp")!),
             CheckForJLUpdatesOnStartUp, "CheckForJLUpdatesOnStartUp");
+
+        WindowsUtils.Try(() => AlwaysOnTop =
+                bool.Parse(ConfigurationManager.AppSettings.Get("AlwaysOnTop")!),
+            AlwaysOnTop, "AlwaysOnTop");
+        mainWindow.Topmost = AlwaysOnTop;
+
+        WindowsUtils.Try(() => TextOnlyVisibleOnHover =
+                bool.Parse(ConfigurationManager.AppSettings.Get("TextOnlyVisibleOnHover")!),
+            TextOnlyVisibleOnHover, "TextOnlyVisibleOnHover");
+        mainWindow.MainTextBox.Opacity = TextOnlyVisibleOnHover ? 0 : 1;
 
         WindowsUtils.Try(() => AnkiIntegration =
                 bool.Parse(ConfigurationManager.AppSettings.Get("AnkiIntegration")!),
@@ -422,6 +435,9 @@ public class ConfigManager : CoreConfig
         NextDictKeyGesture = WindowsUtils.KeyGestureSetter("NextDictKeyGesture", NextDictKeyGesture);
         PreviousDictKeyGesture = WindowsUtils.KeyGestureSetter("PreviousDictKeyGesture", PreviousDictKeyGesture);
 
+        AlwaysOnTopKeyGesture = WindowsUtils.KeyGestureSetter("AlwaysOnTopKeyGesture", AlwaysOnTopKeyGesture);
+        TextOnlyVisibleOnHoverKeyGesture = WindowsUtils.KeyGestureSetter("TextOnlyVisibleOnHoverKeyGesture", TextOnlyVisibleOnHoverKeyGesture);
+
         WindowsUtils.SetInputGestureText(mainWindow.AddNameButton, ShowAddNameWindowKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.AddWordButton, ShowAddWordWindowKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.SearchButton, SearchWithBrowserKeyGesture);
@@ -575,6 +591,11 @@ public class ConfigManager : CoreConfig
         preferenceWindow.PreviousDictKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(PreviousDictKeyGesture);
 
+        preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text =
+            WindowsUtils.KeyGestureToString(AlwaysOnTopKeyGesture);
+        preferenceWindow.TextOnlyVisibleOnHoverKeyGestureTextBox.Text =
+            WindowsUtils.KeyGestureToString(TextOnlyVisibleOnHoverKeyGesture);
+
         preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
         preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri;
         preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = ForceSyncAnki;
@@ -585,7 +606,8 @@ public class ConfigManager : CoreConfig
         preferenceWindow.AutoPlayAudioCheckBox.IsChecked = AutoPlayAudio;
         preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = CheckForJLUpdatesOnStartUp;
         preferenceWindow.PrecachingCheckBox.IsChecked = Precaching;
-
+        preferenceWindow.AlwaysOnTopCheckBox.IsChecked = AlwaysOnTop;
+        preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked = TextOnlyVisibleOnHover;
         preferenceWindow.AnkiIntegrationCheckBox.IsChecked = AnkiIntegration;
         preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
 
@@ -702,6 +724,11 @@ public class ConfigManager : CoreConfig
         WindowsUtils.KeyGestureSaver("PreviousDictKeyGesture",
             preferenceWindow.PreviousDictKeyGestureTextBox.Text);
 
+        WindowsUtils.KeyGestureSaver("AlwaysOnTopKeyGesture",
+            preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text);
+        WindowsUtils.KeyGestureSaver("TextOnlyVisibleOnHoverKeyGesture",
+            preferenceWindow.TextOnlyVisibleOnHoverKeyGestureTextBox.Text);
+
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
         config.AppSettings.Settings["MaxSearchLength"].Value =
@@ -744,6 +771,11 @@ public class ConfigManager : CoreConfig
             preferenceWindow.PrecachingCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["CheckForJLUpdatesOnStartUp"].Value =
             preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked.ToString();
+
+        config.AppSettings.Settings["AlwaysOnTop"].Value =
+            preferenceWindow.AlwaysOnTopCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings["TextOnlyVisibleOnHover"].Value =
+            preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked.ToString();
 
         config.AppSettings.Settings["AnkiIntegration"].Value =
             preferenceWindow.AnkiIntegrationCheckBox.IsChecked.ToString();

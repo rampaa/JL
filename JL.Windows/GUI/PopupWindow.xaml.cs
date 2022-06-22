@@ -1642,7 +1642,7 @@ public partial class PopupWindow : Window
         Hide();
         LastText = "";
 
-        if (ConfigManager.HighlightLongestMatch)
+        if (ConfigManager.HighlightLongestMatch && !PopupContextMenu.IsVisible)
         {
             WindowsUtils.Unselect(_lastTextBox);
         }

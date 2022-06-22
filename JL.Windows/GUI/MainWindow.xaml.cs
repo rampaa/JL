@@ -209,14 +209,15 @@ public partial class MainWindow : Window, IFrontend
             CopyFromClipboard();
         }
 
-        // Add an option?
-        if (FirstPopupWindow.Visibility != Visibility.Visible
-            && ManageDictionariesWindow.Instance.Visibility != Visibility.Visible
-            && ManageFrequenciesWindow.Instance.Visibility != Visibility.Visible
-            && AddNameWindow.Instance.Visibility != Visibility.Visible
-            && AddWordWindow.Instance.Visibility != Visibility.Visible
-            && PreferencesWindow.Instance.Visibility != Visibility.Visible
-            && StatsWindow.Instance.Visibility != Visibility.Visible)
+        if (ConfigManager.AlwaysOnTop
+            && !FirstPopupWindow.IsVisible
+            && !ManageDictionariesWindow.Instance.IsVisible
+            && !ManageFrequenciesWindow.Instance.IsVisible
+            && !AddNameWindow.Instance.IsVisible
+            && !AddWordWindow.Instance.IsVisible
+            && !PreferencesWindow.Instance.IsVisible
+            && !StatsWindow.Instance.IsVisible
+            && !MainTextboxContextMenu.IsVisible)
         {
             _winApi!.KeepTopmost();
         }
@@ -299,15 +300,36 @@ public partial class MainWindow : Window, IFrontend
 
     private void MainTextBox_MouseLeave(object sender, MouseEventArgs e)
     {
+        if (ConfigManager.TextOnlyVisibleOnHover
+            && !FirstPopupWindow.IsVisible
+            && !ManageDictionariesWindow.Instance.IsVisible
+            && !ManageFrequenciesWindow.Instance.IsVisible
+            && !AddNameWindow.Instance.IsVisible
+            && !AddWordWindow.Instance.IsVisible
+            && !PreferencesWindow.Instance.IsVisible
+            && !StatsWindow.Instance.IsVisible
+            && !MainTextboxContextMenu.IsVisible)
+        {
+            MainTextBox.Opacity = 0;
+        }
+
         if (FirstPopupWindow.MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning || (FirstPopupWindow.UnavoidableMouseEnter && FirstPopupWindow.IsMouseOver))
             return;
 
         FirstPopupWindow.Hide();
         FirstPopupWindow.LastText = "";
 
-        if (ConfigManager.HighlightLongestMatch)
+        if (ConfigManager.HighlightLongestMatch && !MainTextboxContextMenu.IsVisible)
         {
             WindowsUtils.Unselect(MainTextBox);
+        }
+    }
+
+    private void MainTextBox_MouseEnter(object sender, MouseEventArgs e)
+    {
+        if (ConfigManager.TextOnlyVisibleOnHover)
+        {
+            MainTextBox.Opacity = 1;
         }
     }
 
@@ -461,6 +483,28 @@ public partial class MainWindow : Window, IFrontend
         {
             WindowsUtils.ShowStatsWindow();
         }
+
+        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.AlwaysOnTopKeyGesture))
+        {
+            ConfigManager.AlwaysOnTop = !ConfigManager.AlwaysOnTop;
+
+            Topmost = ConfigManager.AlwaysOnTop;
+        }
+
+        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.TextOnlyVisibleOnHoverKeyGesture))
+        {
+            ConfigManager.TextOnlyVisibleOnHover = !ConfigManager.TextOnlyVisibleOnHover;
+
+            if (ConfigManager.TextOnlyVisibleOnHover)
+            {
+                MainTextBox.Opacity = MainTextBox.IsMouseOver ? 1 : 0;
+            }
+
+            else
+            {
+                MainTextBox.Opacity = 1;
+            }
+        }
     }
 
     private void AddName(object sender, RoutedEventArgs e)
@@ -556,19 +600,6 @@ public partial class MainWindow : Window, IFrontend
     {
         ConfigManager.MainWindowHeight = Height;
         ConfigManager.MainWindowWidth = Width;
-    }
-
-    private void MainTextBox_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
-    {
-        ManageDictionariesButton!.IsEnabled = Storage.DictsReady
-                                              && !Storage.UpdatingJMdict
-                                              && !Storage.UpdatingJMnedict
-                                              && !Storage.UpdatingKanjidic;
-
-        ManageFrequenciesButton!.IsEnabled = Storage.FreqsReady;
-
-        AddNameButton!.IsEnabled = Storage.DictsReady;
-        AddWordButton!.IsEnabled = Storage.DictsReady;
     }
 
     private void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -777,5 +808,18 @@ public partial class MainWindow : Window, IFrontend
     {
         //FocusEllipse.Fill = Brushes.Green;
         //FocusEllipse.Opacity = Background.Opacity;
+    }
+
+    private void MainTextBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+    {
+        ManageDictionariesButton!.IsEnabled = Storage.DictsReady
+                                      && !Storage.UpdatingJMdict
+                                      && !Storage.UpdatingJMnedict
+                                      && !Storage.UpdatingKanjidic;
+
+        ManageFrequenciesButton!.IsEnabled = Storage.FreqsReady;
+
+        AddNameButton!.IsEnabled = Storage.DictsReady;
+        AddWordButton!.IsEnabled = Storage.DictsReady;
     }
 }
