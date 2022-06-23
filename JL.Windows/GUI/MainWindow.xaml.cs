@@ -749,6 +749,7 @@ public partial class MainWindow : Window, IFrontend
     //            WindowResizer.SetWindowPos(_windowResizer.windowHandle, IntPtr.Zero, Convert.ToInt32(Left + e.HorizontalChange), Convert.ToInt32(Top + e.VerticalChange), Convert.ToInt32(Width), Convert.ToInt32(Height),
     //WindowResizer.SetWindowPosFlags.SWP_SHOWWINDOW | WindowResizer.SetWindowPosFlags.SWP_NOREDRAW);
     //}
+
     private void ResizeWindow(object sender, MouseButtonEventArgs e)
     {
         _winApi?.ResizeWindow(sender as Border ?? new());
@@ -759,33 +760,21 @@ public partial class MainWindow : Window, IFrontend
         WidthBeforeResolutionChange = Width;
     }
 
-    public bool IsMouseOnTitleBar(int lParam)
-    {
-        int x = lParam << 16 >> 16;
-        int y = lParam >> 16;
-        Point cursorPoint = PointFromScreen(new Point(x, y));
+    //public bool IsMouseOnTitleBar(int lParam)
+    //{
+    //    int x = lParam << 16 >> 16;
+    //    int y = lParam >> 16;
+    //    Point cursorPoint = PointFromScreen(new Point(x, y));
 
-        HitTestResult? hitTestResult = VisualTreeHelper.HitTest(this, cursorPoint);
+    //    HitTestResult? hitTestResult = VisualTreeHelper.HitTest(this, cursorPoint);
 
-        if (hitTestResult != null)
-        {
-            return hitTestResult.VisualHit == TitleBar;
-        }
+    //    if (hitTestResult != null)
+    //    {
+    //        return hitTestResult.VisualHit == TitleBar;
+    //    }
 
-        return false;
-    }
-
-    public bool IsMouseOnTitleBar(Point cursorPoint)
-    {
-        HitTestResult? hitTestResult = VisualTreeHelper.HitTest(this, cursorPoint);
-
-        if (hitTestResult != null)
-        {
-            return hitTestResult.VisualHit == TitleBar;
-        }
-
-        return false;
-    }
+    //    return false;
+    //}
 
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
