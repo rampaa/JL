@@ -94,4 +94,23 @@ public partial class AddNameWindow : Window
     {
         OtherRadioButton!.IsChecked = true;
     }
+
+    private void Window_Closed(object sender, EventArgs e)
+    {
+        MainWindow mainWindow = MainWindow.Instance;
+        mainWindow.Focus();
+
+        if (!mainWindow.IsMouseOver)
+        {
+            if (ConfigManager.TextOnlyVisibleOnHover)
+            {
+                mainWindow.MainGrid.Opacity = 0;
+            }
+
+            if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+            {
+                mainWindow.Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
+            }
+        }
+    }
 }

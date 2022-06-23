@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Add Word" Height="450" ResizeMode="NoResize" Width="457" SizeToContent="Height" MaxHeight="600"
-        Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False">
+        Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False" Closed="Window_Closed">
     <ScrollViewer>
         <Grid Background="Black">
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,20">

@@ -470,7 +470,7 @@ public class ConfigManager : CoreConfig
         WindowsUtils.Try(() => TextOnlyVisibleOnHover =
             bool.Parse(ConfigurationManager.AppSettings.Get("TextOnlyVisibleOnHover")!),
             TextOnlyVisibleOnHover, "TextOnlyVisibleOnHover");
-        mainWindow.MainTextBox.Opacity = TextOnlyVisibleOnHover ? 0 : 1;
+        mainWindow.MainGrid.Opacity = TextOnlyVisibleOnHover && !mainWindow.IsMouseOver ? 0 : 1;
 
         WindowsUtils.Try(() => ChangeMainWindowBackgroundOpacityOnUnhover =
             bool.Parse(ConfigurationManager.AppSettings.Get("ChangeMainWindowBackgroundOpacityOnUnhover")!),
@@ -480,7 +480,7 @@ public class ConfigManager : CoreConfig
             int.Parse(ConfigurationManager.AppSettings.Get("MainWindowBackgroundOpacityOnUnhover")!),
             MainWindowBackgroundOpacityOnUnhover, "MainWindowBackgroundOpacityOnUnhover");
 
-        if (ChangeMainWindowBackgroundOpacityOnUnhover)
+        if (ChangeMainWindowBackgroundOpacityOnUnhover && !mainWindow.IsMouseOver)
         {
             mainWindow.Background.Opacity = MainWindowBackgroundOpacityOnUnhover / 100;
         }

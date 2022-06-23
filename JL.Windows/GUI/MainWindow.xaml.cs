@@ -300,24 +300,6 @@ public partial class MainWindow : Window, IFrontend
 
     private void MainTextBox_MouseLeave(object sender, MouseEventArgs e)
     {
-        if (ConfigManager.TextOnlyVisibleOnHover
-            && !FirstPopupWindow.IsVisible
-            && !ManageDictionariesWindow.Instance.IsVisible
-            && !ManageFrequenciesWindow.Instance.IsVisible
-            && !AddNameWindow.Instance.IsVisible
-            && !AddWordWindow.Instance.IsVisible
-            && !PreferencesWindow.Instance.IsVisible
-            && !StatsWindow.Instance.IsVisible
-            && !MainTextboxContextMenu.IsVisible)
-        {
-            MainTextBox.Opacity = 0;
-        }
-
-        if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
-        {
-            Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
-        }
-
         if (FirstPopupWindow.MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning || (FirstPopupWindow.UnavoidableMouseEnter && FirstPopupWindow.IsMouseOver))
             return;
 
@@ -327,19 +309,6 @@ public partial class MainWindow : Window, IFrontend
         if (ConfigManager.HighlightLongestMatch && !MainTextboxContextMenu.IsVisible)
         {
             WindowsUtils.Unselect(MainTextBox);
-        }
-    }
-
-    private void MainTextBox_MouseEnter(object sender, MouseEventArgs e)
-    {
-        if (ConfigManager.TextOnlyVisibleOnHover)
-        {
-            MainTextBox.Opacity = 1;
-        }
-
-        if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
-        {
-            Background.Opacity = OpacitySlider.Value / 100;
         }
     }
 
@@ -507,12 +476,12 @@ public partial class MainWindow : Window, IFrontend
 
             if (ConfigManager.TextOnlyVisibleOnHover)
             {
-                MainTextBox.Opacity = MainTextBox.IsMouseOver ? 1 : 0;
+                MainGrid.Opacity = IsMouseOver ? 1 : 0;
             }
 
             else
             {
-                MainTextBox.Opacity = 1;
+                MainGrid.Opacity = 1;
             }
         }
     }
@@ -731,6 +700,10 @@ public partial class MainWindow : Window, IFrontend
 
     private void Border_OnMouseEnter(object sender, MouseEventArgs e)
     {
+        // For some reason, when DragMove() is used Mouse.GetPosition() returns Point(0, 0)
+        if (e.GetPosition(this) == new Point(0, 0))
+            return;
+
         var border = (Border)sender;
 
         switch (border.Name)
@@ -792,7 +765,19 @@ public partial class MainWindow : Window, IFrontend
         int y = lParam >> 16;
         Point cursorPoint = PointFromScreen(new Point(x, y));
 
-        HitTestResult? hitTestResult = VisualTreeHelper.HitTest(MainGrid!, cursorPoint);
+        HitTestResult? hitTestResult = VisualTreeHelper.HitTest(this, cursorPoint);
+
+        if (hitTestResult != null)
+        {
+            return hitTestResult.VisualHit == TitleBar;
+        }
+
+        return false;
+    }
+
+    public bool IsMouseOnTitleBar(Point cursorPoint)
+    {
+        HitTestResult? hitTestResult = VisualTreeHelper.HitTest(this, cursorPoint);
 
         if (hitTestResult != null)
         {
@@ -804,6 +789,11 @@ public partial class MainWindow : Window, IFrontend
 
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
+        if (e.LeftButton == MouseButtonState.Pressed)
+        {
+            DragMove();
+        }
+
         LeftPositionBeforeResolutionChange = Left;
         TopPositionBeforeResolutionChange = Top;
     }
@@ -831,5 +821,37 @@ public partial class MainWindow : Window, IFrontend
 
         AddNameButton!.IsEnabled = Storage.DictsReady;
         AddWordButton!.IsEnabled = Storage.DictsReady;
+    }
+
+    private void Window_MouseLeave(object sender, MouseEventArgs e)
+    {
+        if (!FirstPopupWindow.IsVisible
+            && !AddNameWindow.Instance.IsVisible
+            && !AddWordWindow.Instance.IsVisible
+            && !MainTextboxContextMenu.IsVisible)
+        {
+            if (ConfigManager.TextOnlyVisibleOnHover)
+            {
+                MainGrid.Opacity = 0;
+            }
+
+            if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+            {
+                Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
+            }
+        }
+    }
+
+    private void Window_MouseEnter(object sender, MouseEventArgs e)
+    {
+        if (ConfigManager.TextOnlyVisibleOnHover)
+        {
+            MainGrid.Opacity = 1;
+        }
+
+        if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+        {
+            Background.Opacity = OpacitySlider.Value / 100;
+        }
     }
 }

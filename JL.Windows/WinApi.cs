@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
-using JL.Windows.GUI;
 
 namespace JL.Windows;
 
@@ -161,13 +160,13 @@ public class WinApi
                 handled = true;
                 return (IntPtr)1;
 
-            case NativeMethods.WM_NCHITTEST:
-                if (MainWindow.Instance.IsMouseOnTitleBar(lParam.ToInt32()))
-                {
-                    handled = true;
-                    return (IntPtr)2; // HTCAPTION
-                }
-                break;
+                //case NativeMethods.WM_NCHITTEST:
+                //    if (MainWindow.Instance.IsMouseOnTitleBar(lParam.ToInt32()))
+                //    {
+                //        handled = true;
+                //        return (IntPtr)2; // HTCAPTION
+                //    }
+                //    break;
         }
 
         return IntPtr.Zero;

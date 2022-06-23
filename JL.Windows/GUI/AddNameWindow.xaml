@@ -6,7 +6,7 @@
     x:Class="JL.Windows.GUI.AddNameWindow"
     mc:Ignorable="d"
     Title="Add Name" Height="350" Width="400" Topmost="True" SizeToContent="Height" ResizeMode="NoResize"
-    MaxHeight="600" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" ShowInTaskbar="False">
+    MaxHeight="600" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" ShowInTaskbar="False" Closed="Window_Closed">
 
     <ScrollViewer>
         <Grid Background="Black">
