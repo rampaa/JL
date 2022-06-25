@@ -116,8 +116,10 @@ You need to be in mining mode in order to interact with the popup window.
 ### How do I disable pass-through mode?
 Press the opacity slider button located top-left of the main window.
 ### How can I use JL with Magpie?
-Enable the "Preferences>General>Always on top" option. This option will make sure that JL is the topmost window on every clipboard change.\
+Enable the "Preferences>General>Always on top" option. This option will make sure that JL is the topmost window on every clipboard change.
+
 Disable the "Preferences>Popup>Focus on lookup" option. When this option is disabled, JL can work without stealing the focus from other windows.
+
 
 ### How do I add EPWING dictionaries?
 
