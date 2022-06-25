@@ -1,7 +1,7 @@
 # JL
 JL is a program for looking up Japanese words and expressions. Inspired by [Nazeka](https://github.com/wareya/nazeka) and [Chiitrans Lite](https://github.com/alexbft/chiitrans).
 
-Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer the x86 version for 50-80% less memory usage. ~~Prefer the x64 version if you intend to use *lots of* dictionaries together, because x86 programs cannot use more than 2 GB of RAM.~~ The x86 version of JL can now use more than 2 GB of RAM because it's marked as [LARGEADDRESSAWARE](https://docs.microsoft.com/en-us/cpp/build/reference/largeaddressaware-handle-large-addresses).
+Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer the x86 version for 50-80% less memory usage. Prefer the x64 version if you intend to use *lots of* dictionaries together ~~because x86 programs cannot use more than 2 GB of RAM~~. The x86 version of JL can now use more than 2 GB of RAM (up to 4 GB) because it's marked as [LARGEADDRESSAWARE](https://docs.microsoft.com/en-us/cpp/build/reference/largeaddressaware-handle-large-addresses).
 
 IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries, you MUST use the x86 version because of a .NET bug. See the [link](https://github.com/dotnet/runtime/issues/66272) for more details.
 
@@ -118,8 +118,7 @@ Press the opacity slider button located top-left of the main window.
 ### How can I use JL with Magpie?
 Enable the "Preferences>General>Always on top" option. This option will make sure that JL is the topmost window on every clipboard change.
 
-Disable the "Preferences>Popup>Focus on lookup" option. When this option is disabled, JL can work without stealing the focus from other windows.
-
+Disable the "Preferences>Popup>Focus on lookup" option. When this option is disabled, JL can work without stealing the focus away from other windows.
 
 ### How do I add EPWING dictionaries?
 
