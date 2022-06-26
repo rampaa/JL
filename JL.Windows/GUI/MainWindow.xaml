@@ -31,7 +31,7 @@
                  VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
                  MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow"
                  FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled="True" IsUndoEnabled="False"
-                 PreviewMouseLeftButtonUp="MainTextBox_PreviewMouseLeftButtonUp" MinWidth="100" MinHeight="100" ContextMenuOpening="MainTextBox_ContextMenuOpening">
+                 PreviewMouseLeftButtonUp="MainTextBox_PreviewMouseLeftButtonUp" MinWidth="100" MinHeight="100" ContextMenuOpening="MainTextBox_ContextMenuOpening" AcceptsReturn="True" AcceptsTab="True">
 
             <TextBox.ContextMenu>
                 <ContextMenu Name="MainTextboxContextMenu">

@@ -80,6 +80,12 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Disable hotkeys"
+                                       ToolTip="Disables hotkeys except for Toggle Hotkeys hotkey" Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                            <CheckBox x:Name="DisableHotkeysCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Check for updates on start up"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="CheckForJLUpdatesOnStartUpCheckBox" Content=""
@@ -184,6 +190,24 @@
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="MainWindowBackgroundOpacityOnUnhoverNumericUpDown" Maximum="100" Minimum="1"
                                               HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Trim white-space characters"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="TextBoxTrimWhiteSpaceCharactersCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Remove newlines"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="TextBoxRemoveNewlinesCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Read only"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="TextBoxIsReadOnlyCheckBox" Content="" HorizontalAlignment="Right" />
                         </DockPanel>
 
                     </StackPanel>
@@ -519,6 +543,16 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="DisableHotkeysKeyGestureTextBox" AutomationProperties.Name=""
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Hotkey toggle" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Cursor="Help" ToolTip="Toggle disable hotkeys option" VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
                             <TextBox x:Name="MiningModeKeyGestureTextBox" AutomationProperties.Name=""
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -715,6 +749,16 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle text only visible on hover" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="TextBoxIsReadOnlyKeyGestureTextBox" AutomationProperties.Name=""
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Toggle read only option" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 

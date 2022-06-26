@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -98,7 +99,6 @@ public partial class MainWindow : Window, IFrontend
 
         WindowsUtils.InitializeMainWindow();
 
-        //MainWindowChrome.Freeze();
         _lastClipboardChangeTime = new(Stopwatch.GetTimestamp());
         CopyFromClipboard();
     }
@@ -114,7 +114,16 @@ public partial class MainWindow : Window, IFrontend
                 gotTextFromClipboard = true;
                 if (Storage.JapaneseRegex.IsMatch(text))
                 {
-                    text = text.Trim();
+                    if (ConfigManager.TextBoxTrimWhiteSpaceCharacters)
+                    {
+                        text = text.Trim();
+                    }
+
+                    if (ConfigManager.TextBoxRemoveNewlines)
+                    {
+                        text = Regex.Replace(text, @"\r\n?|\n", "");
+                    }
+
                     MainTextBox!.Text = text;
                     MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
 
@@ -371,6 +380,14 @@ public partial class MainWindow : Window, IFrontend
 
     private void MainWindow_KeyDown(object sender, KeyEventArgs e)
     {
+        if (WindowsUtils.KeyGestureComparer(e, ConfigManager.DisableHotkeysKeyGesture))
+        {
+            ConfigManager.DisableHotkeys = !ConfigManager.DisableHotkeys;
+        }
+
+        if (ConfigManager.DisableHotkeys)
+            return;
+
         if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowPreferencesWindowKeyGesture))
         {
             WindowsUtils.ShowPreferencesWindow();
@@ -483,6 +500,13 @@ public partial class MainWindow : Window, IFrontend
             {
                 MainGrid.Opacity = 1;
             }
+        }
+
+        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.TextBoxIsReadOnlyKeyGesture))
+        {
+            ConfigManager.TextBoxIsReadOnly = !ConfigManager.TextBoxIsReadOnly;
+            MainTextBox.IsReadOnly = ConfigManager.TextBoxIsReadOnly;
+            MainTextBox.IsUndoEnabled = !ConfigManager.TextBoxIsReadOnly;
         }
     }
 

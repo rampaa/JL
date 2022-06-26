@@ -46,6 +46,7 @@ public class ConfigManager : CoreConfig
     public static bool AutoPlayAudio { get; private set; } = false;
     public static bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
     public static bool AlwaysOnTop { get; set; } = true;
+    public static bool DisableHotkeys { get; set; } = false;
 
     #endregion
 
@@ -56,8 +57,11 @@ public class ConfigManager : CoreConfig
     public static Brush MainWindowTextColor { get; private set; } = Brushes.White;
     public static Brush MainWindowBacklogTextColor { get; private set; } = Brushes.Bisque;
     public static bool TextOnlyVisibleOnHover { get; set; } = false;
-    public static bool ChangeMainWindowBackgroundOpacityOnUnhover { get; set; } = false;
-    public static double MainWindowBackgroundOpacityOnUnhover { get; set; } = 1; // 1-100
+    public static bool ChangeMainWindowBackgroundOpacityOnUnhover { get; private set; } = false;
+    public static double MainWindowBackgroundOpacityOnUnhover { get; private set; } = 1; // 1-100
+    public static bool TextBoxTrimWhiteSpaceCharacters { get; private set; } = true;
+    public static bool TextBoxRemoveNewlines { get; private set; } = false;
+    public static bool TextBoxIsReadOnly { get; set; } = true;
 
     #endregion
 
@@ -103,6 +107,7 @@ public class ConfigManager : CoreConfig
 
     #region Hotkeys
 
+    public static KeyGesture DisableHotkeysKeyGesture { get; private set; } = new(Key.Pause, ModifierKeys.Windows);
     public static KeyGesture MiningModeKeyGesture { get; private set; } = new(Key.M, ModifierKeys.Windows);
     public static KeyGesture PlayAudioKeyGesture { get; private set; } = new(Key.P, ModifierKeys.Windows);
     public static KeyGesture KanjiModeKeyGesture { get; private set; } = new(Key.K, ModifierKeys.Windows);
@@ -129,6 +134,7 @@ public class ConfigManager : CoreConfig
     public static KeyGesture PreviousDictKeyGesture { get; private set; } = new(Key.PageUp, ModifierKeys.Windows);
     public static KeyGesture AlwaysOnTopKeyGesture { get; private set; } = new(Key.R, ModifierKeys.Windows);
     public static KeyGesture TextOnlyVisibleOnHoverKeyGesture { get; private set; } = new(Key.E, ModifierKeys.Windows);
+    public static KeyGesture TextBoxIsReadOnlyKeyGesture { get; private set; } = new(Key.U, ModifierKeys.Windows);
 
     #endregion
 
@@ -178,6 +184,10 @@ public class ConfigManager : CoreConfig
                 bool.Parse(ConfigurationManager.AppSettings.Get("AlwaysOnTop")!),
             AlwaysOnTop, "AlwaysOnTop");
         mainWindow.Topmost = AlwaysOnTop;
+
+        WindowsUtils.Try(() => DisableHotkeys =
+                bool.Parse(ConfigurationManager.AppSettings.Get("DisableHotkeys")!),
+            DisableHotkeys, "DisableHotkeys");
 
         WindowsUtils.Try(() => AnkiIntegration =
                 bool.Parse(ConfigurationManager.AppSettings.Get("AnkiIntegration")!),
@@ -392,6 +402,7 @@ public class ConfigManager : CoreConfig
                 break;
         }
 
+        DisableHotkeysKeyGesture = WindowsUtils.KeyGestureSetter("DisableHotkeysKeyGesture", DisableHotkeysKeyGesture);
         MiningModeKeyGesture = WindowsUtils.KeyGestureSetter("MiningModeKeyGesture", MiningModeKeyGesture);
         PlayAudioKeyGesture = WindowsUtils.KeyGestureSetter("PlayAudioKeyGesture", PlayAudioKeyGesture);
         KanjiModeKeyGesture = WindowsUtils.KeyGestureSetter("KanjiModeKeyGesture", KanjiModeKeyGesture);
@@ -434,6 +445,7 @@ public class ConfigManager : CoreConfig
 
         AlwaysOnTopKeyGesture = WindowsUtils.KeyGestureSetter("AlwaysOnTopKeyGesture", AlwaysOnTopKeyGesture);
         TextOnlyVisibleOnHoverKeyGesture = WindowsUtils.KeyGestureSetter("TextOnlyVisibleOnHoverKeyGesture", TextOnlyVisibleOnHoverKeyGesture);
+        TextBoxIsReadOnlyKeyGesture = WindowsUtils.KeyGestureSetter("TextBoxIsReadOnlyKeyGesture", TextBoxIsReadOnlyKeyGesture);
 
         WindowsUtils.SetInputGestureText(mainWindow.AddNameButton, ShowAddNameWindowKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.AddWordButton, ShowAddWordWindowKeyGesture);
@@ -477,13 +489,27 @@ public class ConfigManager : CoreConfig
             ChangeMainWindowBackgroundOpacityOnUnhover, "ChangeMainWindowBackgroundOpacityOnUnhover");
 
         WindowsUtils.Try(() => MainWindowBackgroundOpacityOnUnhover =
-            int.Parse(ConfigurationManager.AppSettings.Get("MainWindowBackgroundOpacityOnUnhover")!),
+            double.Parse(ConfigurationManager.AppSettings.Get("MainWindowBackgroundOpacityOnUnhover")!),
             MainWindowBackgroundOpacityOnUnhover, "MainWindowBackgroundOpacityOnUnhover");
 
         if (ChangeMainWindowBackgroundOpacityOnUnhover && !mainWindow.IsMouseOver)
         {
             mainWindow.Background.Opacity = MainWindowBackgroundOpacityOnUnhover / 100;
         }
+
+        WindowsUtils.Try(() => TextBoxIsReadOnly =
+            bool.Parse(ConfigurationManager.AppSettings.Get("TextBoxIsReadOnly")!),
+            TextBoxIsReadOnly, "TextBoxIsReadOnly");
+        mainWindow.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
+        mainWindow.MainTextBox.IsUndoEnabled = !TextBoxIsReadOnly;
+
+        WindowsUtils.Try(() => TextBoxTrimWhiteSpaceCharacters =
+            bool.Parse(ConfigurationManager.AppSettings.Get("TextBoxTrimWhiteSpaceCharacters")!),
+            TextBoxTrimWhiteSpaceCharacters, "TextBoxTrimWhiteSpaceCharacters");
+
+        WindowsUtils.Try(() => TextBoxRemoveNewlines =
+            bool.Parse(ConfigurationManager.AppSettings.Get("TextBoxRemoveNewlines")!),
+            TextBoxRemoveNewlines, "TextBoxRemoveNewlines");
 
         WindowsUtils.Try(() => MainWindowHeight = double.Parse(ConfigurationManager.AppSettings
             .Get("MainWindowHeight")!), MainWindowHeight, "MainWindowHeight");
@@ -568,6 +594,7 @@ public class ConfigManager : CoreConfig
 
         preferenceWindow.VersionTextBlock.Text = "v" + Storage.Version;
 
+        preferenceWindow.DisableHotkeysKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(DisableHotkeysKeyGesture);
         preferenceWindow.MiningModeKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(MiningModeKeyGesture);
         preferenceWindow.PlayAudioKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(PlayAudioKeyGesture);
         preferenceWindow.KanjiModeKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(KanjiModeKeyGesture);
@@ -610,6 +637,9 @@ public class ConfigManager : CoreConfig
         preferenceWindow.TextOnlyVisibleOnHoverKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(TextOnlyVisibleOnHoverKeyGesture);
 
+        preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text =
+            WindowsUtils.KeyGestureToString(TextBoxIsReadOnlyKeyGesture);
+
         preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
         preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri;
         preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = ForceSyncAnki;
@@ -621,6 +651,7 @@ public class ConfigManager : CoreConfig
         preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = CheckForJLUpdatesOnStartUp;
         preferenceWindow.PrecachingCheckBox.IsChecked = Precaching;
         preferenceWindow.AlwaysOnTopCheckBox.IsChecked = AlwaysOnTop;
+        preferenceWindow.DisableHotkeysCheckBox.IsChecked = DisableHotkeys;
         preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked = TextOnlyVisibleOnHover;
         preferenceWindow.AnkiIntegrationCheckBox.IsChecked = AnkiIntegration;
         preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
@@ -641,6 +672,10 @@ public class ConfigManager : CoreConfig
 
         preferenceWindow.ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox.IsChecked = ChangeMainWindowBackgroundOpacityOnUnhover;
         preferenceWindow.MainWindowBackgroundOpacityOnUnhoverNumericUpDown.Value = MainWindowBackgroundOpacityOnUnhover;
+
+        preferenceWindow.TextBoxIsReadOnlyCheckBox.IsChecked = TextBoxIsReadOnly;
+        preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked = TextBoxTrimWhiteSpaceCharacters;
+        preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked = TextBoxRemoveNewlines;
 
         preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
         preferenceWindow.MainWindowFontComboBox.SelectedIndex = s_japaneseFonts.FindIndex(f =>
@@ -704,6 +739,8 @@ public class ConfigManager : CoreConfig
 
     public async Task SavePreferences(PreferencesWindow preferenceWindow)
     {
+
+        WindowsUtils.KeyGestureSaver("DisableHotkeysKeyGesture", preferenceWindow.DisableHotkeysKeyGestureTextBox.Text);
         WindowsUtils.KeyGestureSaver("MiningModeKeyGesture", preferenceWindow.MiningModeKeyGestureTextBox.Text);
         WindowsUtils.KeyGestureSaver("PlayAudioKeyGesture", preferenceWindow.PlayAudioKeyGestureTextBox.Text);
         WindowsUtils.KeyGestureSaver("KanjiModeKeyGesture", preferenceWindow.KanjiModeKeyGestureTextBox.Text);
@@ -746,6 +783,9 @@ public class ConfigManager : CoreConfig
         WindowsUtils.KeyGestureSaver("TextOnlyVisibleOnHoverKeyGesture",
             preferenceWindow.TextOnlyVisibleOnHoverKeyGestureTextBox.Text);
 
+        WindowsUtils.KeyGestureSaver("TextBoxIsReadOnlyKeyGesture",
+            preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text);
+
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
         config.AppSettings.Settings["MaxSearchLength"].Value =
@@ -764,6 +804,13 @@ public class ConfigManager : CoreConfig
             preferenceWindow.ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["MainWindowBackgroundOpacityOnUnhover"].Value =
             preferenceWindow.MainWindowBackgroundOpacityOnUnhoverNumericUpDown.Value.ToString();
+
+        config.AppSettings.Settings["TextBoxIsReadOnly"].Value =
+            preferenceWindow.TextBoxIsReadOnlyCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings["TextBoxTrimWhiteSpaceCharacters"].Value =
+            preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings["TextBoxRemoveNewlines"].Value =
+            preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked.ToString();
 
         config.AppSettings.Settings["MainWindowTextColor"].Value =
             preferenceWindow.TextboxTextColorButton.Background.ToString();
@@ -797,6 +844,10 @@ public class ConfigManager : CoreConfig
 
         config.AppSettings.Settings["AlwaysOnTop"].Value =
             preferenceWindow.AlwaysOnTopCheckBox.IsChecked.ToString();
+
+        config.AppSettings.Settings["DisableHotkeys"].Value =
+            preferenceWindow.DisableHotkeysCheckBox.IsChecked.ToString();
+
         config.AppSettings.Settings["TextOnlyVisibleOnHover"].Value =
             preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked.ToString();
 

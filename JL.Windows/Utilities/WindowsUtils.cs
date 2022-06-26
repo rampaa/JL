@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
@@ -209,7 +210,7 @@ public static class WindowsUtils
         if (selectedText?.Length > 0)
         {
             Process.Start(new ProcessStartInfo("cmd",
-                $"/c start https://www.google.com/search?q={selectedText.ReplaceLineEndings("")}^&hl=ja")
+                $"/c start https://www.google.com/search?q={Regex.Replace(selectedText, @"\r\n?|\n", "")}^&hl=ja")
             { CreateNoWindow = true });
         }
     }
