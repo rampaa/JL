@@ -940,7 +940,10 @@ public class ConfigManager : CoreConfig
 
         ApplyPreferences();
 
-        await preferenceWindow.SaveMiningSetup().ConfigureAwait(false);
+        if (preferenceWindow.SetAnkiConfig)
+        {
+            await preferenceWindow.SaveMiningSetup().ConfigureAwait(false);
+        }
     }
 
     public static void SaveBeforeClosing()

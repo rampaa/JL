@@ -20,7 +20,7 @@ namespace JL.Windows.GUI;
 public partial class PreferencesWindow : Window
 {
     private static PreferencesWindow? s_instance;
-    private bool _setAnkiConfig = false;
+    public bool SetAnkiConfig { get; set; } = false;
 
     public static PreferencesWindow Instance
     {
@@ -69,14 +69,14 @@ public partial class PreferencesWindow : Window
         switch (itemTab.Header)
         {
             case "Anki":
-                if (ConfigManager.AnkiIntegration && !_setAnkiConfig)
+                if (ConfigManager.AnkiIntegration && !SetAnkiConfig)
                 {
                     await SetPreviousMiningConfig();
 
                     if (MiningSetupComboBoxDeckNames.SelectedItem == null)
                         await PopulateDeckAndModelNames().ConfigureAwait(false);
 
-                    _setAnkiConfig = true;
+                    SetAnkiConfig = true;
                 }
 
                 break;
