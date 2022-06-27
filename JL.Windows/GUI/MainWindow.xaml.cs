@@ -838,6 +838,9 @@ public partial class MainWindow : Window, IFrontend
 
     private void Window_MouseLeave(object sender, MouseEventArgs e)
     {
+        if (Background.Opacity == 0 || ConfigManager.InvisibleMode)
+            return;
+
         if (!FirstPopupWindow.IsVisible
             && !AddNameWindow.Instance.IsVisible
             && !AddWordWindow.Instance.IsVisible
@@ -857,6 +860,9 @@ public partial class MainWindow : Window, IFrontend
 
     private void Window_MouseEnter(object sender, MouseEventArgs e)
     {
+        if (Background.Opacity == 0 || ConfigManager.InvisibleMode)
+            return;
+
         if (ConfigManager.TextOnlyVisibleOnHover)
         {
             MainGrid.Opacity = 1;
