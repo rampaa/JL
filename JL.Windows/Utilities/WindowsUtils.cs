@@ -210,7 +210,7 @@ public static class WindowsUtils
         if (selectedText?.Length > 0)
         {
             Process.Start(new ProcessStartInfo("cmd",
-                $"/c start https://www.google.com/search?q={Regex.Replace(selectedText, @"\r\n?|\n", "")}^&hl=ja")
+                $"/c start https://www.google.com/search?q={Regex.Replace(selectedText, @"\r\n?|\n", "").Replace(" ", "%20")}^&hl=ja")
             { CreateNoWindow = true });
         }
     }
