@@ -1732,8 +1732,12 @@ public partial class PopupWindow : Window
 
     private bool NoAllDictFilter(object item)
     {
-        var dict = (Dict)((StackPanel)item).Tag;
+        if (MainWindow.Instance.CoreConfig.KanjiMode)
+        {
+            return true;
+        }
 
+        var dict = (Dict)((StackPanel)item).Tag;
         return (!dict?.Options?.NoAll?.Value) ?? true;
     }
 }
