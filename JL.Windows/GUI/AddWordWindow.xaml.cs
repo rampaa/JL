@@ -114,7 +114,7 @@ public partial class AddWordWindow : Window
         OtherRadioButton!.IsChecked = true;
     }
 
-    private void Window_Closing(object sender, EventArgs e)
+    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         MainWindow mainWindow = MainWindow.Instance;
         mainWindow.Focus();
