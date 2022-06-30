@@ -44,27 +44,36 @@ public static class Networking
 
                 if (latestVersion > Storage.Version)
                 {
-                    if (Storage.Frontend.ShowYesNoDialog(
-                            "A new version of JL is available. Would you like to download it now?", ""))
+                    bool foundRelease = false;
+                    string architecture = Environment.Is64BitProcess ? "x64" : "x86";
+                    JsonElement assets = jsonDocument.RootElement.GetProperty("assets");
+
+                    foreach (JsonElement asset in assets.EnumerateArray())
                     {
-                        Storage.Frontend.ShowOkDialog(
-                            "This may take a while. Please don't manually shut down the program until it's updated.", "");
+                        string latestReleaseUrl = asset.GetProperty("browser_download_url").ToString();
 
-                        string architecture = Environment.Is64BitProcess ? "x64" : "x86";
-                        JsonElement assets = jsonDocument.RootElement.GetProperty("assets");
-
-                        foreach (JsonElement asset in assets.EnumerateArray())
+                        // Add OS check?
+                        if (latestReleaseUrl.Contains(architecture))
                         {
-                            string latestReleaseUrl = asset.GetProperty("browser_download_url").ToString();
+                            foundRelease = true;
 
-                            // Add OS check?
-                            if (latestReleaseUrl.Contains(architecture))
+                            if (Storage.Frontend.ShowYesNoDialog(
+                                "A new version of JL is available. Would you like to download it now?", ""))
                             {
+                                Storage.Frontend.ShowOkDialog(
+                                    "This may take a while. Please don't manually shut down the program until it's updated.", "");
+
                                 await Storage.Frontend.UpdateJL(new Uri(latestReleaseUrl)).ConfigureAwait(false);
-                                break;
                             }
+                            break;
                         }
                     }
+
+                    if (!isAutoCheck && !foundRelease)
+                    {
+                        Storage.Frontend.ShowOkDialog("JL is up to date", "");
+                    }
+
                 }
 
                 else if (!isAutoCheck)
