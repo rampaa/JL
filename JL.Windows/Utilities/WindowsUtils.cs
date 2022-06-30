@@ -238,11 +238,7 @@ public static class WindowsUtils
 
             Process.Start(
                 new ProcessStartInfo("cmd",
-                    $"/c start {Path.Join(Storage.ApplicationPath, "update-helper.cmd")} & exit")
-                {
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                });
+                $"/c start \"JL Updater\" \"{Path.Join(Storage.ApplicationPath, "update-helper.cmd")}\""));
         }
 
         else
