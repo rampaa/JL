@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -58,7 +59,7 @@ public class ConfigManager : CoreConfig
     public static Brush MainWindowBacklogTextColor { get; private set; } = Brushes.Bisque;
     public static bool TextOnlyVisibleOnHover { get; set; } = false;
     public static bool ChangeMainWindowBackgroundOpacityOnUnhover { get; private set; } = false;
-    public static double MainWindowBackgroundOpacityOnUnhover { get; private set; } = 1; // 1-100
+    public static double MainWindowBackgroundOpacityOnUnhover { get; private set; } = 0.2; // 0.2-100
     public static bool TextBoxTrimWhiteSpaceCharacters { get; private set; } = true;
     public static bool TextBoxRemoveNewlines { get; private set; } = false;
     public static bool TextBoxIsReadOnly { get; set; } = true;
@@ -717,7 +718,7 @@ public class ConfigManager : CoreConfig
                     .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor")!)!,
             preferenceWindow.PopupBackgroundColorButton.Background, "PopupBackgroundColor");
 
-        WindowsUtils.Try(() => preferenceWindow.PopupOpacityNumericUpDown.Value = int.Parse(
+        WindowsUtils.Try(() => preferenceWindow.PopupOpacityNumericUpDown.Value = double.Parse(
                 ConfigurationManager.AppSettings.Get("PopupOpacity")!),
             preferenceWindow.PopupOpacityNumericUpDown.Value, "PopupOpacity");
 
@@ -789,22 +790,21 @@ public class ConfigManager : CoreConfig
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
         config.AppSettings.Settings["MaxSearchLength"].Value =
-            preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString();
+            preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["AnkiConnectUri"].Value =
             preferenceWindow.AnkiUriTextBox.Text;
 
         config.AppSettings.Settings["MainWindowWidth"].Value =
-            preferenceWindow.MainWindowWidthNumericUpDown.Value.ToString();
+            preferenceWindow.MainWindowWidthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["MainWindowHeight"].Value =
-            preferenceWindow.MainWindowHeightNumericUpDown.Value.ToString();
+            preferenceWindow.MainWindowHeightNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["MainWindowBackgroundColor"].Value =
             preferenceWindow.TextboxBackgroundColorButton.Background.ToString();
 
         config.AppSettings.Settings["ChangeMainWindowBackgroundOpacityOnUnhover"].Value =
             preferenceWindow.ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["MainWindowBackgroundOpacityOnUnhover"].Value =
-            preferenceWindow.MainWindowBackgroundOpacityOnUnhoverNumericUpDown.Value.ToString();
-
+            preferenceWindow.MainWindowBackgroundOpacityOnUnhoverNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["TextBoxIsReadOnly"].Value =
             preferenceWindow.TextBoxIsReadOnlyCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["TextBoxTrimWhiteSpaceCharacters"].Value =
@@ -817,9 +817,9 @@ public class ConfigManager : CoreConfig
         config.AppSettings.Settings["MainWindowBacklogTextColor"].Value =
             preferenceWindow.TextboxBacklogTextColorButton.Background.ToString();
         config.AppSettings.Settings["MainWindowFontSize"].Value =
-            preferenceWindow.TextboxFontSizeNumericUpDown.Value.ToString();
+            preferenceWindow.TextboxFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["MainWindowOpacity"].Value =
-            preferenceWindow.TextboxOpacityNumericUpDown.Value.ToString();
+            preferenceWindow.TextboxOpacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["MainWindowFont"].Value =
             preferenceWindow.MainWindowFontComboBox.SelectedValue.ToString();
         config.AppSettings.Settings["PopupFont"].Value =
@@ -832,7 +832,7 @@ public class ConfigManager : CoreConfig
         config.AppSettings.Settings["AllowDuplicateCards"].Value =
             preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["LookupRate"].Value =
-            preferenceWindow.LookupRateNumericUpDown.Value.ToString();
+            preferenceWindow.LookupRateNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["HighlightLongestMatch"].Value =
             preferenceWindow.HighlightLongestMatchCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["AutoPlayAudio"].Value =
@@ -857,18 +857,18 @@ public class ConfigManager : CoreConfig
             preferenceWindow.HighlightColorButton.Background.ToString();
 
         config.AppSettings.Settings[nameof(MaxNumResultsNotInMiningMode)].Value =
-            preferenceWindow.MaxNumResultsNotInMiningModeNumericUpDown.Value.ToString();
+            preferenceWindow.MaxNumResultsNotInMiningModeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
 
         config.AppSettings.Settings["PopupMaxWidth"].Value =
-            preferenceWindow.PopupMaxWidthNumericUpDown.Value.ToString();
+            preferenceWindow.PopupMaxWidthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["PopupMaxHeight"].Value =
-            preferenceWindow.PopupMaxHeightNumericUpDown.Value.ToString();
+            preferenceWindow.PopupMaxHeightNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["FixedPopupPositioning"].Value =
             preferenceWindow.FixedPopupPositioningCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["FixedPopupXPosition"].Value =
-            preferenceWindow.FixedPopupXPositionNumericUpDown.Value.ToString();
+            preferenceWindow.FixedPopupXPositionNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["FixedPopupYPosition"].Value =
-            preferenceWindow.FixedPopupYPositionNumericUpDown.Value.ToString();
+            preferenceWindow.FixedPopupYPositionNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["PopupDynamicHeight"].Value =
             preferenceWindow.PopupDynamicHeightCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["PopupDynamicWidth"].Value =
@@ -888,21 +888,21 @@ public class ConfigManager : CoreConfig
         config.AppSettings.Settings["DeconjugationInfoColor"].Value =
             preferenceWindow.DeconjugationInfoColorButton.Background.ToString();
         config.AppSettings.Settings["PopupOpacity"].Value =
-            preferenceWindow.PopupOpacityNumericUpDown.Value.ToString();
+            preferenceWindow.PopupOpacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["PrimarySpellingFontSize"].Value =
-            preferenceWindow.PrimarySpellingFontSizeNumericUpDown.Value.ToString();
+            preferenceWindow.PrimarySpellingFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["ReadingsFontSize"].Value =
-            preferenceWindow.ReadingsFontSizeNumericUpDown.Value.ToString();
+            preferenceWindow.ReadingsFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["AlternativeSpellingsFontSize"].Value =
-            preferenceWindow.AlternativeSpellingsFontSizeNumericUpDown.Value.ToString();
+            preferenceWindow.AlternativeSpellingsFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["DefinitionsFontSize"].Value =
-            preferenceWindow.DefinitionsFontSizeNumericUpDown.Value.ToString();
+            preferenceWindow.DefinitionsFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["FrequencyFontSize"].Value =
-            preferenceWindow.FrequencyFontSizeNumericUpDown.Value.ToString();
+            preferenceWindow.FrequencyFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["DeconjugationInfoFontSize"].Value =
-            preferenceWindow.DeconjugationInfoFontSizeNumericUpDown.Value.ToString();
+            preferenceWindow.DeconjugationInfoFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["DictTypeFontSize"].Value =
-            preferenceWindow.DictTypeFontSizeNumericUpDown.Value.ToString();
+            preferenceWindow.DictTypeFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
 
         config.AppSettings.Settings["SeparatorColor"].Value =
             preferenceWindow.SeparatorColorButton.Background.ToString();
@@ -913,9 +913,9 @@ public class ConfigManager : CoreConfig
         config.AppSettings.Settings["PopupFocusOnLookup"].Value =
             preferenceWindow.PopupFocusOnLookupCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["PopupXOffset"].Value =
-            preferenceWindow.PopupXOffsetNumericUpDown.Value.ToString();
+            preferenceWindow.PopupXOffsetNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["PopupYOffset"].Value =
-            preferenceWindow.PopupYOffsetNumericUpDown.Value.ToString();
+            preferenceWindow.PopupYOffsetNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["PopupFlip"].Value =
             preferenceWindow.PopupFlipComboBox.SelectedValue.ToString();
 
@@ -932,8 +932,8 @@ public class ConfigManager : CoreConfig
             preferenceWindow.LookupKeyComboBox.SelectedValue.ToString();
 
         MainWindow mainWindow = MainWindow.Instance;
-        config.AppSettings.Settings["MainWindowTopPosition"].Value = mainWindow.Top.ToString();
-        config.AppSettings.Settings["MainWindowLeftPosition"].Value = mainWindow.Left.ToString();
+        config.AppSettings.Settings["MainWindowTopPosition"].Value = mainWindow.Top.ToString(CultureInfo.InvariantCulture);
+        config.AppSettings.Settings["MainWindowLeftPosition"].Value = mainWindow.Left.ToString(CultureInfo.InvariantCulture);
 
         config.Save(ConfigurationSaveMode.Modified);
         ConfigurationManager.RefreshSection("appSettings");
@@ -955,23 +955,23 @@ public class ConfigManager : CoreConfig
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
         config.AppSettings.Settings["MainWindowFontSize"].Value =
-            mainWindow.FontSizeSlider.Value.ToString();
-        config.AppSettings.Settings["MainWindowOpacity"].Value = mainWindow.OpacitySlider.Value.ToString();
+            mainWindow.FontSizeSlider.Value.ToString(CultureInfo.InvariantCulture);
+        config.AppSettings.Settings["MainWindowOpacity"].Value = mainWindow.OpacitySlider.Value.ToString(CultureInfo.InvariantCulture);
 
         config.AppSettings.Settings["MainWindowHeight"].Value = MainWindowHeight > mainWindow.MinHeight
-            ? MainWindowHeight.ToString()
-            : mainWindow.MinHeight.ToString();
+            ? MainWindowHeight.ToString(CultureInfo.InvariantCulture)
+            : mainWindow.MinHeight.ToString(CultureInfo.InvariantCulture);
 
         config.AppSettings.Settings["MainWindowWidth"].Value = MainWindowWidth > mainWindow.MinWidth
-            ? MainWindowWidth.ToString()
-            : mainWindow.MinWidth.ToString();
+            ? MainWindowWidth.ToString(CultureInfo.InvariantCulture)
+            : mainWindow.MinWidth.ToString(CultureInfo.InvariantCulture);
 
         config.AppSettings.Settings["MainWindowTopPosition"].Value = mainWindow.Top >= SystemParameters.VirtualScreenTop
-            ? mainWindow.Top.ToString()
+            ? mainWindow.Top.ToString(CultureInfo.InvariantCulture)
             : "0";
 
         config.AppSettings.Settings["MainWindowLeftPosition"].Value = mainWindow.Left >= SystemParameters.VirtualScreenLeft
-            ? mainWindow.Left.ToString()
+            ? mainWindow.Left.ToString(CultureInfo.InvariantCulture)
             : "0";
 
         config.Save(ConfigurationSaveMode.Modified);

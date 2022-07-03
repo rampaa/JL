@@ -115,7 +115,7 @@
         <TextBlock x:Name="PrecacheProgress" Margin="1,1,15,15" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                    Visibility="Collapsed" Width="120" Height="17" Foreground="White">
             <TextBlock.Background>
-                <SolidColorBrush Color="Black" Opacity="0.01"/>
+                <SolidColorBrush Color="Black" Opacity="0.002"/>
             </TextBlock.Background>
         </TextBlock>
 
@@ -123,7 +123,7 @@
                    Margin="37,0,10,0" Text="T" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" RenderTransformOrigin="-0.222,0.567" FontFamily="Meiryo UI"
                    MouseLeftButtonDown="FontSizeButton_MouseLeftButtonDown" ToolTip="Font Size" FontSize="18">
             <TextBlock.Background>
-                <SolidColorBrush Color="Black" Opacity="0.01"/>
+                <SolidColorBrush Color="Black" Opacity="0.002"/>
             </TextBlock.Background>
         </TextBlock>
 
@@ -131,7 +131,7 @@
                    Margin="10,0,10,0" Text="☯" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" FontFamily="Meiryo UI" Padding="0,0,0,0"
                    MouseLeftButtonDown="OpacityButton_MouseLeftButtonDown" ToolTip="Opacity" FontWeight="Normal" FontSize="18">
             <TextBlock.Background>
-                <SolidColorBrush Color="Black" Opacity="0.01"/>
+                <SolidColorBrush Color="Black" Opacity="0.002"/>
             </TextBlock.Background>
         </TextBlock>
 

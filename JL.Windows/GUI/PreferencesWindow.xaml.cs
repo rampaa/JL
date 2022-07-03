@@ -20,7 +20,7 @@ namespace JL.Windows.GUI;
 public partial class PreferencesWindow : Window
 {
     private static PreferencesWindow? s_instance;
-    public bool SetAnkiConfig { get; set; } = false;
+    public bool SetAnkiConfig { get; private set; } = false;
 
     public static PreferencesWindow Instance
     {

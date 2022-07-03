@@ -169,7 +169,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Opacity"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="TextboxOpacityNumericUpDown" Maximum="100" Minimum="1"
+                            <hc:NumericUpDown x:Name="TextboxOpacityNumericUpDown" Maximum="100" Minimum="0.2" DecimalPlaces="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -188,7 +188,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Opacity on unhover"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="MainWindowBackgroundOpacityOnUnhoverNumericUpDown" Maximum="100" Minimum="1"
+                            <hc:NumericUpDown x:Name="MainWindowBackgroundOpacityOnUnhoverNumericUpDown" Maximum="100" Minimum="0.2" DecimalPlaces="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -309,7 +309,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Opacity"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="PopupOpacityNumericUpDown" Maximum="100" Minimum="1"
+                            <hc:NumericUpDown x:Name="PopupOpacityNumericUpDown" Maximum="100" Minimum="0.2" DecimalPlaces="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 

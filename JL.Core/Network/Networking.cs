@@ -10,7 +10,7 @@ public static class Networking
         try
         {
             Uri uri = new(
-                "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=" +
+                "https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=" +
                 foundSpelling +
                 "&kana=" +
                 reading
