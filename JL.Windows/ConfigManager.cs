@@ -593,7 +593,7 @@ public class ConfigManager : CoreConfig
 
         MainWindow mainWindow = MainWindow.Instance;
 
-        preferenceWindow.VersionTextBlock.Text = "v" + Storage.Version;
+        preferenceWindow.JLVersionTextBlock.Text = "v" + Storage.JLVersion;
 
         preferenceWindow.DisableHotkeysKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(DisableHotkeysKeyGesture);
         preferenceWindow.MiningModeKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(MiningModeKeyGesture);

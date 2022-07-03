@@ -40,9 +40,9 @@ public static class Networking
                 Stream githubApiResultStream = await gitHubApiResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 JsonDocument jsonDocument = await JsonDocument.ParseAsync(githubApiResultStream).ConfigureAwait(false);
                 JsonElement rootElement = jsonDocument.RootElement;
-                Version latestVersion = new(rootElement.GetProperty("tag_name").ToString());
+                Version latestJLVersion = new(rootElement.GetProperty("tag_name").ToString());
 
-                if (latestVersion > Storage.Version)
+                if (latestJLVersion > Storage.JLVersion)
                 {
                     bool foundRelease = false;
                     string architecture = Environment.Is64BitProcess ? "x64" : "x86";

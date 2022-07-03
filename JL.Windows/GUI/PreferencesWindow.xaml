@@ -97,7 +97,7 @@
                                     Width="119" Height="32" HorizontalAlignment="Center"
                                     Click="CheckForJLUpdatesButton_Click" />
                         </DockPanel>
-                        <TextBlock x:Name="VersionTextBlock" TextWrapping="Wrap" HorizontalAlignment="Left"
+                        <TextBlock x:Name="JLVersionTextBlock" TextWrapping="Wrap" HorizontalAlignment="Left"
                                    VerticalAlignment="Bottom" />
 
                     </StackPanel>
