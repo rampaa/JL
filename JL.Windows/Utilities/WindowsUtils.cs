@@ -1,5 +1,6 @@
 ﻿using System.Configuration;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
@@ -326,10 +327,20 @@ public static class WindowsUtils
         {
             Configuration config =
                 ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            if (ConfigurationManager.AppSettings.Get(key) == null)
-                config.AppSettings.Settings.Add(key, variable.ToString());
+
+            string? variableStr;
+
+            if (variable is double doubleVariable)
+                variableStr = doubleVariable.ToString(CultureInfo.InvariantCulture);
+            else if (variable is float floatVariable)
+                variableStr = floatVariable.ToString(CultureInfo.InvariantCulture);
             else
-                config.AppSettings.Settings[key].Value = variable.ToString();
+                variableStr = variable.ToString();
+
+            if (ConfigurationManager.AppSettings.Get(key) == null)
+                config.AppSettings.Settings.Add(key, variableStr);
+            else
+                config.AppSettings.Settings[key].Value = variableStr;
 
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");

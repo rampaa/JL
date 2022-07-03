@@ -288,7 +288,7 @@ public class ConfigManager : CoreConfig
                 .ConvertFrom(ConfigurationManager.AppSettings
                     .Get("PopupBackgroundColor")!)!, PopupBackgroundColor, "PopupBackgroundColor");
         WindowsUtils.Try(() => PopupBackgroundColor.Opacity = double.Parse(ConfigurationManager.AppSettings
-            .Get("PopupOpacity")!) / 100, 70, "PopupOpacity");
+            .Get("PopupOpacity")!, CultureInfo.InvariantCulture) / 100, 70, "PopupOpacity");
         PopupBackgroundColor.Freeze();
 
         WindowsUtils.Try(() => PrimarySpellingFontSize = int.Parse(ConfigurationManager.AppSettings
@@ -457,10 +457,10 @@ public class ConfigManager : CoreConfig
         WindowsUtils.SetInputGestureText(mainWindow.StatsButton, ShowStatsKeyGesture);
 
         WindowsUtils.Try(() => mainWindow.OpacitySlider.Value = double.Parse(ConfigurationManager
-            .AppSettings.Get("MainWindowOpacity")!), mainWindow.OpacitySlider.Value, "MainWindowOpacity");
+            .AppSettings.Get("MainWindowOpacity")!, CultureInfo.InvariantCulture), mainWindow.OpacitySlider.Value, "MainWindowOpacity");
 
         WindowsUtils.Try(() => mainWindow.FontSizeSlider.Value = double.Parse(ConfigurationManager
-            .AppSettings.Get("MainWindowFontSize")!), mainWindow.FontSizeSlider.Value, "MainWindowFontSize");
+            .AppSettings.Get("MainWindowFontSize")!, CultureInfo.InvariantCulture), mainWindow.FontSizeSlider.Value, "MainWindowFontSize");
 
         tempStr = ConfigurationManager.AppSettings.Get("MainWindowFont");
 
@@ -490,7 +490,7 @@ public class ConfigManager : CoreConfig
             ChangeMainWindowBackgroundOpacityOnUnhover, "ChangeMainWindowBackgroundOpacityOnUnhover");
 
         WindowsUtils.Try(() => MainWindowBackgroundOpacityOnUnhover =
-            double.Parse(ConfigurationManager.AppSettings.Get("MainWindowBackgroundOpacityOnUnhover")!),
+            double.Parse(ConfigurationManager.AppSettings.Get("MainWindowBackgroundOpacityOnUnhover")!, CultureInfo.InvariantCulture),
             MainWindowBackgroundOpacityOnUnhover, "MainWindowBackgroundOpacityOnUnhover");
 
         if (ChangeMainWindowBackgroundOpacityOnUnhover && !mainWindow.IsMouseOver)
@@ -513,21 +513,21 @@ public class ConfigManager : CoreConfig
             TextBoxRemoveNewlines, "TextBoxRemoveNewlines");
 
         WindowsUtils.Try(() => MainWindowHeight = double.Parse(ConfigurationManager.AppSettings
-            .Get("MainWindowHeight")!), MainWindowHeight, "MainWindowHeight");
+            .Get("MainWindowHeight")!, CultureInfo.InvariantCulture), MainWindowHeight, "MainWindowHeight");
         mainWindow.Height = MainWindowHeight;
         mainWindow.HeightBeforeResolutionChange = MainWindowHeight;
 
         WindowsUtils.Try(() => MainWindowWidth = double.Parse(ConfigurationManager.AppSettings
-            .Get("MainWindowWidth")!), MainWindowWidth, "MainWindowWidth");
+            .Get("MainWindowWidth")!, CultureInfo.InvariantCulture), MainWindowWidth, "MainWindowWidth");
         mainWindow.Width = MainWindowWidth;
         mainWindow.WidthBeforeResolutionChange = MainWindowWidth;
 
         WindowsUtils.Try(() => mainWindow.Top = double.Parse(ConfigurationManager.AppSettings
-            .Get("MainWindowTopPosition")!), mainWindow.Top, "MainWindowTopPosition");
+            .Get("MainWindowTopPosition")!, CultureInfo.InvariantCulture), mainWindow.Top, "MainWindowTopPosition");
         mainWindow.TopPositionBeforeResolutionChange = mainWindow.Top;
 
         WindowsUtils.Try(() => mainWindow.Left = double.Parse(ConfigurationManager.AppSettings
-            .Get("MainWindowLeftPosition")!), mainWindow.Left, "MainWindowLeftPosition");
+            .Get("MainWindowLeftPosition")!, CultureInfo.InvariantCulture), mainWindow.Left, "MainWindowLeftPosition");
         mainWindow.LeftPositionBeforeResolutionChange = mainWindow.Left;
 
         tempStr = ConfigurationManager.AppSettings.Get("PopupFont");
@@ -719,7 +719,7 @@ public class ConfigManager : CoreConfig
             preferenceWindow.PopupBackgroundColorButton.Background, "PopupBackgroundColor");
 
         WindowsUtils.Try(() => preferenceWindow.PopupOpacityNumericUpDown.Value = double.Parse(
-                ConfigurationManager.AppSettings.Get("PopupOpacity")!),
+                ConfigurationManager.AppSettings.Get("PopupOpacity")!, CultureInfo.InvariantCulture),
             preferenceWindow.PopupOpacityNumericUpDown.Value, "PopupOpacity");
 
         preferenceWindow.SeparatorColorButton.Background = SeparatorColor;
@@ -740,7 +740,6 @@ public class ConfigManager : CoreConfig
 
     public async Task SavePreferences(PreferencesWindow preferenceWindow)
     {
-
         WindowsUtils.KeyGestureSaver("DisableHotkeysKeyGesture", preferenceWindow.DisableHotkeysKeyGestureTextBox.Text);
         WindowsUtils.KeyGestureSaver("MiningModeKeyGesture", preferenceWindow.MiningModeKeyGestureTextBox.Text);
         WindowsUtils.KeyGestureSaver("PlayAudioKeyGesture", preferenceWindow.PlayAudioKeyGestureTextBox.Text);
