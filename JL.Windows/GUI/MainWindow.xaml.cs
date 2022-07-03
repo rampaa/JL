@@ -338,7 +338,7 @@ public partial class MainWindow : Window, IFrontend
         if (Background!.Opacity == 0)
         {
             Background.Opacity = OpacitySlider!.Value / 100;
-            OpacityButton.Background.Opacity = 0.01;
+            OpacityButton.Background.Opacity = 0.002;
             MainTextBox.Focus();
         }
 
