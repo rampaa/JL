@@ -30,7 +30,7 @@ public static class Storage
     public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
     public static readonly HttpClient Client = new(new HttpClientHandler { UseProxy = false }) { Timeout = TimeSpan.FromMinutes(10) };
     public static readonly Version Version = new(1, 12, 1);
-    public static readonly string GitHubApiUrlForLatestJLRelease = "https://api.github.com/repos/rampaa/JL/releases/latest";
+    public static readonly Uri GitHubApiUrlForLatestJLRelease = new("https://api.github.com/repos/rampaa/JL/releases/latest");
     public static readonly Uri JmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
     public static readonly Uri JmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     public static readonly Uri KanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
