@@ -376,7 +376,20 @@ public static class Storage
                     if (freq.Active && !freq.Contents.Any())
                     {
                         Task nazekaFreqTask = Task.Run(async () =>
-                            await FrequencyNazekaLoader.Load(freq).ConfigureAwait(false));
+                        {
+                            try
+                            {
+                                await FrequencyNazekaLoader.Load(freq).ConfigureAwait(false);
+                            }
+
+                            catch (Exception ex)
+                            {
+                                Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
+                                Utils.Logger.Error("Couldn't import {FreqName}: {Exception}", freq.Name, ex.ToString());
+                                FreqDicts.Remove(freq.Name);
+                                freqRemoved = true;
+                            }
+                        });
 
                         tasks.Add(nazekaFreqTask);
                     }
