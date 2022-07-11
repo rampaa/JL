@@ -109,7 +109,7 @@ public static class WindowsUtils
         {
             KeyGestureConverter keyGestureConverter = new();
 
-            if (rawKeyGesture.Contains("Ctrl") || rawKeyGesture.Contains("Alt"))
+            if (rawKeyGesture.Contains("Ctrl") || rawKeyGesture.Contains("Alt") || rawKeyGesture.Contains("Shift"))
             {
                 return (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture)!;
             }
