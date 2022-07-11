@@ -48,30 +48,55 @@ public static class WindowsUtils
     {
         if (keyGesture.Modifiers.Equals(ModifierKeys.Windows))
             return keyGesture.Key == e.Key && (Keyboard.Modifiers & ModifierKeys.Windows) == 0;
+        else if (keyGesture.Modifiers == 0)
+            return keyGesture.Key == e.Key;
         else
             return keyGesture.Matches(null, e);
+    }
+
+    public static bool KeyGestureComparer(KeyGesture keyGesture)
+    {
+        if (keyGesture.Modifiers == ModifierKeys.Windows)
+            return Keyboard.IsKeyDown(keyGesture.Key) && (Keyboard.Modifiers & ModifierKeys.Windows) == 0;
+        else if (keyGesture.Modifiers == 0)
+            return Keyboard.IsKeyDown(keyGesture.Key);
+        else
+            return Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers == keyGesture.Modifiers;
     }
 
     public static string KeyGestureToString(KeyGesture keyGesture)
     {
         StringBuilder keyGestureStringBuilder = new();
 
-        if (keyGesture.Modifiers.HasFlag(ModifierKeys.Control))
+        if (keyGesture.Key == Key.LeftShift || keyGesture.Key == Key.RightShift
+            || keyGesture.Key == Key.LeftCtrl || keyGesture.Key == Key.RightCtrl
+            || keyGesture.Key == Key.LeftAlt || keyGesture.Key == Key.RightAlt)
         {
-            keyGestureStringBuilder.Append("Ctrl+");
+            keyGestureStringBuilder.Append(keyGesture.Key.ToString());
         }
 
-        if (keyGesture.Modifiers.HasFlag(ModifierKeys.Shift))
+        else
         {
-            keyGestureStringBuilder.Append("Shift+");
-        }
+            if (keyGesture.Modifiers.HasFlag(ModifierKeys.Control))
+            {
+                keyGestureStringBuilder.Append("Ctrl+");
+            }
 
-        if (keyGesture.Modifiers.HasFlag(ModifierKeys.Alt))
-        {
-            keyGestureStringBuilder.Append("Alt+");
-        }
+            if (keyGesture.Modifiers.HasFlag(ModifierKeys.Alt))
+            {
+                keyGestureStringBuilder.Append("Alt+");
+            }
 
-        keyGestureStringBuilder.Append(keyGesture.Key.ToString());
+            if (keyGesture.Modifiers.HasFlag(ModifierKeys.Shift) && keyGestureStringBuilder.Length > 0)
+            {
+                keyGestureStringBuilder.Append("Shift+");
+            }
+
+            if (keyGesture.Key != Key.None)
+            {
+                keyGestureStringBuilder.Append(keyGesture.Key.ToString());
+            }
+        }
 
         return keyGestureStringBuilder.ToString();
     }
@@ -83,11 +108,16 @@ public static class WindowsUtils
         if (rawKeyGesture != null)
         {
             KeyGestureConverter keyGestureConverter = new();
-            if (!rawKeyGesture.StartsWith("Ctrl+") && !rawKeyGesture.StartsWith("Shift+") &&
-                !rawKeyGesture.StartsWith("Alt+"))
-                return (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture)!;
-            else
+
+            if (rawKeyGesture.Contains("Ctrl") || rawKeyGesture.Contains("Alt"))
+            {
                 return (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture)!;
+            }
+
+            else
+            {
+                return (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture)!;
+            }
         }
 
         else

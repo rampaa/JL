@@ -28,22 +28,25 @@
                             <TextBlock HorizontalAlignment="Left" Text="Lookup Mode"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <ComboBox x:Name="LookupModeComboBox" HorizontalAlignment="Right"
-                                      SelectedValuePath="Tag" Width="220">
-                                <ComboBoxItem Content="Mouse move" Tag="1" />
-                                <ComboBoxItem Content="Key press+mouse move" Tag="2" />
-                                <ComboBoxItem Content="Text select" Tag="3" />
+                                      SelectedValuePath="Tag" Width="250">
+                                <ComboBoxItem Content="Mouse move" Tag="Hover" />
+                                <ComboBoxItem Content="Left click/Touch" Tag="Click" />
+                                <ComboBoxItem Content="Text select" Tag="Select" />
                             </ComboBox>
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Lookup Key"
+                            <TextBlock HorizontalAlignment="Left" Text="Lookup requires Lookup Key press"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <ComboBox x:Name="LookupKeyComboBox" HorizontalAlignment="Right"
-                                      SelectedValuePath="Content" Width="80">
-                                <ComboBoxItem Content="Alt" />
-                                <ComboBoxItem Content="Ctrl" />
-                                <ComboBoxItem Content="Shift" />
-                            </ComboBox>
+                            <CheckBox x:Name="RequireLookupKeyPressCheckBox" Content="" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock Text="Lookup Key" HorizontalAlignment="Left"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <TextBox x:Name="LookupKeyKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right"/>
                         </DockPanel>
 
                         <DockPanel>

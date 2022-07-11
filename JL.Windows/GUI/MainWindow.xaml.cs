@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
+using HandyControl.Tools;
 using JL.Core;
 using JL.Core.Lookup;
 using JL.Core.Utilities;
@@ -74,6 +75,7 @@ public partial class MainWindow : Window, IFrontend
     {
         InitializeComponent();
         s_instance = this;
+        ConfigHelper.Instance.SetLang("en");
         MainTextBox.Focus();
     }
 
@@ -235,12 +237,16 @@ public partial class MainWindow : Window, IFrontend
     public void MainTextBox_MouseMove(object? sender, MouseEventArgs? e)
     {
         if (ConfigManager.LookupOnSelectOnly
+            || ConfigManager.LookupOnLeftClickOnly
             || Background!.Opacity == 0
             || MainTextboxContextMenu!.IsVisible
             || FontSizeSlider!.IsVisible
             || OpacitySlider!.IsVisible
             || FirstPopupWindow.MiningMode
-            || (ConfigManager.RequireLookupKeyPress && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))) return;
+            || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.KeyGestureComparer(ConfigManager.LookupKeyKeyGesture)))
+        {
+            return;
+        }
 
         PrecacheCancellationToken.Cancel();
         FirstPopupWindow.TextBox_MouseMove(MainTextBox!);
@@ -309,8 +315,14 @@ public partial class MainWindow : Window, IFrontend
 
     private void MainTextBox_MouseLeave(object sender, MouseEventArgs e)
     {
-        if (FirstPopupWindow.MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning || (FirstPopupWindow.UnavoidableMouseEnter && FirstPopupWindow.IsMouseOver))
+        if (FirstPopupWindow.MiningMode
+            || ConfigManager.LookupOnSelectOnly
+            || ConfigManager.LookupOnLeftClickOnly
+            || ConfigManager.FixedPopupPositioning
+            || (FirstPopupWindow.UnavoidableMouseEnter && FirstPopupWindow.IsMouseOver))
+        {
             return;
+        }
 
         FirstPopupWindow.Hide();
         FirstPopupWindow.LastText = "";
@@ -612,12 +624,24 @@ public partial class MainWindow : Window, IFrontend
 
     private void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        if (!ConfigManager.LookupOnSelectOnly
+        if ((!ConfigManager.LookupOnSelectOnly && !ConfigManager.LookupOnLeftClickOnly)
             || Background!.Opacity == 0
             || ConfigManager.InactiveLookupMode
-            || FirstPopupWindow.MiningMode) return;
+            || FirstPopupWindow.MiningMode
+            || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.KeyGestureComparer(ConfigManager.LookupKeyKeyGesture)))
+        {
+            return;
+        }
 
-        FirstPopupWindow.LookupOnSelect(MainTextBox!);
+        if (ConfigManager.LookupOnSelectOnly)
+        {
+            FirstPopupWindow.LookupOnSelect(MainTextBox!);
+        }
+
+        else
+        {
+            FirstPopupWindow.TextBox_MouseMove(MainTextBox!);
+        }
 
         if (ConfigManager.FixedPopupPositioning)
         {

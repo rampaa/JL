@@ -40,9 +40,9 @@ public class ConfigManager : CoreConfig
     public static Brush HighlightColor { get; private set; } = Brushes.AliceBlue;
     public static bool RequireLookupKeyPress { get; private set; } = false;
     public static bool LookupOnSelectOnly { get; private set; } = false;
+    public static bool LookupOnLeftClickOnly { get; private set; } = false;
 
-    // Using alt as the lookup key cause focusing bugs. Consider making this key a KeyGesture.
-    public static ModifierKeys LookupKey { get; private set; } = ModifierKeys.Shift;
+    public static KeyGesture LookupKeyKeyGesture { get; private set; } = new(Key.LeftShift, ModifierKeys.None);
     public static bool HighlightLongestMatch { get; private set; } = false;
     public static bool AutoPlayAudio { get; private set; } = false;
     public static bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
@@ -186,6 +186,10 @@ public class ConfigManager : CoreConfig
             AlwaysOnTop, "AlwaysOnTop");
         mainWindow.Topmost = AlwaysOnTop;
 
+        WindowsUtils.Try(() => RequireLookupKeyPress =
+                bool.Parse(ConfigurationManager.AppSettings.Get("RequireLookupKeyPress")!),
+            RequireLookupKeyPress, "RequireLookupKeyPress");
+
         WindowsUtils.Try(() => DisableHotkeys =
                 bool.Parse(ConfigurationManager.AppSettings.Get("DisableHotkeys")!),
             DisableHotkeys, "DisableHotkeys");
@@ -209,10 +213,6 @@ public class ConfigManager : CoreConfig
         WindowsUtils.Try(() => LookupRate = int.Parse(ConfigurationManager.AppSettings.Get("LookupRate")!),
             LookupRate,
             "LookupRate");
-
-        WindowsUtils.Try(() => LookupKey = (ModifierKeys)new ModifierKeysConverter()
-                .ConvertFromString(ConfigurationManager.AppSettings.Get("LookupKey")!)!,
-            LookupKey, "LookupKey");
 
         // MAKE SURE YOU FREEZE ANY NEW COLOR OBJECTS YOU ADD
         // OR THE PROGRAM WILL CRASH AND BURN
@@ -377,28 +377,28 @@ public class ConfigManager : CoreConfig
 
         if (tempStr == null)
         {
-            WindowsUtils.AddToConfig("LookupMode", "1");
+            WindowsUtils.AddToConfig("LookupMode", "Hover");
         }
 
         switch (ConfigurationManager.AppSettings.Get("LookupMode"))
         {
-            case "1":
-                RequireLookupKeyPress = false;
+            case "Hover":
+                LookupOnLeftClickOnly = false;
                 LookupOnSelectOnly = false;
                 break;
 
-            case "2":
-                RequireLookupKeyPress = true;
+            case "Click":
+                LookupOnLeftClickOnly = true;
                 LookupOnSelectOnly = false;
                 break;
 
-            case "3":
-                RequireLookupKeyPress = false;
+            case "Select":
+                LookupOnLeftClickOnly = false;
                 LookupOnSelectOnly = true;
                 break;
 
             default:
-                RequireLookupKeyPress = false;
+                LookupOnLeftClickOnly = false;
                 LookupOnSelectOnly = false;
                 break;
         }
@@ -407,6 +407,7 @@ public class ConfigManager : CoreConfig
         MiningModeKeyGesture = WindowsUtils.KeyGestureSetter("MiningModeKeyGesture", MiningModeKeyGesture);
         PlayAudioKeyGesture = WindowsUtils.KeyGestureSetter("PlayAudioKeyGesture", PlayAudioKeyGesture);
         KanjiModeKeyGesture = WindowsUtils.KeyGestureSetter("KanjiModeKeyGesture", KanjiModeKeyGesture);
+        LookupKeyKeyGesture = WindowsUtils.KeyGestureSetter("LookupKeyKeyGesture", LookupKeyKeyGesture);
 
         ShowManageDictionariesWindowKeyGesture =
             WindowsUtils.KeyGestureSetter("ShowManageDictionariesWindowKeyGesture",
@@ -599,6 +600,7 @@ public class ConfigManager : CoreConfig
         preferenceWindow.MiningModeKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(MiningModeKeyGesture);
         preferenceWindow.PlayAudioKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(PlayAudioKeyGesture);
         preferenceWindow.KanjiModeKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(KanjiModeKeyGesture);
+        preferenceWindow.LookupKeyKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(LookupKeyKeyGesture);
 
         preferenceWindow.ShowManageDictionariesWindowKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(ShowManageDictionariesWindowKeyGesture);
@@ -652,6 +654,7 @@ public class ConfigManager : CoreConfig
         preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = CheckForJLUpdatesOnStartUp;
         preferenceWindow.PrecachingCheckBox.IsChecked = Precaching;
         preferenceWindow.AlwaysOnTopCheckBox.IsChecked = AlwaysOnTop;
+        preferenceWindow.RequireLookupKeyPressCheckBox.IsChecked = RequireLookupKeyPress;
         preferenceWindow.DisableHotkeysCheckBox.IsChecked = DisableHotkeys;
         preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked = TextOnlyVisibleOnHover;
         preferenceWindow.AnkiIntegrationCheckBox.IsChecked = AnkiIntegration;
@@ -732,7 +735,11 @@ public class ConfigManager : CoreConfig
         preferenceWindow.PopupFlipComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("PopupFlip");
 
         preferenceWindow.LookupModeComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("LookupMode");
-        preferenceWindow.LookupKeyComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("LookupKey");
+
+        if (preferenceWindow.LookupModeComboBox.SelectedIndex == -1)
+        {
+            preferenceWindow.LookupModeComboBox.SelectedIndex = 0;
+        }
 
         preferenceWindow.ShowMiningModeReminderCheckBox.IsChecked = ShowMiningModeReminder;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInPopups;
@@ -744,6 +751,7 @@ public class ConfigManager : CoreConfig
         WindowsUtils.KeyGestureSaver("MiningModeKeyGesture", preferenceWindow.MiningModeKeyGestureTextBox.Text);
         WindowsUtils.KeyGestureSaver("PlayAudioKeyGesture", preferenceWindow.PlayAudioKeyGestureTextBox.Text);
         WindowsUtils.KeyGestureSaver("KanjiModeKeyGesture", preferenceWindow.KanjiModeKeyGestureTextBox.Text);
+        WindowsUtils.KeyGestureSaver("LookupKeyKeyGesture", preferenceWindow.LookupKeyKeyGestureTextBox.Text);
 
         WindowsUtils.KeyGestureSaver("ShowManageDictionariesWindowKeyGesture",
             preferenceWindow.ShowManageDictionariesWindowKeyGestureTextBox.Text);
@@ -844,6 +852,9 @@ public class ConfigManager : CoreConfig
         config.AppSettings.Settings["AlwaysOnTop"].Value =
             preferenceWindow.AlwaysOnTopCheckBox.IsChecked.ToString();
 
+        config.AppSettings.Settings["RequireLookupKeyPress"].Value =
+            preferenceWindow.RequireLookupKeyPressCheckBox.IsChecked.ToString();
+
         config.AppSettings.Settings["DisableHotkeys"].Value =
             preferenceWindow.DisableHotkeysCheckBox.IsChecked.ToString();
 
@@ -926,9 +937,6 @@ public class ConfigManager : CoreConfig
 
         config.AppSettings.Settings["LookupMode"].Value =
             preferenceWindow.LookupModeComboBox.SelectedValue.ToString();
-
-        config.AppSettings.Settings["LookupKey"].Value =
-            preferenceWindow.LookupKeyComboBox.SelectedValue.ToString();
 
         MainWindow mainWindow = MainWindow.Instance;
         config.AppSettings.Settings["MainWindowTopPosition"].Value = mainWindow.Top.ToString(CultureInfo.InvariantCulture);

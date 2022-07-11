@@ -281,32 +281,39 @@ public partial class PreferencesWindow : Window
 
         Key key = (e.Key == Key.System ? e.SystemKey : e.Key);
 
-        if (key == Key.LeftShift || key == Key.RightShift
-                                 || key == Key.LeftCtrl || key == Key.RightCtrl
-                                 || key == Key.LeftAlt || key == Key.RightAlt
-                                 || key == Key.LWin || key == Key.RWin)
+        if (key == Key.LWin || key == Key.RWin)
         {
             return;
         }
 
         StringBuilder hotkeyTextBuilder = new();
 
-        if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
+        if (key == Key.LeftShift || key == Key.RightShift
+            || key == Key.LeftCtrl || key == Key.RightCtrl
+            || key == Key.LeftAlt || key == Key.RightAlt)
         {
-            hotkeyTextBuilder.Append("Ctrl+");
+            hotkeyTextBuilder.Append(key.ToString());
         }
 
-        if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0)
+        else
         {
-            hotkeyTextBuilder.Append("Shift+");
-        }
+            if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
+            {
+                hotkeyTextBuilder.Append("Ctrl+");
+            }
 
-        if ((Keyboard.Modifiers & ModifierKeys.Alt) != 0)
-        {
-            hotkeyTextBuilder.Append("Alt+");
-        }
+            if ((Keyboard.Modifiers & ModifierKeys.Alt) != 0)
+            {
+                hotkeyTextBuilder.Append("Alt+");
+            }
 
-        hotkeyTextBuilder.Append(key.ToString());
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0 && hotkeyTextBuilder.Length > 0)
+            {
+                hotkeyTextBuilder.Append("Shift+");
+            }
+
+            hotkeyTextBuilder.Append(key.ToString());
+        }
 
         ((TextBox)sender).Text = hotkeyTextBuilder.ToString();
     }

@@ -12,7 +12,7 @@
         Deactivated="Window_Deactivated"
         KeyDown="Window_KeyDown" Closing="Window_Closing" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave">
 
-    <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Disabled"
+    <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Auto"
                   VerticalContentAlignment="Top"
                   CanContentScroll="True">
         <Grid>

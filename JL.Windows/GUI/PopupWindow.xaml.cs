@@ -135,7 +135,7 @@ public partial class PopupWindow : Window
     public async void TextBox_MouseMove(TextBox tb)
     {
         if (MiningMode || ConfigManager.InactiveLookupMode
-                       || (ConfigManager.RequireLookupKeyPress && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
+                       || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.KeyGestureComparer(ConfigManager.LookupKeyKeyGesture))
                        || (ConfigManager.FixedPopupPositioning && _parentPopupWindow != null)
            )
             return;
@@ -168,7 +168,7 @@ public partial class PopupWindow : Window
 
             string text = tb.Text[charPosition..endPosition];
 
-            if (text == LastText) return;
+            if (text == LastText && IsVisible) return;
             LastText = text;
 
             ResultStackPanels.Clear();
@@ -182,7 +182,9 @@ public partial class PopupWindow : Window
                 {
                     double verticalOffset = tb.VerticalOffset;
 
-                    if (ConfigManager.PopupFocusOnLookup || _parentPopupWindow != null)
+                    if (ConfigManager.PopupFocusOnLookup
+                        || ConfigManager.LookupOnLeftClickOnly
+                        || _parentPopupWindow != null)
                     {
                         tb.Focus();
                     }
@@ -194,11 +196,23 @@ public partial class PopupWindow : Window
                 Init();
 
                 _lastLookupResults = lookupResults;
-                DisplayResults(false, text);
+
+                if (ConfigManager.LookupOnLeftClickOnly)
+                {
+                    EnableMiningMode();
+                    DisplayResults(true, text);
+                }
+
+                else
+                {
+                    DisplayResults(false, text);
+                }
 
                 Visibility = Visibility.Visible;
 
-                if (ConfigManager.PopupFocusOnLookup || _parentPopupWindow != null)
+                if (ConfigManager.PopupFocusOnLookup
+                    || ConfigManager.LookupOnLeftClickOnly
+                    || _parentPopupWindow != null)
                 {
                     tb.Focus();
                     Activate();
@@ -216,10 +230,10 @@ public partial class PopupWindow : Window
                 LastText = "";
                 Visibility = Visibility.Hidden;
 
-                if (ConfigManager.HighlightLongestMatch)
-                {
-                    //Unselect(tb);
-                }
+                //if (ConfigManager.HighlightLongestMatch)
+                //{
+                //    //Unselect(tb);
+                //}
             }
         }
         else
@@ -251,9 +265,8 @@ public partial class PopupWindow : Window
 
             Init();
 
-            PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-
             _lastLookupResults = lookupResults;
+            EnableMiningMode();
             DisplayResults(true, tb.SelectedText);
 
             Visibility = Visibility.Visible;
@@ -270,7 +283,6 @@ public partial class PopupWindow : Window
         }
         else
         {
-            PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
             Visibility = Visibility.Hidden;
         }
     }
@@ -508,7 +520,7 @@ public partial class PopupWindow : Window
 
             if (readingsText != "")
             {
-                if (MiningMode || ConfigManager.LookupOnSelectOnly)
+                if (MiningMode)
                 {
                     uiElementReadings = new TextBox()
                     {
@@ -555,7 +567,7 @@ public partial class PopupWindow : Window
 
         if (result.FormattedDefinitions != null && result.FormattedDefinitions.Any())
         {
-            if (MiningMode || ConfigManager.LookupOnSelectOnly)
+            if (MiningMode)
             {
                 uiElementDefinitions = new TextBox
                 {
@@ -620,7 +632,7 @@ public partial class PopupWindow : Window
 
             if (alternativeSpellingsText != "")
             {
-                if (MiningMode || ConfigManager.LookupOnSelectOnly)
+                if (MiningMode)
                 {
                     uiElementAlternativeSpellings = new TextBox()
                     {
@@ -1083,9 +1095,12 @@ public partial class PopupWindow : Window
     private void PopupMouseMove(object sender, MouseEventArgs e)
     {
         if (ConfigManager.LookupOnSelectOnly
+            || ConfigManager.LookupOnLeftClickOnly
             || (ConfigManager.RequireLookupKeyPress
-                && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey)))
+                && !WindowsUtils.KeyGestureComparer(ConfigManager.LookupKeyKeyGesture)))
+        {
             return;
+        }
 
         ChildPopupWindow ??= new PopupWindow(this);
 
@@ -1127,8 +1142,10 @@ public partial class PopupWindow : Window
 
     private async void FoundSpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        if (!MiningMode && !ConfigManager.LookupOnSelectOnly)
+        if (!MiningMode)
+        {
             return;
+        }
 
         MiningMode = false;
         TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
@@ -1316,25 +1333,20 @@ public partial class PopupWindow : Window
         //    numericKeyValue = (int)e.Key - (int)Key.NumPad0 - 1;
         //}
 
+        e.Handled = true;
+
         if (WindowsUtils.KeyGestureComparer(e, ConfigManager.MiningModeKeyGesture))
         {
-            MiningMode = true;
+            if (MiningMode)
+                return;
 
-            if (ConfigManager.ShowMiningModeReminder)
-            {
-                TextBlockMiningModeReminder!.Visibility = Visibility.Visible;
-            }
-
-            PopUpScrollViewer!.ScrollToTop();
-            PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            EnableMiningMode();
 
             Activate();
             Focus();
 
             ResultStackPanels.Clear();
             DisplayResults(true);
-
-            ItemsControlButtons.Visibility = Visibility.Visible;
         }
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.PlayAudioKeyGesture))
         {
@@ -1347,7 +1359,6 @@ public partial class PopupWindow : Window
             ItemsControlButtons.Visibility = Visibility.Collapsed;
 
             PopUpScrollViewer!.ScrollToTop();
-            PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
 
             if (ConfigManager.LookupOnSelectOnly)
             {
@@ -1371,8 +1382,15 @@ public partial class PopupWindow : Window
             ConfigManager.Instance.KanjiMode = !ConfigManager.Instance.KanjiMode;
             LastText = "";
             Storage.Frontend.InvalidateDisplayCache();
-            //todo will only work for the FirstPopupWindow
-            MainWindow.Instance.MainTextBox_MouseMove(null, null);
+            if (_parentPopupWindow != null)
+            {
+                TextBox_MouseMove(_lastTextBox!);
+            }
+
+            else
+            {
+                MainWindow.Instance.MainTextBox_MouseMove(null, null);
+            }
         }
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
         {
@@ -1491,6 +1509,20 @@ public partial class PopupWindow : Window
         }
     }
 
+    private void EnableMiningMode()
+    {
+        MiningMode = true;
+
+        if (ConfigManager.ShowMiningModeReminder)
+        {
+            TextBlockMiningModeReminder!.Visibility = Visibility.Visible;
+        }
+
+        ItemsControlButtons.Visibility = Visibility.Visible;
+
+        PopUpScrollViewer!.ScrollToTop();
+    }
+
     private async Task PlayAudio()
     {
         //int index = numericKeyValue != -1 ? numericKeyValue : _playAudioIndex;
@@ -1582,15 +1614,21 @@ public partial class PopupWindow : Window
 
     private void OnMouseEnter(object sender, MouseEventArgs e)
     {
-        if (!ConfigManager.LookupOnSelectOnly && !ConfigManager.FixedPopupPositioning &&
-            ChildPopupWindow is { MiningMode: false })
+        if (!ConfigManager.LookupOnSelectOnly
+            && !ConfigManager.LookupOnLeftClickOnly
+            && !ConfigManager.FixedPopupPositioning
+            && ChildPopupWindow is { MiningMode: false })
         {
             ChildPopupWindow.Hide();
             ChildPopupWindow.LastText = "";
         }
 
-        if (MiningMode || ConfigManager.LookupOnSelectOnly || ConfigManager.FixedPopupPositioning ||
-            UnavoidableMouseEnter) return;
+        if (MiningMode
+            || ConfigManager.FixedPopupPositioning
+            || UnavoidableMouseEnter)
+        {
+            return;
+        }
 
         Hide();
         LastText = "";
@@ -1598,11 +1636,14 @@ public partial class PopupWindow : Window
 
     private void UiElement_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        if (!ConfigManager.LookupOnSelectOnly
+        if ((!ConfigManager.LookupOnSelectOnly && !ConfigManager.LookupOnLeftClickOnly)
             || Background!.Opacity == 0
             || ConfigManager.InactiveLookupMode
+            || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.KeyGestureComparer(ConfigManager.LookupKeyKeyGesture))
             || (ConfigManager.FixedPopupPositioning && _parentPopupWindow != null))
+        {
             return;
+        }
 
         //if (ConfigManager.RequireLookupKeyPress
         //    && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
@@ -1610,7 +1651,15 @@ public partial class PopupWindow : Window
 
         ChildPopupWindow ??= new PopupWindow(this);
 
-        ChildPopupWindow.LookupOnSelect((TextBox)sender);
+        if (ConfigManager.LookupOnSelectOnly)
+        {
+            ChildPopupWindow.LookupOnSelect((TextBox)sender);
+        }
+
+        else
+        {
+            ChildPopupWindow.TextBox_MouseMove((TextBox)sender);
+        }
 
         if (ConfigManager.FixedPopupPositioning)
         {
@@ -1626,18 +1675,21 @@ public partial class PopupWindow : Window
 
     private void OnMouseLeave(object sender, MouseEventArgs e)
     {
-        if (!ConfigManager.LookupOnSelectOnly && !ConfigManager.FixedPopupPositioning &&
-            ChildPopupWindow is { MiningMode: false, UnavoidableMouseEnter: false })
+        if (!ConfigManager.LookupOnSelectOnly
+            && !ConfigManager.LookupOnLeftClickOnly
+            && !ConfigManager.FixedPopupPositioning
+            && ChildPopupWindow is { MiningMode: false, UnavoidableMouseEnter: false })
         {
             ChildPopupWindow.Hide();
             ChildPopupWindow.LastText = "";
         }
 
-        if (MiningMode ||
-            ConfigManager.LookupOnSelectOnly ||
-            ConfigManager.FixedPopupPositioning ||
-            IsMouseOver)
+        if (MiningMode
+            || ConfigManager.FixedPopupPositioning
+            || IsMouseOver)
+        {
             return;
+        }
 
         Hide();
         LastText = "";
