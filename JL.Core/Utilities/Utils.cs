@@ -14,11 +14,11 @@ namespace JL.Core.Utilities;
 
 public static class Utils
 {
-    public static readonly Logger Logger = new LoggerConfiguration().WriteTo!.File("Logs/log.txt",
+    public static readonly Logger Logger = new LoggerConfiguration().WriteTo.File("Logs/log.txt",
             rollingInterval: RollingInterval.Day,
             retainedFileTimeLimit: TimeSpan.FromDays(90),
             shared: true)
-        .CreateLogger()!;
+        .CreateLogger();
 
     public static readonly Dictionary<string, string> Iso6392BTo2T = new()
     {

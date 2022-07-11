@@ -425,7 +425,7 @@ public static class WindowsUtils
     {
         FormattedText formattedText = new(
             text,
-            System.Globalization.CultureInfo.CurrentCulture,
+            CultureInfo.CurrentCulture,
             System.Windows.FlowDirection.LeftToRight,
             new Typeface(ConfigManager.PopupFont.Source!),
             fontSize,

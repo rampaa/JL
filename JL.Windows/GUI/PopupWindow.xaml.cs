@@ -997,32 +997,32 @@ public partial class PopupWindow : Window
                     WindowsUtils.MeasureTextSize(splitReadingsWithRInfo[i - 1] + ", ", fontSize).Width;
             }
 
-            if (dict.Contents.TryGetValue(normalizedExpression, out List<IResult>? kanjiumResultList))
+            if (dict.Contents.TryGetValue(normalizedExpression, out List<IResult>? pitchAccentDictResultList))
             {
-                PitchResult? chosenKanjiumResult = null;
+                PitchResult? chosenPitchAccentDictResult = null;
 
-                for (int j = 0; j < kanjiumResultList.Count; j++)
+                for (int j = 0; j < pitchAccentDictResultList.Count; j++)
                 {
-                    var kanjiumResult = (PitchResult)kanjiumResultList[j];
+                    var pitchAccentDictResult = (PitchResult)pitchAccentDictResultList[j];
 
-                    if (!hasReading || (kanjiumResult.Reading != null &&
+                    if (!hasReading || (pitchAccentDictResult.Reading != null &&
                                         normalizedExpression ==
-                                        Kana.KatakanaToHiraganaConverter(kanjiumResult.Reading)))
+                                        Kana.KatakanaToHiraganaConverter(pitchAccentDictResult.Reading)))
                     {
-                        if (foundSpelling == kanjiumResult.Spelling)
+                        if (foundSpelling == pitchAccentDictResult.Spelling)
                         {
-                            chosenKanjiumResult = kanjiumResult;
+                            chosenPitchAccentDictResult = pitchAccentDictResult;
                             break;
                         }
 
-                        else if (alternativeSpellings?.Contains(kanjiumResult.Spelling) ?? false)
+                        else if (alternativeSpellings?.Contains(pitchAccentDictResult.Spelling) ?? false)
                         {
-                            chosenKanjiumResult ??= kanjiumResult;
+                            chosenPitchAccentDictResult ??= pitchAccentDictResult;
                         }
                     }
                 }
 
-                if (chosenKanjiumResult != null)
+                if (chosenPitchAccentDictResult != null)
                 {
                     Polyline polyline = new()
                     {
@@ -1039,7 +1039,7 @@ public partial class PopupWindow : Window
                     {
                         Size charSize = WindowsUtils.MeasureTextSize(combinedFormList[j], fontSize);
 
-                        if (chosenKanjiumResult.Position - 1 == j)
+                        if (chosenPitchAccentDictResult.Position - 1 == j)
                         {
                             polyline.Points!.Add(new Point(horizontalOffsetForChar, 0));
                             polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
