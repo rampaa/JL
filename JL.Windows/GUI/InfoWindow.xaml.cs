@@ -5,9 +5,9 @@ namespace JL.Windows.GUI
     /// <summary>
     /// Interaction logic for AbbreviationWindow.xaml
     /// </summary>
-    public partial class InfonWindow : Window
+    public partial class InfoWindow : Window
     {
-        public InfonWindow()
+        public InfoWindow()
         {
             InitializeComponent();
         }

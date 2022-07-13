@@ -34,7 +34,7 @@ public static class JMdictLoader
 
         else if (Storage.Frontend.ShowYesNoDialog(
                      "Couldn't find JMdict.xml. Would you like to download it now?",
-                     "Download JL?"))
+                     "Download JMdict?"))
         {
             await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.JmdictUrl,

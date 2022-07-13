@@ -28,8 +28,8 @@ namespace JL.Windows.GUI;
 public partial class ManageDictionariesWindow : Window
 {
     private static ManageDictionariesWindow? s_instance;
-    private InfonWindow? _jmdictAbbreviationWindow = null;
-    private InfonWindow? _jmnedictAbbreviationWindow = null;
+    private InfoWindow? _jmdictAbbreviationWindow = null;
+    private InfoWindow? _jmnedictAbbreviationWindow = null;
 
     public static ManageDictionariesWindow Instance
     {
@@ -183,16 +183,21 @@ public partial class ManageDictionariesWindow : Window
                 Background = Brushes.LightSlateGray,
                 BorderThickness = new Thickness(1),
                 Margin = new Thickness(0, 0, 5, 0),
-                IsEnabled = dict.Contents.Any(),
                 Visibility = dict.Type is DictType.JMdict or DictType.JMnedict
                     ? Visibility.Visible
                     : Visibility.Collapsed
             };
 
             if (dict.Type == DictType.JMdict)
+            {
+                IsEnabled = Storage.JmdictEntities.Any();
                 buttonInfo.Click += JmdictInfoButton_Click;
+            }
+
             else if (dict.Type == DictType.JMnedict)
+            {
                 buttonInfo.Click += JmnedictInfoButton_Click;
+            }
 
             checkBox.Unchecked += (_, _) => dict.Active = false;
             checkBox.Checked += (_, _) => dict.Active = true;
@@ -395,7 +400,7 @@ public partial class ManageDictionariesWindow : Window
         return sb.ToString()[..^Environment.NewLine.Length];
     }
 
-    private void ShowInfoWindow(ref InfonWindow? infoWindow, Dictionary<string, string> entityDict, string title)
+    private void ShowInfoWindow(ref InfoWindow? infoWindow, Dictionary<string, string> entityDict, string title)
     {
         if (infoWindow == null)
         {
@@ -420,5 +425,13 @@ public partial class ManageDictionariesWindow : Window
     private void JmnedictInfoButton_Click(object sender, RoutedEventArgs e)
     {
         ShowInfoWindow(ref _jmnedictAbbreviationWindow, Storage.JmnedictEntities, "JMnedict Abbreviations");
+    }
+
+    private void Window_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (IsVisible)
+        {
+            UpdateDictionariesDisplay();
+        }
     }
 }
