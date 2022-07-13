@@ -190,7 +190,7 @@ public partial class ManageDictionariesWindow : Window
 
             if (dict.Type == DictType.JMdict)
             {
-                IsEnabled = Storage.JmdictEntities.Any();
+                buttonInfo.IsEnabled = Storage.JmdictEntities.Any();
                 buttonInfo.Click += JmdictInfoButton_Click;
             }
 
