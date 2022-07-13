@@ -13,7 +13,7 @@ public static class JMnedictLoader
             // The downside of using XmlTextReader is that it does not support async methods
             // And we cannot set some settings (e.g. MaxCharactersFromEntities)
 
-            using XmlTextReader xmlTextReader = new(dict.Path)
+            using XmlReader xmlTextReader = new XmlTextReader(dict.Path)
             {
                 DtdProcessing = DtdProcessing.Parse,
                 WhitespaceHandling = WhitespaceHandling.None,
@@ -43,7 +43,7 @@ public static class JMnedictLoader
         }
     }
 
-    private static void ReadEntry(XmlTextReader xmlReader, Dict dict)
+    private static void ReadEntry(XmlReader xmlReader, Dict dict)
     {
         JMnedictEntry entry = new();
         while (!xmlReader.EOF)
@@ -86,21 +86,21 @@ public static class JMnedictLoader
         JMnedictBuilder.BuildDictionary(entry, dict.Contents);
     }
 
-    private static void ReadKEle(XmlTextReader xmlReader, JMnedictEntry entry)
+    private static void ReadKEle(XmlReader xmlReader, JMnedictEntry entry)
     {
         xmlReader.ReadToFollowing("keb");
         entry.KebList.Add(xmlReader.ReadElementContentAsString());
         //xmlReader.ReadToFollowing("k_ele");
     }
 
-    private static void ReadREle(XmlTextReader xmlReader, JMnedictEntry entry)
+    private static void ReadREle(XmlReader xmlReader, JMnedictEntry entry)
     {
         xmlReader.ReadToFollowing("reb");
         entry.RebList.Add(xmlReader.ReadElementContentAsString());
         //xmlReader.ReadToFollowing("r_ele");
     }
 
-    private static void ReadTrans(XmlTextReader xmlReader, JMnedictEntry entry)
+    private static void ReadTrans(XmlReader xmlReader, JMnedictEntry entry)
     {
         Trans trans = new();
         while (!xmlReader.EOF)
@@ -139,7 +139,7 @@ public static class JMnedictLoader
         entry.TransList.Add(trans);
     }
 
-    private static string? ReadEntity(XmlTextReader xmlReader)
+    private static string? ReadEntity(XmlReader xmlReader)
     {
         string? entityName = null;
 

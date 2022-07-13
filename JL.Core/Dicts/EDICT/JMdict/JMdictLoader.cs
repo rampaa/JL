@@ -17,7 +17,7 @@ public static class JMdictLoader
             // The downside of using XmlTextReader is that it does not support async methods
             // And we cannot set some settings (e.g. MaxCharactersFromEntities)
 
-            using XmlTextReader xmlReader = new(dict.Path)
+            using XmlReader xmlReader = new XmlTextReader(dict.Path)
             {
                 DtdProcessing = DtdProcessing.Parse,
                 WhitespaceHandling = WhitespaceHandling.None,
