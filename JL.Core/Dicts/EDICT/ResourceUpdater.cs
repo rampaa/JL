@@ -22,7 +22,7 @@ public static class ResourceUpdater
                 if (!noPrompt)
                     Storage.Frontend.ShowOkDialog(
                         $"This may take a while. Please don't shut down the program until {resourceName} is downloaded.",
-                        "");
+                        "Info");
 
                 HttpResponseMessage response = await Storage.Client.SendAsync(request).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
@@ -33,7 +33,7 @@ public static class ResourceUpdater
 
                     if (!noPrompt)
                         Storage.Frontend.ShowOkDialog($"{resourceName} has been downloaded successfully.",
-                            "");
+                            "Info");
 
                     return true;
                 }
@@ -41,20 +41,20 @@ public static class ResourceUpdater
                 else if (response.StatusCode == HttpStatusCode.NotModified && !noPrompt)
                 {
                     Storage.Frontend.ShowOkDialog($"{resourceName} is up to date.",
-                        "");
+                        "Info");
                 }
 
                 else if (!noPrompt)
                 {
                     Storage.Frontend.ShowOkDialog($"Unexpected error while downloading {resourceName}.",
-                        "");
+                        "Info");
                 }
             }
         }
 
         catch
         {
-            Storage.Frontend.ShowOkDialog($"Unexpected error while downloading {resourceName}.", "");
+            Storage.Frontend.ShowOkDialog($"Unexpected error while downloading {resourceName}.", "Info");
         }
 
         return false;

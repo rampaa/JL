@@ -12,7 +12,7 @@ public class LookupResult
 
     public List<string>? Readings { get; init; }
     public string? FormattedDefinitions { get; init; }
-    public string? EdictId { get; init; }
+    public int EdictId { get; init; }
     public List<string>? AlternativeSpellings { get; init; }
     public string? Process { get; init; }
     public List<string>? POrthographyInfoList { get; init; }

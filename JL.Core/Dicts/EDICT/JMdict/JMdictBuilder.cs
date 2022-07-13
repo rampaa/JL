@@ -1,4 +1,6 @@
-﻿namespace JL.Core.Dicts.EDICT.JMdict;
+﻿using JL.Core.Utilities;
+
+namespace JL.Core.Dicts.EDICT.JMdict;
 
 internal static class JMdictBuilder
 {
@@ -140,10 +142,10 @@ internal static class JMdictBuilder
 
         foreach (KeyValuePair<string, JMdictResult> rl in resultList)
         {
-            rl.Value.Readings = TrimList(rl.Value.Readings);
-            rl.Value.AlternativeSpellings = TrimList(rl.Value.AlternativeSpellings);
-            rl.Value.POrthographyInfoList = TrimList(rl.Value.POrthographyInfoList);
-            rl.Value.DefinitionInfo = TrimList(rl.Value.DefinitionInfo!)!;
+            rl.Value.Readings = Utils.TrimStringList(rl.Value.Readings!);
+            rl.Value.AlternativeSpellings = Utils.TrimStringList(rl.Value.AlternativeSpellings!);
+            rl.Value.POrthographyInfoList = Utils.TrimStringList(rl.Value.POrthographyInfoList!);
+            rl.Value.DefinitionInfo = Utils.TrimStringList(rl.Value.DefinitionInfo!)!;
             rl.Value.Definitions = TrimListOfLists(rl.Value.Definitions!)!;
             rl.Value.RRestrictions = TrimListOfLists(rl.Value.RRestrictions);
             rl.Value.KRestrictions = TrimListOfLists(rl.Value.KRestrictions);
@@ -202,17 +204,5 @@ internal static class JMdictBuilder
         }
 
         return listOfListClone;
-    }
-
-    private static List<string>? TrimList(List<string>? list)
-    {
-        List<string>? listClone = list;
-
-        if (!listClone!.Any() || listClone!.All(string.IsNullOrEmpty))
-            listClone = null;
-        else
-            listClone!.TrimExcess();
-
-        return listClone;
     }
 }

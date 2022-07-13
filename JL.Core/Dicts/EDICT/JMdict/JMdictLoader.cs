@@ -12,16 +12,21 @@ public static class JMdictLoader
     {
         if (File.Exists(dict.Path))
         {
-            using XmlTextReader edictXml = new(dict.Path)
+            // XmlTextReader is preferred over XmlReader here because XmlReader does not have the EntityHandling property
+            // And we do need EntityHandling property because we want to get unexpanded entity names
+            // The downside of using XmlTextReader is that it does not support async methods
+            // And we cannot set some settings (e.g. MaxCharactersFromEntities)
+
+            using XmlTextReader xmlReader = new(dict.Path)
             {
                 DtdProcessing = DtdProcessing.Parse,
                 WhitespaceHandling = WhitespaceHandling.None,
                 EntityHandling = EntityHandling.ExpandCharEntities
             };
 
-            while (edictXml.ReadToFollowing("entry"))
+            while (xmlReader.ReadToFollowing("entry"))
             {
-                ReadEntry(edictXml, dict);
+                ReadEntry(xmlReader, dict);
             }
 
             dict.Contents.TrimExcess();
@@ -29,7 +34,7 @@ public static class JMdictLoader
 
         else if (Storage.Frontend.ShowYesNoDialog(
                      "Couldn't find JMdict.xml. Would you like to download it now?",
-                     ""))
+                     "Download JL?"))
         {
             await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.JmdictUrl,
@@ -43,170 +48,208 @@ public static class JMdictLoader
         }
     }
 
-    private static void ReadEntry(XmlTextReader edictXml, Dict dict)
+    private static void ReadEntry(XmlReader xmlReader, Dict dict)
     {
         JMdictEntry entry = new();
-        while (edictXml.Read())
+
+        xmlReader.Read();
+
+        while (!xmlReader.EOF)
         {
-            if (edictXml.Name == "entry" && edictXml.NodeType == XmlNodeType.EndElement)
+            if (xmlReader.Name == "entry" && xmlReader.NodeType == XmlNodeType.EndElement)
                 break;
 
-            if (edictXml.NodeType == XmlNodeType.Element)
+            if (xmlReader.NodeType == XmlNodeType.Element)
             {
-                switch (edictXml.Name)
+                switch (xmlReader.Name)
                 {
                     case "ent_seq":
-                        entry.Id = edictXml.ReadString();
+                        entry.Id = xmlReader.ReadElementContentAsInt();
                         break;
 
                     case "k_ele":
-                        ReadKEle(edictXml, entry);
+                        ReadKEle(xmlReader, entry);
                         break;
 
                     case "r_ele":
-                        ReadREle(edictXml, entry);
+                        ReadREle(xmlReader, entry);
                         break;
 
                     case "sense":
-                        ReadSense(edictXml, entry);
+                        ReadSense(xmlReader, entry);
+                        break;
+
+                    default:
+                        xmlReader.Read();
                         break;
                 }
+            }
+            else
+            {
+                xmlReader.Read();
             }
         }
 
         JMdictBuilder.BuildDictionary(entry, dict.Contents);
     }
 
-    private static void ReadKEle(XmlTextReader edictXml, JMdictEntry entry)
+    private static void ReadKEle(XmlReader xmlReader, JMdictEntry entry)
     {
         KanjiElement kanjiElement = new();
-        while (edictXml.Read())
+
+        xmlReader.Read();
+
+        while (!xmlReader.EOF)
         {
-            if (edictXml.Name == "k_ele" && edictXml.NodeType == XmlNodeType.EndElement)
+            if (xmlReader.Name == "k_ele" && xmlReader.NodeType == XmlNodeType.EndElement)
                 break;
 
-            if (edictXml.NodeType == XmlNodeType.Element)
+            if (xmlReader.NodeType == XmlNodeType.Element)
             {
-                switch (edictXml.Name)
+                switch (xmlReader.Name)
                 {
                     case "keb":
-                        kanjiElement.Keb = edictXml.ReadString();
+                        kanjiElement.Keb = xmlReader.ReadElementContentAsString();
                         break;
 
                     case "ke_inf":
-                        kanjiElement.KeInfList.Add(ReadEntity(edictXml)!);
+                        kanjiElement.KeInfList.Add(ReadEntity(xmlReader)!);
                         break;
 
-                        //case "ke_pri":
-                        //    kanjiElement.KePriList.Add(edictXml.ReadString());
-                        //    break;
+                    //case "ke_pri":
+                    //    kanjiElement.KePriList.Add(xmlReader.ReadElementContentAsString());
+                    //    break;
+
+                    default:
+                        xmlReader.Read();
+                        break;
                 }
+            }
+
+            else
+            {
+                xmlReader.Read();
             }
         }
 
         entry.KanjiElements.Add(kanjiElement);
     }
 
-    private static void ReadREle(XmlTextReader jmdictXml, JMdictEntry entry)
+    private static void ReadREle(XmlReader xmlReader, JMdictEntry entry)
     {
         ReadingElement readingElement = new();
-        while (jmdictXml.Read())
+
+        xmlReader.Read();
+
+        while (!xmlReader.EOF)
         {
-            if (jmdictXml.Name == "r_ele" && jmdictXml.NodeType == XmlNodeType.EndElement)
+            if (xmlReader.Name == "r_ele" && xmlReader.NodeType == XmlNodeType.EndElement)
                 break;
 
-            if (jmdictXml.NodeType == XmlNodeType.Element)
+            if (xmlReader.NodeType == XmlNodeType.Element)
             {
-                switch (jmdictXml.Name)
+                switch (xmlReader.Name)
                 {
                     case "reb":
-                        readingElement.Reb = jmdictXml.ReadString();
+                        readingElement.Reb = xmlReader.ReadElementContentAsString();
                         break;
 
                     case "re_restr":
-                        readingElement.ReRestrList.Add(jmdictXml.ReadString());
+                        readingElement.ReRestrList.Add(xmlReader.ReadElementContentAsString());
                         break;
 
                     case "re_inf":
-                        readingElement.ReInfList.Add(ReadEntity(jmdictXml)!);
+                        readingElement.ReInfList.Add(ReadEntity(xmlReader)!);
                         break;
 
-                        //case "re_pri":
-                        //    readingElement.RePriList.Add(jMDictXML.ReadString());
-                        //    break;
+                    //case "re_pri":
+                    //    readingElement.RePriList.Add(xmlReader.ReadElementContentAsString());
+                    //    break;
+
+                    default:
+                        xmlReader.Read();
+                        break;
                 }
+            }
+
+            else
+            {
+                xmlReader.Read();
             }
         }
 
         entry.ReadingElements.Add(readingElement);
     }
 
-    private static void ReadSense(XmlTextReader jmdictXml, JMdictEntry entry)
+    private static void ReadSense(XmlReader xmlReader, JMdictEntry entry)
     {
         Sense sense = new();
-        while (jmdictXml.Read())
+
+        xmlReader.Read();
+
+        while (!xmlReader.EOF)
         {
-            if (jmdictXml.Name == "sense" && jmdictXml.NodeType == XmlNodeType.EndElement)
+            if (xmlReader.Name == "sense" && xmlReader.NodeType == XmlNodeType.EndElement)
                 break;
 
-            if (jmdictXml.NodeType == XmlNodeType.Element)
+            if (xmlReader.NodeType == XmlNodeType.Element)
             {
-                switch (jmdictXml.Name)
+                switch (xmlReader.Name)
                 {
                     case "stagk":
-                        sense.StagKList.Add(jmdictXml.ReadString());
+                        sense.StagKList.Add(xmlReader.ReadElementContentAsString());
                         break;
 
                     case "stagr":
-                        sense.StagRList.Add(jmdictXml.ReadString());
+                        sense.StagRList.Add(xmlReader.ReadElementContentAsString());
                         break;
 
                     case "pos":
-                        sense.PosList.Add(ReadEntity(jmdictXml)!);
+                        sense.PosList.Add(ReadEntity(xmlReader)!);
                         break;
 
                     case "field":
-                        sense.FieldList.Add(ReadEntity(jmdictXml)!);
+                        sense.FieldList.Add(ReadEntity(xmlReader)!);
                         break;
 
                     case "misc":
-                        sense.MiscList.Add(ReadEntity(jmdictXml)!);
+                        sense.MiscList.Add(ReadEntity(xmlReader)!);
                         break;
 
                     case "s_inf":
-                        sense.SInf = jmdictXml.ReadString();
+                        sense.SInf = xmlReader.ReadElementContentAsString();
                         break;
 
                     case "dial":
-                        sense.DialList.Add(ReadEntity(jmdictXml)!);
+                        sense.DialList.Add(ReadEntity(xmlReader)!);
                         break;
 
                     case "gloss":
                         string gloss = "";
 
-                        if (jmdictXml.HasAttributes)
+                        if (xmlReader.HasAttributes)
                         {
-                            string? glossType = jmdictXml.GetAttribute("g_type");
+                            string? glossType = xmlReader.GetAttribute("g_type");
 
                             if (glossType != null)
                                 gloss = "(" + glossType + ".) ";
                         }
 
-                        gloss += jmdictXml.ReadString();
+                        gloss += xmlReader.ReadElementContentAsString();
 
                         sense.GlossList.Add(gloss);
                         break;
 
                     case "xref":
-                        sense.XRefList.Add(jmdictXml.ReadString());
+                        sense.XRefList.Add(xmlReader.ReadElementContentAsString());
                         break;
 
                     case "ant":
-                        sense.AntList.Add(jmdictXml.ReadString());
+                        sense.AntList.Add(xmlReader.ReadElementContentAsString());
                         break;
 
                     case "lsource":
-                        string? lang = jmdictXml.GetAttribute("xml:lang");
+                        string? lang = xmlReader.GetAttribute("xml:lang");
 
                         if (lang != null)
                         {
@@ -235,29 +278,48 @@ public static class JMdictLoader
                             lang = "English";
                         }
 
-                        bool isPart = jmdictXml.GetAttribute("ls_type") == "part";
-                        bool isWasei = jmdictXml.GetAttribute("ls_wasei") != null;
+                        bool isPart = xmlReader.GetAttribute("ls_type") == "part";
+                        bool isWasei = xmlReader.GetAttribute("ls_wasei") != null;
 
-                        string? originalWord = jmdictXml.ReadString();
+                        string? originalWord = xmlReader.ReadElementContentAsString();
                         originalWord = originalWord != "" ? originalWord : null;
 
                         sense.LSourceList.Add(new LSource(lang, isPart, isWasei, originalWord));
                         break;
+
+                    default:
+                        xmlReader.Read();
+                        break;
                 }
+            }
+
+            else
+            {
+                xmlReader.Read();
             }
         }
 
         entry.SenseList.Add(sense);
     }
 
-    private static string? ReadEntity(XmlTextReader jmdictXml)
+    private static string? ReadEntity(XmlReader xmlReader)
     {
-        jmdictXml.Read();
-        if (jmdictXml.NodeType == XmlNodeType.EntityReference)
+        string? entityName = null;
+
+        xmlReader.Read();
+
+        if (xmlReader.NodeType == XmlNodeType.EntityReference)
         {
-            //jMDictXML.ResolveEntity();
-            return jmdictXml.Name;
+            entityName = xmlReader.Name;
+
+            xmlReader.ResolveEntity();
+            xmlReader.Read();
+
+            Storage.JmdictEntities.TryAdd(entityName, xmlReader.Value);
+
+            xmlReader.Read();
         }
-        else return null;
+
+        return entityName;
     }
 }

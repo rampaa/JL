@@ -193,22 +193,18 @@ public static class Lookup
     }
 
     private static List<LookupResult> SortLookupResults(
-        List<LookupResult> lookupResults)
+    List<LookupResult> lookupResults)
     {
-        List<LookupResult> sortedLookupResults = lookupResults
-            .OrderByDescending(dict => dict.FoundForm.Length)
+        string longestFoundForm = lookupResults.Aggregate((r1, r2) => r1.FoundForm.Length > r2.FoundForm.Length ? r1 : r2).FoundForm;
+
+        return lookupResults
+            .OrderByDescending(dict => longestFoundForm == dict.FoundSpelling)
+            .ThenByDescending(dict => dict.Readings?.Contains(longestFoundForm))
+            .ThenByDescending(dict => dict.FoundForm.Length)
+            .ThenByDescending(dict => longestFoundForm.Length >= dict.FoundSpelling.Length && longestFoundForm[..dict.FoundSpelling.Length] == dict.FoundSpelling)
             .ThenBy(dict => dict.Dict?.Priority ?? int.MaxValue)
             .ThenBy(dict => dict.Frequencies.Count > 0 ? dict.Frequencies.First().Freq : int.MaxValue)
             .ToList();
-
-        string longestFoundForm = sortedLookupResults.First().FoundForm;
-
-        sortedLookupResults = sortedLookupResults
-            .OrderByDescending(dict => longestFoundForm == dict.FoundSpelling)
-            .ThenByDescending(dict => dict.Readings?.Contains(longestFoundForm))
-            .ToList();
-
-        return sortedLookupResults;
     }
 
     private static (bool tryLongVowelConversion, int succAttempt) GetWordResultsHelper(Dict dict,

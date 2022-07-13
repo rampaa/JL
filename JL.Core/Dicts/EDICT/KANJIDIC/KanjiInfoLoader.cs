@@ -1,4 +1,5 @@
 ﻿using System.Xml;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EDICT.KANJIDIC;
 
@@ -8,12 +9,14 @@ public static class KanjiInfoLoader
     {
         if (File.Exists(dict.Path))
         {
-            using XmlTextReader edictXml = new(dict.Path)
+            XmlReaderSettings xmlReaderSettings = new()
             {
+                Async = true,
                 DtdProcessing = DtdProcessing.Parse,
-                WhitespaceHandling = WhitespaceHandling.None,
-                EntityHandling = EntityHandling.ExpandCharEntities
+                IgnoreWhitespace = true
             };
+
+            using XmlReader xmlReader = XmlReader.Create(dict.Path, xmlReaderSettings);
 
             Dictionary<string, string> kanjiCompositionDictionary = new();
             if (File.Exists($"{Storage.ResourcesPath}/ids.txt"))
@@ -53,9 +56,9 @@ public static class KanjiInfoLoader
             }
 
             dict.Contents = new Dictionary<string, List<IResult>>();
-            while (edictXml.ReadToFollowing("literal"))
+            while (xmlReader.ReadToFollowing("literal"))
             {
-                ReadCharacter(edictXml, kanjiCompositionDictionary, dict);
+                await ReadCharacter(xmlReader, kanjiCompositionDictionary, dict).ConfigureAwait(false);
             }
 
             dict.Contents.TrimExcess();
@@ -63,7 +66,7 @@ public static class KanjiInfoLoader
 
         else if (Storage.Frontend.ShowYesNoDialog(
                      "Couldn't find kanjidic2.xml. Would you like to download it now?",
-                     ""))
+                     "Download KANJIDIC2?"))
         {
             await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.KanjidicUrl,
@@ -77,81 +80,85 @@ public static class KanjiInfoLoader
         }
     }
 
-    private static void ReadCharacter(XmlReader kanjiDicXml, Dictionary<string, string> kanjiCompositionDictionary, Dict dict)
+    private static async Task ReadCharacter(XmlReader xmlReader, Dictionary<string, string> kanjiCompositionDictionary, Dict dict)
     {
-        string key = kanjiDicXml.ReadString();
+        string key = xmlReader.ReadElementContentAsString();
 
         KanjiResult entry = new();
 
         if (kanjiCompositionDictionary.TryGetValue(key, out string? composition))
             entry.Composition = composition;
 
-        while (kanjiDicXml.Read())
+        while (!xmlReader.EOF)
         {
-            if (kanjiDicXml.Name == "character" && kanjiDicXml.NodeType == XmlNodeType.EndElement)
+            if (xmlReader.Name == "character" && xmlReader.NodeType == XmlNodeType.EndElement)
                 break;
 
-            if (kanjiDicXml.NodeType == XmlNodeType.Element)
+            if (xmlReader.NodeType == XmlNodeType.Element)
             {
-                switch (kanjiDicXml.Name)
+                switch (xmlReader.Name)
                 {
                     case "grade":
-                        //kanjiDicXml.ReadElementContentAsInt();
-                        entry.Grade = int.Parse(kanjiDicXml.ReadString());
+                        entry.Grade = xmlReader.ReadElementContentAsInt();
                         break;
 
                     case "stroke_count":
-                        entry.StrokeCount = int.Parse(kanjiDicXml.ReadString());
+                        entry.StrokeCount = xmlReader.ReadElementContentAsInt();
                         break;
 
                     case "freq":
-                        entry.Frequency = int.Parse(kanjiDicXml.ReadString());
+                        entry.Frequency = xmlReader.ReadElementContentAsInt();
                         break;
 
                     case "meaning":
-                        if (!kanjiDicXml.HasAttributes)
-                            entry.Meanings!.Add(kanjiDicXml.ReadString());
+                        // English definition
+                        if (!xmlReader.HasAttributes)
+                        {
+                            entry.Meanings!.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+                        }
+                        else
+                        {
+                            await xmlReader.ReadAsync().ConfigureAwait(false);
+                        }
                         break;
 
                     case "nanori":
-                        entry.Nanori!.Add(kanjiDicXml.ReadString());
+                        entry.Nanori!.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
                         break;
 
                     case "reading":
-                        switch (kanjiDicXml.GetAttribute("r_type"))
+                        switch (xmlReader.GetAttribute("r_type"))
                         {
                             case "ja_on":
-                                entry.OnReadings!.Add(kanjiDicXml.ReadString());
+                                entry.OnReadings!.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
                                 break;
 
                             case "ja_kun":
-                                entry.KunReadings!.Add(kanjiDicXml.ReadString());
+                                entry.KunReadings!.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+                                break;
+
+                            default:
+                                await xmlReader.ReadAsync().ConfigureAwait(false);
                                 break;
                         }
                         break;
+
+                    default:
+                        await xmlReader.ReadAsync().ConfigureAwait(false);
+                        break;
                 }
+            }
+
+            else
+            {
+                await xmlReader.ReadAsync().ConfigureAwait(false);
             }
         }
 
-        if (!entry.Nanori!.Any() || entry.Nanori!.All(l => !l.Any()))
-            entry.Nanori = null;
-        else
-            entry.Nanori!.TrimExcess();
-
-        if (!entry.Meanings!.Any() || entry.Meanings!.All(l => !l.Any()))
-            entry.Meanings = null;
-        else
-            entry.Meanings!.TrimExcess();
-
-        if (!entry.OnReadings!.Any() || entry.OnReadings!.All(l => !l.Any()))
-            entry.OnReadings = null;
-        else
-            entry.OnReadings!.TrimExcess();
-
-        if (!entry.KunReadings!.Any() || entry.KunReadings!.All(l => !l.Any()))
-            entry.KunReadings = null;
-        else
-            entry.KunReadings!.TrimExcess();
+        entry.Nanori = Utils.TrimStringList(entry.Nanori!);
+        entry.Nanori = Utils.TrimStringList(entry.Meanings!);
+        entry.Nanori = Utils.TrimStringList(entry.OnReadings!);
+        entry.Nanori = Utils.TrimStringList(entry.KunReadings!);
 
         dict.Contents.Add(key, new List<IResult> { entry });
     }

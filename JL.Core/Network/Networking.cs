@@ -58,10 +58,10 @@ public static class Networking
                             foundRelease = true;
 
                             if (Storage.Frontend.ShowYesNoDialog(
-                                "A new version of JL is available. Would you like to download it now?", ""))
+                                "A new version of JL is available. Would you like to download it now?", "Update JL?"))
                             {
                                 Storage.Frontend.ShowOkDialog(
-                                    "This may take a while. Please don't manually shut down the program until it's updated.", "");
+                                    "This may take a while. Please don't manually shut down the program until it's updated.", "Info");
 
                                 await Storage.Frontend.UpdateJL(new Uri(latestReleaseUrl)).ConfigureAwait(false);
                             }
@@ -71,14 +71,14 @@ public static class Networking
 
                     if (!isAutoCheck && !foundRelease)
                     {
-                        Storage.Frontend.ShowOkDialog("JL is up to date", "");
+                        Storage.Frontend.ShowOkDialog("JL is up to date", "Info");
                     }
 
                 }
 
                 else if (!isAutoCheck)
                 {
-                    Storage.Frontend.ShowOkDialog("JL is up to date", "");
+                    Storage.Frontend.ShowOkDialog("JL is up to date", "Info");
                 }
             }
 

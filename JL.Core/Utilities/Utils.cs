@@ -384,4 +384,16 @@ public static class Utils
     {
         await Stats.UpdateLifetimeStats().ConfigureAwait(false);
     }
+
+    public static List<string>? TrimStringList(List<string> list)
+    {
+        List<string>? listClone = list;
+
+        if (!listClone.Any() || listClone!.All(string.IsNullOrEmpty))
+            listClone = null;
+        else
+            listClone!.TrimExcess();
+
+        return listClone;
+    }
 }

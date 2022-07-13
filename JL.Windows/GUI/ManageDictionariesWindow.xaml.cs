@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Runtime;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -27,6 +28,8 @@ namespace JL.Windows.GUI;
 public partial class ManageDictionariesWindow : Window
 {
     private static ManageDictionariesWindow? s_instance;
+    private InfonWindow? _jmdictAbbreviationWindow = null;
+    private InfonWindow? _jmnedictAbbreviationWindow = null;
 
     public static ManageDictionariesWindow Instance
     {
@@ -171,6 +174,26 @@ public partial class ManageDictionariesWindow : Window
                 //     : Visibility.Visible,
             };
 
+            var buttonInfo = new Button
+            {
+                Width = 50,
+                Height = 30,
+                Content = "Info",
+                Foreground = Brushes.White,
+                Background = Brushes.LightSlateGray,
+                BorderThickness = new Thickness(1),
+                Margin = new Thickness(0, 0, 5, 0),
+                IsEnabled = dict.Contents.Any(),
+                Visibility = dict.Type is DictType.JMdict or DictType.JMnedict
+                    ? Visibility.Visible
+                    : Visibility.Collapsed
+            };
+
+            if (dict.Type == DictType.JMdict)
+                buttonInfo.Click += JmdictInfoButton_Click;
+            else if (dict.Type == DictType.JMnedict)
+                buttonInfo.Click += JmnedictInfoButton_Click;
+
             checkBox.Unchecked += (_, _) => dict.Active = false;
             checkBox.Checked += (_, _) => dict.Active = true;
             buttonIncreasePriority.Click += (_, _) =>
@@ -217,6 +240,7 @@ public partial class ManageDictionariesWindow : Window
             dockPanel.Children.Add(buttonEdit);
             dockPanel.Children.Add(buttonUpdate);
             dockPanel.Children.Add(buttonRemove);
+            dockPanel.Children.Add(buttonInfo);
         }
 
         DictionariesDisplay!.ItemsSource = resultDockPanels.OrderBy(dockPanel =>
@@ -353,5 +377,48 @@ public partial class ManageDictionariesWindow : Window
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
         Close();
+    }
+
+    private string EntityDictToString(Dictionary<string, string> entityDict)
+    {
+        StringBuilder sb = new();
+        IOrderedEnumerable<KeyValuePair<string, string>> sortedJmdictEntities = entityDict.OrderBy(e => e.Key);
+
+        foreach (KeyValuePair<string, string> entity in sortedJmdictEntities)
+        {
+            sb.Append(entity.Key);
+            sb.Append(": ");
+            sb.Append(entity.Value);
+            sb.Append(Environment.NewLine);
+        }
+
+        return sb.ToString()[..^Environment.NewLine.Length];
+    }
+
+    private void ShowInfoWindow(ref InfonWindow? infoWindow, Dictionary<string, string> entityDict, string title)
+    {
+        if (infoWindow == null)
+        {
+            infoWindow = new();
+            infoWindow.Title = title;
+            infoWindow.InfoTextBox.Text = EntityDictToString(entityDict);
+        }
+
+        else
+        {
+            infoWindow.InfoTextBox.ScrollToHome();
+        }
+
+        infoWindow.ShowDialog();
+    }
+
+    private void JmdictInfoButton_Click(object sender, RoutedEventArgs e)
+    {
+        ShowInfoWindow(ref _jmdictAbbreviationWindow, Storage.JmdictEntities, "JMdict Abbreviations");
+    }
+
+    private void JmnedictInfoButton_Click(object sender, RoutedEventArgs e)
+    {
+        ShowInfoWindow(ref _jmnedictAbbreviationWindow, Storage.JmnedictEntities, "JMnedict Abbreviations");
     }
 }

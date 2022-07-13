@@ -178,6 +178,21 @@ public static class Storage
             "\n"
         };
 
+    public static readonly Dictionary<string, string> JmdictEntities = new();
+
+    public static readonly Dictionary<string, string> JmnedictEntities = new()
+    {
+        #pragma warning disable format
+        {"char", "character"}, {"company", "company name"}, {"creat", "creature"}, {"dei", "deity"},
+        {"doc", "document"}, {"ev", "event"}, {"fem", "female given name or forename"}, {"fict", "fiction"},
+        {"given", "given name or forename, gender not specified"},
+        {"group", "group"}, {"leg", "legend"}, {"masc", "male given name or forename"}, {"myth", "mythology"},
+        {"obj", "object"}, {"organization", "organization name"}, {"oth", "other"}, {"person", "full name of a particular person"},
+        {"place", "place name"}, {"product", "product name"}, {"relig", "religion"}, {"serv", "service"},
+        {"station", "railway station"}, {"surname", "family or surname"}, {"unclass", "unclassified name"}, {"work", "work of art, literature, music, etc. name"},
+        #pragma warning restore format
+    };
+
     public static int CacheSize { get; set; } = 1000;
 
     public static async Task LoadDictionaries()

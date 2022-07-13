@@ -56,7 +56,7 @@ public class LookupTests
                     Readings = new List<string> { "はじまる" },
                     FormattedDefinitions =
                         "(v5r, vi) (1) to begin; to start; to commence (v5r, vi) (2) to happen (again); to begin (anew) (v5r, vi) (3) to date (from); to originate (in)",
-                    EdictId = "1307500",
+                    EdictId = 1307500,
                     AlternativeSpellings = new List<string>(),
                     Process = null,
                     POrthographyInfoList = new List<string>(),

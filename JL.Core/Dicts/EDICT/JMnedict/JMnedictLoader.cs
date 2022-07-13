@@ -8,23 +8,28 @@ public static class JMnedictLoader
     {
         if (File.Exists(dict.Path))
         {
-            using XmlTextReader edictXml = new(dict.Path)
+            // XmlTextReader is preferred over XmlReader here because XmlReader does not have the EntityHandling property
+            // And we do need EntityHandling property because we want to get unexpanded entity names
+            // The downside of using XmlTextReader is that it does not support async methods
+            // And we cannot set some settings (e.g. MaxCharactersFromEntities)
+
+            using XmlTextReader xmlTextReader = new(dict.Path)
             {
                 DtdProcessing = DtdProcessing.Parse,
                 WhitespaceHandling = WhitespaceHandling.None,
                 EntityHandling = EntityHandling.ExpandCharEntities
             };
 
-            while (edictXml.ReadToFollowing("entry"))
+            while (xmlTextReader.ReadToFollowing("entry"))
             {
-                ReadEntry(edictXml, dict);
+                ReadEntry(xmlTextReader, dict);
             }
 
             dict.Contents.TrimExcess();
         }
 
         else if (Storage.Frontend.ShowYesNoDialog("Couldn't find JMnedict.xml. Would you like to download it now?",
-                     ""))
+                     "Download JMnedict?"))
         {
             await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.JmnedictUrl,
@@ -38,93 +43,114 @@ public static class JMnedictLoader
         }
     }
 
-    private static void ReadEntry(XmlTextReader edictXml, Dict dict)
+    private static void ReadEntry(XmlTextReader xmlReader, Dict dict)
     {
         JMnedictEntry entry = new();
-        while (edictXml.Read())
+        while (!xmlReader.EOF)
         {
-            if (edictXml.Name == "entry" && edictXml.NodeType == XmlNodeType.EndElement)
+            if (xmlReader.Name == "entry" && xmlReader.NodeType == XmlNodeType.EndElement)
                 break;
 
-            if (edictXml.NodeType == XmlNodeType.Element)
+            if (xmlReader.NodeType == XmlNodeType.Element)
             {
-                switch (edictXml.Name)
+                switch (xmlReader.Name)
                 {
                     case "ent_seq":
-                        entry.Id = edictXml.ReadString();
+                        entry.Id = xmlReader.ReadElementContentAsInt();
                         break;
 
                     case "k_ele":
-                        ReadKEle(edictXml, entry);
+                        ReadKEle(xmlReader, entry);
                         break;
 
                     case "r_ele":
-                        ReadREle(edictXml, entry);
+                        ReadREle(xmlReader, entry);
                         break;
 
                     case "trans":
-                        ReadTrans(edictXml, entry);
+                        ReadTrans(xmlReader, entry);
+                        break;
+
+                    default:
+                        xmlReader.Read();
                         break;
                 }
+            }
+
+            else
+            {
+                xmlReader.Read();
             }
         }
 
         JMnedictBuilder.BuildDictionary(entry, dict.Contents);
     }
 
-    private static void ReadKEle(XmlTextReader jmnedictXml, JMnedictEntry entry)
+    private static void ReadKEle(XmlTextReader xmlReader, JMnedictEntry entry)
     {
-        jmnedictXml.ReadToFollowing("keb");
-        entry.KebList.Add(jmnedictXml.ReadString());
-        //jmnedictXml.ReadToFollowing("k_ele");
+        xmlReader.ReadToFollowing("keb");
+        entry.KebList.Add(xmlReader.ReadElementContentAsString());
+        //xmlReader.ReadToFollowing("k_ele");
     }
 
-    private static void ReadREle(XmlTextReader jmnedictXml, JMnedictEntry entry)
+    private static void ReadREle(XmlTextReader xmlReader, JMnedictEntry entry)
     {
-        jmnedictXml.ReadToFollowing("reb");
-        entry.RebList.Add(jmnedictXml.ReadString());
-        //jmnedictXml.ReadToFollowing("r_ele");
+        xmlReader.ReadToFollowing("reb");
+        entry.RebList.Add(xmlReader.ReadElementContentAsString());
+        //xmlReader.ReadToFollowing("r_ele");
     }
 
-    private static void ReadTrans(XmlTextReader jmnedictXml, JMnedictEntry entry)
+    private static void ReadTrans(XmlTextReader xmlReader, JMnedictEntry entry)
     {
         Trans trans = new();
-        while (jmnedictXml.Read())
+        while (!xmlReader.EOF)
         {
-            if (jmnedictXml.Name == "trans" && jmnedictXml.NodeType == XmlNodeType.EndElement)
+            if (xmlReader.Name == "trans" && xmlReader.NodeType == XmlNodeType.EndElement)
                 break;
 
-            if (jmnedictXml.NodeType == XmlNodeType.Element)
+            if (xmlReader.NodeType == XmlNodeType.Element)
             {
-                switch (jmnedictXml.Name)
+                switch (xmlReader.Name)
                 {
                     case "name_type":
-                        trans.NameTypeList.Add(ReadEntity(jmnedictXml)!);
+                        trans.NameTypeList.Add(ReadEntity(xmlReader)!);
                         break;
 
                     case "trans_det":
-                        trans.TransDetList.Add(jmnedictXml.ReadString());
+                        trans.TransDetList.Add(xmlReader.ReadElementContentAsString());
                         break;
 
-                        //case "xref":
-                        //    trans.XRefList.Add(jmnedictXml.ReadString());
-                        //    break;
+                    //case "xref":
+                    //    trans.XRefList.Add(xmlReader.ReadElementContentAsString());
+                    //    break;
+
+                    default:
+                        xmlReader.Read();
+                        break;
                 }
+            }
+
+            else
+            {
+                xmlReader.Read();
             }
         }
 
         entry.TransList.Add(trans);
     }
 
-    private static string? ReadEntity(XmlTextReader jmnedictXml)
+    private static string? ReadEntity(XmlTextReader xmlReader)
     {
-        jmnedictXml.Read();
-        if (jmnedictXml.NodeType == XmlNodeType.EntityReference)
+        string? entityName = null;
+
+        xmlReader.Read();
+        if (xmlReader.NodeType == XmlNodeType.EntityReference)
         {
-            //jmnedictXml.ResolveEntity();
-            return jmnedictXml.Name;
+            //xmlReader.ResolveEntity();
+            entityName = xmlReader.Name;
+            xmlReader.Read();
         }
 
-        return null;
+        return entityName;
     }
 }

@@ -2,7 +2,7 @@
 
 public class JMdictResult : IResult
 {
-    public string Id { get; set; }
+    public int Id { get; set; }
     public List<string>? AlternativeSpellings { get; set; }
     public List<List<string>> Definitions { get; set; }
     public List<List<string>?>? RRestrictions { get; set; }
@@ -25,7 +25,6 @@ public class JMdictResult : IResult
 
     public JMdictResult()
     {
-        Id = string.Empty;
         PrimarySpelling = string.Empty;
         Definitions = new List<List<string>>();
         RRestrictions = new List<List<string>?>();

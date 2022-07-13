@@ -426,10 +426,20 @@ public partial class PopupWindow : Window
             Text = result.FoundSpelling,
             Tag = index, // for audio
             Foreground = ConfigManager.PrimarySpellingColor,
+            Background = Brushes.Transparent,
+            //SelectionTextBrush = ConfigManager.HighlightColor,
             FontSize = ConfigManager.PrimarySpellingFontSize,
             TextWrapping = TextWrapping.Wrap,
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Center,
+            //BorderThickness = new Thickness(0, 0, 0, 0),
+            Margin = new Thickness(5, 0, 0, 0),
+            Padding = new Thickness(0),
+            //IsReadOnly = true,
+            //IsUndoEnabled = false,
+            Cursor = Cursors.Arrow,
+            //IsInactiveSelectionHighlightEnabled = true,
+            ContextMenu = PopupContextMenu,
         };
 
         // bottom
@@ -612,12 +622,12 @@ public partial class PopupWindow : Window
             }
         }
 
-        if (result.EdictId != null)
+        if (result.EdictId != 0)
         {
             textBlockEdictId = new TextBlock
             {
                 Name = nameof(result.EdictId),
-                Text = result.EdictId,
+                Text = result.EdictId.ToString(),
                 Visibility = Visibility.Collapsed,
             };
         }

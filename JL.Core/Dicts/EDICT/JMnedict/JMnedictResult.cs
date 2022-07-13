@@ -2,7 +2,7 @@
 
 public class JMnedictResult : IResult
 {
-    public string Id { get; set; }
+    public int Id { get; set; }
     public string PrimarySpelling { get; set; }
     public List<string>? AlternativeSpellings { get; set; }
     public List<string>? Readings { get; set; }
@@ -11,7 +11,6 @@ public class JMnedictResult : IResult
 
     public JMnedictResult()
     {
-        Id = string.Empty;
         PrimarySpelling = string.Empty;
         AlternativeSpellings = new List<string>();
         Readings = new List<string>();

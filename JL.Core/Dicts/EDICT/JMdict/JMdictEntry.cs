@@ -2,7 +2,7 @@
 
 public class JMdictEntry
 {
-    public string Id { get; set; }
+    public int Id { get; set; }
     public List<KanjiElement> KanjiElements { get; set; }
     public List<ReadingElement> ReadingElements { get; set; }
     public List<Sense> SenseList { get; set; }
@@ -12,6 +12,5 @@ public class JMdictEntry
         KanjiElements = new List<KanjiElement>();
         ReadingElements = new List<ReadingElement>();
         SenseList = new List<Sense>();
-        Id = string.Empty;
     }
 }
