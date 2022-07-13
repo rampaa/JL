@@ -156,9 +156,9 @@ public static class KanjiInfoLoader
         }
 
         entry.Nanori = Utils.TrimStringList(entry.Nanori!);
-        entry.Nanori = Utils.TrimStringList(entry.Meanings!);
-        entry.Nanori = Utils.TrimStringList(entry.OnReadings!);
-        entry.Nanori = Utils.TrimStringList(entry.KunReadings!);
+        entry.Meanings = Utils.TrimStringList(entry.Meanings!);
+        entry.OnReadings = Utils.TrimStringList(entry.OnReadings!);
+        entry.KunReadings = Utils.TrimStringList(entry.KunReadings!);
 
         dict.Contents.Add(key, new List<IResult> { entry });
     }
