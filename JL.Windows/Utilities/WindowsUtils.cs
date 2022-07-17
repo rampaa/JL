@@ -471,4 +471,34 @@ public static class WindowsUtils
         tb.Select(0, 0);
         tb.ScrollToVerticalOffset(verticalOffset);
     }
+
+    public static void SetSizeToContent(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, System.Windows.Window window)
+    {
+        window.MaxHeight = maxHeight;
+        window.MaxWidth = maxWidth;
+
+        if (dynamicWidth && dynamicHeight)
+        {
+            window.SizeToContent = SizeToContent.WidthAndHeight;
+        }
+
+        else if (dynamicWidth)
+        {
+            window.SizeToContent = SizeToContent.Width;
+            window.Height = maxHeight;
+        }
+
+        else if (dynamicHeight)
+        {
+            window.SizeToContent = SizeToContent.Height;
+            window.Width = maxWidth;
+        }
+
+        else
+        {
+            window.SizeToContent = SizeToContent.Manual;
+            window.Height = maxHeight;
+            window.Width = maxWidth;
+        }
+    }
 }

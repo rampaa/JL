@@ -105,6 +105,16 @@ public partial class MainWindow : Window, IFrontend
         CopyFromClipboard();
     }
 
+    protected override void OnActivated(EventArgs e)
+    {
+        base.OnActivated(e);
+
+        if (!ConfigManager.Focusable)
+        {
+            _winApi!.PreventFocus();
+        }
+    }
+
     private async void CopyFromClipboard()
     {
         bool gotTextFromClipboard = false;
@@ -218,6 +228,11 @@ public partial class MainWindow : Window, IFrontend
         {
             _lastClipboardChangeTime = currentTime;
             CopyFromClipboard();
+
+            if (ConfigManager.MainWindowDynamicWidth || ConfigManager.MainWindowDynamicHeight)
+            {
+                WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, this);
+            }
         }
 
         if (ConfigManager.AlwaysOnTop
@@ -236,6 +251,11 @@ public partial class MainWindow : Window, IFrontend
 
     public void MainTextBox_MouseMove(object? sender, MouseEventArgs? e)
     {
+        if (Cursor != Cursors.Arrow)
+        {
+            Mouse.OverrideCursor = Cursors.Arrow;
+        }
+
         if (ConfigManager.LookupOnSelectOnly
             || ConfigManager.LookupOnLeftClickOnly
             || Background!.Opacity == 0

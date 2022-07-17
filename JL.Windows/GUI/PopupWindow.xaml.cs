@@ -35,6 +35,8 @@ public partial class PopupWindow : Window
 
     private string? _lastSelectedText;
 
+    private WinApi? _winApi;
+
     private List<LookupResult> _lastLookupResults = new();
 
     private Dict? _filteredDict = null;
@@ -67,37 +69,29 @@ public partial class PopupWindow : Window
         _parentPopupWindow = parentPopUp;
     }
 
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+
+        _winApi = new(this);
+    }
+
+    protected override void OnActivated(EventArgs e)
+    {
+        base.OnActivated(e);
+
+        if (!ConfigManager.Focusable)
+        {
+            _winApi!.PreventFocus();
+        }
+    }
+
     private void Init()
     {
         Background = ConfigManager.PopupBackgroundColor;
         FontFamily = ConfigManager.PopupFont;
 
-        MaxHeight = WindowsUtils.DpiAwarePopupMaxHeight;
-        MaxWidth = WindowsUtils.DpiAwarePopupMaxWidth;
-
-        if (ConfigManager.PopupDynamicWidth && ConfigManager.PopupDynamicHeight)
-        {
-            SizeToContent = SizeToContent.WidthAndHeight;
-        }
-
-        else if (ConfigManager.PopupDynamicWidth)
-        {
-            SizeToContent = SizeToContent.Width;
-            Height = WindowsUtils.DpiAwarePopupMaxHeight;
-        }
-
-        else if (ConfigManager.PopupDynamicHeight)
-        {
-            SizeToContent = SizeToContent.Height;
-            Width = WindowsUtils.DpiAwarePopupMaxWidth;
-        }
-
-        else
-        {
-            SizeToContent = SizeToContent.Manual;
-            Height = WindowsUtils.DpiAwarePopupMaxHeight;
-            Width = WindowsUtils.DpiAwarePopupMaxWidth;
-        }
+        WindowsUtils.SetSizeToContent(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxWidth, WindowsUtils.DpiAwarePopupMaxHeight, this);
 
         WindowsUtils.SetInputGestureText(AddNameButton!, ConfigManager.ShowAddNameWindowKeyGesture);
         WindowsUtils.SetInputGestureText(AddWordButton!, ConfigManager.ShowAddWordWindowKeyGesture);
@@ -216,7 +210,6 @@ public partial class PopupWindow : Window
                 {
                     tb.Focus();
                     Activate();
-                    Keyboard.Focus(this);
                     Focus();
                 }
 
@@ -273,7 +266,6 @@ public partial class PopupWindow : Window
 
             tb.Focus();
             Activate();
-            Keyboard.Focus(this);
             Focus();
 
             if (ConfigManager.AutoPlayAudio)

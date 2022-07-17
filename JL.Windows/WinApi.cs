@@ -18,6 +18,8 @@ public class WinApi
         internal const int SWP_NOSIZE = 0x0001;
         internal const int SWP_NOMOVE = 0x0002;
         internal const int SWP_SHOWWINDOW = 0x0040;
+        internal const int GWL_EXSTYLE = -20;
+        internal const int WS_EX_NOACTIVATE = 0x08000000;
         public static readonly IntPtr HWND_TOPMOST = new(-1);
 
         //RECT Structure
@@ -54,6 +56,12 @@ public class WinApi
 
         [DllImport("user32.dll")]
         internal static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        [DllImport("user32.dll")]
+        public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
     }
 
     private enum ResizeDirection
@@ -133,6 +141,11 @@ public class WinApi
     public void KeepTopmost()
     {
         NativeMethods.SetWindowPos(_windowHandle, NativeMethods.HWND_TOPMOST, 0, 0, 0, 0, NativeMethods.SWP_NOMOVE | NativeMethods.SWP_NOSIZE | NativeMethods.SWP_SHOWWINDOW);
+    }
+
+    public void PreventFocus()
+    {
+        NativeMethods.SetWindowLong(_windowHandle, NativeMethods.GWL_EXSTYLE, NativeMethods.GetWindowLong(_windowHandle, NativeMethods.GWL_EXSTYLE) | NativeMethods.WS_EX_NOACTIVATE);
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)

@@ -38,7 +38,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Lookup requires Lookup Key press"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="RequireLookupKeyPressCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="RequireLookupKeyPressCheckBox" HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -52,7 +52,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Highlight color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <Button x:Name="HighlightColorButton" Content="" HorizontalAlignment="Right"
+                            <Button x:Name="HighlightColorButton"  HorizontalAlignment="Right"
                                     Width="60" Click="ShowColorPicker"
                                     BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" />
                         </DockPanel>
@@ -60,38 +60,44 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Always on top"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="AlwaysOnTopCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="AlwaysOnTopCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Focusable"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="FocusableCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Kanji mode"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="KanjiModeCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="KanjiModeCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Highlight the longest match"
                                        Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"
                                        ToolTip="Ignored if lookup mode is set to text select" />
-                            <CheckBox x:Name="HighlightLongestMatchCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="HighlightLongestMatchCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Auto play audio"
                                        Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                            <CheckBox x:Name="AutoPlayAudioCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="AutoPlayAudioCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Disable hotkeys"
                                        ToolTip="Disables hotkeys except for Toggle Hotkeys hotkey" Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                            <CheckBox x:Name="DisableHotkeysCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="DisableHotkeysCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Check for updates on start up"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="CheckForJLUpdatesOnStartUpCheckBox" Content=""
+                            <CheckBox x:Name="CheckForJLUpdatesOnStartUpCheckBox" 
                                       HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -139,9 +145,36 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Dynamic width"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="MainWindowDynamicWidthCheckBox" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Dynamic height" 
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="MainWindowDynamicHeightCheckBox"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Max dynamic width"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="MainWindowMaxDynamicWidthNumericUpDown" Minimum="1"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Max dynamic height"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <hc:NumericUpDown x:Name="MainWindowMaxDynamicHeightNumericUpDown" Minimum="1"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Background color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <Button x:Name="TextboxBackgroundColorButton" Content="" HorizontalAlignment="Right"
+                            <Button x:Name="TextboxBackgroundColorButton"  HorizontalAlignment="Right"
                                     Width="60" Click="ShowColorPicker"
                                     BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" />
                         </DockPanel>
@@ -149,7 +182,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Text color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <Button x:Name="TextboxTextColorButton" Content="" HorizontalAlignment="Right"
+                            <Button x:Name="TextboxTextColorButton"  HorizontalAlignment="Right"
                                     Width="60" Height="32" BorderThickness="5,5,5,5"
                                     Click="ShowColorPicker" BorderBrush="#FF707070" />
                         </DockPanel>
@@ -157,7 +190,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Backlog text color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <Button x:Name="TextboxBacklogTextColorButton" Content="" HorizontalAlignment="Right"
+                            <Button x:Name="TextboxBacklogTextColorButton"  HorizontalAlignment="Right"
                                     Width="60" Height="32" BorderThickness="5,5,5,5"
                                     Click="ShowColorPicker" BorderBrush="#FF707070" />
                         </DockPanel>
@@ -179,13 +212,13 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Text only visible on hover"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="TextOnlyVisibleOnHoverCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="TextOnlyVisibleOnHoverCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Change opacity on unhover"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -198,19 +231,19 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Trim white-space characters"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="TextBoxTrimWhiteSpaceCharactersCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="TextBoxTrimWhiteSpaceCharactersCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Remove newlines"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="TextBoxRemoveNewlinesCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="TextBoxRemoveNewlinesCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Read only"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="TextBoxIsReadOnlyCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="TextBoxIsReadOnlyCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                     </StackPanel>
@@ -249,19 +282,19 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Dynamic width"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="PopupDynamicWidthCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="PopupDynamicWidthCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Dynamic height"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="PopupDynamicHeightCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="PopupDynamicHeightCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Fixed positioning"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="FixedPopupPositioningCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="FixedPopupPositioningCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -286,25 +319,25 @@
                                        Cursor="Help"
                                        ToolTip="Attempt to set focus on the popup window when you mouse over text.
 &#10;Required if you want to be able to use hotkeys without clicking on the window first." />
-                            <CheckBox x:Name="PopupFocusOnLookupCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="PopupFocusOnLookupCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Show mining mode reminder"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="ShowMiningModeReminderCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="ShowMiningModeReminderCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Disable lookups for non-Japanese characters"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="DisableLookupsForNonJapaneseCharsInPopupsCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="DisableLookupsForNonJapaneseCharsInPopupsCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Background color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <Button x:Name="PopupBackgroundColorButton" Content="" HorizontalAlignment="Right"
+                            <Button x:Name="PopupBackgroundColorButton"  HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
                         </DockPanel>
@@ -344,7 +377,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Primary spelling color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <Button x:Name="PrimarySpellingColorButton" Content="" HorizontalAlignment="Right"
+                            <Button x:Name="PrimarySpellingColorButton"  HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
                         </DockPanel>
@@ -360,7 +393,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Reading color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <Button x:Name="ReadingsColorButton" Content="" HorizontalAlignment="Right"
+                            <Button x:Name="ReadingsColorButton"  HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
                         </DockPanel>
@@ -375,7 +408,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Alternative spelling color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <Button x:Name="AlternativeSpellingsColorButton" Content=""
+                            <Button x:Name="AlternativeSpellingsColorButton" 
                                     HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
@@ -393,7 +426,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Definition color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <Button x:Name="DefinitionsColorButton" Content="" HorizontalAlignment="Right"
+                            <Button x:Name="DefinitionsColorButton"  HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
                         </DockPanel>
@@ -409,7 +442,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Frequency color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <Button x:Name="FrequencyColorButton" Content="" HorizontalAlignment="Right"
+                            <Button x:Name="FrequencyColorButton"  HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
                         </DockPanel>
@@ -424,7 +457,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Deconjugation info color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <Button x:Name="DeconjugationInfoColorButton" Content=""
+                            <Button x:Name="DeconjugationInfoColorButton" 
                                     HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
@@ -441,7 +474,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Dictionary name color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <Button x:Name="DictTypeColorButton" Content="" HorizontalAlignment="Right"
+                            <Button x:Name="DictTypeColorButton"  HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
                         </DockPanel>
@@ -457,7 +490,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Separator Color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <Button x:Name="SeparatorColorButton" Content="" HorizontalAlignment="Right"
+                            <Button x:Name="SeparatorColorButton"  HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
                         </DockPanel>
@@ -476,7 +509,7 @@
                         <DockPanel Margin="0,10,0,0">
                             <TextBlock HorizontalAlignment="Left" Text="Enable Anki integration"
                                        TextWrapping="Wrap" />
-                            <CheckBox x:Name="AnkiIntegrationCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="AnkiIntegrationCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <StackPanel IsEnabled="{Binding ElementName=AnkiIntegrationCheckBox,Path=IsChecked}">
@@ -491,13 +524,13 @@
                             <DockPanel Margin="0,10,0,0">
                                 <TextBlock HorizontalAlignment="Left" Text="Force sync after mining"
                                            TextWrapping="Wrap" />
-                                <CheckBox x:Name="ForceSyncAnkiCheckBox" Content="" HorizontalAlignment="Right" />
+                                <CheckBox x:Name="ForceSyncAnkiCheckBox"  HorizontalAlignment="Right" />
                             </DockPanel>
 
                             <DockPanel Margin="0,10,0,0">
                                 <TextBlock HorizontalAlignment="Left" Text="Allow duplicate cards"
                                            TextWrapping="Wrap" />
-                                <CheckBox x:Name="AllowDuplicateCardsCheckBox" Content="" HorizontalAlignment="Right" />
+                                <CheckBox x:Name="AllowDuplicateCardsCheckBox"  HorizontalAlignment="Right" />
                             </DockPanel>
 
                             <Grid Margin="10,10,10,10">
@@ -820,7 +853,7 @@
 &#10;look up something immediately after the text changes.
 &#10;Not recommended unless you feel that lookup is slow."
                                        Cursor="Help"/>
-                            <CheckBox x:Name="PrecachingCheckBox" Content="" HorizontalAlignment="Right" />
+                            <CheckBox x:Name="PrecachingCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                     </StackPanel>

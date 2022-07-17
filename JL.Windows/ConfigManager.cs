@@ -48,6 +48,7 @@ public class ConfigManager : CoreConfig
     public static bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
     public static bool AlwaysOnTop { get; set; } = true;
     public static bool DisableHotkeys { get; set; } = false;
+    public static bool Focusable { get; private set; } = true;
 
     #endregion
 
@@ -55,6 +56,10 @@ public class ConfigManager : CoreConfig
 
     public static double MainWindowWidth { get; set; } = 800;
     public static double MainWindowHeight { get; set; } = 200;
+    public static bool MainWindowDynamicHeight { get; private set; } = false;
+    public static bool MainWindowDynamicWidth { get; private set; } = false;
+    public static double MainWindowMaxDynamicWidth { get; private set; } = 800;
+    public static double MainWindowMaxDynamicHeight { get; private set; } = 800;
     public static Brush MainWindowTextColor { get; private set; } = Brushes.White;
     public static Brush MainWindowBacklogTextColor { get; private set; } = Brushes.Bisque;
     public static bool TextOnlyVisibleOnHover { get; set; } = false;
@@ -193,6 +198,10 @@ public class ConfigManager : CoreConfig
         WindowsUtils.Try(() => DisableHotkeys =
                 bool.Parse(ConfigurationManager.AppSettings.Get("DisableHotkeys")!),
             DisableHotkeys, "DisableHotkeys");
+
+        WindowsUtils.Try(() => Focusable =
+                bool.Parse(ConfigurationManager.AppSettings.Get("Focusable")!),
+            Focusable, "Focusable");
 
         WindowsUtils.Try(() => AnkiIntegration =
                 bool.Parse(ConfigurationManager.AppSettings.Get("AnkiIntegration")!),
@@ -513,15 +522,25 @@ public class ConfigManager : CoreConfig
             bool.Parse(ConfigurationManager.AppSettings.Get("TextBoxRemoveNewlines")!),
             TextBoxRemoveNewlines, "TextBoxRemoveNewlines");
 
+        WindowsUtils.Try(() => MainWindowDynamicHeight = bool.Parse(ConfigurationManager.AppSettings
+            .Get("MainWindowDynamicHeight")!), MainWindowDynamicHeight, "MainWindowDynamicHeight");
+        WindowsUtils.Try(() => MainWindowDynamicWidth = bool.Parse(ConfigurationManager.AppSettings
+            .Get("MainWindowDynamicWidth")!), MainWindowDynamicWidth, "MainWindowDynamicWidth");
+
         WindowsUtils.Try(() => MainWindowHeight = double.Parse(ConfigurationManager.AppSettings
             .Get("MainWindowHeight")!, CultureInfo.InvariantCulture), MainWindowHeight, "MainWindowHeight");
-        mainWindow.Height = MainWindowHeight;
-        mainWindow.HeightBeforeResolutionChange = MainWindowHeight;
 
         WindowsUtils.Try(() => MainWindowWidth = double.Parse(ConfigurationManager.AppSettings
             .Get("MainWindowWidth")!, CultureInfo.InvariantCulture), MainWindowWidth, "MainWindowWidth");
-        mainWindow.Width = MainWindowWidth;
+
+        WindowsUtils.Try(() => MainWindowMaxDynamicWidth = double.Parse(ConfigurationManager.AppSettings
+            .Get("MainWindowMaxDynamicWidth")!, CultureInfo.InvariantCulture), MainWindowMaxDynamicWidth, "MainWindowMaxDynamicWidth");
+        WindowsUtils.Try(() => MainWindowMaxDynamicHeight = double.Parse(ConfigurationManager.AppSettings
+            .Get("MainWindowMaxDynamicHeight")!, CultureInfo.InvariantCulture), MainWindowMaxDynamicHeight, "MainWindowMaxDynamicHeight");
+
+        WindowsUtils.SetSizeToContent(MainWindowDynamicWidth, MainWindowDynamicHeight, MainWindowMaxDynamicWidth, MainWindowMaxDynamicHeight, mainWindow);
         mainWindow.WidthBeforeResolutionChange = MainWindowWidth;
+        mainWindow.HeightBeforeResolutionChange = MainWindowHeight;
 
         WindowsUtils.Try(() => mainWindow.Top = double.Parse(ConfigurationManager.AppSettings
             .Get("MainWindowTopPosition")!, CultureInfo.InvariantCulture), mainWindow.Top, "MainWindowTopPosition");
@@ -550,34 +569,7 @@ public class ConfigManager : CoreConfig
             currentPopupWindow.Background = PopupBackgroundColor;
             currentPopupWindow.FontFamily = PopupFont;
 
-            currentPopupWindow.MaxHeight = WindowsUtils.DpiAwarePopupMaxHeight;
-            currentPopupWindow.MaxWidth = WindowsUtils.DpiAwarePopupMaxWidth;
-
-            if (PopupDynamicWidth && PopupDynamicHeight)
-            {
-                currentPopupWindow.SizeToContent = SizeToContent.WidthAndHeight;
-            }
-
-
-            else if (PopupDynamicWidth)
-            {
-                currentPopupWindow.SizeToContent = SizeToContent.Width;
-                currentPopupWindow.Height = WindowsUtils.DpiAwarePopupMaxHeight;
-            }
-
-
-            else if (PopupDynamicHeight)
-            {
-                currentPopupWindow.SizeToContent = SizeToContent.Height;
-                currentPopupWindow.Width = WindowsUtils.DpiAwarePopupMaxWidth;
-            }
-
-            else
-            {
-                currentPopupWindow.SizeToContent = SizeToContent.Manual;
-                currentPopupWindow.Height = WindowsUtils.DpiAwarePopupMaxHeight;
-                currentPopupWindow.Width = WindowsUtils.DpiAwarePopupMaxWidth;
-            }
+            WindowsUtils.SetSizeToContent(PopupDynamicWidth, PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxHeight, WindowsUtils.DpiAwarePopupMaxWidth, currentPopupWindow);
 
             WindowsUtils.SetInputGestureText(currentPopupWindow.AddNameButton, ShowAddNameWindowKeyGesture);
             WindowsUtils.SetInputGestureText(currentPopupWindow.AddWordButton, ShowAddWordWindowKeyGesture);
@@ -656,9 +648,16 @@ public class ConfigManager : CoreConfig
         preferenceWindow.AlwaysOnTopCheckBox.IsChecked = AlwaysOnTop;
         preferenceWindow.RequireLookupKeyPressCheckBox.IsChecked = RequireLookupKeyPress;
         preferenceWindow.DisableHotkeysCheckBox.IsChecked = DisableHotkeys;
+        preferenceWindow.FocusableCheckBox.IsChecked = Focusable;
         preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked = TextOnlyVisibleOnHover;
         preferenceWindow.AnkiIntegrationCheckBox.IsChecked = AnkiIntegration;
         preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
+
+        preferenceWindow.MainWindowDynamicWidthCheckBox.IsChecked = MainWindowDynamicWidth;
+        preferenceWindow.MainWindowDynamicHeightCheckBox.IsChecked = MainWindowDynamicHeight;
+
+        preferenceWindow.MainWindowMaxDynamicWidthNumericUpDown.Value = MainWindowMaxDynamicWidth;
+        preferenceWindow.MainWindowMaxDynamicHeightNumericUpDown.Value = MainWindowMaxDynamicHeight;
 
         preferenceWindow.MainWindowHeightNumericUpDown.Value = MainWindowHeight;
         preferenceWindow.MainWindowWidthNumericUpDown.Value = MainWindowWidth;
@@ -801,6 +800,16 @@ public class ConfigManager : CoreConfig
         config.AppSettings.Settings["AnkiConnectUri"].Value =
             preferenceWindow.AnkiUriTextBox.Text;
 
+        config.AppSettings.Settings["MainWindowDynamicWidth"].Value =
+            preferenceWindow.MainWindowDynamicWidthCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings["MainWindowDynamicHeight"].Value =
+            preferenceWindow.MainWindowDynamicHeightCheckBox.IsChecked.ToString();
+
+        config.AppSettings.Settings["MainWindowMaxDynamicWidth"].Value =
+            preferenceWindow.MainWindowMaxDynamicWidthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
+        config.AppSettings.Settings["MainWindowMaxDynamicHeight"].Value =
+            preferenceWindow.MainWindowMaxDynamicHeightNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
+
         config.AppSettings.Settings["MainWindowWidth"].Value =
             preferenceWindow.MainWindowWidthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["MainWindowHeight"].Value =
@@ -857,6 +866,9 @@ public class ConfigManager : CoreConfig
 
         config.AppSettings.Settings["DisableHotkeys"].Value =
             preferenceWindow.DisableHotkeysCheckBox.IsChecked.ToString();
+
+        config.AppSettings.Settings["Focusable"].Value =
+            preferenceWindow.FocusableCheckBox.IsChecked.ToString();
 
         config.AppSettings.Settings["TextOnlyVisibleOnHover"].Value =
             preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked.ToString();
