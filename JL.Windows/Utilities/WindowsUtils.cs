@@ -472,7 +472,7 @@ public static class WindowsUtils
         tb.ScrollToVerticalOffset(verticalOffset);
     }
 
-    public static void SetSizeToContent(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, System.Windows.Window window)
+    public static void SetSizeToContentForPopup(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, System.Windows.Window window)
     {
         window.MaxHeight = maxHeight;
         window.MaxWidth = maxWidth;
@@ -499,6 +499,41 @@ public static class WindowsUtils
             window.SizeToContent = SizeToContent.Manual;
             window.Height = maxHeight;
             window.Width = maxWidth;
+        }
+    }
+
+    public static void SetSizeToContentForMainWindow(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, double width, double height, System.Windows.Window window)
+    {
+        if (dynamicWidth && dynamicHeight)
+        {
+            window.MaxHeight = maxHeight;
+            window.MaxWidth = maxWidth;
+            window.SizeToContent = SizeToContent.WidthAndHeight;
+        }
+
+        else if (dynamicWidth)
+        {
+            window.MaxHeight = double.PositiveInfinity;
+            window.MaxWidth = maxWidth;
+            window.SizeToContent = SizeToContent.Width;
+            window.Height = height;
+        }
+
+        else if (dynamicHeight)
+        {
+            window.MaxHeight = maxHeight;
+            window.MaxWidth = double.PositiveInfinity;
+            window.SizeToContent = SizeToContent.Height;
+            window.Width = width;
+        }
+
+        else
+        {
+            window.SizeToContent = SizeToContent.Manual;
+            window.MaxHeight = double.PositiveInfinity;
+            window.MaxWidth = double.PositiveInfinity;
+            window.Width = width;
+            window.Height = height;
         }
     }
 }

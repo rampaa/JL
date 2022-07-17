@@ -229,10 +229,8 @@ public partial class MainWindow : Window, IFrontend
             _lastClipboardChangeTime = currentTime;
             CopyFromClipboard();
 
-            if (ConfigManager.MainWindowDynamicWidth || ConfigManager.MainWindowDynamicHeight)
-            {
-                WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, this);
-            }
+            WindowsUtils.SetSizeToContentForMainWindow(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, ConfigManager.MainWindowMaxDynamicWidth,
+                ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
         }
 
         if (ConfigManager.AlwaysOnTop

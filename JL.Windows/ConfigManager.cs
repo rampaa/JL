@@ -59,7 +59,7 @@ public class ConfigManager : CoreConfig
     public static bool MainWindowDynamicHeight { get; private set; } = false;
     public static bool MainWindowDynamicWidth { get; private set; } = false;
     public static double MainWindowMaxDynamicWidth { get; private set; } = 800;
-    public static double MainWindowMaxDynamicHeight { get; private set; } = 800;
+    public static double MainWindowMaxDynamicHeight { get; private set; } = 269;
     public static Brush MainWindowTextColor { get; private set; } = Brushes.White;
     public static Brush MainWindowBacklogTextColor { get; private set; } = Brushes.Bisque;
     public static bool TextOnlyVisibleOnHover { get; set; } = false;
@@ -538,7 +538,8 @@ public class ConfigManager : CoreConfig
         WindowsUtils.Try(() => MainWindowMaxDynamicHeight = double.Parse(ConfigurationManager.AppSettings
             .Get("MainWindowMaxDynamicHeight")!, CultureInfo.InvariantCulture), MainWindowMaxDynamicHeight, "MainWindowMaxDynamicHeight");
 
-        WindowsUtils.SetSizeToContent(MainWindowDynamicWidth, MainWindowDynamicHeight, MainWindowMaxDynamicWidth, MainWindowMaxDynamicHeight, mainWindow);
+        WindowsUtils.SetSizeToContentForMainWindow(MainWindowDynamicWidth, MainWindowDynamicHeight, MainWindowMaxDynamicWidth, MainWindowMaxDynamicHeight,
+            MainWindowWidth, MainWindowHeight, mainWindow);
         mainWindow.WidthBeforeResolutionChange = MainWindowWidth;
         mainWindow.HeightBeforeResolutionChange = MainWindowHeight;
 
@@ -569,7 +570,7 @@ public class ConfigManager : CoreConfig
             currentPopupWindow.Background = PopupBackgroundColor;
             currentPopupWindow.FontFamily = PopupFont;
 
-            WindowsUtils.SetSizeToContent(PopupDynamicWidth, PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxHeight, WindowsUtils.DpiAwarePopupMaxWidth, currentPopupWindow);
+            WindowsUtils.SetSizeToContentForPopup(PopupDynamicWidth, PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxHeight, WindowsUtils.DpiAwarePopupMaxWidth, currentPopupWindow);
 
             WindowsUtils.SetInputGestureText(currentPopupWindow.AddNameButton, ShowAddNameWindowKeyGesture);
             WindowsUtils.SetInputGestureText(currentPopupWindow.AddWordButton, ShowAddWordWindowKeyGesture);
