@@ -470,7 +470,7 @@ public static class WindowsUtils
 
         Color selectedBrushColor = ((SolidColorBrush)selectedBrush).Color;
 
-        button.Background = selectedBrushColor.A == 255 ? selectedBrush : CreateOpaqueBrush(selectedBrushColor);
+        button.Background = CreateOpaqueBrush(selectedBrushColor);
     }
 
     private static Brush CreateOpaqueBrush(Color color)
