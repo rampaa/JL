@@ -229,8 +229,11 @@ public partial class MainWindow : Window, IFrontend
             _lastClipboardChangeTime = currentTime;
             CopyFromClipboard();
 
-            WindowsUtils.SetSizeToContentForMainWindow(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, ConfigManager.MainWindowMaxDynamicWidth,
-                ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
+            if (SizeToContent == SizeToContent.Manual && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
+            {
+                WindowsUtils.SetSizeToContentForMainWindow(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight,
+                    ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
+            }
         }
 
         if (ConfigManager.AlwaysOnTop
@@ -249,11 +252,6 @@ public partial class MainWindow : Window, IFrontend
 
     public void MainTextBox_MouseMove(object? sender, MouseEventArgs? e)
     {
-        if (Cursor != Cursors.Arrow)
-        {
-            Mouse.OverrideCursor = Cursors.Arrow;
-        }
-
         if (ConfigManager.LookupOnSelectOnly
             || ConfigManager.LookupOnLeftClickOnly
             || Background!.Opacity == 0
