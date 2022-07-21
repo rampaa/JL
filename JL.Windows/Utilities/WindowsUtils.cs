@@ -449,17 +449,35 @@ public static class WindowsUtils
     {
         ColorPicker picker = SingleOpenHelper.CreateControl<ColorPicker>();
         var window = new HandyControl.Controls.PopupWindow { PopupElement = picker, };
+        picker.SelectedBrush = (SolidColorBrush)((Button)sender).Tag;
         picker.Canceled += delegate { window.Close(); };
-        picker.Confirmed += delegate { ColorSetter((Button)sender, picker.SelectedBrush, window); };
+        picker.Confirmed += delegate { ConfirmColor((Button)sender, picker.SelectedBrush, window); };
 
         window.ShowDialog(picker, false);
     }
 
-    private static void ColorSetter(Button sender, SolidColorBrush selectedColor,
+    private static void ConfirmColor(Button button, Brush selectedBrush,
     HandyControl.Controls.PopupWindow window)
     {
-        sender.Background = selectedColor;
+        SetButtonColor(button, selectedBrush);
         window.Close();
+    }
+
+    public static void SetButtonColor(Button button, Brush selectedBrush)
+    {
+        selectedBrush.Freeze();
+        button.Tag = selectedBrush;
+
+        Color selectedBrushColor = ((SolidColorBrush)selectedBrush).Color;
+
+        button.Background = selectedBrushColor.A == 255 ? selectedBrush : CreateOpaqueBrush(selectedBrushColor);
+    }
+
+    private static Brush CreateOpaqueBrush(Color color)
+    {
+        Brush opaqueBrush = new SolidColorBrush(Color.FromRgb(color.R, color.G, color.B));
+        opaqueBrush.Freeze();
+        return opaqueBrush;
     }
 
     public static void Unselect(System.Windows.Controls.TextBox? tb)

@@ -174,7 +174,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Background color"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <Button x:Name="TextboxBackgroundColorButton"  HorizontalAlignment="Right"
+                            <Button x:Name="MainWindowBackgroundColorButton"  HorizontalAlignment="Right"
                                     Width="60" Click="ShowColorPicker"
                                     BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" />
                         </DockPanel>
@@ -205,7 +205,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Opacity"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="TextboxOpacityNumericUpDown" Maximum="100" Minimum="0.2" DecimalPlaces="1"
+                            <hc:NumericUpDown x:Name="MainWindowOpacityNumericUpDown" Maximum="100" Minimum="0.2" DecimalPlaces="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 

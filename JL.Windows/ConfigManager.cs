@@ -627,14 +627,26 @@ public class ConfigManager : CoreConfig
             WindowsUtils.KeyGestureToString(NextDictKeyGesture);
         preferenceWindow.PreviousDictKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(PreviousDictKeyGesture);
-
         preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(AlwaysOnTopKeyGesture);
         preferenceWindow.TextOnlyVisibleOnHoverKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(TextOnlyVisibleOnHoverKeyGesture);
-
         preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(TextBoxIsReadOnlyKeyGesture);
+
+        WindowsUtils.SetButtonColor(preferenceWindow.HighlightColorButton, HighlightColor);
+        WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, mainWindow.Background);
+        WindowsUtils.SetButtonColor(preferenceWindow.TextboxTextColorButton, MainWindowTextColor);
+        WindowsUtils.SetButtonColor(preferenceWindow.TextboxBacklogTextColorButton, MainWindowBacklogTextColor);
+        WindowsUtils.SetButtonColor(preferenceWindow.DeconjugationInfoColorButton, DeconjugationInfoColor);
+        WindowsUtils.SetButtonColor(preferenceWindow.DefinitionsColorButton, DefinitionsColor);
+        WindowsUtils.SetButtonColor(preferenceWindow.FrequencyColorButton, FrequencyColor);
+        WindowsUtils.SetButtonColor(preferenceWindow.PrimarySpellingColorButton, PrimarySpellingColor);
+        WindowsUtils.SetButtonColor(preferenceWindow.ReadingsColorButton, ReadingsColor);
+        WindowsUtils.SetButtonColor(preferenceWindow.AlternativeSpellingsColorButton, AlternativeSpellingsColor);
+        WindowsUtils.SetButtonColor(preferenceWindow.PopupBackgroundColorButton, PopupBackgroundColor);
+        WindowsUtils.SetButtonColor(preferenceWindow.SeparatorColorButton, SeparatorColor);
+        WindowsUtils.SetButtonColor(preferenceWindow.DictTypeColorButton, DictTypeColor);
 
         preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
         preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri;
@@ -662,17 +674,8 @@ public class ConfigManager : CoreConfig
 
         preferenceWindow.MainWindowHeightNumericUpDown.Value = MainWindowHeight;
         preferenceWindow.MainWindowWidthNumericUpDown.Value = MainWindowWidth;
-        preferenceWindow.HighlightColorButton.Background = HighlightColor;
-
-        WindowsUtils.Try(() => preferenceWindow.TextboxBackgroundColorButton.Background =
-                (SolidColorBrush)new BrushConverter()
-                    .ConvertFrom(ConfigurationManager.AppSettings.Get("MainWindowBackgroundColor")!)!,
-            preferenceWindow.TextboxBackgroundColorButton.Background, "MainWindowBackgroundColor");
-
-        preferenceWindow.TextboxTextColorButton.Background = MainWindowTextColor;
-        preferenceWindow.TextboxBacklogTextColorButton.Background = MainWindowBacklogTextColor;
         preferenceWindow.TextboxFontSizeNumericUpDown.Value = mainWindow.FontSizeSlider.Value;
-        preferenceWindow.TextboxOpacityNumericUpDown.Value = mainWindow.OpacitySlider.Value;
+        preferenceWindow.MainWindowOpacityNumericUpDown.Value = mainWindow.OpacitySlider.Value;
 
         preferenceWindow.ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox.IsChecked = ChangeMainWindowBackgroundOpacityOnUnhover;
         preferenceWindow.MainWindowBackgroundOpacityOnUnhoverNumericUpDown.Value = MainWindowBackgroundOpacityOnUnhover;
@@ -701,12 +704,7 @@ public class ConfigManager : CoreConfig
         preferenceWindow.FixedPopupYPositionNumericUpDown.Value = FixedPopupYPosition;
         preferenceWindow.PopupDynamicHeightCheckBox.IsChecked = PopupDynamicHeight;
         preferenceWindow.PopupDynamicWidthCheckBox.IsChecked = PopupDynamicWidth;
-        preferenceWindow.AlternativeSpellingsColorButton.Background = AlternativeSpellingsColor;
-        preferenceWindow.DeconjugationInfoColorButton.Background = DeconjugationInfoColor;
-        preferenceWindow.DefinitionsColorButton.Background = DefinitionsColor;
-        preferenceWindow.FrequencyColorButton.Background = FrequencyColor;
-        preferenceWindow.PrimarySpellingColorButton.Background = PrimarySpellingColor;
-        preferenceWindow.ReadingsColorButton.Background = ReadingsColor;
+
         preferenceWindow.AlternativeSpellingsFontSizeNumericUpDown.Value = AlternativeSpellingsFontSize;
         preferenceWindow.DeconjugationInfoFontSizeNumericUpDown.Value = DeconjugationInfoFontSize;
         preferenceWindow.DictTypeFontSizeNumericUpDown.Value = DictTypeFontSize;
@@ -714,21 +712,7 @@ public class ConfigManager : CoreConfig
         preferenceWindow.FrequencyFontSizeNumericUpDown.Value = FrequencyFontSize;
         preferenceWindow.PrimarySpellingFontSizeNumericUpDown.Value = PrimarySpellingFontSize;
         preferenceWindow.ReadingsFontSizeNumericUpDown.Value = ReadingsFontSize;
-
-        // Button background color has to be opaque, so we cannot use PopupBackgroundColor here
-        WindowsUtils.Try(() => preferenceWindow.PopupBackgroundColorButton.Background =
-                (SolidColorBrush)new BrushConverter()
-                    .ConvertFrom(ConfigurationManager.AppSettings.Get("PopupBackgroundColor")!)!,
-            preferenceWindow.PopupBackgroundColorButton.Background, "PopupBackgroundColor");
-
-        WindowsUtils.Try(() => preferenceWindow.PopupOpacityNumericUpDown.Value = double.Parse(
-                ConfigurationManager.AppSettings.Get("PopupOpacity")!, CultureInfo.InvariantCulture),
-            preferenceWindow.PopupOpacityNumericUpDown.Value, "PopupOpacity");
-
-        preferenceWindow.SeparatorColorButton.Background = SeparatorColor;
-
-        preferenceWindow.DictTypeColorButton.Background = DictTypeColor;
-
+        preferenceWindow.PopupOpacityNumericUpDown.Value = PopupBackgroundColor.Opacity * 100;
         preferenceWindow.PopupFocusOnLookupCheckBox.IsChecked = PopupFocusOnLookup;
         preferenceWindow.PopupXOffsetNumericUpDown.Value = PopupXOffset;
         preferenceWindow.PopupYOffsetNumericUpDown.Value = PopupYOffset;
@@ -815,8 +799,10 @@ public class ConfigManager : CoreConfig
             preferenceWindow.MainWindowWidthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["MainWindowHeight"].Value =
             preferenceWindow.MainWindowHeightNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
+
+        // We want the opaque color here
         config.AppSettings.Settings["MainWindowBackgroundColor"].Value =
-            preferenceWindow.TextboxBackgroundColorButton.Background.ToString();
+            preferenceWindow.MainWindowBackgroundColorButton.Background.ToString();
 
         config.AppSettings.Settings["ChangeMainWindowBackgroundOpacityOnUnhover"].Value =
             preferenceWindow.ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox.IsChecked.ToString();
@@ -830,13 +816,13 @@ public class ConfigManager : CoreConfig
             preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked.ToString();
 
         config.AppSettings.Settings["MainWindowTextColor"].Value =
-            preferenceWindow.TextboxTextColorButton.Background.ToString();
+            preferenceWindow.TextboxTextColorButton.Tag.ToString();
         config.AppSettings.Settings["MainWindowBacklogTextColor"].Value =
-            preferenceWindow.TextboxBacklogTextColorButton.Background.ToString();
+            preferenceWindow.TextboxBacklogTextColorButton.Tag.ToString();
         config.AppSettings.Settings["MainWindowFontSize"].Value =
             preferenceWindow.TextboxFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["MainWindowOpacity"].Value =
-            preferenceWindow.TextboxOpacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
+            preferenceWindow.MainWindowOpacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["MainWindowFont"].Value =
             preferenceWindow.MainWindowFontComboBox.SelectedValue.ToString();
         config.AppSettings.Settings["PopupFont"].Value =
@@ -877,7 +863,7 @@ public class ConfigManager : CoreConfig
         config.AppSettings.Settings["AnkiIntegration"].Value =
             preferenceWindow.AnkiIntegrationCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["HighlightColor"].Value =
-            preferenceWindow.HighlightColorButton.Background.ToString();
+            preferenceWindow.HighlightColorButton.Tag.ToString();
 
         config.AppSettings.Settings[nameof(MaxNumResultsNotInMiningMode)].Value =
             preferenceWindow.MaxNumResultsNotInMiningModeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
@@ -896,20 +882,23 @@ public class ConfigManager : CoreConfig
             preferenceWindow.PopupDynamicHeightCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["PopupDynamicWidth"].Value =
             preferenceWindow.PopupDynamicWidthCheckBox.IsChecked.ToString();
+
+        // We want the opaque color here
         config.AppSettings.Settings["PopupBackgroundColor"].Value =
             preferenceWindow.PopupBackgroundColorButton.Background.ToString();
+
         config.AppSettings.Settings["PrimarySpellingColor"].Value =
-            preferenceWindow.PrimarySpellingColorButton.Background.ToString();
+            preferenceWindow.PrimarySpellingColorButton.Tag.ToString();
         config.AppSettings.Settings["ReadingsColor"].Value =
-            preferenceWindow.ReadingsColorButton.Background.ToString();
+            preferenceWindow.ReadingsColorButton.Tag.ToString();
         config.AppSettings.Settings["AlternativeSpellingsColor"].Value =
-            preferenceWindow.AlternativeSpellingsColorButton.Background.ToString();
+            preferenceWindow.AlternativeSpellingsColorButton.Tag.ToString();
         config.AppSettings.Settings["DefinitionsColor"].Value =
-            preferenceWindow.DefinitionsColorButton.Background.ToString();
+            preferenceWindow.DefinitionsColorButton.Tag.ToString();
         config.AppSettings.Settings["FrequencyColor"].Value =
-            preferenceWindow.FrequencyColorButton.Background.ToString();
+            preferenceWindow.FrequencyColorButton.Tag.ToString();
         config.AppSettings.Settings["DeconjugationInfoColor"].Value =
-            preferenceWindow.DeconjugationInfoColorButton.Background.ToString();
+            preferenceWindow.DeconjugationInfoColorButton.Tag.ToString();
         config.AppSettings.Settings["PopupOpacity"].Value =
             preferenceWindow.PopupOpacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["PrimarySpellingFontSize"].Value =
@@ -928,10 +917,10 @@ public class ConfigManager : CoreConfig
             preferenceWindow.DictTypeFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
 
         config.AppSettings.Settings["SeparatorColor"].Value =
-            preferenceWindow.SeparatorColorButton.Background.ToString();
+            preferenceWindow.SeparatorColorButton.Tag.ToString();
 
         config.AppSettings.Settings["DictTypeColor"].Value =
-            preferenceWindow.DictTypeColorButton.Background.ToString();
+            preferenceWindow.DictTypeColorButton.Tag.ToString();
 
         config.AppSettings.Settings["PopupFocusOnLookup"].Value =
             preferenceWindow.PopupFocusOnLookupCheckBox.IsChecked.ToString();
