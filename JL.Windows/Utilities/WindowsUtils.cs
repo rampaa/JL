@@ -240,7 +240,7 @@ public static class WindowsUtils
         if (selectedText?.Length > 0)
         {
             Process.Start(new ProcessStartInfo("cmd",
-                $"/c start https://www.google.com/search?q={System.Web.HttpUtility.UrlEncode(selectedText)}^&hl=ja")
+                $"/c start \"\" \"{ConfigManager.SearchUrl.Replace("{SearchTerm}", System.Web.HttpUtility.UrlEncode(selectedText))}\"")
             { CreateNoWindow = true });
         }
     }

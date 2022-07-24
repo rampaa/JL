@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         mc:Ignorable="d"
-        Title="Preferences" Height="600" Width="666" Topmost="True" Closing="Window_Closing"
+        Title="Preferences" Height="650" Width="666" Topmost="True" Closing="Window_Closing"
         SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Background="Black" ShowInTaskbar="False">
     <Grid>
         <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="20,0,0,20"
@@ -13,7 +13,7 @@
         <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Right" Margin="0,0,20,20"
                 VerticalAlignment="Bottom" Width="85" Click="SaveButton_Click" FontSize="16" Height="35" />
 
-        <TabControl TabStripPlacement="Top" VerticalContentAlignment="Stretch" Margin="0,0,0,79"
+        <TabControl TabStripPlacement="Top" VerticalContentAlignment="Stretch" Margin="0,0,0,65"
                     Background="#F3000000" SelectionChanged="TabControl_OnSelectionChanged" Name="TabControl">
             <TabItem Header="General">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
@@ -55,6 +55,12 @@
                             <Button x:Name="HighlightColorButton"  HorizontalAlignment="Right"
                                     Width="60" Click="ShowColorPicker"
                                     BorderThickness="5,5,5,5" Height="32" BorderBrush="#FF707070" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Search URL" VerticalAlignment="Center"
+                                           TextWrapping="Wrap" />
+                            <TextBox x:Name="SearchUrlTextBox" HorizontalAlignment="Right" MinWidth="250" MaxWidth="350" MaxHeight="50" TextWrapping="Wrap" />
                         </DockPanel>
 
                         <DockPanel>
@@ -508,7 +514,7 @@
 
                         <DockPanel Margin="0,10,0,0">
                             <TextBlock HorizontalAlignment="Left" Text="Enable Anki integration"
-                                       TextWrapping="Wrap" />
+                                       VerticalAlignment="Center" TextWrapping="Wrap" />
                             <CheckBox x:Name="AnkiIntegrationCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -516,20 +522,20 @@
 
                             <DockPanel Margin="0,10,0,0">
                                 <TextBlock HorizontalAlignment="Left" Text="AnkiConnect server address"
-                                           TextWrapping="Wrap" />
+                                           VerticalAlignment="Center" TextWrapping="Wrap" />
                                 <TextBox x:Name="AnkiUriTextBox" HorizontalAlignment="Right"
                                          TextWrapping="NoWrap" Width="210" />
                             </DockPanel>
 
                             <DockPanel Margin="0,10,0,0">
                                 <TextBlock HorizontalAlignment="Left" Text="Force sync after mining"
-                                           TextWrapping="Wrap" />
+                                           VerticalAlignment="Center" TextWrapping="Wrap" />
                                 <CheckBox x:Name="ForceSyncAnkiCheckBox"  HorizontalAlignment="Right" />
                             </DockPanel>
 
                             <DockPanel Margin="0,10,0,0">
                                 <TextBlock HorizontalAlignment="Left" Text="Allow duplicate cards"
-                                           TextWrapping="Wrap" />
+                                           VerticalAlignment="Center" TextWrapping="Wrap" />
                                 <CheckBox x:Name="AllowDuplicateCardsCheckBox"  HorizontalAlignment="Right" />
                             </DockPanel>
 

@@ -2,7 +2,7 @@
 
 public class CoreConfig
 {
-    public string AnkiConnectUri { get; protected set; } = "http://localhost:8765";
+    public Uri AnkiConnectUri { get; protected set; } = new("http://localhost:8765");
     public string FrequencyListName { get; protected set; } = "VN";
     public bool KanjiMode { get; set; } = false;
     public bool ForceSyncAnki { get; protected set; } = false;

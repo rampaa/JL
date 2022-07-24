@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
 using JL.Core;
+using JL.Core.Utilities;
 using JL.Windows.GUI;
 using JL.Windows.Utilities;
 
@@ -49,6 +50,7 @@ public class ConfigManager : CoreConfig
     public static bool AlwaysOnTop { get; set; } = true;
     public static bool DisableHotkeys { get; set; } = false;
     public static bool Focusable { get; private set; } = true;
+    public static string SearchUrl { get; private set; } = "https://www.google.com/search?q={SearchTerm}&hl=ja";
 
     #endregion
 
@@ -161,11 +163,36 @@ public class ConfigManager : CoreConfig
         string? tempStr = ConfigurationManager.AppSettings.Get("AnkiConnectUri");
         if (tempStr == null)
         {
-            tempStr = "http://localhost:8765";
-            WindowsUtils.AddToConfig("AnkiConnectUri", "http://localhost:8765");
+            tempStr = AnkiConnectUri.OriginalString;
+            WindowsUtils.AddToConfig("AnkiConnectUri", tempStr);
         }
 
-        AnkiConnectUri = tempStr;
+        try
+        {
+            AnkiConnectUri = new Uri(tempStr);
+        }
+        catch
+        {
+            Utils.Logger.Error("Couldn't save AnkiConnect server address, invalid URL");
+            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
+        }
+
+
+        tempStr = ConfigurationManager.AppSettings.Get("SearchUrl");
+        if (tempStr == null)
+        {
+            tempStr = SearchUrl;
+            WindowsUtils.AddToConfig("SearchUrl", tempStr);
+        }
+        else if (!Uri.IsWellFormedUriString(tempStr.Replace("{SearchTerm}", ""), UriKind.Absolute))
+        {
+            Utils.Logger.Error("Couldn't save Seach URL, invalid URL");
+            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save Seach URL, invalid URL");
+        }
+        else
+        {
+            SearchUrl = tempStr;
+        }
 
         WindowsUtils.Try(
             () => HighlightLongestMatch =
@@ -648,8 +675,9 @@ public class ConfigManager : CoreConfig
         WindowsUtils.SetButtonColor(preferenceWindow.SeparatorColorButton, SeparatorColor);
         WindowsUtils.SetButtonColor(preferenceWindow.DictTypeColorButton, DictTypeColor);
 
+        preferenceWindow.SearchUrlTextBox.Text = SearchUrl;
         preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
-        preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri;
+        preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri.OriginalString;
         preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = ForceSyncAnki;
         preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = AllowDuplicateCards;
         preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
@@ -779,6 +807,8 @@ public class ConfigManager : CoreConfig
             preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text);
 
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+        config.AppSettings.Settings["SearchUrl"].Value = preferenceWindow.SearchUrlTextBox.Text;
 
         config.AppSettings.Settings["MaxSearchLength"].Value =
             preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
