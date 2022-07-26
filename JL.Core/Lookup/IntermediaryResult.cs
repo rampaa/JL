@@ -4,16 +4,16 @@ namespace JL.Core.Lookup;
 
 public class IntermediaryResult
 {
-    public List<IResult> ResultsList { get; }
-    public List<List<string>>? ProcessListList { get; }
+    public List<List<IResult>> Results { get; }
+    public List<List<List<string>>>? Processes { get; }
     public string FoundForm { get; }
     public Dict Dict { get; }
 
-    public IntermediaryResult(List<IResult> resultsList, List<List<string>>? processListList, string foundForm,
+    public IntermediaryResult(List<List<IResult>> resultsList, List<List<List<string>>>? processListList, string foundForm,
         Dict dict)
     {
-        ResultsList = resultsList;
-        ProcessListList = processListList;
+        Results = resultsList;
+        Processes = processListList;
         FoundForm = foundForm;
         Dict = dict;
     }
