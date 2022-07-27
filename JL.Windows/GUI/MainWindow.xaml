@@ -72,7 +72,7 @@
 
         <Slider x:Name="OpacitySlider" HorizontalAlignment="Left" Margin="-42,70,0,0" VerticalAlignment="Top"
                 Width="120" RenderTransformOrigin="0.5,0.5" Maximum="100" Value="30" Visibility="Collapsed"
-                Minimum="1" ToolTip="{Binding Value, ElementName=OpacitySlider}"
+                Minimum="0.2" ToolTip="{Binding Value, ElementName=OpacitySlider}"
                 ValueChanged="OpacitySlider_ValueChanged" LostMouseCapture="OpacitySlider_LostMouseCapture"
                 IsMoveToPointEnabled="True" IsSnapToTickEnabled="True"
                 ScrollViewer.VerticalScrollBarVisibility="Disabled" LostFocus="OpacitySlider_LostFocus">

@@ -662,7 +662,7 @@ public class ConfigManager : CoreConfig
             WindowsUtils.KeyGestureToString(TextBoxIsReadOnlyKeyGesture);
 
         WindowsUtils.SetButtonColor(preferenceWindow.HighlightColorButton, HighlightColor);
-        WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, mainWindow.Background);
+        WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, mainWindow.Background.CloneCurrentValue());
         WindowsUtils.SetButtonColor(preferenceWindow.TextboxTextColorButton, MainWindowTextColor);
         WindowsUtils.SetButtonColor(preferenceWindow.TextboxBacklogTextColorButton, MainWindowBacklogTextColor);
         WindowsUtils.SetButtonColor(preferenceWindow.DeconjugationInfoColorButton, DeconjugationInfoColor);
