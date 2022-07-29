@@ -1144,7 +1144,13 @@ public partial class PopupWindow : Window
 
     private async void FoundSpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        if (!MiningMode)
+        if (e.ChangedButton == MouseButton.Middle)
+        {
+            WindowsUtils.CopyTextToClipboard(((TextBlock)sender).Text);
+            return;
+        }
+
+        if (!MiningMode || e.ChangedButton == MouseButton.Right)
         {
             return;
         }
@@ -1786,7 +1792,7 @@ public partial class PopupWindow : Window
 
     private bool NoAllDictFilter(object item)
     {
-        if (MainWindow.Instance.CoreConfig.KanjiMode)
+        if (Storage.Frontend.CoreConfig.KanjiMode)
         {
             return true;
         }

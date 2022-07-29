@@ -554,4 +554,21 @@ public static class WindowsUtils
             window.Height = height;
         }
     }
+
+    public static void CopyTextToClipboard(string text)
+    {
+        bool retry = true;
+        while (!string.IsNullOrEmpty(text) && retry)
+        {
+            try
+            {
+                System.Windows.Clipboard.SetText(text);
+                retry = false;
+            }
+            catch (Exception e)
+            {
+                Utils.Logger.Warning(e, "CopyTextToClipboard failed");
+            }
+        }
+    }
 }
