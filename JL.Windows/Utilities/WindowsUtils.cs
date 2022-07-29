@@ -555,7 +555,7 @@ public static class WindowsUtils
         }
     }
 
-    public static void CopyTextToClipboard(string text)
+    public static void CopyTextToClipboard(string? text)
     {
         if (string.IsNullOrEmpty(text))
         {
@@ -563,7 +563,7 @@ public static class WindowsUtils
         }
 
         bool retry = true;
-        while (retry)
+        do
         {
             try
             {
@@ -575,5 +575,6 @@ public static class WindowsUtils
                 Utils.Logger.Warning(e, "CopyTextToClipboard failed");
             }
         }
+        while (retry);
     }
 }
