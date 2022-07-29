@@ -557,8 +557,13 @@ public static class WindowsUtils
 
     public static void CopyTextToClipboard(string text)
     {
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+
         bool retry = true;
-        while (!string.IsNullOrEmpty(text) && retry)
+        while (retry)
         {
             try
             {
