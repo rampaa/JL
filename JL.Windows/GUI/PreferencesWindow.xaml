@@ -60,7 +60,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Search URL" VerticalAlignment="Center"
                                            TextWrapping="Wrap" />
-                            <TextBox x:Name="SearchUrlTextBox" HorizontalAlignment="Right" MinWidth="250" MaxWidth="350" MaxHeight="50" TextWrapping="Wrap" />
+                            <TextBox x:Name="SearchUrlTextBox" HorizontalAlignment="Right" MinWidth="250" MaxWidth="350" MaxHeight="60" TextWrapping="Wrap" />
                         </DockPanel>
 
                         <DockPanel>

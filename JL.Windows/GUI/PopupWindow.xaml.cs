@@ -1708,16 +1708,16 @@ public partial class PopupWindow : Window
         }
     }
 
-    private void Window_Deactivated(object sender, EventArgs e)
-    {
-        //if (!IsKeyboardFocusWithin && (!ChildPopupWindow?.IsVisible ?? true))
-        //    MainWindow.Instance.FocusEllipse.Fill = Brushes.Transparent;
-    }
+    //private void Window_Deactivated(object sender, EventArgs e)
+    //{
+    //    if (!IsKeyboardFocusWithin && (!ChildPopupWindow?.IsVisible ?? true))
+    //        MainWindow.Instance.FocusEllipse.Fill = Brushes.Transparent;
+    //}
 
-    private void Window_Activated(object sender, EventArgs e)
-    {
-        //MainWindow.Instance.FocusEllipse.Fill = Brushes.Green;
-    }
+    //private void Window_Activated(object sender, EventArgs e)
+    //{
+    //    MainWindow.Instance.FocusEllipse.Fill = Brushes.Green;
+    //}
 
     private void GenerateDictTypeButtons()
     {

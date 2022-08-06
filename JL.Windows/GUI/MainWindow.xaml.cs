@@ -234,19 +234,19 @@ public partial class MainWindow : Window, IFrontend
                 WindowsUtils.SetSizeToContentForMainWindow(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight,
                     ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
             }
-        }
 
-        if (ConfigManager.AlwaysOnTop
-            && !FirstPopupWindow.IsVisible
-            && !ManageDictionariesWindow.Instance.IsVisible
-            && !ManageFrequenciesWindow.Instance.IsVisible
-            && !AddNameWindow.Instance.IsVisible
-            && !AddWordWindow.Instance.IsVisible
-            && !PreferencesWindow.Instance.IsVisible
-            && !StatsWindow.Instance.IsVisible
-            && !MainTextboxContextMenu.IsVisible)
-        {
-            _winApi!.KeepTopmost();
+            if (ConfigManager.AlwaysOnTop
+                && !FirstPopupWindow.IsVisible
+                && !ManageDictionariesWindow.Instance.IsVisible
+                && !ManageFrequenciesWindow.Instance.IsVisible
+                && !AddNameWindow.Instance.IsVisible
+                && !AddWordWindow.Instance.IsVisible
+                && !PreferencesWindow.Instance.IsVisible
+                && !StatsWindow.Instance.IsVisible
+                && !MainTextboxContextMenu.IsVisible)
+            {
+                _winApi!.KeepTopmost();
+            }
         }
     }
 
@@ -890,7 +890,8 @@ public partial class MainWindow : Window, IFrontend
         if (!FirstPopupWindow.IsVisible
             && !AddNameWindow.Instance.IsVisible
             && !AddWordWindow.Instance.IsVisible
-            && !MainTextboxContextMenu.IsVisible)
+            && !MainTextboxContextMenu.IsVisible
+            && e.LeftButton == MouseButtonState.Released)
         {
             if (ConfigManager.TextOnlyVisibleOnHover)
             {

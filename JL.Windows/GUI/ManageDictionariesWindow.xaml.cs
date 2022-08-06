@@ -404,8 +404,11 @@ public partial class ManageDictionariesWindow : Window
     {
         if (infoWindow == null)
         {
-            infoWindow = new();
-            infoWindow.Title = title;
+            infoWindow = new()
+            {
+                Title = title
+            };
+
             infoWindow.InfoTextBox.Text = EntityDictToString(entityDict);
         }
 
