@@ -2,7 +2,7 @@
 
 namespace JL.Core.Dicts.EPWING.EpwingYomichan;
 
-public class EpwingYomichanResult : IResult
+public class EpwingYomichanResult : IEpwingResult
 {
     public List<string>? Definitions { get; set; }
     public string? Reading { get; }

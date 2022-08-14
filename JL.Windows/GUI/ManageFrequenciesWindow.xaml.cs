@@ -8,6 +8,7 @@ using System.Windows.Media;
 using JL.Core;
 using JL.Core.Frequency;
 using JL.Core.Utilities;
+using JL.Windows.Utilities;
 using Path = System.IO.Path;
 
 namespace JL.Windows.GUI;
@@ -38,9 +39,8 @@ public partial class ManageFrequenciesWindow : Window
     private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         e.Cancel = true;
-        Visibility = Visibility.Collapsed;
+        WindowsUtils.HideWindow(this);
         Storage.Frontend.InvalidateDisplayCache();
-        MainWindow.Instance.Focus();
         await Utils.SerializeFreqs().ConfigureAwait(false);
         await Storage.LoadFrequencies().ConfigureAwait(false);
     }

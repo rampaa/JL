@@ -32,7 +32,7 @@ public class PitchResult : IResult
         {
             Reading = jsonObject[1].ToString();
 
-            if (int.TryParse(Regex.Match(jsonObject[5][0].ToString(), @"\[(\d)\]").Groups[1].Value, out int position))
+            if (int.TryParse(Regex.Match(jsonObject[5][0].ToString(), @"(\[|［)(\d)(］|\])").Groups[2].Value, out int position))
             {
                 Position = position;
             }

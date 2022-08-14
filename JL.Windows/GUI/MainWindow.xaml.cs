@@ -857,17 +857,17 @@ public partial class MainWindow : Window, IFrontend
         TopPositionBeforeResolutionChange = Top;
     }
 
-    private void Window_Deactivated(object sender, EventArgs e)
-    {
-        //if (!FirstPopupWindow.IsVisible)
-        //    FocusEllipse.Fill = Brushes.Transparent;
-    }
+    //private void Window_Deactivated(object sender, EventArgs e)
+    //{
+    //    //if (!FirstPopupWindow.IsVisible)
+    //    //    FocusEllipse.Fill = Brushes.Transparent;
+    //}
 
-    private void Window_Activated(object sender, EventArgs e)
-    {
-        //FocusEllipse.Fill = Brushes.Green;
-        //FocusEllipse.Opacity = Background.Opacity;
-    }
+    //private void Window_Activated(object sender, EventArgs e)
+    //{
+    //    //FocusEllipse.Fill = Brushes.Green;
+    //    //FocusEllipse.Opacity = Background.Opacity;
+    //}
 
     private void MainTextBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {

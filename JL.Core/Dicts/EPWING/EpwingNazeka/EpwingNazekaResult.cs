@@ -1,6 +1,6 @@
 ﻿namespace JL.Core.Dicts.EPWING.EpwingNazeka;
 
-public class EpwingNazekaResult : IResult
+public class EpwingNazekaResult : IEpwingResult
 {
     public string PrimarySpelling { get; set; }
     public string? Reading { get; set; }

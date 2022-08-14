@@ -130,24 +130,39 @@ public static class Utils
             {
                 foreach (Dict dict in deserializedDicts.Values)
                 {
-                    if (!Storage.ObsoleteDictTypes.Contains(dict.Type) && !Storage.Dicts.ContainsKey(dict.Name))
+                    if (!Storage.Dicts.ContainsKey(dict.Name))
                     {
                         dict.Contents = dict.Type switch
                         {
                             DictType.JMdict => new Dictionary<string, List<IResult>>(524288), //2022/05/11: 394949
                             DictType.JMnedict => new Dictionary<string, List<IResult>>(1048576), //2022/05/11: 608833
                             DictType.Kanjidic => new Dictionary<string, List<IResult>>(16384), //2022/05/11: 13108
+                            DictType.Daijirin => new Dictionary<string, List<IResult>>(420429),
+                            DictType.DaijirinNazeka => new Dictionary<string, List<IResult>>(420429),
+                            DictType.Daijisen => new Dictionary<string, List<IResult>>(679115),
+                            DictType.Gakken => new Dictionary<string, List<IResult>>(254558),
+                            DictType.GakkenYojijukugoYomichan => new Dictionary<string, List<IResult>>(7989),
+                            DictType.IwanamiYomichan => new Dictionary<string, List<IResult>>(101929),
+                            DictType.JitsuyouYomichan => new Dictionary<string, List<IResult>>(69746),
+                            DictType.KanjigenYomichan => new Dictionary<string, List<IResult>>(64730),
                             DictType.Kenkyuusha => new Dictionary<string, List<IResult>>(303677),
                             DictType.KenkyuushaNazeka => new Dictionary<string, List<IResult>>(191804),
-                            DictType.Daijirin => new Dictionary<string, List<IResult>>(357227),
-                            //DictType.DaijirinNazeka => new Dictionary<string, List<IResult>>(),
-                            DictType.Daijisen => new Dictionary<string, List<IResult>>(317546),
-                            DictType.Koujien => new Dictionary<string, List<IResult>>(363280),
-                            DictType.Meikyou => new Dictionary<string, List<IResult>>(96845),
-                            DictType.Gakken => new Dictionary<string, List<IResult>>(254292),
+                            DictType.KireiCakeYomichan => new Dictionary<string, List<IResult>>(332628),
                             DictType.Kotowaza => new Dictionary<string, List<IResult>>(30846),
-                            //DictType.ShinmeikaiNazeka => new Dictionary<string, List<IResult>>(),
-                            _ => new Dictionary<string, List<IResult>>(),
+                            DictType.Koujien => new Dictionary<string, List<IResult>>(402571),
+                            DictType.Meikyou => new Dictionary<string, List<IResult>>(107367),
+                            DictType.NikkokuYomichan => new Dictionary<string, List<IResult>>(451455),
+                            DictType.OubunshaYomichan => new Dictionary<string, List<IResult>>(138935),
+                            DictType.PitchAccentYomichan => new Dictionary<string, List<IResult>>(434991),
+                            DictType.ShinjirinYomichan => new Dictionary<string, List<IResult>>(229758),
+                            DictType.ShinmeikaiYomichan => new Dictionary<string, List<IResult>>(126049),
+                            DictType.ShinmeikaiNazeka => new Dictionary<string, List<IResult>>(126049),
+                            DictType.ShinmeikaiYojijukugoYomichan => new Dictionary<string, List<IResult>>(6088),
+                            DictType.WeblioKogoYomichan => new Dictionary<string, List<IResult>>(30838),
+                            DictType.ZokugoYomichan => new Dictionary<string, List<IResult>>(2392),
+                            DictType.NonspecificYomichan => new Dictionary<string, List<IResult>>(250000),
+                            DictType.NonspecificNazeka => new Dictionary<string, List<IResult>>(250000),
+                            _ => new Dictionary<string, List<IResult>>(250000),
                         };
                         Storage.Dicts.Add(dict.Name, dict);
                     }
@@ -389,10 +404,10 @@ public static class Utils
     {
         List<string>? listClone = list;
 
-        if (!listClone.Any() || listClone!.All(string.IsNullOrEmpty))
+        if (!listClone.Any() || listClone.All(string.IsNullOrEmpty))
             listClone = null;
         else
-            listClone!.TrimExcess();
+            listClone.TrimExcess();
 
         return listClone;
     }

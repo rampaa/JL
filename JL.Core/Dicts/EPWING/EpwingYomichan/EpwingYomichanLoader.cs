@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using JL.Core.Dicts.Options;
 
 namespace JL.Core.Dicts.EPWING.EpwingYomichan;
 
@@ -40,7 +39,7 @@ public static class EpwingYomichanLoader
 
     private static void DictionaryBuilder(EpwingYomichanResult yomichanResult, Dict dict)
     {
-        if (!IsValidEpwingResultForDictType(yomichanResult, dict))
+        if (!EpwingUtils.IsValidEpwingResultForDictType(yomichanResult, dict))
             return;
 
         string hiraganaExpression = Kana.KatakanaToHiraganaConverter(yomichanResult.PrimarySpelling);
@@ -59,142 +58,5 @@ public static class EpwingYomichanLoader
             tempList.Add(yomichanResult);
         else
             dict.Contents.Add(hiraganaExpression, new List<IResult> { yomichanResult });
-    }
-
-    private static bool IsValidEpwingResultForDictType(EpwingYomichanResult yomichanResult, Dict dict)
-    {
-        string[] badCharacters = { "�", "(", "=", "＝", "［", "〔", "「", "『", "（", "【", "[" };
-
-        foreach (string badCharacter in badCharacters)
-        {
-            if (yomichanResult.PrimarySpelling.Contains(badCharacter))
-                return false;
-        }
-
-        switch (dict.Type)
-        {
-            case DictType.Kenkyuusha:
-                if ((dict.Options?.Examples?.Value ?? ExamplesOptionValue.None) == ExamplesOptionValue.None)
-                {
-                    if (yomichanResult.Definitions?.Count > 2)
-                    {
-                        for (int i = 2; i < yomichanResult.Definitions.Count; i++)
-                        {
-                            if (!char.IsDigit(yomichanResult.Definitions[i][0]))
-                            {
-                                yomichanResult.Definitions.RemoveAt(i);
-                                --i;
-                            }
-                        }
-                    }
-                }
-                else if (dict.Options is { Examples.Value: ExamplesOptionValue.One })
-                {
-                    if (yomichanResult.Definitions?.Count > 2)
-                    {
-                        bool isMainExample = true;
-
-                        for (int i = 2; i < yomichanResult.Definitions.Count; i++)
-                        {
-                            if (char.IsDigit(yomichanResult.Definitions[i][0]))
-                            {
-                                isMainExample = true;
-                            }
-
-                            else
-                            {
-                                if (!isMainExample)
-                                {
-                                    yomichanResult.Definitions.RemoveAt(i);
-                                    --i;
-                                }
-
-                                isMainExample = false;
-                            }
-                        }
-                    }
-                }
-
-                // Filter duplicate entries.
-                // If an entry has reading info while others don't, keep the one with the reading info.
-                if (dict.Contents.TryGetValue(
-                        Kana.KatakanaToHiraganaConverter(yomichanResult.PrimarySpelling),
-                        out List<IResult>? kenkyuushaResults))
-                {
-                    int kenkyuushaResultCount = kenkyuushaResults.Count;
-                    for (int i = 0; i < kenkyuushaResultCount; i++)
-                    {
-                        var kenkyuushaResult = (EpwingYomichanResult)kenkyuushaResults[i];
-
-                        if (yomichanResult.Definitions != null)
-                        {
-                            yomichanResult.Definitions = yomichanResult.Definitions.Select(def => def.Replace("┏", "")).ToList();
-
-                            if (kenkyuushaResult.Definitions?.SequenceEqual(yomichanResult.Definitions) ?? false)
-                            {
-                                if (string.IsNullOrEmpty(kenkyuushaResult.Reading) &&
-                                    !string.IsNullOrEmpty(yomichanResult.Reading))
-                                {
-                                    kenkyuushaResults.RemoveAt(i);
-                                    break;
-                                }
-                                else
-                                {
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                else if (yomichanResult.Definitions != null)
-                {
-                    yomichanResult.Definitions = yomichanResult.Definitions.Select(def => def.Replace("┏", "")).ToList();
-                }
-                break;
-
-            case DictType.Daijirin:
-                if (yomichanResult.Definitions != null)
-                {
-                    // english definitions
-                    if (yomichanResult.Definitions.Any(def => def.Contains("→英和") || def.Contains("\\u003")))
-                        return false;
-
-                    // english definitions
-                    if (!yomichanResult.Definitions.Any(def => Storage.JapaneseRegex.IsMatch(def)))
-                        return false;
-                }
-                break;
-
-            case DictType.Daijisen:
-                // kanji definitions
-                if (yomichanResult.Definitions?.Any(def => def.Contains("［音］")) ?? false)
-                    return false;
-                break;
-
-            case DictType.Koujien:
-            case DictType.Meikyou:
-            case DictType.Gakken:
-            case DictType.Kotowaza:
-            case DictType.IwanamiYomichan:
-            case DictType.JitsuyouYomichan:
-            case DictType.ShinmeikaiYomichan:
-            case DictType.NikkokuYomichan:
-            case DictType.ShinjirinYomichan:
-            case DictType.OubunshaYomichan:
-            case DictType.ZokugoYomichan:
-            case DictType.WeblioKogoYomichan:
-            case DictType.GakkenYojijukugoYomichan:
-            case DictType.ShinmeikaiYojijukugoYomichan:
-            case DictType.KanjigenYomichan:
-            case DictType.KireiCakeYomichan:
-            case DictType.NonspecificYomichan:
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException(nameof(dict), dict.Name, null);
-        }
-
-        return true;
     }
 }

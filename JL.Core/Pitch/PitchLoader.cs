@@ -7,9 +7,6 @@ public static class PitchLoader
 {
     public static async Task Load(Dict dict)
     {
-        if (!Directory.Exists(dict.Path) && !File.Exists(dict.Path))
-            return;
-
         Dictionary<string, List<IResult>> pitchDict = dict.Contents;
 
         string[] jsonFiles = Directory.GetFiles(dict.Path, "term*bank_*.json");

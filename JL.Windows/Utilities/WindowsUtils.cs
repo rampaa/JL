@@ -23,6 +23,7 @@ using NAudio.Wave;
 using Application = System.Windows.Application;
 using Button = System.Windows.Controls.Button;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using Window = System.Windows.Window;
 
 namespace JL.Windows.Utilities;
 
@@ -576,5 +577,29 @@ public static class WindowsUtils
             }
         }
         while (retry);
+    }
+
+    public static void HideWindow(Window window)
+    {
+        window.Visibility = Visibility.Collapsed;
+        UpdateMainWindowVisibility();
+        MainWindow.Instance.Focus();
+    }
+
+    public static void UpdateMainWindowVisibility()
+    {
+        MainWindow mainWindow = MainWindow.Instance;
+        if (!mainWindow.IsMouseOver)
+        {
+            if (ConfigManager.TextOnlyVisibleOnHover)
+            {
+                mainWindow.MainGrid.Opacity = 0;
+            }
+
+            if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+            {
+                mainWindow.Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
+            }
+        }
     }
 }

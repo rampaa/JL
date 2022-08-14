@@ -41,22 +41,20 @@ public partial class PreferencesWindow : Window
 
     private async void SaveButton_Click(object sender, RoutedEventArgs e)
     {
-        Visibility = Visibility.Collapsed;
+        WindowsUtils.HideWindow(this);
         Storage.Frontend.InvalidateDisplayCache();
-        MainWindow.Instance.Focus();
         await ConfigManager.Instance.SavePreferences(this).ConfigureAwait(false);
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)
     {
-        Visibility = Visibility.Collapsed;
+        WindowsUtils.HideWindow(this);
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         e.Cancel = true;
-        Visibility = Visibility.Collapsed;
-        MainWindow.Instance.Focus();
+        WindowsUtils.HideWindow(this);
     }
 
     private async void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

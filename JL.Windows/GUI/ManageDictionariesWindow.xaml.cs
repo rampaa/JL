@@ -14,6 +14,7 @@ using JL.Core.Dicts.EDICT.JMnedict;
 using JL.Core.Dicts.EDICT.KANJIDIC;
 using JL.Core.PoS;
 using JL.Core.Utilities;
+using JL.Windows.Utilities;
 using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
 using Cursors = System.Windows.Input.Cursors;
@@ -51,9 +52,8 @@ public partial class ManageDictionariesWindow : Window
     private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         e.Cancel = true;
-        Visibility = Visibility.Collapsed;
+        WindowsUtils.HideWindow(this);
         Storage.Frontend.InvalidateDisplayCache();
-        MainWindow.Instance.Focus();
         await Utils.SerializeDicts().ConfigureAwait(false);
         await Storage.LoadDictionaries().ConfigureAwait(false);
     }
@@ -384,7 +384,7 @@ public partial class ManageDictionariesWindow : Window
         Close();
     }
 
-    private string EntityDictToString(Dictionary<string, string> entityDict)
+    private static string EntityDictToString(Dictionary<string, string> entityDict)
     {
         StringBuilder sb = new();
         IOrderedEnumerable<KeyValuePair<string, string>> sortedJmdictEntities = entityDict.OrderBy(e => e.Key);
@@ -400,16 +400,15 @@ public partial class ManageDictionariesWindow : Window
         return sb.ToString()[..^Environment.NewLine.Length];
     }
 
-    private void ShowInfoWindow(ref InfoWindow? infoWindow, Dictionary<string, string> entityDict, string title)
+    private static void ShowInfoWindow(ref InfoWindow? infoWindow, Dictionary<string, string> entityDict, string title)
     {
         if (infoWindow == null)
         {
             infoWindow = new()
             {
-                Title = title
+                Title = title,
+                InfoTextBox = { Text = EntityDictToString(entityDict) }
             };
-
-            infoWindow.InfoTextBox.Text = EntityDictToString(entityDict);
         }
 
         else

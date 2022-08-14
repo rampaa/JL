@@ -14,7 +14,7 @@ public class WinApi
         internal const int WM_SYSCOMMAND = 0x0112;
         internal const int WM_NCCALCSIZE = 0x0083;
         internal const int WVR_VALIDRECTS = 0x0400;
-        internal const int WM_NCHITTEST = 0x0084;
+        // internal const int WM_NCHITTEST = 0x0084;
         internal const int SWP_NOSIZE = 0x0001;
         internal const int SWP_NOMOVE = 0x0002;
         internal const int SWP_SHOWWINDOW = 0x0040;

@@ -82,7 +82,7 @@ public static class KanjiInfoLoader
 
     private static async Task ReadCharacter(XmlReader xmlReader, Dictionary<string, string> kanjiCompositionDictionary, Dict dict)
     {
-        string key = xmlReader.ReadElementContentAsString();
+        string key = await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false);
 
         KanjiResult entry = new();
 

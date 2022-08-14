@@ -150,11 +150,6 @@ public static class Storage
         DictType.NonspecificNazeka,
     };
 
-    public static readonly List<DictType> ObsoleteDictTypes = new()
-    {
-        DictType.Kanjium,
-    };
-
     public static readonly Regex JapaneseRegex =
         new(
             @"[\u2e80-\u30ff\u31c0-\u4dbf\u4e00-\u9fff\uf900-\ufaff\ufe30-\ufe4f\uff00-\uffef]|\ud82c[\udc00-\udcff]|\ud83c[\ude00-\udeff]|\ud840[\udc00-\udfff]|[\ud841-\ud868][\udc00-\udfff]|\ud869[\udc00-\udedf]|\ud869[\udf00-\udfff]|[\ud86a-\ud879][\udc00-\udfff]|\ud87a[\udc00-\udfef]|\ud87e[\udc00-\ude1f]|\ud880[\udc00-\udfff]|[\ud881-\ud883][\udc00-\udfff]|\ud884[\udc00-\udf4f]");
@@ -331,7 +326,20 @@ public static class Storage
                     if (dict.Active && !dict.Contents.Any())
                     {
                         tasks.Add(Task.Run(async () =>
-                            await EpwingNazekaLoader.Load(dict).ConfigureAwait(false)));
+                        {
+                            try
+                            {
+                                await EpwingNazekaLoader.Load(dict).ConfigureAwait(false);
+                            }
+
+                            catch (Exception ex)
+                            {
+                                Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                                Utils.Logger.Error("Couldn't import {DictType}: {Exception}", dict.Type, ex.ToString());
+                                Dicts.Remove(dict.Name);
+                                dictRemoved = true;
+                            }
+                        }));
                     }
 
                     else if (!dict.Active && dict.Contents.Any())
@@ -345,7 +353,20 @@ public static class Storage
                     if (dict.Active && !dict.Contents.Any())
                     {
                         tasks.Add(Task.Run(async () =>
-                            await PitchLoader.Load(dict).ConfigureAwait(false)));
+                        {
+                            try
+                            {
+                                await PitchLoader.Load(dict).ConfigureAwait(false);
+                            }
+
+                            catch (Exception ex)
+                            {
+                                Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                                Utils.Logger.Error("Couldn't import {DictType}: {Exception}", dict.Type, ex.ToString());
+                                Dicts.Remove(dict.Name);
+                                dictRemoved = true;
+                            }
+                        }));
                     }
 
                     else if (!dict.Active && dict.Contents.Any())

@@ -6,6 +6,7 @@ using System.Windows.Media;
 using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomNameDict;
+using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
 
@@ -99,19 +100,6 @@ public partial class AddNameWindow : Window
     {
         MainWindow mainWindow = MainWindow.Instance;
         mainWindow.Focus();
-
-        if (!mainWindow.IsMouseOver)
-        {
-            if (ConfigManager.TextOnlyVisibleOnHover)
-            {
-                mainWindow.MainGrid.Opacity = 0;
-            }
-
-            if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
-            {
-                mainWindow.Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
-            }
-        }
+        WindowsUtils.UpdateMainWindowVisibility();
     }
-
 }
