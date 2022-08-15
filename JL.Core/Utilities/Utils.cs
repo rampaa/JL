@@ -170,7 +170,11 @@ public static class Utils
                             };
 
                         if (dict.Type == DictType.CustomNameDictionary || dict.Type == DictType.CustomWordDictionary)
-                            dict.Size *= 2;
+                        {
+                            dict.Size = dict.Size < 64
+                                ? 128
+                                : dict.Size * 2;
+                        }
 
                         Storage.Dicts.Add(dict.Name, dict);
                     }

@@ -6,11 +6,8 @@ public class Freq
 {
     public FreqType Type { get; set; }
     public string Name { get; set; }
-
     public string Path { get; set; }
-
     public bool Active { get; set; }
-
     public int Priority { get; set; }
     public int Size { get; set; }
 

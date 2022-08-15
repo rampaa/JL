@@ -52,14 +52,14 @@ public static class Storage
                 new Dict(DictType.CustomWordDictionary,
                     "Custom Word Dictionary",
                     $"{ResourcesPath}/custom_words.txt",
-                    true, 0, 1024,
+                    true, 0, 128,
                     new DictOptions(newlineBetweenDefinitions: new() { Value = false }))
             },
             {
                 "CustomNameDictionary",
                 new Dict(DictType.CustomNameDictionary,
                     "Custom Name Dictionary",
-                    $"{ResourcesPath}/custom_names.txt", true, 1, 1024,
+                    $"{ResourcesPath}/custom_names.txt", true, 1, 128,
                     new DictOptions())
             },
             {
