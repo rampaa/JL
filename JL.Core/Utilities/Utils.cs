@@ -198,6 +198,12 @@ public static class Utils
                 {
                     if (!Storage.FreqDicts.ContainsKey(freq.Name))
                     {
+                        freq.Contents = freq.Type switch
+                        {
+                            FreqType.Yomichan => new Dictionary<string, List<FrequencyRecord>>(1504512),
+                            FreqType.Nazeka => new Dictionary<string, List<FrequencyRecord>>(114348),
+                            _ => new Dictionary<string, List<FrequencyRecord>>(500000),
+                        };
                         Storage.FreqDicts.Add(freq.Name, freq);
                     }
                 }
