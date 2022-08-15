@@ -93,7 +93,7 @@ public partial class AddDictionaryWindow : Window
                     examplesOption);
 
             Storage.Dicts.Add(name,
-                new Dict(type, name, path, true, lowestPriority + 1, options));
+                new Dict(type, name, path, true, lowestPriority + 1, 0, options));
 
             Close();
         }

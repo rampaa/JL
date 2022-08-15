@@ -12,18 +12,20 @@ public class Freq
     public bool Active { get; set; }
 
     public int Priority { get; set; }
+    public int Size { get; set; }
 
     [JsonIgnore] public Dictionary<string, List<FrequencyRecord>> Contents { get; set; } = new();
 
     //public DictOptions? Options { get; set; } // can be null for dicts.json files generated before version 1.10
 
-    public Freq(FreqType type, string name, string path, bool active, int priority)
+    public Freq(FreqType type, string name, string path, bool active, int priority, int size)
     {
         Type = type;
         Name = name; /*?? type.GetDescription() ?? type.ToString();*/
         Path = path;
         Active = active;
         Priority = priority;
+        Size = size;
         //Options = options;
     }
 }

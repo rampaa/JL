@@ -70,7 +70,7 @@ public partial class AddFrequencyWindow : Window
             int lowestPriority = Storage.FreqDicts.Select(freq => freq.Value.Priority).Max();
 
             Storage.FreqDicts.Add(name,
-                new Freq(type, name, path, true, lowestPriority + 1));
+                new Freq(type, name, path, true, lowestPriority + 1, 0));
 
             Close();
         }

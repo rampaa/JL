@@ -39,7 +39,7 @@ public static class Storage
     public static bool UpdatingJMnedict { get; set; } = false;
     public static bool UpdatingKanjidic { get; set; } = false;
     public static bool FreqsReady { get; private set; } = false;
-    public static Dictionary<string, List<JmdictWc>> WcDict { get; set; } = new();
+    public static Dictionary<string, List<JmdictWc>> WcDict { get; set; } = new(65536); // 2022/08/15: 47352
     public static Dictionary<string, Freq> FreqDicts { get; set; } = new();
 
     public static readonly Dictionary<string, Dict> Dicts = new();
@@ -52,19 +52,19 @@ public static class Storage
                 new Dict(DictType.CustomWordDictionary,
                     "Custom Word Dictionary",
                     $"{ResourcesPath}/custom_words.txt",
-                    true, 0,
+                    true, 0, 1024,
                     new DictOptions(newlineBetweenDefinitions: new() { Value = false }))
             },
             {
                 "CustomNameDictionary",
                 new Dict(DictType.CustomNameDictionary,
                     "Custom Name Dictionary",
-                    $"{ResourcesPath}/custom_names.txt", true, 1,
+                    $"{ResourcesPath}/custom_names.txt", true, 1, 1024,
                     new DictOptions())
             },
             {
                 "JMdict",
-                new Dict(DictType.JMdict, "JMdict", $"{ResourcesPath}/JMdict.xml", true, 2,
+                new Dict(DictType.JMdict, "JMdict", $"{ResourcesPath}/JMdict.xml", true, 2, 500000,
                     new DictOptions(
                         newlineBetweenDefinitions: new() { Value = false },
                         wordClassInfo: new() { Value = true },
@@ -83,12 +83,12 @@ public static class Storage
             },
             {
                 "JMnedict",
-                new Dict(DictType.JMnedict, "JMnedict", $"{ResourcesPath}/JMnedict.xml", true, 3,
+                new Dict(DictType.JMnedict, "JMnedict", $"{ResourcesPath}/JMnedict.xml", true, 3, 700000,
                     new DictOptions(newlineBetweenDefinitions: new() { Value = false }))
             },
             {
                 "Kanjidic",
-                new Dict(DictType.Kanjidic, "Kanjidic", $"{ResourcesPath}/kanjidic2.xml", true, 4,
+                new Dict(DictType.Kanjidic, "Kanjidic", $"{ResourcesPath}/kanjidic2.xml", true, 4, 13108,
                     new DictOptions(noAll: new() { Value = false }))
             }
         };
@@ -97,17 +97,17 @@ public static class Storage
     {
         {
             "VN (Nazeka)",
-            new Freq(FreqType.Nazeka, "VN (Nazeka)", $"{ResourcesPath}/freqlist_vns.json", true, 0)
+            new Freq(FreqType.Nazeka, "VN (Nazeka)", $"{ResourcesPath}/freqlist_vns.json", true, 0, 57273)
         },
 
         {
             "Narou (Nazeka)",
-            new Freq(FreqType.Nazeka, "Narou (Nazeka)", $"{ResourcesPath}/freqlist_narou.json", false, 1)
+            new Freq(FreqType.Nazeka, "Narou (Nazeka)", $"{ResourcesPath}/freqlist_narou.json", false, 1, 75588)
         },
 
         {
             "Novel (Nazeka)",
-            new Freq(FreqType.Nazeka, "Novel (Nazeka)", $"{ResourcesPath}/freqlist_novels.json", false, 2)
+            new Freq(FreqType.Nazeka, "Novel (Nazeka)", $"{ResourcesPath}/freqlist_novels.json", false, 2, 114348)
         },
     };
 
@@ -205,7 +205,10 @@ public static class Storage
                     if (dict.Active && !dict.Contents.Any() && !UpdatingJMdict)
                     {
                         Task jMDictTask = Task.Run(async () =>
-                            await JMdictLoader.Load(dict).ConfigureAwait(false));
+                        {
+                            await JMdictLoader.Load(dict).ConfigureAwait(false);
+                            dict.Size = dict.Contents.Count;
+                        });
 
                         tasks.Add(jMDictTask);
                     }
@@ -221,7 +224,10 @@ public static class Storage
                     if (dict.Active && !dict.Contents.Any() && !UpdatingJMnedict)
                     {
                         tasks.Add(Task.Run(async () =>
-                            await JMnedictLoader.Load(dict).ConfigureAwait(false)));
+                        {
+                            await JMnedictLoader.Load(dict).ConfigureAwait(false);
+                            dict.Size = dict.Contents.Count;
+                        }));
                     }
 
                     else if (!dict.Active && dict.Contents.Any() && !UpdatingJMnedict)
@@ -235,7 +241,10 @@ public static class Storage
                     if (dict.Active && !dict.Contents.Any() && !UpdatingKanjidic)
                     {
                         tasks.Add(Task.Run(async () =>
-                            await KanjiInfoLoader.Load(dict).ConfigureAwait(false)));
+                        {
+                            await KanjiInfoLoader.Load(dict).ConfigureAwait(false);
+                            dict.Size = dict.Contents.Count;
+                        }));
                     }
 
                     else if (!dict.Active && dict.Contents.Any() && !UpdatingKanjidic)
@@ -272,6 +281,7 @@ public static class Storage
                             try
                             {
                                 await EpwingYomichanLoader.Load(dict).ConfigureAwait(false);
+                                dict.Size = dict.Contents.Count;
                             }
 
                             catch (Exception ex)
@@ -295,7 +305,10 @@ public static class Storage
                     if (dict.Active && !dict.Contents.Any())
                     {
                         tasks.Add(Task.Run(async () =>
-                            await CustomWordLoader.Load(dict.Path).ConfigureAwait(false)));
+                        {
+                            await CustomWordLoader.Load(dict.Path).ConfigureAwait(false);
+                            dict.Size = dict.Contents.Count;
+                        }));
                     }
 
                     else if (!dict.Active && dict.Contents.Any())
@@ -309,7 +322,10 @@ public static class Storage
                     if (dict.Active && !dict.Contents.Any())
                     {
                         tasks.Add(Task.Run(async () =>
-                            await CustomNameLoader.Load(dict.Path).ConfigureAwait(false)));
+                        {
+                            await CustomNameLoader.Load(dict.Path).ConfigureAwait(false);
+                            dict.Size = dict.Contents.Count;
+                        }));
                     }
 
                     else if (!dict.Active && dict.Contents.Any())
@@ -330,6 +346,7 @@ public static class Storage
                             try
                             {
                                 await EpwingNazekaLoader.Load(dict).ConfigureAwait(false);
+                                dict.Size = dict.Contents.Count;
                             }
 
                             catch (Exception ex)
@@ -357,6 +374,7 @@ public static class Storage
                             try
                             {
                                 await PitchLoader.Load(dict).ConfigureAwait(false);
+                                dict.Size = dict.Contents.Count;
                             }
 
                             catch (Exception ex)
@@ -416,6 +434,7 @@ public static class Storage
                             try
                             {
                                 await FrequencyNazekaLoader.Load(freq).ConfigureAwait(false);
+                                freq.Size = freq.Contents.Count;
                             }
 
                             catch (Exception ex)
@@ -445,6 +464,7 @@ public static class Storage
                             try
                             {
                                 await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false);
+                                freq.Size = freq.Contents.Count;
                             }
 
                             catch (Exception ex)

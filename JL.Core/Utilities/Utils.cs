@@ -132,38 +132,46 @@ public static class Utils
                 {
                     if (!Storage.Dicts.ContainsKey(dict.Name))
                     {
-                        dict.Contents = dict.Type switch
-                        {
-                            DictType.JMdict => new Dictionary<string, List<IResult>>(524288), //2022/05/11: 394949
-                            DictType.JMnedict => new Dictionary<string, List<IResult>>(1048576), //2022/05/11: 608833
-                            DictType.Kanjidic => new Dictionary<string, List<IResult>>(16384), //2022/05/11: 13108
-                            DictType.Daijirin => new Dictionary<string, List<IResult>>(420429),
-                            DictType.DaijirinNazeka => new Dictionary<string, List<IResult>>(420429),
-                            DictType.Daijisen => new Dictionary<string, List<IResult>>(679115),
-                            DictType.Gakken => new Dictionary<string, List<IResult>>(254558),
-                            DictType.GakkenYojijukugoYomichan => new Dictionary<string, List<IResult>>(7989),
-                            DictType.IwanamiYomichan => new Dictionary<string, List<IResult>>(101929),
-                            DictType.JitsuyouYomichan => new Dictionary<string, List<IResult>>(69746),
-                            DictType.KanjigenYomichan => new Dictionary<string, List<IResult>>(64730),
-                            DictType.Kenkyuusha => new Dictionary<string, List<IResult>>(303677),
-                            DictType.KenkyuushaNazeka => new Dictionary<string, List<IResult>>(191804),
-                            DictType.KireiCakeYomichan => new Dictionary<string, List<IResult>>(332628),
-                            DictType.Kotowaza => new Dictionary<string, List<IResult>>(30846),
-                            DictType.Koujien => new Dictionary<string, List<IResult>>(402571),
-                            DictType.Meikyou => new Dictionary<string, List<IResult>>(107367),
-                            DictType.NikkokuYomichan => new Dictionary<string, List<IResult>>(451455),
-                            DictType.OubunshaYomichan => new Dictionary<string, List<IResult>>(138935),
-                            DictType.PitchAccentYomichan => new Dictionary<string, List<IResult>>(434991),
-                            DictType.ShinjirinYomichan => new Dictionary<string, List<IResult>>(229758),
-                            DictType.ShinmeikaiYomichan => new Dictionary<string, List<IResult>>(126049),
-                            DictType.ShinmeikaiNazeka => new Dictionary<string, List<IResult>>(126049),
-                            DictType.ShinmeikaiYojijukugoYomichan => new Dictionary<string, List<IResult>>(6088),
-                            DictType.WeblioKogoYomichan => new Dictionary<string, List<IResult>>(30838),
-                            DictType.ZokugoYomichan => new Dictionary<string, List<IResult>>(2392),
-                            DictType.NonspecificYomichan => new Dictionary<string, List<IResult>>(250000),
-                            DictType.NonspecificNazeka => new Dictionary<string, List<IResult>>(250000),
-                            _ => new Dictionary<string, List<IResult>>(250000),
-                        };
+                        dict.Contents = dict.Size != 0
+                            ? new Dictionary<string, List<IResult>>(dict.Size)
+                            : dict.Type switch
+                            {
+                                DictType.CustomNameDictionary => new Dictionary<string, List<IResult>>(1024),
+                                DictType.CustomWordDictionary => new Dictionary<string, List<IResult>>(1024),
+                                DictType.JMdict => new Dictionary<string, List<IResult>>(500000), //2022/05/11: 394949, 2022/08/15: 398303
+                                DictType.JMnedict => new Dictionary<string, List<IResult>>(700000), //2022/05/11: 608833, 2022/08/15: 609117
+                                DictType.Kanjidic => new Dictionary<string, List<IResult>>(13108), //2022/05/11: 13108, 2022/08/15: 13108
+                                DictType.Daijirin => new Dictionary<string, List<IResult>>(420429),
+                                DictType.DaijirinNazeka => new Dictionary<string, List<IResult>>(420429),
+                                DictType.Daijisen => new Dictionary<string, List<IResult>>(679115),
+                                DictType.Gakken => new Dictionary<string, List<IResult>>(254558),
+                                DictType.GakkenYojijukugoYomichan => new Dictionary<string, List<IResult>>(7989),
+                                DictType.IwanamiYomichan => new Dictionary<string, List<IResult>>(101929),
+                                DictType.JitsuyouYomichan => new Dictionary<string, List<IResult>>(69746),
+                                DictType.KanjigenYomichan => new Dictionary<string, List<IResult>>(64730),
+                                DictType.Kenkyuusha => new Dictionary<string, List<IResult>>(303677),
+                                DictType.KenkyuushaNazeka => new Dictionary<string, List<IResult>>(191804),
+                                DictType.KireiCakeYomichan => new Dictionary<string, List<IResult>>(332628),
+                                DictType.Kotowaza => new Dictionary<string, List<IResult>>(30846),
+                                DictType.Koujien => new Dictionary<string, List<IResult>>(402571),
+                                DictType.Meikyou => new Dictionary<string, List<IResult>>(107367),
+                                DictType.NikkokuYomichan => new Dictionary<string, List<IResult>>(451455),
+                                DictType.OubunshaYomichan => new Dictionary<string, List<IResult>>(138935),
+                                DictType.PitchAccentYomichan => new Dictionary<string, List<IResult>>(434991),
+                                DictType.ShinjirinYomichan => new Dictionary<string, List<IResult>>(229758),
+                                DictType.ShinmeikaiYomichan => new Dictionary<string, List<IResult>>(126049),
+                                DictType.ShinmeikaiNazeka => new Dictionary<string, List<IResult>>(126049),
+                                DictType.ShinmeikaiYojijukugoYomichan => new Dictionary<string, List<IResult>>(6088),
+                                DictType.WeblioKogoYomichan => new Dictionary<string, List<IResult>>(30838),
+                                DictType.ZokugoYomichan => new Dictionary<string, List<IResult>>(2392),
+                                DictType.NonspecificYomichan => new Dictionary<string, List<IResult>>(250000),
+                                DictType.NonspecificNazeka => new Dictionary<string, List<IResult>>(250000),
+                                _ => new Dictionary<string, List<IResult>>(250000),
+                            };
+
+                        if (dict.Type == DictType.CustomNameDictionary || dict.Type == DictType.CustomWordDictionary)
+                            dict.Size *= 2;
+
                         Storage.Dicts.Add(dict.Name, dict);
                     }
                 }
@@ -198,12 +206,14 @@ public static class Utils
                 {
                     if (!Storage.FreqDicts.ContainsKey(freq.Name))
                     {
-                        freq.Contents = freq.Type switch
-                        {
-                            FreqType.Yomichan => new Dictionary<string, List<FrequencyRecord>>(1504512),
-                            FreqType.Nazeka => new Dictionary<string, List<FrequencyRecord>>(114348),
-                            _ => new Dictionary<string, List<FrequencyRecord>>(500000),
-                        };
+                        freq.Contents = freq.Size != 0
+                            ? new Dictionary<string, List<FrequencyRecord>>(freq.Size)
+                            : freq.Type switch
+                            {
+                                FreqType.Yomichan => new Dictionary<string, List<FrequencyRecord>>(1504512),
+                                FreqType.Nazeka => new Dictionary<string, List<FrequencyRecord>>(114348),
+                                _ => new Dictionary<string, List<FrequencyRecord>>(500000),
+                            };
                         Storage.FreqDicts.Add(freq.Name, freq);
                     }
                 }
