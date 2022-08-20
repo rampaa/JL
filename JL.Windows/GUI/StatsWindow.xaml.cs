@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using JL.Core;
+using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
 
@@ -68,6 +69,11 @@ public partial class StatsWindow : Window
                     throw new ArgumentOutOfRangeException(null, "StatsMode out of range");
             }
         }
+    }
+
+    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+        WindowsUtils.UpdateMainWindowVisibility();
     }
 }
 

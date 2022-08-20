@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Stats" ResizeMode="NoResize" SizeToContent="WidthAndHeight" MaxHeight="600" MaxWidth="800"
-        Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False">
+        Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False" Closing="Window_Closing">
 
     <ScrollViewer HorizontalScrollBarVisibility="Auto">
         <Grid Background="Black">

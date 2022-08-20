@@ -486,6 +486,7 @@ public partial class MainWindow : Window, IFrontend
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))
         {
             WindowsUtils.SearchWithBrowser(MainTextBox!.SelectedText);
+            WindowsUtils.UpdateMainWindowVisibility();
         }
 
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.InactiveLookupModeKeyGesture))
@@ -561,6 +562,7 @@ public partial class MainWindow : Window, IFrontend
     private void SearchWithBrowser(object sender, RoutedEventArgs e)
     {
         WindowsUtils.SearchWithBrowser(MainTextBox!.SelectedText);
+        WindowsUtils.UpdateMainWindowVisibility();
     }
 
     private void ShowManageDictionariesWindow(object sender, RoutedEventArgs e)
