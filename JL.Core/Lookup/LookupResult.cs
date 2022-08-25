@@ -6,10 +6,10 @@ public class LookupResult
 {
     // common (required for sorting)
     public string FoundForm { get; init; } // todo rename foundform to foundtext
+    public string DeconjugatedFoundForm { get; init; }
     public List<LookupFrequencyResult> Frequencies { get; init; }
     public Dict? Dict { get; init; }
     public string FoundSpelling { get; init; }
-
     public List<string>? Readings { get; init; }
     public string? FormattedDefinitions { get; init; }
     public int EdictId { get; init; }
@@ -33,6 +33,7 @@ public class LookupResult
         StrokeCount = 0;
         Grade = 0;
         FoundForm = string.Empty;
+        DeconjugatedFoundForm = string.Empty;
         FoundSpelling = string.Empty;
     }
 }

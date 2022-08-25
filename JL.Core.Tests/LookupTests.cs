@@ -53,6 +53,7 @@ public class LookupTests
                     Dict = Storage.Dicts.Values.First(dict => dict.Type == DictType.JMdict),
                     Frequencies = new () {new ("VN (Nazeka)" ,759 ) },
                     FoundSpelling = "始まる",
+                    DeconjugatedFoundForm = "始まる",
                     Readings = new List<string> { "はじまる" },
                     FormattedDefinitions =
                         "(v5r, vi) (1) to begin; to start; to commence (v5r, vi) (2) to happen (again); to begin (anew) (v5r, vi) (3) to date (from); to originate (in)",

@@ -9,6 +9,7 @@ public enum JLField
     Readings, // separate on,kun,nanori from this maybe?
     Definitions,
     [Description("Found Form")] FoundForm,
+    [Description("Deconjugated Found Form")] DeconjugatedFoundForm,
     Context,
     Audio,
     [Description("Edict ID")] EdictId,

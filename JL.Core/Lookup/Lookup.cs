@@ -22,7 +22,7 @@ public static class Lookup
     // public static readonly LRUCache<string, List<LookupResult>?> LookupResultCache = new(
     //     Storage.CacheSize, Storage.CacheSize / 8);
 
-    public static List<LookupResult>? LookupText(string text, bool useCache = true)
+    public static List<LookupResult>? LookupText(string text) //, bool useCache = true
     {
         DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
         if ((preciseTimeNow - s_lastLookupTime).TotalMilliseconds < Storage.Frontend.CoreConfig.LookupRate)
@@ -221,7 +221,7 @@ public static class Lookup
         if (dictionary.TryGetValue(textInHiragana, out List<IResult>? tempResult))
         {
             results.TryAdd(textInHiragana,
-                new IntermediaryResult(new List<List<IResult>> { tempResult }, null, foundForm,
+                new IntermediaryResult(new List<List<IResult>> { tempResult }, null, foundForm, foundForm,
                     dict));
             tryLongVowelConversion = false;
         }
@@ -398,6 +398,7 @@ public static class Lookup
                                 new IntermediaryResult(new List<List<IResult>> { resultsList },
                                     new List<List<List<string>>> { new List<List<string>> { deconjugationResult.Process } },
                                     foundForm,
+                                    deconjugationResult.Text,
                                     dict)
                             );
                         }
@@ -451,7 +452,7 @@ public static class Lookup
                 .TryGetValue(textInHiraganaList[i], out List<IResult>? result))
             {
                 nameResults.TryAdd(textInHiraganaList[i],
-                    new IntermediaryResult(new List<List<IResult>> { result }, null, text[..^i], dict));
+                    new IntermediaryResult(new List<List<IResult>> { result }, null, text[..^i], text[..^i], dict));
             }
         }
 
@@ -467,7 +468,7 @@ public static class Lookup
         if (kanji != null && dict.Contents.TryGetValue(kanji, out List<IResult>? result))
         {
             kanjiResults.Add(kanji,
-                new IntermediaryResult(new List<List<IResult>> { result }, null, kanji, dict));
+                new IntermediaryResult(new List<List<IResult>> { result }, null, kanji, kanji, dict));
         }
 
         return kanjiResults;
@@ -525,6 +526,7 @@ public static class Lookup
                         FoundSpelling = jMDictResult.PrimarySpelling,
                         Readings = jMDictResult.Readings ?? new(),
                         FoundForm = wordResult.FoundForm,
+                        DeconjugatedFoundForm = wordResult.DeconjugatedFoundForm,
                         EdictId = jMDictResult.Id,
                         AlternativeSpellings = jMDictResult.AlternativeSpellings ?? new(),
                         Process = ProcessProcess(wordResult.Processes?[i]),
@@ -567,6 +569,7 @@ public static class Lookup
                         AlternativeSpellings = jMnedictResult.AlternativeSpellings ?? new(),
                         Readings = jMnedictResult.Readings ?? new(),
                         FoundForm = nameResult.FoundForm,
+                        DeconjugatedFoundForm = nameResult.DeconjugatedFoundForm,
                         Dict = nameResult.Dict,
                         FormattedDefinitions = jMnedictResult.Definitions != null
                             ? BuildJmnedictDefinition(jMnedictResult)
@@ -615,6 +618,7 @@ public static class Lookup
             Composition = kanjiResult.Composition,
             Frequencies = new() { new(kanjiResults.First().Value.Dict.Name, kanjiResult.Frequency) },
             FoundForm = kanjiResults.First().Value.FoundForm,
+            DeconjugatedFoundForm = kanjiResults.First().Value.DeconjugatedFoundForm,
             Dict = kanjiResults.First().Value.Dict,
             FormattedDefinitions = kanjiResult.Meanings != null
             ? string.Join(", ", kanjiResult.Meanings)
@@ -644,6 +648,7 @@ public static class Lookup
                     {
                         FoundSpelling = epwingResult.PrimarySpelling,
                         FoundForm = wordResult.FoundForm,
+                        DeconjugatedFoundForm = wordResult.DeconjugatedFoundForm,
                         Process = ProcessProcess(wordResult.Processes?[i]),
                         Frequencies = GetFrequencies(epwingResult, wordResult.Dict),
                         Dict = wordResult.Dict,
@@ -684,6 +689,7 @@ public static class Lookup
                         FoundSpelling = epwingResult.PrimarySpelling,
                         AlternativeSpellings = epwingResult.AlternativeSpellings ?? new(),
                         FoundForm = wordResult.FoundForm,
+                        DeconjugatedFoundForm = wordResult.DeconjugatedFoundForm,
                         Process = ProcessProcess(wordResult.Processes?[i]),
                         Frequencies = GetFrequencies(epwingResult, wordResult.Dict),
                         Dict = wordResult.Dict,
@@ -731,6 +737,7 @@ public static class Lookup
                         Frequencies = freqs,
                         FoundSpelling = customWordDictResult.PrimarySpelling,
                         FoundForm = wordResult.FoundForm,
+                        DeconjugatedFoundForm = wordResult.DeconjugatedFoundForm,
                         Process = ProcessProcess(wordResult.Processes?[i]),
                         Dict = wordResult.Dict,
                         Readings = customWordDictResult.Readings ?? new(),
@@ -766,6 +773,7 @@ public static class Lookup
                     {
                         FoundSpelling = customNameDictResult.PrimarySpelling,
                         FoundForm = customNameResult.Value.FoundForm,
+                        DeconjugatedFoundForm = customNameResult.Value.DeconjugatedFoundForm,
                         Frequencies = new() { new(customNameResult.Value.Dict.Name, -freq) },
                         Dict = customNameResult.Value.Dict,
                         Readings = new List<string> { customNameDictResult.Reading },

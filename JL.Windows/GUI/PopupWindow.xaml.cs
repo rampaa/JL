@@ -413,6 +413,15 @@ public partial class PopupWindow : Window
             VerticalAlignment = VerticalAlignment.Center,
         };
 
+        var textBlockDeconjugatedFoundForm = new TextBlock
+        {
+            Name = nameof(result.DeconjugatedFoundForm),
+            Text = result.DeconjugatedFoundForm,
+            Visibility = Visibility.Collapsed,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+
         var textBlockFoundSpelling = new TextBlock
         {
             Name = nameof(result.FoundSpelling),
@@ -828,7 +837,7 @@ public partial class PopupWindow : Window
         UIElement?[] babies =
         {
             textBlockFoundSpelling, textBlockPOrthographyInfo, uiElementReadings, uiElementAlternativeSpellings,
-            textBlockProcess, textBlockFoundForm, textBlockEdictId, textBlockFrequency, textBlockDictType
+            textBlockProcess, textBlockFoundForm, textBlockDeconjugatedFoundForm, textBlockEdictId, textBlockFrequency, textBlockDictType
         };
 
         for (int i = 0; i < babies.Length; i++)
@@ -1205,6 +1214,9 @@ public partial class PopupWindow : Window
                             break;
                         case nameof(LookupResult.FoundForm):
                             miningParams[JLField.FoundForm] = ch.Text;
+                            break;
+                        case nameof(LookupResult.DeconjugatedFoundForm):
+                            miningParams[JLField.DeconjugatedFoundForm] = ch.Text;
                             break;
                         case nameof(LookupResult.EdictId):
                             miningParams[JLField.EdictId] = ch.Text;
