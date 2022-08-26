@@ -177,7 +177,33 @@ public static class Storage
         DictType.NonspecificNameNazeka,
     };
 
-    public static readonly List<DictType> WordDictTypes = YomichanDictTypes.Union(NazekaDictTypes).Except(NonspecificDictTypes).Except(KanjiDictTypes).Except(NameDictTypes).ToList();
+    public static readonly List<DictType> WordDictTypes = new()
+    {
+        DictType.CustomWordDictionary,
+        DictType.Daijirin,
+        DictType.Daijisen,
+        DictType.Gakken,
+        DictType.GakkenYojijukugoYomichan,
+        DictType.IwanamiYomichan,
+        DictType.JitsuyouYomichan,
+        DictType.Kenkyuusha,
+        DictType.KireiCakeYomichan,
+        DictType.Kotowaza,
+        DictType.Koujien,
+        DictType.Meikyou,
+        DictType.NikkokuYomichan,
+        DictType.OubunshaYomichan,
+        DictType.ShinjirinYomichan,
+        DictType.ShinmeikaiYomichan,
+        DictType.ShinmeikaiYojijukugoYomichan,
+        DictType.WeblioKogoYomichan,
+        DictType.ZokugoYomichan,
+        DictType.NonspecificWordYomichan,
+        DictType.DaijirinNazeka,
+        DictType.KenkyuushaNazeka,
+        DictType.ShinmeikaiNazeka,
+        DictType.NonspecificWordNazeka
+    };
 
     public static readonly Regex JapaneseRegex =
         new(
