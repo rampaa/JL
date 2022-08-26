@@ -164,7 +164,13 @@ public static class Utils
                                 DictType.ShinmeikaiYojijukugoYomichan => new Dictionary<string, List<IResult>>(6088),
                                 DictType.WeblioKogoYomichan => new Dictionary<string, List<IResult>>(30838),
                                 DictType.ZokugoYomichan => new Dictionary<string, List<IResult>>(2392),
+                                DictType.NonspecificWordYomichan => new Dictionary<string, List<IResult>>(250000),
+                                DictType.NonspecificKanjiYomichan => new Dictionary<string, List<IResult>>(250000),
+                                DictType.NonspecificNameYomichan => new Dictionary<string, List<IResult>>(250000),
                                 DictType.NonspecificYomichan => new Dictionary<string, List<IResult>>(250000),
+                                DictType.NonspecificWordNazeka => new Dictionary<string, List<IResult>>(250000),
+                                DictType.NonspecificKanjiNazeka => new Dictionary<string, List<IResult>>(250000),
+                                DictType.NonspecificNameNazeka => new Dictionary<string, List<IResult>>(250000),
                                 DictType.NonspecificNazeka => new Dictionary<string, List<IResult>>(250000),
                                 _ => new Dictionary<string, List<IResult>>(250000),
                             };

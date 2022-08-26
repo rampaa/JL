@@ -133,7 +133,10 @@ public static class Storage
         DictType.WeblioKogoYomichan,
         DictType.ZokugoYomichan,
         DictType.PitchAccentYomichan,
-        DictType.NonspecificYomichan,
+        DictType.NonspecificWordYomichan,
+        DictType.NonspecificKanjiYomichan,
+        DictType.NonspecificNameYomichan,
+        DictType.NonspecificYomichan
     };
 
     public static readonly List<DictType> NazekaDictTypes = new()
@@ -141,14 +144,40 @@ public static class Storage
         DictType.DaijirinNazeka,
         DictType.KenkyuushaNazeka,
         DictType.ShinmeikaiNazeka,
+        DictType.NonspecificWordNazeka,
+        DictType.NonspecificKanjiNazeka,
+        DictType.NonspecificNameNazeka,
         DictType.NonspecificNazeka,
     };
 
     public static readonly List<DictType> NonspecificDictTypes = new()
     {
+        DictType.NonspecificWordYomichan,
+        DictType.NonspecificKanjiYomichan,
+        DictType.NonspecificNameYomichan,
         DictType.NonspecificYomichan,
-        DictType.NonspecificNazeka,
+        DictType.NonspecificWordNazeka,
+        DictType.NonspecificKanjiNazeka,
+        DictType.NonspecificNameNazeka,
+        DictType.NonspecificNazeka
     };
+
+    public static readonly List<DictType> KanjiDictTypes = new()
+    {
+        DictType.Kanjidic,
+        DictType.KanjigenYomichan,
+        DictType.NonspecificKanjiYomichan,
+        DictType.NonspecificKanjiNazeka
+    };
+
+    public static readonly List<DictType> NameDictTypes = new()
+    {
+        DictType.CustomNameDictionary,
+        DictType.NonspecificNameYomichan,
+        DictType.NonspecificNameNazeka,
+    };
+
+    public static readonly List<DictType> WordDictTypes = YomichanDictTypes.Union(NazekaDictTypes).Except(NonspecificDictTypes).Except(KanjiDictTypes).Except(NameDictTypes).ToList();
 
     public static readonly Regex JapaneseRegex =
         new(
@@ -273,6 +302,9 @@ public static class Storage
                 case DictType.ShinmeikaiYojijukugoYomichan:
                 case DictType.KanjigenYomichan:
                 case DictType.KireiCakeYomichan:
+                case DictType.NonspecificWordYomichan:
+                case DictType.NonspecificKanjiYomichan:
+                case DictType.NonspecificNameYomichan:
                 case DictType.NonspecificYomichan:
                     if (dict.Active && !dict.Contents.Any())
                     {
@@ -338,6 +370,9 @@ public static class Storage
                 case DictType.DaijirinNazeka:
                 case DictType.KenkyuushaNazeka:
                 case DictType.ShinmeikaiNazeka:
+                case DictType.NonspecificWordNazeka:
+                case DictType.NonspecificKanjiNazeka:
+                case DictType.NonspecificNameNazeka:
                 case DictType.NonspecificNazeka:
                     if (dict.Active && !dict.Contents.Any())
                     {

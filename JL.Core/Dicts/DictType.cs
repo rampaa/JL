@@ -54,6 +54,12 @@ public enum DictType
     KireiCakeYomichan,
     [Description("Kanjigen (Yomichan)")]
     KanjigenYomichan,
+    [Description("Nonspecific Word Dictionary (Yomichan)")]
+    NonspecificWordYomichan,
+    [Description("Nonspecific Kanji Dictionary (Yomichan)")]
+    NonspecificKanjiYomichan,
+    [Description("Nonspecific Name Dictionary (Yomichan)")]
+    NonspecificNameYomichan,
     [Description("Nonspecific (Yomichan)")]
     NonspecificYomichan,
 
@@ -64,6 +70,12 @@ public enum DictType
     DaijirinNazeka,
     [Description("Shinmeikai (Nazeka)")]
     ShinmeikaiNazeka,
+    [Description("Nonspecific Word Dictionary (Nazeka)")]
+    NonspecificWordNazeka,
+    [Description("Nonspecific Kanji Dictionary (Nazeka)")]
+    NonspecificKanjiNazeka,
+    [Description("Nonspecific Name Dictionary (Nazeka)")]
+    NonspecificNameNazeka,
     [Description("Nonspecific (Nazeka)")]
     NonspecificNazeka,
 }

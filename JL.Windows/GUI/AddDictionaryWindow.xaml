@@ -4,16 +4,16 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Add Dictionary" Height="350" Width="600" ResizeMode="NoResize" SizeToContent="Height"
+        Title="Add Dictionary" Height="350" Width="650" ResizeMode="NoResize" SizeToContent="Height"
         Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False">
     <Grid Background="Black">
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,20">
-            <TextBlock Foreground="White" Text="Dict Type" TextWrapping="Wrap" Margin="0,0,0,10" />
-            <ComboBox Name="ComboBoxDictType" Width="285" Margin="10" HorizontalAlignment="Left" />
+            <TextBlock Foreground="White" Text="Dictionary Type" TextWrapping="Wrap" Margin="0,0,0,10" />
+            <ComboBox Name="ComboBoxDictType" Width="340" Margin="10" HorizontalAlignment="Left" />
 
             <TextBlock Foreground="White" Text="Path" TextWrapping="Wrap" Margin="0,10,0,10" />
             <WrapPanel>
-                <TextBox Name="TextBlockPath" Foreground="White" Width="285"
+                <TextBox Name="TextBlockPath" Foreground="White" Width="340"
                          Text=""
                          Margin="10"
                          IsReadOnly="True" />
@@ -23,7 +23,7 @@
             </WrapPanel>
 
             <TextBlock Foreground="White" Text="Name" TextWrapping="Wrap" Margin="0,0,0,10" />
-            <TextBox Name="NameTextBox" Width="285" Margin="10" HorizontalAlignment="Left"
+            <TextBox Name="NameTextBox" Width="340" Margin="10" HorizontalAlignment="Left"
                      Cursor="Help" ToolTip="Dictionary name must be unique"/>
 
         </StackPanel>

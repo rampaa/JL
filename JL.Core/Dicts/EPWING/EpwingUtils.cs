@@ -98,7 +98,13 @@ public static class EpwingUtils
             case DictType.ShinmeikaiYojijukugoYomichan:
             case DictType.WeblioKogoYomichan:
             case DictType.ZokugoYomichan:
+            case DictType.NonspecificWordYomichan:
+            case DictType.NonspecificKanjiYomichan:
+            case DictType.NonspecificNameYomichan:
             case DictType.NonspecificYomichan:
+            case DictType.NonspecificWordNazeka:
+            case DictType.NonspecificKanjiNazeka:
+            case DictType.NonspecificNameNazeka:
             case DictType.NonspecificNazeka:
                 return FilterDuplicateEntries(epwingResult, dict);
 

@@ -36,17 +36,28 @@ public static class Lookup
 
         if (Storage.Frontend.CoreConfig.KanjiMode)
         {
-            Dict? kanjidic = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.Kanjidic);
-            Dict? kanjigen = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.KanjigenYomichan);
-
-            if (kanjidic?.Active ?? false)
+            foreach (Dict dict in Storage.Dicts.Values)
             {
-                lookupResults.AddRange(KanjidicResultBuilder(GetKanjiResults(text, kanjidic)));
-            }
+                if (dict.Active)
+                {
+                    if (dict.Type == DictType.Kanjidic)
+                    {
+                        lookupResults.AddRange(KanjidicResultBuilder(GetKanjiResults(text, dict)));
+                    }
 
-            if (kanjigen?.Active ?? false)
-            {
-                lookupResults.AddRange(EpwingYomichanResultBuilder(GetKanjiResults(text, kanjigen)));
+                    else if (Storage.KanjiDictTypes.Contains(dict.Type))
+                    {
+                        if (Storage.NazekaDictTypes.Contains(dict.Type))
+                        {
+                            lookupResults.AddRange(EpwingNazekaResultBuilder(GetKanjiResults(text, dict)));
+                        }
+
+                        else // if (Storage.YomichanDictTypes.Contains(dict.Type))
+                        {
+                            lookupResults.AddRange(EpwingYomichanResultBuilder(GetKanjiResults(text, dict)));
+                        }
+                    }
+                }
             }
 
             return lookupResults.Any() ? SortLookupResults(lookupResults) : null;
@@ -122,6 +133,9 @@ public static class Lookup
                     case DictType.GakkenYojijukugoYomichan:
                     case DictType.ShinmeikaiYojijukugoYomichan:
                     case DictType.KireiCakeYomichan:
+                    case DictType.NonspecificWordYomichan:
+                    case DictType.NonspecificKanjiYomichan:
+                    case DictType.NonspecificNameYomichan:
                     case DictType.NonspecificYomichan:
                         epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
                             deconjugationResultsList, dict));
@@ -130,6 +144,9 @@ public static class Lookup
                     case DictType.DaijirinNazeka:
                     case DictType.KenkyuushaNazeka:
                     case DictType.ShinmeikaiNazeka:
+                    case DictType.NonspecificWordNazeka:
+                    case DictType.NonspecificKanjiNazeka:
+                    case DictType.NonspecificNameNazeka:
                     case DictType.NonspecificNazeka:
                         epwingNazekaWordResultsList.Add(GetWordResults(text, textInHiraganaList,
                             deconjugationResultsList, dict));
@@ -292,6 +309,9 @@ public static class Lookup
                         case DictType.ShinmeikaiYojijukugoYomichan:
                         case DictType.KanjigenYomichan:
                         case DictType.KireiCakeYomichan:
+                        case DictType.NonspecificWordYomichan:
+                        case DictType.NonspecificKanjiYomichan:
+                        case DictType.NonspecificNameYomichan:
                         case DictType.NonspecificYomichan:
                             {
                                 int dictResultsCount = dictResults.Count;
@@ -331,6 +351,9 @@ public static class Lookup
                         case DictType.DaijirinNazeka:
                         case DictType.KenkyuushaNazeka:
                         case DictType.ShinmeikaiNazeka:
+                        case DictType.NonspecificWordNazeka:
+                        case DictType.NonspecificKanjiNazeka:
+                        case DictType.NonspecificNameNazeka:
                         case DictType.NonspecificNazeka:
                             {
                                 int dictResultsCount = dictResults.Count;
@@ -810,6 +833,9 @@ public static class Lookup
                     case DictType.DaijirinNazeka:
                     case DictType.KenkyuushaNazeka:
                     case DictType.ShinmeikaiNazeka:
+                    case DictType.NonspecificWordNazeka:
+                    case DictType.NonspecificKanjiNazeka:
+                    case DictType.NonspecificNameNazeka:
                     case DictType.NonspecificNazeka:
                         freqsList.Add(new(freq.Name, GetEpwingNazekaFreq((EpwingNazekaResult)result, freq)));
                         break;
@@ -833,6 +859,9 @@ public static class Lookup
                     case DictType.ShinmeikaiYojijukugoYomichan:
                     case DictType.KanjigenYomichan:
                     case DictType.KireiCakeYomichan:
+                    case DictType.NonspecificWordYomichan:
+                    case DictType.NonspecificKanjiYomichan:
+                    case DictType.NonspecificNameYomichan:
                     case DictType.NonspecificYomichan:
                         freqsList.Add(new(freq.Name, GetEpwingFreq((EpwingYomichanResult)result, freq)));
                         break;

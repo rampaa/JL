@@ -173,6 +173,9 @@ public partial class AddDictionaryWindow : Window
             case DictType.ShinmeikaiYojijukugoYomichan:
             case DictType.KanjigenYomichan:
             case DictType.KireiCakeYomichan:
+            case DictType.NonspecificWordYomichan:
+            case DictType.NonspecificKanjiYomichan:
+            case DictType.NonspecificNameYomichan:
             case DictType.NonspecificYomichan:
                 BrowseForDictionaryFolder();
                 break;
@@ -190,6 +193,9 @@ public partial class AddDictionaryWindow : Window
             case DictType.ShinmeikaiNazeka:
                 BrowseForDictionaryFile("Shinmeikai file|*.json");
                 break;
+            case DictType.NonspecificWordNazeka:
+            case DictType.NonspecificKanjiNazeka:
+            case DictType.NonspecificNameNazeka:
             case DictType.NonspecificNazeka:
                 BrowseForDictionaryFile("Nazeka file|*.json");
                 break;
