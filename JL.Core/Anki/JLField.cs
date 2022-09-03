@@ -13,7 +13,7 @@ public enum JLField
     [Description("Dictionary Name")] DictionaryName,
     Audio,
     Sentence,
-    [Description("Clipboard Text")] ClipboardText,
+    [Description("Source Text")] SourceText,
     [Description("Matched Text")] MatchedText,
     [Description("EDICT ID")] EdictId,
     [Description("Local Time")] LocalTime,

@@ -1166,7 +1166,7 @@ public partial class PopupWindow : Window
         if (_currentText != null)
         {
             miningParams[JLField.Sentence] = Utils.FindSentence(_currentText, _currentCharPosition);
-            miningParams[JLField.ClipboardText] = _currentText;
+            miningParams[JLField.SourceText] = _currentText;
         }
 
         var textBlock = (TextBlock)sender;
