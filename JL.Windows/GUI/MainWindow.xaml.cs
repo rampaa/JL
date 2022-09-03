@@ -366,7 +366,6 @@ public partial class MainWindow : Window, IFrontend
         if (Background!.Opacity == 0)
         {
             Background.Opacity = OpacitySlider!.Value / 100;
-            OpacityButton.Background.Opacity = 0.002;
             MainTextBox.Focus();
         }
 
@@ -430,7 +429,6 @@ public partial class MainWindow : Window, IFrontend
             if (!ConfigManager.InvisibleMode)
             {
                 Background!.Opacity = 0;
-                OpacityButton.Background.Opacity = 0.1;
                 Keyboard.ClearFocus();
             }
         }
