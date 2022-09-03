@@ -166,7 +166,7 @@ public partial class PopupWindow : Window
             LastText = text;
 
             ResultStackPanels.Clear();
-            List<LookupResult>? lookupResults = Lookup.LookupText(tb.Text);
+            List<LookupResult>? lookupResults = Lookup.LookupText(text);
 
             if (lookupResults is { Count: > 0 })
             {
