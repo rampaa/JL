@@ -161,8 +161,8 @@ public partial class MainWindow : Window, IFrontend
 
     private async Task Precache(string input)
     {
-        if (Debugger.IsAttached)
-            PrecacheProgress.Visibility = Visibility.Visible;
+        //if (Debugger.IsAttached)
+        //    PrecacheProgress.Visibility = Visibility.Visible;
 
         int added = 0;
         for (int charPosition = 0; charPosition < input.Length; charPosition++)
@@ -183,7 +183,7 @@ public partial class MainWindow : Window, IFrontend
             if (charPosition > 0 && char.IsHighSurrogate(input[charPosition - 1]))
                 --charPosition;
 
-            PrecacheProgress.Text = $"{charPosition + 1}/{input.Length} ({added} new)";
+            //PrecacheProgress.Text = $"{charPosition + 1}/{input.Length} ({added} new)";
             if (charPosition % 10 == 0)
             {
                 await Task.Delay(1); // let user interact with the GUI while this method is running

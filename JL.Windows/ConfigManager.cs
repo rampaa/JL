@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Xml;
 using JL.Core;
 using JL.Core.Utilities;
@@ -70,6 +71,7 @@ public class ConfigManager : CoreConfig
     public static bool TextBoxTrimWhiteSpaceCharacters { get; private set; } = true;
     public static bool TextBoxRemoveNewlines { get; private set; } = false;
     public static bool TextBoxIsReadOnly { get; set; } = true;
+    public static bool TextBoxApplyDropShadowEffect { get; set; } = true;
 
     #endregion
 
@@ -549,6 +551,22 @@ public class ConfigManager : CoreConfig
             bool.Parse(ConfigurationManager.AppSettings.Get("TextBoxRemoveNewlines")!),
             TextBoxRemoveNewlines, "TextBoxRemoveNewlines");
 
+        WindowsUtils.Try(() => TextBoxApplyDropShadowEffect =
+            bool.Parse(ConfigurationManager.AppSettings.Get("TextBoxApplyDropShadowEffect")!),
+            TextBoxApplyDropShadowEffect, "TextBoxApplyDropShadowEffect");
+
+        if (TextBoxApplyDropShadowEffect)
+        {
+            DropShadowEffect dropShadowEffect = new() { Direction = 320, BlurRadius = 4, ShadowDepth = 1.3, Opacity = 0.8, RenderingBias = RenderingBias.Quality };
+            dropShadowEffect.Freeze();
+            mainWindow.MainTextBox.Effect = dropShadowEffect;
+        }
+
+        else
+        {
+            mainWindow.MainTextBox.Effect = null;
+        }
+
         WindowsUtils.Try(() => MainWindowDynamicHeight = bool.Parse(ConfigurationManager.AppSettings
             .Get("MainWindowDynamicHeight")!), MainWindowDynamicHeight, "MainWindowDynamicHeight");
         WindowsUtils.Try(() => MainWindowDynamicWidth = bool.Parse(ConfigurationManager.AppSettings
@@ -711,6 +729,7 @@ public class ConfigManager : CoreConfig
         preferenceWindow.TextBoxIsReadOnlyCheckBox.IsChecked = TextBoxIsReadOnly;
         preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked = TextBoxTrimWhiteSpaceCharacters;
         preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked = TextBoxRemoveNewlines;
+        preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked = TextBoxApplyDropShadowEffect;
 
         preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
         preferenceWindow.MainWindowFontComboBox.SelectedIndex = s_japaneseFonts.FindIndex(f =>
@@ -844,6 +863,9 @@ public class ConfigManager : CoreConfig
             preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["TextBoxRemoveNewlines"].Value =
             preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings["TextBoxApplyDropShadowEffect"].Value =
+            preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked.ToString();
+        
 
         config.AppSettings.Settings["MainWindowTextColor"].Value =
             preferenceWindow.TextboxTextColorButton.Tag.ToString();
