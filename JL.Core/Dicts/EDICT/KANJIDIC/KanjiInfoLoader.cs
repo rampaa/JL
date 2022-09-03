@@ -114,7 +114,7 @@ public static class KanjiInfoLoader
                         // English definition
                         if (!xmlReader.HasAttributes)
                         {
-                            entry.Meanings!.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+                            entry.Definitions!.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
                         }
                         else
                         {
@@ -156,7 +156,7 @@ public static class KanjiInfoLoader
         }
 
         entry.Nanori = Utils.TrimStringList(entry.Nanori!);
-        entry.Meanings = Utils.TrimStringList(entry.Meanings!);
+        entry.Definitions = Utils.TrimStringList(entry.Definitions!);
         entry.OnReadings = Utils.TrimStringList(entry.OnReadings!);
         entry.KunReadings = Utils.TrimStringList(entry.KunReadings!);
 

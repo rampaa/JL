@@ -1,6 +1,10 @@
-﻿namespace JL.Core.Dicts.EDICT.JMdict;
+﻿using System.Text;
+using JL.Core.Dicts.Options;
+using JL.Core.Frequency;
 
-public class JMdictResult : IResult
+namespace JL.Core.Dicts.EDICT.JMdict;
+
+public class JMdictResult : IHasFrequency
 {
     public int Id { get; set; }
     public List<string>? AlternativeSpellings { get; set; }
@@ -44,4 +48,217 @@ public class JMdictResult : IResult
         Antonyms = new List<List<string>?>();
         LoanwordEtymology = new List<List<LSource>?>();
     }
+
+    public string BuildFormattedDefinition(DictOptions? options)
+    {
+        bool newlines = options is { NewlineBetweenDefinitions.Value: true };
+
+        string separator = newlines ? "\n" : "";
+
+        int count = 1;
+
+        StringBuilder defResult = new();
+
+        int definitionCount = Definitions.Count;
+
+        for (int i = 0; i < definitionCount; i++)
+        {
+            if (newlines)
+                defResult.Append($"({count}) ");
+
+            if ((options?.WordClassInfo?.Value ?? true) && (WordClasses?[i]?.Any() ?? false))
+            {
+                defResult.Append('(');
+                defResult.Append(string.Join(", ", WordClasses[i]!));
+                defResult.Append(") ");
+            }
+
+            if (!newlines)
+                defResult.Append($"({count}) ");
+
+            if ((options?.DialectInfo?.Value ?? true) && (Dialects?[i]?.Any() ?? false))
+            {
+                defResult.Append('(');
+                defResult.Append(string.Join(", ", Dialects[i]!));
+                defResult.Append(") ");
+            }
+
+            if ((options?.ExtraDefinitionInfo?.Value ?? true)
+                && (DefinitionInfo?.Any() ?? false)
+                && DefinitionInfo[i] != null)
+            {
+                defResult.Append('(');
+                defResult.Append(DefinitionInfo[i]);
+                defResult.Append(") ");
+            }
+
+            if ((options?.MiscInfo?.Value ?? true) && (MiscList?[i]?.Any() ?? false))
+            {
+                defResult.Append('(');
+                defResult.Append(string.Join(", ", MiscList[i]!));
+                defResult.Append(") ");
+            }
+
+            if ((options?.WordTypeInfo?.Value ?? true) && (FieldList?[i]?.Any() ?? false))
+            {
+                defResult.Append('(');
+                defResult.Append(string.Join(", ", FieldList[i]!));
+                defResult.Append(") ");
+            }
+
+            defResult.Append(string.Join("; ", Definitions[i]) + " ");
+
+            if ((options?.SpellingRestrictionInfo?.Value ?? true)
+                && ((RRestrictions?[i]?.Any() ?? false)
+                    || (KRestrictions?[i]?.Any() ?? false)))
+            {
+                defResult.Append("(only applies to ");
+
+                if (KRestrictions?[i]?.Any() ?? false)
+                {
+                    defResult.Append(string.Join("; ", KRestrictions[i]!));
+                }
+
+                if (RRestrictions?[i]?.Any() ?? false)
+                {
+                    if (KRestrictions?[i]?.Any() ?? false)
+                        defResult.Append("; ");
+
+                    defResult.Append(string.Join("; ", RRestrictions[i]!));
+                }
+
+                defResult.Append(") ");
+            }
+
+            if ((options?.LoanwordEtymology?.Value ?? true) && (LoanwordEtymology?[i]?.Any() ?? false))
+            {
+                defResult.Append('(');
+
+                List<LSource> lSources = LoanwordEtymology[i]!;
+
+                int lSourceCount = lSources.Count;
+                for (int j = 0; j < lSourceCount; j++)
+                {
+                    if (lSources[j].IsWasei)
+                        defResult.Append("Wasei ");
+
+                    defResult.Append(lSources[j].Language);
+
+                    if (lSources[j].OriginalWord != null)
+                    {
+                        defResult.Append(": ");
+                        defResult.Append(lSources[j].OriginalWord);
+                    }
+
+                    if (j + 1 < lSourceCount)
+                    {
+                        defResult.Append(lSources[j].IsPart ? " + " : ", ");
+                    }
+                }
+
+                defResult.Append(") ");
+            }
+
+            if ((options?.RelatedTerm?.Value ?? false) && (RelatedTerms?[i]?.Any() ?? false))
+            {
+                defResult.Append("(related terms: ");
+                defResult.Append(string.Join(", ", RelatedTerms[i]!));
+                defResult.Append(") ");
+            }
+
+            if ((options?.Antonym?.Value ?? false) && (Antonyms?[i]?.Any() ?? false))
+            {
+                defResult.Append("(antonyms: ");
+                defResult.Append(string.Join(", ", Antonyms[i]!));
+                defResult.Append(") ");
+            }
+
+            defResult.Append(separator);
+
+            ++count;
+        }
+
+        return defResult.ToString().TrimEnd(' ', '\n');
+    }
+
+    public int GetFrequency(Freq freq)
+    {
+        int frequency = int.MaxValue;
+        if (freq.Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(PrimarySpelling),
+                out List<FrequencyRecord>? freqResults))
+        {
+            int freqResultsCount = freqResults.Count;
+            for (int i = 0; i < freqResultsCount; i++)
+            {
+                FrequencyRecord freqResult = freqResults[i];
+
+                if ((Readings != null && Readings.Contains(freqResult.Spelling))
+                    || (Readings == null && PrimarySpelling == freqResult.Spelling))
+                {
+                    if (frequency > freqResult.Frequency)
+                    {
+                        frequency = freqResult.Frequency;
+                    }
+                }
+            }
+
+            if (frequency == int.MaxValue && AlternativeSpellings != null)
+            {
+                int alternativeSpellingsCount = AlternativeSpellings.Count;
+                for (int i = 0; i < alternativeSpellingsCount; i++)
+                {
+                    if (freq.Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(AlternativeSpellings[i]),
+                            out List<FrequencyRecord>? alternativeSpellingFreqResults))
+                    {
+                        int alternativeSpellingFreqResultsCount = alternativeSpellingFreqResults.Count;
+                        for (int j = 0; j < alternativeSpellingFreqResultsCount; j++)
+                        {
+                            FrequencyRecord alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
+
+                            if (Readings != null
+                                && Readings.Contains(alternativeSpellingFreqResult.Spelling))
+                            {
+                                if (frequency > alternativeSpellingFreqResult.Frequency)
+                                {
+                                    frequency = alternativeSpellingFreqResult.Frequency;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        else if (Readings != null)
+        {
+            int readingCount = Readings.Count;
+            for (int i = 0; i < readingCount; i++)
+            {
+                string reading = Readings[i];
+
+                if (freq.Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(reading),
+                        out List<FrequencyRecord>? readingFreqResults))
+                {
+                    int readingFreqResultsCount = readingFreqResults.Count;
+                    for (int j = 0; j < readingFreqResultsCount; j++)
+                    {
+                        FrequencyRecord readingFreqResult = readingFreqResults[j];
+
+                        if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading)
+                            || (AlternativeSpellings != null
+                                && AlternativeSpellings.Contains(readingFreqResult.Spelling)))
+                        {
+                            if (frequency > readingFreqResult.Frequency)
+                            {
+                                frequency = readingFreqResult.Frequency;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return frequency;
+    }
+
 }

@@ -14,7 +14,7 @@
                 VerticalAlignment="Bottom" Width="85" Click="SaveButton_Click" FontSize="16" Height="35" />
 
         <TabControl TabStripPlacement="Top" VerticalContentAlignment="Stretch" Margin="0,0,0,65"
-                    Background="#F3000000" SelectionChanged="TabControl_OnSelectionChanged" Name="TabControl">
+                    Background="#F3000000"  Name="TabControl">
             <TabItem Header="General">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
                     <StackPanel Background="Black" Margin="20,10,20,10">
@@ -503,7 +503,7 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-            <TabItem Header="Anki">
+            <TabItem Name="AnkiTabItem" Header="Anki" Height="33" MouseUp="TabItem_PreviewMouseLeftButtonDown">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
                     <StackPanel Background="Black" Margin="20,10,20,10">
                         <StackPanel.Resources>
@@ -539,36 +539,149 @@
                                 <CheckBox x:Name="AllowDuplicateCardsCheckBox"  HorizontalAlignment="Right" />
                             </DockPanel>
 
-                            <Grid Margin="10,10,10,10">
-                                <StackPanel Margin="10">
-                                    <TextBlock HorizontalAlignment="Center" Text="Deck:"
+                            <TabControl Margin="0,10,0,0" Background="Black">
+                                <TabControl.Resources>
+                                    <Style TargetType="{x:Type TabPanel}">
+                                        <Setter Property="HorizontalAlignment" Value="Center" />
+                                    </Style>
+                                </TabControl.Resources>
+                                <TabItem Header="Word" Foreground="White">
+                                    <StackPanel>
+                                        <Grid Margin="10,10,10,10">
+                                            <StackPanel Margin="10">
+                                                <TextBlock HorizontalAlignment="Center" Text="Deck:"
                                                TextWrapping="Wrap" />
-                                    <ComboBox x:Name="MiningSetupComboBoxDeckNames" Width="200" Margin="0,10,0,0" />
-                                    <Button x:Name="MiningSetupButtonRefresh" Click="MiningSetupButtonRefresh_Click"
+                                                <ComboBox x:Name="WordMiningSetupComboBoxDeckNames" Width="300" Margin="0,10,0,0" />
+                                                <Button x:Name="WordMiningSetupButtonRefresh" Click="MiningSetupButtonRefresh_Click"
                                             Width="100"
                                             Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
-                                        Refresh
-                                    </Button>
-                                    <TextBlock HorizontalAlignment="Center" Text="Model:"
+                                                    Refresh
+                                                </Button>
+                                                <TextBlock HorizontalAlignment="Center" Text="Model:"
                                                TextWrapping="Wrap" />
-                                    <ComboBox x:Name="MiningSetupComboBoxModelNames" Width="200" Margin="0,10,0,0" />
+                                                <ComboBox x:Name="WordMiningSetupComboBoxModelNames" Width="300" Margin="0,10,0,0" />
 
-                                    <Separator Height="15" />
+                                                <Separator Height="15" />
 
-                                    <Button x:Name="MiningSetupButtonGetFields"
-                                            Click="MiningSetupButtonGetFields_Click"
+                                                <Button x:Name="WordMiningSetupButtonGetFields"
+                                            Click="WordMiningSetupButtonGetFields_Click"
                                             Width="150"
                                             Content="Get Fields" FontSize="16" Height="35" />
-                                    <StackPanel x:Name="MiningSetupStackPanelFields" Margin="10" />
+                                                <StackPanel x:Name="WordMiningSetupStackPanelFields" Margin="10" />
 
-                                    <Separator Height="15" />
+                                                <Separator Height="15" />
 
-                                    <TextBlock HorizontalAlignment="Center" Text="Tags:"
+                                                <TextBlock HorizontalAlignment="Center" Text="Tags:"
                                                TextWrapping="Wrap" />
-                                    <TextBox x:Name="TagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
+                                                <TextBox x:Name="WordTagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
                                              Cursor="Help" ToolTip="Separated by a comma" />
-                                </StackPanel>
-                            </Grid>
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </TabItem>
+                                <TabItem Header="Kanji">
+                                    <StackPanel>
+                                        <Grid Margin="10,10,10,10">
+                                            <StackPanel Margin="10">
+                                                <TextBlock HorizontalAlignment="Center" Text="Deck:"
+                                               TextWrapping="Wrap" />
+                                                <ComboBox x:Name="KanjiMiningSetupComboBoxDeckNames" Width="200" Margin="0,10,0,0" />
+                                                <Button x:Name="KanjiMiningSetupButtonRefresh" Click="MiningSetupButtonRefresh_Click"
+                                            Width="100"
+                                            Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
+                                                    Refresh
+                                                </Button>
+                                                <TextBlock HorizontalAlignment="Center" Text="Model:"
+                                               TextWrapping="Wrap" />
+                                                <ComboBox x:Name="KanjiMiningSetupComboBoxModelNames" Width="200" Margin="0,10,0,0" />
+
+                                                <Separator Height="15" />
+
+                                                <Button x:Name="KanjiMiningSetupButtonGetFields"
+                                            Click="KanjiMiningSetupButtonGetFields_Click"
+                                            Width="150"
+                                            Content="Get Fields" FontSize="16" Height="35" />
+                                                <StackPanel x:Name="KanjiMiningSetupStackPanelFields" Margin="10" />
+
+                                                <Separator Height="15" />
+
+                                                <TextBlock HorizontalAlignment="Center" Text="Tags:"
+                                               TextWrapping="Wrap" />
+                                                <TextBox x:Name="KanjiTagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
+                                             Cursor="Help" ToolTip="Separated by a comma" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </TabItem>
+                                <TabItem Header="Name">
+                                    <StackPanel>
+                                        <Grid Margin="10,10,10,10">
+                                            <StackPanel Margin="10">
+                                                <TextBlock HorizontalAlignment="Center" Text="Deck:"
+                                               TextWrapping="Wrap" />
+                                                <ComboBox x:Name="NameMiningSetupComboBoxDeckNames" Width="200" Margin="0,10,0,0" />
+                                                <Button x:Name="NameMiningSetupButtonRefresh" Click="MiningSetupButtonRefresh_Click"
+                                            Width="100"
+                                            Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
+                                                    Refresh
+                                                </Button>
+                                                <TextBlock HorizontalAlignment="Center" Text="Model:"
+                                               TextWrapping="Wrap" />
+                                                <ComboBox x:Name="NameMiningSetupComboBoxModelNames" Width="200" Margin="0,10,0,0" />
+
+                                                <Separator Height="15" />
+
+                                                <Button x:Name="NameMiningSetupButtonGetFields"
+                                            Click="NameMiningSetupButtonGetFields_Click"
+                                            Width="150"
+                                            Content="Get Fields" FontSize="16" Height="35" />
+                                                <StackPanel x:Name="NameMiningSetupStackPanelFields" Margin="10" />
+
+                                                <Separator Height="15" />
+
+                                                <TextBlock HorizontalAlignment="Center" Text="Tags:"
+                                               TextWrapping="Wrap" />
+                                                <TextBox x:Name="NameTagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
+                                             Cursor="Help" ToolTip="Separated by a comma" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </TabItem>
+                                <TabItem Header="Other">
+                                    <StackPanel>
+                                        <Grid Margin="10,10,10,10">
+                                            <StackPanel Margin="10">
+                                                <TextBlock HorizontalAlignment="Center" Text="Deck:"
+                                               TextWrapping="Wrap" />
+                                                <ComboBox x:Name="OtherMiningSetupComboBoxDeckNames" Width="200" Margin="0,10,0,0" />
+                                                <Button x:Name="OtherMiningSetupButtonRefresh" Click="MiningSetupButtonRefresh_Click"
+                                            Width="100"
+                                            Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
+                                                    Refresh
+                                                </Button>
+                                                <TextBlock HorizontalAlignment="Center" Text="Model:"
+                                               TextWrapping="Wrap" />
+                                                <ComboBox x:Name="OtherMiningSetupComboBoxModelNames" Width="200" Margin="0,10,0,0" />
+
+                                                <Separator Height="15" />
+
+                                                <Button x:Name="OtherMiningSetupButtonGetFields"
+                                            Click="OtherMiningSetupButtonGetFields_Click"
+                                            Width="150"
+                                            Content="Get Fields" FontSize="16" Height="35" />
+                                                <StackPanel x:Name="OtherMiningSetupStackPanelFields" Margin="10" />
+
+                                                <Separator Height="15" />
+
+                                                <TextBlock HorizontalAlignment="Center" Text="Tags:"
+                                               TextWrapping="Wrap" />
+                                                <TextBox x:Name="OtherTagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
+                                             Cursor="Help" ToolTip="Separated by a comma" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </TabItem>
+                            </TabControl>
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>

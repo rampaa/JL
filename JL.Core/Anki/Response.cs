@@ -2,7 +2,7 @@
 
 namespace JL.Core.Anki;
 
-public readonly struct Response
+public class Response
 {
     // result can be:
     //   a number

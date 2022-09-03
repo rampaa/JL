@@ -13,19 +13,19 @@ public static class AnkiConnect
         return await Send(req).ConfigureAwait(false);
     }
 
-    public static async Task<Response?> GetDeckNames()
+    public static async Task<Response?> GetDeckNamesResponse()
     {
         Request req = new("deckNames", 6);
         return await Send(req).ConfigureAwait(false);
     }
 
-    public static async Task<Response?> GetModelNames()
+    public static async Task<Response?> GetModelNamesResponse()
     {
         Request req = new("modelNames", 6);
         return await Send(req).ConfigureAwait(false);
     }
 
-    public static async Task<Response?> GetModelFieldNames(string modelName)
+    public static async Task<Response?> GetModelFieldNamesResponse(string modelName)
     {
         Request req = new("modelFieldNames", 6, new Dictionary<string, object> { { "modelName", modelName } });
         return await Send(req).ConfigureAwait(false);
@@ -51,16 +51,16 @@ public static class AnkiConnect
             // AnkiConnect doesn't like null values
             StringContent payload = new(JsonSerializer.Serialize(req,
                 new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }));
-            Utils.Logger.Information("Sending: {Payload}", await payload.ReadAsStringAsync().ConfigureAwait(false));
+            //Utils.Logger.Information("Sending: {Payload}", await payload.ReadAsStringAsync().ConfigureAwait(false));
 
             HttpResponseMessage postResponse = await Storage.Client
                 .PostAsync(Storage.Frontend.CoreConfig.AnkiConnectUri, payload)
                 .ConfigureAwait(false);
 
-            Response json = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);
-            Utils.Logger.Information("json result: {JsonResult}", json.Result ?? "null");
+            Response? json = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);
+            Utils.Logger.Information("json result: {JsonResult}", json?.Result ?? "null");
 
-            if (json.Error == null)
+            if (json?.Error == null)
                 return json;
 
             Storage.Frontend.Alert(AlertLevel.Error, json.Error.ToString()!);

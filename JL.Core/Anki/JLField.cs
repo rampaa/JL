@@ -4,22 +4,31 @@ namespace JL.Core.Anki;
 
 public enum JLField
 {
+    // Shared
     Nothing,
-    [Description("Found Spelling")] FoundSpelling,
-    Readings, // separate on,kun,nanori from this maybe?
+    [Description("Primary Spelling")] PrimarySpelling,
+    Readings,
     Definitions,
-    [Description("Found Form")] FoundForm,
-    [Description("Deconjugated Found Form")] DeconjugatedFoundForm,
-    Context,
-    Audio,
-    [Description("Edict ID")] EdictId,
-    [Description("Time (Local)")] TimeLocal,
     [Description("Alternative Spellings")] AlternativeSpellings,
-    Frequency,
+    [Description("Dictionary Name")] DictionaryName,
+    Audio,
+    Sentence,
+    [Description("Clipboard Text")] ClipboardText,
+    [Description("Matched Text")] MatchedText,
+    [Description("EDICT ID")] EdictId,
+    [Description("Local Time")] LocalTime,
+    Frequencies,
+    // Screenshot? Image? Picture?
+
+    // Word dictionaries
+    [Description("Deconjugated Matched Text")] DeconjugatedMatchedText,
+    [Description("Deconjugation Process")] DeconjugationProcess,
+
+    //Kanji dictionaries
+    [Description("Kun Readings")] KunReadings,
+    [Description("On Readings")] OnReadings,
+    Nanori,
     [Description("Stroke Count")] StrokeCount,
-    Grade,
-    Composition,
-    [Description("Dict Type")] DictType,
-    Process,
-    // Source
+    [Description("Kanji Grade")] KanjiGrade,
+    [Description("Kanji Composition")] KanjiComposition,
 }

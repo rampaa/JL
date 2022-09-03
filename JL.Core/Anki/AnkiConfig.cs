@@ -22,27 +22,30 @@ public class AnkiConfig
         Tags = tags;
     }
 
-    public static async Task CreateDefaultAnkiConfig()
-    {
-        await WriteAnkiConfig(new AnkiConfig(
-                "JLDeck",
-                "Japanese JL-Basic",
-                new Dictionary<string, JLField>
-                {
-                    { "Edict ID", JLField.EdictId },
-                    { "Expression", JLField.FoundSpelling },
-                    { "Reading", JLField.Readings },
-                    { "Gloss", JLField.Definitions },
-                    { "Sentence", JLField.Context },
-                    { "Audio", JLField.Audio },
-                    { "Time", JLField.TimeLocal },
-                },
-                new[] { "JL" }
-            )
-        ).ConfigureAwait(false);
-    }
+    //public static async Task CreateDefaultAnkiConfig()
+    //{
+    //    Dictionary<string, AnkiConfig> defaultAnkiConfigDict = new();
+    //    AnkiConfig wordAnkiConfig = new(
+    //            "JLDeck",
+    //            "Japanese JL-Basic",
+    //            new Dictionary<string, JLField>
+    //            {
+    //                { "Edict ID", JLField.EdictId },
+    //                { "Expression", JLField.FoundSpelling },
+    //                { "Reading", JLField.Readings },
+    //                { "Gloss", JLField.Definitions },
+    //                { "Sentence", JLField.Context },
+    //                { "Audio", JLField.Audio },
+    //                { "Time", JLField.TimeLocal },
+    //            },
+    //            new[] { "JL", "Word" }
+    //        );
 
-    public static async Task<bool> WriteAnkiConfig(AnkiConfig ankiConfig)
+    //    await WriteAnkiConfig(defaultAnkiConfigDict
+    //    ).ConfigureAwait(false);
+    //}
+
+    public static async Task<bool> WriteAnkiConfig(Dictionary<MineType, AnkiConfig> ankiConfig)
     {
         try
         {
@@ -67,13 +70,13 @@ public class AnkiConfig
         }
     }
 
-    public static async Task<AnkiConfig?> ReadAnkiConfig()
+    public static async Task<Dictionary<MineType, AnkiConfig>?> ReadAnkiConfig()
     {
         if (File.Exists(Path.Join(Storage.ConfigPath, "AnkiConfig.json")))
         {
             try
             {
-                return JsonSerializer.Deserialize<AnkiConfig>(
+                return JsonSerializer.Deserialize<Dictionary<MineType, AnkiConfig>>(
                     await File.ReadAllTextAsync(Path.Join(Storage.ConfigPath, "AnkiConfig.json"))
                         .ConfigureAwait(false),
                     new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } });

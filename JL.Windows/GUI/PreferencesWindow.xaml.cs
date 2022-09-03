@@ -1,5 +1,4 @@
 using System.Text;
-using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -57,27 +56,17 @@ public partial class PreferencesWindow : Window
         WindowsUtils.HideWindow(this);
     }
 
-    private async void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async void TabItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        var itemTab = (TabItem?)TabControl.SelectedItem;
-
-        if (itemTab == null)
-            return;
-
-        switch (itemTab.Header)
+        if (e.Source.Equals(AnkiTabItem))
         {
-            case "Anki":
-                if (ConfigManager.AnkiIntegration && !SetAnkiConfig)
-                {
-                    await SetPreviousMiningConfig();
+            if (ConfigManager.AnkiIntegration && !SetAnkiConfig)
+            {
+                await SetPreviousMiningConfig();
+                await PopulateDeckAndModelNames();
 
-                    if (MiningSetupComboBoxDeckNames.SelectedItem == null)
-                        await PopulateDeckAndModelNames().ConfigureAwait(false);
-
-                    SetAnkiConfig = true;
-                }
-
-                break;
+                SetAnkiConfig = true;
+            }
         }
     }
 
@@ -96,17 +85,40 @@ public partial class PreferencesWindow : Window
     {
         try
         {
-            AnkiConfig? ankiConfig = await AnkiConfig.ReadAnkiConfig();
+            Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig();
 
-            if (ankiConfig == null)
+            if (ankiConfigDict == null)
                 return;
 
-            MiningSetupComboBoxDeckNames.ItemsSource = new List<string> { ankiConfig.DeckName };
-            MiningSetupComboBoxDeckNames.SelectedIndex = 0;
-            MiningSetupComboBoxModelNames.ItemsSource = new List<string> { ankiConfig.ModelName };
-            MiningSetupComboBoxModelNames.SelectedIndex = 0;
-            TagsTextBox.Text = string.Join(",", ankiConfig.Tags);
-            CreateFieldElements(ankiConfig.Fields);
+            AnkiConfig? wordAnkiConfig = ankiConfigDict.GetValueOrDefault(MineType.Word);
+            AnkiConfig? kanjiAnkiConfig = ankiConfigDict.GetValueOrDefault(MineType.Kanji);
+            AnkiConfig? nameAnkiConfig = ankiConfigDict.GetValueOrDefault(MineType.Name);
+            AnkiConfig? otherAnkiConfig = ankiConfigDict.GetValueOrDefault(MineType.Other);
+
+
+            if (wordAnkiConfig != null)
+            {
+                SetPreviousMiningConfig(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordTagsTextBox, wordAnkiConfig);
+                CreateFieldElements(wordAnkiConfig.Fields, Storage.JLFieldsForWordDicts, WordMiningSetupStackPanelFields);
+            }
+
+            if (kanjiAnkiConfig != null)
+            {
+                SetPreviousMiningConfig(KanjiMiningSetupComboBoxDeckNames, KanjiMiningSetupComboBoxModelNames, KanjiTagsTextBox, kanjiAnkiConfig);
+                CreateFieldElements(kanjiAnkiConfig.Fields, Storage.JLFieldsForKanjiDicts, KanjiMiningSetupStackPanelFields);
+            }
+
+            if (nameAnkiConfig != null)
+            {
+                SetPreviousMiningConfig(NameMiningSetupComboBoxDeckNames, NameMiningSetupComboBoxModelNames, NameTagsTextBox, nameAnkiConfig);
+                CreateFieldElements(nameAnkiConfig.Fields, Storage.JLFieldsForNameDicts, NameMiningSetupStackPanelFields);
+            }
+
+            if (otherAnkiConfig != null)
+            {
+                SetPreviousMiningConfig(OtherMiningSetupComboBoxDeckNames, OtherMiningSetupComboBoxModelNames, OtherTagsTextBox, otherAnkiConfig);
+                CreateFieldElements(otherAnkiConfig.Fields, Enum.GetValues<JLField>().ToList(), OtherMiningSetupStackPanelFields);
+            }
         }
         catch (Exception e)
         {
@@ -115,40 +127,47 @@ public partial class PreferencesWindow : Window
         }
     }
 
+    private static void SetPreviousMiningConfig(ComboBox deckNamesComboBox, ComboBox modelNamesComboBox, TextBox tagTextBox, AnkiConfig ankiConfig)
+    {
+        deckNamesComboBox.ItemsSource = new List<string> { ankiConfig.DeckName };
+        deckNamesComboBox.SelectedItem = ankiConfig.DeckName;
+        modelNamesComboBox.ItemsSource = new List<string> { ankiConfig.ModelName };
+        modelNamesComboBox.SelectedItem = ankiConfig.ModelName;
+        tagTextBox.Text = string.Join(",", ankiConfig.Tags);
+    }
+
     private async Task PopulateDeckAndModelNames()
     {
-        Response? getNameResponse = await AnkiConnect.GetDeckNames();
-        Response? getModelResponse = await AnkiConnect.GetModelNames();
+        List<string>? deckNames = await AnkiUtils.GetDeckNames();
+        List<string>? modelNames = await AnkiUtils.GetModelNames();
 
-        if (getNameResponse != null && getModelResponse != null)
+        if (deckNames != null && modelNames != null)
         {
-            try
-            {
-                List<string> deckNamesList =
-                    JsonSerializer.Deserialize<List<string>>(getNameResponse.Value.Result?.ToString()!)!;
+            WordMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
+            KanjiMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
+            NameMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
+            OtherMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
 
-                MiningSetupComboBoxDeckNames.ItemsSource = deckNamesList;
-
-                List<string> modelNamesList =
-                    JsonSerializer.Deserialize<List<string>>(getModelResponse.Value.Result?.ToString()!)!;
-                MiningSetupComboBoxModelNames.ItemsSource = modelNamesList;
-            }
-
-            catch
-            {
-                WindowsUtils.Alert(AlertLevel.Error, "Error getting deck and model names form Anki");
-                Utils.Logger.Error("Error getting deck and model names from Anki");
-                MiningSetupComboBoxDeckNames.ItemsSource = "";
-                MiningSetupComboBoxModelNames.ItemsSource = "";
-            }
+            WordMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
+            KanjiMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
+            NameMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
+            OtherMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
         }
 
         else
         {
-            WindowsUtils.Alert(AlertLevel.Error, "Error getting deck and model names from Anki");
+            WindowsUtils.Alert(AlertLevel.Error, "Error getting deck and model names form Anki");
             Utils.Logger.Error("Error getting deck and model names from Anki");
-            MiningSetupComboBoxDeckNames.ItemsSource = "";
-            MiningSetupComboBoxModelNames.ItemsSource = "";
+
+            //WordMiningSetupComboBoxDeckNames.ItemsSource = "";
+            //KanjiMiningSetupComboBoxDeckNames.ItemsSource = "";
+            //NameMiningSetupComboBoxDeckNames.ItemsSource = "";
+            //OtherMiningSetupComboBoxDeckNames.ItemsSource = "";
+
+            //WordMiningSetupComboBoxModelNames.ItemsSource = "";
+            //KanjiMiningSetupComboBoxModelNames.ItemsSource = "";
+            //NameMiningSetupComboBoxModelNames.ItemsSource = "";
+            //OtherMiningSetupComboBoxModelNames.ItemsSource = "";
         }
     }
 
@@ -157,34 +176,52 @@ public partial class PreferencesWindow : Window
         await PopulateDeckAndModelNames().ConfigureAwait(false);
     }
 
-    private async void MiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
+    private static async Task GetFields(ComboBox modelNamesComboBox, StackPanel miningStackPanel, List<JLField> fieldList)
     {
-        try
+        string modelName = modelNamesComboBox.SelectionBoxItem.ToString()!;
+
+        List<string>? fieldNames = await AnkiUtils.GetFieldNames(modelName);
+
+        if (fieldNames != null)
         {
-            string modelName = MiningSetupComboBoxModelNames.SelectionBoxItem.ToString()!;
-
-            List<string> fieldNames =
-                JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelFieldNames(modelName))?.Result?
-                    .ToString()!)!;
-
             Dictionary<string, JLField> fields =
                 fieldNames.ToDictionary(fieldName => fieldName, _ => JLField.Nothing);
 
-            CreateFieldElements(fields);
+            CreateFieldElements(fields, fieldList, miningStackPanel);
         }
-        catch (Exception exception)
+
+        else
         {
             WindowsUtils.Alert(AlertLevel.Error, "Error getting fields from AnkiConnect");
-            Utils.Logger.Error(exception, "Error getting fields from AnkiConnect");
+            Utils.Logger.Error("Error getting fields from AnkiConnect");
         }
     }
 
-    private void CreateFieldElements(Dictionary<string, JLField> fields)
+    private async void WordMiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
     {
-        MiningSetupStackPanelFields.Children.Clear();
+        await GetFields(WordMiningSetupComboBoxModelNames, WordMiningSetupStackPanelFields, Storage.JLFieldsForWordDicts);
+    }
 
-        IEnumerable<JLField> jlFieldNames = Enum.GetValues(typeof(JLField)).Cast<JLField>();
-        string[] descriptions = jlFieldNames
+    private async void KanjiMiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
+    {
+        await GetFields(KanjiMiningSetupComboBoxModelNames, KanjiMiningSetupStackPanelFields, Storage.JLFieldsForKanjiDicts);
+    }
+
+    private async void NameMiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
+    {
+        await GetFields(NameMiningSetupComboBoxModelNames, NameMiningSetupStackPanelFields, Storage.JLFieldsForNameDicts);
+    }
+
+    private async void OtherMiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
+    {
+        await GetFields(OtherMiningSetupComboBoxModelNames, OtherMiningSetupStackPanelFields, Storage.AllJLFields);
+    }
+
+    private static void CreateFieldElements(Dictionary<string, JLField> fields, List<JLField> fieldList, StackPanel fieldStackPanel)
+    {
+        fieldStackPanel.Children.Clear();
+
+        string[] descriptions = fieldList
             .Select(jlFieldName => jlFieldName.GetDescription() ?? jlFieldName.ToString()).ToArray();
 
         try
@@ -201,7 +238,7 @@ public partial class PreferencesWindow : Window
 
                 stackPanel.Children.Add(textBlockFieldName);
                 stackPanel.Children.Add(comboBoxJLFields);
-                MiningSetupStackPanelFields.Children.Add(stackPanel);
+                fieldStackPanel.Children.Add(stackPanel);
             }
         }
         catch (Exception exception)
@@ -211,61 +248,83 @@ public partial class PreferencesWindow : Window
         }
     }
 
-    public async Task SaveMiningSetup()
+    private static AnkiConfig? GetAnkiConfigFromPreferences(ComboBox deckNamesComboBox, ComboBox modelNamesComboBox, StackPanel miningStackPanel, TextBox tagsTextBox, List<JLField> jlFieldList)
     {
         try
         {
-            if (!ConfigManager.AnkiIntegration)
-                return;
-
-            string deckName = MiningSetupComboBoxDeckNames.SelectionBoxItem.ToString()!;
-            string modelName = MiningSetupComboBoxModelNames.SelectionBoxItem.ToString()!;
+            string deckName = deckNamesComboBox.SelectionBoxItem.ToString()!;
+            string modelName = modelNamesComboBox.SelectionBoxItem.ToString()!;
 
             Dictionary<string, JLField> dict = new();
-            foreach (StackPanel stackPanel in MiningSetupStackPanelFields.Children)
+            foreach (StackPanel stackPanel in miningStackPanel.Children)
             {
                 var textBlock = (TextBlock)stackPanel.Children[0];
                 var comboBox = (ComboBox)stackPanel.Children[1];
 
                 string selectedDescription = comboBox.SelectionBoxItem.ToString()!;
-
-                IEnumerable<JLField> jlFieldNames = Enum.GetValues(typeof(JLField)).Cast<JLField>();
-                JLField result = jlFieldNames.FirstOrDefault(jlFieldName =>
-                        (jlFieldName.GetDescription() ?? jlFieldName.ToString()) == selectedDescription,
-                    JLField.Nothing);
+                JLField result = jlFieldList.FirstOrDefault(jlFieldName =>
+                        (jlFieldName.GetDescription() ?? jlFieldName.ToString()) == selectedDescription, JLField.Nothing);
 
                 dict.Add(textBlock.Text, result);
             }
 
             Dictionary<string, JLField> fields = dict;
 
-            string rawTags = TagsTextBox.Text;
+            string rawTags = tagsTextBox.Text;
             string[] tags = string.IsNullOrEmpty(rawTags)
                 ? Array.Empty<string>()
                 : rawTags.Split(',').Select(s => s.Trim()).ToArray();
 
-            if (MiningSetupComboBoxDeckNames.SelectedItem == null ||
-                MiningSetupComboBoxModelNames.SelectedItem == null)
+            if (deckNamesComboBox.SelectedItem == null ||
+                modelNamesComboBox.SelectedItem == null)
             {
                 WindowsUtils.Alert(AlertLevel.Error, "Save failed: Incomplete Anki config");
                 Utils.Logger.Error("Save failed: Incomplete Anki config");
-                return;
+                return null;
             }
 
-            AnkiConfig ankiConfig = new(deckName, modelName, fields, tags);
-
-            await AnkiConfig.WriteAnkiConfig(ankiConfig).ConfigureAwait(false);
-
-            //if (await AnkiConfig.WriteAnkiConfig(ankiConfig).ConfigureAwait(false))
-            //{
-            //    WindowsUtils.Alert(AlertLevel.Success, "Saved AnkiConfig");
-            //    Utils.Logger.Information("Saved AnkiConfig");
-            //}
+            return new AnkiConfig(deckName, modelName, fields, tags);
         }
         catch (Exception exception)
         {
             WindowsUtils.Alert(AlertLevel.Error, "Error saving AnkiConfig");
             Utils.Logger.Error(exception, "Error saving AnkiConfig");
+            return null;
+        }
+    }
+
+    public async Task SaveMiningSetup()
+    {
+        if (!ConfigManager.AnkiIntegration)
+            return;
+
+        Dictionary<MineType, AnkiConfig> ankiConfigDict = new();
+
+        AnkiConfig? ankiConfig = GetAnkiConfigFromPreferences(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordMiningSetupStackPanelFields, WordTagsTextBox, Storage.JLFieldsForWordDicts);
+        if (ankiConfig != null)
+            ankiConfigDict.Add(MineType.Word, ankiConfig);
+
+        ankiConfig = GetAnkiConfigFromPreferences(KanjiMiningSetupComboBoxDeckNames, KanjiMiningSetupComboBoxModelNames, KanjiMiningSetupStackPanelFields, KanjiTagsTextBox, Storage.JLFieldsForKanjiDicts);
+        if (ankiConfig != null)
+            ankiConfigDict.Add(MineType.Kanji, ankiConfig);
+
+        ankiConfig = GetAnkiConfigFromPreferences(NameMiningSetupComboBoxDeckNames, NameMiningSetupComboBoxModelNames, NameMiningSetupStackPanelFields, NameTagsTextBox, Storage.JLFieldsForNameDicts);
+        if (ankiConfig != null)
+            ankiConfigDict.Add(MineType.Name, ankiConfig);
+
+        ankiConfig = GetAnkiConfigFromPreferences(OtherMiningSetupComboBoxDeckNames, OtherMiningSetupComboBoxModelNames, OtherMiningSetupStackPanelFields, OtherTagsTextBox, Storage.AllJLFields);
+        if (ankiConfig != null)
+            ankiConfigDict.Add(MineType.Other, ankiConfig);
+
+        if (ankiConfigDict.Count > 0)
+        {
+            await AnkiConfig.WriteAnkiConfig(ankiConfigDict).ConfigureAwait(false);
+        }
+
+        else
+        {
+            WindowsUtils.Alert(AlertLevel.Error, "Error saving AnkiConfig");
+            Utils.Logger.Error("Error saving AnkiConfig");
         }
     }
 

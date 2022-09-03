@@ -2,7 +2,7 @@
 
 public class KanjiResult : IResult
 {
-    public List<string>? Meanings { get; set; }
+    public List<string>? Definitions { get; set; }
     public List<string>? OnReadings { get; set; }
     public List<string>? KunReadings { get; set; }
     public List<string>? Nanori { get; set; }
@@ -13,9 +13,17 @@ public class KanjiResult : IResult
 
     public KanjiResult()
     {
-        Meanings = new List<string>();
+        Definitions = new List<string>();
         OnReadings = new List<string>();
         KunReadings = new List<string>();
         Nanori = new List<string>();
+    }
+
+    public string? BuildFormattedDefinition()
+    {
+        if (Definitions is null)
+            return null;
+
+        return string.Join(", ", Definitions);
     }
 }

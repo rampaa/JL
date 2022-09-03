@@ -101,7 +101,7 @@ public partial class AddFrequencyWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        FreqTypeComboBox.ItemsSource = Enum.GetValues(typeof(FreqType)).Cast<FreqType>().Select(ft => ft.GetDescription() ?? ft.ToString());
+        FreqTypeComboBox.ItemsSource = Enum.GetValues<FreqType>().Select(ft => ft.GetDescription() ?? ft.ToString());
     }
     private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)
     {

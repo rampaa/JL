@@ -166,12 +166,12 @@ public partial class PopupWindow : Window
             LastText = text;
 
             ResultStackPanels.Clear();
-            List<LookupResult>? lookupResults = Lookup.LookupText(text);
+            List<LookupResult>? lookupResults = Lookup.LookupText(tb.Text);
 
             if (lookupResults is { Count: > 0 })
             {
                 _lastTextBox = tb;
-                _lastSelectedText = lookupResults[0].FoundForm;
+                _lastSelectedText = lookupResults[0].MatchedText;
                 if (ConfigManager.HighlightLongestMatch)
                 {
                     double verticalOffset = tb.VerticalOffset;
@@ -183,7 +183,7 @@ public partial class PopupWindow : Window
                         tb.Focus();
                     }
 
-                    tb.Select(charPosition, lookupResults[0].FoundForm.Length);
+                    tb.Select(charPosition, lookupResults[0].MatchedText.Length);
                     tb.ScrollToVerticalOffset(verticalOffset);
                 }
 
@@ -356,8 +356,7 @@ public partial class PopupWindow : Window
                     break;
                 }
 
-                StackPanel stackPanel = data[i];
-                ResultStackPanels.Add(stackPanel);
+                ResultStackPanels.Add(data[i]);
             }
 
             GenerateDictTypeButtons();
@@ -401,31 +400,30 @@ public partial class PopupWindow : Window
         UIElement? uiElementAlternativeSpellings = null;
         TextBlock? textBlockProcess = null;
         TextBlock? textBlockFrequency = null;
-        TextBlock? textBlockDictType = null;
         TextBlock? textBlockEdictId = null;
 
-        var textBlockFoundForm = new TextBlock
+        var textBlockMatchedText = new TextBlock
         {
-            Name = nameof(result.FoundForm),
-            Text = result.FoundForm,
+            Name = nameof(result.MatchedText),
+            Text = result.MatchedText,
             Visibility = Visibility.Collapsed,
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Center,
         };
 
-        var textBlockDeconjugatedFoundForm = new TextBlock
+        var textBlockDeconjugatedMatchedText = new TextBlock
         {
-            Name = nameof(result.DeconjugatedFoundForm),
-            Text = result.DeconjugatedFoundForm,
+            Name = nameof(result.DeconjugatedMatchedText),
+            Text = result.DeconjugatedMatchedText,
             Visibility = Visibility.Collapsed,
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Center,
         };
 
-        var textBlockFoundSpelling = new TextBlock
+        var textBlockPrimarySpelling = new TextBlock
         {
-            Name = nameof(result.FoundSpelling),
-            Text = result.FoundSpelling,
+            Name = nameof(result.PrimarySpelling),
+            Text = result.PrimarySpelling,
             Tag = index, // for audio
             Foreground = ConfigManager.PrimarySpellingColor,
             Background = Brushes.Transparent,
@@ -453,7 +451,7 @@ public partial class PopupWindow : Window
         TextBlock? textBlockGrade = null;
         TextBlock? textBlockComposition = null;
 
-        if (result.Frequencies.Count > 0)
+        if (result.Frequencies?.Count > 0)
         {
             string freqStr = "";
 
@@ -472,10 +470,7 @@ public partial class PopupWindow : Window
                         || lookupFreqResult.Freq <= 0)
                         continue;
 
-                    freqStrBuilder.Append(lookupFreqResult.Name);
-                    freqStrBuilder.Append(": #");
-                    freqStrBuilder.Append(lookupFreqResult.Freq);
-                    freqStrBuilder.Append(", ");
+                    freqStrBuilder.Append($"{lookupFreqResult.Name}: #{lookupFreqResult.Freq}, ");
                     freqResultCount++;
                 }
 
@@ -503,30 +498,27 @@ public partial class PopupWindow : Window
             }
         }
 
-        if (result.Dict != null)
+        TextBlock textBlockDictType = new()
         {
-            textBlockDictType = new TextBlock
-            {
-                Name = nameof(result.Dict.Name),
-                Text = result.Dict.Name,
-                Foreground = ConfigManager.DictTypeColor,
-                FontSize = ConfigManager.DictTypeFontSize,
-                Margin = new Thickness(5, 0, 0, 0),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Top,
-            };
-        }
+            Name = nameof(result.Dict.Name),
+            Text = result.Dict.Name,
+            Foreground = ConfigManager.DictTypeColor,
+            FontSize = ConfigManager.DictTypeFontSize,
+            Margin = new Thickness(5, 0, 0, 0),
+            TextWrapping = TextWrapping.Wrap,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top,
+        };
 
-        textBlockFoundSpelling.MouseEnter += FoundSpelling_MouseEnter; // for audio
-        textBlockFoundSpelling.MouseLeave += FoundSpelling_MouseLeave; // for audio
-        textBlockFoundSpelling.PreviewMouseUp += FoundSpelling_PreviewMouseUp; // for mining
+        textBlockPrimarySpelling.MouseEnter += PrimarySpelling_MouseEnter; // for audio
+        textBlockPrimarySpelling.MouseLeave += PrimarySpelling_MouseLeave; // for audio
+        textBlockPrimarySpelling.PreviewMouseUp += PrimarySpelling_PreviewMouseUp; // for mining
 
-        if (result.Readings != null && result.Readings.Any())
+        if (result.Readings?.Any() ?? false)
         {
             List<string> rOrthographyInfoList = result.ROrthographyInfoList ?? new();
             List<string> readings = result.Readings;
-            string readingsText = rOrthographyInfoList.Any() && (result.Dict?.Options?.ROrthographyInfo?.Value ?? true)
+            string readingsText = rOrthographyInfoList.Any() && (result.Dict.Options?.ROrthographyInfo?.Value ?? true)
                 ? PopupWindowUtilities.MakeUiElementReadingsText(readings, rOrthographyInfoList)
                 : string.Join(", ", result.Readings);
 
@@ -577,7 +569,7 @@ public partial class PopupWindow : Window
             }
         }
 
-        if (result.FormattedDefinitions != null && result.FormattedDefinitions.Any())
+        if (result.FormattedDefinitions?.Any() ?? false)
         {
             if (MiningMode)
             {
@@ -634,11 +626,11 @@ public partial class PopupWindow : Window
             };
         }
 
-        if (result.AlternativeSpellings != null && result.AlternativeSpellings.Any())
+        if (result.AlternativeSpellings?.Any() ?? false)
         {
             List<string> aOrthographyInfoList = result.AOrthographyInfoList ?? new List<string>();
             List<string> alternativeSpellings = result.AlternativeSpellings;
-            string alternativeSpellingsText = aOrthographyInfoList.Any() && (result.Dict?.Options?.AOrthographyInfo?.Value ?? true)
+            string alternativeSpellingsText = aOrthographyInfoList.Any() && (result.Dict.Options?.AOrthographyInfo?.Value ?? true)
                 ? PopupWindowUtilities.MakeUiElementAlternativeSpellingsText(alternativeSpellings, aOrthographyInfoList)
                 : "(" + string.Join(", ", alternativeSpellings) + ")";
 
@@ -706,7 +698,7 @@ public partial class PopupWindow : Window
         }
 
         if ((result.POrthographyInfoList?.Any() ?? false)
-            && (result.Dict?.Options?.POrthographyInfo?.Value ?? true))
+            && (result.Dict.Options?.POrthographyInfo?.Value ?? true))
         {
             textBlockPOrthographyInfo = new TextBlock
             {
@@ -714,10 +706,10 @@ public partial class PopupWindow : Window
                 Text = $"({string.Join(", ", result.POrthographyInfoList)})",
 
                 Foreground = (SolidColorBrush)new BrushConverter()
-                    .ConvertFrom(result.Dict?.Options?.POrthographyInfoColor?.Value
+                    .ConvertFrom(result.Dict.Options?.POrthographyInfoColor?.Value
                         ?? ConfigManager.PrimarySpellingColor.ToString())!,
 
-                FontSize = result.Dict?.Options?.POrthographyInfoFontSize?.Value ?? 15,
+                FontSize = result.Dict.Options?.POrthographyInfoFontSize?.Value ?? 15,
                 Margin = new Thickness(5, 0, 0, 0),
                 TextWrapping = TextWrapping.Wrap,
                 HorizontalAlignment = HorizontalAlignment.Left,
@@ -726,7 +718,7 @@ public partial class PopupWindow : Window
         }
 
         // KANJIDIC
-        if (result.OnReadings != null && result.OnReadings.Any())
+        if (result.OnReadings?.Any() ?? false)
         {
             textBlockOnReadings = new TextBlock
             {
@@ -741,7 +733,7 @@ public partial class PopupWindow : Window
             };
         }
 
-        if (result.KunReadings != null && result.KunReadings.Any())
+        if (result.KunReadings?.Any() ?? false)
         {
             textBlockKunReadings = new TextBlock
             {
@@ -756,7 +748,7 @@ public partial class PopupWindow : Window
             };
         }
 
-        if (result.Nanori != null && result.Nanori.Any())
+        if (result.Nanori?.Any() ?? false)
         {
             textBlockNanori = new TextBlock
             {
@@ -786,10 +778,10 @@ public partial class PopupWindow : Window
             };
         }
 
-        if (result.Grade > 0)
+        if (result.KanjiGrade > 0)
         {
             string gradeString = "";
-            int gradeInt = result.Grade;
+            int gradeInt = result.KanjiGrade;
             switch (gradeInt)
             {
                 case 0:
@@ -808,8 +800,8 @@ public partial class PopupWindow : Window
 
             textBlockGrade = new TextBlock
             {
-                Name = nameof(result.Grade),
-                Text = nameof(result.Grade) + ": " + gradeString,
+                Name = nameof(result.KanjiGrade),
+                Text = nameof(result.KanjiGrade) + ": " + gradeString,
                 Foreground = ConfigManager.DefinitionsColor,
                 FontSize = ConfigManager.DefinitionsFontSize,
                 Margin = new Thickness(2, 2, 2, 2),
@@ -819,12 +811,12 @@ public partial class PopupWindow : Window
             };
         }
 
-        if (result.Composition != null && result.Composition.Any())
+        if (result.KanjiComposition?.Any() ?? false)
         {
             textBlockComposition = new TextBlock
             {
-                Name = nameof(result.Composition),
-                Text = nameof(result.Composition) + ": " + result.Composition,
+                Name = nameof(result.KanjiComposition),
+                Text = nameof(result.KanjiComposition) + ": " + result.KanjiComposition,
                 Foreground = ConfigManager.DefinitionsColor,
                 FontSize = ConfigManager.DefinitionsFontSize,
                 Margin = new Thickness(2, 2, 2, 2),
@@ -836,8 +828,8 @@ public partial class PopupWindow : Window
 
         UIElement?[] babies =
         {
-            textBlockFoundSpelling, textBlockPOrthographyInfo, uiElementReadings, uiElementAlternativeSpellings,
-            textBlockProcess, textBlockFoundForm, textBlockDeconjugatedFoundForm, textBlockEdictId, textBlockFrequency, textBlockDictType
+            textBlockPrimarySpelling, textBlockPOrthographyInfo, uiElementReadings, uiElementAlternativeSpellings,
+            textBlockProcess, textBlockMatchedText, textBlockDeconjugatedMatchedText, textBlockEdictId, textBlockFrequency, textBlockDictType
         };
 
         for (int i = 0; i < babies.Length; i++)
@@ -854,21 +846,21 @@ public partial class PopupWindow : Window
 
                 textBlock.MouseLeave += OnMouseLeave;
 
-                if ((textBlock.Name is "FoundSpelling" or "Readings"))
+                if ((textBlock.Name is "PrimarySpelling" or "Readings"))
                 {
                     Dict? pitchDict = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.PitchAccentYomichan);
                     if (pitchDict?.Active ?? false)
                     {
                         List<string>? readings = result.Readings;
 
-                        if (textBlock.Name is "FoundSpelling" && (readings?.Any() ?? false))
+                        if (textBlock.Name is "PrimarySpelling" && (readings?.Any() ?? false))
                         {
                             top.Children.Add(textBlock);
                         }
 
                         else
                         {
-                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling,
+                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.PrimarySpelling,
                                 result.AlternativeSpellings ?? new(),
                                 readings ?? new(),
                                 textBlock.Text.Split(", ").ToList(),
@@ -902,20 +894,20 @@ public partial class PopupWindow : Window
 
                 textBox.MouseLeave += OnMouseLeave;
 
-                if ((textBox.Name is "FoundSpelling" or "Readings"))
+                if ((textBox.Name is "PrimarySpelling" or "Readings"))
                 {
                     Dict? pitchDict = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.PitchAccentYomichan);
                     if (pitchDict?.Active ?? false)
                     {
                         List<string>? readings = result.Readings;
 
-                        if (textBox.Name is "FoundSpelling" && (readings?.Any() ?? false))
+                        if (textBox.Name is "PrimarySpelling" && (readings?.Any() ?? false))
                         {
                             top.Children.Add(textBox);
                         }
                         else
                         {
-                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.FoundSpelling,
+                            Grid pitchAccentGrid = CreatePitchAccentGrid(result.PrimarySpelling,
                                 result.AlternativeSpellings ?? new(),
                                 readings ?? new(),
                                 textBox.Text.Split(", ").ToList(),
@@ -983,7 +975,7 @@ public partial class PopupWindow : Window
         return innerStackPanel;
     }
 
-    private static Grid CreatePitchAccentGrid(string foundSpelling, List<string> alternativeSpellings,
+    private static Grid CreatePitchAccentGrid(string primarySpelling, List<string> alternativeSpellings,
         List<string> readings, List<string> splitReadingsWithRInfo, double leftMargin, Dict dict)
     {
         Grid pitchAccentGrid = new();
@@ -994,7 +986,7 @@ public partial class PopupWindow : Window
             ? ConfigManager.ReadingsFontSize
             : ConfigManager.PrimarySpellingFontSize;
 
-        List<string> expressions = hasReading ? readings : new List<string> { foundSpelling };
+        List<string> expressions = hasReading ? readings : new List<string> { primarySpelling };
 
         double horizontalOffsetForReading = leftMargin;
 
@@ -1021,7 +1013,7 @@ public partial class PopupWindow : Window
                                         normalizedExpression ==
                                         Kana.KatakanaToHiraganaConverter(pitchAccentDictResult.Reading)))
                     {
-                        if (foundSpelling == pitchAccentDictResult.Spelling)
+                        if (primarySpelling == pitchAccentDictResult.Spelling)
                         {
                             chosenPitchAccentDictResult = pitchAccentDictResult;
                             break;
@@ -1119,7 +1111,6 @@ public partial class PopupWindow : Window
         if (ChildPopupWindow.MiningMode)
             return;
 
-
         // prevents stray PopupWindows being created when you move your mouse too fast
         if (MiningMode)
         {
@@ -1141,18 +1132,18 @@ public partial class PopupWindow : Window
         }
     }
 
-    private void FoundSpelling_MouseEnter(object sender, MouseEventArgs e)
+    private void PrimarySpelling_MouseEnter(object sender, MouseEventArgs e)
     {
         var textBlock = (TextBlock)sender;
         _playAudioIndex = (int)textBlock.Tag;
     }
 
-    private void FoundSpelling_MouseLeave(object sender, MouseEventArgs e)
+    private void PrimarySpelling_MouseLeave(object sender, MouseEventArgs e)
     {
         _playAudioIndex = 0;
     }
 
-    private async void FoundSpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    private async void PrimarySpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
         if (e.ChangedButton == MouseButton.Middle)
         {
@@ -1171,18 +1162,20 @@ public partial class PopupWindow : Window
         Hide();
 
         var miningParams = new Dictionary<JLField, string>();
-        foreach (JLField jlf in Enum.GetValues(typeof(JLField)))
+
+        if (_currentText != null)
         {
-            miningParams[jlf] = "";
+            miningParams[JLField.Sentence] = Utils.FindSentence(_currentText, _currentCharPosition);
+            miningParams[JLField.ClipboardText] = _currentText;
         }
 
         var textBlock = (TextBlock)sender;
 
         WrapPanel top;
 
-        if (textBlock.Parent is Grid foundSpellingGrid)
+        if (textBlock.Parent is Grid primarySpellingGrid)
         {
-            top = (WrapPanel)foundSpellingGrid.Parent;
+            top = (WrapPanel)primarySpellingGrid.Parent;
         }
 
         else
@@ -1209,26 +1202,26 @@ public partial class PopupWindow : Window
                 case TextBlock ch:
                     switch (ch.Name)
                     {
-                        case nameof(LookupResult.FoundSpelling):
-                            miningParams[JLField.FoundSpelling] = ch.Text;
+                        case nameof(LookupResult.PrimarySpelling):
+                            miningParams[JLField.PrimarySpelling] = ch.Text;
                             break;
-                        case nameof(LookupResult.FoundForm):
-                            miningParams[JLField.FoundForm] = ch.Text;
+                        case nameof(LookupResult.MatchedText):
+                            miningParams[JLField.MatchedText] = ch.Text;
                             break;
-                        case nameof(LookupResult.DeconjugatedFoundForm):
-                            miningParams[JLField.DeconjugatedFoundForm] = ch.Text;
+                        case nameof(LookupResult.DeconjugatedMatchedText):
+                            miningParams[JLField.DeconjugatedMatchedText] = ch.Text;
                             break;
                         case nameof(LookupResult.EdictId):
                             miningParams[JLField.EdictId] = ch.Text;
                             break;
                         case nameof(LookupResult.Frequencies):
-                            miningParams[JLField.Frequency] = ch.Text;
+                            miningParams[JLField.Frequencies] = ch.Text;
                             break;
                         case nameof(LookupResult.Dict.Name):
-                            miningParams[JLField.DictType] = ch.Text;
+                            miningParams[JLField.DictionaryName] = ch.Text;
                             break;
                         case nameof(LookupResult.Process):
-                            miningParams[JLField.Process] = ch.Text;
+                            miningParams[JLField.DeconjugationProcess] = ch.Text;
                             break;
                     }
 
@@ -1241,8 +1234,8 @@ public partial class PopupWindow : Window
                             {
                                 switch (textBlockCg.Name)
                                 {
-                                    case nameof(LookupResult.FoundSpelling):
-                                        miningParams[JLField.FoundSpelling] = textBlockCg.Text!;
+                                    case nameof(LookupResult.PrimarySpelling):
+                                        miningParams[JLField.PrimarySpelling] = textBlockCg.Text!;
                                         break;
                                 }
                             }
@@ -1268,7 +1261,7 @@ public partial class PopupWindow : Window
         {
             if (child is TextBox textBox)
             {
-                miningParams[JLField.Definitions] += textBox.Text.Replace("\n", "<br/>");
+                miningParams[JLField.Definitions] = textBox.Text.Replace("\n", "<br/>");
                 continue;
             }
 
@@ -1279,34 +1272,30 @@ public partial class PopupWindow : Window
 
             switch (textBlock.Name)
             {
-                case nameof(LookupResult.StrokeCount):
-                    miningParams[JLField.StrokeCount] += textBlock.Text;
-                    break;
-                case nameof(LookupResult.Grade):
-                    miningParams[JLField.Grade] += textBlock.Text;
-                    break;
-                case nameof(LookupResult.Composition):
-                    miningParams[JLField.Composition] += textBlock.Text;
-                    break;
                 case nameof(LookupResult.OnReadings):
+                    miningParams[JLField.OnReadings] = textBlock.Text;
+                    break;
                 case nameof(LookupResult.KunReadings):
+                    miningParams[JLField.KunReadings] = textBlock.Text;
+                    break;
                 case nameof(LookupResult.Nanori):
-                    if (!miningParams[JLField.Readings].EndsWith("<br/>"))
-                    {
-                        miningParams[JLField.Readings] += "<br/>";
-                    }
-
-                    miningParams[JLField.Readings] += textBlock.Text + "<br/>";
+                    miningParams[JLField.Nanori] = textBlock.Text;
+                    break;
+                case nameof(LookupResult.StrokeCount):
+                    miningParams[JLField.StrokeCount] = textBlock.Text;
+                    break;
+                case nameof(LookupResult.KanjiGrade):
+                    miningParams[JLField.KanjiGrade] = textBlock.Text;
+                    break;
+                case nameof(LookupResult.KanjiComposition):
+                    miningParams[JLField.KanjiComposition] = textBlock.Text;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(null, "Invalid LookupResult type");
             }
         }
 
-        miningParams[JLField.Context] = _currentText != null
-            ? Utils.FindSentence(_currentText, _currentCharPosition)
-            : "";
-        miningParams[JLField.TimeLocal] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
+        miningParams[JLField.LocalTime] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
 
         bool miningResult = await Mining.Mine(miningParams).ConfigureAwait(false);
 
@@ -1555,7 +1544,7 @@ public partial class PopupWindow : Window
 
         //var innerStackPanel = (StackPanel)PopupListBox.Items[index];
 
-        string? foundSpelling = null;
+        string? primarySpelling = null;
         string? reading = null;
 
         StackPanel[] visibleStackPanels = PopupListBox.Items.Cast<StackPanel>()
@@ -1583,8 +1572,8 @@ public partial class PopupWindow : Window
             {
                 switch (ch.Name)
                 {
-                    case nameof(LookupResult.FoundSpelling):
-                        foundSpelling = ch.Text;
+                    case nameof(LookupResult.PrimarySpelling):
+                        primarySpelling = ch.Text;
                         break;
                     case nameof(LookupResult.Readings):
                         reading = ch.Text.Split(",")[0];
@@ -1600,8 +1589,8 @@ public partial class PopupWindow : Window
                     {
                         switch (textBlockCg.Name)
                         {
-                            case nameof(LookupResult.FoundSpelling):
-                                foundSpelling = textBlockCg.Text;
+                            case nameof(LookupResult.PrimarySpelling):
+                                primarySpelling = textBlockCg.Text;
                                 break;
                             case nameof(LookupResult.Readings):
                                 reading = textBlockCg.Text.Split(",")[0];
@@ -1621,9 +1610,9 @@ public partial class PopupWindow : Window
             }
         }
 
-        if (foundSpelling != null)
+        if (primarySpelling != null)
         {
-            await Utils.GetAndPlayAudioFromJpod101(foundSpelling, reading, 1).ConfigureAwait(false);
+            await Utils.GetAndPlayAudioFromJpod101(primarySpelling, reading, 1).ConfigureAwait(false);
         }
     }
 

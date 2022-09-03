@@ -1,4 +1,5 @@
-﻿using JL.Core.Network;
+﻿using JL.Core.Dicts;
+using JL.Core.Network;
 using JL.Core.Utilities;
 
 namespace JL.Core.Anki;
@@ -7,11 +8,42 @@ public static class Mining
 {
     public static async Task<bool> Mine(Dictionary<JLField, string> miningParams)
     {
-        string foundSpelling = miningParams[JLField.FoundSpelling];
+        string primarySpelling = miningParams[JLField.PrimarySpelling];
 
         try
         {
-            AnkiConfig? ankiConfig = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
+            Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
+
+            if (ankiConfigDict == null)
+            {
+                Storage.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
+                return false;
+            }
+
+            AnkiConfig? ankiConfig;
+
+            DictType dictType = Storage.Dicts[miningParams[JLField.DictionaryName]].Type;
+
+            if (Storage.WordDictTypes.Contains(dictType))
+            {
+                ankiConfigDict.TryGetValue(MineType.Word, out ankiConfig);
+            }
+
+            else if (Storage.KanjiDictTypes.Contains(dictType))
+            {
+                ankiConfigDict.TryGetValue(MineType.Kanji, out ankiConfig);
+            }
+
+            else if (Storage.NameDictTypes.Contains(dictType))
+            {
+                ankiConfigDict.TryGetValue(MineType.Name, out ankiConfig);
+            }
+
+            else
+            {
+                ankiConfigDict.TryGetValue(MineType.Other, out ankiConfig);
+            }
+
             if (ankiConfig == null)
             {
                 Storage.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
@@ -31,15 +63,15 @@ public static class Mining
             string[] tags = ankiConfig.Tags;
 
             // idk if this gets the right audio for every word
-            string reading = miningParams[JLField.Readings].Split(",")[0];
+            string? reading = miningParams.GetValueOrDefault(JLField.Readings)?.Split(",")[0];
             if (string.IsNullOrEmpty(reading))
-                reading = foundSpelling;
+                reading = primarySpelling;
 
             byte[]? audioRes = null;
 
             if (userFields.Values.Any(jlField => jlField == JLField.Audio))
             {
-                audioRes = await Networking.GetAudioFromJpod101(foundSpelling, reading).ConfigureAwait(false);
+                audioRes = await Networking.GetAudioFromJpod101(primarySpelling, reading).ConfigureAwait(false);
             }
 
             Dictionary<string, object?>[] audio =
@@ -47,7 +79,7 @@ public static class Mining
                 new()
                 {
                     { "data", audioRes },
-                    { "filename", $"JL_audio_{reading}_{foundSpelling}.mp3" },
+                    { "filename", $"JL_audio_{reading}_{primarySpelling}.mp3" },
                     { "skipHash", Storage.Jpod101NoAudioMd5Hash },
                     { "fields", FindAudioFields(userFields) },
                 }
@@ -61,22 +93,22 @@ public static class Mining
 
             if (response == null)
             {
-                Storage.Frontend.Alert(AlertLevel.Error, $"Mining failed for {foundSpelling}");
-                Utils.Logger.Error("Mining failed for {FoundSpelling}", foundSpelling);
+                Storage.Frontend.Alert(AlertLevel.Error, $"Mining failed for {primarySpelling}");
+                Utils.Logger.Error("Mining failed for {FoundSpelling}", primarySpelling);
                 return false;
             }
             else
             {
                 if (audioRes == null || Utils.GetMd5String(audioRes) == Storage.Jpod101NoAudioMd5Hash)
                 {
-                    Storage.Frontend.Alert(AlertLevel.Warning, $"Mined {foundSpelling} (no audio)");
-                    Utils.Logger.Information("Mined {FoundSpelling} (no audio)", foundSpelling);
+                    Storage.Frontend.Alert(AlertLevel.Warning, $"Mined {primarySpelling} (no audio)");
+                    Utils.Logger.Information("Mined {FoundSpelling} (no audio)", primarySpelling);
                 }
 
                 else
                 {
-                    Storage.Frontend.Alert(AlertLevel.Success, $"Mined {foundSpelling}");
-                    Utils.Logger.Information("Mined {FoundSpelling}", foundSpelling);
+                    Storage.Frontend.Alert(AlertLevel.Success, $"Mined {primarySpelling}");
+                    Utils.Logger.Information("Mined {FoundSpelling}", primarySpelling);
                 }
 
                 if (Storage.Frontend.CoreConfig.ForceSyncAnki)
@@ -87,8 +119,8 @@ public static class Mining
         }
         catch (Exception e)
         {
-            Storage.Frontend.Alert(AlertLevel.Error, $"Mining failed for {foundSpelling}");
-            Utils.Logger.Information(e, "Mining failed for {FoundSpelling}", foundSpelling);
+            Storage.Frontend.Alert(AlertLevel.Error, $"Mining failed for {primarySpelling}");
+            Utils.Logger.Information(e, "Mining failed for {FoundSpelling}", primarySpelling);
             return false;
         }
     }
@@ -96,7 +128,7 @@ public static class Mining
     /// <summary>
     /// Converts JLField,Value pairs to UserField,Value pairs <br/>
     /// JLField is our internal name of a mining field <br/>
-    /// Value is the actual content of a mining field (e.g. if the field name is TimeLocal, then it should contain the current time) <br/>
+    /// Value is the actual content of a mining field (e.g. if the field name is LocalTime, then it should contain the current time) <br/>
     /// UserField is the name of the user's field in Anki (e.g. Expression) <br/>
     /// </summary>
     private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> userFields,
@@ -105,9 +137,10 @@ public static class Mining
         Dictionary<string, object> dict = new();
         foreach ((string key, JLField value) in userFields)
         {
-            if (!string.IsNullOrEmpty(miningParams[value]))
+            string? fieldName = miningParams.GetValueOrDefault(value);
+            if (!string.IsNullOrEmpty(fieldName))
             {
-                dict.Add(key, miningParams[value]);
+                dict.Add(key, fieldName);
             }
         }
 

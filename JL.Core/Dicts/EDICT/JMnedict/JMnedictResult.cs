@@ -1,4 +1,6 @@
-﻿namespace JL.Core.Dicts.EDICT.JMnedict;
+﻿using System.Text;
+
+namespace JL.Core.Dicts.EDICT.JMnedict;
 
 public class JMnedictResult : IResult
 {
@@ -16,5 +18,39 @@ public class JMnedictResult : IResult
         Readings = new List<string>();
         NameTypes = new List<string>();
         Definitions = new List<string>();
+    }
+
+    public string? BuildFormattedDefinition()
+    {
+        if (Definitions is null)
+            return null;
+
+        int count = 1;
+        StringBuilder defResult = new();
+
+        if (NameTypes != null &&
+            (NameTypes.Count > 1 || !NameTypes.Contains("unclass")))
+        {
+            for (int i = 0; i < NameTypes.Count; i++)
+            {
+                defResult.Append('(');
+                defResult.Append(NameTypes[i]);
+                defResult.Append(") ");
+            }
+        }
+
+        for (int i = 0; i < Definitions.Count; i++)
+        {
+            if (Definitions.Any())
+            {
+                if (Definitions.Count > 0)
+                    defResult.Append($"({count}) ");
+
+                defResult.Append($"{string.Join("; ", Definitions[i])} ");
+                ++count;
+            }
+        }
+
+        return defResult.ToString();
     }
 }

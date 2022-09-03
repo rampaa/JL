@@ -130,7 +130,7 @@ public static class EpwingUtils
                 {
                     epwingResult.Definitions = epwingResult.Definitions.Select(def => def.Replace("┏", "")).ToList();
 
-                    if (kenkyuushaResult.Definitions?.SequenceEqual(epwingResult.Definitions) ?? false)
+                    if (kenkyuushaResult.BuildFormattedDefinition(dict.Options) == epwingResult.BuildFormattedDefinition(dict.Options))
                     {
                         // If an entry has reading info while others don't, keep the one with the reading info.
                         if (string.IsNullOrEmpty(kenkyuushaResult.Reading) &&

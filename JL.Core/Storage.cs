@@ -1,5 +1,6 @@
 ﻿using System.Runtime;
 using System.Text.RegularExpressions;
+using JL.Core.Anki;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomNameDict;
 using JL.Core.Dicts.CustomWordDict;
@@ -173,6 +174,7 @@ public static class Storage
     public static readonly List<DictType> NameDictTypes = new()
     {
         DictType.CustomNameDictionary,
+        DictType.JMnedict,
         DictType.NonspecificNameYomichan,
         DictType.NonspecificNameNazeka,
     };
@@ -180,6 +182,7 @@ public static class Storage
     public static readonly List<DictType> WordDictTypes = new()
     {
         DictType.CustomWordDictionary,
+        DictType.JMdict,
         DictType.Daijirin,
         DictType.Daijisen,
         DictType.Gakken,
@@ -204,6 +207,65 @@ public static class Storage
         DictType.ShinmeikaiNazeka,
         DictType.NonspecificWordNazeka
     };
+
+    public static readonly List<JLField> JLFieldsForWordDicts = new()
+    {
+        JLField.Nothing,
+        JLField.PrimarySpelling,
+        JLField.Readings,
+        JLField.Definitions,
+        JLField.AlternativeSpellings,
+        JLField.DictionaryName,
+        JLField.Audio,
+        JLField.Sentence,
+        JLField.ClipboardText,
+        JLField.MatchedText,
+        JLField.DeconjugatedMatchedText,
+        JLField.Frequencies,
+        JLField.DeconjugationProcess,
+        JLField.EdictId,
+        JLField.LocalTime,
+    };
+
+    public static readonly List<JLField> JLFieldsForKanjiDicts = new()
+    {
+        JLField.Nothing,
+        JLField.PrimarySpelling,
+        JLField.Readings,
+        JLField.KunReadings,
+        JLField.OnReadings,
+        JLField.Nanori,
+        JLField.StrokeCount,
+        JLField.KanjiGrade,
+        JLField.KanjiComposition,
+        JLField.Definitions,
+        JLField.DictionaryName,
+        JLField.Frequencies,
+        JLField.Audio,
+        JLField.Sentence,
+        JLField.ClipboardText,
+        JLField.MatchedText,
+        JLField.EdictId,
+        JLField.LocalTime,
+    };
+
+    public static readonly List<JLField> JLFieldsForNameDicts = new()
+    {
+        JLField.Nothing,
+        JLField.PrimarySpelling,
+        JLField.Readings,
+        JLField.Definitions,
+        JLField.AlternativeSpellings,
+        JLField.DictionaryName,
+        JLField.Audio,
+        JLField.Sentence,
+        JLField.ClipboardText,
+        JLField.MatchedText,
+        JLField.EdictId,
+        JLField.LocalTime,
+    };
+
+    public static readonly List<JLField> AllJLFields = Enum.GetValues<JLField>().ToList();
 
     public static readonly Regex JapaneseRegex =
         new(

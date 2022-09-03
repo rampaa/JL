@@ -4,13 +4,18 @@ public class CustomNameEntry : IResult
 {
     public string PrimarySpelling { get; }
     public string Reading { get; }
-    public string NameType { get; }
+    private string NameType { get; }
 
     public CustomNameEntry(string primarySpelling, string reading, string nameType)
     {
         PrimarySpelling = primarySpelling;
         Reading = reading;
         NameType = nameType;
+    }
+
+    public string BuildFormattedDefinition()
+    {
+        return $"({NameType.ToLower()}) {Reading}";
     }
 
     public override bool Equals(object? obj)
