@@ -396,6 +396,8 @@ public partial class MainWindow : Window, IFrontend
     private async void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         ConfigManager.SaveBeforeClosing();
+
+        Stats.IncrementStat(StatType.Time, Storage.StatsStopWatch.ElapsedTicks);
         await Stats.UpdateLifetimeStats().ConfigureAwait(false);
     }
 
@@ -918,6 +920,19 @@ public partial class MainWindow : Window, IFrontend
         if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
         {
             Background.Opacity = OpacitySlider.Value / 100;
+        }
+    }
+
+    private void Window_StateChanged(object sender, EventArgs e)
+    {
+        if (WindowState == WindowState.Minimized)
+        {
+            Storage.StatsStopWatch.Stop();
+        }
+
+        else
+        {
+            Storage.StatsStopWatch.Start();
         }
     }
 }

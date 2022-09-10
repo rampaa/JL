@@ -248,8 +248,7 @@ public static class Lookup
         return lookupResults;
     }
 
-    private static List<LookupResult> SortLookupResults(
-    List<LookupResult> lookupResults)
+    private static List<LookupResult> SortLookupResults(List<LookupResult> lookupResults)
     {
         string longestMatchedText = lookupResults.Aggregate((r1, r2) => r1.MatchedText.Length > r2.MatchedText.Length ? r1 : r2).MatchedText;
 

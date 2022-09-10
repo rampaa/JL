@@ -384,6 +384,8 @@ public static class Utils
     {
         SetTimer();
 
+        Storage.StatsStopWatch.Start();
+
         if (!File.Exists($"{Storage.ConfigPath}/dicts.json"))
             Utils.CreateDefaultDictsConfig();
 
@@ -423,6 +425,18 @@ public static class Utils
 
     private static async void OnTimedEvent(object? sender, ElapsedEventArgs e)
     {
+        Stats.IncrementStat(StatType.Time, Storage.StatsStopWatch.ElapsedTicks);
+
+        if (Storage.StatsStopWatch.IsRunning)
+        {
+            Storage.StatsStopWatch.Restart();
+        }
+
+        else
+        {
+            Storage.StatsStopWatch.Reset();
+        }
+
         await Stats.UpdateLifetimeStats().ConfigureAwait(false);
     }
 

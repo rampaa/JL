@@ -1,4 +1,5 @@
-﻿using System.Runtime;
+﻿using System.Diagnostics;
+using System.Runtime;
 using System.Text.RegularExpressions;
 using JL.Core.Anki;
 using JL.Core.Dicts;
@@ -24,6 +25,7 @@ namespace JL.Core;
 public static class Storage
 {
     public static Timer Timer { get; } = new();
+    public static Stopwatch StatsStopWatch { get; } = new();
     public const string Jpod101NoAudioMd5Hash = "7e2c2f954ef6051373ba916f000168dc";
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
     public static readonly string ApplicationPath = AppContext.BaseDirectory;

@@ -24,6 +24,11 @@
                 </DockPanel>
 
                 <DockPanel>
+                    <TextBlock Foreground="White" Text="Time: " TextWrapping="Wrap" Margin="0,0,0,10" />
+                    <TextBlock Foreground="White" Name="TextBlockTime" TextWrapping="Wrap" Margin="0,0,0,10" />
+                </DockPanel>
+
+                <DockPanel>
                     <TextBlock Foreground="White" Text="Cards mined: " TextWrapping="Wrap" Margin="0,0,0,10" />
                     <TextBlock Foreground="White" Name="TextBlockCardsMined" TextWrapping="Wrap"
                                        Margin="0,0,0,10" />

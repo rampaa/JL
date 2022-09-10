@@ -10,17 +10,19 @@ public class Stats
 
     public long Lines { get; set; }
 
-    public int CardsMined { get; set; }
+    public TimeSpan Time { get; set; }
 
-    public int TimesPlayedAudio { get; set; }
+    public long CardsMined { get; set; }
 
-    public int Imoutos { get; set; }
+    public long TimesPlayedAudio { get; set; }
+
+    public long Imoutos { get; set; }
 
     [JsonIgnore] public static Stats SessionStats { get; set; } = new();
 
     [JsonIgnore] public static Stats LifetimeStats { get; set; } = ReadLifetimeStats()!;
 
-    public static void IncrementStat(StatType type, int amount = 1)
+    public static void IncrementStat(StatType type, long amount = 1)
     {
         switch (type)
         {
@@ -31,6 +33,10 @@ public class Stats
             case StatType.Lines:
                 SessionStats.Lines += amount;
                 LifetimeStats.Lines += amount;
+                break;
+            case StatType.Time:
+                SessionStats.Time = SessionStats.Time.Add(TimeSpan.FromTicks(amount));
+                LifetimeStats.Time = LifetimeStats.Time.Add(TimeSpan.FromTicks(amount));
                 break;
             case StatType.CardsMined:
                 SessionStats.CardsMined += amount;
@@ -105,6 +111,7 @@ public enum StatType
 {
     Characters,
     Lines,
+    Time,
     CardsMined,
     TimesPlayedAudio,
     Imoutos

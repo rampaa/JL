@@ -232,6 +232,18 @@ public static class WindowsUtils
 
     public static void ShowStatsWindow()
     {
+        Stats.IncrementStat(StatType.Time, Storage.StatsStopWatch.ElapsedTicks);
+
+        if (Storage.StatsStopWatch.IsRunning)
+        {
+            Storage.StatsStopWatch.Restart();
+        }
+
+        else
+        {
+            Storage.StatsStopWatch.Reset();
+        }
+
         StatsWindow.Instance.Owner = MainWindow.Instance;
         StatsWindow.Instance.ShowDialog();
     }
@@ -491,7 +503,7 @@ public static class WindowsUtils
         tb.ScrollToVerticalOffset(verticalOffset);
     }
 
-    public static void SetSizeToContentForPopup(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, System.Windows.Window window)
+    public static void SetSizeToContentForPopup(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, Window window)
     {
         window.MaxHeight = maxHeight;
         window.MaxWidth = maxWidth;
@@ -521,7 +533,7 @@ public static class WindowsUtils
         }
     }
 
-    public static void SetSizeToContentForMainWindow(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, double width, double height, System.Windows.Window window)
+    public static void SetSizeToContentForMainWindow(bool dynamicWidth, bool dynamicHeight, double maxWidth, double maxHeight, double width, double height, Window window)
     {
         if (dynamicWidth && dynamicHeight)
         {

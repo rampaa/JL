@@ -44,6 +44,7 @@ public partial class StatsWindow : Window
 
         TextBlockCharacters.Text = stats.Characters.ToString();
         TextBlockLines.Text = stats.Lines.ToString();
+        TextBlockTime.Text = stats.Time.ToString(@"d\.hh\:mm\:ss");
         TextBlockCardsMined.Text = stats.CardsMined.ToString();
         TextBlockTimesPlayedAudio.Text = stats.TimesPlayedAudio.ToString();
         TextBlockImoutos.Text = stats.Imoutos.ToString();
