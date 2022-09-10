@@ -188,6 +188,7 @@ public static class WindowsUtils
         AddNameWindow addNameWindowInstance = AddNameWindow.Instance;
         addNameWindowInstance.SpellingTextBox.Text = selectedText;
         addNameWindowInstance.Owner = MainWindow.Instance;
+        Storage.StatsStopWatch.Stop();
         addNameWindowInstance.ShowDialog();
     }
 
@@ -196,6 +197,7 @@ public static class WindowsUtils
         AddWordWindow addWordWindowInstance = AddWordWindow.Instance;
         addWordWindowInstance.SpellingsTextBox!.Text = selectedText;
         addWordWindowInstance.Owner = MainWindow.Instance;
+        Storage.StatsStopWatch.Stop();
         addWordWindowInstance.ShowDialog();
     }
 
@@ -203,6 +205,7 @@ public static class WindowsUtils
     {
         ConfigManager.Instance.LoadPreferences(PreferencesWindow.Instance);
         PreferencesWindow.Instance.Owner = MainWindow.Instance;
+        Storage.StatsStopWatch.Stop();
         PreferencesWindow.Instance.ShowDialog();
     }
 
@@ -218,6 +221,7 @@ public static class WindowsUtils
             File.Create($"{Storage.ResourcesPath}/custom_names.txt").Dispose();
 
         ManageDictionariesWindow.Instance.Owner = MainWindow.Instance;
+        Storage.StatsStopWatch.Stop();
         ManageDictionariesWindow.Instance.ShowDialog();
     }
 
@@ -227,24 +231,17 @@ public static class WindowsUtils
             Utils.CreateDefaultFreqsConfig();
 
         ManageFrequenciesWindow.Instance.Owner = MainWindow.Instance;
+        Storage.StatsStopWatch.Stop();
         ManageFrequenciesWindow.Instance.ShowDialog();
     }
 
     public static void ShowStatsWindow()
     {
         Stats.IncrementStat(StatType.Time, Storage.StatsStopWatch.ElapsedTicks);
-
-        if (Storage.StatsStopWatch.IsRunning)
-        {
-            Storage.StatsStopWatch.Restart();
-        }
-
-        else
-        {
-            Storage.StatsStopWatch.Reset();
-        }
+        Storage.StatsStopWatch.Reset();
 
         StatsWindow.Instance.Owner = MainWindow.Instance;
+        Storage.StatsStopWatch.Stop();
         StatsWindow.Instance.ShowDialog();
     }
 
@@ -613,5 +610,7 @@ public static class WindowsUtils
                 mainWindow.Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
             }
         }
+
+        Storage.StatsStopWatch.Start();
     }
 }
