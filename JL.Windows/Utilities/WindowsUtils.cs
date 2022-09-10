@@ -241,7 +241,6 @@ public static class WindowsUtils
         Storage.StatsStopWatch.Reset();
 
         StatsWindow.Instance.Owner = MainWindow.Instance;
-        Storage.StatsStopWatch.Stop();
         StatsWindow.Instance.ShowDialog();
     }
 
