@@ -73,9 +73,7 @@ public class CustomWordEntry : IHasFrequency
             {
                 FrequencyRecord freqResult = freqResults[i];
 
-                if (Readings != null && Readings.Contains(freqResult.Spelling)
-                    || (Readings == null
-                        && PrimarySpelling == freqResult.Spelling))
+                if (PrimarySpelling == freqResult.Spelling || (Readings?.Contains(freqResult.Spelling) ?? false))
                 {
                     if (frequency > freqResult.Frequency)
                     {
@@ -98,9 +96,7 @@ public class CustomWordEntry : IHasFrequency
                         {
                             FrequencyRecord alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
 
-                            if (Readings != null
-                                && Readings.Contains(alternativeSpellingFreqResult.Spelling)
-                               )
+                            if (Readings?.Contains(alternativeSpellingFreqResult.Spelling) ?? false)
                             {
                                 if (frequency > alternativeSpellingFreqResult.Frequency)
                                 {
@@ -129,8 +125,7 @@ public class CustomWordEntry : IHasFrequency
                         FrequencyRecord readingFreqResult = readingFreqResults[j];
 
                         if ((reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
-                            || (AlternativeSpellings != null
-                                && AlternativeSpellings.Contains(readingFreqResult.Spelling)))
+                            || (AlternativeSpellings?.Contains(readingFreqResult.Spelling) ?? false))
                         {
                             if (frequency > readingFreqResult.Frequency)
                             {

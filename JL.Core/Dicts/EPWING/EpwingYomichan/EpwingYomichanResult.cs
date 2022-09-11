@@ -123,9 +123,7 @@ public class EpwingYomichanResult : IEpwingResult, IHasFrequency
             {
                 FrequencyRecord freqResult = freqResults[i];
 
-                if (Reading == freqResult.Spelling
-                    || (string.IsNullOrEmpty(Reading)
-                        && PrimarySpelling == freqResult.Spelling))
+                if (Reading == freqResult.Spelling || PrimarySpelling == freqResult.Spelling)
                 {
                     if (frequency > freqResult.Frequency)
                     {

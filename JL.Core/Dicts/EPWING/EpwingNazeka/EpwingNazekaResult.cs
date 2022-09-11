@@ -50,8 +50,7 @@ public class EpwingNazekaResult : IEpwingResult, IHasFrequency
             {
                 FrequencyRecord freqResult = freqResults[i];
 
-                if ((Reading == freqResult.Spelling)
-                    || (Reading == null && PrimarySpelling == freqResult.Spelling))
+                if (Reading == freqResult.Spelling || PrimarySpelling == freqResult.Spelling)
                 {
                     if (frequency > freqResult.Frequency)
                     {
@@ -100,7 +99,7 @@ public class EpwingNazekaResult : IEpwingResult, IHasFrequency
                     FrequencyRecord readingFreqResult = readingFreqResults[j];
 
                     if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading)
-                        || (AlternativeSpellings != null && AlternativeSpellings.Contains(readingFreqResult.Spelling)))
+                        || (AlternativeSpellings?.Contains(readingFreqResult.Spelling) ?? false))
                     {
                         if (frequency > readingFreqResult.Frequency)
                         {
@@ -113,5 +112,4 @@ public class EpwingNazekaResult : IEpwingResult, IHasFrequency
 
         return frequency;
     }
-
 }
