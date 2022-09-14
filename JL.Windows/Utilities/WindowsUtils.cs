@@ -288,13 +288,13 @@ public static class WindowsUtils
         }
     }
 
-    public static async void InitializeMainWindow()
+    public static async Task InitializeMainWindow()
     {
         Storage.Frontend = MainWindow.Instance;
 
-        Utils.CoreInitialize();
-
         ConfigManager.Instance.ApplyPreferences();
+
+        await Utils.CoreInitialize();
 
         if (ConfigManager.CheckForJLUpdatesOnStartUp)
         {

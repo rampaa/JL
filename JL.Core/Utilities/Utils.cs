@@ -175,13 +175,6 @@ public static class Utils
                                 _ => new Dictionary<string, List<IResult>>(250000),
                             };
 
-                        if (dict.Type == DictType.CustomNameDictionary || dict.Type == DictType.CustomWordDictionary)
-                        {
-                            dict.Size = dict.Size < 64
-                                ? 128
-                                : dict.Size * 2;
-                        }
-
                         Storage.Dicts.Add(dict.Name, dict);
                     }
                 }
@@ -380,39 +373,37 @@ public static class Utils
         }
     }
 
-    public static void CoreInitialize()
+    public static async Task CoreInitialize()
     {
         SetTimer();
 
         Storage.StatsStopWatch.Start();
 
         if (!File.Exists($"{Storage.ConfigPath}/dicts.json"))
-            Utils.CreateDefaultDictsConfig();
+            CreateDefaultDictsConfig();
 
         if (!File.Exists($"{Storage.ConfigPath}/freqs.json"))
-            Utils.CreateDefaultFreqsConfig();
+            CreateDefaultFreqsConfig();
 
         if (!File.Exists($"{Storage.ResourcesPath}/custom_words.txt"))
-            File.Create($"{Storage.ResourcesPath}/custom_words.txt").Dispose();
+            await File.Create($"{Storage.ResourcesPath}/custom_words.txt").DisposeAsync();
 
         if (!File.Exists($"{Storage.ResourcesPath}/custom_names.txt"))
-            File.Create($"{Storage.ResourcesPath}/custom_names.txt").Dispose();
+            await File.Create($"{Storage.ResourcesPath}/custom_names.txt").DisposeAsync();
 
-        Utils.DeserializeDicts().ContinueWith(_ =>
-        {
-            Storage.LoadDictionaries().ContinueWith(_ =>
-                {
-                    Storage.InitializePoS().ContinueWith(_ =>
-                    {
-                        GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-                    }).ConfigureAwait(false);
-                }
-            ).ConfigureAwait(false);
-        }).ConfigureAwait(false);
+        Task[] tasks = new Task[4];
 
-        DeserializeFreqs().ContinueWith(_ => Storage.LoadFrequencies().ConfigureAwait(false))
-            .ConfigureAwait(false);
+        await DeserializeDicts().ConfigureAwait(false);
+        tasks[0] = Storage.LoadDictionaries(false);
+        tasks[1] = Storage.InitializePoS();
+        tasks[2] = Storage.InitializeKanjiCompositionDict();
+
+        await DeserializeFreqs().ConfigureAwait(false);
+        tasks[3] = Storage.LoadFrequencies();
+
+        await Task.WhenAll(tasks).ConfigureAwait(false);
+        GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
     }
 
     private static void SetTimer()

@@ -9,6 +9,7 @@ using JL.Core.Dicts.EDICT.JMnedict;
 using JL.Core.Dicts.EDICT.KANJIDIC;
 using JL.Core.Dicts.EPWING.EpwingNazeka;
 using JL.Core.Dicts.EPWING.EpwingYomichan;
+using JL.Core.Dicts.YomichanKanji;
 using JL.Core.Frequency;
 using JL.Core.PoS;
 using JL.Core.Utilities;
@@ -54,7 +55,7 @@ public static class Lookup
 
                         else // if (Storage.YomichanDictTypes.Contains(dict.Type))
                         {
-                            lookupResults.AddRange(EpwingYomichanResultBuilder(GetKanjiResults(text, dict)));
+                            lookupResults.AddRange(YomichanKanjiResultBuilder(GetKanjiResults(text, dict)));
                         }
                     }
                 }
@@ -203,7 +204,7 @@ public static class Lookup
         {
             for (int i = 0; i < epwingYomichanKanjiResultsList.Count; i++)
             {
-                lookupResults.AddRange(EpwingYomichanResultBuilder(epwingYomichanKanjiResultsList[i]));
+                lookupResults.AddRange(YomichanKanjiResultBuilder(epwingYomichanKanjiResultsList[i]));
             }
         }
 
@@ -651,8 +652,10 @@ public static class Lookup
         if (!kanjiResults.Any())
             return results;
 
-        List<List<IResult>> iResult = kanjiResults.First().Value.Results;
-        KanjiResult kanjiResult = (KanjiResult)iResult[0][0];
+        KeyValuePair<string, IntermediaryResult> dictResult = kanjiResults.First();
+
+        List<List<IResult>> iResult = dictResult.Value.Results;
+        KanjidicResult kanjiResult = (KanjidicResult)iResult[0][0];
 
         List<string> allReadings = new();
 
@@ -665,21 +668,65 @@ public static class Lookup
         if (kanjiResult.Nanori != null)
             allReadings.AddRange(kanjiResult.Nanori);
 
+        IntermediaryResult intermediaryResult = kanjiResults.First().Value;
+
         LookupResult result = new
         (
-            primarySpelling: kanjiResults.First().Key,
+            primarySpelling: dictResult.Key,
             readings: allReadings,
             onReadings: kanjiResult.OnReadings,
             kunReadings: kanjiResult.KunReadings,
             nanori: kanjiResult.Nanori,
             strokeCount: kanjiResult.StrokeCount,
             kanjiGrade: kanjiResult.Grade,
-            kanjiComposition: kanjiResult.Composition,
-            frequencies: new() { new(kanjiResults.First().Value.Dict.Name, kanjiResult.Frequency) },
-            matchedText: kanjiResults.First().Value.MatchedText,
-            deconjugatedMatchedText: kanjiResults.First().Value.DeconjugatedMatchedText,
-            dict: kanjiResults.First().Value.Dict,
+            kanjiComposition: Storage.KanjiCompositionDict.GetValueOrDefault(dictResult.Key),
+            frequencies: new() { new(intermediaryResult.Dict.Name, kanjiResult.Frequency) },
+            matchedText: intermediaryResult.MatchedText,
+            deconjugatedMatchedText: intermediaryResult.DeconjugatedMatchedText,
+            dict: intermediaryResult.Dict,
             formattedDefinitions: kanjiResult.BuildFormattedDefinition()
+        );
+
+        results.Add(result);
+        return results;
+    }
+
+    private static List<LookupResult> YomichanKanjiResultBuilder(
+    Dictionary<string, IntermediaryResult> kanjiResults)
+    {
+        List<LookupResult> results = new();
+
+        if (!kanjiResults.Any())
+            return results;
+
+        KeyValuePair<string, IntermediaryResult> dictResult = kanjiResults.First();
+
+        List<List<IResult>> iResult = dictResult.Value.Results;
+        var kanjiResult = (YomichanKanjiResult)iResult[0][0];
+
+        List<string> allReadings = new();
+
+        if (kanjiResult.OnReadings != null)
+            allReadings.AddRange(kanjiResult.OnReadings);
+
+        if (kanjiResult.KunReadings != null)
+            allReadings.AddRange(kanjiResult.KunReadings);
+
+        IntermediaryResult intermediaryResult = kanjiResults.First().Value;
+
+        LookupResult result = new
+        (
+            primarySpelling: dictResult.Key,
+            readings: allReadings,
+            onReadings: kanjiResult.OnReadings,
+            kunReadings: kanjiResult.KunReadings,
+            kanjiComposition: Storage.KanjiCompositionDict.GetValueOrDefault(dictResult.Key),
+            kanjiStats: kanjiResult.BuildFormattedStats(),
+            // frequencies: new() { new(intermediaryResult.Dict.Name, kanjiResult.Frequency) },
+            matchedText: intermediaryResult.MatchedText,
+            deconjugatedMatchedText: intermediaryResult.DeconjugatedMatchedText,
+            dict: intermediaryResult.Dict,
+            formattedDefinitions: kanjiResult.BuildFormattedDefinition(intermediaryResult.Dict.Options)
         );
 
         results.Add(result);

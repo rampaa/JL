@@ -12,6 +12,7 @@ using JL.Core.Dicts.EDICT.KANJIDIC;
 using JL.Core.Dicts.EPWING.EpwingNazeka;
 using JL.Core.Dicts.EPWING.EpwingYomichan;
 using JL.Core.Dicts.Options;
+using JL.Core.Dicts.YomichanKanji;
 using JL.Core.Frequency;
 using JL.Core.Frequency.FreqNazeka;
 using JL.Core.Frequency.FreqYomichan;
@@ -43,6 +44,7 @@ public static class Storage
     public static bool UpdatingKanjidic { get; set; } = false;
     public static bool FreqsReady { get; private set; } = false;
     public static Dictionary<string, List<JmdictWc>> WcDict { get; set; } = new(65536); // 2022/08/15: 47352
+    public static readonly Dictionary<string, string> KanjiCompositionDict = new(86934);
     public static Dictionary<string, Freq> FreqDicts { get; set; } = new();
 
     public static readonly Dictionary<string, Dict> Dicts = new();
@@ -309,7 +311,7 @@ public static class Storage
 
     public static int CacheSize { get; set; } = 1000;
 
-    public static async Task LoadDictionaries()
+    public static async Task LoadDictionaries(bool runGC = true)
     {
         DictsReady = false;
 
@@ -361,7 +363,7 @@ public static class Storage
                     {
                         tasks.Add(Task.Run(async () =>
                         {
-                            await KanjiInfoLoader.Load(dict).ConfigureAwait(false);
+                            await KanjidicLoader.Load(dict).ConfigureAwait(false);
                             dict.Size = dict.Contents.Count;
                         }));
                     }
@@ -393,7 +395,6 @@ public static class Storage
                 case DictType.KanjigenYomichan:
                 case DictType.KireiCakeYomichan:
                 case DictType.NonspecificWordYomichan:
-                case DictType.NonspecificKanjiYomichan:
                 case DictType.NonspecificNameYomichan:
                 case DictType.NonspecificYomichan:
                     if (dict.Active && !dict.Contents.Any())
@@ -420,6 +421,28 @@ public static class Storage
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
+                    }
+                    break;
+
+                case DictType.NonspecificKanjiYomichan:
+                    if (dict.Active && !dict.Contents.Any())
+                    {
+                        tasks.Add(Task.Run(async () =>
+                        {
+                            try
+                            {
+                                await YomichanKanjiLoader.Load(dict).ConfigureAwait(false);
+                                dict.Size = dict.Contents.Count;
+                            }
+
+                            catch (Exception ex)
+                            {
+                                Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                                Utils.Logger.Error("Couldn't import {DictType}: {Exception}", dict.Type, ex.ToString());
+                                Dicts.Remove(dict.Name);
+                                dictRemoved = true;
+                            }
+                        }));
                     }
                     break;
 
@@ -533,8 +556,11 @@ public static class Storage
 
             Storage.Frontend.InvalidateDisplayCache();
 
-            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+            if (runGC)
+            {
+                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+            }
         }
 
         DictsReady = true;
@@ -665,4 +691,46 @@ public static class Storage
 
         await JmdictWcLoader.Load().ConfigureAwait(false);
     }
+
+    public static async Task InitializeKanjiCompositionDict()
+    {
+        if (File.Exists($"{ResourcesPath}/ids.txt"))
+        {
+            string[] lines = await File
+                .ReadAllLinesAsync($"{ResourcesPath}/ids.txt")
+                .ConfigureAwait(false);
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string[] lParts = lines[i].Split("\t");
+
+                if (lParts.Length == 3)
+                {
+                    int endIndex = lParts[2].IndexOf("[", StringComparison.Ordinal);
+
+                    KanjiCompositionDict.Add(lParts[1],
+                        endIndex == -1 ? lParts[2] : lParts[2][..endIndex]);
+                }
+
+                else if (lParts.Length > 3)
+                {
+                    for (int j = 2; j < lParts.Length; j++)
+                    {
+                        if (lParts[j].Contains('J'))
+                        {
+                            int endIndex = lParts[j].IndexOf("[", StringComparison.Ordinal);
+                            if (endIndex != -1)
+                            {
+                                KanjiCompositionDict.Add(lParts[1], lParts[j][..endIndex]);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            KanjiCompositionDict.TrimExcess();
+        }
+    }
+
 }

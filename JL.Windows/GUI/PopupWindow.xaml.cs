@@ -450,6 +450,7 @@ public partial class PopupWindow : Window
         TextBlock? textBlockStrokeCount = null;
         TextBlock? textBlockGrade = null;
         TextBlock? textBlockComposition = null;
+        TextBlock? textBlockKanjiStats = null;
 
         if (result.Frequencies?.Count > 0)
         {
@@ -816,7 +817,22 @@ public partial class PopupWindow : Window
             textBlockComposition = new TextBlock
             {
                 Name = nameof(result.KanjiComposition),
-                Text = nameof(result.KanjiComposition) + ": " + result.KanjiComposition,
+                Text = "Composition: " + result.KanjiComposition,
+                Foreground = ConfigManager.DefinitionsColor,
+                FontSize = ConfigManager.DefinitionsFontSize,
+                Margin = new Thickness(2, 2, 2, 2),
+                TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+        }
+
+        if (result.KanjiStats?.Any() ?? false)
+        {
+            textBlockKanjiStats = new TextBlock
+            {
+                Name = nameof(result.KanjiStats),
+                Text = "Statistics:\n" + result.KanjiStats,
                 Foreground = ConfigManager.DefinitionsColor,
                 FontSize = ConfigManager.DefinitionsFontSize,
                 Margin = new Thickness(2, 2, 2, 2),
@@ -939,7 +955,7 @@ public partial class PopupWindow : Window
         TextBlock?[] babiesKanji =
         {
             textBlockOnReadings, textBlockKunReadings, textBlockNanori, textBlockGrade, textBlockStrokeCount,
-            textBlockComposition,
+            textBlockComposition, textBlockKanjiStats,
         };
         foreach (TextBlock? baby in babiesKanji)
         {
@@ -1289,6 +1305,9 @@ public partial class PopupWindow : Window
                     break;
                 case nameof(LookupResult.KanjiComposition):
                     miningParams[JLField.KanjiComposition] = textBlock.Text;
+                    break;
+                case nameof(LookupResult.KanjiStats):
+                    miningParams[JLField.KanjiStats] = textBlock.Text;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(null, "Invalid LookupResult type");

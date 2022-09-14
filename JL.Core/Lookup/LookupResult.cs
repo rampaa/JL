@@ -20,13 +20,14 @@ public class LookupResult
     public List<string>? ROrthographyInfoList { get; init; }
     public List<string>? AOrthographyInfoList { get; init; }
 
-    // KANJIDIC
+    // Kanji
     public List<string>? OnReadings { get; init; }
     public List<string>? KunReadings { get; init; }
     public List<string>? Nanori { get; init; }
     public int StrokeCount { get; init; }
     public string? KanjiComposition { get; init; }
     public int KanjiGrade { get; init; }
+    public string? KanjiStats { get; init; }
 
     public LookupResult(
         string primarySpelling,
@@ -45,6 +46,7 @@ public class LookupResult
         string? formattedDefinitions = null,
         string? process = null,
         string? kanjiComposition = null,
+        string? kanjiStats = null,
         int edictId = 0,
         int strokeCount = 0,
         int kanjiGrade = 0
@@ -68,6 +70,7 @@ public class LookupResult
         Nanori = nanori;
         StrokeCount = strokeCount;
         KanjiComposition = kanjiComposition;
+        KanjiStats = kanjiStats;
         KanjiGrade = kanjiGrade;
     }
 }

@@ -366,7 +366,7 @@ public partial class ManageDictionariesWindow : Window
         {
             dict.Contents.Clear();
 
-            await Task.Run(async () => await KanjiInfoLoader
+            await Task.Run(async () => await KanjidicLoader
                 .Load(dict).ConfigureAwait(false));
 
             if (!dict.Active)

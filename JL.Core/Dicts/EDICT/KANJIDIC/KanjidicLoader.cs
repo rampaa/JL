@@ -3,7 +3,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EDICT.KANJIDIC;
 
-public static class KanjiInfoLoader
+public static class KanjidicLoader
 {
     public static async Task Load(Dict dict)
     {
@@ -18,47 +18,10 @@ public static class KanjiInfoLoader
 
             using XmlReader xmlReader = XmlReader.Create(dict.Path, xmlReaderSettings);
 
-            Dictionary<string, string> kanjiCompositionDictionary = new();
-            if (File.Exists($"{Storage.ResourcesPath}/ids.txt"))
-            {
-                string[] lines = await File
-                    .ReadAllLinesAsync($"{Storage.ResourcesPath}/ids.txt")
-                    .ConfigureAwait(false);
-
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    string[] lParts = lines[i].Split("\t");
-
-                    if (lParts.Length == 3)
-                    {
-                        int endIndex = lParts[2].IndexOf("[", StringComparison.Ordinal);
-
-                        kanjiCompositionDictionary.Add(lParts[1],
-                            endIndex == -1 ? lParts[2] : lParts[2][..endIndex]);
-                    }
-
-                    else if (lParts.Length > 3)
-                    {
-                        for (int j = 2; j < lParts.Length; j++)
-                        {
-                            if (lParts[j].Contains('J'))
-                            {
-                                int endIndex = lParts[j].IndexOf("[", StringComparison.Ordinal);
-                                if (endIndex != -1)
-                                {
-                                    kanjiCompositionDictionary.Add(lParts[1], lParts[j][..endIndex]);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             dict.Contents = new Dictionary<string, List<IResult>>();
             while (xmlReader.ReadToFollowing("literal"))
             {
-                await ReadCharacter(xmlReader, kanjiCompositionDictionary, dict).ConfigureAwait(false);
+                await ReadCharacter(xmlReader, dict).ConfigureAwait(false);
             }
 
             dict.Contents.TrimExcess();
@@ -80,14 +43,11 @@ public static class KanjiInfoLoader
         }
     }
 
-    private static async Task ReadCharacter(XmlReader xmlReader, Dictionary<string, string> kanjiCompositionDictionary, Dict dict)
+    private static async Task ReadCharacter(XmlReader xmlReader, Dict dict)
     {
         string key = await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false);
 
-        KanjiResult entry = new();
-
-        if (kanjiCompositionDictionary.TryGetValue(key, out string? composition))
-            entry.Composition = composition;
+        KanjidicResult entry = new();
 
         while (!xmlReader.EOF)
         {

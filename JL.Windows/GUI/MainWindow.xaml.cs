@@ -79,7 +79,7 @@ public partial class MainWindow : Window, IFrontend
         MainTextBox.Focus();
     }
 
-    protected override void OnSourceInitialized(EventArgs e)
+    protected override async void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
 
@@ -99,7 +99,7 @@ public partial class MainWindow : Window, IFrontend
         _winApi = new(this);
         _winApi.ClipboardChanged += ClipboardChanged;
 
-        WindowsUtils.InitializeMainWindow();
+        await WindowsUtils.InitializeMainWindow();
 
         _lastClipboardChangeTime = new(Stopwatch.GetTimestamp());
         CopyFromClipboard();
