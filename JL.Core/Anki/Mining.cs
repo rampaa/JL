@@ -69,7 +69,8 @@ public static class Mining
 
             byte[]? audioRes = null;
 
-            if (userFields.Values.Any(jlField => jlField == JLField.Audio))
+            bool needsAudio = userFields.Values.Any(jlField => jlField == JLField.Audio);
+            if (needsAudio)
             {
                 audioRes = await Networking.GetAudioFromJpod101(primarySpelling, reading).ConfigureAwait(false);
             }
@@ -99,7 +100,7 @@ public static class Mining
             }
             else
             {
-                if (audioRes == null || Utils.GetMd5String(audioRes) == Storage.Jpod101NoAudioMd5Hash)
+                if (needsAudio && (audioRes == null || Utils.GetMd5String(audioRes) == Storage.Jpod101NoAudioMd5Hash))
                 {
                     Storage.Frontend.Alert(AlertLevel.Warning, $"Mined {primarySpelling} (no audio)");
                     Utils.Logger.Information("Mined {FoundSpelling} (no audio)", primarySpelling);
