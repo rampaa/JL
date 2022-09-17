@@ -569,13 +569,13 @@
 
                                                 <Separator Height="15" />
 
-                                                <DockPanel HorizontalAlignment="Center">
+                                                <!--<DockPanel HorizontalAlignment="Center">-->
                                                     <Button x:Name="WordMiningSetupButtonGetFields"
                                                         Click="WordMiningSetupButtonGetFields_Click"
                                                         Width="150" Margin="5"
                                                         Content="Get Fields" FontSize="16" Height="35" />
-                                                    <Button Content="Info" Background="LightSlateGray" Width="50" Height="30" Margin="5" />
-                                                </DockPanel>
+                                                    <!--<Button Content="Info" Background="LightSlateGray" Width="50" Height="30" Margin="5" />-->
+                                                <!--</DockPanel>-->
 
                                                 <StackPanel x:Name="WordMiningSetupStackPanelFields" Margin="10" />
 
