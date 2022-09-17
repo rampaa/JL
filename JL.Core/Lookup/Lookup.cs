@@ -107,8 +107,8 @@ public static class Lookup
                         break;
 
                     case DictType.KanjigenYomichan:
-                        // Kanjigen is a word dictionary templete-wise
-                        // But it's a kanji dictionary content-wise
+                        // Template-wise, Kanjigen is a word dictionary that's why its results are put into Yomichan Word Results
+                        // Content-wise though it's a kanji dictionary, that's why GetKanjiResults is being used for the lookup
                         epwingYomichanWordResultsList.Add(GetKanjiResults(text, dict));
                         break;
 
