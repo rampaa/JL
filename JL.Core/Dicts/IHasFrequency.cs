@@ -2,7 +2,7 @@
 
 namespace JL.Core.Dicts;
 
-public interface IHasFrequency : IResult
+public interface IHasGetFrequency : IResult
 {
     int GetFrequency(Freq frequency);
 }

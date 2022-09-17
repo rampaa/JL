@@ -112,6 +112,7 @@ public partial class AddFrequencyWindow : Window
         {
             // not providing a description for the filter causes the filename returned to be empty
             case FreqType.Yomichan:
+            case FreqType.YomichanKanji:
                 BrowseForFrequencyFolder();
                 break;
 

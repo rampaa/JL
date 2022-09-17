@@ -29,7 +29,8 @@ public static class YomichanKanjiLoader
             foreach (List<JsonElement> jsonObj in jsonObjects)
             {
                 YomichanKanjiResult yomichanKanjiResult = new(jsonObj);
-                dict.Contents.TryAdd(yomichanKanjiResult.PrimarySpelling, new List<IResult> { yomichanKanjiResult });
+                string kanji = jsonObj[0].ToString();
+                dict.Contents.TryAdd(kanji, new List<IResult> { yomichanKanjiResult });
             }
         }
 

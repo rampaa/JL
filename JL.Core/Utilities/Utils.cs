@@ -214,6 +214,7 @@ public static class Utils
                             : freq.Type switch
                             {
                                 FreqType.Yomichan => new Dictionary<string, List<FrequencyRecord>>(1504512),
+                                FreqType.YomichanKanji => new Dictionary<string, List<FrequencyRecord>>(169623),
                                 FreqType.Nazeka => new Dictionary<string, List<FrequencyRecord>>(114348),
                                 _ => new Dictionary<string, List<FrequencyRecord>>(500000),
                             };

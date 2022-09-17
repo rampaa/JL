@@ -5,7 +5,7 @@ using JL.Core.Frequency;
 
 namespace JL.Core.Dicts.EPWING.EpwingYomichan;
 
-public class EpwingYomichanResult : IEpwingResult, IHasFrequency
+public class EpwingYomichanResult : IEpwingResult, IHasGetFrequency
 {
     public List<string>? Definitions { get; set; }
     public string? Reading { get; }

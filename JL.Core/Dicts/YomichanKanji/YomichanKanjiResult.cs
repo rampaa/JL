@@ -6,7 +6,6 @@ namespace JL.Core.Dicts.YomichanKanji;
 
 public class YomichanKanjiResult : IResult
 {
-    public string PrimarySpelling { get; }
     public List<string>? OnReadings { get; }
     public List<string>? KunReadings { get; }
     //public List<string>? Tags { get; }
@@ -15,8 +14,6 @@ public class YomichanKanjiResult : IResult
 
     public YomichanKanjiResult(List<JsonElement> jsonElement)
     {
-        PrimarySpelling = jsonElement[0].ToString();
-
         OnReadings = jsonElement[1].ToString().Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
         if (!OnReadings.Any())
         {

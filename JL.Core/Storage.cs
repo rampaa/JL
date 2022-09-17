@@ -608,6 +608,7 @@ public static class Storage
                     break;
 
                 case FreqType.Yomichan:
+                case FreqType.YomichanKanji:
                     if (freq.Active && !freq.Contents.Any())
                     {
                         Task yomichanFreqTask = Task.Run(async () =>

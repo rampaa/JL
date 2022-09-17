@@ -4,7 +4,7 @@ using JL.Core.Frequency;
 
 namespace JL.Core.Dicts.CustomWordDict;
 
-public class CustomWordEntry : IHasFrequency
+public class CustomWordEntry : IHasGetFrequency
 {
     public string PrimarySpelling { get; }
     public List<string>? AlternativeSpellings { get; }

@@ -4,7 +4,7 @@ using JL.Core.Frequency;
 
 namespace JL.Core.Dicts.EDICT.JMdict;
 
-public class JMdictResult : IHasFrequency
+public class JMdictResult : IHasGetFrequency
 {
     public int Id { get; set; }
     public List<string>? AlternativeSpellings { get; set; }
