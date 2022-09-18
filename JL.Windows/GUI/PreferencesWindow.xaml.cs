@@ -31,7 +31,7 @@ public partial class PreferencesWindow : Window
 • Source Text: Whole text in which the mined word appears in.
 • Sentence: Sentence in which the mined word appears in.
 • Matched Text: Text the mined word found as. e.g. わかりました.
-• Deconjugated Matched Text: ""Matched Text""'s decomjugated form. e.g. If the matched text is ""わかりました"", Deconjugated Matched Text will be ""わかる"".
+• Deconjugated Matched Text: ""Matched Text""'s deconjugated form. e.g. If the matched text is ""わかりました"", Deconjugated Matched Text will be ""わかる"".
 • Deconjugation Process: Deconjugation path from the Matched Text to Deconjugated Matched Text.
 • Frequencies: Frequency info for the mined word. e.g. ""VN: #77, JPDB: 666"".
 • EDICT ID: JMDict entry ID.
