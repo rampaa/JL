@@ -83,7 +83,7 @@ public static class KanjidicLoader
                         break;
 
                     case "nanori":
-                        entry.Nanori!.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+                        entry.NanoriReadings!.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
                         break;
 
                     case "reading":
@@ -115,7 +115,7 @@ public static class KanjidicLoader
             }
         }
 
-        entry.Nanori = Utils.TrimStringList(entry.Nanori!);
+        entry.NanoriReadings = Utils.TrimStringList(entry.NanoriReadings!);
         entry.Definitions = Utils.TrimStringList(entry.Definitions!);
         entry.OnReadings = Utils.TrimStringList(entry.OnReadings!);
         entry.KunReadings = Utils.TrimStringList(entry.KunReadings!);

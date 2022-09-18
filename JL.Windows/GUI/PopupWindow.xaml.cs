@@ -444,7 +444,7 @@ public partial class PopupWindow : Window
 
         // bottom
         UIElement? uiElementDefinitions = null;
-        TextBlock? textBlockNanori = null;
+        TextBlock? textBlockNanoriReadings = null;
         TextBlock? textBlockOnReadings = null;
         TextBlock? textBlockKunReadings = null;
         TextBlock? textBlockStrokeCount = null;
@@ -749,12 +749,12 @@ public partial class PopupWindow : Window
             };
         }
 
-        if (result.Nanori?.Any() ?? false)
+        if (result.NanoriReadings?.Any() ?? false)
         {
-            textBlockNanori = new TextBlock
+            textBlockNanoriReadings = new TextBlock
             {
-                Name = nameof(result.Nanori),
-                Text = nameof(result.Nanori) + ": " + string.Join(", ", result.Nanori),
+                Name = nameof(result.NanoriReadings),
+                Text = nameof(result.NanoriReadings) + ": " + string.Join(", ", result.NanoriReadings),
                 Foreground = ConfigManager.ReadingsColor,
                 FontSize = ConfigManager.ReadingsFontSize,
                 Margin = new Thickness(2, 0, 0, 0),
@@ -954,7 +954,7 @@ public partial class PopupWindow : Window
 
         TextBlock?[] babiesKanji =
         {
-            textBlockOnReadings, textBlockKunReadings, textBlockNanori, textBlockGrade, textBlockStrokeCount,
+            textBlockOnReadings, textBlockKunReadings, textBlockNanoriReadings, textBlockGrade, textBlockStrokeCount,
             textBlockComposition, textBlockKanjiStats,
         };
         foreach (TextBlock? baby in babiesKanji)
@@ -1294,8 +1294,8 @@ public partial class PopupWindow : Window
                 case nameof(LookupResult.KunReadings):
                     miningParams[JLField.KunReadings] = textBlock.Text;
                     break;
-                case nameof(LookupResult.Nanori):
-                    miningParams[JLField.Nanori] = textBlock.Text;
+                case nameof(LookupResult.NanoriReadings):
+                    miningParams[JLField.NanoriReadings] = textBlock.Text;
                     break;
                 case nameof(LookupResult.StrokeCount):
                     miningParams[JLField.StrokeCount] = textBlock.Text;

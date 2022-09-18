@@ -27,7 +27,7 @@ public enum JLField
     //Kanji dictionaries
     [Description("Kun Readings")] KunReadings,
     [Description("On Readings")] OnReadings,
-    Nanori,
+    [Description("Nanori Readings")] NanoriReadings,
     [Description("Stroke Count")] StrokeCount,
     [Description("Kanji Grade")] KanjiGrade,
     [Description("Kanji Composition")] KanjiComposition,

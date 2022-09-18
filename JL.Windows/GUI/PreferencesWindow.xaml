@@ -569,14 +569,14 @@
 
                                                 <Separator Height="15" />
 
-                                                <!--<DockPanel HorizontalAlignment="Center">-->
+                                                <DockPanel HorizontalAlignment="Center">
                                                     <Button x:Name="WordMiningSetupButtonGetFields"
                                                         Click="WordMiningSetupButtonGetFields_Click"
                                                         Width="150" Margin="5"
                                                         Content="Get Fields" FontSize="16" Height="35" />
-                                                    <!--<Button Content="Info" Background="LightSlateGray" Width="50" Height="30" Margin="5" />-->
-                                                <!--</DockPanel>-->
-
+                                                    <Button Name="WordInfoButton" Content="Info" Background="LightSlateGray" Width="50" Height="30" Margin="5" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" />
+                                                </DockPanel>
+                                                
                                                 <StackPanel x:Name="WordMiningSetupStackPanelFields" Margin="10" />
 
                                                 <Separator Height="15" />
@@ -607,10 +607,14 @@
 
                                                 <Separator Height="15" />
 
-                                                <Button x:Name="KanjiMiningSetupButtonGetFields"
-                                            Click="KanjiMiningSetupButtonGetFields_Click"
-                                            Width="150"
-                                            Content="Get Fields" FontSize="16" Height="35" />
+                                                <DockPanel HorizontalAlignment="Center">
+                                                    <Button x:Name="KanjiMiningSetupButtonGetFields"
+                                                        Click="KanjiMiningSetupButtonGetFields_Click"
+                                                        Width="150"
+                                                        Content="Get Fields" FontSize="16" Height="35" />
+                                                    <Button Name="KanjiInfoButton" Content="Info" Background="LightSlateGray" Width="50" Height="30" Margin="5" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" />
+                                                </DockPanel>
+                                                
                                                 <StackPanel x:Name="KanjiMiningSetupStackPanelFields" Margin="10" />
 
                                                 <Separator Height="15" />
@@ -641,10 +645,14 @@
 
                                                 <Separator Height="15" />
 
-                                                <Button x:Name="NameMiningSetupButtonGetFields"
-                                            Click="NameMiningSetupButtonGetFields_Click"
-                                            Width="150"
-                                            Content="Get Fields" FontSize="16" Height="35" />
+                                                <DockPanel HorizontalAlignment="Center">
+                                                    <Button x:Name="NameMiningSetupButtonGetFields"
+                                                        Click="NameMiningSetupButtonGetFields_Click"
+                                                        Width="150"
+                                                        Content="Get Fields" FontSize="16" Height="35" />
+                                                    <Button Name="NameInfoButton" Content="Info" Background="LightSlateGray" Width="50" Height="30" Margin="5" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" />
+                                                </DockPanel>
+                                                
                                                 <StackPanel x:Name="NameMiningSetupStackPanelFields" Margin="10" />
 
                                                 <Separator Height="15" />
@@ -672,13 +680,17 @@
                                                 <TextBlock HorizontalAlignment="Center" Text="Model:"
                                                TextWrapping="Wrap" />
                                                 <ComboBox x:Name="OtherMiningSetupComboBoxModelNames" Width="200" Margin="0,10,0,0" />
-
+                                                
                                                 <Separator Height="15" />
 
-                                                <Button x:Name="OtherMiningSetupButtonGetFields"
-                                            Click="OtherMiningSetupButtonGetFields_Click"
-                                            Width="150"
-                                            Content="Get Fields" FontSize="16" Height="35" />
+                                                <DockPanel HorizontalAlignment="Center">
+                                                    <Button x:Name="OtherMiningSetupButtonGetFields"
+                                                        Click="OtherMiningSetupButtonGetFields_Click"
+                                                        Width="150"
+                                                        Content="Get Fields" FontSize="16" Height="35" />
+                                                    <Button Name="OtherInfoButton" Content="Info" Background="LightSlateGray" Width="50" Height="30" Margin="5" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" />
+                                                </DockPanel>
+                                                
                                                 <StackPanel x:Name="OtherMiningSetupStackPanelFields" Margin="10" />
 
                                                 <Separator Height="15" />

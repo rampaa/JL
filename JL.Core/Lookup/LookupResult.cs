@@ -23,7 +23,7 @@ public class LookupResult
     // Kanji
     public List<string>? OnReadings { get; init; }
     public List<string>? KunReadings { get; init; }
-    public List<string>? Nanori { get; init; }
+    public List<string>? NanoriReadings { get; init; }
     public int StrokeCount { get; init; }
     public string? KanjiComposition { get; init; }
     public int KanjiGrade { get; init; }
@@ -42,7 +42,7 @@ public class LookupResult
         List<string>? aOrthographyInfoList = null,
         List<string>? onReadings = null,
         List<string>? kunReadings = null,
-        List<string>? nanori = null,
+        List<string>? nanoriReadings = null,
         string? formattedDefinitions = null,
         string? process = null,
         string? kanjiComposition = null,
@@ -67,7 +67,7 @@ public class LookupResult
         AOrthographyInfoList = aOrthographyInfoList;
         OnReadings = onReadings;
         KunReadings = kunReadings;
-        Nanori = nanori;
+        NanoriReadings = nanoriReadings;
         StrokeCount = strokeCount;
         KanjiComposition = kanjiComposition;
         KanjiStats = kanjiStats;

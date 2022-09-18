@@ -216,17 +216,17 @@ public static class Storage
     {
         JLField.Nothing,
         JLField.PrimarySpelling,
+        JLField.AlternativeSpellings,
         JLField.Readings,
         JLField.Definitions,
-        JLField.AlternativeSpellings,
         JLField.DictionaryName,
         JLField.Audio,
-        JLField.Sentence,
         JLField.SourceText,
+        JLField.Sentence,
         JLField.MatchedText,
         JLField.DeconjugatedMatchedText,
-        JLField.Frequencies,
         JLField.DeconjugationProcess,
+        JLField.Frequencies,
         JLField.EdictId,
         JLField.LocalTime,
     };
@@ -238,17 +238,15 @@ public static class Storage
         JLField.Readings,
         JLField.KunReadings,
         JLField.OnReadings,
-        JLField.Nanori,
+        JLField.NanoriReadings,
         JLField.StrokeCount,
         JLField.KanjiGrade,
         JLField.KanjiComposition,
         JLField.Definitions,
         JLField.DictionaryName,
-        JLField.Frequencies,
-        JLField.Audio,
-        JLField.Sentence,
         JLField.SourceText,
-        JLField.MatchedText,
+        JLField.Sentence,
+        JLField.Frequencies,
         JLField.EdictId,
         JLField.LocalTime,
     };
@@ -258,18 +256,14 @@ public static class Storage
         JLField.Nothing,
         JLField.PrimarySpelling,
         JLField.Readings,
-        JLField.Definitions,
         JLField.AlternativeSpellings,
+        JLField.Definitions,
         JLField.DictionaryName,
-        JLField.Audio,
-        JLField.Sentence,
         JLField.SourceText,
-        JLField.MatchedText,
+        JLField.Sentence,
         JLField.EdictId,
         JLField.LocalTime,
     };
-
-    public static readonly List<JLField> AllJLFields = Enum.GetValues<JLField>().ToList();
 
     public static readonly Regex JapaneseRegex =
         new(
@@ -543,7 +537,7 @@ public static class Storage
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(null, "Dict type");
             }
         }
 

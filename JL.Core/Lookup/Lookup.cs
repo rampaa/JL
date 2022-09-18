@@ -667,8 +667,8 @@ public static class Lookup
         if (kanjiResult.KunReadings != null)
             allReadings.AddRange(kanjiResult.KunReadings);
 
-        if (kanjiResult.Nanori != null)
-            allReadings.AddRange(kanjiResult.Nanori);
+        if (kanjiResult.NanoriReadings != null)
+            allReadings.AddRange(kanjiResult.NanoriReadings);
 
         IntermediaryResult intermediaryResult = kanjiResults.First().Value;
 
@@ -678,7 +678,7 @@ public static class Lookup
             readings: allReadings,
             onReadings: kanjiResult.OnReadings,
             kunReadings: kanjiResult.KunReadings,
-            nanori: kanjiResult.Nanori,
+            nanoriReadings: kanjiResult.NanoriReadings,
             strokeCount: kanjiResult.StrokeCount,
             kanjiGrade: kanjiResult.Grade,
             kanjiComposition: Storage.KanjiCompositionDict.GetValueOrDefault(dictResult.Key),
