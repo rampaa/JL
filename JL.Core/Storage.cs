@@ -537,7 +537,7 @@ public static class Storage
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(null, "Dict type");
+                    throw new ArgumentOutOfRangeException(null, "Invalid dict type");
             }
         }
 
