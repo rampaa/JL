@@ -60,7 +60,6 @@ public static class EpwingUtils
                 return FilterDuplicateEntries(epwingResult, dict);
 
             case DictType.Daijirin:
-            case DictType.DaijirinNazeka:
                 if (epwingResult.Definitions != null)
                 {
                     // english definitions
@@ -71,6 +70,7 @@ public static class EpwingUtils
                     if (!epwingResult.Definitions.Any(def => Storage.JapaneseRegex.IsMatch(def)))
                         return false;
                 }
+                // todo: missing FilterDuplicateEntries call?
                 break;
 
             case DictType.Daijisen:
@@ -80,36 +80,8 @@ public static class EpwingUtils
 
                 return FilterDuplicateEntries(epwingResult, dict);
 
-            case DictType.Gakken:
-            case DictType.GakkenYojijukugoYomichan:
-            case DictType.IwanamiYomichan:
-            case DictType.JitsuyouYomichan:
-            case DictType.KanjigenYomichan:
-            case DictType.KenkyuushaNazeka:
-            case DictType.KireiCakeYomichan:
-            case DictType.Kotowaza:
-            case DictType.Koujien:
-            case DictType.Meikyou:
-            case DictType.NikkokuYomichan:
-            case DictType.OubunshaYomichan:
-            case DictType.ShinjirinYomichan:
-            case DictType.ShinmeikaiYomichan:
-            case DictType.ShinmeikaiNazeka:
-            case DictType.ShinmeikaiYojijukugoYomichan:
-            case DictType.WeblioKogoYomichan:
-            case DictType.ZokugoYomichan:
-            case DictType.NonspecificWordYomichan:
-            case DictType.NonspecificKanjiYomichan:
-            case DictType.NonspecificNameYomichan:
-            case DictType.NonspecificYomichan:
-            case DictType.NonspecificWordNazeka:
-            case DictType.NonspecificKanjiNazeka:
-            case DictType.NonspecificNameNazeka:
-            case DictType.NonspecificNazeka:
-                return FilterDuplicateEntries(epwingResult, dict);
-
             default:
-                throw new ArgumentOutOfRangeException(nameof(dict), dict.Name, null);
+                return FilterDuplicateEntries(epwingResult, dict);
         }
 
         return true;
