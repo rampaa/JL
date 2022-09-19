@@ -308,15 +308,23 @@ public static class WindowsUtils
         {
             Application.Current!.Dispatcher!.BeginInvoke(() =>
             {
-                if (s_audioPlayer != null)
+                try
                 {
-                    s_audioPlayer.Dispose();
+                    if (s_audioPlayer != null)
+                    {
+                        s_audioPlayer.Dispose();
+                    }
+
+                    s_audioPlayer = new WaveOut { Volume = volume };
+
+                    s_audioPlayer.Init(new Mp3FileReader(new MemoryStream(audio)));
+                    s_audioPlayer.Play();
                 }
-
-                s_audioPlayer = new WaveOut { Volume = volume };
-
-                s_audioPlayer.Init(new Mp3FileReader(new MemoryStream(audio)));
-                s_audioPlayer.Play();
+                catch (Exception e)
+                {
+                    Utils.Logger.Error(e, "Error playing audio: {Audio}", JsonSerializer.Serialize(audio));
+                    Alert(AlertLevel.Error, "Error playing audio");
+                }
             });
         }
         catch (Exception e)
