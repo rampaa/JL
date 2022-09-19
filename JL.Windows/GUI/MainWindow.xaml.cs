@@ -99,10 +99,10 @@ public partial class MainWindow : Window, IFrontend
         _winApi = new(this);
         _winApi.ClipboardChanged += ClipboardChanged;
 
-        await WindowsUtils.InitializeMainWindow();
-
-        _lastClipboardChangeTime = new(Stopwatch.GetTimestamp());
         CopyFromClipboard();
+        _lastClipboardChangeTime = new(Stopwatch.GetTimestamp());
+
+        await WindowsUtils.InitializeMainWindow().ConfigureAwait(false);
     }
 
     protected override void OnActivated(EventArgs e)
