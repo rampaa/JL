@@ -1,0 +1,324 @@
+﻿<UserControl x:Class="JL.Windows.GUI.View.OneResult"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:viewModel="clr-namespace:JL.Windows.GUI.ViewModel"
+             xmlns:mock="clr-namespace:JL.Windows.GUI.Mock"
+             xmlns:converter="clr-namespace:JL.Windows.GUI.Converter"
+             mc:Ignorable="d"
+             d:DesignHeight="400" d:DesignWidth="400" d:Background="Black"
+             d:DataContext="{x:Static mock:MockOneResultViewModel.ViewModel}">
+    <UserControl.Resources>
+    </UserControl.Resources>
+
+    <Grid Name="innerStackPanel" Margin="4,2,4,2" MaxWidth="700"
+          MouseLeave="OnMouseLeave">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="4*" />
+        </Grid.RowDefinitions>
+        <!-- <b:Interaction.Triggers> -->
+        <!--     <b:EventTrigger EventName="MouseLeave"> -->
+        <!--         <b:InvokeCommandAction Command="{Binding MouseLeaveCommand}" /> -->
+        <!--     </b:EventTrigger> -->
+        <!-- </b:Interaction.Triggers> -->
+
+        <WrapPanel Grid.Row="0" Name="top" MouseLeave="OnMouseLeave">
+            <!-- <b:Interaction.Triggers> -->
+            <!--     <b:EventTrigger EventName="MouseLeave"> -->
+            <!--         <b:InvokeCommandAction Command="{Binding MouseLeaveCommand}" /> -->
+            <!--     </b:EventTrigger> -->
+            <!-- </b:Interaction.Triggers> -->
+
+            <TextBlock
+                Name="TextBlockPrimarySpelling"
+                Text="{Binding PrimarySpelling}"
+                Foreground="{Binding ConfigManager.PrimarySpellingColor}"
+                Background="Transparent"
+                FontSize="{Binding ConfigManager.PrimarySpellingFontSize}"
+                TextWrapping="Wrap"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Margin="5,0,0,0"
+                Padding="0"
+                Cursor="Arrow"
+                PreviewMouseUp="PrimarySpelling_PreviewMouseUp">
+                <!-- <b:Interaction.Triggers> -->
+                <!--     <b:EventTrigger EventName="PreviewMouseUp"> -->
+                <!--         <b:CallMethodAction -->
+                <!--             TargetObject="{Binding}" -->
+                <!--             MethodName="PrimarySpelling_PreviewMouseUp" /> -->
+                <!--     </b:EventTrigger> -->
+                <!-- </b:Interaction.Triggers> -->
+                <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="MouseEnter">
+                        <b:CallMethodAction
+                            TargetObject="{Binding}"
+                            MethodName="PrimarySpelling_MouseEnter" />
+                    </b:EventTrigger>
+                    <b:EventTrigger EventName="MouseLeave">
+                        <b:CallMethodAction
+                            TargetObject="{Binding}"
+                            MethodName="PrimarySpelling_MouseLeave" />
+                    </b:EventTrigger>
+                </b:Interaction.Triggers>
+            </TextBlock>
+
+            <!-- not sure if these fallbacks work correctly -->
+            <TextBlock
+                Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text.Length,
+                 Converter={StaticResource Bool2Vis}}"
+                Name="TextBlockPOrthographyInfo"
+                Text="{Binding POrthographyInfo}"
+                Foreground="{Binding Dict.Options.POrthographyInfoColor.Value,
+                 FallbackValue='Chocolate', TargetNullValue='Chocolate'}"
+                FontSize="{Binding Dict.Options.POrthographyInfoFontSize.Value,
+                 FallbackValue=15, TargetNullValue=15 }"
+                Margin="5,0,0,0"
+                TextWrapping="Wrap"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top">
+            </TextBlock>
+
+            <TextBox
+                Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text.Length,
+                 Converter={StaticResource Bool2Vis}}"
+                Name="TextBoxReadings"
+                Text="{Binding Readings}"
+                TextWrapping="Wrap"
+                Background="Transparent"
+                Foreground="{Binding ConfigManager.ReadingsColor}"
+                FontSize="{Binding ConfigManager.ReadingsFontSize}"
+                BorderThickness="0"
+                Margin="5,0,0,0"
+                Padding="0"
+                IsReadOnly="True"
+                IsUndoEnabled="False"
+                Cursor="Arrow"
+                SelectionBrush="{Binding ConfigManager.HighlightColor}"
+                IsInactiveSelectionHighlightEnabled="True"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                MouseMove="PopupMouseMove"
+                LostFocus="Unselect"
+                PreviewMouseLeftButtonUp="UiElement_PreviewMouseLeftButtonUp"
+                PreviewMouseRightButtonUp="TextBoxPreviewMouseRightButtonUp">
+            </TextBox>
+
+            <TextBox
+                Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text.Length,
+                 Converter={StaticResource Bool2Vis}}"
+                Name="TextBoxAlternativeSpellings"
+                Text="{Binding AlternativeSpellings}"
+                TextWrapping="Wrap"
+                Background="Transparent"
+                Foreground="{Binding ConfigManager.AlternativeSpellingsColor}"
+                FontSize="{Binding ConfigManager.AlternativeSpellingsFontSize}"
+                BorderThickness="0"
+                Margin="5,0,0,0"
+                Padding="0"
+                IsReadOnly="True"
+                IsUndoEnabled="False"
+                Cursor="Arrow"
+                SelectionBrush="{Binding ConfigManager.HighlightColor}"
+                IsInactiveSelectionHighlightEnabled="True"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                MouseMove="PopupMouseMove"
+                LostFocus="Unselect"
+                PreviewMouseLeftButtonUp="UiElement_PreviewMouseLeftButtonUp"
+                PreviewMouseRightButtonUp="TextBoxPreviewMouseRightButtonUp">
+            </TextBox>
+
+            <TextBlock
+                Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text.Length,
+                 Converter={StaticResource Bool2Vis}}"
+                Name="TextBlockProcess"
+                Text="{Binding Process}"
+                Foreground="{Binding ConfigManager.DeconjugationInfoColor}"
+                FontSize="{Binding ConfigManager.DeconjugationInfoFontSize}"
+                Margin="5,0,0,0"
+                TextWrapping="Wrap"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top">
+            </TextBlock>
+
+            <TextBlock
+                Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text.Length,
+                 Converter={StaticResource Bool2Vis}}"
+                Name="TextBlockFrequency"
+                Text="{Binding Frequency}"
+                Foreground="{Binding ConfigManager.FrequencyColor}"
+                FontSize="{Binding ConfigManager.FrequencyFontSize}"
+                Margin="5,0,0,0"
+                TextWrapping="Wrap"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top">
+            </TextBlock>
+
+            <TextBlock
+                Name="TextBlockDictType"
+                Text="{Binding Dict.Name}"
+                Foreground="{Binding ConfigManager.DictTypeColor}"
+                FontSize="{Binding ConfigManager.DictTypeFontSize}"
+                Margin="5,0,0,0"
+                TextWrapping="Wrap"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top">
+            </TextBlock>
+
+        </WrapPanel>
+
+        <Grid Grid.Row="1" Name="bottom" MouseLeave="OnMouseLeave">
+            <!-- TODO -->
+            <!-- <Grid.ColumnDefinitions> -->
+            <!--     <ColumnDefinition Width="650" />  -->
+            <!-- </Grid.ColumnDefinitions> -->
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <!-- <b:Interaction.Triggers> -->
+            <!--     <b:EventTrigger EventName="MouseLeave"> -->
+            <!--         <b:InvokeCommandAction Command="{Binding MouseLeaveCommand}" /> -->
+            <!--     </b:EventTrigger> -->
+            <!-- </b:Interaction.Triggers> -->
+
+            <TextBox
+                Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text.Length,
+                 Converter={StaticResource Bool2Vis}}"
+                Name="TextBoxDefinitions"
+                Text="{Binding Definitions}"
+                TextWrapping="Wrap"
+                Background="Transparent"
+                Foreground="{Binding ConfigManager.DefinitionsColor}"
+                FontSize="{Binding ConfigManager.DefinitionsFontSize}"
+                BorderThickness="0"
+                Margin="2"
+                Padding="2"
+                IsReadOnly="True"
+                IsUndoEnabled="False"
+                Cursor="Arrow"
+                SelectionBrush="{Binding ConfigManager.HighlightColor}"
+                IsInactiveSelectionHighlightEnabled="True"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                MouseMove="PopupMouseMove"
+                LostFocus="Unselect"
+                PreviewMouseLeftButtonUp="UiElement_PreviewMouseLeftButtonUp"
+                PreviewMouseRightButtonUp="TextBoxPreviewMouseRightButtonUp">
+            </TextBox>
+            <!-- <TextBlock -->
+            <!--     Visibility="{Binding PopupViewModel.MiningMode, Converter={StaticResource !Bool2Vis}}" -->
+            <!--     Name="TextBlockDefinitions" -->
+            <!--     Text="{Binding Definitions}" -->
+            <!--     TextWrapping="Wrap" -->
+            <!--     Foreground="{Binding ConfigManager.DefinitionsColor}" -->
+            <!--     FontSize="{Binding ConfigManager.DefinitionsFontSize}" -->
+            <!--     Margin="2" -->
+            <!--     HorizontalAlignment="Left" -->
+            <!--     VerticalAlignment="Center"> -->
+            <!-- </TextBlock> -->
+
+            <StackPanel Grid.Row="1" Name="stackPanelKanji">
+                <TextBlock
+                    Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text.Length,
+                 Converter={StaticResource Bool2Vis}}"
+                    Name="TextBlockOnReadings"
+                    Text="{Binding OnReadings}"
+                    Foreground="{Binding ConfigManager.ReadingsColor}"
+                    FontSize="{Binding ConfigManager.ReadingsFontSize}"
+                    Margin="2,0,0,0"
+                    TextWrapping="Wrap"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+                </TextBlock>
+                <TextBlock
+                    Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text.Length,
+                 Converter={StaticResource Bool2Vis}}"
+                    Name="TextBlockKunReadings"
+                    Text="{Binding KunReadings}"
+                    Foreground="{Binding ConfigManager.ReadingsColor}"
+                    FontSize="{Binding ConfigManager.ReadingsFontSize}"
+                    Margin="2,0,0,0"
+                    TextWrapping="Wrap"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+                </TextBlock>
+                <TextBlock
+                    Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text.Length,
+                 Converter={StaticResource Bool2Vis}}"
+                    Name="TextBlockNanoriReadings"
+                    Text="{Binding NanoriReadings}"
+                    Foreground="{Binding ConfigManager.ReadingsColor}"
+                    FontSize="{Binding ConfigManager.ReadingsFontSize}"
+                    Margin="2,0,0,0"
+                    TextWrapping="Wrap"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+                </TextBlock>
+                <TextBlock
+                    Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text.Length,
+                 Converter={StaticResource Bool2Vis}}"
+                    Name="TextBlockKanjiGrade"
+                    Text="{Binding KanjiGrade}"
+                    Foreground="{Binding ConfigManager.DefinitionsColor}"
+                    FontSize="{Binding ConfigManager.DefinitionsFontSize}"
+                    Margin="2,2,2,2"
+                    TextWrapping="Wrap"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+                </TextBlock>
+                <TextBlock
+                    Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text.Length,
+                 Converter={StaticResource Bool2Vis}}"
+                    Name="TextBlockStrokeCount"
+                    Text="{Binding StrokeCount}"
+                    Foreground="{Binding ConfigManager.DefinitionsColor}"
+                    FontSize="{Binding ConfigManager.DefinitionsFontSize}"
+                    Margin="2,2,2,2"
+                    TextWrapping="Wrap"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+                </TextBlock>
+                <TextBlock
+                    Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text.Length,
+                 Converter={StaticResource Bool2Vis}}"
+                    Name="TextBlockKanjiComposition"
+                    Text="{Binding KanjiComposition}"
+                    Foreground="{Binding ConfigManager.DefinitionsColor}"
+                    FontSize="{Binding ConfigManager.DefinitionsFontSize}"
+                    Margin="2,2,2,2"
+                    TextWrapping="Wrap"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+                </TextBlock>
+                <TextBlock
+                    Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text.Length,
+                 Converter={StaticResource Bool2Vis}}"
+                    Name="TextBlockKanjiStats"
+                    Text="{Binding KanjiStats}"
+                    Foreground="{Binding ConfigManager.DefinitionsColor}"
+                    FontSize="{Binding ConfigManager.DefinitionsFontSize}"
+                    Margin="2,2,2,2"
+                    TextWrapping="Wrap"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+                </TextBlock>
+            </StackPanel>
+
+            <Separator
+                Grid.Row="2"
+                Height="2"
+                Background="{Binding ConfigManager.SeparatorColor}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center" />
+        </Grid>
+    </Grid>
+</UserControl>

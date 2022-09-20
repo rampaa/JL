@@ -11,6 +11,7 @@ using HandyControl.Tools;
 using JL.Core;
 using JL.Core.Lookup;
 using JL.Core.Utilities;
+using JL.Windows.GUI.View;
 using JL.Windows.Utilities;
 using Microsoft.Win32;
 
@@ -183,7 +184,7 @@ public partial class MainWindow : Window, IFrontend
             if (charPosition > 0 && char.IsHighSurrogate(input[charPosition - 1]))
                 --charPosition;
 
-            //PrecacheProgress.Text = $"{charPosition + 1}/{input.Length} ({added} new)";
+            PrecacheProgress.Text = $"{charPosition + 1}/{input.Length} ({added} new)";
             if (charPosition % 10 == 0)
             {
                 await Task.Delay(1); // let user interact with the GUI while this method is running
@@ -200,7 +201,7 @@ public partial class MainWindow : Window, IFrontend
                 List<LookupResult>? lookupResults = Lookup.LookupText(text);
                 if (lookupResults is { Count: > 0 })
                 {
-                    var stackPanels = new List<StackPanel>();
+                    var stackPanels = new List<OneResult>();
                     for (int i = 0; i < lookupResults.Count; i++)
                     {
                         if (i > ConfigManager.MaxNumResultsNotInMiningMode)
@@ -209,7 +210,7 @@ public partial class MainWindow : Window, IFrontend
                         }
 
                         LookupResult lookupResult = lookupResults[i];
-                        StackPanel stackPanel = FirstPopupWindow.MakeResultStackPanel(lookupResult, i, lookupResults.Count);
+                        var stackPanel = FirstPopupWindow.MakeResultStackPanel(lookupResult, i, lookupResults.Count);
                         stackPanels.Add(stackPanel);
                     }
 
@@ -258,7 +259,7 @@ public partial class MainWindow : Window, IFrontend
             || MainTextboxContextMenu!.IsVisible
             || FontSizeSlider!.IsVisible
             || OpacitySlider!.IsVisible
-            || FirstPopupWindow.MiningMode
+            || FirstPopupWindow.Vm.MiningMode
             || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.KeyGestureComparer(ConfigManager.LookupKeyKeyGesture)))
         {
             return;
@@ -331,17 +332,17 @@ public partial class MainWindow : Window, IFrontend
 
     private void MainTextBox_MouseLeave(object sender, MouseEventArgs e)
     {
-        if (FirstPopupWindow.MiningMode
+        if (FirstPopupWindow.Vm.MiningMode
             || ConfigManager.LookupOnSelectOnly
             || ConfigManager.LookupOnLeftClickOnly
             || ConfigManager.FixedPopupPositioning
-            || (FirstPopupWindow.UnavoidableMouseEnter && FirstPopupWindow.IsMouseOver))
+            || (FirstPopupWindow.Vm.UnavoidableMouseEnter && FirstPopupWindow.IsMouseOver))
         {
             return;
         }
 
         FirstPopupWindow.Hide();
-        FirstPopupWindow.LastText = "";
+        FirstPopupWindow.Vm.LastText = "";
 
         if (ConfigManager.HighlightLongestMatch && !MainTextboxContextMenu.IsVisible)
         {
@@ -447,7 +448,7 @@ public partial class MainWindow : Window, IFrontend
             e.Handled = true;
 
             ConfigManager.Instance.KanjiMode = !ConfigManager.Instance.KanjiMode;
-            FirstPopupWindow.LastText = "";
+            FirstPopupWindow.Vm.LastText = "";
             Storage.Frontend.InvalidateDisplayCache();
             MainTextBox_MouseMove(null, null);
         }
@@ -501,7 +502,7 @@ public partial class MainWindow : Window, IFrontend
 
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ClosePopupKeyGesture))
         {
-            FirstPopupWindow.MiningMode = false;
+            FirstPopupWindow.Vm.MiningMode = false;
             FirstPopupWindow.TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
             FirstPopupWindow.ItemsControlButtons.Visibility = Visibility.Collapsed;
 
@@ -645,7 +646,7 @@ public partial class MainWindow : Window, IFrontend
         if ((!ConfigManager.LookupOnSelectOnly && !ConfigManager.LookupOnLeftClickOnly)
             || Background!.Opacity == 0
             || ConfigManager.InactiveLookupMode
-            || FirstPopupWindow.MiningMode
+            || FirstPopupWindow.Vm.MiningMode
             || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.KeyGestureComparer(ConfigManager.LookupKeyKeyGesture)))
         {
             return;
@@ -678,7 +679,7 @@ public partial class MainWindow : Window, IFrontend
 
         while (currentPopupWindow != null)
         {
-            currentPopupWindow.MiningMode = false;
+            currentPopupWindow.Vm.MiningMode = false;
             currentPopupWindow.TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
             currentPopupWindow.ItemsControlButtons.Visibility = Visibility.Collapsed;
             currentPopupWindow.PopUpScrollViewer.ScrollToTop();

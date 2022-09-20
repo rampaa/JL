@@ -1,5 +1,15 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converter="clr-namespace:JL.Windows.GUI.Converter">
+
+    <converter:BooleanToVisibilityConverter
+        x:Key="Bool2Vis"
+        True="Visible"
+        False="Collapsed" />
+    <converter:BooleanToVisibilityConverter
+        x:Key="!Bool2Vis"
+        True="Collapsed"
+        False="Visible" />
 
     <Style TargetType="ComboBoxItem">
         <Setter Property="HorizontalContentAlignment" Value="Left" />

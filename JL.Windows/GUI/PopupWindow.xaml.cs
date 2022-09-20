@@ -8,11 +8,12 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using Caching;
 using JL.Core;
-using JL.Core.Anki;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
 using JL.Core.Pitch;
 using JL.Core.Utilities;
+using JL.Windows.GUI.View;
+using JL.Windows.GUI.ViewModel;
 using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
@@ -22,41 +23,27 @@ namespace JL.Windows.GUI;
 /// </summary>
 public partial class PopupWindow : Window
 {
-    private readonly PopupWindow? _parentPopupWindow;
-    public PopupWindow? ChildPopupWindow { get; private set; }
+    // Other classes should only access popup by an interface, ideally
+    public PopupViewModel Vm { get; }
 
-    private TextBox? _lastTextBox;
+    public PopupWindow? ParentPopupWindow { get; }
 
-    private int _playAudioIndex;
+    public PopupWindow? ChildPopupWindow { get; set; }
 
-    private int _currentCharPosition;
+    public TextBox? LastTextBox { get; set; }
 
-    private string? _currentText;
-
-    private string? _lastSelectedText;
-
-    private WinApi? _winApi;
-
-    private List<LookupResult> _lastLookupResults = new();
-
-    private Dict? _filteredDict = null;
-
-    public bool UnavoidableMouseEnter { get; private set; } = false;
-
-    public string? LastText { get; set; }
-
-    public bool MiningMode { get; set; }
-
-    public ObservableCollection<StackPanel> ResultStackPanels { get; } = new();
+    public ObservableCollection<OneResult> ResultStackPanels { get; } = new();
 
     public ObservableCollection<Button> DictTypeButtons { get; } = new();
 
-    public static LRUCache<string, StackPanel[]> StackPanelCache { get; } = new(
+    public static LRUCache<string, OneResult[]> StackPanelCache { get; } = new(
         Storage.CacheSize, Storage.CacheSize / 8);
 
     public PopupWindow()
     {
         InitializeComponent();
+        Vm = new PopupViewModel();
+        // DataContext = Vm; // todo
         Init();
 
         // need to initialize window (position) for later
@@ -64,16 +51,16 @@ public partial class PopupWindow : Window
         Hide();
     }
 
-    private PopupWindow(PopupWindow parentPopUp) : this()
+    public PopupWindow(PopupWindow parentPopUp) : this()
     {
-        _parentPopupWindow = parentPopUp;
+        ParentPopupWindow = parentPopUp;
     }
 
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
 
-        _winApi = new(this);
+        Vm.WinApi = new(this);
     }
 
     protected override void OnActivated(EventArgs e)
@@ -82,7 +69,7 @@ public partial class PopupWindow : Window
 
         if (!ConfigManager.Focusable)
         {
-            _winApi!.PreventFocus();
+            Vm.WinApi!.PreventFocus();
         }
     }
 
@@ -108,17 +95,17 @@ public partial class PopupWindow : Window
 
     private void AddName(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.ShowAddNameWindow(_lastSelectedText);
+        WindowsUtils.ShowAddNameWindow(Vm.LastSelectedText);
     }
 
     private void AddWord(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.ShowAddWordWindow(_lastSelectedText);
+        WindowsUtils.ShowAddWordWindow(Vm.LastSelectedText);
     }
 
     private void SearchWithBrowser(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.SearchWithBrowser(_lastSelectedText);
+        WindowsUtils.SearchWithBrowser(Vm.LastSelectedText);
     }
 
     private void ShowStats(object sender, RoutedEventArgs e)
@@ -128,9 +115,9 @@ public partial class PopupWindow : Window
 
     public async void TextBox_MouseMove(TextBox tb)
     {
-        if (MiningMode || ConfigManager.InactiveLookupMode
-                       || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.KeyGestureComparer(ConfigManager.LookupKeyKeyGesture))
-                       || (ConfigManager.FixedPopupPositioning && _parentPopupWindow != null)
+        if (Vm.MiningMode || ConfigManager.InactiveLookupMode
+                          || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.KeyGestureComparer(ConfigManager.LookupKeyKeyGesture))
+                          || (ConfigManager.FixedPopupPositioning && ParentPopupWindow != null)
            )
             return;
 
@@ -140,16 +127,16 @@ public partial class PopupWindow : Window
             if (charPosition > 0 && char.IsHighSurrogate(tb.Text[charPosition - 1]))
                 --charPosition;
 
-            _currentText = tb.Text;
-            _currentCharPosition = charPosition;
+            Vm.CurrentText = tb.Text;
+            Vm.CurrentCharPosition = charPosition;
 
-            if (_parentPopupWindow != null
+            if (ParentPopupWindow != null
                 && ConfigManager.DisableLookupsForNonJapaneseCharsInPopups
                 && !Storage.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString()))
             {
                 if (ConfigManager.HighlightLongestMatch)
                 {
-                    WindowsUtils.Unselect(_lastTextBox);
+                    WindowsUtils.Unselect(LastTextBox);
                 }
 
                 Visibility = Visibility.Hidden;
@@ -162,23 +149,23 @@ public partial class PopupWindow : Window
 
             string text = tb.Text[charPosition..endPosition];
 
-            if (text == LastText && IsVisible) return;
-            LastText = text;
+            if (text == Vm.LastText && IsVisible) return;
+            Vm.LastText = text;
 
             ResultStackPanels.Clear();
             List<LookupResult>? lookupResults = Lookup.LookupText(text);
 
             if (lookupResults is { Count: > 0 })
             {
-                _lastTextBox = tb;
-                _lastSelectedText = lookupResults[0].MatchedText;
+                LastTextBox = tb;
+                Vm.LastSelectedText = lookupResults[0].MatchedText;
                 if (ConfigManager.HighlightLongestMatch)
                 {
                     double verticalOffset = tb.VerticalOffset;
 
                     if (ConfigManager.PopupFocusOnLookup
                         || ConfigManager.LookupOnLeftClickOnly
-                        || _parentPopupWindow != null)
+                        || ParentPopupWindow != null)
                     {
                         tb.Focus();
                     }
@@ -189,7 +176,7 @@ public partial class PopupWindow : Window
 
                 Init();
 
-                _lastLookupResults = lookupResults;
+                Vm.LastLookupResults = lookupResults;
 
                 if (ConfigManager.LookupOnLeftClickOnly)
                 {
@@ -206,7 +193,7 @@ public partial class PopupWindow : Window
 
                 if (ConfigManager.PopupFocusOnLookup
                     || ConfigManager.LookupOnLeftClickOnly
-                    || _parentPopupWindow != null)
+                    || ParentPopupWindow != null)
                 {
                     tb.Focus();
                     Activate();
@@ -220,7 +207,7 @@ public partial class PopupWindow : Window
             }
             else
             {
-                LastText = "";
+                Vm.LastText = "";
                 Visibility = Visibility.Hidden;
 
                 //if (ConfigManager.HighlightLongestMatch)
@@ -231,7 +218,7 @@ public partial class PopupWindow : Window
         }
         else
         {
-            LastText = "";
+            Vm.LastText = "";
             Visibility = Visibility.Hidden;
 
             if (ConfigManager.HighlightLongestMatch)
@@ -246,7 +233,7 @@ public partial class PopupWindow : Window
         if (string.IsNullOrWhiteSpace(tb.SelectedText))
             return;
 
-        _lastTextBox = tb;
+        LastTextBox = tb;
 
         PopUpScrollViewer!.ScrollToTop();
 
@@ -258,7 +245,7 @@ public partial class PopupWindow : Window
 
             Init();
 
-            _lastLookupResults = lookupResults;
+            Vm.LastLookupResults = lookupResults;
             EnableMiningMode();
             DisplayResults(true, tb.SelectedText);
 
@@ -290,7 +277,7 @@ public partial class PopupWindow : Window
         double newLeft;
         double newTop;
 
-        UnavoidableMouseEnter = false;
+        Vm.UnavoidableMouseEnter = false;
 
         if (needsFlipX)
         {
@@ -329,7 +316,7 @@ public partial class PopupWindow : Window
 
         if (mouseX >= newLeft && mouseX <= newLeft + Width && mouseY >= newTop && mouseY <= newTop + Height)
         {
-            UnavoidableMouseEnter = true;
+            Vm.UnavoidableMouseEnter = true;
         }
 
         Left = newLeft;
@@ -347,7 +334,7 @@ public partial class PopupWindow : Window
         // TODO: Should be configurable
         PopupListBox.Items.Filter = NoAllDictFilter;
 
-        if (text != null && !generateAllResults && StackPanelCache.TryGet(text, out StackPanel[] data))
+        if (text != null && !generateAllResults && StackPanelCache.TryGet(text, out var data))
         {
             for (int i = 0; i < data.Length; i++)
             {
@@ -363,7 +350,7 @@ public partial class PopupWindow : Window
             return;
         }
 
-        int resultCount = _lastLookupResults.Count;
+        int resultCount = Vm.LastLookupResults.Count;
         for (int index = 0; index < resultCount; index++)
         {
             if (!generateAllResults && index > ConfigManager.MaxNumResultsNotInMiningMode)
@@ -371,7 +358,7 @@ public partial class PopupWindow : Window
                 break;
             }
 
-            ResultStackPanels.Add(MakeResultStackPanel(_lastLookupResults[index], index, resultCount));
+            ResultStackPanels.Add(MakeResultStackPanel(Vm.LastLookupResults[index], index, resultCount));
         }
 
         GenerateDictTypeButtons();
@@ -384,9 +371,13 @@ public partial class PopupWindow : Window
         }
     }
 
-    public StackPanel MakeResultStackPanel(LookupResult result,
+    public OneResult MakeResultStackPanel(LookupResult result,
         int index, int resultsCount)
     {
+        var oneResult = new OneResult(result, this, index);
+        PopupListBox.Items.Filter = NoAllDictFilter;
+        return oneResult;
+
         var innerStackPanel = new StackPanel { Margin = new Thickness(4, 2, 4, 2), Tag = result.Dict };
         WrapPanel top = new();
         StackPanel bottom = new();
@@ -394,474 +385,18 @@ public partial class PopupWindow : Window
         innerStackPanel.Children.Add(top);
         innerStackPanel.Children.Add(bottom);
 
-        // top
-        TextBlock? textBlockPOrthographyInfo = null;
-        UIElement? uiElementReadings = null;
-        UIElement? uiElementAlternativeSpellings = null;
-        TextBlock? textBlockProcess = null;
-        TextBlock? textBlockFrequency = null;
-        TextBlock? textBlockEdictId = null;
-
-        var textBlockMatchedText = new TextBlock
-        {
-            Name = nameof(result.MatchedText),
-            Text = result.MatchedText,
-            Visibility = Visibility.Collapsed,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            VerticalAlignment = VerticalAlignment.Center,
-        };
-
-        var textBlockDeconjugatedMatchedText = new TextBlock
-        {
-            Name = nameof(result.DeconjugatedMatchedText),
-            Text = result.DeconjugatedMatchedText,
-            Visibility = Visibility.Collapsed,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            VerticalAlignment = VerticalAlignment.Center,
-        };
-
-        var textBlockPrimarySpelling = new TextBlock
-        {
-            Name = nameof(result.PrimarySpelling),
-            Text = result.PrimarySpelling,
-            Tag = index, // for audio
-            Foreground = ConfigManager.PrimarySpellingColor,
-            Background = Brushes.Transparent,
-            //SelectionTextBrush = ConfigManager.HighlightColor,
-            FontSize = ConfigManager.PrimarySpellingFontSize,
-            TextWrapping = TextWrapping.Wrap,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            VerticalAlignment = VerticalAlignment.Center,
-            //BorderThickness = new Thickness(0, 0, 0, 0),
-            Margin = new Thickness(5, 0, 0, 0),
-            Padding = new Thickness(0),
-            //IsReadOnly = true,
-            //IsUndoEnabled = false,
-            Cursor = Cursors.Arrow,
-            //IsInactiveSelectionHighlightEnabled = true,
-            ContextMenu = PopupContextMenu,
-        };
-
-        // bottom
-        UIElement? uiElementDefinitions = null;
-        TextBlock? textBlockNanoriReadings = null;
-        TextBlock? textBlockOnReadings = null;
-        TextBlock? textBlockKunReadings = null;
-        TextBlock? textBlockStrokeCount = null;
-        TextBlock? textBlockGrade = null;
-        TextBlock? textBlockComposition = null;
-        TextBlock? textBlockKanjiStats = null;
-
-        if (result.Frequencies?.Count > 0)
-        {
-            string freqStr = "";
-
-            if (result.Frequencies.Count == 1 && result.Frequencies[0].Freq > 0 && result.Frequencies[0].Freq != int.MaxValue)
-            {
-                freqStr = "#" + result.Frequencies.First().Freq;
-            }
-
-            else if (result.Frequencies.Count > 1)
-            {
-                int freqResultCount = 0;
-                StringBuilder freqStrBuilder = new();
-                foreach (LookupFrequencyResult lookupFreqResult in result.Frequencies)
-                {
-                    if (lookupFreqResult.Freq == int.MaxValue
-                        || lookupFreqResult.Freq <= 0)
-                        continue;
-
-                    freqStrBuilder.Append($"{lookupFreqResult.Name}: #{lookupFreqResult.Freq}, ");
-                    freqResultCount++;
-                }
-
-                if (freqResultCount > 0)
-                {
-                    freqStrBuilder.Remove(freqStrBuilder.Length - 2, 1);
-
-                    freqStr = freqStrBuilder.ToString();
-                }
-            }
-
-            if (freqStr != "")
-            {
-                textBlockFrequency = new TextBlock
-                {
-                    Name = nameof(result.Frequencies),
-                    Text = freqStr,
-                    Foreground = ConfigManager.FrequencyColor,
-                    FontSize = ConfigManager.FrequencyFontSize,
-                    Margin = new Thickness(5, 0, 0, 0),
-                    TextWrapping = TextWrapping.Wrap,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Top,
-                };
-            }
-        }
-
-        TextBlock textBlockDictType = new()
-        {
-            Name = nameof(result.Dict.Name),
-            Text = result.Dict.Name,
-            Foreground = ConfigManager.DictTypeColor,
-            FontSize = ConfigManager.DictTypeFontSize,
-            Margin = new Thickness(5, 0, 0, 0),
-            TextWrapping = TextWrapping.Wrap,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            VerticalAlignment = VerticalAlignment.Top,
-        };
-
-        textBlockPrimarySpelling.MouseEnter += PrimarySpelling_MouseEnter; // for audio
-        textBlockPrimarySpelling.MouseLeave += PrimarySpelling_MouseLeave; // for audio
-        textBlockPrimarySpelling.PreviewMouseUp += PrimarySpelling_PreviewMouseUp; // for mining
-
-        if (result.Readings?.Any() ?? false)
-        {
-            List<string> rOrthographyInfoList = result.ROrthographyInfoList ?? new();
-            List<string> readings = result.Readings;
-            string readingsText = rOrthographyInfoList.Any() && (result.Dict.Options?.ROrthographyInfo?.Value ?? true)
-                ? PopupWindowUtilities.MakeUiElementReadingsText(readings, rOrthographyInfoList)
-                : string.Join(", ", result.Readings);
-
-            if (readingsText != "")
-            {
-                if (MiningMode)
-                {
-                    uiElementReadings = new TextBox()
-                    {
-                        Name = nameof(result.Readings),
-                        Text = readingsText,
-                        TextWrapping = TextWrapping.Wrap,
-                        Background = Brushes.Transparent,
-                        Foreground = ConfigManager.ReadingsColor,
-                        FontSize = ConfigManager.ReadingsFontSize,
-                        BorderThickness = new Thickness(0, 0, 0, 0),
-                        Margin = new Thickness(5, 0, 0, 0),
-                        Padding = new Thickness(0),
-                        IsReadOnly = true,
-                        IsUndoEnabled = false,
-                        Cursor = Cursors.Arrow,
-                        SelectionBrush = ConfigManager.HighlightColor,
-                        IsInactiveSelectionHighlightEnabled = true,
-                        ContextMenu = PopupContextMenu,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment = VerticalAlignment.Center,
-                    };
-
-                    uiElementReadings.PreviewMouseLeftButtonUp += UiElement_PreviewMouseLeftButtonUp;
-                    uiElementReadings.MouseMove += PopupMouseMove;
-                    uiElementReadings.LostFocus += Unselect;
-                    uiElementReadings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
-                }
-                else
-                {
-                    uiElementReadings = new TextBlock
-                    {
-                        Name = nameof(result.Readings),
-                        Text = readingsText,
-                        TextWrapping = TextWrapping.Wrap,
-                        Foreground = ConfigManager.ReadingsColor,
-                        FontSize = ConfigManager.ReadingsFontSize,
-                        Margin = new Thickness(5, 0, 0, 0),
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment = VerticalAlignment.Center,
-                    };
-                }
-            }
-        }
-
-        if (result.FormattedDefinitions?.Any() ?? false)
-        {
-            if (MiningMode)
-            {
-                uiElementDefinitions = new TextBox
-                {
-                    Name = nameof(result.FormattedDefinitions),
-                    Text = result.FormattedDefinitions,
-                    TextWrapping = TextWrapping.Wrap,
-                    Background = Brushes.Transparent,
-                    Foreground = ConfigManager.DefinitionsColor,
-                    FontSize = ConfigManager.DefinitionsFontSize,
-                    BorderThickness = new Thickness(0, 0, 0, 0),
-                    Margin = new Thickness(2, 2, 2, 2),
-                    Padding = new Thickness(0),
-                    IsReadOnly = true,
-                    IsUndoEnabled = false,
-                    Cursor = Cursors.Arrow,
-                    SelectionBrush = ConfigManager.HighlightColor,
-                    IsInactiveSelectionHighlightEnabled = true,
-                    ContextMenu = PopupContextMenu,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center,
-                };
-
-                uiElementDefinitions.PreviewMouseLeftButtonUp += UiElement_PreviewMouseLeftButtonUp;
-
-                uiElementDefinitions.MouseMove += PopupMouseMove;
-                uiElementDefinitions.LostFocus += Unselect;
-                uiElementDefinitions.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
-            }
-            else
-            {
-                uiElementDefinitions = new TextBlock
-                {
-                    Name = nameof(result.FormattedDefinitions),
-                    Text = result.FormattedDefinitions,
-                    TextWrapping = TextWrapping.Wrap,
-                    Foreground = ConfigManager.DefinitionsColor,
-                    FontSize = ConfigManager.DefinitionsFontSize,
-                    Margin = new Thickness(2, 2, 2, 2),
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center,
-                };
-            }
-        }
-
-        if (result.EdictId != 0)
-        {
-            textBlockEdictId = new TextBlock
-            {
-                Name = nameof(result.EdictId),
-                Text = result.EdictId.ToString(),
-                Visibility = Visibility.Collapsed,
-            };
-        }
-
-        if (result.AlternativeSpellings?.Any() ?? false)
-        {
-            List<string> aOrthographyInfoList = result.AOrthographyInfoList ?? new List<string>();
-            List<string> alternativeSpellings = result.AlternativeSpellings;
-            string alternativeSpellingsText = aOrthographyInfoList.Any() && (result.Dict.Options?.AOrthographyInfo?.Value ?? true)
-                ? PopupWindowUtilities.MakeUiElementAlternativeSpellingsText(alternativeSpellings, aOrthographyInfoList)
-                : "(" + string.Join(", ", alternativeSpellings) + ")";
-
-            if (alternativeSpellingsText != "")
-            {
-                if (MiningMode)
-                {
-                    uiElementAlternativeSpellings = new TextBox()
-                    {
-                        Name = nameof(result.AlternativeSpellings),
-                        Text = alternativeSpellingsText,
-                        TextWrapping = TextWrapping.Wrap,
-                        Background = Brushes.Transparent,
-                        Foreground = ConfigManager.AlternativeSpellingsColor,
-                        FontSize = ConfigManager.AlternativeSpellingsFontSize,
-                        BorderThickness = new Thickness(0, 0, 0, 0),
-                        Margin = new Thickness(5, 0, 0, 0),
-                        Padding = new Thickness(0),
-                        IsReadOnly = true,
-                        IsUndoEnabled = false,
-                        Cursor = Cursors.Arrow,
-                        SelectionBrush = ConfigManager.HighlightColor,
-                        IsInactiveSelectionHighlightEnabled = true,
-                        ContextMenu = PopupContextMenu,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment = VerticalAlignment.Center,
-                    };
-
-                    uiElementAlternativeSpellings.PreviewMouseLeftButtonUp +=
-                        UiElement_PreviewMouseLeftButtonUp;
-                    uiElementAlternativeSpellings.MouseMove += PopupMouseMove;
-                    uiElementAlternativeSpellings.LostFocus += Unselect;
-                    uiElementAlternativeSpellings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
-                }
-                else
-                {
-                    uiElementAlternativeSpellings = new TextBlock
-                    {
-                        Name = nameof(result.AlternativeSpellings),
-                        Text = alternativeSpellingsText,
-                        TextWrapping = TextWrapping.Wrap,
-                        Foreground = ConfigManager.AlternativeSpellingsColor,
-                        FontSize = ConfigManager.AlternativeSpellingsFontSize,
-                        Margin = new Thickness(5, 0, 0, 0),
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment = VerticalAlignment.Center,
-                    };
-                }
-            }
-        }
-
-        if (result.Process != null)
-        {
-            textBlockProcess = new TextBlock
-            {
-                Name = nameof(result.Process),
-                Text = result.Process,
-                Foreground = ConfigManager.DeconjugationInfoColor,
-                FontSize = ConfigManager.DeconjugationInfoFontSize,
-                Margin = new Thickness(5, 0, 0, 0),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Top,
-            };
-        }
-
-        if ((result.POrthographyInfoList?.Any() ?? false)
-            && (result.Dict.Options?.POrthographyInfo?.Value ?? true))
-        {
-            textBlockPOrthographyInfo = new TextBlock
-            {
-                Name = nameof(result.POrthographyInfoList),
-                Text = $"({string.Join(", ", result.POrthographyInfoList)})",
-
-                Foreground = (SolidColorBrush)new BrushConverter()
-                    .ConvertFrom(result.Dict.Options?.POrthographyInfoColor?.Value
-                        ?? ConfigManager.PrimarySpellingColor.ToString())!,
-
-                FontSize = result.Dict.Options?.POrthographyInfoFontSize?.Value ?? 15,
-                Margin = new Thickness(5, 0, 0, 0),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-        }
-
-        // KANJIDIC
-        if (result.OnReadings?.Any() ?? false)
-        {
-            textBlockOnReadings = new TextBlock
-            {
-                Name = nameof(result.OnReadings),
-                Text = "On" + ": " + string.Join(", ", result.OnReadings),
-                Foreground = ConfigManager.ReadingsColor,
-                FontSize = ConfigManager.ReadingsFontSize,
-                Margin = new Thickness(2, 0, 0, 0),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-        }
-
-        if (result.KunReadings?.Any() ?? false)
-        {
-            textBlockKunReadings = new TextBlock
-            {
-                Name = nameof(result.KunReadings),
-                Text = "Kun" + ": " + string.Join(", ", result.KunReadings),
-                Foreground = ConfigManager.ReadingsColor,
-                FontSize = ConfigManager.ReadingsFontSize,
-                Margin = new Thickness(2, 0, 0, 0),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-        }
-
-        if (result.NanoriReadings?.Any() ?? false)
-        {
-            textBlockNanoriReadings = new TextBlock
-            {
-                Name = nameof(result.NanoriReadings),
-                Text = nameof(result.NanoriReadings) + ": " + string.Join(", ", result.NanoriReadings),
-                Foreground = ConfigManager.ReadingsColor,
-                FontSize = ConfigManager.ReadingsFontSize,
-                Margin = new Thickness(2, 0, 0, 0),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-        }
-
-        if (result.StrokeCount > 0)
-        {
-            textBlockStrokeCount = new TextBlock
-            {
-                Name = nameof(result.StrokeCount),
-                Text = "Strokes" + ": " + result.StrokeCount,
-                Foreground = ConfigManager.DefinitionsColor,
-                FontSize = ConfigManager.DefinitionsFontSize,
-                Margin = new Thickness(2, 2, 2, 2),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-        }
-
-        if (result.KanjiGrade > 0)
-        {
-            string gradeString = "";
-            int gradeInt = result.KanjiGrade;
-            switch (gradeInt)
-            {
-                case 0:
-                    gradeString = "Hyougai";
-                    break;
-                case <= 6:
-                    gradeString = $"{gradeInt} (Kyouiku)";
-                    break;
-                case 8:
-                    gradeString = $"{gradeInt} (Jouyou)";
-                    break;
-                case <= 10:
-                    gradeString = $"{gradeInt} (Jinmeiyou)";
-                    break;
-            }
-
-            textBlockGrade = new TextBlock
-            {
-                Name = nameof(result.KanjiGrade),
-                Text = nameof(result.KanjiGrade) + ": " + gradeString,
-                Foreground = ConfigManager.DefinitionsColor,
-                FontSize = ConfigManager.DefinitionsFontSize,
-                Margin = new Thickness(2, 2, 2, 2),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-        }
-
-        if (result.KanjiComposition?.Any() ?? false)
-        {
-            textBlockComposition = new TextBlock
-            {
-                Name = nameof(result.KanjiComposition),
-                Text = "Composition: " + result.KanjiComposition,
-                Foreground = ConfigManager.DefinitionsColor,
-                FontSize = ConfigManager.DefinitionsFontSize,
-                Margin = new Thickness(2, 2, 2, 2),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-        }
-
-        if (result.KanjiStats?.Any() ?? false)
-        {
-            textBlockKanjiStats = new TextBlock
-            {
-                Name = nameof(result.KanjiStats),
-                Text = "Statistics:\n" + result.KanjiStats,
-                Foreground = ConfigManager.DefinitionsColor,
-                FontSize = ConfigManager.DefinitionsFontSize,
-                Margin = new Thickness(2, 2, 2, 2),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-        }
-
         UIElement?[] babies =
         {
-            textBlockPrimarySpelling, textBlockPOrthographyInfo, uiElementReadings, uiElementAlternativeSpellings,
-            textBlockProcess, textBlockMatchedText, textBlockDeconjugatedMatchedText, textBlockEdictId, textBlockFrequency, textBlockDictType
+
         };
 
         for (int i = 0; i < babies.Length; i++)
         {
             UIElement? baby = babies[i];
 
-            if (baby == null) continue;
-
+            // TODO(rampaa): Adapt this
             if (baby is TextBlock textBlock)
             {
-                // common emptiness check
-                if (textBlock.Text == "")
-                    continue;
-
-                textBlock.MouseLeave += OnMouseLeave;
-
                 if ((textBlock.Name is "PrimarySpelling" or "Readings"))
                 {
                     Dict? pitchDict = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.PitchAccentYomichan);
@@ -873,7 +408,6 @@ public partial class PopupWindow : Window
                         {
                             top.Children.Add(textBlock);
                         }
-
                         else
                         {
                             Grid pitchAccentGrid = CreatePitchAccentGrid(result.PrimarySpelling,
@@ -887,7 +421,6 @@ public partial class PopupWindow : Window
                             {
                                 top.Children.Add(textBlock);
                             }
-
                             else
                             {
                                 pitchAccentGrid.Children.Add(textBlock);
@@ -904,12 +437,6 @@ public partial class PopupWindow : Window
             }
             else if (baby is TextBox textBox)
             {
-                // common emptiness check
-                if (textBox.Text == "")
-                    continue;
-
-                textBox.MouseLeave += OnMouseLeave;
-
                 if ((textBox.Name is "PrimarySpelling" or "Readings"))
                 {
                     Dict? pitchDict = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.PitchAccentYomichan);
@@ -948,49 +475,9 @@ public partial class PopupWindow : Window
                     top.Children.Add(textBox);
             }
         }
-
-        if (uiElementDefinitions != null)
-            bottom.Children.Add(uiElementDefinitions);
-
-        TextBlock?[] babiesKanji =
-        {
-            textBlockOnReadings, textBlockKunReadings, textBlockNanoriReadings, textBlockGrade, textBlockStrokeCount,
-            textBlockComposition, textBlockKanjiStats,
-        };
-        foreach (TextBlock? baby in babiesKanji)
-        {
-            if (baby == null) continue;
-
-            // common emptiness check
-            if (baby.Text == "")
-                continue;
-
-            baby.MouseLeave += OnMouseLeave;
-
-            bottom.Children.Add(baby);
-        }
-
-        if (index != resultsCount - 1)
-        {
-            bottom.Children.Add(new Separator
-            {
-                // TODO: Fix width differing from one separator to another
-                Height = 2,
-                Background = ConfigManager.SeparatorColor,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Center,
-            });
-        }
-
-        innerStackPanel.MouseLeave += OnMouseLeave;
-        top.MouseLeave += OnMouseLeave;
-        bottom.MouseLeave += OnMouseLeave;
-
-        PopupListBox.Items.Filter = NoAllDictFilter;
-
-        return innerStackPanel;
     }
 
+    [Obsolete("Unadapted")]
     private static Grid CreatePitchAccentGrid(string primarySpelling, List<string> alternativeSpellings,
         List<string> readings, List<string> splitReadingsWithRInfo, double leftMargin, Dict dict)
     {
@@ -1099,232 +586,7 @@ public partial class PopupWindow : Window
         return pitchAccentGrid;
     }
 
-    private void Unselect(object sender, RoutedEventArgs e)
-    {
-        WindowsUtils.Unselect((TextBox)sender);
-    }
-
-    private void TextBoxPreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
-    {
-        AddNameButton!.IsEnabled = Storage.DictsReady;
-        AddWordButton!.IsEnabled = Storage.DictsReady;
-
-        _lastSelectedText = ((TextBox)sender).SelectedText;
-    }
-
-    private void PopupMouseMove(object sender, MouseEventArgs e)
-    {
-        if (ConfigManager.LookupOnSelectOnly
-            || ConfigManager.LookupOnLeftClickOnly
-            || (ConfigManager.RequireLookupKeyPress
-                && !WindowsUtils.KeyGestureComparer(ConfigManager.LookupKeyKeyGesture)))
-        {
-            return;
-        }
-
-        ChildPopupWindow ??= new PopupWindow(this);
-
-        if (ChildPopupWindow.MiningMode)
-            return;
-
-        // prevents stray PopupWindows being created when you move your mouse too fast
-        if (MiningMode)
-        {
-            ChildPopupWindow.Definitions_MouseMove((TextBox)sender);
-
-            if (!ChildPopupWindow.MiningMode)
-            {
-                if (ConfigManager.FixedPopupPositioning)
-                {
-                    ChildPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition,
-                        WindowsUtils.DpiAwareFixedPopupYPosition);
-                }
-
-                else
-                {
-                    ChildPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
-                }
-            }
-        }
-    }
-
-    private void PrimarySpelling_MouseEnter(object sender, MouseEventArgs e)
-    {
-        var textBlock = (TextBlock)sender;
-        _playAudioIndex = (int)textBlock.Tag;
-    }
-
-    private void PrimarySpelling_MouseLeave(object sender, MouseEventArgs e)
-    {
-        _playAudioIndex = 0;
-    }
-
-    private async void PrimarySpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-    {
-        if (e.ChangedButton == MouseButton.Middle)
-        {
-            WindowsUtils.CopyTextToClipboard(((TextBlock)sender).Text);
-            return;
-        }
-
-        if (!MiningMode || e.ChangedButton == MouseButton.Right)
-        {
-            return;
-        }
-
-        MiningMode = false;
-        TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
-        ItemsControlButtons.Visibility = Visibility.Collapsed;
-        Hide();
-
-        var miningParams = new Dictionary<JLField, string>();
-
-        if (_currentText != null)
-        {
-            miningParams[JLField.SourceText] = _currentText;
-            miningParams[JLField.Sentence] = Utils.FindSentence(_currentText, _currentCharPosition);
-        }
-
-        var textBlock = (TextBlock)sender;
-
-        WrapPanel top;
-
-        if (textBlock.Parent is Grid primarySpellingGrid)
-        {
-            top = (WrapPanel)primarySpellingGrid.Parent;
-        }
-
-        else
-        {
-            top = (WrapPanel)textBlock.Parent;
-        }
-
-        foreach (UIElement child in top.Children)
-        {
-            switch (child)
-            {
-                case TextBox chi:
-                    switch (chi.Name)
-                    {
-                        case nameof(LookupResult.Readings):
-                            miningParams[JLField.Readings] = chi.Text;
-                            break;
-                        case nameof(LookupResult.AlternativeSpellings):
-                            miningParams[JLField.AlternativeSpellings] = chi.Text;
-                            break;
-                    }
-
-                    break;
-                case TextBlock ch:
-                    switch (ch.Name)
-                    {
-                        case nameof(LookupResult.PrimarySpelling):
-                            miningParams[JLField.PrimarySpelling] = ch.Text;
-                            break;
-                        case nameof(LookupResult.MatchedText):
-                            miningParams[JLField.MatchedText] = ch.Text;
-                            break;
-                        case nameof(LookupResult.DeconjugatedMatchedText):
-                            miningParams[JLField.DeconjugatedMatchedText] = ch.Text;
-                            break;
-                        case nameof(LookupResult.EdictId):
-                            miningParams[JLField.EdictId] = ch.Text;
-                            break;
-                        case nameof(LookupResult.Frequencies):
-                            miningParams[JLField.Frequencies] = ch.Text;
-                            break;
-                        case nameof(LookupResult.Dict.Name):
-                            miningParams[JLField.DictionaryName] = ch.Text;
-                            break;
-                        case nameof(LookupResult.Process):
-                            miningParams[JLField.DeconjugationProcess] = ch.Text;
-                            break;
-                    }
-
-                    break;
-                case Grid grid:
-                    {
-                        foreach (UIElement uiElement in grid.Children)
-                        {
-                            if (uiElement is TextBlock textBlockCg)
-                            {
-                                switch (textBlockCg.Name)
-                                {
-                                    case nameof(LookupResult.PrimarySpelling):
-                                        miningParams[JLField.PrimarySpelling] = textBlockCg.Text!;
-                                        break;
-                                }
-                            }
-                            else if (uiElement is TextBox textBoxCg)
-                            {
-                                switch (textBoxCg.Name)
-                                {
-                                    case nameof(LookupResult.Readings):
-                                        miningParams[JLField.Readings] = textBoxCg.Text;
-                                        break;
-                                }
-                            }
-                        }
-
-                        break;
-                    }
-            }
-        }
-
-        var innerStackPanel = (StackPanel)top.Parent;
-        var bottom = (StackPanel)innerStackPanel.Children[1];
-        foreach (object child in bottom.Children)
-        {
-            if (child is TextBox textBox)
-            {
-                miningParams[JLField.Definitions] = textBox.Text.Replace("\n", "<br/>");
-                continue;
-            }
-
-            if (child is not TextBlock tb)
-                continue;
-
-            textBlock = tb;
-
-            switch (textBlock.Name)
-            {
-                case nameof(LookupResult.OnReadings):
-                    miningParams[JLField.OnReadings] = textBlock.Text;
-                    break;
-                case nameof(LookupResult.KunReadings):
-                    miningParams[JLField.KunReadings] = textBlock.Text;
-                    break;
-                case nameof(LookupResult.NanoriReadings):
-                    miningParams[JLField.NanoriReadings] = textBlock.Text;
-                    break;
-                case nameof(LookupResult.StrokeCount):
-                    miningParams[JLField.StrokeCount] = textBlock.Text;
-                    break;
-                case nameof(LookupResult.KanjiGrade):
-                    miningParams[JLField.KanjiGrade] = textBlock.Text;
-                    break;
-                case nameof(LookupResult.KanjiComposition):
-                    miningParams[JLField.KanjiComposition] = textBlock.Text;
-                    break;
-                case nameof(LookupResult.KanjiStats):
-                    miningParams[JLField.KanjiStats] = textBlock.Text;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(null, "Invalid LookupResult type");
-            }
-        }
-
-        miningParams[JLField.LocalTime] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
-
-        bool miningResult = await Mining.Mine(miningParams).ConfigureAwait(false);
-
-        if (miningResult)
-        {
-            Stats.IncrementStat(StatType.CardsMined);
-        }
-    }
-
-    private void Definitions_MouseMove(TextBox tb)
+    public void Definitions_MouseMove(TextBox tb)
     {
         if (Storage.JapaneseRegex.IsMatch(tb.Text))
         {
@@ -1333,7 +595,7 @@ public partial class PopupWindow : Window
 
         else if (ConfigManager.HighlightLongestMatch)
         {
-            WindowsUtils.Unselect(_lastTextBox);
+            WindowsUtils.Unselect(LastTextBox);
         }
     }
 
@@ -1366,7 +628,7 @@ public partial class PopupWindow : Window
 
         if (WindowsUtils.KeyGestureComparer(e, ConfigManager.MiningModeKeyGesture))
         {
-            if (MiningMode)
+            if (Vm.MiningMode)
                 return;
 
             EnableMiningMode();
@@ -1383,7 +645,7 @@ public partial class PopupWindow : Window
         }
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ClosePopupKeyGesture))
         {
-            MiningMode = false;
+            Vm.MiningMode = false;
             TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
             ItemsControlButtons.Visibility = Visibility.Collapsed;
 
@@ -1391,12 +653,12 @@ public partial class PopupWindow : Window
 
             if (ConfigManager.LookupOnSelectOnly)
             {
-                WindowsUtils.Unselect(_lastTextBox);
+                WindowsUtils.Unselect(LastTextBox);
             }
 
-            if (_parentPopupWindow != null)
+            if (ParentPopupWindow != null)
             {
-                _parentPopupWindow.Focus();
+                ParentPopupWindow.Focus();
             }
 
             else
@@ -1409,11 +671,11 @@ public partial class PopupWindow : Window
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.KanjiModeKeyGesture))
         {
             ConfigManager.Instance.KanjiMode = !ConfigManager.Instance.KanjiMode;
-            LastText = "";
+            Vm.LastText = "";
             Storage.Frontend.InvalidateDisplayCache();
-            if (_parentPopupWindow != null)
+            if (ParentPopupWindow != null)
             {
-                TextBox_MouseMove(_lastTextBox!);
+                TextBox_MouseMove(LastTextBox!);
             }
 
             else
@@ -1424,16 +686,16 @@ public partial class PopupWindow : Window
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
         {
             if (Storage.DictsReady)
-                WindowsUtils.ShowAddNameWindow(_lastSelectedText);
+                WindowsUtils.ShowAddNameWindow(Vm.LastSelectedText);
         }
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
         {
             if (Storage.DictsReady)
-                WindowsUtils.ShowAddWordWindow(_lastSelectedText);
+                WindowsUtils.ShowAddWordWindow(Vm.LastSelectedText);
         }
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))
         {
-            WindowsUtils.SearchWithBrowser(_lastSelectedText);
+            WindowsUtils.SearchWithBrowser(Vm.LastSelectedText);
         }
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.InactiveLookupModeKeyGesture))
         {
@@ -1469,7 +731,7 @@ public partial class PopupWindow : Window
 
                 if (foundSelectedButton && button.IsEnabled)
                 {
-                    _filteredDict = (Dict)button.Tag;
+                    Vm.FilteredDict = (Dict)button.Tag;
                     movedToNextDict = true;
                     button.Background = Brushes.DodgerBlue;
                     PopupListBox.Items.Filter = DictFilter;
@@ -1506,7 +768,7 @@ public partial class PopupWindow : Window
 
                 if (foundSelectedButton && button.IsEnabled)
                 {
-                    _filteredDict = (Dict)button.Tag;
+                    Vm.FilteredDict = (Dict)button.Tag;
                     button.Background = Brushes.DodgerBlue;
                     movedToPreviousDict = true;
                     PopupListBox.Items.Filter = DictFilter;
@@ -1527,7 +789,7 @@ public partial class PopupWindow : Window
                     var btn = (Button)ItemsControlButtons.Items[i];
                     if (btn.IsEnabled)
                     {
-                        _filteredDict = (Dict)btn.Tag;
+                        Vm.FilteredDict = (Dict)btn.Tag;
                         btn.Background = Brushes.DodgerBlue;
                         ((Button)ItemsControlButtons.Items[0]).Background = brush;
                         PopupListBox.Items.Filter = DictFilter;
@@ -1540,7 +802,7 @@ public partial class PopupWindow : Window
 
     private void EnableMiningMode()
     {
-        MiningMode = true;
+        Vm.MiningMode = true;
 
         if (ConfigManager.ShowMiningModeReminder)
         {
@@ -1563,76 +825,23 @@ public partial class PopupWindow : Window
 
         //var innerStackPanel = (StackPanel)PopupListBox.Items[index];
 
-        string? primarySpelling = null;
-        string? reading = null;
+        var visibleOneResults = PopupListBox.Items.Cast<OneResult>()
+            .Where(oneResult => oneResult.Visibility == Visibility.Visible).ToArray();
 
-        StackPanel[] visibleStackPanels = PopupListBox.Items.Cast<StackPanel>()
-            .Where(stackPanel => stackPanel.Visibility == Visibility.Visible).ToArray();
-
-        if (visibleStackPanels.Length == 0)
+        if (visibleOneResults.Length == 0)
             return;
 
-        StackPanel innerStackPanel = visibleStackPanels[_playAudioIndex];
-        var top = (WrapPanel)innerStackPanel.Children[0];
-
-        foreach (UIElement child in top.Children)
+        if (Vm.PlayAudioIndex > visibleOneResults.Length - 1)
         {
-            if (child is TextBox chi)
-            {
-                switch (chi.Name)
-                {
-                    case nameof(LookupResult.Readings):
-                        reading = chi.Text.Split(",")[0];
-                        break;
-                }
-            }
-
-            else if (child is TextBlock ch)
-            {
-                switch (ch.Name)
-                {
-                    case nameof(LookupResult.PrimarySpelling):
-                        primarySpelling = ch.Text;
-                        break;
-                    case nameof(LookupResult.Readings):
-                        reading = ch.Text.Split(",")[0];
-                        break;
-                }
-            }
-
-            else if (child is Grid grid)
-            {
-                foreach (UIElement uiElement in grid.Children)
-                {
-                    if (uiElement is TextBlock textBlockCg)
-                    {
-                        switch (textBlockCg.Name)
-                        {
-                            case nameof(LookupResult.PrimarySpelling):
-                                primarySpelling = textBlockCg.Text;
-                                break;
-                            case nameof(LookupResult.Readings):
-                                reading = textBlockCg.Text.Split(",")[0];
-                                break;
-                        }
-                    }
-                    else if (uiElement is TextBox textBoxCg)
-                    {
-                        switch (textBoxCg.Name)
-                        {
-                            case nameof(LookupResult.Readings):
-                                reading = textBoxCg.Text.Split(",")[0];
-                                break;
-                        }
-                    }
-                }
-            }
+            Utils.Logger.Debug("PlayAudioIndex is invalid. Resetting to 0");
+            Vm.PlayAudioIndex = 0;
         }
 
-        if (primarySpelling != null)
-        {
-            await Utils.GetAndPlayAudioFromJpod101(primarySpelling, reading, 1).ConfigureAwait(false);
-        }
+        var oneResultVm = visibleOneResults[Vm.PlayAudioIndex].Vm;
+        string primarySpelling = oneResultVm.PrimarySpelling;
+        string reading = string.IsNullOrEmpty(oneResultVm.Readings) ? "" : oneResultVm.Readings.Split(',')[0];
+
+        await Utils.GetAndPlayAudioFromJpod101(primarySpelling, reading, 1).ConfigureAwait(false);
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -1646,74 +855,35 @@ public partial class PopupWindow : Window
         if (!ConfigManager.LookupOnSelectOnly
             && !ConfigManager.LookupOnLeftClickOnly
             && !ConfigManager.FixedPopupPositioning
-            && ChildPopupWindow is { MiningMode: false })
+            && ChildPopupWindow is { Vm.MiningMode: false })
         {
             ChildPopupWindow.Hide();
-            ChildPopupWindow.LastText = "";
+            ChildPopupWindow.Vm.LastText = "";
         }
 
-        if (MiningMode
+        if (Vm.MiningMode
             || ConfigManager.FixedPopupPositioning
-            || UnavoidableMouseEnter)
+            || Vm.UnavoidableMouseEnter)
         {
             return;
         }
 
         Hide();
-        LastText = "";
+        Vm.LastText = "";
     }
 
-    private void UiElement_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-    {
-        if ((!ConfigManager.LookupOnSelectOnly && !ConfigManager.LookupOnLeftClickOnly)
-            || Background!.Opacity == 0
-            || ConfigManager.InactiveLookupMode
-            || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.KeyGestureComparer(ConfigManager.LookupKeyKeyGesture))
-            || (ConfigManager.FixedPopupPositioning && _parentPopupWindow != null))
-        {
-            return;
-        }
-
-        //if (ConfigManager.RequireLookupKeyPress
-        //    && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
-        //    return;
-
-        ChildPopupWindow ??= new PopupWindow(this);
-
-        if (ConfigManager.LookupOnSelectOnly)
-        {
-            ChildPopupWindow.LookupOnSelect((TextBox)sender);
-        }
-
-        else
-        {
-            ChildPopupWindow.TextBox_MouseMove((TextBox)sender);
-        }
-
-        if (ConfigManager.FixedPopupPositioning)
-        {
-            ChildPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition,
-                WindowsUtils.DpiAwareFixedPopupYPosition);
-        }
-
-        else
-        {
-            ChildPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
-        }
-    }
-
-    private void OnMouseLeave(object sender, MouseEventArgs e)
+    public void OnMouseLeave(object sender, MouseEventArgs e)
     {
         if (!ConfigManager.LookupOnSelectOnly
             && !ConfigManager.LookupOnLeftClickOnly
             && !ConfigManager.FixedPopupPositioning
-            && ChildPopupWindow is { MiningMode: false, UnavoidableMouseEnter: false })
+            && ChildPopupWindow is { Vm.MiningMode: false, Vm.UnavoidableMouseEnter: false })
         {
             ChildPopupWindow.Hide();
-            ChildPopupWindow.LastText = "";
+            ChildPopupWindow.Vm.LastText = "";
         }
 
-        if (MiningMode
+        if (Vm.MiningMode
             || ConfigManager.FixedPopupPositioning
             || IsMouseOver)
         {
@@ -1721,11 +891,11 @@ public partial class PopupWindow : Window
         }
 
         Hide();
-        LastText = "";
+        Vm.LastText = "";
 
         if (ConfigManager.HighlightLongestMatch && !PopupContextMenu.IsVisible)
         {
-            WindowsUtils.Unselect(_lastTextBox);
+            WindowsUtils.Unselect(LastTextBox);
         }
     }
 
@@ -1750,9 +920,9 @@ public partial class PopupWindow : Window
 
         List<Dict> foundDicts = new();
 
-        foreach (StackPanel stackPanel in ResultStackPanels)
+        foreach (var oneResult in ResultStackPanels)
         {
-            Dict foundDict = (Dict)stackPanel.Tag;
+            Dict foundDict = oneResult.Vm.Dict;
             foundDicts.Add(foundDict);
         }
 
@@ -1801,24 +971,24 @@ public partial class PopupWindow : Window
 
         button.Background = Brushes.DodgerBlue;
 
-        _filteredDict = (Dict)button.Tag;
+        Vm.FilteredDict = (Dict)button.Tag;
 
         PopupListBox.Items.Filter = DictFilter;
     }
     private bool DictFilter(object item)
     {
-        StackPanel items = (StackPanel)item;
-        return (Dict)items.Tag == _filteredDict;
+        var items = (OneResult)item;
+        return items.Vm.Dict == Vm.FilteredDict;
     }
 
-    private bool NoAllDictFilter(object item)
+    private static bool NoAllDictFilter(object item)
     {
         if (Storage.Frontend.CoreConfig.KanjiMode)
         {
             return true;
         }
 
-        var dict = (Dict)((StackPanel)item).Tag;
-        return (!dict?.Options?.NoAll?.Value) ?? true;
+        var dict = ((OneResult)item).Vm.Dict;
+        return !dict.Options?.NoAll?.Value ?? true;
     }
 }

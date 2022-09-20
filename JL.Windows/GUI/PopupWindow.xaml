@@ -5,11 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         mc:Ignorable="d"
+        d:DesignHeight="400" d:DesignWidth="400"
         Title="PopupWindow"
         Width="Auto" Height="Auto" SizeToContent="Height" MaxWidth="700" MaxHeight="520"
         Background="#FF2C2B2B" Foreground="White"
         Topmost="True" WindowStyle="None" AllowsTransparency="true" ShowInTaskbar="False"
-        KeyDown="Window_KeyDown" Closing="Window_Closing" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave">
+        KeyDown="Window_KeyDown" Closing="Window_Closing" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave"
+        Visibility="{Binding Vm.Visibility, Converter={StaticResource Bool2Vis}}"
+        >
 
     <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Auto"
                   VerticalContentAlignment="Top"
