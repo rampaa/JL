@@ -35,39 +35,41 @@
             <!--     </b:EventTrigger> -->
             <!-- </b:Interaction.Triggers> -->
 
-            <TextBlock
-                Name="TextBlockPrimarySpelling"
-                Text="{Binding PrimarySpelling}"
-                Foreground="{Binding ConfigManager.PrimarySpellingColor}"
-                Background="Transparent"
-                FontSize="{Binding ConfigManager.PrimarySpellingFontSize}"
-                TextWrapping="Wrap"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                Margin="5,0,0,0"
-                Padding="0"
-                Cursor="Arrow"
-                PreviewMouseUp="PrimarySpelling_PreviewMouseUp">
-                <!-- <b:Interaction.Triggers> -->
-                <!--     <b:EventTrigger EventName="PreviewMouseUp"> -->
-                <!--         <b:CallMethodAction -->
-                <!--             TargetObject="{Binding}" -->
-                <!--             MethodName="PrimarySpelling_PreviewMouseUp" /> -->
-                <!--     </b:EventTrigger> -->
-                <!-- </b:Interaction.Triggers> -->
-                <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="MouseEnter">
-                        <b:CallMethodAction
-                            TargetObject="{Binding}"
-                            MethodName="PrimarySpelling_MouseEnter" />
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="MouseLeave">
-                        <b:CallMethodAction
-                            TargetObject="{Binding}"
-                            MethodName="PrimarySpelling_MouseLeave" />
-                    </b:EventTrigger>
-                </b:Interaction.Triggers>
-            </TextBlock>
+            <Grid Name="pitchAccentGridPrimarySpelling" VerticalAlignment="Center" HorizontalAlignment="Left">
+                <TextBlock
+                    Name="TextBlockPrimarySpelling"
+                    Text="{Binding PrimarySpelling}"
+                    Foreground="{Binding ConfigManager.PrimarySpellingColor}"
+                    Background="Transparent"
+                    FontSize="{Binding ConfigManager.PrimarySpellingFontSize}"
+                    TextWrapping="Wrap"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Margin="5,0,0,0"
+                    Padding="0"
+                    Cursor="Arrow"
+                    PreviewMouseUp="PrimarySpelling_PreviewMouseUp">
+                    <!-- <b:Interaction.Triggers> -->
+                    <!--     <b:EventTrigger EventName="PreviewMouseUp"> -->
+                    <!--         <b:CallMethodAction -->
+                    <!--             TargetObject="{Binding}" -->
+                    <!--             MethodName="PrimarySpelling_PreviewMouseUp" /> -->
+                    <!--     </b:EventTrigger> -->
+                    <!-- </b:Interaction.Triggers> -->
+                    <b:Interaction.Triggers>
+                        <b:EventTrigger EventName="MouseEnter">
+                            <b:CallMethodAction
+                                TargetObject="{Binding}"
+                                MethodName="PrimarySpelling_MouseEnter" />
+                        </b:EventTrigger>
+                        <b:EventTrigger EventName="MouseLeave">
+                            <b:CallMethodAction
+                                TargetObject="{Binding}"
+                                MethodName="PrimarySpelling_MouseLeave" />
+                        </b:EventTrigger>
+                    </b:Interaction.Triggers>
+                </TextBlock>
+            </Grid>
 
             <!-- not sure if these fallbacks work correctly -->
             <TextBlock
@@ -85,30 +87,32 @@
                 VerticalAlignment="Top">
             </TextBlock>
 
-            <TextBox
-                Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text.Length,
+            <Grid Name="pitchAccentGridReadings" VerticalAlignment="Center" HorizontalAlignment="Left">
+                <TextBox
+                    Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text.Length,
                  Converter={StaticResource Bool2Vis}}"
-                Name="TextBoxReadings"
-                Text="{Binding Readings}"
-                TextWrapping="Wrap"
-                Background="Transparent"
-                Foreground="{Binding ConfigManager.ReadingsColor}"
-                FontSize="{Binding ConfigManager.ReadingsFontSize}"
-                BorderThickness="0"
-                Margin="5,0,0,0"
-                Padding="0"
-                IsReadOnly="True"
-                IsUndoEnabled="False"
-                Cursor="Arrow"
-                SelectionBrush="{Binding ConfigManager.HighlightColor}"
-                IsInactiveSelectionHighlightEnabled="True"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                MouseMove="PopupMouseMove"
-                LostFocus="Unselect"
-                PreviewMouseLeftButtonUp="UiElement_PreviewMouseLeftButtonUp"
-                PreviewMouseRightButtonUp="TextBoxPreviewMouseRightButtonUp">
-            </TextBox>
+                    Name="TextBoxReadings"
+                    Text="{Binding Readings}"
+                    TextWrapping="Wrap"
+                    Background="Transparent"
+                    Foreground="{Binding ConfigManager.ReadingsColor}"
+                    FontSize="{Binding ConfigManager.ReadingsFontSize}"
+                    BorderThickness="0"
+                    Margin="5,0,0,0"
+                    Padding="0"
+                    IsReadOnly="True"
+                    IsUndoEnabled="False"
+                    Cursor="Arrow"
+                    SelectionBrush="{Binding ConfigManager.HighlightColor}"
+                    IsInactiveSelectionHighlightEnabled="True"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    MouseMove="PopupMouseMove"
+                    LostFocus="Unselect"
+                    PreviewMouseLeftButtonUp="UiElement_PreviewMouseLeftButtonUp"
+                    PreviewMouseRightButtonUp="TextBoxPreviewMouseRightButtonUp">
+                </TextBox>
+            </Grid>
 
             <TextBox
                 Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Text.Length,
