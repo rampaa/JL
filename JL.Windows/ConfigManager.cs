@@ -71,7 +71,10 @@ public class ConfigManager : CoreConfig
     public static bool TextBoxTrimWhiteSpaceCharacters { get; private set; } = true;
     public static bool TextBoxRemoveNewlines { get; private set; } = false;
     public static bool TextBoxIsReadOnly { get; set; } = true;
-    public static bool TextBoxApplyDropShadowEffect { get; set; } = true;
+    public static bool TextBoxApplyDropShadowEffect { get; private set; } = true;
+    public static bool CaptureTextFromClipboard { get; set; } = true;
+    public static bool OnlyCaptureTextWithJapaneseCharsFromClipboard { get; private set; } = true;
+    public static bool DisableLookupsForNonJapaneseCharsInMainWindow { get; private set; } = false;
 
     #endregion
 
@@ -145,6 +148,7 @@ public class ConfigManager : CoreConfig
     public static KeyGesture AlwaysOnTopKeyGesture { get; private set; } = new(Key.R, ModifierKeys.Windows);
     public static KeyGesture TextOnlyVisibleOnHoverKeyGesture { get; private set; } = new(Key.E, ModifierKeys.Windows);
     public static KeyGesture TextBoxIsReadOnlyKeyGesture { get; private set; } = new(Key.U, ModifierKeys.Windows);
+    public static KeyGesture CaptureTextFromClipboardKeyGesture { get; private set; } = new(Key.F12, ModifierKeys.Windows);
 
     #endregion
 
@@ -486,6 +490,7 @@ public class ConfigManager : CoreConfig
         AlwaysOnTopKeyGesture = WindowsUtils.KeyGestureSetter("AlwaysOnTopKeyGesture", AlwaysOnTopKeyGesture);
         TextOnlyVisibleOnHoverKeyGesture = WindowsUtils.KeyGestureSetter("TextOnlyVisibleOnHoverKeyGesture", TextOnlyVisibleOnHoverKeyGesture);
         TextBoxIsReadOnlyKeyGesture = WindowsUtils.KeyGestureSetter("TextBoxIsReadOnlyKeyGesture", TextBoxIsReadOnlyKeyGesture);
+        CaptureTextFromClipboardKeyGesture = WindowsUtils.KeyGestureSetter("CaptureTextFromClipboardKeyGesture", CaptureTextFromClipboardKeyGesture);
 
         WindowsUtils.SetInputGestureText(mainWindow.AddNameButton, ShowAddNameWindowKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.AddWordButton, ShowAddWordWindowKeyGesture);
@@ -566,6 +571,19 @@ public class ConfigManager : CoreConfig
         {
             mainWindow.MainTextBox.Effect = null;
         }
+
+        
+        WindowsUtils.Try(() => CaptureTextFromClipboard =
+            bool.Parse(ConfigurationManager.AppSettings.Get("CaptureTextFromClipboard")!),
+            CaptureTextFromClipboard, "CaptureTextFromClipboard");
+
+        WindowsUtils.Try(() => OnlyCaptureTextWithJapaneseCharsFromClipboard =
+            bool.Parse(ConfigurationManager.AppSettings.Get("OnlyCaptureTextWithJapaneseCharsFromClipboard")!),
+            OnlyCaptureTextWithJapaneseCharsFromClipboard, "OnlyCaptureTextWithJapaneseCharsFromClipboard");
+
+        WindowsUtils.Try(() => DisableLookupsForNonJapaneseCharsInMainWindow =
+            bool.Parse(ConfigurationManager.AppSettings.Get("DisableLookupsForNonJapaneseCharsInMainWindow")!),
+            DisableLookupsForNonJapaneseCharsInMainWindow, "DisableLookupsForNonJapaneseCharsInMainWindow");
 
         WindowsUtils.Try(() => MainWindowDynamicHeight = bool.Parse(ConfigurationManager.AppSettings
             .Get("MainWindowDynamicHeight")!), MainWindowDynamicHeight, "MainWindowDynamicHeight");
@@ -678,6 +696,8 @@ public class ConfigManager : CoreConfig
             WindowsUtils.KeyGestureToString(TextOnlyVisibleOnHoverKeyGesture);
         preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(TextBoxIsReadOnlyKeyGesture);
+        preferenceWindow.CaptureTextFromClipboardKeyGestureTextBox.Text =
+            WindowsUtils.KeyGestureToString(CaptureTextFromClipboardKeyGesture);
 
         WindowsUtils.SetButtonColor(preferenceWindow.HighlightColorButton, HighlightColor);
         WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, mainWindow.Background.CloneCurrentValue());
@@ -730,6 +750,11 @@ public class ConfigManager : CoreConfig
         preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked = TextBoxTrimWhiteSpaceCharacters;
         preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked = TextBoxRemoveNewlines;
         preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked = TextBoxApplyDropShadowEffect;
+
+        
+        preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked = CaptureTextFromClipboard;
+        preferenceWindow.OnlyCaptureTextWithJapaneseCharsFromClipboardCheckBox.IsChecked = OnlyCaptureTextWithJapaneseCharsFromClipboard;
+        preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInMainWindow;
 
         preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
         preferenceWindow.MainWindowFontComboBox.SelectedIndex = s_japaneseFonts.FindIndex(f =>
@@ -824,6 +849,8 @@ public class ConfigManager : CoreConfig
 
         WindowsUtils.KeyGestureSaver("TextBoxIsReadOnlyKeyGesture",
             preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text);
+        WindowsUtils.KeyGestureSaver("CaptureTextFromClipboardKeyGesture",
+            preferenceWindow.CaptureTextFromClipboardKeyGestureTextBox.Text);
 
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
@@ -865,7 +892,14 @@ public class ConfigManager : CoreConfig
             preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["TextBoxApplyDropShadowEffect"].Value =
             preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked.ToString();
+
         
+        config.AppSettings.Settings["CaptureTextFromClipboard"].Value =
+            preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings["OnlyCaptureTextWithJapaneseCharsFromClipboard"].Value =
+            preferenceWindow.OnlyCaptureTextWithJapaneseCharsFromClipboardCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings["DisableLookupsForNonJapaneseCharsInMainWindow"].Value =
+            preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked.ToString();
 
         config.AppSettings.Settings["MainWindowTextColor"].Value =
             preferenceWindow.TextboxTextColorButton.Tag.ToString();

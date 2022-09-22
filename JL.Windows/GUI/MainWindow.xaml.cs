@@ -99,8 +99,13 @@ public partial class MainWindow : Window, IFrontend
         _winApi = new(this);
         _winApi.ClipboardChanged += ClipboardChanged;
 
-        CopyFromClipboard();
-        _lastClipboardChangeTime = new(Stopwatch.GetTimestamp());
+        ConfigManager.Instance.ApplyPreferences();
+
+        if (ConfigManager.CaptureTextFromClipboard)
+        {
+            CopyFromClipboard();
+            _lastClipboardChangeTime = new(Stopwatch.GetTimestamp());
+        }
 
         await WindowsUtils.InitializeMainWindow().ConfigureAwait(false);
     }
@@ -124,7 +129,7 @@ public partial class MainWindow : Window, IFrontend
             {
                 string text = Clipboard.GetText();
                 gotTextFromClipboard = true;
-                if (Storage.JapaneseRegex.IsMatch(text))
+                if (!ConfigManager.OnlyCaptureTextWithJapaneseCharsFromClipboard || Storage.JapaneseRegex.IsMatch(text))
                 {
                     if (ConfigManager.TextBoxTrimWhiteSpaceCharacters)
                     {
@@ -222,6 +227,9 @@ public partial class MainWindow : Window, IFrontend
 
     private void ClipboardChanged(object? sender, EventArgs? e)
     {
+        if (!ConfigManager.CaptureTextFromClipboard)
+            return;
+
         DateTime currentTime = new(Stopwatch.GetTimestamp());
 
         if ((currentTime - _lastClipboardChangeTime).TotalMilliseconds > 5)
@@ -534,6 +542,11 @@ public partial class MainWindow : Window, IFrontend
             {
                 MainGrid.Opacity = 1;
             }
+        }
+
+        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.CaptureTextFromClipboardKeyGesture))
+        {
+            ConfigManager.CaptureTextFromClipboard = !ConfigManager.CaptureTextFromClipboard;
         }
 
         else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.TextBoxIsReadOnlyKeyGesture))

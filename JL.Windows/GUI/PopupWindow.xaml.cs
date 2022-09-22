@@ -144,8 +144,10 @@ public partial class PopupWindow : Window
             _currentCharPosition = charPosition;
 
             if (_parentPopupWindow != null
-                && ConfigManager.DisableLookupsForNonJapaneseCharsInPopups
-                && !Storage.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString()))
+                ? ConfigManager.DisableLookupsForNonJapaneseCharsInPopups
+                    && !Storage.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString())
+                : ConfigManager.DisableLookupsForNonJapaneseCharsInMainWindow
+                    && !Storage.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString()))
             {
                 if (ConfigManager.HighlightLongestMatch)
                 {

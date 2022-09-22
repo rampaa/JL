@@ -292,8 +292,6 @@ public static class WindowsUtils
     {
         Storage.Frontend = MainWindow.Instance;
 
-        ConfigManager.Instance.ApplyPreferences();
-
         await Utils.CoreInitialize();
 
         if (ConfigManager.CheckForJLUpdatesOnStartUp)
