@@ -257,7 +257,7 @@ public static class Lookup
 
         return lookupResults
             .OrderByDescending(dict => longestMatchedText == dict.PrimarySpelling)
-            .ThenByDescending(dict => dict.Readings?.Contains(longestMatchedText))
+            .ThenByDescending(dict => dict.Readings?.Contains(longestMatchedText) ?? false)
             .ThenByDescending(dict => dict.MatchedText.Length)
             .ThenByDescending(dict => longestMatchedText.Length >= dict.PrimarySpelling.Length && longestMatchedText[..dict.PrimarySpelling.Length] == dict.PrimarySpelling)
             .ThenBy(dict => dict.Dict.Priority)
