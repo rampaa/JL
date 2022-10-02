@@ -71,7 +71,7 @@ public class ConfigManager : CoreConfig
     public static bool TextBoxTrimWhiteSpaceCharacters { get; private set; } = true;
     public static bool TextBoxRemoveNewlines { get; private set; } = false;
     public static bool TextBoxIsReadOnly { get; set; } = true;
-    public static bool TextBoxApplyDropShadowEffect { get; private set; } = true;
+    private static bool TextBoxApplyDropShadowEffect { get; set; } = true;
     public static bool CaptureTextFromClipboard { get; set; } = true;
     public static bool OnlyCaptureTextWithJapaneseCharsFromClipboard { get; private set; } = true;
     public static bool DisableLookupsForNonJapaneseCharsInMainWindow { get; private set; } = false;
@@ -572,7 +572,7 @@ public class ConfigManager : CoreConfig
             mainWindow.MainTextBox.Effect = null;
         }
 
-        
+
         WindowsUtils.Try(() => CaptureTextFromClipboard =
             bool.Parse(ConfigurationManager.AppSettings.Get("CaptureTextFromClipboard")!),
             CaptureTextFromClipboard, "CaptureTextFromClipboard");
@@ -751,7 +751,7 @@ public class ConfigManager : CoreConfig
         preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked = TextBoxRemoveNewlines;
         preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked = TextBoxApplyDropShadowEffect;
 
-        
+
         preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked = CaptureTextFromClipboard;
         preferenceWindow.OnlyCaptureTextWithJapaneseCharsFromClipboardCheckBox.IsChecked = OnlyCaptureTextWithJapaneseCharsFromClipboard;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInMainWindow;
@@ -893,7 +893,7 @@ public class ConfigManager : CoreConfig
         config.AppSettings.Settings["TextBoxApplyDropShadowEffect"].Value =
             preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked.ToString();
 
-        
+
         config.AppSettings.Settings["CaptureTextFromClipboard"].Value =
             preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked.ToString();
         config.AppSettings.Settings["OnlyCaptureTextWithJapaneseCharsFromClipboard"].Value =

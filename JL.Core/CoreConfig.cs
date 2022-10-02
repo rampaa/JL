@@ -3,7 +3,6 @@
 public class CoreConfig
 {
     public Uri AnkiConnectUri { get; protected set; } = new("http://localhost:8765");
-    public string FrequencyListName { get; protected set; } = "VN";
     public bool KanjiMode { get; set; } = false;
     public bool ForceSyncAnki { get; protected set; } = false;
     public bool AllowDuplicateCards { get; protected set; } = false;

@@ -282,10 +282,7 @@ public static class Kana
                     listSize = stringBuilders.Count;
                     for (int j = 0; j < listSize; j++)
                     {
-                        if (j < listSize / 2)
-                            stringBuilders[j].Append(vowel);
-                        else
-                            stringBuilders[j].Append(alternativeVowel);
+                        stringBuilders[j].Append(j < listSize / 2 ? vowel : alternativeVowel);
                     }
                 }
             }
