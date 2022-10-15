@@ -649,7 +649,7 @@ public partial class MainWindow : Window, IFrontend
 
     private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        if (Height is double.NaN || Width is double.NaN)
+        if (double.IsNaN(Height) || double.IsNaN(Width))
             return;
 
         ConfigManager.MainWindowHeight = Height;

@@ -59,10 +59,10 @@ public partial class PreferencesWindow : Window
 • Readings: Readings of the name.
 • Alternative Spellings: Alternative spellings of the mined name.
 • Definitions: Translations of the name.
-• Dictionary Name: Name of the dictionary. e.g. JMnedic.
+• Dictionary Name: Name of the dictionary. e.g. JMnedict.
 • Source Text: Whole text in which the mined name appears in.
 • Sentence: Sentence in which the mined name appears in.
-• EDICT ID: KANJIDIC2 entry ID.
+• EDICT ID: JMnedict entry ID.
 • Local Time: Mining date and time expressed in local timezone.";
 
     public static PreferencesWindow Instance

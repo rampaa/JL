@@ -403,6 +403,7 @@ public static class Utils
         tasks[3] = Storage.LoadFrequencies();
 
         await Task.WhenAll(tasks).ConfigureAwait(false);
+        await SerializeDicts().ConfigureAwait(false);
         GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
     }
