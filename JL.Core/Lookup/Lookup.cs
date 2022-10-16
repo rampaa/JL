@@ -43,19 +43,19 @@ public static class Lookup
                 {
                     if (dict.Type == DictType.Kanjidic)
                     {
-                        lookupResults.AddRange(KanjidicResultBuilder(GetKanjiResults(text, dict)));
+                        lookupResults.AddRange(BuildKanjidicResult(GetKanjiResults(text, dict)));
                     }
 
                     else if (Storage.KanjiDictTypes.Contains(dict.Type))
                     {
                         if (Storage.NazekaDictTypes.Contains(dict.Type))
                         {
-                            lookupResults.AddRange(EpwingNazekaResultBuilder(GetKanjiResults(text, dict)));
+                            lookupResults.AddRange(BuildEpwingNazekaResult(GetKanjiResults(text, dict)));
                         }
 
                         else // if (Storage.YomichanDictTypes.Contains(dict.Type))
                         {
-                            lookupResults.AddRange(YomichanKanjiResultBuilder(GetKanjiResults(text, dict)));
+                            lookupResults.AddRange(BuildYomichanKanjiResult(GetKanjiResults(text, dict)));
                         }
                     }
                 }
@@ -180,25 +180,25 @@ public static class Lookup
         }
 
         if (jMdictResults.Any())
-            lookupResults.AddRange(JmdictResultBuilder(jMdictResults));
+            lookupResults.AddRange(BuildJmdictResult(jMdictResults));
 
         if (jMnedictResults.Any())
-            lookupResults.AddRange(JmnedictResultBuilder(jMnedictResults));
+            lookupResults.AddRange(BuildJmnedictResult(jMnedictResults));
 
         if (kanjidicResults.Any())
-            lookupResults.AddRange(KanjidicResultBuilder(kanjidicResults));
+            lookupResults.AddRange(BuildKanjidicResult(kanjidicResults));
 
         if (customWordResults.Any())
-            lookupResults.AddRange(CustomWordResultBuilder(customWordResults));
+            lookupResults.AddRange(BuildCustomWordResult(customWordResults));
 
         if (customNameResults.Any())
-            lookupResults.AddRange(CustomNameResultBuilder(customNameResults));
+            lookupResults.AddRange(BuildCustomNameResult(customNameResults));
 
         if (epwingYomichanWordResultsList.Any())
         {
             for (int i = 0; i < epwingYomichanWordResultsList.Count; i++)
             {
-                lookupResults.AddRange(EpwingYomichanResultBuilder(epwingYomichanWordResultsList[i]));
+                lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanWordResultsList[i]));
             }
         }
 
@@ -206,7 +206,7 @@ public static class Lookup
         {
             for (int i = 0; i < epwingYomichanKanjiResultsList.Count; i++)
             {
-                lookupResults.AddRange(YomichanKanjiResultBuilder(epwingYomichanKanjiResultsList[i]));
+                lookupResults.AddRange(BuildYomichanKanjiResult(epwingYomichanKanjiResultsList[i]));
             }
         }
 
@@ -214,7 +214,7 @@ public static class Lookup
         {
             for (int i = 0; i < epwingYomichanNameResultsList.Count; i++)
             {
-                lookupResults.AddRange(EpwingYomichanResultBuilder(epwingYomichanNameResultsList[i]));
+                lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanNameResultsList[i]));
             }
         }
 
@@ -222,7 +222,7 @@ public static class Lookup
         {
             for (int i = 0; i < epwingNazekaWordResultsList.Count; i++)
             {
-                lookupResults.AddRange(EpwingNazekaResultBuilder(epwingNazekaWordResultsList[i]));
+                lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaWordResultsList[i]));
             }
         }
 
@@ -230,7 +230,7 @@ public static class Lookup
         {
             for (int i = 0; i < epwingNazekaNameResultsList.Count; i++)
             {
-                lookupResults.AddRange(EpwingNazekaResultBuilder(epwingNazekaNameResultsList[i]));
+                lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaNameResultsList[i]));
             }
         }
 
@@ -238,7 +238,7 @@ public static class Lookup
         {
             for (int i = 0; i < epwingNazekaKanjiResultsList.Count; i++)
             {
-                lookupResults.AddRange(EpwingNazekaResultBuilder(epwingNazekaKanjiResultsList[i]));
+                lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaKanjiResultsList[i]));
             }
         }
 
@@ -538,7 +538,7 @@ public static class Lookup
         return kanjiResults;
     }
 
-    private static IEnumerable<LookupResult> JmdictResultBuilder(
+    private static IEnumerable<LookupResult> BuildJmdictResult(
         Dictionary<string, IntermediaryResult> jmdictResults)
     {
         List<LookupResult> results = new();
@@ -610,7 +610,7 @@ public static class Lookup
         return results;
     }
 
-    private static IEnumerable<LookupResult> JmnedictResultBuilder(
+    private static IEnumerable<LookupResult> BuildJmnedictResult(
         Dictionary<string, IntermediaryResult> jmnedictResults)
     {
         List<LookupResult> results = new();
@@ -646,7 +646,7 @@ public static class Lookup
         return results;
     }
 
-    private static List<LookupResult> KanjidicResultBuilder(
+    private static List<LookupResult> BuildKanjidicResult(
         Dictionary<string, IntermediaryResult> kanjiResults)
     {
         List<LookupResult> results = new();
@@ -693,7 +693,7 @@ public static class Lookup
         return results;
     }
 
-    private static List<LookupResult> YomichanKanjiResultBuilder(
+    private static List<LookupResult> BuildYomichanKanjiResult(
     Dictionary<string, IntermediaryResult> kanjiResults)
     {
         List<LookupResult> results = new();
@@ -733,7 +733,7 @@ public static class Lookup
         return results;
     }
 
-    private static IEnumerable<LookupResult> EpwingYomichanResultBuilder(
+    private static IEnumerable<LookupResult> BuildEpwingYomichanResult(
         Dictionary<string, IntermediaryResult> epwingResults)
     {
         List<LookupResult> results = new();
@@ -770,7 +770,7 @@ public static class Lookup
         return results;
     }
 
-    private static List<LookupResult> EpwingNazekaResultBuilder(
+    private static List<LookupResult> BuildEpwingNazekaResult(
         Dictionary<string, IntermediaryResult> epwingNazekaResults)
     {
         List<LookupResult> results = new();
@@ -809,7 +809,7 @@ public static class Lookup
         return results;
     }
 
-    private static List<LookupResult> CustomWordResultBuilder(
+    private static List<LookupResult> BuildCustomWordResult(
         Dictionary<string, IntermediaryResult> customWordResults)
     {
         List<LookupResult> results = new();
@@ -853,7 +853,7 @@ public static class Lookup
         return results;
     }
 
-    private static List<LookupResult> CustomNameResultBuilder(
+    private static List<LookupResult> BuildCustomNameResult(
         Dictionary<string, IntermediaryResult> customNameResults)
     {
         List<LookupResult> results = new();
