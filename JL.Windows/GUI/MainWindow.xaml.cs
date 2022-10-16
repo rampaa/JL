@@ -267,7 +267,7 @@ public partial class MainWindow : Window, IFrontend
             || FontSizeSlider!.IsVisible
             || OpacitySlider!.IsVisible
             || FirstPopupWindow.MiningMode
-            || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.KeyGestureComparer(ConfigManager.LookupKeyKeyGesture)))
+            || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
         {
             return;
         }
@@ -421,7 +421,7 @@ public partial class MainWindow : Window, IFrontend
 
     private void MainWindow_KeyDown(object sender, KeyEventArgs e)
     {
-        if (WindowsUtils.KeyGestureComparer(e, ConfigManager.DisableHotkeysKeyGesture))
+        if (WindowsUtils.CompareKeyGesture(e, ConfigManager.DisableHotkeysKeyGesture))
         {
             ConfigManager.DisableHotkeys = !ConfigManager.DisableHotkeys;
         }
@@ -429,12 +429,12 @@ public partial class MainWindow : Window, IFrontend
         if (ConfigManager.DisableHotkeys)
             return;
 
-        if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowPreferencesWindowKeyGesture))
+        if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowPreferencesWindowKeyGesture))
         {
             WindowsUtils.ShowPreferencesWindow();
         }
 
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.MousePassThroughModeKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.MousePassThroughModeKeyGesture))
         {
             if (!ConfigManager.InvisibleMode)
             {
@@ -443,13 +443,13 @@ public partial class MainWindow : Window, IFrontend
             }
         }
 
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.InvisibleToggleModeKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.InvisibleToggleModeKeyGesture))
         {
             ConfigManager.InvisibleMode = !ConfigManager.InvisibleMode;
             MainGrid!.Opacity = ConfigManager.InvisibleMode ? 0 : 1;
         }
 
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.KanjiModeKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.KanjiModeKeyGesture))
         {
             // fixes double toggling KanjiMode
             e.Handled = true;
@@ -460,19 +460,19 @@ public partial class MainWindow : Window, IFrontend
             MainTextBox_MouseMove(null, null);
         }
 
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowAddNameWindowKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowAddNameWindowKeyGesture))
         {
             if (Storage.DictsReady)
                 WindowsUtils.ShowAddNameWindow(MainTextBox!.SelectedText);
         }
 
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowAddWordWindowKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowAddWordWindowKeyGesture))
         {
             if (Storage.DictsReady)
                 WindowsUtils.ShowAddWordWindow(MainTextBox!.SelectedText);
         }
 
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
         {
             if (Storage.DictsReady
                 && !Storage.UpdatingJMdict
@@ -483,7 +483,7 @@ public partial class MainWindow : Window, IFrontend
             }
         }
 
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowManageFrequenciesWindowKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowManageFrequenciesWindowKeyGesture))
         {
             if (Storage.FreqsReady)
             {
@@ -491,23 +491,23 @@ public partial class MainWindow : Window, IFrontend
             }
         }
 
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.SearchWithBrowserKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.SearchWithBrowserKeyGesture))
         {
             WindowsUtils.SearchWithBrowser(MainTextBox!.SelectedText);
             WindowsUtils.UpdateMainWindowVisibility();
         }
 
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.InactiveLookupModeKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.InactiveLookupModeKeyGesture))
         {
             ConfigManager.InactiveLookupMode = !ConfigManager.InactiveLookupMode;
         }
 
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.MotivationKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.MotivationKeyGesture))
         {
             WindowsUtils.Motivate($"{Storage.ResourcesPath}/Motivation");
         }
 
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ClosePopupKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ClosePopupKeyGesture))
         {
             FirstPopupWindow.MiningMode = false;
             FirstPopupWindow.TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
@@ -517,19 +517,19 @@ public partial class MainWindow : Window, IFrontend
             FirstPopupWindow.Hide();
         }
 
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.ShowStatsKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowStatsKeyGesture))
         {
             WindowsUtils.ShowStatsWindow();
         }
 
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.AlwaysOnTopKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.AlwaysOnTopKeyGesture))
         {
             ConfigManager.AlwaysOnTop = !ConfigManager.AlwaysOnTop;
 
             Topmost = ConfigManager.AlwaysOnTop;
         }
 
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.TextOnlyVisibleOnHoverKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.TextOnlyVisibleOnHoverKeyGesture))
         {
             ConfigManager.TextOnlyVisibleOnHover = !ConfigManager.TextOnlyVisibleOnHover;
 
@@ -544,12 +544,12 @@ public partial class MainWindow : Window, IFrontend
             }
         }
 
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.CaptureTextFromClipboardKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.CaptureTextFromClipboardKeyGesture))
         {
             ConfigManager.CaptureTextFromClipboard = !ConfigManager.CaptureTextFromClipboard;
         }
 
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.TextBoxIsReadOnlyKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.TextBoxIsReadOnlyKeyGesture))
         {
             ConfigManager.TextBoxIsReadOnly = !ConfigManager.TextBoxIsReadOnly;
             MainTextBox.IsReadOnly = ConfigManager.TextBoxIsReadOnly;
@@ -600,7 +600,7 @@ public partial class MainWindow : Window, IFrontend
 
     private void SteppedBacklog(KeyEventArgs e)
     {
-        if (WindowsUtils.KeyGestureComparer(e, ConfigManager.SteppedBacklogBackwardsKeyGesture))
+        if (WindowsUtils.CompareKeyGesture(e, ConfigManager.SteppedBacklogBackwardsKeyGesture))
         {
             if (_currentTextIndex != 0)
             {
@@ -610,7 +610,7 @@ public partial class MainWindow : Window, IFrontend
 
             MainTextBox!.Text = _backlog[_currentTextIndex];
         }
-        else if (WindowsUtils.KeyGestureComparer(e, ConfigManager.SteppedBacklogForwardsKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.SteppedBacklogForwardsKeyGesture))
         {
             if (_currentTextIndex < _backlog.Count - 1)
             {
@@ -662,7 +662,7 @@ public partial class MainWindow : Window, IFrontend
             || Background!.Opacity == 0
             || ConfigManager.InactiveLookupMode
             || FirstPopupWindow.MiningMode
-            || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.KeyGestureComparer(ConfigManager.LookupKeyKeyGesture)))
+            || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
         {
             return;
         }

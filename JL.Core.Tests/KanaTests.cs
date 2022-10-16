@@ -91,7 +91,7 @@ public class KanaTests
         string text = "オー";
 
         // Act
-        List<string> result = Kana.LongVowelMarkConverter(
+        List<string> result = Kana.ConvertLongVowelMarkToKana(
             text);
 
         // Assert

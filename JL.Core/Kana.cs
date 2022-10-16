@@ -235,7 +235,7 @@ public static class Kana
         return textInKatakana.ToString();
     }
 
-    public static List<string> LongVowelMarkConverter(string text)
+    public static List<string> ConvertLongVowelMarkToKana(string text)
     {
         List<StringBuilder> stringBuilders = new();
         List<string> unicodeTextList = text.UnicodeIterator().ToList();

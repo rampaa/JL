@@ -45,7 +45,7 @@ public static class WindowsUtils
     public static double DpiAwareFixedPopupXPosition { get; set; } = ConfigManager.FixedPopupXPosition / Dpi.DpiScaleX;
     public static double DpiAwareFixedPopupYPosition { get; set; } = ConfigManager.FixedPopupYPosition / Dpi.DpiScaleY;
 
-    public static bool KeyGestureComparer(KeyEventArgs e, KeyGesture keyGesture)
+    public static bool CompareKeyGesture(KeyEventArgs e, KeyGesture keyGesture)
     {
         if (keyGesture.Modifiers.Equals(ModifierKeys.Windows))
             return keyGesture.Key == e.Key && (Keyboard.Modifiers & ModifierKeys.Windows) == 0;
@@ -55,7 +55,7 @@ public static class WindowsUtils
             return keyGesture.Matches(null, e);
     }
 
-    public static bool KeyGestureComparer(KeyGesture keyGesture)
+    public static bool CompareKeyGesture(KeyGesture keyGesture)
     {
         if (keyGesture.Modifiers == ModifierKeys.Windows)
             return Keyboard.IsKeyDown(keyGesture.Key) && (Keyboard.Modifiers & ModifierKeys.Windows) == 0;
@@ -102,7 +102,7 @@ public static class WindowsUtils
         return keyGestureStringBuilder.ToString();
     }
 
-    public static KeyGesture KeyGestureSetter(string keyGestureName, KeyGesture keyGesture)
+    public static KeyGesture SetKeyGesture(string keyGestureName, KeyGesture keyGesture)
     {
         string? rawKeyGesture = ConfigurationManager.AppSettings.Get(keyGestureName);
 
@@ -401,7 +401,7 @@ public static class WindowsUtils
         ConfigurationManager.RefreshSection("appSettings");
     }
 
-    public static void KeyGestureSaver(string key, string rawKeyGesture)
+    public static void SaveKeyGesture(string key, string rawKeyGesture)
     {
         Configuration config =
             ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);

@@ -445,52 +445,52 @@ public class ConfigManager : CoreConfig
                 break;
         }
 
-        DisableHotkeysKeyGesture = WindowsUtils.KeyGestureSetter("DisableHotkeysKeyGesture", DisableHotkeysKeyGesture);
-        MiningModeKeyGesture = WindowsUtils.KeyGestureSetter("MiningModeKeyGesture", MiningModeKeyGesture);
-        PlayAudioKeyGesture = WindowsUtils.KeyGestureSetter("PlayAudioKeyGesture", PlayAudioKeyGesture);
-        KanjiModeKeyGesture = WindowsUtils.KeyGestureSetter("KanjiModeKeyGesture", KanjiModeKeyGesture);
-        LookupKeyKeyGesture = WindowsUtils.KeyGestureSetter("LookupKeyKeyGesture", LookupKeyKeyGesture);
+        DisableHotkeysKeyGesture = WindowsUtils.SetKeyGesture("DisableHotkeysKeyGesture", DisableHotkeysKeyGesture);
+        MiningModeKeyGesture = WindowsUtils.SetKeyGesture("MiningModeKeyGesture", MiningModeKeyGesture);
+        PlayAudioKeyGesture = WindowsUtils.SetKeyGesture("PlayAudioKeyGesture", PlayAudioKeyGesture);
+        KanjiModeKeyGesture = WindowsUtils.SetKeyGesture("KanjiModeKeyGesture", KanjiModeKeyGesture);
+        LookupKeyKeyGesture = WindowsUtils.SetKeyGesture("LookupKeyKeyGesture", LookupKeyKeyGesture);
 
         ShowManageDictionariesWindowKeyGesture =
-            WindowsUtils.KeyGestureSetter("ShowManageDictionariesWindowKeyGesture",
+            WindowsUtils.SetKeyGesture("ShowManageDictionariesWindowKeyGesture",
                 ShowManageDictionariesWindowKeyGesture);
 
         ShowManageFrequenciesWindowKeyGesture =
-            WindowsUtils.KeyGestureSetter("ShowManageFrequenciesWindowKeyGesture",
+            WindowsUtils.SetKeyGesture("ShowManageFrequenciesWindowKeyGesture",
                 ShowManageFrequenciesWindowKeyGesture);
 
         ShowPreferencesWindowKeyGesture =
-            WindowsUtils.KeyGestureSetter("ShowPreferencesWindowKeyGesture", ShowPreferencesWindowKeyGesture);
+            WindowsUtils.SetKeyGesture("ShowPreferencesWindowKeyGesture", ShowPreferencesWindowKeyGesture);
         ShowAddNameWindowKeyGesture =
-            WindowsUtils.KeyGestureSetter("ShowAddNameWindowKeyGesture", ShowAddNameWindowKeyGesture);
+            WindowsUtils.SetKeyGesture("ShowAddNameWindowKeyGesture", ShowAddNameWindowKeyGesture);
         ShowAddWordWindowKeyGesture =
-            WindowsUtils.KeyGestureSetter("ShowAddWordWindowKeyGesture", ShowAddWordWindowKeyGesture);
+            WindowsUtils.SetKeyGesture("ShowAddWordWindowKeyGesture", ShowAddWordWindowKeyGesture);
         SearchWithBrowserKeyGesture =
-            WindowsUtils.KeyGestureSetter("SearchWithBrowserKeyGesture", SearchWithBrowserKeyGesture);
+            WindowsUtils.SetKeyGesture("SearchWithBrowserKeyGesture", SearchWithBrowserKeyGesture);
         MousePassThroughModeKeyGesture =
-            WindowsUtils.KeyGestureSetter("MousePassThroughModeKeyGesture", MousePassThroughModeKeyGesture);
+            WindowsUtils.SetKeyGesture("MousePassThroughModeKeyGesture", MousePassThroughModeKeyGesture);
         InvisibleToggleModeKeyGesture =
-            WindowsUtils.KeyGestureSetter("InvisibleToggleModeKeyGesture", InvisibleToggleModeKeyGesture);
+            WindowsUtils.SetKeyGesture("InvisibleToggleModeKeyGesture", InvisibleToggleModeKeyGesture);
         SteppedBacklogBackwardsKeyGesture =
-            WindowsUtils.KeyGestureSetter("SteppedBacklogBackwardsKeyGesture", SteppedBacklogBackwardsKeyGesture);
+            WindowsUtils.SetKeyGesture("SteppedBacklogBackwardsKeyGesture", SteppedBacklogBackwardsKeyGesture);
         SteppedBacklogForwardsKeyGesture =
-            WindowsUtils.KeyGestureSetter("SteppedBacklogForwardsKeyGesture", SteppedBacklogForwardsKeyGesture);
+            WindowsUtils.SetKeyGesture("SteppedBacklogForwardsKeyGesture", SteppedBacklogForwardsKeyGesture);
         InactiveLookupModeKeyGesture =
-            WindowsUtils.KeyGestureSetter("InactiveLookupModeKeyGesture", InactiveLookupModeKeyGesture);
+            WindowsUtils.SetKeyGesture("InactiveLookupModeKeyGesture", InactiveLookupModeKeyGesture);
         MotivationKeyGesture =
-            WindowsUtils.KeyGestureSetter("MotivationKeyGesture", MotivationKeyGesture);
+            WindowsUtils.SetKeyGesture("MotivationKeyGesture", MotivationKeyGesture);
 
-        ClosePopupKeyGesture = WindowsUtils.KeyGestureSetter("ClosePopupKeyGesture", ClosePopupKeyGesture);
+        ClosePopupKeyGesture = WindowsUtils.SetKeyGesture("ClosePopupKeyGesture", ClosePopupKeyGesture);
 
-        ShowStatsKeyGesture = WindowsUtils.KeyGestureSetter("ShowStatsKeyGesture", ShowStatsKeyGesture);
+        ShowStatsKeyGesture = WindowsUtils.SetKeyGesture("ShowStatsKeyGesture", ShowStatsKeyGesture);
 
-        NextDictKeyGesture = WindowsUtils.KeyGestureSetter("NextDictKeyGesture", NextDictKeyGesture);
-        PreviousDictKeyGesture = WindowsUtils.KeyGestureSetter("PreviousDictKeyGesture", PreviousDictKeyGesture);
+        NextDictKeyGesture = WindowsUtils.SetKeyGesture("NextDictKeyGesture", NextDictKeyGesture);
+        PreviousDictKeyGesture = WindowsUtils.SetKeyGesture("PreviousDictKeyGesture", PreviousDictKeyGesture);
 
-        AlwaysOnTopKeyGesture = WindowsUtils.KeyGestureSetter("AlwaysOnTopKeyGesture", AlwaysOnTopKeyGesture);
-        TextOnlyVisibleOnHoverKeyGesture = WindowsUtils.KeyGestureSetter("TextOnlyVisibleOnHoverKeyGesture", TextOnlyVisibleOnHoverKeyGesture);
-        TextBoxIsReadOnlyKeyGesture = WindowsUtils.KeyGestureSetter("TextBoxIsReadOnlyKeyGesture", TextBoxIsReadOnlyKeyGesture);
-        CaptureTextFromClipboardKeyGesture = WindowsUtils.KeyGestureSetter("CaptureTextFromClipboardKeyGesture", CaptureTextFromClipboardKeyGesture);
+        AlwaysOnTopKeyGesture = WindowsUtils.SetKeyGesture("AlwaysOnTopKeyGesture", AlwaysOnTopKeyGesture);
+        TextOnlyVisibleOnHoverKeyGesture = WindowsUtils.SetKeyGesture("TextOnlyVisibleOnHoverKeyGesture", TextOnlyVisibleOnHoverKeyGesture);
+        TextBoxIsReadOnlyKeyGesture = WindowsUtils.SetKeyGesture("TextBoxIsReadOnlyKeyGesture", TextBoxIsReadOnlyKeyGesture);
+        CaptureTextFromClipboardKeyGesture = WindowsUtils.SetKeyGesture("CaptureTextFromClipboardKeyGesture", CaptureTextFromClipboardKeyGesture);
 
         WindowsUtils.SetInputGestureText(mainWindow.AddNameButton, ShowAddNameWindowKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.AddWordButton, ShowAddWordWindowKeyGesture);
@@ -803,53 +803,53 @@ public class ConfigManager : CoreConfig
 
     public async Task SavePreferences(PreferencesWindow preferenceWindow)
     {
-        WindowsUtils.KeyGestureSaver("DisableHotkeysKeyGesture", preferenceWindow.DisableHotkeysKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("MiningModeKeyGesture", preferenceWindow.MiningModeKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("PlayAudioKeyGesture", preferenceWindow.PlayAudioKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("KanjiModeKeyGesture", preferenceWindow.KanjiModeKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("LookupKeyKeyGesture", preferenceWindow.LookupKeyKeyGestureTextBox.Text);
+        WindowsUtils.SaveKeyGesture("DisableHotkeysKeyGesture", preferenceWindow.DisableHotkeysKeyGestureTextBox.Text);
+        WindowsUtils.SaveKeyGesture("MiningModeKeyGesture", preferenceWindow.MiningModeKeyGestureTextBox.Text);
+        WindowsUtils.SaveKeyGesture("PlayAudioKeyGesture", preferenceWindow.PlayAudioKeyGestureTextBox.Text);
+        WindowsUtils.SaveKeyGesture("KanjiModeKeyGesture", preferenceWindow.KanjiModeKeyGestureTextBox.Text);
+        WindowsUtils.SaveKeyGesture("LookupKeyKeyGesture", preferenceWindow.LookupKeyKeyGestureTextBox.Text);
 
-        WindowsUtils.KeyGestureSaver("ShowManageDictionariesWindowKeyGesture",
+        WindowsUtils.SaveKeyGesture("ShowManageDictionariesWindowKeyGesture",
             preferenceWindow.ShowManageDictionariesWindowKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("ShowManageFrequenciesWindowKeyGesture",
+        WindowsUtils.SaveKeyGesture("ShowManageFrequenciesWindowKeyGesture",
             preferenceWindow.ShowManageFrequenciesWindowKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("ShowPreferencesWindowKeyGesture",
+        WindowsUtils.SaveKeyGesture("ShowPreferencesWindowKeyGesture",
             preferenceWindow.ShowPreferencesWindowKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("ShowAddNameWindowKeyGesture",
+        WindowsUtils.SaveKeyGesture("ShowAddNameWindowKeyGesture",
             preferenceWindow.ShowAddNameWindowKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("ShowAddWordWindowKeyGesture",
+        WindowsUtils.SaveKeyGesture("ShowAddWordWindowKeyGesture",
             preferenceWindow.ShowAddWordWindowKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("SearchWithBrowserKeyGesture",
+        WindowsUtils.SaveKeyGesture("SearchWithBrowserKeyGesture",
             preferenceWindow.SearchWithBrowserKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("MousePassThroughModeKeyGesture",
+        WindowsUtils.SaveKeyGesture("MousePassThroughModeKeyGesture",
             preferenceWindow.MousePassThroughModeKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("InvisibleToggleModeKeyGesture",
+        WindowsUtils.SaveKeyGesture("InvisibleToggleModeKeyGesture",
             preferenceWindow.InvisibleToggleModeKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("SteppedBacklogBackwardsKeyGesture",
+        WindowsUtils.SaveKeyGesture("SteppedBacklogBackwardsKeyGesture",
             preferenceWindow.SteppedBacklogBackwardsKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("SteppedBacklogForwardsKeyGesture",
+        WindowsUtils.SaveKeyGesture("SteppedBacklogForwardsKeyGesture",
             preferenceWindow.SteppedBacklogForwardsKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("InactiveLookupModeKeyGesture",
+        WindowsUtils.SaveKeyGesture("InactiveLookupModeKeyGesture",
             preferenceWindow.InactiveLookupModeKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("MotivationKeyGesture",
+        WindowsUtils.SaveKeyGesture("MotivationKeyGesture",
             preferenceWindow.MotivationKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("ClosePopupKeyGesture",
+        WindowsUtils.SaveKeyGesture("ClosePopupKeyGesture",
             preferenceWindow.ClosePopupKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("ShowStatsKeyGesture",
+        WindowsUtils.SaveKeyGesture("ShowStatsKeyGesture",
             preferenceWindow.ShowStatsKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("NextDictKeyGesture",
+        WindowsUtils.SaveKeyGesture("NextDictKeyGesture",
             preferenceWindow.NextDictKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("PreviousDictKeyGesture",
+        WindowsUtils.SaveKeyGesture("PreviousDictKeyGesture",
             preferenceWindow.PreviousDictKeyGestureTextBox.Text);
 
-        WindowsUtils.KeyGestureSaver("AlwaysOnTopKeyGesture",
+        WindowsUtils.SaveKeyGesture("AlwaysOnTopKeyGesture",
             preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("TextOnlyVisibleOnHoverKeyGesture",
+        WindowsUtils.SaveKeyGesture("TextOnlyVisibleOnHoverKeyGesture",
             preferenceWindow.TextOnlyVisibleOnHoverKeyGestureTextBox.Text);
 
-        WindowsUtils.KeyGestureSaver("TextBoxIsReadOnlyKeyGesture",
+        WindowsUtils.SaveKeyGesture("TextBoxIsReadOnlyKeyGesture",
             preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text);
-        WindowsUtils.KeyGestureSaver("CaptureTextFromClipboardKeyGesture",
+        WindowsUtils.SaveKeyGesture("CaptureTextFromClipboardKeyGesture",
             preferenceWindow.CaptureTextFromClipboardKeyGestureTextBox.Text);
 
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
