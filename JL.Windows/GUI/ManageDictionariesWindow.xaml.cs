@@ -125,9 +125,24 @@ public partial class ManageDictionariesWindow : Window
                     : Visibility.Visible,
             };
 
-            buttonUpdate.Click += async (sender, _) =>
+            switch(dict.Type)
             {
-                ((Button)sender).IsEnabled = false;
+                case DictType.JMdict:
+                    buttonUpdate.IsEnabled = !Storage.UpdatingJMdict;
+                    break;
+
+                case DictType.JMnedict:
+                    buttonUpdate.IsEnabled = !Storage.UpdatingJMnedict;
+                    break;
+
+                case DictType.Kanjidic:
+                    buttonUpdate.IsEnabled = !Storage.UpdatingKanjidic;
+                    break;
+            }
+
+            buttonUpdate.Click += async (_, _) =>
+            {
+                buttonUpdate.IsEnabled = false;
 
                 switch (dict.Type)
                 {
