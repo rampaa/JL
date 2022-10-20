@@ -362,6 +362,7 @@ public partial class PopupWindow : Window
             }
 
             GenerateDictTypeButtons();
+            UpdateLayout();
             return;
         }
 
