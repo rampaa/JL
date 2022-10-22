@@ -24,7 +24,7 @@ IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries,
 * Custom word and name dictionaries
 * Supports lots of dictionaries (see the [Supported Dictionaries](https://github.com/rampaa/JL/blob/master/Supported%20Dictionaries.md) page for details)
 * Pitch accent (needs a pitch accent dictionary such as [Kanjium](https://foosoft.net/projects/yomichan/#dictionaries))
-* Can deconjugate verbs (see the [Deconjugation Support](https://github.com/rampaa/JL/blob/master/Deconjugation%20Support.md) page for details)
+* Can deconjugate verbs (see the [Deconjugation Support](https://github.com/rampaa/JL/blob/master/Deconjugation%20Support.md) page for the list of supported  adjective and verb types)
 * Anki mining (allows different configurations for word/kanji/name mining)
 * Allows different opacity level on un/hover
 * Pass-through mode
