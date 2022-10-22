@@ -61,9 +61,11 @@
 * VN
 * Wikipedia
 * Youtube
-* And probably all other frequency dictionaries that Yomichan currently supports
+* Kanji frequency dictionaries through "Yomichan (Kanji) type
+* And probably all other word frequency dictionaries that Yomichan currently supports through "Yomichan" type
 
 #### Nazeka format
 * Narou
 * Novels
 * VN
+* Other word frequency dictionaries through "Nazeka" type
