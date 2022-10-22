@@ -176,8 +176,6 @@ public partial class PopupWindow : Window
                 _lastSelectedText = lookupResults[0].MatchedText;
                 if (ConfigManager.HighlightLongestMatch)
                 {
-                    double verticalOffset = tb.VerticalOffset;
-
                     if (ConfigManager.PopupFocusOnLookup
                         || ConfigManager.LookupOnLeftClickOnly
                         || _parentPopupWindow != null)
@@ -186,7 +184,6 @@ public partial class PopupWindow : Window
                     }
 
                     tb.Select(charPosition, lookupResults[0].MatchedText.Length);
-                    tb.ScrollToVerticalOffset(verticalOffset);
                 }
 
                 Init();
@@ -363,27 +360,29 @@ public partial class PopupWindow : Window
 
             GenerateDictTypeButtons();
             UpdateLayout();
-            return;
         }
 
-        int resultCount = _lastLookupResults.Count;
-        for (int index = 0; index < resultCount; index++)
+        else
         {
-            if (!generateAllResults && index > ConfigManager.MaxNumResultsNotInMiningMode)
+            int resultCount = _lastLookupResults.Count;
+            for (int index = 0; index < resultCount; index++)
             {
-                break;
+                if (!generateAllResults && index > ConfigManager.MaxNumResultsNotInMiningMode)
+                {
+                    break;
+                }
+
+                ResultStackPanels.Add(MakeResultStackPanel(_lastLookupResults[index], index, resultCount));
             }
 
-            ResultStackPanels.Add(MakeResultStackPanel(_lastLookupResults[index], index, resultCount));
-        }
+            GenerateDictTypeButtons();
+            UpdateLayout();
 
-        GenerateDictTypeButtons();
-        UpdateLayout();
-
-        // we might cache incomplete results if we don't wait until all dicts are loaded
-        if (text != null && Storage.DictsReady && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic)
-        {
-            StackPanelCache.AddReplace(text, ResultStackPanels.ToArray());
+            // we might cache incomplete results if we don't wait until all dicts are loaded
+            if (text != null && Storage.DictsReady && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic)
+            {
+                StackPanelCache.AddReplace(text, ResultStackPanels.ToArray());
+            }
         }
     }
 

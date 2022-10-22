@@ -1000,7 +1000,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Lookup throttle (ms)"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="LookupRateNumericUpDown" Maximum="50" Minimum="0"
+                            <hc:NumericUpDown x:Name="LookupRateNumericUpDown" Maximum="100" Minimum="0"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
