@@ -46,8 +46,6 @@ public static class CustomWordLoader
 
             List<string> wordClass = new();
 
-
-            // TODO
             if (rawWordClass == "Verb")
             {
                 wordClass.Add("v1");
@@ -65,9 +63,9 @@ public static class CustomWordLoader
                 wordClass.Add("v5t");
                 wordClass.Add("v5u");
                 wordClass.Add("v5u-s");
-                wordClass.Add("vi");
                 wordClass.Add("vk");
-                wordClass.Add("vs");
+                wordClass.Add("vs-c");
+                wordClass.Add("vs-i");
                 wordClass.Add("vz");
             }
             else if (rawWordClass == "Adjective")
