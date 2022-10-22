@@ -20,93 +20,20 @@ IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries,
 * .NET Desktop Runtime 6.0 or later
 
 ## Features
-* Highly customizable
+* Highly customizable (i.e. You can change the size/color/opacity of pretty much everything)
 * Custom word and name dictionaries
-* Anki mining
+* Supports lots of dictionaries (see the [Supported Dictionaries](https://github.com/rampaa/JL/blob/master/Supported%20Dictionaries.md) page for details)
+* Pitch accent (needs a pitch accent dictionary such as [Kanjium](https://foosoft.net/projects/yomichan/#dictionaries))
+* Can deconjugate verbs (see the [Deconjugation Support](https://github.com/rampaa/JL/blob/master/Deconjugation%20Support.md) page for details)
+* Anki mining (allows different configurations for word/kanji/name mining)
+* Allows different opacity level on un/hover
 * Pass-through mode
 * Invisible mode (see https://github.com/rampaa/JL/pull/7#issuecomment-1069236589)
-* Allows different opacity level on un/hover
-* Pitch accent (needs a pitch accent dictionary such as [Kanjium](https://foosoft.net/projects/yomichan/#dictionaries))
+* Recursive lookups (i.e. popup within popup)
 * Remembers last window position
-* Recursive lookups
 * Halfwidth -> Fullwidth conversions (and vice-versa)
 * Hiragana -> Katakana conversions (and vice-versa)
-* Chouonpu conversions
-* Can keep itself as the topmost window (i.e. JL can be used with programs like [Magpie](https://github.com/Blinue/Magpie))
-
-## Supported dictionaries
-
-### EDICT
-
-* JMdict
-* JMnedict
-* KANJIDIC (w/ composition data)
-
-### EPWING
-
-#### [Yomichan Import](https://github.com/FooSoft/yomichan-import/) format
-
-* Daijirin
-* Daijisen
-* Gakken
-* Gakken Yojijukugo
-* Iwanami
-* Jitsuyou
-* Kanjigen
-* Kenkyuusha
-* Kirei Cake
-* Kotowaza
-* Koujien
-* Meikyou
-* Nikkoku
-* Oubunsha (without images)
-* Shinjirin
-* Shinmeikai
-* Shinmeikai Yojijukugo
-* Weblio Kogo
-* Zokugo
-* Pitch accent dictionaries (e.g. [Kanjium](https://foosoft.net/projects/yomichan/#dictionaries)) through "Pitch Accent (Yomichan)" type
-* Other dictionaries (such as grammar dictionaries) through "Nonspecific (Yomichan)" type
-
-
-#### [Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter) format
-* Daijirin
-* Kenkyuusha
-* Shinmeikai
-
-
-### Frequency Dictionaries
-
-#### Yomichan Import format
-* Anime & J-drama
-* BCCWJ
-* BCCWJ-LUW
-* BCCWJ-SUW
-* Innocent Ranked
-* JPDB
-* Kokugojiten
-* Monodicts 206k
-* Narou
-* Netflix
-* Nier
-* Novels
-* VN
-* Wikipedia
-* Youtube
-* And probably all other frequency dictionaries that Yomichan currently supports
-
-#### Nazeka format
-* Narou
-* Novels
-* VN
-
-
-## Credits
-* [Nazeka](https://github.com/wareya/nazeka): Deconjugation rules, deconjugator, frequency lists
-* [JMdict](https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project): JMdict_e.gz
-* [JMnedict](https://www.edrdg.org/enamdict/enamdict_doc.html): JMnedict.xml.gz
-* [KANJIDIC](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project): kanjidic2.xml.gz
-* [cjkvi-ids](https://github.com/cjkvi/cjkvi-ids): ids.txt
+* Chouonpu conversions (e.g. can find 清掃 from セーソー)
 
 ## FAQ
 ### Why can't I look anything up?
@@ -135,5 +62,13 @@ Select the file you got from [Nazeka EPWING Converter](https://github.com/wareya
 * Everything else: JL.dll.config
 ### Will you add machine translation capabilities?
 No.
+
+## Credits
+* [Nazeka](https://github.com/wareya/nazeka): Deconjugation rules, deconjugator, frequency lists
+* [JMdict](https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project): JMdict_e.gz
+* [JMnedict](https://www.edrdg.org/enamdict/enamdict_doc.html): JMnedict.xml.gz
+* [KANJIDIC](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project): kanjidic2.xml.gz
+* [cjkvi-ids](https://github.com/cjkvi/cjkvi-ids): ids.txt
+
 ## License
 Licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
