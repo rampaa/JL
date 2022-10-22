@@ -24,18 +24,23 @@ IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries,
 * Custom word and name dictionaries
 * Supports lots of dictionaries (see the [Supported Dictionaries](https://github.com/rampaa/JL/blob/master/Supported%20Dictionaries.md) page for details)
 * Pitch accent (needs a pitch accent dictionary such as [Kanjium](https://foosoft.net/projects/yomichan/#dictionaries))
+* Allows customizing the displayed info per dictionary (not showing PoS info for JMdict, showing no/only one/all example sentences for Kenkyuusha, choosing whether to put newlines between definitions etc. through "Manage Dictionaries"->"Edit" button of the dictionary->"Options" section)
 * Can deconjugate verbs (see the [Deconjugation Support](https://github.com/rampaa/JL/blob/master/Deconjugation%20Support.md) page for the list of supported  adjective and verb types)
 * Anki mining (allows different configurations for word/kanji/name mining)
 * Allows different opacity level on un/hover
-* Pass-through mode
+* Pass-through mode (i.e. mouse clicks will pass through JL)
 * Invisible mode (see https://github.com/rampaa/JL/pull/7#issuecomment-1069236589)
 * Recursive lookups (i.e. popup within popup)
 * Remembers last window position
 * Halfwidth -> Fullwidth conversions (and vice-versa)
 * Hiragana -> Katakana conversions (and vice-versa)
 * Chouonpu conversions (e.g. can find 清掃 from セーソー)
+* Text normalization (e.g. can find 株式会社 when ㍿ is looked up)
 * Has a backlog (using the arrow keys will show items in the backlog one by one, scrolling up will show all the backlog at once)
 * Touch screen support (i.e. Left Click/Touch look mode)
+* Can work without stealing the focus away from other windows
+* Can keep itself as the topmost window (i.e. JL can be used with programs like [Magpie](https://github.com/Blinue/Magpie))
+* Stats (read character/line count, spent time etc.)
 
 ## FAQ
 ### Why can't I look anything up?
