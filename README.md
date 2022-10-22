@@ -20,7 +20,7 @@ IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries,
 * .NET Desktop Runtime 6.0 or later
 
 ## Features
-* Highly customizable (i.e. You can change the size/color/opacity of pretty much everything)
+* Highly customizable (i.e. You can change the size/color/opacity/hotkey of pretty much everything)
 * Custom word and name dictionaries
 * Supports lots of dictionaries (see the [Supported Dictionaries](https://github.com/rampaa/JL/blob/master/Supported%20Dictionaries.md) page for details)
 * Pitch accent (needs a pitch accent dictionary such as [Kanjium](https://foosoft.net/projects/yomichan/#dictionaries))
@@ -34,6 +34,8 @@ IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries,
 * Halfwidth -> Fullwidth conversions (and vice-versa)
 * Hiragana -> Katakana conversions (and vice-versa)
 * Chouonpu conversions (e.g. can find 清掃 from セーソー)
+* Has a backlog (using the arrow keys will show items in the backlog one by one, scrolling up will show all the backlog at once)
+* Touch screen support (i.e. Left Click/Touch look mode)
 
 ## FAQ
 ### Why can't I look anything up?
