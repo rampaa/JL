@@ -22,5 +22,6 @@
 
 * vs-c: su verb - precursor to the modern suru (at the moment, the process info for su verbs is mostly rubbish)
 * vs-i: suru verb - included
+* vs-s: suru verb - special class
 
 * vz: Ichidan verb - zuru verb (alternative form of -jiru verbs)
