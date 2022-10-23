@@ -66,6 +66,7 @@ public static class CustomWordLoader
                 wordClass.Add("vk");
                 wordClass.Add("vs-c");
                 wordClass.Add("vs-i");
+                wordClass.Add("vs-s");
                 wordClass.Add("vz");
             }
             else if (rawWordClass == "Adjective")
