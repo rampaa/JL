@@ -392,18 +392,25 @@ public static class Utils
         if (!File.Exists($"{Storage.ResourcesPath}/custom_names.txt"))
             await File.Create($"{Storage.ResourcesPath}/custom_names.txt").DisposeAsync();
 
-        Task[] tasks = new Task[4];
+        Task[] tasks = new Task[3];
+        tasks[0] = Task.Run(async () =>
+        {
+            await DeserializeDicts().ConfigureAwait(false);
+            await Storage.LoadDictionaries(false).ConfigureAwait(false);
+            await SerializeDicts().ConfigureAwait(false);
+            await Storage.InitializePoS().ConfigureAwait(false);
+        });
 
-        await DeserializeDicts().ConfigureAwait(false);
-        tasks[0] = Storage.LoadDictionaries(false);
-        tasks[1] = Storage.InitializePoS();
-        tasks[2] = Storage.InitializeKanjiCompositionDict();
+        tasks[1] = Storage.InitializeKanjiCompositionDict();
 
-        await DeserializeFreqs().ConfigureAwait(false);
-        tasks[3] = Storage.LoadFrequencies();
+        tasks[2] = Task.Run(async () =>
+        {
+            await DeserializeFreqs().ConfigureAwait(false);
+            await Storage.LoadFrequencies(false).ConfigureAwait(false);
+        });
 
         await Task.WhenAll(tasks).ConfigureAwait(false);
-        await SerializeDicts().ConfigureAwait(false);
+
         GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
     }

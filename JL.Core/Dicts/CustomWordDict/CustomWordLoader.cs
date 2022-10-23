@@ -50,6 +50,7 @@ public static class CustomWordLoader
             {
                 wordClass.Add("v1");
                 wordClass.Add("v1-s");
+                wordClass.Add("v4r");
                 wordClass.Add("v5aru");
                 wordClass.Add("v5b");
                 wordClass.Add("v5g");

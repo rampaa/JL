@@ -560,7 +560,7 @@ public static class Storage
         DictsReady = true;
     }
 
-    public static async Task LoadFrequencies()
+    public static async Task LoadFrequencies(bool runGC = true)
     {
         FreqsReady = false;
 
@@ -633,7 +633,7 @@ public static class Storage
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(null, "Invalid freq type");
             }
         }
 
@@ -646,8 +646,11 @@ public static class Storage
 
             Storage.Frontend.InvalidateDisplayCache();
 
-            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+            if (runGC)
+            {
+                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+            }
         }
 
         FreqsReady = true;

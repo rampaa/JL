@@ -125,7 +125,7 @@ public partial class ManageDictionariesWindow : Window
                     : Visibility.Visible,
             };
 
-            switch(dict.Type)
+            switch (dict.Type)
             {
                 case DictType.JMdict:
                     buttonUpdate.IsEnabled = !Storage.UpdatingJMdict;
