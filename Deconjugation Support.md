@@ -4,6 +4,8 @@
 * v1: Ichidan verb
 * v1-s: Ichidan verb - kureru special class
 
+* v4r: v4r - Yodan verb with `ru' ending (archaic)
+
 * v5aru: Godan verb - -aru special class
 * v5b: Godan verb with 'bu' ending
 * v5g: Godan verb with 'gu' ending
