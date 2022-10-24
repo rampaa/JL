@@ -911,10 +911,10 @@
     },
     {
         "type": "stdrule",
-        "dec_end": [ "る", "る", "る", "ずる", "する", "する" ],
-        "con_end": [ "られる", "られる", "られる", "ぜられる", "せられる", "しられる" ],
-        "dec_tag": [ "v1", "v1-s", "v5aru", "vz", "vs-s", "vs-s" ],
-        "con_tag": [ "v1", "v1-s", "v5aru", "vz", "vs-s", "vs-s" ],
+        "dec_end": [ "る", "る", "る", "ずる", "ずる", "する", "する" ],
+        "con_end": [ "られる", "られる", "られる", "ぜられる", "ざれる", "せられる", "しられる" ],
+        "dec_tag": [ "v1", "v1-s", "v5aru", "vz", "vz", "vs-s", "vs-s" ],
+        "con_tag": [ "v1", "v1-s", "v5aru", "vz", "vz", "vs-s", "vs-s" ],
         "detail": "passive/potential"
     },
     {
@@ -1254,11 +1254,5 @@
         "dec_tag": [ "vk" ],
         "con_tag": [ "uninflectable" ],
         "detail": "slurred"
-    },
-    {
-        "type": "substitution",
-        "dec_end": [ "叱" ],
-        "con_end": [ "𠮟" ],
-        "detail": ""
     }
 ]
