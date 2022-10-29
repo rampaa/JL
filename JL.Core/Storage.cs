@@ -43,7 +43,7 @@ public static class Storage
     public static bool UpdatingJMnedict { get; set; } = false;
     public static bool UpdatingKanjidic { get; set; } = false;
     public static bool FreqsReady { get; private set; } = false;
-    public static Dictionary<string, List<JmdictWc>> WcDict { get; set; } = new(65536); // 2022/08/15: 47352
+    public static Dictionary<string, List<JmdictWc>> WcDict { get; set; } = new(65536); // 2022/10/29: 48909
     public static readonly Dictionary<string, string> KanjiCompositionDict = new(86934);
     public static Dictionary<string, Freq> FreqDicts { get; set; } = new();
 

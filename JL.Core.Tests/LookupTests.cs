@@ -202,10 +202,10 @@ public class LookupTests
     }
 
     [Test]
-    public void Freq_懐かしい_いだく()
+    public void Freq_懐かしい_なつかしい()
     {
         // Arrange
-        int expected = 903;
+        int expected = 1776;
 
         string text = "懐かしい";
 
@@ -213,7 +213,7 @@ public class LookupTests
         List<LookupResult>? result = Lookup.Lookup.LookupText(text);
 
         int actual = result != null
-            ? result.First(x => x.Readings?.Contains("いだく") ?? false).Frequencies?.First().Freq ?? int.MaxValue
+            ? result.First(x => x.Readings?.Contains("なつかしい") ?? false).Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
