@@ -37,7 +37,7 @@ public static class Networking
 
             if (gitHubApiResponse.IsSuccessStatusCode)
             {
-                Stream githubApiResultStream = await gitHubApiResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                using Stream githubApiResultStream = await gitHubApiResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 JsonDocument jsonDocument = await JsonDocument.ParseAsync(githubApiResultStream).ConfigureAwait(false);
                 JsonElement rootElement = jsonDocument.RootElement;
                 Version latestJLVersion = new(rootElement.GetProperty("tag_name").ToString());

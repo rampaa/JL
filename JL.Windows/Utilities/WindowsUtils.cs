@@ -261,8 +261,8 @@ public static class WindowsUtils
 
         if (downloadResponse.IsSuccessStatusCode)
         {
-            Stream downloadResponseStream = await downloadResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            ZipArchive archive = new(downloadResponseStream);
+            using Stream downloadResponseStream = await downloadResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            using ZipArchive archive = new(downloadResponseStream);
 
             string tmpDirectory = Path.Join(Storage.ApplicationPath, "tmp");
 

@@ -120,11 +120,10 @@ public static class Utils
         try
         {
             var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(), }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+            using Stream dictStream = new StreamReader(Path.Join(Storage.ConfigPath, "dicts.json")).BaseStream;
 
             Dictionary<string, Dict>? deserializedDicts = await JsonSerializer
-                .DeserializeAsync<Dictionary<string, Dict>>(
-                    new StreamReader(Path.Join(Storage.ConfigPath, "dicts.json")).BaseStream, jso)
-                .ConfigureAwait(false);
+                .DeserializeAsync<Dictionary<string, Dict>>(dictStream, jso).ConfigureAwait(false);
 
             if (deserializedDicts != null)
             {
@@ -197,11 +196,10 @@ public static class Utils
         try
         {
             var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(), }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+            using Stream freqStream = new StreamReader(Path.Join(Storage.ConfigPath, "freqs.json")).BaseStream;
 
             Dictionary<string, Freq>? deserializedFreqs = await JsonSerializer
-                .DeserializeAsync<Dictionary<string, Freq>>(
-                    new StreamReader(Path.Join(Storage.ConfigPath, "freqs.json")).BaseStream, jso)
-                .ConfigureAwait(false);
+                .DeserializeAsync<Dictionary<string, Freq>>(freqStream, jso).ConfigureAwait(false);
 
             if (deserializedFreqs != null)
             {
