@@ -245,12 +245,12 @@ public partial class MainWindow : Window, IFrontend
 
             if (ConfigManager.AlwaysOnTop
                 && !FirstPopupWindow.IsVisible
-                && !ManageDictionariesWindow.Instance.IsVisible
-                && !ManageFrequenciesWindow.Instance.IsVisible
-                && !AddNameWindow.Instance.IsVisible
-                && !AddWordWindow.Instance.IsVisible
-                && !PreferencesWindow.Instance.IsVisible
-                && !StatsWindow.Instance.IsVisible
+                && !ManageDictionariesWindow.IsItVisible()
+                && !ManageFrequenciesWindow.IsItVisible()
+                && !AddNameWindow.IsItVisible()
+                && !AddWordWindow.IsItVisible()
+                && !PreferencesWindow.IsItVisible()
+                && !StatsWindow.IsItVisible()
                 && !MainTextboxContextMenu.IsVisible)
             {
                 _winApi!.KeepTopmost();

@@ -19,18 +19,17 @@ public partial class AddWordWindow : Window
 
     public static AddWordWindow Instance
     {
-        get
-        {
-            if (s_instance == null || !s_instance.IsLoaded)
-                s_instance = new();
-
-            return s_instance;
-        }
+        get { return s_instance ??= new(); }
     }
 
     public AddWordWindow()
     {
         InitializeComponent();
+    }
+
+    public static bool IsItVisible()
+    {
+        return s_instance?.IsVisible ?? false;
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -119,6 +118,7 @@ public partial class AddWordWindow : Window
     {
         MainWindow mainWindow = MainWindow.Instance;
         mainWindow.Focus();
+        s_instance = null;
         WindowsUtils.UpdateMainWindowVisibility();
     }
 }

@@ -34,19 +34,18 @@ public partial class ManageDictionariesWindow : Window
 
     public static ManageDictionariesWindow Instance
     {
-        get
-        {
-            if (s_instance == null || !s_instance.IsLoaded)
-                s_instance = new ManageDictionariesWindow();
-
-            return s_instance;
-        }
+        get { return s_instance ??= new(); }
     }
 
     public ManageDictionariesWindow()
     {
         InitializeComponent();
         UpdateDictionariesDisplay();
+    }
+
+    public static bool IsItVisible()
+    {
+        return s_instance?.IsVisible ?? false;
     }
 
     private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

@@ -14,18 +14,17 @@ public partial class StatsWindow : Window
 
     public static StatsWindow Instance
     {
-        get
-        {
-            if (s_instance is not { IsLoaded: true })
-                s_instance = new StatsWindow();
-
-            return s_instance;
-        }
+        get { return s_instance ??= new(); }
     }
 
     public StatsWindow()
     {
         InitializeComponent();
+    }
+
+    public static bool IsItVisible()
+    {
+        return s_instance?.IsVisible ?? false;
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -74,6 +73,7 @@ public partial class StatsWindow : Window
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
+        s_instance = null;
         WindowsUtils.UpdateMainWindowVisibility();
     }
 }

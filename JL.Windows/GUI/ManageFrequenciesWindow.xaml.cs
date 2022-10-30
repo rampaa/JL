@@ -22,18 +22,17 @@ public partial class ManageFrequenciesWindow : Window
 
     public static ManageFrequenciesWindow Instance
     {
-        get
-        {
-            if (s_instance == null || !s_instance.IsLoaded)
-                s_instance = new ManageFrequenciesWindow();
-
-            return s_instance;
-        }
+        get { return s_instance ??= new(); }
     }
     public ManageFrequenciesWindow()
     {
         InitializeComponent();
         UpdateFreqsDisplay();
+    }
+
+    public static bool IsItVisible()
+    {
+        return s_instance?.IsVisible ?? false;
     }
 
     private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

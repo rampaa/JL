@@ -21,6 +21,21 @@ public partial class PreferencesWindow : Window
     private static PreferencesWindow? s_instance;
     public bool SetAnkiConfig { get; private set; } = false;
 
+    public static PreferencesWindow Instance
+    {
+        get { return s_instance ??= new(); }
+    }
+
+    public PreferencesWindow()
+    {
+        InitializeComponent();
+    }
+
+    public static bool IsItVisible()
+    {
+        return s_instance?.IsVisible ?? false;
+    }
+
     private readonly string _wordJLFieldsInfo =
 @"• Primary Spelling: It's the spelling you click to mine the word. e.g. If you look up ""わかりました"", its primary spelling will be ""分かる"".
 • Readings: Readings of the mined word.
@@ -64,16 +79,6 @@ public partial class PreferencesWindow : Window
 • Sentence: Sentence in which the mined name appears in.
 • EDICT ID: JMnedict entry ID.
 • Local Time: Mining date and time expressed in local timezone.";
-
-    public static PreferencesWindow Instance
-    {
-        get { return s_instance ??= new(); }
-    }
-
-    public PreferencesWindow()
-    {
-        InitializeComponent();
-    }
 
     #region EventHandlers
 
