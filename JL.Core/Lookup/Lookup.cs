@@ -260,6 +260,7 @@ public static class Lookup
             .ThenByDescending(dict => dict.Readings?.Contains(longestMatchedText) ?? false)
             .ThenByDescending(dict => dict.MatchedText.Length)
             .ThenByDescending(dict => longestMatchedText.Length >= dict.PrimarySpelling.Length && longestMatchedText[..dict.PrimarySpelling.Length] == dict.PrimarySpelling)
+            .ThenByDescending(dict => dict.PrimarySpelling.Length)
             .ThenBy(dict => dict.Dict.Priority)
             .ThenBy(dict => dict.Frequencies?.Count > 0 ? dict.Frequencies.First().Freq : int.MaxValue)
             .ToList();
@@ -446,6 +447,7 @@ public static class Lookup
                                 int index = r.Results.FindIndex(rs => rs.SequenceEqual(resultsList));
                                 if (index != -1)
                                 {
+                                    //if (!r.Processes?[index].Any(p => p.SequenceEqual(deconjugationResult.Process)) ?? false)
                                     r.Processes?[index].Add(deconjugationResult.Process);
                                 }
 
@@ -838,7 +840,10 @@ public static class Lookup
                         primarySpelling: customWordDictResult.PrimarySpelling,
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        process: ProcessProcess(wordResult.Processes?[i]),
+                        //process: ProcessProcess(wordResult.Processes?[i]
+                        //    .GroupBy(c => string.Join(",", c))
+                        //    .Select(c => c.First().ToList())
+                        //    .ToList()),
                         dict: wordResult.Dict,
                         readings: customWordDictResult.Readings,
                         alternativeSpellings: customWordDictResult.AlternativeSpellings,
