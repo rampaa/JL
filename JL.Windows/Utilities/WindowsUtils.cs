@@ -203,10 +203,11 @@ public static class WindowsUtils
 
     public static void ShowPreferencesWindow()
     {
-        ConfigManager.Instance.LoadPreferences(PreferencesWindow.Instance);
-        PreferencesWindow.Instance.Owner = MainWindow.Instance;
+        PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
+        ConfigManager.Instance.LoadPreferences(preferencesWindow);
+        preferencesWindow.Owner = MainWindow.Instance;
         Storage.StatsStopWatch.Stop();
-        PreferencesWindow.Instance.ShowDialog();
+        preferencesWindow.ShowDialog();
     }
 
     public static void ShowManageDictionariesWindow()
@@ -220,9 +221,10 @@ public static class WindowsUtils
         if (!File.Exists($"{Storage.ResourcesPath}/custom_names.txt"))
             File.Create($"{Storage.ResourcesPath}/custom_names.txt").Dispose();
 
-        ManageDictionariesWindow.Instance.Owner = MainWindow.Instance;
+        ManageDictionariesWindow manageDictionariesWindow = ManageDictionariesWindow.Instance;
+        manageDictionariesWindow.Owner = MainWindow.Instance;
         Storage.StatsStopWatch.Stop();
-        ManageDictionariesWindow.Instance.ShowDialog();
+        manageDictionariesWindow.ShowDialog();
     }
 
     public static void ShowManageFrequenciesWindow()
@@ -230,9 +232,10 @@ public static class WindowsUtils
         if (!File.Exists(Path.Join(Storage.ConfigPath, "freqs.json")))
             Utils.CreateDefaultFreqsConfig();
 
-        ManageFrequenciesWindow.Instance.Owner = MainWindow.Instance;
+        ManageFrequenciesWindow manageFrequenciesWindow = ManageFrequenciesWindow.Instance;
+        manageFrequenciesWindow.Owner = MainWindow.Instance;
         Storage.StatsStopWatch.Stop();
-        ManageFrequenciesWindow.Instance.ShowDialog();
+        manageFrequenciesWindow.ShowDialog();
     }
 
     public static void ShowStatsWindow()
@@ -240,8 +243,9 @@ public static class WindowsUtils
         Stats.IncrementStat(StatType.Time, Storage.StatsStopWatch.ElapsedTicks);
         Storage.StatsStopWatch.Reset();
 
-        StatsWindow.Instance.Owner = MainWindow.Instance;
-        StatsWindow.Instance.ShowDialog();
+        StatsWindow statsWindow = StatsWindow.Instance;
+        statsWindow.Owner = MainWindow.Instance;
+        statsWindow.ShowDialog();
     }
 
     public static void SearchWithBrowser(string? selectedText)
@@ -296,9 +300,10 @@ public static class WindowsUtils
 
         if (ConfigManager.CheckForJLUpdatesOnStartUp)
         {
-            PreferencesWindow.Instance.CheckForJLUpdatesButton!.IsEnabled = false;
+            PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
+            preferencesWindow.CheckForJLUpdatesButton!.IsEnabled = false;
             await Networking.CheckForJLUpdates(true);
-            PreferencesWindow.Instance.CheckForJLUpdatesButton.IsEnabled = true;
+            preferencesWindow.CheckForJLUpdatesButton.IsEnabled = true;
         }
     }
 
@@ -603,16 +608,20 @@ public static class WindowsUtils
     public static void UpdateMainWindowVisibility()
     {
         MainWindow mainWindow = MainWindow.Instance;
-        if (!mainWindow.IsMouseOver)
-        {
-            if (ConfigManager.TextOnlyVisibleOnHover)
-            {
-                mainWindow.MainGrid.Opacity = 0;
-            }
 
-            if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+        if (!mainWindow.FirstPopupWindow.IsVisible)
+        {
+            if (!mainWindow.IsMouseOver)
             {
-                mainWindow.Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
+                if (ConfigManager.TextOnlyVisibleOnHover)
+                {
+                    mainWindow.MainGrid.Opacity = 0;
+                }
+
+                if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+                {
+                    mainWindow.Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
+                }
             }
         }
 

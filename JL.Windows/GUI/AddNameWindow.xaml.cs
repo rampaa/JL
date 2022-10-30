@@ -97,9 +97,8 @@ public partial class AddNameWindow : Window
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        MainWindow mainWindow = MainWindow.Instance;
-        mainWindow.Focus();
-        s_instance = null;
         WindowsUtils.UpdateMainWindowVisibility();
+        MainWindow.Instance.Focus();
+        s_instance = null;
     }
 }

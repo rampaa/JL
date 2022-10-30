@@ -73,8 +73,9 @@ public partial class StatsWindow : Window
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        s_instance = null;
         WindowsUtils.UpdateMainWindowVisibility();
+        MainWindow.Instance.Focus();
+        s_instance = null;
     }
 }
 

@@ -906,8 +906,12 @@ public partial class MainWindow : Window, IFrontend
             return;
 
         if (!FirstPopupWindow.IsVisible
-            && !AddNameWindow.Instance.IsVisible
-            && !AddWordWindow.Instance.IsVisible
+            && !ManageDictionariesWindow.IsItVisible()
+            && !ManageFrequenciesWindow.IsItVisible()
+            && !AddNameWindow.IsItVisible()
+            && !AddWordWindow.IsItVisible()
+            && !PreferencesWindow.IsItVisible()
+            && !StatsWindow.IsItVisible()
             && !MainTextboxContextMenu.IsVisible
             && e.LeftButton == MouseButtonState.Released)
         {

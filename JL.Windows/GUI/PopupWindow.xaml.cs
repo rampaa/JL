@@ -294,7 +294,7 @@ public partial class PopupWindow : Window
         if (needsFlipX)
         {
             // flip Leftwards while preventing -OOB
-            newLeft = mouseX - Width - WindowsUtils.DpiAwareXOffset * 2;
+            newLeft = mouseX - (Width + WindowsUtils.DpiAwareXOffset / 2);
             if (newLeft < 0) newLeft = 0;
         }
         else
@@ -306,7 +306,7 @@ public partial class PopupWindow : Window
         if (needsFlipY)
         {
             // flip Upwards while preventing -OOB
-            newTop = mouseY - Height - WindowsUtils.DpiAwareYOffset * 2;
+            newTop = mouseY - (Height + WindowsUtils.DpiAwareYOffset / 2);
             if (newTop < 0) newTop = 0;
         }
         else
