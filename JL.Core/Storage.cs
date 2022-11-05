@@ -548,7 +548,7 @@ public static class Storage
                 await Task.WhenAll(tasks.ToArray()).ConfigureAwait(false);
             }
 
-            Storage.Frontend.InvalidateDisplayCache();
+            Frontend.InvalidateDisplayCache();
 
             if (runGC)
             {
@@ -644,7 +644,7 @@ public static class Storage
                 await Task.WhenAll(tasks.ToArray()).ConfigureAwait(false);
             }
 
-            Storage.Frontend.InvalidateDisplayCache();
+            Frontend.InvalidateDisplayCache();
 
             if (runGC)
             {
@@ -659,7 +659,7 @@ public static class Storage
     public static async Task InitializePoS()
     {
         Dict dict = Dicts.Values.First(dict => dict.Type == DictType.JMdict);
-        if (!File.Exists($"{Storage.ResourcesPath}/PoS.json"))
+        if (!File.Exists($"{ResourcesPath}/PoS.json"))
         {
             if (dict.Active)
             {
@@ -677,8 +677,8 @@ public static class Storage
                         dict.Type.ToString(), false, true).ConfigureAwait(false);
                 }
 
-                await Task.Run((async () =>
-                    await JMdictLoader.Load(dict).ConfigureAwait(false)));
+                await Task.Run(async () =>
+                    await JMdictLoader.Load(dict).ConfigureAwait(false));
                 await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
                 dict.Contents.Clear();
 

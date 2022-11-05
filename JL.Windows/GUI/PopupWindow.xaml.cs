@@ -756,7 +756,7 @@ public partial class PopupWindow : Window
             textBlockNanoriReadings = new TextBlock
             {
                 Name = nameof(result.NanoriReadings),
-                Text = "Nanori Readings: "+ string.Join(", ", result.NanoriReadings),
+                Text = "Nanori Readings: " + string.Join(", ", result.NanoriReadings),
                 Foreground = ConfigManager.ReadingsColor,
                 FontSize = ConfigManager.ReadingsFontSize,
                 Margin = new Thickness(2, 0, 0, 0),

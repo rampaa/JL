@@ -315,10 +315,7 @@ public static class WindowsUtils
             {
                 try
                 {
-                    if (s_audioPlayer != null)
-                    {
-                        s_audioPlayer.Dispose();
-                    }
+                    s_audioPlayer?.Dispose();
 
                     s_audioPlayer = new WaveOut { Volume = volume };
 
