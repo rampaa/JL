@@ -22,7 +22,7 @@
 
 * vk: Kuru verb - special class
 
-* vs-c: su verb - precursor to the modern suru (at the moment, the process info for su verbs is mostly rubbish)
+* vs-c: su verb - precursor to the modern suru (limited support)
 * vs-i: suru verb - included
 * vs-s: suru verb - special class
 
