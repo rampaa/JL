@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <RollForward>Major</RollForward>
+    <LangVersion>latest</LangVersion>
+    <RollForward>LatestMajor</RollForward>
     <IsPackable>false</IsPackable>
     <Platforms>AnyCPU;x86;x64</Platforms>
     <Nullable>enable</Nullable>

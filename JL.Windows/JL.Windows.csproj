@@ -3,11 +3,12 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <RollForward>LatestMajor</RollForward>
     <UseWPF>true</UseWPF>
     <Platforms>AnyCPU;x86;x64</Platforms>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <ApplicationIcon>icon.ico</ApplicationIcon>
-    <RollForward>Major</RollForward>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PackageId>JL.Windows</PackageId>
     <AssemblyName>JL</AssemblyName>
