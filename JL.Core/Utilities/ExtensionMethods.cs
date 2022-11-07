@@ -33,11 +33,11 @@ public static class ExtensionMethods
     // Falls back to name
     public static T GetEnum<T>(this string description) where T : Enum
     {
-        foreach (Enum enumItem in Enum.GetValues(typeof(T)))
+        foreach (T enumItem in Enum.GetValues(typeof(T)))
         {
             if (enumItem.GetDescription() == description)
             {
-                return (T)enumItem;
+                return enumItem;
             }
         }
 
