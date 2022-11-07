@@ -235,7 +235,7 @@ public static class Utils
 
     public static string GetMd5String(byte[] bytes)
     {
-        byte[] hash = ((HashAlgorithm)CryptoConfig.CreateFromName("MD5")!).ComputeHash(bytes);
+        byte[] hash = MD5.Create().ComputeHash(bytes);
         string encoded = BitConverter.ToString(hash).Replace("-", string.Empty).ToLower();
 
         return encoded;

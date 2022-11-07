@@ -33,18 +33,11 @@ public static class ExtensionMethods
     // Falls back to name
     public static T GetEnum<T>(this string description) where T : Enum
     {
-        foreach (FieldInfo field in typeof(T).GetFields())
+        foreach (Enum enumItem in Enum.GetValues(typeof(T)))
         {
-            if (Attribute.GetCustomAttribute(field,
-                    typeof(DescriptionAttribute)) is DescriptionAttribute attribute)
+            if (enumItem.GetDescription() == description)
             {
-                if (attribute.Description == description)
-                    return (T)field.GetValue(null)!;
-            }
-            else
-            {
-                if (field.Name == description)
-                    return (T)field.GetValue(null)!;
+                return (T)enumItem;
             }
         }
 
