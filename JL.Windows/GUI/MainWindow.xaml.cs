@@ -13,6 +13,8 @@ using JL.Core.Lookup;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using Microsoft.Win32;
+using MessageBox = HandyControl.Controls.MessageBox;
+using Window = System.Windows.Window;
 
 namespace JL.Windows.GUI;
 
@@ -31,16 +33,12 @@ public partial class MainWindow : Window, IFrontend
 
     public bool ShowYesNoDialog(string text, string caption)
     {
-        return MessageBox.Show(
-            text, caption,
-            MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes,
-            MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes;
+        return MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
     }
 
     public void ShowOkDialog(string text, string caption)
     {
-        MessageBox.Show(text, caption, MessageBoxButton.OK,
-            MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
+        MessageBox.Show(text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     public Task UpdateJL(Uri downloadUrlOfLatestJLRelease) => WindowsUtils.UpdateJL(downloadUrlOfLatestJLRelease);
