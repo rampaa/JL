@@ -27,7 +27,7 @@ public static class ResourceUpdater
                 HttpResponseMessage response = await Storage.Client.SendAsync(request).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
-                    using Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                    await using Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                     await DecompressGzipStream(responseStream, resourcePath).ConfigureAwait(false);
 
                     if (!noPrompt)

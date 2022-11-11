@@ -30,7 +30,6 @@ public static class ExtensionMethods
         return null;
     }
 
-    // Falls back to name
     public static T GetEnum<T>(this string description) where T : Enum
     {
         foreach (T enumItem in Enum.GetValues(typeof(T)))

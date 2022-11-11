@@ -30,33 +30,33 @@ public static class EpwingYomichanLoader
 
             foreach (List<JsonElement> jsonObj in jsonObjects)
             {
-                DictionaryBuilder(new EpwingYomichanResult(jsonObj), dict);
+                DictionaryBuilder(new EpwingYomichanRecord(jsonObj), dict);
             }
         }
 
         dict.Contents.TrimExcess();
     }
 
-    private static void DictionaryBuilder(EpwingYomichanResult yomichanResult, Dict dict)
+    private static void DictionaryBuilder(EpwingYomichanRecord yomichanRecord, Dict dict)
     {
-        if (!EpwingUtils.IsValidEpwingResultForDictType(yomichanResult, dict))
+        if (!EpwingUtils.IsValidEpwingResultForDictType(yomichanRecord, dict))
             return;
 
-        string hiraganaExpression = Kana.KatakanaToHiraganaConverter(yomichanResult.PrimarySpelling);
+        string hiraganaExpression = Kana.KatakanaToHiraganaConverter(yomichanRecord.PrimarySpelling);
 
-        if (!string.IsNullOrEmpty(yomichanResult.Reading))
+        if (!string.IsNullOrEmpty(yomichanRecord.Reading))
         {
-            string hiraganaReading = Kana.KatakanaToHiraganaConverter(yomichanResult.Reading);
+            string hiraganaReading = Kana.KatakanaToHiraganaConverter(yomichanRecord.Reading);
 
-            if (dict.Contents.TryGetValue(hiraganaReading, out List<IResult>? tempList2))
-                tempList2.Add(yomichanResult);
+            if (dict.Contents.TryGetValue(hiraganaReading, out List<IDictRecord>? tempList2))
+                tempList2.Add(yomichanRecord);
             else
-                dict.Contents.Add(hiraganaReading, new List<IResult> { yomichanResult });
+                dict.Contents.Add(hiraganaReading, new List<IDictRecord> { yomichanRecord });
         }
 
-        if (dict.Contents.TryGetValue(hiraganaExpression, out List<IResult>? tempList))
-            tempList.Add(yomichanResult);
+        if (dict.Contents.TryGetValue(hiraganaExpression, out List<IDictRecord>? tempList))
+            tempList.Add(yomichanRecord);
         else
-            dict.Contents.Add(hiraganaExpression, new List<IResult> { yomichanResult });
+            dict.Contents.Add(hiraganaExpression, new List<IDictRecord> { yomichanRecord });
     }
 }

@@ -2,17 +2,17 @@
 
 public class Sense
 {
-    public List<string> StagKList { get; set; } // Meaning only valid for these kebs.
-    public List<string> StagRList { get; set; } // Meaning only valid for these rebs.
-    public List<string> PosList { get; set; } // e.g. "noun"
-    public List<string> FieldList { get; set; } // e.g. "martial arts"
-    public List<string> MiscList { get; set; } // e.g. "abbr"
+    public List<string> StagKList { get; } // Meaning only valid for these kebs.
+    public List<string> StagRList { get; } // Meaning only valid for these rebs.
+    public List<string> PosList { get; } // e.g. "noun"
+    public List<string> FieldList { get; } // e.g. "martial arts"
+    public List<string> MiscList { get; } // e.g. "abbr"
     public string? SInf { get; set; } // e.g. "often derog"
-    public List<string> DialList { get; set; } // e.g. ksb
-    public List<string> GlossList { get; set; } // English meaning
-    public List<string> XRefList { get; set; } // Related terms
-    public List<string> AntList { get; set; } // Antonyms
-    public List<LSource> LSourceList { get; set; }
+    public List<string> DialList { get; } // e.g. ksb
+    public List<string> GlossList { get; } // English meaning
+    public List<string> XRefList { get; } // Related terms
+    public List<string> AntList { get; } // Antonyms
+    public List<LanguageSource> LSourceList { get; }
 
     public Sense()
     {
@@ -25,6 +25,6 @@ public class Sense
         GlossList = new List<string>();
         XRefList = new List<string>();
         AntList = new List<string>();
-        LSourceList = new List<LSource>();
+        LSourceList = new List<LanguageSource>();
     }
 }

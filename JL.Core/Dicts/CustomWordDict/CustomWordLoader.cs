@@ -84,25 +84,25 @@ public static class CustomWordLoader
                 wordClass.Add("other");
             }
 
-            CustomWordEntry newWordEntry = new(spelling, alternativeSpellings, readings, definitions, wordClass);
+            CustomWordRecord newWordRecord = new(spelling, alternativeSpellings, readings, definitions, wordClass);
 
-            Dictionary<string, List<IResult>> customWordDictionary = Storage.Dicts.Values.First(dict => dict.Type == DictType.CustomWordDictionary).Contents;
+            Dictionary<string, List<IDictRecord>> customWordDictionary = Storage.Dicts.Values.First(dict => dict.Type == DictType.CustomWordDictionary).Contents;
 
-            if (customWordDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out List<IResult>? result))
+            if (customWordDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out List<IDictRecord>? result))
             {
-                if (result.Contains(newWordEntry))
+                if (result.Contains(newWordRecord))
                 {
                     break;
                 }
                 else
                 {
-                    result.Add(newWordEntry);
+                    result.Add(newWordRecord);
                 }
             }
             else
             {
                 customWordDictionary.Add(Kana.KatakanaToHiraganaConverter(spelling),
-                    new List<IResult> { newWordEntry });
+                    new List<IDictRecord> { newWordRecord });
             }
         }
     }

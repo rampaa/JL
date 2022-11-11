@@ -18,7 +18,7 @@ public static class KanjidicLoader
 
             using XmlReader xmlReader = XmlReader.Create(dict.Path, xmlReaderSettings);
 
-            dict.Contents = new Dictionary<string, List<IResult>>();
+            dict.Contents = new Dictionary<string, List<IDictRecord>>();
             while (xmlReader.ReadToFollowing("literal"))
             {
                 await ReadCharacter(xmlReader, dict).ConfigureAwait(false);
@@ -47,7 +47,7 @@ public static class KanjidicLoader
     {
         string key = await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false);
 
-        KanjidicResult entry = new();
+        KanjidicRecord entry = new();
 
         while (!xmlReader.EOF)
         {
@@ -120,6 +120,6 @@ public static class KanjidicLoader
         entry.OnReadings = Utils.TrimStringList(entry.OnReadings!);
         entry.KunReadings = Utils.TrimStringList(entry.KunReadings!);
 
-        dict.Contents.Add(key, new List<IResult> { entry });
+        dict.Contents.Add(key, new List<IDictRecord> { entry });
     }
 }

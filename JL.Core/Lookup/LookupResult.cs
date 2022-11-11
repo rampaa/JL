@@ -8,7 +8,7 @@ public class LookupResult
     public string MatchedText { get; }
     public string DeconjugatedMatchedText { get; init; }
     public List<LookupFrequencyResult>? Frequencies { get; init; }
-    public Dict Dict { get; init; }
+    public Dict Dict { get; }
     public string PrimarySpelling { get; init; }
 
     public List<string>? Readings { get; init; }
@@ -16,9 +16,9 @@ public class LookupResult
     public int EdictId { get; init; }
     public List<string>? AlternativeSpellings { get; init; }
     public string? Process { get; init; }
-    public List<string>? POrthographyInfoList { get; init; }
-    public List<string>? ROrthographyInfoList { get; init; }
-    public List<string>? AOrthographyInfoList { get; init; }
+    public List<string>? PrimarySpellingOrthographyInfoList { get; init; }
+    public List<string>? ReadingsOrthographyInfoList { get; }
+    public List<string>? AlternativeSpellingsOrthographyInfoList { get; }
 
     // Kanji
     public List<string>? OnReadings { get; init; }
@@ -37,9 +37,9 @@ public class LookupResult
         List<string>? readings,
         List<LookupFrequencyResult>? frequencies = null,
         List<string>? alternativeSpellings = null,
-        List<string>? pOrthographyInfoList = null,
-        List<string>? rOrthographyInfoList = null,
-        List<string>? aOrthographyInfoList = null,
+        List<string>? primarySpellingOrthographyInfoList = null,
+        List<string>? readingsOrthographyInfoList = null,
+        List<string>? alternativeSpellingsOrthographyInfoList = null,
         List<string>? onReadings = null,
         List<string>? kunReadings = null,
         List<string>? nanoriReadings = null,
@@ -62,9 +62,9 @@ public class LookupResult
         EdictId = edictId;
         AlternativeSpellings = alternativeSpellings;
         Process = process;
-        POrthographyInfoList = pOrthographyInfoList;
-        ROrthographyInfoList = rOrthographyInfoList;
-        AOrthographyInfoList = aOrthographyInfoList;
+        PrimarySpellingOrthographyInfoList = primarySpellingOrthographyInfoList;
+        ReadingsOrthographyInfoList = readingsOrthographyInfoList;
+        AlternativeSpellingsOrthographyInfoList = alternativeSpellingsOrthographyInfoList;
         OnReadings = onReadings;
         KunReadings = kunReadings;
         NanoriReadings = nanoriReadings;

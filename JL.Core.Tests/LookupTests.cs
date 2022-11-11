@@ -35,7 +35,7 @@ public class LookupTests
                         loanwordEtymology: new() { Value = true }
                         )));
 
-        JMdictLoader.Load(Storage.Dicts.Values.First(dict => dict.Type == DictType.JMdict)).Wait();
+        JmdictLoader.Load(Storage.Dicts.Values.First(dict => dict.Type == DictType.JMdict)).Wait();
         Storage.FreqDicts = Storage.BuiltInFreqs;
         Storage.LoadFrequencies().Wait();
     }
@@ -58,8 +58,8 @@ public class LookupTests
                     formattedDefinitions:
                         "(v5r, vi) (1) to begin; to start; to commence (v5r, vi) (2) to happen (again); to begin (anew) (v5r, vi) (3) to date (from); to originate (in)",
                     edictId: 1307500,
-                    aOrthographyInfoList: new(),
-                    rOrthographyInfoList: new()
+                    alternativeSpellingsOrthographyInfoList: new(),
+                    readingsOrthographyInfoList: new()
                 )
             };
 

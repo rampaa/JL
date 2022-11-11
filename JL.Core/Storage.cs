@@ -13,11 +13,11 @@ using JL.Core.Dicts.EPWING.EpwingNazeka;
 using JL.Core.Dicts.EPWING.EpwingYomichan;
 using JL.Core.Dicts.Options;
 using JL.Core.Dicts.YomichanKanji;
-using JL.Core.Frequency;
-using JL.Core.Frequency.FreqNazeka;
-using JL.Core.Frequency.FreqYomichan;
-using JL.Core.Pitch;
-using JL.Core.PoS;
+using JL.Core.Freqs;
+using JL.Core.Freqs.FrequencyNazeka;
+using JL.Core.Freqs.FrequencyYomichan;
+using JL.Core.PitchAccent;
+using JL.Core.WordClass;
 using JL.Core.Utilities;
 using Timer = System.Timers.Timer;
 
@@ -43,7 +43,7 @@ public static class Storage
     public static bool UpdatingJMnedict { get; set; } = false;
     public static bool UpdatingKanjidic { get; set; } = false;
     public static bool FreqsReady { get; private set; } = false;
-    public static Dictionary<string, List<JmdictWc>> WcDict { get; set; } = new(65536); // 2022/10/29: 48909
+    public static Dictionary<string, List<JmdictWordClass>> WordClassDictionary { get; set; } = new(65536); // 2022/10/29: 48909
     public static readonly Dictionary<string, string> KanjiCompositionDict = new(86934);
     public static Dictionary<string, Freq> FreqDicts { get; set; } = new();
 
@@ -321,7 +321,7 @@ public static class Storage
                     {
                         Task jMDictTask = Task.Run(async () =>
                         {
-                            await JMdictLoader.Load(dict).ConfigureAwait(false);
+                            await JmdictLoader.Load(dict).ConfigureAwait(false);
                             dict.Size = dict.Contents.Count;
                         });
 
@@ -340,7 +340,7 @@ public static class Storage
                     {
                         tasks.Add(Task.Run(async () =>
                         {
-                            await JMnedictLoader.Load(dict).ConfigureAwait(false);
+                            await JmnedictLoader.Load(dict).ConfigureAwait(false);
                             dict.Size = dict.Contents.Count;
                         }));
                     }
@@ -515,7 +515,7 @@ public static class Storage
                         {
                             try
                             {
-                                await PitchLoader.Load(dict).ConfigureAwait(false);
+                                await PitchAccentLoader.Load(dict).ConfigureAwait(false);
                                 dict.Size = dict.Contents.Count;
                             }
 
@@ -663,7 +663,7 @@ public static class Storage
         {
             if (dict.Active)
             {
-                await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
+                await JmdictWordClassLoader.JmdictWordClassSerializer().ConfigureAwait(false);
             }
 
             else
@@ -678,8 +678,8 @@ public static class Storage
                 }
 
                 await Task.Run(async () =>
-                    await JMdictLoader.Load(dict).ConfigureAwait(false));
-                await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
+                    await JmdictLoader.Load(dict).ConfigureAwait(false));
+                await JmdictWordClassLoader.JmdictWordClassSerializer().ConfigureAwait(false);
                 dict.Contents.Clear();
 
                 if (deleteJmdictFile)
@@ -687,7 +687,7 @@ public static class Storage
             }
         }
 
-        await JmdictWcLoader.Load().ConfigureAwait(false);
+        await JmdictWordClassLoader.Load().ConfigureAwait(false);
     }
 
     public static async Task InitializeKanjiCompositionDict()

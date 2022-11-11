@@ -11,7 +11,7 @@ using JL.Core;
 using JL.Core.Anki;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
-using JL.Core.Pitch;
+using JL.Core.PitchAccent;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 
@@ -519,10 +519,10 @@ public partial class PopupWindow : Window
 
         if (result.Readings?.Any() ?? false)
         {
-            List<string> rOrthographyInfoList = result.ROrthographyInfoList ?? new();
+            List<string> rOrthographyInfoList = result.ReadingsOrthographyInfoList ?? new();
             List<string> readings = result.Readings;
             string readingsText = rOrthographyInfoList.Any() && (result.Dict.Options?.ROrthographyInfo?.Value ?? true)
-                ? PopupWindowUtilities.MakeUiElementReadingsText(readings, rOrthographyInfoList)
+                ? MakeUiElementReadingsText(readings, rOrthographyInfoList)
                 : string.Join(", ", result.Readings);
 
             if (readingsText != "")
@@ -631,10 +631,10 @@ public partial class PopupWindow : Window
 
         if (result.AlternativeSpellings?.Any() ?? false)
         {
-            List<string> aOrthographyInfoList = result.AOrthographyInfoList ?? new List<string>();
+            List<string> aOrthographyInfoList = result.AlternativeSpellingsOrthographyInfoList ?? new List<string>();
             List<string> alternativeSpellings = result.AlternativeSpellings;
             string alternativeSpellingsText = aOrthographyInfoList.Any() && (result.Dict.Options?.AOrthographyInfo?.Value ?? true)
-                ? PopupWindowUtilities.MakeUiElementAlternativeSpellingsText(alternativeSpellings, aOrthographyInfoList)
+                ? MakeUiElementAlternativeSpellingsText(alternativeSpellings, aOrthographyInfoList)
                 : "(" + string.Join(", ", alternativeSpellings) + ")";
 
             if (alternativeSpellingsText != "")
@@ -700,13 +700,13 @@ public partial class PopupWindow : Window
             };
         }
 
-        if ((result.POrthographyInfoList?.Any() ?? false)
+        if ((result.PrimarySpellingOrthographyInfoList?.Any() ?? false)
             && (result.Dict.Options?.POrthographyInfo?.Value ?? true))
         {
             textBlockPOrthographyInfo = new TextBlock
             {
-                Name = nameof(result.POrthographyInfoList),
-                Text = $"({string.Join(", ", result.POrthographyInfoList)})",
+                Name = nameof(result.PrimarySpellingOrthographyInfoList),
+                Text = $"({string.Join(", ", result.PrimarySpellingOrthographyInfoList)})",
 
                 Foreground = (SolidColorBrush)new BrushConverter()
                     .ConvertFrom(result.Dict.Options?.POrthographyInfoColor?.Value
@@ -1019,13 +1019,13 @@ public partial class PopupWindow : Window
                     WindowsUtils.MeasureTextSize(splitReadingsWithRInfo[i - 1] + ", ", fontSize).Width;
             }
 
-            if (dict.Contents.TryGetValue(normalizedExpression, out List<IResult>? pitchAccentDictResultList))
+            if (dict.Contents.TryGetValue(normalizedExpression, out List<IDictRecord>? pitchAccentDictResultList))
             {
-                PitchResult? chosenPitchAccentDictResult = null;
+                PitchAccentRecord? chosenPitchAccentDictResult = null;
 
                 for (int j = 0; j < pitchAccentDictResultList.Count; j++)
                 {
-                    var pitchAccentDictResult = (PitchResult)pitchAccentDictResultList[j];
+                    var pitchAccentDictResult = (PitchAccentRecord)pitchAccentDictResultList[j];
 
                     if (!hasReading || (pitchAccentDictResult.Reading != null &&
                                         normalizedExpression ==
@@ -1099,6 +1099,69 @@ public partial class PopupWindow : Window
         pitchAccentGrid.HorizontalAlignment = HorizontalAlignment.Left;
 
         return pitchAccentGrid;
+    }
+
+    private static string MakeUiElementReadingsText(List<string> readings, List<string> rOrthographyInfoList)
+    {
+        if (readings.Count == 0) return "";
+
+        StringBuilder sb = new();
+
+        for (int index = 0; index < readings.Count; index++)
+        {
+            sb.Append(readings[index]);
+
+            if (index < rOrthographyInfoList?.Count)
+            {
+                if (!string.IsNullOrEmpty(rOrthographyInfoList[index]))
+                {
+                    sb.Append(" (");
+                    sb.Append(rOrthographyInfoList[index]);
+                    sb.Append(')');
+                }
+            }
+
+            if (index != readings.Count - 1)
+            {
+                sb.Append(", ");
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    private static string MakeUiElementAlternativeSpellingsText(List<string> alternativeSpellings,
+        List<string> aOrthographyInfoList)
+    {
+        if (alternativeSpellings.Count == 0) return "";
+
+        StringBuilder sb = new();
+
+        sb.Append('(');
+
+        for (int index = 0; index < alternativeSpellings.Count; index++)
+        {
+            sb.Append(alternativeSpellings[index]);
+
+            if (index < aOrthographyInfoList?.Count)
+            {
+                if (!string.IsNullOrEmpty(aOrthographyInfoList[index]))
+                {
+                    sb.Append(" (");
+                    sb.Append(aOrthographyInfoList[index]);
+                    sb.Append(')');
+                }
+            }
+
+            if (index != alternativeSpellings.Count - 1)
+            {
+                sb.Append(", ");
+            }
+        }
+
+        sb.Append(')');
+
+        return sb.ToString();
     }
 
     private void Unselect(object sender, RoutedEventArgs e)

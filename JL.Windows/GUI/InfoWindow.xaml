@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:JL.Windows.GUI"
         mc:Ignorable="d"
         Title="" MaxHeight="800" MaxWidth="800" Background="Transparent" ShowInTaskbar="False" Topmost="True" Closing="Window_Closing" SizeToContent="WidthAndHeight" >
     <Grid>

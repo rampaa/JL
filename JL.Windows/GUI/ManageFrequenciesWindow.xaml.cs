@@ -6,7 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using JL.Core;
-using JL.Core.Frequency;
+using JL.Core.Freqs;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using Path = System.IO.Path;

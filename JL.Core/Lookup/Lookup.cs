@@ -10,8 +10,8 @@ using JL.Core.Dicts.EDICT.KANJIDIC;
 using JL.Core.Dicts.EPWING.EpwingNazeka;
 using JL.Core.Dicts.EPWING.EpwingYomichan;
 using JL.Core.Dicts.YomichanKanji;
-using JL.Core.Frequency;
-using JL.Core.PoS;
+using JL.Core.Freqs;
+using JL.Core.WordClass;
 using JL.Core.Utilities;
 
 namespace JL.Core.Lookup;
@@ -273,14 +273,14 @@ public static class Lookup
         string textInHiragana,
         int succAttempt)
     {
-        Dictionary<string, List<IResult>> dictionary = dict.Contents;
+        Dictionary<string, List<IDictRecord>> dictionary = dict.Contents;
 
         bool tryLongVowelConversion = true;
 
-        if (dictionary.TryGetValue(textInHiragana, out List<IResult>? tempResult))
+        if (dictionary.TryGetValue(textInHiragana, out List<IDictRecord>? tempResult))
         {
             results.TryAdd(textInHiragana,
-                new IntermediaryResult(new List<List<IResult>> { tempResult }, null, matchedText, matchedText,
+                new IntermediaryResult(new List<List<IDictRecord>> { tempResult }, null, matchedText, matchedText,
                     dict));
             tryLongVowelConversion = false;
         }
@@ -293,9 +293,9 @@ public static class Lookup
                 if (deconjugationResult.Tags.Count > 0)
                     lastTag = deconjugationResult.Tags.Last();
 
-                if (dictionary.TryGetValue(deconjugationResult.Text, out List<IResult>? dictResults))
+                if (dictionary.TryGetValue(deconjugationResult.Text, out List<IDictRecord>? dictResults))
                 {
-                    List<IResult> resultsList = new();
+                    List<IDictRecord> resultsList = new();
 
                     switch (dict.Type)
                     {
@@ -304,7 +304,7 @@ public static class Lookup
                                 int dictResultsCount = dictResults.Count;
                                 for (int i = 0; i < dictResultsCount; i++)
                                 {
-                                    var dictResult = (JMdictResult)dictResults[i];
+                                    var dictResult = (JmdictRecord)dictResults[i];
 
                                     if (deconjugationResult.Tags.Count == 0 || (dictResult.WordClasses
                                             ?.Where(pos => pos != null)
@@ -321,7 +321,7 @@ public static class Lookup
                                 int dictResultsCount = dictResults.Count;
                                 for (int i = 0; i < dictResultsCount; i++)
                                 {
-                                    var dictResult = (CustomWordEntry)dictResults[i];
+                                    var dictResult = (CustomWordRecord)dictResults[i];
 
                                     if (deconjugationResult.Tags.Count == 0 ||
                                         dictResult.WordClasses.Contains(lastTag))
@@ -359,7 +359,7 @@ public static class Lookup
                                 int dictResultsCount = dictResults.Count;
                                 for (int i = 0; i < dictResultsCount; i++)
                                 {
-                                    var dictResult = (EpwingYomichanResult)dictResults[i];
+                                    var dictResult = (EpwingYomichanRecord)dictResults[i];
 
                                     if (deconjugationResult.Tags.Count == 0 ||
                                         (dictResult.WordClasses?.Contains(lastTag) ?? false))
@@ -367,18 +367,18 @@ public static class Lookup
                                         resultsList.Add(dictResult);
                                     }
 
-                                    else if (Storage.WcDict.TryGetValue(deconjugationResult.Text,
-                                                 out List<JmdictWc>? jmdictWcResults))
+                                    else if (Storage.WordClassDictionary.TryGetValue(deconjugationResult.Text,
+                                                 out List<JmdictWordClass>? jmdictWcResults))
                                     {
                                         for (int j = 0; j < jmdictWcResults.Count; j++)
                                         {
-                                            JmdictWc jmdictWcResult = jmdictWcResults[j];
+                                            JmdictWordClass jmdictWordClassResult = jmdictWcResults[j];
 
-                                            if (dictResult.PrimarySpelling == jmdictWcResult.Spelling
-                                                && (jmdictWcResult.Readings?.Contains(dictResult.Reading ?? string.Empty)
+                                            if (dictResult.PrimarySpelling == jmdictWordClassResult.Spelling
+                                                && (jmdictWordClassResult.Readings?.Contains(dictResult.Reading ?? string.Empty)
                                                     ?? string.IsNullOrEmpty(dictResult.Reading)))
                                             {
-                                                if (jmdictWcResult.WordClasses.Contains(lastTag))
+                                                if (jmdictWordClassResult.WordClasses.Contains(lastTag))
                                                 {
                                                     resultsList.Add(dictResult);
                                                     break;
@@ -401,25 +401,25 @@ public static class Lookup
                                 int dictResultsCount = dictResults.Count;
                                 for (int i = 0; i < dictResultsCount; i++)
                                 {
-                                    var dictResult = (EpwingNazekaResult)dictResults[i];
+                                    var dictResult = (EpwingNazekaRecord)dictResults[i];
 
                                     if (deconjugationResult.Tags.Count == 0)
                                     {
                                         resultsList.Add(dictResult);
                                     }
 
-                                    else if (Storage.WcDict.TryGetValue(deconjugationResult.Text,
-                                                 out List<JmdictWc>? jmdictWcResults))
+                                    else if (Storage.WordClassDictionary.TryGetValue(deconjugationResult.Text,
+                                                 out List<JmdictWordClass>? jmdictWcResults))
                                     {
                                         for (int j = 0; j < jmdictWcResults.Count; j++)
                                         {
-                                            JmdictWc jmdictWcResult = jmdictWcResults[j];
+                                            JmdictWordClass jmdictWordClassResult = jmdictWcResults[j];
 
-                                            if (dictResult.PrimarySpelling == jmdictWcResult.Spelling
-                                                && (jmdictWcResult.Readings?.Contains(dictResult.Reading ?? "")
+                                            if (dictResult.PrimarySpelling == jmdictWordClassResult.Spelling
+                                                && (jmdictWordClassResult.Readings?.Contains(dictResult.Reading ?? "")
                                                     ?? string.IsNullOrEmpty(dictResult.Reading)))
                                             {
-                                                if (jmdictWcResult.WordClasses.Contains(lastTag))
+                                                if (jmdictWordClassResult.WordClasses.Contains(lastTag))
                                                 {
                                                     resultsList.Add(dictResult);
                                                     break;
@@ -461,7 +461,7 @@ public static class Lookup
                         else
                         {
                             results.Add(deconjugationResult.Text,
-                                new IntermediaryResult(new List<List<IResult>> { resultsList },
+                                new IntermediaryResult(new List<List<IDictRecord>> { resultsList },
                                     new List<List<List<string>>> { new List<List<string>> { deconjugationResult.Process } },
                                     matchedText,
                                     deconjugationResult.Text,
@@ -515,10 +515,10 @@ public static class Lookup
         for (int i = 0; i < text.Length; i++)
         {
             if (dict.Contents
-                .TryGetValue(textInHiraganaList[i], out List<IResult>? result))
+                .TryGetValue(textInHiraganaList[i], out List<IDictRecord>? result))
             {
                 nameResults.TryAdd(textInHiraganaList[i],
-                    new IntermediaryResult(new List<List<IResult>> { result }, null, text[..^i], text[..^i], dict));
+                    new IntermediaryResult(new List<List<IDictRecord>> { result }, null, text[..^i], text[..^i], dict));
             }
         }
 
@@ -531,10 +531,10 @@ public static class Lookup
 
         string? kanji = text.UnicodeIterator().FirstOrDefault();
 
-        if (kanji != null && dict.Contents.TryGetValue(kanji, out List<IResult>? result))
+        if (kanji != null && dict.Contents.TryGetValue(kanji, out List<IDictRecord>? result))
         {
             kanjiResults.Add(kanji,
-                new IntermediaryResult(new List<List<IResult>> { result }, null, kanji, kanji, dict));
+                new IntermediaryResult(new List<List<IDictRecord>> { result }, null, kanji, kanji, dict));
         }
 
         return kanjiResults;
@@ -554,10 +554,10 @@ public static class Lookup
 
                 for (int j = 0; j < resultCount; j++)
                 {
-                    var jMDictResult = (JMdictResult)wordResult.Results[i][j];
+                    var jMDictResult = (JmdictRecord)wordResult.Results[i][j];
 
-                    List<List<string>?> rLists = jMDictResult.ROrthographyInfoList ?? new();
-                    List<List<string>?> aLists = jMDictResult.AOrthographyInfoList ?? new();
+                    List<List<string>?> rLists = jMDictResult.ReadingsOrthographyInfoList ?? new();
+                    List<List<string>?> aLists = jMDictResult.AlternativeSpellingsOrthographyInfoList ?? new();
                     List<string> rOrthographyInfoList = new();
                     List<string> aOrthographyInfoList = new();
 
@@ -597,9 +597,9 @@ public static class Lookup
                         alternativeSpellings: jMDictResult.AlternativeSpellings,
                         process: ProcessProcess(wordResult.Processes?[i]),
                         frequencies: GetWordFrequencies(jMDictResult),
-                        pOrthographyInfoList: jMDictResult.POrthographyInfoList,
-                        rOrthographyInfoList: rOrthographyInfoList,
-                        aOrthographyInfoList: aOrthographyInfoList,
+                        primarySpellingOrthographyInfoList: jMDictResult.PrimarySpellingOrthographyInfoList,
+                        readingsOrthographyInfoList: rOrthographyInfoList,
+                        alternativeSpellingsOrthographyInfoList: aOrthographyInfoList,
                         dict: wordResult.Dict,
                         formattedDefinitions: jMDictResult.BuildFormattedDefinition(wordResult.Dict.Options)
                     );
@@ -626,7 +626,7 @@ public static class Lookup
 
                 for (int j = 0; j < resultCount; j++)
                 {
-                    var jMnedictResult = (JMnedictResult)nameResult.Results[i][j];
+                    var jMnedictResult = (JmnedictRecord)nameResult.Results[i][j];
 
                     LookupResult result = new
                     (
@@ -658,19 +658,19 @@ public static class Lookup
 
         KeyValuePair<string, IntermediaryResult> dictResult = kanjiResults.First();
 
-        List<List<IResult>> iResult = dictResult.Value.Results;
-        KanjidicResult kanjiResult = (KanjidicResult)iResult[0][0];
+        List<List<IDictRecord>> iResult = dictResult.Value.Results;
+        KanjidicRecord kanjiRecord = (KanjidicRecord)iResult[0][0];
 
         List<string> allReadings = new();
 
-        if (kanjiResult.OnReadings != null)
-            allReadings.AddRange(kanjiResult.OnReadings);
+        if (kanjiRecord.OnReadings != null)
+            allReadings.AddRange(kanjiRecord.OnReadings);
 
-        if (kanjiResult.KunReadings != null)
-            allReadings.AddRange(kanjiResult.KunReadings);
+        if (kanjiRecord.KunReadings != null)
+            allReadings.AddRange(kanjiRecord.KunReadings);
 
-        if (kanjiResult.NanoriReadings != null)
-            allReadings.AddRange(kanjiResult.NanoriReadings);
+        if (kanjiRecord.NanoriReadings != null)
+            allReadings.AddRange(kanjiRecord.NanoriReadings);
 
         IntermediaryResult intermediaryResult = kanjiResults.First().Value;
 
@@ -678,17 +678,17 @@ public static class Lookup
         (
             primarySpelling: dictResult.Key,
             readings: allReadings,
-            onReadings: kanjiResult.OnReadings,
-            kunReadings: kanjiResult.KunReadings,
-            nanoriReadings: kanjiResult.NanoriReadings,
-            strokeCount: kanjiResult.StrokeCount,
-            kanjiGrade: kanjiResult.Grade,
+            onReadings: kanjiRecord.OnReadings,
+            kunReadings: kanjiRecord.KunReadings,
+            nanoriReadings: kanjiRecord.NanoriReadings,
+            strokeCount: kanjiRecord.StrokeCount,
+            kanjiGrade: kanjiRecord.Grade,
             kanjiComposition: Storage.KanjiCompositionDict.GetValueOrDefault(dictResult.Key),
-            frequencies: GetKanjidicFrequencies(dictResult.Key, kanjiResult.Frequency),
+            frequencies: GetKanjidicFrequencies(dictResult.Key, kanjiRecord.Frequency),
             matchedText: intermediaryResult.MatchedText,
             deconjugatedMatchedText: intermediaryResult.DeconjugatedMatchedText,
             dict: intermediaryResult.Dict,
-            formattedDefinitions: kanjiResult.BuildFormattedDefinition()
+            formattedDefinitions: kanjiRecord.BuildFormattedDefinition()
         );
 
         results.Add(result);
@@ -706,7 +706,7 @@ public static class Lookup
         string kanji = kanjiResults.First().Key;
 
         IntermediaryResult intermediaryResult = kanjiResults.First().Value;
-        var kanjiResult = (YomichanKanjiResult)intermediaryResult.Results[0][0];
+        var kanjiResult = (YomichanKanjiRecord)intermediaryResult.Results[0][0];
 
         List<string> allReadings = new();
 
@@ -748,7 +748,7 @@ public static class Lookup
                 int resultCount = wordResult.Results[i].Count;
                 for (int j = 0; j < resultCount; j++)
                 {
-                    var epwingResult = (EpwingYomichanResult)wordResult.Results[i][j];
+                    var epwingResult = (EpwingYomichanRecord)wordResult.Results[i][j];
 
                     LookupResult result = new
                     (
@@ -786,7 +786,7 @@ public static class Lookup
                 int resultCount = wordResult.Results[i].Count;
                 for (int j = 0; j < resultCount; j++)
                 {
-                    var epwingResult = (EpwingNazekaResult)wordResult.Results[i][j];
+                    var epwingResult = (EpwingNazekaRecord)wordResult.Results[i][j];
 
                     LookupResult result = new
                     (
@@ -825,7 +825,7 @@ public static class Lookup
 
                 for (int j = 0; j < wordResultCount; j++)
                 {
-                    var customWordDictResult = (CustomWordEntry)wordResult.Results[i][j];
+                    var customWordDictResult = (CustomWordRecord)wordResult.Results[i][j];
 
                     List<LookupFrequencyResult> freqs = GetWordFrequencies(customWordDictResult);
                     foreach (LookupFrequencyResult freqResult in freqs)
@@ -873,7 +873,7 @@ public static class Lookup
 
                 for (int j = 0; j < resultCount; j++)
                 {
-                    var customNameDictResult = (CustomNameEntry)customNameResult.Value.Results[i][j];
+                    var customNameDictResult = (CustomNameRecord)customNameResult.Value.Results[i][j];
                     LookupResult result = new
                     (
                         primarySpelling: customNameDictResult.PrimarySpelling,
@@ -894,7 +894,7 @@ public static class Lookup
         return results;
     }
 
-    private static List<LookupFrequencyResult> GetWordFrequencies(IHasGetFrequency result)
+    private static List<LookupFrequencyResult> GetWordFrequencies(IDictRecordWithGetFrequency record)
     {
         List<LookupFrequencyResult> freqsList = new();
 
@@ -902,7 +902,7 @@ public static class Lookup
         {
             if (freq.Active && freq.Type != FreqType.YomichanKanji)
             {
-                freqsList.Add(new(freq.Name, result.GetFrequency(freq)));
+                freqsList.Add(new(freq.Name, record.GetFrequency(freq)));
             }
         }
 

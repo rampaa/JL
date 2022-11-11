@@ -192,8 +192,8 @@ public class ConfigManager : CoreConfig
         }
         else if (!Uri.IsWellFormedUriString(tempStr.Replace("{SearchTerm}", ""), UriKind.Absolute))
         {
-            Utils.Logger.Error("Couldn't save Seach URL, invalid URL");
-            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save Seach URL, invalid URL");
+            Utils.Logger.Error("Couldn't save Search URL, invalid URL");
+            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save Search URL, invalid URL");
         }
         else
         {

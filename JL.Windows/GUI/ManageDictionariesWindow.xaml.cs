@@ -12,7 +12,7 @@ using JL.Core.Dicts.EDICT;
 using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Dicts.EDICT.JMnedict;
 using JL.Core.Dicts.EDICT.KANJIDIC;
-using JL.Core.PoS;
+using JL.Core.WordClass;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using Button = System.Windows.Controls.Button;
@@ -321,14 +321,14 @@ public partial class ManageDictionariesWindow : Window
         {
             dict.Contents.Clear();
 
-            await Task.Run(async () => await JMdictLoader
+            await Task.Run(async () => await JmdictLoader
                 .Load(dict).ConfigureAwait(false));
 
-            await JmdictWcLoader.JmdictWordClassSerializer().ConfigureAwait(false);
+            await JmdictWordClassLoader.JmdictWordClassSerializer().ConfigureAwait(false);
 
-            Storage.WcDict.Clear();
+            Storage.WordClassDictionary.Clear();
 
-            await JmdictWcLoader.Load().ConfigureAwait(false);
+            await JmdictWordClassLoader.Load().ConfigureAwait(false);
 
             if (!dict.Active)
                 dict.Contents.Clear();
@@ -354,7 +354,7 @@ public partial class ManageDictionariesWindow : Window
         {
             dict.Contents.Clear();
 
-            await Task.Run(async () => await JMnedictLoader
+            await Task.Run(async () => await JmnedictLoader
                 .Load(dict).ConfigureAwait(false));
 
             if (!dict.Active)

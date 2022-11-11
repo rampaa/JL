@@ -15,7 +15,7 @@ internal static class EpwingNazekaLoader
                 .ConfigureAwait(false);
         }
 
-        Dictionary<string, List<IResult>> nazekaEpwingDict = dict.Contents;
+        Dictionary<string, List<IDictRecord>> nazekaEpwingDict = dict.Contents;
 
         foreach (JsonElement jsonObj in jsonObjects!.Skip(1))
         {
@@ -48,16 +48,16 @@ internal static class EpwingNazekaLoader
 
                 string key = Kana.KatakanaToHiraganaConverter(reading);
 
-                EpwingNazekaResult tempResult = new(primarySpelling, reading, alternativeSpellings,
+                EpwingNazekaRecord tempRecord = new(primarySpelling, reading, alternativeSpellings,
                     definitions);
 
-                if (nazekaEpwingDict.TryGetValue(key, out List<IResult>? result))
+                if (nazekaEpwingDict.TryGetValue(key, out List<IDictRecord>? result))
                 {
-                    result.Add(tempResult);
+                    result.Add(tempRecord);
                 }
                 else
                 {
-                    nazekaEpwingDict.Add(key, new List<IResult> { tempResult });
+                    nazekaEpwingDict.Add(key, new List<IDictRecord> { tempRecord });
                 }
 
                 for (int i = 0; i < spellings.Count; i++)
@@ -72,18 +72,18 @@ internal static class EpwingNazekaLoader
 
                     key = Kana.KatakanaToHiraganaConverter(primarySpelling);
 
-                    tempResult = new(primarySpelling, reading, alternativeSpellings, definitions);
+                    tempRecord = new(primarySpelling, reading, alternativeSpellings, definitions);
 
-                    if (!EpwingUtils.IsValidEpwingResultForDictType(tempResult, dict))
+                    if (!EpwingUtils.IsValidEpwingResultForDictType(tempRecord, dict))
                         continue;
 
                     if (nazekaEpwingDict.TryGetValue(key, out result))
                     {
-                        result.Add(tempResult);
+                        result.Add(tempRecord);
                     }
                     else
                     {
-                        nazekaEpwingDict.Add(key, new List<IResult> { tempResult });
+                        nazekaEpwingDict.Add(key, new List<IDictRecord> { tempRecord });
                     }
                 }
             }
@@ -93,18 +93,18 @@ internal static class EpwingNazekaLoader
                 string primarySpelling = reading;
                 string key = Kana.KatakanaToHiraganaConverter(primarySpelling);
 
-                EpwingNazekaResult tempResult = new(primarySpelling, null, null, definitions);
+                EpwingNazekaRecord tempRecord = new(primarySpelling, null, null, definitions);
 
-                if (!EpwingUtils.IsValidEpwingResultForDictType(tempResult, dict))
+                if (!EpwingUtils.IsValidEpwingResultForDictType(tempRecord, dict))
                     continue;
 
-                if (nazekaEpwingDict.TryGetValue(key, out List<IResult>? result))
+                if (nazekaEpwingDict.TryGetValue(key, out List<IDictRecord>? result))
                 {
-                    result.Add(tempResult);
+                    result.Add(tempRecord);
                 }
                 else
                 {
-                    nazekaEpwingDict.Add(key, new List<IResult> { tempResult });
+                    nazekaEpwingDict.Add(key, new List<IDictRecord> { tempRecord });
                 }
             }
         }

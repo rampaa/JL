@@ -23,22 +23,22 @@ public static class CustomNameLoader
 
     public static void AddToDictionary(string spelling, string reading, string nameType)
     {
-        CustomNameEntry newNameEntry = new(spelling, reading, nameType);
+        CustomNameRecord newNameRecord = new(spelling, reading, nameType);
 
-        Dictionary<string, List<IResult>> customNameDictionary = Storage.Dicts.Values.First(dict => dict.Type == DictType.CustomNameDictionary).Contents;
+        Dictionary<string, List<IDictRecord>> customNameDictionary = Storage.Dicts.Values.First(dict => dict.Type == DictType.CustomNameDictionary).Contents;
 
-        if (customNameDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out List<IResult>? entry))
+        if (customNameDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out List<IDictRecord>? entry))
         {
-            if (!entry.Contains(newNameEntry))
+            if (!entry.Contains(newNameRecord))
             {
-                entry.Add(newNameEntry);
+                entry.Add(newNameRecord);
             }
         }
 
         else
         {
             customNameDictionary.Add(Kana.KatakanaToHiraganaConverter(spelling),
-                new List<IResult> { newNameEntry });
+                new List<IDictRecord> { newNameRecord });
         }
     }
 }
