@@ -27,8 +27,11 @@ public static class ResourceUpdater
                 HttpResponseMessage response = await Storage.Client.SendAsync(request).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
-                    await using Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                    await DecompressGzipStream(responseStream, resourcePath).ConfigureAwait(false);
+                    Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                    await using (responseStream.ConfigureAwait(false))
+                    {
+                        await DecompressGzipStream(responseStream, resourcePath).ConfigureAwait(false);
+                    }
 
                     if (!noPrompt)
                         Storage.Frontend.ShowOkDialog($"{resourceName} has been downloaded successfully.",

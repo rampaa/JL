@@ -120,68 +120,70 @@ public static class Utils
         try
         {
             var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(), }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
-            await using Stream dictStream = new StreamReader(Path.Join(Storage.ConfigPath, "dicts.json")).BaseStream;
-
-            Dictionary<string, Dict>? deserializedDicts = await JsonSerializer
-                .DeserializeAsync<Dictionary<string, Dict>>(dictStream, jso).ConfigureAwait(false);
-
-            if (deserializedDicts != null)
+            Stream dictStream = new StreamReader(Path.Join(Storage.ConfigPath, "dicts.json")).BaseStream;
+            await using (dictStream.ConfigureAwait(false))
             {
-                foreach (Dict dict in deserializedDicts.Values)
-                {
-                    if (!Storage.Dicts.ContainsKey(dict.Name))
-                    {
-                        dict.Contents = dict.Size != 0
-                            ? new Dictionary<string, List<IDictRecord>>(dict.Size)
-                            : dict.Type switch
-                            {
-                                DictType.CustomNameDictionary => new Dictionary<string, List<IDictRecord>>(1024),
-                                DictType.CustomWordDictionary => new Dictionary<string, List<IDictRecord>>(1024),
-                                DictType.JMdict => new Dictionary<string, List<IDictRecord>>(500000), //2022/05/11: 394949, 2022/08/15: 398303
-                                DictType.JMnedict => new Dictionary<string, List<IDictRecord>>(700000), //2022/05/11: 608833, 2022/08/15: 609117
-                                DictType.Kanjidic => new Dictionary<string, List<IDictRecord>>(13108), //2022/05/11: 13108, 2022/08/15: 13108
-                                DictType.Daijirin => new Dictionary<string, List<IDictRecord>>(420429),
-                                DictType.DaijirinNazeka => new Dictionary<string, List<IDictRecord>>(420429),
-                                DictType.Daijisen => new Dictionary<string, List<IDictRecord>>(679115),
-                                DictType.Gakken => new Dictionary<string, List<IDictRecord>>(254558),
-                                DictType.GakkenYojijukugoYomichan => new Dictionary<string, List<IDictRecord>>(7989),
-                                DictType.IwanamiYomichan => new Dictionary<string, List<IDictRecord>>(101929),
-                                DictType.JitsuyouYomichan => new Dictionary<string, List<IDictRecord>>(69746),
-                                DictType.KanjigenYomichan => new Dictionary<string, List<IDictRecord>>(64730),
-                                DictType.Kenkyuusha => new Dictionary<string, List<IDictRecord>>(303677),
-                                DictType.KenkyuushaNazeka => new Dictionary<string, List<IDictRecord>>(191804),
-                                DictType.KireiCakeYomichan => new Dictionary<string, List<IDictRecord>>(332628),
-                                DictType.Kotowaza => new Dictionary<string, List<IDictRecord>>(30846),
-                                DictType.Koujien => new Dictionary<string, List<IDictRecord>>(402571),
-                                DictType.Meikyou => new Dictionary<string, List<IDictRecord>>(107367),
-                                DictType.NikkokuYomichan => new Dictionary<string, List<IDictRecord>>(451455),
-                                DictType.OubunshaYomichan => new Dictionary<string, List<IDictRecord>>(138935),
-                                DictType.PitchAccentYomichan => new Dictionary<string, List<IDictRecord>>(434991),
-                                DictType.ShinjirinYomichan => new Dictionary<string, List<IDictRecord>>(229758),
-                                DictType.ShinmeikaiYomichan => new Dictionary<string, List<IDictRecord>>(126049),
-                                DictType.ShinmeikaiNazeka => new Dictionary<string, List<IDictRecord>>(126049),
-                                DictType.ShinmeikaiYojijukugoYomichan => new Dictionary<string, List<IDictRecord>>(6088),
-                                DictType.WeblioKogoYomichan => new Dictionary<string, List<IDictRecord>>(30838),
-                                DictType.ZokugoYomichan => new Dictionary<string, List<IDictRecord>>(2392),
-                                DictType.NonspecificWordYomichan => new Dictionary<string, List<IDictRecord>>(250000),
-                                DictType.NonspecificKanjiYomichan => new Dictionary<string, List<IDictRecord>>(250000),
-                                DictType.NonspecificNameYomichan => new Dictionary<string, List<IDictRecord>>(250000),
-                                DictType.NonspecificYomichan => new Dictionary<string, List<IDictRecord>>(250000),
-                                DictType.NonspecificWordNazeka => new Dictionary<string, List<IDictRecord>>(250000),
-                                DictType.NonspecificKanjiNazeka => new Dictionary<string, List<IDictRecord>>(250000),
-                                DictType.NonspecificNameNazeka => new Dictionary<string, List<IDictRecord>>(250000),
-                                DictType.NonspecificNazeka => new Dictionary<string, List<IDictRecord>>(250000),
-                                _ => new Dictionary<string, List<IDictRecord>>(250000),
-                            };
+                Dictionary<string, Dict>? deserializedDicts = await JsonSerializer
+                    .DeserializeAsync<Dictionary<string, Dict>>(dictStream, jso).ConfigureAwait(false);
 
-                        Storage.Dicts.Add(dict.Name, dict);
+                if (deserializedDicts != null)
+                {
+                    foreach (Dict dict in deserializedDicts.Values)
+                    {
+                        if (!Storage.Dicts.ContainsKey(dict.Name))
+                        {
+                            dict.Contents = dict.Size != 0
+                                ? new Dictionary<string, List<IDictRecord>>(dict.Size)
+                                : dict.Type switch
+                                {
+                                    DictType.CustomNameDictionary => new Dictionary<string, List<IDictRecord>>(1024),
+                                    DictType.CustomWordDictionary => new Dictionary<string, List<IDictRecord>>(1024),
+                                    DictType.JMdict => new Dictionary<string, List<IDictRecord>>(500000), //2022/05/11: 394949, 2022/08/15: 398303
+                                    DictType.JMnedict => new Dictionary<string, List<IDictRecord>>(700000), //2022/05/11: 608833, 2022/08/15: 609117
+                                    DictType.Kanjidic => new Dictionary<string, List<IDictRecord>>(13108), //2022/05/11: 13108, 2022/08/15: 13108
+                                    DictType.Daijirin => new Dictionary<string, List<IDictRecord>>(420429),
+                                    DictType.DaijirinNazeka => new Dictionary<string, List<IDictRecord>>(420429),
+                                    DictType.Daijisen => new Dictionary<string, List<IDictRecord>>(679115),
+                                    DictType.Gakken => new Dictionary<string, List<IDictRecord>>(254558),
+                                    DictType.GakkenYojijukugoYomichan => new Dictionary<string, List<IDictRecord>>(7989),
+                                    DictType.IwanamiYomichan => new Dictionary<string, List<IDictRecord>>(101929),
+                                    DictType.JitsuyouYomichan => new Dictionary<string, List<IDictRecord>>(69746),
+                                    DictType.KanjigenYomichan => new Dictionary<string, List<IDictRecord>>(64730),
+                                    DictType.Kenkyuusha => new Dictionary<string, List<IDictRecord>>(303677),
+                                    DictType.KenkyuushaNazeka => new Dictionary<string, List<IDictRecord>>(191804),
+                                    DictType.KireiCakeYomichan => new Dictionary<string, List<IDictRecord>>(332628),
+                                    DictType.Kotowaza => new Dictionary<string, List<IDictRecord>>(30846),
+                                    DictType.Koujien => new Dictionary<string, List<IDictRecord>>(402571),
+                                    DictType.Meikyou => new Dictionary<string, List<IDictRecord>>(107367),
+                                    DictType.NikkokuYomichan => new Dictionary<string, List<IDictRecord>>(451455),
+                                    DictType.OubunshaYomichan => new Dictionary<string, List<IDictRecord>>(138935),
+                                    DictType.PitchAccentYomichan => new Dictionary<string, List<IDictRecord>>(434991),
+                                    DictType.ShinjirinYomichan => new Dictionary<string, List<IDictRecord>>(229758),
+                                    DictType.ShinmeikaiYomichan => new Dictionary<string, List<IDictRecord>>(126049),
+                                    DictType.ShinmeikaiNazeka => new Dictionary<string, List<IDictRecord>>(126049),
+                                    DictType.ShinmeikaiYojijukugoYomichan => new Dictionary<string, List<IDictRecord>>(6088),
+                                    DictType.WeblioKogoYomichan => new Dictionary<string, List<IDictRecord>>(30838),
+                                    DictType.ZokugoYomichan => new Dictionary<string, List<IDictRecord>>(2392),
+                                    DictType.NonspecificWordYomichan => new Dictionary<string, List<IDictRecord>>(250000),
+                                    DictType.NonspecificKanjiYomichan => new Dictionary<string, List<IDictRecord>>(250000),
+                                    DictType.NonspecificNameYomichan => new Dictionary<string, List<IDictRecord>>(250000),
+                                    DictType.NonspecificYomichan => new Dictionary<string, List<IDictRecord>>(250000),
+                                    DictType.NonspecificWordNazeka => new Dictionary<string, List<IDictRecord>>(250000),
+                                    DictType.NonspecificKanjiNazeka => new Dictionary<string, List<IDictRecord>>(250000),
+                                    DictType.NonspecificNameNazeka => new Dictionary<string, List<IDictRecord>>(250000),
+                                    DictType.NonspecificNazeka => new Dictionary<string, List<IDictRecord>>(250000),
+                                    _ => new Dictionary<string, List<IDictRecord>>(250000),
+                                };
+
+                            Storage.Dicts.Add(dict.Name, dict);
+                        }
                     }
                 }
-            }
-            else
-            {
-                Storage.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/dicts.json");
-                Utils.Logger.Error("Couldn't load Config/dicts.json");
+                else
+                {
+                    Storage.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/dicts.json");
+                    Utils.Logger.Error("Couldn't load Config/dicts.json");
+                }
             }
         }
         catch (Exception e)
@@ -196,34 +198,36 @@ public static class Utils
         try
         {
             var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(), }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
-            await using Stream freqStream = new StreamReader(Path.Join(Storage.ConfigPath, "freqs.json")).BaseStream;
-
-            Dictionary<string, Freq>? deserializedFreqs = await JsonSerializer
-                .DeserializeAsync<Dictionary<string, Freq>>(freqStream, jso).ConfigureAwait(false);
-
-            if (deserializedFreqs != null)
+            Stream freqStream = new StreamReader(Path.Join(Storage.ConfigPath, "freqs.json")).BaseStream;
+            await using (freqStream.ConfigureAwait(false))
             {
-                foreach (Freq freq in deserializedFreqs.Values)
+                Dictionary<string, Freq>? deserializedFreqs = await JsonSerializer
+                    .DeserializeAsync<Dictionary<string, Freq>>(freqStream, jso).ConfigureAwait(false);
+
+                if (deserializedFreqs != null)
                 {
-                    if (!Storage.FreqDicts.ContainsKey(freq.Name))
+                    foreach (Freq freq in deserializedFreqs.Values)
                     {
-                        freq.Contents = freq.Size != 0
-                            ? new Dictionary<string, List<FrequencyRecord>>(freq.Size)
-                            : freq.Type switch
-                            {
-                                FreqType.Yomichan => new Dictionary<string, List<FrequencyRecord>>(1504512),
-                                FreqType.YomichanKanji => new Dictionary<string, List<FrequencyRecord>>(169623),
-                                FreqType.Nazeka => new Dictionary<string, List<FrequencyRecord>>(114348),
-                                _ => new Dictionary<string, List<FrequencyRecord>>(500000),
-                            };
-                        Storage.FreqDicts.Add(freq.Name, freq);
+                        if (!Storage.FreqDicts.ContainsKey(freq.Name))
+                        {
+                            freq.Contents = freq.Size != 0
+                                ? new Dictionary<string, List<FrequencyRecord>>(freq.Size)
+                                : freq.Type switch
+                                {
+                                    FreqType.Yomichan => new Dictionary<string, List<FrequencyRecord>>(1504512),
+                                    FreqType.YomichanKanji => new Dictionary<string, List<FrequencyRecord>>(169623),
+                                    FreqType.Nazeka => new Dictionary<string, List<FrequencyRecord>>(114348),
+                                    _ => new Dictionary<string, List<FrequencyRecord>>(500000),
+                                };
+                            Storage.FreqDicts.Add(freq.Name, freq);
+                        }
                     }
                 }
-            }
-            else
-            {
-                Storage.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/freqs.json");
-                Utils.Logger.Error("Couldn't load Config/freqs.json");
+                else
+                {
+                    Storage.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/freqs.json");
+                    Utils.Logger.Error("Couldn't load Config/freqs.json");
+                }
             }
         }
         catch (Exception e)

@@ -37,48 +37,51 @@ public static class Networking
 
             if (gitHubApiResponse.IsSuccessStatusCode)
             {
-                await using Stream githubApiResultStream = await gitHubApiResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                JsonDocument jsonDocument = await JsonDocument.ParseAsync(githubApiResultStream).ConfigureAwait(false);
-                JsonElement rootElement = jsonDocument.RootElement;
-                Version latestJLVersion = new(rootElement.GetProperty("tag_name").ToString());
-
-                if (latestJLVersion > Storage.JLVersion)
+                Stream githubApiResultStream = await gitHubApiResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                await using (githubApiResultStream.ConfigureAwait(false))
                 {
-                    bool foundRelease = false;
-                    string architecture = Environment.Is64BitProcess ? "x64" : "x86";
-                    JsonElement assets = jsonDocument.RootElement.GetProperty("assets");
+                    JsonDocument jsonDocument = await JsonDocument.ParseAsync(githubApiResultStream).ConfigureAwait(false);
+                    JsonElement rootElement = jsonDocument.RootElement;
+                    Version latestJLVersion = new(rootElement.GetProperty("tag_name").ToString());
 
-                    foreach (JsonElement asset in assets.EnumerateArray())
+                    if (latestJLVersion > Storage.JLVersion)
                     {
-                        string latestReleaseUrl = asset.GetProperty("browser_download_url").ToString();
+                        bool foundRelease = false;
+                        string architecture = Environment.Is64BitProcess ? "x64" : "x86";
+                        JsonElement assets = jsonDocument.RootElement.GetProperty("assets");
 
-                        // Add OS check?
-                        if (latestReleaseUrl.Contains(architecture))
+                        foreach (JsonElement asset in assets.EnumerateArray())
                         {
-                            foundRelease = true;
+                            string latestReleaseUrl = asset.GetProperty("browser_download_url").ToString();
 
-                            if (Storage.Frontend.ShowYesNoDialog(
-                                "A new version of JL is available. Would you like to download it now?", "Update JL?"))
+                            // Add OS check?
+                            if (latestReleaseUrl.Contains(architecture))
                             {
-                                Storage.Frontend.ShowOkDialog(
-                                    "This may take a while. Please don't manually shut down the program until it's updated.", "Info");
+                                foundRelease = true;
 
-                                await Storage.Frontend.UpdateJL(new Uri(latestReleaseUrl)).ConfigureAwait(false);
+                                if (Storage.Frontend.ShowYesNoDialog(
+                                    "A new version of JL is available. Would you like to download it now?", "Update JL?"))
+                                {
+                                    Storage.Frontend.ShowOkDialog(
+                                        "This may take a while. Please don't manually shut down the program until it's updated.", "Info");
+
+                                    await Storage.Frontend.UpdateJL(new Uri(latestReleaseUrl)).ConfigureAwait(false);
+                                }
+                                break;
                             }
-                            break;
                         }
+
+                        if (!isAutoCheck && !foundRelease)
+                        {
+                            Storage.Frontend.ShowOkDialog("JL is up to date", "Info");
+                        }
+
                     }
 
-                    if (!isAutoCheck && !foundRelease)
+                    else if (!isAutoCheck)
                     {
                         Storage.Frontend.ShowOkDialog("JL is up to date", "Info");
                     }
-
-                }
-
-                else if (!isAutoCheck)
-                {
-                    Storage.Frontend.ShowOkDialog("JL is up to date", "Info");
                 }
             }
 

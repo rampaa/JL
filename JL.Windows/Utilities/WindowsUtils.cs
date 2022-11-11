@@ -265,18 +265,21 @@ public static class WindowsUtils
 
         if (downloadResponse.IsSuccessStatusCode)
         {
-            await using Stream downloadResponseStream = await downloadResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            using ZipArchive archive = new(downloadResponseStream);
-
-            string tmpDirectory = Path.Join(Storage.ApplicationPath, "tmp");
-
-            if (Directory.Exists(tmpDirectory))
+            Stream downloadResponseStream = await downloadResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            await using (downloadResponseStream.ConfigureAwait(false))
             {
-                Directory.Delete(tmpDirectory, true);
-            }
+                using ZipArchive archive = new(downloadResponseStream);
 
-            Directory.CreateDirectory(tmpDirectory);
-            archive.ExtractToDirectory(tmpDirectory);
+                string tmpDirectory = Path.Join(Storage.ApplicationPath, "tmp");
+
+                if (Directory.Exists(tmpDirectory))
+                {
+                    Directory.Delete(tmpDirectory, true);
+                }
+
+                Directory.CreateDirectory(tmpDirectory);
+                archive.ExtractToDirectory(tmpDirectory);
+            }
 
             await MainWindow.Instance.Dispatcher!.BeginInvoke(ConfigManager.SaveBeforeClosing);
 

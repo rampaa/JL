@@ -17,8 +17,8 @@ using JL.Core.Freqs;
 using JL.Core.Freqs.FrequencyNazeka;
 using JL.Core.Freqs.FrequencyYomichan;
 using JL.Core.PitchAccent;
-using JL.Core.WordClass;
 using JL.Core.Utilities;
+using JL.Core.WordClass;
 using Timer = System.Timers.Timer;
 
 namespace JL.Core;

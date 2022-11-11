@@ -11,8 +11,8 @@ using JL.Core.Dicts.EPWING.EpwingNazeka;
 using JL.Core.Dicts.EPWING.EpwingYomichan;
 using JL.Core.Dicts.YomichanKanji;
 using JL.Core.Freqs;
-using JL.Core.WordClass;
 using JL.Core.Utilities;
+using JL.Core.WordClass;
 
 namespace JL.Core.Lookup;
 
