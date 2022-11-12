@@ -656,7 +656,7 @@ public static class Storage
         FreqsReady = true;
     }
 
-    public static async Task InitializePoS()
+    public static async Task InitializeWordClassDictionary()
     {
         Dict dict = Dicts.Values.First(dict => dict.Type == DictType.JMdict);
         if (!File.Exists($"{ResourcesPath}/PoS.json"))

@@ -284,7 +284,7 @@ public static class JmdictLoader
                         string? originalWord = xmlReader.ReadElementContentAsString();
                         originalWord = originalWord != "" ? originalWord : null;
 
-                        sense.LSourceList.Add(new LanguageSource(lang, isPart, isWasei, originalWord));
+                        sense.LSourceList.Add(new LoanwordSource(lang, isPart, isWasei, originalWord));
                         break;
 
                     default:

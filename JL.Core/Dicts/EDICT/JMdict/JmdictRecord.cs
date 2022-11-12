@@ -25,7 +25,7 @@ public class JmdictRecord : IDictRecordWithGetFrequency
     //public List<string> PriorityList { get; set; } // e.g. gai1
     public List<List<string>?>? RelatedTerms { get; set; }
     public List<List<string>?>? Antonyms { get; set; }
-    public List<List<LanguageSource>?>? LoanwordEtymology { get; set; }
+    public List<List<LoanwordSource>?>? LoanwordEtymology { get; set; }
 
     public JmdictRecord()
     {
@@ -46,7 +46,7 @@ public class JmdictRecord : IDictRecordWithGetFrequency
         //PriorityList = new List<string>();
         RelatedTerms = new List<List<string>?>();
         Antonyms = new List<List<string>?>();
-        LoanwordEtymology = new List<List<LanguageSource>?>();
+        LoanwordEtymology = new List<List<LoanwordSource>?>();
     }
 
     public string BuildFormattedDefinition(DictOptions? options)
@@ -134,7 +134,7 @@ public class JmdictRecord : IDictRecordWithGetFrequency
             {
                 defResult.Append('(');
 
-                List<LanguageSource> lSources = LoanwordEtymology[i]!;
+                List<LoanwordSource> lSources = LoanwordEtymology[i]!;
 
                 int lSourceCount = lSources.Count;
                 for (int j = 0; j < lSourceCount; j++)

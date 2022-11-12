@@ -12,7 +12,7 @@ public class Sense
     public List<string> GlossList { get; } // English meaning
     public List<string> XRefList { get; } // Related terms
     public List<string> AntList { get; } // Antonyms
-    public List<LanguageSource> LSourceList { get; }
+    public List<LoanwordSource> LSourceList { get; }
 
     public Sense()
     {
@@ -25,6 +25,6 @@ public class Sense
         GlossList = new List<string>();
         XRefList = new List<string>();
         AntList = new List<string>();
-        LSourceList = new List<LanguageSource>();
+        LSourceList = new List<LoanwordSource>();
     }
 }

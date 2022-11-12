@@ -400,7 +400,7 @@ public static class Utils
             await DeserializeDicts().ConfigureAwait(false);
             await Storage.LoadDictionaries(false).ConfigureAwait(false);
             await SerializeDicts().ConfigureAwait(false);
-            await Storage.InitializePoS().ConfigureAwait(false);
+            await Storage.InitializeWordClassDictionary().ConfigureAwait(false);
         });
 
         tasks[1] = Task.Run(async () =>
