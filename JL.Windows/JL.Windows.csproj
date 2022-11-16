@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HandyControl" Version="3.3.0" />
-    <PackageReference Include="HandyControl.Lang.en" Version="3.3.0" />
+    <PackageReference Include="HandyControl" Version="3.4.0" />
+    <PackageReference Include="HandyControl.Lang.en" Version="3.4.0" />
     <PackageReference Include="NAudio" Version="2.1.0" />
   </ItemGroup>
 
