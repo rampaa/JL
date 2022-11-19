@@ -67,7 +67,7 @@ public static class EpwingUtils
                         return false;
 
                     // english definitions
-                    if (!epwingRecord.Definitions.Any(def => Storage.JapaneseRegex.IsMatch(def)))
+                    if (!epwingRecord.Definitions.Any(Storage.JapaneseRegex.IsMatch))
                         return false;
                 }
                 // todo: missing FilterDuplicateEntries call?

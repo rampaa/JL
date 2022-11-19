@@ -153,8 +153,7 @@ public static class Deconjugator
         if (!myForm.Text.Contains(myRule.ConEnd.First()))
             return null;
 
-        string newText = new Regex(myRule.ConEnd.First())
-            .Replace(myForm.Text, myRule.DecEnd.First());
+        string newText = myForm.Text.Replace(myRule.ConEnd.First(), myRule.DecEnd.First());
 
         Form newForm = new(
             newText,

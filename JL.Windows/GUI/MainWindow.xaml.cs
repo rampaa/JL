@@ -136,7 +136,7 @@ public partial class MainWindow : Window, IFrontend
 
                     if (ConfigManager.TextBoxRemoveNewlines)
                     {
-                        text = Regex.Replace(text, @"\r\n?|\n", "");
+                        text = text.ReplaceLineEndings("");
                     }
 
                     MainTextBox!.Text = text;
