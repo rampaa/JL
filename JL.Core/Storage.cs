@@ -265,10 +265,35 @@ public static class Storage
         JLField.LocalTime,
     };
 
+    // Matches the following Unicode ranges:
+    // CJK Radicals Supplement (2E80–2EFF)
+    // Kangxi Radicals (2F00–2FDF)
+    // Ideographic Description Characters (2FF0–2FFF)
+    // CJK Symbols and Punctuation (3000–303F)
+    // Hiragana (3040–309F)
+    // Katakana (30A0–30FF)
+    // Kanbun (3190–319F)
+    // CJK Strokes (31C0–31EF)
+    // Katakana Phonetic Extensions (31F0–31FF)
+    // Enclosed CJK Letters and Months (3200–32FF)
+    // CJK Compatibility (3300–33FF)
+    // CJK Unified Ideographs Extension A (3400–4DBF)
+    // CJK Unified Ideographs (4E00–9FFF)
+    // CJK Compatibility Ideographs (F900–FAFF)
+    // CJK Compatibility Forms (FE30–FE4F)
+    // CJK Unified Ideographs Extension B (20000–2A6DF)
+    // CJK Unified Ideographs Extension C (2A700–2B73F)
+    // CJK Unified Ideographs Extension D (2B740–2B81F)
+    // CJK Unified Ideographs Extension E (2B820–2CEAF)
+    // CJK Unified Ideographs Extension F (2CEB0–2EBEF)
+    // CJK Compatibility Ideographs Supplement (2F800–2FA1F)
+    // CJK Unified Ideographs Extension G (30000–3134F)
+    // CJK Unified Ideographs Extension H (31350–323AF)
     public static readonly Regex JapaneseRegex =
         new(
-            @"[\u2e80-\u30ff\u31c0-\u4dbf\u4e00-\u9fff\uf900-\ufaff\ufe30-\ufe4f\uff00-\uffef]|\ud82c[\udc00-\udcff]|\ud83c[\ude00-\udeff]|\ud840[\udc00-\udfff]|[\ud841-\ud868][\udc00-\udfff]|\ud869[\udc00-\udedf]|\ud869[\udf00-\udfff]|[\ud86a-\ud879][\udc00-\udfff]|\ud87a[\udc00-\udfef]|\ud87e[\udc00-\ude1f]|\ud880[\udc00-\udfff]|[\ud881-\ud883][\udc00-\udfff]|\ud884[\udc00-\udfff]|[\ud885-\ud887][\udc00-\udfff]|\ud888[\udc00-\udfaf]",
+            @"[\u2e80-\u30ff\u3190–\u319f\u31c0-\u4dbf\u4e00-\u9fff\uf900-\ufaff\ufe30-\ufe4f\uff00-\uffef]|\ud82c[\udc00-\udcff]|\ud83c[\ude00-\udeff]|\ud840[\udc00-\udfff]|[\ud841-\ud868][\udc00-\udfff]|\ud869[\udc00-\udedf]|\ud869[\udf00-\udfff]|[\ud86a-\ud879][\udc00-\udfff]|\ud87a[\udc00-\udfef]|\ud87e[\udc00-\ude1f]|\ud880[\udc00-\udfff]|[\ud881-\ud883][\udc00-\udfff]|\ud884[\udc00-\udfff]|[\ud885-\ud887][\udc00-\udfff]|\ud888[\udc00-\udfaf]",
             RegexOptions.Compiled);
+
     // Consider checking for \t, \r, "　", " ", ., !, ?, –, —, ―, ‒, ~, ‥, ♪, ～, ♡, ♥, ☆, ★
     public static readonly List<string> JapanesePunctuation =
         new()
