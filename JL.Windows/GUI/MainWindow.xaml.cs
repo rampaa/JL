@@ -53,7 +53,7 @@ public partial class MainWindow : Window, IFrontend
     private DateTime _lastClipboardChangeTime;
     private WinApi? _winApi;
 
-    public PopupWindow FirstPopupWindow { get; init; } = new();
+    public PopupWindow FirstPopupWindow { get; init; }
 
     private static MainWindow? s_instance;
     public static MainWindow Instance
@@ -73,6 +73,7 @@ public partial class MainWindow : Window, IFrontend
         InitializeComponent();
         s_instance = this;
         ConfigHelper.Instance.SetLang("en");
+        FirstPopupWindow = new();
         MainTextBox.Focus();
     }
 
