@@ -34,7 +34,7 @@ internal static class EpwingNazekaLoader
                 definitions = null;
             }
 
-            if (spellings.Count == 1 && spellings[0] == "")
+            if (spellings is [""])
             {
                 spellings = null;
             }

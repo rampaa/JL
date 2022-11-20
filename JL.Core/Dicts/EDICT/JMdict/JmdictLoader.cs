@@ -56,7 +56,7 @@ public static class JmdictLoader
 
         while (!xmlReader.EOF)
         {
-            if (xmlReader.Name == "entry" && xmlReader.NodeType == XmlNodeType.EndElement)
+            if (xmlReader is { Name: "entry", NodeType: XmlNodeType.EndElement })
                 break;
 
             if (xmlReader.NodeType == XmlNodeType.Element)
@@ -101,7 +101,7 @@ public static class JmdictLoader
 
         while (!xmlReader.EOF)
         {
-            if (xmlReader.Name == "k_ele" && xmlReader.NodeType == XmlNodeType.EndElement)
+            if (xmlReader is { Name: "k_ele", NodeType: XmlNodeType.EndElement })
                 break;
 
             if (xmlReader.NodeType == XmlNodeType.Element)
@@ -143,7 +143,7 @@ public static class JmdictLoader
 
         while (!xmlReader.EOF)
         {
-            if (xmlReader.Name == "r_ele" && xmlReader.NodeType == XmlNodeType.EndElement)
+            if (xmlReader is { Name: "r_ele", NodeType: XmlNodeType.EndElement })
                 break;
 
             if (xmlReader.NodeType == XmlNodeType.Element)
@@ -189,7 +189,7 @@ public static class JmdictLoader
 
         while (!xmlReader.EOF)
         {
-            if (xmlReader.Name == "sense" && xmlReader.NodeType == XmlNodeType.EndElement)
+            if (xmlReader is { Name: "sense", NodeType: XmlNodeType.EndElement })
                 break;
 
             if (xmlReader.NodeType == XmlNodeType.Element)

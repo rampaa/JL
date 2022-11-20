@@ -340,7 +340,7 @@ public partial class MainWindow : Window, IFrontend
             || ConfigManager.LookupOnSelectOnly
             || ConfigManager.LookupOnLeftClickOnly
             || ConfigManager.FixedPopupPositioning
-            || (FirstPopupWindow.UnavoidableMouseEnter && FirstPopupWindow.IsMouseOver))
+            || FirstPopupWindow is { UnavoidableMouseEnter: true, IsMouseOver: true })
         {
             return;
         }
@@ -709,7 +709,7 @@ public partial class MainWindow : Window, IFrontend
         WindowsUtils.DpiAwareWorkAreaWidth = WindowsUtils.ActiveScreen.Bounds.Width / WindowsUtils.Dpi.DpiScaleX;
         WindowsUtils.DpiAwareWorkAreaHeight = WindowsUtils.ActiveScreen.Bounds.Height / WindowsUtils.Dpi.DpiScaleY;
 
-        if (oldResolution.Width != WindowsUtils.DpiAwareWorkAreaWidth || oldResolution.Height != WindowsUtils.DpiAwareWorkAreaHeight)
+        if (Math.Abs(oldResolution.Width - WindowsUtils.DpiAwareWorkAreaWidth) > 1 || Math.Abs(oldResolution.Height - WindowsUtils.DpiAwareWorkAreaHeight) > 1)
         {
             double ratioX = oldResolution.Width / WindowsUtils.DpiAwareWorkAreaWidth;
             double ratioY = oldResolution.Height / WindowsUtils.DpiAwareWorkAreaHeight;

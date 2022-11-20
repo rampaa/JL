@@ -51,7 +51,7 @@ public static class KanjidicLoader
 
         while (!xmlReader.EOF)
         {
-            if (xmlReader.Name == "character" && xmlReader.NodeType == XmlNodeType.EndElement)
+            if (xmlReader is { Name: "character", NodeType: XmlNodeType.EndElement })
                 break;
 
             if (xmlReader.NodeType == XmlNodeType.Element)

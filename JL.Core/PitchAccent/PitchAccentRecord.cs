@@ -10,7 +10,7 @@ public class PitchAccentRecord : IDictRecord
     public string? Reading { get; }
     public int Position { get; }
 
-    public static readonly Regex PositionRegex = new("@\"(\\[|［)(\\d)(］|\\])", RegexOptions.Compiled);
+    private static readonly Regex s_positionRegex = new("@\"(\\[|［)(\\d)(］|\\])", RegexOptions.Compiled);
 
     public PitchAccentRecord(List<JsonElement> jsonObject)
     {
@@ -27,7 +27,7 @@ public class PitchAccentRecord : IDictRecord
         {
             Reading = jsonObject[1].ToString();
 
-            if (int.TryParse(PositionRegex.Match(jsonObject[5][0].ToString()).Groups[2].Value, out int position))
+            if (int.TryParse(s_positionRegex.Match(jsonObject[5][0].ToString()).Groups[2].Value, out int position))
             {
                 Position = position;
             }

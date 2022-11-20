@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace JL.Core.Tests;
 
 [TestFixture]
-public class PopupWindowUtilitiesTests
+public class UtilsTests
 {
     [Test]
     public void FindSentence_FromTheStart()

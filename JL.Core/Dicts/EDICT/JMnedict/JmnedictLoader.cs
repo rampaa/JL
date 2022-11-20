@@ -48,7 +48,7 @@ public static class JmnedictLoader
         JmnedictEntry entry = new();
         while (!xmlReader.EOF)
         {
-            if (xmlReader.Name == "entry" && xmlReader.NodeType == XmlNodeType.EndElement)
+            if (xmlReader is { Name: "entry", NodeType: XmlNodeType.EndElement })
                 break;
 
             if (xmlReader.NodeType == XmlNodeType.Element)
@@ -105,7 +105,7 @@ public static class JmnedictLoader
         Translation translation = new();
         while (!xmlReader.EOF)
         {
-            if (xmlReader.Name == "trans" && xmlReader.NodeType == XmlNodeType.EndElement)
+            if (xmlReader is { Name: "trans", NodeType: XmlNodeType.EndElement })
                 break;
 
             if (xmlReader.NodeType == XmlNodeType.Element)
