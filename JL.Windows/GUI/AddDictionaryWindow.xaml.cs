@@ -70,7 +70,9 @@ public partial class AddDictionaryWindow : Window
             DictType type = typeString!.GetEnum<DictType>();
 
             // lowest priority means highest number
-            int lowestPriority = Storage.Dicts.Select(dict => dict.Value.Priority).Max();
+            int lowestPriority = Storage.Dicts.Count > 0
+                ? Storage.Dicts.Select(dict => dict.Value.Priority).Max()
+                : -1;
 
             NewlineBetweenDefinitionsOption? newlineOption = null;
             if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(type))

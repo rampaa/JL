@@ -67,7 +67,9 @@ public partial class AddFrequencyWindow : Window
             FreqType type = typeString!.GetEnum<FreqType>();
 
             // lowest priority means highest number
-            int lowestPriority = Storage.FreqDicts.Select(freq => freq.Value.Priority).Max();
+            int lowestPriority = Storage.FreqDicts.Count > 0
+                ? Storage.FreqDicts.Select(freq => freq.Value.Priority).Max()
+                : -1;
 
             Storage.FreqDicts.Add(name,
                 new Freq(type, name, path, true, lowestPriority + 1, 0));
