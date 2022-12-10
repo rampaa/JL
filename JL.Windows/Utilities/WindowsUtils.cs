@@ -8,7 +8,6 @@ using System.Text;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Markup;
@@ -31,8 +30,8 @@ public static class WindowsUtils
 {
     private static WaveOut? s_audioPlayer;
 
-    public static Screen ActiveScreen { get; set; } =
-        Screen.FromHandle(
+    public static System.Windows.Forms.Screen ActiveScreen { get; set; } =
+        System.Windows.Forms.Screen.FromHandle(
             new WindowInteropHelper(MainWindow.Instance).Handle);
 
     public static DpiScale Dpi { get; set; } = VisualTreeHelper.GetDpi(MainWindow.Instance);
@@ -367,56 +366,9 @@ public static class WindowsUtils
         }
     }
 
-    public static void Try(Action a, object variable, string key)
+    public static Brush? BrushFromHex(string hexColorString)
     {
-        try
-        {
-            a();
-        }
-        catch
-        {
-            Configuration config =
-                ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-            string? variableStr;
-
-            if (variable is double doubleVariable)
-                variableStr = doubleVariable.ToString(CultureInfo.InvariantCulture);
-            else if (variable is float floatVariable)
-                variableStr = floatVariable.ToString(CultureInfo.InvariantCulture);
-            else
-                variableStr = variable.ToString();
-
-            if (ConfigurationManager.AppSettings.Get(key) == null)
-                config.AppSettings.Settings.Add(key, variableStr);
-            else
-                config.AppSettings.Settings[key].Value = variableStr;
-
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
-        }
-    }
-
-    public static void AddToConfig(string key, string value)
-    {
-        Configuration config =
-            ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-        config.AppSettings.Settings.Add(key, value);
-        config.Save(ConfigurationSaveMode.Modified);
-        ConfigurationManager.RefreshSection("appSettings");
-    }
-
-    public static void SaveKeyGesture(string key, string rawKeyGesture)
-    {
-        Configuration config =
-            ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-        config.AppSettings.Settings[key].Value = rawKeyGesture.StartsWith("Win+")
-            ? rawKeyGesture[4..]
-            : rawKeyGesture;
-
-        config.Save(ConfigurationSaveMode.Modified);
-        ConfigurationManager.RefreshSection("appSettings");
+        return (Brush?)new BrushConverter().ConvertFrom(hexColorString);
     }
 
     public static void Alert(AlertLevel alertLevel, string message)
@@ -587,7 +539,7 @@ public static class WindowsUtils
         {
             try
             {
-                System.Windows.Clipboard.SetText(text);
+                Clipboard.SetText(text);
                 retry = false;
             }
             catch (Exception e)

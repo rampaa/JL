@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Media;
 using JL.Core;
 using JL.Core.Dicts;
@@ -98,7 +97,7 @@ public partial class EditDictionaryWindow : Window
 
     private void BrowseForDictionaryFolder()
     {
-        using var fbd = new FolderBrowserDialog { SelectedPath = Directory.Exists(TextBlockPath.Text) ? TextBlockPath.Text : Storage.ApplicationPath };
+        using var fbd = new System.Windows.Forms.FolderBrowserDialog { SelectedPath = Directory.Exists(TextBlockPath.Text) ? TextBlockPath.Text : Storage.ApplicationPath };
 
         if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK &&
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))
