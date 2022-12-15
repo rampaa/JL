@@ -838,7 +838,7 @@ public partial class MainWindow : Window, IFrontend
 
     private void ResizeWindow(object sender, MouseButtonEventArgs e)
     {
-        _winApi?.ResizeWindow(sender as Border ?? new());
+        _winApi?.ResizeWindow(((Border)sender).Name);
 
         LeftPositionBeforeResolutionChange = Left;
         TopPositionBeforeResolutionChange = Top;

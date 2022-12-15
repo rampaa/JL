@@ -26,7 +26,7 @@ public static class JmdictLoader
 
             while (xmlReader.ReadToFollowing("entry"))
             {
-                ReadEntry(xmlReader, dict);
+                JmdictRecordBuilder.AddToDictionary(ReadEntry(xmlReader), dict.Contents);
             }
 
             dict.Contents.TrimExcess();
@@ -48,7 +48,7 @@ public static class JmdictLoader
         }
     }
 
-    private static void ReadEntry(XmlReader xmlReader, Dict dict)
+    private static JmdictEntry ReadEntry(XmlReader xmlReader)
     {
         JmdictEntry entry = new();
 
@@ -68,15 +68,15 @@ public static class JmdictLoader
                         break;
 
                     case "k_ele":
-                        ReadKEle(xmlReader, entry);
+                        entry.KanjiElements.Add(ReadKanjiElement(xmlReader));
                         break;
 
                     case "r_ele":
-                        ReadREle(xmlReader, entry);
+                        entry.ReadingElements.Add(ReadReadingElement(xmlReader));
                         break;
 
                     case "sense":
-                        ReadSense(xmlReader, entry);
+                        entry.SenseList.Add(ReadSense(xmlReader));
                         break;
 
                     default:
@@ -90,10 +90,10 @@ public static class JmdictLoader
             }
         }
 
-        JmdictBuilder.BuildDictionary(entry, dict.Contents);
+        return entry;
     }
 
-    private static void ReadKEle(XmlReader xmlReader, JmdictEntry entry)
+    private static KanjiElement ReadKanjiElement(XmlReader xmlReader)
     {
         KanjiElement kanjiElement = new();
 
@@ -132,10 +132,10 @@ public static class JmdictLoader
             }
         }
 
-        entry.KanjiElements.Add(kanjiElement);
+        return kanjiElement;
     }
 
-    private static void ReadREle(XmlReader xmlReader, JmdictEntry entry)
+    private static ReadingElement ReadReadingElement(XmlReader xmlReader)
     {
         ReadingElement readingElement = new();
 
@@ -178,10 +178,10 @@ public static class JmdictLoader
             }
         }
 
-        entry.ReadingElements.Add(readingElement);
+        return readingElement;
     }
 
-    private static void ReadSense(XmlReader xmlReader, JmdictEntry entry)
+    private static Sense ReadSense(XmlReader xmlReader)
     {
         Sense sense = new();
 
@@ -299,7 +299,7 @@ public static class JmdictLoader
             }
         }
 
-        entry.SenseList.Add(sense);
+        return sense;
     }
 
     private static string? ReadEntity(XmlReader xmlReader)

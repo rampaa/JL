@@ -2,9 +2,9 @@
 
 namespace JL.Core.Dicts.EDICT.JMdict;
 
-internal static class JmdictBuilder
+internal static class JmdictRecordBuilder
 {
-    public static void BuildDictionary(JmdictEntry entry, Dictionary<string, List<IDictRecord>> jmdictDictionary)
+    public static void AddToDictionary(JmdictEntry entry, Dictionary<string, List<IDictRecord>> jmdictDictionary)
     {
         // entry (k_ele*, r_ele+, sense+)
         // k_ele (keb, ke_inf*, ke_pri*)
@@ -165,7 +165,7 @@ internal static class JmdictBuilder
             if (jmdictDictionary.TryGetValue(key, out List<IDictRecord>? tempRecordList))
                 tempRecordList.Add(recordKeyValuePair.Value);
             else
-                tempRecordList = new() { recordKeyValuePair.Value };
+                tempRecordList = new List<IDictRecord>() { recordKeyValuePair.Value };
 
             jmdictDictionary[key] = tempRecordList;
         }

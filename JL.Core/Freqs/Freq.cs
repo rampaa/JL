@@ -18,7 +18,7 @@ public class Freq
     public Freq(FreqType type, string name, string path, bool active, int priority, int size)
     {
         Type = type;
-        Name = name; /*?? type.GetDescription() ?? type.ToString();*/
+        Name = name; //?? type.GetDescription() ?? type.ToString();
         Path = path;
         Active = active;
         Priority = priority;

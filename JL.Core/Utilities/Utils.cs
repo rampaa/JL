@@ -8,13 +8,12 @@ using JL.Core.Dicts;
 using JL.Core.Freqs;
 using JL.Core.Network;
 using Serilog;
-using Serilog.Core;
 
 namespace JL.Core.Utilities;
 
 public static class Utils
 {
-    public static readonly Logger Logger = new LoggerConfiguration().WriteTo.File("Logs/log.txt",
+    public static readonly ILogger Logger = new LoggerConfiguration().WriteTo.File("Logs/log.txt",
             rollingInterval: RollingInterval.Day,
             retainedFileTimeLimit: TimeSpan.FromDays(90),
             shared: true)

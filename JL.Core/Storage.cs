@@ -570,7 +570,7 @@ public static class Storage
         {
             if (tasks.Any())
             {
-                await Task.WhenAll(tasks.ToArray()).ConfigureAwait(false);
+                await Task.WhenAll(tasks).ConfigureAwait(false);
             }
 
             Frontend.InvalidateDisplayCache();
@@ -666,7 +666,7 @@ public static class Storage
         {
             if (tasks.Any())
             {
-                await Task.WhenAll(tasks.ToArray()).ConfigureAwait(false);
+                await Task.WhenAll(tasks).ConfigureAwait(false);
             }
 
             Frontend.InvalidateDisplayCache();
@@ -688,7 +688,7 @@ public static class Storage
         {
             if (dict.Active)
             {
-                await JmdictWordClassLoader.JmdictWordClassSerializer().ConfigureAwait(false);
+                await JmdictWordClassUtils.SerializeJmdictWordClass().ConfigureAwait(false);
             }
 
             else
@@ -704,7 +704,7 @@ public static class Storage
 
                 await Task.Run(async () =>
                     await JmdictLoader.Load(dict).ConfigureAwait(false));
-                await JmdictWordClassLoader.JmdictWordClassSerializer().ConfigureAwait(false);
+                await JmdictWordClassUtils.SerializeJmdictWordClass().ConfigureAwait(false);
                 dict.Contents.Clear();
 
                 if (deleteJmdictFile)
@@ -712,7 +712,7 @@ public static class Storage
             }
         }
 
-        await JmdictWordClassLoader.Load().ConfigureAwait(false);
+        await JmdictWordClassUtils.Load().ConfigureAwait(false);
     }
 
     public static async Task InitializeKanjiCompositionDict()

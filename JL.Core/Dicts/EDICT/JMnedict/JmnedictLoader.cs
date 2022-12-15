@@ -22,7 +22,7 @@ public static class JmnedictLoader
 
             while (xmlTextReader.ReadToFollowing("entry"))
             {
-                ReadEntry(xmlTextReader, dict);
+                JmnedictRecordBuilder.AddToDictionary(ReadEntry(xmlTextReader), dict.Contents);
             }
 
             dict.Contents.TrimExcess();
@@ -43,7 +43,7 @@ public static class JmnedictLoader
         }
     }
 
-    private static void ReadEntry(XmlReader xmlReader, Dict dict)
+    private static JmnedictEntry ReadEntry(XmlReader xmlReader)
     {
         JmnedictEntry entry = new();
         while (!xmlReader.EOF)
@@ -60,15 +60,15 @@ public static class JmnedictLoader
                         break;
 
                     case "k_ele":
-                        ReadKEle(xmlReader, entry);
+                        entry.KebList.Add(ReadKEle(xmlReader));
                         break;
 
                     case "r_ele":
-                        ReadREle(xmlReader, entry);
+                        entry.RebList.Add(ReadREle(xmlReader));
                         break;
 
                     case "trans":
-                        ReadTrans(xmlReader, entry);
+                        entry.TranslationList.Add(ReadTrans(xmlReader));
                         break;
 
                     default:
@@ -83,24 +83,24 @@ public static class JmnedictLoader
             }
         }
 
-        JmnedictBuilder.BuildDictionary(entry, dict.Contents);
+        return entry;
     }
 
-    private static void ReadKEle(XmlReader xmlReader, JmnedictEntry entry)
+    private static string ReadKEle(XmlReader xmlReader)
     {
         xmlReader.ReadToFollowing("keb");
-        entry.KebList.Add(xmlReader.ReadElementContentAsString());
+        return xmlReader.ReadElementContentAsString();
         //xmlReader.ReadToFollowing("k_ele");
     }
 
-    private static void ReadREle(XmlReader xmlReader, JmnedictEntry entry)
+    private static string ReadREle(XmlReader xmlReader)
     {
         xmlReader.ReadToFollowing("reb");
-        entry.RebList.Add(xmlReader.ReadElementContentAsString());
+        return xmlReader.ReadElementContentAsString();
         //xmlReader.ReadToFollowing("r_ele");
     }
 
-    private static void ReadTrans(XmlReader xmlReader, JmnedictEntry entry)
+    private static Translation ReadTrans(XmlReader xmlReader)
     {
         Translation translation = new();
         while (!xmlReader.EOF)
@@ -136,7 +136,7 @@ public static class JmnedictLoader
             }
         }
 
-        entry.TransList.Add(translation);
+        return translation;
     }
 
     private static string? ReadEntity(XmlReader xmlReader)

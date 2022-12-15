@@ -1,6 +1,5 @@
 ﻿using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Interop;
 
 namespace JL.Windows;
@@ -103,11 +102,11 @@ public class WinApi
         ClipboardChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    public void ResizeWindow(Border border)
+    public void ResizeWindow(string borderName)
     {
         IntPtr wParam = IntPtr.Zero;
 
-        switch (border.Name)
+        switch (borderName)
         {
             case "LeftBorder":
                 wParam = (IntPtr)ResizeDirection.Left;

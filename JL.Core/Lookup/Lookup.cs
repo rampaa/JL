@@ -612,7 +612,7 @@ public static class Lookup
         return results;
     }
 
-    private static IEnumerable<LookupResult> BuildJmnedictResult(
+    private static List<LookupResult> BuildJmnedictResult(
         Dictionary<string, IntermediaryResult> jmnedictResults)
     {
         List<LookupResult> results = new();
@@ -696,7 +696,7 @@ public static class Lookup
     }
 
     private static List<LookupResult> BuildYomichanKanjiResult(
-    Dictionary<string, IntermediaryResult> kanjiResults)
+        Dictionary<string, IntermediaryResult> kanjiResults)
     {
         List<LookupResult> results = new();
 
@@ -735,7 +735,7 @@ public static class Lookup
         return results;
     }
 
-    private static IEnumerable<LookupResult> BuildEpwingYomichanResult(
+    private static List<LookupResult> BuildEpwingYomichanResult(
         Dictionary<string, IntermediaryResult> epwingResults)
     {
         List<LookupResult> results = new();

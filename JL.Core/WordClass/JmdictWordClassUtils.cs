@@ -7,7 +7,7 @@ using JL.Core.Dicts.EDICT.JMdict;
 
 namespace JL.Core.WordClass;
 
-public static class JmdictWordClassLoader
+public static class JmdictWordClassUtils
 {
     public static async Task Load()
     {
@@ -48,7 +48,7 @@ public static class JmdictWordClassLoader
         Storage.WordClassDictionary.TrimExcess();
     }
 
-    public static async Task JmdictWordClassSerializer()
+    public static async Task SerializeJmdictWordClass()
     {
         Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary = new();
 

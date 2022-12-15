@@ -324,11 +324,11 @@ public partial class ManageDictionariesWindow : Window
             await Task.Run(async () => await JmdictLoader
                 .Load(dict).ConfigureAwait(false));
 
-            await JmdictWordClassLoader.JmdictWordClassSerializer().ConfigureAwait(false);
+            await JmdictWordClassUtils.SerializeJmdictWordClass().ConfigureAwait(false);
 
             Storage.WordClassDictionary.Clear();
 
-            await JmdictWordClassLoader.Load().ConfigureAwait(false);
+            await JmdictWordClassUtils.Load().ConfigureAwait(false);
 
             if (!dict.Active)
                 dict.Contents.Clear();

@@ -2,9 +2,9 @@
 
 namespace JL.Core.Dicts.EDICT.JMnedict;
 
-public static class JmnedictBuilder
+public static class JmnedictRecordBuilder
 {
-    public static void BuildDictionary(JmnedictEntry entry, Dictionary<string, List<IDictRecord>> jmnedictDictionary)
+    public static void AddToDictionary(JmnedictEntry entry, Dictionary<string, List<IDictRecord>> jmnedictDictionary)
     {
         Dictionary<string, JmnedictRecord> recordDictionary = new();
 
@@ -21,10 +21,10 @@ public static class JmnedictBuilder
                 record.PrimarySpelling = keb;
                 record.Readings = entry.RebList;
 
-                int transListCount = entry.TransList.Count;
+                int transListCount = entry.TranslationList.Count;
                 for (int j = 0; j < transListCount; j++)
                 {
-                    Translation translation = entry.TransList[j];
+                    Translation translation = entry.TranslationList[j];
 
                     record.Definitions!.AddRange(translation.TransDetList);
                     record.NameTypes!.AddRange(translation.NameTypeList);
@@ -63,10 +63,10 @@ public static class JmnedictBuilder
 
                 JmnedictRecord record = new() { PrimarySpelling = reb };
 
-                int transListCount = entry.TransList.Count;
+                int transListCount = entry.TranslationList.Count;
                 for (int j = 0; j < transListCount; j++)
                 {
-                    Translation translation = entry.TransList[j];
+                    Translation translation = entry.TranslationList[j];
 
                     record.Definitions!.AddRange(translation.TransDetList);
 
@@ -92,7 +92,7 @@ public static class JmnedictBuilder
             if (jmnedictDictionary.TryGetValue(key, out List<IDictRecord>? tempRecordList))
                 tempRecordList.Add(recordKeyValuePair.Value);
             else
-                tempRecordList = new() { recordKeyValuePair.Value };
+                tempRecordList = new List<IDictRecord>() { recordKeyValuePair.Value };
 
             jmnedictDictionary[key] = tempRecordList;
         }
