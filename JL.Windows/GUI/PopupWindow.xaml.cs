@@ -269,12 +269,12 @@ public partial class PopupWindow : Window
             Activate();
             Focus();
 
+            _winApi!.BringToFront();
+
             if (ConfigManager.AutoPlayAudio)
             {
                 await PlayAudio();
             }
-
-            _winApi!.BringToFront();
         }
         else
         {
