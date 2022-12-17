@@ -251,7 +251,7 @@ public partial class MainWindow : Window, IFrontend
                 && !StatsWindow.IsItVisible()
                 && !MainTextboxContextMenu.IsVisible)
             {
-                _winApi!.KeepTopmost();
+                _winApi!.BringToFront();
             }
         }
     }

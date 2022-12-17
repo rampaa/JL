@@ -137,7 +137,7 @@ public class WinApi
         NativeMethods.SendMessage(_windowHandle, NativeMethods.WM_SYSCOMMAND, wParam, IntPtr.Zero);
     }
 
-    public void KeepTopmost()
+    public void BringToFront()
     {
         NativeMethods.SetWindowPos(_windowHandle, NativeMethods.HWND_TOPMOST, 0, 0, 0, 0, NativeMethods.SWP_NOMOVE | NativeMethods.SWP_NOSIZE | NativeMethods.SWP_SHOWWINDOW);
     }

@@ -212,6 +212,8 @@ public partial class PopupWindow : Window
                     Focus();
                 }
 
+                _winApi!.BringToFront();
+
                 if (ConfigManager.AutoPlayAudio)
                 {
                     await PlayAudio().ConfigureAwait(false);
@@ -271,6 +273,8 @@ public partial class PopupWindow : Window
             {
                 await PlayAudio();
             }
+
+            _winApi!.BringToFront();
         }
         else
         {
