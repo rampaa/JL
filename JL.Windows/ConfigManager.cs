@@ -441,7 +441,7 @@ public class ConfigManager : CoreConfig
         if (tempStr == null)
         {
             tempStr = "Hover";
-            AddToConfig("LookupMode", "Hover");
+            AddToConfig("LookupMode", tempStr);
         }
 
         switch (tempStr)
