@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Xml;
+using HandyControl.Data;
 using JL.Core;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
@@ -37,6 +38,7 @@ public class ConfigManager : CoreConfig
             Foreground = f.Foreground
         });
 
+    public static SkinType Theme { get; private set; } = SkinType.Dark;
     public static bool InactiveLookupMode { get; set; } = false; // todo checkbox?
     public static bool InvisibleMode { get; set; } = false; // todo checkbox?
     public static Brush HighlightColor { get; private set; } = Brushes.AliceBlue;
@@ -359,7 +361,15 @@ public class ConfigManager : CoreConfig
         WindowsUtils.SetInputGestureText(mainWindow.ManageFrequenciesButton, ShowManageFrequenciesWindowKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.StatsButton, ShowStatsKeyGesture);
 
-        string? tempStr = ConfigurationManager.AppSettings.Get(nameof(AnkiConnectUri));
+        string? tempStr = ConfigurationManager.AppSettings.Get(nameof(Theme));
+        if (tempStr == null)
+        {
+            tempStr = "Dark";
+            AddToConfig(nameof(Theme), tempStr);
+        }
+        WindowsUtils.ChangeTheme(tempStr == "Dark" ? SkinType.Dark : SkinType.Default);
+
+        tempStr = ConfigurationManager.AppSettings.Get(nameof(AnkiConnectUri));
         if (tempStr == null)
         {
             AddToConfig(nameof(AnkiConnectUri), AnkiConnectUri.OriginalString);
@@ -400,10 +410,11 @@ public class ConfigManager : CoreConfig
         tempStr = ConfigurationManager.AppSettings.Get("PopupFlip");
         if (tempStr == null)
         {
-            AddToConfig("PopupFlip", "Both");
+            tempStr = "Both";
+            AddToConfig("PopupFlip", tempStr);
         }
 
-        switch (ConfigurationManager.AppSettings.Get("PopupFlip"))
+        switch (tempStr)
         {
             case "X":
                 PopupFlipX = true;
@@ -429,10 +440,11 @@ public class ConfigManager : CoreConfig
         tempStr = ConfigurationManager.AppSettings.Get("LookupMode");
         if (tempStr == null)
         {
+            tempStr = "Hover";
             AddToConfig("LookupMode", "Hover");
         }
 
-        switch (ConfigurationManager.AppSettings.Get("LookupMode"))
+        switch (tempStr)
         {
             case "Hover":
                 LookupOnLeftClickOnly = false;
@@ -465,6 +477,7 @@ public class ConfigManager : CoreConfig
         while (currentPopupWindow != null)
         {
             currentPopupWindow.Background = PopupBackgroundColor;
+            currentPopupWindow.Foreground = DefinitionsColor;
             currentPopupWindow.FontFamily = PopupFont;
 
             WindowsUtils.SetSizeToContentForPopup(PopupDynamicWidth, PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxHeight, WindowsUtils.DpiAwarePopupMaxWidth, currentPopupWindow);
@@ -585,10 +598,11 @@ public class ConfigManager : CoreConfig
         preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked = TextBoxRemoveNewlines;
         preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked = TextBoxApplyDropShadowEffect;
 
-
         preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked = CaptureTextFromClipboard;
         preferenceWindow.OnlyCaptureTextWithJapaneseCharsFromClipboardCheckBox.IsChecked = OnlyCaptureTextWithJapaneseCharsFromClipboard;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInMainWindow;
+
+        preferenceWindow.ThemeComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("Theme");
 
         preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
         preferenceWindow.MainWindowFontComboBox.SelectedIndex = s_japaneseFonts.FindIndex(f =>
@@ -743,6 +757,8 @@ public class ConfigManager : CoreConfig
             preferenceWindow.TextboxFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["MainWindowOpacity"].Value =
             preferenceWindow.MainWindowOpacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
+        config.AppSettings.Settings["Theme"].Value =
+            preferenceWindow.ThemeComboBox.SelectedValue.ToString();
         config.AppSettings.Settings["MainWindowFont"].Value =
             preferenceWindow.MainWindowFontComboBox.SelectedValue.ToString();
         config.AppSettings.Settings[nameof(PopupFont)].Value =

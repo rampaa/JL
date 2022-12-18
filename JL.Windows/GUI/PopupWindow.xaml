@@ -7,7 +7,6 @@
         mc:Ignorable="d"
         Title="PopupWindow"
         Width="Auto" Height="Auto" SizeToContent="Height" MaxWidth="700" MaxHeight="520"
-        Background="#FF2C2B2B" Foreground="White"
         Topmost="True" WindowStyle="None" AllowsTransparency="true" ShowInTaskbar="False"
         KeyDown="Window_KeyDown" Closing="Window_Closing" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave">
 
@@ -41,7 +40,7 @@
             </ItemsControl>
 
             <ListBox Grid.Row="2" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
-                     Foreground="White"
+                     BorderThickness="0"
                      Background="{Binding Path=Background,
                   RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
                      PreviewMouseWheel="PopupListBox_PreviewMouseWheel"

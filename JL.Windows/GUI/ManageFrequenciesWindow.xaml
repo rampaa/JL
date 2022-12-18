@@ -4,10 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Manage Frequencies" Height="700" Width="750" Closing="Window_Closing" ResizeMode="NoResize"
-        SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Background="Black" Topmost="True" ShowInTaskbar="False">
+        Title="Manage Frequencies" Height="700" Width="750" Closing="Window_Closing" ResizeMode="NoResize" Background="{DynamicResource RegionBrush}"
+        SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Topmost="True" ShowInTaskbar="False" >
     <Grid>
-        <StackPanel Background="Black" Margin="20,10,20,10">
+        <StackPanel Margin="20,10,20,10">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type DockPanel}">
                     <Setter Property="Margin" Value="0,10,0,0" />

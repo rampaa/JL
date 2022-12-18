@@ -89,6 +89,7 @@ public partial class PopupWindow : Window
     private void Init()
     {
         Background = ConfigManager.PopupBackgroundColor;
+        Foreground = ConfigManager.DefinitionsColor;
         FontFamily = ConfigManager.PopupFont;
 
         WindowsUtils.SetSizeToContentForPopup(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxWidth, WindowsUtils.DpiAwarePopupMaxHeight, this);
@@ -1528,9 +1529,7 @@ public partial class PopupWindow : Window
 
                 if (button.Background == Brushes.DodgerBlue)
                 {
-                    var brush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF2D2D30")!; // "Dark"
-                    brush.Freeze();
-                    button.Background = brush;
+                    button.ClearValue(BackgroundProperty);
 
                     foundSelectedButton = true;
                     continue;
@@ -1557,9 +1556,6 @@ public partial class PopupWindow : Window
             bool foundSelectedButton = false;
             bool movedToPreviousDict = false;
 
-            var brush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF2D2D30")!; // "Dark"
-            brush.Freeze();
-
             int dictCount = ItemsControlButtons.Items.Count;
             for (int i = dictCount - 1; i > 0; i--)
             {
@@ -1567,7 +1563,7 @@ public partial class PopupWindow : Window
 
                 if (button.Background == Brushes.DodgerBlue)
                 {
-                    button.Background = brush;
+                    button.ClearValue(BackgroundProperty);
 
                     foundSelectedButton = true;
                     continue;
@@ -1598,7 +1594,7 @@ public partial class PopupWindow : Window
                     {
                         _filteredDict = (Dict)btn.Tag;
                         btn.Background = Brushes.DodgerBlue;
-                        ((Button)ItemsControlButtons.Items[0]).Background = brush;
+                        ((Button)ItemsControlButtons.Items[0]).Background.ClearValue(BackgroundProperty);
                         PopupListBox.Items.Filter = DictFilter;
                         break;
                     }
@@ -1844,14 +1840,12 @@ public partial class PopupWindow : Window
 
     private void ButtonAllOnClick(object sender, RoutedEventArgs e)
     {
-        var button = (Button)sender;
-        var brush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF2D2D30")!; // "Dark"
-        brush.Freeze();
         foreach (Button btn in ItemsControlButtons.Items)
         {
-            btn.Background = brush;
+            btn.ClearValue(BackgroundProperty);
         }
 
+        var button = (Button)sender;
         button.Background = Brushes.DodgerBlue;
 
         PopupListBox.Items.Filter = NoAllDictFilter;
@@ -1859,14 +1853,12 @@ public partial class PopupWindow : Window
 
     private void DictTypeButtonOnClick(object sender, RoutedEventArgs e)
     {
-        var button = (Button)sender;
-        var brush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF2D2D30")!; // "Dark"
-        brush.Freeze();
-
         foreach (Button btn in ItemsControlButtons.Items)
         {
-            btn.Background = brush;
+            btn.ClearValue(BackgroundProperty);
         }
+
+        var button = (Button)sender;
 
         button.Background = Brushes.DodgerBlue;
 

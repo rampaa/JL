@@ -6,7 +6,7 @@
         xmlns:hc="https://handyorg.github.io/handycontrol"
         mc:Ignorable="d"
         Title="Preferences" Height="700" Width="666" Topmost="True" Closing="Window_Closing"
-        SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Background="Black" ShowInTaskbar="False">
+        SizeToContent="Manual" ScrollViewer.CanContentScroll="True" ShowInTaskbar="False" Background="{DynamicResource RegionBrush}">
     <Grid>
         <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="20,0,0,20"
                 VerticalAlignment="Bottom" Click="CancelButton_Click" FontSize="16" Height="35" Width="85" />
@@ -14,15 +14,25 @@
                 VerticalAlignment="Bottom" Width="85" Click="SaveButton_Click" FontSize="16" Height="35" />
 
         <TabControl TabStripPlacement="Top" VerticalContentAlignment="Stretch" Margin="0,0,0,65"
-                    Background="#F3000000"  Name="TabControl">
+                    Name="TabControl">
             <TabItem Header="General">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                    <StackPanel Background="Black" Margin="20,10,20,10">
+                    <StackPanel  Margin="20,10,20,10">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type DockPanel}">
                                 <Setter Property="Margin" Value="0,10,0,0" />
                             </Style>
                         </StackPanel.Resources>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Theme"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <ComboBox x:Name="ThemeComboBox" HorizontalAlignment="Right"
+                                      SelectedValuePath="Tag" Width="250">
+                                <ComboBoxItem Content="Dark" Tag="Dark" />
+                                <ComboBoxItem Content="Light" Tag="Light" />
+                            </ComboBox>
+                        </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Lookup Mode"
@@ -120,7 +130,7 @@
             </TabItem>
             <TabItem Header="Textbox">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                    <StackPanel Background="Black" Margin="20,10,20,10">
+                    <StackPanel  Margin="20,10,20,10">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type DockPanel}">
                                 <Setter Property="Margin" Value="0,10,0,0" />
@@ -279,9 +289,9 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-            <TabItem Header="Popup">
+            <TabItem Header="Popup" HorizontalAlignment="Left" Width="66">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                    <StackPanel Background="Black" Margin="20,10,20,10">
+                    <StackPanel Margin="20,10,20,10">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type DockPanel}">
                                 <Setter Property="Margin" Value="0,10,0,0" />
@@ -529,7 +539,7 @@
             </TabItem>
             <TabItem Name="AnkiTabItem" Header="Anki" Height="33" MouseUp="TabItem_PreviewMouseLeftButtonDown">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                    <StackPanel Background="Black" Margin="20,10,20,10">
+                    <StackPanel Margin="20,10,20,10">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type DockPanel}">
                                 <Setter Property="Margin" Value="0,10,0,0" />
@@ -563,13 +573,13 @@
                                 <CheckBox x:Name="AllowDuplicateCardsCheckBox"  HorizontalAlignment="Right" />
                             </DockPanel>
 
-                            <TabControl Margin="0,10,0,0" Background="Black">
+                            <TabControl Margin="0,10,0,0">
                                 <TabControl.Resources>
                                     <Style TargetType="{x:Type TabPanel}">
                                         <Setter Property="HorizontalAlignment" Value="Center" />
                                     </Style>
                                 </TabControl.Resources>
-                                <TabItem Header="Word" Foreground="White">
+                                <TabItem Header="Word">
                                     <StackPanel>
                                         <Grid Margin="10,10,10,10">
                                             <StackPanel Margin="10">
@@ -613,7 +623,7 @@
                                             <StackPanel Margin="10">
                                                 <TextBlock HorizontalAlignment="Center" Text="Deck:"
                                                TextWrapping="Wrap" />
-                                                <ComboBox x:Name="KanjiMiningSetupComboBoxDeckNames" Width="200" Margin="0,10,0,0" />
+                                                <ComboBox x:Name="KanjiMiningSetupComboBoxDeckNames" Width="300" Margin="0,10,0,0" />
                                                 <Button x:Name="KanjiMiningSetupButtonRefresh" Click="MiningSetupButtonRefresh_Click"
                                             Width="100"
                                             Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
@@ -621,14 +631,14 @@
                                                 </Button>
                                                 <TextBlock HorizontalAlignment="Center" Text="Model:"
                                                TextWrapping="Wrap" />
-                                                <ComboBox x:Name="KanjiMiningSetupComboBoxModelNames" Width="200" Margin="0,10,0,0" />
+                                                <ComboBox x:Name="KanjiMiningSetupComboBoxModelNames" Width="300" Margin="0,10,0,0" />
 
                                                 <Separator Height="15" />
 
                                                 <DockPanel HorizontalAlignment="Center">
                                                     <Button x:Name="KanjiMiningSetupButtonGetFields"
                                                         Click="KanjiMiningSetupButtonGetFields_Click"
-                                                        Width="150"
+                                                        Width="150" Margin="5"
                                                         Content="Get Fields" FontSize="16" Height="35" />
                                                     <Button Name="KanjiInfoButton" Content="Info" Background="LightSlateGray" Width="50" Height="30" Margin="5" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" />
                                                 </DockPanel>
@@ -651,7 +661,7 @@
                                             <StackPanel Margin="10">
                                                 <TextBlock HorizontalAlignment="Center" Text="Deck:"
                                                TextWrapping="Wrap" />
-                                                <ComboBox x:Name="NameMiningSetupComboBoxDeckNames" Width="200" Margin="0,10,0,0" />
+                                                <ComboBox x:Name="NameMiningSetupComboBoxDeckNames" Width="300" Margin="0,10,0,0" />
                                                 <Button x:Name="NameMiningSetupButtonRefresh" Click="MiningSetupButtonRefresh_Click"
                                             Width="100"
                                             Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
@@ -659,14 +669,14 @@
                                                 </Button>
                                                 <TextBlock HorizontalAlignment="Center" Text="Model:"
                                                TextWrapping="Wrap" />
-                                                <ComboBox x:Name="NameMiningSetupComboBoxModelNames" Width="200" Margin="0,10,0,0" />
+                                                <ComboBox x:Name="NameMiningSetupComboBoxModelNames" Width="300" Margin="0,10,0,0" />
 
                                                 <Separator Height="15" />
 
                                                 <DockPanel HorizontalAlignment="Center">
                                                     <Button x:Name="NameMiningSetupButtonGetFields"
                                                         Click="NameMiningSetupButtonGetFields_Click"
-                                                        Width="150"
+                                                        Width="150" Margin="5"
                                                         Content="Get Fields" FontSize="16" Height="35" />
                                                     <Button Name="NameInfoButton" Content="Info" Background="LightSlateGray" Width="50" Height="30" Margin="5" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" />
                                                 </DockPanel>
@@ -689,7 +699,7 @@
                                             <StackPanel Margin="10">
                                                 <TextBlock HorizontalAlignment="Center" Text="Deck:"
                                                TextWrapping="Wrap" />
-                                                <ComboBox x:Name="OtherMiningSetupComboBoxDeckNames" Width="200" Margin="0,10,0,0" />
+                                                <ComboBox x:Name="OtherMiningSetupComboBoxDeckNames" Width="300" Margin="0,10,0,0" />
                                                 <Button x:Name="OtherMiningSetupButtonRefresh" Click="MiningSetupButtonRefresh_Click"
                                             Width="100"
                                             Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
@@ -697,14 +707,14 @@
                                                 </Button>
                                                 <TextBlock HorizontalAlignment="Center" Text="Model:"
                                                TextWrapping="Wrap" />
-                                                <ComboBox x:Name="OtherMiningSetupComboBoxModelNames" Width="200" Margin="0,10,0,0" />
+                                                <ComboBox x:Name="OtherMiningSetupComboBoxModelNames" Width="300" Margin="0,10,0,0" />
                                                 
                                                 <Separator Height="15" />
 
                                                 <DockPanel HorizontalAlignment="Center">
                                                     <Button x:Name="OtherMiningSetupButtonGetFields"
                                                         Click="OtherMiningSetupButtonGetFields_Click"
-                                                        Width="150"
+                                                        Width="150" Margin="5"
                                                         Content="Get Fields" FontSize="16" Height="35" />
                                                     <Button Name="OtherInfoButton" Content="Info" Background="LightSlateGray" Width="50" Height="30" Margin="5" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" />
                                                 </DockPanel>
@@ -728,7 +738,7 @@
             </TabItem>
             <TabItem Header="Hotkeys">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                    <StackPanel Background="Black" Margin="20,10,20,10">
+                    <StackPanel Margin="20,10,20,10">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type DockPanel}">
                                 <Setter Property="Margin" Value="0,10,0,0" />
@@ -982,7 +992,7 @@
             </TabItem>
             <TabItem Header="Advanced">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                    <StackPanel Background="Black" Margin="20,10,20,10">
+                    <StackPanel Margin="20,10,20,10">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type DockPanel}">
                                 <Setter Property="Margin" Value="0,10,0,0" />

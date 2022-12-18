@@ -5,15 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Edit Dictionary" Height="400" Width="800" ResizeMode="NoResize" SizeToContent="WidthAndHeight"
-        Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False">
-    <Grid Background="Black">
+        Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False" Background="{DynamicResource RegionBrush}">
+    <Grid>
         <StackPanel Name="StackPanel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,60">
-            <TextBlock Foreground="White" Text="Dictionary Type" TextWrapping="Wrap" Margin="0,0,0,10" />
+            <TextBlock Text="Dictionary Type" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
             <ComboBox Name="ComboBoxDictType" Width="340" Margin="10" HorizontalAlignment="Left" IsEnabled="False" />
 
-            <TextBlock Foreground="White" Text="Path" TextWrapping="Wrap" Margin="0,10,0,10" />
+            <TextBlock Text="Path" TextWrapping="Wrap" Margin="0,10,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
             <WrapPanel>
-                <TextBox Name="TextBlockPath" Foreground="White" Width="340"
+                <TextBox Name="TextBlockPath" Width="340"
                          Text=""
                          Margin="10"
                          IsReadOnly="True" />
@@ -22,7 +22,7 @@
                 </Button>
             </WrapPanel>
 
-            <TextBlock Foreground="White" Text="Name" TextWrapping="Wrap" Margin="0,0,0,10" />
+            <TextBlock Text="Name" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
             <TextBox Name="NameTextBox" Width="340" Margin="10" HorizontalAlignment="Left"
                      Cursor="Help" ToolTip="Dictionary name must be unique" />
 

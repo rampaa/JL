@@ -5,22 +5,22 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Class="JL.Windows.GUI.AddNameWindow"
     mc:Ignorable="d"
+    Background="{DynamicResource RegionBrush}"
     Title="Add Name" Height="350" Width="400" Topmost="True" SizeToContent="Height" ResizeMode="NoResize"
     MaxHeight="600" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" ShowInTaskbar="False" Closing="Window_Closing">
 
     <ScrollViewer>
-        <Grid Background="Black">
-
+        <Grid>
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,0,70">
-                <TextBlock HorizontalAlignment="Left" Margin="0,0,0,10" Text="Spelling" Foreground="White" />
+                <TextBlock HorizontalAlignment="Left" Margin="0,0,0,10" Text="Spelling" Style="{StaticResource TextBlockDefault}" />
                 <TextBox x:Name="SpellingTextBox" TextWrapping="Wrap" HorizontalAlignment="Stretch" Margin="0,0,0,40"
                          Width="200" />
-                <TextBlock Text="Reading" Foreground="White" HorizontalAlignment="Left" Margin="0,0,0,10" />
+                <TextBlock Text="Reading" HorizontalAlignment="Left" Margin="0,0,0,10" Style="{StaticResource TextBlockDefault}" />
                 <TextBox x:Name="ReadingTextBox" TextWrapping="Wrap" HorizontalAlignment="Stretch" Width="200" />
             </StackPanel>
             <StackPanel x:Name="NameTypeStackPanel" HorizontalAlignment="Right" VerticalAlignment="Top"
                         Margin="0,20,20,70">
-                <TextBlock Text="Name Type" Foreground="White" HorizontalAlignment="Stretch" Margin="0,0,0,10" />
+                <TextBlock Text="Name Type" HorizontalAlignment="Stretch" Margin="0,0,0,10" Style="{StaticResource TextBlockDefault}" />
                 <RadioButton Content="Male" HorizontalAlignment="Stretch" FontSize="16" Height="40" />
                 <RadioButton Content="Female" HorizontalAlignment="Stretch" FontSize="16" Height="40" />
                 <RadioButton Content="Surname" HorizontalAlignment="Stretch" FontSize="16" Height="40" />

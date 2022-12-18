@@ -10,16 +10,17 @@
         SizeToContent="Height"
         Focusable="False"
         ShowInTaskbar="False"
-        Title="AlertWindow" MaxHeight="200" Width="500" Topmost="True" Background="{x:Null}" Foreground="{x:Null}">
+        Title="AlertWindow" MaxHeight="200" Width="500" Topmost="True" Background="{DynamicResource RegionBrush}">
     <Grid>
         <Border Name="AlertBorder" BorderThickness="2">
             <TextBlock Name="AlertWindowTextBlock"
                        Focusable="False"
                        FontSize="25"
-                       Foreground="White"
-                       Background="Black"
                        Opacity="0.8"
-                       TextWrapping="Wrap" />
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Left"
+                       Style="{StaticResource TextBlockDefault}"
+                       />
         </Border>
     </Grid>
 </Window>

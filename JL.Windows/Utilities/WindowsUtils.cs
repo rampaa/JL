@@ -13,6 +13,7 @@ using System.Windows.Interop;
 using System.Windows.Markup;
 using System.Windows.Media;
 using HandyControl.Controls;
+using HandyControl.Data;
 using HandyControl.Tools;
 using JL.Core;
 using JL.Core.Network;
@@ -578,5 +579,21 @@ public static class WindowsUtils
         }
 
         Storage.StatsStopWatch.Start();
+    }
+
+    public static void ChangeTheme(SkinType skin)
+    {
+        ResourceDictionary resources = Application.Current.Resources;
+
+        resources.MergedDictionaries.Clear();
+        resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("ResourceDictionary.xaml", UriKind.Relative) });
+        resources.MergedDictionaries.Add(new ResourceDictionary
+        {
+            Source = new Uri($"pack://application:,,,/HandyControl;component/Themes/Skin{skin}.xaml")
+        });
+        resources.MergedDictionaries.Add(new ResourceDictionary
+        {
+            Source = new Uri("pack://application:,,,/HandyControl;component/Themes/Theme.xaml")
+        });
     }
 }
