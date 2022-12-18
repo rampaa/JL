@@ -37,7 +37,7 @@ IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries,
 * Chouonpu conversions (e.g. can find 清掃 from セーソー)
 * Text normalization (e.g. can find 株式会社 when ㍿ is looked up)
 * Has a backlog (using the arrow keys will show items in the backlog one by one, scrolling up will show all the backlog at once)
-* Touch screen support (i.e. Left Click/Touch look mode)
+* Touch screen support (i.e. Left Click/Touch lookup mode)
 * Can work without stealing the focus away from other windows
 * Can keep itself as the topmost window (i.e. JL can be used with programs like [Magpie](https://github.com/Blinue/Magpie))
 * Stats (read character/line count, spent time etc.)
