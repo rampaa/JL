@@ -27,12 +27,18 @@ jobs:
           dotnet-version: 6.x
 
       - name: Build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BASE64_PFX: ${{ secrets.BASE64_PFX }}
+          PFX_PASSWORD: ${{ secrets.PFX_PASSWORD }}
         shell: bash
         run: |
           tag=$(git describe --tags --abbrev=0)
           release_name="JL-$tag-${{ matrix.target }}"
+          
           # Build everything
           dotnet publish JL.Windows/JL.Windows.csproj --framework net6.0-windows --runtime "${{ matrix.target }}" --no-self-contained -c Release -o "$release_name"
+          
           # Mark JL as LARGEADDRESSAWARE
           if [ "${{ matrix.target }}" = "win-x86" ]
           then
@@ -42,13 +48,19 @@ jobs:
           editbin_path=$("${vswhere_path}" -latest -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find "VC/Tools/MSVC/${vc_tools_version}/bin/Hostx64/x64/editbin.exe")
           "${editbin_path}" //NOLOGO //LARGEADDRESSAWARE ${release_name}/JL.exe
           fi
+          
+          #Sign with self-signed certificate
+          pfxCertFilePath=${release_name}/JLCertificate.pfx
+          echo "${BASE64_PFX}" | base64 --decode > "${pfxCertFilePath}"
+          pwsh -c '$pwd = ConvertTo-SecureString -String '"${PFX_PASSWORD}"' -Force -AsPlainText;''$pfx = Get-PfxCertificate -FilePath '"$pfxCertFilePath"' -Password $pwd -NoPromptForPassword;''Set-AuthenticodeSignature -FilePath '"$release_name"'/JL.exe -Certificate $pfx -HashAlgorithm SHA256;'
+          rm "${pfxCertFilePath}"
+          
           # Pack files
           7z a -tzip "${release_name}.zip" "./${release_name}/*"
+          
           # Delete output directory
           rm -r "$release_name"
       - name: Publish
         uses: softprops/action-gh-release@v1
         with:
           files: "JL*.zip"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
