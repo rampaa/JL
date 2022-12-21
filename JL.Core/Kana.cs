@@ -221,7 +221,7 @@ public static class Kana
 
     public static string HiraganaToKatakanaConverter(string text)
     {
-        StringBuilder textInKatakana = new();
+        StringBuilder textInKatakana = new(text.Length);
         foreach (string str in text.EnumerateUnicodeCharacters())
         {
             textInKatakana.Append(s_hiraganaToKatakanaDict.TryGetValue(str, out string? hiraganaStr)
@@ -234,10 +234,13 @@ public static class Kana
 
     public static List<string> ConvertLongVowelMarkToKana(string text)
     {
-        List<StringBuilder> stringBuilders = new();
         List<string> unicodeTextList = text.EnumerateUnicodeCharacters().ToList();
-        stringBuilders.Add(new StringBuilder(text.Length));
-        stringBuilders[0].Append(unicodeTextList[0]);
+
+        List<StringBuilder> stringBuilders = new(4)
+        {
+            new StringBuilder(unicodeTextList[0], text.Length)
+        };
+
         for (int i = 1; i < unicodeTextList.Count; i++)
         {
             if (text[i] == 'ー' && s_kanaFinalVowelDict.TryGetValue(unicodeTextList[i - 1], out string? vowel))
