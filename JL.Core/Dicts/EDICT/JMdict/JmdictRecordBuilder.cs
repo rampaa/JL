@@ -83,7 +83,7 @@ internal static class JmdictRecordBuilder
         {
             ReadingElement readingElement = entry.ReadingElements[i];
 
-            string key = Kana.KatakanaToHiraganaConverter(readingElement.Reb);
+            string key = Kana.KatakanaToHiragana(readingElement.Reb);
 
             if (recordDictionary.ContainsKey(key))
             {
@@ -160,7 +160,7 @@ internal static class JmdictRecordBuilder
             recordKeyValuePair.Value.LoanwordEtymology = TrimListOfLists(recordKeyValuePair.Value.LoanwordEtymology);
 
             recordKeyValuePair.Value.Id = entry.Id;
-            string key = Kana.KatakanaToHiraganaConverter(recordKeyValuePair.Key);
+            string key = Kana.KatakanaToHiragana(recordKeyValuePair.Key);
 
             if (jmdictDictionary.TryGetValue(key, out List<IDictRecord>? tempRecordList))
                 tempRecordList.Add(recordKeyValuePair.Value);

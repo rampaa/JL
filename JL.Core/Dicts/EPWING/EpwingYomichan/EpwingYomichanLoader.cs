@@ -42,13 +42,13 @@ public static class EpwingYomichanLoader
         if (!EpwingUtils.IsValidEpwingResultForDictType(yomichanRecord, dict))
             return;
 
-        string hiraganaExpression = Kana.KatakanaToHiraganaConverter(yomichanRecord.PrimarySpelling);
+        string hiraganaExpression = Kana.KatakanaToHiragana(yomichanRecord.PrimarySpelling);
 
         List<IDictRecord>? records;
 
         if (!string.IsNullOrEmpty(yomichanRecord.Reading))
         {
-            string hiraganaReading = Kana.KatakanaToHiraganaConverter(yomichanRecord.Reading);
+            string hiraganaReading = Kana.KatakanaToHiragana(yomichanRecord.Reading);
 
             if (dict.Contents.TryGetValue(hiraganaReading, out records))
                 records.Add(yomichanRecord);

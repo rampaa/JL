@@ -88,7 +88,7 @@ public static class CustomWordLoader
 
             Dictionary<string, List<IDictRecord>> customWordDictionary = Storage.Dicts.Values.First(dict => dict.Type == DictType.CustomWordDictionary).Contents;
 
-            if (customWordDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out List<IDictRecord>? result))
+            if (customWordDictionary.TryGetValue(Kana.KatakanaToHiragana(spelling), out List<IDictRecord>? result))
             {
                 if (result.Contains(newWordRecord))
                 {
@@ -101,7 +101,7 @@ public static class CustomWordLoader
             }
             else
             {
-                customWordDictionary.Add(Kana.KatakanaToHiraganaConverter(spelling),
+                customWordDictionary.Add(Kana.KatakanaToHiragana(spelling),
                     new List<IDictRecord> { newWordRecord });
             }
         }

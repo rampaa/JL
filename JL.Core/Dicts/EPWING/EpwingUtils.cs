@@ -90,7 +90,7 @@ public static class EpwingUtils
     private static bool FilterDuplicateEntries(IEpwingRecord epwingRecord, Dict dict)
     {
         if (dict.Contents.TryGetValue(
-                Kana.KatakanaToHiraganaConverter(epwingRecord.PrimarySpelling),
+                Kana.KatakanaToHiragana(epwingRecord.PrimarySpelling),
                 out List<IDictRecord>? previousResults))
         {
             int prevResultCount = previousResults.Count;

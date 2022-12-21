@@ -42,7 +42,7 @@ public class EpwingNazekaRecord : IEpwingRecord, IDictRecordWithGetFrequency
     {
         int frequency = int.MaxValue;
 
-        if (freq.Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(PrimarySpelling),
+        if (freq.Contents.TryGetValue(Kana.KatakanaToHiragana(PrimarySpelling),
                 out List<FrequencyRecord>? freqResults))
         {
             int freqResultsCount = freqResults.Count;
@@ -65,7 +65,7 @@ public class EpwingNazekaRecord : IEpwingRecord, IDictRecordWithGetFrequency
                 for (int i = 0; i < alternativeSpellingsCount; i++)
                 {
                     if (freq.Contents.TryGetValue(
-                            Kana.KatakanaToHiraganaConverter(AlternativeSpellings[i]),
+                            Kana.KatakanaToHiragana(AlternativeSpellings[i]),
                             out List<FrequencyRecord>? alternativeSpellingFreqResults))
                     {
                         int alternativeSpellingFreqResultsCount = alternativeSpellingFreqResults.Count;
@@ -90,7 +90,7 @@ public class EpwingNazekaRecord : IEpwingRecord, IDictRecordWithGetFrequency
         {
             string reading = Reading;
 
-            if (freq.Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(reading),
+            if (freq.Contents.TryGetValue(Kana.KatakanaToHiragana(reading),
                     out List<FrequencyRecord>? readingFreqResults))
             {
                 int readingFreqResultsCount = readingFreqResults.Count;

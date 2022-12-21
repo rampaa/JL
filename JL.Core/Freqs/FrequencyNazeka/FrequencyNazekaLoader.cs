@@ -37,7 +37,7 @@ public static class FrequencyNazekaLoader
                         new List<FrequencyRecord> { new(exactSpelling, frequencyRank) });
                 }
 
-                string exactSpellingInHiragana = Kana.KatakanaToHiraganaConverter(exactSpelling);
+                string exactSpellingInHiragana = Kana.KatakanaToHiragana(exactSpelling);
 
                 if (exactSpellingInHiragana != reading)
                 {

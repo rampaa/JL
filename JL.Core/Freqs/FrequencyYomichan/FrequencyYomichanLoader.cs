@@ -28,7 +28,7 @@ public class FrequencyYomichanLoader
             foreach (List<JsonElement> value in frequencyJson!)
             {
                 string spelling = value[0].ToString();
-                string spellingInHiragana = Kana.KatakanaToHiraganaConverter(spelling);
+                string spellingInHiragana = Kana.KatakanaToHiragana(spelling);
                 string reading = "";
                 int frequency = int.MaxValue;
                 JsonElement thirdElement = value[2];
@@ -80,7 +80,7 @@ public class FrequencyYomichanLoader
 
                     else
                     {
-                        string readingInHiragana = Kana.KatakanaToHiraganaConverter(reading);
+                        string readingInHiragana = Kana.KatakanaToHiragana(reading);
                         if (freqDict.TryGetValue(readingInHiragana, out List<FrequencyRecord>? readingFreqResult))
                         {
                             readingFreqResult.Add(new(spelling, frequency));

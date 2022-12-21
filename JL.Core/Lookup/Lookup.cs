@@ -89,7 +89,7 @@ public static class Lookup
 
             textList.Add(currentText);
 
-            string textInHiragana = Kana.KatakanaToHiraganaConverter(currentText);
+            string textInHiragana = Kana.KatakanaToHiragana(currentText);
             textInHiraganaList.Add(textInHiragana);
 
             deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
@@ -501,7 +501,7 @@ public static class Lookup
             if (tryLongVowelConversion && textInHiraganaList[i].Contains('ー') &&
                 textInHiraganaList[i][0] != 'ー')
             {
-                List<string> textWithoutLongVowelMarkList = Kana.ConvertLongVowelMarkToKana(textInHiraganaList[i]);
+                List<string> textWithoutLongVowelMarkList = Kana.LongVowelMarkToKana(textInHiraganaList[i]);
 
                 for (int j = 0; j < textWithoutLongVowelMarkList.Count; j++)
                 {

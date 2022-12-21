@@ -193,7 +193,7 @@ public static class Kana
         #pragma warning restore format
     };
 
-    public static string KatakanaToHiraganaConverter(string text)
+    public static string KatakanaToHiragana(string text)
     {
         List<string> unicodeCharacters = text.Normalize(NormalizationForm.FormKC).EnumerateUnicodeCharacters().ToList();
         StringBuilder textInHiragana = new(unicodeCharacters.Count);
@@ -219,20 +219,20 @@ public static class Kana
         return textInHiragana.ToString();
     }
 
-    public static string HiraganaToKatakanaConverter(string text)
-    {
-        StringBuilder textInKatakana = new(text.Length);
-        foreach (string str in text.EnumerateUnicodeCharacters())
-        {
-            textInKatakana.Append(s_hiraganaToKatakanaDict.TryGetValue(str, out string? hiraganaStr)
-                ? hiraganaStr
-                : str);
-        }
+    //public static string HiraganaToKatakana(string text)
+    //{
+    //    StringBuilder textInKatakana = new(text.Length);
+    //    foreach (string str in text.EnumerateUnicodeCharacters())
+    //    {
+    //        textInKatakana.Append(s_hiraganaToKatakanaDict.TryGetValue(str, out string? hiraganaStr)
+    //            ? hiraganaStr
+    //            : str);
+    //    }
 
-        return textInKatakana.ToString();
-    }
+    //    return textInKatakana.ToString();
+    //}
 
-    public static List<string> ConvertLongVowelMarkToKana(string text)
+    public static List<string> LongVowelMarkToKana(string text)
     {
         List<string> unicodeTextList = text.EnumerateUnicodeCharacters().ToList();
 

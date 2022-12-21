@@ -1015,7 +1015,7 @@ public partial class PopupWindow : Window
 
         for (int i = 0; i < expressions.Count; i++)
         {
-            string normalizedExpression = Kana.KatakanaToHiraganaConverter(expressions[i]);
+            string normalizedExpression = Kana.KatakanaToHiragana(expressions[i]);
             List<string> combinedFormList = Kana.CreateCombinedForm(expressions[i]);
 
             if (i > 0)
@@ -1034,7 +1034,7 @@ public partial class PopupWindow : Window
 
                     if (!hasReading || (pitchAccentDictResult.Reading != null &&
                                         normalizedExpression ==
-                                        Kana.KatakanaToHiraganaConverter(pitchAccentDictResult.Reading)))
+                                        Kana.KatakanaToHiragana(pitchAccentDictResult.Reading)))
                     {
                         if (primarySpelling == pitchAccentDictResult.Spelling)
                         {

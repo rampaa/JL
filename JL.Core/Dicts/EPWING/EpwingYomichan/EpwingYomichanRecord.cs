@@ -115,7 +115,7 @@ public class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
     {
         int frequency = int.MaxValue;
 
-        if (freq.Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(PrimarySpelling),
+        if (freq.Contents.TryGetValue(Kana.KatakanaToHiragana(PrimarySpelling),
                 out List<FrequencyRecord>? freqResults))
         {
             int freqResultsCount = freqResults.Count;
@@ -134,7 +134,7 @@ public class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
         }
 
         else if (!string.IsNullOrEmpty(Reading)
-                 && freq.Contents.TryGetValue(Kana.KatakanaToHiraganaConverter(Reading),
+                 && freq.Contents.TryGetValue(Kana.KatakanaToHiragana(Reading),
                      out List<FrequencyRecord>? readingFreqResults))
         {
             int readingFreqResultsCount = readingFreqResults.Count;

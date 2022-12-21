@@ -46,7 +46,7 @@ internal static class EpwingNazekaLoader
                 List<string>? alternativeSpellings = spellings.ToList();
                 alternativeSpellings.RemoveAt(0);
 
-                string key = Kana.KatakanaToHiraganaConverter(reading);
+                string key = Kana.KatakanaToHiragana(reading);
 
                 EpwingNazekaRecord tempRecord = new(primarySpelling, reading, alternativeSpellings,
                     definitions);
@@ -70,7 +70,7 @@ internal static class EpwingNazekaLoader
                     if (!alternativeSpellings.Any())
                         alternativeSpellings = null;
 
-                    key = Kana.KatakanaToHiraganaConverter(primarySpelling);
+                    key = Kana.KatakanaToHiragana(primarySpelling);
 
                     tempRecord = new(primarySpelling, reading, alternativeSpellings, definitions);
 
@@ -91,7 +91,7 @@ internal static class EpwingNazekaLoader
             else
             {
                 string primarySpelling = reading;
-                string key = Kana.KatakanaToHiraganaConverter(primarySpelling);
+                string key = Kana.KatakanaToHiragana(primarySpelling);
 
                 EpwingNazekaRecord tempRecord = new(primarySpelling, null, null, definitions);
 

@@ -16,7 +16,7 @@ public static class JmnedictRecordBuilder
                 string keb = entry.KebList[i];
 
                 JmnedictRecord record = new();
-                string key = Kana.KatakanaToHiraganaConverter(keb);
+                string key = Kana.KatakanaToHiragana(keb);
 
                 record.PrimarySpelling = keb;
                 record.Readings = entry.RebList;
@@ -56,7 +56,7 @@ public static class JmnedictRecordBuilder
             {
                 string reb = entry.RebList[i];
 
-                string key = Kana.KatakanaToHiraganaConverter(reb);
+                string key = Kana.KatakanaToHiragana(reb);
 
                 if (recordDictionary.ContainsKey(key))
                     continue;

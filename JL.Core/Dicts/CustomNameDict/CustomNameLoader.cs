@@ -27,7 +27,7 @@ public static class CustomNameLoader
 
         Dictionary<string, List<IDictRecord>> customNameDictionary = Storage.Dicts.Values.First(dict => dict.Type == DictType.CustomNameDictionary).Contents;
 
-        if (customNameDictionary.TryGetValue(Kana.KatakanaToHiraganaConverter(spelling), out List<IDictRecord>? entry))
+        if (customNameDictionary.TryGetValue(Kana.KatakanaToHiragana(spelling), out List<IDictRecord>? entry))
         {
             if (!entry.Contains(newNameRecord))
             {
@@ -37,7 +37,7 @@ public static class CustomNameLoader
 
         else
         {
-            customNameDictionary.Add(Kana.KatakanaToHiraganaConverter(spelling),
+            customNameDictionary.Add(Kana.KatakanaToHiragana(spelling),
                 new List<IDictRecord> { newNameRecord });
         }
     }

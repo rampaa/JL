@@ -32,7 +32,7 @@ public static class PitchAccentLoader
                 if (newEntry.Position == -1)
                     continue;
 
-                string spellingInHiragana = Kana.KatakanaToHiraganaConverter(newEntry.Spelling);
+                string spellingInHiragana = Kana.KatakanaToHiragana(newEntry.Spelling);
 
                 if (pitchDict.TryGetValue(spellingInHiragana, out List<IDictRecord>? result))
                 {
@@ -46,7 +46,7 @@ public static class PitchAccentLoader
 
                 if (!string.IsNullOrEmpty(newEntry.Reading))
                 {
-                    string readingInHiragana = Kana.KatakanaToHiraganaConverter(newEntry.Reading);
+                    string readingInHiragana = Kana.KatakanaToHiragana(newEntry.Reading);
 
                     if (pitchDict.TryGetValue(readingInHiragana, out List<IDictRecord>? readingResult))
                     {
