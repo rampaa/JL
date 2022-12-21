@@ -76,6 +76,7 @@ public static class Lookup
         Dictionary<string, IntermediaryResult> customWordResults = new();
         Dictionary<string, IntermediaryResult> customNameResults = new();
 
+        List<string> textList = new();
         List<string> textInHiraganaList = new();
         List<HashSet<Form>> deconjugationResultsList = new();
 
@@ -84,7 +85,11 @@ public static class Lookup
             if (char.IsHighSurrogate(text[text.Length - i - 1]))
                 continue;
 
-            string textInHiragana = Kana.KatakanaToHiraganaConverter(text[..^i]);
+            string currentText = text[..^i];
+
+            textList.Add(currentText);
+
+            string textInHiragana = Kana.KatakanaToHiraganaConverter(currentText);
             textInHiraganaList.Add(textInHiragana);
 
             deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
@@ -97,12 +102,12 @@ public static class Lookup
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
-                        jMdictResults = GetWordResults(text, textInHiraganaList, deconjugationResultsList,
+                        jMdictResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList,
                             dict);
                         break;
 
                     case DictType.JMnedict:
-                        jMnedictResults = GetNameResults(text, textInHiraganaList, dict);
+                        jMnedictResults = GetNameResults(textList, textInHiraganaList, dict);
                         break;
 
                     case DictType.Kanjidic:
@@ -116,12 +121,12 @@ public static class Lookup
                         break;
 
                     case DictType.CustomWordDictionary:
-                        customWordResults = GetWordResults(text, textInHiraganaList,
+                        customWordResults = GetWordResults(textList, textInHiraganaList,
                             deconjugationResultsList, dict);
                         break;
 
                     case DictType.CustomNameDictionary:
-                        customNameResults = GetNameResults(text, textInHiraganaList, dict);
+                        customNameResults = GetNameResults(textList, textInHiraganaList, dict);
                         break;
 
                     case DictType.NonspecificKanjiYomichan:
@@ -129,7 +134,7 @@ public static class Lookup
                         break;
 
                     case DictType.NonspecificNameYomichan:
-                        epwingYomichanNameResultsList.Add(GetNameResults(text, textInHiraganaList, dict));
+                        epwingYomichanNameResultsList.Add(GetNameResults(textList, textInHiraganaList, dict));
                         break;
 
                     case DictType.Kenkyuusha:
@@ -152,16 +157,16 @@ public static class Lookup
                     case DictType.KireiCakeYomichan:
                     case DictType.NonspecificWordYomichan:
                     case DictType.NonspecificYomichan:
-                        epwingYomichanWordResultsList.Add(GetWordResults(text, textInHiraganaList,
+                        epwingYomichanWordResultsList.Add(GetWordResults(textList, textInHiraganaList,
                             deconjugationResultsList, dict));
                         break;
 
                     case DictType.NonspecificKanjiNazeka:
-                        epwingNazekaKanjiResultsList.Add(GetNameResults(text, textInHiraganaList, dict));
+                        epwingNazekaKanjiResultsList.Add(GetNameResults(textList, textInHiraganaList, dict));
                         break;
 
                     case DictType.NonspecificNameNazeka:
-                        epwingNazekaNameResultsList.Add(GetNameResults(text, textInHiraganaList, dict));
+                        epwingNazekaNameResultsList.Add(GetNameResults(textList, textInHiraganaList, dict));
                         break;
 
                     case DictType.DaijirinNazeka:
@@ -169,8 +174,7 @@ public static class Lookup
                     case DictType.ShinmeikaiNazeka:
                     case DictType.NonspecificWordNazeka:
                     case DictType.NonspecificNazeka:
-                        epwingNazekaWordResultsList.Add(GetWordResults(text, textInHiraganaList,
-                            deconjugationResultsList, dict));
+                        epwingNazekaWordResultsList.Add(GetWordResults(textList, textInHiraganaList, deconjugationResultsList, dict));
                         break;
 
                     case DictType.PitchAccentYomichan:
@@ -482,20 +486,17 @@ public static class Lookup
         return (tryLongVowelConversion, succAttempt);
     }
 
-    private static Dictionary<string, IntermediaryResult> GetWordResults(string text,
+    private static Dictionary<string, IntermediaryResult> GetWordResults(List<string> textList,
         List<string> textInHiraganaList, List<HashSet<Form>> deconjugationResultsList, Dict dict)
     {
         Dictionary<string, IntermediaryResult> results = new();
 
         int succAttempt = 0;
 
-        for (int i = 0; i < text.Length; i++)
+        for (int i = 0; i < textList.Count; i++)
         {
-            if (char.IsHighSurrogate(text[text.Length - i - 1]))
-                continue;
-
             (bool tryLongVowelConversion, succAttempt) = GetWordResultsHelper(dict, results,
-                deconjugationResultsList[i], text[..^i], textInHiraganaList[i], succAttempt);
+                deconjugationResultsList[i], textList[i], textInHiraganaList[i], succAttempt);
 
             if (tryLongVowelConversion && textInHiraganaList[i].Contains('ー') &&
                 textInHiraganaList[i][0] != 'ー')
@@ -505,29 +506,25 @@ public static class Lookup
                 for (int j = 0; j < textWithoutLongVowelMarkList.Count; j++)
                 {
                     succAttempt = GetWordResultsHelper(dict, results, deconjugationResultsList[i],
-                        text[..^i], textWithoutLongVowelMarkList[j], succAttempt).succAttempt;
+                        textList[i], textWithoutLongVowelMarkList[j], succAttempt).succAttempt;
                 }
             }
         }
-
         return results;
     }
 
-    private static Dictionary<string, IntermediaryResult> GetNameResults(string text,
+    private static Dictionary<string, IntermediaryResult> GetNameResults(List<string> textList,
         List<string> textInHiraganaList, Dict dict)
     {
         Dictionary<string, IntermediaryResult> nameResults = new();
 
-        for (int i = 0; i < text.Length; i++)
+        for (int i = 0; i < textList.Count; i++)
         {
-            if (char.IsHighSurrogate(text[text.Length - i - 1]))
-                continue;
-
             if (dict.Contents
                 .TryGetValue(textInHiraganaList[i], out List<IDictRecord>? result))
             {
                 nameResults.TryAdd(textInHiraganaList[i],
-                    new IntermediaryResult(new List<List<IDictRecord>> { result }, null, text[..^i], text[..^i], dict));
+                    new IntermediaryResult(new List<List<IDictRecord>> { result }, null, textList[i], textList[i], dict));
             }
         }
 
