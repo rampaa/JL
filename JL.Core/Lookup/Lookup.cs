@@ -81,6 +81,9 @@ public static class Lookup
 
         for (int i = 0; i < text.Length; i++)
         {
+            if (char.IsHighSurrogate(text[text.Length - i - 1]))
+                continue;
+
             string textInHiragana = Kana.KatakanaToHiraganaConverter(text[..^i]);
             textInHiraganaList.Add(textInHiragana);
 
@@ -488,6 +491,9 @@ public static class Lookup
 
         for (int i = 0; i < text.Length; i++)
         {
+            if (char.IsHighSurrogate(text[text.Length - i - 1]))
+                continue;
+
             (bool tryLongVowelConversion, succAttempt) = GetWordResultsHelper(dict, results,
                 deconjugationResultsList[i], text[..^i], textInHiraganaList[i], succAttempt);
 
@@ -514,6 +520,9 @@ public static class Lookup
 
         for (int i = 0; i < text.Length; i++)
         {
+            if (char.IsHighSurrogate(text[text.Length - i - 1]))
+                continue;
+
             if (dict.Contents
                 .TryGetValue(textInHiraganaList[i], out List<IDictRecord>? result))
             {
@@ -529,7 +538,7 @@ public static class Lookup
     {
         Dictionary<string, IntermediaryResult> kanjiResults = new();
 
-        string? kanji = text.UnicodeIterator().FirstOrDefault();
+        string? kanji = text.EnumerateUnicodeCharacters().FirstOrDefault();
 
         if (kanji != null && dict.Contents.TryGetValue(kanji, out List<IDictRecord>? result))
         {

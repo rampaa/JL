@@ -44,7 +44,7 @@ public static class ExtensionMethods
         // return default;
     }
 
-    public static IEnumerable<string> UnicodeIterator(this string s)
+    public static IEnumerable<string> EnumerateUnicodeCharacters(this string s)
     {
         for (int i = 0; i < s.Length; ++i)
         {
