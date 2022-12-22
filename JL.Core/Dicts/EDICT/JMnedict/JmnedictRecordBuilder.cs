@@ -13,13 +13,11 @@ public static class JmnedictRecordBuilder
             int kebListCount = entry.KebList.Count;
             for (int i = 0; i < kebListCount; i++)
             {
-                string keb = entry.KebList[i];
-
-                JmnedictRecord record = new();
-                string key = Kana.KatakanaToHiragana(keb);
-
-                record.PrimarySpelling = keb;
-                record.Readings = entry.RebList;
+                JmnedictRecord record = new()
+                {
+                    PrimarySpelling = entry.KebList[i],
+                    Readings = entry.RebList
+                };
 
                 int transListCount = entry.TranslationList.Count;
                 for (int j = 0; j < transListCount; j++)
@@ -31,7 +29,7 @@ public static class JmnedictRecordBuilder
                     // record.RelatedTerms.AddRange(translation.XRefList);
                 }
 
-                recordDictionary.TryAdd(key, record);
+                recordDictionary.Add(record.PrimarySpelling, record);
             }
 
             List<string> alternativeSpellings = recordDictionary.Keys.ToList();
@@ -54,14 +52,14 @@ public static class JmnedictRecordBuilder
             int rebListCount = entry.RebList.Count;
             for (int i = 0; i < rebListCount; i++)
             {
-                string reb = entry.RebList[i];
-
-                string key = Kana.KatakanaToHiragana(reb);
+                string key = Kana.KatakanaToHiragana(entry.RebList[i]);
 
                 if (recordDictionary.ContainsKey(key))
+                {
                     continue;
+                }
 
-                JmnedictRecord record = new() { PrimarySpelling = reb };
+                JmnedictRecord record = new() { PrimarySpelling = entry.RebList[i] };
 
                 int transListCount = entry.TranslationList.Count;
                 for (int j = 0; j < transListCount; j++)
@@ -75,26 +73,30 @@ public static class JmnedictRecordBuilder
                     //record.RelatedTerms.AddRange(translation.XRefList);
                 }
 
+                record.AlternativeSpellings = entry.RebList.ToList();
+                record.AlternativeSpellings.RemoveAt(i);
+
                 recordDictionary.Add(key, record);
             }
         }
 
         foreach (KeyValuePair<string, JmnedictRecord> recordKeyValuePair in recordDictionary)
         {
-            recordKeyValuePair.Value.Id = entry.Id;
-            string key = recordKeyValuePair.Key;
-
             recordKeyValuePair.Value.AlternativeSpellings = Utils.TrimStringList(recordKeyValuePair.Value.AlternativeSpellings!);
             recordKeyValuePair.Value.Definitions = Utils.TrimStringList(recordKeyValuePair.Value.Definitions!);
             recordKeyValuePair.Value.NameTypes = Utils.TrimStringList(recordKeyValuePair.Value.NameTypes!);
             recordKeyValuePair.Value.Readings = Utils.TrimStringList(recordKeyValuePair.Value.Readings!);
+            recordKeyValuePair.Value.Id = entry.Id;
 
+            string key = Kana.KatakanaToHiragana(recordKeyValuePair.Key);
             if (jmnedictDictionary.TryGetValue(key, out List<IDictRecord>? tempRecordList))
+            {
                 tempRecordList.Add(recordKeyValuePair.Value);
+            }
             else
-                tempRecordList = new List<IDictRecord>() { recordKeyValuePair.Value };
-
-            jmnedictDictionary[key] = tempRecordList;
+            {
+                jmnedictDictionary.Add(key, new List<IDictRecord>() { recordKeyValuePair.Value });
+            }
         }
     }
 }

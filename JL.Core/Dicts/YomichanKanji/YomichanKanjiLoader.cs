@@ -30,7 +30,15 @@ public static class YomichanKanjiLoader
             {
                 YomichanKanjiRecord yomichanKanjiRecord = new(jsonObj);
                 string kanji = jsonObj[0].ToString();
-                dict.Contents.TryAdd(kanji, new List<IDictRecord> { yomichanKanjiRecord });
+
+                if (dict.Contents.TryGetValue(kanji, out List<IDictRecord>? kanjiResult))
+                {
+                    kanjiResult.Add(yomichanKanjiRecord);
+                }
+                else
+                {
+                    dict.Contents.Add(kanji, new List<IDictRecord> { yomichanKanjiRecord });
+                }
             }
         }
 

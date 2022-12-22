@@ -18,12 +18,12 @@ internal static class JmdictRecordBuilder
         {
             KanjiElement kanjiElement = entry.KanjiElements[i];
 
-            JmdictRecord record = new();
-            string key = kanjiElement.Keb!;
+            JmdictRecord record = new()
+            {
+                PrimarySpelling = kanjiElement.Keb!,
+                PrimarySpellingOrthographyInfoList = kanjiElement.KeInfList
+            };
 
-            record.PrimarySpelling = key;
-
-            record.PrimarySpellingOrthographyInfoList = kanjiElement.KeInfList;
             //record.PriorityList = kanjiElement.KePriList;
 
             int lREleListCount = entry.ReadingElements.Count;
@@ -31,7 +31,7 @@ internal static class JmdictRecordBuilder
             {
                 ReadingElement readingElement = entry.ReadingElements[j];
 
-                if (!readingElement.ReRestrList.Any() || readingElement.ReRestrList.Contains(key))
+                if (!readingElement.ReRestrList.Any() || readingElement.ReRestrList.Contains(record.PrimarySpelling))
                 {
                     record.Readings?.Add(readingElement.Reb);
                     record.ReadingsOrthographyInfoList?.Add(readingElement.ReInfList);
@@ -44,14 +44,14 @@ internal static class JmdictRecordBuilder
                 Sense sense = entry.SenseList[j];
 
                 if ((!sense.StagKList.Any() && !sense.StagRList.Any())
-                    || sense.StagKList.Contains(key)
+                    || sense.StagKList.Contains(record.PrimarySpelling)
                     || sense.StagRList.Intersect(record.Readings!).Any())
                 {
                     ProcessSense(record, sense);
                 }
             }
 
-            recordDictionary.Add(key, record);
+            recordDictionary.Add(record.PrimarySpelling, record);
         }
 
         List<string> alternativeSpellings = recordDictionary.Keys.ToList();
@@ -163,11 +163,13 @@ internal static class JmdictRecordBuilder
             string key = Kana.KatakanaToHiragana(recordKeyValuePair.Key);
 
             if (jmdictDictionary.TryGetValue(key, out List<IDictRecord>? tempRecordList))
+            {
                 tempRecordList.Add(recordKeyValuePair.Value);
+            }
             else
-                tempRecordList = new List<IDictRecord>() { recordKeyValuePair.Value };
-
-            jmdictDictionary[key] = tempRecordList;
+            {
+                jmdictDictionary.Add(key, new List<IDictRecord>() { recordKeyValuePair.Value });
+            }
         }
     }
 

@@ -523,7 +523,7 @@ public static class Lookup
             if (dict.Contents
                 .TryGetValue(textInHiraganaList[i], out List<IDictRecord>? result))
             {
-                nameResults.TryAdd(textInHiraganaList[i],
+                nameResults.Add(textInHiraganaList[i],
                     new IntermediaryResult(new List<List<IDictRecord>> { result }, null, textList[i], textList[i], dict));
             }
         }
@@ -706,38 +706,44 @@ public static class Lookup
     {
         List<LookupResult> results = new();
 
-        if (!kanjiResults.Any())
-            return results;
+        foreach (KeyValuePair<string, IntermediaryResult> kanjiResult in kanjiResults.ToList())
+        {
+            int resultsListCount = kanjiResult.Value.Results.Count;
+            for (int i = 0; i < resultsListCount; i++)
+            {
+                int resultCount = kanjiResult.Value.Results[i].Count;
 
-        string kanji = kanjiResults.First().Key;
+                for (int j = 0; j < resultCount; j++)
+                {
+                    var yomichanKanjiDictResult = (YomichanKanjiRecord)kanjiResult.Value.Results[i][j];
 
-        IntermediaryResult intermediaryResult = kanjiResults.First().Value;
-        var kanjiResult = (YomichanKanjiRecord)intermediaryResult.Results[0][0];
+                    List<string> allReadings = new();
 
-        List<string> allReadings = new();
+                    if (yomichanKanjiDictResult.OnReadings != null)
+                        allReadings.AddRange(yomichanKanjiDictResult.OnReadings);
 
-        if (kanjiResult.OnReadings != null)
-            allReadings.AddRange(kanjiResult.OnReadings);
+                    if (yomichanKanjiDictResult.KunReadings != null)
+                        allReadings.AddRange(yomichanKanjiDictResult.KunReadings);
 
-        if (kanjiResult.KunReadings != null)
-            allReadings.AddRange(kanjiResult.KunReadings);
+                    LookupResult result = new
+                    (
+                        primarySpelling: kanjiResult.Key,
+                        readings: allReadings,
+                        onReadings: yomichanKanjiDictResult.OnReadings,
+                        kunReadings: yomichanKanjiDictResult.KunReadings,
+                        kanjiComposition: Storage.KanjiCompositionDict.GetValueOrDefault(kanjiResult.Key),
+                        kanjiStats: yomichanKanjiDictResult.BuildFormattedStats(),
+                        frequencies: GetYomichanKanjiFrequencies(kanjiResult.Key),
+                        matchedText: kanjiResult.Value.MatchedText,
+                        deconjugatedMatchedText: kanjiResult.Value.DeconjugatedMatchedText,
+                        dict: kanjiResult.Value.Dict,
+                        formattedDefinitions: yomichanKanjiDictResult.BuildFormattedDefinition(kanjiResult.Value.Dict.Options)
+                    );
+                    results.Add(result);
+                }
+            }
+        }
 
-        LookupResult result = new
-        (
-            primarySpelling: kanji,
-            readings: allReadings,
-            onReadings: kanjiResult.OnReadings,
-            kunReadings: kanjiResult.KunReadings,
-            kanjiComposition: Storage.KanjiCompositionDict.GetValueOrDefault(kanji),
-            kanjiStats: kanjiResult.BuildFormattedStats(),
-            frequencies: GetYomichanKanjiFrequencies(kanji),
-            matchedText: intermediaryResult.MatchedText,
-            deconjugatedMatchedText: intermediaryResult.DeconjugatedMatchedText,
-            dict: intermediaryResult.Dict,
-            formattedDefinitions: kanjiResult.BuildFormattedDefinition(intermediaryResult.Dict.Options)
-        );
-
-        results.Add(result);
         return results;
     }
 
