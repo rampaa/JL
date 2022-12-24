@@ -6,40 +6,31 @@ public static class AnkiUtils
 {
     public static async Task<List<string>?> GetDeckNames()
     {
-        try
-        {
-            return JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetDeckNamesResponse().ConfigureAwait(false))?.Result?.ToString()!)!;
-        }
+        Response? response = await AnkiConnect.GetDeckNamesResponse().ConfigureAwait(false);
+        string? resultString = response?.Result?.ToString() ?? null;
 
-        catch
-        {
-            return null;
-        }
+        return resultString != null
+            ? JsonSerializer.Deserialize<List<string>>(resultString)
+            : null;
     }
 
     public static async Task<List<string>?> GetModelNames()
     {
-        try
-        {
-            return JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelNamesResponse().ConfigureAwait(false))?.Result?.ToString()!)!;
-        }
+        Response? response = await AnkiConnect.GetModelNamesResponse().ConfigureAwait(false);
+        string? resultString = response?.Result?.ToString() ?? null;
 
-        catch
-        {
-            return null;
-        }
+        return resultString != null
+            ? JsonSerializer.Deserialize<List<string>>(resultString)
+            : null;
     }
 
     public static async Task<List<string>?> GetFieldNames(string modelName)
     {
-        try
-        {
-            return JsonSerializer.Deserialize<List<string>>((await AnkiConnect.GetModelFieldNamesResponse(modelName).ConfigureAwait(false))?.Result?.ToString()!)!;
-        }
+        Response? response = await AnkiConnect.GetModelFieldNamesResponse(modelName).ConfigureAwait(false);
+        string? resultString = response?.Result?.ToString() ?? null;
 
-        catch
-        {
-            return null;
-        }
+        return resultString != null
+            ? JsonSerializer.Deserialize<List<string>>(resultString)
+            : null;
     }
 }

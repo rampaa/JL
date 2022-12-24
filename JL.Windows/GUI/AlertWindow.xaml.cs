@@ -11,7 +11,13 @@ public partial class AlertWindow : Window
         InitializeComponent();
     }
 
-    public void DisplayAlert(AlertLevel alertLevel, string message)
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+        new WinApi(this).BringToFront();
+    }
+
+    public void SetAlert(AlertLevel alertLevel, string message)
     {
         AlertBorder!.BorderBrush = alertLevel switch
         {

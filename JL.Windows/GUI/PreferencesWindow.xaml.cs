@@ -188,35 +188,35 @@ public partial class PreferencesWindow : Window
     private async Task PopulateDeckAndModelNames()
     {
         List<string>? deckNames = await AnkiUtils.GetDeckNames();
-        List<string>? modelNames = await AnkiUtils.GetModelNames();
 
-        if (deckNames != null && modelNames != null)
+        if (deckNames != null)
         {
-            WordMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
-            KanjiMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
-            NameMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
-            OtherMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
+            List<string>? modelNames = await AnkiUtils.GetModelNames();
 
-            WordMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
-            KanjiMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
-            NameMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
-            OtherMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
+            if (modelNames != null)
+            {
+                WordMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
+                KanjiMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
+                NameMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
+                OtherMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
+
+                WordMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
+                KanjiMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
+                NameMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
+                OtherMiningSetupComboBoxModelNames.ItemsSource = modelNames.ToList();
+            }
+
+            else
+            {
+                WindowsUtils.Alert(AlertLevel.Error, "Error getting model names form Anki");
+                Utils.Logger.Error("Error getting model names from Anki");
+            }
         }
 
         else
         {
-            WindowsUtils.Alert(AlertLevel.Error, "Error getting deck and model names form Anki");
-            Utils.Logger.Error("Error getting deck and model names from Anki");
-
-            //WordMiningSetupComboBoxDeckNames.ItemsSource = "";
-            //KanjiMiningSetupComboBoxDeckNames.ItemsSource = "";
-            //NameMiningSetupComboBoxDeckNames.ItemsSource = "";
-            //OtherMiningSetupComboBoxDeckNames.ItemsSource = "";
-
-            //WordMiningSetupComboBoxModelNames.ItemsSource = "";
-            //KanjiMiningSetupComboBoxModelNames.ItemsSource = "";
-            //NameMiningSetupComboBoxModelNames.ItemsSource = "";
-            //OtherMiningSetupComboBoxModelNames.ItemsSource = "";
+            WindowsUtils.Alert(AlertLevel.Error, "Error getting deck names form Anki");
+            Utils.Logger.Error("Error getting deck names from Anki");
         }
     }
 

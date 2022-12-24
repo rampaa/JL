@@ -374,24 +374,21 @@ public static class WindowsUtils
 
     public static void Alert(AlertLevel alertLevel, string message)
     {
-        if (Application.Current != null)
+        Application.Current?.Dispatcher!.InvokeAsync(async delegate
         {
-            Application.Current.Dispatcher!.InvokeAsync(async delegate
-            {
-                List<AlertWindow> alertWindowList = Application.Current.Windows.OfType<AlertWindow>().ToList();
+            List<AlertWindow> alertWindowList = Application.Current.Windows.OfType<AlertWindow>().ToList();
 
-                AlertWindow alertWindow = new();
+            AlertWindow alertWindow = new();
 
-                alertWindow.Left = DpiAwareWorkAreaWidth - alertWindow.Width - 30;
-                alertWindow.Top =
-                    alertWindowList.Count * ((alertWindowList.LastOrDefault()?.ActualHeight ?? 0) + 2) + 30;
+            alertWindow.Left = DpiAwareWorkAreaWidth - alertWindow.Width - 30;
+            alertWindow.Top =
+                alertWindowList.Count * ((alertWindowList.LastOrDefault()?.ActualHeight ?? 0) + 2) + 30;
 
-                alertWindow.DisplayAlert(alertLevel, message);
-                alertWindow.Show();
-                await Task.Delay(4004);
-                alertWindow.Close();
-            });
-        }
+            alertWindow.SetAlert(alertLevel, message);
+            alertWindow.Show();
+            await Task.Delay(4004);
+            alertWindow.Close();
+        });
     }
 
     public static Size MeasureTextSize(string text, int fontSize)
