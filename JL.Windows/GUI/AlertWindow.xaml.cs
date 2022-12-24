@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Core.Utilities;
 
@@ -14,7 +15,7 @@ public partial class AlertWindow : Window
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
-        new WinApi(this).BringToFront();
+        WinApi.BringToFront(new WindowInteropHelper(this).Handle);
     }
 
     public void SetAlert(AlertLevel alertLevel, string message)

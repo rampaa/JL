@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Caching;
@@ -35,7 +36,7 @@ public partial class PopupWindow : Window
 
     private string? _lastSelectedText;
 
-    private WinApi? _winApi;
+    private IntPtr _windowHandle;
 
     private List<LookupResult> _lastLookupResults = new();
 
@@ -72,17 +73,15 @@ public partial class PopupWindow : Window
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
-
-        _winApi = new(this);
+        _windowHandle = new WindowInteropHelper(this).Handle;
     }
-
     protected override void OnActivated(EventArgs e)
     {
         base.OnActivated(e);
 
         if (!ConfigManager.Focusable)
         {
-            _winApi!.PreventFocus();
+            WinApi.PreventFocus(_windowHandle);
         }
     }
 
@@ -213,7 +212,7 @@ public partial class PopupWindow : Window
                     Focus();
                 }
 
-                _winApi!.BringToFront();
+                WinApi.BringToFront(_windowHandle);
 
                 if (ConfigManager.AutoPlayAudio)
                 {
@@ -270,7 +269,7 @@ public partial class PopupWindow : Window
             Activate();
             Focus();
 
-            _winApi!.BringToFront();
+            WinApi.BringToFront(_windowHandle);
 
             if (ConfigManager.AutoPlayAudio)
             {

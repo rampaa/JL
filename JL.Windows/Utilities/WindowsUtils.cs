@@ -9,7 +9,6 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Markup;
 using System.Windows.Media;
 using HandyControl.Controls;
@@ -32,8 +31,7 @@ public static class WindowsUtils
     private static WaveOut? s_audioPlayer;
 
     public static System.Windows.Forms.Screen ActiveScreen { get; set; } =
-        System.Windows.Forms.Screen.FromHandle(
-            new WindowInteropHelper(MainWindow.Instance).Handle);
+        System.Windows.Forms.Screen.FromHandle(MainWindow.Instance.WindowHandle);
 
     public static DpiScale Dpi { get; set; } = VisualTreeHelper.GetDpi(MainWindow.Instance);
     public static double DpiAwareWorkAreaWidth { get; set; } = ActiveScreen.Bounds.Width / Dpi.DpiScaleX;
@@ -374,7 +372,7 @@ public static class WindowsUtils
 
     public static void Alert(AlertLevel alertLevel, string message)
     {
-        Application.Current?.Dispatcher!.InvokeAsync(async delegate
+        Application.Current?.Dispatcher.InvokeAsync(async delegate
         {
             List<AlertWindow> alertWindowList = Application.Current.Windows.OfType<AlertWindow>().ToList();
 

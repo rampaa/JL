@@ -52,6 +52,7 @@ public partial class MainWindow : Window, IFrontend
 
     private DateTime _lastClipboardChangeTime;
     private WinApi? _winApi;
+    public IntPtr WindowHandle { get; private set; }
 
     public PopupWindow FirstPopupWindow { get; init; }
 
@@ -94,7 +95,9 @@ public partial class MainWindow : Window, IFrontend
 
         SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
 
-        _winApi = new(this);
+        WindowHandle = new WindowInteropHelper(this).Handle;
+        _winApi = new();
+        _winApi.SubscribeToClipboardChanged(this);
         _winApi.ClipboardChanged += ClipboardChanged;
 
         ConfigManager.Instance.ApplyPreferences();
@@ -114,7 +117,7 @@ public partial class MainWindow : Window, IFrontend
 
         if (!ConfigManager.Focusable)
         {
-            _winApi!.PreventFocus();
+            WinApi.PreventFocus(WindowHandle);
         }
     }
 
@@ -251,7 +254,7 @@ public partial class MainWindow : Window, IFrontend
                 && !StatsWindow.IsItVisible()
                 && !MainTextboxContextMenu.IsVisible)
             {
-                _winApi!.BringToFront();
+                WinApi.BringToFront(WindowHandle);
             }
         }
     }
@@ -838,7 +841,7 @@ public partial class MainWindow : Window, IFrontend
 
     private void ResizeWindow(object sender, MouseButtonEventArgs e)
     {
-        _winApi?.ResizeWindow(((Border)sender).Name);
+        WinApi.ResizeWindow(WindowHandle, ((Border)sender).Name);
 
         LeftPositionBeforeResolutionChange = Left;
         TopPositionBeforeResolutionChange = Top;
