@@ -147,7 +147,7 @@ public partial class ManageFrequenciesWindow : Window
             };
             buttonEdit.Click += (_, _) =>
             {
-                new EditFrequencyWindow(freq).ShowDialog();
+                new EditFrequencyWindow(freq) { Owner = this }.ShowDialog();
                 UpdateFreqsDisplay();
             };
 
@@ -205,7 +205,7 @@ public partial class ManageFrequenciesWindow : Window
 
     private void ButtonAddFrequency_OnClick(object sender, RoutedEventArgs e)
     {
-        new AddFrequencyWindow().ShowDialog();
+        new AddFrequencyWindow() { Owner = this }.ShowDialog();
         UpdateFreqsDisplay();
     }
     private void CloseButton_Click(object sender, RoutedEventArgs e)

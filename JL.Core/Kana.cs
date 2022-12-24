@@ -196,9 +196,10 @@ public static class Kana
     public static string KatakanaToHiragana(string text)
     {
         List<string> unicodeCharacters = text.Normalize(NormalizationForm.FormKC).EnumerateUnicodeCharacters().ToList();
-        StringBuilder textInHiragana = new(unicodeCharacters.Count);
 
         int listLength = unicodeCharacters.Count;
+        StringBuilder textInHiragana = new(listLength);
+
         for (int i = 0; i < listLength; i++)
         {
             if (listLength > i + 1

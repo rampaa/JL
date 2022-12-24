@@ -243,7 +243,7 @@ public partial class ManageDictionariesWindow : Window
             };
             buttonEdit.Click += (_, _) =>
             {
-                new EditDictionaryWindow(dict).ShowDialog();
+                new EditDictionaryWindow(dict) { Owner = this }.ShowDialog();
                 UpdateDictionariesDisplay();
             };
 
@@ -302,7 +302,7 @@ public partial class ManageDictionariesWindow : Window
 
     private void ButtonAddDictionary_OnClick(object sender, RoutedEventArgs e)
     {
-        new AddDictionaryWindow().ShowDialog();
+        new AddDictionaryWindow() { Owner = this }.ShowDialog();
         UpdateDictionariesDisplay();
     }
 
@@ -414,12 +414,13 @@ public partial class ManageDictionariesWindow : Window
         return sb.ToString()[..^Environment.NewLine.Length];
     }
 
-    private static void ShowInfoWindow(ref InfoWindow? infoWindow, Dictionary<string, string> entityDict, string title)
+    private void ShowInfoWindow(ref InfoWindow? infoWindow, Dictionary<string, string> entityDict, string title)
     {
-        if (infoWindow == null)
+        if (infoWindow is null)
         {
             infoWindow = new()
             {
+                Owner = this,
                 Title = title,
                 InfoTextBox = { Text = EntityDictToString(entityDict) }
             };
