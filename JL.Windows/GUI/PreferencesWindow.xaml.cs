@@ -464,6 +464,7 @@ public partial class PreferencesWindow : Window
 
         InfoWindow infoWindow = new()
         {
+            Owner = this,
             Title = title,
             InfoTextBox = { Text = text }
         };
