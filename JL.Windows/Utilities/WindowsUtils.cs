@@ -283,7 +283,8 @@ public static class WindowsUtils
 
             Process.Start(
                 new ProcessStartInfo("cmd",
-                $"/c start \"JL Updater\" \"{Path.Join(Storage.ApplicationPath, "update-helper.cmd")}\""));
+                $"/c start \"JL Updater\" \"{Path.Join(Storage.ApplicationPath, "update-helper.cmd")}\"")
+                { UseShellExecute = true, Verb = "runas" });
         }
 
         else
