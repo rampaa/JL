@@ -288,6 +288,9 @@ public class ConfigManager : CoreConfig
         DeconjugationInfoColor = GetBrushFromConfig(DeconjugationInfoColor, nameof(DeconjugationInfoColor));
         DeconjugationInfoColor.Freeze();
 
+        SeparatorColor = GetBrushFromConfig(SeparatorColor, nameof(SeparatorColor));
+        SeparatorColor.Freeze();
+
         DictTypeColor = GetBrushFromConfig(DictTypeColor, nameof(DictTypeColor));
         DictTypeColor.Freeze();
 
