@@ -5,45 +5,45 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Stats" ResizeMode="NoResize" SizeToContent="WidthAndHeight" MaxHeight="600" MaxWidth="800"
-        Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False" Closing="Window_Closing">
+        Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False" Closing="Window_Closing" Background="{DynamicResource RegionBrush}">
 
     <ScrollViewer HorizontalScrollBarVisibility="Auto">
-        <Grid Background="Black">
+        <Grid>
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,10">
                 <Button Name="ButtonSwapStats" Click="ButtonSwapStats_OnClick" HorizontalAlignment="Left"
                             VerticalAlignment="Top" Margin="0,0,0,20" Content="Session"/>
                 <DockPanel>
-                    <TextBlock Foreground="White" Text="Characters: " TextWrapping="Wrap" Margin="0,0,0,10" />
-                    <TextBlock Foreground="White" Name="TextBlockCharacters" TextWrapping="Wrap"
-                                       Margin="0,0,20,10" />
+                    <TextBlock Text="Characters: " TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                    <TextBlock Name="TextBlockCharacters" TextWrapping="Wrap"
+                                       Margin="0,0,20,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>
 
                 <DockPanel>
-                    <TextBlock Foreground="White" Text="Lines: " TextWrapping="Wrap" Margin="0,0,0,10" />
-                    <TextBlock Foreground="White" Name="TextBlockLines" TextWrapping="Wrap" Margin="0,0,0,10" />
+                    <TextBlock Text="Lines: " TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                    <TextBlock Name="TextBlockLines" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>
 
                 <DockPanel>
-                    <TextBlock Foreground="White" Text="Time: " TextWrapping="Wrap" Margin="0,0,0,10" />
-                    <TextBlock Foreground="White" Name="TextBlockTime" TextWrapping="Wrap" Margin="0,0,0,10" />
+                    <TextBlock Text="Time: " TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                    <TextBlock Name="TextBlockTime" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>
 
                 <DockPanel>
-                    <TextBlock Foreground="White" Text="Cards mined: " TextWrapping="Wrap" Margin="0,0,0,10" />
-                    <TextBlock Foreground="White" Name="TextBlockCardsMined" TextWrapping="Wrap"
-                                       Margin="0,0,0,10" />
+                    <TextBlock Text="Cards mined: " TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                    <TextBlock Name="TextBlockCardsMined" TextWrapping="Wrap"
+                                       Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>
 
                 <DockPanel>
-                    <TextBlock Foreground="White" Text="Times played audio: " TextWrapping="Wrap"
-                                       Margin="0,0,0,10" />
-                    <TextBlock Foreground="White" Name="TextBlockTimesPlayedAudio" TextWrapping="Wrap"
-                                       Margin="0,0,0,10" />
+                    <TextBlock Text="Times played audio: " TextWrapping="Wrap"
+                                       Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                    <TextBlock Name="TextBlockTimesPlayedAudio" TextWrapping="Wrap"
+                                       Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>
 
                 <DockPanel>
-                    <TextBlock Foreground="White" Text="???: " TextWrapping="Wrap" Margin="0,0,0,10" />
-                    <TextBlock Foreground="White" Name="TextBlockImoutos" TextWrapping="Wrap" Margin="0,0,0,10" />
+                    <TextBlock Text="???: " TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                    <TextBlock Name="TextBlockImoutos" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>
             </StackPanel>
         </Grid>

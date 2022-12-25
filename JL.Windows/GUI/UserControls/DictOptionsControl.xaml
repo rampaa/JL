@@ -7,35 +7,35 @@
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <StackPanel>
-        <TextBlock Name="OptionsTextBlock" Foreground="White" Text="Options" TextWrapping="Wrap" Margin="0,10,0,10"
-                   Visibility="Collapsed" />
-        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300" Background="#1C1C1C">
+        <TextBlock Name="OptionsTextBlock" Text="Options" TextWrapping="Wrap" Margin="0,10,0,10"
+                   Visibility="Collapsed" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300">
             <StackPanel x:Name="OptionsStackPanel" VerticalAlignment="Center" HorizontalAlignment="Left">
                 <CheckBox Name="NewlineCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Foreground="White" Text="Newline between definitions" TextWrapping="Wrap" />
+                    <TextBlock Text="Newline between definitions" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <DockPanel Name="ExamplesDockPanel" Visibility="Collapsed">
-                    <TextBlock Foreground="White" Text="Examples" TextWrapping="Wrap" Margin="10, 10, 5, 10"
-                               FontSize="12" />
+                    <TextBlock Text="Examples" TextWrapping="Wrap" Margin="10, 10, 5, 10"
+                               FontSize="12" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                     <ComboBox Name="ExamplesComboBox" Margin="0, 0, 10, 0" Height="30" Width="80"
                               HorizontalAlignment="Left" FontSize="12" />
                 </DockPanel>
 
                 <CheckBox Name="NoAllCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Foreground="White" Text="Don't show results under All" TextWrapping="Wrap" />
+                    <TextBlock Text="Don't show results under All" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <CheckBox Name="WordClassInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Foreground="White" Text="Show word class info" TextWrapping="Wrap" />
+                    <TextBlock Text="Show word class info" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <CheckBox Name="DialectInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Foreground="White" Text="Show dialect info" TextWrapping="Wrap" />
+                    <TextBlock Text="Show dialect info" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <CheckBox Name="POrthographyInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Foreground="White" Text="Show orthography info for primary spelling" TextWrapping="Wrap" />
+                    <TextBlock Text="Show orthography info for primary spelling" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <DockPanel x:Name="POrthographyInfoColorDockPanel" Visibility="Collapsed">
@@ -43,60 +43,60 @@
                             Width="50" Height="25" Click="ShowColorPicker" Margin="10, 0, 0, 0"
                             VerticalAlignment="Center"
                             BorderThickness="2" BorderBrush="#FF707070" />
-                    <TextBlock HorizontalAlignment="Left" Text="Orthography info color for primary spelling"
-                               Margin="10"
-                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" Foreground="White" />
+                    <TextBlock Text="Orthography info color for primary spelling"
+                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
+                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
                 </DockPanel>
 
                 <DockPanel x:Name="POrthographyInfoFontSizeDockPanel" Visibility="Collapsed">
                     <hc:NumericUpDown x:Name="POrthographyInfoFontSizeNumericUpDown" Minimum="1"
                                       HorizontalAlignment="Left" VerticalAlignment="Center"
                                       Margin="10, 0, 0, 0" FontSize="12" Width="70" Height="30" />
-                    <TextBlock HorizontalAlignment="Left" Text="Orthography info font size for primary spelling"
-                               Margin="10"
-                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" Foreground="White" />
+                    <TextBlock Text="Orthography info font size for primary spelling"
+                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
+                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
                 </DockPanel>
 
                 <CheckBox Name="AOrthographyInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Foreground="White" Text="Show orthography info for alternative spellings"
-                               TextWrapping="Wrap" />
+                    <TextBlock Text="Show orthography info for alternative spellings"
+                               TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <CheckBox Name="ROrthographyInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Foreground="White" Text="Show orthography info for readings" TextWrapping="Wrap" />
+                    <TextBlock Text="Show orthography info for readings" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <CheckBox Name="WordTypeInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Foreground="White" Text="Show word type" TextWrapping="Wrap" />
+                    <TextBlock Text="Show word type" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <CheckBox Name="SpellingRestrictionInfoCheckBox" Margin="10" Visibility="Collapsed"
                           HorizontalAlignment="Left" >
-                    <TextBlock Foreground="White" Text="Show spelling restriction info"
+                    <TextBlock Text="Show spelling restriction info"
                                ToolTip="e.g. only applies to X"
-                               TextWrapping="Wrap" />
+                               TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <CheckBox Name="ExtraDefinitionInfoCheckBox" Margin="10" Visibility="Collapsed"
                           HorizontalAlignment="Left">
-                    <TextBlock Foreground="White" Text="Show extra definition info" ToolTip="e.g. often derog"
-                               TextWrapping="Wrap" />
+                    <TextBlock Text="Show extra definition info" ToolTip="e.g. often derog"
+                               TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <CheckBox Name="MiscInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Foreground="White" Text="Show misc info" TextWrapping="Wrap" />
+                    <TextBlock Text="Show misc info" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <CheckBox Name="RelatedTermCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Foreground="White" Text="Show related terms" TextWrapping="Wrap" />
+                    <TextBlock Text="Show related terms" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <CheckBox Name="AntonymCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Foreground="White" Text="Show antonyms" TextWrapping="Wrap" />
+                    <TextBlock Text="Show antonyms" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <CheckBox Name="LoanwordEtymologyCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Foreground="White" Text="Show the etymology of loanwords" TextWrapping="Wrap" />
+                    <TextBlock Text="Show the etymology of loanwords" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <DockPanel x:Name="PitchAccentMarkerColorDockPanel" Visibility="Collapsed">
@@ -104,9 +104,9 @@
                             Width="50" Height="25" Click="ShowColorPicker" Margin="10, 0, 0, 0"
                             VerticalAlignment="Center"
                             BorderThickness="2" BorderBrush="#FF707070" />
-                    <TextBlock HorizontalAlignment="Left" Text="Pitch Accent Marker Color"
-                               Margin="10"
-                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" Foreground="White" />
+                    <TextBlock Text="Pitch Accent Marker Color"
+                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
+                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
                 </DockPanel>
 
             </StackPanel>
