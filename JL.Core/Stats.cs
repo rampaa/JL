@@ -71,10 +71,10 @@ public class Stats
 
             return true;
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
             Storage.Frontend.Alert(AlertLevel.Error, "Couldn't write Stats");
-            Utils.Logger.Error(e, "Couldn't write Stats");
+            Utils.Logger.Error(ex, "Couldn't write Stats");
             return false;
         }
     }
@@ -89,16 +89,16 @@ public class Stats
                    File.ReadAllText(Path.Join(Storage.ConfigPath, "Stats.json")));
             }
 
-            catch
+            catch (Exception ex)
             {
                 Storage.Frontend.Alert(AlertLevel.Error, "Couldn't read Stats");
-                Utils.Logger.Error("Couldn't read Stats");
+                Utils.Logger.Error(ex, "Couldn't read Stats");
                 return null;
             }
         }
         else
         {
-            Utils.Logger.Warning("Stats.json doesn't exist, creating it");
+            Utils.Logger.Information("Stats.json doesn't exist, creating it");
 
             var lifetimeStats = new Stats();
             WriteLifetimeStats(lifetimeStats).Wait();

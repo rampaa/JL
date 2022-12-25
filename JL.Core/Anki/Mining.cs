@@ -118,10 +118,10 @@ public static class Mining
                 return true;
             }
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
             Storage.Frontend.Alert(AlertLevel.Error, $"Mining failed for {primarySpelling}");
-            Utils.Logger.Information(e, "Mining failed for {FoundSpelling}", primarySpelling);
+            Utils.Logger.Error(ex, "Mining failed for {FoundSpelling}", primarySpelling);
             return false;
         }
     }

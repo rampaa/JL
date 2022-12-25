@@ -85,12 +85,12 @@ public partial class MainWindow : Window, IFrontend
         AppDomain.CurrentDomain.UnhandledException += (_, eventArgs) =>
         {
             Exception ex = (Exception)eventArgs.ExceptionObject;
-            Utils.Logger.Error("{UnhandledExceptionMessage}", ex.ToString());
+            Utils.Logger.Error(ex, "Unhandled exception");
         };
 
         TaskScheduler.UnobservedTaskException += (_, eventArgs) =>
         {
-            Utils.Logger.Error("{UnobservedTaskExceptionMessage}", eventArgs.Exception.ToString());
+            Utils.Logger.Error(eventArgs.Exception, "Unobserved task exception");
         };
 
         SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
@@ -158,9 +158,9 @@ public partial class MainWindow : Window, IFrontend
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Utils.Logger.Warning(e, "CopyFromClipboard failed");
+                Utils.Logger.Warning(ex, "CopyFromClipboard failed");
             }
         }
     }

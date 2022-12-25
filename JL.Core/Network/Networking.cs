@@ -18,10 +18,10 @@ public static class Networking
             HttpResponseMessage getResponse = await Storage.Client.GetAsync(uri).ConfigureAwait(false);
             return await getResponse.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
             Storage.Frontend.Alert(AlertLevel.Error, "Error getting audio from jpod101");
-            Utils.Logger.Error(e, "Error getting audio from jpod101");
+            Utils.Logger.Error(ex, "Error getting audio from jpod101");
             return null;
         }
     }
@@ -87,14 +87,14 @@ public static class Networking
 
             else
             {
-                Utils.Logger.Error("Couldn't update JL. GitHub API problem. {StatusCode} {ReasonPhrase}", gitHubApiResponse.StatusCode, gitHubApiResponse.ReasonPhrase);
-                Storage.Frontend.Alert(AlertLevel.Error, "Couldn't update JL");
+                Utils.Logger.Error("Couldn't check for JL updates. GitHub API problem. {StatusCode} {ReasonPhrase}", gitHubApiResponse.StatusCode, gitHubApiResponse.ReasonPhrase);
+                Storage.Frontend.Alert(AlertLevel.Error, "Couldn't check for JL updates. GitHub API problem.");
             }
         }
-        catch
+        catch (Exception ex)
         {
-            Utils.Logger.Warning("Couldn't update JL");
-            Storage.Frontend.Alert(AlertLevel.Warning, "Couldn't update JL");
+            Utils.Logger.Error(ex, "Couldn't check for JL updates");
+            Storage.Frontend.Alert(AlertLevel.Warning, "Couldn't check for JL updates");
         }
     }
 }

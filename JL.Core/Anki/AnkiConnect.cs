@@ -67,16 +67,16 @@ public static class AnkiConnect
             Utils.Logger.Error("{JsonError}", json.Error.ToString());
             return null;
         }
-        catch (HttpRequestException e)
+        catch (HttpRequestException ex)
         {
             Storage.Frontend.Alert(AlertLevel.Error, "Communication error: Is Anki open?");
-            Utils.Logger.Error(e, "Communication error: Is Anki open?");
+            Utils.Logger.Error(ex, "Communication error: Is Anki open?");
             return null;
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
             Storage.Frontend.Alert(AlertLevel.Error, "Communication error: Unknown error");
-            Utils.Logger.Error(e, "Communication error: Unknown error");
+            Utils.Logger.Error(ex, "Communication error: Unknown error");
             return null;
         }
     }

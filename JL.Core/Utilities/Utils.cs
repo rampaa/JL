@@ -43,10 +43,10 @@ public static class Utils
             File.WriteAllText(Path.Join(Storage.ConfigPath, "dicts.json"),
                 JsonSerializer.Serialize(Storage.BuiltInDicts, jso));
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
             Storage.Frontend.Alert(AlertLevel.Error, "Couldn't write default Dicts config");
-            Logger.Error(e, "Couldn't write default Dicts config");
+            Logger.Error(ex, "Couldn't write default Dicts config");
         }
     }
 
@@ -64,10 +64,10 @@ public static class Utils
             File.WriteAllText(Path.Join(Storage.ConfigPath, "freqs.json"),
                 JsonSerializer.Serialize(Storage.BuiltInFreqs, jso));
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
             Storage.Frontend.Alert(AlertLevel.Error, "Couldn't write default Freqs config");
-            Logger.Error(e, "Couldn't write default Freqs config");
+            Logger.Error(ex, "Couldn't write default Freqs config");
         }
     }
 
@@ -86,9 +86,9 @@ public static class Utils
             await File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "dicts.json"),
                 JsonSerializer.Serialize(Storage.Dicts, jso)).ConfigureAwait(false);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Logger.Fatal(e, "SerializeDicts failed");
+            Logger.Fatal(ex, "SerializeDicts failed");
             throw;
         }
     }
@@ -107,9 +107,9 @@ public static class Utils
             await File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "freqs.json"),
                 JsonSerializer.Serialize(Storage.FreqDicts, jso)).ConfigureAwait(false);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Logger.Fatal(e, "SerializeFreqs failed");
+            Logger.Fatal(ex, "SerializeFreqs failed");
             throw;
         }
     }
@@ -185,9 +185,9 @@ public static class Utils
                 }
             }
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Utils.Logger.Fatal(e, "DeserializeDicts failed");
+            Utils.Logger.Fatal(ex, "DeserializeDicts failed");
             throw;
         }
     }
@@ -229,9 +229,9 @@ public static class Utils
                 }
             }
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Utils.Logger.Fatal(e, "DeserializeFreqs failed");
+            Utils.Logger.Fatal(ex, "DeserializeFreqs failed");
             throw;
         }
     }

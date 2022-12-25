@@ -429,7 +429,7 @@ public static class Storage
                             catch (Exception ex)
                             {
                                 Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                                Utils.Logger.Error("Couldn't import {DictType}: {Exception}", dict.Type, ex.ToString());
+                                Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 Dicts.Remove(dict.Name);
                                 dictRemoved = true;
                             }
@@ -457,7 +457,7 @@ public static class Storage
                             catch (Exception ex)
                             {
                                 Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                                Utils.Logger.Error("Couldn't import {DictType}: {Exception}", dict.Type, ex.ToString());
+                                Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 Dicts.Remove(dict.Name);
                                 dictRemoved = true;
                             }
@@ -519,7 +519,7 @@ public static class Storage
                             catch (Exception ex)
                             {
                                 Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                                Utils.Logger.Error("Couldn't import {DictType}: {Exception}", dict.Type, ex.ToString());
+                                Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 Dicts.Remove(dict.Name);
                                 dictRemoved = true;
                             }
@@ -547,7 +547,7 @@ public static class Storage
                             catch (Exception ex)
                             {
                                 Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
-                                Utils.Logger.Error("Couldn't import {DictType}: {Exception}", dict.Type, ex.ToString());
+                                Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 Dicts.Remove(dict.Name);
                                 dictRemoved = true;
                             }
@@ -610,7 +610,7 @@ public static class Storage
                             catch (Exception ex)
                             {
                                 Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
-                                Utils.Logger.Error("Couldn't import {FreqName}: {Exception}", freq.Name, ex.ToString());
+                                Utils.Logger.Error(ex, "Couldn't import {FreqName}", freq.Type);
                                 FreqDicts.Remove(freq.Name);
                                 freqRemoved = true;
                             }
@@ -641,7 +641,7 @@ public static class Storage
                             catch (Exception ex)
                             {
                                 Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
-                                Utils.Logger.Error("Couldn't import {FreqName}: {Exception}", freq.Name, ex.ToString());
+                                Utils.Logger.Error(ex, "Couldn't import {FreqName}", freq.Type);
                                 FreqDicts.Remove(freq.Name);
                                 freqRemoved = true;
                             }

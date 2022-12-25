@@ -323,16 +323,16 @@ public static class WindowsUtils
                     s_audioPlayer.Init(new Mp3FileReader(new MemoryStream(audio)));
                     s_audioPlayer.Play();
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    Utils.Logger.Error(e, "Error playing audio: {Audio}", JsonSerializer.Serialize(audio));
+                    Utils.Logger.Error(ex, "Error playing audio: {Audio}", JsonSerializer.Serialize(audio));
                     Alert(AlertLevel.Error, "Error playing audio");
                 }
             });
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Utils.Logger.Error(e, "Error playing audio: {Audio}", JsonSerializer.Serialize(audio));
+            Utils.Logger.Error(ex, "Error playing audio: {Audio}", JsonSerializer.Serialize(audio));
             Alert(AlertLevel.Error, "Error playing audio");
         }
     }
@@ -348,8 +348,8 @@ public static class WindowsUtils
 
             if (numFiles == 0)
             {
-                Utils.Logger.Error("Motivation folder is empty!");
-                Alert(AlertLevel.Error, "Motivation folder is empty!");
+                Utils.Logger.Warning("Motivation folder is empty!");
+                Alert(AlertLevel.Warning, "Motivation folder is empty!");
                 return;
             }
 
@@ -358,9 +358,9 @@ public static class WindowsUtils
             PlayAudio(randomFile, 1);
             Stats.IncrementStat(StatType.Imoutos);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Utils.Logger.Error(e, "Error motivating");
+            Utils.Logger.Error(ex, "Error motivating");
             Alert(AlertLevel.Error, "Error motivating");
         }
     }
@@ -538,9 +538,9 @@ public static class WindowsUtils
                 Clipboard.SetText(text);
                 retry = false;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Utils.Logger.Warning(e, "CopyTextToClipboard failed");
+                Utils.Logger.Warning(ex, "CopyTextToClipboard failed");
             }
         }
         while (retry);

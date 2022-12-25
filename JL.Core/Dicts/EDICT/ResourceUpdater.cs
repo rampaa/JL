@@ -1,5 +1,6 @@
 ﻿using System.IO.Compression;
 using System.Net;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EDICT;
 
@@ -54,8 +55,9 @@ public static class ResourceUpdater
             }
         }
 
-        catch
+        catch (Exception ex)
         {
+            Utils.Logger.Error(ex, "Unexpected error while downloading {ResourceName}", resourceName);
             Storage.Frontend.ShowOkDialog($"Unexpected error while downloading {resourceName}.", "Info");
         }
 

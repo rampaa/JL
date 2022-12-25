@@ -169,10 +169,10 @@ public partial class PreferencesWindow : Window
                 CreateFieldElements(otherAnkiConfig.Fields, Enum.GetValues<JLField>().ToList(), OtherMiningSetupStackPanelFields);
             }
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
             // config probably doesn't exist; no need to alert the user
-            Utils.Logger.Warning(e, "Error setting previous mining config");
+            Utils.Logger.Warning(ex, "Error setting previous mining config");
         }
     }
 
@@ -290,10 +290,10 @@ public partial class PreferencesWindow : Window
                 fieldStackPanel.Children.Add(stackPanel);
             }
         }
-        catch (Exception exception)
+        catch (Exception ex)
         {
             WindowsUtils.Alert(AlertLevel.Error, "Error creating field elements for Anki setup");
-            Utils.Logger.Error(exception, "Error creating field elements for Anki setup");
+            Utils.Logger.Error(ex, "Error creating field elements for Anki setup");
         }
     }
 
@@ -334,10 +334,10 @@ public partial class PreferencesWindow : Window
 
             return new AnkiConfig(deckName, modelName, fields, tags);
         }
-        catch (Exception exception)
+        catch (Exception ex)
         {
             WindowsUtils.Alert(AlertLevel.Error, "Error saving AnkiConfig");
-            Utils.Logger.Error(exception, "Error saving AnkiConfig");
+            Utils.Logger.Error(ex, "Error saving AnkiConfig");
             return null;
         }
     }

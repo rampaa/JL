@@ -268,7 +268,7 @@ public static class JmdictLoader
 
                             catch (Exception ex)
                             {
-                                Utils.Logger.Error("{CultureInfoException}", ex.ToString());
+                                Utils.Logger.Error(ex, "Underlying OS cannot process the culture info");
                                 s_canHandleCulture = false;
                             }
                         }

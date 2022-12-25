@@ -62,10 +62,10 @@ public class AnkiConfig
 
             return true;
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
             Storage.Frontend.Alert(AlertLevel.Error, "Couldn't write AnkiConfig");
-            Utils.Logger.Error(e, "Couldn't write AnkiConfig");
+            Utils.Logger.Error(ex, "Couldn't write AnkiConfig");
             return false;
         }
     }
@@ -82,10 +82,10 @@ public class AnkiConfig
                     new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } });
             }
 
-            catch
+            catch (Exception ex)
             {
                 Storage.Frontend.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
-                Utils.Logger.Error("Couldn't read AnkiConfig");
+                Utils.Logger.Error(ex, "Couldn't read AnkiConfig");
                 return null;
             }
         }
