@@ -81,14 +81,9 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Focusable"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                       Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"
+                                       ToolTip="If unchecked, JL will not steal the focus away from other windows, even in case of a mouse click."/>
                             <CheckBox x:Name="FocusableCheckBox"  HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Kanji mode"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="KanjiModeCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -102,6 +97,12 @@
                             <TextBlock HorizontalAlignment="Left" Text="Auto play audio"
                                        Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <CheckBox x:Name="AutoPlayAudioCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Kanji mode"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="KanjiModeCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
@@ -358,7 +359,8 @@
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Cursor="Help"
                                        ToolTip="Attempt to set focus on the popup window when you mouse over text.
-&#10;Required if you want to be able to use hotkeys without clicking on the window first." />
+&#10;Required if you want to be able to use hotkeys without clicking on the window first.
+&#10;If Focusable is set to false, this option will have no effect." />
                             <CheckBox x:Name="PopupFocusOnLookupCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
