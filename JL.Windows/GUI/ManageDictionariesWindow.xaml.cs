@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Core;
 using JL.Core.Dicts;
@@ -18,9 +19,6 @@ using JL.Windows.Utilities;
 using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
 using Cursors = System.Windows.Input.Cursors;
-using MessageBoxOptions = System.Windows.MessageBoxOptions;
-using Path = System.IO.Path;
-
 namespace JL.Windows.GUI;
 
 /// <summary>
@@ -29,6 +27,9 @@ namespace JL.Windows.GUI;
 public partial class ManageDictionariesWindow : Window
 {
     private static ManageDictionariesWindow? s_instance;
+
+    private IntPtr _windowHandle;
+
     private InfoWindow? _jmdictAbbreviationWindow = null;
     private InfoWindow? _jmnedictAbbreviationWindow = null;
 
@@ -41,6 +42,27 @@ public partial class ManageDictionariesWindow : Window
     {
         InitializeComponent();
         UpdateDictionariesDisplay();
+    }
+
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+        _windowHandle = new WindowInteropHelper(this).Handle;
+        WinApi.BringToFront(_windowHandle);
+    }
+
+    protected override void OnActivated(EventArgs e)
+    {
+        base.OnActivated(e);
+
+        if (!ConfigManager.Focusable)
+        {
+            WinApi.PreventActivation(_windowHandle);
+        }
+        else
+        {
+            WinApi.AllowActivation(_windowHandle);
+        }
     }
 
     public static bool IsItVisible()
@@ -227,11 +249,7 @@ public partial class ManageDictionariesWindow : Window
             };
             buttonRemove.Click += (_, _) =>
             {
-                if (MessageBox.Show("Really remove dictionary?", "Confirmation",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question,
-                        MessageBoxResult.No,
-                        MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
+                if (Storage.Frontend.ShowYesNoDialog("Really remove dictionary?", "Confirmation"))
                 {
                     dict.Contents.Clear();
                     Storage.Dicts.Remove(dict.Name);

@@ -117,7 +117,11 @@ public partial class MainWindow : Window, IFrontend
 
         if (!ConfigManager.Focusable)
         {
-            WinApi.PreventFocus(WindowHandle);
+            WinApi.PreventActivation(WindowHandle);
+        }
+        else
+        {
+            WinApi.AllowActivation(WindowHandle);
         }
     }
 
@@ -691,17 +695,26 @@ public partial class MainWindow : Window, IFrontend
 
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        PopupWindow? currentPopupWindow = FirstPopupWindow;
-
-        while (currentPopupWindow != null)
+        if (e.MiddleButton == MouseButtonState.Pressed && FirstPopupWindow.IsVisible && !FirstPopupWindow.MiningMode)
         {
-            currentPopupWindow.MiningMode = false;
-            currentPopupWindow.TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
-            currentPopupWindow.ItemsControlButtons.Visibility = Visibility.Collapsed;
-            currentPopupWindow.PopUpScrollViewer.ScrollToTop();
-            currentPopupWindow.Hide();
+            e.Handled = true;
+            PopupWindow.PopupWindow_PreviewMouseDown(FirstPopupWindow);
+        }
 
-            currentPopupWindow = currentPopupWindow.ChildPopupWindow;
+        else
+        {
+            PopupWindow? currentPopupWindow = FirstPopupWindow;
+
+            while (currentPopupWindow != null)
+            {
+                currentPopupWindow.MiningMode = false;
+                currentPopupWindow.TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
+                currentPopupWindow.ItemsControlButtons.Visibility = Visibility.Collapsed;
+                currentPopupWindow.PopUpScrollViewer.ScrollToTop();
+                currentPopupWindow.Hide();
+
+                currentPopupWindow = currentPopupWindow.ChildPopupWindow;
+            }
         }
     }
 

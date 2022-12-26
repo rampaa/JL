@@ -208,14 +208,14 @@ public partial class PreferencesWindow : Window
 
             else
             {
-                WindowsUtils.Alert(AlertLevel.Error, "Error getting model names form Anki");
+                Storage.Frontend.Alert(AlertLevel.Error, "Error getting model names form Anki");
                 Utils.Logger.Error("Error getting model names from Anki");
             }
         }
 
         else
         {
-            WindowsUtils.Alert(AlertLevel.Error, "Error getting deck names form Anki");
+            Storage.Frontend.Alert(AlertLevel.Error, "Error getting deck names form Anki");
             Utils.Logger.Error("Error getting deck names from Anki");
         }
     }
@@ -241,7 +241,7 @@ public partial class PreferencesWindow : Window
 
         else
         {
-            WindowsUtils.Alert(AlertLevel.Error, "Error getting fields from AnkiConnect");
+            Storage.Frontend.Alert(AlertLevel.Error, "Error getting fields from AnkiConnect");
             Utils.Logger.Error("Error getting fields from AnkiConnect");
         }
     }
@@ -292,7 +292,7 @@ public partial class PreferencesWindow : Window
         }
         catch (Exception ex)
         {
-            WindowsUtils.Alert(AlertLevel.Error, "Error creating field elements for Anki setup");
+            Storage.Frontend.Alert(AlertLevel.Error, "Error creating field elements for Anki setup");
             Utils.Logger.Error(ex, "Error creating field elements for Anki setup");
         }
     }
@@ -327,7 +327,7 @@ public partial class PreferencesWindow : Window
             if (deckNamesComboBox.SelectedItem == null ||
                 modelNamesComboBox.SelectedItem == null)
             {
-                WindowsUtils.Alert(AlertLevel.Error, "Save failed: Incomplete Anki config");
+                Storage.Frontend.Alert(AlertLevel.Error, "Save failed: Incomplete Anki config");
                 Utils.Logger.Error("Save failed: Incomplete Anki config");
                 return null;
             }
@@ -336,7 +336,7 @@ public partial class PreferencesWindow : Window
         }
         catch (Exception ex)
         {
-            WindowsUtils.Alert(AlertLevel.Error, "Error saving AnkiConfig");
+            Storage.Frontend.Alert(AlertLevel.Error, "Error saving AnkiConfig");
             Utils.Logger.Error(ex, "Error saving AnkiConfig");
             return null;
         }
@@ -372,7 +372,7 @@ public partial class PreferencesWindow : Window
 
         else
         {
-            WindowsUtils.Alert(AlertLevel.Error, "Error saving AnkiConfig");
+            Storage.Frontend.Alert(AlertLevel.Error, "Error saving AnkiConfig");
             Utils.Logger.Error("Error saving AnkiConfig");
         }
     }

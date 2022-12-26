@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using JL.Core;
 using JL.Windows.Utilities;
 
@@ -11,6 +12,7 @@ namespace JL.Windows.GUI;
 public partial class StatsWindow : Window
 {
     private static StatsWindow? s_instance;
+    private IntPtr _windowHandle;
 
     public static StatsWindow Instance
     {
@@ -20,6 +22,27 @@ public partial class StatsWindow : Window
     public StatsWindow()
     {
         InitializeComponent();
+    }
+
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+        _windowHandle = new WindowInteropHelper(this).Handle;
+        WinApi.BringToFront(_windowHandle);
+    }
+
+    protected override void OnActivated(EventArgs e)
+    {
+        base.OnActivated(e);
+
+        if (!ConfigManager.Focusable)
+        {
+            WinApi.PreventActivation(_windowHandle);
+        }
+        else
+        {
+            WinApi.AllowActivation(_windowHandle);
+        }
     }
 
     public static bool IsItVisible()

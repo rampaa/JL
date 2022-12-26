@@ -4,12 +4,12 @@ using System.Runtime;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Core;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
-using Path = System.IO.Path;
 
 namespace JL.Windows.GUI;
 
@@ -20,6 +20,8 @@ public partial class ManageFrequenciesWindow : Window
 {
     private static ManageFrequenciesWindow? s_instance;
 
+    private IntPtr _windowHandle;
+
     public static ManageFrequenciesWindow Instance
     {
         get { return s_instance ??= new(); }
@@ -28,6 +30,27 @@ public partial class ManageFrequenciesWindow : Window
     {
         InitializeComponent();
         UpdateFreqsDisplay();
+    }
+
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+        _windowHandle = new WindowInteropHelper(this).Handle;
+        WinApi.BringToFront(_windowHandle);
+    }
+
+    protected override void OnActivated(EventArgs e)
+    {
+        base.OnActivated(e);
+
+        if (!ConfigManager.Focusable)
+        {
+            WinApi.PreventActivation(_windowHandle);
+        }
+        else
+        {
+            WinApi.AllowActivation(_windowHandle);
+        }
     }
 
     public static bool IsItVisible()
@@ -131,11 +154,7 @@ public partial class ManageFrequenciesWindow : Window
             };
             buttonRemove.Click += (_, _) =>
             {
-                if (MessageBox.Show("Really remove frequency?", "Confirmation",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question,
-                        MessageBoxResult.No,
-                        MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
+                if (Storage.Frontend.ShowYesNoDialog("Really remove frequency?", "Confirmation"))
                 {
                     freq.Contents.Clear();
                     Storage.FreqDicts.Remove(freq.Name);

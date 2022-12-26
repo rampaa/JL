@@ -36,7 +36,7 @@ public partial class PopupWindow : Window
 
     private string? _lastSelectedText;
 
-    private IntPtr _windowHandle;
+    public IntPtr WindowHandle { get; private set; }
 
     private List<LookupResult> _lastLookupResults = new();
 
@@ -73,7 +73,7 @@ public partial class PopupWindow : Window
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
-        _windowHandle = new WindowInteropHelper(this).Handle;
+        WindowHandle = new WindowInteropHelper(this).Handle;
     }
     protected override void OnActivated(EventArgs e)
     {
@@ -81,7 +81,11 @@ public partial class PopupWindow : Window
 
         if (!ConfigManager.Focusable)
         {
-            WinApi.PreventFocus(_windowHandle);
+            WinApi.PreventActivation(WindowHandle);
+        }
+        else
+        {
+            WinApi.AllowActivation(WindowHandle);
         }
     }
 
@@ -176,13 +180,7 @@ public partial class PopupWindow : Window
                 _lastSelectedText = lookupResults[0].MatchedText;
                 if (ConfigManager.HighlightLongestMatch)
                 {
-                    if (ConfigManager.PopupFocusOnLookup
-                        || ConfigManager.LookupOnLeftClickOnly
-                        || _parentPopupWindow != null)
-                    {
-                        tb.Focus();
-                    }
-
+                    tb.Focus();
                     tb.Select(charPosition, lookupResults[0].MatchedText.Length);
                 }
 
@@ -203,16 +201,14 @@ public partial class PopupWindow : Window
 
                 Visibility = Visibility.Visible;
 
-                if (ConfigManager.PopupFocusOnLookup
-                    || ConfigManager.LookupOnLeftClickOnly
-                    || _parentPopupWindow != null)
+                if (ConfigManager.Focusable && ConfigManager.PopupFocusOnLookup)
                 {
-                    tb.Focus();
                     Activate();
-                    Focus();
                 }
 
-                WinApi.BringToFront(_windowHandle);
+                Focus();
+
+                WinApi.BringToFront(WindowHandle);
 
                 if (ConfigManager.AutoPlayAudio)
                 {
@@ -264,12 +260,16 @@ public partial class PopupWindow : Window
             DisplayResults(true, tb.SelectedText);
 
             Visibility = Visibility.Visible;
-
             tb.Focus();
-            Activate();
+
+            if (ConfigManager.Focusable)
+            {
+                Activate();
+            }
+
             Focus();
 
-            WinApi.BringToFront(_windowHandle);
+            WinApi.BringToFront(WindowHandle);
 
             if (ConfigManager.AutoPlayAudio)
             {
@@ -555,6 +555,7 @@ public partial class PopupWindow : Window
                     };
 
                     uiElementReadings.PreviewMouseLeftButtonUp += UiElement_PreviewMouseLeftButtonUp;
+                    uiElementReadings.PreviewMouseDown += UiElement_PreviewMouseButtonDown;
                     uiElementReadings.MouseMove += PopupMouseMove;
                     uiElementReadings.LostFocus += Unselect;
                     uiElementReadings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
@@ -602,7 +603,7 @@ public partial class PopupWindow : Window
                 };
 
                 uiElementDefinitions.PreviewMouseLeftButtonUp += UiElement_PreviewMouseLeftButtonUp;
-
+                uiElementDefinitions.PreviewMouseDown += UiElement_PreviewMouseButtonDown;
                 uiElementDefinitions.MouseMove += PopupMouseMove;
                 uiElementDefinitions.LostFocus += Unselect;
                 uiElementDefinitions.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
@@ -666,8 +667,8 @@ public partial class PopupWindow : Window
                         VerticalAlignment = VerticalAlignment.Center,
                     };
 
-                    uiElementAlternativeSpellings.PreviewMouseLeftButtonUp +=
-                        UiElement_PreviewMouseLeftButtonUp;
+                    uiElementAlternativeSpellings.PreviewMouseLeftButtonUp += UiElement_PreviewMouseLeftButtonUp;
+                    uiElementAlternativeSpellings.PreviewMouseDown += UiElement_PreviewMouseButtonDown;
                     uiElementAlternativeSpellings.MouseMove += PopupMouseMove;
                     uiElementAlternativeSpellings.LostFocus += Unselect;
                     uiElementAlternativeSpellings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
@@ -1621,7 +1622,7 @@ public partial class PopupWindow : Window
         //int index = numericKeyValue != -1 ? numericKeyValue : _playAudioIndex;
         //if (index > PopupListBox.Items.Count - 1)
         //{
-        //    WindowsUtils.Alert(AlertLevel.Error, "Index out of range");
+        //    Storage.Frontend.Alert(AlertLevel.Error, "Index out of range");
         //    return;
         //}
 
@@ -1766,6 +1767,15 @@ public partial class PopupWindow : Window
         }
     }
 
+    private void UiElement_PreviewMouseButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.MiddleButton == MouseButtonState.Pressed && ChildPopupWindow != null && ChildPopupWindow.IsVisible && !ChildPopupWindow.MiningMode)
+        {
+            e.Handled = true;
+            PopupWindow_PreviewMouseDown(ChildPopupWindow);
+        }
+    }
+
     private void OnMouseLeave(object sender, MouseEventArgs e)
     {
         if (!ConfigManager.LookupOnSelectOnly
@@ -1791,6 +1801,14 @@ public partial class PopupWindow : Window
         {
             WindowsUtils.Unselect(_lastTextBox);
         }
+    }
+
+    public static void PopupWindow_PreviewMouseDown(PopupWindow popupWindow)
+    {
+        popupWindow.EnableMiningMode();
+        WinApi.BringToFront(popupWindow.WindowHandle);
+        popupWindow.ResultStackPanels.Clear();
+        popupWindow.DisplayResults(true);
     }
 
     //private void Window_Deactivated(object sender, EventArgs e)

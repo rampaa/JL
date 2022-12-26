@@ -186,6 +186,7 @@ public static class WindowsUtils
         AddNameWindow addNameWindowInstance = AddNameWindow.Instance;
         addNameWindowInstance.SpellingTextBox.Text = selectedText;
         addNameWindowInstance.Owner = MainWindow.Instance;
+        addNameWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         Storage.StatsStopWatch.Stop();
         addNameWindowInstance.ShowDialog();
     }
@@ -195,6 +196,7 @@ public static class WindowsUtils
         AddWordWindow addWordWindowInstance = AddWordWindow.Instance;
         addWordWindowInstance.SpellingsTextBox!.Text = selectedText;
         addWordWindowInstance.Owner = MainWindow.Instance;
+        addWordWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         Storage.StatsStopWatch.Stop();
         addWordWindowInstance.ShowDialog();
     }
@@ -204,6 +206,7 @@ public static class WindowsUtils
         PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
         ConfigManager.Instance.LoadPreferences(preferencesWindow);
         preferencesWindow.Owner = MainWindow.Instance;
+        preferencesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Storage.StatsStopWatch.Stop();
         preferencesWindow.ShowDialog();
     }
@@ -221,6 +224,7 @@ public static class WindowsUtils
 
         ManageDictionariesWindow manageDictionariesWindow = ManageDictionariesWindow.Instance;
         manageDictionariesWindow.Owner = MainWindow.Instance;
+        manageDictionariesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Storage.StatsStopWatch.Stop();
         manageDictionariesWindow.ShowDialog();
     }
@@ -232,6 +236,7 @@ public static class WindowsUtils
 
         ManageFrequenciesWindow manageFrequenciesWindow = ManageFrequenciesWindow.Instance;
         manageFrequenciesWindow.Owner = MainWindow.Instance;
+        manageFrequenciesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Storage.StatsStopWatch.Stop();
         manageFrequenciesWindow.ShowDialog();
     }
@@ -243,6 +248,7 @@ public static class WindowsUtils
 
         StatsWindow statsWindow = StatsWindow.Instance;
         statsWindow.Owner = MainWindow.Instance;
+        statsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         statsWindow.ShowDialog();
     }
 
