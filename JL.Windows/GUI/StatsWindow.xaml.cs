@@ -35,13 +35,13 @@ public partial class StatsWindow : Window
     {
         base.OnActivated(e);
 
-        if (!ConfigManager.Focusable)
+        if (ConfigManager.Focusable)
         {
-            WinApi.PreventActivation(_windowHandle);
+            WinApi.AllowActivation(_windowHandle);
         }
         else
         {
-            WinApi.AllowActivation(_windowHandle);
+            WinApi.PreventActivation(_windowHandle);
         }
     }
 

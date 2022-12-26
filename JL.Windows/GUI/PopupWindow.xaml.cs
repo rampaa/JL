@@ -79,13 +79,13 @@ public partial class PopupWindow : Window
     {
         base.OnActivated(e);
 
-        if (!ConfigManager.Focusable)
+        if (ConfigManager.Focusable)
         {
-            WinApi.PreventActivation(WindowHandle);
+            WinApi.AllowActivation(WindowHandle);
         }
         else
         {
-            WinApi.AllowActivation(WindowHandle);
+            WinApi.PreventActivation(WindowHandle);
         }
     }
 

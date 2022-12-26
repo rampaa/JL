@@ -118,7 +118,7 @@ public class WinApi
     public void SubscribeToClipboardChanged(Window windowSource)
     {
         SubscribeToWndProc(windowSource);
-        NativeMethods.AddClipboardFormatListener(new WindowInteropHelper(windowSource).Handle);
+        AddClipboardFormatListener(new WindowInteropHelper(windowSource).Handle);
     }
 
     private void OnClipboardChanged()
