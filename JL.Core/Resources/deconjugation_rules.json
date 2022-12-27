@@ -727,6 +727,22 @@
         "detail": "negative"
     },
     {
+        "type": "stdrule",
+        "dec_end": [ "" ],
+        "con_end": [ "ざる" ],
+        "dec_tag": [ "stem-mizenkei" ],
+        "con_tag": [ "adj-pn" ],
+        "detail": "negative"
+    },
+    {
+        "type": "rewriterule",
+        "dec_end": [ "する" ],
+        "con_end": [ "せざる" ],
+        "dec_tag": [ "vs-i" ],
+        "con_tag": [ "adj-pn" ],
+        "detail": "negative"
+    },
+    {
         "type": "rewriterule",
         "dec_end": [ "する" ],
         "con_end": [ "せず" ],
