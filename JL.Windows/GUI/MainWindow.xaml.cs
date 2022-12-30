@@ -779,7 +779,7 @@ public partial class MainWindow : Window, IFrontend
     private void Window_DpiChanged(object sender, DpiChangedEventArgs e)
     {
         WindowsUtils.Dpi = e.NewDpi;
-        WindowsUtils.ActiveScreen = System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(this).Handle);
+        WindowsUtils.ActiveScreen = System.Windows.Forms.Screen.FromHandle(WindowHandle);
         WindowsUtils.DpiAwareWorkAreaWidth = WindowsUtils.ActiveScreen.Bounds.Width / e.NewDpi.DpiScaleX;
         WindowsUtils.DpiAwareWorkAreaHeight = WindowsUtils.ActiveScreen.Bounds.Height / e.NewDpi.DpiScaleY;
         WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / e.NewDpi.DpiScaleX;

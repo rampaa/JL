@@ -173,6 +173,8 @@ public class ConfigManager : CoreConfig
         Precaching = GetValueFromConfig(Precaching, nameof(Precaching), bool.TryParse);
         CheckForJLUpdatesOnStartUp = GetValueFromConfig(CheckForJLUpdatesOnStartUp, nameof(CheckForJLUpdatesOnStartUp), bool.TryParse);
         AlwaysOnTop = GetValueFromConfig(AlwaysOnTop, nameof(AlwaysOnTop), bool.TryParse);
+        mainWindow.Topmost = AlwaysOnTop;
+
         RequireLookupKeyPress = GetValueFromConfig(RequireLookupKeyPress, nameof(RequireLookupKeyPress), bool.TryParse);
         DisableHotkeys = GetValueFromConfig(DisableHotkeys, nameof(DisableHotkeys), bool.TryParse);
         Focusable = GetValueFromConfig(Focusable, nameof(Focusable), bool.TryParse);
@@ -193,8 +195,6 @@ public class ConfigManager : CoreConfig
         DisableLookupsForNonJapaneseCharsInMainWindow = GetValueFromConfig(DisableLookupsForNonJapaneseCharsInMainWindow, nameof(DisableLookupsForNonJapaneseCharsInMainWindow), bool.TryParse);
         MainWindowDynamicHeight = GetValueFromConfig(MainWindowDynamicHeight, nameof(MainWindowDynamicHeight), bool.TryParse);
         MainWindowDynamicWidth = GetValueFromConfig(MainWindowDynamicWidth, nameof(MainWindowDynamicWidth), bool.TryParse);
-        TextBoxIsReadOnly = GetValueFromConfig(TextBoxIsReadOnly, nameof(TextBoxIsReadOnly), bool.TryParse);
-        TextBoxIsReadOnly = GetValueFromConfig(TextBoxIsReadOnly, nameof(TextBoxIsReadOnly), bool.TryParse);
         PopupDynamicHeight = GetValueFromConfig(PopupDynamicHeight, nameof(PopupDynamicHeight), bool.TryParse);
         PopupDynamicWidth = GetValueFromConfig(PopupDynamicWidth, nameof(PopupDynamicWidth), bool.TryParse);
 
@@ -611,9 +611,20 @@ public class ConfigManager : CoreConfig
         preferenceWindow.MainWindowFontComboBox.SelectedIndex = s_japaneseFonts.FindIndex(f =>
             f.Content.ToString() == mainWindow.MainTextBox.FontFamily.Source);
 
+        if (preferenceWindow.MainWindowFontComboBox.SelectedIndex == -1)
+        {
+            preferenceWindow.MainWindowFontComboBox.SelectedIndex = 0;
+        }
+
+
         preferenceWindow.PopupFontComboBox.ItemsSource = s_popupJapaneseFonts;
         preferenceWindow.PopupFontComboBox.SelectedIndex =
             s_popupJapaneseFonts.FindIndex(f => f.Content.ToString() == PopupFont.Source);
+
+        if (preferenceWindow.PopupFontComboBox.SelectedIndex == -1)
+        {
+            preferenceWindow.PopupFontComboBox.SelectedIndex = 0;
+        }
 
         preferenceWindow.PopupMaxHeightNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Height;
         preferenceWindow.PopupMaxWidthNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;
