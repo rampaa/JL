@@ -238,7 +238,7 @@ public static class Utils
 
     public static string GetMd5String(byte[] bytes)
     {
-        byte[] hash = MD5.Create().ComputeHash(bytes);
+        byte[] hash = MD5.HashData(bytes);
         string encoded = BitConverter.ToString(hash).Replace("-", string.Empty).ToLower();
 
         return encoded;
@@ -393,20 +393,22 @@ public static class Utils
         if (!File.Exists($"{Storage.ResourcesPath}/custom_names.txt"))
             await File.Create($"{Storage.ResourcesPath}/custom_names.txt").DisposeAsync();
 
-        Task[] tasks = new Task[2];
-        tasks[0] = Task.Run(async () =>
+        List<Task> tasks = new()
+        {
+            Task.Run(async () =>
         {
             await DeserializeDicts().ConfigureAwait(false);
             await Storage.LoadDictionaries(false).ConfigureAwait(false);
             await SerializeDicts().ConfigureAwait(false);
             await Storage.InitializeWordClassDictionary().ConfigureAwait(false);
-        });
+        }),
 
-        tasks[1] = Task.Run(async () =>
-        {
-            await DeserializeFreqs().ConfigureAwait(false);
-            await Storage.LoadFrequencies(false).ConfigureAwait(false);
-        });
+            Task.Run(async () =>
+            {
+                await DeserializeFreqs().ConfigureAwait(false);
+                await Storage.LoadFrequencies(false).ConfigureAwait(false);
+            })
+        };
 
         await Storage.InitializeKanjiCompositionDict().ConfigureAwait(false);
         await Task.WhenAll(tasks).ConfigureAwait(false);

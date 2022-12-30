@@ -50,7 +50,6 @@ public class ConfigManager : CoreConfig
     public static bool HighlightLongestMatch { get; private set; } = false;
     public static bool AutoPlayAudio { get; private set; } = false;
     public static bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
-    public static bool AlwaysOnTop { get; set; } = true;
     public static bool DisableHotkeys { get; set; } = false;
     public static bool Focusable { get; private set; } = true;
     public static string SearchUrl { get; private set; } = "https://www.google.com/search?q={SearchTerm}&hl=ja";
@@ -67,6 +66,7 @@ public class ConfigManager : CoreConfig
     public static double MainWindowMaxDynamicHeight { get; private set; } = 269;
     public static Brush MainWindowTextColor { get; private set; } = Brushes.White;
     public static Brush MainWindowBacklogTextColor { get; private set; } = Brushes.Bisque;
+    public static bool AlwaysOnTop { get; set; } = true;
     public static bool TextOnlyVisibleOnHover { get; set; } = false;
     public static bool ChangeMainWindowBackgroundOpacityOnUnhover { get; private set; } = false;
     public static double MainWindowBackgroundOpacityOnUnhover { get; private set; } = 0.2; // 0.2-100

@@ -101,8 +101,10 @@ public partial class PreferencesWindow : Window
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        e.Cancel = true;
-        WindowsUtils.HideWindow(this);
+        Storage.Frontend.InvalidateDisplayCache();
+        WindowsUtils.UpdateMainWindowVisibility();
+        MainWindow.Instance.Focus();
+        s_instance = null;
     }
 
     private async void TabItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

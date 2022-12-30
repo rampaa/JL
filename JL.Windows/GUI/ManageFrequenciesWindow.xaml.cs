@@ -60,9 +60,10 @@ public partial class ManageFrequenciesWindow : Window
 
     private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        e.Cancel = true;
-        WindowsUtils.HideWindow(this);
         Storage.Frontend.InvalidateDisplayCache();
+        WindowsUtils.UpdateMainWindowVisibility();
+        MainWindow.Instance.Focus();
+        s_instance = null;
         await Utils.SerializeFreqs().ConfigureAwait(false);
         await Storage.LoadFrequencies().ConfigureAwait(false);
     }

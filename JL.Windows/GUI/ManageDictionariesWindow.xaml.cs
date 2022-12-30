@@ -30,9 +30,6 @@ public partial class ManageDictionariesWindow : Window
 
     private IntPtr _windowHandle;
 
-    private InfoWindow? _jmdictAbbreviationWindow = null;
-    private InfoWindow? _jmnedictAbbreviationWindow = null;
-
     public static ManageDictionariesWindow Instance
     {
         get { return s_instance ??= new(); }
@@ -72,9 +69,10 @@ public partial class ManageDictionariesWindow : Window
 
     private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        e.Cancel = true;
-        WindowsUtils.HideWindow(this);
         Storage.Frontend.InvalidateDisplayCache();
+        WindowsUtils.UpdateMainWindowVisibility();
+        MainWindow.Instance.Focus();
+        s_instance = null;
         await Utils.SerializeDicts().ConfigureAwait(false);
         await Storage.LoadDictionaries().ConfigureAwait(false);
     }
@@ -432,34 +430,29 @@ public partial class ManageDictionariesWindow : Window
         return sb.ToString()[..^Environment.NewLine.Length];
     }
 
-    private void ShowInfoWindow(ref InfoWindow? infoWindow, Dictionary<string, string> entityDict, string title)
+    private void ShowInfoWindow(Dictionary<string, string> entityDict, string title)
     {
-        if (infoWindow is null)
+        InfoWindow infoWindow = new()
         {
-            infoWindow = new()
-            {
-                Owner = this,
-                Title = title,
-                InfoTextBox = { Text = EntityDictToString(entityDict) }
-            };
-        }
+            Owner = this,
+            Title = title,
+            InfoTextBox = { Text = EntityDictToString(entityDict) }
+        };
 
-        else
-        {
-            infoWindow.InfoTextBox.ScrollToHome();
-        }
+        infoWindow.Owner = this;
+        infoWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
         infoWindow.ShowDialog();
     }
 
     private void JmdictInfoButton_Click(object sender, RoutedEventArgs e)
     {
-        ShowInfoWindow(ref _jmdictAbbreviationWindow, Storage.JmdictEntities, "JMdict Abbreviations");
+        ShowInfoWindow(Storage.JmdictEntities, "JMdict Abbreviations");
     }
 
     private void JmnedictInfoButton_Click(object sender, RoutedEventArgs e)
     {
-        ShowInfoWindow(ref _jmnedictAbbreviationWindow, Storage.JmnedictEntities, "JMnedict Abbreviations");
+        ShowInfoWindow(Storage.JmnedictEntities, "JMnedict Abbreviations");
     }
 
     private void Window_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
