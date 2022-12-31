@@ -13,9 +13,8 @@ public static class JmnedictRecordBuilder
             int kebListCount = entry.KebList.Count;
             for (int i = 0; i < kebListCount; i++)
             {
-                JmnedictRecord record = new()
+                JmnedictRecord record = new(entry.KebList[i])
                 {
-                    PrimarySpelling = entry.KebList[i],
                     Readings = entry.RebList
                 };
 
@@ -59,7 +58,7 @@ public static class JmnedictRecordBuilder
                     continue;
                 }
 
-                JmnedictRecord record = new() { PrimarySpelling = entry.RebList[i] };
+                JmnedictRecord record = new(entry.RebList[i]);
 
                 int transListCount = entry.TranslationList.Count;
                 for (int j = 0; j < transListCount; j++)

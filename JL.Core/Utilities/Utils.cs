@@ -239,7 +239,7 @@ public static class Utils
     public static string GetMd5String(byte[] bytes)
     {
         byte[] hash = MD5.HashData(bytes);
-        string encoded = BitConverter.ToString(hash).Replace("-", string.Empty).ToLower();
+        string encoded = BitConverter.ToString(hash);
 
         return encoded;
     }

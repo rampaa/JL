@@ -401,7 +401,7 @@ public static class WindowsUtils
         FormattedText formattedText = new(
             text,
             CultureInfo.CurrentCulture,
-            System.Windows.FlowDirection.LeftToRight,
+            FlowDirection.LeftToRight,
             new Typeface(ConfigManager.PopupFont.Source!),
             fontSize,
             Brushes.Transparent,

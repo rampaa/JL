@@ -18,9 +18,8 @@ internal static class JmdictRecordBuilder
         {
             KanjiElement kanjiElement = entry.KanjiElements[i];
 
-            JmdictRecord record = new()
+            JmdictRecord record = new(kanjiElement.Keb!)
             {
-                PrimarySpelling = kanjiElement.Keb!,
                 PrimarySpellingOrthographyInfoList = kanjiElement.KeInfList
             };
 
@@ -90,16 +89,19 @@ internal static class JmdictRecordBuilder
                 continue;
             }
 
-            JmdictRecord record = new()
-            {
-                AlternativeSpellings = readingElement.ReRestrList.Any()
-                    ? readingElement.ReRestrList
-                    : new List<string>(alternativeSpellings)
-            };
+            JmdictRecord record;
 
-            if (record.AlternativeSpellings.Any())
+            if (readingElement.ReRestrList.Any() || alternativeSpellings.Any())
             {
-                record.PrimarySpelling = record.AlternativeSpellings[0];
+                if (readingElement.ReRestrList.Any())
+                {
+                    record = new(readingElement.ReRestrList[0]) { AlternativeSpellings = readingElement.ReRestrList };
+                }
+
+                else
+                {
+                    record = new(alternativeSpellings[0]) { AlternativeSpellings = alternativeSpellings.ToList() };
+                }
 
                 record.AlternativeSpellings.RemoveAt(0);
 
@@ -113,13 +115,14 @@ internal static class JmdictRecordBuilder
 
             else
             {
-                record.PrimarySpelling = readingElement.Reb;
-                record.PrimarySpellingOrthographyInfoList = readingElement.ReInfList;
+                record = new(readingElement.Reb)
+                {
+                    PrimarySpellingOrthographyInfoList = readingElement.ReInfList,
+                    AlternativeSpellings = allReadings.ToList(),
+                    AlternativeSpellingsOrthographyInfoList = allROrthographyInfoLists.ToList()!
+                };
 
-                record.AlternativeSpellings = allReadings.ToList();
                 record.AlternativeSpellings.RemoveAt(i);
-
-                record.AlternativeSpellingsOrthographyInfoList = allROrthographyInfoLists.ToList()!;
                 record.AlternativeSpellingsOrthographyInfoList.RemoveAt(i);
             }
 

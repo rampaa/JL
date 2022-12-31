@@ -35,7 +35,7 @@ public partial class PopupWindow : Window
 
     private string? _lastSelectedText;
 
-    public IntPtr WindowHandle { get; private set; }
+    private IntPtr _windowHandle;
 
     private List<LookupResult> _lastLookupResults = new();
 
@@ -63,7 +63,7 @@ public partial class PopupWindow : Window
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
-        WindowHandle = new WindowInteropHelper(this).Handle;
+        _windowHandle = new WindowInteropHelper(this).Handle;
     }
     protected override void OnActivated(EventArgs e)
     {
@@ -71,11 +71,11 @@ public partial class PopupWindow : Window
 
         if (ConfigManager.Focusable)
         {
-            WinApi.AllowActivation(WindowHandle);
+            WinApi.AllowActivation(_windowHandle);
         }
         else
         {
-            WinApi.PreventActivation(WindowHandle);
+            WinApi.PreventActivation(_windowHandle);
         }
     }
 
@@ -198,7 +198,7 @@ public partial class PopupWindow : Window
 
                 Focus();
 
-                WinApi.BringToFront(WindowHandle);
+                WinApi.BringToFront(_windowHandle);
 
                 if (ConfigManager.AutoPlayAudio)
                 {
@@ -259,7 +259,7 @@ public partial class PopupWindow : Window
 
             Focus();
 
-            WinApi.BringToFront(WindowHandle);
+            WinApi.BringToFront(_windowHandle);
 
             if (ConfigManager.AutoPlayAudio)
             {
@@ -1751,7 +1751,7 @@ public partial class PopupWindow : Window
 
     private void UiElement_PreviewMouseButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.MiddleButton == MouseButtonState.Pressed && ChildPopupWindow != null && ChildPopupWindow.IsVisible && !ChildPopupWindow.MiningMode)
+        if (e.MiddleButton == MouseButtonState.Pressed && ChildPopupWindow is {IsVisible: true, MiningMode: false})
         {
             e.Handled = true;
             PopupWindow_PreviewMouseDown(ChildPopupWindow);
@@ -1788,7 +1788,7 @@ public partial class PopupWindow : Window
     public static void PopupWindow_PreviewMouseDown(PopupWindow popupWindow)
     {
         popupWindow.EnableMiningMode();
-        WinApi.BringToFront(popupWindow.WindowHandle);
+        WinApi.BringToFront(popupWindow._windowHandle);
         popupWindow.ResultStackPanels.Clear();
         popupWindow.DisplayResults(true);
     }

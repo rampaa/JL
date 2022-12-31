@@ -259,6 +259,9 @@ public class ConfigManager : CoreConfig
         mainWindow.Top = GetNumberWithDecimalPointFromConfig(mainWindow.Top, "MainWindowTopPosition", double.TryParse);
         mainWindow.Left = GetNumberWithDecimalPointFromConfig(mainWindow.Left, "MainWindowLeftPosition", double.TryParse);
 
+        mainWindow.TopPositionBeforeResolutionChange = mainWindow.Top;
+        mainWindow.LeftPositionBeforeResolutionChange = mainWindow.Left;
+
         mainWindow.MainGrid.Opacity = TextOnlyVisibleOnHover && !mainWindow.IsMouseOver ? 0 : 1;
 
         // MAKE SURE YOU FREEZE ANY NEW COLOR OBJECTS YOU ADD

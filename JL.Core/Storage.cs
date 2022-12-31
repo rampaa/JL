@@ -27,7 +27,7 @@ public static class Storage
 {
     public static Timer Timer { get; } = new();
     public static Stopwatch StatsStopWatch { get; } = new();
-    public const string Jpod101NoAudioMd5Hash = "7e2c2f954ef6051373ba916f000168dc";
+    public const string Jpod101NoAudioMd5Hash = "7E-2C-2F-95-4E-F6-05-13-73-BA-91-6F-00-01-68-DC";
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
     public static readonly string ApplicationPath = AppContext.BaseDirectory;
     public static readonly string ResourcesPath = Path.Join(AppContext.BaseDirectory, "Resources");

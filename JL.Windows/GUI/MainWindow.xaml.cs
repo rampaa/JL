@@ -697,7 +697,7 @@ public partial class MainWindow : Window, IFrontend
 
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.MiddleButton == MouseButtonState.Pressed && FirstPopupWindow.IsVisible && !FirstPopupWindow.MiningMode)
+        if (e.MiddleButton == MouseButtonState.Pressed && FirstPopupWindow is {IsVisible: true, MiningMode: false})
         {
             e.Handled = true;
             PopupWindow.PopupWindow_PreviewMouseDown(FirstPopupWindow);

@@ -6,6 +6,7 @@ namespace JL.Core.Dicts.EDICT.JMdict;
 
 public class JmdictRecord : IDictRecordWithGetFrequency
 {
+    public string PrimarySpelling { get; }
     public int Id { get; set; }
     public List<string>? AlternativeSpellings { get; set; }
     public List<List<string>> Definitions { get; set; }
@@ -20,16 +21,14 @@ public class JmdictRecord : IDictRecordWithGetFrequency
     public List<List<string>?>? MiscList { get; set; } // e.g. "abbr" +
     public List<string?>? DefinitionInfo { get; set; } // e.g. "often derog" +
     public List<List<string>?>? Dialects { get; set; } // e.g. ksb
-
-    public string PrimarySpelling { get; set; }
     //public List<string> PriorityList { get; set; } // e.g. gai1
     public List<List<string>?>? RelatedTerms { get; set; }
     public List<List<string>?>? Antonyms { get; set; }
     public List<List<LoanwordSource>?>? LoanwordEtymology { get; set; }
 
-    public JmdictRecord()
+    public JmdictRecord(string primarySpelling)
     {
-        PrimarySpelling = string.Empty;
+        PrimarySpelling = primarySpelling;
         Definitions = new List<List<string>>();
         ReadingRestrictions = new List<List<string>?>();
         SpellingRestrictions = new List<List<string>?>();

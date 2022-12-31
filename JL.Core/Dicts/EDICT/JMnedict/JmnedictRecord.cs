@@ -5,15 +5,15 @@ namespace JL.Core.Dicts.EDICT.JMnedict;
 public class JmnedictRecord : IDictRecord
 {
     public int Id { get; set; }
-    public string PrimarySpelling { get; set; }
+    public string PrimarySpelling { get; }
     public List<string>? AlternativeSpellings { get; set; }
     public List<string>? Readings { get; set; }
     public List<string>? NameTypes { get; set; }
     public List<string>? Definitions { get; set; }
 
-    public JmnedictRecord()
+    public JmnedictRecord(string primarySpelling)
     {
-        PrimarySpelling = string.Empty;
+        PrimarySpelling = primarySpelling;
         AlternativeSpellings = new List<string>();
         Readings = new List<string>();
         NameTypes = new List<string>();
