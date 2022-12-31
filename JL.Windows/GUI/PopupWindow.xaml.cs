@@ -23,7 +23,6 @@ namespace JL.Windows.GUI;
 /// </summary>
 public partial class PopupWindow : Window
 {
-    private readonly PopupWindow? _parentPopupWindow;
     public PopupWindow? ChildPopupWindow { get; private set; }
 
     private TextBox? _lastTextBox;
@@ -59,15 +58,6 @@ public partial class PopupWindow : Window
     {
         InitializeComponent();
         Init();
-
-        // need to initialize window (position) for later
-        Show();
-        Hide();
-    }
-
-    private PopupWindow(PopupWindow parentPopUp) : this()
-    {
-        _parentPopupWindow = parentPopUp;
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -134,7 +124,7 @@ public partial class PopupWindow : Window
     {
         if (MiningMode || ConfigManager.InactiveLookupMode
                        || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
-                       || (ConfigManager.FixedPopupPositioning && _parentPopupWindow != null)
+                       || (ConfigManager.FixedPopupPositioning && Owner != MainWindow.Instance)
            )
             return;
 
@@ -147,7 +137,7 @@ public partial class PopupWindow : Window
             _currentText = tb.Text;
             _currentCharPosition = charPosition;
 
-            if (_parentPopupWindow != null
+            if (Owner != MainWindow.Instance
                 ? ConfigManager.DisableLookupsForNonJapaneseCharsInPopups
                     && !Storage.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString())
                 : ConfigManager.DisableLookupsForNonJapaneseCharsInMainWindow
@@ -1192,7 +1182,7 @@ public partial class PopupWindow : Window
             return;
         }
 
-        ChildPopupWindow ??= new PopupWindow(this);
+        ChildPopupWindow ??= new PopupWindow() { Owner = this };
 
         if (ChildPopupWindow.MiningMode)
             return;
@@ -1464,15 +1454,7 @@ public partial class PopupWindow : Window
                 WindowsUtils.Unselect(_lastTextBox);
             }
 
-            if (_parentPopupWindow != null)
-            {
-                _parentPopupWindow.Focus();
-            }
-
-            else
-            {
-                MainWindow.Instance.Focus();
-            }
+            Owner.Focus();
 
             Hide();
         }
@@ -1481,7 +1463,7 @@ public partial class PopupWindow : Window
             ConfigManager.Instance.KanjiMode = !ConfigManager.Instance.KanjiMode;
             LastText = "";
             Storage.Frontend.InvalidateDisplayCache();
-            if (_parentPopupWindow != null)
+            if (Owner != MainWindow.Instance)
             {
                 TextBox_MouseMove(_lastTextBox!);
             }
@@ -1734,7 +1716,7 @@ public partial class PopupWindow : Window
             || Background!.Opacity == 0
             || ConfigManager.InactiveLookupMode
             || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
-            || (ConfigManager.FixedPopupPositioning && _parentPopupWindow != null))
+            || (ConfigManager.FixedPopupPositioning && Owner != MainWindow.Instance))
         {
             return;
         }
@@ -1743,7 +1725,7 @@ public partial class PopupWindow : Window
         //    && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
         //    return;
 
-        ChildPopupWindow ??= new PopupWindow(this);
+        ChildPopupWindow ??= new PopupWindow() { Owner = this };
 
         if (ConfigManager.LookupOnSelectOnly)
         {

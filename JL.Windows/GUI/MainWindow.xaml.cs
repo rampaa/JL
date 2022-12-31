@@ -108,6 +108,8 @@ public partial class MainWindow : Window, IFrontend
             _lastClipboardChangeTime = new(Stopwatch.GetTimestamp());
         }
 
+        FirstPopupWindow.Owner = this;
+
         await WindowsUtils.InitializeMainWindow().ConfigureAwait(false);
     }
 

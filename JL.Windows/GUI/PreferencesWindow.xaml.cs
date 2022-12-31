@@ -89,19 +89,18 @@ public partial class PreferencesWindow : Window
 
     private async void SaveButton_Click(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.HideWindow(this);
         Storage.Frontend.InvalidateDisplayCache();
         await ConfigManager.Instance.SavePreferences(this).ConfigureAwait(false);
+        Close();
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.HideWindow(this);
+        Close();
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        Storage.Frontend.InvalidateDisplayCache();
         WindowsUtils.UpdateMainWindowVisibility();
         MainWindow.Instance.Focus();
         s_instance = null;

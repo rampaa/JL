@@ -553,13 +553,6 @@ public static class WindowsUtils
         while (retry);
     }
 
-    public static void HideWindow(Window window)
-    {
-        window.Visibility = Visibility.Collapsed;
-        UpdateMainWindowVisibility();
-        MainWindow.Instance.Focus();
-    }
-
     public static void UpdateMainWindowVisibility()
     {
         MainWindow mainWindow = MainWindow.Instance;
