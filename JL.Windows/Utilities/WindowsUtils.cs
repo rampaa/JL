@@ -45,7 +45,7 @@ public static class WindowsUtils
 
     public static bool CompareKeyGesture(KeyEventArgs e, KeyGesture keyGesture)
     {
-        if (keyGesture.Modifiers.Equals(ModifierKeys.Windows))
+        if (keyGesture.Modifiers == ModifierKeys.Windows)
             return keyGesture.Key == e.Key && (Keyboard.Modifiers & ModifierKeys.Windows) == 0;
         else if (keyGesture.Modifiers == 0)
             return keyGesture.Key == e.Key;

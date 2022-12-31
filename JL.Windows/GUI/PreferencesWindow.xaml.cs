@@ -106,17 +106,14 @@ public partial class PreferencesWindow : Window
         s_instance = null;
     }
 
-    private async void TabItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private async void AnkiTabItem_MouseUp(object sender, MouseButtonEventArgs e)
     {
-        if (e.Source.Equals(AnkiTabItem))
+        if (ConfigManager.AnkiIntegration && !SetAnkiConfig)
         {
-            if (ConfigManager.AnkiIntegration && !SetAnkiConfig)
-            {
-                await SetPreviousMiningConfig();
-                await PopulateDeckAndModelNames();
+            await SetPreviousMiningConfig();
+            await PopulateDeckAndModelNames();
 
-                SetAnkiConfig = true;
-            }
+            SetAnkiConfig = true;
         }
     }
 

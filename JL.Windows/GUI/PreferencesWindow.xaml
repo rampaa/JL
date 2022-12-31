@@ -123,7 +123,7 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-            <TabItem Header="Textbox">
+            <TabItem Header="Main Window">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
                     <StackPanel  Margin="20,10,20,10">
                         <StackPanel.Resources>
@@ -539,7 +539,7 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-            <TabItem Name="AnkiTabItem" Header="Anki" Height="33" MouseUp="TabItem_PreviewMouseLeftButtonDown">
+            <TabItem Name="AnkiTabItem" Header="Anki" Height="33" MouseUp="AnkiTabItem_MouseUp">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
                     <StackPanel Margin="20,10,20,10">
                         <StackPanel.Resources>
