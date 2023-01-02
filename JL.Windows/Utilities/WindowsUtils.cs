@@ -45,9 +45,9 @@ public static class WindowsUtils
 
     public static bool CompareKeyGesture(KeyEventArgs e, KeyGesture keyGesture)
     {
-        if (keyGesture.Modifiers == ModifierKeys.Windows)
-            return keyGesture.Key == e.Key && (Keyboard.Modifiers & ModifierKeys.Windows) == 0;
-        else if (keyGesture.Modifiers == 0)
+        if (keyGesture.Modifiers is ModifierKeys.Windows)
+            return keyGesture.Key == e.Key && (Keyboard.Modifiers & ModifierKeys.Windows) is 0;
+        else if (keyGesture.Modifiers is 0)
             return keyGesture.Key == e.Key;
         else
             return keyGesture.Matches(null, e);
@@ -55,9 +55,9 @@ public static class WindowsUtils
 
     public static bool CompareKeyGesture(KeyGesture keyGesture)
     {
-        if (keyGesture.Modifiers == ModifierKeys.Windows)
-            return Keyboard.IsKeyDown(keyGesture.Key) && (Keyboard.Modifiers & ModifierKeys.Windows) == 0;
-        else if (keyGesture.Modifiers == 0)
+        if (keyGesture.Modifiers is ModifierKeys.Windows)
+            return Keyboard.IsKeyDown(keyGesture.Key) && (Keyboard.Modifiers & ModifierKeys.Windows) is 0;
+        else if (keyGesture.Modifiers is 0)
             return Keyboard.IsKeyDown(keyGesture.Key);
         else
             return Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers == keyGesture.Modifiers;
@@ -67,9 +67,9 @@ public static class WindowsUtils
     {
         StringBuilder keyGestureStringBuilder = new();
 
-        if (keyGesture.Key == Key.LeftShift || keyGesture.Key == Key.RightShift
-            || keyGesture.Key == Key.LeftCtrl || keyGesture.Key == Key.RightCtrl
-            || keyGesture.Key == Key.LeftAlt || keyGesture.Key == Key.RightAlt)
+        if (keyGesture.Key is Key.LeftShift or Key.RightShift
+            or Key.LeftCtrl or Key.RightCtrl
+            or Key.LeftAlt or Key.RightAlt)
         {
             keyGestureStringBuilder.Append(keyGesture.Key.ToString());
         }
@@ -91,7 +91,7 @@ public static class WindowsUtils
                 keyGestureStringBuilder.Append("Shift+");
             }
 
-            if (keyGesture.Key != Key.None)
+            if (keyGesture.Key is not Key.None)
             {
                 keyGestureStringBuilder.Append(keyGesture.Key.ToString());
             }
@@ -104,7 +104,7 @@ public static class WindowsUtils
     {
         string? rawKeyGesture = ConfigurationManager.AppSettings.Get(keyGestureName);
 
-        if (rawKeyGesture != null)
+        if (rawKeyGesture is not null)
         {
             KeyGestureConverter keyGestureConverter = new();
 
@@ -353,7 +353,7 @@ public static class WindowsUtils
             string[] filePaths = Directory.GetFiles(motivationFolder);
             int numFiles = filePaths.Length;
 
-            if (numFiles == 0)
+            if (numFiles is 0)
             {
                 Utils.Logger.Warning("Motivation folder is empty!");
                 Alert(AlertLevel.Warning, "Motivation folder is empty!");
@@ -379,7 +379,7 @@ public static class WindowsUtils
 
     public static void Alert(AlertLevel alertLevel, string message)
     {
-        Application.Current?.Dispatcher.InvokeAsync(async delegate
+        Application.Current?.Dispatcher.InvokeAsync(async () =>
         {
             List<AlertWindow> alertWindowList = Application.Current.Windows.OfType<AlertWindow>().ToList();
 
@@ -415,7 +415,7 @@ public static class WindowsUtils
     {
         string keyGestureString = KeyGestureToString(keyGesture);
 
-        menuItem.InputGestureText = keyGestureString != "None"
+        menuItem.InputGestureText = keyGestureString is not "None"
             ? keyGestureString
             : "";
     }
@@ -457,7 +457,7 @@ public static class WindowsUtils
 
     public static void Unselect(System.Windows.Controls.TextBox? tb)
     {
-        if (tb == null)
+        if (tb is null)
             return;
 
         double verticalOffset = tb.VerticalOffset;

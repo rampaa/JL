@@ -13,7 +13,7 @@ public static class CustomWordLoader
             {
                 string[] lParts = lines[i].Split("\t");
 
-                if (lParts.Length == 4)
+                if (lParts.Length is 4)
                 {
                     string[] spellings = lParts[0].Split(';').Select(s => s.Trim()).ToArray();
 
@@ -46,7 +46,7 @@ public static class CustomWordLoader
 
             List<string> wordClass = new();
 
-            if (rawWordClass == "Verb")
+            if (rawWordClass is "Verb")
             {
                 wordClass.Add("v1");
                 wordClass.Add("v1-s");
@@ -70,12 +70,12 @@ public static class CustomWordLoader
                 wordClass.Add("vs-s");
                 wordClass.Add("vz");
             }
-            else if (rawWordClass == "Adjective")
+            else if (rawWordClass is "Adjective")
             {
                 wordClass.Add("adj-i");
                 wordClass.Add("adj-na");
             }
-            else if (rawWordClass == "Noun")
+            else if (rawWordClass is "Noun")
             {
                 wordClass.Add("noun");
             }
@@ -86,7 +86,7 @@ public static class CustomWordLoader
 
             CustomWordRecord newWordRecord = new(spelling, alternativeSpellings, readings, definitions, wordClass);
 
-            Dictionary<string, List<IDictRecord>> customWordDictionary = Storage.Dicts.Values.First(dict => dict.Type == DictType.CustomWordDictionary).Contents;
+            Dictionary<string, List<IDictRecord>> customWordDictionary = Storage.Dicts.Values.First(dict => dict.Type is DictType.CustomWordDictionary).Contents;
 
             if (customWordDictionary.TryGetValue(Kana.KatakanaToHiragana(spelling), out List<IDictRecord>? result))
             {

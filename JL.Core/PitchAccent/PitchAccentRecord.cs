@@ -16,7 +16,7 @@ public class PitchAccentRecord : IDictRecord
     {
         Spelling = jsonObject[0].ToString();
 
-        if (jsonObject[2].ValueKind == JsonValueKind.Object)
+        if (jsonObject[2].ValueKind is JsonValueKind.Object)
         {
             Reading = jsonObject[2].GetProperty("reading").ToString();
 

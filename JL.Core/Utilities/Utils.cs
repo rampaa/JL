@@ -125,13 +125,13 @@ public static class Utils
                 Dictionary<string, Dict>? deserializedDicts = await JsonSerializer
                     .DeserializeAsync<Dictionary<string, Dict>>(dictStream, jso).ConfigureAwait(false);
 
-                if (deserializedDicts != null)
+                if (deserializedDicts is not null)
                 {
                     foreach (Dict dict in deserializedDicts.Values)
                     {
                         if (!Storage.Dicts.ContainsKey(dict.Name))
                         {
-                            dict.Contents = dict.Size != 0
+                            dict.Contents = dict.Size is not 0
                                 ? new Dictionary<string, List<IDictRecord>>(dict.Size)
                                 : dict.Type switch
                                 {
@@ -203,13 +203,13 @@ public static class Utils
                 Dictionary<string, Freq>? deserializedFreqs = await JsonSerializer
                     .DeserializeAsync<Dictionary<string, Freq>>(freqStream, jso).ConfigureAwait(false);
 
-                if (deserializedFreqs != null)
+                if (deserializedFreqs is not null)
                 {
                     foreach (Freq freq in deserializedFreqs.Values)
                     {
                         if (!Storage.FreqDicts.ContainsKey(freq.Name))
                         {
-                            freq.Contents = freq.Size != 0
+                            freq.Contents = freq.Size is not 0
                                 ? new Dictionary<string, List<FrequencyRecord>>(freq.Size)
                                 : freq.Type switch
                                 {
@@ -252,11 +252,11 @@ public static class Utils
         {
             int tempIndex = text.IndexOf(Storage.JapanesePunctuation[i], position, StringComparison.Ordinal);
 
-            if (tempIndex != -1 && (endPosition == -1 || tempIndex < endPosition))
+            if (tempIndex is not -1 && (endPosition is -1 || tempIndex < endPosition))
                 endPosition = tempIndex;
         }
 
-        if (endPosition == -1)
+        if (endPosition is -1)
             endPosition = text.Length;
 
         return endPosition;
@@ -290,13 +290,13 @@ public static class Utils
 
             tempIndex = text.IndexOf(punctuation, position, StringComparison.Ordinal);
 
-            if (tempIndex != -1 && (endPosition == -1 || tempIndex < endPosition))
+            if (tempIndex is not -1 && (endPosition is -1 || tempIndex < endPosition))
                 endPosition = tempIndex;
         }
 
         ++startPosition;
 
-        if (endPosition == -1)
+        if (endPosition is -1)
             endPosition = text.Length - 1;
 
         string sentence = startPosition < endPosition
@@ -362,9 +362,9 @@ public static class Utils
             reading = foundSpelling;
 
         byte[]? sound = await Networking.GetAudioFromJpod101(foundSpelling, reading).ConfigureAwait(false);
-        if (sound != null)
+        if (sound is not null)
         {
-            if (Utils.GetMd5String(sound) == Storage.Jpod101NoAudioMd5Hash)
+            if (GetMd5String(sound) is Storage.Jpod101NoAudioMd5Hash)
             {
                 // TODO sound = shortErrorSound
                 return;

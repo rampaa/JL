@@ -368,15 +368,15 @@ public class ConfigManager : CoreConfig
         WindowsUtils.SetInputGestureText(mainWindow.StatsButton, ShowStatsKeyGesture);
 
         string? tempStr = ConfigurationManager.AppSettings.Get(nameof(Theme));
-        if (tempStr == null)
+        if (tempStr is null)
         {
             tempStr = "Dark";
             AddToConfig(nameof(Theme), tempStr);
         }
-        WindowsUtils.ChangeTheme(tempStr == "Dark" ? SkinType.Dark : SkinType.Default);
+        WindowsUtils.ChangeTheme(tempStr is "Dark" ? SkinType.Dark : SkinType.Default);
 
         tempStr = ConfigurationManager.AppSettings.Get(nameof(AnkiConnectUri));
-        if (tempStr == null)
+        if (tempStr is null)
         {
             AddToConfig(nameof(AnkiConnectUri), AnkiConnectUri.OriginalString);
         }
@@ -391,7 +391,7 @@ public class ConfigManager : CoreConfig
         }
 
         tempStr = ConfigurationManager.AppSettings.Get(nameof(SearchUrl));
-        if (tempStr == null)
+        if (tempStr is null)
         {
             AddToConfig(nameof(SearchUrl), SearchUrl);
         }
@@ -406,7 +406,7 @@ public class ConfigManager : CoreConfig
         }
 
         tempStr = ConfigurationManager.AppSettings.Get("MainWindowFont");
-        if (tempStr == null)
+        if (tempStr is null)
         {
             AddToConfig("MainWindowFont", "Meiryo");
             tempStr = "Meiryo";
@@ -414,7 +414,7 @@ public class ConfigManager : CoreConfig
         mainWindow.MainTextBox.FontFamily = new FontFamily(tempStr);
 
         tempStr = ConfigurationManager.AppSettings.Get("PopupFlip");
-        if (tempStr == null)
+        if (tempStr is null)
         {
             tempStr = "Both";
             AddToConfig("PopupFlip", tempStr);
@@ -444,7 +444,7 @@ public class ConfigManager : CoreConfig
         }
 
         tempStr = ConfigurationManager.AppSettings.Get("LookupMode");
-        if (tempStr == null)
+        if (tempStr is null)
         {
             tempStr = "Hover";
             AddToConfig("LookupMode", tempStr);
@@ -474,13 +474,13 @@ public class ConfigManager : CoreConfig
         }
 
         tempStr = ConfigurationManager.AppSettings.Get(nameof(PopupFont));
-        if (tempStr == null)
+        if (tempStr is null)
             AddToConfig(nameof(PopupFont), PopupFont.Source);
         else
             PopupFont = new FontFamily(tempStr);
 
         PopupWindow? currentPopupWindow = mainWindow.FirstPopupWindow;
-        while (currentPopupWindow != null)
+        while (currentPopupWindow is not null)
         {
             currentPopupWindow.Background = PopupBackgroundColor;
             currentPopupWindow.Foreground = DefinitionsColor;
@@ -614,7 +614,7 @@ public class ConfigManager : CoreConfig
         preferenceWindow.MainWindowFontComboBox.SelectedIndex = s_japaneseFonts.FindIndex(f =>
             f.Content.ToString() == mainWindow.MainTextBox.FontFamily.Source);
 
-        if (preferenceWindow.MainWindowFontComboBox.SelectedIndex == -1)
+        if (preferenceWindow.MainWindowFontComboBox.SelectedIndex is -1)
         {
             preferenceWindow.MainWindowFontComboBox.SelectedIndex = 0;
         }
@@ -624,7 +624,7 @@ public class ConfigManager : CoreConfig
         preferenceWindow.PopupFontComboBox.SelectedIndex =
             s_popupJapaneseFonts.FindIndex(f => f.Content.ToString() == PopupFont.Source);
 
-        if (preferenceWindow.PopupFontComboBox.SelectedIndex == -1)
+        if (preferenceWindow.PopupFontComboBox.SelectedIndex is -1)
         {
             preferenceWindow.PopupFontComboBox.SelectedIndex = 0;
         }
@@ -657,7 +657,7 @@ public class ConfigManager : CoreConfig
 
         preferenceWindow.LookupModeComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("LookupMode");
 
-        if (preferenceWindow.LookupModeComboBox.SelectedIndex == -1)
+        if (preferenceWindow.LookupModeComboBox.SelectedIndex is -1)
         {
             preferenceWindow.LookupModeComboBox.SelectedIndex = 0;
         }
@@ -964,7 +964,7 @@ public class ConfigManager : CoreConfig
     private static T GetValueFromConfig<T>(T variable, string configKey, TryParseHandler<T> tryParseHandler) where T : struct
     {
         string? configValue = ConfigurationManager.AppSettings.Get(configKey);
-        if (configValue != null && tryParseHandler(configValue, out T value))
+        if (configValue is not null && tryParseHandler(configValue, out T value))
         {
             return value;
         }
@@ -973,7 +973,7 @@ public class ConfigManager : CoreConfig
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
-            if (ConfigurationManager.AppSettings.Get(configKey) == null)
+            if (ConfigurationManager.AppSettings.Get(configKey) is null)
                 config.AppSettings.Settings.Add(configKey, variable.ToString());
             else
                 config.AppSettings.Settings[configKey].Value = variable.ToString();
@@ -988,7 +988,7 @@ public class ConfigManager : CoreConfig
     private static T GetNumberWithDecimalPointFromConfig<T>(T number, string configKey, TryParseHandlerWithCultureInfo<T> tryParseHandler) where T : struct
     {
         string? configValue = ConfigurationManager.AppSettings.Get(configKey);
-        if (configValue != null && tryParseHandler(configValue, NumberStyles.Number, CultureInfo.InvariantCulture, out T value))
+        if (configValue is not null && tryParseHandler(configValue, NumberStyles.Number, CultureInfo.InvariantCulture, out T value))
         {
             return value;
         }
@@ -997,7 +997,7 @@ public class ConfigManager : CoreConfig
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
-            if (ConfigurationManager.AppSettings.Get(configKey) == null)
+            if (ConfigurationManager.AppSettings.Get(configKey) is null)
                 config.AppSettings.Settings.Add(configKey, Convert.ToString(number, CultureInfo.InvariantCulture));
             else
                 config.AppSettings.Settings[configKey].Value = Convert.ToString(number, CultureInfo.InvariantCulture);
@@ -1013,12 +1013,12 @@ public class ConfigManager : CoreConfig
         Brush? brushFromConfig = null;
         string? configValue = ConfigurationManager.AppSettings.Get(configKey);
 
-        if (configValue != null)
+        if (configValue is not null)
         {
             brushFromConfig = WindowsUtils.BrushFromHex(configValue);
         }
 
-        if (brushFromConfig != null)
+        if (brushFromConfig is not null)
         {
             return brushFromConfig;
         }
@@ -1027,7 +1027,7 @@ public class ConfigManager : CoreConfig
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
-            if (ConfigurationManager.AppSettings.Get(configKey) == null)
+            if (ConfigurationManager.AppSettings.Get(configKey) is null)
                 config.AppSettings.Settings.Add(configKey, solidColorBrush.ToString());
             else
                 config.AppSettings.Settings[configKey].Value = solidColorBrush.ToString();

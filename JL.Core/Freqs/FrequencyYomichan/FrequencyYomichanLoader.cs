@@ -42,7 +42,7 @@ public class FrequencyYomichanLoader
                 {
                     reading = readingValue.ToString();
                     JsonElement freqElement = thirdElement.GetProperty("frequency");
-                    frequency = freqElement.ValueKind == JsonValueKind.Number
+                    frequency = freqElement.ValueKind is JsonValueKind.Number
                         ? freqElement.GetInt32()
                         : thirdElement.GetProperty("frequency").GetProperty("value").GetInt32();
                 }
@@ -52,20 +52,20 @@ public class FrequencyYomichanLoader
                     frequency = freqValue.GetInt32();
                 }
 
-                else if (thirdElement.ValueKind == JsonValueKind.Array)
+                else if (thirdElement.ValueKind is JsonValueKind.Array)
                 {
                     reading = thirdElement[0].ToString();
                     frequency = thirdElement[1].GetInt32();
                 }
 
-                else if (thirdElement.ValueKind == JsonValueKind.Number)
+                else if (thirdElement.ValueKind is JsonValueKind.Number)
                 {
                     frequency = thirdElement.GetInt32();
                 }
 
-                if (frequency != int.MaxValue)
+                if (frequency is not int.MaxValue)
                 {
-                    if (reading == "")
+                    if (reading is "")
                     {
                         if (freqDict.TryGetValue(spellingInHiragana, out List<FrequencyRecord>? spellingFreqResult))
                         {

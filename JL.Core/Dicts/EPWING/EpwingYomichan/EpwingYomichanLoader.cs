@@ -25,7 +25,7 @@ public static class EpwingYomichanLoader
                     .ConfigureAwait(false);
             }
 
-            if (jsonObjects == null)
+            if (jsonObjects is null)
                 continue;
 
             foreach (List<JsonElement> jsonObj in jsonObjects)

@@ -82,7 +82,7 @@ public partial class AddFrequencyWindow : Window
     {
         OpenFileDialog openFileDialog = new() { InitialDirectory = Storage.ApplicationPath, Filter = filter };
 
-        if (openFileDialog.ShowDialog() == true)
+        if (openFileDialog.ShowDialog() is true)
         {
             string relativePath = Path.GetRelativePath(Storage.ApplicationPath, openFileDialog.FileName);
             TextBlockPath.Text = relativePath;
@@ -93,7 +93,7 @@ public partial class AddFrequencyWindow : Window
     {
         using var fbd = new System.Windows.Forms.FolderBrowserDialog { SelectedPath = Storage.ApplicationPath };
 
-        if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK &&
+        if (fbd.ShowDialog() is System.Windows.Forms.DialogResult.OK &&
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))
         {
             string relativePath = Path.GetRelativePath(Storage.ApplicationPath, fbd.SelectedPath);

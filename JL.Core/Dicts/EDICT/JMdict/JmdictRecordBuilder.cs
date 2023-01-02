@@ -195,7 +195,7 @@ internal static class JmdictRecordBuilder
     {
         List<List<T>?>? listOfListClone = listOfLists;
 
-        if (!listOfListClone!.Any() || listOfListClone!.All(l => l == null || !l.Any()))
+        if (!listOfListClone!.Any() || listOfListClone!.All(l => l is null || !l.Any()))
             listOfListClone = null;
         else
         {

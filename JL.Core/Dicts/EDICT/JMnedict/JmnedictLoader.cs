@@ -51,7 +51,7 @@ public static class JmnedictLoader
             if (xmlReader is { Name: "entry", NodeType: XmlNodeType.EndElement })
                 break;
 
-            if (xmlReader.NodeType == XmlNodeType.Element)
+            if (xmlReader.NodeType is XmlNodeType.Element)
             {
                 switch (xmlReader.Name)
                 {
@@ -108,7 +108,7 @@ public static class JmnedictLoader
             if (xmlReader is { Name: "trans", NodeType: XmlNodeType.EndElement })
                 break;
 
-            if (xmlReader.NodeType == XmlNodeType.Element)
+            if (xmlReader.NodeType is XmlNodeType.Element)
             {
                 switch (xmlReader.Name)
                 {
@@ -144,7 +144,7 @@ public static class JmnedictLoader
         string? entityName = null;
 
         xmlReader.Read();
-        if (xmlReader.NodeType == XmlNodeType.EntityReference)
+        if (xmlReader.NodeType is XmlNodeType.EntityReference)
         {
             //xmlReader.ResolveEntity();
             entityName = xmlReader.Name;

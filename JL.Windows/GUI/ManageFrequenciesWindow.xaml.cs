@@ -187,7 +187,7 @@ public partial class ManageFrequenciesWindow : Window
         FrequenciesDisplay!.ItemsSource = resultDockPanels.OrderBy(dockPanel =>
             dockPanel.Children
                 .OfType<TextBlock>()
-                .Where(textBlock => textBlock.Name == "priority")
+                .Where(textBlock => textBlock.Name is "priority")
                 .Select(textBlockPriority => Convert.ToInt32(textBlockPriority.Text)).First());
     }
 
@@ -206,7 +206,8 @@ public partial class ManageFrequenciesWindow : Window
 
     private static void PrioritizeFreq(Freq freq)
     {
-        if (freq.Priority == 0) return;
+        if (freq.Priority is 0)
+            return;
 
         Storage.FreqDicts.Single(f => f.Value.Priority == freq.Priority - 1).Value.Priority += 1;
         freq.Priority -= 1;

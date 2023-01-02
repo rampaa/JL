@@ -13,7 +13,7 @@ public static class CustomNameLoader
             {
                 string[] lParts = lines[i].Split("\t");
 
-                if (lParts.Length == 3)
+                if (lParts.Length is 3)
                 {
                     AddToDictionary(lParts[0].Trim(), lParts[1].Trim(), lParts[2].Trim());
                 }
@@ -25,7 +25,7 @@ public static class CustomNameLoader
     {
         CustomNameRecord newNameRecord = new(spelling, reading, nameType);
 
-        Dictionary<string, List<IDictRecord>> customNameDictionary = Storage.Dicts.Values.First(dict => dict.Type == DictType.CustomNameDictionary).Contents;
+        Dictionary<string, List<IDictRecord>> customNameDictionary = Storage.Dicts.Values.First(dict => dict.Type is DictType.CustomNameDictionary).Contents;
 
         if (customNameDictionary.TryGetValue(Kana.KatakanaToHiragana(spelling), out List<IDictRecord>? entry))
         {

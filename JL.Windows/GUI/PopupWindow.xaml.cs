@@ -129,7 +129,7 @@ public partial class PopupWindow : Window
             return;
 
         int charPosition = tb.GetCharacterIndexFromPoint(Mouse.GetPosition(tb), false);
-        if (charPosition != -1)
+        if (charPosition is not -1)
         {
             if (charPosition > 0 && char.IsHighSurrogate(tb.Text[charPosition - 1]))
                 --charPosition;
@@ -340,7 +340,7 @@ public partial class PopupWindow : Window
         // TODO: Should be configurable
         PopupListBox.Items.Filter = NoAllDictFilter;
 
-        if (text != null && !generateAllResults && StackPanelCache.TryGet(text, out StackPanel[] data))
+        if (text is not null && !generateAllResults && StackPanelCache.TryGet(text, out StackPanel[] data))
         {
             for (int i = 0; i < data.Length; i++)
             {
@@ -373,7 +373,7 @@ public partial class PopupWindow : Window
             UpdateLayout();
 
             // we might cache incomplete results if we don't wait until all dicts are loaded
-            if (text != null && Storage.DictsReady && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic)
+            if (text is not null && Storage.DictsReady && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic)
             {
                 StackPanelCache.AddReplace(text, ResultStackPanels.ToArray());
             }
@@ -452,7 +452,7 @@ public partial class PopupWindow : Window
         {
             string freqStr = "";
 
-            if (result.Frequencies.Count == 1 && result.Frequencies[0].Freq > 0 && result.Frequencies[0].Freq != int.MaxValue)
+            if (result.Frequencies.Count is 1 && result.Frequencies[0].Freq is > 0 and not int.MaxValue)
             {
                 freqStr = "#" + result.Frequencies.First().Freq;
             }
@@ -463,8 +463,7 @@ public partial class PopupWindow : Window
                 StringBuilder freqStrBuilder = new();
                 foreach (LookupFrequencyResult lookupFreqResult in result.Frequencies)
                 {
-                    if (lookupFreqResult.Freq == int.MaxValue
-                        || lookupFreqResult.Freq <= 0)
+                    if (lookupFreqResult.Freq is int.MaxValue or <= 0)
                         continue;
 
                     freqStrBuilder.Append($"{lookupFreqResult.Name}: #{lookupFreqResult.Freq}, ");
@@ -479,7 +478,7 @@ public partial class PopupWindow : Window
                 }
             }
 
-            if (freqStr != "")
+            if (freqStr is not "")
             {
                 textBlockFrequency = new TextBlock
                 {
@@ -519,7 +518,7 @@ public partial class PopupWindow : Window
                 ? MakeUiElementReadingsText(readings, rOrthographyInfoList)
                 : string.Join(", ", result.Readings);
 
-            if (readingsText != "")
+            if (readingsText is not "")
             {
                 if (MiningMode)
                 {
@@ -614,7 +613,7 @@ public partial class PopupWindow : Window
             }
         }
 
-        if (result.EdictId != 0)
+        if (result.EdictId is not 0)
         {
             textBlockEdictId = new TextBlock
             {
@@ -632,7 +631,7 @@ public partial class PopupWindow : Window
                 ? MakeUiElementAlternativeSpellingsText(alternativeSpellings, aOrthographyInfoList)
                 : "(" + string.Join(", ", alternativeSpellings) + ")";
 
-            if (alternativeSpellingsText != "")
+            if (alternativeSpellingsText is not "")
             {
                 if (MiningMode)
                 {
@@ -680,7 +679,7 @@ public partial class PopupWindow : Window
             }
         }
 
-        if (result.Process != null)
+        if (result.Process is not null)
         {
             textBlockProcess = new TextBlock
             {
@@ -849,19 +848,20 @@ public partial class PopupWindow : Window
         {
             UIElement? baby = babies[i];
 
-            if (baby == null) continue;
+            if (baby is null)
+                continue;
 
             if (baby is TextBlock textBlock)
             {
                 // common emptiness check
-                if (textBlock.Text == "")
+                if (textBlock.Text is "")
                     continue;
 
                 textBlock.MouseLeave += OnMouseLeave;
 
                 if ((textBlock.Name is "PrimarySpelling" or "Readings"))
                 {
-                    Dict? pitchDict = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.PitchAccentYomichan);
+                    Dict? pitchDict = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type is DictType.PitchAccentYomichan);
                     if (pitchDict?.Active ?? false)
                     {
                         List<string>? readings = result.Readings;
@@ -880,7 +880,7 @@ public partial class PopupWindow : Window
                                 textBlock.Margin.Left,
                                 pitchDict);
 
-                            if (pitchAccentGrid.Children.Count == 0)
+                            if (pitchAccentGrid.Children.Count is 0)
                             {
                                 top.Children.Add(textBlock);
                             }
@@ -902,14 +902,14 @@ public partial class PopupWindow : Window
             else if (baby is TextBox textBox)
             {
                 // common emptiness check
-                if (textBox.Text == "")
+                if (textBox.Text is "")
                     continue;
 
                 textBox.MouseLeave += OnMouseLeave;
 
                 if ((textBox.Name is "PrimarySpelling" or "Readings"))
                 {
-                    Dict? pitchDict = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type == DictType.PitchAccentYomichan);
+                    Dict? pitchDict = Storage.Dicts.Values.FirstOrDefault(dict => dict.Type is DictType.PitchAccentYomichan);
                     if (pitchDict?.Active ?? false)
                     {
                         List<string>? readings = result.Readings;
@@ -927,7 +927,7 @@ public partial class PopupWindow : Window
                                 textBox.Margin.Left,
                                 pitchDict);
 
-                            if (pitchAccentGrid.Children.Count == 0)
+                            if (pitchAccentGrid.Children.Count is 0)
                             {
                                 top.Children.Add(textBox);
                             }
@@ -946,7 +946,7 @@ public partial class PopupWindow : Window
             }
         }
 
-        if (uiElementDefinitions != null)
+        if (uiElementDefinitions is not null)
             bottom.Children.Add(uiElementDefinitions);
 
         TextBlock?[] babiesKanji =
@@ -954,12 +954,13 @@ public partial class PopupWindow : Window
             textBlockOnReadings, textBlockKunReadings, textBlockNanoriReadings, textBlockGrade, textBlockStrokeCount,
             textBlockComposition, textBlockKanjiStats,
         };
+
         foreach (TextBlock? baby in babiesKanji)
         {
-            if (baby == null) continue;
+            if (baby is null) continue;
 
             // common emptiness check
-            if (baby.Text == "")
+            if (baby.Text is "")
                 continue;
 
             baby.MouseLeave += OnMouseLeave;
@@ -1022,7 +1023,7 @@ public partial class PopupWindow : Window
                 {
                     var pitchAccentDictResult = (PitchAccentRecord)pitchAccentDictResultList[j];
 
-                    if (!hasReading || (pitchAccentDictResult.Reading != null &&
+                    if (!hasReading || (pitchAccentDictResult.Reading is not null &&
                                         normalizedExpression ==
                                         Kana.KatakanaToHiragana(pitchAccentDictResult.Reading)))
                     {
@@ -1039,7 +1040,7 @@ public partial class PopupWindow : Window
                     }
                 }
 
-                if (chosenPitchAccentDictResult != null)
+                if (chosenPitchAccentDictResult is not null)
                 {
                     Polyline polyline = new()
                     {
@@ -1066,7 +1067,7 @@ public partial class PopupWindow : Window
                             lowPitch = true;
                         }
 
-                        else if (j == 0)
+                        else if (j is 0)
                         {
                             polyline.Points!.Add(new Point(horizontalOffsetForChar, charSize.Height));
                             polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width,
@@ -1098,7 +1099,8 @@ public partial class PopupWindow : Window
 
     private static string MakeUiElementReadingsText(List<string> readings, List<string> rOrthographyInfoList)
     {
-        if (readings.Count == 0) return "";
+        if (readings.Count is 0)
+            return "";
 
         StringBuilder sb = new();
 
@@ -1128,7 +1130,8 @@ public partial class PopupWindow : Window
     private static string MakeUiElementAlternativeSpellingsText(List<string> alternativeSpellings,
         List<string> aOrthographyInfoList)
     {
-        if (alternativeSpellings.Count == 0) return "";
+        if (alternativeSpellings.Count is 0)
+            return "";
 
         StringBuilder sb = new();
 
@@ -1221,13 +1224,13 @@ public partial class PopupWindow : Window
 
     private async void PrimarySpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton == MouseButton.Middle)
+        if (e.ChangedButton is MouseButton.Middle)
         {
             WindowsUtils.CopyTextToClipboard(((TextBlock)sender).Text);
             return;
         }
 
-        if (!MiningMode || e.ChangedButton == MouseButton.Right)
+        if (!MiningMode || e.ChangedButton is MouseButton.Right)
         {
             return;
         }
@@ -1239,7 +1242,7 @@ public partial class PopupWindow : Window
 
         var miningParams = new Dictionary<JLField, string>();
 
-        if (_currentText != null)
+        if (_currentText is not null)
         {
             miningParams[JLField.SourceText] = _currentText;
             miningParams[JLField.Sentence] = Utils.FindSentence(_currentText, _currentCharPosition);
@@ -1601,22 +1604,13 @@ public partial class PopupWindow : Window
 
     private async Task PlayAudio()
     {
-        //int index = numericKeyValue != -1 ? numericKeyValue : _playAudioIndex;
-        //if (index > PopupListBox.Items.Count - 1)
-        //{
-        //    Storage.Frontend.Alert(AlertLevel.Error, "Index out of range");
-        //    return;
-        //}
-
-        //var innerStackPanel = (StackPanel)PopupListBox.Items[index];
-
         string? primarySpelling = null;
         string? reading = null;
 
         StackPanel[] visibleStackPanels = PopupListBox.Items.Cast<StackPanel>()
-            .Where(stackPanel => stackPanel.Visibility == Visibility.Visible).ToArray();
+            .Where(stackPanel => stackPanel.Visibility is Visibility.Visible).ToArray();
 
-        if (visibleStackPanels.Length == 0)
+        if (visibleStackPanels.Length is 0)
             return;
 
         StackPanel innerStackPanel = visibleStackPanels[_playAudioIndex];
@@ -1676,7 +1670,7 @@ public partial class PopupWindow : Window
             }
         }
 
-        if (primarySpelling != null)
+        if (primarySpelling is not null)
         {
             await Utils.GetAndPlayAudioFromJpod101(primarySpelling, reading, 1).ConfigureAwait(false);
         }
@@ -1713,7 +1707,7 @@ public partial class PopupWindow : Window
     private void UiElement_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         if ((!ConfigManager.LookupOnSelectOnly && !ConfigManager.LookupOnLeftClickOnly)
-            || Background!.Opacity == 0
+            || Background!.Opacity is 0
             || ConfigManager.InactiveLookupMode
             || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
             || (ConfigManager.FixedPopupPositioning && Owner != MainWindow.Instance))
@@ -1751,7 +1745,7 @@ public partial class PopupWindow : Window
 
     private void UiElement_PreviewMouseButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.MiddleButton == MouseButtonState.Pressed && ChildPopupWindow is {IsVisible: true, MiningMode: false})
+        if (e.MiddleButton is MouseButtonState.Pressed && ChildPopupWindow is { IsVisible: true, MiningMode: false })
         {
             e.Handled = true;
             PopupWindow_PreviewMouseDown(ChildPopupWindow);
@@ -1822,7 +1816,7 @@ public partial class PopupWindow : Window
 
         foreach (Dict dict in Storage.Dicts.Values.OrderBy(dict => dict.Priority).ToList())
         {
-            if (!dict.Active || dict.Type == DictType.PitchAccentYomichan)
+            if (!dict.Active || dict.Type is DictType.PitchAccentYomichan)
                 continue;
 
             var button = new Button { Content = dict.Name, Margin = new Thickness(1), Tag = dict };

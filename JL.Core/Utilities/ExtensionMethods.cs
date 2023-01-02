@@ -10,10 +10,10 @@ public static class ExtensionMethods
     {
         Type type = value.GetType();
         string? name = Enum.GetName(type, value);
-        if (name != null)
+        if (name is not null)
         {
             FieldInfo? field = type.GetField(name);
-            if (field != null)
+            if (field is not null)
             {
                 if (Attribute.GetCustomAttribute(field,
                         typeof(DescriptionAttribute)) is DescriptionAttribute attr)

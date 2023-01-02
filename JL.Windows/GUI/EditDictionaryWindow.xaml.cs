@@ -88,7 +88,7 @@ public partial class EditDictionaryWindow : Window
     {
         OpenFileDialog openFileDialog = new() { InitialDirectory = File.Exists(TextBlockPath.Text) ? new FileInfo(TextBlockPath.Text).Directory!.FullName : Storage.ApplicationPath, Filter = filter };
 
-        if (openFileDialog.ShowDialog() == true)
+        if (openFileDialog.ShowDialog() is true)
         {
             string relativePath = Path.GetRelativePath(Storage.ApplicationPath, openFileDialog.FileName);
             TextBlockPath.Text = relativePath;
@@ -99,7 +99,7 @@ public partial class EditDictionaryWindow : Window
     {
         using var fbd = new System.Windows.Forms.FolderBrowserDialog { SelectedPath = Directory.Exists(TextBlockPath.Text) ? TextBlockPath.Text : Storage.ApplicationPath };
 
-        if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK &&
+        if (fbd.ShowDialog() is System.Windows.Forms.DialogResult.OK &&
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))
         {
             string relativePath = Path.GetRelativePath(Storage.ApplicationPath, fbd.SelectedPath);

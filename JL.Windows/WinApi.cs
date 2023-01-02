@@ -79,7 +79,7 @@ public class WinApi
 
         internal static IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
         {
-            return IntPtr.Size == 8
+            return Environment.Is64BitProcess
                 ? SetWindowLongPtr64(hWnd, nIndex, dwNewLong)
                 : new IntPtr(SetWindowLong32(hWnd, nIndex, dwNewLong.ToInt32()));
         }
@@ -92,7 +92,7 @@ public class WinApi
 
         internal static IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex)
         {
-            return IntPtr.Size == 8
+            return Environment.Is64BitProcess
                 ? GetWindowLongPtr64(hWnd, nIndex)
                 : new IntPtr(GetWindowLongPtr32(hWnd, nIndex));
         }
@@ -198,7 +198,7 @@ public class WinApi
                 break;
 
                 //case WM_NCCALCSIZE:
-                //    if (wParam  != IntPtr.Zero)
+                //    if (wParam != IntPtr.Zero)
                 //    {
                 //        NCCALCSIZE_PARAMS calcSizeParams = Marshal.PtrToStructure<NCCALCSIZE_PARAMS>(lParam);
                 //        calcSizeParams.rgrc1.left = 0;

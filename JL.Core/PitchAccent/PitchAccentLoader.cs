@@ -22,14 +22,14 @@ public static class PitchAccentLoader
                     .ConfigureAwait(false);
             }
 
-            if (jsonObjects == null)
+            if (jsonObjects is null)
                 continue;
 
             foreach (List<JsonElement> jsonObject in jsonObjects)
             {
                 PitchAccentRecord newEntry = new(jsonObject);
 
-                if (newEntry.Position == -1)
+                if (newEntry.Position is -1)
                     continue;
 
                 string spellingInHiragana = Kana.KatakanaToHiragana(newEntry.Spelling);

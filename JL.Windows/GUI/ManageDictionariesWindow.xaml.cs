@@ -137,9 +137,9 @@ public partial class ManageDictionariesWindow : Window
                 Foreground = Brushes.White,
                 Background = Brushes.DarkGreen,
                 BorderThickness = new Thickness(1),
-                Visibility = (dict.Type != DictType.JMdict
-                              && dict.Type != DictType.JMnedict
-                              && dict.Type != DictType.Kanjidic)
+                Visibility = (dict.Type is not DictType.JMdict
+                              and not DictType.JMnedict
+                              and not DictType.Kanjidic)
                     ? Visibility.Collapsed
                     : Visibility.Visible,
             };
@@ -222,13 +222,13 @@ public partial class ManageDictionariesWindow : Window
                     : Visibility.Collapsed
             };
 
-            if (dict.Type == DictType.JMdict)
+            if (dict.Type is DictType.JMdict)
             {
                 buttonInfo.IsEnabled = Storage.JmdictEntities.Any();
                 buttonInfo.Click += JmdictInfoButton_Click;
             }
 
-            else if (dict.Type == DictType.JMnedict)
+            else if (dict.Type is DictType.JMnedict)
             {
                 buttonInfo.Click += JmnedictInfoButton_Click;
             }
@@ -281,7 +281,7 @@ public partial class ManageDictionariesWindow : Window
         DictionariesDisplay!.ItemsSource = resultDockPanels.OrderBy(dockPanel =>
             dockPanel.Children
                 .OfType<TextBlock>()
-                .Where(textBlock => textBlock.Name == "priority")
+                .Where(textBlock => textBlock.Name is "priority")
                 .Select(textBlockPriority => Convert.ToInt32(textBlockPriority.Text)).First());
     }
 
@@ -300,7 +300,8 @@ public partial class ManageDictionariesWindow : Window
 
     private static void PrioritizeDict(Dict dict)
     {
-        if (dict.Priority == 0) return;
+        if (dict.Priority is 0)
+            return;
 
         Storage.Dicts.Single(d => d.Value.Priority == dict.Priority - 1).Value.Priority += 1;
         dict.Priority -= 1;
@@ -310,7 +311,9 @@ public partial class ManageDictionariesWindow : Window
     {
         // lowest priority means highest number
         int lowestPriority = Storage.Dicts.Select(d => d.Value.Priority).Max();
-        if (dict.Priority == lowestPriority) return;
+
+        if (dict.Priority == lowestPriority)
+            return;
 
         Storage.Dicts.Single(d => d.Value.Priority == dict.Priority + 1).Value.Priority -= 1;
         dict.Priority += 1;
@@ -327,7 +330,7 @@ public partial class ManageDictionariesWindow : Window
     {
         Storage.UpdatingJMdict = true;
 
-        Dict dict = Storage.Dicts.Values.First(dict => dict.Type == DictType.JMdict);
+        Dict dict = Storage.Dicts.Values.First(dict => dict.Type is DictType.JMdict);
         bool isDownloaded = await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.JmdictUrl,
                 DictType.JMdict.ToString(), true, false)
@@ -360,7 +363,7 @@ public partial class ManageDictionariesWindow : Window
     {
         Storage.UpdatingJMnedict = true;
 
-        Dict dict = Storage.Dicts.Values.First(dict => dict.Type == DictType.JMnedict);
+        Dict dict = Storage.Dicts.Values.First(dict => dict.Type is DictType.JMnedict);
         bool isDownloaded = await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.JmnedictUrl,
                 DictType.JMnedict.ToString(), true, false)
@@ -386,7 +389,7 @@ public partial class ManageDictionariesWindow : Window
     private static async Task UpdateKanjidic()
     {
         Storage.UpdatingKanjidic = true;
-        Dict dict = Storage.Dicts.Values.First(dict => dict.Type == DictType.Kanjidic);
+        Dict dict = Storage.Dicts.Values.First(dict => dict.Type is DictType.Kanjidic);
         bool isDownloaded = await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.KanjidicUrl,
                 DictType.Kanjidic.ToString(), true, false)

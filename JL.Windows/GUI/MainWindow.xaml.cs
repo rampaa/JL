@@ -32,7 +32,7 @@ public partial class MainWindow : Window, IFrontend
 
     public bool ShowYesNoDialog(string text, string caption)
     {
-        return MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+        return MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
     }
 
     public void ShowOkDialog(string text, string caption)
@@ -159,7 +159,7 @@ public partial class MainWindow : Window, IFrontend
                     if (Storage.DictsReady && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic && Storage.FreqsReady
                         && ConfigManager.Precaching && MainTextBox!.Text.Length < Storage.CacheSize)
                     {
-                        Dispatcher.Invoke(DispatcherPriority.Render, delegate () { }); // let MainTextBox text update
+                        Dispatcher.Invoke(DispatcherPriority.Render, () => {}); // let MainTextBox text update
                         await Precache(MainTextBox!.Text).ConfigureAwait(false);
                     }
                 }
@@ -181,7 +181,7 @@ public partial class MainWindow : Window, IFrontend
         {
             if (PrecacheCancellationToken.IsCancellationRequested)
             {
-                if (charPosition == 0)
+                if (charPosition is 0)
                 {
                     PrecacheCancellationToken = new CancellationTokenSource();
                 }
@@ -196,7 +196,7 @@ public partial class MainWindow : Window, IFrontend
                 --charPosition;
 
             //PrecacheProgress.Text = $"{charPosition + 1}/{input.Length} ({added} new)";
-            if (charPosition % 10 == 0)
+            if (charPosition % 10 is 0)
             {
                 await Task.Delay(1); // let user interact with the GUI while this method is running
             }
@@ -226,7 +226,7 @@ public partial class MainWindow : Window, IFrontend
                     }
 
                     PopupWindow.StackPanelCache.AddReplace(text, stackPanels.ToArray());
-                    added += added == 0 ? 2 : 1;
+                    added += added is 0 ? 2 : 1;
                 }
             }
         }
@@ -244,7 +244,7 @@ public partial class MainWindow : Window, IFrontend
             _lastClipboardChangeTime = currentTime;
             CopyFromClipboard();
 
-            if (SizeToContent == SizeToContent.Manual && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
+            if (SizeToContent is SizeToContent.Manual && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
             {
                 WindowsUtils.SetSizeToContentForMainWindow(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight,
                     ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
@@ -269,7 +269,7 @@ public partial class MainWindow : Window, IFrontend
     {
         if (ConfigManager.LookupOnSelectOnly
             || ConfigManager.LookupOnLeftClickOnly
-            || Background!.Opacity == 0
+            || Background!.Opacity is 0
             || MainTextboxContextMenu!.IsVisible
             || FontSizeSlider!.IsVisible
             || OpacitySlider!.IsVisible
@@ -306,7 +306,7 @@ public partial class MainWindow : Window, IFrontend
             string allBacklogText = string.Join("\n", _backlog);
             if (MainTextBox!.Text != allBacklogText)
             {
-                if (MainTextBox.GetFirstVisibleLineIndex() == 0)
+                if (MainTextBox.GetFirstVisibleLineIndex() is 0)
                 {
                     int caretIndex = allBacklogText.Length - MainTextBox.Text.Length;
 
@@ -378,13 +378,13 @@ public partial class MainWindow : Window, IFrontend
     {
         FontSizeSlider!.Visibility = Visibility.Collapsed;
 
-        if (Background!.Opacity == 0)
+        if (Background!.Opacity is 0)
         {
             Background.Opacity = OpacitySlider!.Value / 100;
             MainTextBox.Focus();
         }
 
-        else if (OpacitySlider!.Visibility == Visibility.Collapsed)
+        else if (OpacitySlider!.Visibility is Visibility.Collapsed)
         {
             OpacitySlider.Visibility = Visibility.Visible;
             OpacitySlider.Focus();
@@ -398,7 +398,7 @@ public partial class MainWindow : Window, IFrontend
     {
         OpacitySlider!.Visibility = Visibility.Collapsed;
 
-        if (FontSizeSlider!.Visibility == Visibility.Collapsed)
+        if (FontSizeSlider!.Visibility is Visibility.Collapsed)
         {
             FontSizeSlider.Visibility = Visibility.Visible;
             FontSizeSlider.Focus();
@@ -609,7 +609,7 @@ public partial class MainWindow : Window, IFrontend
     {
         if (WindowsUtils.CompareKeyGesture(e, ConfigManager.SteppedBacklogBackwardsKeyGesture))
         {
-            if (_currentTextIndex != 0)
+            if (_currentTextIndex is not 0)
             {
                 _currentTextIndex--;
                 MainTextBox!.Foreground = ConfigManager.MainWindowBacklogTextColor;
@@ -666,7 +666,7 @@ public partial class MainWindow : Window, IFrontend
     private void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         if ((!ConfigManager.LookupOnSelectOnly && !ConfigManager.LookupOnLeftClickOnly)
-            || Background!.Opacity == 0
+            || Background!.Opacity is 0
             || ConfigManager.InactiveLookupMode
             || FirstPopupWindow.MiningMode
             || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
@@ -697,7 +697,7 @@ public partial class MainWindow : Window, IFrontend
 
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.MiddleButton == MouseButtonState.Pressed && FirstPopupWindow is {IsVisible: true, MiningMode: false})
+        if (e.MiddleButton is MouseButtonState.Pressed && FirstPopupWindow is { IsVisible: true, MiningMode: false })
         {
             e.Handled = true;
             PopupWindow.PopupWindow_PreviewMouseDown(FirstPopupWindow);
@@ -707,7 +707,7 @@ public partial class MainWindow : Window, IFrontend
         {
             PopupWindow? currentPopupWindow = FirstPopupWindow;
 
-            while (currentPopupWindow != null)
+            while (currentPopupWindow is not null)
             {
                 currentPopupWindow.MiningMode = false;
                 currentPopupWindow.TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
@@ -840,7 +840,7 @@ public partial class MainWindow : Window, IFrontend
     }
     private void Border_OnMouseLeave(object sender, MouseEventArgs e)
     {
-        if (Mouse.LeftButton == MouseButtonState.Released)
+        if (Mouse.LeftButton is MouseButtonState.Released)
         {
             Mouse.OverrideCursor = Cursors.Arrow;
         }
@@ -872,7 +872,7 @@ public partial class MainWindow : Window, IFrontend
 
     //    HitTestResult? hitTestResult = VisualTreeHelper.HitTest(this, cursorPoint);
 
-    //    if (hitTestResult != null)
+    //    if (hitTestResult is not null)
     //    {
     //        return hitTestResult.VisualHit == TitleBar;
     //    }
@@ -882,7 +882,7 @@ public partial class MainWindow : Window, IFrontend
 
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.LeftButton == MouseButtonState.Pressed)
+        if (e.LeftButton is MouseButtonState.Pressed)
         {
             DragMove();
         }
@@ -918,7 +918,7 @@ public partial class MainWindow : Window, IFrontend
 
     private void Window_MouseLeave(object sender, MouseEventArgs e)
     {
-        if (Background.Opacity == 0 || ConfigManager.InvisibleMode)
+        if (Background.Opacity is 0 || ConfigManager.InvisibleMode)
             return;
 
         if (!FirstPopupWindow.IsVisible
@@ -929,7 +929,7 @@ public partial class MainWindow : Window, IFrontend
             && !PreferencesWindow.IsItVisible()
             && !StatsWindow.IsItVisible()
             && !MainTextboxContextMenu.IsVisible
-            && e.LeftButton == MouseButtonState.Released)
+            && e.LeftButton is MouseButtonState.Released)
         {
             if (ConfigManager.TextOnlyVisibleOnHover)
             {
@@ -945,7 +945,7 @@ public partial class MainWindow : Window, IFrontend
 
     private void Window_MouseEnter(object sender, MouseEventArgs e)
     {
-        if (Background.Opacity == 0 || ConfigManager.InvisibleMode)
+        if (Background.Opacity is 0 || ConfigManager.InvisibleMode)
             return;
 
         if (ConfigManager.TextOnlyVisibleOnHover)
@@ -961,7 +961,7 @@ public partial class MainWindow : Window, IFrontend
 
     private void Window_StateChanged(object sender, EventArgs e)
     {
-        if (WindowState == WindowState.Minimized)
+        if (WindowState is WindowState.Minimized)
         {
             Storage.StatsStopWatch.Stop();
         }

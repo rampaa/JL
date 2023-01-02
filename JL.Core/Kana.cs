@@ -244,9 +244,9 @@ public static class Kana
 
         for (int i = 1; i < unicodeTextList.Count; i++)
         {
-            if (text[i] == 'ー' && s_kanaFinalVowelDict.TryGetValue(unicodeTextList[i - 1], out string? vowel))
+            if (text[i] is 'ー' && s_kanaFinalVowelDict.TryGetValue(unicodeTextList[i - 1], out string? vowel))
             {
-                if (vowel != "お" && vowel != "え" && vowel != "オ" && vowel != "エ")
+                if (vowel is not "お" and not "え" and not "オ" and not "エ")
                 {
                     for (int j = 0; j < stringBuilders.Count; j++)
                     {

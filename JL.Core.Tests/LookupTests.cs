@@ -83,7 +83,7 @@ public class LookupTests
 
         // Act
         List<LookupResult>? result = Lookup.Lookup.LookupText(text);
-        int actual = result != null
+        int actual = result is not null
             ? result.First(x => x.PrimarySpelling == "他").Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
 
@@ -101,7 +101,7 @@ public class LookupTests
 
         // Act
         List<LookupResult>? result = Lookup.Lookup.LookupText(text);
-        int actual = result != null
+        int actual = result is not null
             ? result.First(x => x.PrimarySpelling == "多").Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
 
@@ -119,7 +119,7 @@ public class LookupTests
 
         // Act
         List<LookupResult>? result = Lookup.Lookup.LookupText(text);
-        int actual = result != null
+        int actual = result is not null
             ? result.First(x => x.PrimarySpelling == "田").Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
 
@@ -137,7 +137,7 @@ public class LookupTests
 
         // Act
         List<LookupResult>? result = Lookup.Lookup.LookupText(text);
-        int actual = result != null
+        int actual = result is not null
             ? result.First(x => x.Readings?.Contains("ひ") ?? false).Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
 
@@ -155,7 +155,7 @@ public class LookupTests
 
         // Act
         List<LookupResult>? result = Lookup.Lookup.LookupText(text);
-        int actual = result != null
+        int actual = result is not null
             ? result.First(x => x.Readings?.Contains("にち") ?? false).Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
 
@@ -174,7 +174,7 @@ public class LookupTests
         // Act
         List<LookupResult>? result = Lookup.Lookup.LookupText(text);
 
-        int actual = result != null
+        int actual = result is not null
             ? result.First(x => x.Readings?.Contains("か") ?? false).Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
 
@@ -193,7 +193,7 @@ public class LookupTests
         // Act
         List<LookupResult>? result = Lookup.Lookup.LookupText(text);
 
-        int actual = result != null
+        int actual = result is not null
             ? result.First(x => x.PrimarySpelling == "余り").Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
 
@@ -212,7 +212,7 @@ public class LookupTests
         // Act
         List<LookupResult>? result = Lookup.Lookup.LookupText(text);
 
-        int actual = result != null
+        int actual = result is not null
             ? result.First(x => x.Readings?.Contains("なつかしい") ?? false).Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
 
@@ -231,7 +231,7 @@ public class LookupTests
         // Act
         List<LookupResult>? result = Lookup.Lookup.LookupText(text);
 
-        int actual = result != null
+        int actual = result is not null
             ? result.First(x => x.Readings?.Contains("はいきょ") ?? false).Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
 
@@ -250,7 +250,7 @@ public class LookupTests
         // Act
         List<LookupResult>? result = Lookup.Lookup.LookupText(text);
 
-        int actual = result != null
+        int actual = result is not null
             ? result.First(x => x.Readings?.Contains("はいきょ") ?? false).Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
 

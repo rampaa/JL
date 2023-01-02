@@ -21,13 +21,13 @@ public class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
         PrimarySpelling = jsonElement[0].ToString();
         Reading = jsonElement[1].ToString();
 
-        if (Reading == "" || Reading == PrimarySpelling)
+        if (Reading is "" || Reading == PrimarySpelling)
             Reading = null;
 
         DefinitionTags = new();
 
         JsonElement definitionTagsElement = jsonElement[2];
-        if (definitionTagsElement.ValueKind == JsonValueKind.Array)
+        if (definitionTagsElement.ValueKind is JsonValueKind.Array)
         {
             foreach (JsonElement definitionTag in definitionTagsElement.EnumerateArray())
             {
@@ -35,7 +35,7 @@ public class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
             }
         }
 
-        else //if (definitionTagsElement.ValueKind == JsonValueKind.String)
+        else //if (definitionTagsElement.ValueKind is JsonValueKind.String)
         {
             DefinitionTags = definitionTagsElement.ToString()
                 .Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -67,7 +67,7 @@ public class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
         {
             JsonElement definitionElement = jsonElement[5][0];
 
-            if (definitionElement.ValueKind == JsonValueKind.Object)
+            if (definitionElement.ValueKind is JsonValueKind.Object)
             {
                 definitionElement = definitionElement.GetProperty("content")[0];
             }

@@ -23,7 +23,7 @@ public static class YomichanKanjiLoader
                     .ConfigureAwait(false);
             }
 
-            if (jsonObjects == null)
+            if (jsonObjects is null)
                 continue;
 
             foreach (List<JsonElement> jsonObj in jsonObjects)

@@ -134,7 +134,7 @@ public partial class PreferencesWindow : Window
         {
             Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig();
 
-            if (ankiConfigDict == null)
+            if (ankiConfigDict is null)
                 return;
 
             AnkiConfig? wordAnkiConfig = ankiConfigDict.GetValueOrDefault(MineType.Word);
@@ -143,25 +143,25 @@ public partial class PreferencesWindow : Window
             AnkiConfig? otherAnkiConfig = ankiConfigDict.GetValueOrDefault(MineType.Other);
 
 
-            if (wordAnkiConfig != null)
+            if (wordAnkiConfig is not null)
             {
                 SetPreviousMiningConfig(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordTagsTextBox, wordAnkiConfig);
                 CreateFieldElements(wordAnkiConfig.Fields, Storage.JLFieldsForWordDicts, WordMiningSetupStackPanelFields);
             }
 
-            if (kanjiAnkiConfig != null)
+            if (kanjiAnkiConfig is not null)
             {
                 SetPreviousMiningConfig(KanjiMiningSetupComboBoxDeckNames, KanjiMiningSetupComboBoxModelNames, KanjiTagsTextBox, kanjiAnkiConfig);
                 CreateFieldElements(kanjiAnkiConfig.Fields, Storage.JLFieldsForKanjiDicts, KanjiMiningSetupStackPanelFields);
             }
 
-            if (nameAnkiConfig != null)
+            if (nameAnkiConfig is not null)
             {
                 SetPreviousMiningConfig(NameMiningSetupComboBoxDeckNames, NameMiningSetupComboBoxModelNames, NameTagsTextBox, nameAnkiConfig);
                 CreateFieldElements(nameAnkiConfig.Fields, Storage.JLFieldsForNameDicts, NameMiningSetupStackPanelFields);
             }
 
-            if (otherAnkiConfig != null)
+            if (otherAnkiConfig is not null)
             {
                 SetPreviousMiningConfig(OtherMiningSetupComboBoxDeckNames, OtherMiningSetupComboBoxModelNames, OtherTagsTextBox, otherAnkiConfig);
                 CreateFieldElements(otherAnkiConfig.Fields, Enum.GetValues<JLField>().ToList(), OtherMiningSetupStackPanelFields);
@@ -187,11 +187,11 @@ public partial class PreferencesWindow : Window
     {
         List<string>? deckNames = await AnkiUtils.GetDeckNames();
 
-        if (deckNames != null)
+        if (deckNames is not null)
         {
             List<string>? modelNames = await AnkiUtils.GetModelNames();
 
-            if (modelNames != null)
+            if (modelNames is not null)
             {
                 WordMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
                 KanjiMiningSetupComboBoxDeckNames.ItemsSource = deckNames.ToList();
@@ -229,7 +229,7 @@ public partial class PreferencesWindow : Window
 
         List<string>? fieldNames = await AnkiUtils.GetFieldNames(modelName);
 
-        if (fieldNames != null)
+        if (fieldNames is not null)
         {
             Dictionary<string, JLField> fields =
                 fieldNames.ToDictionary(fieldName => fieldName, _ => JLField.Nothing);
@@ -322,8 +322,8 @@ public partial class PreferencesWindow : Window
                 ? Array.Empty<string>()
                 : rawTags.Split(',').Select(s => s.Trim()).ToArray();
 
-            if (deckNamesComboBox.SelectedItem == null ||
-                modelNamesComboBox.SelectedItem == null)
+            if (deckNamesComboBox.SelectedItem is null ||
+                modelNamesComboBox.SelectedItem is null)
             {
                 Storage.Frontend.Alert(AlertLevel.Error, "Save failed: Incomplete Anki config");
                 Utils.Logger.Error("Save failed: Incomplete Anki config");
@@ -348,19 +348,19 @@ public partial class PreferencesWindow : Window
         Dictionary<MineType, AnkiConfig> ankiConfigDict = new();
 
         AnkiConfig? ankiConfig = GetAnkiConfigFromPreferences(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordMiningSetupStackPanelFields, WordTagsTextBox, Storage.JLFieldsForWordDicts);
-        if (ankiConfig != null)
+        if (ankiConfig is not null)
             ankiConfigDict.Add(MineType.Word, ankiConfig);
 
         ankiConfig = GetAnkiConfigFromPreferences(KanjiMiningSetupComboBoxDeckNames, KanjiMiningSetupComboBoxModelNames, KanjiMiningSetupStackPanelFields, KanjiTagsTextBox, Storage.JLFieldsForKanjiDicts);
-        if (ankiConfig != null)
+        if (ankiConfig is not null)
             ankiConfigDict.Add(MineType.Kanji, ankiConfig);
 
         ankiConfig = GetAnkiConfigFromPreferences(NameMiningSetupComboBoxDeckNames, NameMiningSetupComboBoxModelNames, NameMiningSetupStackPanelFields, NameTagsTextBox, Storage.JLFieldsForNameDicts);
-        if (ankiConfig != null)
+        if (ankiConfig is not null)
             ankiConfigDict.Add(MineType.Name, ankiConfig);
 
         ankiConfig = GetAnkiConfigFromPreferences(OtherMiningSetupComboBoxDeckNames, OtherMiningSetupComboBoxModelNames, OtherMiningSetupStackPanelFields, OtherTagsTextBox, Storage.JLFieldsForWordDicts);
-        if (ankiConfig != null)
+        if (ankiConfig is not null)
             ankiConfigDict.Add(MineType.Other, ankiConfig);
 
         if (ankiConfigDict.Count > 0)
@@ -383,35 +383,35 @@ public partial class PreferencesWindow : Window
     {
         e.Handled = true;
 
-        Key key = (e.Key == Key.System ? e.SystemKey : e.Key);
+        Key key = (e.Key is Key.System ? e.SystemKey : e.Key);
 
-        if (key == Key.LWin || key == Key.RWin)
+        if (key is Key.LWin or Key.RWin)
         {
             return;
         }
 
         StringBuilder hotkeyTextBuilder = new();
 
-        if (key == Key.LeftShift || key == Key.RightShift
-            || key == Key.LeftCtrl || key == Key.RightCtrl
-            || key == Key.LeftAlt || key == Key.RightAlt)
+        if (key is Key.LeftShift or Key.RightShift
+            or Key.LeftCtrl or Key.RightCtrl
+            or Key.LeftAlt or Key.RightAlt)
         {
             hotkeyTextBuilder.Append(key.ToString());
         }
 
         else
         {
-            if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
+            if ((Keyboard.Modifiers & ModifierKeys.Control) is not 0)
             {
                 hotkeyTextBuilder.Append("Ctrl+");
             }
 
-            if ((Keyboard.Modifiers & ModifierKeys.Alt) != 0)
+            if ((Keyboard.Modifiers & ModifierKeys.Alt) is not 0)
             {
                 hotkeyTextBuilder.Append("Alt+");
             }
 
-            if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0 && hotkeyTextBuilder.Length > 0)
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) is not 0 && hotkeyTextBuilder.Length > 0)
             {
                 hotkeyTextBuilder.Append("Shift+");
             }

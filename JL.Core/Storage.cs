@@ -683,7 +683,7 @@ public static class Storage
 
     public static async Task InitializeWordClassDictionary()
     {
-        Dict dict = Dicts.Values.First(dict => dict.Type == DictType.JMdict);
+        Dict dict = Dicts.Values.First(dict => dict.Type is DictType.JMdict);
         if (!File.Exists($"{ResourcesPath}/PoS.json"))
         {
             if (dict.Active)
@@ -727,12 +727,12 @@ public static class Storage
             {
                 string[] lParts = lines[i].Split("\t");
 
-                if (lParts.Length == 3)
+                if (lParts.Length is 3)
                 {
                     int endIndex = lParts[2].IndexOf("[", StringComparison.Ordinal);
 
                     KanjiCompositionDict.Add(lParts[1],
-                        endIndex == -1 ? lParts[2] : lParts[2][..endIndex]);
+                        endIndex is -1 ? lParts[2] : lParts[2][..endIndex]);
                 }
 
                 else if (lParts.Length > 3)
@@ -742,7 +742,7 @@ public static class Storage
                         if (lParts[j].Contains('J'))
                         {
                             int endIndex = lParts[j].IndexOf("[", StringComparison.Ordinal);
-                            if (endIndex != -1)
+                            if (endIndex is not -1)
                             {
                                 KanjiCompositionDict.Add(lParts[1], lParts[j][..endIndex]);
                                 break;

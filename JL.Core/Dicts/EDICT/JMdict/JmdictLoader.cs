@@ -59,7 +59,7 @@ public static class JmdictLoader
             if (xmlReader is { Name: "entry", NodeType: XmlNodeType.EndElement })
                 break;
 
-            if (xmlReader.NodeType == XmlNodeType.Element)
+            if (xmlReader.NodeType is XmlNodeType.Element)
             {
                 switch (xmlReader.Name)
                 {
@@ -104,7 +104,7 @@ public static class JmdictLoader
             if (xmlReader is { Name: "k_ele", NodeType: XmlNodeType.EndElement })
                 break;
 
-            if (xmlReader.NodeType == XmlNodeType.Element)
+            if (xmlReader.NodeType is XmlNodeType.Element)
             {
                 switch (xmlReader.Name)
                 {
@@ -146,7 +146,7 @@ public static class JmdictLoader
             if (xmlReader is { Name: "r_ele", NodeType: XmlNodeType.EndElement })
                 break;
 
-            if (xmlReader.NodeType == XmlNodeType.Element)
+            if (xmlReader.NodeType is XmlNodeType.Element)
             {
                 switch (xmlReader.Name)
                 {
@@ -192,7 +192,7 @@ public static class JmdictLoader
             if (xmlReader is { Name: "sense", NodeType: XmlNodeType.EndElement })
                 break;
 
-            if (xmlReader.NodeType == XmlNodeType.Element)
+            if (xmlReader.NodeType is XmlNodeType.Element)
             {
                 switch (xmlReader.Name)
                 {
@@ -231,7 +231,7 @@ public static class JmdictLoader
                         {
                             string? glossType = xmlReader.GetAttribute("g_type");
 
-                            if (glossType != null)
+                            if (glossType is not null)
                                 gloss = "(" + glossType + ".) ";
                         }
 
@@ -251,7 +251,7 @@ public static class JmdictLoader
                     case "lsource":
                         string? lang = xmlReader.GetAttribute("xml:lang");
 
-                        if (lang != null)
+                        if (lang is not null)
                         {
                             try
                             {
@@ -278,11 +278,11 @@ public static class JmdictLoader
                             lang = "English";
                         }
 
-                        bool isPart = xmlReader.GetAttribute("ls_type") == "part";
-                        bool isWasei = xmlReader.GetAttribute("ls_wasei") != null;
+                        bool isPart = xmlReader.GetAttribute("ls_type") is "part";
+                        bool isWasei = xmlReader.GetAttribute("ls_wasei") is not null;
 
                         string? originalWord = xmlReader.ReadElementContentAsString();
-                        originalWord = originalWord != "" ? originalWord : null;
+                        originalWord = originalWord is not "" ? originalWord : null;
 
                         sense.LSourceList.Add(new LoanwordSource(lang, isPart, isWasei, originalWord));
                         break;
@@ -308,7 +308,7 @@ public static class JmdictLoader
 
         xmlReader.Read();
 
-        if (xmlReader.NodeType == XmlNodeType.EntityReference)
+        if (xmlReader.NodeType is XmlNodeType.EntityReference)
         {
             entityName = xmlReader.Name;
 

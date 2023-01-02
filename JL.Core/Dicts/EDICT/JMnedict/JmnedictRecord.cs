@@ -28,7 +28,7 @@ public class JmnedictRecord : IDictRecord
         int count = 1;
         StringBuilder defResult = new();
 
-        if (NameTypes != null &&
+        if (NameTypes is not null &&
             (NameTypes.Count > 1 || !NameTypes.Contains("unclass")))
         {
             for (int i = 0; i < NameTypes.Count; i++)

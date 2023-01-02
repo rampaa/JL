@@ -84,7 +84,7 @@ public class JmdictRecord : IDictRecordWithGetFrequency
 
             if ((options?.ExtraDefinitionInfo?.Value ?? true)
                 && (DefinitionInfo?.Any() ?? false)
-                && DefinitionInfo[i] != null)
+                && DefinitionInfo[i] is not null)
             {
                 defResult.Append('(');
                 defResult.Append(DefinitionInfo[i]);
@@ -143,7 +143,7 @@ public class JmdictRecord : IDictRecordWithGetFrequency
 
                     defResult.Append(lSources[j].Language);
 
-                    if (lSources[j].OriginalWord != null)
+                    if (lSources[j].OriginalWord is not null)
                     {
                         defResult.Append(": ");
                         defResult.Append(lSources[j].OriginalWord);
@@ -200,7 +200,7 @@ public class JmdictRecord : IDictRecordWithGetFrequency
                 }
             }
 
-            if (frequency == int.MaxValue && AlternativeSpellings != null)
+            if (frequency is int.MaxValue && AlternativeSpellings is not null)
             {
                 int alternativeSpellingsCount = AlternativeSpellings.Count;
                 for (int i = 0; i < alternativeSpellingsCount; i++)
@@ -226,7 +226,7 @@ public class JmdictRecord : IDictRecordWithGetFrequency
             }
         }
 
-        else if (Readings != null)
+        else if (Readings is not null)
         {
             int readingCount = Readings.Count;
             for (int i = 0; i < readingCount; i++)

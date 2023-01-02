@@ -34,12 +34,12 @@ internal static class EpwingNazekaLoader
                 definitions = null;
             }
 
-            if (spellings.Count == 1 && spellings[0] == "")
+            if (spellings.Count is 1 && spellings[0] is "")
             {
                 spellings = null;
             }
 
-            if (spellings != null)
+            if (spellings is not null)
             {
                 string primarySpelling = spellings[0];
 

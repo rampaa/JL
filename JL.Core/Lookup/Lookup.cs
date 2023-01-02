@@ -41,7 +41,7 @@ public static class Lookup
             {
                 if (dict.Active)
                 {
-                    if (dict.Type == DictType.Kanjidic)
+                    if (dict.Type is DictType.Kanjidic)
                     {
                         lookupResults.AddRange(BuildKanjidicResult(GetKanjiResults(text, dict)));
                     }
@@ -313,8 +313,8 @@ public static class Lookup
                                 {
                                     var dictResult = (JmdictRecord)dictResults[i];
 
-                                    if (deconjugationResult.Tags.Count == 0 || (dictResult.WordClasses
-                                            ?.Where(pos => pos != null)
+                                    if (deconjugationResult.Tags.Count is 0 || (dictResult.WordClasses
+                                            ?.Where(pos => pos is not null)
                                             .SelectMany(pos => pos!).Contains(lastTag) ?? false))
                                     {
                                         resultsList.Add(dictResult);
@@ -330,7 +330,7 @@ public static class Lookup
                                 {
                                     var dictResult = (CustomWordRecord)dictResults[i];
 
-                                    if (deconjugationResult.Tags.Count == 0 ||
+                                    if (deconjugationResult.Tags.Count is 0 ||
                                         dictResult.WordClasses.Contains(lastTag))
                                     {
                                         resultsList.Add(dictResult);
@@ -368,7 +368,7 @@ public static class Lookup
                                 {
                                     var dictResult = (EpwingYomichanRecord)dictResults[i];
 
-                                    if (deconjugationResult.Tags.Count == 0 ||
+                                    if (deconjugationResult.Tags.Count is 0 ||
                                         (dictResult.WordClasses?.Contains(lastTag) ?? false))
                                     {
                                         resultsList.Add(dictResult);
@@ -410,7 +410,7 @@ public static class Lookup
                                 {
                                     var dictResult = (EpwingNazekaRecord)dictResults[i];
 
-                                    if (deconjugationResult.Tags.Count == 0)
+                                    if (deconjugationResult.Tags.Count is 0)
                                     {
                                         resultsList.Add(dictResult);
                                     }
@@ -452,7 +452,7 @@ public static class Lookup
                             if (r.MatchedText == deconjugationResult.OriginalText)
                             {
                                 int index = r.Results.FindIndex(rs => rs.SequenceEqual(resultsList));
-                                if (index != -1)
+                                if (index is not -1)
                                 {
                                     //if (!r.Processes?[index].Any(p => p.SequenceEqual(deconjugationResult.Process)) ?? false)
                                     r.Processes?[index].Add(deconjugationResult.Process);
@@ -499,7 +499,7 @@ public static class Lookup
                 deconjugationResultsList[i], textList[i], textInHiraganaList[i], succAttempt);
 
             if (tryLongVowelConversion && textInHiraganaList[i].Contains('ー') &&
-                textInHiraganaList[i][0] != 'ー')
+                textInHiraganaList[i][0] is not 'ー')
             {
                 List<string> textWithoutLongVowelMarkList = Kana.LongVowelMarkToKana(textInHiraganaList[i]);
 
@@ -537,7 +537,7 @@ public static class Lookup
 
         string? kanji = text.EnumerateUnicodeCharacters().FirstOrDefault();
 
-        if (kanji != null && dict.Contents.TryGetValue(kanji, out List<IDictRecord>? result))
+        if (kanji is not null && dict.Contents.TryGetValue(kanji, out List<IDictRecord>? result))
         {
             kanjiResults.Add(kanji,
                 new IntermediaryResult(new List<List<IDictRecord>> { result }, null, kanji, kanji, dict));
@@ -669,13 +669,13 @@ public static class Lookup
 
         List<string> allReadings = new();
 
-        if (kanjiRecord.OnReadings != null)
+        if (kanjiRecord.OnReadings is not null)
             allReadings.AddRange(kanjiRecord.OnReadings);
 
-        if (kanjiRecord.KunReadings != null)
+        if (kanjiRecord.KunReadings is not null)
             allReadings.AddRange(kanjiRecord.KunReadings);
 
-        if (kanjiRecord.NanoriReadings != null)
+        if (kanjiRecord.NanoriReadings is not null)
             allReadings.AddRange(kanjiRecord.NanoriReadings);
 
         IntermediaryResult intermediaryResult = kanjiResults.First().Value;
@@ -719,10 +719,10 @@ public static class Lookup
 
                     List<string> allReadings = new();
 
-                    if (yomichanKanjiDictResult.OnReadings != null)
+                    if (yomichanKanjiDictResult.OnReadings is not null)
                         allReadings.AddRange(yomichanKanjiDictResult.OnReadings);
 
-                    if (yomichanKanjiDictResult.KunReadings != null)
+                    if (yomichanKanjiDictResult.KunReadings is not null)
                         allReadings.AddRange(yomichanKanjiDictResult.KunReadings);
 
                     LookupResult result = new
@@ -770,7 +770,7 @@ public static class Lookup
                         process: ProcessProcess(wordResult.Processes?[i]),
                         frequencies: GetWordFrequencies(epwingResult),
                         dict: wordResult.Dict,
-                        readings: epwingResult.Reading != null
+                        readings: epwingResult.Reading is not null
                             ? new List<string> { epwingResult.Reading }
                             : null,
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options)
@@ -809,7 +809,7 @@ public static class Lookup
                         process: ProcessProcess(wordResult.Processes?[i]),
                         frequencies: GetWordFrequencies(epwingResult),
                         dict: wordResult.Dict,
-                        readings: epwingResult.Reading != null
+                        readings: epwingResult.Reading is not null
                             ? new List<string> { epwingResult.Reading }
                             : null,
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options)
@@ -842,7 +842,7 @@ public static class Lookup
                     List<LookupFrequencyResult> freqs = GetWordFrequencies(customWordDictResult);
                     foreach (LookupFrequencyResult freqResult in freqs)
                     {
-                        if (freqResult.Freq == int.MaxValue)
+                        if (freqResult.Freq is int.MaxValue)
                             freqResult.Freq = -i;
                     }
 
@@ -912,7 +912,7 @@ public static class Lookup
 
         foreach (Freq freq in Storage.FreqDicts.Values)
         {
-            if (freq.Active && freq.Type != FreqType.YomichanKanji)
+            if (freq.Active && freq.Type is not FreqType.YomichanKanji)
             {
                 freqsList.Add(new(freq.Name, record.GetFrequency(freq)));
             }
@@ -925,7 +925,7 @@ public static class Lookup
     {
         List<LookupFrequencyResult> freqsList = new();
 
-        Freq? kanjiFreq = Storage.FreqDicts.Values.FirstOrDefault(f => f.Type == FreqType.YomichanKanji);
+        Freq? kanjiFreq = Storage.FreqDicts.Values.FirstOrDefault(f => f.Type is FreqType.YomichanKanji);
 
         if (kanjiFreq?.Active ?? false)
         {
@@ -933,7 +933,7 @@ public static class Lookup
             {
                 int frequency = freqResultList.FirstOrDefault()?.Frequency ?? int.MaxValue;
 
-                if (frequency != int.MaxValue)
+                if (frequency is not int.MaxValue)
                 {
                     freqsList.Add(new(kanjiFreq.Name, frequency));
                 }
@@ -947,7 +947,7 @@ public static class Lookup
     {
         List<LookupFrequencyResult> freqsList = new();
 
-        if (frequency != 0)
+        if (frequency is not 0)
         {
             freqsList.Add(new("Kanjidic Freq", frequency));
         }
@@ -973,10 +973,10 @@ public static class Lookup
             {
                 string info = form[j];
 
-                if (info == "")
+                if (info is "")
                     continue;
 
-                if (info.StartsWith('(') && info.EndsWith(')') && j != 0)
+                if (info.StartsWith('(') && info.EndsWith(')') && j is not 0)
                     continue;
 
                 if (added > 0)
@@ -986,7 +986,7 @@ public static class Lookup
                 formText.Append(info);
             }
 
-            if (formText.Length != 0)
+            if (formText.Length is not 0)
             {
                 if (first)
                     deconj.Append('～');
@@ -999,6 +999,6 @@ public static class Lookup
             first = false;
         }
 
-        return deconj.Length == 0 ? null : deconj.ToString();
+        return deconj.Length is 0 ? null : deconj.ToString();
     }
 }

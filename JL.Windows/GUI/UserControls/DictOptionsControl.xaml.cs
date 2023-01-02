@@ -280,8 +280,8 @@ public partial class DictOptionsControl : UserControl
         }
 
         if (
-            NoAllCheckBox.Visibility == Visibility.Visible
-            || PitchAccentMarkerColorDockPanel.Visibility == Visibility.Visible
+            NoAllCheckBox.Visibility is Visibility.Visible
+            || PitchAccentMarkerColorDockPanel.Visibility is Visibility.Visible
            )
         {
             OptionsTextBlock.Visibility = Visibility.Visible;

@@ -51,7 +51,7 @@ public partial class AddWordWindow : Window
             SpellingsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
         }
 
-        if (ReadingsTextBox!.Text == "")
+        if (ReadingsTextBox!.Text is "")
         {
             ReadingsTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -61,7 +61,7 @@ public partial class AddWordWindow : Window
             ReadingsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
         }
 
-        if (DefinitionsTextBox!.Text == "")
+        if (DefinitionsTextBox!.Text is "")
         {
             DefinitionsTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -104,7 +104,7 @@ public partial class AddWordWindow : Window
         stringBuilder.Append(wordClass);
         stringBuilder.Append(Environment.NewLine);
 
-        string customWordDictPath = Storage.Dicts.Values.First(dict => dict.Type == DictType.CustomWordDictionary).Path;
+        string customWordDictPath = Storage.Dicts.Values.First(dict => dict.Type is DictType.CustomWordDictionary).Path;
         await File.AppendAllTextAsync(customWordDictPath,
             stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);
     }

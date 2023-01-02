@@ -59,7 +59,7 @@ public class EpwingNazekaRecord : IEpwingRecord, IDictRecordWithGetFrequency
                 }
             }
 
-            if (frequency == int.MaxValue && AlternativeSpellings != null)
+            if (frequency == int.MaxValue && AlternativeSpellings is not null)
             {
                 int alternativeSpellingsCount = AlternativeSpellings.Count;
                 for (int i = 0; i < alternativeSpellingsCount; i++)
@@ -86,7 +86,7 @@ public class EpwingNazekaRecord : IEpwingRecord, IDictRecordWithGetFrequency
             }
         }
 
-        else if (Reading != null)
+        else if (Reading is not null)
         {
             string reading = Reading;
 

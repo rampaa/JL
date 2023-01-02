@@ -51,7 +51,7 @@ public partial class AddNameWindow : Window
             SpellingTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
         }
 
-        if (ReadingTextBox!.Text == "")
+        if (ReadingTextBox!.Text is "")
         {
             ReadingTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -85,7 +85,7 @@ public partial class AddNameWindow : Window
         stringBuilder.Append(type);
         stringBuilder.Append(Environment.NewLine);
 
-        string customNameDictPath = Storage.Dicts.Values.First(dict => dict.Type == DictType.CustomNameDictionary).Path;
+        string customNameDictPath = Storage.Dicts.Values.First(dict => dict.Type is DictType.CustomNameDictionary).Path;
         await File.AppendAllTextAsync(customNameDictPath,
             stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);
     }

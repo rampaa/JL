@@ -60,7 +60,7 @@ public static class EpwingUtils
                 return FilterDuplicateEntries(epwingRecord, dict);
 
             case DictType.Daijirin:
-                if (epwingRecord.Definitions != null)
+                if (epwingRecord.Definitions is not null)
                 {
                     // english definitions
                     if (epwingRecord.Definitions.Any(def => def.Contains("→英和") || def.Contains("\\u003")))
@@ -98,7 +98,7 @@ public static class EpwingUtils
             {
                 var kenkyuushaResult = (IEpwingRecord)previousResults[i];
 
-                if (epwingRecord.Definitions != null)
+                if (epwingRecord.Definitions is not null)
                 {
                     epwingRecord.Definitions = epwingRecord.Definitions.Select(def => def.Replace("┏", "")).ToList();
 
@@ -120,7 +120,7 @@ public static class EpwingUtils
             }
         }
 
-        else if (epwingRecord.Definitions != null)
+        else if (epwingRecord.Definitions is not null)
         {
             epwingRecord.Definitions = epwingRecord.Definitions.Select(def => def.Replace("┏", "")).ToList();
         }

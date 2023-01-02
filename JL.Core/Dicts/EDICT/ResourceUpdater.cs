@@ -41,7 +41,7 @@ public static class ResourceUpdater
                     return true;
                 }
 
-                else if (response.StatusCode == HttpStatusCode.NotModified && !noPrompt)
+                else if (response.StatusCode is HttpStatusCode.NotModified && !noPrompt)
                 {
                     Storage.Frontend.ShowOkDialog($"{resourceName} is up to date.",
                         "Info");

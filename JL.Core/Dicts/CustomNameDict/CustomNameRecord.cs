@@ -20,7 +20,7 @@ public class CustomNameRecord : IDictRecord
 
     public override bool Equals(object? obj)
     {
-        if (obj == null)
+        if (obj is null)
             return false;
 
         CustomNameRecord customNameRecordObj = (obj as CustomNameRecord)!;

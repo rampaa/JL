@@ -82,7 +82,7 @@ public class CustomWordRecord : IDictRecordWithGetFrequency
                 }
             }
 
-            if (frequency == int.MaxValue && AlternativeSpellings != null)
+            if (frequency == int.MaxValue && AlternativeSpellings is not null)
             {
                 int alternativeSpellingsCount = AlternativeSpellings.Count;
                 for (int i = 0; i < alternativeSpellingsCount; i++)
@@ -109,7 +109,7 @@ public class CustomWordRecord : IDictRecordWithGetFrequency
             }
         }
 
-        else if (Readings != null)
+        else if (Readings is not null)
         {
             int readingCount = Readings.Count;
             for (int i = 0; i < readingCount; i++)
@@ -162,7 +162,7 @@ public class CustomWordRecord : IDictRecordWithGetFrequency
 
             hash = hash * 37 + PrimarySpelling.GetHashCode();
 
-            if (AlternativeSpellings != null)
+            if (AlternativeSpellings is not null)
             {
                 foreach (string spelling in AlternativeSpellings)
                     hash = hash * 37 + spelling.GetHashCode();
@@ -173,7 +173,7 @@ public class CustomWordRecord : IDictRecordWithGetFrequency
             }
 
 
-            if (Readings != null)
+            if (Readings is not null)
             {
                 foreach (string readings in Readings)
                     hash = hash * 37 + readings.GetHashCode();

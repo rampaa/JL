@@ -14,7 +14,7 @@ public static class Mining
         {
             Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
 
-            if (ankiConfigDict == null)
+            if (ankiConfigDict is null)
             {
                 Storage.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
                 return false;
@@ -44,7 +44,7 @@ public static class Mining
                 ankiConfigDict.TryGetValue(MineType.Other, out ankiConfig);
             }
 
-            if (ankiConfig == null)
+            if (ankiConfig is null)
             {
                 Storage.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
                 return false;
@@ -69,7 +69,7 @@ public static class Mining
 
             byte[]? audioRes = null;
 
-            bool needsAudio = userFields.Values.Any(jlField => jlField == JLField.Audio);
+            bool needsAudio = userFields.Values.Any(jlField => jlField is JLField.Audio);
             if (needsAudio)
             {
                 audioRes = await Networking.GetAudioFromJpod101(primarySpelling, reading).ConfigureAwait(false);
@@ -92,7 +92,7 @@ public static class Mining
             Note note = new(deckName, modelName, fields, options, tags, audio, video, picture);
             Response? response = await AnkiConnect.AddNoteToDeck(note).ConfigureAwait(false);
 
-            if (response == null)
+            if (response is null)
             {
                 Storage.Frontend.Alert(AlertLevel.Error, $"Mining failed for {primarySpelling}");
                 Utils.Logger.Error("Mining failed for {FoundSpelling}", primarySpelling);
@@ -100,7 +100,7 @@ public static class Mining
             }
             else
             {
-                if (needsAudio && (audioRes == null || Utils.GetMd5String(audioRes) == Storage.Jpod101NoAudioMd5Hash))
+                if (needsAudio && (audioRes is null || Utils.GetMd5String(audioRes) is Storage.Jpod101NoAudioMd5Hash))
                 {
                     Storage.Frontend.Alert(AlertLevel.Warning, $"Mined {primarySpelling} (no audio)");
                     Utils.Logger.Information("Mined {FoundSpelling} (no audio)", primarySpelling);

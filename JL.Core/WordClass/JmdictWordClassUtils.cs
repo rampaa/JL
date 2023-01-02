@@ -24,7 +24,7 @@ public static class JmdictWordClassUtils
             {
                 JmdictWordClass jmdictWordClass = jmdictWordClassList[i];
 
-                if (jmdictWordClass.Readings != null)
+                if (jmdictWordClass.Readings is not null)
                 {
                     int readingCount = jmdictWordClass.Readings.Count;
                     for (int j = 0; j < readingCount; j++)
@@ -68,7 +68,7 @@ public static class JmdictWordClassUtils
                 if ((!value.WordClasses?.Any()) ?? true)
                     continue;
 
-                List<string> wordClasses = value.WordClasses?.Where(wc => wc != null).SelectMany(wc => wc!).ToHashSet().Intersect(usedWordClasses).ToList() ?? new();
+                List<string> wordClasses = value.WordClasses?.Where(wc => wc is not null).SelectMany(wc => wc!).ToHashSet().Intersect(usedWordClasses).ToList() ?? new();
 
                 if (!wordClasses.Any())
                     continue;
@@ -87,7 +87,7 @@ public static class JmdictWordClassUtils
                         new List<JmdictWordClass> { new(value.PrimarySpelling, value.Readings, wordClasses) });
                 }
 
-                if (value.AlternativeSpellings != null)
+                if (value.AlternativeSpellings is not null)
                 {
                     int alternativeSpellingCount = value.AlternativeSpellings.Count;
                     for (int j = 0; j < alternativeSpellingCount; j++)

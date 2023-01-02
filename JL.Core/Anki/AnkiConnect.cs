@@ -60,7 +60,7 @@ public static class AnkiConnect
             Response? json = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);
             Utils.Logger.Information("json result: {JsonResult}", json?.Result ?? "null");
 
-            if (json?.Error == null)
+            if (json?.Error is null)
                 return json;
 
             Storage.Frontend.Alert(AlertLevel.Error, json.Error.ToString()!);

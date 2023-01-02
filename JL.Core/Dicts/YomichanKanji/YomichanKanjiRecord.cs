@@ -33,7 +33,7 @@ public class YomichanKanjiRecord : IDictRecord
         //}
 
         JsonElement definitionsArray = jsonElement[4];
-        if (definitionsArray.ValueKind == JsonValueKind.Array)
+        if (definitionsArray.ValueKind is JsonValueKind.Array)
         {
             Definitions = new List<string>();
             foreach (JsonElement definition in definitionsArray.EnumerateArray())
@@ -49,7 +49,7 @@ public class YomichanKanjiRecord : IDictRecord
 
         JsonElement statsElement = jsonElement[5];
         Stats = new List<string>();
-        if (statsElement.ValueKind == JsonValueKind.Array)
+        if (statsElement.ValueKind is JsonValueKind.Array)
         {
             foreach (JsonElement stat in statsElement.EnumerateArray())
             {
@@ -57,7 +57,7 @@ public class YomichanKanjiRecord : IDictRecord
             }
         }
 
-        else if (statsElement.ValueKind == JsonValueKind.Object)
+        else if (statsElement.ValueKind is JsonValueKind.Object)
         {
             foreach (JsonProperty stat in statsElement.EnumerateObject())
             {

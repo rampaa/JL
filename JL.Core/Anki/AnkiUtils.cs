@@ -9,7 +9,7 @@ public static class AnkiUtils
         Response? response = await AnkiConnect.GetDeckNamesResponse().ConfigureAwait(false);
         string? resultString = response?.Result?.ToString() ?? null;
 
-        return resultString != null
+        return resultString is not null
             ? JsonSerializer.Deserialize<List<string>>(resultString)
             : null;
     }
@@ -19,7 +19,7 @@ public static class AnkiUtils
         Response? response = await AnkiConnect.GetModelNamesResponse().ConfigureAwait(false);
         string? resultString = response?.Result?.ToString() ?? null;
 
-        return resultString != null
+        return resultString is not null
             ? JsonSerializer.Deserialize<List<string>>(resultString)
             : null;
     }
@@ -29,7 +29,7 @@ public static class AnkiUtils
         Response? response = await AnkiConnect.GetModelFieldNamesResponse(modelName).ConfigureAwait(false);
         string? resultString = response?.Result?.ToString() ?? null;
 
-        return resultString != null
+        return resultString is not null
             ? JsonSerializer.Deserialize<List<string>>(resultString)
             : null;
     }
