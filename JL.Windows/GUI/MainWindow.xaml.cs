@@ -147,8 +147,9 @@ public partial class MainWindow : Window, IFrontend
                     await Stats.IncrementStat(StatType.Characters, new StringInfo(text).LengthInTextElements).ConfigureAwait(false);
                     await Stats.IncrementStat(StatType.Lines).ConfigureAwait(false);
 
-                    if (Storage.DictsReady && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic && Storage.FreqsReady
-                        && ConfigManager.Precaching && MainTextBox!.Text.Length < Storage.CacheSize)
+                    if (ConfigManager.Precaching && Storage.DictsReady
+                        && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic
+                        && Storage.FreqsReady && MainTextBox!.Text.Length < Storage.CacheSize)
                     {
                         _ = Dispatcher.Invoke(DispatcherPriority.Render, () => { }); // let MainTextBox text update
                         await Precache(MainTextBox!.Text).ConfigureAwait(false);

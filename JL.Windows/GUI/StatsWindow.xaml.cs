@@ -79,11 +79,11 @@ public partial class StatsWindow : Window
             {
                 case StatsMode.Session:
                     await Stats.UpdateLifetimeStats().ConfigureAwait(true);
-                    await UpdateStatsDisplay(StatsMode.Lifetime).ConfigureAwait(false);
+                    await UpdateStatsDisplay(StatsMode.Lifetime).ConfigureAwait(true);
                     button.Content = StatsMode.Lifetime.ToString();
                     break;
                 case StatsMode.Lifetime:
-                    await UpdateStatsDisplay(StatsMode.Session).ConfigureAwait(false);
+                    await UpdateStatsDisplay(StatsMode.Session).ConfigureAwait(true);
                     button.Content = StatsMode.Session.ToString();
                     break;
                 default:

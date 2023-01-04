@@ -29,32 +29,32 @@ public class Stats
 
     public static async Task IncrementStat(StatType type, long amount = 1)
     {
-        Stats lifeTimeStats = await GetLifetimeStats().ConfigureAwait(false);
+        Stats lifetimeStats = await GetLifetimeStats().ConfigureAwait(false);
         switch (type)
         {
             case StatType.Characters:
                 SessionStats.Characters += amount;
-                lifeTimeStats.Characters += amount;
+                lifetimeStats.Characters += amount;
                 break;
             case StatType.Lines:
                 SessionStats.Lines += amount;
-                lifeTimeStats.Lines += amount;
+                lifetimeStats.Lines += amount;
                 break;
             case StatType.Time:
                 SessionStats.Time = SessionStats.Time.Add(TimeSpan.FromTicks(amount));
-                lifeTimeStats.Time = lifeTimeStats.Time.Add(TimeSpan.FromTicks(amount));
+                lifetimeStats.Time = lifetimeStats.Time.Add(TimeSpan.FromTicks(amount));
                 break;
             case StatType.CardsMined:
                 SessionStats.CardsMined += amount;
-                lifeTimeStats.CardsMined += amount;
+                lifetimeStats.CardsMined += amount;
                 break;
             case StatType.TimesPlayedAudio:
                 SessionStats.TimesPlayedAudio += amount;
-                lifeTimeStats.TimesPlayedAudio += amount;
+                lifetimeStats.TimesPlayedAudio += amount;
                 break;
             case StatType.Imoutos:
                 SessionStats.Imoutos += amount;
-                lifeTimeStats.Imoutos += amount;
+                lifetimeStats.Imoutos += amount;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
@@ -63,8 +63,8 @@ public class Stats
 
     public static async Task UpdateLifetimeStats()
     {
-        Stats lifeTimeStats = await GetLifetimeStats().ConfigureAwait(false);
-        await WriteLifetimeStats(lifeTimeStats).ConfigureAwait(false);
+        Stats lifetimeStats = await GetLifetimeStats().ConfigureAwait(false);
+        await WriteLifetimeStats(lifetimeStats).ConfigureAwait(false);
     }
 
     private static async Task WriteLifetimeStats(Stats lifetimeStats)
