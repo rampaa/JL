@@ -1,4 +1,5 @@
-﻿using System.Runtime;
+using System.Globalization;
+using System.Runtime;
 using System.Security.Cryptography;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -14,6 +15,7 @@ namespace JL.Core.Utilities;
 public static class Utils
 {
     public static readonly ILogger Logger = new LoggerConfiguration().WriteTo.File("Logs/log.txt",
+            formatProvider: CultureInfo.InvariantCulture,
             rollingInterval: RollingInterval.Day,
             retainedFileTimeLimit: TimeSpan.FromDays(90),
             shared: true)
@@ -39,7 +41,7 @@ public static class Utils
 
         try
         {
-            Directory.CreateDirectory(Storage.ConfigPath);
+            _ = Directory.CreateDirectory(Storage.ConfigPath);
             File.WriteAllText(Path.Join(Storage.ConfigPath, "dicts.json"),
                 JsonSerializer.Serialize(Storage.BuiltInDicts, jso));
         }
@@ -60,7 +62,7 @@ public static class Utils
 
         try
         {
-            Directory.CreateDirectory(Storage.ConfigPath);
+            _ = Directory.CreateDirectory(Storage.ConfigPath);
             File.WriteAllText(Path.Join(Storage.ConfigPath, "freqs.json"),
                 JsonSerializer.Serialize(Storage.BuiltInFreqs, jso));
         }
@@ -181,13 +183,13 @@ public static class Utils
                 else
                 {
                     Storage.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/dicts.json");
-                    Utils.Logger.Error("Couldn't load Config/dicts.json");
+                    Logger.Error("Couldn't load Config/dicts.json");
                 }
             }
         }
         catch (Exception ex)
         {
-            Utils.Logger.Fatal(ex, "DeserializeDicts failed");
+            Logger.Fatal(ex, "DeserializeDicts failed");
             throw;
         }
     }
@@ -225,24 +227,27 @@ public static class Utils
                 else
                 {
                     Storage.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/freqs.json");
-                    Utils.Logger.Error("Couldn't load Config/freqs.json");
+                    Logger.Error("Couldn't load Config/freqs.json");
                 }
             }
         }
         catch (Exception ex)
         {
-            Utils.Logger.Fatal(ex, "DeserializeFreqs failed");
+            Logger.Fatal(ex, "DeserializeFreqs failed");
             throw;
         }
     }
 
+#pragma warning disable CA5351
     public static string GetMd5String(byte[] bytes)
     {
+
         byte[] hash = MD5.HashData(bytes);
         string encoded = BitConverter.ToString(hash);
 
         return encoded;
     }
+#pragma warning restore CA5351
 
     public static int FindWordBoundary(string text, int position)
     {
@@ -253,11 +258,15 @@ public static class Utils
             int tempIndex = text.IndexOf(Storage.JapanesePunctuation[i], position, StringComparison.Ordinal);
 
             if (tempIndex is not -1 && (endPosition is -1 || tempIndex < endPosition))
+            {
                 endPosition = tempIndex;
+            }
         }
 
         if (endPosition is -1)
+        {
             endPosition = text.Length;
+        }
 
         return endPosition;
     }
@@ -286,18 +295,24 @@ public static class Utils
             int tempIndex = text.LastIndexOf(punctuation, position, StringComparison.Ordinal);
 
             if (tempIndex > startPosition)
+            {
                 startPosition = tempIndex;
+            }
 
             tempIndex = text.IndexOf(punctuation, position, StringComparison.Ordinal);
 
             if (tempIndex is not -1 && (endPosition is -1 || tempIndex < endPosition))
+            {
                 endPosition = tempIndex;
+            }
         }
 
         ++startPosition;
 
         if (endPosition is -1)
+        {
             endPosition = text.Length - 1;
+        }
 
         string sentence = startPosition < endPosition
             ? text[startPosition..(endPosition + 1)].Trim('\n', '\t', '\r', ' ', '　')
@@ -318,18 +333,22 @@ public static class Utils
             if (japaneseParentheses.TryGetValue(sentence.FirstOrDefault().ToString(), out string? rightParenthesis))
             {
                 if (sentence.Last().ToString() == rightParenthesis)
+                {
                     sentence = sentence[1..^1];
-
+                }
                 else if (!sentence.Contains(rightParenthesis))
+                {
                     sentence = sentence[1..];
-
+                }
                 else if (sentence.Contains(rightParenthesis))
                 {
                     int numberOfLeftParentheses = sentence.Count(p => p == sentence[0]);
                     int numberOfRightParentheses = sentence.Count(p => p == rightParenthesis[0]);
 
                     if (numberOfLeftParentheses == numberOfRightParentheses + 1)
+                    {
                         sentence = sentence[1..];
+                    }
                 }
             }
 
@@ -338,15 +357,18 @@ public static class Utils
                 string leftParenthesis = japaneseParentheses.First(p => p.Value == sentence.Last().ToString()).Key;
 
                 if (!sentence.Contains(leftParenthesis))
+                {
                     sentence = sentence[..^1];
-
+                }
                 else if (sentence.Contains(leftParenthesis))
                 {
                     int numberOfLeftParentheses = sentence.Count(p => p == leftParenthesis[0]);
                     int numberOfRightParentheses = sentence.Count(p => p == sentence.Last());
 
                     if (numberOfRightParentheses == numberOfLeftParentheses + 1)
+                    {
                         sentence = sentence[..^1];
+                    }
                 }
             }
         }
@@ -356,10 +378,12 @@ public static class Utils
 
     public static async Task GetAndPlayAudioFromJpod101(string foundSpelling, string? reading, float volume)
     {
-        Utils.Logger.Information("Attempting to play audio from jpod101: {FoundSpelling} {Reading}", foundSpelling, reading);
+        Logger.Information("Attempting to play audio from jpod101: {FoundSpelling} {Reading}", foundSpelling, reading);
 
         if (string.IsNullOrEmpty(reading))
+        {
             reading = foundSpelling;
+        }
 
         byte[]? sound = await Networking.GetAudioFromJpod101(foundSpelling, reading).ConfigureAwait(false);
         if (sound is not null)
@@ -371,7 +395,7 @@ public static class Utils
             }
 
             Storage.Frontend.PlayAudio(sound, volume);
-            Stats.IncrementStat(StatType.TimesPlayedAudio);
+            await Stats.IncrementStat(StatType.TimesPlayedAudio).ConfigureAwait(false);
         }
     }
 
@@ -382,16 +406,24 @@ public static class Utils
         Storage.StatsStopWatch.Start();
 
         if (!File.Exists($"{Storage.ConfigPath}/dicts.json"))
+        {
             CreateDefaultDictsConfig();
+        }
 
         if (!File.Exists($"{Storage.ConfigPath}/freqs.json"))
+        {
             CreateDefaultFreqsConfig();
+        }
 
         if (!File.Exists($"{Storage.ResourcesPath}/custom_words.txt"))
-            await File.Create($"{Storage.ResourcesPath}/custom_words.txt").DisposeAsync();
+        {
+            await File.Create($"{Storage.ResourcesPath}/custom_words.txt").DisposeAsync().ConfigureAwait(false);
+        }
 
         if (!File.Exists($"{Storage.ResourcesPath}/custom_names.txt"))
-            await File.Create($"{Storage.ResourcesPath}/custom_names.txt").DisposeAsync();
+        {
+            await File.Create($"{Storage.ResourcesPath}/custom_names.txt").DisposeAsync().ConfigureAwait(false);
+        }
 
         List<Task> tasks = new()
         {
@@ -427,7 +459,7 @@ public static class Utils
 
     private static async void OnTimedEvent(object? sender, ElapsedEventArgs e)
     {
-        Stats.IncrementStat(StatType.Time, Storage.StatsStopWatch.ElapsedTicks);
+        await Stats.IncrementStat(StatType.Time, Storage.StatsStopWatch.ElapsedTicks).ConfigureAwait(false);
 
         if (Storage.StatsStopWatch.IsRunning)
         {
@@ -447,9 +479,13 @@ public static class Utils
         List<string>? listClone = list;
 
         if (!listClone.Any() || listClone.All(string.IsNullOrEmpty))
+        {
             listClone = null;
+        }
         else
+        {
             listClone.TrimExcess();
+        }
 
         return listClone;
     }

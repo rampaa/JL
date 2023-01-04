@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace JL.Core.Utilities;
@@ -15,15 +15,9 @@ public static class ExtensionMethods
             FieldInfo? field = type.GetField(name);
             if (field is not null)
             {
-                if (Attribute.GetCustomAttribute(field,
-                        typeof(DescriptionAttribute)) is DescriptionAttribute attr)
-                {
-                    return attr.Description;
-                }
-                else
-                {
-                    return name;
-                }
+                return Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) is DescriptionAttribute attr
+                    ? attr.Description
+                    : name;
             }
         }
 

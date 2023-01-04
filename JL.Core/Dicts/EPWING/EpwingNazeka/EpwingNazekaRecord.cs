@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
 
@@ -22,7 +22,9 @@ public class EpwingNazekaRecord : IEpwingRecord, IDictRecordWithGetFrequency
     public string? BuildFormattedDefinition(DictOptions? options)
     {
         if (Definitions is null)
+        {
             return null;
+        }
 
         StringBuilder defResult = new();
 
@@ -32,7 +34,7 @@ public class EpwingNazekaRecord : IEpwingRecord, IDictRecordWithGetFrequency
 
         for (int i = 0; i < Definitions.Count; i++)
         {
-            defResult.Append(Definitions[i] + separator);
+            _ = defResult.Append(Definitions[i] + separator);
         }
 
         return defResult.ToString().TrimEnd(' ', '\n');
@@ -98,7 +100,7 @@ public class EpwingNazekaRecord : IEpwingRecord, IDictRecordWithGetFrequency
                 {
                     FrequencyRecord readingFreqResult = readingFreqResults[j];
 
-                    if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading)
+                    if ((reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
                         || (AlternativeSpellings?.Contains(readingFreqResult.Spelling) ?? false))
                     {
                         if (frequency > readingFreqResult.Frequency)

@@ -1,4 +1,4 @@
-﻿using System.Xml;
+using System.Xml;
 
 namespace JL.Core.Dicts.EDICT.JMnedict;
 
@@ -31,7 +31,7 @@ public static class JmnedictLoader
         else if (Storage.Frontend.ShowYesNoDialog("Couldn't find JMnedict.xml. Would you like to download it now?",
                      "Download JMnedict?"))
         {
-            await ResourceUpdater.UpdateResource(dict.Path,
+            _ = await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.JmnedictUrl,
                 DictType.JMnedict.ToString(), false, false).ConfigureAwait(false);
             await Load(dict).ConfigureAwait(false);
@@ -49,7 +49,9 @@ public static class JmnedictLoader
         while (!xmlReader.EOF)
         {
             if (xmlReader is { Name: "entry", NodeType: XmlNodeType.EndElement })
+            {
                 break;
+            }
 
             if (xmlReader.NodeType is XmlNodeType.Element)
             {
@@ -72,14 +74,14 @@ public static class JmnedictLoader
                         break;
 
                     default:
-                        xmlReader.Read();
+                        _ = xmlReader.Read();
                         break;
                 }
             }
 
             else
             {
-                xmlReader.Read();
+                _ = xmlReader.Read();
             }
         }
 
@@ -88,14 +90,14 @@ public static class JmnedictLoader
 
     private static string ReadKEle(XmlReader xmlReader)
     {
-        xmlReader.ReadToFollowing("keb");
+        _ = xmlReader.ReadToFollowing("keb");
         return xmlReader.ReadElementContentAsString();
         //xmlReader.ReadToFollowing("k_ele");
     }
 
     private static string ReadREle(XmlReader xmlReader)
     {
-        xmlReader.ReadToFollowing("reb");
+        _ = xmlReader.ReadToFollowing("reb");
         return xmlReader.ReadElementContentAsString();
         //xmlReader.ReadToFollowing("r_ele");
     }
@@ -106,7 +108,9 @@ public static class JmnedictLoader
         while (!xmlReader.EOF)
         {
             if (xmlReader is { Name: "trans", NodeType: XmlNodeType.EndElement })
+            {
                 break;
+            }
 
             if (xmlReader.NodeType is XmlNodeType.Element)
             {
@@ -125,14 +129,14 @@ public static class JmnedictLoader
                     //    break;
 
                     default:
-                        xmlReader.Read();
+                        _ = xmlReader.Read();
                         break;
                 }
             }
 
             else
             {
-                xmlReader.Read();
+                _ = xmlReader.Read();
             }
         }
 
@@ -143,12 +147,12 @@ public static class JmnedictLoader
     {
         string? entityName = null;
 
-        xmlReader.Read();
+        _ = xmlReader.Read();
         if (xmlReader.NodeType is XmlNodeType.EntityReference)
         {
             //xmlReader.ResolveEntity();
             entityName = xmlReader.Name;
-            xmlReader.Read();
+            _ = xmlReader.Read();
         }
 
         return entityName;

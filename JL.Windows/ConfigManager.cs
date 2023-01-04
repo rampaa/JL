@@ -1,4 +1,4 @@
-﻿using System.Configuration;
+using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Windows;
@@ -19,15 +19,12 @@ public class ConfigManager : CoreConfig
 {
     private static ConfigManager? s_instance;
 
-    public static ConfigManager Instance
-    {
-        get { return s_instance ??= new ConfigManager(); }
-    }
+    public static ConfigManager Instance => s_instance ??= new ConfigManager();
 
     #region General
 
     private static readonly List<ComboBoxItem> s_japaneseFonts =
-        WindowsUtils.FindJapaneseFonts().OrderByDescending(f => f.Foreground!.ToString()).ThenBy(font => font.Content)
+        WindowsUtils.FindJapaneseFonts().OrderByDescending(f => f.Foreground!.ToString(CultureInfo.InvariantCulture)).ThenBy(font => font.Content)
             .ToList();
 
     private static readonly List<ComboBoxItem> s_popupJapaneseFonts =
@@ -117,7 +114,7 @@ public class ConfigManager : CoreConfig
     #endregion
 
     #region Anki
-    public static bool AnkiIntegration { get; private set; } = false;
+    public static bool AnkiIntegration { get; set; } = false;
     #endregion
 
     #region Hotkeys
@@ -307,14 +304,9 @@ public class ConfigManager : CoreConfig
 
         mainWindow.Background = GetBrushFromConfig(mainWindow.Background, "MainWindowBackgroundColor");
 
-        if (ChangeMainWindowBackgroundOpacityOnUnhover && !mainWindow.IsMouseOver)
-        {
-            mainWindow.Background.Opacity = MainWindowBackgroundOpacityOnUnhover / 100;
-        }
-        else
-        {
-            mainWindow.Background.Opacity = mainWindow.OpacitySlider.Value / 100;
-        }
+        mainWindow.Background.Opacity = ChangeMainWindowBackgroundOpacityOnUnhover && !mainWindow.IsMouseOver
+            ? MainWindowBackgroundOpacityOnUnhover / 100
+            : mainWindow.OpacitySlider.Value / 100;
 
         DisableHotkeysKeyGesture = WindowsUtils.SetKeyGesture(nameof(DisableHotkeysKeyGesture), DisableHotkeysKeyGesture);
         MiningModeKeyGesture = WindowsUtils.SetKeyGesture(nameof(MiningModeKeyGesture), MiningModeKeyGesture);
@@ -475,9 +467,13 @@ public class ConfigManager : CoreConfig
 
         tempStr = ConfigurationManager.AppSettings.Get(nameof(PopupFont));
         if (tempStr is null)
+        {
             AddToConfig(nameof(PopupFont), PopupFont.Source);
+        }
         else
+        {
             PopupFont = new FontFamily(tempStr);
+        }
 
         PopupWindow? currentPopupWindow = mainWindow.FirstPopupWindow;
         while (currentPopupWindow is not null)
@@ -743,7 +739,7 @@ public class ConfigManager : CoreConfig
 
         // We want the opaque color here
         config.AppSettings.Settings["MainWindowBackgroundColor"].Value =
-            preferenceWindow.MainWindowBackgroundColorButton.Background.ToString();
+            preferenceWindow.MainWindowBackgroundColorButton.Background.ToString(CultureInfo.InvariantCulture);
 
         config.AppSettings.Settings[nameof(ChangeMainWindowBackgroundOpacityOnUnhover)].Value =
             preferenceWindow.ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox.IsChecked.ToString();
@@ -838,7 +834,7 @@ public class ConfigManager : CoreConfig
 
         // We want the opaque color here
         config.AppSettings.Settings[nameof(PopupBackgroundColor)].Value =
-            preferenceWindow.PopupBackgroundColorButton.Background.ToString();
+            preferenceWindow.PopupBackgroundColorButton.Background.ToString(CultureInfo.InvariantCulture);
 
         config.AppSettings.Settings[nameof(PrimarySpellingColor)].Value =
             preferenceWindow.PrimarySpellingColorButton.Tag.ToString();
@@ -936,6 +932,8 @@ public class ConfigManager : CoreConfig
             ? mainWindow.Left.ToString(CultureInfo.InvariantCulture)
             : "0";
 
+        // TODO: properties with public setters should be saved here?
+
         config.Save(ConfigurationSaveMode.Modified);
     }
 
@@ -974,9 +972,13 @@ public class ConfigManager : CoreConfig
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
             if (ConfigurationManager.AppSettings.Get(configKey) is null)
+            {
                 config.AppSettings.Settings.Add(configKey, variable.ToString());
+            }
             else
+            {
                 config.AppSettings.Settings[configKey].Value = variable.ToString();
+            }
 
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
@@ -998,9 +1000,13 @@ public class ConfigManager : CoreConfig
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
             if (ConfigurationManager.AppSettings.Get(configKey) is null)
+            {
                 config.AppSettings.Settings.Add(configKey, Convert.ToString(number, CultureInfo.InvariantCulture));
+            }
             else
+            {
                 config.AppSettings.Settings[configKey].Value = Convert.ToString(number, CultureInfo.InvariantCulture);
+            }
 
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
@@ -1028,9 +1034,13 @@ public class ConfigManager : CoreConfig
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
             if (ConfigurationManager.AppSettings.Get(configKey) is null)
-                config.AppSettings.Settings.Add(configKey, solidColorBrush.ToString());
+            {
+                config.AppSettings.Settings.Add(configKey, solidColorBrush.ToString(CultureInfo.InvariantCulture));
+            }
             else
-                config.AppSettings.Settings[configKey].Value = solidColorBrush.ToString();
+            {
+                config.AppSettings.Settings[configKey].Value = solidColorBrush.ToString(CultureInfo.InvariantCulture);
+            }
 
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
@@ -1053,7 +1063,7 @@ public class ConfigManager : CoreConfig
         Configuration config =
             ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
-        config.AppSettings.Settings[key].Value = rawKeyGesture.StartsWith("Win+")
+        config.AppSettings.Settings[key].Value = rawKeyGesture.StartsWith("Win+", StringComparison.Ordinal)
             ? rawKeyGesture[4..]
             : rawKeyGesture;
 

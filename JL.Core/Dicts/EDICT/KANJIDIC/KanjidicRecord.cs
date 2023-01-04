@@ -1,4 +1,4 @@
-﻿namespace JL.Core.Dicts.EDICT.KANJIDIC;
+namespace JL.Core.Dicts.EDICT.KANJIDIC;
 
 public class KanjidicRecord : IDictRecord
 {
@@ -20,9 +20,8 @@ public class KanjidicRecord : IDictRecord
 
     public string? BuildFormattedDefinition()
     {
-        if (Definitions is null)
-            return null;
-
-        return string.Join(", ", Definitions);
+        return Definitions is null
+            ? null
+            : string.Join(", ", Definitions);
     }
 }

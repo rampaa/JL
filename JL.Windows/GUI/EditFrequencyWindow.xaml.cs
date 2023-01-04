@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using JL.Core;
@@ -97,7 +97,7 @@ public partial class EditFrequencyWindow : Window
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         string type = _freq.Type.GetDescription() ?? _freq.Type.ToString();
-        FreqTypeComboBox.Items.Add(type);
+        _ = FreqTypeComboBox.Items.Add(type);
         FreqTypeComboBox.SelectedValue = type;
         TextBlockPath.Text = _freq.Path;
         NameTextBox.Text = _freq.Name;

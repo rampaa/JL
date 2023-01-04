@@ -20,7 +20,9 @@ public class Form
     public override bool Equals(object? obj)
     {
         if (obj is null)
+        {
             return false;
+        }
 
         Form form = (obj as Form)!;
 
@@ -37,17 +39,23 @@ public class Form
         {
             int hash = 17;
 
-            hash = hash * 37 + Text.GetHashCode();
-            hash = hash * 37 + OriginalText.GetHashCode();
+            hash = (hash * 37) + Text.GetHashCode();
+            hash = (hash * 37) + OriginalText.GetHashCode();
 
             foreach (string tag in Tags)
-                hash = hash * 37 + tag.GetHashCode();
+            {
+                hash = (hash * 37) + tag.GetHashCode();
+            }
 
             foreach (string process in Process)
-                hash = hash * 37 + process.GetHashCode();
+            {
+                hash = (hash * 37) + process.GetHashCode();
+            }
 
             foreach (string seenText in SeenText)
-                hash = hash * 37 + seenText.GetHashCode();
+            {
+                hash = (hash * 37) + seenText.GetHashCode();
+            }
 
             return hash;
         }

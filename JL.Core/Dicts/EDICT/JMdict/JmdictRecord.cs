@@ -1,4 +1,5 @@
-﻿using System.Text;
+using System.Globalization;
+using System.Text;
 using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
 
@@ -63,75 +64,81 @@ public class JmdictRecord : IDictRecordWithGetFrequency
         for (int i = 0; i < definitionCount; i++)
         {
             if (newlines)
-                defResult.Append($"({count}) ");
+            {
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"({count}) ");
+            }
 
             if ((options?.WordClassInfo?.Value ?? true) && (WordClasses?[i]?.Any() ?? false))
             {
-                defResult.Append('(');
-                defResult.Append(string.Join(", ", WordClasses[i]!));
-                defResult.Append(") ");
+                _ = defResult.Append('(')
+                    .Append(string.Join(", ", WordClasses[i]!))
+                    .Append(") ");
             }
 
             if (!newlines)
-                defResult.Append($"({count}) ");
+            {
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"({count}) ");
+            }
 
             if ((options?.DialectInfo?.Value ?? true) && (Dialects?[i]?.Any() ?? false))
             {
-                defResult.Append('(');
-                defResult.Append(string.Join(", ", Dialects[i]!));
-                defResult.Append(") ");
+                _ = defResult.Append('(')
+                    .Append(string.Join(", ", Dialects[i]!))
+                    .Append(") ");
             }
 
             if ((options?.ExtraDefinitionInfo?.Value ?? true)
                 && (DefinitionInfo?.Any() ?? false)
                 && DefinitionInfo[i] is not null)
             {
-                defResult.Append('(');
-                defResult.Append(DefinitionInfo[i]);
-                defResult.Append(") ");
+                _ = defResult.Append('(')
+                    .Append(DefinitionInfo[i])
+                    .Append(") ");
             }
 
             if ((options?.MiscInfo?.Value ?? true) && (MiscList?[i]?.Any() ?? false))
             {
-                defResult.Append('(');
-                defResult.Append(string.Join(", ", MiscList[i]!));
-                defResult.Append(") ");
+                _ = defResult.Append('(')
+                    .Append(string.Join(", ", MiscList[i]!))
+                    .Append(") ");
             }
 
             if ((options?.WordTypeInfo?.Value ?? true) && (FieldList?[i]?.Any() ?? false))
             {
-                defResult.Append('(');
-                defResult.Append(string.Join(", ", FieldList[i]!));
-                defResult.Append(") ");
+                _ = defResult.Append('(')
+                    .Append(string.Join(", ", FieldList[i]!))
+                    .Append(") ");
             }
 
-            defResult.Append(string.Join("; ", Definitions[i]) + " ");
+            _ = defResult.Append(string.Join("; ", Definitions[i]) + " ");
 
             if ((options?.SpellingRestrictionInfo?.Value ?? true)
                 && ((ReadingRestrictions?[i]?.Any() ?? false)
                     || (SpellingRestrictions?[i]?.Any() ?? false)))
             {
-                defResult.Append("(only applies to ");
+                _ = defResult.Append("(only applies to ");
 
                 if (SpellingRestrictions?[i]?.Any() ?? false)
                 {
-                    defResult.Append(string.Join("; ", SpellingRestrictions[i]!));
+                    _ = defResult.Append(string.Join("; ", SpellingRestrictions[i]!));
                 }
 
                 if (ReadingRestrictions?[i]?.Any() ?? false)
                 {
                     if (SpellingRestrictions?[i]?.Any() ?? false)
-                        defResult.Append("; ");
+                    {
+                        _ = defResult.Append("; ");
+                    }
 
-                    defResult.Append(string.Join("; ", ReadingRestrictions[i]!));
+                    _ = defResult.Append(string.Join("; ", ReadingRestrictions[i]!));
                 }
 
-                defResult.Append(") ");
+                _ = defResult.Append(") ");
             }
 
             if ((options?.LoanwordEtymology?.Value ?? true) && (LoanwordEtymology?[i]?.Any() ?? false))
             {
-                defResult.Append('(');
+                _ = defResult.Append('(');
 
                 List<LoanwordSource> lSources = LoanwordEtymology[i]!;
 
@@ -139,40 +146,41 @@ public class JmdictRecord : IDictRecordWithGetFrequency
                 for (int j = 0; j < lSourceCount; j++)
                 {
                     if (lSources[j].IsWasei)
-                        defResult.Append("Wasei ");
+                    {
+                        _ = defResult.Append("Wasei ");
+                    }
 
-                    defResult.Append(lSources[j].Language);
+                    _ = defResult.Append(lSources[j].Language);
 
                     if (lSources[j].OriginalWord is not null)
                     {
-                        defResult.Append(": ");
-                        defResult.Append(lSources[j].OriginalWord);
+                        _ = defResult.Append(": ").Append(lSources[j].OriginalWord);
                     }
 
                     if (j + 1 < lSourceCount)
                     {
-                        defResult.Append(lSources[j].IsPart ? " + " : ", ");
+                        _ = defResult.Append(lSources[j].IsPart ? " + " : ", ");
                     }
                 }
 
-                defResult.Append(") ");
+                _ = defResult.Append(") ");
             }
 
             if ((options?.RelatedTerm?.Value ?? false) && (RelatedTerms?[i]?.Any() ?? false))
             {
-                defResult.Append("(related terms: ");
-                defResult.Append(string.Join(", ", RelatedTerms[i]!));
-                defResult.Append(") ");
+                _ = defResult.Append("(related terms: ")
+                    .Append(string.Join(", ", RelatedTerms[i]!))
+                    .Append(") ");
             }
 
             if ((options?.Antonym?.Value ?? false) && (Antonyms?[i]?.Any() ?? false))
             {
-                defResult.Append("(antonyms: ");
-                defResult.Append(string.Join(", ", Antonyms[i]!));
-                defResult.Append(") ");
+                _ = defResult.Append("(antonyms: ")
+                    .Append(string.Join(", ", Antonyms[i]!))
+                    .Append(") ");
             }
 
-            defResult.Append(separator);
+            _ = defResult.Append(separator);
 
             ++count;
         }
@@ -241,7 +249,7 @@ public class JmdictRecord : IDictRecordWithGetFrequency
                     {
                         FrequencyRecord readingFreqResult = readingFreqResults[j];
 
-                        if (reading == readingFreqResult.Spelling && Kana.IsKatakana(reading)
+                        if ((reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
                             || (AlternativeSpellings?.Contains(readingFreqResult.Spelling) ?? false))
                         {
                             if (frequency > readingFreqResult.Frequency)

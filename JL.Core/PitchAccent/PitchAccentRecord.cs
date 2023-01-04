@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using JL.Core.Dicts;
 
@@ -27,18 +27,14 @@ public class PitchAccentRecord : IDictRecord
         {
             Reading = jsonObject[1].ToString();
 
-            if (int.TryParse(s_positionRegex.Match(jsonObject[5][0].ToString()).Groups[2].Value, out int position))
-            {
-                Position = position;
-            }
-
-            else
-            {
-                Position = -1;
-            }
+            Position = int.TryParse(s_positionRegex.Match(jsonObject[5][0].ToString()).Groups[2].Value, out int position)
+                ? position
+                : -1;
         }
 
         if (Spelling == Reading)
+        {
             Reading = null;
+        }
     }
 }

@@ -27,7 +27,10 @@ public static class Lookup
     {
         DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
         if ((preciseTimeNow - s_lastLookupTime).TotalMilliseconds < Storage.Frontend.CoreConfig.LookupRate)
+        {
             return null;
+        }
+
         s_lastLookupTime = preciseTimeNow;
 
         // if (useCache && LookupResultCache.TryGet(text, out List<LookupResult>? data))
@@ -83,7 +86,9 @@ public static class Lookup
         for (int i = 0; i < text.Length; i++)
         {
             if (char.IsHighSurrogate(text[text.Length - i - 1]))
+            {
                 continue;
+            }
 
             string currentText = text[..^i];
 
@@ -187,19 +192,29 @@ public static class Lookup
         }
 
         if (jMdictResults.Any())
+        {
             lookupResults.AddRange(BuildJmdictResult(jMdictResults));
+        }
 
         if (jMnedictResults.Any())
+        {
             lookupResults.AddRange(BuildJmnedictResult(jMnedictResults));
+        }
 
         if (kanjidicResults.Any())
+        {
             lookupResults.AddRange(BuildKanjidicResult(kanjidicResults));
+        }
 
         if (customWordResults.Any())
+        {
             lookupResults.AddRange(BuildCustomWordResult(customWordResults));
+        }
 
         if (customNameResults.Any())
+        {
             lookupResults.AddRange(BuildCustomNameResult(customNameResults));
+        }
 
         if (epwingYomichanWordResultsList.Any())
         {
@@ -250,7 +265,9 @@ public static class Lookup
         }
 
         if (lookupResults.Any())
+        {
             lookupResults = SortLookupResults(lookupResults);
+        }
 
         // if (useCache)
         //     LookupResultCache.AddReplace(text, lookupResults.ToList());
@@ -286,7 +303,7 @@ public static class Lookup
 
         if (dictionary.TryGetValue(textInHiragana, out List<IDictRecord>? tempResult))
         {
-            results.TryAdd(textInHiragana,
+            _ = results.TryAdd(textInHiragana,
                 new IntermediaryResult(new List<List<IDictRecord>> { tempResult }, null, matchedText, matchedText,
                     dict));
             tryLongVowelConversion = false;
@@ -298,7 +315,9 @@ public static class Lookup
             {
                 string lastTag = "";
                 if (deconjugationResult.Tags.Count > 0)
+                {
                     lastTag = deconjugationResult.Tags.Last();
+                }
 
                 if (dictionary.TryGetValue(deconjugationResult.Text, out List<IDictRecord>? dictResults))
                 {
@@ -439,6 +458,9 @@ public static class Lookup
                             break;
 
                         case DictType.PitchAccentYomichan:
+                        case DictType.JMnedict:
+                        case DictType.Kanjidic:
+                        case DictType.CustomNameDictionary:
                             break;
 
                         default:
@@ -573,8 +595,7 @@ public static class Lookup
 
                         for (int l = 0; l < rLists[k]?.Count; l++)
                         {
-                            formattedROrthographyInfo.Append(rLists[k]![l]);
-                            formattedROrthographyInfo.Append(", ");
+                            _ = formattedROrthographyInfo.Append(rLists[k]![l]).Append(", ");
                         }
 
                         rOrthographyInfoList.Add(formattedROrthographyInfo.ToString().TrimEnd(", ".ToCharArray()));
@@ -586,8 +607,7 @@ public static class Lookup
 
                         for (int l = 0; l < aLists[k]?.Count; l++)
                         {
-                            formattedAOrthographyInfo.Append(aLists[k]![l]);
-                            formattedAOrthographyInfo.Append(", ");
+                            _ = formattedAOrthographyInfo.Append(aLists[k]![l]).Append(", ");
                         }
 
                         aOrthographyInfoList.Add(formattedAOrthographyInfo.ToString().TrimEnd(", ".ToCharArray()));
@@ -660,7 +680,9 @@ public static class Lookup
         List<LookupResult> results = new();
 
         if (!kanjiResults.Any())
+        {
             return results;
+        }
 
         KeyValuePair<string, IntermediaryResult> dictResult = kanjiResults.First();
 
@@ -670,13 +692,19 @@ public static class Lookup
         List<string> allReadings = new();
 
         if (kanjiRecord.OnReadings is not null)
+        {
             allReadings.AddRange(kanjiRecord.OnReadings);
+        }
 
         if (kanjiRecord.KunReadings is not null)
+        {
             allReadings.AddRange(kanjiRecord.KunReadings);
+        }
 
         if (kanjiRecord.NanoriReadings is not null)
+        {
             allReadings.AddRange(kanjiRecord.NanoriReadings);
+        }
 
         IntermediaryResult intermediaryResult = kanjiResults.First().Value;
 
@@ -720,10 +748,14 @@ public static class Lookup
                     List<string> allReadings = new();
 
                     if (yomichanKanjiDictResult.OnReadings is not null)
+                    {
                         allReadings.AddRange(yomichanKanjiDictResult.OnReadings);
+                    }
 
                     if (yomichanKanjiDictResult.KunReadings is not null)
+                    {
                         allReadings.AddRange(yomichanKanjiDictResult.KunReadings);
+                    }
 
                     LookupResult result = new
                     (
@@ -843,7 +875,9 @@ public static class Lookup
                     foreach (LookupFrequencyResult freqResult in freqs)
                     {
                         if (freqResult.Freq is int.MaxValue)
+                        {
                             freqResult.Freq = -i;
+                        }
                     }
 
                     LookupResult result = new
@@ -974,26 +1008,31 @@ public static class Lookup
                 string info = form[j];
 
                 if (info is "")
+                {
                     continue;
+                }
 
                 if (info.StartsWith('(') && info.EndsWith(')') && j is not 0)
+                {
                     continue;
+                }
 
                 if (added > 0)
-                    formText.Append('→');
+                {
+                    _ = formText.Append('→');
+                }
 
                 ++added;
-                formText.Append(info);
+                _ = formText.Append(info);
             }
 
             if (formText.Length is not 0)
             {
-                if (first)
-                    deconj.Append('～');
-                else
-                    deconj.Append("; ");
+                _ = first
+                    ? deconj.Append('～')
+                    : deconj.Append("; ");
 
-                deconj.Append(formText);
+                _ = deconj.Append(formText);
             }
 
             first = false;

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -21,10 +21,7 @@ public partial class PreferencesWindow : Window
     private static PreferencesWindow? s_instance;
     public bool SetAnkiConfig { get; private set; } = false;
 
-    public static PreferencesWindow Instance
-    {
-        get { return s_instance ??= new(); }
-    }
+    public static PreferencesWindow Instance => s_instance ??= new();
 
     public PreferencesWindow()
     {
@@ -90,7 +87,7 @@ public partial class PreferencesWindow : Window
     private async void SaveButton_Click(object sender, RoutedEventArgs e)
     {
         Storage.Frontend.InvalidateDisplayCache();
-        await ConfigManager.Instance.SavePreferences(this).ConfigureAwait(false);
+        await ConfigManager.Instance.SavePreferences(this).ConfigureAwait(true);
         Close();
     }
 
@@ -102,7 +99,7 @@ public partial class PreferencesWindow : Window
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         WindowsUtils.UpdateMainWindowVisibility();
-        MainWindow.Instance.Focus();
+        _ = MainWindow.Instance.Focus();
         s_instance = null;
     }
 
@@ -110,8 +107,8 @@ public partial class PreferencesWindow : Window
     {
         if (ConfigManager.AnkiIntegration && !SetAnkiConfig)
         {
-            await SetPreviousMiningConfig();
-            await PopulateDeckAndModelNames();
+            await SetPreviousMiningConfig().ConfigureAwait(true);
+            await PopulateDeckAndModelNames().ConfigureAwait(true);
 
             SetAnkiConfig = true;
         }
@@ -120,7 +117,7 @@ public partial class PreferencesWindow : Window
     private async void CheckForJLUpdatesButton_Click(object sender, RoutedEventArgs e)
     {
         CheckForJLUpdatesButton.IsEnabled = false;
-        await Networking.CheckForJLUpdates(false);
+        await Networking.CheckForJLUpdates(false).ConfigureAwait(true);
         CheckForJLUpdatesButton.IsEnabled = true;
     }
 
@@ -132,10 +129,12 @@ public partial class PreferencesWindow : Window
     {
         try
         {
-            Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig();
+            Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(true);
 
             if (ankiConfigDict is null)
+            {
                 return;
+            }
 
             AnkiConfig? wordAnkiConfig = ankiConfigDict.GetValueOrDefault(MineType.Word);
             AnkiConfig? kanjiAnkiConfig = ankiConfigDict.GetValueOrDefault(MineType.Kanji);
@@ -185,11 +184,11 @@ public partial class PreferencesWindow : Window
 
     private async Task PopulateDeckAndModelNames()
     {
-        List<string>? deckNames = await AnkiUtils.GetDeckNames();
+        List<string>? deckNames = await AnkiUtils.GetDeckNames().ConfigureAwait(true);
 
         if (deckNames is not null)
         {
-            List<string>? modelNames = await AnkiUtils.GetModelNames();
+            List<string>? modelNames = await AnkiUtils.GetModelNames().ConfigureAwait(true);
 
             if (modelNames is not null)
             {
@@ -227,7 +226,7 @@ public partial class PreferencesWindow : Window
     {
         string modelName = modelNamesComboBox.SelectionBoxItem.ToString()!;
 
-        List<string>? fieldNames = await AnkiUtils.GetFieldNames(modelName);
+        List<string>? fieldNames = await AnkiUtils.GetFieldNames(modelName).ConfigureAwait(true);
 
         if (fieldNames is not null)
         {
@@ -246,22 +245,22 @@ public partial class PreferencesWindow : Window
 
     private async void WordMiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
     {
-        await GetFields(WordMiningSetupComboBoxModelNames, WordMiningSetupStackPanelFields, Storage.JLFieldsForWordDicts);
+        await GetFields(WordMiningSetupComboBoxModelNames, WordMiningSetupStackPanelFields, Storage.JLFieldsForWordDicts).ConfigureAwait(false);
     }
 
     private async void KanjiMiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
     {
-        await GetFields(KanjiMiningSetupComboBoxModelNames, KanjiMiningSetupStackPanelFields, Storage.JLFieldsForKanjiDicts);
+        await GetFields(KanjiMiningSetupComboBoxModelNames, KanjiMiningSetupStackPanelFields, Storage.JLFieldsForKanjiDicts).ConfigureAwait(false);
     }
 
     private async void NameMiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
     {
-        await GetFields(NameMiningSetupComboBoxModelNames, NameMiningSetupStackPanelFields, Storage.JLFieldsForNameDicts);
+        await GetFields(NameMiningSetupComboBoxModelNames, NameMiningSetupStackPanelFields, Storage.JLFieldsForNameDicts).ConfigureAwait(false);
     }
 
     private async void OtherMiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
     {
-        await GetFields(OtherMiningSetupComboBoxModelNames, OtherMiningSetupStackPanelFields, Storage.JLFieldsForWordDicts);
+        await GetFields(OtherMiningSetupComboBoxModelNames, OtherMiningSetupStackPanelFields, Storage.JLFieldsForWordDicts).ConfigureAwait(false);
     }
 
     private static void CreateFieldElements(Dictionary<string, JLField> fields, List<JLField> fieldList, StackPanel fieldStackPanel)
@@ -283,9 +282,9 @@ public partial class PreferencesWindow : Window
                     SelectedItem = jlField.GetDescription() ?? jlField.ToString()
                 };
 
-                stackPanel.Children.Add(textBlockFieldName);
-                stackPanel.Children.Add(comboBoxJLFields);
-                fieldStackPanel.Children.Add(stackPanel);
+                _ = stackPanel.Children.Add(textBlockFieldName);
+                _ = stackPanel.Children.Add(comboBoxJLFields);
+                _ = fieldStackPanel.Children.Add(stackPanel);
             }
         }
         catch (Exception ex)
@@ -343,35 +342,46 @@ public partial class PreferencesWindow : Window
     public async Task SaveMiningSetup()
     {
         if (!ConfigManager.AnkiIntegration)
+        {
             return;
+        }
 
         Dictionary<MineType, AnkiConfig> ankiConfigDict = new();
 
         AnkiConfig? ankiConfig = GetAnkiConfigFromPreferences(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordMiningSetupStackPanelFields, WordTagsTextBox, Storage.JLFieldsForWordDicts);
         if (ankiConfig is not null)
+        {
             ankiConfigDict.Add(MineType.Word, ankiConfig);
+        }
 
         ankiConfig = GetAnkiConfigFromPreferences(KanjiMiningSetupComboBoxDeckNames, KanjiMiningSetupComboBoxModelNames, KanjiMiningSetupStackPanelFields, KanjiTagsTextBox, Storage.JLFieldsForKanjiDicts);
         if (ankiConfig is not null)
+        {
             ankiConfigDict.Add(MineType.Kanji, ankiConfig);
+        }
 
         ankiConfig = GetAnkiConfigFromPreferences(NameMiningSetupComboBoxDeckNames, NameMiningSetupComboBoxModelNames, NameMiningSetupStackPanelFields, NameTagsTextBox, Storage.JLFieldsForNameDicts);
         if (ankiConfig is not null)
+        {
             ankiConfigDict.Add(MineType.Name, ankiConfig);
+        }
 
         ankiConfig = GetAnkiConfigFromPreferences(OtherMiningSetupComboBoxDeckNames, OtherMiningSetupComboBoxModelNames, OtherMiningSetupStackPanelFields, OtherTagsTextBox, Storage.JLFieldsForWordDicts);
         if (ankiConfig is not null)
+        {
             ankiConfigDict.Add(MineType.Other, ankiConfig);
+        }
 
         if (ankiConfigDict.Count > 0)
         {
-            await AnkiConfig.WriteAnkiConfig(ankiConfigDict).ConfigureAwait(false);
+            _ = await AnkiConfig.WriteAnkiConfig(ankiConfigDict).ConfigureAwait(false);
         }
 
         else
         {
             Storage.Frontend.Alert(AlertLevel.Error, "Error saving AnkiConfig");
             Utils.Logger.Error("Error saving AnkiConfig");
+            ConfigManager.AnkiIntegration = false;
         }
     }
 
@@ -383,7 +393,9 @@ public partial class PreferencesWindow : Window
     {
         e.Handled = true;
 
-        Key key = (e.Key is Key.System ? e.SystemKey : e.Key);
+        Key key = e.Key is Key.System
+            ? e.SystemKey
+            : e.Key;
 
         if (key is Key.LWin or Key.RWin)
         {
@@ -396,27 +408,27 @@ public partial class PreferencesWindow : Window
             or Key.LeftCtrl or Key.RightCtrl
             or Key.LeftAlt or Key.RightAlt)
         {
-            hotkeyTextBuilder.Append(key.ToString());
+            _ = hotkeyTextBuilder.Append(key.ToString());
         }
 
         else
         {
             if ((Keyboard.Modifiers & ModifierKeys.Control) is not 0)
             {
-                hotkeyTextBuilder.Append("Ctrl+");
+                _ = hotkeyTextBuilder.Append("Ctrl+");
             }
 
             if ((Keyboard.Modifiers & ModifierKeys.Alt) is not 0)
             {
-                hotkeyTextBuilder.Append("Alt+");
+                _ = hotkeyTextBuilder.Append("Alt+");
             }
 
             if ((Keyboard.Modifiers & ModifierKeys.Shift) is not 0 && hotkeyTextBuilder.Length > 0)
             {
-                hotkeyTextBuilder.Append("Shift+");
+                _ = hotkeyTextBuilder.Append("Shift+");
             }
 
-            hotkeyTextBuilder.Append(key.ToString());
+            _ = hotkeyTextBuilder.Append(key.ToString());
         }
 
         ((TextBox)sender).Text = hotkeyTextBuilder.ToString();
@@ -467,6 +479,6 @@ public partial class PreferencesWindow : Window
             InfoTextBox = { Text = text }
         };
 
-        infoWindow.ShowDialog();
+        _ = infoWindow.ShowDialog();
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using static JL.Windows.WinApi.NativeMethods;
@@ -7,6 +7,8 @@ namespace JL.Windows;
 
 public class WinApi
 {
+
+#pragma warning disable IDE1006
     internal static class NativeMethods
     {
         internal const int WM_WINDOWPOSCHANGING = 0x0046;
@@ -100,6 +102,7 @@ public class WinApi
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         internal static extern IntPtr DefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
     }
+#pragma warning restore IDE1006
 
     public event EventHandler? ClipboardChanged;
 
@@ -115,10 +118,10 @@ public class WinApi
         source.AddHook(WndProc);
     }
 
-    public void SubscribeToClipboardChanged(Window windowSource)
+    public void SubscribeToClipboardChanged(Window windowSource, IntPtr windowHandle)
     {
         SubscribeToWndProc(windowSource);
-        AddClipboardFormatListener(new WindowInteropHelper(windowSource).Handle);
+        _ = AddClipboardFormatListener(windowHandle);
     }
 
     private void OnClipboardChanged()
@@ -156,24 +159,26 @@ public class WinApi
             case "TopLeftBorder":
                 wParam = (IntPtr)ResizeDirection.TopLeft;
                 break;
+            default:
+                break;
         }
 
-        SendMessage(windowHandle, WM_SYSCOMMAND, wParam, IntPtr.Zero);
+        _ = SendMessage(windowHandle, WM_SYSCOMMAND, wParam, IntPtr.Zero);
     }
 
     public static void BringToFront(IntPtr windowHandle)
     {
-        SetWindowPos(windowHandle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+        _ = SetWindowPos(windowHandle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
     }
 
     public static void PreventActivation(IntPtr windowHandle)
     {
-        SetWindowLongPtr(windowHandle, GWL_EXSTYLE, new IntPtr(GetWindowLongPtr(windowHandle, GWL_EXSTYLE).ToInt32() | WS_EX_NOACTIVATE));
+        _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, new IntPtr(GetWindowLongPtr(windowHandle, GWL_EXSTYLE).ToInt32() | WS_EX_NOACTIVATE));
     }
 
     public static void AllowActivation(IntPtr windowHandle)
     {
-        SetWindowLongPtr(windowHandle, GWL_EXSTYLE, IntPtr.Zero);
+        _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, IntPtr.Zero);
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -190,12 +195,15 @@ public class WinApi
                 return new IntPtr(1);
 
             case WM_WINDOWPOSCHANGING:
-                DefWindowProc(hwnd, msg, wParam, lParam);
+                _ = DefWindowProc(hwnd, msg, wParam, lParam);
                 WINDOWPOS windowPos = Marshal.PtrToStructure<WINDOWPOS>(lParam)!;
                 windowPos.flags |= SWP_NOCOPYBITS;
                 Marshal.StructureToPtr(windowPos, lParam, true);
                 handled = true;
                 break;
+
+            default:
+                return IntPtr.Zero;
 
                 //case WM_NCCALCSIZE:
                 //    if (wParam != IntPtr.Zero)

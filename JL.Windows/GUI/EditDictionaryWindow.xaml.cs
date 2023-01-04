@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using JL.Core;
@@ -24,7 +24,7 @@ public partial class EditDictionaryWindow : Window
         _dict = dict;
         _dictOptionsControl = new DictOptionsControl();
         InitializeComponent();
-        StackPanel.Children.Add(_dictOptionsControl);
+        _ = StackPanel.Children.Add(_dictOptionsControl);
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -110,7 +110,7 @@ public partial class EditDictionaryWindow : Window
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         string type = _dict.Type.GetDescription() ?? _dict.Type.ToString();
-        ComboBoxDictType.Items.Add(type);
+        _ = ComboBoxDictType.Items.Add(type);
         ComboBoxDictType.SelectedValue = type;
         TextBlockPath.Text = _dict.Path;
         NameTextBox.Text = _dict.Name;

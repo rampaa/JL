@@ -1,4 +1,4 @@
-﻿using JL.Core.Dicts;
+using JL.Core.Dicts;
 using JL.Core.Network;
 using JL.Core.Utilities;
 
@@ -26,22 +26,22 @@ public static class Mining
 
             if (Storage.WordDictTypes.Contains(dictType))
             {
-                ankiConfigDict.TryGetValue(MineType.Word, out ankiConfig);
+                _ = ankiConfigDict.TryGetValue(MineType.Word, out ankiConfig);
             }
 
             else if (Storage.KanjiDictTypes.Contains(dictType))
             {
-                ankiConfigDict.TryGetValue(MineType.Kanji, out ankiConfig);
+                _ = ankiConfigDict.TryGetValue(MineType.Kanji, out ankiConfig);
             }
 
             else if (Storage.NameDictTypes.Contains(dictType))
             {
-                ankiConfigDict.TryGetValue(MineType.Name, out ankiConfig);
+                _ = ankiConfigDict.TryGetValue(MineType.Name, out ankiConfig);
             }
 
             else
             {
-                ankiConfigDict.TryGetValue(MineType.Other, out ankiConfig);
+                _ = ankiConfigDict.TryGetValue(MineType.Other, out ankiConfig);
             }
 
             if (ankiConfig is null)
@@ -65,7 +65,9 @@ public static class Mining
             // idk if this gets the right audio for every word
             string? reading = miningParams.GetValueOrDefault(JLField.Readings)?.Split(",")[0];
             if (string.IsNullOrEmpty(reading))
+            {
                 reading = primarySpelling;
+            }
 
             byte[]? audioRes = null;
 
@@ -113,7 +115,9 @@ public static class Mining
                 }
 
                 if (Storage.Frontend.CoreConfig.ForceSyncAnki)
+                {
                     await AnkiConnect.Sync().ConfigureAwait(false);
+                }
 
                 return true;
             }

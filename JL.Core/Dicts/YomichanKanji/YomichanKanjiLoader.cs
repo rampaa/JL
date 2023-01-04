@@ -7,7 +7,9 @@ public static class YomichanKanjiLoader
     public static async Task Load(Dict dict)
     {
         if (!Directory.Exists(dict.Path) && !File.Exists(dict.Path))
+        {
             return;
+        }
 
         string[] jsonFiles = Directory.EnumerateFiles(dict.Path, "kanji_bank_*.json", SearchOption.TopDirectoryOnly).ToArray();
 
@@ -24,7 +26,9 @@ public static class YomichanKanjiLoader
             }
 
             if (jsonObjects is null)
+            {
                 continue;
+            }
 
             foreach (List<JsonElement> jsonObj in jsonObjects)
             {

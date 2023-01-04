@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using JL.Core.Utilities;
 
@@ -49,7 +49,7 @@ public class AnkiConfig
     {
         try
         {
-            Directory.CreateDirectory(Storage.ConfigPath);
+            _ = Directory.CreateDirectory(Storage.ConfigPath);
             await File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "AnkiConfig.json"),
                 JsonSerializer.Serialize(ankiConfig,
                     new JsonSerializerOptions

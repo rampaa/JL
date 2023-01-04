@@ -1,4 +1,5 @@
-﻿using System.Text;
+using System.Globalization;
+using System.Text;
 using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
 
@@ -35,24 +36,32 @@ public class CustomWordRecord : IDictRecordWithGetFrequency
         {
             string tempWordClass;
             if (WordClasses.Contains("adj-i"))
+            {
                 tempWordClass = "adjective";
+            }
             else if (WordClasses.Contains("v1"))
+            {
                 tempWordClass = "verb";
+            }
             else if (WordClasses.Contains("noun"))
+            {
                 tempWordClass = "noun";
+            }
             else
+            {
                 tempWordClass = "other";
+            }
 
-            defResult.Append($"({tempWordClass}) ");
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"({tempWordClass}) ");
         }
 
         for (int i = 0; i < Definitions.Count; i++)
         {
             if (Definitions.Any())
             {
-                defResult.Append($"({count}) ");
-                defResult.Append(string.Join("; ", Definitions[i]) + " ");
-                defResult.Append(separator);
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"({count}) ")
+                    .Append(string.Join("; ", Definitions[i]) + " ")
+                    .Append(separator);
 
                 ++count;
             }
@@ -143,7 +152,9 @@ public class CustomWordRecord : IDictRecordWithGetFrequency
     public override bool Equals(object? obj)
     {
         if (obj == null)
+        {
             return false;
+        }
 
         CustomWordRecord customWordRecordObj = (obj as CustomWordRecord)!;
 
@@ -160,12 +171,14 @@ public class CustomWordRecord : IDictRecordWithGetFrequency
         {
             int hash = 17;
 
-            hash = hash * 37 + PrimarySpelling.GetHashCode();
+            hash = (hash * 37) + PrimarySpelling.GetHashCode();
 
             if (AlternativeSpellings is not null)
             {
                 foreach (string spelling in AlternativeSpellings)
-                    hash = hash * 37 + spelling.GetHashCode();
+                {
+                    hash = (hash * 37) + spelling.GetHashCode();
+                }
             }
             else
             {
@@ -176,7 +189,9 @@ public class CustomWordRecord : IDictRecordWithGetFrequency
             if (Readings is not null)
             {
                 foreach (string readings in Readings)
-                    hash = hash * 37 + readings.GetHashCode();
+                {
+                    hash = (hash * 37) + readings.GetHashCode();
+                }
             }
 
             else
@@ -185,10 +200,14 @@ public class CustomWordRecord : IDictRecordWithGetFrequency
             }
 
             foreach (string definition in Definitions)
-                hash = hash * 37 + definition.GetHashCode();
+            {
+                hash = (hash * 37) + definition.GetHashCode();
+            }
 
             foreach (string wordClass in WordClasses)
-                hash = hash * 37 + wordClass.GetHashCode();
+            {
+                hash = (hash * 37) + wordClass.GetHashCode();
+            }
 
             return hash;
         }

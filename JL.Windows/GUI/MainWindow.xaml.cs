@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -37,7 +37,7 @@ public partial class MainWindow : Window, IFrontend
 
     public void ShowOkDialog(string text, string caption)
     {
-        MessageBox.Show(text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+        _ = MessageBox.Show(text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     public Task UpdateJL(Uri downloadUrlOfLatestJLRelease) => WindowsUtils.UpdateJL(downloadUrlOfLatestJLRelease);
@@ -47,9 +47,8 @@ public partial class MainWindow : Window, IFrontend
     #endregion
 
     private readonly List<string> _backlog = new();
-
     private int _currentTextIndex;
-
+    private bool _stopPrecache = false;
     private DateTime _lastClipboardChangeTime;
     private WinApi? _winApi;
     public IntPtr WindowHandle { get; private set; }
@@ -57,17 +56,12 @@ public partial class MainWindow : Window, IFrontend
     public PopupWindow FirstPopupWindow { get; init; }
 
     private static MainWindow? s_instance;
-    public static MainWindow Instance
-    {
-        get { return s_instance ??= new(); }
-    }
+    public static MainWindow Instance => s_instance ??= new();
 
     public double LeftPositionBeforeResolutionChange { get; set; }
     public double TopPositionBeforeResolutionChange { get; set; }
     public double HeightBeforeResolutionChange { get; set; }
     public double WidthBeforeResolutionChange { get; set; }
-
-    private CancellationTokenSource PrecacheCancellationToken { get; set; } = new();
 
     public MainWindow()
     {
@@ -75,7 +69,7 @@ public partial class MainWindow : Window, IFrontend
         s_instance = this;
         ConfigHelper.Instance.SetLang("en");
         FirstPopupWindow = new();
-        MainTextBox.Focus();
+        _ = MainTextBox.Focus();
     }
 
     protected override async void OnSourceInitialized(EventArgs e)
@@ -88,16 +82,13 @@ public partial class MainWindow : Window, IFrontend
             Utils.Logger.Error(ex, "Unhandled exception");
         };
 
-        TaskScheduler.UnobservedTaskException += (_, eventArgs) =>
-        {
-            Utils.Logger.Error(eventArgs.Exception, "Unobserved task exception");
-        };
+        TaskScheduler.UnobservedTaskException += (_, eventArgs) => Utils.Logger.Error(eventArgs.Exception, "Unobserved task exception");
 
         SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
 
         WindowHandle = new WindowInteropHelper(this).Handle;
         _winApi = new();
-        _winApi.SubscribeToClipboardChanged(this);
+        _winApi.SubscribeToClipboardChanged(this, WindowHandle);
         _winApi.ClipboardChanged += ClipboardChanged;
 
         ConfigManager.Instance.ApplyPreferences();
@@ -153,13 +144,13 @@ public partial class MainWindow : Window, IFrontend
 
                     _backlog.Add(text);
                     _currentTextIndex = _backlog.Count - 1;
-                    Stats.IncrementStat(StatType.Characters, new StringInfo(text).LengthInTextElements);
-                    Stats.IncrementStat(StatType.Lines);
+                    await Stats.IncrementStat(StatType.Characters, new StringInfo(text).LengthInTextElements).ConfigureAwait(false);
+                    await Stats.IncrementStat(StatType.Lines).ConfigureAwait(false);
 
                     if (Storage.DictsReady && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic && Storage.FreqsReady
                         && ConfigManager.Precaching && MainTextBox!.Text.Length < Storage.CacheSize)
                     {
-                        Dispatcher.Invoke(DispatcherPriority.Render, () => {}); // let MainTextBox text update
+                        _ = Dispatcher.Invoke(DispatcherPriority.Render, () => { }); // let MainTextBox text update
                         await Precache(MainTextBox!.Text).ConfigureAwait(false);
                     }
                 }
@@ -173,32 +164,22 @@ public partial class MainWindow : Window, IFrontend
 
     private async Task Precache(string input)
     {
-        //if (Debugger.IsAttached)
-        //    PrecacheProgress.Visibility = Visibility.Visible;
-
-        int added = 0;
         for (int charPosition = 0; charPosition < input.Length; charPosition++)
         {
-            if (PrecacheCancellationToken.IsCancellationRequested)
+            if (_stopPrecache)
             {
-                if (charPosition is 0)
-                {
-                    PrecacheCancellationToken = new CancellationTokenSource();
-                }
-                else
-                {
-                    PrecacheCancellationToken = new CancellationTokenSource();
-                    return;
-                }
+                _stopPrecache = false;
+                return;
             }
 
             if (charPosition > 0 && char.IsHighSurrogate(input[charPosition - 1]))
+            {
                 --charPosition;
+            }
 
-            //PrecacheProgress.Text = $"{charPosition + 1}/{input.Length} ({added} new)";
             if (charPosition % 10 is 0)
             {
-                await Task.Delay(1); // let user interact with the GUI while this method is running
+                await Task.Delay(1).ConfigureAwait(true); // let user interact with the GUI while this method is running
             }
 
             int endPosition = input.Length - charPosition > ConfigManager.MaxSearchLength
@@ -226,7 +207,6 @@ public partial class MainWindow : Window, IFrontend
                     }
 
                     PopupWindow.StackPanelCache.AddReplace(text, stackPanels.ToArray());
-                    added += added is 0 ? 2 : 1;
                 }
             }
         }
@@ -235,7 +215,9 @@ public partial class MainWindow : Window, IFrontend
     private void ClipboardChanged(object? sender, EventArgs? e)
     {
         if (!ConfigManager.CaptureTextFromClipboard)
+        {
             return;
+        }
 
         DateTime currentTime = new(Stopwatch.GetTimestamp());
 
@@ -279,7 +261,7 @@ public partial class MainWindow : Window, IFrontend
             return;
         }
 
-        PrecacheCancellationToken.Cancel();
+        _stopPrecache = true;
         FirstPopupWindow.TextBox_MouseMove(MainTextBox!);
 
         if (ConfigManager.FixedPopupPositioning)
@@ -314,7 +296,9 @@ public partial class MainWindow : Window, IFrontend
                     MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
 
                     if (caretIndex >= 0)
+                    {
                         MainTextBox.CaretIndex = caretIndex;
+                    }
 
                     MainTextBox.ScrollToEnd();
                 }
@@ -381,17 +365,19 @@ public partial class MainWindow : Window, IFrontend
         if (Background!.Opacity is 0)
         {
             Background.Opacity = OpacitySlider!.Value / 100;
-            MainTextBox.Focus();
+            _ = MainTextBox.Focus();
         }
 
         else if (OpacitySlider!.Visibility is Visibility.Collapsed)
         {
             OpacitySlider.Visibility = Visibility.Visible;
-            OpacitySlider.Focus();
+            _ = OpacitySlider.Focus();
         }
 
         else
+        {
             OpacitySlider.Visibility = Visibility.Collapsed;
+        }
     }
 
     private void FontSizeButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -401,18 +387,20 @@ public partial class MainWindow : Window, IFrontend
         if (FontSizeSlider!.Visibility is Visibility.Collapsed)
         {
             FontSizeSlider.Visibility = Visibility.Visible;
-            FontSizeSlider.Focus();
+            _ = FontSizeSlider.Focus();
         }
 
         else
+        {
             FontSizeSlider.Visibility = Visibility.Collapsed;
+        }
     }
 
     private async void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         ConfigManager.SaveBeforeClosing();
 
-        Stats.IncrementStat(StatType.Time, Storage.StatsStopWatch.ElapsedTicks);
+        await Stats.IncrementStat(StatType.Time, Storage.StatsStopWatch.ElapsedTicks).ConfigureAwait(false);
         await Stats.UpdateLifetimeStats().ConfigureAwait(false);
     }
 
@@ -426,7 +414,7 @@ public partial class MainWindow : Window, IFrontend
         MainTextBox!.FontSize = FontSizeSlider!.Value;
     }
 
-    private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+    private async void MainWindow_KeyDown(object sender, KeyEventArgs e)
     {
         if (WindowsUtils.CompareKeyGesture(e, ConfigManager.DisableHotkeysKeyGesture))
         {
@@ -434,7 +422,9 @@ public partial class MainWindow : Window, IFrontend
         }
 
         if (ConfigManager.DisableHotkeys)
+        {
             return;
+        }
 
         if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowPreferencesWindowKeyGesture))
         {
@@ -470,13 +460,17 @@ public partial class MainWindow : Window, IFrontend
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowAddNameWindowKeyGesture))
         {
             if (Storage.DictsReady)
+            {
                 WindowsUtils.ShowAddNameWindow(MainTextBox!.SelectedText);
+            }
         }
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowAddWordWindowKeyGesture))
         {
             if (Storage.DictsReady)
+            {
                 WindowsUtils.ShowAddWordWindow(MainTextBox!.SelectedText);
+            }
         }
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
@@ -511,7 +505,7 @@ public partial class MainWindow : Window, IFrontend
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.MotivationKeyGesture))
         {
-            WindowsUtils.Motivate($"{Storage.ResourcesPath}/Motivation");
+            await WindowsUtils.Motivate($"{Storage.ResourcesPath}/Motivation").ConfigureAwait(false);
         }
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ClosePopupKeyGesture))
@@ -526,7 +520,7 @@ public partial class MainWindow : Window, IFrontend
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowStatsKeyGesture))
         {
-            WindowsUtils.ShowStatsWindow();
+            await WindowsUtils.ShowStatsWindow().ConfigureAwait(false);
         }
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.AlwaysOnTopKeyGesture))
@@ -595,9 +589,9 @@ public partial class MainWindow : Window, IFrontend
         WindowsUtils.ShowManageFrequenciesWindow();
     }
 
-    private void ShowStats(object sender, RoutedEventArgs e)
+    private async void ShowStats(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.ShowStatsWindow();
+        await WindowsUtils.ShowStatsWindow().ConfigureAwait(false);
     }
 
     private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -657,7 +651,9 @@ public partial class MainWindow : Window, IFrontend
     private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         if (double.IsNaN(Height) || double.IsNaN(Width))
+        {
             return;
+        }
 
         ConfigManager.MainWindowHeight = Height;
         ConfigManager.MainWindowWidth = Width;
@@ -806,37 +802,24 @@ public partial class MainWindow : Window, IFrontend
     {
         // For some reason, when DragMove() is used Mouse.GetPosition() returns Point(0, 0)
         if (e.GetPosition(this) == new Point(0, 0))
+        {
             return;
+        }
 
         var border = (Border)sender;
 
-        switch (border.Name)
+        Mouse.OverrideCursor = border.Name switch
         {
-            case "LeftBorder":
-                Mouse.OverrideCursor = Cursors.SizeWE;
-                break;
-            case "RightBorder":
-                Mouse.OverrideCursor = Cursors.SizeWE;
-                break;
-            case "TopBorder":
-                Mouse.OverrideCursor = Cursors.SizeNS;
-                break;
-            case "TopRightBorder":
-                Mouse.OverrideCursor = Cursors.SizeNESW;
-                break;
-            case "BottomBorder":
-                Mouse.OverrideCursor = Cursors.SizeNS;
-                break;
-            case "BottomLeftBorder":
-                Mouse.OverrideCursor = Cursors.SizeNESW;
-                break;
-            case "BottomRightBorder":
-                Mouse.OverrideCursor = Cursors.SizeNWSE;
-                break;
-            case "TopLeftBorder":
-                Mouse.OverrideCursor = Cursors.SizeNWSE;
-                break;
-        }
+            "LeftBorder" => Cursors.SizeWE,
+            "RightBorder" => Cursors.SizeWE,
+            "TopBorder" => Cursors.SizeNS,
+            "TopRightBorder" => Cursors.SizeNESW,
+            "BottomBorder" => Cursors.SizeNS,
+            "BottomLeftBorder" => Cursors.SizeNESW,
+            "BottomRightBorder" => Cursors.SizeNWSE,
+            "TopLeftBorder" => Cursors.SizeNWSE,
+            _ => Cursors.Arrow,
+        };
     }
     private void Border_OnMouseLeave(object sender, MouseEventArgs e)
     {
@@ -919,7 +902,9 @@ public partial class MainWindow : Window, IFrontend
     private void Window_MouseLeave(object sender, MouseEventArgs e)
     {
         if (Background.Opacity is 0 || ConfigManager.InvisibleMode)
+        {
             return;
+        }
 
         if (!FirstPopupWindow.IsVisible
             && !ManageDictionariesWindow.IsItVisible()
@@ -946,7 +931,9 @@ public partial class MainWindow : Window, IFrontend
     private void Window_MouseEnter(object sender, MouseEventArgs e)
     {
         if (Background.Opacity is 0 || ConfigManager.InvisibleMode)
+        {
             return;
+        }
 
         if (ConfigManager.TextOnlyVisibleOnHover)
         {

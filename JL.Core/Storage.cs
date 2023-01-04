@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime;
 using System.Text.RegularExpressions;
 using JL.Core.Anki;
@@ -430,7 +430,7 @@ public static class Storage
                             {
                                 Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
-                                Dicts.Remove(dict.Name);
+                                _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
                             }
                         }));
@@ -458,7 +458,7 @@ public static class Storage
                             {
                                 Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
-                                Dicts.Remove(dict.Name);
+                                _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
                             }
                         }));
@@ -520,7 +520,7 @@ public static class Storage
                             {
                                 Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
-                                Dicts.Remove(dict.Name);
+                                _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
                             }
                         }));
@@ -548,7 +548,7 @@ public static class Storage
                             {
                                 Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
-                                Dicts.Remove(dict.Name);
+                                _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
                             }
                         }));
@@ -611,7 +611,7 @@ public static class Storage
                             {
                                 Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
                                 Utils.Logger.Error(ex, "Couldn't import {FreqName}", freq.Type);
-                                FreqDicts.Remove(freq.Name);
+                                _ = FreqDicts.Remove(freq.Name);
                                 freqRemoved = true;
                             }
                         });
@@ -642,7 +642,7 @@ public static class Storage
                             {
                                 Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
                                 Utils.Logger.Error(ex, "Couldn't import {FreqName}", freq.Type);
-                                FreqDicts.Remove(freq.Name);
+                                _ = FreqDicts.Remove(freq.Name);
                                 freqRemoved = true;
                             }
                         });
@@ -697,18 +697,20 @@ public static class Storage
                 if (!File.Exists(dict.Path))
                 {
                     deleteJmdictFile = true;
-                    await ResourceUpdater.UpdateResource(dict.Path,
+                    _ = await ResourceUpdater.UpdateResource(dict.Path,
                         JmdictUrl,
                         dict.Type.ToString(), false, true).ConfigureAwait(false);
                 }
 
                 await Task.Run(async () =>
-                    await JmdictLoader.Load(dict).ConfigureAwait(false));
+                    await JmdictLoader.Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
                 await JmdictWordClassUtils.SerializeJmdictWordClass().ConfigureAwait(false);
                 dict.Contents.Clear();
 
                 if (deleteJmdictFile)
+                {
                     File.Delete(dict.Path);
+                }
             }
         }
 

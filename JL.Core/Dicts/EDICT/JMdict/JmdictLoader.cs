@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Xml;
 using JL.Core.Utilities;
 
@@ -36,7 +36,7 @@ public static class JmdictLoader
                      "Couldn't find JMdict.xml. Would you like to download it now?",
                      "Download JMdict?"))
         {
-            await ResourceUpdater.UpdateResource(dict.Path,
+            _ = await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.JmdictUrl,
                 DictType.JMdict.ToString(), false, false).ConfigureAwait(false);
             await Load(dict).ConfigureAwait(false);
@@ -52,12 +52,14 @@ public static class JmdictLoader
     {
         JmdictEntry entry = new();
 
-        xmlReader.Read();
+        _ = xmlReader.Read();
 
         while (!xmlReader.EOF)
         {
             if (xmlReader is { Name: "entry", NodeType: XmlNodeType.EndElement })
+            {
                 break;
+            }
 
             if (xmlReader.NodeType is XmlNodeType.Element)
             {
@@ -80,13 +82,13 @@ public static class JmdictLoader
                         break;
 
                     default:
-                        xmlReader.Read();
+                        _ = xmlReader.Read();
                         break;
                 }
             }
             else
             {
-                xmlReader.Read();
+                _ = xmlReader.Read();
             }
         }
 
@@ -97,12 +99,14 @@ public static class JmdictLoader
     {
         KanjiElement kanjiElement = new();
 
-        xmlReader.Read();
+        _ = xmlReader.Read();
 
         while (!xmlReader.EOF)
         {
             if (xmlReader is { Name: "k_ele", NodeType: XmlNodeType.EndElement })
+            {
                 break;
+            }
 
             if (xmlReader.NodeType is XmlNodeType.Element)
             {
@@ -121,14 +125,14 @@ public static class JmdictLoader
                     //    break;
 
                     default:
-                        xmlReader.Read();
+                        _ = xmlReader.Read();
                         break;
                 }
             }
 
             else
             {
-                xmlReader.Read();
+                _ = xmlReader.Read();
             }
         }
 
@@ -139,12 +143,14 @@ public static class JmdictLoader
     {
         ReadingElement readingElement = new();
 
-        xmlReader.Read();
+        _ = xmlReader.Read();
 
         while (!xmlReader.EOF)
         {
             if (xmlReader is { Name: "r_ele", NodeType: XmlNodeType.EndElement })
+            {
                 break;
+            }
 
             if (xmlReader.NodeType is XmlNodeType.Element)
             {
@@ -167,14 +173,14 @@ public static class JmdictLoader
                     //    break;
 
                     default:
-                        xmlReader.Read();
+                        _ = xmlReader.Read();
                         break;
                 }
             }
 
             else
             {
-                xmlReader.Read();
+                _ = xmlReader.Read();
             }
         }
 
@@ -185,12 +191,14 @@ public static class JmdictLoader
     {
         Sense sense = new();
 
-        xmlReader.Read();
+        _ = xmlReader.Read();
 
         while (!xmlReader.EOF)
         {
             if (xmlReader is { Name: "sense", NodeType: XmlNodeType.EndElement })
+            {
                 break;
+            }
 
             if (xmlReader.NodeType is XmlNodeType.Element)
             {
@@ -232,7 +240,9 @@ public static class JmdictLoader
                             string? glossType = xmlReader.GetAttribute("g_type");
 
                             if (glossType is not null)
+                            {
                                 gloss = "(" + glossType + ".) ";
+                            }
                         }
 
                         gloss += xmlReader.ReadElementContentAsString();
@@ -288,14 +298,14 @@ public static class JmdictLoader
                         break;
 
                     default:
-                        xmlReader.Read();
+                        _ = xmlReader.Read();
                         break;
                 }
             }
 
             else
             {
-                xmlReader.Read();
+                _ = xmlReader.Read();
             }
         }
 
@@ -306,18 +316,18 @@ public static class JmdictLoader
     {
         string? entityName = null;
 
-        xmlReader.Read();
+        _ = xmlReader.Read();
 
         if (xmlReader.NodeType is XmlNodeType.EntityReference)
         {
             entityName = xmlReader.Name;
 
             xmlReader.ResolveEntity();
-            xmlReader.Read();
+            _ = xmlReader.Read();
 
-            Storage.JmdictEntities.TryAdd(entityName, xmlReader.Value);
+            _ = Storage.JmdictEntities.TryAdd(entityName, xmlReader.Value);
 
-            xmlReader.Read();
+            _ = xmlReader.Read();
         }
 
         return entityName;

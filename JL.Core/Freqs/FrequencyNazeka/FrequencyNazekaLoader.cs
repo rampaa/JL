@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 
 namespace JL.Core.Freqs.FrequencyNazeka;
 
@@ -24,7 +24,7 @@ public static class FrequencyNazekaLoader
                 List<JsonElement> elementList = value[i];
 
                 string exactSpelling = elementList[0].ToString();
-                elementList[1].TryGetInt32(out int frequencyRank);
+                _ = elementList[1].TryGetInt32(out int frequencyRank);
 
                 if (freqDict.TryGetValue(reading, out List<FrequencyRecord>? readingFreqResult))
                 {

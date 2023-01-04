@@ -7,7 +7,9 @@ public class FrequencyYomichanLoader
     public static async Task Load(Freq freq)
     {
         if (!Directory.Exists(freq.Path) && !File.Exists(freq.Path))
+        {
             return;
+        }
 
         Dictionary<string, List<FrequencyRecord>> freqDict = freq.Contents;
 

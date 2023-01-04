@@ -1,4 +1,4 @@
-﻿using System.Configuration;
+using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -46,21 +46,33 @@ public static class WindowsUtils
     public static bool CompareKeyGesture(KeyEventArgs e, KeyGesture keyGesture)
     {
         if (keyGesture.Modifiers is ModifierKeys.Windows)
+        {
             return keyGesture.Key == e.Key && (Keyboard.Modifiers & ModifierKeys.Windows) is 0;
+        }
         else if (keyGesture.Modifiers is 0)
+        {
             return keyGesture.Key == e.Key;
+        }
         else
+        {
             return keyGesture.Matches(null, e);
+        }
     }
 
     public static bool CompareKeyGesture(KeyGesture keyGesture)
     {
         if (keyGesture.Modifiers is ModifierKeys.Windows)
+        {
             return Keyboard.IsKeyDown(keyGesture.Key) && (Keyboard.Modifiers & ModifierKeys.Windows) is 0;
+        }
         else if (keyGesture.Modifiers is 0)
+        {
             return Keyboard.IsKeyDown(keyGesture.Key);
+        }
         else
+        {
             return Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers == keyGesture.Modifiers;
+        }
     }
 
     public static string KeyGestureToString(KeyGesture keyGesture)
@@ -71,29 +83,29 @@ public static class WindowsUtils
             or Key.LeftCtrl or Key.RightCtrl
             or Key.LeftAlt or Key.RightAlt)
         {
-            keyGestureStringBuilder.Append(keyGesture.Key.ToString());
+            _ = keyGestureStringBuilder.Append(keyGesture.Key.ToString());
         }
 
         else
         {
             if (keyGesture.Modifiers.HasFlag(ModifierKeys.Control))
             {
-                keyGestureStringBuilder.Append("Ctrl+");
+                _ = keyGestureStringBuilder.Append("Ctrl+");
             }
 
             if (keyGesture.Modifiers.HasFlag(ModifierKeys.Alt))
             {
-                keyGestureStringBuilder.Append("Alt+");
+                _ = keyGestureStringBuilder.Append("Alt+");
             }
 
             if (keyGesture.Modifiers.HasFlag(ModifierKeys.Shift) && keyGestureStringBuilder.Length > 0)
             {
-                keyGestureStringBuilder.Append("Shift+");
+                _ = keyGestureStringBuilder.Append("Shift+");
             }
 
             if (keyGesture.Key is not Key.None)
             {
-                keyGestureStringBuilder.Append(keyGesture.Key.ToString());
+                _ = keyGestureStringBuilder.Append(keyGesture.Key.ToString());
             }
         }
 
@@ -108,15 +120,9 @@ public static class WindowsUtils
         {
             KeyGestureConverter keyGestureConverter = new();
 
-            if (rawKeyGesture.Contains("Ctrl") || rawKeyGesture.Contains("Alt") || rawKeyGesture.Contains("Shift"))
-            {
-                return (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture)!;
-            }
-
-            else
-            {
-                return (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture)!;
-            }
+            return rawKeyGesture.Contains("Ctrl") || rawKeyGesture.Contains("Alt") || rawKeyGesture.Contains("Shift")
+                ? (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture)!
+                : (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture)!;
         }
 
         else
@@ -188,7 +194,7 @@ public static class WindowsUtils
         addNameWindowInstance.Owner = MainWindow.Instance;
         addNameWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         Storage.StatsStopWatch.Stop();
-        addNameWindowInstance.ShowDialog();
+        _ = addNameWindowInstance.ShowDialog();
     }
 
     public static void ShowAddWordWindow(string? selectedText)
@@ -198,7 +204,7 @@ public static class WindowsUtils
         addWordWindowInstance.Owner = MainWindow.Instance;
         addWordWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         Storage.StatsStopWatch.Stop();
-        addWordWindowInstance.ShowDialog();
+        _ = addWordWindowInstance.ShowDialog();
     }
 
     public static void ShowPreferencesWindow()
@@ -208,55 +214,63 @@ public static class WindowsUtils
         preferencesWindow.Owner = MainWindow.Instance;
         preferencesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Storage.StatsStopWatch.Stop();
-        preferencesWindow.ShowDialog();
+        _ = preferencesWindow.ShowDialog();
     }
 
     public static void ShowManageDictionariesWindow()
     {
         if (!File.Exists(Path.Join(Storage.ConfigPath, "dicts.json")))
+        {
             Utils.CreateDefaultDictsConfig();
+        }
 
         if (!File.Exists($"{Storage.ResourcesPath}/custom_words.txt"))
+        {
             File.Create($"{Storage.ResourcesPath}/custom_words.txt").Dispose();
+        }
 
         if (!File.Exists($"{Storage.ResourcesPath}/custom_names.txt"))
+        {
             File.Create($"{Storage.ResourcesPath}/custom_names.txt").Dispose();
+        }
 
         ManageDictionariesWindow manageDictionariesWindow = ManageDictionariesWindow.Instance;
         manageDictionariesWindow.Owner = MainWindow.Instance;
         manageDictionariesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Storage.StatsStopWatch.Stop();
-        manageDictionariesWindow.ShowDialog();
+        _ = manageDictionariesWindow.ShowDialog();
     }
 
     public static void ShowManageFrequenciesWindow()
     {
         if (!File.Exists(Path.Join(Storage.ConfigPath, "freqs.json")))
+        {
             Utils.CreateDefaultFreqsConfig();
+        }
 
         ManageFrequenciesWindow manageFrequenciesWindow = ManageFrequenciesWindow.Instance;
         manageFrequenciesWindow.Owner = MainWindow.Instance;
         manageFrequenciesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Storage.StatsStopWatch.Stop();
-        manageFrequenciesWindow.ShowDialog();
+        _ = manageFrequenciesWindow.ShowDialog();
     }
 
-    public static void ShowStatsWindow()
+    public static async Task ShowStatsWindow()
     {
-        Stats.IncrementStat(StatType.Time, Storage.StatsStopWatch.ElapsedTicks);
+        await Stats.IncrementStat(StatType.Time, Storage.StatsStopWatch.ElapsedTicks).ConfigureAwait(false);
         Storage.StatsStopWatch.Reset();
 
         StatsWindow statsWindow = StatsWindow.Instance;
         statsWindow.Owner = MainWindow.Instance;
         statsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-        statsWindow.ShowDialog();
+        _ = statsWindow.ShowDialog();
     }
 
     public static void SearchWithBrowser(string? selectedText)
     {
         if (selectedText?.Length > 0)
         {
-            Process.Start(new ProcessStartInfo("cmd",
+            _ = Process.Start(new ProcessStartInfo("cmd",
                 $"/c start \"\" \"{ConfigManager.SearchUrl.Replace("{SearchTerm}", System.Web.HttpUtility.UrlEncode(selectedText))}\"")
             { CreateNoWindow = true });
         }
@@ -281,13 +295,13 @@ public static class WindowsUtils
                     Directory.Delete(tmpDirectory, true);
                 }
 
-                Directory.CreateDirectory(tmpDirectory);
+                _ = Directory.CreateDirectory(tmpDirectory);
                 archive.ExtractToDirectory(tmpDirectory);
             }
 
             await MainWindow.Instance.Dispatcher!.BeginInvoke(ConfigManager.SaveBeforeClosing);
 
-            Process.Start(
+            _ = Process.Start(
                 new ProcessStartInfo("cmd",
                 $"/c start \"JL Updater\" \"{Path.Join(Storage.ApplicationPath, "update-helper.cmd")}\"")
                 { UseShellExecute = true, Verb = "runas" });
@@ -304,13 +318,13 @@ public static class WindowsUtils
     {
         Storage.Frontend = MainWindow.Instance;
 
-        await Utils.CoreInitialize();
+        await Utils.CoreInitialize().ConfigureAwait(true);
 
         if (ConfigManager.CheckForJLUpdatesOnStartUp)
         {
             PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
             preferencesWindow.CheckForJLUpdatesButton!.IsEnabled = false;
-            await Networking.CheckForJLUpdates(true);
+            await Networking.CheckForJLUpdates(true).ConfigureAwait(true);
             preferencesWindow.CheckForJLUpdatesButton.IsEnabled = true;
         }
     }
@@ -319,7 +333,7 @@ public static class WindowsUtils
     {
         try
         {
-            Application.Current!.Dispatcher!.BeginInvoke(() =>
+            _ = Application.Current!.Dispatcher!.BeginInvoke(() =>
             {
                 try
                 {
@@ -344,7 +358,7 @@ public static class WindowsUtils
         }
     }
 
-    public static void Motivate(string motivationFolder)
+    public static async Task Motivate(string motivationFolder)
     {
         try
         {
@@ -363,7 +377,7 @@ public static class WindowsUtils
             string randomFilePath = filePaths[rand.Next(numFiles)];
             byte[] randomFile = File.ReadAllBytes(randomFilePath);
             PlayAudio(randomFile, 1);
-            Stats.IncrementStat(StatType.Imoutos);
+            await Stats.IncrementStat(StatType.Imoutos).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -379,7 +393,7 @@ public static class WindowsUtils
 
     public static void Alert(AlertLevel alertLevel, string message)
     {
-        Application.Current?.Dispatcher.InvokeAsync(async () =>
+        _ = Application.Current?.Dispatcher.InvokeAsync(async () =>
         {
             List<AlertWindow> alertWindowList = Application.Current.Windows.OfType<AlertWindow>().ToList();
 
@@ -387,11 +401,11 @@ public static class WindowsUtils
 
             alertWindow.Left = DpiAwareWorkAreaWidth - alertWindow.Width - 30;
             alertWindow.Top =
-                alertWindowList.Count * ((alertWindowList.LastOrDefault()?.ActualHeight ?? 0) + 2) + 30;
+                (alertWindowList.Count * ((alertWindowList.LastOrDefault()?.ActualHeight ?? 0) + 2)) + 30;
 
             alertWindow.SetAlert(alertLevel, message);
             alertWindow.Show();
-            await Task.Delay(4004);
+            await Task.Delay(4004).ConfigureAwait(true);
             alertWindow.Close();
         });
     }
@@ -425,8 +439,16 @@ public static class WindowsUtils
         ColorPicker picker = SingleOpenHelper.CreateControl<ColorPicker>();
         var window = new HandyControl.Controls.PopupWindow { PopupElement = picker, };
         picker.SelectedBrush = (SolidColorBrush)((Button)sender).Tag;
-        picker.Canceled += delegate { window.Close(); };
-        picker.Confirmed += delegate { ConfirmColor((Button)sender, picker.SelectedBrush, window); };
+
+        picker.Canceled += delegate
+        {
+            window.Close();
+        };
+
+        picker.Confirmed += delegate
+        {
+            ConfirmColor((Button)sender, picker.SelectedBrush, window);
+        };
 
         window.ShowDialog(picker, false);
     }
@@ -458,7 +480,9 @@ public static class WindowsUtils
     public static void Unselect(System.Windows.Controls.TextBox? tb)
     {
         if (tb is null)
+        {
             return;
+        }
 
         double verticalOffset = tb.VerticalOffset;
         tb.Select(0, 0);

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Runtime;
 using System.Windows;
@@ -22,10 +23,7 @@ public partial class ManageFrequenciesWindow : Window
 
     private IntPtr _windowHandle;
 
-    public static ManageFrequenciesWindow Instance
-    {
-        get { return s_instance ??= new(); }
-    }
+    public static ManageFrequenciesWindow Instance => s_instance ??= new();
     public ManageFrequenciesWindow()
     {
         InitializeComponent();
@@ -62,7 +60,7 @@ public partial class ManageFrequenciesWindow : Window
     {
         Storage.Frontend.InvalidateDisplayCache();
         WindowsUtils.UpdateMainWindowVisibility();
-        MainWindow.Instance.Focus();
+        _ = MainWindow.Instance.Focus();
         s_instance = null;
         await Utils.SerializeFreqs().ConfigureAwait(false);
         await Storage.LoadFrequencies().ConfigureAwait(false);
@@ -85,7 +83,7 @@ public partial class ManageFrequenciesWindow : Window
                 Name = "priority",
                 // Width = 20,
                 Width = 0,
-                Text = freq.Priority.ToString(),
+                Text = freq.Priority.ToString(CultureInfo.InvariantCulture),
                 Visibility = Visibility.Collapsed,
                 // Margin = new Thickness(10),
             };
@@ -158,7 +156,7 @@ public partial class ManageFrequenciesWindow : Window
                 if (Storage.Frontend.ShowYesNoDialog("Really remove frequency?", "Confirmation"))
                 {
                     freq.Contents.Clear();
-                    Storage.FreqDicts.Remove(freq.Name);
+                    _ = Storage.FreqDicts.Remove(freq.Name);
                     UpdateFreqsDisplay();
 
                     GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
@@ -167,28 +165,28 @@ public partial class ManageFrequenciesWindow : Window
             };
             buttonEdit.Click += (_, _) =>
             {
-                new EditFrequencyWindow(freq) { Owner = this }.ShowDialog();
+                _ = new EditFrequencyWindow(freq) { Owner = this }.ShowDialog();
                 UpdateFreqsDisplay();
             };
 
             resultDockPanels.Add(dockPanel);
 
-            dockPanel.Children.Add(checkBox);
-            dockPanel.Children.Add(buttonIncreasePriority);
-            dockPanel.Children.Add(buttonDecreasePriority);
-            dockPanel.Children.Add(priority);
-            dockPanel.Children.Add(freqTypeDisplay);
-            dockPanel.Children.Add(freqPathValidityDisplay);
-            dockPanel.Children.Add(freqPathDisplay);
-            dockPanel.Children.Add(buttonEdit);
-            dockPanel.Children.Add(buttonRemove);
+            _ = dockPanel.Children.Add(checkBox);
+            _ = dockPanel.Children.Add(buttonIncreasePriority);
+            _ = dockPanel.Children.Add(buttonDecreasePriority);
+            _ = dockPanel.Children.Add(priority);
+            _ = dockPanel.Children.Add(freqTypeDisplay);
+            _ = dockPanel.Children.Add(freqPathValidityDisplay);
+            _ = dockPanel.Children.Add(freqPathDisplay);
+            _ = dockPanel.Children.Add(buttonEdit);
+            _ = dockPanel.Children.Add(buttonRemove);
         }
 
         FrequenciesDisplay!.ItemsSource = resultDockPanels.OrderBy(dockPanel =>
             dockPanel.Children
                 .OfType<TextBlock>()
                 .Where(textBlock => textBlock.Name is "priority")
-                .Select(textBlockPriority => Convert.ToInt32(textBlockPriority.Text)).First());
+                .Select(textBlockPriority => Convert.ToInt32(textBlockPriority.Text, CultureInfo.InvariantCulture)).First());
     }
 
     private void PathTextbox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -198,16 +196,20 @@ public partial class ManageFrequenciesWindow : Window
         if (File.Exists(path) || Directory.Exists(path))
         {
             if (File.Exists(path))
+            {
                 path = Path.GetDirectoryName(path)!;
+            }
 
-            Process.Start("explorer.exe", path ?? throw new InvalidOperationException());
+            _ = Process.Start("explorer.exe", path ?? throw new InvalidOperationException());
         }
     }
 
     private static void PrioritizeFreq(Freq freq)
     {
         if (freq.Priority is 0)
+        {
             return;
+        }
 
         Storage.FreqDicts.Single(f => f.Value.Priority == freq.Priority - 1).Value.Priority += 1;
         freq.Priority -= 1;
@@ -217,7 +219,10 @@ public partial class ManageFrequenciesWindow : Window
     {
         // lowest priority means highest number
         int lowestPriority = Storage.FreqDicts.Select(f => f.Value.Priority).Max();
-        if (freq.Priority == lowestPriority) return;
+        if (freq.Priority == lowestPriority)
+        {
+            return;
+        }
 
         Storage.FreqDicts.Single(f => f.Value.Priority == freq.Priority + 1).Value.Priority -= 1;
         freq.Priority += 1;
@@ -226,7 +231,7 @@ public partial class ManageFrequenciesWindow : Window
 
     private void ButtonAddFrequency_OnClick(object sender, RoutedEventArgs e)
     {
-        new AddFrequencyWindow() { Owner = this }.ShowDialog();
+        _ = new AddFrequencyWindow() { Owner = this }.ShowDialog();
         UpdateFreqsDisplay();
     }
     private void CloseButton_Click(object sender, RoutedEventArgs e)

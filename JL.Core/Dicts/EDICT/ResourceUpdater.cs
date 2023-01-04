@@ -17,13 +17,17 @@ public static class ResourceUpdater
                 HttpRequestMessage request = new(HttpMethod.Get, resourceDownloadUri);
 
                 if (File.Exists(resourcePath))
+                {
                     request.Headers.IfModifiedSince =
                         File.GetLastWriteTime(resourcePath);
+                }
 
                 if (!noPrompt)
+                {
                     Storage.Frontend.ShowOkDialog(
                         $"This may take a while. Please don't shut down the program until {resourceName} is downloaded.",
                         "Info");
+                }
 
                 HttpResponseMessage response = await Storage.Client.SendAsync(request).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
@@ -35,8 +39,10 @@ public static class ResourceUpdater
                     }
 
                     if (!noPrompt)
+                    {
                         Storage.Frontend.ShowOkDialog($"{resourceName} has been downloaded successfully.",
                             "Info");
+                    }
 
                     return true;
                 }

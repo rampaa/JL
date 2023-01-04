@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,10 +17,7 @@ public partial class AddNameWindow : Window
 {
     private static AddNameWindow? s_instance;
 
-    public static AddNameWindow Instance
-    {
-        get { return s_instance ??= new(); }
-    }
+    public static AddNameWindow Instance => s_instance ??= new();
 
     public AddNameWindow()
     {
@@ -78,12 +75,12 @@ public partial class AddNameWindow : Window
     private static async Task WriteToFile(string spelling, string reading, string type)
     {
         StringBuilder stringBuilder = new();
-        stringBuilder.Append(spelling);
-        stringBuilder.Append('\t');
-        stringBuilder.Append(reading);
-        stringBuilder.Append('\t');
-        stringBuilder.Append(type);
-        stringBuilder.Append(Environment.NewLine);
+        _ = stringBuilder.Append(spelling)
+            .Append('\t')
+            .Append(reading)
+            .Append('\t')
+            .Append(type)
+            .Append(Environment.NewLine);
 
         string customNameDictPath = Storage.Dicts.Values.First(dict => dict.Type is DictType.CustomNameDictionary).Path;
         await File.AppendAllTextAsync(customNameDictPath,
@@ -98,7 +95,7 @@ public partial class AddNameWindow : Window
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         WindowsUtils.UpdateMainWindowVisibility();
-        MainWindow.Instance.Focus();
+        _ = MainWindow.Instance.Focus();
         s_instance = null;
     }
 }

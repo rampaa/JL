@@ -201,6 +201,13 @@ public partial class AddDictionaryWindow : Window
                 BrowseForDictionaryFile("Nazeka file|*.json");
                 break;
 
+            case DictType.JMdict:
+            case DictType.JMnedict:
+            case DictType.Kanjidic:
+            case DictType.CustomWordDictionary:
+            case DictType.CustomNameDictionary:
+                break;
+
             default:
                 throw new ArgumentOutOfRangeException(null, "Invalid DictType (Add)");
         }

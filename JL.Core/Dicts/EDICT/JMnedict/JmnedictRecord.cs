@@ -1,4 +1,5 @@
-﻿using System.Text;
+using System.Globalization;
+using System.Text;
 
 namespace JL.Core.Dicts.EDICT.JMnedict;
 
@@ -23,7 +24,9 @@ public class JmnedictRecord : IDictRecord
     public string? BuildFormattedDefinition()
     {
         if (Definitions is null)
+        {
             return null;
+        }
 
         int count = 1;
         StringBuilder defResult = new();
@@ -33,9 +36,9 @@ public class JmnedictRecord : IDictRecord
         {
             for (int i = 0; i < NameTypes.Count; i++)
             {
-                defResult.Append('(');
-                defResult.Append(NameTypes[i]);
-                defResult.Append(") ");
+                _ = defResult.Append('(')
+                    .Append(NameTypes[i])
+                    .Append(") ");
             }
         }
 
@@ -44,9 +47,11 @@ public class JmnedictRecord : IDictRecord
             if (Definitions.Any())
             {
                 if (Definitions.Count > 0)
-                    defResult.Append($"({count}) ");
+                {
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({count}) ");
+                }
 
-                defResult.Append($"{string.Join("; ", Definitions[i])} ");
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", Definitions[i])} ");
                 ++count;
             }
         }

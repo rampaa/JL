@@ -1,4 +1,5 @@
-﻿using System.Windows;
+using System.Globalization;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using JL.Core;
@@ -14,10 +15,7 @@ public partial class StatsWindow : Window
     private static StatsWindow? s_instance;
     private IntPtr _windowHandle;
 
-    public static StatsWindow Instance
-    {
-        get { return s_instance ??= new(); }
-    }
+    public static StatsWindow Instance => s_instance ??= new();
 
     public StatsWindow()
     {
@@ -50,26 +48,26 @@ public partial class StatsWindow : Window
         return s_instance?.IsVisible ?? false;
     }
 
-    private void Window_Loaded(object sender, RoutedEventArgs e)
+    private async void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        UpdateStatsDisplay(StatsMode.Session);
+        await UpdateStatsDisplay(StatsMode.Session).ConfigureAwait(false);
     }
 
-    private void UpdateStatsDisplay(StatsMode mode)
+    private async Task UpdateStatsDisplay(StatsMode mode)
     {
         Stats stats = mode switch
         {
             StatsMode.Session => Stats.SessionStats,
-            StatsMode.Lifetime => Stats.LifetimeStats,
+            StatsMode.Lifetime => await Stats.GetLifetimeStats().ConfigureAwait(true),
             _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null)
         };
 
-        TextBlockCharacters.Text = stats.Characters.ToString();
-        TextBlockLines.Text = stats.Lines.ToString();
-        TextBlockTime.Text = stats.Time.ToString(@"d\.hh\:mm\:ss");
-        TextBlockCardsMined.Text = stats.CardsMined.ToString();
-        TextBlockTimesPlayedAudio.Text = stats.TimesPlayedAudio.ToString();
-        TextBlockImoutos.Text = stats.Imoutos.ToString();
+        TextBlockCharacters.Text = stats.Characters.ToString(CultureInfo.InvariantCulture);
+        TextBlockLines.Text = stats.Lines.ToString(CultureInfo.InvariantCulture);
+        TextBlockTime.Text = stats.Time.ToString(@"d\.hh\:mm\:ss", CultureInfo.InvariantCulture);
+        TextBlockCardsMined.Text = stats.CardsMined.ToString(CultureInfo.InvariantCulture);
+        TextBlockTimesPlayedAudio.Text = stats.TimesPlayedAudio.ToString(CultureInfo.InvariantCulture);
+        TextBlockImoutos.Text = stats.Imoutos.ToString(CultureInfo.InvariantCulture);
     }
 
     private async void ButtonSwapStats_OnClick(object sender, RoutedEventArgs e)
@@ -80,12 +78,12 @@ public partial class StatsWindow : Window
             switch (mode)
             {
                 case StatsMode.Session:
-                    await Stats.UpdateLifetimeStats();
-                    UpdateStatsDisplay(StatsMode.Lifetime);
+                    await Stats.UpdateLifetimeStats().ConfigureAwait(true);
+                    await UpdateStatsDisplay(StatsMode.Lifetime).ConfigureAwait(false);
                     button.Content = StatsMode.Lifetime.ToString();
                     break;
                 case StatsMode.Lifetime:
-                    UpdateStatsDisplay(StatsMode.Session);
+                    await UpdateStatsDisplay(StatsMode.Session).ConfigureAwait(false);
                     button.Content = StatsMode.Session.ToString();
                     break;
                 default:
@@ -97,7 +95,7 @@ public partial class StatsWindow : Window
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         WindowsUtils.UpdateMainWindowVisibility();
-        MainWindow.Instance.Focus();
+        _ = MainWindow.Instance.Focus();
         s_instance = null;
     }
 }

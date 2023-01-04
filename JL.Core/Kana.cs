@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using JL.Core.Utilities;
 
 namespace JL.Core;
@@ -206,15 +206,21 @@ public static class Kana
                 && s_compositeHalfWidthKatakanaToFullWidthHiraganaDict.TryGetValue(
                     unicodeCharacters[i] + unicodeCharacters[i + 1], out string? compositeStr))
             {
-                textInHiragana.Append(compositeStr);
+                _ = textInHiragana.Append(compositeStr);
                 ++i;
             }
             else if (s_katakanaToHiraganaDict.TryGetValue(unicodeCharacters[i], out string? hiraganaStr))
-                textInHiragana.Append(hiraganaStr);
+            {
+                _ = textInHiragana.Append(hiraganaStr);
+            }
             else if (s_halfWidthToFullWidthDict.TryGetValue(unicodeCharacters[i], out string? fullWidthStr))
-                textInHiragana.Append(fullWidthStr);
+            {
+                _ = textInHiragana.Append(fullWidthStr);
+            }
             else
-                textInHiragana.Append(unicodeCharacters[i]);
+            {
+                _ = textInHiragana.Append(unicodeCharacters[i]);
+            }
         }
 
         return textInHiragana.ToString();
@@ -250,7 +256,7 @@ public static class Kana
                 {
                     for (int j = 0; j < stringBuilders.Count; j++)
                     {
-                        stringBuilders[j].Append(vowel);
+                        _ = stringBuilders[j].Append(vowel);
                     }
                 }
 
@@ -272,6 +278,8 @@ public static class Kana
                         case "エ":
                             alternativeVowel = "イ";
                             break;
+                        default:
+                            break;
                     }
 
                     int listSize = stringBuilders.Count;
@@ -283,7 +291,7 @@ public static class Kana
                     listSize = stringBuilders.Count;
                     for (int j = 0; j < listSize; j++)
                     {
-                        stringBuilders[j].Append(j < listSize / 2 ? vowel : alternativeVowel);
+                        _ = stringBuilders[j].Append(j < listSize / 2 ? vowel : alternativeVowel);
                     }
                 }
             }
@@ -292,7 +300,7 @@ public static class Kana
             {
                 for (int j = 0; j < stringBuilders.Count; j++)
                 {
-                    stringBuilders[j].Append(text[i]);
+                    _ = stringBuilders[j].Append(text[i]);
                 }
             }
         }

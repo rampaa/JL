@@ -14,7 +14,7 @@ public static class JmdictWordClassUtils
         FileStream openStream = File.OpenRead($"{Storage.ResourcesPath}/PoS.json");
         await using (openStream.ConfigureAwait(false))
         {
-            Storage.WordClassDictionary = (await JsonSerializer.DeserializeAsync<Dictionary<string, List<JmdictWordClass>>>(openStream))!;
+            Storage.WordClassDictionary = (await JsonSerializer.DeserializeAsync<Dictionary<string, List<JmdictWordClass>>>(openStream).ConfigureAwait(false))!;
         }
 
         foreach (List<JmdictWordClass> jmdictWordClassList in Storage.WordClassDictionary.Values.ToList())
@@ -66,19 +66,25 @@ public static class JmdictWordClassUtils
                 var value = (JmdictRecord)jmdictRecordList[i];
 
                 if ((!value.WordClasses?.Any()) ?? true)
+                {
                     continue;
+                }
 
                 List<string> wordClasses = value.WordClasses?.Where(wc => wc is not null).SelectMany(wc => wc!).ToHashSet().Intersect(usedWordClasses).ToList() ?? new();
 
                 if (!wordClasses.Any())
+                {
                     continue;
+                }
 
                 if (jmdictWordClassDictionary.TryGetValue(value.PrimarySpelling, out List<JmdictWordClass>? psr))
                 {
                     if (!psr.Any(r =>
                             r.Readings?.SequenceEqual(value.Readings ?? new List<string>()) ??
-                            value.Readings == null && r.Spelling == value.PrimarySpelling))
+                            (value.Readings == null && r.Spelling == value.PrimarySpelling)))
+                    {
                         psr.Add(new JmdictWordClass(value.PrimarySpelling, value.Readings, wordClasses));
+                    }
                 }
 
                 else
@@ -98,8 +104,10 @@ public static class JmdictWordClassUtils
                         {
                             if (!asr.Any(r =>
                                     r.Readings?.SequenceEqual(value.Readings ?? new List<string>()) ??
-                                    value.Readings == null && r.Spelling == spelling))
+                                    (value.Readings == null && r.Spelling == spelling)))
+                            {
                                 asr.Add(new JmdictWordClass(spelling, value.Readings, wordClasses));
+                            }
                         }
 
                         else

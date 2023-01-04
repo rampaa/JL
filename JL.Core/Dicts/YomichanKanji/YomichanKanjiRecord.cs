@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 using JL.Core.Dicts.Options;
 
@@ -73,7 +73,9 @@ public class YomichanKanjiRecord : IDictRecord
     public string? BuildFormattedDefinition(DictOptions? options)
     {
         if (Definitions is null)
+        {
             return null;
+        }
 
         StringBuilder defResult = new();
 
@@ -83,7 +85,7 @@ public class YomichanKanjiRecord : IDictRecord
 
         for (int i = 0; i < Definitions.Count; i++)
         {
-            defResult.Append(Definitions[i] + separator);
+            _ = defResult.Append(Definitions[i] + separator);
         }
 
         return defResult.ToString().TrimEnd(' ', '\n');
@@ -92,13 +94,15 @@ public class YomichanKanjiRecord : IDictRecord
     public string? BuildFormattedStats()
     {
         if (Stats is null)
+        {
             return null;
+        }
 
         StringBuilder statResult = new();
 
         for (int i = 0; i < Stats.Count; i++)
         {
-            statResult.Append(Stats[i] + "\n");
+            _ = statResult.Append(Stats[i] + "\n");
         }
 
         return statResult.ToString().TrimEnd('\n');

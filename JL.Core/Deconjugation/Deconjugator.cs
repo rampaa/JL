@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Caching;
 
 namespace JL.Core.Deconjugation;
@@ -14,10 +14,14 @@ public static class Deconjugator
     {
         // tag doesn't match
         if (myForm.Tags.Count > 0 && myForm.Tags[^1] != myRule.ConTag)
+        {
             return null;
+        }
         // ending doesn't match
-        if (!myForm.Text.EndsWith(myRule.ConEnd))
+        if (!myForm.Text.EndsWith(myRule.ConEnd, StringComparison.Ordinal))
+        {
             return null;
+        }
 
         string newText =
             myForm.Text[..^myRule.ConEnd.Length]
@@ -35,14 +39,18 @@ public static class Deconjugator
         newForm.Process.Add(myRule.Detail);
 
         if (newForm.Tags.Count is 0)
+        {
             newForm.Tags.Add(myRule.ConTag);
+        }
 
         newForm.Tags.Add(myRule.DecTag);
 
         if (newForm.SeenText.Count is 0)
-            newForm.SeenText.Add(myForm.Text);
+        {
+            _ = newForm.SeenText.Add(myForm.Text);
+        }
 
-        newForm.SeenText.Add(newText);
+        _ = newForm.SeenText.Add(newText);
 
         return newForm;
     }
@@ -52,16 +60,24 @@ public static class Deconjugator
     {
         // can't deconjugate nothingness
         if (myForm.Text is "")
+        {
             return null;
+        }
         // deconjugated form too much longer than conjugated form
         if (myForm.Text.Length > myForm.OriginalText.Length + 10)
+        {
             return null;
+        }
         // impossibly information-dense
         if (myForm.Tags.Count > myForm.OriginalText.Length + 6)
+        {
             return null;
+        }
         // blank detail mean it can't be the last (first applied, but rightmost) rule
         if (myRule.Detail is "" && myForm.Tags.Count is 0)
+        {
             return null;
+        }
 
         HashSet<Form> collection = new();
 
@@ -78,7 +94,9 @@ public static class Deconjugator
             );
             Form? result = StdruleDeconjugateInner(myForm, virtualRule);
             if (result is not null)
-                collection.Add(result);
+            {
+                _ = collection.Add(result);
+            }
         }
         else if (array.Count > 1)
         {
@@ -104,7 +122,9 @@ public static class Deconjugator
                 );
                 Form? ret = StdruleDeconjugateInner(myForm, virtualRule);
                 if (ret is not null)
-                    collection.Add(ret);
+                {
+                    _ = collection.Add(ret);
+                }
             }
         }
 
@@ -113,26 +133,23 @@ public static class Deconjugator
 
     private static HashSet<Form>? RewriteruleDeconjugate(Form myForm, Rule myRule)
     {
-        if (myForm.Text != myRule.ConEnd.First())
-            return null;
-
-        return StdruleDeconjugate(myForm, myRule);
+        return myForm.Text != myRule.ConEnd.First()
+            ? null
+            : StdruleDeconjugate(myForm, myRule);
     }
 
     private static HashSet<Form>? OnlyfinalruleDeconjugate(Form myForm, Rule myRule)
     {
-        if (myForm.Tags.Count is not 0)
-            return null;
-
-        return StdruleDeconjugate(myForm, myRule);
+        return myForm.Tags.Count is not 0
+            ? null
+            : StdruleDeconjugate(myForm, myRule);
     }
 
     private static HashSet<Form>? NeverfinalruleDeconjugate(Form myForm, Rule myRule)
     {
-        if (myForm.Tags.Count is 0)
-            return null;
-
-        return StdruleDeconjugate(myForm, myRule);
+        return myForm.Tags.Count is 0
+            ? null
+            : StdruleDeconjugate(myForm, myRule);
     }
 
     private static HashSet<Form>? ContextruleDeconjugate(Form myForm, Rule myRule)
@@ -143,16 +160,18 @@ public static class Deconjugator
             "saspecial" => SaspecialCheck(myForm, myRule),
             _ => false
         };
-        if (!result)
-            return null;
 
-        return StdruleDeconjugate(myForm, myRule);
+        return result
+            ? StdruleDeconjugate(myForm, myRule)
+            : null;
     }
 
     private static Form? SubstitutionInner(Form myForm, Rule myRule)
     {
         if (!myForm.Text.Contains(myRule.ConEnd.First()))
+        {
             return null;
+        }
 
         string newText = myForm.Text.Replace(myRule.ConEnd.First(), myRule.DecEnd.First());
 
@@ -167,9 +186,11 @@ public static class Deconjugator
         newForm.Process.Add(myRule.Detail);
 
         if (newForm.SeenText.Count is 0)
-            newForm.SeenText.Add(myForm.Text);
+        {
+            _ = newForm.SeenText.Add(myForm.Text);
+        }
 
-        newForm.SeenText.Add(newText);
+        _ = newForm.SeenText.Add(newText);
 
         return newForm;
     }
@@ -177,11 +198,15 @@ public static class Deconjugator
     private static HashSet<Form>? SubstitutionDeconjugate(Form myForm, Rule myRule)
     {
         if (myForm.Process.Count is not 0)
+        {
             return null;
+        }
 
         // can't deconjugate nothingness
         if (myForm.Text is "")
+        {
             return null;
+        }
 
         HashSet<Form> collection = new();
 
@@ -190,7 +215,9 @@ public static class Deconjugator
         {
             Form? result = SubstitutionInner(myForm, myRule);
             if (result is not null)
-                collection.Add(result);
+            {
+                _ = collection.Add(result);
+            }
         }
         else if (array.Count > 1)
         {
@@ -214,7 +241,9 @@ public static class Deconjugator
                 );
                 Form? ret = SubstitutionInner(myForm, virtualRule);
                 if (ret is not null)
-                    collection.Add(ret);
+                {
+                    _ = collection.Add(ret);
+                }
             }
         }
 
@@ -224,29 +253,37 @@ public static class Deconjugator
     private static bool V1InftrapCheck(Form myForm)
     {
         if (myForm.Tags.Count is not 1)
+        {
             return true;
+        }
 
         string myTag = myForm.Tags[0];
-        if (myTag is "stem-ren")
-            return false;
-
-        return true;
+        return myTag is not "stem-ren";
     }
 
     private static bool SaspecialCheck(Form myForm,
         Rule myRule)
     {
-        if (myForm.Text is "") return false;
-        if (!myForm.Text.EndsWith(myRule.ConEnd.First())) return false;
+        if (myForm.Text is "")
+        {
+            return false;
+        }
+
+        if (!myForm.Text.EndsWith(myRule.ConEnd.First(), StringComparison.Ordinal))
+        {
+            return false;
+        }
 
         string baseText = myForm.Text[..^myRule.ConEnd.First().Length];
-        return !baseText.EndsWith("さ");
+        return !baseText.EndsWith("さ", StringComparison.Ordinal);
     }
 
     public static HashSet<Form> Deconjugate(string myText, bool useCache = true)
     {
         if (useCache && s_cache.TryGet(myText, out HashSet<Form> data))
+        {
             return data!;
+        }
 
         HashSet<Form> processed = new();
         HashSet<Form> novel = new();
@@ -259,7 +296,7 @@ public static class Deconjugator
             new HashSet<string>(),
             new List<string>()
         );
-        novel.Add(startForm);
+        _ = novel.Add(startForm);
 
         while (novel.Count > 0)
         {
@@ -279,7 +316,10 @@ public static class Deconjugator
                         _ => null
                     };
 
-                    if (newForm is null || newForm.Count is 0) continue;
+                    if (newForm is null || newForm.Count is 0)
+                    {
+                        continue;
+                    }
 
                     foreach (Form myForm in newForm)
                     {
@@ -287,7 +327,7 @@ public static class Deconjugator
                             !novel.Contains(myForm) &&
                             !newNovel.Contains(myForm))
                         {
-                            newNovel.Add(myForm);
+                            _ = newNovel.Add(myForm);
                         }
                     }
                 }
@@ -298,7 +338,9 @@ public static class Deconjugator
         }
 
         if (useCache)
+        {
             s_cache.AddReplace(myText, processed);
+        }
 
         return processed;
     }

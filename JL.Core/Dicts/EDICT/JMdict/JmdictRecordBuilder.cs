@@ -1,4 +1,4 @@
-﻿using JL.Core.Utilities;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EDICT.JMdict;
 
@@ -196,7 +196,9 @@ internal static class JmdictRecordBuilder
         List<List<T>?>? listOfListClone = listOfLists;
 
         if (!listOfListClone!.Any() || listOfListClone!.All(l => l is null || !l.Any()))
+        {
             listOfListClone = null;
+        }
         else
         {
             listOfListClone!.TrimExcess();

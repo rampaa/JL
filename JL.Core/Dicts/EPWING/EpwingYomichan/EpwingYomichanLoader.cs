@@ -7,7 +7,9 @@ public static class EpwingYomichanLoader
     public static async Task Load(Dict dict)
     {
         if (!Directory.Exists(dict.Path) && !File.Exists(dict.Path))
+        {
             return;
+        }
 
         string[] jsonFiles = Directory.EnumerateFiles(dict.Path, "*_bank_*.json", SearchOption.TopDirectoryOnly)
             .Where(s => s.Contains("term") || s.Contains("kanji"))
@@ -26,7 +28,9 @@ public static class EpwingYomichanLoader
             }
 
             if (jsonObjects is null)
+            {
                 continue;
+            }
 
             foreach (List<JsonElement> jsonObj in jsonObjects)
             {
@@ -40,7 +44,9 @@ public static class EpwingYomichanLoader
     private static void AddToDictionary(EpwingYomichanRecord yomichanRecord, Dict dict)
     {
         if (!EpwingUtils.IsValidEpwingResultForDictType(yomichanRecord, dict))
+        {
             return;
+        }
 
         string hiraganaExpression = Kana.KatakanaToHiragana(yomichanRecord.PrimarySpelling);
 
@@ -51,14 +57,22 @@ public static class EpwingYomichanLoader
             string hiraganaReading = Kana.KatakanaToHiragana(yomichanRecord.Reading);
 
             if (dict.Contents.TryGetValue(hiraganaReading, out records))
+            {
                 records.Add(yomichanRecord);
+            }
             else
+            {
                 dict.Contents.Add(hiraganaReading, new List<IDictRecord> { yomichanRecord });
+            }
         }
 
         if (dict.Contents.TryGetValue(hiraganaExpression, out records))
+        {
             records.Add(yomichanRecord);
+        }
         else
+        {
             dict.Contents.Add(hiraganaExpression, new List<IDictRecord> { yomichanRecord });
+        }
     }
 }

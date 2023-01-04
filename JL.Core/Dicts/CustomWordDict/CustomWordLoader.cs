@@ -20,7 +20,9 @@ public static class CustomWordLoader
                     List<string>? readings = lParts[1].Split(';').Select(r => r.Trim()).ToList();
 
                     if (!readings.Any())
+                    {
                         readings = null;
+                    }
 
                     List<string> definitions = lParts[2].Split(';').Select(d => d.Trim()).ToList();
                     string wordClass = lParts[3].Trim();
@@ -40,7 +42,9 @@ public static class CustomWordLoader
             alternativeSpellings.RemoveAt(i);
 
             if (!alternativeSpellings.Any())
+            {
                 alternativeSpellings = null;
+            }
 
             string spelling = spellings[i];
 

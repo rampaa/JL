@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using JL.Core.Utilities;
 
@@ -20,35 +20,41 @@ public class Stats
 
     [JsonIgnore] public static Stats SessionStats { get; set; } = new();
 
-    [JsonIgnore] public static Stats LifetimeStats { get; set; } = ReadLifetimeStats()!;
+    [JsonIgnore] private static Stats? s_lifetimeStats;
 
-    public static void IncrementStat(StatType type, long amount = 1)
+    public static async Task<Stats> GetLifetimeStats()
     {
+        return s_lifetimeStats ??= await ReadLifetimeStats().ConfigureAwait(false);
+    }
+
+    public static async Task IncrementStat(StatType type, long amount = 1)
+    {
+        Stats lifeTimeStats = await GetLifetimeStats().ConfigureAwait(false);
         switch (type)
         {
             case StatType.Characters:
                 SessionStats.Characters += amount;
-                LifetimeStats.Characters += amount;
+                lifeTimeStats.Characters += amount;
                 break;
             case StatType.Lines:
                 SessionStats.Lines += amount;
-                LifetimeStats.Lines += amount;
+                lifeTimeStats.Lines += amount;
                 break;
             case StatType.Time:
                 SessionStats.Time = SessionStats.Time.Add(TimeSpan.FromTicks(amount));
-                LifetimeStats.Time = LifetimeStats.Time.Add(TimeSpan.FromTicks(amount));
+                lifeTimeStats.Time = lifeTimeStats.Time.Add(TimeSpan.FromTicks(amount));
                 break;
             case StatType.CardsMined:
                 SessionStats.CardsMined += amount;
-                LifetimeStats.CardsMined += amount;
+                lifeTimeStats.CardsMined += amount;
                 break;
             case StatType.TimesPlayedAudio:
                 SessionStats.TimesPlayedAudio += amount;
-                LifetimeStats.TimesPlayedAudio += amount;
+                lifeTimeStats.TimesPlayedAudio += amount;
                 break;
             case StatType.Imoutos:
                 SessionStats.Imoutos += amount;
-                LifetimeStats.Imoutos += amount;
+                lifeTimeStats.Imoutos += amount;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
@@ -57,51 +63,49 @@ public class Stats
 
     public static async Task UpdateLifetimeStats()
     {
-        await WriteLifetimeStats(LifetimeStats).ConfigureAwait(false);
+        Stats lifeTimeStats = await GetLifetimeStats().ConfigureAwait(false);
+        await WriteLifetimeStats(lifeTimeStats).ConfigureAwait(false);
     }
 
-    private static async Task<bool> WriteLifetimeStats(Stats lifetimeStats)
+    private static async Task WriteLifetimeStats(Stats lifetimeStats)
     {
         try
         {
-            Directory.CreateDirectory(Storage.ConfigPath);
+            _ = Directory.CreateDirectory(Storage.ConfigPath);
             await File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "Stats.json"),
                     JsonSerializer.Serialize(lifetimeStats, new JsonSerializerOptions { WriteIndented = true }))
                 .ConfigureAwait(false);
-
-            return true;
         }
         catch (Exception ex)
         {
             Storage.Frontend.Alert(AlertLevel.Error, "Couldn't write Stats");
             Utils.Logger.Error(ex, "Couldn't write Stats");
-            return false;
         }
     }
 
-    private static Stats? ReadLifetimeStats()
+    private static async Task<Stats> ReadLifetimeStats()
     {
         if (File.Exists(Path.Join(Storage.ConfigPath, "Stats.json")))
         {
             try
             {
                 return JsonSerializer.Deserialize<Stats>(
-                   File.ReadAllText(Path.Join(Storage.ConfigPath, "Stats.json")));
+                   File.ReadAllText(Path.Join(Storage.ConfigPath, "Stats.json"))) ?? new Stats();
             }
 
             catch (Exception ex)
             {
                 Storage.Frontend.Alert(AlertLevel.Error, "Couldn't read Stats");
                 Utils.Logger.Error(ex, "Couldn't read Stats");
-                return null;
+                return new Stats();
             }
         }
         else
         {
             Utils.Logger.Information("Stats.json doesn't exist, creating it");
 
-            var lifetimeStats = new Stats();
-            WriteLifetimeStats(lifetimeStats).Wait();
+            Stats lifetimeStats = new();
+            await WriteLifetimeStats(lifetimeStats).ConfigureAwait(false);
             return lifetimeStats;
         }
     }

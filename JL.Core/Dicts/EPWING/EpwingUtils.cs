@@ -1,4 +1,4 @@
-﻿using JL.Core.Dicts.Options;
+using JL.Core.Dicts.Options;
 
 namespace JL.Core.Dicts.EPWING;
 
@@ -11,7 +11,9 @@ public static class EpwingUtils
         foreach (string badCharacter in badCharacters)
         {
             if (epwingRecord.PrimarySpelling.Contains(badCharacter))
+            {
                 return false;
+            }
         }
 
         switch (dict.Type)
@@ -64,11 +66,15 @@ public static class EpwingUtils
                 {
                     // english definitions
                     if (epwingRecord.Definitions.Any(def => def.Contains("→英和") || def.Contains("\\u003")))
+                    {
                         return false;
+                    }
 
                     // english definitions
                     if (!epwingRecord.Definitions.Any(Storage.JapaneseRegex.IsMatch))
+                    {
                         return false;
+                    }
                 }
                 // todo: missing FilterDuplicateEntries call?
                 break;
@@ -76,7 +82,9 @@ public static class EpwingUtils
             case DictType.Daijisen:
                 // kanji definitions
                 if (epwingRecord.Definitions?.Any(def => def.Contains("［音］")) ?? false)
+                {
                     return false;
+                }
 
                 return FilterDuplicateEntries(epwingRecord, dict);
 

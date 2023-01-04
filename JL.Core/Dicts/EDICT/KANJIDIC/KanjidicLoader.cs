@@ -1,4 +1,4 @@
-﻿using System.Xml;
+using System.Xml;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EDICT.KANJIDIC;
@@ -31,7 +31,7 @@ public static class KanjidicLoader
                      "Couldn't find kanjidic2.xml. Would you like to download it now?",
                      "Download KANJIDIC2?"))
         {
-            await ResourceUpdater.UpdateResource(dict.Path,
+            _ = await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.KanjidicUrl,
                 DictType.Kanjidic.ToString(), false, false).ConfigureAwait(false);
             await Load(dict).ConfigureAwait(false);
@@ -52,7 +52,9 @@ public static class KanjidicLoader
         while (!xmlReader.EOF)
         {
             if (xmlReader is { Name: "character", NodeType: XmlNodeType.EndElement })
+            {
                 break;
+            }
 
             if (xmlReader.NodeType is XmlNodeType.Element)
             {
@@ -78,7 +80,7 @@ public static class KanjidicLoader
                         }
                         else
                         {
-                            await xmlReader.ReadAsync().ConfigureAwait(false);
+                            _ = await xmlReader.ReadAsync().ConfigureAwait(false);
                         }
                         break;
 
@@ -98,20 +100,20 @@ public static class KanjidicLoader
                                 break;
 
                             default:
-                                await xmlReader.ReadAsync().ConfigureAwait(false);
+                                _ = await xmlReader.ReadAsync().ConfigureAwait(false);
                                 break;
                         }
                         break;
 
                     default:
-                        await xmlReader.ReadAsync().ConfigureAwait(false);
+                        _ = await xmlReader.ReadAsync().ConfigureAwait(false);
                         break;
                 }
             }
 
             else
             {
-                await xmlReader.ReadAsync().ConfigureAwait(false);
+                _ = await xmlReader.ReadAsync().ConfigureAwait(false);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Runtime;
 using System.Text;
@@ -30,10 +31,7 @@ public partial class ManageDictionariesWindow : Window
 
     private IntPtr _windowHandle;
 
-    public static ManageDictionariesWindow Instance
-    {
-        get { return s_instance ??= new(); }
-    }
+    public static ManageDictionariesWindow Instance => s_instance ??= new();
 
     public ManageDictionariesWindow()
     {
@@ -71,7 +69,7 @@ public partial class ManageDictionariesWindow : Window
     {
         Storage.Frontend.InvalidateDisplayCache();
         WindowsUtils.UpdateMainWindowVisibility();
-        MainWindow.Instance.Focus();
+        _ = MainWindow.Instance.Focus();
         s_instance = null;
         await Utils.SerializeDicts().ConfigureAwait(false);
         await Storage.LoadDictionaries().ConfigureAwait(false);
@@ -94,7 +92,7 @@ public partial class ManageDictionariesWindow : Window
                 Name = "priority",
                 // Width = 20,
                 Width = 0,
-                Text = dict.Priority.ToString(),
+                Text = dict.Priority.ToString(CultureInfo.InvariantCulture),
                 Visibility = Visibility.Collapsed,
                 // Margin = new Thickness(10),
             };
@@ -157,6 +155,9 @@ public partial class ManageDictionariesWindow : Window
                 case DictType.Kanjidic:
                     buttonUpdate.IsEnabled = !Storage.UpdatingKanjidic;
                     break;
+
+                default:
+                    break;
             }
 
             buttonUpdate.Click += async (_, _) =>
@@ -166,13 +167,15 @@ public partial class ManageDictionariesWindow : Window
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
-                        await UpdateJMdict();
+                        await UpdateJMdict().ConfigureAwait(true);
                         break;
                     case DictType.JMnedict:
-                        await UpdateJMnedict();
+                        await UpdateJMnedict().ConfigureAwait(true);
                         break;
                     case DictType.Kanjidic:
-                        await UpdateKanjidic();
+                        await UpdateKanjidic().ConfigureAwait(true);
+                        break;
+                    default:
                         break;
                 }
 
@@ -250,7 +253,7 @@ public partial class ManageDictionariesWindow : Window
                 if (Storage.Frontend.ShowYesNoDialog("Really remove dictionary?", "Confirmation"))
                 {
                     dict.Contents.Clear();
-                    Storage.Dicts.Remove(dict.Name);
+                    _ = Storage.Dicts.Remove(dict.Name);
                     UpdateDictionariesDisplay();
 
                     GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
@@ -259,30 +262,30 @@ public partial class ManageDictionariesWindow : Window
             };
             buttonEdit.Click += (_, _) =>
             {
-                new EditDictionaryWindow(dict) { Owner = this }.ShowDialog();
+                _ = new EditDictionaryWindow(dict) { Owner = this }.ShowDialog();
                 UpdateDictionariesDisplay();
             };
 
             resultDockPanels.Add(dockPanel);
 
-            dockPanel.Children.Add(checkBox);
-            dockPanel.Children.Add(buttonIncreasePriority);
-            dockPanel.Children.Add(buttonDecreasePriority);
-            dockPanel.Children.Add(priority);
-            dockPanel.Children.Add(dictTypeDisplay);
-            dockPanel.Children.Add(dictPathValidityDisplay);
-            dockPanel.Children.Add(dictPathDisplay);
-            dockPanel.Children.Add(buttonEdit);
-            dockPanel.Children.Add(buttonUpdate);
-            dockPanel.Children.Add(buttonRemove);
-            dockPanel.Children.Add(buttonInfo);
+            _ = dockPanel.Children.Add(checkBox);
+            _ = dockPanel.Children.Add(buttonIncreasePriority);
+            _ = dockPanel.Children.Add(buttonDecreasePriority);
+            _ = dockPanel.Children.Add(priority);
+            _ = dockPanel.Children.Add(dictTypeDisplay);
+            _ = dockPanel.Children.Add(dictPathValidityDisplay);
+            _ = dockPanel.Children.Add(dictPathDisplay);
+            _ = dockPanel.Children.Add(buttonEdit);
+            _ = dockPanel.Children.Add(buttonUpdate);
+            _ = dockPanel.Children.Add(buttonRemove);
+            _ = dockPanel.Children.Add(buttonInfo);
         }
 
         DictionariesDisplay!.ItemsSource = resultDockPanels.OrderBy(dockPanel =>
             dockPanel.Children
                 .OfType<TextBlock>()
                 .Where(textBlock => textBlock.Name is "priority")
-                .Select(textBlockPriority => Convert.ToInt32(textBlockPriority.Text)).First());
+                .Select(textBlockPriority => Convert.ToInt32(textBlockPriority.Text, CultureInfo.InvariantCulture)).First());
     }
 
     private void PathTextbox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -292,16 +295,20 @@ public partial class ManageDictionariesWindow : Window
         if (File.Exists(path) || Directory.Exists(path))
         {
             if (File.Exists(path))
+            {
                 path = Path.GetDirectoryName(path)!;
+            }
 
-            Process.Start("explorer.exe", path ?? throw new InvalidOperationException());
+            _ = Process.Start("explorer.exe", path);
         }
     }
 
     private static void PrioritizeDict(Dict dict)
     {
         if (dict.Priority is 0)
+        {
             return;
+        }
 
         Storage.Dicts.Single(d => d.Value.Priority == dict.Priority - 1).Value.Priority += 1;
         dict.Priority -= 1;
@@ -313,7 +320,9 @@ public partial class ManageDictionariesWindow : Window
         int lowestPriority = Storage.Dicts.Select(d => d.Value.Priority).Max();
 
         if (dict.Priority == lowestPriority)
+        {
             return;
+        }
 
         Storage.Dicts.Single(d => d.Value.Priority == dict.Priority + 1).Value.Priority -= 1;
         dict.Priority += 1;
@@ -321,7 +330,7 @@ public partial class ManageDictionariesWindow : Window
 
     private void ButtonAddDictionary_OnClick(object sender, RoutedEventArgs e)
     {
-        new AddDictionaryWindow() { Owner = this }.ShowDialog();
+        _ = new AddDictionaryWindow() { Owner = this }.ShowDialog();
         UpdateDictionariesDisplay();
     }
 
@@ -341,7 +350,7 @@ public partial class ManageDictionariesWindow : Window
             dict.Contents.Clear();
 
             await Task.Run(async () => await JmdictLoader
-                .Load(dict).ConfigureAwait(false));
+                .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
 
             await JmdictWordClassUtils.SerializeJmdictWordClass().ConfigureAwait(false);
 
@@ -350,7 +359,9 @@ public partial class ManageDictionariesWindow : Window
             await JmdictWordClassUtils.Load().ConfigureAwait(false);
 
             if (!dict.Active)
+            {
                 dict.Contents.Clear();
+            }
 
             GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
@@ -374,10 +385,12 @@ public partial class ManageDictionariesWindow : Window
             dict.Contents.Clear();
 
             await Task.Run(async () => await JmnedictLoader
-                .Load(dict).ConfigureAwait(false));
+                .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
 
             if (!dict.Active)
+            {
                 dict.Contents.Clear();
+            }
 
             GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
@@ -400,10 +413,12 @@ public partial class ManageDictionariesWindow : Window
             dict.Contents.Clear();
 
             await Task.Run(async () => await KanjidicLoader
-                .Load(dict).ConfigureAwait(false));
+                .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
 
             if (!dict.Active)
+            {
                 dict.Contents.Clear();
+            }
 
             GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
@@ -424,10 +439,10 @@ public partial class ManageDictionariesWindow : Window
 
         foreach (KeyValuePair<string, string> entity in sortedJmdictEntities)
         {
-            sb.Append(entity.Key);
-            sb.Append(": ");
-            sb.Append(entity.Value);
-            sb.Append(Environment.NewLine);
+            _ = sb.Append(entity.Key)
+                .Append(": ")
+                .Append(entity.Value)
+                .Append(Environment.NewLine);
         }
 
         return sb.ToString()[..^Environment.NewLine.Length];
@@ -445,7 +460,7 @@ public partial class ManageDictionariesWindow : Window
         infoWindow.Owner = this;
         infoWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
-        infoWindow.ShowDialog();
+        _ = infoWindow.ShowDialog();
     }
 
     private void JmdictInfoButton_Click(object sender, RoutedEventArgs e)

@@ -1,4 +1,5 @@
-﻿using System.Text;
+using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
@@ -22,7 +23,9 @@ public class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
         Reading = jsonElement[1].ToString();
 
         if (Reading is "" || Reading == PrimarySpelling)
+        {
             Reading = null;
+        }
 
         DefinitionTags = new();
 
@@ -42,12 +45,16 @@ public class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
         }
 
         if (!DefinitionTags.Any())
+        {
             DefinitionTags = null;
+        }
 
         WordClasses = jsonElement[3].ToString().Split(" ").ToList();
 
         if (!WordClasses.Any())
+        {
             WordClasses = null;
+        }
 
         //jsonElement[4].TryGetInt32(out int score);
         //Score = score;
@@ -79,7 +86,9 @@ public class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
         }
 
         if (!Definitions.Any())
+        {
             Definitions = null;
+        }
 
         //jsonElement[6].TryGetInt32(out int sequence);
         //Sequence = sequence;
@@ -90,7 +99,9 @@ public class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
     public string? BuildFormattedDefinition(DictOptions? options)
     {
         if (Definitions is null)
+        {
             return null;
+        }
 
         StringBuilder defResult = new();
 
@@ -102,10 +113,10 @@ public class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
         {
             if (DefinitionTags?.Count > i)
             {
-                defResult.Append($"({DefinitionTags[i]}) ");
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"({DefinitionTags[i]}) ");
             }
 
-            defResult.Append(Definitions[i] + separator);
+            _ = defResult.Append(Definitions[i] + separator);
         }
 
         return defResult.ToString().TrimEnd(' ', '\n');

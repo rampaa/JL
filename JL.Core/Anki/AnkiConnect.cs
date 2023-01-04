@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Json;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using JL.Core.Utilities;
@@ -38,10 +38,10 @@ public static class AnkiConnect
     //     return await Send(req).ConfigureAwait(false);
     // }
 
-    public static async Task<Response?> Sync()
+    public static async Task Sync()
     {
         Request req = new("sync", 6);
-        return await Send(req).ConfigureAwait(false);
+        _ = await Send(req).ConfigureAwait(false);
     }
 
     private static async Task<Response?> Send(Request req)
@@ -61,7 +61,9 @@ public static class AnkiConnect
             Utils.Logger.Information("json result: {JsonResult}", json?.Result ?? "null");
 
             if (json?.Error is null)
+            {
                 return json;
+            }
 
             Storage.Frontend.Alert(AlertLevel.Error, json.Error.ToString()!);
             Utils.Logger.Error("{JsonError}", json.Error.ToString());

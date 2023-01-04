@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,10 +17,7 @@ public partial class AddWordWindow : Window
 {
     private static AddWordWindow? s_instance;
 
-    public static AddWordWindow Instance
-    {
-        get { return s_instance ??= new(); }
-    }
+    public static AddWordWindow Instance => s_instance ??= new();
 
     public AddWordWindow()
     {
@@ -95,14 +92,14 @@ public partial class AddWordWindow : Window
     private static async Task WriteToFile(string spellings, string readings, string definitions, string wordClass)
     {
         StringBuilder stringBuilder = new();
-        stringBuilder.Append(spellings);
-        stringBuilder.Append('\t');
-        stringBuilder.Append(readings);
-        stringBuilder.Append('\t');
-        stringBuilder.Append(definitions);
-        stringBuilder.Append('\t');
-        stringBuilder.Append(wordClass);
-        stringBuilder.Append(Environment.NewLine);
+        _ = stringBuilder.Append(spellings)
+            .Append('\t')
+            .Append(readings)
+            .Append('\t')
+            .Append(definitions)
+            .Append('\t')
+            .Append(wordClass)
+            .Append(Environment.NewLine);
 
         string customWordDictPath = Storage.Dicts.Values.First(dict => dict.Type is DictType.CustomWordDictionary).Path;
         await File.AppendAllTextAsync(customWordDictPath,
@@ -117,7 +114,7 @@ public partial class AddWordWindow : Window
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         WindowsUtils.UpdateMainWindowVisibility();
-        MainWindow.Instance.Focus();
+        _ = MainWindow.Instance.Focus();
         s_instance = null;
     }
 }

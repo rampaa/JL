@@ -68,14 +68,18 @@ internal static class EpwingNazekaLoader
                     alternativeSpellings.RemoveAt(i);
 
                     if (!alternativeSpellings.Any())
+                    {
                         alternativeSpellings = null;
+                    }
 
                     key = Kana.KatakanaToHiragana(primarySpelling);
 
                     tempRecord = new(primarySpelling, reading, alternativeSpellings, definitions);
 
                     if (!EpwingUtils.IsValidEpwingResultForDictType(tempRecord, dict))
+                    {
                         continue;
+                    }
 
                     if (nazekaEpwingDict.TryGetValue(key, out result))
                     {
@@ -96,7 +100,9 @@ internal static class EpwingNazekaLoader
                 EpwingNazekaRecord tempRecord = new(primarySpelling, null, null, definitions);
 
                 if (!EpwingUtils.IsValidEpwingResultForDictType(tempRecord, dict))
+                {
                     continue;
+                }
 
                 if (nazekaEpwingDict.TryGetValue(key, out List<IDictRecord>? result))
                 {
