@@ -278,8 +278,6 @@ public static class Kana
                         case "エ":
                             alternativeVowel = "イ";
                             break;
-                        default:
-                            break;
                     }
 
                     int listSize = stringBuilders.Count;

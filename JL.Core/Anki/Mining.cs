@@ -100,27 +100,25 @@ public static class Mining
                 Utils.Logger.Error("Mining failed for {FoundSpelling}", primarySpelling);
                 return false;
             }
+
+            if (needsAudio && (audioRes is null || Utils.GetMd5String(audioRes) is Storage.Jpod101NoAudioMd5Hash))
+            {
+                Storage.Frontend.Alert(AlertLevel.Warning, $"Mined {primarySpelling} (no audio)");
+                Utils.Logger.Information("Mined {FoundSpelling} (no audio)", primarySpelling);
+            }
+
             else
             {
-                if (needsAudio && (audioRes is null || Utils.GetMd5String(audioRes) is Storage.Jpod101NoAudioMd5Hash))
-                {
-                    Storage.Frontend.Alert(AlertLevel.Warning, $"Mined {primarySpelling} (no audio)");
-                    Utils.Logger.Information("Mined {FoundSpelling} (no audio)", primarySpelling);
-                }
-
-                else
-                {
-                    Storage.Frontend.Alert(AlertLevel.Success, $"Mined {primarySpelling}");
-                    Utils.Logger.Information("Mined {FoundSpelling}", primarySpelling);
-                }
-
-                if (Storage.Frontend.CoreConfig.ForceSyncAnki)
-                {
-                    await AnkiConnect.Sync().ConfigureAwait(false);
-                }
-
-                return true;
+                Storage.Frontend.Alert(AlertLevel.Success, $"Mined {primarySpelling}");
+                Utils.Logger.Information("Mined {FoundSpelling}", primarySpelling);
             }
+
+            if (Storage.Frontend.CoreConfig.ForceSyncAnki)
+            {
+                await AnkiConnect.Sync().ConfigureAwait(false);
+            }
+
+            return true;
         }
         catch (Exception ex)
         {

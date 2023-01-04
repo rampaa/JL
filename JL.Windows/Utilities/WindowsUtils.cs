@@ -49,14 +49,12 @@ public static class WindowsUtils
         {
             return keyGesture.Key == e.Key && (Keyboard.Modifiers & ModifierKeys.Windows) is 0;
         }
-        else if (keyGesture.Modifiers is 0)
+
+        if (keyGesture.Modifiers is 0)
         {
             return keyGesture.Key == e.Key;
         }
-        else
-        {
-            return keyGesture.Matches(null, e);
-        }
+        return keyGesture.Matches(null, e);
     }
 
     public static bool CompareKeyGesture(KeyGesture keyGesture)
@@ -65,14 +63,12 @@ public static class WindowsUtils
         {
             return Keyboard.IsKeyDown(keyGesture.Key) && (Keyboard.Modifiers & ModifierKeys.Windows) is 0;
         }
-        else if (keyGesture.Modifiers is 0)
+
+        if (keyGesture.Modifiers is 0)
         {
             return Keyboard.IsKeyDown(keyGesture.Key);
         }
-        else
-        {
-            return Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers == keyGesture.Modifiers;
-        }
+        return Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers == keyGesture.Modifiers;
     }
 
     public static string KeyGestureToString(KeyGesture keyGesture)
@@ -125,15 +121,12 @@ public static class WindowsUtils
                 : (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture)!;
         }
 
-        else
-        {
-            Configuration config =
-                ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings.Add(keyGestureName, KeyGestureToString(keyGesture));
-            config.Save(ConfigurationSaveMode.Modified);
+        Configuration config =
+            ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+        config.AppSettings.Settings.Add(keyGestureName, KeyGestureToString(keyGesture));
+        config.Save(ConfigurationSaveMode.Modified);
 
-            return keyGesture;
-        }
+        return keyGesture;
     }
 
     public static List<ComboBoxItem> FindJapaneseFonts()
@@ -257,7 +250,7 @@ public static class WindowsUtils
 
     public static async Task ShowStatsWindow()
     {
-        await Stats.IncrementStat(StatType.Time, Storage.StatsStopWatch.ElapsedTicks).ConfigureAwait(false);
+        await Stats.IncrementStat(StatType.Time, Storage.StatsStopWatch.ElapsedTicks).ConfigureAwait(true);
         Storage.StatsStopWatch.Reset();
 
         StatsWindow statsWindow = StatsWindow.Instance;
@@ -375,7 +368,7 @@ public static class WindowsUtils
             }
 
             string randomFilePath = filePaths[rand.Next(numFiles)];
-            byte[] randomFile = File.ReadAllBytes(randomFilePath);
+            byte[] randomFile = await File.ReadAllBytesAsync(randomFilePath).ConfigureAwait(false);
             PlayAudio(randomFile, 1);
             await Stats.IncrementStat(StatType.Imoutos).ConfigureAwait(false);
         }

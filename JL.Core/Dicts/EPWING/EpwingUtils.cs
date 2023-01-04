@@ -104,25 +104,23 @@ public static class EpwingUtils
             int prevResultCount = previousResults.Count;
             for (int i = 0; i < prevResultCount; i++)
             {
-                var kenkyuushaResult = (IEpwingRecord)previousResults[i];
+                var previousResult = (IEpwingRecord)previousResults[i];
 
                 if (epwingRecord.Definitions is not null)
                 {
                     epwingRecord.Definitions = epwingRecord.Definitions.Select(def => def.Replace("┏", "")).ToList();
 
-                    if (kenkyuushaResult.BuildFormattedDefinition(dict.Options) == epwingRecord.BuildFormattedDefinition(dict.Options))
+                    if (previousResult.Definitions?.SequenceEqual(epwingRecord.Definitions ?? new List<string>()) ?? epwingRecord.Definitions is null)
                     {
                         // If an entry has reading info while others don't, keep the one with the reading info.
-                        if (string.IsNullOrEmpty(kenkyuushaResult.Reading) &&
+                        if (string.IsNullOrEmpty(previousResult.Reading) &&
                             !string.IsNullOrEmpty(epwingRecord.Reading))
                         {
                             previousResults.RemoveAt(i);
                             break;
                         }
-                        else
-                        {
-                            return false;
-                        }
+
+                        return false;
                     }
                 }
             }

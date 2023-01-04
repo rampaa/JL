@@ -90,11 +90,8 @@ public class AnkiConfig
             }
         }
 
-        else
-        {
-            // Storage.FrontEnd.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
-            Utils.Logger.Error("AnkiConfig.json doesn't exist");
-            return null;
-        }
+        // Storage.FrontEnd.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
+        Utils.Logger.Error("AnkiConfig.json doesn't exist");
+        return null;
     }
 }

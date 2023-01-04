@@ -342,7 +342,7 @@ public static class Storage
             switch (dict.Type)
             {
                 case DictType.JMdict:
-                    if (dict.Active && dict.Contents.Count is 0 && !UpdatingJMdict)
+                    if (dict is { Active: true, Contents.Count: 0 } && !UpdatingJMdict)
                     {
                         Task jMDictTask = Task.Run(async () =>
                         {
@@ -353,7 +353,7 @@ public static class Storage
                         tasks.Add(jMDictTask);
                     }
 
-                    else if (!dict.Active && dict.Contents.Count > 0 && !UpdatingJMdict)
+                    else if (dict is { Active: false, Contents.Count: > 0 } && !UpdatingJMdict)
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
@@ -361,7 +361,7 @@ public static class Storage
                     break;
 
                 case DictType.JMnedict:
-                    if (dict.Active && dict.Contents.Count is 0 && !UpdatingJMnedict)
+                    if (dict is { Active: true, Contents.Count: 0 } && !UpdatingJMnedict)
                     {
                         tasks.Add(Task.Run(async () =>
                         {
@@ -370,7 +370,7 @@ public static class Storage
                         }));
                     }
 
-                    else if (!dict.Active && dict.Contents.Count > 0 && !UpdatingJMnedict)
+                    else if (dict is { Active: false, Contents.Count: > 0 } && !UpdatingJMnedict)
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
@@ -378,7 +378,7 @@ public static class Storage
 
                     break;
                 case DictType.Kanjidic:
-                    if (dict.Active && dict.Contents.Count is 0 && !UpdatingKanjidic)
+                    if (dict is { Active: true, Contents.Count: 0 } && !UpdatingKanjidic)
                     {
                         tasks.Add(Task.Run(async () =>
                         {
@@ -387,7 +387,7 @@ public static class Storage
                         }));
                     }
 
-                    else if (!dict.Active && dict.Contents.Count > 0 && !UpdatingKanjidic)
+                    else if (dict is { Active: false, Contents.Count: > 0 } && !UpdatingKanjidic)
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
@@ -416,7 +416,7 @@ public static class Storage
                 case DictType.NonspecificWordYomichan:
                 case DictType.NonspecificNameYomichan:
                 case DictType.NonspecificYomichan:
-                    if (dict.Active && dict.Contents.Count is 0)
+                    if (dict is { Active: true, Contents.Count: 0 })
                     {
                         tasks.Add(Task.Run(async () =>
                         {
@@ -436,7 +436,7 @@ public static class Storage
                         }));
                     }
 
-                    else if (!dict.Active && dict.Contents.Count > 0)
+                    else if (dict is { Active: false, Contents.Count: > 0 })
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
@@ -444,7 +444,7 @@ public static class Storage
                     break;
 
                 case DictType.NonspecificKanjiYomichan:
-                    if (dict.Active && dict.Contents.Count is 0)
+                    if (dict is { Active: true, Contents.Count: 0 })
                     {
                         tasks.Add(Task.Run(async () =>
                         {
@@ -464,7 +464,7 @@ public static class Storage
                         }));
                     }
 
-                    else if (!dict.Active && dict.Contents.Count > 0)
+                    else if (dict is { Active: false, Contents.Count: > 0 })
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
@@ -472,7 +472,7 @@ public static class Storage
                     break;
 
                 case DictType.CustomWordDictionary:
-                    if (dict.Active && dict.Contents.Count is 0)
+                    if (dict is { Active: true, Contents.Count: 0 })
                     {
                         tasks.Add(Task.Run(async () =>
                         {
@@ -481,7 +481,7 @@ public static class Storage
                         }));
                     }
 
-                    else if (!dict.Active && dict.Contents.Count > 0)
+                    else if (dict is { Active: false, Contents.Count: > 0 })
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
@@ -489,7 +489,7 @@ public static class Storage
                     break;
 
                 case DictType.CustomNameDictionary:
-                    if (dict.Active && dict.Contents.Count is 0)
+                    if (dict is { Active: true, Contents.Count: 0 })
                     {
                         tasks.Add(Task.Run(async () =>
                         {
@@ -498,7 +498,7 @@ public static class Storage
                         }));
                     }
 
-                    else if (!dict.Active && dict.Contents.Count > 0)
+                    else if (dict is { Active: false, Contents.Count: > 0 })
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
@@ -512,7 +512,7 @@ public static class Storage
                 case DictType.NonspecificKanjiNazeka:
                 case DictType.NonspecificNameNazeka:
                 case DictType.NonspecificNazeka:
-                    if (dict.Active && dict.Contents.Count is 0)
+                    if (dict is { Active: true, Contents.Count: 0 })
                     {
                         tasks.Add(Task.Run(async () =>
                         {
@@ -532,7 +532,7 @@ public static class Storage
                         }));
                     }
 
-                    else if (!dict.Active && dict.Contents.Count > 0)
+                    else if (dict is { Active: false, Contents.Count: > 0 })
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
@@ -540,7 +540,7 @@ public static class Storage
                     break;
 
                 case DictType.PitchAccentYomichan:
-                    if (dict.Active && dict.Contents.Count is 0)
+                    if (dict is { Active: true, Contents.Count: 0 })
                     {
                         tasks.Add(Task.Run(async () =>
                         {
@@ -560,7 +560,7 @@ public static class Storage
                         }));
                     }
 
-                    else if (!dict.Active && dict.Contents.Count > 0)
+                    else if (dict is { Active: false, Contents.Count: > 0 })
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
@@ -603,7 +603,7 @@ public static class Storage
             switch (freq.Type)
             {
                 case FreqType.Nazeka:
-                    if (freq.Active && freq.Contents.Count is 0)
+                    if (freq is { Active: true, Contents.Count: 0 })
                     {
                         Task nazekaFreqTask = Task.Run(async () =>
                         {
@@ -625,7 +625,7 @@ public static class Storage
                         tasks.Add(nazekaFreqTask);
                     }
 
-                    else if (!freq.Active && freq.Contents.Count > 0)
+                    else if (freq is { Active: false, Contents.Count: > 0 })
                     {
                         freq.Contents.Clear();
                         freqRemoved = true;
@@ -634,7 +634,7 @@ public static class Storage
 
                 case FreqType.Yomichan:
                 case FreqType.YomichanKanji:
-                    if (freq.Active && freq.Contents.Count is 0)
+                    if (freq is { Active: true, Contents.Count: 0 })
                     {
                         Task yomichanFreqTask = Task.Run(async () =>
                         {
@@ -656,7 +656,7 @@ public static class Storage
                         tasks.Add(yomichanFreqTask);
                     }
 
-                    else if (!freq.Active && freq.Contents.Count > 0)
+                    else if (freq is { Active: false, Contents.Count: > 0 })
                     {
                         freq.Contents.Clear();
                         freqRemoved = true;

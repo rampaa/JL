@@ -195,13 +195,13 @@ internal static class JmdictRecordBuilder
     {
         List<List<T>?>? listOfListClone = listOfLists;
 
-        if (listOfListClone!.Count is 0 || listOfListClone!.All(l => l is null || l.Count is 0))
+        if (listOfListClone!.Count is 0 || listOfListClone.All(l => l is null || l.Count is 0))
         {
             listOfListClone = null;
         }
         else
         {
-            listOfListClone!.TrimExcess();
+            listOfListClone.TrimExcess();
 
             int counter = listOfListClone.Count;
             for (int i = 0; i < counter; i++)

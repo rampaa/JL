@@ -98,10 +98,8 @@ public static class CustomWordLoader
                 {
                     break;
                 }
-                else
-                {
-                    result.Add(newWordRecord);
-                }
+
+                result.Add(newWordRecord);
             }
             else
             {

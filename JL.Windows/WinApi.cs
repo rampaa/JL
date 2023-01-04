@@ -159,8 +159,6 @@ public class WinApi
             case "TopLeftBorder":
                 wParam = (IntPtr)ResizeDirection.TopLeft;
                 break;
-            default:
-                break;
         }
 
         _ = SendMessage(windowHandle, WM_SYSCOMMAND, wParam, IntPtr.Zero);

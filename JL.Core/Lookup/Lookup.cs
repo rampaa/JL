@@ -930,7 +930,7 @@ public static class Lookup
 
         foreach (Freq freq in Storage.FreqDicts.Values)
         {
-            if (freq.Active && freq.Type is not FreqType.YomichanKanji)
+            if (freq is { Active: true, Type: not FreqType.YomichanKanji })
             {
                 freqsList.Add(new(freq.Name, record.GetFrequency(freq)));
             }

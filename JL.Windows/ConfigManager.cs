@@ -967,24 +967,21 @@ public class ConfigManager : CoreConfig
             return value;
         }
 
+        Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+        if (ConfigurationManager.AppSettings.Get(configKey) is null)
+        {
+            config.AppSettings.Settings.Add(configKey, variable.ToString());
+        }
         else
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-            if (ConfigurationManager.AppSettings.Get(configKey) is null)
-            {
-                config.AppSettings.Settings.Add(configKey, variable.ToString());
-            }
-            else
-            {
-                config.AppSettings.Settings[configKey].Value = variable.ToString();
-            }
-
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
-
-            return variable;
+            config.AppSettings.Settings[configKey].Value = variable.ToString();
         }
+
+        config.Save(ConfigurationSaveMode.Modified);
+        ConfigurationManager.RefreshSection("appSettings");
+
+        return variable;
     }
 
     private static T GetNumberWithDecimalPointFromConfig<T>(T number, string configKey, TryParseHandlerWithCultureInfo<T> tryParseHandler) where T : struct
@@ -995,24 +992,21 @@ public class ConfigManager : CoreConfig
             return value;
         }
 
+        Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+        if (ConfigurationManager.AppSettings.Get(configKey) is null)
+        {
+            config.AppSettings.Settings.Add(configKey, Convert.ToString(number, CultureInfo.InvariantCulture));
+        }
         else
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-            if (ConfigurationManager.AppSettings.Get(configKey) is null)
-            {
-                config.AppSettings.Settings.Add(configKey, Convert.ToString(number, CultureInfo.InvariantCulture));
-            }
-            else
-            {
-                config.AppSettings.Settings[configKey].Value = Convert.ToString(number, CultureInfo.InvariantCulture);
-            }
-
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
-
-            return number;
+            config.AppSettings.Settings[configKey].Value = Convert.ToString(number, CultureInfo.InvariantCulture);
         }
+
+        config.Save(ConfigurationSaveMode.Modified);
+        ConfigurationManager.RefreshSection("appSettings");
+
+        return number;
     }
     private static Brush GetBrushFromConfig(Brush solidColorBrush, string configKey)
     {
@@ -1029,24 +1023,21 @@ public class ConfigManager : CoreConfig
             return brushFromConfig;
         }
 
+        Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+        if (ConfigurationManager.AppSettings.Get(configKey) is null)
+        {
+            config.AppSettings.Settings.Add(configKey, solidColorBrush.ToString(CultureInfo.InvariantCulture));
+        }
         else
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-            if (ConfigurationManager.AppSettings.Get(configKey) is null)
-            {
-                config.AppSettings.Settings.Add(configKey, solidColorBrush.ToString(CultureInfo.InvariantCulture));
-            }
-            else
-            {
-                config.AppSettings.Settings[configKey].Value = solidColorBrush.ToString(CultureInfo.InvariantCulture);
-            }
-
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
-
-            return solidColorBrush;
+            config.AppSettings.Settings[configKey].Value = solidColorBrush.ToString(CultureInfo.InvariantCulture);
         }
+
+        config.Save(ConfigurationSaveMode.Modified);
+        ConfigurationManager.RefreshSection("appSettings");
+
+        return solidColorBrush;
     }
 
     private static void AddToConfig(string key, string value)

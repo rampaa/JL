@@ -131,13 +131,13 @@ public partial class ManageDictionariesWindow : Window
             {
                 Width = 75,
                 Height = 30,
-                Content = (Directory.Exists(dict.Path) || File.Exists(dict.Path)) ? "Update" : "Download",
+                Content = Directory.Exists(dict.Path) || File.Exists(dict.Path) ? "Update" : "Download",
                 Foreground = Brushes.White,
                 Background = Brushes.DarkGreen,
                 BorderThickness = new Thickness(1),
-                Visibility = (dict.Type is not DictType.JMdict
-                              and not DictType.JMnedict
-                              and not DictType.Kanjidic)
+                Visibility = dict.Type is not DictType.JMdict
+                    and not DictType.JMnedict
+                    and not DictType.Kanjidic
                     ? Visibility.Collapsed
                     : Visibility.Visible,
             };
@@ -155,9 +155,6 @@ public partial class ManageDictionariesWindow : Window
                 case DictType.Kanjidic:
                     buttonUpdate.IsEnabled = !Storage.UpdatingKanjidic;
                     break;
-
-                default:
-                    break;
             }
 
             buttonUpdate.Click += async (_, _) =>
@@ -174,8 +171,6 @@ public partial class ManageDictionariesWindow : Window
                         break;
                     case DictType.Kanjidic:
                         await UpdateKanjidic().ConfigureAwait(true);
-                        break;
-                    default:
                         break;
                 }
 

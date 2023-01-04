@@ -162,8 +162,8 @@ public class CustomWordRecord : IDictRecordWithGetFrequency
         CustomWordRecord customWordRecordObj = (obj as CustomWordRecord)!;
 
         return PrimarySpelling == customWordRecordObj.PrimarySpelling
-               && ((customWordRecordObj.AlternativeSpellings?.SequenceEqual(AlternativeSpellings ?? new())) ?? AlternativeSpellings == null)
-               && ((customWordRecordObj.Readings?.SequenceEqual(Readings ?? new())) ?? Readings == null)
+               && (customWordRecordObj.AlternativeSpellings?.SequenceEqual(AlternativeSpellings ?? new()) ?? AlternativeSpellings == null)
+               && (customWordRecordObj.Readings?.SequenceEqual(Readings ?? new()) ?? Readings == null)
                && customWordRecordObj.Definitions.SequenceEqual(Definitions)
                && customWordRecordObj.WordClasses.SequenceEqual(WordClasses);
     }

@@ -712,7 +712,7 @@ public partial class PopupWindow : Window
             };
         }
 
-        if ((result.PrimarySpellingOrthographyInfoList?.Count > 0)
+        if (result.PrimarySpellingOrthographyInfoList?.Count > 0
             && (result.Dict.Options?.POrthographyInfo?.Value ?? true))
         {
             textBlockPOrthographyInfo = new TextBlock
@@ -811,8 +811,6 @@ public partial class PopupWindow : Window
                 case <= 10:
                     gradeString = $"{gradeInt} (Jinmeiyou)";
                     break;
-                default:
-                    break;
             }
 
             textBlockGrade = new TextBlock
@@ -890,7 +888,7 @@ public partial class PopupWindow : Window
                     {
                         List<string>? readings = result.Readings;
 
-                        if (textBlock.Name is "PrimarySpelling" && (readings?.Count > 0))
+                        if (textBlock.Name is "PrimarySpelling" && readings?.Count > 0)
                         {
                             _ = top.Children.Add(textBlock);
                         }
@@ -944,10 +942,11 @@ public partial class PopupWindow : Window
                     {
                         List<string>? readings = result.Readings;
 
-                        if (textBox.Name is "PrimarySpelling" && (readings?.Count > 0))
+                        if (textBox.Name is "PrimarySpelling" && readings?.Count > 0)
                         {
                             _ = top.Children.Add(textBox);
                         }
+
                         else
                         {
                             Grid pitchAccentGrid = CreatePitchAccentGrid(result.PrimarySpelling,
@@ -1074,7 +1073,7 @@ public partial class PopupWindow : Window
                             break;
                         }
 
-                        else if (alternativeSpellings?.Contains(pitchAccentDictResult.Spelling) ?? false)
+                        if (alternativeSpellings?.Contains(pitchAccentDictResult.Spelling) ?? false)
                         {
                             chosenPitchAccentDictResult ??= pitchAccentDictResult;
                         }
@@ -1314,8 +1313,6 @@ public partial class PopupWindow : Window
                         case nameof(LookupResult.AlternativeSpellings):
                             miningParams[JLField.AlternativeSpellings] = chi.Text;
                             break;
-                        default:
-                            break;
                     }
 
                     break;
@@ -1343,8 +1340,6 @@ public partial class PopupWindow : Window
                         case nameof(LookupResult.Process):
                             miningParams[JLField.DeconjugationProcess] = ch.Text;
                             break;
-                        default:
-                            break;
                     }
 
                     break;
@@ -1359,8 +1354,6 @@ public partial class PopupWindow : Window
                                     case nameof(LookupResult.PrimarySpelling):
                                         miningParams[JLField.PrimarySpelling] = textBlockCg.Text!;
                                         break;
-                                    default:
-                                        break;
                                 }
                             }
                             else if (uiElement is TextBox textBoxCg)
@@ -1370,17 +1363,12 @@ public partial class PopupWindow : Window
                                     case nameof(LookupResult.Readings):
                                         miningParams[JLField.Readings] = textBoxCg.Text;
                                         break;
-                                    default:
-                                        break;
                                 }
                             }
                         }
 
                         break;
                     }
-
-                default:
-                    break;
             }
         }
 
@@ -1685,8 +1673,6 @@ public partial class PopupWindow : Window
                     case nameof(LookupResult.Readings):
                         reading = chi.Text.Split(",")[0];
                         break;
-                    default:
-                        break;
                 }
             }
 
@@ -1699,8 +1685,6 @@ public partial class PopupWindow : Window
                         break;
                     case nameof(LookupResult.Readings):
                         reading = ch.Text.Split(",")[0];
-                        break;
-                    default:
                         break;
                 }
             }
@@ -1719,8 +1703,6 @@ public partial class PopupWindow : Window
                             case nameof(LookupResult.Readings):
                                 reading = textBlockCg.Text.Split(",")[0];
                                 break;
-                            default:
-                                break;
                         }
                     }
                     else if (uiElement is TextBox textBoxCg)
@@ -1729,8 +1711,6 @@ public partial class PopupWindow : Window
                         {
                             case nameof(LookupResult.Readings):
                                 reading = textBoxCg.Text.Split(",")[0];
-                                break;
-                            default:
                                 break;
                         }
                     }
@@ -1943,6 +1923,6 @@ public partial class PopupWindow : Window
         }
 
         var dict = (Dict)((StackPanel)item).Tag;
-        return (!dict?.Options?.NoAll?.Value) ?? true;
+        return !dict?.Options?.NoAll?.Value ?? true;
     }
 }

@@ -90,7 +90,7 @@ public class Stats
             try
             {
                 return JsonSerializer.Deserialize<Stats>(
-                   File.ReadAllText(Path.Join(Storage.ConfigPath, "Stats.json"))) ?? new Stats();
+                   await File.ReadAllTextAsync(Path.Join(Storage.ConfigPath, "Stats.json")).ConfigureAwait(false)) ?? new Stats();
             }
 
             catch (Exception ex)
@@ -100,14 +100,11 @@ public class Stats
                 return new Stats();
             }
         }
-        else
-        {
-            Utils.Logger.Information("Stats.json doesn't exist, creating it");
 
-            Stats lifetimeStats = new();
-            await WriteLifetimeStats(lifetimeStats).ConfigureAwait(false);
-            return lifetimeStats;
-        }
+        Utils.Logger.Information("Stats.json doesn't exist, creating it");
+        Stats lifetimeStats = new();
+        await WriteLifetimeStats(lifetimeStats).ConfigureAwait(false);
+        return lifetimeStats;
     }
 }
 
