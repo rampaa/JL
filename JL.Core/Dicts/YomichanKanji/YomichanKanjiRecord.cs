@@ -15,19 +15,19 @@ public class YomichanKanjiRecord : IDictRecord
     public YomichanKanjiRecord(List<JsonElement> jsonElement)
     {
         OnReadings = jsonElement[1].ToString().Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
-        if (!OnReadings.Any())
+        if (OnReadings.Count is 0)
         {
             OnReadings = null;
         }
 
         KunReadings = jsonElement[2].ToString().Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
-        if (!KunReadings.Any())
+        if (KunReadings.Count is 0)
         {
             KunReadings = null;
         }
 
         //Tags = jsonElement[3].ToString().Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
-        //if (!Tags.Any())
+        //if (Tags.Count is 0)
         //{
         //    Tags = null;
         //}
@@ -41,7 +41,7 @@ public class YomichanKanjiRecord : IDictRecord
                 Definitions.Add(definition.ToString());
             }
 
-            if (!Definitions.Any())
+            if (Definitions.Count is 0)
             {
                 Definitions = null;
             }
@@ -65,7 +65,7 @@ public class YomichanKanjiRecord : IDictRecord
             }
         }
 
-        if (!Stats.Any())
+        if (Stats.Count is 0)
         {
             Stats = null;
         }

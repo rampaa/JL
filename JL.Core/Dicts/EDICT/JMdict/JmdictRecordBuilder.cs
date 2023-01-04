@@ -30,7 +30,7 @@ internal static class JmdictRecordBuilder
             {
                 ReadingElement readingElement = entry.ReadingElements[j];
 
-                if (!readingElement.ReRestrList.Any() || readingElement.ReRestrList.Contains(record.PrimarySpelling))
+                if (readingElement.ReRestrList.Count is 0 || readingElement.ReRestrList.Contains(record.PrimarySpelling))
                 {
                     record.Readings?.Add(readingElement.Reb);
                     record.ReadingsOrthographyInfoList?.Add(readingElement.ReInfList);
@@ -42,7 +42,7 @@ internal static class JmdictRecordBuilder
             {
                 Sense sense = entry.SenseList[j];
 
-                if ((!sense.StagKList.Any() && !sense.StagRList.Any())
+                if ((sense.StagKList.Count is 0 && sense.StagRList.Count is 0)
                     || sense.StagKList.Contains(record.PrimarySpelling)
                     || sense.StagRList.Intersect(record.Readings!).Any())
                 {
@@ -91,9 +91,9 @@ internal static class JmdictRecordBuilder
 
             JmdictRecord record;
 
-            if (readingElement.ReRestrList.Any() || alternativeSpellings.Any())
+            if (readingElement.ReRestrList.Count > 0 || alternativeSpellings.Count > 0)
             {
-                if (readingElement.ReRestrList.Any())
+                if (readingElement.ReRestrList.Count > 0)
                 {
                     record = new(readingElement.ReRestrList[0]) { AlternativeSpellings = readingElement.ReRestrList };
                 }
@@ -131,7 +131,7 @@ internal static class JmdictRecordBuilder
             {
                 Sense sense = entry.SenseList[j];
 
-                if ((!sense.StagKList.Any() && !sense.StagRList.Any())
+                if ((sense.StagKList.Count is 0 && sense.StagRList.Count is 0)
                     || sense.StagRList.Contains(readingElement.Reb)
                     || sense.StagKList.Contains(record.PrimarySpelling)
                     || sense.StagKList.Intersect(record.AlternativeSpellings).Any())
@@ -179,23 +179,23 @@ internal static class JmdictRecordBuilder
     private static void ProcessSense(JmdictRecord jmdictRecord, Sense sense)
     {
         jmdictRecord.Definitions.Add(sense.GlossList);
-        jmdictRecord.ReadingRestrictions!.Add(sense.StagRList.Any() ? sense.StagRList : null);
-        jmdictRecord.SpellingRestrictions!.Add(sense.StagKList.Any() ? sense.StagKList : null);
-        jmdictRecord.WordClasses!.Add(sense.PosList.Any() ? sense.PosList : null);
-        jmdictRecord.FieldList!.Add(sense.FieldList.Any() ? sense.FieldList : null);
-        jmdictRecord.MiscList!.Add(sense.MiscList.Any() ? sense.MiscList : null);
-        jmdictRecord.Dialects!.Add(sense.DialList.Any() ? sense.DialList : null);
+        jmdictRecord.ReadingRestrictions!.Add(sense.StagRList.Count > 0 ? sense.StagRList : null);
+        jmdictRecord.SpellingRestrictions!.Add(sense.StagKList.Count > 0 ? sense.StagKList : null);
+        jmdictRecord.WordClasses!.Add(sense.PosList.Count > 0 ? sense.PosList : null);
+        jmdictRecord.FieldList!.Add(sense.FieldList.Count > 0 ? sense.FieldList : null);
+        jmdictRecord.MiscList!.Add(sense.MiscList.Count > 0 ? sense.MiscList : null);
+        jmdictRecord.Dialects!.Add(sense.DialList.Count > 0 ? sense.DialList : null);
         jmdictRecord.DefinitionInfo!.Add(sense.SInf);
-        jmdictRecord.RelatedTerms!.Add(sense.XRefList.Any() ? sense.XRefList : null);
-        jmdictRecord.Antonyms!.Add(sense.AntList.Any() ? sense.AntList : null);
-        jmdictRecord.LoanwordEtymology!.Add(sense.LSourceList.Any() ? sense.LSourceList : null);
+        jmdictRecord.RelatedTerms!.Add(sense.XRefList.Count > 0 ? sense.XRefList : null);
+        jmdictRecord.Antonyms!.Add(sense.AntList.Count > 0 ? sense.AntList : null);
+        jmdictRecord.LoanwordEtymology!.Add(sense.LSourceList.Count > 0 ? sense.LSourceList : null);
     }
 
     private static List<List<T>?>? TrimListOfLists<T>(List<List<T>?>? listOfLists)
     {
         List<List<T>?>? listOfListClone = listOfLists;
 
-        if (!listOfListClone!.Any() || listOfListClone!.All(l => l is null || !l.Any()))
+        if (listOfListClone!.Count is 0 || listOfListClone!.All(l => l is null || l.Count is 0))
         {
             listOfListClone = null;
         }

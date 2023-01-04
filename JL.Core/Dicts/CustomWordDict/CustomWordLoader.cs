@@ -1,4 +1,4 @@
-﻿namespace JL.Core.Dicts.CustomWordDict;
+namespace JL.Core.Dicts.CustomWordDict;
 
 public static class CustomWordLoader
 {
@@ -19,7 +19,7 @@ public static class CustomWordLoader
 
                     List<string>? readings = lParts[1].Split(';').Select(r => r.Trim()).ToList();
 
-                    if (!readings.Any())
+                    if (readings.Count is 0)
                     {
                         readings = null;
                     }
@@ -41,7 +41,7 @@ public static class CustomWordLoader
             List<string>? alternativeSpellings = spellings.ToList();
             alternativeSpellings.RemoveAt(i);
 
-            if (!alternativeSpellings.Any())
+            if (alternativeSpellings.Count is 0)
             {
                 alternativeSpellings = null;
             }

@@ -32,7 +32,7 @@ public class CustomWordRecord : IDictRecordWithGetFrequency
         int count = 1;
         StringBuilder defResult = new();
 
-        if (WordClasses.Any())
+        if (WordClasses.Count > 0)
         {
             string tempWordClass;
             if (WordClasses.Contains("adj-i"))
@@ -57,11 +57,14 @@ public class CustomWordRecord : IDictRecordWithGetFrequency
 
         for (int i = 0; i < Definitions.Count; i++)
         {
-            if (Definitions.Any())
+            if (Definitions.Count > 0)
             {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"({count}) ")
-                    .Append(string.Join("; ", Definitions[i]) + " ")
-                    .Append(separator);
+                if (Definitions.Count > 1)
+                {
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({count}) ");
+                }
+
+                _ = defResult.Append(string.Join("; ", Definitions[i]) + " ").Append(separator);
 
                 ++count;
             }

@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 
 namespace JL.Core.Dicts.EPWING.EpwingNazeka;
 
@@ -29,7 +29,7 @@ internal static class EpwingNazekaLoader
                 .Split("\",", StringSplitOptions.RemoveEmptyEntries)
                 .Select(select => select.Trim('\n', ' ', '"')).ToList();
 
-            if (!definitions.Any())
+            if (definitions.Count is 0)
             {
                 definitions = null;
             }
@@ -67,7 +67,7 @@ internal static class EpwingNazekaLoader
                     alternativeSpellings = spellings.ToList();
                     alternativeSpellings.RemoveAt(i);
 
-                    if (!alternativeSpellings.Any())
+                    if (alternativeSpellings.Count is 0)
                     {
                         alternativeSpellings = null;
                     }

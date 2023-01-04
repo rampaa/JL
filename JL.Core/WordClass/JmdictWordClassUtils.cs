@@ -1,4 +1,4 @@
-﻿using System.Text.Encodings.Web;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
@@ -65,14 +65,14 @@ public static class JmdictWordClassUtils
             {
                 var value = (JmdictRecord)jmdictRecordList[i];
 
-                if ((!value.WordClasses?.Any()) ?? true)
+                if (value.WordClasses?.Count is 0)
                 {
                     continue;
                 }
 
                 List<string> wordClasses = value.WordClasses?.Where(wc => wc is not null).SelectMany(wc => wc!).ToHashSet().Intersect(usedWordClasses).ToList() ?? new();
 
-                if (!wordClasses.Any())
+                if (wordClasses.Count is 0)
                 {
                     continue;
                 }

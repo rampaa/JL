@@ -64,7 +64,9 @@ public static class Lookup
                 }
             }
 
-            return lookupResults.Any() ? SortLookupResults(lookupResults) : null;
+            return lookupResults.Count > 0
+                ? SortLookupResults(lookupResults)
+                : null;
         }
 
         Dictionary<string, IntermediaryResult> jMdictResults = new();
@@ -191,80 +193,62 @@ public static class Lookup
             }
         }
 
-        if (jMdictResults.Any())
+        if (jMdictResults.Count > 0)
         {
             lookupResults.AddRange(BuildJmdictResult(jMdictResults));
         }
 
-        if (jMnedictResults.Any())
+        if (jMnedictResults.Count > 0)
         {
             lookupResults.AddRange(BuildJmnedictResult(jMnedictResults));
         }
 
-        if (kanjidicResults.Any())
+        if (kanjidicResults.Count > 0)
         {
             lookupResults.AddRange(BuildKanjidicResult(kanjidicResults));
         }
 
-        if (customWordResults.Any())
+        if (customWordResults.Count > 0)
         {
             lookupResults.AddRange(BuildCustomWordResult(customWordResults));
         }
 
-        if (customNameResults.Any())
+        if (customNameResults.Count > 0)
         {
             lookupResults.AddRange(BuildCustomNameResult(customNameResults));
         }
 
-        if (epwingYomichanWordResultsList.Any())
+        for (int i = 0; i < epwingYomichanWordResultsList.Count; i++)
         {
-            for (int i = 0; i < epwingYomichanWordResultsList.Count; i++)
-            {
-                lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanWordResultsList[i]));
-            }
+            lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanWordResultsList[i]));
         }
 
-        if (epwingYomichanKanjiResultsList.Any())
+        for (int i = 0; i < epwingYomichanKanjiResultsList.Count; i++)
         {
-            for (int i = 0; i < epwingYomichanKanjiResultsList.Count; i++)
-            {
-                lookupResults.AddRange(BuildYomichanKanjiResult(epwingYomichanKanjiResultsList[i]));
-            }
+            lookupResults.AddRange(BuildYomichanKanjiResult(epwingYomichanKanjiResultsList[i]));
         }
 
-        if (epwingYomichanNameResultsList.Any())
+        for (int i = 0; i < epwingYomichanNameResultsList.Count; i++)
         {
-            for (int i = 0; i < epwingYomichanNameResultsList.Count; i++)
-            {
-                lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanNameResultsList[i]));
-            }
+            lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanNameResultsList[i]));
         }
 
-        if (epwingNazekaWordResultsList.Any())
+        for (int i = 0; i < epwingNazekaWordResultsList.Count; i++)
         {
-            for (int i = 0; i < epwingNazekaWordResultsList.Count; i++)
-            {
-                lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaWordResultsList[i]));
-            }
+            lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaWordResultsList[i]));
         }
 
-        if (epwingNazekaNameResultsList.Any())
+        for (int i = 0; i < epwingNazekaNameResultsList.Count; i++)
         {
-            for (int i = 0; i < epwingNazekaNameResultsList.Count; i++)
-            {
-                lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaNameResultsList[i]));
-            }
+            lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaNameResultsList[i]));
         }
 
-        if (epwingNazekaKanjiResultsList.Any())
+        for (int i = 0; i < epwingNazekaKanjiResultsList.Count; i++)
         {
-            for (int i = 0; i < epwingNazekaKanjiResultsList.Count; i++)
-            {
-                lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaKanjiResultsList[i]));
-            }
+            lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaKanjiResultsList[i]));
         }
 
-        if (lookupResults.Any())
+        if (lookupResults.Count > 0)
         {
             lookupResults = SortLookupResults(lookupResults);
         }
@@ -467,7 +451,7 @@ public static class Lookup
                             throw new ArgumentOutOfRangeException(null, "Invalid DictType");
                     }
 
-                    if (resultsList.Any())
+                    if (resultsList.Count > 0)
                     {
                         if (results.TryGetValue(deconjugationResult.Text, out IntermediaryResult? r))
                         {
@@ -679,7 +663,7 @@ public static class Lookup
     {
         List<LookupResult> results = new();
 
-        if (!kanjiResults.Any())
+        if (kanjiResults.Count is 0)
         {
             return results;
         }

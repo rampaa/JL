@@ -478,7 +478,7 @@ public static class Utils
     {
         List<string>? listClone = list;
 
-        if (!listClone.Any() || listClone.All(string.IsNullOrEmpty))
+        if (listClone.Count is 0 || listClone.All(string.IsNullOrEmpty))
         {
             listClone = null;
         }

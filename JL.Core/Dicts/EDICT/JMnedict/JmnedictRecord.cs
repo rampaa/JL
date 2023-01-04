@@ -44,9 +44,9 @@ public class JmnedictRecord : IDictRecord
 
         for (int i = 0; i < Definitions.Count; i++)
         {
-            if (Definitions.Any())
+            if (Definitions.Count > 0)
             {
-                if (Definitions.Count > 0)
+                if (Definitions.Count > 1)
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"({count}) ");
                 }

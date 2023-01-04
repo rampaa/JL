@@ -68,7 +68,7 @@ public class JmdictRecord : IDictRecordWithGetFrequency
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({count}) ");
             }
 
-            if ((options?.WordClassInfo?.Value ?? true) && (WordClasses?[i]?.Any() ?? false))
+            if ((options?.WordClassInfo?.Value ?? true) && (WordClasses?[i]?.Count > 0))
             {
                 _ = defResult.Append('(')
                     .Append(string.Join(", ", WordClasses[i]!))
@@ -80,7 +80,7 @@ public class JmdictRecord : IDictRecordWithGetFrequency
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({count}) ");
             }
 
-            if ((options?.DialectInfo?.Value ?? true) && (Dialects?[i]?.Any() ?? false))
+            if ((options?.DialectInfo?.Value ?? true) && (Dialects?[i]?.Count > 0))
             {
                 _ = defResult.Append('(')
                     .Append(string.Join(", ", Dialects[i]!))
@@ -88,7 +88,7 @@ public class JmdictRecord : IDictRecordWithGetFrequency
             }
 
             if ((options?.ExtraDefinitionInfo?.Value ?? true)
-                && (DefinitionInfo?.Any() ?? false)
+                && (DefinitionInfo?.Count > 0)
                 && DefinitionInfo[i] is not null)
             {
                 _ = defResult.Append('(')
@@ -96,14 +96,14 @@ public class JmdictRecord : IDictRecordWithGetFrequency
                     .Append(") ");
             }
 
-            if ((options?.MiscInfo?.Value ?? true) && (MiscList?[i]?.Any() ?? false))
+            if ((options?.MiscInfo?.Value ?? true) && (MiscList?[i]?.Count > 0))
             {
                 _ = defResult.Append('(')
                     .Append(string.Join(", ", MiscList[i]!))
                     .Append(") ");
             }
 
-            if ((options?.WordTypeInfo?.Value ?? true) && (FieldList?[i]?.Any() ?? false))
+            if ((options?.WordTypeInfo?.Value ?? true) && (FieldList?[i]?.Count > 0))
             {
                 _ = defResult.Append('(')
                     .Append(string.Join(", ", FieldList[i]!))
@@ -113,19 +113,19 @@ public class JmdictRecord : IDictRecordWithGetFrequency
             _ = defResult.Append(string.Join("; ", Definitions[i]) + " ");
 
             if ((options?.SpellingRestrictionInfo?.Value ?? true)
-                && ((ReadingRestrictions?[i]?.Any() ?? false)
-                    || (SpellingRestrictions?[i]?.Any() ?? false)))
+                && ((ReadingRestrictions?[i]?.Count > 0)
+                    || (SpellingRestrictions?[i]?.Count > 0)))
             {
                 _ = defResult.Append("(only applies to ");
 
-                if (SpellingRestrictions?[i]?.Any() ?? false)
+                if (SpellingRestrictions?[i]?.Count > 0)
                 {
                     _ = defResult.Append(string.Join("; ", SpellingRestrictions[i]!));
                 }
 
-                if (ReadingRestrictions?[i]?.Any() ?? false)
+                if (ReadingRestrictions?[i]?.Count > 0)
                 {
-                    if (SpellingRestrictions?[i]?.Any() ?? false)
+                    if (SpellingRestrictions?[i]?.Count > 0)
                     {
                         _ = defResult.Append("; ");
                     }
@@ -136,7 +136,7 @@ public class JmdictRecord : IDictRecordWithGetFrequency
                 _ = defResult.Append(") ");
             }
 
-            if ((options?.LoanwordEtymology?.Value ?? true) && (LoanwordEtymology?[i]?.Any() ?? false))
+            if ((options?.LoanwordEtymology?.Value ?? true) && (LoanwordEtymology?[i]?.Count > 0))
             {
                 _ = defResult.Append('(');
 
@@ -166,14 +166,14 @@ public class JmdictRecord : IDictRecordWithGetFrequency
                 _ = defResult.Append(") ");
             }
 
-            if ((options?.RelatedTerm?.Value ?? false) && (RelatedTerms?[i]?.Any() ?? false))
+            if ((options?.RelatedTerm?.Value ?? false) && (RelatedTerms?[i]?.Count > 0))
             {
                 _ = defResult.Append("(related terms: ")
                     .Append(string.Join(", ", RelatedTerms[i]!))
                     .Append(") ");
             }
 
-            if ((options?.Antonym?.Value ?? false) && (Antonyms?[i]?.Any() ?? false))
+            if ((options?.Antonym?.Value ?? false) && (Antonyms?[i]?.Count > 0))
             {
                 _ = defResult.Append("(antonyms: ")
                     .Append(string.Join(", ", Antonyms[i]!))

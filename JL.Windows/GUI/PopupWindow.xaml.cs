@@ -249,7 +249,7 @@ public partial class PopupWindow : Window
 
         List<LookupResult>? lookupResults = Lookup.LookupText(tb.SelectedText);
 
-        if (lookupResults?.Any() ?? false)
+        if (lookupResults?.Count > 0)
         {
             ResultStackPanels.Clear();
 
@@ -528,11 +528,11 @@ public partial class PopupWindow : Window
         textBlockPrimarySpelling.MouseLeave += PrimarySpelling_MouseLeave; // for audio
         textBlockPrimarySpelling.PreviewMouseUp += PrimarySpelling_PreviewMouseUp; // for mining
 
-        if (result.Readings?.Any() ?? false)
+        if (result.Readings?.Count > 0)
         {
             List<string> rOrthographyInfoList = result.ReadingsOrthographyInfoList ?? new();
             List<string> readings = result.Readings;
-            string readingsText = rOrthographyInfoList.Any() && (result.Dict.Options?.ROrthographyInfo?.Value ?? true)
+            string readingsText = rOrthographyInfoList.Count > 0 && (result.Dict.Options?.ROrthographyInfo?.Value ?? true)
                 ? MakeUiElementReadingsText(readings, rOrthographyInfoList)
                 : string.Join(", ", result.Readings);
 
@@ -584,7 +584,7 @@ public partial class PopupWindow : Window
             }
         }
 
-        if (result.FormattedDefinitions?.Any() ?? false)
+        if (result.FormattedDefinitions?.Length > 0)
         {
             if (MiningMode)
             {
@@ -641,11 +641,11 @@ public partial class PopupWindow : Window
             };
         }
 
-        if (result.AlternativeSpellings?.Any() ?? false)
+        if (result.AlternativeSpellings?.Count > 0)
         {
             List<string> aOrthographyInfoList = result.AlternativeSpellingsOrthographyInfoList ?? new List<string>();
             List<string> alternativeSpellings = result.AlternativeSpellings;
-            string alternativeSpellingsText = aOrthographyInfoList.Any() && (result.Dict.Options?.AOrthographyInfo?.Value ?? true)
+            string alternativeSpellingsText = aOrthographyInfoList.Count > 0 && (result.Dict.Options?.AOrthographyInfo?.Value ?? true)
                 ? MakeUiElementAlternativeSpellingsText(alternativeSpellings, aOrthographyInfoList)
                 : "(" + string.Join(", ", alternativeSpellings) + ")";
 
@@ -712,7 +712,7 @@ public partial class PopupWindow : Window
             };
         }
 
-        if ((result.PrimarySpellingOrthographyInfoList?.Any() ?? false)
+        if ((result.PrimarySpellingOrthographyInfoList?.Count > 0)
             && (result.Dict.Options?.POrthographyInfo?.Value ?? true))
         {
             textBlockPOrthographyInfo = new TextBlock
@@ -733,7 +733,7 @@ public partial class PopupWindow : Window
         }
 
         // KANJIDIC
-        if (result.OnReadings?.Any() ?? false)
+        if (result.OnReadings?.Count > 0)
         {
             textBlockOnReadings = new TextBlock
             {
@@ -748,7 +748,7 @@ public partial class PopupWindow : Window
             };
         }
 
-        if (result.KunReadings?.Any() ?? false)
+        if (result.KunReadings?.Count > 0)
         {
             textBlockKunReadings = new TextBlock
             {
@@ -763,7 +763,7 @@ public partial class PopupWindow : Window
             };
         }
 
-        if (result.NanoriReadings?.Any() ?? false)
+        if (result.NanoriReadings?.Count > 0)
         {
             textBlockNanoriReadings = new TextBlock
             {
@@ -828,7 +828,7 @@ public partial class PopupWindow : Window
             };
         }
 
-        if (result.KanjiComposition?.Any() ?? false)
+        if (result.KanjiComposition?.Length > 0)
         {
             textBlockComposition = new TextBlock
             {
@@ -843,7 +843,7 @@ public partial class PopupWindow : Window
             };
         }
 
-        if (result.KanjiStats?.Any() ?? false)
+        if (result.KanjiStats?.Length > 0)
         {
             textBlockKanjiStats = new TextBlock
             {
@@ -890,7 +890,7 @@ public partial class PopupWindow : Window
                     {
                         List<string>? readings = result.Readings;
 
-                        if (textBlock.Name is "PrimarySpelling" && (readings?.Any() ?? false))
+                        if (textBlock.Name is "PrimarySpelling" && (readings?.Count > 0))
                         {
                             _ = top.Children.Add(textBlock);
                         }
@@ -944,7 +944,7 @@ public partial class PopupWindow : Window
                     {
                         List<string>? readings = result.Readings;
 
-                        if (textBox.Name is "PrimarySpelling" && (readings?.Any() ?? false))
+                        if (textBox.Name is "PrimarySpelling" && (readings?.Count > 0))
                         {
                             _ = top.Children.Add(textBox);
                         }
@@ -1035,7 +1035,7 @@ public partial class PopupWindow : Window
     {
         Grid pitchAccentGrid = new();
 
-        bool hasReading = readings.Any();
+        bool hasReading = readings.Count > 0;
 
         int fontSize = hasReading
             ? ConfigManager.ReadingsFontSize

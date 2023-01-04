@@ -1,4 +1,4 @@
-﻿using JL.Core.Utilities;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EDICT.JMnedict;
 
@@ -8,7 +8,7 @@ public static class JmnedictRecordBuilder
     {
         Dictionary<string, JmnedictRecord> recordDictionary = new();
 
-        if (entry.KebList.Any())
+        if (entry.KebList.Count > 0)
         {
             int kebListCount = entry.KebList.Count;
             for (int i = 0; i < kebListCount; i++)

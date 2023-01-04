@@ -227,7 +227,7 @@ public partial class ManageDictionariesWindow : Window
 
             if (dict.Type is DictType.JMdict)
             {
-                buttonInfo.IsEnabled = Storage.JmdictEntities.Any();
+                buttonInfo.IsEnabled = Storage.JmdictEntities.Count > 0;
                 buttonInfo.Click += JmdictInfoButton_Click;
             }
 

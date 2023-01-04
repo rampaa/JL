@@ -44,14 +44,14 @@ public class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
                 .Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
         }
 
-        if (!DefinitionTags.Any())
+        if (DefinitionTags.Count is 0)
         {
             DefinitionTags = null;
         }
 
         WordClasses = jsonElement[3].ToString().Split(" ").ToList();
 
-        if (!WordClasses.Any())
+        if (WordClasses.Count is 0)
         {
             WordClasses = null;
         }
@@ -85,7 +85,7 @@ public class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
                 .ToList();
         }
 
-        if (!Definitions.Any())
+        if (Definitions.Count is 0)
         {
             Definitions = null;
         }
