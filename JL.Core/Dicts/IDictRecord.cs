@@ -1,4 +1,4 @@
-﻿namespace JL.Core.Dicts;
+namespace JL.Core.Dicts;
 
 public interface IDictRecord
 {

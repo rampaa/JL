@@ -1,4 +1,4 @@
-﻿namespace JL.Core.Dicts.EDICT.JMnedict;
+namespace JL.Core.Dicts.EDICT.JMnedict;
 
 public class JmnedictEntry
 {

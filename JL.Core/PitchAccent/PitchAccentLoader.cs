@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using JL.Core.Dicts;
 
 namespace JL.Core.PitchAccent;

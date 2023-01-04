@@ -1,4 +1,4 @@
-﻿using JL.Core.Dicts.Options;
+using JL.Core.Dicts.Options;
 
 namespace JL.Core.Dicts.EPWING;
 

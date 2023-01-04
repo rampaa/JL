@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using JL.Core.Utilities;
 
 namespace JL.Core.Network;

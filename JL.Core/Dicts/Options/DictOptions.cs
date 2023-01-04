@@ -1,4 +1,4 @@
-﻿namespace JL.Core.Dicts.Options;
+namespace JL.Core.Dicts.Options;
 
 public class DictOptions
 {

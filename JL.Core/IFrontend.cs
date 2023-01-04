@@ -1,4 +1,4 @@
-﻿using JL.Core.Utilities;
+using JL.Core.Utilities;
 
 namespace JL.Core;
 

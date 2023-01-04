@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using JL.Core.Dicts.Options;
 using JL.Core.Utilities;
 

@@ -1,4 +1,4 @@
-﻿namespace JL.Core.Lookup;
+namespace JL.Core.Lookup;
 
 public class LookupFrequencyResult
 {

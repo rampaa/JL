@@ -1,4 +1,4 @@
-﻿namespace JL.Core.Deconjugation;
+namespace JL.Core.Deconjugation;
 
 public readonly struct VirtualRule
 {

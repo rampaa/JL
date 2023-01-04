@@ -1,4 +1,4 @@
-﻿namespace JL.Core.Dicts.CustomNameDict;
+namespace JL.Core.Dicts.CustomNameDict;
 
 public static class CustomNameLoader
 {

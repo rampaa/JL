@@ -1,4 +1,4 @@
-﻿namespace JL.Core.Freqs;
+namespace JL.Core.Freqs;
 
 public class FrequencyRecord
 {
