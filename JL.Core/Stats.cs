@@ -4,7 +4,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core;
 
-public class Stats
+public sealed class Stats
 {
     public long Characters { get; set; }
 

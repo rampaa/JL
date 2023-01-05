@@ -5,7 +5,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Anki;
 
-public static class AnkiConnect
+internal static class AnkiConnect
 {
     public static async Task<Response?> AddNoteToDeck(Note note)
     {

@@ -4,7 +4,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts;
 
-public class Dict
+public sealed class Dict
 {
     public DictType Type { get; }
     public string Name { get; set; }
@@ -13,7 +13,7 @@ public class Dict
     public int Priority { get; set; }
     public int Size { get; set; }
 
-    [JsonIgnore] public Dictionary<string, List<IDictRecord>> Contents { get; set; } = new();
+    [JsonIgnore] public Dictionary<string, List<IDictRecord>> Contents { get; internal set; } = new();
 
     public DictOptions? Options { get; set; } // can be null for dicts.json files generated before version 1.10
 

@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace JL.Core.Dicts.YomichanKanji;
 
-public static class YomichanKanjiLoader
+internal static class YomichanKanjiLoader
 {
     public static async Task Load(Dict dict)
     {

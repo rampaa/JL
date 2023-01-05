@@ -267,7 +267,7 @@ public static class JmdictLoader
                             {
                                 if (s_canHandleCulture)
                                 {
-                                    if (Utils.Iso6392BTo2T.TryGetValue(lang, out string? langCode))
+                                    if (Utils.s_iso6392BTo2T.TryGetValue(lang, out string? langCode))
                                     {
                                         lang = langCode;
                                     }

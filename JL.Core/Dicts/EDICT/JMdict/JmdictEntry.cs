@@ -1,6 +1,6 @@
 namespace JL.Core.Dicts.EDICT.JMdict;
 
-public class JmdictEntry
+internal sealed class JmdictEntry
 {
     public int Id { get; set; }
     public List<KanjiElement> KanjiElements { get; }

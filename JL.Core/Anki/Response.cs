@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace JL.Core.Anki;
 
-public class Response
+internal class Response
 {
     // result can be:
     //   a number

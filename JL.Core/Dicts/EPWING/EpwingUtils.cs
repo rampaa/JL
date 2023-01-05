@@ -2,7 +2,7 @@ using JL.Core.Dicts.Options;
 
 namespace JL.Core.Dicts.EPWING;
 
-public static class EpwingUtils
+internal static class EpwingUtils
 {
     public static bool IsValidEpwingResultForDictType(IEpwingRecord epwingRecord, Dict dict)
     {
@@ -65,7 +65,7 @@ public static class EpwingUtils
                 if (epwingRecord.Definitions is not null)
                 {
                     // english definitions
-                    if (epwingRecord.Definitions.Any(def => def.Contains("→英和") || def.Contains("\\u003")))
+                    if (epwingRecord.Definitions.Any(static def => def.Contains("→英和") || def.Contains("\\u003")))
                     {
                         return false;
                     }
@@ -81,7 +81,7 @@ public static class EpwingUtils
 
             case DictType.Daijisen:
                 // kanji definitions
-                if (epwingRecord.Definitions?.Any(def => def.Contains("［音］")) ?? false)
+                if (epwingRecord.Definitions?.Any(static def => def.Contains("［音］")) ?? false)
                 {
                     return false;
                 }
@@ -108,7 +108,7 @@ public static class EpwingUtils
 
                 if (epwingRecord.Definitions is not null)
                 {
-                    epwingRecord.Definitions = epwingRecord.Definitions.Select(def => def.Replace("┏", "")).ToList();
+                    epwingRecord.Definitions = epwingRecord.Definitions.Select(static def => def.Replace("┏", "")).ToList();
 
                     if (previousResult.Definitions?.SequenceEqual(epwingRecord.Definitions ?? new List<string>()) ?? epwingRecord.Definitions is null)
                     {
@@ -128,7 +128,7 @@ public static class EpwingUtils
 
         else if (epwingRecord.Definitions is not null)
         {
-            epwingRecord.Definitions = epwingRecord.Definitions.Select(def => def.Replace("┏", "")).ToList();
+            epwingRecord.Definitions = epwingRecord.Definitions.Select(static def => def.Replace("┏", "")).ToList();
         }
 
         return true;

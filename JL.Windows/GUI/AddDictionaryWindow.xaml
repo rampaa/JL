@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         Background="{DynamicResource RegionBrush}"
         Title="Add Dictionary" Height="350" Width="650" ResizeMode="NoResize" SizeToContent="Height"
-        Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False">
+        Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False" x:ClassModifier="internal">
     <Grid>
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,20">
             <TextBlock Text="Dictionary Type" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
@@ -18,7 +18,7 @@
                          Text=""
                          Margin="10"
                          IsReadOnly="True" />
-                <Button Name="BrowsePathButton" Content="..." Click="BrowsePathButton_OnClick"
+                <Button Content="..." Click="BrowsePathButton_OnClick"
                         IsEnabled="{Binding ElementName=ComboBoxDictType,Path=Text.Length}">
                 </Button>
             </WrapPanel>
@@ -29,21 +29,21 @@
 
         </StackPanel>
 
-        <StackPanel x:Name="DictFormatStackPanel" HorizontalAlignment="Right" VerticalAlignment="Top"
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top"
                     Margin="0,20,20,70">
             <TextBlock Text="Dict Format" HorizontalAlignment="Stretch" Margin="0,0,0,10" Style="{StaticResource TextBlockDefault}" />
             <RadioButton Click="RadioButtonYomichanImport_OnClick" Name="RadioButtonYomichanImport"
                          Content="Yomichan Import" HorizontalAlignment="Stretch"
                          FontSize="16" Height="40" />
-            <RadioButton Click="RadioButtonNazekaEpwingConverter_OnClick" Name="RadioButtonNazekaEpwingConverter"
+            <RadioButton Click="RadioButtonNazekaEpwingConverter_OnClick"
                          Content="Nazeka Epwing Converter" HorizontalAlignment="Stretch"
                          FontSize="16" Height="40" />
         </StackPanel>
 
         <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="20,120,20,20">
-            <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+            <Button Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                     Margin="0,200,50,0" FontSize="16" Width="70" Height="35" Click="CancelButton_Click" />
-            <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+            <Button Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                     Margin="50,200,0,0" FontSize="16" Width="70" Height="35" Click="SaveButton_Click" />
         </WrapPanel>
     </Grid>

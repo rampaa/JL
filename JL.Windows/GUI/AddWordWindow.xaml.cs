@@ -13,11 +13,11 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for AddWordWindow.xaml
 /// </summary>
-public partial class AddWordWindow : Window
+internal sealed partial class AddWordWindow : Window
 {
     private static AddWordWindow? s_instance;
 
-    public static AddWordWindow Instance => s_instance ??= new();
+    public static AddWordWindow Instance => s_instance ??= new AddWordWindow();
 
     public AddWordWindow()
     {
@@ -74,11 +74,11 @@ public partial class AddWordWindow : Window
             string rawReadings = ReadingsTextBox.Text.Replace("\t", "  ");
             string rawDefinitions = DefinitionsTextBox.Text.Replace("\t", "  ");
             string rawWordClass = WordClassStackPanel!.Children.OfType<RadioButton>()
-                .FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
+                .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
 
-            string[] spellings = rawSpellings.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
-            List<string> readings = rawReadings.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(r => r.Trim()).ToList();
-            List<string> definitions = rawDefinitions.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
+            string[] spellings = rawSpellings.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static s => s.Trim()).ToArray();
+            List<string> readings = rawReadings.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static r => r.Trim()).ToList();
+            List<string> definitions = rawDefinitions.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static s => s.Trim()).ToList();
 
             CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawWordClass);
             Storage.Frontend.InvalidateDisplayCache();
@@ -101,7 +101,7 @@ public partial class AddWordWindow : Window
             .Append(wordClass)
             .Append(Environment.NewLine);
 
-        string customWordDictPath = Storage.Dicts.Values.First(dict => dict.Type is DictType.CustomWordDictionary).Path;
+        string customWordDictPath = Storage.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary).Path;
         await File.AppendAllTextAsync(customWordDictPath,
             stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);
     }

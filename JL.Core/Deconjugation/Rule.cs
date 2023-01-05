@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace JL.Core.Deconjugation;
 
-public class Rule
+internal sealed class Rule
 {
     [JsonPropertyName("type")] public string Type { get; }
     [JsonPropertyName("contextrule")] public string? ContextRule { get; }

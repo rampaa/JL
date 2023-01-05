@@ -4,7 +4,7 @@ using JL.Core.Freqs;
 
 namespace JL.Core.Dicts.EPWING.EpwingNazeka;
 
-public class EpwingNazekaRecord : IEpwingRecord, IDictRecordWithGetFrequency
+internal sealed class EpwingNazekaRecord : IEpwingRecord, IDictRecordWithGetFrequency
 {
     public string PrimarySpelling { get; }
     public string? Reading { get; }
@@ -90,9 +90,7 @@ public class EpwingNazekaRecord : IEpwingRecord, IDictRecordWithGetFrequency
 
         else if (Reading is not null)
         {
-            string reading = Reading;
-
-            if (freq.Contents.TryGetValue(Kana.KatakanaToHiragana(reading),
+            if (freq.Contents.TryGetValue(Kana.KatakanaToHiragana(Reading),
                     out List<FrequencyRecord>? readingFreqResults))
             {
                 int readingFreqResultsCount = readingFreqResults.Count;
@@ -100,7 +98,7 @@ public class EpwingNazekaRecord : IEpwingRecord, IDictRecordWithGetFrequency
                 {
                     FrequencyRecord readingFreqResult = readingFreqResults[j];
 
-                    if ((reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
+                    if ((Reading == readingFreqResult.Spelling && Kana.IsKatakana(Reading))
                         || (AlternativeSpellings?.Contains(readingFreqResult.Spelling) ?? false))
                     {
                         if (frequency > readingFreqResult.Frequency)

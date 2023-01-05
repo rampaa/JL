@@ -13,7 +13,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for EditDictionaryWindow.xaml
 /// </summary>
-public partial class EditDictionaryWindow : Window
+internal sealed partial class EditDictionaryWindow : Window
 {
     private readonly Dict _dict;
 

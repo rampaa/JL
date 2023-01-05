@@ -4,7 +4,7 @@ using JL.Core.Dicts.Options;
 
 namespace JL.Core.Dicts.YomichanKanji;
 
-public class YomichanKanjiRecord : IDictRecord
+internal sealed class YomichanKanjiRecord : IDictRecord
 {
     public List<string>? OnReadings { get; }
     public List<string>? KunReadings { get; }
@@ -12,7 +12,7 @@ public class YomichanKanjiRecord : IDictRecord
     private List<string>? Definitions { get; }
     private List<string>? Stats { get; }
 
-    public YomichanKanjiRecord(List<JsonElement> jsonElement)
+    public YomichanKanjiRecord(IReadOnlyList<JsonElement> jsonElement)
     {
         OnReadings = jsonElement[1].ToString().Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
         if (OnReadings.Count is 0)

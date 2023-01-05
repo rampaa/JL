@@ -6,7 +6,7 @@ using JL.Core.Freqs;
 
 namespace JL.Core.Dicts.EPWING.EpwingYomichan;
 
-public class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
+internal sealed class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
 {
     public List<string>? Definitions { get; set; }
     public string? Reading { get; }
@@ -17,7 +17,7 @@ public class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
     //public int Sequence { get; init; }
     //public string TermTags { get; init; }
 
-    public EpwingYomichanRecord(List<JsonElement> jsonElement)
+    public EpwingYomichanRecord(IReadOnlyList<JsonElement> jsonElement)
     {
         PrimarySpelling = jsonElement[0].ToString();
         Reading = jsonElement[1].ToString();
@@ -27,7 +27,7 @@ public class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
             Reading = null;
         }
 
-        DefinitionTags = new();
+        DefinitionTags = new List<string>();
 
         JsonElement definitionTagsElement = jsonElement[2];
         if (definitionTagsElement.ValueKind is JsonValueKind.Array)
@@ -81,7 +81,7 @@ public class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
 
             Definitions = definitionElement.ToString()
                 .Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-                .Select(s => s.Replace("\\\"", "\""))
+                .Select(static s => s.Replace("\\\"", "\""))
                 .ToList();
         }
 

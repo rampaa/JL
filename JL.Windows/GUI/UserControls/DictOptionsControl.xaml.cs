@@ -9,7 +9,7 @@ using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI.UserControls;
 
-public partial class DictOptionsControl : UserControl
+internal sealed partial class DictOptionsControl : UserControl
 {
     public DictOptionsControl()
     {

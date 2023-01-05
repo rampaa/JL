@@ -6,7 +6,8 @@
         xmlns:hc="https://handyorg.github.io/handycontrol"
         mc:Ignorable="d"
         Title="Preferences" Height="720" Width="800" Topmost="True" Closing="Window_Closing"
-        SizeToContent="Manual" ScrollViewer.CanContentScroll="True" ShowInTaskbar="False" Background="{DynamicResource RegionBrush}">
+        SizeToContent="Manual" ScrollViewer.CanContentScroll="True" ShowInTaskbar="False" Background="{DynamicResource RegionBrush}"
+        x:ClassModifier="internal">
     <Grid>
         <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="20,0,0,20"
                 VerticalAlignment="Bottom" Click="CancelButton_Click" FontSize="16" Height="35" Width="85" />

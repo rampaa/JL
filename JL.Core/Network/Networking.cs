@@ -5,7 +5,7 @@ namespace JL.Core.Network;
 
 public static class Networking
 {
-    public static async Task<byte[]?> GetAudioFromJpod101(string foundSpelling, string reading)
+    internal static async Task<byte[]?> GetAudioFromJpod101(string foundSpelling, string reading)
     {
         try
         {
@@ -30,7 +30,7 @@ public static class Networking
     {
         try
         {
-            HttpRequestMessage gitHubApiRequest = new(HttpMethod.Get, Storage.GitHubApiUrlForLatestJLRelease);
+            HttpRequestMessage gitHubApiRequest = new(HttpMethod.Get, Storage.s_gitHubApiUrlForLatestJLRelease);
             gitHubApiRequest.Headers.Add("User-Agent", "JL");
 
             HttpResponseMessage gitHubApiResponse = await Storage.Client.SendAsync(gitHubApiRequest).ConfigureAwait(false);

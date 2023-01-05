@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace JL.Core.Anki;
 
-public class Request
+internal sealed class Request
 {
     [JsonPropertyName("action")] public string Action { get; }
 

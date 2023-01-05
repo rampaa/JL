@@ -1,6 +1,6 @@
 namespace JL.Core.Dicts.EDICT.KANJIDIC;
 
-public class KanjidicRecord : IDictRecord
+internal sealed class KanjidicRecord : IDictRecord
 {
     public List<string>? Definitions { get; set; }
     public List<string>? OnReadings { get; set; }

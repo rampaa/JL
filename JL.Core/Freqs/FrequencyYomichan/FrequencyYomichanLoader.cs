@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace JL.Core.Freqs.FrequencyYomichan;
 
-public class FrequencyYomichanLoader
+internal static class FrequencyYomichanLoader
 {
     public static async Task Load(Freq freq)
     {
@@ -14,7 +14,7 @@ public class FrequencyYomichanLoader
         Dictionary<string, List<FrequencyRecord>> freqDict = freq.Contents;
 
         string[] jsonFiles = Directory.EnumerateFiles(freq.Path, "*_bank_*.json", SearchOption.TopDirectoryOnly)
-            .Where(s => s.Contains("term") || s.Contains("kanji"))
+            .Where(static s => s.Contains("term") || s.Contains("kanji"))
             .ToArray();
 
         foreach (string jsonFile in jsonFiles)
@@ -71,12 +71,12 @@ public class FrequencyYomichanLoader
                     {
                         if (freqDict.TryGetValue(spellingInHiragana, out List<FrequencyRecord>? spellingFreqResult))
                         {
-                            spellingFreqResult.Add(new(spelling, frequency));
+                            spellingFreqResult.Add(new FrequencyRecord(spelling, frequency));
                         }
 
                         else
                         {
-                            freqDict.Add(spellingInHiragana, new() { new(spelling, frequency) });
+                            freqDict.Add(spellingInHiragana, new List<FrequencyRecord> { new(spelling, frequency) });
                         }
                     }
 
@@ -85,24 +85,24 @@ public class FrequencyYomichanLoader
                         string readingInHiragana = Kana.KatakanaToHiragana(reading);
                         if (freqDict.TryGetValue(readingInHiragana, out List<FrequencyRecord>? readingFreqResult))
                         {
-                            readingFreqResult.Add(new(spelling, frequency));
+                            readingFreqResult.Add(new FrequencyRecord(spelling, frequency));
                         }
 
                         else
                         {
-                            freqDict.Add(readingInHiragana, new() { new(spelling, frequency) });
+                            freqDict.Add(readingInHiragana, new List<FrequencyRecord> { new(spelling, frequency) });
                         }
 
                         if (reading != spelling)
                         {
                             if (freqDict.TryGetValue(spellingInHiragana, out List<FrequencyRecord>? spellingFreqResult))
                             {
-                                spellingFreqResult.Add(new(reading, frequency));
+                                spellingFreqResult.Add(new FrequencyRecord(reading, frequency));
                             }
 
                             else
                             {
-                                freqDict.Add(spellingInHiragana, new() { new(reading, frequency) });
+                                freqDict.Add(spellingInHiragana, new List<FrequencyRecord> { new(reading, frequency) });
                             }
                         }
                     }

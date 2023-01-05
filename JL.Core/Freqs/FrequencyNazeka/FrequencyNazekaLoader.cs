@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace JL.Core.Freqs.FrequencyNazeka;
 
-public static class FrequencyNazekaLoader
+internal static class FrequencyNazekaLoader
 {
     public static async Task Load(Freq freq)
     {
@@ -43,7 +43,7 @@ public static class FrequencyNazekaLoader
                 {
                     if (freqDict.TryGetValue(exactSpellingInHiragana, out List<FrequencyRecord>? exactSpellingFreqResult))
                     {
-                        exactSpellingFreqResult.Add(new(reading, frequencyRank));
+                        exactSpellingFreqResult.Add(new FrequencyRecord(reading, frequencyRank));
                     }
 
                     else

@@ -1,6 +1,6 @@
 namespace JL.Core.Dicts.Options;
 
-public class DictOptions
+public sealed class DictOptions
 {
     public NewlineBetweenDefinitionsOption? NewlineBetweenDefinitions { get; }
     public ExamplesOption? Examples { get; }

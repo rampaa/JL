@@ -8,7 +8,8 @@
         mc:Ignorable="d" MinWidth="100" MinHeight="50" WindowStyle="None" ResizeMode="NoResize" Topmost="True"
         Closed="MainWindow_Closed" Closing="MainWindow_Closing" KeyDown="MainWindow_KeyDown"
         PreviewKeyDown="MainWindow_PreviewKeyDown" SizeChanged="MainWindow_SizeChanged"
-        PreviewMouseDown="Window_PreviewMouseDown" DpiChanged="Window_DpiChanged" PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown" MouseLeave="Window_MouseLeave" MouseEnter="Window_MouseEnter" StateChanged="Window_StateChanged">
+        PreviewMouseDown="Window_PreviewMouseDown" DpiChanged="Window_DpiChanged" PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown" MouseLeave="Window_MouseLeave" MouseEnter="Window_MouseEnter" StateChanged="Window_StateChanged"
+        x:ClassModifier="internal">
     <Window.Background>
         <SolidColorBrush Color="Black" Opacity="0.3" />
     </Window.Background>

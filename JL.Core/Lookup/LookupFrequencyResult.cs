@@ -1,11 +1,11 @@
 namespace JL.Core.Lookup;
 
-public class LookupFrequencyResult
+public sealed class LookupFrequencyResult
 {
     public string Name { get; }
-    public int Freq { get; set; }
+    public int Freq { get; internal set; }
 
-    public LookupFrequencyResult(string name, int freq)
+    internal LookupFrequencyResult(string name, int freq)
     {
         Name = name;
         Freq = freq;

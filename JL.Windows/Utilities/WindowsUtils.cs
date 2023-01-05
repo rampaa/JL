@@ -26,7 +26,7 @@ using Window = System.Windows.Window;
 
 namespace JL.Windows.Utilities;
 
-public static class WindowsUtils
+internal static class WindowsUtils
 {
     private static WaveOut? s_audioPlayer;
 
@@ -129,7 +129,7 @@ public static class WindowsUtils
         return keyGesture;
     }
 
-    public static List<ComboBoxItem> FindJapaneseFonts()
+    public static IEnumerable<ComboBoxItem> FindJapaneseFonts()
     {
         List<ComboBoxItem> japaneseFonts = new();
 
@@ -430,7 +430,7 @@ public static class WindowsUtils
     public static void ShowColorPicker(object sender, RoutedEventArgs e)
     {
         ColorPicker picker = SingleOpenHelper.CreateControl<ColorPicker>();
-        var window = new HandyControl.Controls.PopupWindow { PopupElement = picker, };
+        var window = new HandyControl.Controls.PopupWindow { PopupElement = picker };
         picker.SelectedBrush = (SolidColorBrush)((Button)sender).Tag;
 
         picker.Canceled += delegate

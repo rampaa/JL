@@ -74,8 +74,8 @@ internal static class JmdictRecordBuilder
             }
         }
 
-        List<string> allReadings = entry.ReadingElements.Select(rEle => rEle.Reb).ToList();
-        List<List<string>> allROrthographyInfoLists = entry.ReadingElements.Select(rEle => rEle.ReInfList).ToList();
+        List<string> allReadings = entry.ReadingElements.Select(static rEle => rEle.Reb).ToList();
+        List<List<string>> allROrthographyInfoLists = entry.ReadingElements.Select(static rEle => rEle.ReInfList).ToList();
 
         int rEleListCount = entry.ReadingElements.Count;
         for (int i = 0; i < rEleListCount; i++)
@@ -95,12 +95,12 @@ internal static class JmdictRecordBuilder
             {
                 if (readingElement.ReRestrList.Count > 0)
                 {
-                    record = new(readingElement.ReRestrList[0]) { AlternativeSpellings = readingElement.ReRestrList };
+                    record = new JmdictRecord(readingElement.ReRestrList[0]) { AlternativeSpellings = readingElement.ReRestrList };
                 }
 
                 else
                 {
-                    record = new(alternativeSpellings[0]) { AlternativeSpellings = alternativeSpellings.ToList() };
+                    record = new JmdictRecord(alternativeSpellings[0]) { AlternativeSpellings = alternativeSpellings.ToList() };
                 }
 
                 record.AlternativeSpellings.RemoveAt(0);
@@ -115,7 +115,7 @@ internal static class JmdictRecordBuilder
 
             else
             {
-                record = new(readingElement.Reb)
+                record = new JmdictRecord(readingElement.Reb)
                 {
                     PrimarySpellingOrthographyInfoList = readingElement.ReInfList,
                     AlternativeSpellings = allReadings.ToList(),
@@ -171,7 +171,7 @@ internal static class JmdictRecordBuilder
             }
             else
             {
-                jmdictDictionary.Add(key, new List<IDictRecord>() { recordKeyValuePair.Value });
+                jmdictDictionary.Add(key, new List<IDictRecord> { recordKeyValuePair.Value });
             }
         }
     }
@@ -195,7 +195,7 @@ internal static class JmdictRecordBuilder
     {
         List<List<T>?>? listOfListClone = listOfLists;
 
-        if (listOfListClone!.Count is 0 || listOfListClone.All(l => l is null || l.Count is 0))
+        if (listOfListClone!.Count is 0 || listOfListClone.All(static l => l is null || l.Count is 0))
         {
             listOfListClone = null;
         }

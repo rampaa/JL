@@ -1,6 +1,6 @@
 namespace JL.Core.Freqs;
 
-public class FrequencyRecord
+public sealed class FrequencyRecord
 {
     public string Spelling { get; }
     public int Frequency { get; }

@@ -2,7 +2,7 @@ using JL.Core.Dicts;
 
 namespace JL.Core.Lookup;
 
-public class IntermediaryResult
+internal sealed class IntermediaryResult
 {
     public List<List<IDictRecord>> Results { get; }
     public List<List<List<string>>>? Processes { get; }

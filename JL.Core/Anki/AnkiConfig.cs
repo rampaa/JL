@@ -4,7 +4,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Anki;
 
-public class AnkiConfig
+public sealed class AnkiConfig
 {
     [JsonPropertyName("deckName")] public string DeckName { get; set; }
 

@@ -5,7 +5,7 @@ using static JL.Windows.WinApi.NativeMethods;
 
 namespace JL.Windows;
 
-public class WinApi
+internal sealed class WinApi
 {
 
 #pragma warning disable IDE1006
@@ -16,14 +16,14 @@ public class WinApi
         internal const int WM_CLIPBOARDUPDATE = 0x031D;
         internal const int WM_ERASEBKGND = 0x0014;
         internal const int WM_SYSCOMMAND = 0x0112;
-        internal const int WM_NCCALCSIZE = 0x0083;
+        // internal const int WM_NCCALCSIZE = 0x0083;
         // internal const int WM_NCHITTEST = 0x0084;
         internal const int SWP_NOSIZE = 0x0001;
         internal const int SWP_NOMOVE = 0x0002;
         internal const int SWP_SHOWWINDOW = 0x0040;
         internal const int GWL_EXSTYLE = -20;
         internal const int WS_EX_NOACTIVATE = 0x08000000;
-        public static readonly IntPtr WVR_VALIDRECTS = new(0x0400);
+        // public static readonly IntPtr WVR_VALIDRECTS = new(0x0400);
         public static readonly IntPtr HWND_TOPMOST = new(-1);
 
         internal enum ResizeDirection
@@ -35,7 +35,7 @@ public class WinApi
             TopRight = 61445,
             Bottom = 61446,
             BottomLeft = 61447,
-            BottomRight = 61448,
+            BottomRight = 61448
         }
 
         //RECT Structure
@@ -46,12 +46,12 @@ public class WinApi
         }
 
         //NCCALCSIZE_PARAMS Structure
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct NCCALCSIZE_PARAMS
-        {
-            public RECT rgrc0, rgrc1, rgrc2;
-            public WINDOWPOS lppos;
-        }
+        // [StructLayout(LayoutKind.Sequential)]
+        // internal struct NCCALCSIZE_PARAMS
+        // {
+        //     public RECT rgrc0, rgrc1, rgrc2;
+        //     public WINDOWPOS lppos;
+        // }
 
         //WINDOWPOS Structure
         [StructLayout(LayoutKind.Sequential)]
@@ -131,35 +131,18 @@ public class WinApi
 
     public static void ResizeWindow(IntPtr windowHandle, string borderName)
     {
-        IntPtr wParam = IntPtr.Zero;
-
-        switch (borderName)
+        IntPtr wParam = borderName switch
         {
-            case "LeftBorder":
-                wParam = (IntPtr)ResizeDirection.Left;
-                break;
-            case "RightBorder":
-                wParam = (IntPtr)ResizeDirection.Right;
-                break;
-            case "TopBorder":
-                wParam = (IntPtr)ResizeDirection.Top;
-                break;
-            case "TopRightBorder":
-                wParam = (IntPtr)ResizeDirection.TopRight;
-                break;
-            case "BottomBorder":
-                wParam = (IntPtr)ResizeDirection.Bottom;
-                break;
-            case "BottomLeftBorder":
-                wParam = (IntPtr)ResizeDirection.BottomLeft;
-                break;
-            case "BottomRightBorder":
-                wParam = (IntPtr)ResizeDirection.BottomRight;
-                break;
-            case "TopLeftBorder":
-                wParam = (IntPtr)ResizeDirection.TopLeft;
-                break;
-        }
+            "LeftBorder" => (IntPtr)ResizeDirection.Left,
+            "RightBorder" => (IntPtr)ResizeDirection.Right,
+            "TopBorder" => (IntPtr)ResizeDirection.Top,
+            "TopRightBorder" => (IntPtr)ResizeDirection.TopRight,
+            "BottomBorder" => (IntPtr)ResizeDirection.Bottom,
+            "BottomLeftBorder" => (IntPtr)ResizeDirection.BottomLeft,
+            "BottomRightBorder" => (IntPtr)ResizeDirection.BottomRight,
+            "TopLeftBorder" => (IntPtr)ResizeDirection.TopLeft,
+            _ => IntPtr.Zero
+        };
 
         _ = SendMessage(windowHandle, WM_SYSCOMMAND, wParam, IntPtr.Zero);
     }

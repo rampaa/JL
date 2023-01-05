@@ -6,7 +6,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for AbbreviationWindow.xaml
 /// </summary>
-public partial class InfoWindow : Window
+internal sealed partial class InfoWindow : Window
 {
     private IntPtr _windowHandle;
 

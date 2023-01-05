@@ -1,6 +1,6 @@
 namespace JL.Core.Dicts.EDICT.JMdict;
 
-public class KanjiElement
+internal sealed class KanjiElement
 {
     public string? Keb { get; set; } //e.g. 娘
 

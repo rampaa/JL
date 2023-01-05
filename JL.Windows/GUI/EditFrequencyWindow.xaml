@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Edit Frequency" Height="400" Width="800" ResizeMode="NoResize" SizeToContent="WidthAndHeight"
-        Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False" Background="{DynamicResource RegionBrush}">
+        Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False" Background="{DynamicResource RegionBrush}"
+        x:ClassModifier="internal">
     <Grid>
-        <StackPanel Name="StackPanel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,60">
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,60">
             <TextBlock Text="Freq Type" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
             <ComboBox Name="FreqTypeComboBox" Width="285" Margin="10" HorizontalAlignment="Left" IsEnabled="False" />
 
@@ -17,7 +18,7 @@
                          Text=""
                          Margin="10"
                          IsReadOnly="True" />
-                <Button Name="BrowsePathButton" Content="..." Click="BrowsePathButton_OnClick"
+                <Button Content="..." Click="BrowsePathButton_OnClick"
                         IsEnabled="{Binding ElementName=FreqTypeComboBox,Path=Text.Length}">
                 </Button>
             </WrapPanel>
@@ -29,9 +30,9 @@
         </StackPanel>
 
         <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="20,320,20,20">
-            <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+            <Button Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                     Margin="0,20,20,0" FontSize="16" Width="70" Height="35" Click="CancelButton_Click" />
-            <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+            <Button Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                     Margin="20,20,0,0" FontSize="16" Width="70" Height="35" Click="SaveButton_Click" />
         </WrapPanel>
     </Grid>

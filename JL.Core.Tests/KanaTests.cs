@@ -24,9 +24,9 @@ public class KanaTests
     public void KatakanaToHiraganaConverter_アToあ()
     {
         // Arrange
-        string expected = "あ";
+        const string expected = "あ";
 
-        string text = "ア";
+        const string text = "ア";
 
         // Act
         string result = Kana.KatakanaToHiragana(
@@ -40,8 +40,8 @@ public class KanaTests
     public void KatakanaToHiraganaConverter_NormalizesText1()
     {
         // Arrange
-        string expected1 = "か";
-        string text1 = "㋕";
+        const string expected1 = "か";
+        const string text1 = "㋕";
 
         // Act
         string result1 = Kana.KatakanaToHiragana(
@@ -55,8 +55,8 @@ public class KanaTests
     public void KatakanaToHiraganaConverter_NormalizesText2()
     {
         // Arrange
-        string expected2 = "あぱーと";
-        string text2 = "㌀";
+        const string expected2 = "あぱーと";
+        const string text2 = "㌀";
 
         // Act
         string result2 = Kana.KatakanaToHiragana(
@@ -67,12 +67,13 @@ public class KanaTests
     }
 
     // this one seems to be inconsistent between platforms
-    [Test, Explicit]
+    [Test]
+    [Explicit]
     public void KatakanaToHiraganaConverter_NormalizesText3()
     {
         // Arrange
-        string expected3 = "令和";
-        string text3 = "㋿";
+        const string expected3 = "令和";
+        const string text3 = "㋿";
 
         // Act
         string result3 = Kana.KatakanaToHiragana(
@@ -88,7 +89,7 @@ public class KanaTests
         // Arrange
         List<string> expected = new() { "オオ", "オウ" };
 
-        string text = "オー";
+        const string text = "オー";
 
         // Act
         List<string> result = Kana.LongVowelMarkToKana(

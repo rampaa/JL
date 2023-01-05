@@ -239,7 +239,7 @@ public static class Kana
     //    return textInKatakana.ToString();
     //}
 
-    public static List<string> LongVowelMarkToKana(string text)
+    internal static List<string> LongVowelMarkToKana(string text)
     {
         List<string> unicodeTextList = text.EnumerateUnicodeCharacters().ToList();
 
@@ -262,23 +262,14 @@ public static class Kana
 
                 else
                 {
-                    string alternativeVowel = "";
-
-                    switch (vowel)
+                    string alternativeVowel = vowel switch
                     {
-                        case "お":
-                            alternativeVowel = "う";
-                            break;
-                        case "え":
-                            alternativeVowel = "い";
-                            break;
-                        case "オ":
-                            alternativeVowel = "ウ";
-                            break;
-                        case "エ":
-                            alternativeVowel = "イ";
-                            break;
-                    }
+                        "お" => "う",
+                        "え" => "い",
+                        "オ" => "ウ",
+                        "エ" => "イ",
+                        _ => ""
+                    };
 
                     int listSize = stringBuilders.Count;
                     for (int j = 0; j < listSize; j++)
@@ -303,7 +294,7 @@ public static class Kana
             }
         }
 
-        return stringBuilders.ConvertAll(sb => sb.ToString());
+        return stringBuilders.ConvertAll(static sb => sb.ToString());
     }
 
     public static List<string> CreateCombinedForm(string text)
@@ -334,7 +325,7 @@ public static class Kana
     //    return s_hiraganaToKatakanaDict.ContainsKey(text.EnumerateUnicodeCharacters().First());
     //}
 
-    public static bool IsKatakana(string text)
+    internal static bool IsKatakana(string text)
     {
         return s_katakanaToHiraganaDict.ContainsKey(text.EnumerateUnicodeCharacters().First());
     }

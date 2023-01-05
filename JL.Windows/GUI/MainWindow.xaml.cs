@@ -20,11 +20,11 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
-public partial class MainWindow : Window, IFrontend
+internal sealed partial class MainWindow : Window, IFrontend
 {
     #region IFrontend implementation
 
-    public CoreConfig CoreConfig { get; set; } = ConfigManager.Instance;
+    public CoreConfig CoreConfig { get; } = ConfigManager.Instance;
 
     public void PlayAudio(byte[] sound, float volume) => WindowsUtils.PlayAudio(sound, volume);
 
@@ -53,10 +53,10 @@ public partial class MainWindow : Window, IFrontend
     private WinApi? _winApi;
     public IntPtr WindowHandle { get; private set; }
 
-    public PopupWindow FirstPopupWindow { get; init; }
+    public PopupWindow FirstPopupWindow { get; }
 
     private static MainWindow? s_instance;
-    public static MainWindow Instance => s_instance ??= new();
+    public static MainWindow Instance => s_instance ??= new MainWindow();
 
     public double LeftPositionBeforeResolutionChange { get; set; }
     public double TopPositionBeforeResolutionChange { get; set; }
@@ -68,7 +68,7 @@ public partial class MainWindow : Window, IFrontend
         InitializeComponent();
         s_instance = this;
         ConfigHelper.Instance.SetLang("en");
-        FirstPopupWindow = new();
+        FirstPopupWindow = new PopupWindow();
         _ = MainTextBox.Focus();
     }
 
@@ -76,18 +76,18 @@ public partial class MainWindow : Window, IFrontend
     {
         base.OnSourceInitialized(e);
 
-        AppDomain.CurrentDomain.UnhandledException += (_, eventArgs) =>
+        AppDomain.CurrentDomain.UnhandledException += static (_, eventArgs) =>
         {
             Exception ex = (Exception)eventArgs.ExceptionObject;
             Utils.Logger.Error(ex, "Unhandled exception");
         };
 
-        TaskScheduler.UnobservedTaskException += (_, eventArgs) => Utils.Logger.Error(eventArgs.Exception, "Unobserved task exception");
+        TaskScheduler.UnobservedTaskException += static (_, eventArgs) => Utils.Logger.Error(eventArgs.Exception, "Unobserved task exception");
 
         SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
 
         WindowHandle = new WindowInteropHelper(this).Handle;
-        _winApi = new();
+        _winApi = new WinApi();
         _winApi.SubscribeToClipboardChanged(this, WindowHandle);
         _winApi.ClipboardChanged += ClipboardChanged;
 
@@ -96,7 +96,7 @@ public partial class MainWindow : Window, IFrontend
         if (ConfigManager.CaptureTextFromClipboard)
         {
             CopyFromClipboard();
-            _lastClipboardChangeTime = new(Stopwatch.GetTimestamp());
+            _lastClipboardChangeTime = new DateTime(Stopwatch.GetTimestamp());
         }
 
         FirstPopupWindow.Owner = this;
@@ -151,7 +151,7 @@ public partial class MainWindow : Window, IFrontend
                         && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic
                         && Storage.FreqsReady && MainTextBox!.Text.Length < Storage.CacheSize)
                     {
-                        _ = Dispatcher.Invoke(DispatcherPriority.Render, () => { }); // let MainTextBox text update
+                        _ = Dispatcher.Invoke(DispatcherPriority.Render, static () => { }); // let MainTextBox text update
                         await Precache(MainTextBox!.Text).ConfigureAwait(false);
                     }
                 }
@@ -819,7 +819,7 @@ public partial class MainWindow : Window, IFrontend
             "BottomLeftBorder" => Cursors.SizeNESW,
             "BottomRightBorder" => Cursors.SizeNWSE,
             "TopLeftBorder" => Cursors.SizeNWSE,
-            _ => Cursors.Arrow,
+            _ => Cursors.Arrow
         };
     }
     private void Border_OnMouseLeave(object sender, MouseEventArgs e)

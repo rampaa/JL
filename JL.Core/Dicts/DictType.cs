@@ -77,5 +77,5 @@ public enum DictType
     [Description("Nonspecific Name Dictionary (Nazeka)")]
     NonspecificNameNazeka,
     [Description("Nonspecific (Nazeka)")]
-    NonspecificNazeka,
+    NonspecificNazeka
 }

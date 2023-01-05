@@ -4,7 +4,7 @@ using JL.Core.Dicts;
 
 namespace JL.Core.PitchAccent;
 
-public class PitchAccentRecord : IDictRecord
+public sealed class PitchAccentRecord : IDictRecord
 {
     public string Spelling { get; }
     public string? Reading { get; }
@@ -12,7 +12,7 @@ public class PitchAccentRecord : IDictRecord
 
     private static readonly Regex s_positionRegex = new("@\"(\\[|［)(\\d)(］|\\])", RegexOptions.Compiled);
 
-    public PitchAccentRecord(List<JsonElement> jsonObject)
+    internal PitchAccentRecord(IReadOnlyList<JsonElement> jsonObject)
     {
         Spelling = jsonObject[0].ToString();
 

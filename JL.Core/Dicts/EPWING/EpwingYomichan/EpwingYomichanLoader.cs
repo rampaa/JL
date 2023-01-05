@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace JL.Core.Dicts.EPWING.EpwingYomichan;
 
-public static class EpwingYomichanLoader
+internal static class EpwingYomichanLoader
 {
     public static async Task Load(Dict dict)
     {
@@ -12,7 +12,7 @@ public static class EpwingYomichanLoader
         }
 
         string[] jsonFiles = Directory.EnumerateFiles(dict.Path, "*_bank_*.json", SearchOption.TopDirectoryOnly)
-            .Where(s => s.Contains("term") || s.Contains("kanji"))
+            .Where(static s => s.Contains("term") || s.Contains("kanji"))
             .ToArray();
 
         foreach (string jsonFile in jsonFiles)
@@ -41,7 +41,7 @@ public static class EpwingYomichanLoader
         dict.Contents.TrimExcess();
     }
 
-    private static void AddToDictionary(EpwingYomichanRecord yomichanRecord, Dict dict)
+    private static void AddToDictionary(IEpwingRecord yomichanRecord, Dict dict)
     {
         if (!EpwingUtils.IsValidEpwingResultForDictType(yomichanRecord, dict))
         {

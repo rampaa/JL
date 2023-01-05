@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace JL.Core.Dicts.CustomNameDict;
 
-public class CustomNameRecord : IDictRecord
+internal sealed class CustomNameRecord : IDictRecord
 {
     public string PrimarySpelling { get; }
     public string Reading { get; }

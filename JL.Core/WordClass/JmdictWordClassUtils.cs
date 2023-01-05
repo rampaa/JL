@@ -58,7 +58,7 @@ public static class JmdictWordClassUtils
             "v5n", "v5r", "v5r-i", "v5s", "v5t", "v5u", "v5u-s", "vk", "vs-c", "vs-i", "vs-s", "vz"
         };
 
-        foreach (List<IDictRecord> jmdictRecordList in Storage.Dicts.Values.First(dict => dict.Type == DictType.JMdict).Contents.Values.ToList())
+        foreach (List<IDictRecord> jmdictRecordList in Storage.Dicts.Values.First(static dict => dict.Type == DictType.JMdict).Contents.Values.ToList())
         {
             int jmdictRecordListCount = jmdictRecordList.Count;
             for (int i = 0; i < jmdictRecordListCount; i++)
@@ -70,7 +70,7 @@ public static class JmdictWordClassUtils
                     continue;
                 }
 
-                List<string> wordClasses = value.WordClasses?.Where(wc => wc is not null).SelectMany(wc => wc!).ToHashSet().Intersect(usedWordClasses).ToList() ?? new();
+                List<string> wordClasses = value.WordClasses?.Where(static wc => wc is not null).SelectMany(static wc => wc!).ToHashSet().Intersect(usedWordClasses).ToList() ?? new List<string>();
 
                 if (wordClasses.Count is 0)
                 {
@@ -123,7 +123,7 @@ public static class JmdictWordClassUtils
         var options = new JsonSerializerOptions
         {
             Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
         await File.WriteAllBytesAsync($"{Storage.ResourcesPath}/PoS.json",

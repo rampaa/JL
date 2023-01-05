@@ -23,11 +23,11 @@ internal static class EpwingNazekaLoader
 
             List<string>? spellings = jsonObj.GetProperty("s").ToString().TrimStart('[').TrimEnd(']')
                 .Split("\",", StringSplitOptions.RemoveEmptyEntries)
-                .Select(select => select.Trim('\n', ' ', '"')).ToList();
+                .Select(static select => select.Trim('\n', ' ', '"')).ToList();
 
             List<string>? definitions = jsonObj.GetProperty("l").ToString().TrimStart('[').TrimEnd(']')
                 .Split("\",", StringSplitOptions.RemoveEmptyEntries)
-                .Select(select => select.Trim('\n', ' ', '"')).ToList();
+                .Select(static select => select.Trim('\n', ' ', '"')).ToList();
 
             if (definitions.Count is 0)
             {
@@ -74,7 +74,7 @@ internal static class EpwingNazekaLoader
 
                     key = Kana.KatakanaToHiragana(primarySpelling);
 
-                    tempRecord = new(primarySpelling, reading, alternativeSpellings, definitions);
+                    tempRecord = new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions);
 
                     if (!EpwingUtils.IsValidEpwingResultForDictType(tempRecord, dict))
                     {

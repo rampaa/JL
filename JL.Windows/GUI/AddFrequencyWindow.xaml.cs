@@ -11,7 +11,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for AddFrequencyWindow.xaml
 /// </summary>
-public partial class AddFrequencyWindow : Window
+internal sealed partial class AddFrequencyWindow : Window
 {
     public AddFrequencyWindow()
     {
@@ -41,7 +41,7 @@ public partial class AddFrequencyWindow : Window
         string path = TextBlockPath.Text;
         if (string.IsNullOrEmpty(path)
             || (!Directory.Exists(path) && !File.Exists(path))
-            || Storage.FreqDicts.Values.Select(freq => freq.Path).Contains(path))
+            || Storage.FreqDicts.Values.Select(static freq => freq.Path).Contains(path))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
             isValid = false;
@@ -52,7 +52,7 @@ public partial class AddFrequencyWindow : Window
         }
 
         string name = NameTextBox.Text;
-        if (string.IsNullOrEmpty(name) || Storage.FreqDicts.Values.Select(freq => freq.Name).Contains(name))
+        if (string.IsNullOrEmpty(name) || Storage.FreqDicts.Values.Select(static freq => freq.Name).Contains(name))
         {
             NameTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -68,7 +68,7 @@ public partial class AddFrequencyWindow : Window
 
             // lowest priority means highest number
             int lowestPriority = Storage.FreqDicts.Count > 0
-                ? Storage.FreqDicts.Select(freq => freq.Value.Priority).Max()
+                ? Storage.FreqDicts.Select(static freq => freq.Value.Priority).Max()
                 : -1;
 
             Storage.FreqDicts.Add(name,
@@ -103,7 +103,7 @@ public partial class AddFrequencyWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        FreqTypeComboBox.ItemsSource = Enum.GetValues<FreqType>().Select(ft => ft.GetDescription() ?? ft.ToString());
+        FreqTypeComboBox.ItemsSource = Enum.GetValues<FreqType>().Select(static ft => ft.GetDescription() ?? ft.ToString());
     }
     private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)
     {

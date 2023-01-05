@@ -1,6 +1,6 @@
 namespace JL.Core.Dicts.EDICT.JMnedict;
 
-public class JmnedictEntry
+internal sealed class JmnedictEntry
 {
     public int Id { get; set; }
     public List<string> KebList { get; }

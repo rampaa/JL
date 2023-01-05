@@ -1,6 +1,6 @@
 namespace JL.Core.Dicts.EDICT.JMdict;
 
-public class ReadingElement
+internal sealed class ReadingElement
 {
     public string Reb { get; set; } // Reading in kana. e.g. むすめ
     public List<string> ReRestrList { get; } // ReRestrList = Keb. The reading is only valid for this specific keb.

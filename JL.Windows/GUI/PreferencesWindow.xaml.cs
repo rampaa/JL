@@ -1,6 +1,7 @@
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using JL.Core;
 using JL.Core.Anki;
@@ -16,12 +17,12 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for PreferenceWindow.xaml
 /// </summary>
-public partial class PreferencesWindow : Window
+internal sealed partial class PreferencesWindow : Window
 {
     private static PreferencesWindow? s_instance;
     public bool SetAnkiConfig { get; private set; } = false;
 
-    public static PreferencesWindow Instance => s_instance ??= new();
+    public static PreferencesWindow Instance => s_instance ??= new PreferencesWindow();
 
     public PreferencesWindow()
     {
@@ -33,8 +34,7 @@ public partial class PreferencesWindow : Window
         return s_instance?.IsVisible ?? false;
     }
 
-    private readonly string _wordJLFieldsInfo =
-@"• Primary Spelling: It's the spelling you click to mine the word. e.g. If you look up ""わかりました"", its primary spelling will be ""分かる"".
+    private const string WordJLFieldsInfo = @"• Primary Spelling: It's the spelling you click to mine the word. e.g. If you look up ""わかりました"", its primary spelling will be ""分かる"".
 • Readings: Readings of the mined word.
 • Alternative Spellings: Alternative spellings of the mined word. e.g. If you look up ""わかりました"", its alternative spellings will be ""解る, 判る, 分る"".
 • Definitions: Definitions of the mined word.
@@ -49,8 +49,7 @@ public partial class PreferencesWindow : Window
 • EDICT ID: JMDict entry ID.
 • Local Time: Mining date and time expressed in local timezone.";
 
-    private readonly string _kanjiJLFieldsInfo =
-@"• Primary Spelling: It's the spelling you click to mine the kanji. e.g. 妹.
+    private const string KanjiJLFieldsInfo = @"• Primary Spelling: It's the spelling you click to mine the kanji. e.g. 妹.
 • Readings: Kun+On+Nanori readings of the kanji.
 • Kun Readings: Kun readings of the mined kanji.
 • On Readings: On readings of the mined kanji.
@@ -66,8 +65,7 @@ public partial class PreferencesWindow : Window
 • EDICT ID: KANJIDIC2 entry ID.
 • Local Time: Mining date and time expressed in local timezone.";
 
-    private readonly string _nameJLFieldsInfo =
- @"• Primary Spelling: It's the spelling you click to mine the name.
+    private const string NameJLFieldsInfo = @"• Primary Spelling: It's the spelling you click to mine the name.
 • Readings: Readings of the name.
 • Alternative Spellings: Alternative spellings of the mined name.
 • Definitions: Translations of the name.
@@ -173,10 +171,10 @@ public partial class PreferencesWindow : Window
         }
     }
 
-    private static void SetPreviousMiningConfig(ComboBox deckNamesComboBox, ComboBox modelNamesComboBox, TextBox tagTextBox, AnkiConfig ankiConfig)
+    private static void SetPreviousMiningConfig(Selector deckNamesSelector, Selector modelNamesComboBox, TextBox tagTextBox, AnkiConfig ankiConfig)
     {
-        deckNamesComboBox.ItemsSource = new List<string> { ankiConfig.DeckName };
-        deckNamesComboBox.SelectedItem = ankiConfig.DeckName;
+        deckNamesSelector.ItemsSource = new List<string> { ankiConfig.DeckName };
+        deckNamesSelector.SelectedItem = ankiConfig.DeckName;
         modelNamesComboBox.ItemsSource = new List<string> { ankiConfig.ModelName };
         modelNamesComboBox.SelectedItem = ankiConfig.ModelName;
         tagTextBox.Text = string.Join(",", ankiConfig.Tags);
@@ -222,7 +220,7 @@ public partial class PreferencesWindow : Window
         await PopulateDeckAndModelNames().ConfigureAwait(false);
     }
 
-    private static async Task GetFields(ComboBox modelNamesComboBox, StackPanel miningStackPanel, List<JLField> fieldList)
+    private static async Task GetFields(ComboBox modelNamesComboBox, Panel miningPanel, IEnumerable<JLField> fieldList)
     {
         string modelName = modelNamesComboBox.SelectionBoxItem.ToString()!;
 
@@ -231,9 +229,9 @@ public partial class PreferencesWindow : Window
         if (fieldNames is not null)
         {
             Dictionary<string, JLField> fields =
-                fieldNames.ToDictionary(fieldName => fieldName, _ => JLField.Nothing);
+                fieldNames.ToDictionary(static fieldName => fieldName, static _ => JLField.Nothing);
 
-            CreateFieldElements(fields, fieldList, miningStackPanel);
+            CreateFieldElements(fields, fieldList, miningPanel);
         }
 
         else
@@ -263,12 +261,12 @@ public partial class PreferencesWindow : Window
         await GetFields(OtherMiningSetupComboBoxModelNames, OtherMiningSetupStackPanelFields, Storage.JLFieldsForWordDicts).ConfigureAwait(false);
     }
 
-    private static void CreateFieldElements(Dictionary<string, JLField> fields, List<JLField> fieldList, StackPanel fieldStackPanel)
+    private static void CreateFieldElements(Dictionary<string, JLField> fields, IEnumerable<JLField> fieldList, Panel fieldPanel)
     {
-        fieldStackPanel.Children.Clear();
+        fieldPanel.Children.Clear();
 
         string[] descriptions = fieldList
-            .Select(jlFieldName => jlFieldName.GetDescription() ?? jlFieldName.ToString()).ToArray();
+            .Select(static jlFieldName => jlFieldName.GetDescription() ?? jlFieldName.ToString()).ToArray();
 
         try
         {
@@ -284,7 +282,7 @@ public partial class PreferencesWindow : Window
 
                 _ = stackPanel.Children.Add(textBlockFieldName);
                 _ = stackPanel.Children.Add(comboBoxJLFields);
-                _ = fieldStackPanel.Children.Add(stackPanel);
+                _ = fieldPanel.Children.Add(stackPanel);
             }
         }
         catch (Exception ex)
@@ -294,7 +292,7 @@ public partial class PreferencesWindow : Window
         }
     }
 
-    private static AnkiConfig? GetAnkiConfigFromPreferences(ComboBox deckNamesComboBox, ComboBox modelNamesComboBox, StackPanel miningStackPanel, TextBox tagsTextBox, List<JLField> jlFieldList)
+    private static AnkiConfig? GetAnkiConfigFromPreferences(ComboBox deckNamesComboBox, ComboBox modelNamesComboBox, Panel miningPanel, TextBox tagsTextBox, IReadOnlyCollection<JLField> jlFieldList)
     {
         try
         {
@@ -302,7 +300,7 @@ public partial class PreferencesWindow : Window
             string modelName = modelNamesComboBox.SelectionBoxItem.ToString()!;
 
             Dictionary<string, JLField> dict = new();
-            foreach (StackPanel stackPanel in miningStackPanel.Children)
+            foreach (StackPanel stackPanel in miningPanel.Children)
             {
                 var textBlock = (TextBlock)stackPanel.Children[0];
                 var comboBox = (ComboBox)stackPanel.Children[1];
@@ -314,12 +312,10 @@ public partial class PreferencesWindow : Window
                 dict.Add(textBlock.Text, result);
             }
 
-            Dictionary<string, JLField> fields = dict;
-
             string rawTags = tagsTextBox.Text;
             string[] tags = string.IsNullOrEmpty(rawTags)
                 ? Array.Empty<string>()
-                : rawTags.Split(',').Select(s => s.Trim()).ToArray();
+                : rawTags.Split(',').Select(static s => s.Trim()).ToArray();
 
             if (deckNamesComboBox.SelectedItem is null ||
                 modelNamesComboBox.SelectedItem is null)
@@ -329,7 +325,7 @@ public partial class PreferencesWindow : Window
                 return null;
             }
 
-            return new AnkiConfig(deckName, modelName, fields, tags);
+            return new AnkiConfig(deckName, modelName, dict, tags);
         }
         catch (Exception ex)
         {
@@ -453,22 +449,22 @@ public partial class PreferencesWindow : Window
         {
             case "WordInfoButton":
                 title += "Words";
-                text = _wordJLFieldsInfo;
+                text = WordJLFieldsInfo;
                 break;
 
             case "KanjiInfoButton":
                 title += "Kanjis";
-                text = _kanjiJLFieldsInfo;
+                text = KanjiJLFieldsInfo;
                 break;
 
             case "NameInfoButton":
                 title += "Names";
-                text = _nameJLFieldsInfo;
+                text = NameJLFieldsInfo;
                 break;
 
             default:
                 title += "Others";
-                text = _wordJLFieldsInfo;
+                text = WordJLFieldsInfo;
                 break;
         }
 

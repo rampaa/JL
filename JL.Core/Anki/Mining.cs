@@ -24,17 +24,17 @@ public static class Mining
 
             DictType dictType = Storage.Dicts[miningParams[JLField.DictionaryName]].Type;
 
-            if (Storage.WordDictTypes.Contains(dictType))
+            if (Storage.s_wordDictTypes.Contains(dictType))
             {
                 _ = ankiConfigDict.TryGetValue(MineType.Word, out ankiConfig);
             }
 
-            else if (Storage.KanjiDictTypes.Contains(dictType))
+            else if (Storage.s_kanjiDictTypes.Contains(dictType))
             {
                 _ = ankiConfigDict.TryGetValue(MineType.Kanji, out ankiConfig);
             }
 
-            else if (Storage.NameDictTypes.Contains(dictType))
+            else if (Storage.s_nameDictTypes.Contains(dictType))
             {
                 _ = ankiConfigDict.TryGetValue(MineType.Name, out ankiConfig);
             }
@@ -58,7 +58,7 @@ public static class Mining
 
             Dictionary<string, object> options = new()
             {
-                { "allowDuplicate", Storage.Frontend.CoreConfig.AllowDuplicateCards },
+                { "allowDuplicate", Storage.Frontend.CoreConfig.AllowDuplicateCards }
             };
             string[] tags = ankiConfig.Tags;
 
@@ -71,7 +71,7 @@ public static class Mining
 
             byte[]? audioRes = null;
 
-            bool needsAudio = userFields.Values.Any(jlField => jlField is JLField.Audio);
+            bool needsAudio = userFields.Values.Any(static jlField => jlField is JLField.Audio);
             if (needsAudio)
             {
                 audioRes = await Networking.GetAudioFromJpod101(primarySpelling, reading).ConfigureAwait(false);
@@ -84,7 +84,7 @@ public static class Mining
                     { "data", audioRes },
                     { "filename", $"JL_audio_{reading}_{primarySpelling}.mp3" },
                     { "skipHash", Storage.Jpod101NoAudioMd5Hash },
-                    { "fields", FindAudioFields(userFields) },
+                    { "fields", FindAudioFields(userFields) }
                 }
             };
 
@@ -135,7 +135,7 @@ public static class Mining
     /// UserField is the name of the user's field in Anki (e.g. Expression) <br/>
     /// </summary>
     private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> userFields,
-        Dictionary<JLField, string> miningParams)
+        IReadOnlyDictionary<JLField, string> miningParams)
     {
         Dictionary<string, object> dict = new();
         foreach ((string key, JLField value) in userFields)

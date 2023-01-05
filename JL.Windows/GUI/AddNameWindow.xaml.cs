@@ -13,11 +13,11 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for AddNameWindow.xaml
 /// </summary>
-public partial class AddNameWindow : Window
+internal sealed partial class AddNameWindow : Window
 {
     private static AddNameWindow? s_instance;
 
-    public static AddNameWindow Instance => s_instance ??= new();
+    public static AddNameWindow Instance => s_instance ??= new AddNameWindow();
 
     public AddNameWindow()
     {
@@ -62,7 +62,7 @@ public partial class AddNameWindow : Window
         {
             string nameType =
                 NameTypeStackPanel!.Children.OfType<RadioButton>()
-                    .FirstOrDefault(r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
+                    .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
             string spelling = SpellingTextBox.Text.Replace("\t", "  ").Trim();
             string reading = ReadingTextBox.Text.Replace("\t", "  ").Trim();
             CustomNameLoader.AddToDictionary(spelling, reading, nameType);
@@ -82,7 +82,7 @@ public partial class AddNameWindow : Window
             .Append(type)
             .Append(Environment.NewLine);
 
-        string customNameDictPath = Storage.Dicts.Values.First(dict => dict.Type is DictType.CustomNameDictionary).Path;
+        string customNameDictPath = Storage.Dicts.Values.First(static dict => dict.Type is DictType.CustomNameDictionary).Path;
         await File.AppendAllTextAsync(customNameDictPath,
             stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);
     }

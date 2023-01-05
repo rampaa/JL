@@ -2,7 +2,7 @@ namespace JL.Core.Dicts.CustomWordDict;
 
 public static class CustomWordLoader
 {
-    public static async Task Load(string customWordDictPath)
+    internal static async Task Load(string customWordDictPath)
     {
         if (File.Exists(customWordDictPath))
         {
@@ -15,16 +15,16 @@ public static class CustomWordLoader
 
                 if (lParts.Length is 4)
                 {
-                    string[] spellings = lParts[0].Split(';').Select(s => s.Trim()).ToArray();
+                    string[] spellings = lParts[0].Split(';').Select(static s => s.Trim()).ToArray();
 
-                    List<string>? readings = lParts[1].Split(';').Select(r => r.Trim()).ToList();
+                    List<string>? readings = lParts[1].Split(';').Select(static r => r.Trim()).ToList();
 
                     if (readings.Count is 0)
                     {
                         readings = null;
                     }
 
-                    List<string> definitions = lParts[2].Split(';').Select(d => d.Trim()).ToList();
+                    List<string> definitions = lParts[2].Split(';').Select(static d => d.Trim()).ToList();
                     string wordClass = lParts[3].Trim();
 
                     AddToDictionary(spellings, readings, definitions, wordClass);
@@ -50,47 +50,46 @@ public static class CustomWordLoader
 
             List<string> wordClass = new();
 
-            if (rawWordClass is "Verb")
+            switch (rawWordClass)
             {
-                wordClass.Add("v1");
-                wordClass.Add("v1-s");
-                wordClass.Add("v4r");
-                wordClass.Add("v5aru");
-                wordClass.Add("v5b");
-                wordClass.Add("v5g");
-                wordClass.Add("v5k");
-                wordClass.Add("v5k-s");
-                wordClass.Add("v5m");
-                wordClass.Add("v5n");
-                wordClass.Add("v5r");
-                wordClass.Add("v5r-i");
-                wordClass.Add("v5s");
-                wordClass.Add("v5t");
-                wordClass.Add("v5u");
-                wordClass.Add("v5u-s");
-                wordClass.Add("vk");
-                wordClass.Add("vs-c");
-                wordClass.Add("vs-i");
-                wordClass.Add("vs-s");
-                wordClass.Add("vz");
-            }
-            else if (rawWordClass is "Adjective")
-            {
-                wordClass.Add("adj-i");
-                wordClass.Add("adj-na");
-            }
-            else if (rawWordClass is "Noun")
-            {
-                wordClass.Add("noun");
-            }
-            else
-            {
-                wordClass.Add("other");
+                case "Verb":
+                    wordClass.Add("v1");
+                    wordClass.Add("v1-s");
+                    wordClass.Add("v4r");
+                    wordClass.Add("v5aru");
+                    wordClass.Add("v5b");
+                    wordClass.Add("v5g");
+                    wordClass.Add("v5k");
+                    wordClass.Add("v5k-s");
+                    wordClass.Add("v5m");
+                    wordClass.Add("v5n");
+                    wordClass.Add("v5r");
+                    wordClass.Add("v5r-i");
+                    wordClass.Add("v5s");
+                    wordClass.Add("v5t");
+                    wordClass.Add("v5u");
+                    wordClass.Add("v5u-s");
+                    wordClass.Add("vk");
+                    wordClass.Add("vs-c");
+                    wordClass.Add("vs-i");
+                    wordClass.Add("vs-s");
+                    wordClass.Add("vz");
+                    break;
+                case "Adjective":
+                    wordClass.Add("adj-i");
+                    wordClass.Add("adj-na");
+                    break;
+                case "Noun":
+                    wordClass.Add("noun");
+                    break;
+                default:
+                    wordClass.Add("other");
+                    break;
             }
 
             CustomWordRecord newWordRecord = new(spelling, alternativeSpellings, readings, definitions, wordClass);
 
-            Dictionary<string, List<IDictRecord>> customWordDictionary = Storage.Dicts.Values.First(dict => dict.Type is DictType.CustomWordDictionary).Contents;
+            Dictionary<string, List<IDictRecord>> customWordDictionary = Storage.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary).Contents;
 
             if (customWordDictionary.TryGetValue(Kana.KatakanaToHiragana(spelling), out List<IDictRecord>? result))
             {

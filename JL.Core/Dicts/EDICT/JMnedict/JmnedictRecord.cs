@@ -3,7 +3,7 @@ using System.Text;
 
 namespace JL.Core.Dicts.EDICT.JMnedict;
 
-public class JmnedictRecord : IDictRecord
+internal sealed class JmnedictRecord : IDictRecord
 {
     public int Id { get; set; }
     public string PrimarySpelling { get; }

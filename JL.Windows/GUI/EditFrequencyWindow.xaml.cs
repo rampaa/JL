@@ -12,7 +12,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for EditFrequencyWindow.xaml
 /// </summary>
-public partial class EditFrequencyWindow : Window
+internal sealed partial class EditFrequencyWindow : Window
 {
     private readonly Freq _freq;
 

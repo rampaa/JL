@@ -13,7 +13,7 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for AddDictionaryWindow.xaml
 /// </summary>
-public partial class AddDictionaryWindow : Window
+internal sealed partial class AddDictionaryWindow : Window
 {
     public AddDictionaryWindow()
     {
@@ -43,7 +43,7 @@ public partial class AddDictionaryWindow : Window
         string path = TextBlockPath.Text;
         if (string.IsNullOrEmpty(path)
             || (!Directory.Exists(path) && !File.Exists(path))
-            || Storage.Dicts.Values.Select(freq => freq.Path).Contains(path))
+            || Storage.Dicts.Values.Select(static freq => freq.Path).Contains(path))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
             isValid = false;
@@ -54,7 +54,7 @@ public partial class AddDictionaryWindow : Window
         }
 
         string name = NameTextBox.Text;
-        if (string.IsNullOrEmpty(name) || Storage.Dicts.Values.Select(dict => dict.Name).Contains(name))
+        if (string.IsNullOrEmpty(name) || Storage.Dicts.Values.Select(static dict => dict.Name).Contains(name))
         {
             NameTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -70,7 +70,7 @@ public partial class AddDictionaryWindow : Window
 
             // lowest priority means highest number
             int lowestPriority = Storage.Dicts.Count > 0
-                ? Storage.Dicts.Select(dict => dict.Value.Priority).Max()
+                ? Storage.Dicts.Select(static dict => dict.Value.Priority).Max()
                 : -1;
 
             NewlineBetweenDefinitionsOption? newlineOption = null;
@@ -141,10 +141,10 @@ public partial class AddDictionaryWindow : Window
 
     private void FillDictTypesCombobox(IEnumerable<DictType> types)
     {
-        IEnumerable<DictType> loadedDictTypes = Storage.Dicts.Values.Select(dict => dict.Type);
+        IEnumerable<DictType> loadedDictTypes = Storage.Dicts.Values.Select(static dict => dict.Type);
         IEnumerable<DictType> validTypes = types.Except(loadedDictTypes.Except(Storage.NonspecificDictTypes));
 
-        ComboBoxDictType.ItemsSource = validTypes.Select(d => d.GetDescription() ?? d.ToString());
+        ComboBoxDictType.ItemsSource = validTypes.Select(static d => d.GetDescription() ?? d.ToString());
     }
 
     private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)

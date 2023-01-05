@@ -17,13 +17,14 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for ManageFrequenciesWindow.xaml
 /// </summary>
-public partial class ManageFrequenciesWindow : Window
+internal sealed partial class ManageFrequenciesWindow : Window
 {
     private static ManageFrequenciesWindow? s_instance;
 
     private IntPtr _windowHandle;
 
-    public static ManageFrequenciesWindow Instance => s_instance ??= new();
+    public static ManageFrequenciesWindow Instance => s_instance ??= new ManageFrequenciesWindow();
+
     public ManageFrequenciesWindow()
     {
         InitializeComponent();
@@ -75,23 +76,23 @@ public partial class ManageFrequenciesWindow : Window
         {
             DockPanel dockPanel = new();
 
-            var checkBox = new CheckBox { Width = 20, IsChecked = freq.Active, Margin = new Thickness(10), };
-            var buttonIncreasePriority = new Button { Width = 25, Content = "↑", Margin = new Thickness(1), };
-            var buttonDecreasePriority = new Button { Width = 25, Content = "↓", Margin = new Thickness(1), };
+            var checkBox = new CheckBox { Width = 20, IsChecked = freq.Active, Margin = new Thickness(10) };
+            var buttonIncreasePriority = new Button { Width = 25, Content = "↑", Margin = new Thickness(1) };
+            var buttonDecreasePriority = new Button { Width = 25, Content = "↓", Margin = new Thickness(1) };
             var priority = new TextBlock
             {
                 Name = "priority",
                 // Width = 20,
                 Width = 0,
                 Text = freq.Priority.ToString(CultureInfo.InvariantCulture),
-                Visibility = Visibility.Collapsed,
+                Visibility = Visibility.Collapsed
                 // Margin = new Thickness(10),
             };
             var freqTypeDisplay = new TextBlock
             {
                 Width = 177,
                 Text = freq.Name,
-                Margin = new Thickness(10),
+                Margin = new Thickness(10)
             };
             var freqPathValidityDisplay = new TextBlock
             {
@@ -125,7 +126,7 @@ public partial class ManageFrequenciesWindow : Window
                 Content = "Remove",
                 Foreground = Brushes.White,
                 Background = Brushes.Red,
-                BorderThickness = new Thickness(1),
+                BorderThickness = new Thickness(1)
             };
 
             var buttonEdit = new Button
@@ -136,21 +137,24 @@ public partial class ManageFrequenciesWindow : Window
                 Foreground = Brushes.White,
                 Background = Brushes.DodgerBlue,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(0, 0, 5, 0),
+                Margin = new Thickness(0, 0, 5, 0)
             };
 
             checkBox.Unchecked += (_, _) => freq.Active = false;
             checkBox.Checked += (_, _) => freq.Active = true;
+
             buttonIncreasePriority.Click += (_, _) =>
             {
                 PrioritizeFreq(freq);
                 UpdateFreqsDisplay();
             };
+
             buttonDecreasePriority.Click += (_, _) =>
             {
                 UnPrioritizeFreq(freq);
                 UpdateFreqsDisplay();
             };
+
             buttonRemove.Click += (_, _) =>
             {
                 if (Storage.Frontend.ShowYesNoDialog("Really remove frequency?", "Confirmation"))
@@ -182,11 +186,11 @@ public partial class ManageFrequenciesWindow : Window
             _ = dockPanel.Children.Add(buttonRemove);
         }
 
-        FrequenciesDisplay!.ItemsSource = resultDockPanels.OrderBy(dockPanel =>
+        FrequenciesDisplay.ItemsSource = resultDockPanels.OrderBy(static dockPanel =>
             dockPanel.Children
                 .OfType<TextBlock>()
-                .Where(textBlock => textBlock.Name is "priority")
-                .Select(textBlockPriority => Convert.ToInt32(textBlockPriority.Text, CultureInfo.InvariantCulture)).First());
+                .Where(static textBlock => textBlock.Name is "priority")
+                .Select(static textBlockPriority => Convert.ToInt32(textBlockPriority.Text, CultureInfo.InvariantCulture)).First());
     }
 
     private void PathTextbox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -218,7 +222,7 @@ public partial class ManageFrequenciesWindow : Window
     private static void UnPrioritizeFreq(Freq freq)
     {
         // lowest priority means highest number
-        int lowestPriority = Storage.FreqDicts.Select(f => f.Value.Priority).Max();
+        int lowestPriority = Storage.FreqDicts.Select(static f => f.Value.Priority).Max();
         if (freq.Priority == lowestPriority)
         {
             return;
@@ -231,7 +235,7 @@ public partial class ManageFrequenciesWindow : Window
 
     private void ButtonAddFrequency_OnClick(object sender, RoutedEventArgs e)
     {
-        _ = new AddFrequencyWindow() { Owner = this }.ShowDialog();
+        _ = new AddFrequencyWindow { Owner = this }.ShowDialog();
         UpdateFreqsDisplay();
     }
     private void CloseButton_Click(object sender, RoutedEventArgs e)

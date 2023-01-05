@@ -5,7 +5,7 @@ using JL.Core.Utilities;
 
 namespace JL.Windows.GUI;
 
-public partial class AlertWindow : Window
+internal sealed partial class AlertWindow : Window
 {
     public AlertWindow()
     {

@@ -4,7 +4,7 @@ using Caching;
 namespace JL.Core.Deconjugation;
 
 // translated from https://github.com/wareya/nazeka/blob/master/background-script.js
-public static class Deconjugator
+internal static class Deconjugator
 {
     private static readonly Rule[] s_rules = JsonSerializer.Deserialize<Rule[]>(File.ReadAllText($"{Storage.ResourcesPath}/deconjugation_rules.json"))!;
 

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace JL.Core.Freqs;
 
-public class Freq
+public sealed class Freq
 {
     public FreqType Type { get; }
     public string Name { get; set; }
@@ -11,7 +11,7 @@ public class Freq
     public int Priority { get; set; }
     public int Size { get; set; }
 
-    [JsonIgnore] public Dictionary<string, List<FrequencyRecord>> Contents { get; set; } = new();
+    [JsonIgnore] public Dictionary<string, List<FrequencyRecord>> Contents { get; internal set; } = new();
 
     //public DictOptions? Options { get; set; } // can be null for dicts.json files generated before version 1.10
 

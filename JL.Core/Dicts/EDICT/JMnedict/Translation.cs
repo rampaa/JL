@@ -1,6 +1,6 @@
 namespace JL.Core.Dicts.EDICT.JMnedict;
 
-public class Translation
+internal sealed class Translation
 {
     public List<string> NameTypeList { get; }
 

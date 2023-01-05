@@ -15,7 +15,7 @@ using JL.Windows.Utilities;
 
 namespace JL.Windows;
 
-public class ConfigManager : CoreConfig
+internal sealed class ConfigManager : CoreConfig
 {
     private static ConfigManager? s_instance;
 
@@ -24,11 +24,11 @@ public class ConfigManager : CoreConfig
     #region General
 
     private static readonly List<ComboBoxItem> s_japaneseFonts =
-        WindowsUtils.FindJapaneseFonts().OrderByDescending(f => f.Foreground!.ToString(CultureInfo.InvariantCulture)).ThenBy(font => font.Content)
+        WindowsUtils.FindJapaneseFonts().OrderByDescending(static f => f.Foreground.ToString(CultureInfo.InvariantCulture)).ThenBy(static font => font.Content)
             .ToList();
 
     private static readonly List<ComboBoxItem> s_popupJapaneseFonts =
-        s_japaneseFonts.ConvertAll(f => new ComboBoxItem()
+        s_japaneseFonts.ConvertAll(static f => new ComboBoxItem
         {
             Content = f.Content,
             FontFamily = f.FontFamily,
@@ -618,7 +618,7 @@ public class ConfigManager : CoreConfig
 
         preferenceWindow.PopupFontComboBox.ItemsSource = s_popupJapaneseFonts;
         preferenceWindow.PopupFontComboBox.SelectedIndex =
-            s_popupJapaneseFonts.FindIndex(f => f.Content.ToString() == PopupFont.Source);
+            s_popupJapaneseFonts.FindIndex(static f => f.Content.ToString() == PopupFont.Source);
 
         if (preferenceWindow.PopupFontComboBox.SelectedIndex is -1)
         {

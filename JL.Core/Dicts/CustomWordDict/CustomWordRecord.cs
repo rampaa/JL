@@ -5,7 +5,7 @@ using JL.Core.Freqs;
 
 namespace JL.Core.Dicts.CustomWordDict;
 
-public class CustomWordRecord : IDictRecordWithGetFrequency
+internal sealed class CustomWordRecord : IDictRecordWithGetFrequency
 {
     public string PrimarySpelling { get; }
     public List<string>? AlternativeSpellings { get; }
@@ -162,8 +162,8 @@ public class CustomWordRecord : IDictRecordWithGetFrequency
         CustomWordRecord customWordRecordObj = (obj as CustomWordRecord)!;
 
         return PrimarySpelling == customWordRecordObj.PrimarySpelling
-               && (customWordRecordObj.AlternativeSpellings?.SequenceEqual(AlternativeSpellings ?? new()) ?? AlternativeSpellings == null)
-               && (customWordRecordObj.Readings?.SequenceEqual(Readings ?? new()) ?? Readings == null)
+               && (customWordRecordObj.AlternativeSpellings?.SequenceEqual(AlternativeSpellings ?? new List<string>()) ?? AlternativeSpellings == null)
+               && (customWordRecordObj.Readings?.SequenceEqual(Readings ?? new List<string>()) ?? Readings == null)
                && customWordRecordObj.Definitions.SequenceEqual(Definitions)
                && customWordRecordObj.WordClasses.SequenceEqual(WordClasses);
     }

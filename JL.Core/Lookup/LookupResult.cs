@@ -2,7 +2,7 @@ using JL.Core.Dicts;
 
 namespace JL.Core.Lookup;
 
-public class LookupResult
+public sealed class LookupResult
 {
     // common (required for sorting)
     public string MatchedText { get; }
@@ -29,7 +29,7 @@ public class LookupResult
     public int KanjiGrade { get; init; }
     public string? KanjiStats { get; init; }
 
-    public LookupResult(
+    internal LookupResult(
         string primarySpelling,
         string matchedText,
         string deconjugatedMatchedText,

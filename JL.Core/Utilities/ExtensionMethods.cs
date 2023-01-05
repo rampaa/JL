@@ -38,7 +38,7 @@ public static class ExtensionMethods
         // return default;
     }
 
-    public static IEnumerable<string> EnumerateUnicodeCharacters(this string s)
+    internal static IEnumerable<string> EnumerateUnicodeCharacters(this string s)
     {
         for (int i = 0; i < s.Length; ++i)
         {
@@ -47,6 +47,7 @@ public static class ExtensionMethods
                 && char.IsLowSurrogate(s, i + 1))
             {
                 yield return char.ConvertFromUtf32(char.ConvertToUtf32(s, i));
+
                 ++i;
             }
             else

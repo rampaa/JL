@@ -2,7 +2,7 @@ namespace JL.Core.Dicts.CustomNameDict;
 
 public static class CustomNameLoader
 {
-    public static async Task Load(string customNameDictPath)
+    internal static async Task Load(string customNameDictPath)
     {
         if (File.Exists(customNameDictPath))
         {
@@ -25,7 +25,7 @@ public static class CustomNameLoader
     {
         CustomNameRecord newNameRecord = new(spelling, reading, nameType);
 
-        Dictionary<string, List<IDictRecord>> customNameDictionary = Storage.Dicts.Values.First(dict => dict.Type is DictType.CustomNameDictionary).Contents;
+        Dictionary<string, List<IDictRecord>> customNameDictionary = Storage.Dicts.Values.First(static dict => dict.Type is DictType.CustomNameDictionary).Contents;
 
         if (customNameDictionary.TryGetValue(Kana.KatakanaToHiragana(spelling), out List<IDictRecord>? entry))
         {

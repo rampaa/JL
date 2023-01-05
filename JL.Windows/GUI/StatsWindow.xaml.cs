@@ -10,12 +10,12 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for StatsWindow.xaml
 /// </summary>
-public partial class StatsWindow : Window
+internal sealed partial class StatsWindow : Window
 {
     private static StatsWindow? s_instance;
     private IntPtr _windowHandle;
 
-    public static StatsWindow Instance => s_instance ??= new();
+    public static StatsWindow Instance => s_instance ??= new StatsWindow();
 
     public StatsWindow()
     {

@@ -1,6 +1,6 @@
 namespace JL.Core.Deconjugation;
 
-public class Form
+internal sealed class Form
 {
     public string Text { get; }
     public string OriginalText { get; }

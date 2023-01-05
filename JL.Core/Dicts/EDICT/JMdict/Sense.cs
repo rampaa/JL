@@ -1,6 +1,6 @@
 namespace JL.Core.Dicts.EDICT.JMdict;
 
-public class Sense
+internal sealed class Sense
 {
     public List<string> StagKList { get; } // Meaning only valid for these kebs.
     public List<string> StagRList { get; } // Meaning only valid for these rebs.

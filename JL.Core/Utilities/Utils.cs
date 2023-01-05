@@ -21,7 +21,7 @@ public static class Utils
             shared: true)
         .CreateLogger();
 
-    public static readonly Dictionary<string, string> Iso6392BTo2T = new()
+    internal static readonly Dictionary<string, string> s_iso6392BTo2T = new()
     {
         #pragma warning disable format
         { "tib", "bod" }, { "cze", "ces" }, { "wel", "cym" }, { "ger", "deu" }, { "gre", "ell" },
@@ -36,7 +36,7 @@ public static class Utils
         var jso = new JsonSerializerOptions
         {
             WriteIndented = true,
-            Converters = { new JsonStringEnumConverter(), },
+            Converters = { new JsonStringEnumConverter() }
         };
 
         try
@@ -57,14 +57,14 @@ public static class Utils
         var jso = new JsonSerializerOptions
         {
             WriteIndented = true,
-            Converters = { new JsonStringEnumConverter(), },
+            Converters = { new JsonStringEnumConverter() }
         };
 
         try
         {
             _ = Directory.CreateDirectory(Storage.ConfigPath);
             File.WriteAllText(Path.Join(Storage.ConfigPath, "freqs.json"),
-                JsonSerializer.Serialize(Storage.BuiltInFreqs, jso));
+                JsonSerializer.Serialize(Storage.s_builtInFreqs, jso));
         }
         catch (Exception ex)
         {
@@ -80,9 +80,9 @@ public static class Utils
             var jso = new JsonSerializerOptions
             {
                 WriteIndented = true,
-                Converters = { new JsonStringEnumConverter(), },
+                Converters = { new JsonStringEnumConverter() },
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
 
             await File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "dicts.json"),
@@ -103,7 +103,7 @@ public static class Utils
             {
                 WriteIndented = true,
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             };
 
             await File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "freqs.json"),
@@ -120,7 +120,7 @@ public static class Utils
     {
         try
         {
-            var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(), }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+            var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
             Stream dictStream = new StreamReader(Path.Join(Storage.ConfigPath, "dicts.json")).BaseStream;
             await using (dictStream.ConfigureAwait(false))
             {
@@ -173,7 +173,7 @@ public static class Utils
                                     DictType.NonspecificKanjiNazeka => new Dictionary<string, List<IDictRecord>>(250000),
                                     DictType.NonspecificNameNazeka => new Dictionary<string, List<IDictRecord>>(250000),
                                     DictType.NonspecificNazeka => new Dictionary<string, List<IDictRecord>>(250000),
-                                    _ => new Dictionary<string, List<IDictRecord>>(250000),
+                                    _ => new Dictionary<string, List<IDictRecord>>(250000)
                                 };
 
                             Storage.Dicts.Add(dict.Name, dict);
@@ -198,7 +198,7 @@ public static class Utils
     {
         try
         {
-            var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter(), }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+            var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
             Stream freqStream = new StreamReader(Path.Join(Storage.ConfigPath, "freqs.json")).BaseStream;
             await using (freqStream.ConfigureAwait(false))
             {
@@ -218,7 +218,7 @@ public static class Utils
                                     FreqType.Yomichan => new Dictionary<string, List<FrequencyRecord>>(1504512),
                                     FreqType.YomichanKanji => new Dictionary<string, List<FrequencyRecord>>(169623),
                                     FreqType.Nazeka => new Dictionary<string, List<FrequencyRecord>>(114348),
-                                    _ => new Dictionary<string, List<FrequencyRecord>>(500000),
+                                    _ => new Dictionary<string, List<FrequencyRecord>>(500000)
                                 };
                             Storage.FreqDicts.Add(freq.Name, freq);
                         }
@@ -239,7 +239,7 @@ public static class Utils
     }
 
 #pragma warning disable CA5351
-    public static string GetMd5String(byte[] bytes)
+    internal static string GetMd5String(byte[] bytes)
     {
 
         byte[] hash = MD5.HashData(bytes);
@@ -253,9 +253,9 @@ public static class Utils
     {
         int endPosition = -1;
 
-        for (int i = 0; i < Storage.JapanesePunctuation.Count; i++)
+        for (int i = 0; i < Storage.s_japanesePunctuation.Count; i++)
         {
-            int tempIndex = text.IndexOf(Storage.JapanesePunctuation[i], position, StringComparison.Ordinal);
+            int tempIndex = text.IndexOf(Storage.s_japanesePunctuation[i], position, StringComparison.Ordinal);
 
             if (tempIndex is not -1 && (endPosition is -1 || tempIndex < endPosition))
             {
@@ -280,10 +280,10 @@ public static class Utils
             "？",
             "…",
             ".",
-            "\n",
+            "\n"
         };
 
-        Dictionary<string, string> japaneseParentheses = new() { { "「", "」" }, { "『", "』" }, { "（", "）" }, };
+        Dictionary<string, string> japaneseParentheses = new() { { "「", "」" }, { "『", "』" }, { "（", "）" } };
 
         int startPosition = -1;
         int endPosition = -1;
@@ -427,7 +427,7 @@ public static class Utils
 
         List<Task> tasks = new()
         {
-            Task.Run(async () =>
+            Task.Run(static async () =>
         {
             await DeserializeDicts().ConfigureAwait(false);
             await Storage.LoadDictionaries(false).ConfigureAwait(false);
@@ -435,7 +435,7 @@ public static class Utils
             await Storage.InitializeWordClassDictionary().ConfigureAwait(false);
         }),
 
-            Task.Run(async () =>
+            Task.Run(static async () =>
             {
                 await DeserializeFreqs().ConfigureAwait(false);
                 await Storage.LoadFrequencies(false).ConfigureAwait(false);
@@ -474,7 +474,7 @@ public static class Utils
         await Stats.UpdateLifetimeStats().ConfigureAwait(false);
     }
 
-    public static List<string>? TrimStringList(List<string> list)
+    internal static List<string>? TrimStringList(List<string> list)
     {
         List<string>? listClone = list;
 

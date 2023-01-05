@@ -2,7 +2,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EDICT.JMnedict;
 
-public static class JmnedictRecordBuilder
+internal static class JmnedictRecordBuilder
 {
     public static void AddToDictionary(JmnedictEntry entry, Dictionary<string, List<IDictRecord>> jmnedictDictionary)
     {
@@ -94,7 +94,7 @@ public static class JmnedictRecordBuilder
             }
             else
             {
-                jmnedictDictionary.Add(key, new List<IDictRecord>() { recordKeyValuePair.Value });
+                jmnedictDictionary.Add(key, new List<IDictRecord> { recordKeyValuePair.Value });
             }
         }
     }

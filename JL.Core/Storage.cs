@@ -25,16 +25,16 @@ namespace JL.Core;
 
 public static class Storage
 {
-    public static Timer Timer { get; } = new();
+    internal static Timer Timer { get; } = new();
     public static Stopwatch StatsStopWatch { get; } = new();
-    public const string Jpod101NoAudioMd5Hash = "7E-2C-2F-95-4E-F6-05-13-73-BA-91-6F-00-01-68-DC";
+    internal const string Jpod101NoAudioMd5Hash = "7E-2C-2F-95-4E-F6-05-13-73-BA-91-6F-00-01-68-DC";
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
     public static readonly string ApplicationPath = AppContext.BaseDirectory;
     public static readonly string ResourcesPath = Path.Join(AppContext.BaseDirectory, "Resources");
     public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
     public static readonly HttpClient Client = new(new HttpClientHandler { UseProxy = false }) { Timeout = TimeSpan.FromMinutes(10) };
     public static readonly Version JLVersion = new(1, 16, 4);
-    public static readonly Uri GitHubApiUrlForLatestJLRelease = new("https://api.github.com/repos/rampaa/JL/releases/latest");
+    internal static readonly Uri s_gitHubApiUrlForLatestJLRelease = new("https://api.github.com/repos/rampaa/JL/releases/latest");
     public static readonly Uri JmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
     public static readonly Uri JmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     public static readonly Uri KanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
@@ -43,9 +43,9 @@ public static class Storage
     public static bool UpdatingJMnedict { get; set; } = false;
     public static bool UpdatingKanjidic { get; set; } = false;
     public static bool FreqsReady { get; private set; } = false;
-    public static Dictionary<string, List<JmdictWordClass>> WordClassDictionary { get; set; } = new(65536); // 2022/10/29: 48909
-    public static readonly Dictionary<string, string> KanjiCompositionDict = new(86934);
-    public static Dictionary<string, Freq> FreqDicts { get; set; } = new();
+    public static Dictionary<string, List<JmdictWordClass>> WordClassDictionary { get; internal set; } = new(65536); // 2022/10/29: 48909
+    internal static readonly Dictionary<string, string> s_kanjiCompositionDict = new(86934);
+    public static Dictionary<string, Freq> FreqDicts { get; internal set; } = new();
 
     public static readonly Dictionary<string, Dict> Dicts = new();
 
@@ -58,7 +58,7 @@ public static class Storage
                     "Custom Word Dictionary",
                     $"{ResourcesPath}/custom_words.txt",
                     true, 0, 128,
-                    new DictOptions(newlineBetweenDefinitions: new() { Value = false }))
+                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }))
             },
             {
                 "CustomNameDictionary",
@@ -71,34 +71,34 @@ public static class Storage
                 "JMdict",
                 new Dict(DictType.JMdict, "JMdict", $"{ResourcesPath}/JMdict.xml", true, 2, 500000,
                     new DictOptions(
-                        newlineBetweenDefinitions: new() { Value = false },
-                        wordClassInfo: new() { Value = true },
-                        dialectInfo: new() { Value = true },
-                        pOrthographyInfo: new() { Value = true },
-                        pOrthographyInfoColor: new() { Value = "#FFD2691E" },
-                        pOrthographyInfoFontSize: new() { Value = 15 },
-                        aOrthographyInfo: new() { Value = true },
-                        rOrthographyInfo: new() { Value = true },
-                        wordTypeInfo: new() { Value = true },
-                        miscInfo: new() { Value = true },
-                        relatedTerm: new() { Value = false },
-                        antonym: new() { Value = false },
-                        loanwordEtymology: new () { Value = true}
+                        new NewlineBetweenDefinitionsOption { Value = false },
+                        wordClassInfo: new WordClassInfoOption { Value = true },
+                        dialectInfo: new DialectInfoOption { Value = true },
+                        pOrthographyInfo: new POrthographyInfoOption { Value = true },
+                        pOrthographyInfoColor: new POrthographyInfoColorOption { Value = "#FFD2691E" },
+                        pOrthographyInfoFontSize: new POrthographyInfoFontSizeOption { Value = 15 },
+                        aOrthographyInfo: new AOrthographyInfoOption { Value = true },
+                        rOrthographyInfo: new ROrthographyInfoOption { Value = true },
+                        wordTypeInfo: new WordTypeInfoOption { Value = true },
+                        miscInfo: new MiscInfoOption { Value = true },
+                        relatedTerm: new RelatedTermOption { Value = false },
+                        antonym: new AntonymOption { Value = false },
+                        loanwordEtymology: new LoanwordEtymologyOption { Value = true}
                         ))
             },
             {
                 "JMnedict",
                 new Dict(DictType.JMnedict, "JMnedict", $"{ResourcesPath}/JMnedict.xml", true, 3, 700000,
-                    new DictOptions(newlineBetweenDefinitions: new() { Value = false }))
+                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }))
             },
             {
                 "Kanjidic",
                 new Dict(DictType.Kanjidic, "Kanjidic", $"{ResourcesPath}/kanjidic2.xml", true, 4, 13108,
-                    new DictOptions(noAll: new() { Value = false }))
+                    new DictOptions(noAll: new NoAllOption { Value = false }))
             }
         };
 
-    public static readonly Dictionary<string, Freq> BuiltInFreqs = new()
+    internal static readonly Dictionary<string, Freq> s_builtInFreqs = new()
     {
         {
             "VN (Nazeka)",
@@ -113,7 +113,7 @@ public static class Storage
         {
             "Novel (Nazeka)",
             new Freq(FreqType.Nazeka, "Novel (Nazeka)", $"{ResourcesPath}/freqlist_novels.json", false, 2, 114348)
-        },
+        }
     };
 
     public static readonly List<DictType> YomichanDictTypes = new()
@@ -152,7 +152,7 @@ public static class Storage
         DictType.NonspecificWordNazeka,
         DictType.NonspecificKanjiNazeka,
         DictType.NonspecificNameNazeka,
-        DictType.NonspecificNazeka,
+        DictType.NonspecificNazeka
     };
 
     public static readonly List<DictType> NonspecificDictTypes = new()
@@ -167,7 +167,7 @@ public static class Storage
         DictType.NonspecificNazeka
     };
 
-    public static readonly List<DictType> KanjiDictTypes = new()
+    internal static readonly List<DictType> s_kanjiDictTypes = new()
     {
         DictType.Kanjidic,
         DictType.KanjigenYomichan,
@@ -175,15 +175,15 @@ public static class Storage
         DictType.NonspecificKanjiNazeka
     };
 
-    public static readonly List<DictType> NameDictTypes = new()
+    internal static readonly List<DictType> s_nameDictTypes = new()
     {
         DictType.CustomNameDictionary,
         DictType.JMnedict,
         DictType.NonspecificNameYomichan,
-        DictType.NonspecificNameNazeka,
+        DictType.NonspecificNameNazeka
     };
 
-    public static readonly List<DictType> WordDictTypes = new()
+    internal static readonly List<DictType> s_wordDictTypes = new()
     {
         DictType.CustomWordDictionary,
         DictType.JMdict,
@@ -228,7 +228,7 @@ public static class Storage
         JLField.DeconjugationProcess,
         JLField.Frequencies,
         JLField.EdictId,
-        JLField.LocalTime,
+        JLField.LocalTime
     };
 
     public static readonly List<JLField> JLFieldsForKanjiDicts = new()
@@ -248,7 +248,7 @@ public static class Storage
         JLField.Sentence,
         JLField.Frequencies,
         JLField.EdictId,
-        JLField.LocalTime,
+        JLField.LocalTime
     };
 
     public static readonly List<JLField> JLFieldsForNameDicts = new()
@@ -262,7 +262,7 @@ public static class Storage
         JLField.SourceText,
         JLField.Sentence,
         JLField.EdictId,
-        JLField.LocalTime,
+        JLField.LocalTime
     };
 
     // Matches the following Unicode ranges:
@@ -295,7 +295,7 @@ public static class Storage
             RegexOptions.Compiled);
 
     // Consider checking for \t, \r, "　", " ", ., !, ?, –, —, ―, ‒, ~, ‥, ♪, ～, ♡, ♥, ☆, ★
-    public static readonly List<string> JapanesePunctuation =
+    internal static readonly List<string> s_japanesePunctuation =
         new()
         {
             "。",
@@ -328,7 +328,7 @@ public static class Storage
         #pragma warning restore format
     };
 
-    public static int CacheSize { get; set; } = 1000;
+    public const int CacheSize = 1000;
 
     public static async Task LoadDictionaries(bool runGC = true)
     {
@@ -687,9 +687,9 @@ public static class Storage
         FreqsReady = true;
     }
 
-    public static async Task InitializeWordClassDictionary()
+    internal static async Task InitializeWordClassDictionary()
     {
-        Dict dict = Dicts.Values.First(dict => dict.Type is DictType.JMdict);
+        Dict dict = Dicts.Values.First(static dict => dict.Type is DictType.JMdict);
         if (!File.Exists($"{ResourcesPath}/PoS.json"))
         {
             if (dict.Active)
@@ -723,7 +723,7 @@ public static class Storage
         await JmdictWordClassUtils.Load().ConfigureAwait(false);
     }
 
-    public static async Task InitializeKanjiCompositionDict()
+    internal static async Task InitializeKanjiCompositionDict()
     {
         if (File.Exists($"{ResourcesPath}/ids.txt"))
         {
@@ -739,7 +739,7 @@ public static class Storage
                 {
                     int endIndex = lParts[2].IndexOf("[", StringComparison.Ordinal);
 
-                    KanjiCompositionDict.Add(lParts[1],
+                    s_kanjiCompositionDict.Add(lParts[1],
                         endIndex is -1 ? lParts[2] : lParts[2][..endIndex]);
                 }
 
@@ -752,7 +752,7 @@ public static class Storage
                             int endIndex = lParts[j].IndexOf("[", StringComparison.Ordinal);
                             if (endIndex is not -1)
                             {
-                                KanjiCompositionDict.Add(lParts[1], lParts[j][..endIndex]);
+                                s_kanjiCompositionDict.Add(lParts[1], lParts[j][..endIndex]);
                                 break;
                             }
                         }
@@ -760,7 +760,7 @@ public static class Storage
                 }
             }
 
-            KanjiCompositionDict.TrimExcess();
+            s_kanjiCompositionDict.TrimExcess();
         }
     }
 

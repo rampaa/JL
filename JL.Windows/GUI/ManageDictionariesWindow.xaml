@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Manage Dictionaries" Height="700" Width="800" Closing="Window_Closing" ResizeMode="NoResize" IsVisibleChanged="Window_IsVisibleChanged"
-        SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Background="{DynamicResource RegionBrush}" Topmost="True" ShowInTaskbar="False">
+        SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Background="{DynamicResource RegionBrush}" Topmost="True" ShowInTaskbar="False"
+        x:ClassModifier="internal">
     <Grid>
         <StackPanel Margin="20,10,20,10">
             <StackPanel.Resources>
@@ -13,7 +14,7 @@
                     <Setter Property="Margin" Value="0,10,0,0" />
                 </Style>
             </StackPanel.Resources>
-            <Button Name="ButtonAddDictionary" Margin="10" Click="ButtonAddDictionary_OnClick">Add dictionary</Button>
+            <Button Margin="10" Click="ButtonAddDictionary_OnClick">Add dictionary</Button>
 
             <ListBox x:Name="DictionariesDisplay" Focusable="False" Margin="10" Height="520" />
         </StackPanel>

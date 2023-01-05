@@ -3,7 +3,7 @@ using JL.Core.Dicts;
 
 namespace JL.Core.PitchAccent;
 
-public static class PitchAccentLoader
+internal static class PitchAccentLoader
 {
     public static async Task Load(Dict dict)
     {

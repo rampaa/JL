@@ -2,9 +2,9 @@ using JL.Core.Utilities;
 
 namespace JL.Core;
 
-public class DummyFrontend : IFrontend
+internal sealed class DummyFrontend : IFrontend
 {
-    public CoreConfig CoreConfig { get; set; } = new();
+    public CoreConfig CoreConfig { get; } = new();
 
     public void PlayAudio(byte[] sound, float volume)
     {

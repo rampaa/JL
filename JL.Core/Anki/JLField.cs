@@ -31,5 +31,5 @@ public enum JLField
     [Description("Stroke Count")] StrokeCount,
     [Description("Kanji Grade")] KanjiGrade,
     [Description("Kanji Composition")] KanjiComposition,
-    [Description("Kanji Statistics")] KanjiStats,
+    [Description("Kanji Statistics")] KanjiStats
 }

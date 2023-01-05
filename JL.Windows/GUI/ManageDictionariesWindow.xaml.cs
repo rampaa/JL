@@ -25,13 +25,13 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for ManageDictionariesWindow.xaml
 /// </summary>
-public partial class ManageDictionariesWindow : Window
+internal sealed partial class ManageDictionariesWindow : Window
 {
     private static ManageDictionariesWindow? s_instance;
 
     private IntPtr _windowHandle;
 
-    public static ManageDictionariesWindow Instance => s_instance ??= new();
+    public static ManageDictionariesWindow Instance => s_instance ??= new ManageDictionariesWindow();
 
     public ManageDictionariesWindow()
     {
@@ -84,23 +84,23 @@ public partial class ManageDictionariesWindow : Window
         {
             DockPanel dockPanel = new();
 
-            var checkBox = new CheckBox { Width = 20, IsChecked = dict.Active, Margin = new Thickness(10), };
-            var buttonIncreasePriority = new Button { Width = 25, Content = "↑", Margin = new Thickness(1), };
-            var buttonDecreasePriority = new Button { Width = 25, Content = "↓", Margin = new Thickness(1), };
+            var checkBox = new CheckBox { Width = 20, IsChecked = dict.Active, Margin = new Thickness(10) };
+            var buttonIncreasePriority = new Button { Width = 25, Content = "↑", Margin = new Thickness(1) };
+            var buttonDecreasePriority = new Button { Width = 25, Content = "↓", Margin = new Thickness(1) };
             var priority = new TextBlock
             {
                 Name = "priority",
                 // Width = 20,
                 Width = 0,
                 Text = dict.Priority.ToString(CultureInfo.InvariantCulture),
-                Visibility = Visibility.Collapsed,
+                Visibility = Visibility.Collapsed
                 // Margin = new Thickness(10),
             };
             var dictTypeDisplay = new TextBlock
             {
                 Width = 177,
                 Text = dict.Name,
-                Margin = new Thickness(10),
+                Margin = new Thickness(10)
             };
             var dictPathValidityDisplay = new TextBlock
             {
@@ -124,8 +124,16 @@ public partial class ManageDictionariesWindow : Window
             };
 
             dictPathDisplay.PreviewMouseLeftButtonUp += PathTextbox_PreviewMouseLeftButtonUp;
-            dictPathDisplay.MouseEnter += (_, _) => dictPathDisplay.TextDecorations = TextDecorations.Underline;
-            dictPathDisplay.MouseLeave += (_, _) => dictPathDisplay.TextDecorations = null;
+
+            dictPathDisplay.MouseEnter += (_, _) =>
+            {
+                dictPathDisplay.TextDecorations = TextDecorations.Underline;
+            };
+
+            dictPathDisplay.MouseLeave += (_, _) =>
+            {
+                dictPathDisplay.TextDecorations = null;
+            };
 
             var buttonUpdate = new Button
             {
@@ -139,7 +147,7 @@ public partial class ManageDictionariesWindow : Window
                     and not DictType.JMnedict
                     and not DictType.Kanjidic
                     ? Visibility.Collapsed
-                    : Visibility.Visible,
+                    : Visibility.Visible
             };
 
             switch (dict.Type)
@@ -186,9 +194,9 @@ public partial class ManageDictionariesWindow : Window
                 Background = Brushes.Red,
                 BorderThickness = new Thickness(1),
                 Visibility = Storage.BuiltInDicts.Values
-                    .Select(d => d.Type).Contains(dict.Type)
+                    .Select(static d => d.Type).Contains(dict.Type)
                     ? Visibility.Collapsed
-                    : Visibility.Visible,
+                    : Visibility.Visible
             };
 
             var buttonEdit = new Button
@@ -199,7 +207,7 @@ public partial class ManageDictionariesWindow : Window
                 Foreground = Brushes.White,
                 Background = Brushes.DodgerBlue,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(0, 0, 5, 0),
+                Margin = new Thickness(0, 0, 5, 0)
                 // Visibility = Storage.BuiltInDicts.Values
                 //     .Select(t => t.Type).ToList().Contains(dict.Type)
                 //     ? Visibility.Collapsed
@@ -220,19 +228,27 @@ public partial class ManageDictionariesWindow : Window
                     : Visibility.Collapsed
             };
 
-            if (dict.Type is DictType.JMdict)
+            switch (dict.Type)
             {
-                buttonInfo.IsEnabled = Storage.JmdictEntities.Count > 0;
-                buttonInfo.Click += JmdictInfoButton_Click;
+                case DictType.JMdict:
+                    buttonInfo.IsEnabled = Storage.JmdictEntities.Count > 0;
+                    buttonInfo.Click += JmdictInfoButton_Click;
+                    break;
+                case DictType.JMnedict:
+                    buttonInfo.Click += JmnedictInfoButton_Click;
+                    break;
             }
 
-            else if (dict.Type is DictType.JMnedict)
+            checkBox.Unchecked += (_, _) =>
             {
-                buttonInfo.Click += JmnedictInfoButton_Click;
-            }
+                dict.Active = false;
+            };
 
-            checkBox.Unchecked += (_, _) => dict.Active = false;
-            checkBox.Checked += (_, _) => dict.Active = true;
+            checkBox.Checked += (_, _) =>
+            {
+                dict.Active = true;
+            };
+
             buttonIncreasePriority.Click += (_, _) =>
             {
                 PrioritizeDict(dict);
@@ -276,11 +292,11 @@ public partial class ManageDictionariesWindow : Window
             _ = dockPanel.Children.Add(buttonInfo);
         }
 
-        DictionariesDisplay!.ItemsSource = resultDockPanels.OrderBy(dockPanel =>
+        DictionariesDisplay.ItemsSource = resultDockPanels.OrderBy(static dockPanel =>
             dockPanel.Children
                 .OfType<TextBlock>()
-                .Where(textBlock => textBlock.Name is "priority")
-                .Select(textBlockPriority => Convert.ToInt32(textBlockPriority.Text, CultureInfo.InvariantCulture)).First());
+                .Where(static textBlock => textBlock.Name is "priority")
+                .Select(static textBlockPriority => Convert.ToInt32(textBlockPriority.Text, CultureInfo.InvariantCulture)).First());
     }
 
     private void PathTextbox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -312,7 +328,7 @@ public partial class ManageDictionariesWindow : Window
     private static void UnPrioritizeDict(Dict dict)
     {
         // lowest priority means highest number
-        int lowestPriority = Storage.Dicts.Select(d => d.Value.Priority).Max();
+        int lowestPriority = Storage.Dicts.Select(static d => d.Value.Priority).Max();
 
         if (dict.Priority == lowestPriority)
         {
@@ -325,7 +341,7 @@ public partial class ManageDictionariesWindow : Window
 
     private void ButtonAddDictionary_OnClick(object sender, RoutedEventArgs e)
     {
-        _ = new AddDictionaryWindow() { Owner = this }.ShowDialog();
+        _ = new AddDictionaryWindow { Owner = this }.ShowDialog();
         UpdateDictionariesDisplay();
     }
 
@@ -334,7 +350,7 @@ public partial class ManageDictionariesWindow : Window
     {
         Storage.UpdatingJMdict = true;
 
-        Dict dict = Storage.Dicts.Values.First(dict => dict.Type is DictType.JMdict);
+        Dict dict = Storage.Dicts.Values.First(static dict => dict.Type is DictType.JMdict);
         bool isDownloaded = await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.JmdictUrl,
                 DictType.JMdict.ToString(), true, false)
@@ -369,7 +385,7 @@ public partial class ManageDictionariesWindow : Window
     {
         Storage.UpdatingJMnedict = true;
 
-        Dict dict = Storage.Dicts.Values.First(dict => dict.Type is DictType.JMnedict);
+        Dict dict = Storage.Dicts.Values.First(static dict => dict.Type is DictType.JMnedict);
         bool isDownloaded = await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.JmnedictUrl,
                 DictType.JMnedict.ToString(), true, false)
@@ -397,7 +413,7 @@ public partial class ManageDictionariesWindow : Window
     private static async Task UpdateKanjidic()
     {
         Storage.UpdatingKanjidic = true;
-        Dict dict = Storage.Dicts.Values.First(dict => dict.Type is DictType.Kanjidic);
+        Dict dict = Storage.Dicts.Values.First(static dict => dict.Type is DictType.Kanjidic);
         bool isDownloaded = await ResourceUpdater.UpdateResource(dict.Path,
                 Storage.KanjidicUrl,
                 DictType.Kanjidic.ToString(), true, false)
@@ -430,7 +446,7 @@ public partial class ManageDictionariesWindow : Window
     private static string EntityDictToString(Dictionary<string, string> entityDict)
     {
         StringBuilder sb = new();
-        IOrderedEnumerable<KeyValuePair<string, string>> sortedJmdictEntities = entityDict.OrderBy(e => e.Key);
+        IOrderedEnumerable<KeyValuePair<string, string>> sortedJmdictEntities = entityDict.OrderBy(static e => e.Key);
 
         foreach (KeyValuePair<string, string> entity in sortedJmdictEntities)
         {
