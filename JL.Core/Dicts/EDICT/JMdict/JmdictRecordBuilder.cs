@@ -150,17 +150,17 @@ internal static class JmdictRecordBuilder
             recordKeyValuePair.Value.PrimarySpellingOrthographyInfoList = Utils.TrimStringList(recordKeyValuePair.Value.PrimarySpellingOrthographyInfoList!);
             recordKeyValuePair.Value.DefinitionInfo = Utils.TrimStringList(recordKeyValuePair.Value.DefinitionInfo!)!;
             recordKeyValuePair.Value.Definitions = TrimListOfLists(recordKeyValuePair.Value.Definitions!)!;
-            recordKeyValuePair.Value.ReadingRestrictions = TrimListOfLists(recordKeyValuePair.Value.ReadingRestrictions);
-            recordKeyValuePair.Value.SpellingRestrictions = TrimListOfLists(recordKeyValuePair.Value.SpellingRestrictions);
-            recordKeyValuePair.Value.Dialects = TrimListOfLists(recordKeyValuePair.Value.Dialects);
-            recordKeyValuePair.Value.MiscList = TrimListOfLists(recordKeyValuePair.Value.MiscList);
-            recordKeyValuePair.Value.AlternativeSpellingsOrthographyInfoList = TrimListOfLists(recordKeyValuePair.Value.AlternativeSpellingsOrthographyInfoList);
-            recordKeyValuePair.Value.ReadingsOrthographyInfoList = TrimListOfLists(recordKeyValuePair.Value.ReadingsOrthographyInfoList);
-            recordKeyValuePair.Value.FieldList = TrimListOfLists(recordKeyValuePair.Value.FieldList);
-            recordKeyValuePair.Value.WordClasses = TrimListOfLists(recordKeyValuePair.Value.WordClasses);
-            recordKeyValuePair.Value.RelatedTerms = TrimListOfLists(recordKeyValuePair.Value.RelatedTerms);
-            recordKeyValuePair.Value.Antonyms = TrimListOfLists(recordKeyValuePair.Value.Antonyms);
-            recordKeyValuePair.Value.LoanwordEtymology = TrimListOfLists(recordKeyValuePair.Value.LoanwordEtymology);
+            recordKeyValuePair.Value.ReadingRestrictions = TrimListOfLists(recordKeyValuePair.Value.ReadingRestrictions!);
+            recordKeyValuePair.Value.SpellingRestrictions = TrimListOfLists(recordKeyValuePair.Value.SpellingRestrictions!);
+            recordKeyValuePair.Value.Dialects = TrimListOfLists(recordKeyValuePair.Value.Dialects!);
+            recordKeyValuePair.Value.MiscList = TrimListOfLists(recordKeyValuePair.Value.MiscList!);
+            recordKeyValuePair.Value.AlternativeSpellingsOrthographyInfoList = TrimListOfLists(recordKeyValuePair.Value.AlternativeSpellingsOrthographyInfoList!);
+            recordKeyValuePair.Value.ReadingsOrthographyInfoList = TrimListOfLists(recordKeyValuePair.Value.ReadingsOrthographyInfoList!);
+            recordKeyValuePair.Value.FieldList = TrimListOfLists(recordKeyValuePair.Value.FieldList!);
+            recordKeyValuePair.Value.WordClasses = TrimListOfLists(recordKeyValuePair.Value.WordClasses!);
+            recordKeyValuePair.Value.RelatedTerms = TrimListOfLists(recordKeyValuePair.Value.RelatedTerms!);
+            recordKeyValuePair.Value.Antonyms = TrimListOfLists(recordKeyValuePair.Value.Antonyms!);
+            recordKeyValuePair.Value.LoanwordEtymology = TrimListOfLists(recordKeyValuePair.Value.LoanwordEtymology!);
 
             recordKeyValuePair.Value.Id = entry.Id;
             string key = Kana.KatakanaToHiragana(recordKeyValuePair.Key);
@@ -191,11 +191,11 @@ internal static class JmdictRecordBuilder
         jmdictRecord.LoanwordEtymology!.Add(sense.LSourceList.Count > 0 ? sense.LSourceList : null);
     }
 
-    private static List<List<T>?>? TrimListOfLists<T>(List<List<T>?>? listOfLists)
+    private static List<List<T>?>? TrimListOfLists<T>(List<List<T>?> listOfLists)
     {
         List<List<T>?>? listOfListClone = listOfLists;
 
-        if (listOfListClone!.Count is 0 || listOfListClone.All(static l => l is null || l.Count is 0))
+        if (listOfListClone.Count is 0 || listOfListClone.All(static l => l is null || l.Count is 0))
         {
             listOfListClone = null;
         }

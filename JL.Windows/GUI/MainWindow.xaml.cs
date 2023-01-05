@@ -139,7 +139,7 @@ internal sealed partial class MainWindow : Window, IFrontend
                         text = text.ReplaceLineEndings("");
                     }
 
-                    MainTextBox!.Text = text;
+                    MainTextBox.Text = text;
                     MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
 
                     _backlog.Add(text);
@@ -149,10 +149,10 @@ internal sealed partial class MainWindow : Window, IFrontend
 
                     if (ConfigManager.Precaching && Storage.DictsReady
                         && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic
-                        && Storage.FreqsReady && MainTextBox!.Text.Length < Storage.CacheSize)
+                        && Storage.FreqsReady && MainTextBox.Text.Length < Storage.CacheSize)
                     {
                         _ = Dispatcher.Invoke(DispatcherPriority.Render, static () => { }); // let MainTextBox text update
-                        await Precache(MainTextBox!.Text).ConfigureAwait(false);
+                        await Precache(MainTextBox.Text).ConfigureAwait(false);
                     }
                 }
             }
@@ -252,10 +252,10 @@ internal sealed partial class MainWindow : Window, IFrontend
     {
         if (ConfigManager.LookupOnSelectOnly
             || ConfigManager.LookupOnLeftClickOnly
-            || Background!.Opacity is 0
-            || MainTextboxContextMenu!.IsVisible
-            || FontSizeSlider!.IsVisible
-            || OpacitySlider!.IsVisible
+            || Background.Opacity is 0
+            || MainTextboxContextMenu.IsVisible
+            || FontSizeSlider.IsVisible
+            || OpacitySlider.IsVisible
             || FirstPopupWindow.MiningMode
             || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
         {
@@ -263,7 +263,7 @@ internal sealed partial class MainWindow : Window, IFrontend
         }
 
         _stopPrecache = true;
-        FirstPopupWindow.TextBox_MouseMove(MainTextBox!);
+        FirstPopupWindow.TextBox_MouseMove(MainTextBox);
 
         if (ConfigManager.FixedPopupPositioning)
         {
@@ -279,7 +279,7 @@ internal sealed partial class MainWindow : Window, IFrontend
     private void MainWindow_Closed(object sender, EventArgs e)
     {
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
-        Application.Current!.Shutdown();
+        Application.Current.Shutdown();
     }
 
     private void MainTextBox_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -287,7 +287,7 @@ internal sealed partial class MainWindow : Window, IFrontend
         if (e.Delta > 0 && !Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
         {
             string allBacklogText = string.Join("\n", _backlog);
-            if (MainTextBox!.Text != allBacklogText)
+            if (MainTextBox.Text != allBacklogText)
             {
                 if (MainTextBox.GetFirstVisibleLineIndex() is 0)
                 {
@@ -308,19 +308,19 @@ internal sealed partial class MainWindow : Window, IFrontend
 
         else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Delta > 0)
         {
-            FontSizeSlider!.Value += 5;
+            FontSizeSlider.Value += 5;
         }
 
         else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Delta < 0)
         {
-            FontSizeSlider!.Value -= 5;
+            FontSizeSlider.Value -= 5;
         }
     }
 
     private void MinimizeButton_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        OpacitySlider!.Visibility = Visibility.Collapsed;
-        FontSizeSlider!.Visibility = Visibility.Collapsed;
+        OpacitySlider.Visibility = Visibility.Collapsed;
+        FontSizeSlider.Visibility = Visibility.Collapsed;
         WindowState = WindowState.Minimized;
     }
 
@@ -361,15 +361,15 @@ internal sealed partial class MainWindow : Window, IFrontend
 
     private void OpacityButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        FontSizeSlider!.Visibility = Visibility.Collapsed;
+        FontSizeSlider.Visibility = Visibility.Collapsed;
 
-        if (Background!.Opacity is 0)
+        if (Background.Opacity is 0)
         {
-            Background.Opacity = OpacitySlider!.Value / 100;
+            Background.Opacity = OpacitySlider.Value / 100;
             _ = MainTextBox.Focus();
         }
 
-        else if (OpacitySlider!.Visibility is Visibility.Collapsed)
+        else if (OpacitySlider.Visibility is Visibility.Collapsed)
         {
             OpacitySlider.Visibility = Visibility.Visible;
             _ = OpacitySlider.Focus();
@@ -383,9 +383,9 @@ internal sealed partial class MainWindow : Window, IFrontend
 
     private void FontSizeButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        OpacitySlider!.Visibility = Visibility.Collapsed;
+        OpacitySlider.Visibility = Visibility.Collapsed;
 
-        if (FontSizeSlider!.Visibility is Visibility.Collapsed)
+        if (FontSizeSlider.Visibility is Visibility.Collapsed)
         {
             FontSizeSlider.Visibility = Visibility.Visible;
             _ = FontSizeSlider.Focus();
@@ -407,12 +407,12 @@ internal sealed partial class MainWindow : Window, IFrontend
 
     private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
-        Background!.Opacity = OpacitySlider!.Value / 100;
+        Background.Opacity = OpacitySlider.Value / 100;
     }
 
     private void FontSizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
-        MainTextBox!.FontSize = FontSizeSlider!.Value;
+        MainTextBox.FontSize = FontSizeSlider.Value;
     }
 
     private async void MainWindow_KeyDown(object sender, KeyEventArgs e)
@@ -436,7 +436,7 @@ internal sealed partial class MainWindow : Window, IFrontend
         {
             if (!ConfigManager.InvisibleMode)
             {
-                Background!.Opacity = 0;
+                Background.Opacity = 0;
                 Keyboard.ClearFocus();
             }
         }
@@ -444,7 +444,7 @@ internal sealed partial class MainWindow : Window, IFrontend
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.InvisibleToggleModeKeyGesture))
         {
             ConfigManager.InvisibleMode = !ConfigManager.InvisibleMode;
-            MainGrid!.Opacity = ConfigManager.InvisibleMode ? 0 : 1;
+            MainGrid.Opacity = ConfigManager.InvisibleMode ? 0 : 1;
         }
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.KanjiModeKeyGesture))
@@ -462,7 +462,7 @@ internal sealed partial class MainWindow : Window, IFrontend
         {
             if (Storage.DictsReady)
             {
-                WindowsUtils.ShowAddNameWindow(MainTextBox!.SelectedText);
+                WindowsUtils.ShowAddNameWindow(MainTextBox.SelectedText);
             }
         }
 
@@ -470,7 +470,7 @@ internal sealed partial class MainWindow : Window, IFrontend
         {
             if (Storage.DictsReady)
             {
-                WindowsUtils.ShowAddWordWindow(MainTextBox!.SelectedText);
+                WindowsUtils.ShowAddWordWindow(MainTextBox.SelectedText);
             }
         }
 
@@ -495,7 +495,7 @@ internal sealed partial class MainWindow : Window, IFrontend
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.SearchWithBrowserKeyGesture))
         {
-            WindowsUtils.SearchWithBrowser(MainTextBox!.SelectedText);
+            WindowsUtils.SearchWithBrowser(MainTextBox.SelectedText);
             WindowsUtils.UpdateMainWindowVisibility();
         }
 
@@ -512,10 +512,10 @@ internal sealed partial class MainWindow : Window, IFrontend
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ClosePopupKeyGesture))
         {
             FirstPopupWindow.MiningMode = false;
-            FirstPopupWindow.TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
+            FirstPopupWindow.TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
             FirstPopupWindow.ItemsControlButtons.Visibility = Visibility.Collapsed;
 
-            FirstPopupWindow.PopUpScrollViewer!.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+            FirstPopupWindow.PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
             FirstPopupWindow.Hide();
         }
 
@@ -561,12 +561,12 @@ internal sealed partial class MainWindow : Window, IFrontend
 
     private void AddName(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.ShowAddNameWindow(MainTextBox!.SelectedText);
+        WindowsUtils.ShowAddNameWindow(MainTextBox.SelectedText);
     }
 
     private void AddWord(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.ShowAddWordWindow(MainTextBox!.SelectedText);
+        WindowsUtils.ShowAddWordWindow(MainTextBox.SelectedText);
     }
 
     private void ShowPreferences(object sender, RoutedEventArgs e)
@@ -576,7 +576,7 @@ internal sealed partial class MainWindow : Window, IFrontend
 
     private void SearchWithBrowser(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.SearchWithBrowser(MainTextBox!.SelectedText);
+        WindowsUtils.SearchWithBrowser(MainTextBox.SelectedText);
         WindowsUtils.UpdateMainWindowVisibility();
     }
 
@@ -607,46 +607,46 @@ internal sealed partial class MainWindow : Window, IFrontend
             if (_currentTextIndex is not 0)
             {
                 _currentTextIndex--;
-                MainTextBox!.Foreground = ConfigManager.MainWindowBacklogTextColor;
+                MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
             }
 
-            MainTextBox!.Text = _backlog[_currentTextIndex];
+            MainTextBox.Text = _backlog[_currentTextIndex];
         }
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.SteppedBacklogForwardsKeyGesture))
         {
             if (_currentTextIndex < _backlog.Count - 1)
             {
                 _currentTextIndex++;
-                MainTextBox!.Foreground = ConfigManager.MainWindowBacklogTextColor;
+                MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
             }
 
             if (_currentTextIndex == _backlog.Count - 1)
             {
-                MainTextBox!.Foreground = ConfigManager.MainWindowTextColor;
+                MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
             }
 
-            MainTextBox!.Text = _backlog[_currentTextIndex];
+            MainTextBox.Text = _backlog[_currentTextIndex];
         }
     }
 
     private void OpacitySlider_LostMouseCapture(object sender, MouseEventArgs e)
     {
-        OpacitySlider!.Visibility = Visibility.Collapsed;
+        OpacitySlider.Visibility = Visibility.Collapsed;
     }
 
     private void OpacitySlider_LostFocus(object sender, RoutedEventArgs e)
     {
-        OpacitySlider!.Visibility = Visibility.Collapsed;
+        OpacitySlider.Visibility = Visibility.Collapsed;
     }
 
     private void FontSizeSlider_LostMouseCapture(object sender, MouseEventArgs e)
     {
-        FontSizeSlider!.Visibility = Visibility.Collapsed;
+        FontSizeSlider.Visibility = Visibility.Collapsed;
     }
 
     private void FontSizeSlider_LostFocus(object sender, RoutedEventArgs e)
     {
-        FontSizeSlider!.Visibility = Visibility.Collapsed;
+        FontSizeSlider.Visibility = Visibility.Collapsed;
     }
 
     private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -663,7 +663,7 @@ internal sealed partial class MainWindow : Window, IFrontend
     private void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         if ((!ConfigManager.LookupOnSelectOnly && !ConfigManager.LookupOnLeftClickOnly)
-            || Background!.Opacity is 0
+            || Background.Opacity is 0
             || ConfigManager.InactiveLookupMode
             || FirstPopupWindow.MiningMode
             || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
@@ -673,12 +673,12 @@ internal sealed partial class MainWindow : Window, IFrontend
 
         if (ConfigManager.LookupOnSelectOnly)
         {
-            FirstPopupWindow.LookupOnSelect(MainTextBox!);
+            FirstPopupWindow.LookupOnSelect(MainTextBox);
         }
 
         else
         {
-            FirstPopupWindow.TextBox_MouseMove(MainTextBox!);
+            FirstPopupWindow.TextBox_MouseMove(MainTextBox);
         }
 
         if (ConfigManager.FixedPopupPositioning)
@@ -707,7 +707,7 @@ internal sealed partial class MainWindow : Window, IFrontend
             while (currentPopupWindow is not null)
             {
                 currentPopupWindow.MiningMode = false;
-                currentPopupWindow.TextBlockMiningModeReminder!.Visibility = Visibility.Collapsed;
+                currentPopupWindow.TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
                 currentPopupWindow.ItemsControlButtons.Visibility = Visibility.Collapsed;
                 currentPopupWindow.PopUpScrollViewer.ScrollToTop();
                 currentPopupWindow.Hide();
@@ -734,7 +734,7 @@ internal sealed partial class MainWindow : Window, IFrontend
                 ? Math.Min(ratioX, ratioY) * 0.75
                 : Math.Max(ratioX, ratioY) / 0.75;
 
-            FontSizeSlider!.Value = (int)Math.Round(FontSizeSlider.Value / fontScale);
+            FontSizeSlider.Value = (int)Math.Round(FontSizeSlider.Value / fontScale);
 
             Left = LeftPositionBeforeResolutionChange / ratioX;
             LeftPositionBeforeResolutionChange = Left;
@@ -748,8 +748,8 @@ internal sealed partial class MainWindow : Window, IFrontend
             Height = (int)Math.Round(HeightBeforeResolutionChange / ratioY);
             HeightBeforeResolutionChange = Height;
 
-            PreferencesWindow.Instance.PopupMaxHeightNumericUpDown!.Maximum = WindowsUtils.ActiveScreen.Bounds.Height;
-            PreferencesWindow.Instance.PopupMaxWidthNumericUpDown!.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;
+            PreferencesWindow.Instance.PopupMaxHeightNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Height;
+            PreferencesWindow.Instance.PopupMaxWidthNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;
             ConfigManager.PopupMaxHeight = (int)Math.Round(ConfigManager.PopupMaxHeight / ratioY);
             ConfigManager.PopupMaxWidth = (int)Math.Round(ConfigManager.PopupMaxWidth / ratioX);
             WindowsUtils.DpiAwarePopupMaxHeight = ConfigManager.PopupMaxHeight / WindowsUtils.Dpi.DpiScaleY;
@@ -793,7 +793,7 @@ internal sealed partial class MainWindow : Window, IFrontend
     {
         if (ConfigManager.LookupOnSelectOnly)
         {
-            double verticalOffset = MainTextBox!.VerticalOffset;
+            double verticalOffset = MainTextBox.VerticalOffset;
             MainTextBox.Select(0, 0);
             MainTextBox.ScrollToVerticalOffset(verticalOffset);
         }
@@ -889,15 +889,15 @@ internal sealed partial class MainWindow : Window, IFrontend
 
     private void MainTextBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        ManageDictionariesButton!.IsEnabled = Storage.DictsReady
+        ManageDictionariesButton.IsEnabled = Storage.DictsReady
                                       && !Storage.UpdatingJMdict
                                       && !Storage.UpdatingJMnedict
                                       && !Storage.UpdatingKanjidic;
 
-        ManageFrequenciesButton!.IsEnabled = Storage.FreqsReady;
+        ManageFrequenciesButton.IsEnabled = Storage.FreqsReady;
 
-        AddNameButton!.IsEnabled = Storage.DictsReady;
-        AddWordButton!.IsEnabled = Storage.DictsReady;
+        AddNameButton.IsEnabled = Storage.DictsReady;
+        AddWordButton.IsEnabled = Storage.DictsReady;
     }
 
     private void Window_MouseLeave(object sender, MouseEventArgs e)

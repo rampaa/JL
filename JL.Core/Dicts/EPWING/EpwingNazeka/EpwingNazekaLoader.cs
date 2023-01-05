@@ -94,10 +94,9 @@ internal static class EpwingNazekaLoader
 
             else
             {
-                string primarySpelling = reading;
-                string key = Kana.KatakanaToHiragana(primarySpelling);
+                string key = Kana.KatakanaToHiragana(reading);
 
-                EpwingNazekaRecord tempRecord = new(primarySpelling, null, null, definitions);
+                EpwingNazekaRecord tempRecord = new(reading, null, null, definitions);
 
                 if (!EpwingUtils.IsValidEpwingResultForDictType(tempRecord, dict))
                 {

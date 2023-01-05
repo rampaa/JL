@@ -282,7 +282,7 @@ internal static class Deconjugator
     {
         if (useCache && s_cache.TryGet(myText, out HashSet<Form> data))
         {
-            return data!;
+            return data;
         }
 
         HashSet<Form> processed = new();

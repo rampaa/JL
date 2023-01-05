@@ -38,7 +38,7 @@ internal sealed partial class AddNameWindow : Window
     {
         bool isValid = true;
 
-        if (!Storage.JapaneseRegex.IsMatch(SpellingTextBox!.Text))
+        if (!Storage.JapaneseRegex.IsMatch(SpellingTextBox.Text))
         {
             SpellingTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -89,7 +89,7 @@ internal sealed partial class AddNameWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        OtherRadioButton!.IsChecked = true;
+        OtherRadioButton.IsChecked = true;
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

@@ -38,7 +38,7 @@ internal sealed partial class AddWordWindow : Window
     {
         bool isValid = true;
 
-        if (!Storage.JapaneseRegex.IsMatch(SpellingsTextBox!.Text))
+        if (!Storage.JapaneseRegex.IsMatch(SpellingsTextBox.Text))
         {
             SpellingsTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -48,7 +48,7 @@ internal sealed partial class AddWordWindow : Window
             SpellingsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
         }
 
-        if (ReadingsTextBox!.Text is "")
+        if (ReadingsTextBox.Text is "")
         {
             ReadingsTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -58,7 +58,7 @@ internal sealed partial class AddWordWindow : Window
             ReadingsTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
         }
 
-        if (DefinitionsTextBox!.Text is "")
+        if (DefinitionsTextBox.Text is "")
         {
             DefinitionsTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -73,7 +73,7 @@ internal sealed partial class AddWordWindow : Window
             string rawSpellings = SpellingsTextBox.Text.Replace("\t", "  ");
             string rawReadings = ReadingsTextBox.Text.Replace("\t", "  ");
             string rawDefinitions = DefinitionsTextBox.Text.Replace("\t", "  ");
-            string rawWordClass = WordClassStackPanel!.Children.OfType<RadioButton>()
+            string rawWordClass = WordClassStackPanel.Children.OfType<RadioButton>()
                 .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
 
             string[] spellings = rawSpellings.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static s => s.Trim()).ToArray();
@@ -108,7 +108,7 @@ internal sealed partial class AddWordWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        OtherRadioButton!.IsChecked = true;
+        OtherRadioButton.IsChecked = true;
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
