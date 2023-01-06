@@ -142,7 +142,7 @@ internal static class WindowsUtils
                 Foreground = Brushes.White
             };
 
-            if (fontFamily.FamilyNames!.ContainsKey(XmlLanguage.GetLanguage("ja-jp")))
+            if (fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("ja-jp")))
             {
                 japaneseFonts.Add(comboBoxItem);
             }
@@ -155,7 +155,7 @@ internal static class WindowsUtils
                 {
                     if (typeFace.TryGetGlyphTypeface(out GlyphTypeface glyphTypeFace))
                     {
-                        if (glyphTypeFace!.CharacterToGlyphMap!.ContainsKey(20685))
+                        if (glyphTypeFace.CharacterToGlyphMap.ContainsKey(20685))
                         {
                             japaneseFonts.Add(comboBoxItem);
                             foundGlyph = true;
@@ -193,7 +193,7 @@ internal static class WindowsUtils
     public static void ShowAddWordWindow(string? selectedText)
     {
         AddWordWindow addWordWindowInstance = AddWordWindow.Instance;
-        addWordWindowInstance.SpellingsTextBox!.Text = selectedText;
+        addWordWindowInstance.SpellingsTextBox.Text = selectedText;
         addWordWindowInstance.Owner = MainWindow.Instance;
         addWordWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         Storage.StatsStopWatch.Stop();
@@ -292,7 +292,7 @@ internal static class WindowsUtils
                 archive.ExtractToDirectory(tmpDirectory);
             }
 
-            await MainWindow.Instance.Dispatcher!.BeginInvoke(ConfigManager.SaveBeforeClosing);
+            await MainWindow.Instance.Dispatcher.BeginInvoke(ConfigManager.SaveBeforeClosing);
 
             _ = Process.Start(
                 new ProcessStartInfo("cmd",
@@ -316,7 +316,7 @@ internal static class WindowsUtils
         if (ConfigManager.CheckForJLUpdatesOnStartUp)
         {
             PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
-            preferencesWindow.CheckForJLUpdatesButton!.IsEnabled = false;
+            preferencesWindow.CheckForJLUpdatesButton.IsEnabled = false;
             await Networking.CheckForJLUpdates(true).ConfigureAwait(true);
             preferencesWindow.CheckForJLUpdatesButton.IsEnabled = true;
         }
@@ -326,7 +326,7 @@ internal static class WindowsUtils
     {
         try
         {
-            _ = Application.Current!.Dispatcher!.BeginInvoke(() =>
+            _ = Application.Current.Dispatcher.BeginInvoke(() =>
             {
                 try
                 {
@@ -409,7 +409,7 @@ internal static class WindowsUtils
             text,
             CultureInfo.CurrentCulture,
             FlowDirection.LeftToRight,
-            new Typeface(ConfigManager.PopupFont.Source!),
+            new Typeface(ConfigManager.PopupFont.Source),
             fontSize,
             Brushes.Transparent,
             new NumberSubstitution(),

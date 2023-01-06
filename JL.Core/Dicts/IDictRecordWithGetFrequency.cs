@@ -2,7 +2,7 @@ using JL.Core.Freqs;
 
 namespace JL.Core.Dicts;
 
-public interface IDictRecordWithGetFrequency : IDictRecord
+internal interface IDictRecordWithGetFrequency : IDictRecord
 {
     int GetFrequency(Freq freq);
 }

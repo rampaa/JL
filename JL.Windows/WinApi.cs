@@ -177,7 +177,7 @@ internal sealed class WinApi
 
             case WM_WINDOWPOSCHANGING:
                 _ = DefWindowProc(hwnd, msg, wParam, lParam);
-                WINDOWPOS windowPos = Marshal.PtrToStructure<WINDOWPOS>(lParam)!;
+                WINDOWPOS windowPos = Marshal.PtrToStructure<WINDOWPOS>(lParam);
                 windowPos.flags |= SWP_NOCOPYBITS;
                 Marshal.StructureToPtr(windowPos, lParam, true);
                 handled = true;

@@ -38,12 +38,6 @@ public readonly struct WordClassInfoOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
-
-    public WordClassInfoOption(bool value)
-    {
-        Value = value;
-    }
-
     public bool Value { get; init; }
 }
 

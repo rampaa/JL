@@ -48,7 +48,7 @@ internal sealed partial class AddNameWindow : Window
             SpellingTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
         }
 
-        if (ReadingTextBox!.Text is "")
+        if (ReadingTextBox.Text is "")
         {
             ReadingTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -61,7 +61,7 @@ internal sealed partial class AddNameWindow : Window
         if (isValid)
         {
             string nameType =
-                NameTypeStackPanel!.Children.OfType<RadioButton>()
+                NameTypeStackPanel.Children.OfType<RadioButton>()
                     .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
             string spelling = SpellingTextBox.Text.Replace("\t", "  ").Trim();
             string reading = ReadingTextBox.Text.Replace("\t", "  ").Trim();

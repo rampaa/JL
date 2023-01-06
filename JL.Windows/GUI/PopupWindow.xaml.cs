@@ -1454,17 +1454,6 @@ internal sealed partial class PopupWindow : Window
 
     private async void Window_KeyDown(object sender, KeyEventArgs e)
     {
-        //int keyVal = (int)e.Key;
-        //int numericKeyValue = -1;
-        //if ((keyVal >= (int)Key.D1 && keyVal <= (int)Key.D9))
-        //{
-        //    numericKeyValue = (int)e.Key - (int)Key.D0 - 1;
-        //}
-        //else if (keyVal >= (int)Key.NumPad1 && keyVal <= (int)Key.NumPad9)
-        //{
-        //    numericKeyValue = (int)e.Key - (int)Key.NumPad0 - 1;
-        //}
-
         e.Handled = true;
 
         if (WindowsUtils.CompareKeyGesture(e, ConfigManager.MiningModeKeyGesture))

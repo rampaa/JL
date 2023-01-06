@@ -21,7 +21,7 @@ public class LookupTests
             new Dict(DictType.JMdict, "JMdict", jmdictPath, true, 0, 500000,
                     new DictOptions(
                         new NewlineBetweenDefinitionsOption { Value = false },
-                        wordClassInfo: new WordClassInfoOption(true),
+                        wordClassInfo: new WordClassInfoOption { Value = true },
                         dialectInfo: new DialectInfoOption { Value = true },
                         pOrthographyInfo: new POrthographyInfoOption { Value = true },
                         pOrthographyInfoColor: new POrthographyInfoColorOption { Value = "#FFD2691E" },
