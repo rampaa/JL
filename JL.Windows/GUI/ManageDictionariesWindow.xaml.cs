@@ -11,11 +11,7 @@ using System.Windows.Media;
 using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.EDICT;
-using JL.Core.Dicts.EDICT.JMdict;
-using JL.Core.Dicts.EDICT.JMnedict;
-using JL.Core.Dicts.EDICT.KANJIDIC;
 using JL.Core.Utilities;
-using JL.Core.WordClass;
 using JL.Windows.Utilities;
 using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
@@ -125,15 +121,9 @@ internal sealed partial class ManageDictionariesWindow : Window
 
             dictPathDisplay.PreviewMouseLeftButtonUp += PathTextbox_PreviewMouseLeftButtonUp;
 
-            dictPathDisplay.MouseEnter += (_, _) =>
-            {
-                dictPathDisplay.TextDecorations = TextDecorations.Underline;
-            };
+            dictPathDisplay.MouseEnter += (_, _) => dictPathDisplay.TextDecorations = TextDecorations.Underline;
 
-            dictPathDisplay.MouseLeave += (_, _) =>
-            {
-                dictPathDisplay.TextDecorations = null;
-            };
+            dictPathDisplay.MouseLeave += (_, _) => dictPathDisplay.TextDecorations = null;
 
             var buttonUpdate = new Button
             {
@@ -172,13 +162,13 @@ internal sealed partial class ManageDictionariesWindow : Window
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
-                        await UpdateJMdict().ConfigureAwait(true);
+                        await ResourceUpdater.UpdateJmdict().ConfigureAwait(true);
                         break;
                     case DictType.JMnedict:
-                        await UpdateJMnedict().ConfigureAwait(true);
+                        await ResourceUpdater.UpdateJmnedict().ConfigureAwait(true);
                         break;
                     case DictType.Kanjidic:
-                        await UpdateKanjidic().ConfigureAwait(true);
+                        await ResourceUpdater.UpdateKanjidic().ConfigureAwait(true);
                         break;
                 }
 
@@ -239,15 +229,9 @@ internal sealed partial class ManageDictionariesWindow : Window
                     break;
             }
 
-            checkBox.Unchecked += (_, _) =>
-            {
-                dict.Active = false;
-            };
+            checkBox.Unchecked += (_, _) => dict.Active = false;
 
-            checkBox.Checked += (_, _) =>
-            {
-                dict.Active = true;
-            };
+            checkBox.Checked += (_, _) => dict.Active = true;
 
             buttonIncreasePriority.Click += (_, _) =>
             {
@@ -343,99 +327,6 @@ internal sealed partial class ManageDictionariesWindow : Window
     {
         _ = new AddDictionaryWindow { Owner = this }.ShowDialog();
         UpdateDictionariesDisplay();
-    }
-
-    //todo move to core
-    private static async Task UpdateJMdict()
-    {
-        Storage.UpdatingJMdict = true;
-
-        Dict dict = Storage.Dicts.Values.First(static dict => dict.Type is DictType.JMdict);
-        bool isDownloaded = await ResourceUpdater.UpdateResource(dict.Path,
-                Storage.JmdictUrl,
-                DictType.JMdict.ToString(), true, false)
-            .ConfigureAwait(false);
-
-        if (isDownloaded)
-        {
-            dict.Contents.Clear();
-
-            await Task.Run(async () => await JmdictLoader
-                .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
-
-            await JmdictWordClassUtils.SerializeJmdictWordClass().ConfigureAwait(false);
-
-            Storage.WordClassDictionary.Clear();
-
-            await JmdictWordClassUtils.Load().ConfigureAwait(false);
-
-            if (!dict.Active)
-            {
-                dict.Contents.Clear();
-            }
-
-            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-        }
-
-        Storage.UpdatingJMdict = false;
-    }
-
-    private static async Task UpdateJMnedict()
-    {
-        Storage.UpdatingJMnedict = true;
-
-        Dict dict = Storage.Dicts.Values.First(static dict => dict.Type is DictType.JMnedict);
-        bool isDownloaded = await ResourceUpdater.UpdateResource(dict.Path,
-                Storage.JmnedictUrl,
-                DictType.JMnedict.ToString(), true, false)
-            .ConfigureAwait(false);
-
-        if (isDownloaded)
-        {
-            dict.Contents.Clear();
-
-            await Task.Run(async () => await JmnedictLoader
-                .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
-
-            if (!dict.Active)
-            {
-                dict.Contents.Clear();
-            }
-
-            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-        }
-
-        Storage.UpdatingJMnedict = false;
-    }
-
-    private static async Task UpdateKanjidic()
-    {
-        Storage.UpdatingKanjidic = true;
-        Dict dict = Storage.Dicts.Values.First(static dict => dict.Type is DictType.Kanjidic);
-        bool isDownloaded = await ResourceUpdater.UpdateResource(dict.Path,
-                Storage.KanjidicUrl,
-                DictType.Kanjidic.ToString(), true, false)
-            .ConfigureAwait(false);
-
-        if (isDownloaded)
-        {
-            dict.Contents.Clear();
-
-            await Task.Run(async () => await KanjidicLoader
-                .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
-
-            if (!dict.Active)
-            {
-                dict.Contents.Clear();
-            }
-
-            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-        }
-
-        Storage.UpdatingKanjidic = false;
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)

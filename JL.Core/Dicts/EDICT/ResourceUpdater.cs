@@ -1,12 +1,17 @@
 using System.IO.Compression;
 using System.Net;
+using System.Runtime;
+using JL.Core.Dicts.EDICT.JMdict;
+using JL.Core.Dicts.EDICT.JMnedict;
+using JL.Core.Dicts.EDICT.KANJIDIC;
 using JL.Core.Utilities;
+using JL.Core.WordClass;
 
 namespace JL.Core.Dicts.EDICT;
 
 public static class ResourceUpdater
 {
-    public static async Task<bool> UpdateResource(string resourcePath, Uri resourceDownloadUri, string resourceName,
+    internal static async Task<bool> UpdateResource(string resourcePath, Uri resourceDownloadUri, string resourceName,
         bool isUpdate, bool noPrompt)
     {
         try
@@ -81,5 +86,98 @@ public static class ResourceUpdater
                 await decompressionStream.CopyToAsync(decompressedFileStream).ConfigureAwait(false);
             }
         }
+    }
+
+    public static async Task UpdateJmdict()
+    {
+        Storage.UpdatingJMdict = true;
+
+        Dict dict = Storage.Dicts.Values.First(static dict => dict.Type is DictType.JMdict);
+        bool isDownloaded = await UpdateResource(dict.Path,
+                Storage.JmdictUrl,
+                DictType.JMdict.ToString(), true, false)
+            .ConfigureAwait(false);
+
+        if (isDownloaded)
+        {
+            dict.Contents.Clear();
+
+            await Task.Run(async () => await JmdictLoader
+                .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
+
+            await JmdictWordClassUtils.SerializeJmdictWordClass().ConfigureAwait(false);
+
+            Storage.WordClassDictionary.Clear();
+
+            await JmdictWordClassUtils.Load().ConfigureAwait(false);
+
+            if (!dict.Active)
+            {
+                dict.Contents.Clear();
+            }
+
+            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+        }
+
+        Storage.UpdatingJMdict = false;
+    }
+
+    public static async Task UpdateJmnedict()
+    {
+        Storage.UpdatingJMnedict = true;
+
+        Dict dict = Storage.Dicts.Values.First(static dict => dict.Type is DictType.JMnedict);
+        bool isDownloaded = await UpdateResource(dict.Path,
+                Storage.JmnedictUrl,
+                DictType.JMnedict.ToString(), true, false)
+            .ConfigureAwait(false);
+
+        if (isDownloaded)
+        {
+            dict.Contents.Clear();
+
+            await Task.Run(async () => await JmnedictLoader
+                .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
+
+            if (!dict.Active)
+            {
+                dict.Contents.Clear();
+            }
+
+            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+        }
+
+        Storage.UpdatingJMnedict = false;
+    }
+
+    public static async Task UpdateKanjidic()
+    {
+        Storage.UpdatingKanjidic = true;
+
+        Dict dict = Storage.Dicts.Values.First(static dict => dict.Type is DictType.Kanjidic);
+        bool isDownloaded = await UpdateResource(dict.Path,
+                Storage.KanjidicUrl,
+                DictType.Kanjidic.ToString(), true, false)
+            .ConfigureAwait(false);
+
+        if (isDownloaded)
+        {
+            dict.Contents.Clear();
+
+            await Task.Run(async () => await KanjidicLoader
+                .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
+
+            if (!dict.Active)
+            {
+                dict.Contents.Clear();
+            }
+
+            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+        }
+
+        Storage.UpdatingKanjidic = false;
     }
 }
