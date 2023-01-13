@@ -35,7 +35,7 @@ public class LookupTests
                         loanwordEtymology: new LoanwordEtymologyOption { Value = true }
                         )));
 
-        JmdictLoader.Load(Storage.Dicts.Values.First(static dict => dict.Type == DictType.JMdict)).Wait();
+        JmdictLoader.Load(Storage.Dicts.Values.First(static dict => dict.Type is DictType.JMdict)).Wait();
         Storage.FreqDicts = Storage.s_builtInFreqs;
         Storage.LoadFrequencies().Wait();
     }
@@ -50,7 +50,7 @@ public class LookupTests
                 new LookupResult
                 (
                     matchedText: "始まる",
-                    dict: Storage.Dicts.Values.First(static dict => dict.Type == DictType.JMdict),
+                    dict: Storage.Dicts.Values.First(static dict => dict.Type is DictType.JMdict),
                     frequencies: new List<LookupFrequencyResult> {new ("VN (Nazeka)" ,759 ) },
                     primarySpelling: "始まる",
                     deconjugatedMatchedText: "始まる",
@@ -83,7 +83,7 @@ public class LookupTests
         // Act
         List<LookupResult>? result = Lookup.Lookup.LookupText(text);
         int actual = result is not null
-            ? result.First(static x => x.PrimarySpelling == "他").Frequencies?.First().Freq ?? int.MaxValue
+            ? result.First(static x => x.PrimarySpelling is "他").Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -101,7 +101,7 @@ public class LookupTests
         // Act
         List<LookupResult>? result = Lookup.Lookup.LookupText(text);
         int actual = result is not null
-            ? result.First(static x => x.PrimarySpelling == "多").Frequencies?.First().Freq ?? int.MaxValue
+            ? result.First(static x => x.PrimarySpelling is "多").Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -119,7 +119,7 @@ public class LookupTests
         // Act
         List<LookupResult>? result = Lookup.Lookup.LookupText(text);
         int actual = result is not null
-            ? result.First(static x => x.PrimarySpelling == "田").Frequencies?.First().Freq ?? int.MaxValue
+            ? result.First(static x => x.PrimarySpelling is "田").Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -193,7 +193,7 @@ public class LookupTests
         List<LookupResult>? result = Lookup.Lookup.LookupText(text);
 
         int actual = result is not null
-            ? result.First(static x => x.PrimarySpelling == "余り").Frequencies?.First().Freq ?? int.MaxValue
+            ? result.First(static x => x.PrimarySpelling is "余り").Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert

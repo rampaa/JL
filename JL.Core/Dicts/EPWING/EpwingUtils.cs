@@ -19,7 +19,7 @@ internal static class EpwingUtils
         switch (dict.Type)
         {
             case DictType.Kenkyuusha:
-                if ((dict.Options?.Examples?.Value ?? ExamplesOptionValue.None) == ExamplesOptionValue.None)
+                if ((dict.Options?.Examples?.Value ?? ExamplesOptionValue.None) is ExamplesOptionValue.None)
                 {
                     if (epwingRecord.Definitions?.Count > 2)
                     {

@@ -94,7 +94,7 @@ internal sealed class CustomWordRecord : IDictRecordWithGetFrequency
                 }
             }
 
-            if (frequency == int.MaxValue && AlternativeSpellings is not null)
+            if (frequency is int.MaxValue && AlternativeSpellings is not null)
             {
                 int alternativeSpellingsCount = AlternativeSpellings.Count;
                 for (int i = 0; i < alternativeSpellingsCount; i++)
@@ -154,7 +154,7 @@ internal sealed class CustomWordRecord : IDictRecordWithGetFrequency
 
     public override bool Equals(object? obj)
     {
-        if (obj == null)
+        if (obj is null)
         {
             return false;
         }
@@ -162,8 +162,8 @@ internal sealed class CustomWordRecord : IDictRecordWithGetFrequency
         CustomWordRecord customWordRecordObj = (obj as CustomWordRecord)!;
 
         return PrimarySpelling == customWordRecordObj.PrimarySpelling
-               && (customWordRecordObj.AlternativeSpellings?.SequenceEqual(AlternativeSpellings ?? new List<string>()) ?? AlternativeSpellings == null)
-               && (customWordRecordObj.Readings?.SequenceEqual(Readings ?? new List<string>()) ?? Readings == null)
+               && (customWordRecordObj.AlternativeSpellings?.SequenceEqual(AlternativeSpellings ?? new List<string>()) ?? AlternativeSpellings is null)
+               && (customWordRecordObj.Readings?.SequenceEqual(Readings ?? new List<string>()) ?? Readings is null)
                && customWordRecordObj.Definitions.SequenceEqual(Definitions)
                && customWordRecordObj.WordClasses.SequenceEqual(WordClasses);
     }

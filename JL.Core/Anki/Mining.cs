@@ -152,6 +152,6 @@ public static class Mining
 
     private static List<string> FindAudioFields(Dictionary<string, JLField> userFields)
     {
-        return userFields.Keys.Where(key => JLField.Audio == userFields[key]).ToList();
+        return userFields.Keys.Where(key => userFields[key] is JLField.Audio).ToList();
     }
 }

@@ -58,7 +58,7 @@ public static class JmdictWordClassUtils
             "v5n", "v5r", "v5r-i", "v5s", "v5t", "v5u", "v5u-s", "vk", "vs-c", "vs-i", "vs-s", "vz"
         };
 
-        foreach (List<IDictRecord> jmdictRecordList in Storage.Dicts.Values.First(static dict => dict.Type == DictType.JMdict).Contents.Values.ToList())
+        foreach (List<IDictRecord> jmdictRecordList in Storage.Dicts.Values.First(static dict => dict.Type is DictType.JMdict).Contents.Values.ToList())
         {
             int jmdictRecordListCount = jmdictRecordList.Count;
             for (int i = 0; i < jmdictRecordListCount; i++)
@@ -81,7 +81,7 @@ public static class JmdictWordClassUtils
                 {
                     if (!psr.Any(r =>
                             r.Readings?.SequenceEqual(value.Readings ?? new List<string>()) ??
-                            (value.Readings == null && r.Spelling == value.PrimarySpelling)))
+                            (value.Readings is null && r.Spelling == value.PrimarySpelling)))
                     {
                         psr.Add(new JmdictWordClass(value.PrimarySpelling, value.Readings, wordClasses));
                     }
@@ -104,7 +104,7 @@ public static class JmdictWordClassUtils
                         {
                             if (!asr.Any(r =>
                                     r.Readings?.SequenceEqual(value.Readings ?? new List<string>()) ??
-                                    (value.Readings == null && r.Spelling == spelling)))
+                                    (value.Readings is null && r.Spelling == spelling)))
                             {
                                 asr.Add(new JmdictWordClass(spelling, value.Readings, wordClasses));
                             }

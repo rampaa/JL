@@ -61,7 +61,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IDictRecordWithGetFreq
                 }
             }
 
-            if (frequency == int.MaxValue && AlternativeSpellings is not null)
+            if (frequency is int.MaxValue && AlternativeSpellings is not null)
             {
                 int alternativeSpellingsCount = AlternativeSpellings.Count;
                 for (int i = 0; i < alternativeSpellingsCount; i++)
