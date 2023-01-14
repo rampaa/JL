@@ -16,6 +16,7 @@ internal sealed class KanjidicRecord : IDictRecord
         OnReadings = new List<string>();
         KunReadings = new List<string>();
         NanoriReadings = new List<string>();
+        Grade = -1;
     }
 
     public string? BuildFormattedDefinition()

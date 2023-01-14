@@ -49,7 +49,7 @@ public sealed class LookupResult
         string? kanjiStats = null,
         int edictId = 0,
         int strokeCount = 0,
-        int kanjiGrade = 0
+        int kanjiGrade = -1
         )
     {
         MatchedText = matchedText;

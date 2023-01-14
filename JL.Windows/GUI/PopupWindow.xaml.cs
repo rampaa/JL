@@ -466,42 +466,14 @@ internal sealed partial class PopupWindow : Window
 
         if (result.Frequencies?.Count > 0)
         {
-            string freqStr = "";
+            string freqText = PopupWindowUtils.FrequenciesToText(result.Frequencies);
 
-            if (result.Frequencies.Count is 1 && result.Frequencies[0].Freq is > 0 and not int.MaxValue)
-            {
-                freqStr = "#" + result.Frequencies.First().Freq;
-            }
-
-            else if (result.Frequencies.Count > 1)
-            {
-                int freqResultCount = 0;
-                StringBuilder freqStrBuilder = new();
-                foreach (LookupFrequencyResult lookupFreqResult in result.Frequencies)
-                {
-                    if (lookupFreqResult.Freq is int.MaxValue or <= 0)
-                    {
-                        continue;
-                    }
-
-                    _ = freqStrBuilder.Append(CultureInfo.InvariantCulture, $"{lookupFreqResult.Name}: #{lookupFreqResult.Freq}, ");
-                    freqResultCount++;
-                }
-
-                if (freqResultCount > 0)
-                {
-                    _ = freqStrBuilder.Remove(freqStrBuilder.Length - 2, 1);
-
-                    freqStr = freqStrBuilder.ToString();
-                }
-            }
-
-            if (freqStr is not "")
+            if (freqText is not "")
             {
                 textBlockFrequency = new TextBlock
                 {
                     Name = nameof(result.Frequencies),
-                    Text = freqStr,
+                    Text = freqText,
                     Foreground = ConfigManager.FrequencyColor,
                     FontSize = ConfigManager.FrequencyFontSize,
                     Margin = new Thickness(5, 0, 0, 0),
@@ -793,30 +765,13 @@ internal sealed partial class PopupWindow : Window
             };
         }
 
-        if (result.KanjiGrade > 0)
+        if (result.KanjiGrade > -1)
         {
-            string gradeString = "";
-            int gradeInt = result.KanjiGrade;
-            switch (gradeInt)
-            {
-                case 0:
-                    gradeString = "Hyougai";
-                    break;
-                case <= 6:
-                    gradeString = $"{gradeInt} (Kyouiku)";
-                    break;
-                case 8:
-                    gradeString = $"{gradeInt} (Jouyou)";
-                    break;
-                case <= 10:
-                    gradeString = $"{gradeInt} (Jinmeiyou)";
-                    break;
-            }
-
+            string gradeText = PopupWindowUtils.GradeToText(result.KanjiGrade);
             textBlockGrade = new TextBlock
             {
                 Name = nameof(result.KanjiGrade),
-                Text = nameof(result.KanjiGrade) + ": " + gradeString,
+                Text = nameof(result.KanjiGrade) + ": " + gradeText,
                 Foreground = ConfigManager.DefinitionsColor,
                 FontSize = ConfigManager.DefinitionsFontSize,
                 Margin = new Thickness(2, 2, 2, 2),
