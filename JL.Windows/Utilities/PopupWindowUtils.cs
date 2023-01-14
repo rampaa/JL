@@ -55,7 +55,7 @@ internal static class PopupWindowUtils
                 }
 
                 _ = freqStrBuilder.Append(CultureInfo.InvariantCulture, $"{lookupFreqResult.Name}: #{lookupFreqResult.Freq}, ");
-                freqResultCount++;
+                ++freqResultCount;
             }
 
             if (freqResultCount > 0)

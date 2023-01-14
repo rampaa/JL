@@ -40,7 +40,7 @@ public static class ExtensionMethods
 
     internal static IEnumerable<string> EnumerateUnicodeCharacters(this string s)
     {
-        for (int i = 0; i < s.Length; ++i)
+        for (int i = 0; i < s.Length; i++)
         {
             if (char.IsHighSurrogate(s, i)
                 && s.Length > i + 1
