@@ -430,6 +430,7 @@ public static class Utils
             Task.Run(static async () =>
         {
             await DeserializeDicts().ConfigureAwait(false);
+            Storage.Frontend.ApplyDictOptions();
             await Storage.LoadDictionaries(false).ConfigureAwait(false);
             await SerializeDicts().ConfigureAwait(false);
             await Storage.InitializeWordClassDictionary().ConfigureAwait(false);

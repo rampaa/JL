@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
@@ -67,6 +66,8 @@ internal sealed partial class DictOptionsControl : UserControl
         {
             pOrthographyInfoColorOption =
                 new POrthographyInfoColorOption { Value = POrthographyInfoColorButton.Background.ToString(CultureInfo.InvariantCulture) };
+
+            DictOptionManager.POrthographyInfoColor = WindowsUtils.BrushFromHex(pOrthographyInfoColorOption.Value.Value)!;
         }
 
         POrthographyInfoFontSizeOption? pOrthographyInfoFontSize = null;
@@ -136,6 +137,7 @@ internal sealed partial class DictOptionsControl : UserControl
         if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(type))
         {
             pitchAccentMarkerColorOption = new PitchAccentMarkerColorOption { Value = PitchAccentMarkerColorButton.Background.ToString(CultureInfo.InvariantCulture) };
+            DictOptionManager.PitchAccentMarkerColor = WindowsUtils.BrushFromHex(pitchAccentMarkerColorOption.Value.Value)!;
         }
 
         var options =
@@ -206,9 +208,7 @@ internal sealed partial class DictOptionsControl : UserControl
 
         if (POrthographyInfoColorOption.ValidDictTypes.Contains(dict.Type))
         {
-            POrthographyInfoColorButton.Background = (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(
-                    dict.Options?.POrthographyInfoColor?.Value ?? ConfigManager.PrimarySpellingColor.ToString(CultureInfo.InvariantCulture))!;
+            POrthographyInfoColorButton.Background = DictOptionManager.POrthographyInfoColor;
 
             POrthographyInfoColorDockPanel.Visibility = Visibility.Visible;
         }
@@ -275,9 +275,7 @@ internal sealed partial class DictOptionsControl : UserControl
 
         if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(dict.Type))
         {
-            PitchAccentMarkerColorButton.Background = (SolidColorBrush)new BrushConverter()
-                .ConvertFrom(dict.Options?.PitchAccentMarkerColor?.Value
-                ?? Colors.DeepSkyBlue.ToString(CultureInfo.InvariantCulture))!;
+            PitchAccentMarkerColorButton.Background = DictOptionManager.PitchAccentMarkerColor;
 
             PitchAccentMarkerColorDockPanel.Visibility = Visibility.Visible;
         }

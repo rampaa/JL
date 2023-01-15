@@ -4,6 +4,7 @@ using System.Windows.Media;
 using JL.Core;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
+using JL.Windows.Utilities;
 using Microsoft.Win32;
 
 namespace JL.Windows.GUI;
@@ -35,7 +36,7 @@ internal sealed partial class AddFrequencyWindow : Window
         }
         else if (FreqTypeComboBox.BorderBrush == Brushes.Red)
         {
-            FreqTypeComboBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
+            FreqTypeComboBox.BorderBrush = WindowsUtils.BrushFromHex("#FF3F3F46")!;
         }
 
         string path = TextBlockPath.Text;
@@ -48,7 +49,7 @@ internal sealed partial class AddFrequencyWindow : Window
         }
         else if (TextBlockPath.BorderBrush == Brushes.Red)
         {
-            TextBlockPath.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
+            TextBlockPath.BorderBrush = WindowsUtils.BrushFromHex("#FF3F3F46")!;
         }
 
         string name = NameTextBox.Text;
@@ -59,7 +60,7 @@ internal sealed partial class AddFrequencyWindow : Window
         }
         else if (NameTextBox.BorderBrush == Brushes.Red)
         {
-            NameTextBox.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF3F3F46")!;
+            NameTextBox.BorderBrush = WindowsUtils.BrushFromHex("#FF3F3F46")!;
         }
 
         if (isValid)

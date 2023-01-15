@@ -688,11 +688,7 @@ internal sealed partial class PopupWindow : Window
             {
                 Name = nameof(result.PrimarySpellingOrthographyInfoList),
                 Text = $"({string.Join(", ", result.PrimarySpellingOrthographyInfoList)})",
-
-                Foreground = (SolidColorBrush)new BrushConverter()
-                    .ConvertFrom(result.Dict.Options?.POrthographyInfoColor?.Value
-                        ?? ConfigManager.PrimarySpellingColor.ToString(CultureInfo.InvariantCulture))!,
-
+                Foreground = DictOptionManager.POrthographyInfoColor,
                 FontSize = result.Dict.Options?.POrthographyInfoFontSize?.Value ?? 15,
                 Margin = new Thickness(5, 0, 0, 0),
                 TextWrapping = TextWrapping.Wrap,

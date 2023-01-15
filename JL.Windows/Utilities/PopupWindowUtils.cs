@@ -193,9 +193,7 @@ internal static class PopupWindowUtils
                     Polyline polyline = new()
                     {
                         StrokeThickness = 2,
-                        Stroke = (SolidColorBrush)new BrushConverter()
-                            .ConvertFrom(dict.Options?.PitchAccentMarkerColor?.Value
-                            ?? Colors.DeepSkyBlue.ToString(CultureInfo.InvariantCulture))!,
+                        Stroke = DictOptionManager.PitchAccentMarkerColor,
                         StrokeDashArray = new DoubleCollection { 1, 1 }
                     };
 

@@ -44,6 +44,8 @@ internal sealed partial class MainWindow : Window, IFrontend
 
     public void InvalidateDisplayCache() => PopupWindow.StackPanelCache.Clear();
 
+    public void ApplyDictOptions() => DictOptionManager.ApplyDictOptions();
+
     #endregion
 
     private readonly List<string> _backlog = new();

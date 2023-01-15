@@ -25,4 +25,8 @@ internal sealed class DummyFrontend : IFrontend
     public void InvalidateDisplayCache()
     {
     }
+
+    public void ApplyDictOptions()
+    {
+    }
 }

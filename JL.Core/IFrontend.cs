@@ -17,4 +17,5 @@ public interface IFrontend
     public Task UpdateJL(Uri downloadUrlOfLatestJLRelease);
 
     public void InvalidateDisplayCache();
+    public void ApplyDictOptions();
 }
