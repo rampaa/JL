@@ -87,14 +87,14 @@ public static class Storage
                         ))
             },
             {
-                "JMnedict",
-                new Dict(DictType.JMnedict, "JMnedict", $"{ResourcesPath}/JMnedict.xml", true, 3, 700000,
-                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }))
+                "Kanjidic",
+                new Dict(DictType.Kanjidic, "Kanjidic", $"{ResourcesPath}/kanjidic2.xml", true, 3, 13108,
+                    new DictOptions(noAll: new NoAllOption { Value = false }))
             },
             {
-                "Kanjidic",
-                new Dict(DictType.Kanjidic, "Kanjidic", $"{ResourcesPath}/kanjidic2.xml", true, 4, 13108,
-                    new DictOptions(noAll: new NoAllOption { Value = false }))
+                "JMnedict",
+                new Dict(DictType.JMnedict, "JMnedict", $"{ResourcesPath}/JMnedict.xml", true, 4, 700000,
+                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }))
             }
         };
 

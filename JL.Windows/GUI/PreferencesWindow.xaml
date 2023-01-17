@@ -86,8 +86,7 @@
                                        Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="ChangeFontSizeOnResolutionChangeCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
-
-
+                        
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Highlight the longest match"
                                        Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"
