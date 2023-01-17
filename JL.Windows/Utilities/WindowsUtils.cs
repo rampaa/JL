@@ -309,7 +309,7 @@ internal static class WindowsUtils
 
     public static async Task InitializeMainWindow()
     {
-        Storage.Frontend = MainWindow.Instance;
+        Storage.Frontend = new WindowsFrontend();
 
         await Utils.CoreInitialize().ConfigureAwait(true);
 

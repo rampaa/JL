@@ -12,7 +12,6 @@ using JL.Core.Lookup;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using Microsoft.Win32;
-using MessageBox = HandyControl.Controls.MessageBox;
 using Window = System.Windows.Window;
 
 namespace JL.Windows.GUI;
@@ -20,34 +19,8 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
-internal sealed partial class MainWindow : Window, IFrontend
+internal sealed partial class MainWindow : Window
 {
-    #region IFrontend implementation
-
-    public CoreConfig CoreConfig { get; } = ConfigManager.Instance;
-
-    public void PlayAudio(byte[] sound, float volume) => WindowsUtils.PlayAudio(sound, volume);
-
-    public void Alert(AlertLevel alertLevel, string message) => WindowsUtils.Alert(alertLevel, message);
-
-    public bool ShowYesNoDialog(string text, string caption)
-    {
-        return MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
-    }
-
-    public void ShowOkDialog(string text, string caption)
-    {
-        _ = MessageBox.Show(text, caption, MessageBoxButton.OK, MessageBoxImage.Information);
-    }
-
-    public Task UpdateJL(Uri downloadUrlOfLatestJLRelease) => WindowsUtils.UpdateJL(downloadUrlOfLatestJLRelease);
-
-    public void InvalidateDisplayCache() => PopupWindow.StackPanelCache.Clear();
-
-    public void ApplyDictOptions() => DictOptionManager.ApplyDictOptions();
-
-    #endregion
-
     private readonly List<string> _backlog = new();
     private int _currentTextIndex;
     private bool _stopPrecache = false;
