@@ -45,7 +45,7 @@ internal sealed partial class AddNameWindow : Window
         }
         else if (SpellingTextBox.BorderBrush == Brushes.Red)
         {
-            SpellingTextBox.BorderBrush = WindowsUtils.BrushFromHex("#FF3F3F46")!;
+            SpellingTextBox.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
         }
 
         if (ReadingTextBox.Text is "")
@@ -55,7 +55,7 @@ internal sealed partial class AddNameWindow : Window
         }
         else if (ReadingTextBox.BorderBrush == Brushes.Red)
         {
-            ReadingTextBox.BorderBrush = WindowsUtils.BrushFromHex("#FF3F3F46")!;
+            ReadingTextBox.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
         }
 
         if (isValid)

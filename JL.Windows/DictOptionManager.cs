@@ -15,15 +15,27 @@ internal static class DictOptionManager
         Dict? jmdict = Storage.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.JMdict);
         if (jmdict is not null)
         {
-            POrthographyInfoColor = WindowsUtils.BrushFromHex(jmdict.Options?.POrthographyInfoColor?.Value
+            POrthographyInfoColor = WindowsUtils.FrozenBrushFromHex(jmdict.Options?.POrthographyInfoColor?.Value
                 ?? ConfigManager.PrimarySpellingColor.ToString(CultureInfo.InvariantCulture))!;
+        }
+
+        else
+        {
+            POrthographyInfoColor = Brushes.Chocolate;
+            POrthographyInfoColor.Freeze();
         }
 
         Dict? pitchAccentDict = Storage.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.PitchAccentYomichan);
         if (pitchAccentDict is not null)
         {
-            PitchAccentMarkerColor = WindowsUtils.BrushFromHex(pitchAccentDict.Options?.PitchAccentMarkerColor?.Value
+            PitchAccentMarkerColor = WindowsUtils.FrozenBrushFromHex(pitchAccentDict.Options?.PitchAccentMarkerColor?.Value
                 ?? Colors.DeepSkyBlue.ToString(CultureInfo.InvariantCulture))!;
+        }
+
+        else
+        {
+            PitchAccentMarkerColor = Brushes.DeepSkyBlue;
+            PitchAccentMarkerColor.Freeze();
         }
     }
 }

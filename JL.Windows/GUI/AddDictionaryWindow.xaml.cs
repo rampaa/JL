@@ -38,7 +38,7 @@ internal sealed partial class AddDictionaryWindow : Window
         }
         else if (ComboBoxDictType.BorderBrush == Brushes.Red)
         {
-            ComboBoxDictType.BorderBrush = WindowsUtils.BrushFromHex("#FF3F3F46")!;
+            ComboBoxDictType.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
         }
 
         string path = TextBlockPath.Text;
@@ -51,7 +51,7 @@ internal sealed partial class AddDictionaryWindow : Window
         }
         else if (TextBlockPath.BorderBrush == Brushes.Red)
         {
-            TextBlockPath.BorderBrush = WindowsUtils.BrushFromHex("#FF3F3F46")!;
+            TextBlockPath.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
         }
 
         string name = NameTextBox.Text;
@@ -62,7 +62,7 @@ internal sealed partial class AddDictionaryWindow : Window
         }
         else if (NameTextBox.BorderBrush == Brushes.Red)
         {
-            NameTextBox.BorderBrush = WindowsUtils.BrushFromHex("#FF3F3F46")!;
+            NameTextBox.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
         }
 
         if (isValid)

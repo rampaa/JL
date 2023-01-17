@@ -67,7 +67,7 @@ internal sealed partial class DictOptionsControl : UserControl
             pOrthographyInfoColorOption =
                 new POrthographyInfoColorOption { Value = POrthographyInfoColorButton.Background.ToString(CultureInfo.InvariantCulture) };
 
-            DictOptionManager.POrthographyInfoColor = WindowsUtils.BrushFromHex(pOrthographyInfoColorOption.Value.Value)!;
+            DictOptionManager.POrthographyInfoColor = WindowsUtils.FrozenBrushFromHex(pOrthographyInfoColorOption.Value.Value)!;
         }
 
         POrthographyInfoFontSizeOption? pOrthographyInfoFontSize = null;
@@ -137,7 +137,7 @@ internal sealed partial class DictOptionsControl : UserControl
         if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(type))
         {
             pitchAccentMarkerColorOption = new PitchAccentMarkerColorOption { Value = PitchAccentMarkerColorButton.Background.ToString(CultureInfo.InvariantCulture) };
-            DictOptionManager.PitchAccentMarkerColor = WindowsUtils.BrushFromHex(pitchAccentMarkerColorOption.Value.Value)!;
+            DictOptionManager.PitchAccentMarkerColor = WindowsUtils.FrozenBrushFromHex(pitchAccentMarkerColorOption.Value.Value)!;
         }
 
         var options =

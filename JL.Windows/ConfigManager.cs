@@ -265,39 +265,20 @@ internal sealed class ConfigManager : CoreConfig
 
         // MAKE SURE YOU FREEZE ANY NEW COLOR OBJECTS YOU ADD
         // OR THE PROGRAM WILL CRASH AND BURN
-        MainWindowTextColor = GetBrushFromConfig(MainWindowTextColor, nameof(MainWindowTextColor));
-        MainWindowTextColor.Freeze();
+        MainWindowTextColor = GetFrozenBrushFromConfig(MainWindowTextColor, nameof(MainWindowTextColor));
         mainWindow.MainTextBox.Foreground = MainWindowTextColor;
 
-        MainWindowBacklogTextColor = GetBrushFromConfig(MainWindowBacklogTextColor, nameof(MainWindowBacklogTextColor));
-        MainWindowBacklogTextColor.Freeze();
+        MainWindowBacklogTextColor = GetFrozenBrushFromConfig(MainWindowBacklogTextColor, nameof(MainWindowBacklogTextColor));
+        PrimarySpellingColor = GetFrozenBrushFromConfig(PrimarySpellingColor, nameof(PrimarySpellingColor));
+        ReadingsColor = GetFrozenBrushFromConfig(ReadingsColor, nameof(ReadingsColor));
+        AlternativeSpellingsColor = GetFrozenBrushFromConfig(AlternativeSpellingsColor, nameof(AlternativeSpellingsColor));
+        DefinitionsColor = GetFrozenBrushFromConfig(DefinitionsColor, nameof(DefinitionsColor));
+        FrequencyColor = GetFrozenBrushFromConfig(FrequencyColor, nameof(FrequencyColor));
+        DeconjugationInfoColor = GetFrozenBrushFromConfig(DeconjugationInfoColor, nameof(DeconjugationInfoColor));
+        SeparatorColor = GetFrozenBrushFromConfig(SeparatorColor, nameof(SeparatorColor));
+        DictTypeColor = GetFrozenBrushFromConfig(DictTypeColor, nameof(DictTypeColor));
 
-        PrimarySpellingColor = GetBrushFromConfig(PrimarySpellingColor, nameof(PrimarySpellingColor));
-        PrimarySpellingColor.Freeze();
-
-        ReadingsColor = GetBrushFromConfig(ReadingsColor, nameof(ReadingsColor));
-        ReadingsColor.Freeze();
-
-        AlternativeSpellingsColor = GetBrushFromConfig(AlternativeSpellingsColor, nameof(AlternativeSpellingsColor));
-        AlternativeSpellingsColor.Freeze();
-
-        DefinitionsColor = GetBrushFromConfig(DefinitionsColor, nameof(DefinitionsColor));
-        DefinitionsColor.Freeze();
-
-        FrequencyColor = GetBrushFromConfig(FrequencyColor, nameof(FrequencyColor));
-        FrequencyColor.Freeze();
-
-        DeconjugationInfoColor = GetBrushFromConfig(DeconjugationInfoColor, nameof(DeconjugationInfoColor));
-        DeconjugationInfoColor.Freeze();
-
-        SeparatorColor = GetBrushFromConfig(SeparatorColor, nameof(SeparatorColor));
-        SeparatorColor.Freeze();
-
-        DictTypeColor = GetBrushFromConfig(DictTypeColor, nameof(DictTypeColor));
-        DictTypeColor.Freeze();
-
-        HighlightColor = GetBrushFromConfig(HighlightColor, nameof(HighlightColor));
-        HighlightColor.Freeze();
+        HighlightColor = GetFrozenBrushFromConfig(HighlightColor, nameof(HighlightColor));
         mainWindow.MainTextBox.SelectionBrush = HighlightColor;
 
         PopupBackgroundColor = GetBrushFromConfig(PopupBackgroundColor, nameof(PopupBackgroundColor));
@@ -1043,6 +1024,13 @@ internal sealed class ConfigManager : CoreConfig
         ConfigurationManager.RefreshSection("appSettings");
 
         return solidColorBrush;
+    }
+
+    private static Brush GetFrozenBrushFromConfig(Brush solidColorBrush, string configKey)
+    {
+        Brush brush = GetBrushFromConfig(solidColorBrush, configKey);
+        brush.Freeze();
+        return brush;
     }
 
     private static void AddToConfig(string key, string value)

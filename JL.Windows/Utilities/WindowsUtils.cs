@@ -384,6 +384,13 @@ internal static class WindowsUtils
         return (Brush?)new BrushConverter().ConvertFrom(hexColorString);
     }
 
+    public static Brush? FrozenBrushFromHex(string hexColorString)
+    {
+        var brush = (Brush?)new BrushConverter().ConvertFrom(hexColorString);
+        brush?.Freeze();
+        return brush;
+    }
+
     public static void Alert(AlertLevel alertLevel, string message)
     {
         _ = Application.Current?.Dispatcher.InvokeAsync(async () =>
