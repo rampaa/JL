@@ -42,7 +42,7 @@ internal sealed class ConfigManager : CoreConfig
     public static bool RequireLookupKeyPress { get; private set; } = false;
     public static bool LookupOnSelectOnly { get; private set; } = false;
     public static bool LookupOnLeftClickOnly { get; private set; } = false;
-    public static bool ChangeFontSizeOnResolutionChange { get; private set; } = true;
+    public static bool AutoAdjustFontSizesOnResolutionChange { get; private set; } = true;
 
     public static KeyGesture LookupKeyKeyGesture { get; private set; } = new(Key.LeftShift, ModifierKeys.None);
     public static bool HighlightLongestMatch { get; private set; } = false;
@@ -166,7 +166,7 @@ internal sealed class ConfigManager : CoreConfig
     {
         MainWindow mainWindow = MainWindow.Instance;
 
-        ChangeFontSizeOnResolutionChange = GetValueFromConfig(ChangeFontSizeOnResolutionChange, nameof(ChangeFontSizeOnResolutionChange), bool.TryParse);
+        AutoAdjustFontSizesOnResolutionChange = GetValueFromConfig(AutoAdjustFontSizesOnResolutionChange, nameof(AutoAdjustFontSizesOnResolutionChange), bool.TryParse);
         HighlightLongestMatch = GetValueFromConfig(HighlightLongestMatch, nameof(HighlightLongestMatch), bool.TryParse);
         AutoPlayAudio = GetValueFromConfig(AutoPlayAudio, nameof(AutoPlayAudio), bool.TryParse);
         Precaching = GetValueFromConfig(Precaching, nameof(Precaching), bool.TryParse);
@@ -552,7 +552,7 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = AllowDuplicateCards;
         preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
         preferenceWindow.KanjiModeCheckBox.IsChecked = KanjiMode;
-        preferenceWindow.ChangeFontSizeOnResolutionChangeCheckBox.IsChecked = ChangeFontSizeOnResolutionChange;
+        preferenceWindow.AutoAdjustFontSizesOnResolutionChange.IsChecked = AutoAdjustFontSizesOnResolutionChange;
         preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
         preferenceWindow.AutoPlayAudioCheckBox.IsChecked = AutoPlayAudio;
         preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = CheckForJLUpdatesOnStartUp;
@@ -769,8 +769,8 @@ internal sealed class ConfigManager : CoreConfig
             preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(LookupRate)].Value =
             preferenceWindow.LookupRateNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
-        config.AppSettings.Settings[nameof(ChangeFontSizeOnResolutionChange)].Value =
-            preferenceWindow.ChangeFontSizeOnResolutionChangeCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings[nameof(AutoAdjustFontSizesOnResolutionChange)].Value =
+            preferenceWindow.AutoAdjustFontSizesOnResolutionChange.IsChecked.ToString();
         config.AppSettings.Settings[nameof(HighlightLongestMatch)].Value =
             preferenceWindow.HighlightLongestMatchCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(AutoPlayAudio)].Value =

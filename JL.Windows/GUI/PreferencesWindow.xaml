@@ -82,9 +82,9 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Change font size on resolution change"
+                            <TextBlock HorizontalAlignment="Left" Text="Automatically adjust font sizes on resolution change"
                                        Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="ChangeFontSizeOnResolutionChangeCheckBox"  HorizontalAlignment="Right" />
+                            <CheckBox x:Name="AutoAdjustFontSizesOnResolutionChange"  HorizontalAlignment="Right" />
                         </DockPanel>
                         
                         <DockPanel>

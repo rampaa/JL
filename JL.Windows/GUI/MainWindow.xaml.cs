@@ -740,7 +740,7 @@ internal sealed partial class MainWindow : Window
             WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
             WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
 
-            if (ConfigManager.ChangeFontSizeOnResolutionChange)
+            if (ConfigManager.AutoAdjustFontSizesOnResolutionChange)
             {
                 ConfigManager.AlternativeSpellingsFontSize = (int)Math.Round(ConfigManager.AlternativeSpellingsFontSize / fontScale);
                 ConfigManager.DeconjugationInfoFontSize = (int)Math.Round(ConfigManager.DeconjugationInfoFontSize / fontScale);
