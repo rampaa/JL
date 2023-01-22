@@ -44,15 +44,17 @@ IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries,
 
 ## FAQ
 ### Why can't I look anything up?
-Make sure you're not in pass-through mode, kanji mode, have lookup-on-select-only enabled, or have disabled lookups.
+Make sure you're not in pass-through mode or kanji mode and you did not disable lookups with "Toggle lookup" hotkey.
 ### Why can't I scroll down the results list?
-You need to be in mining mode in order to interact with the popup window.
+You need to be in mining mode in order to interact with the popup window. You can activate the mining mode with a middle mouse click or with the mining mode hotkey (by default it's the key "M")
 ### How do I disable pass-through mode?
 Press the opacity slider button located top-left of the main window.
 ### How can I use JL with Magpie?
 Enable the "Preferences>General>Always on top" option. This option will make sure that JL is the topmost window on every clipboard change.
+Optional: Give UI Access to JL. This allows JL to be on top of Magpie even before any clipboard change occurs. See [UI Access](https://github.com/rampaa/JL/blob/master/UI%20Access.md) page for more details.
 
-Disable the "Preferences>Popup>Focus on lookup" option. When this option is disabled, JL can work without stealing the focus away from other windows.
+Disable the "Preferences>Popup>Focus on lookup" option. When this option is disabled, JL popup won't steal the focus away from other windows.
+Optional: Disable the "Preferences>General>Focusable" option. When this option is disabled, JL won't steal the focus away from other windows, even in case of a mouse click. This allows you to open popups within popups without Magpie exiting the fullscreen mode. Note that if this option is disabled, you won't be able to use hotkeys because JL won't have the keyboard focus. You can use the middle mouse button to activate the mining mode.
 
 ### How do I add EPWING dictionaries?
 
