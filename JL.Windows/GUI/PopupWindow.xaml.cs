@@ -1624,7 +1624,7 @@ internal sealed partial class PopupWindow : Window
 
         foreach (Dict dict in Storage.Dicts.Values.OrderBy(static dict => dict.Priority).ToList())
         {
-            if (!dict.Active || dict.Type is DictType.PitchAccentYomichan)
+            if (!dict.Active || dict.Type is DictType.PitchAccentYomichan || (ConfigManager.HideDictButtonsWithNoResults && !foundDicts.Contains(dict)))
             {
                 continue;
             }

@@ -54,7 +54,7 @@ internal sealed class ConfigManager : CoreConfig
 
     #endregion
 
-    #region Textbox
+    #region MainWindow
 
     public static double MainWindowWidth { get; set; } = 800;
     public static double MainWindowHeight { get; set; } = 200;
@@ -111,6 +111,7 @@ internal sealed class ConfigManager : CoreConfig
     public static Brush DictTypeColor { get; private set; } = Brushes.LightBlue;
     public static int DictTypeFontSize { get; set; } = 15;
     public static Brush SeparatorColor { get; private set; } = Brushes.White;
+    public static bool HideDictButtonsWithNoResults { get; private set; } = false;
 
     #endregion
 
@@ -196,6 +197,7 @@ internal sealed class ConfigManager : CoreConfig
         MainWindowDynamicWidth = GetValueFromConfig(MainWindowDynamicWidth, nameof(MainWindowDynamicWidth), bool.TryParse);
         PopupDynamicHeight = GetValueFromConfig(PopupDynamicHeight, nameof(PopupDynamicHeight), bool.TryParse);
         PopupDynamicWidth = GetValueFromConfig(PopupDynamicWidth, nameof(PopupDynamicWidth), bool.TryParse);
+        HideDictButtonsWithNoResults = GetValueFromConfig(HideDictButtonsWithNoResults, nameof(HideDictButtonsWithNoResults), bool.TryParse);
 
         TextBoxIsReadOnly = GetValueFromConfig(TextBoxIsReadOnly, nameof(TextBoxIsReadOnly), bool.TryParse);
         mainWindow.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
@@ -644,6 +646,7 @@ internal sealed class ConfigManager : CoreConfig
 
         preferenceWindow.ShowMiningModeReminderCheckBox.IsChecked = ShowMiningModeReminder;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInPopups;
+        preferenceWindow.HideDictButtonsWithNoResultsCheckBox.IsChecked = HideDictButtonsWithNoResults;
     }
 
     public async Task SavePreferences(PreferencesWindow preferenceWindow)
@@ -871,6 +874,9 @@ internal sealed class ConfigManager : CoreConfig
 
         config.AppSettings.Settings[nameof(DisableLookupsForNonJapaneseCharsInPopups)].Value =
             preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked.ToString();
+
+        config.AppSettings.Settings[nameof(HideDictButtonsWithNoResults)].Value =
+            preferenceWindow.HideDictButtonsWithNoResultsCheckBox.IsChecked.ToString();
 
         config.AppSettings.Settings["LookupMode"].Value =
             preferenceWindow.LookupModeComboBox.SelectedValue.ToString();
