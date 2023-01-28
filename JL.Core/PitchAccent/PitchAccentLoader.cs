@@ -7,6 +7,11 @@ internal static class PitchAccentLoader
 {
     public static async Task Load(Dict dict)
     {
+        if (!Directory.Exists(dict.Path))
+        {
+            return;
+        }
+
         Dictionary<string, List<IDictRecord>> pitchDict = dict.Contents;
 
         string[] jsonFiles = Directory.GetFiles(dict.Path, "term*bank_*.json");

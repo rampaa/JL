@@ -6,6 +6,11 @@ internal static class EpwingNazekaLoader
 {
     public static async Task Load(Dict dict)
     {
+        if (!File.Exists(dict.Path))
+        {
+            return;
+        }
+
         List<JsonElement>? jsonObjects;
 
         FileStream openStream = File.OpenRead(dict.Path);

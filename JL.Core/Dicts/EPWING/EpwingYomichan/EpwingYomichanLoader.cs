@@ -6,7 +6,7 @@ internal static class EpwingYomichanLoader
 {
     public static async Task Load(Dict dict)
     {
-        if (!Directory.Exists(dict.Path) && !File.Exists(dict.Path))
+        if (!Directory.Exists(dict.Path))
         {
             return;
         }
