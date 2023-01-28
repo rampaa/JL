@@ -1385,7 +1385,7 @@ internal sealed partial class PopupWindow : Window
                     {
                         _filteredDict = (Dict)btn.Tag;
                         btn.Background = Brushes.DodgerBlue;
-                        ((Button)ItemsControlButtons.Items[0]).Background.ClearValue(BackgroundProperty);
+                        ((Button)ItemsControlButtons.Items[0]).ClearValue(BackgroundProperty);
                         PopupListBox.Items.Filter = DictFilter;
                         break;
                     }
