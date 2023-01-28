@@ -249,6 +249,17 @@ internal sealed partial class ManageDictionariesWindow : Window
                 {
                     dict.Contents.Clear();
                     _ = Storage.Dicts.Remove(dict.Name);
+
+                    int priorityOfDeletedDict = dict.Priority;
+
+                    foreach (Dict d in Storage.Dicts.Values)
+                    {
+                        if (d.Priority > priorityOfDeletedDict)
+                        {
+                            dict.Priority -= 1;
+                        }
+                    }
+
                     UpdateDictionariesDisplay();
 
                     GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
@@ -305,7 +316,7 @@ internal sealed partial class ManageDictionariesWindow : Window
             return;
         }
 
-        Storage.Dicts.Single(d => d.Value.Priority == dict.Priority - 1).Value.Priority += 1;
+        Storage.Dicts.First(d => d.Value.Priority == dict.Priority - 1).Value.Priority += 1;
         dict.Priority -= 1;
     }
 
@@ -319,7 +330,7 @@ internal sealed partial class ManageDictionariesWindow : Window
             return;
         }
 
-        Storage.Dicts.Single(d => d.Value.Priority == dict.Priority + 1).Value.Priority -= 1;
+        Storage.Dicts.First(d => d.Value.Priority == dict.Priority + 1).Value.Priority -= 1;
         dict.Priority += 1;
     }
 

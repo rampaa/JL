@@ -161,6 +161,17 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 {
                     freq.Contents.Clear();
                     _ = Storage.FreqDicts.Remove(freq.Name);
+
+                    int priorityOfDeletedFreq = freq.Priority;
+
+                    foreach (Freq f in Storage.FreqDicts.Values)
+                    {
+                        if (f.Priority > priorityOfDeletedFreq)
+                        {
+                            freq.Priority -= 1;
+                        }
+                    }
+
                     UpdateFreqsDisplay();
 
                     GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
@@ -215,7 +226,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
             return;
         }
 
-        Storage.FreqDicts.Single(f => f.Value.Priority == freq.Priority - 1).Value.Priority += 1;
+        Storage.FreqDicts.First(f => f.Value.Priority == freq.Priority - 1).Value.Priority += 1;
         freq.Priority -= 1;
     }
 
@@ -228,7 +239,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
             return;
         }
 
-        Storage.FreqDicts.Single(f => f.Value.Priority == freq.Priority + 1).Value.Priority -= 1;
+        Storage.FreqDicts.First(f => f.Value.Priority == freq.Priority + 1).Value.Priority -= 1;
         freq.Priority += 1;
     }
 
