@@ -258,6 +258,13 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Focus on hover"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       ToolTip="If Focusable is set to false, this option will have no effect."/>
+                            <CheckBox x:Name="MainWindowFocusOnHoverCheckBox" HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Text only visible on hover"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="TextOnlyVisibleOnHoverCheckBox"  HorizontalAlignment="Right" />
@@ -366,7 +373,7 @@
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Cursor="Help"
                                        ToolTip="Attempt to set focus on the popup window when you mouse over text.
-&#10;Required if you want to be able to use hotkeys without clicking on the window first.
+&#10;Required if you want to be able to use popup hotkeys without clicking on the popup window first.
 &#10;If Focusable is set to false, this option will have no effect." />
                             <CheckBox x:Name="PopupFocusOnLookupCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>

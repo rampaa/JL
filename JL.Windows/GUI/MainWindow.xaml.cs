@@ -923,6 +923,13 @@ internal sealed partial class MainWindow : Window
         {
             Background.Opacity = OpacitySlider.Value / 100;
         }
+
+        if (ConfigManager.Focusable
+            && !FirstPopupWindow.IsVisible
+            && ConfigManager.MainWindowFocusOnHover)
+        {
+            _ = Activate();
+        }
     }
 
     private void Window_StateChanged(object sender, EventArgs e)
