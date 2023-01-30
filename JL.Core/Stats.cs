@@ -61,6 +61,31 @@ public sealed class Stats
         }
     }
 
+    public static async Task ResetStats(StatsMode statsMode)
+    {
+        switch (statsMode)
+        {
+            case StatsMode.Lifetime:
+                Stats lifetimeStats = await GetLifetimeStats().ConfigureAwait(false);
+                lifetimeStats.Characters = 0;
+                lifetimeStats.Lines = 0;
+                lifetimeStats.Time = TimeSpan.Zero;
+                lifetimeStats.CardsMined = 0;
+                lifetimeStats.TimesPlayedAudio = 0;
+                lifetimeStats.Imoutos = 0;
+                break;
+
+            case StatsMode.Session:
+                SessionStats.Characters = 0;
+                SessionStats.Lines = 0;
+                SessionStats.Time = TimeSpan.Zero;
+                SessionStats.CardsMined = 0;
+                SessionStats.TimesPlayedAudio = 0;
+                SessionStats.Imoutos = 0;
+                break;
+        }
+    }
+
     public static async Task UpdateLifetimeStats()
     {
         Stats lifetimeStats = await GetLifetimeStats().ConfigureAwait(false);
@@ -106,6 +131,12 @@ public sealed class Stats
         await WriteLifetimeStats(lifetimeStats).ConfigureAwait(false);
         return lifetimeStats;
     }
+}
+
+public enum StatsMode
+{
+    Session,
+    Lifetime
 }
 
 public enum StatType

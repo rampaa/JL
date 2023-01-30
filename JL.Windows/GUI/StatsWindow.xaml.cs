@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using JL.Core;
+using JL.Core.Utilities;
 using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
@@ -90,6 +91,36 @@ internal sealed partial class StatsWindow : Window
                     throw new ArgumentOutOfRangeException(null, "StatsMode out of range");
             }
         }
+
+        else
+        {
+            Utils.Logger.Warning("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
+        }
+    }
+
+    private async void ButtonResetStats_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (Storage.Frontend.ShowYesNoDialog(
+            $"Are you really sure that you want to reset the {ButtonSwapStats.Content.ToString()!.ToLowerInvariant()} stats?",
+            $"Reset {ButtonSwapStats.Content} Stats?"))
+        {
+            if (Enum.TryParse(ButtonSwapStats.Content.ToString(), out StatsMode statsMode))
+            {
+                await Stats.ResetStats(statsMode).ConfigureAwait(true);
+
+                if (statsMode is StatsMode.Lifetime)
+                {
+                    await Stats.UpdateLifetimeStats().ConfigureAwait(true);
+                }
+
+                await UpdateStatsDisplay(statsMode).ConfigureAwait(true);
+            }
+
+            else
+            {
+                Utils.Logger.Warning("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
+            }
+        }
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -98,10 +129,4 @@ internal sealed partial class StatsWindow : Window
         _ = MainWindow.Instance.Focus();
         s_instance = null;
     }
-}
-
-internal enum StatsMode
-{
-    Session,
-    Lifetime
 }
