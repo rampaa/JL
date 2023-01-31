@@ -692,7 +692,7 @@ public static class Storage
                 IOrderedEnumerable<Freq> orderedFreqs = FreqDicts.Values.OrderBy(f => f.Priority);
                 int priority = 1;
 
-                foreach(Freq freq in orderedFreqs)
+                foreach (Freq freq in orderedFreqs)
                 {
                     freq.Priority = priority;
                     ++priority;
