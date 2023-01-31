@@ -579,6 +579,18 @@ public static class Storage
                 await Task.WhenAll(tasks).ConfigureAwait(false);
             }
 
+            if (dictRemoved)
+            {
+                IOrderedEnumerable<Dict> orderedDicts = Dicts.Values.OrderBy(d => d.Priority);
+                int priority = 1;
+
+                foreach (Dict dict in orderedDicts)
+                {
+                    dict.Priority = priority;
+                    ++priority;
+                }
+            }
+
             Frontend.InvalidateDisplayCache();
 
             if (runGC)
@@ -673,6 +685,18 @@ public static class Storage
             if (tasks.Count > 0)
             {
                 await Task.WhenAll(tasks).ConfigureAwait(false);
+            }
+
+            if (freqRemoved)
+            {
+                IOrderedEnumerable<Freq> orderedFreqs = FreqDicts.Values.OrderBy(f => f.Priority);
+                int priority = 1;
+
+                foreach(Freq freq in orderedFreqs)
+                {
+                    freq.Priority = priority;
+                    ++priority;
+                }
             }
 
             Frontend.InvalidateDisplayCache();
