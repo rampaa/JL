@@ -311,7 +311,7 @@ internal sealed partial class ManageDictionariesWindow : Window
 
     private static void PrioritizeDict(Dict dict)
     {
-        if (dict.Priority is 0)
+        if (dict.Priority is 1)
         {
             return;
         }
@@ -322,10 +322,7 @@ internal sealed partial class ManageDictionariesWindow : Window
 
     private static void UnPrioritizeDict(Dict dict)
     {
-        // lowest priority means highest number
-        int lowestPriority = Storage.Dicts.Select(static d => d.Value.Priority).Max();
-
-        if (dict.Priority == lowestPriority)
+        if (dict.Priority == Storage.Dicts.Count)
         {
             return;
         }

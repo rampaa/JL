@@ -69,11 +69,6 @@ internal sealed partial class AddDictionaryWindow : Window
         {
             DictType type = typeString!.GetEnum<DictType>();
 
-            // lowest priority means highest number
-            int lowestPriority = Storage.Dicts.Count > 0
-                ? Storage.Dicts.Select(static dict => dict.Value.Priority).Max()
-                : -1;
-
             NewlineBetweenDefinitionsOption? newlineOption = null;
             if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(type))
             {
@@ -95,7 +90,7 @@ internal sealed partial class AddDictionaryWindow : Window
                     examplesOption);
 
             Storage.Dicts.Add(name,
-                new Dict(type, name, path, true, lowestPriority + 1, 0, options));
+                new Dict(type, name, path, true, Storage.Dicts.Count + 1, 0, options));
 
             Close();
         }

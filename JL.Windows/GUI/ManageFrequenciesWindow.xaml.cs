@@ -221,7 +221,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
 
     private static void PrioritizeFreq(Freq freq)
     {
-        if (freq.Priority is 0)
+        if (freq.Priority is 1)
         {
             return;
         }
@@ -232,9 +232,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
 
     private static void UnPrioritizeFreq(Freq freq)
     {
-        // lowest priority means highest number
-        int lowestPriority = Storage.FreqDicts.Select(static f => f.Value.Priority).Max();
-        if (freq.Priority == lowestPriority)
+        if (freq.Priority == Storage.FreqDicts.Count)
         {
             return;
         }
