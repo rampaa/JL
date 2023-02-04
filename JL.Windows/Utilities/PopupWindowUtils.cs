@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -247,8 +248,39 @@ internal static class PopupWindowUtils
     public static void SetPopupAutoHideTimer()
     {
         PopupWindow.PopupAutoHideTimer.Interval = ConfigManager.AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
-        PopupWindow.PopupAutoHideTimer.Elapsed += PopupWindow.PopupAutoHideTimerEvent;
+        PopupWindow.PopupAutoHideTimer.Elapsed += PopupAutoHideTimerEvent;
         PopupWindow.PopupAutoHideTimer.AutoReset = false;
         PopupWindow.PopupAutoHideTimer.Enabled = true;
+    }
+
+    private static void PopupAutoHideTimerEvent(object? sender, ElapsedEventArgs e)
+    {
+        _ = MainWindow.Instance.FirstPopupWindow.Dispatcher.BeginInvoke(() =>
+        {
+            PopupWindow lastPopupWindow = MainWindow.Instance.FirstPopupWindow;
+            while (lastPopupWindow.ChildPopupWindow?.IsVisible ?? false)
+            {
+                lastPopupWindow = lastPopupWindow.ChildPopupWindow;
+            }
+
+            while (!lastPopupWindow.IsMouseOver)
+            {
+                lastPopupWindow.MiningMode = false;
+                lastPopupWindow.TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
+                lastPopupWindow.ItemsControlButtons.Visibility = Visibility.Collapsed;
+                lastPopupWindow.PopUpScrollViewer.ScrollToTop();
+                lastPopupWindow.Hide();
+
+                if (lastPopupWindow.Owner is PopupWindow parentPopupWindow)
+                {
+                    lastPopupWindow = parentPopupWindow;
+                }
+
+                else
+                {
+                    break;
+                }
+            }
+        });
     }
 }
