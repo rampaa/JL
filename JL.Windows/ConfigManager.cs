@@ -114,7 +114,7 @@ internal sealed class ConfigManager : CoreConfig
     public static Brush SeparatorColor { get; private set; } = Brushes.White;
     public static bool HideDictButtonsWithNoResults { get; private set; } = false;
     public static bool AutoHidePopupIfMouseIsNotOverPopup { get; private set; } = false;
-    public static double AutoHidePopupIfMouseIsNotOverItDelayInMilisecond { get; private set; } = 3000;
+    public static double AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 3000;
 
     #endregion
 
@@ -232,9 +232,9 @@ internal sealed class ConfigManager : CoreConfig
         DictTypeFontSize = GetValueFromConfig(DictTypeFontSize, nameof(DictTypeFontSize), int.TryParse);
         MaxNumResultsNotInMiningMode = GetValueFromConfig(MaxNumResultsNotInMiningMode, nameof(MaxNumResultsNotInMiningMode), int.TryParse);
 
-        AutoHidePopupIfMouseIsNotOverItDelayInMilisecond = GetValueFromConfig(AutoHidePopupIfMouseIsNotOverItDelayInMilisecond, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilisecond), double.TryParse);
+        AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = GetValueFromConfig(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds), double.TryParse);
         PopupWindow.PopupAutoHideTimer.Enabled = false;
-        PopupWindow.PopupAutoHideTimer.Interval = AutoHidePopupIfMouseIsNotOverItDelayInMilisecond;
+        PopupWindow.PopupAutoHideTimer.Interval = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
 
         PopupXOffset = GetValueFromConfig(PopupXOffset, nameof(PopupXOffset), int.TryParse);
         WindowsUtils.DpiAwareXOffset = PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
@@ -637,7 +637,7 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.AlternativeSpellingsFontSizeNumericUpDown.Value = AlternativeSpellingsFontSize;
         preferenceWindow.DeconjugationInfoFontSizeNumericUpDown.Value = DeconjugationInfoFontSize;
         preferenceWindow.DictTypeFontSizeNumericUpDown.Value = DictTypeFontSize;
-        preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMilisecondNumericUpDown.Value = AutoHidePopupIfMouseIsNotOverItDelayInMilisecond;
+        preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown.Value = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
         preferenceWindow.DefinitionsFontSizeNumericUpDown.Value = DefinitionsFontSize;
         preferenceWindow.FrequencyFontSizeNumericUpDown.Value = FrequencyFontSize;
         preferenceWindow.PrimarySpellingFontSizeNumericUpDown.Value = PrimarySpellingFontSize;
@@ -895,8 +895,8 @@ internal sealed class ConfigManager : CoreConfig
         config.AppSettings.Settings[nameof(AutoHidePopupIfMouseIsNotOverPopup)].Value =
             preferenceWindow.AutoHidePopupIfMouseIsNotOverItCheckBox.IsChecked.ToString();
 
-        config.AppSettings.Settings[nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilisecond)].Value =
-            preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMilisecondNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
+        config.AppSettings.Settings[nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds)].Value =
+            preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
 
         config.AppSettings.Settings["LookupMode"].Value =
             preferenceWindow.LookupModeComboBox.SelectedValue.ToString();

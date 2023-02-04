@@ -246,7 +246,7 @@ internal static class PopupWindowUtils
 
     public static void SetPopupAutoHideTimer()
     {
-        PopupWindow.PopupAutoHideTimer.Interval = ConfigManager.AutoHidePopupIfMouseIsNotOverItDelayInMilisecond;
+        PopupWindow.PopupAutoHideTimer.Interval = ConfigManager.AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
         PopupWindow.PopupAutoHideTimer.Elapsed += PopupWindow.PopupAutoHideTimerEvent;
         PopupWindow.PopupAutoHideTimer.AutoReset = false;
         PopupWindow.PopupAutoHideTimer.Enabled = true;

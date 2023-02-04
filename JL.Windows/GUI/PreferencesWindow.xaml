@@ -393,9 +393,9 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Auto hide popup delay (in miliseconds)"
+                            <TextBlock HorizontalAlignment="Left" Text="Auto hide popup delay (in milliseconds)"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="AutoHidePopupIfMouseIsNotOverItDelayInMilisecondNumericUpDown" Maximum="999999" Minimum="0" DecimalPlaces="0"
+                            <hc:NumericUpDown x:Name="AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown" Maximum="999999" Minimum="0" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
