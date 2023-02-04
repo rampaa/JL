@@ -114,7 +114,7 @@ internal sealed class ConfigManager : CoreConfig
     public static Brush SeparatorColor { get; private set; } = Brushes.White;
     public static bool HideDictButtonsWithNoResults { get; private set; } = false;
     public static bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } = false;
-    public static double AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 3000;
+    public static int AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 3000;
 
     #endregion
 
@@ -232,7 +232,7 @@ internal sealed class ConfigManager : CoreConfig
         DictTypeFontSize = GetValueFromConfig(DictTypeFontSize, nameof(DictTypeFontSize), int.TryParse);
         MaxNumResultsNotInMiningMode = GetValueFromConfig(MaxNumResultsNotInMiningMode, nameof(MaxNumResultsNotInMiningMode), int.TryParse);
 
-        AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = GetValueFromConfig(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds), double.TryParse);
+        AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = GetValueFromConfig(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds), int.TryParse);
         PopupWindow.PopupAutoHideTimer.Enabled = false;
         PopupWindow.PopupAutoHideTimer.Interval = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
 
