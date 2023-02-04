@@ -492,6 +492,7 @@ internal sealed partial class MainWindow : Window
 
             FirstPopupWindow.PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
             FirstPopupWindow.Hide();
+            PopupWindow.PopupAutoHideTimer.Stop();
         }
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowStatsKeyGesture))
@@ -677,6 +678,8 @@ internal sealed partial class MainWindow : Window
 
         else
         {
+            PopupWindow.PopupAutoHideTimer.Stop();
+
             PopupWindow? currentPopupWindow = FirstPopupWindow;
 
             while (currentPopupWindow is not null)

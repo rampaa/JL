@@ -8,6 +8,7 @@ using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
 using JL.Core.PitchAccent;
+using JL.Windows.GUI;
 
 namespace JL.Windows.Utilities;
 internal static class PopupWindowUtils
@@ -241,5 +242,13 @@ internal static class PopupWindowUtils
         pitchAccentGrid.HorizontalAlignment = HorizontalAlignment.Left;
 
         return pitchAccentGrid;
+    }
+
+    public static void SetPopupAutoHideTimer()
+    {
+        PopupWindow.PopupAutoHideTimer.Interval = ConfigManager.AutoHidePopupIfMouseIsNotOverItDelayInMilisecond;
+        PopupWindow.PopupAutoHideTimer.Elapsed += PopupWindow.PopupAutoHideTimerEvent;
+        PopupWindow.PopupAutoHideTimer.AutoReset = false;
+        PopupWindow.PopupAutoHideTimer.Enabled = true;
     }
 }

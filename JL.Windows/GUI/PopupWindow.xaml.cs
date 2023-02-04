@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -12,6 +13,7 @@ using JL.Core.Dicts;
 using JL.Core.Lookup;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
+using Timer = System.Timers.Timer;
 
 namespace JL.Windows.GUI;
 
@@ -47,6 +49,8 @@ internal sealed partial class PopupWindow : Window
     public ObservableCollection<StackPanel> ResultStackPanels { get; } = new();
 
     public ObservableCollection<Button> DictTypeButtons { get; } = new();
+
+    public static Timer PopupAutoHideTimer { get; } = new();
 
     public static LRUCache<string, StackPanel[]> StackPanelCache { get; } = new(
         Storage.CacheSize, Storage.CacheSize / 8);
@@ -1262,6 +1266,8 @@ internal sealed partial class PopupWindow : Window
             _ = Owner.Focus();
 
             Hide();
+
+            PopupAutoHideTimer.Stop();
         }
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.KanjiModeKeyGesture))
         {
@@ -1406,6 +1412,11 @@ internal sealed partial class PopupWindow : Window
         ItemsControlButtons.Visibility = Visibility.Visible;
 
         PopUpScrollViewer.ScrollToTop();
+
+        if (ConfigManager.AutoHidePopupIfMouseIsNotOverPopup)
+        {
+            PopupWindowUtils.SetPopupAutoHideTimer();
+        }
     }
 
     private async Task PlayAudio()
@@ -1501,9 +1512,17 @@ internal sealed partial class PopupWindow : Window
             ChildPopupWindow.LastText = "";
         }
 
-        if (MiningMode
-            || ConfigManager.FixedPopupPositioning
-            || UnavoidableMouseEnter)
+        if (MiningMode)
+        {
+            if (!ChildPopupWindow?.IsVisible ?? true)
+            {
+                PopupAutoHideTimer.Stop();
+            }
+
+            return;
+        }
+
+        if (ConfigManager.FixedPopupPositioning || UnavoidableMouseEnter)
         {
             return;
         }
@@ -1571,10 +1590,19 @@ internal sealed partial class PopupWindow : Window
             ChildPopupWindow.LastText = "";
         }
 
-        if (MiningMode
-            || ConfigManager.FixedPopupPositioning
-            || IsMouseOver)
+        if (IsMouseOver || ConfigManager.FixedPopupPositioning)
         {
+            return;
+        }
+
+        if (MiningMode)
+        {
+            if (ConfigManager.AutoHidePopupIfMouseIsNotOverPopup && (!ChildPopupWindow?.IsVisible ?? true))
+            {
+                PopupAutoHideTimer.Stop();
+                PopupAutoHideTimer.Start();
+            }
+
             return;
         }
 
@@ -1684,5 +1712,36 @@ internal sealed partial class PopupWindow : Window
 
         var dict = (Dict)((StackPanel)item).Tag;
         return !dict?.Options?.NoAll?.Value ?? true;
+    }
+
+    public static void PopupAutoHideTimerEvent(object? sender, ElapsedEventArgs e)
+    {
+        _ = MainWindow.Instance.FirstPopupWindow.Dispatcher.BeginInvoke(() =>
+        {
+            PopupWindow lastPopupWindow = MainWindow.Instance.FirstPopupWindow;
+            while (lastPopupWindow.ChildPopupWindow?.IsVisible ?? false)
+            {
+                lastPopupWindow = lastPopupWindow.ChildPopupWindow;
+            }
+
+            while (!lastPopupWindow.IsMouseOver)
+            {
+                lastPopupWindow.MiningMode = false;
+                lastPopupWindow.TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
+                lastPopupWindow.ItemsControlButtons.Visibility = Visibility.Collapsed;
+                lastPopupWindow.PopUpScrollViewer.ScrollToTop();
+                lastPopupWindow.Hide();
+
+                if (lastPopupWindow.Owner is PopupWindow parentPopupWindow)
+                {
+                    lastPopupWindow = parentPopupWindow;
+                }
+
+                else
+                {
+                    break;
+                }
+            }
+        });
     }
 }
