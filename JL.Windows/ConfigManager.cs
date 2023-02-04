@@ -113,7 +113,7 @@ internal sealed class ConfigManager : CoreConfig
     public static int DictTypeFontSize { get; set; } = 15;
     public static Brush SeparatorColor { get; private set; } = Brushes.White;
     public static bool HideDictButtonsWithNoResults { get; private set; } = false;
-    public static bool AutoHidePopupIfMouseIsNotOverPopup { get; private set; } = false;
+    public static bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } = false;
     public static double AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 3000;
 
     #endregion
@@ -202,7 +202,7 @@ internal sealed class ConfigManager : CoreConfig
         PopupDynamicHeight = GetValueFromConfig(PopupDynamicHeight, nameof(PopupDynamicHeight), bool.TryParse);
         PopupDynamicWidth = GetValueFromConfig(PopupDynamicWidth, nameof(PopupDynamicWidth), bool.TryParse);
         HideDictButtonsWithNoResults = GetValueFromConfig(HideDictButtonsWithNoResults, nameof(HideDictButtonsWithNoResults), bool.TryParse);
-        AutoHidePopupIfMouseIsNotOverPopup = GetValueFromConfig(AutoHidePopupIfMouseIsNotOverPopup, nameof(AutoHidePopupIfMouseIsNotOverPopup), bool.TryParse);
+        AutoHidePopupIfMouseIsNotOverIt = GetValueFromConfig(AutoHidePopupIfMouseIsNotOverIt, nameof(AutoHidePopupIfMouseIsNotOverIt), bool.TryParse);
 
         TextBoxIsReadOnly = GetValueFromConfig(TextBoxIsReadOnly, nameof(TextBoxIsReadOnly), bool.TryParse);
         mainWindow.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
@@ -658,7 +658,7 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.ShowMiningModeReminderCheckBox.IsChecked = ShowMiningModeReminder;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInPopups;
         preferenceWindow.HideDictButtonsWithNoResultsCheckBox.IsChecked = HideDictButtonsWithNoResults;
-        preferenceWindow.AutoHidePopupIfMouseIsNotOverItCheckBox.IsChecked = AutoHidePopupIfMouseIsNotOverPopup;
+        preferenceWindow.AutoHidePopupIfMouseIsNotOverItCheckBox.IsChecked = AutoHidePopupIfMouseIsNotOverIt;
     }
 
     public async Task SavePreferences(PreferencesWindow preferenceWindow)
@@ -892,7 +892,7 @@ internal sealed class ConfigManager : CoreConfig
         config.AppSettings.Settings[nameof(HideDictButtonsWithNoResults)].Value =
             preferenceWindow.HideDictButtonsWithNoResultsCheckBox.IsChecked.ToString();
 
-        config.AppSettings.Settings[nameof(AutoHidePopupIfMouseIsNotOverPopup)].Value =
+        config.AppSettings.Settings[nameof(AutoHidePopupIfMouseIsNotOverIt)].Value =
             preferenceWindow.AutoHidePopupIfMouseIsNotOverItCheckBox.IsChecked.ToString();
 
         config.AppSettings.Settings[nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds)].Value =

@@ -1413,7 +1413,7 @@ internal sealed partial class PopupWindow : Window
 
         PopUpScrollViewer.ScrollToTop();
 
-        if (ConfigManager.AutoHidePopupIfMouseIsNotOverPopup)
+        if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
         {
             PopupWindowUtils.SetPopupAutoHideTimer();
         }
@@ -1597,7 +1597,7 @@ internal sealed partial class PopupWindow : Window
 
         if (MiningMode)
         {
-            if (ConfigManager.AutoHidePopupIfMouseIsNotOverPopup && (!ChildPopupWindow?.IsVisible ?? true))
+            if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt && (!ChildPopupWindow?.IsVisible ?? true))
             {
                 PopupAutoHideTimer.Stop();
                 PopupAutoHideTimer.Start();
