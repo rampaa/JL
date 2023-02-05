@@ -1070,12 +1070,13 @@
                             <TextBlock HorizontalAlignment="Left" Text="Browser path" VerticalAlignment="Center" TextWrapping="Wrap"
                                        Cursor="Help"
                                        ToolTip="The path of the browser that will be used for searches, without quotes. Leave blank to use the default browser."/>
-                            <TextBox x:Name="BrowserPathTextBox" HorizontalAlignment="Right" MinWidth="250" MaxWidth="350" MaxHeight="60" TextWrapping="Wrap" />
+                            <hc:TextBox x:Name="BrowserPathTextBox" HorizontalAlignment="Right" Width="300" MaxHeight="60" TextWrapping="Wrap"
+                                        hc:InfoElement.Placeholder="Default browser" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Search URL" VerticalAlignment="Center" TextWrapping="Wrap" />
-                            <TextBox x:Name="SearchUrlTextBox" HorizontalAlignment="Right" MinWidth="250" MaxWidth="350" MaxHeight="60" TextWrapping="Wrap" />
+                            <TextBox x:Name="SearchUrlTextBox" HorizontalAlignment="Right" Width="300" MaxHeight="60" TextWrapping="Wrap" />
                         </DockPanel>
 
                     </StackPanel>
