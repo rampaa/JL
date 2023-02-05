@@ -69,12 +69,6 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Search URL" VerticalAlignment="Center"
-                                           TextWrapping="Wrap" />
-                            <TextBox x:Name="SearchUrlTextBox" HorizontalAlignment="Right" MinWidth="250" MaxWidth="350" MaxHeight="60" TextWrapping="Wrap" />
-                        </DockPanel>
-                        
-                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Focusable"
                                        Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"
                                        ToolTip="If unchecked, JL will not steal the focus away from other windows, even in case of a mouse click."/>
@@ -1070,6 +1064,18 @@
 &#10;Not recommended unless you feel that lookup is slow."
                                        Cursor="Help"/>
                             <CheckBox x:Name="PrecachingCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Browser path" VerticalAlignment="Center" TextWrapping="Wrap"
+                                       Cursor="Help"
+                                       ToolTip="The path of the browser that will be used for searches, without quotes. Leave blank to use the default browser."/>
+                            <TextBox x:Name="BrowserPathTextBox" HorizontalAlignment="Right" MinWidth="250" MaxWidth="350" MaxHeight="60" TextWrapping="Wrap" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Search URL" VerticalAlignment="Center" TextWrapping="Wrap" />
+                            <TextBox x:Name="SearchUrlTextBox" HorizontalAlignment="Right" MinWidth="250" MaxWidth="350" MaxHeight="60" TextWrapping="Wrap" />
                         </DockPanel>
 
                     </StackPanel>

@@ -50,7 +50,6 @@ internal sealed class ConfigManager : CoreConfig
     public static bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
     public static bool DisableHotkeys { get; set; } = false;
     public static bool Focusable { get; private set; } = true;
-    public static string SearchUrl { get; private set; } = "https://www.google.com/search?q={SearchTerm}&hl=ja";
 
     #endregion
 
@@ -159,10 +158,10 @@ internal sealed class ConfigManager : CoreConfig
     #region Advanced
 
     public static int MaxSearchLength { get; private set; } = 37;
-
     public static int MaxNumResultsNotInMiningMode { get; private set; } = 7;
-
     public static bool Precaching { get; private set; } = false;
+    public static string SearchUrl { get; private set; } = "https://www.google.com/search?q={SearchTerm}&hl=ja";
+    public static string BrowserPath { get; private set; } = "";
 
     #endregion
 
@@ -391,6 +390,21 @@ internal sealed class ConfigManager : CoreConfig
             SearchUrl = tempStr;
         }
 
+        tempStr = ConfigurationManager.AppSettings.Get(nameof(BrowserPath));
+        if (tempStr is null)
+        {
+            AddToConfig(nameof(BrowserPath), BrowserPath);
+        }
+        else if (!string.IsNullOrWhiteSpace(tempStr) && !Path.IsPathFullyQualified(tempStr))
+        {
+            Utils.Logger.Error("Couldn't save Browser Path, invalid path");
+            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save Browser Path, invalid path");
+        }
+        else
+        {
+            BrowserPath = tempStr;
+        }
+
         tempStr = ConfigurationManager.AppSettings.Get("MainWindowFont");
         if (tempStr is null)
         {
@@ -557,6 +571,7 @@ internal sealed class ConfigManager : CoreConfig
         WindowsUtils.SetButtonColor(preferenceWindow.DictTypeColorButton, DictTypeColor);
 
         preferenceWindow.SearchUrlTextBox.Text = SearchUrl;
+        preferenceWindow.BrowserPathTextBox.Text = BrowserPath;
         preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
         preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri.OriginalString;
         preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = ForceSyncAnki;
@@ -715,6 +730,8 @@ internal sealed class ConfigManager : CoreConfig
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
         config.AppSettings.Settings[nameof(SearchUrl)].Value = preferenceWindow.SearchUrlTextBox.Text;
+
+        config.AppSettings.Settings[nameof(BrowserPath)].Value = preferenceWindow.BrowserPathTextBox.Text;
 
         config.AppSettings.Settings[nameof(MaxSearchLength)].Value =
             preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);

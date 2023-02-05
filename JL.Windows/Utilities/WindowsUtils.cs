@@ -261,10 +261,16 @@ internal static class WindowsUtils
 
     public static void SearchWithBrowser(string? selectedText)
     {
+        string browserPath = "";
+        if (!string.IsNullOrWhiteSpace(ConfigManager.BrowserPath))
+        {
+            browserPath = $"\"{ConfigManager.BrowserPath}\"";
+        }
+
         if (selectedText?.Length > 0)
         {
             _ = Process.Start(new ProcessStartInfo("cmd",
-                $"/c start \"\" \"{ConfigManager.SearchUrl.Replace("{SearchTerm}", System.Web.HttpUtility.UrlEncode(selectedText))}\"")
+                $"/c start \"\" {browserPath} \"{ConfigManager.SearchUrl.Replace("{SearchTerm}", System.Web.HttpUtility.UrlEncode(selectedText))}\"")
             { CreateNoWindow = true });
         }
     }
