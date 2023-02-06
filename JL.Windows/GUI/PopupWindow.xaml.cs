@@ -1270,7 +1270,7 @@ internal sealed partial class PopupWindow : Window
         }
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.KanjiModeKeyGesture))
         {
-            ConfigManager.Instance.KanjiMode = !ConfigManager.Instance.KanjiMode;
+            Storage.Frontend.CoreConfig.KanjiMode = !Storage.Frontend.CoreConfig.KanjiMode;
             LastText = "";
             Storage.Frontend.InvalidateDisplayCache();
             if (Owner != MainWindow.Instance)

@@ -75,6 +75,7 @@ internal sealed class ConfigManager : CoreConfig
     public static bool OnlyCaptureTextWithJapaneseCharsFromClipboard { get; private set; } = true;
     public static bool DisableLookupsForNonJapaneseCharsInMainWindow { get; private set; } = false;
     public static bool MainWindowFocusOnHover { get; private set; } = false;
+    public static bool SteppedBacklogWithMouseWheel { get; private set; } = false;
 
     #endregion
 
@@ -196,6 +197,7 @@ internal sealed class ConfigManager : CoreConfig
         OnlyCaptureTextWithJapaneseCharsFromClipboard = GetValueFromConfig(OnlyCaptureTextWithJapaneseCharsFromClipboard, nameof(OnlyCaptureTextWithJapaneseCharsFromClipboard), bool.TryParse);
         DisableLookupsForNonJapaneseCharsInMainWindow = GetValueFromConfig(DisableLookupsForNonJapaneseCharsInMainWindow, nameof(DisableLookupsForNonJapaneseCharsInMainWindow), bool.TryParse);
         MainWindowFocusOnHover = GetValueFromConfig(MainWindowFocusOnHover, nameof(MainWindowFocusOnHover), bool.TryParse);
+        SteppedBacklogWithMouseWheel = GetValueFromConfig(SteppedBacklogWithMouseWheel, nameof(SteppedBacklogWithMouseWheel), bool.TryParse);
         MainWindowDynamicHeight = GetValueFromConfig(MainWindowDynamicHeight, nameof(MainWindowDynamicHeight), bool.TryParse);
         MainWindowDynamicWidth = GetValueFromConfig(MainWindowDynamicWidth, nameof(MainWindowDynamicWidth), bool.TryParse);
         PopupDynamicHeight = GetValueFromConfig(PopupDynamicHeight, nameof(PopupDynamicHeight), bool.TryParse);
@@ -614,6 +616,7 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.OnlyCaptureTextWithJapaneseCharsFromClipboardCheckBox.IsChecked = OnlyCaptureTextWithJapaneseCharsFromClipboard;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInMainWindow;
         preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked = MainWindowFocusOnHover;
+        preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked = SteppedBacklogWithMouseWheel;
 
         preferenceWindow.ThemeComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("Theme");
 
@@ -779,6 +782,8 @@ internal sealed class ConfigManager : CoreConfig
             preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(MainWindowFocusOnHover)].Value =
             preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings[nameof(SteppedBacklogWithMouseWheel)].Value =
+    preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked.ToString();
 
         config.AppSettings.Settings[nameof(MainWindowTextColor)].Value =
             preferenceWindow.TextboxTextColorButton.Tag.ToString();

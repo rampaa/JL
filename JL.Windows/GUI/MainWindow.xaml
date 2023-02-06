@@ -6,9 +6,9 @@
         Title="JL"
         AllowsTransparency="True"
         mc:Ignorable="d" MinWidth="100" MinHeight="50" WindowStyle="None" ResizeMode="NoResize" Topmost="True"
-        Closed="MainWindow_Closed" Closing="MainWindow_Closing" KeyDown="MainWindow_KeyDown"
-        PreviewKeyDown="MainWindow_PreviewKeyDown" SizeChanged="MainWindow_SizeChanged"
-        PreviewMouseDown="Window_PreviewMouseDown" DpiChanged="Window_DpiChanged" PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown" MouseLeave="Window_MouseLeave" MouseEnter="Window_MouseEnter" StateChanged="Window_StateChanged"
+        Closed="MainWindow_Closed" Closing="MainWindow_Closing" PreviewKeyDown="Window_PreviewKeyDown"
+        SizeChanged="MainWindow_SizeChanged" 
+        PreviewMouseDown="Window_PreviewMouseDown" DpiChanged="Window_DpiChanged" MouseLeave="Window_MouseLeave" MouseEnter="Window_MouseEnter" StateChanged="Window_StateChanged"
         x:ClassModifier="internal">
     <Window.Background>
         <SolidColorBrush Color="Black" Opacity="0.3" />
@@ -29,7 +29,7 @@
         <TextBox x:Name="MainTextBox" Margin="5,20,5,5" TextWrapping="Wrap" VerticalContentAlignment="Top"
                  Background="Transparent" FontSize="{Binding Value, ElementName=FontSizeSlider}"
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"
-                 VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
+                 VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" AutoWordSelection="False"
                  MouseLeave="MainTextBox_MouseLeave" MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow"
                  FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled="True" IsUndoEnabled="False"
                  PreviewMouseLeftButtonUp="MainTextBox_PreviewMouseLeftButtonUp" ContextMenuOpening="MainTextBox_ContextMenuOpening" AcceptsReturn="True" AcceptsTab="True">
@@ -118,9 +118,6 @@
                 <DropShadowEffect ShadowDepth="0.5" BlurRadius="3" Direction="320" Opacity="0.8" RenderingBias="Quality" />
             </TextBlock.Effect>
         </TextBlock>
-
-        <!-- <Ellipse x:Name="FocusEllipse" Margin="7,1,1,5" HorizontalAlignment="Left" VerticalAlignment="Bottom" -->
-        <!--          ToolTip="Window Focus" Width="10" Height="10" /> -->
 
         <!--<TextBlock x:Name="PrecacheProgress" Margin="1,1,15,15" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                    Visibility="Collapsed" Width="120" Height="17" Foreground="White">

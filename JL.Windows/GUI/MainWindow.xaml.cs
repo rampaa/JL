@@ -257,9 +257,62 @@ internal sealed partial class MainWindow : Window
         Application.Current.Shutdown();
     }
 
+    private void ShowPreviousBacklogItem()
+    {
+        if (_currentTextIndex is not 0)
+        {
+            --_currentTextIndex;
+            MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
+        }
+
+        MainTextBox.Text = _backlog[_currentTextIndex];
+    }
+
+    private void ShowNextBacklogItem()
+    {
+        if (_currentTextIndex < _backlog.Count - 1)
+        {
+            ++_currentTextIndex;
+            MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
+        }
+
+        if (_currentTextIndex == _backlog.Count - 1)
+        {
+            MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+        }
+
+        MainTextBox.Text = _backlog[_currentTextIndex];
+    }
+
     private void MainTextBox_MouseWheel(object sender, MouseWheelEventArgs e)
     {
-        if (e.Delta > 0 && !Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+        {
+            if (e.Delta > 0)
+            {
+                FontSizeSlider.Value += 5;
+            }
+
+            else if (e.Delta < 0)
+            {
+                FontSizeSlider.Value -= 5;
+            }
+        }
+
+        else if (ConfigManager.SteppedBacklogWithMouseWheel)
+        {
+            if (e.Delta > 0)
+            {
+                ShowPreviousBacklogItem();
+            }
+
+            else if (e.Delta < 0)
+            {
+                ShowNextBacklogItem();
+            }
+        }
+
+        else if (e.Delta > 0)
         {
             string allBacklogText = string.Join("\n", _backlog);
             if (MainTextBox.Text != allBacklogText)
@@ -279,16 +332,6 @@ internal sealed partial class MainWindow : Window
                     MainTextBox.ScrollToEnd();
                 }
             }
-        }
-
-        else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Delta > 0)
-        {
-            FontSizeSlider.Value += 5;
-        }
-
-        else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Delta < 0)
-        {
-            FontSizeSlider.Value -= 5;
         }
     }
 
@@ -390,7 +433,7 @@ internal sealed partial class MainWindow : Window
         MainTextBox.FontSize = FontSizeSlider.Value;
     }
 
-    private async void MainWindow_KeyDown(object sender, KeyEventArgs e)
+    private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (WindowsUtils.CompareKeyGesture(e, ConfigManager.DisableHotkeysKeyGesture))
         {
@@ -402,7 +445,16 @@ internal sealed partial class MainWindow : Window
             return;
         }
 
-        if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowPreferencesWindowKeyGesture))
+        if (WindowsUtils.CompareKeyGesture(e, ConfigManager.SteppedBacklogBackwardsKeyGesture))
+        {
+            ShowPreviousBacklogItem();
+        }
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.SteppedBacklogForwardsKeyGesture))
+        {
+            ShowNextBacklogItem();
+        }
+
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowPreferencesWindowKeyGesture))
         {
             WindowsUtils.ShowPreferencesWindow();
         }
@@ -427,7 +479,7 @@ internal sealed partial class MainWindow : Window
             // fixes double toggling KanjiMode
             e.Handled = true;
 
-            ConfigManager.Instance.KanjiMode = !ConfigManager.Instance.KanjiMode;
+            Storage.Frontend.CoreConfig.KanjiMode = !Storage.Frontend.CoreConfig.KanjiMode;
             FirstPopupWindow.LastText = "";
             Storage.Frontend.InvalidateDisplayCache();
             MainTextBox_MouseMove(null, null);
@@ -569,40 +621,6 @@ internal sealed partial class MainWindow : Window
     private async void ShowStats(object sender, RoutedEventArgs e)
     {
         await WindowsUtils.ShowStatsWindow().ConfigureAwait(false);
-    }
-
-    private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
-    {
-        SteppedBacklog(e);
-    }
-
-    private void SteppedBacklog(KeyEventArgs e)
-    {
-        if (WindowsUtils.CompareKeyGesture(e, ConfigManager.SteppedBacklogBackwardsKeyGesture))
-        {
-            if (_currentTextIndex is not 0)
-            {
-                _currentTextIndex--;
-                MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
-            }
-
-            MainTextBox.Text = _backlog[_currentTextIndex];
-        }
-        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.SteppedBacklogForwardsKeyGesture))
-        {
-            if (_currentTextIndex < _backlog.Count - 1)
-            {
-                _currentTextIndex++;
-                MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
-            }
-
-            if (_currentTextIndex == _backlog.Count - 1)
-            {
-                MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
-            }
-
-            MainTextBox.Text = _backlog[_currentTextIndex];
-        }
     }
 
     private void OpacitySlider_LostMouseCapture(object sender, MouseEventArgs e)
@@ -770,16 +788,6 @@ internal sealed partial class MainWindow : Window
         WindowsUtils.DpiAwarePopupMaxHeight = ConfigManager.PopupMaxHeight / e.NewDpi.DpiScaleY;
     }
 
-    private void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        if (ConfigManager.LookupOnSelectOnly)
-        {
-            double verticalOffset = MainTextBox.VerticalOffset;
-            MainTextBox.Select(0, 0);
-            MainTextBox.ScrollToVerticalOffset(verticalOffset);
-        }
-    }
-
     private void Border_OnMouseEnter(object sender, MouseEventArgs e)
     {
         // For some reason, when DragMove() is used Mouse.GetPosition() returns Point(0, 0)
@@ -855,18 +863,6 @@ internal sealed partial class MainWindow : Window
         LeftPositionBeforeResolutionChange = Left;
         TopPositionBeforeResolutionChange = Top;
     }
-
-    //private void Window_Deactivated(object sender, EventArgs e)
-    //{
-    //    //if (!FirstPopupWindow.IsVisible)
-    //    //    FocusEllipse.Fill = Brushes.Transparent;
-    //}
-
-    //private void Window_Activated(object sender, EventArgs e)
-    //{
-    //    //FocusEllipse.Fill = Brushes.Green;
-    //    //FocusEllipse.Opacity = Background.Opacity;
-    //}
 
     private void MainTextBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
