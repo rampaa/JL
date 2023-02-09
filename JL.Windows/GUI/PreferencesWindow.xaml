@@ -228,13 +228,24 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Enable WebSocket text capture"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="CaptureTextFromWebSocketCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="WebSocket server address" VerticalAlignment="Center" TextWrapping="Wrap" />
+                            <TextBox x:Name="WebSocketUriTextBox" HorizontalAlignment="Right" Width="200" MaxHeight="60" TextWrapping="Wrap" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Enable clipboard text capture"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="CaptureTextFromClipboardCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Capture text from clipboard only if it has Japanese characters"
+                            <TextBlock HorizontalAlignment="Left" Text="Capture text from clipboard/WebSocket only if it has Japanese characters"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="OnlyCaptureTextWithJapaneseCharsFromClipboardCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
@@ -1005,6 +1016,26 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle capture text from clipboard option" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="CaptureTextFromWebSocketKeyGestureTextBox" AutomationProperties.Name=""
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Toggle capture text from WebSocket option" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="ReconnectToWebSocketServerKeyGestureTextBox" AutomationProperties.Name=""
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Reconnect to WebSocket" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 

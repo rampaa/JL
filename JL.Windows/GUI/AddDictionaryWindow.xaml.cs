@@ -44,7 +44,7 @@ internal sealed partial class AddDictionaryWindow : Window
         string path = TextBlockPath.Text;
         if (string.IsNullOrEmpty(path)
             || (!Directory.Exists(path) && !File.Exists(path))
-            || Storage.Dicts.Values.Select(static freq => freq.Path).Contains(path))
+            || Storage.Dicts.Values.Select(static dict => dict.Path).Contains(path))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
             isValid = false;

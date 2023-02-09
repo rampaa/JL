@@ -104,37 +104,65 @@ internal sealed partial class MainWindow : Window
                 gotTextFromClipboard = true;
                 if (!ConfigManager.OnlyCaptureTextWithJapaneseCharsFromClipboard || Storage.JapaneseRegex.IsMatch(text))
                 {
-                    if (ConfigManager.TextBoxTrimWhiteSpaceCharacters)
-                    {
-                        text = text.Trim();
-                    }
-
-                    if (ConfigManager.TextBoxRemoveNewlines)
-                    {
-                        text = text.ReplaceLineEndings("");
-                    }
+                    text = SanitizeText(text);
 
                     MainTextBox.Text = text;
                     MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
 
-                    _backlog.Add(text);
-                    _currentTextIndex = _backlog.Count - 1;
-                    await Stats.IncrementStat(StatType.Characters, new StringInfo(text).LengthInTextElements).ConfigureAwait(false);
-                    await Stats.IncrementStat(StatType.Lines).ConfigureAwait(false);
-
-                    if (ConfigManager.Precaching && Storage.DictsReady
-                        && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic
-                        && Storage.FreqsReady && MainTextBox.Text.Length < Storage.CacheSize)
-                    {
-                        _ = Dispatcher.Invoke(DispatcherPriority.Render, static () => { }); // let MainTextBox text update
-                        await Precache(MainTextBox.Text).ConfigureAwait(false);
-                    }
+                    await HandlePostCopy(text).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
             {
                 Utils.Logger.Warning(ex, "CopyFromClipboard failed");
             }
+        }
+    }
+
+    public async Task CopyFromWebSocket(string text)
+    {
+        if (!ConfigManager.OnlyCaptureTextWithJapaneseCharsFromClipboard || Storage.JapaneseRegex.IsMatch(text))
+        {
+            text = SanitizeText(text);
+
+            Dispatcher.Invoke(() =>
+            {
+                MainTextBox.Text = text;
+                MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+            });
+
+            await HandlePostCopy(text).ConfigureAwait(false);
+        }
+    }
+
+    private static string SanitizeText(string text)
+    {
+        if (ConfigManager.TextBoxTrimWhiteSpaceCharacters)
+        {
+            text = text.Trim();
+        }
+
+        if (ConfigManager.TextBoxRemoveNewlines)
+        {
+            text = text.ReplaceLineEndings("");
+        }
+
+        return text;
+    }
+
+    private async Task HandlePostCopy(string text)
+    {
+        _backlog.Add(text);
+        _currentTextIndex = _backlog.Count - 1;
+        await Stats.IncrementStat(StatType.Characters, new StringInfo(text).LengthInTextElements).ConfigureAwait(false);
+        await Stats.IncrementStat(StatType.Lines).ConfigureAwait(false);
+
+        if (ConfigManager.Precaching && Storage.DictsReady
+            && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic
+            && Storage.FreqsReady && MainTextBox.Text.Length < Storage.CacheSize)
+        {
+            _ = Dispatcher.Invoke(DispatcherPriority.Render, static () => { }); // let MainTextBox text update
+            await Precache(MainTextBox.Text).ConfigureAwait(false);
         }
     }
 
@@ -577,6 +605,18 @@ internal sealed partial class MainWindow : Window
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.CaptureTextFromClipboardKeyGesture))
         {
             ConfigManager.CaptureTextFromClipboard = !ConfigManager.CaptureTextFromClipboard;
+        }
+
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.CaptureTextFromWebSocketdKeyGesture))
+        {
+            ConfigManager.CaptureTextFromWebSocket = !ConfigManager.CaptureTextFromWebSocket;
+            WebSocketUtils.HandleWebSocket();
+        }
+
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ReconnectToWebSocketServerKeyGesture))
+        {
+            ConfigManager.CaptureTextFromWebSocket = true;
+            WebSocketUtils.HandleWebSocket();
         }
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.TextBoxIsReadOnlyKeyGesture))

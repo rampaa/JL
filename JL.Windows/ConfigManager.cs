@@ -76,6 +76,8 @@ internal sealed class ConfigManager : CoreConfig
     public static bool DisableLookupsForNonJapaneseCharsInMainWindow { get; private set; } = false;
     public static bool MainWindowFocusOnHover { get; private set; } = false;
     public static bool SteppedBacklogWithMouseWheel { get; private set; } = false;
+    public static bool CaptureTextFromWebSocket { get; set; } = false;
+    public static Uri WebSocketUri { get; set; } = new("ws://127.0.0.1:6677");
 
     #endregion
 
@@ -153,6 +155,8 @@ internal sealed class ConfigManager : CoreConfig
     public static KeyGesture TextOnlyVisibleOnHoverKeyGesture { get; private set; } = new(Key.E, ModifierKeys.Windows);
     public static KeyGesture TextBoxIsReadOnlyKeyGesture { get; private set; } = new(Key.U, ModifierKeys.Windows);
     public static KeyGesture CaptureTextFromClipboardKeyGesture { get; private set; } = new(Key.F12, ModifierKeys.Windows);
+    public static KeyGesture CaptureTextFromWebSocketdKeyGesture { get; private set; } = new(Key.F11, ModifierKeys.Windows);
+    public static KeyGesture ReconnectToWebSocketServerKeyGesture { get; private set; } = new(Key.F9, ModifierKeys.Windows);
 
     #endregion
 
@@ -194,6 +198,7 @@ internal sealed class ConfigManager : CoreConfig
         TextBoxTrimWhiteSpaceCharacters = GetValueFromConfig(TextBoxTrimWhiteSpaceCharacters, nameof(TextBoxTrimWhiteSpaceCharacters), bool.TryParse);
         TextBoxRemoveNewlines = GetValueFromConfig(TextBoxRemoveNewlines, nameof(TextBoxRemoveNewlines), bool.TryParse);
         CaptureTextFromClipboard = GetValueFromConfig(CaptureTextFromClipboard, nameof(CaptureTextFromClipboard), bool.TryParse);
+        CaptureTextFromWebSocket = GetValueFromConfig(CaptureTextFromWebSocket, nameof(CaptureTextFromWebSocket), bool.TryParse);
         OnlyCaptureTextWithJapaneseCharsFromClipboard = GetValueFromConfig(OnlyCaptureTextWithJapaneseCharsFromClipboard, nameof(OnlyCaptureTextWithJapaneseCharsFromClipboard), bool.TryParse);
         DisableLookupsForNonJapaneseCharsInMainWindow = GetValueFromConfig(DisableLookupsForNonJapaneseCharsInMainWindow, nameof(DisableLookupsForNonJapaneseCharsInMainWindow), bool.TryParse);
         MainWindowFocusOnHover = GetValueFromConfig(MainWindowFocusOnHover, nameof(MainWindowFocusOnHover), bool.TryParse);
@@ -316,6 +321,8 @@ internal sealed class ConfigManager : CoreConfig
         TextOnlyVisibleOnHoverKeyGesture = WindowsUtils.SetKeyGesture(nameof(TextOnlyVisibleOnHoverKeyGesture), TextOnlyVisibleOnHoverKeyGesture);
         TextBoxIsReadOnlyKeyGesture = WindowsUtils.SetKeyGesture(nameof(TextBoxIsReadOnlyKeyGesture), TextBoxIsReadOnlyKeyGesture);
         CaptureTextFromClipboardKeyGesture = WindowsUtils.SetKeyGesture(nameof(CaptureTextFromClipboardKeyGesture), CaptureTextFromClipboardKeyGesture);
+        CaptureTextFromWebSocketdKeyGesture = WindowsUtils.SetKeyGesture(nameof(CaptureTextFromWebSocketdKeyGesture), CaptureTextFromWebSocketdKeyGesture);
+        ReconnectToWebSocketServerKeyGesture = WindowsUtils.SetKeyGesture(nameof(ReconnectToWebSocketServerKeyGesture), ReconnectToWebSocketServerKeyGesture);
 
         ShowPreferencesWindowKeyGesture =
             WindowsUtils.SetKeyGesture(nameof(ShowPreferencesWindowKeyGesture), ShowPreferencesWindowKeyGesture);
@@ -376,6 +383,22 @@ internal sealed class ConfigManager : CoreConfig
             Utils.Logger.Error("Couldn't save AnkiConnect server address, invalid URL");
             Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
         }
+
+        tempStr = ConfigurationManager.AppSettings.Get(nameof(WebSocketUri));
+        if (tempStr is null)
+        {
+            AddToConfig(nameof(WebSocketUri), WebSocketUri.OriginalString);
+        }
+        else if (Uri.TryCreate(tempStr, UriKind.Absolute, out Uri? webSocketUri))
+        {
+            WebSocketUri = webSocketUri;
+        }
+        else
+        {
+            Utils.Logger.Error("Couldn't save WebSocket address, invalid URL");
+            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save WebSocket address, invalid URL");
+        }
+        WebSocketUtils.HandleWebSocket();
 
         tempStr = ConfigurationManager.AppSettings.Get(nameof(SearchUrl));
         if (tempStr is null)
@@ -557,6 +580,10 @@ internal sealed class ConfigManager : CoreConfig
             WindowsUtils.KeyGestureToString(TextBoxIsReadOnlyKeyGesture);
         preferenceWindow.CaptureTextFromClipboardKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(CaptureTextFromClipboardKeyGesture);
+        preferenceWindow.CaptureTextFromWebSocketKeyGestureTextBox.Text =
+            WindowsUtils.KeyGestureToString(CaptureTextFromWebSocketdKeyGesture);
+        preferenceWindow.ReconnectToWebSocketServerKeyGestureTextBox.Text =
+            WindowsUtils.KeyGestureToString(ReconnectToWebSocketServerKeyGesture);
 
         WindowsUtils.SetButtonColor(preferenceWindow.HighlightColorButton, HighlightColor);
         WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, mainWindow.Background.CloneCurrentValue());
@@ -576,6 +603,7 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.BrowserPathTextBox.Text = BrowserPath;
         preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
         preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri.OriginalString;
+        preferenceWindow.WebSocketUriTextBox.Text = WebSocketUri.OriginalString;
         preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = ForceSyncAnki;
         preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = AllowDuplicateCards;
         preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
@@ -613,6 +641,8 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked = TextBoxApplyDropShadowEffect;
 
         preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked = CaptureTextFromClipboard;
+        preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked = CaptureTextFromWebSocket;
+
         preferenceWindow.OnlyCaptureTextWithJapaneseCharsFromClipboardCheckBox.IsChecked = OnlyCaptureTextWithJapaneseCharsFromClipboard;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInMainWindow;
         preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked = MainWindowFocusOnHover;
@@ -729,6 +759,10 @@ internal sealed class ConfigManager : CoreConfig
             preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(CaptureTextFromClipboardKeyGesture),
             preferenceWindow.CaptureTextFromClipboardKeyGestureTextBox.Text);
+        SaveKeyGesture(nameof(CaptureTextFromWebSocketdKeyGesture),
+            preferenceWindow.CaptureTextFromWebSocketKeyGestureTextBox.Text);
+        SaveKeyGesture(nameof(ReconnectToWebSocketServerKeyGesture),
+            preferenceWindow.ReconnectToWebSocketServerKeyGestureTextBox.Text);
 
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
@@ -740,6 +774,9 @@ internal sealed class ConfigManager : CoreConfig
             preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings[nameof(AnkiConnectUri)].Value =
             preferenceWindow.AnkiUriTextBox.Text;
+
+        config.AppSettings.Settings[nameof(WebSocketUri)].Value =
+            preferenceWindow.WebSocketUriTextBox.Text;
 
         config.AppSettings.Settings[nameof(MainWindowDynamicWidth)].Value =
             preferenceWindow.MainWindowDynamicWidthCheckBox.IsChecked.ToString();
@@ -776,6 +813,9 @@ internal sealed class ConfigManager : CoreConfig
 
         config.AppSettings.Settings[nameof(CaptureTextFromClipboard)].Value =
             preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings[nameof(CaptureTextFromWebSocket)].Value =
+            preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked.ToString();
+
         config.AppSettings.Settings[nameof(OnlyCaptureTextWithJapaneseCharsFromClipboard)].Value =
             preferenceWindow.OnlyCaptureTextWithJapaneseCharsFromClipboardCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(DisableLookupsForNonJapaneseCharsInMainWindow)].Value =

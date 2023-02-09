@@ -244,6 +244,7 @@ internal sealed partial class PopupWindow : Window
         }
 
         _lastTextBox = tb;
+        _lastSelectedText = tb.SelectedText;
 
         PopUpScrollViewer.ScrollToTop();
 
@@ -1229,6 +1230,16 @@ internal sealed partial class PopupWindow : Window
     private async void Window_KeyDown(object sender, KeyEventArgs e)
     {
         e.Handled = true;
+
+        if (WindowsUtils.CompareKeyGesture(e, ConfigManager.DisableHotkeysKeyGesture))
+        {
+            ConfigManager.DisableHotkeys = !ConfigManager.DisableHotkeys;
+        }
+
+        if (ConfigManager.DisableHotkeys)
+        {
+            return;
+        }
 
         if (WindowsUtils.CompareKeyGesture(e, ConfigManager.MiningModeKeyGesture))
         {
