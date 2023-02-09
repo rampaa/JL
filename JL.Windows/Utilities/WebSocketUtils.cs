@@ -6,7 +6,7 @@ using JL.Core.Utilities;
 using JL.Windows.GUI;
 
 namespace JL.Windows.Utilities;
-internal class WebSocketUtils
+internal static class WebSocketUtils
 {
     private static Task? s_webSocketTask = null;
     private static CancellationTokenSource? s_webSocketCancellationTokenSource = null;
