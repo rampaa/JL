@@ -56,7 +56,7 @@ public static class Storage
                 "CustomWordDictionary",
                 new Dict(DictType.CustomWordDictionary,
                     "Custom Word Dictionary",
-                    $"{ResourcesPath}/custom_words.txt",
+                    "Resources/custom_words.txt",
                     true, 1, 128,
                     new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }))
             },
@@ -64,12 +64,12 @@ public static class Storage
                 "CustomNameDictionary",
                 new Dict(DictType.CustomNameDictionary,
                     "Custom Name Dictionary",
-                    $"{ResourcesPath}/custom_names.txt", true, 2, 128,
+                    "Resources/custom_names.txt", true, 2, 128,
                     new DictOptions())
             },
             {
                 "JMdict",
-                new Dict(DictType.JMdict, "JMdict", $"{ResourcesPath}/JMdict.xml", true, 3, 500000,
+                new Dict(DictType.JMdict, "JMdict", "Resources/JMdict.xml", true, 3, 500000,
                     new DictOptions(
                         new NewlineBetweenDefinitionsOption { Value = false },
                         wordClassInfo: new WordClassInfoOption { Value = true },
@@ -88,12 +88,12 @@ public static class Storage
             },
             {
                 "Kanjidic",
-                new Dict(DictType.Kanjidic, "Kanjidic", $"{ResourcesPath}/kanjidic2.xml", true, 4, 13108,
+                new Dict(DictType.Kanjidic, "Kanjidic", "Resources/kanjidic2.xml", true, 4, 13108,
                     new DictOptions(noAll: new NoAllOption { Value = false }))
             },
             {
                 "JMnedict",
-                new Dict(DictType.JMnedict, "JMnedict", $"{ResourcesPath}/JMnedict.xml", true, 5, 700000,
+                new Dict(DictType.JMnedict, "JMnedict", "Resources/JMnedict.xml", true, 5, 700000,
                     new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }))
             }
         };
@@ -102,17 +102,17 @@ public static class Storage
     {
         {
             "VN (Nazeka)",
-            new Freq(FreqType.Nazeka, "VN (Nazeka)", $"{ResourcesPath}/freqlist_vns.json", true, 1, 57273)
+            new Freq(FreqType.Nazeka, "VN (Nazeka)", "Resources/freqlist_vns.json", true, 1, 57273)
         },
 
         {
             "Narou (Nazeka)",
-            new Freq(FreqType.Nazeka, "Narou (Nazeka)", $"{ResourcesPath}/freqlist_narou.json", false, 2, 75588)
+            new Freq(FreqType.Nazeka, "Narou (Nazeka)", "Resources/freqlist_narou.json", false, 2, 75588)
         },
 
         {
             "Novel (Nazeka)",
-            new Freq(FreqType.Nazeka, "Novel (Nazeka)", $"{ResourcesPath}/freqlist_novels.json", false, 3, 114348)
+            new Freq(FreqType.Nazeka, "Novel (Nazeka)", "Resources/freqlist_novels.json", false, 3, 114348)
         }
     };
 

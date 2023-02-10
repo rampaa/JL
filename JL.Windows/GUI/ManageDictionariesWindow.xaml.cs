@@ -296,13 +296,13 @@ internal sealed partial class ManageDictionariesWindow : Window
 
     private void PathTextbox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        string path = ((TextBlock)sender).Text;
+        string? path = ((TextBlock)sender).Text;
 
         if (File.Exists(path) || Directory.Exists(path))
         {
             if (File.Exists(path))
             {
-                path = Path.GetDirectoryName(path)!;
+                path = Path.GetDirectoryName(path) ?? Storage.ApplicationPath;
             }
 
             _ = Process.Start("explorer.exe", path);

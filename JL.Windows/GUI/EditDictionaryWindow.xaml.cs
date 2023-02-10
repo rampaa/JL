@@ -87,24 +87,24 @@ internal sealed partial class EditDictionaryWindow : Window
 
     private void BrowseForDictionaryFile(string filter)
     {
-        OpenFileDialog openFileDialog = new() { InitialDirectory = File.Exists(TextBlockPath.Text) ? new FileInfo(TextBlockPath.Text).Directory!.FullName : Storage.ApplicationPath, Filter = filter };
+        OpenFileDialog openFileDialog = new() { InitialDirectory = Storage.ApplicationPath, Filter = filter };
 
         if (openFileDialog.ShowDialog() is true)
         {
             string relativePath = Path.GetRelativePath(Storage.ApplicationPath, openFileDialog.FileName);
-            TextBlockPath.Text = relativePath;
+            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
         }
     }
 
     private void BrowseForDictionaryFolder()
     {
-        using var fbd = new System.Windows.Forms.FolderBrowserDialog { SelectedPath = Directory.Exists(TextBlockPath.Text) ? TextBlockPath.Text : Storage.ApplicationPath };
+        using var fbd = new System.Windows.Forms.FolderBrowserDialog { SelectedPath = Storage.ApplicationPath };
 
         if (fbd.ShowDialog() is System.Windows.Forms.DialogResult.OK &&
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))
         {
             string relativePath = Path.GetRelativePath(Storage.ApplicationPath, fbd.SelectedPath);
-            TextBlockPath.Text = relativePath;
+            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
         }
     }
 

@@ -79,7 +79,7 @@ internal sealed partial class EditFrequencyWindow : Window
         if (openFileDialog.ShowDialog() is true)
         {
             string relativePath = Path.GetRelativePath(Storage.ApplicationPath, openFileDialog.FileName);
-            TextBlockPath.Text = relativePath;
+            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
         }
     }
 
@@ -91,7 +91,7 @@ internal sealed partial class EditFrequencyWindow : Window
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))
         {
             string relativePath = Path.GetRelativePath(Storage.ApplicationPath, fbd.SelectedPath);
-            TextBlockPath.Text = relativePath;
+            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
         }
     }
 

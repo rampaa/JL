@@ -180,6 +180,9 @@ public static class Utils
                         dict.Priority = priority;
                         ++priority;
 
+                        string relativePath = Path.GetRelativePath(Storage.ApplicationPath, dict.Path);
+                        dict.Path = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
+
                         Storage.Dicts.Add(dict.Name, dict);
                     }
                 }
