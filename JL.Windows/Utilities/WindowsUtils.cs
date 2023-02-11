@@ -330,31 +330,23 @@ internal static class WindowsUtils
 
     public static void PlayAudio(byte[] audio, float volume)
     {
-        try
+        _ = Application.Current.Dispatcher.BeginInvoke(() =>
         {
-            _ = Application.Current.Dispatcher.BeginInvoke(() =>
+            try
             {
-                try
-                {
-                    s_audioPlayer?.Dispose();
+                s_audioPlayer?.Dispose();
 
-                    s_audioPlayer = new WaveOut { Volume = volume };
+                s_audioPlayer = new WaveOut { Volume = volume };
 
-                    s_audioPlayer.Init(new Mp3FileReader(new MemoryStream(audio)));
-                    s_audioPlayer.Play();
-                }
-                catch (Exception ex)
-                {
-                    Utils.Logger.Error(ex, "Error playing audio: {Audio}", JsonSerializer.Serialize(audio));
-                    Alert(AlertLevel.Error, "Error playing audio");
-                }
-            });
-        }
-        catch (Exception ex)
-        {
-            Utils.Logger.Error(ex, "Error playing audio: {Audio}", JsonSerializer.Serialize(audio));
-            Alert(AlertLevel.Error, "Error playing audio");
-        }
+                s_audioPlayer.Init(new Mp3FileReader(new MemoryStream(audio)));
+                s_audioPlayer.Play();
+            }
+            catch (Exception ex)
+            {
+                Utils.Logger.Error(ex, "Error playing audio: {Audio}", JsonSerializer.Serialize(audio));
+                Alert(AlertLevel.Error, "Error playing audio");
+            }
+        });
     }
 
     public static async Task Motivate(string motivationFolder)
