@@ -344,7 +344,7 @@ internal static class WindowsUtils
             catch (Exception ex)
             {
                 Utils.Logger.Error(ex, "Error playing audio: {Audio}", JsonSerializer.Serialize(audio));
-                Alert(AlertLevel.Error, "Error playing audio");
+                Storage.Frontend.Alert(AlertLevel.Error, "Error playing audio");
             }
         });
     }
@@ -361,7 +361,7 @@ internal static class WindowsUtils
             if (numFiles is 0)
             {
                 Utils.Logger.Warning("Motivation folder is empty!");
-                Alert(AlertLevel.Warning, "Motivation folder is empty!");
+                Storage.Frontend.Alert(AlertLevel.Warning, "Motivation folder is empty!");
                 return;
             }
 
@@ -373,7 +373,7 @@ internal static class WindowsUtils
         catch (Exception ex)
         {
             Utils.Logger.Error(ex, "Error motivating");
-            Alert(AlertLevel.Error, "Error motivating");
+            Storage.Frontend.Alert(AlertLevel.Error, "Error motivating");
         }
     }
 

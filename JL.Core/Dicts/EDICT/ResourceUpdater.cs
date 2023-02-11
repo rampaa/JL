@@ -23,8 +23,7 @@ public static class ResourceUpdater
 
                 if (File.Exists(resourcePath))
                 {
-                    request.Headers.IfModifiedSince =
-                        File.GetLastWriteTime(resourcePath);
+                    request.Headers.IfModifiedSince = File.GetLastWriteTime(resourcePath);
                 }
 
                 if (!noPrompt)
@@ -58,18 +57,23 @@ public static class ResourceUpdater
                         "Info");
                 }
 
-                else if (!noPrompt)
+                else
                 {
-                    Storage.Frontend.ShowOkDialog($"Unexpected error while downloading {resourceName}.",
-                        "Info");
+                    Utils.Logger.Error("Unexpected error while downloading {ResourceName. Status code: {StatusCode}}",
+                        resourceName, response.StatusCode);
+
+                    if (!noPrompt)
+                    {
+                        Storage.Frontend.ShowOkDialog($"Unexpected error while downloading {resourceName}.", "Info");
+                    }
                 }
             }
         }
 
         catch (Exception ex)
         {
-            Utils.Logger.Error(ex, "Unexpected error while downloading {ResourceName}", resourceName);
             Storage.Frontend.ShowOkDialog($"Unexpected error while downloading {resourceName}.", "Info");
+            Utils.Logger.Error(ex, "Unexpected error while downloading {ResourceName}", resourceName);
         }
 
         return false;
