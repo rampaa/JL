@@ -561,7 +561,7 @@ internal sealed partial class MainWindow : Window
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.MotivationKeyGesture))
         {
-            await WindowsUtils.Motivate($"{Storage.ResourcesPath}/Motivation").ConfigureAwait(false);
+            await WindowsUtils.Motivate().ConfigureAwait(false);
         }
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ClosePopupKeyGesture))

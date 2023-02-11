@@ -349,13 +349,13 @@ internal static class WindowsUtils
         });
     }
 
-    public static async Task Motivate(string motivationFolder)
+    public static async Task Motivate()
     {
         try
         {
             Random rand = new();
 
-            string[] filePaths = Directory.GetFiles(motivationFolder);
+            string[] filePaths = Directory.GetFiles($"{Storage.ResourcesPath}/Motivation");
             int numFiles = filePaths.Length;
 
             if (numFiles is 0)
