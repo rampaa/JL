@@ -167,46 +167,28 @@ internal sealed class ConfigManager : CoreConfig
     public static bool Precaching { get; private set; } = false;
     public static string SearchUrl { get; private set; } = "https://www.google.com/search?q={SearchTerm}&hl=ja";
     public static string BrowserPath { get; private set; } = "";
-    public static string MinimumLogLevel { get; private set; } = "Error";
 
     #endregion
 
     public void ApplyPreferences()
     {
-        string? minimumLogLevelStr = ConfigurationManager.AppSettings.Get(nameof(MinimumLogLevel));
+        string? minimumLogLevelStr = ConfigurationManager.AppSettings.Get("MinimumLogLevel");
         if (minimumLogLevelStr is null)
         {
-            AddToConfig(nameof(MinimumLogLevel), MinimumLogLevel);
+            AddToConfig("MinimumLogLevel", "Error");
         }
         else
         {
-            MinimumLogLevel = minimumLogLevelStr;
-
-            switch (MinimumLogLevel)
+            Utils.LoggingLevelSwitch.MinimumLevel = minimumLogLevelStr switch
             {
-                case "Fatal":
-                    Utils.LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Fatal;
-                    break;
-                case "Error":
-                    Utils.LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Error;
-                    break;
-                case "Warning":
-                    Utils.LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Warning;
-                    break;
-                case "Information":
-                    Utils.LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Information;
-                    break;
-                case "Debug":
-                    Utils.LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Debug;
-                    break;
-                case "Verbose":
-                    Utils.LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Verbose;
-                    break;
-                default:
-                    Utils.LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Error;
-                    MinimumLogLevel = "Error";
-                    break;
-            }
+                "Fatal" => Serilog.Events.LogEventLevel.Fatal,
+                "Error" => Serilog.Events.LogEventLevel.Error,
+                "Warning" => Serilog.Events.LogEventLevel.Warning,
+                "Information" => Serilog.Events.LogEventLevel.Information,
+                "Debug" => Serilog.Events.LogEventLevel.Debug,
+                "Verbose" => Serilog.Events.LogEventLevel.Verbose,
+                _ => Serilog.Events.LogEventLevel.Error,
+            };
         }
 
         MainWindow mainWindow = MainWindow.Instance;
@@ -686,7 +668,7 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked = SteppedBacklogWithMouseWheel;
 
         preferenceWindow.ThemeComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("Theme");
-        preferenceWindow.MinimumLogLevelComboBox.SelectedValue = MinimumLogLevel;
+        preferenceWindow.MinimumLogLevelComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("MinimumLogLevel");
 
         preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
         preferenceWindow.MainWindowFontComboBox.SelectedIndex = s_japaneseFonts.FindIndex(f =>
@@ -873,7 +855,7 @@ internal sealed class ConfigManager : CoreConfig
             preferenceWindow.MainWindowOpacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["Theme"].Value =
             preferenceWindow.ThemeComboBox.SelectedValue.ToString();
-        config.AppSettings.Settings[nameof(MinimumLogLevel)].Value =
+        config.AppSettings.Settings["MinimumLogLevel"].Value =
             preferenceWindow.MinimumLogLevelComboBox.SelectedValue.ToString();
         config.AppSettings.Settings["MainWindowFont"].Value =
             preferenceWindow.MainWindowFontComboBox.SelectedValue.ToString();
