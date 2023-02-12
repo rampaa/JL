@@ -209,7 +209,6 @@ internal sealed class ConfigManager : CoreConfig
             }
         }
 
-
         MainWindow mainWindow = MainWindow.Instance;
 
         AutoAdjustFontSizesOnResolutionChange = GetValueFromConfig(AutoAdjustFontSizesOnResolutionChange, nameof(AutoAdjustFontSizesOnResolutionChange), bool.TryParse);
@@ -503,6 +502,7 @@ internal sealed class ConfigManager : CoreConfig
             default:
                 PopupFlipX = true;
                 PopupFlipY = true;
+                AddToConfig("PopupFlip", "Both");
                 break;
         }
 
