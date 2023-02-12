@@ -197,7 +197,7 @@ internal sealed partial class PopupWindow : Window
                     DisplayResults(false, text);
                 }
 
-                Visibility = Visibility.Visible;
+                Show();
 
                 if (ConfigManager.Focusable && ConfigManager.PopupFocusOnLookup)
                 {
@@ -260,7 +260,7 @@ internal sealed partial class PopupWindow : Window
             EnableMiningMode();
             DisplayResults(true, tb.SelectedText);
 
-            Visibility = Visibility.Visible;
+            Show();
             _ = tb.Focus();
 
             if (ConfigManager.Focusable)
