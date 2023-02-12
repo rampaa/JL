@@ -502,7 +502,6 @@ internal sealed class ConfigManager : CoreConfig
             default:
                 PopupFlipX = true;
                 PopupFlipY = true;
-                AddToConfig("PopupFlip", "Both");
                 break;
         }
 
