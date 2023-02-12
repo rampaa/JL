@@ -1121,6 +1121,20 @@
                             <TextBox x:Name="SearchUrlTextBox" HorizontalAlignment="Right" Width="300" MaxHeight="60" TextWrapping="Wrap" />
                         </DockPanel>
 
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Minimum Log Level"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <ComboBox x:Name="MinimumLogLevelComboBox" HorizontalAlignment="Right"
+                                      Width="250" SelectedValuePath="Content">
+                                <ComboBoxItem Content="Fatal" />
+                                <ComboBoxItem Content="Error" />
+                                <ComboBoxItem Content="Warning" />
+                                <ComboBoxItem Content="Information" />
+                                <ComboBoxItem Content="Debug" />
+                                <ComboBoxItem Content="Verbose" />
+                            </ComboBox>
+                        </DockPanel>
+
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

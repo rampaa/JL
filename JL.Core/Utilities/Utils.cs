@@ -9,12 +9,17 @@ using JL.Core.Dicts;
 using JL.Core.Freqs;
 using JL.Core.Network;
 using Serilog;
+using Serilog.Core;
 
 namespace JL.Core.Utilities;
 
 public static class Utils
 {
-    public static readonly ILogger Logger = new LoggerConfiguration().WriteTo.File("Logs/log.txt",
+    public static readonly LoggingLevelSwitch LoggingLevelSwitch = new() { MinimumLevel = Serilog.Events.LogEventLevel.Error };
+
+    public static readonly ILogger Logger = new LoggerConfiguration()
+        .MinimumLevel.ControlledBy(LoggingLevelSwitch)
+        .WriteTo.File("Logs/log.txt",
             formatProvider: CultureInfo.InvariantCulture,
             rollingInterval: RollingInterval.Day,
             retainedFileTimeLimit: TimeSpan.FromDays(90),

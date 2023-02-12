@@ -167,11 +167,49 @@ internal sealed class ConfigManager : CoreConfig
     public static bool Precaching { get; private set; } = false;
     public static string SearchUrl { get; private set; } = "https://www.google.com/search?q={SearchTerm}&hl=ja";
     public static string BrowserPath { get; private set; } = "";
+    public static string MinimumLogLevel { get; private set; } = "Error";
 
     #endregion
 
     public void ApplyPreferences()
     {
+        string? minimumLogLevelStr = ConfigurationManager.AppSettings.Get(nameof(MinimumLogLevel));
+        if (minimumLogLevelStr is null)
+        {
+            AddToConfig(nameof(MinimumLogLevel), MinimumLogLevel);
+        }
+        else
+        {
+            MinimumLogLevel = minimumLogLevelStr;
+
+            switch (MinimumLogLevel)
+            {
+                case "Fatal":
+                    Utils.LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Fatal;
+                    break;
+                case "Error":
+                    Utils.LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Error;
+                    break;
+                case "Warning":
+                    Utils.LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Warning;
+                    break;
+                case "Information":
+                    Utils.LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Information;
+                    break;
+                case "Debug":
+                    Utils.LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Debug;
+                    break;
+                case "Verbose":
+                    Utils.LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Verbose;
+                    break;
+                default:
+                    Utils.LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Error;
+                    MinimumLogLevel = "Error";
+                    break;
+            }
+        }
+
+
         MainWindow mainWindow = MainWindow.Instance;
 
         AutoAdjustFontSizesOnResolutionChange = GetValueFromConfig(AutoAdjustFontSizesOnResolutionChange, nameof(AutoAdjustFontSizesOnResolutionChange), bool.TryParse);
@@ -361,20 +399,20 @@ internal sealed class ConfigManager : CoreConfig
         WindowsUtils.SetInputGestureText(mainWindow.ManageFrequenciesButton, ShowManageFrequenciesWindowKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.StatsButton, ShowStatsKeyGesture);
 
-        string? tempStr = ConfigurationManager.AppSettings.Get(nameof(Theme));
-        if (tempStr is null)
+        string? themeStr = ConfigurationManager.AppSettings.Get(nameof(Theme));
+        if (themeStr is null)
         {
-            tempStr = "Dark";
-            AddToConfig(nameof(Theme), tempStr);
+            themeStr = "Dark";
+            AddToConfig(nameof(Theme), themeStr);
         }
-        WindowsUtils.ChangeTheme(tempStr is "Dark" ? SkinType.Dark : SkinType.Default);
+        WindowsUtils.ChangeTheme(themeStr is "Dark" ? SkinType.Dark : SkinType.Default);
 
-        tempStr = ConfigurationManager.AppSettings.Get(nameof(AnkiConnectUri));
-        if (tempStr is null)
+        string? ankiConnectUriStr = ConfigurationManager.AppSettings.Get(nameof(AnkiConnectUri));
+        if (ankiConnectUriStr is null)
         {
             AddToConfig(nameof(AnkiConnectUri), AnkiConnectUri.OriginalString);
         }
-        else if (Uri.TryCreate(tempStr, UriKind.Absolute, out Uri? ankiConnectUri))
+        else if (Uri.TryCreate(ankiConnectUriStr, UriKind.Absolute, out Uri? ankiConnectUri))
         {
             AnkiConnectUri = ankiConnectUri;
         }
@@ -384,12 +422,12 @@ internal sealed class ConfigManager : CoreConfig
             Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
         }
 
-        tempStr = ConfigurationManager.AppSettings.Get(nameof(WebSocketUri));
-        if (tempStr is null)
+        string? webSocketUriStr = ConfigurationManager.AppSettings.Get(nameof(WebSocketUri));
+        if (webSocketUriStr is null)
         {
             AddToConfig(nameof(WebSocketUri), WebSocketUri.OriginalString);
         }
-        else if (Uri.TryCreate(tempStr, UriKind.Absolute, out Uri? webSocketUri))
+        else if (Uri.TryCreate(webSocketUriStr, UriKind.Absolute, out Uri? webSocketUri))
         {
             WebSocketUri = webSocketUri;
         }
@@ -400,52 +438,52 @@ internal sealed class ConfigManager : CoreConfig
         }
         WebSocketUtils.HandleWebSocket();
 
-        tempStr = ConfigurationManager.AppSettings.Get(nameof(SearchUrl));
-        if (tempStr is null)
+        string? searchUrlStr = ConfigurationManager.AppSettings.Get(nameof(SearchUrl));
+        if (searchUrlStr is null)
         {
             AddToConfig(nameof(SearchUrl), SearchUrl);
         }
-        else if (!Uri.IsWellFormedUriString(tempStr.Replace("{SearchTerm}", ""), UriKind.Absolute))
+        else if (!Uri.IsWellFormedUriString(searchUrlStr.Replace("{SearchTerm}", ""), UriKind.Absolute))
         {
             Utils.Logger.Error("Couldn't save Search URL, invalid URL");
             Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save Search URL, invalid URL");
         }
         else
         {
-            SearchUrl = tempStr;
+            SearchUrl = searchUrlStr;
         }
 
-        tempStr = ConfigurationManager.AppSettings.Get(nameof(BrowserPath));
-        if (tempStr is null)
+        string? browserPathStr = ConfigurationManager.AppSettings.Get(nameof(BrowserPath));
+        if (browserPathStr is null)
         {
             AddToConfig(nameof(BrowserPath), BrowserPath);
         }
-        else if (!string.IsNullOrWhiteSpace(tempStr) && !Path.IsPathFullyQualified(tempStr))
+        else if (!string.IsNullOrWhiteSpace(browserPathStr) && !Path.IsPathFullyQualified(browserPathStr))
         {
             Utils.Logger.Error("Couldn't save Browser Path, invalid path");
             Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save Browser Path, invalid path");
         }
         else
         {
-            BrowserPath = tempStr;
+            BrowserPath = browserPathStr;
         }
 
-        tempStr = ConfigurationManager.AppSettings.Get("MainWindowFont");
-        if (tempStr is null)
+        string? mainWindowFontStr = ConfigurationManager.AppSettings.Get("MainWindowFont");
+        if (mainWindowFontStr is null)
         {
             AddToConfig("MainWindowFont", "Meiryo");
-            tempStr = "Meiryo";
+            mainWindowFontStr = "Meiryo";
         }
-        mainWindow.MainTextBox.FontFamily = new FontFamily(tempStr);
+        mainWindow.MainTextBox.FontFamily = new FontFamily(mainWindowFontStr);
 
-        tempStr = ConfigurationManager.AppSettings.Get("PopupFlip");
-        if (tempStr is null)
+        string? popupFlipStr = ConfigurationManager.AppSettings.Get("PopupFlip");
+        if (popupFlipStr is null)
         {
-            tempStr = "Both";
-            AddToConfig("PopupFlip", tempStr);
+            popupFlipStr = "Both";
+            AddToConfig("PopupFlip", popupFlipStr);
         }
 
-        switch (tempStr)
+        switch (popupFlipStr)
         {
             case "X":
                 PopupFlipX = true;
@@ -468,14 +506,14 @@ internal sealed class ConfigManager : CoreConfig
                 break;
         }
 
-        tempStr = ConfigurationManager.AppSettings.Get("LookupMode");
-        if (tempStr is null)
+        string? lookupModeStr = ConfigurationManager.AppSettings.Get("LookupMode");
+        if (lookupModeStr is null)
         {
-            tempStr = "Hover";
-            AddToConfig("LookupMode", tempStr);
+            lookupModeStr = "Hover";
+            AddToConfig("LookupMode", lookupModeStr);
         }
 
-        switch (tempStr)
+        switch (lookupModeStr)
         {
             case "Hover":
                 LookupOnLeftClickOnly = false;
@@ -498,14 +536,14 @@ internal sealed class ConfigManager : CoreConfig
                 break;
         }
 
-        tempStr = ConfigurationManager.AppSettings.Get(nameof(PopupFont));
-        if (tempStr is null)
+        string? popupFontStr = ConfigurationManager.AppSettings.Get(nameof(PopupFont));
+        if (popupFontStr is null)
         {
             AddToConfig(nameof(PopupFont), PopupFont.Source);
         }
         else
         {
-            PopupFont = new FontFamily(tempStr);
+            PopupFont = new FontFamily(popupFontStr);
         }
 
         PopupWindow? currentPopupWindow = mainWindow.FirstPopupWindow;
@@ -649,6 +687,7 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked = SteppedBacklogWithMouseWheel;
 
         preferenceWindow.ThemeComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("Theme");
+        preferenceWindow.MinimumLogLevelComboBox.SelectedValue = MinimumLogLevel;
 
         preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
         preferenceWindow.MainWindowFontComboBox.SelectedIndex = s_japaneseFonts.FindIndex(f =>
@@ -835,6 +874,8 @@ internal sealed class ConfigManager : CoreConfig
             preferenceWindow.MainWindowOpacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["Theme"].Value =
             preferenceWindow.ThemeComboBox.SelectedValue.ToString();
+        config.AppSettings.Settings[nameof(MinimumLogLevel)].Value =
+            preferenceWindow.MinimumLogLevelComboBox.SelectedValue.ToString();
         config.AppSettings.Settings["MainWindowFont"].Value =
             preferenceWindow.MainWindowFontComboBox.SelectedValue.ToString();
         config.AppSettings.Settings[nameof(PopupFont)].Value =
