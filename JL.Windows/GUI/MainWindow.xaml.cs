@@ -22,7 +22,7 @@ namespace JL.Windows.GUI;
 internal sealed partial class MainWindow : Window
 {
     private readonly List<string> _backlog = new();
-    private int _currentTextIndex;
+    private int _currentTextIndex = 0;
     private bool _stopPrecache = false;
     private DateTime _lastClipboardChangeTime;
     private WinApi? _winApi;
@@ -166,6 +166,35 @@ internal sealed partial class MainWindow : Window
         }
     }
 
+    private async Task DeleteCurrentLine()
+    {
+        if (_backlog.Count is 0 || MainTextBox.Text != _backlog[_currentTextIndex])
+        {
+            return;
+        }
+
+        await Stats.IncrementStat(StatType.Characters,
+            new StringInfo(_backlog[_currentTextIndex]).LengthInTextElements * -1)
+            .ConfigureAwait(false);
+
+        await Stats.IncrementStat(StatType.Lines, -1).ConfigureAwait(false);
+
+        _backlog.RemoveAt(_currentTextIndex);
+
+        if (_currentTextIndex > 0)
+        {
+            --_currentTextIndex;
+        }
+
+        MainTextBox.Text = _backlog.Count > 0
+            ? _backlog[_currentTextIndex]
+            : "";
+
+        MainTextBox.Foreground = _currentTextIndex < _backlog.Count - 1
+            ? ConfigManager.MainWindowBacklogTextColor
+            : ConfigManager.MainWindowTextColor;
+    }
+
     private async Task Precache(string input)
     {
         for (int charPosition = 0; charPosition < input.Length; charPosition++)
@@ -287,7 +316,7 @@ internal sealed partial class MainWindow : Window
 
     private void ShowPreviousBacklogItem()
     {
-        if (_currentTextIndex is not 0)
+        if (_currentTextIndex > 0)
         {
             --_currentTextIndex;
             MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
@@ -624,6 +653,11 @@ internal sealed partial class MainWindow : Window
             ConfigManager.TextBoxIsReadOnly = !ConfigManager.TextBoxIsReadOnly;
             MainTextBox.IsReadOnly = ConfigManager.TextBoxIsReadOnly;
             MainTextBox.IsUndoEnabled = !ConfigManager.TextBoxIsReadOnly;
+        }
+
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.DeleteCurrentLineKeyGesture))
+        {
+            await DeleteCurrentLine().ConfigureAwait(false);
         }
     }
 

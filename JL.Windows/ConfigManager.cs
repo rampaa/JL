@@ -36,7 +36,7 @@ internal sealed class ConfigManager : CoreConfig
         });
 
     public static bool InactiveLookupMode { get; set; } = false; // todo checkbox?
-    public static bool InvisibleMode { get; set; } = false; // todo checkbox?
+    public static bool InvisibleMode { get; set; } = false;
     public static Brush HighlightColor { get; private set; } = Brushes.AliceBlue;
     public static bool RequireLookupKeyPress { get; private set; } = false;
     public static bool LookupOnSelectOnly { get; private set; } = false;
@@ -156,6 +156,7 @@ internal sealed class ConfigManager : CoreConfig
     public static KeyGesture CaptureTextFromClipboardKeyGesture { get; private set; } = new(Key.F12, ModifierKeys.Windows);
     public static KeyGesture CaptureTextFromWebSocketdKeyGesture { get; private set; } = new(Key.F11, ModifierKeys.Windows);
     public static KeyGesture ReconnectToWebSocketServerKeyGesture { get; private set; } = new(Key.F9, ModifierKeys.Windows);
+    public static KeyGesture DeleteCurrentLineKeyGesture { get; private set; } = new(Key.Delete, ModifierKeys.Windows);
 
     #endregion
 
@@ -301,7 +302,6 @@ internal sealed class ConfigManager : CoreConfig
         // MAKE SURE YOU FREEZE ANY NEW COLOR OBJECTS YOU ADD
         // OR THE PROGRAM WILL CRASH AND BURN
         MainWindowTextColor = GetFrozenBrushFromConfig(MainWindowTextColor, nameof(MainWindowTextColor));
-        mainWindow.MainTextBox.Foreground = MainWindowTextColor;
 
         MainWindowBacklogTextColor = GetFrozenBrushFromConfig(MainWindowBacklogTextColor, nameof(MainWindowBacklogTextColor));
         PrimarySpellingColor = GetFrozenBrushFromConfig(PrimarySpellingColor, nameof(PrimarySpellingColor));
@@ -341,6 +341,7 @@ internal sealed class ConfigManager : CoreConfig
         CaptureTextFromClipboardKeyGesture = WindowsUtils.SetKeyGesture(nameof(CaptureTextFromClipboardKeyGesture), CaptureTextFromClipboardKeyGesture);
         CaptureTextFromWebSocketdKeyGesture = WindowsUtils.SetKeyGesture(nameof(CaptureTextFromWebSocketdKeyGesture), CaptureTextFromWebSocketdKeyGesture);
         ReconnectToWebSocketServerKeyGesture = WindowsUtils.SetKeyGesture(nameof(ReconnectToWebSocketServerKeyGesture), ReconnectToWebSocketServerKeyGesture);
+        DeleteCurrentLineKeyGesture = WindowsUtils.SetKeyGesture(nameof(DeleteCurrentLineKeyGesture), DeleteCurrentLineKeyGesture);
 
         ShowPreferencesWindowKeyGesture =
             WindowsUtils.SetKeyGesture(nameof(ShowPreferencesWindowKeyGesture), ShowPreferencesWindowKeyGesture);
@@ -602,6 +603,8 @@ internal sealed class ConfigManager : CoreConfig
             WindowsUtils.KeyGestureToString(CaptureTextFromWebSocketdKeyGesture);
         preferenceWindow.ReconnectToWebSocketServerKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(ReconnectToWebSocketServerKeyGesture);
+        preferenceWindow.DeleteCurrentLineKeyGestureTextBox.Text =
+            WindowsUtils.KeyGestureToString(DeleteCurrentLineKeyGesture);
 
         WindowsUtils.SetButtonColor(preferenceWindow.HighlightColorButton, HighlightColor);
         WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, mainWindow.Background.CloneCurrentValue());
@@ -782,6 +785,8 @@ internal sealed class ConfigManager : CoreConfig
             preferenceWindow.CaptureTextFromWebSocketKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(ReconnectToWebSocketServerKeyGesture),
             preferenceWindow.ReconnectToWebSocketServerKeyGestureTextBox.Text);
+        SaveKeyGesture(nameof(DeleteCurrentLineKeyGesture),
+            preferenceWindow.DeleteCurrentLineKeyGestureTextBox.Text);
 
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 

@@ -312,7 +312,7 @@
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Cursor="Help"
                                        ToolTip="If enabled, scrolling up/down with mouse wheel show the items in backlog one by one.
-&#10;If disabled, scrolling up will show all the backlog at once."/>
+                                       &#10;If disabled, scrolling up will show all the backlog at once."/>
                             <CheckBox x:Name="SteppedBacklogWithMouseWheelCheckBox" HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -388,8 +388,8 @@
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Cursor="Help"
                                        ToolTip="Attempt to set focus on the popup window when you mouse over text.
-&#10;Required if you want to be able to use popup hotkeys without clicking on the popup window first.
-&#10;If Focusable is set to false, this option will have no effect." />
+                                       &#10;Required if you want to be able to use popup hotkeys without clicking on the popup window first.
+                                       &#10;If Focusable is set to false, this option will have no effect." />
                             <CheckBox x:Name="PopupFocusOnLookupCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -800,7 +800,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="DisableHotkeysKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="DisableHotkeysKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Hotkey toggle" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -810,7 +810,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="MiningModeKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="MiningModeKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Mining mode" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -820,7 +820,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="KanjiModeKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="KanjiModeKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Kanji mode" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -830,7 +830,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="MousePassThroughModeKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="MousePassThroughModeKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Mouse pass-through mode" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -840,7 +840,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="InvisibleToggleModeKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="InvisibleToggleModeKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Invisible toggle" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -850,7 +850,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="PlayAudioKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="PlayAudioKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Play audio" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -861,7 +861,7 @@
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
                             <TextBox x:Name="ShowManageDictionariesWindowKeyGestureTextBox"
-                                     AutomationProperties.Name=""
+                                    
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Manage dictionaries" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -872,7 +872,7 @@
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
                             <TextBox x:Name="ShowManageFrequenciesWindowKeyGestureTextBox"
-                                     AutomationProperties.Name=""
+                                    
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Manage frequencies" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -882,7 +882,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="ShowPreferencesWindowKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="ShowPreferencesWindowKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Preferences" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -892,7 +892,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="ShowAddNameWindowKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="ShowAddNameWindowKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Add name" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -902,7 +902,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="ShowAddWordWindowKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="ShowAddWordWindowKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Add word" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -912,7 +912,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="SearchWithBrowserKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="SearchWithBrowserKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Search" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -922,7 +922,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="SteppedBacklogBackwardsKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="SteppedBacklogBackwardsKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Move backwards (Backlog)" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -932,7 +932,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="SteppedBacklogForwardsKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="SteppedBacklogForwardsKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Move forward (Backlog)" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -942,7 +942,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="InactiveLookupModeKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="InactiveLookupModeKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle lookup" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -952,7 +952,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="ClosePopupKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="ClosePopupKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Close popup" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -962,7 +962,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="ShowStatsKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="ShowStatsKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Show stats" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -972,7 +972,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="PreviousDictKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="PreviousDictKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Previous dictionary" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -982,7 +982,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="NextDictKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="NextDictKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Next dictionary" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -992,7 +992,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="AlwaysOnTopKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="AlwaysOnTopKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle always on top" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -1002,7 +1002,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="TextOnlyVisibleOnHoverKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="TextOnlyVisibleOnHoverKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle text only visible on hover" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -1012,7 +1012,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="CaptureTextFromClipboardKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="CaptureTextFromClipboardKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle capture text from clipboard option" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -1022,7 +1022,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="CaptureTextFromWebSocketKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="CaptureTextFromWebSocketKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle capture text from WebSocket option" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -1032,7 +1032,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="ReconnectToWebSocketServerKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="ReconnectToWebSocketServerKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Reconnect to WebSocket" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -1042,7 +1042,19 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="TextBoxIsReadOnlyKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="DeleteCurrentLineKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Delete the currently shown line" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" Cursor="Help"
+                                       ToolTip="Delete the currently shown line from the main window.
+                                       &#10;Line and character count stats will be updated accordingly."/>
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="TextBoxIsReadOnlyKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle read only option" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -1052,7 +1064,7 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="MotivationKeyGestureTextBox" AutomationProperties.Name=""
+                            <TextBox x:Name="MotivationKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="???" TextWrapping="Wrap" HorizontalAlignment="Left"
@@ -1100,9 +1112,9 @@
                             <TextBlock HorizontalAlignment="Left" Text="Precache results on text change"
                                        TextWrapping="Wrap"
                                        ToolTip="Generate all possible results for the text in the main window before you mouse over anything.
-&#10;Improves performance when using a lot of dictionaries at the same time, as long as you don't try to
-&#10;look up something immediately after the text changes.
-&#10;Not recommended unless you feel that lookup is slow."
+                                       &#10;Improves performance when using a lot of dictionaries at the same time, as long as you don't try to
+                                       &#10;look up something immediately after the text changes.
+                                       &#10;Not recommended unless you feel that lookup is slow."
                                        Cursor="Help"/>
                             <CheckBox x:Name="PrecachingCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
@@ -1111,7 +1123,7 @@
                             <TextBlock HorizontalAlignment="Left" Text="Browser path" VerticalAlignment="Center" TextWrapping="Wrap"
                                        Cursor="Help"
                                        ToolTip="The path of the browser that will be used by the search functionality, without quotes.
-&#10;Leave blank to use the default browser."/>
+                                       &#10;Leave blank to use the default browser."/>
                             <hc:TextBox x:Name="BrowserPathTextBox" HorizontalAlignment="Right" Width="300" MaxHeight="60" TextWrapping="Wrap"
                                         hc:InfoElement.Placeholder="Default browser" />
                         </DockPanel>
