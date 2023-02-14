@@ -399,7 +399,7 @@ internal sealed class ConfigManager : CoreConfig
         }
         else
         {
-            Utils.Logger.Error("Couldn't save AnkiConnect server address, invalid URL");
+            Utils.Logger.Warning("Couldn't save AnkiConnect server address, invalid URL");
             Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
         }
 
@@ -414,7 +414,7 @@ internal sealed class ConfigManager : CoreConfig
         }
         else
         {
-            Utils.Logger.Error("Couldn't save WebSocket address, invalid URL");
+            Utils.Logger.Warning("Couldn't save WebSocket address, invalid URL");
             Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save WebSocket address, invalid URL");
         }
         WebSocketUtils.HandleWebSocket();
@@ -426,7 +426,7 @@ internal sealed class ConfigManager : CoreConfig
         }
         else if (!Uri.IsWellFormedUriString(searchUrlStr.Replace("{SearchTerm}", ""), UriKind.Absolute))
         {
-            Utils.Logger.Error("Couldn't save Search URL, invalid URL");
+            Utils.Logger.Warning("Couldn't save Search URL, invalid URL");
             Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save Search URL, invalid URL");
         }
         else
@@ -441,7 +441,7 @@ internal sealed class ConfigManager : CoreConfig
         }
         else if (!string.IsNullOrWhiteSpace(browserPathStr) && !Path.IsPathFullyQualified(browserPathStr))
         {
-            Utils.Logger.Error("Couldn't save Browser Path, invalid path");
+            Utils.Logger.Warning("Couldn't save Browser Path, invalid path");
             Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save Browser Path, invalid path");
         }
         else

@@ -54,10 +54,10 @@ internal sealed partial class MainWindow : Window
         AppDomain.CurrentDomain.UnhandledException += static (_, eventArgs) =>
         {
             Exception ex = (Exception)eventArgs.ExceptionObject;
-            Utils.Logger.Error(ex, "Unhandled exception");
+            Utils.Logger.Fatal(ex, "Unhandled exception");
         };
 
-        TaskScheduler.UnobservedTaskException += static (_, eventArgs) => Utils.Logger.Error(eventArgs.Exception, "Unobserved task exception");
+        TaskScheduler.UnobservedTaskException += static (_, eventArgs) => Utils.Logger.Fatal(eventArgs.Exception, "Unobserved task exception");
 
         SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
 

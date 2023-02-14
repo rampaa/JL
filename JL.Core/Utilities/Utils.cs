@@ -194,7 +194,7 @@ public static class Utils
                 else
                 {
                     Storage.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/dicts.json");
-                    Logger.Error("Couldn't load Config/dicts.json");
+                    Logger.Fatal("Couldn't load Config/dicts.json");
                 }
             }
         }
@@ -242,7 +242,7 @@ public static class Utils
                 else
                 {
                     Storage.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/freqs.json");
-                    Logger.Error("Couldn't load Config/freqs.json");
+                    Logger.Fatal("Couldn't load Config/freqs.json");
                 }
             }
         }

@@ -72,7 +72,7 @@ internal static class WebSocketUtils
                     catch (WebSocketException webSocketException)
                     {
                         Utils.Logger.Warning(webSocketException, "WebSocket server is closed unexpectedly");
-                        Storage.Frontend.Alert(AlertLevel.Warning, "WebSocket server is closed");
+                        Storage.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
                         break;
                     }
                 }
@@ -81,7 +81,7 @@ internal static class WebSocketUtils
             catch (WebSocketException webSocketException)
             {
                 Utils.Logger.Warning(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
-                Storage.Frontend.Alert(AlertLevel.Warning, "Couldn't connect to the WebSocket server, probably because it is not running");
+                Storage.Frontend.Alert(AlertLevel.Error, "Couldn't connect to the WebSocket server, probably because it is not running");
             }
         }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
     }

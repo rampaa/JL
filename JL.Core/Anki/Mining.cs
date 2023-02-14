@@ -10,75 +10,79 @@ public static class Mining
     {
         string primarySpelling = miningParams[JLField.PrimarySpelling];
 
-        try
+        Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
+
+        if (ankiConfigDict is null)
         {
-            Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
+            Storage.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
+            return false;
+        }
 
-            if (ankiConfigDict is null)
+        AnkiConfig? ankiConfig;
+
+        DictType? dictType = null;
+
+        if (miningParams.TryGetValue(JLField.DictionaryName, out string? dictionaryName))
+        {
+            if (Storage.Dicts.TryGetValue(dictionaryName, out Dict? dict))
             {
-                Storage.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
-                return false;
+                dictType = dict.Type;
             }
+        }
 
-            AnkiConfig? ankiConfig;
+        if (dictType is null)
+        {
+            Storage.Frontend.Alert(AlertLevel.Error, $"Mining failed for {primarySpelling}. Cannot find the type of {JLField.DictionaryName.GetDescription()}");
+            Utils.Logger.Error("Mining failed for {FoundSpelling}. Cannot find the type of {DictionaryName}", primarySpelling, JLField.DictionaryName.GetDescription());
+            return false;
+        }
 
-            DictType dictType = Storage.Dicts[miningParams[JLField.DictionaryName]].Type;
 
-            if (Storage.s_wordDictTypes.Contains(dictType))
-            {
-                _ = ankiConfigDict.TryGetValue(MineType.Word, out ankiConfig);
-            }
+        if (Storage.s_wordDictTypes.Contains(dictType.Value))
+        {
+            _ = ankiConfigDict.TryGetValue(MineType.Word, out ankiConfig);
+        }
 
-            else if (Storage.s_kanjiDictTypes.Contains(dictType))
-            {
-                _ = ankiConfigDict.TryGetValue(MineType.Kanji, out ankiConfig);
-            }
+        else if (Storage.s_kanjiDictTypes.Contains(dictType.Value))
+        {
+            _ = ankiConfigDict.TryGetValue(MineType.Kanji, out ankiConfig);
+        }
 
-            else if (Storage.s_nameDictTypes.Contains(dictType))
-            {
-                _ = ankiConfigDict.TryGetValue(MineType.Name, out ankiConfig);
-            }
+        else if (Storage.s_nameDictTypes.Contains(dictType.Value))
+        {
+            _ = ankiConfigDict.TryGetValue(MineType.Name, out ankiConfig);
+        }
 
-            else
-            {
-                _ = ankiConfigDict.TryGetValue(MineType.Other, out ankiConfig);
-            }
+        else
+        {
+            _ = ankiConfigDict.TryGetValue(MineType.Other, out ankiConfig);
+        }
 
-            if (ankiConfig is null)
-            {
-                Storage.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
-                return false;
-            }
+        if (ankiConfig is null)
+        {
+            Storage.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
+            return false;
+        }
 
-            string deckName = ankiConfig.DeckName;
-            string modelName = ankiConfig.ModelName;
+        // idk if this gets the right audio for every word
+        string? reading = miningParams.GetValueOrDefault(JLField.Readings)?.Split(",")[0];
+        if (string.IsNullOrEmpty(reading))
+        {
+            reading = primarySpelling;
+        }
 
-            Dictionary<string, JLField> userFields = ankiConfig.Fields;
-            Dictionary<string, object> fields = ConvertFields(userFields, miningParams);
+        Dictionary<string, JLField> userFields = ankiConfig.Fields;
+        Dictionary<string, object> fields = ConvertFields(userFields, miningParams);
 
-            Dictionary<string, object> options = new()
-            {
-                { "allowDuplicate", Storage.Frontend.CoreConfig.AllowDuplicateCards }
-            };
-            string[] tags = ankiConfig.Tags;
+        byte[]? audioRes = null;
+        bool needsAudio = userFields.Values.Any(static jlField => jlField is JLField.Audio);
+        if (needsAudio)
+        {
+            audioRes = await Networking.GetAudioFromJpod101(primarySpelling, reading).ConfigureAwait(false);
+        }
 
-            // idk if this gets the right audio for every word
-            string? reading = miningParams.GetValueOrDefault(JLField.Readings)?.Split(",")[0];
-            if (string.IsNullOrEmpty(reading))
-            {
-                reading = primarySpelling;
-            }
-
-            byte[]? audioRes = null;
-
-            bool needsAudio = userFields.Values.Any(static jlField => jlField is JLField.Audio);
-            if (needsAudio)
-            {
-                audioRes = await Networking.GetAudioFromJpod101(primarySpelling, reading).ConfigureAwait(false);
-            }
-
-            Dictionary<string, object?>[] audio =
-            {
+        Dictionary<string, object?>[] audio =
+        {
                 new()
                 {
                     { "data", audioRes },
@@ -88,44 +92,39 @@ public static class Mining
                 }
             };
 
-            Dictionary<string, object>[]? video = null;
-            Dictionary<string, object>[]? picture = null;
-
-            Note note = new(deckName, modelName, fields, options, tags, audio, video, picture);
-            Response? response = await AnkiConnect.AddNoteToDeck(note).ConfigureAwait(false);
-
-            if (response is null)
+        Dictionary<string, object> options = new()
             {
-                Storage.Frontend.Alert(AlertLevel.Error, $"Mining failed for {primarySpelling}");
-                Utils.Logger.Error("Mining failed for {FoundSpelling}", primarySpelling);
-                return false;
-            }
+                { "allowDuplicate", Storage.Frontend.CoreConfig.AllowDuplicateCards }
+            };
 
-            if (needsAudio && (audioRes is null || Utils.GetMd5String(audioRes) is Storage.Jpod101NoAudioMd5Hash))
-            {
-                Storage.Frontend.Alert(AlertLevel.Warning, $"Mined {primarySpelling} (no audio)");
-                Utils.Logger.Information("Mined {FoundSpelling} (no audio)", primarySpelling);
-            }
+        Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, options, ankiConfig.Tags, audio, video: null, picture: null);
+        Response? response = await AnkiConnect.AddNoteToDeck(note).ConfigureAwait(false);
 
-            else
-            {
-                Storage.Frontend.Alert(AlertLevel.Success, $"Mined {primarySpelling}");
-                Utils.Logger.Information("Mined {FoundSpelling}", primarySpelling);
-            }
-
-            if (Storage.Frontend.CoreConfig.ForceSyncAnki)
-            {
-                await AnkiConnect.Sync().ConfigureAwait(false);
-            }
-
-            return true;
-        }
-        catch (Exception ex)
+        if (response is null)
         {
             Storage.Frontend.Alert(AlertLevel.Error, $"Mining failed for {primarySpelling}");
-            Utils.Logger.Error(ex, "Mining failed for {FoundSpelling}", primarySpelling);
+            Utils.Logger.Error("Mining failed for {FoundSpelling}", primarySpelling);
             return false;
         }
+
+        if (needsAudio && (audioRes is null || Utils.GetMd5String(audioRes) is Storage.Jpod101NoAudioMd5Hash))
+        {
+            Storage.Frontend.Alert(AlertLevel.Warning, $"Mined {primarySpelling} (no audio)");
+            Utils.Logger.Information("Mined {FoundSpelling} (no audio)", primarySpelling);
+        }
+
+        else
+        {
+            Storage.Frontend.Alert(AlertLevel.Success, $"Mined {primarySpelling}");
+            Utils.Logger.Information("Mined {FoundSpelling}", primarySpelling);
+        }
+
+        if (Storage.Frontend.CoreConfig.ForceSyncAnki)
+        {
+            await AnkiConnect.Sync().ConfigureAwait(false);
+        }
+
+        return true;
     }
 
     /// <summary>

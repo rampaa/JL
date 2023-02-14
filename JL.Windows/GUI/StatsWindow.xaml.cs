@@ -94,7 +94,7 @@ internal sealed partial class StatsWindow : Window
 
         else
         {
-            Utils.Logger.Warning("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
+            Utils.Logger.Error("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
         }
     }
 
@@ -118,7 +118,7 @@ internal sealed partial class StatsWindow : Window
 
             else
             {
-                Utils.Logger.Warning("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
+                Utils.Logger.Error("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
             }
         }
     }

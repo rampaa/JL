@@ -91,7 +91,7 @@ public sealed class AnkiConfig
         }
 
         // Storage.FrontEnd.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
-        Utils.Logger.Error("AnkiConfig.json doesn't exist");
+        Utils.Logger.Warning("AnkiConfig.json doesn't exist");
         return null;
     }
 }
