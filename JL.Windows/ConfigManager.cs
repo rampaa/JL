@@ -35,7 +35,6 @@ internal sealed class ConfigManager : CoreConfig
             Foreground = f.Foreground
         });
 
-    public static SkinType Theme { get; private set; } = SkinType.Dark;
     public static bool InactiveLookupMode { get; set; } = false; // todo checkbox?
     public static bool InvisibleMode { get; set; } = false; // todo checkbox?
     public static Brush HighlightColor { get; private set; } = Brushes.AliceBlue;
@@ -380,11 +379,11 @@ internal sealed class ConfigManager : CoreConfig
         WindowsUtils.SetInputGestureText(mainWindow.ManageFrequenciesButton, ShowManageFrequenciesWindowKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.StatsButton, ShowStatsKeyGesture);
 
-        string? themeStr = ConfigurationManager.AppSettings.Get(nameof(Theme));
+        string? themeStr = ConfigurationManager.AppSettings.Get("Theme");
         if (themeStr is null)
         {
             themeStr = "Dark";
-            AddToConfig(nameof(Theme), themeStr);
+            AddToConfig("Theme", themeStr);
         }
         WindowsUtils.ChangeTheme(themeStr is "Dark" ? SkinType.Dark : SkinType.Default);
 
