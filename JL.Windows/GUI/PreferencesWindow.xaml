@@ -247,7 +247,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Capture text from clipboard/WebSocket only if it has Japanese characters"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="OnlyCaptureTextWithJapaneseCharsFromClipboardCheckBox"  HorizontalAlignment="Right" />
+                            <CheckBox x:Name="OnlyCaptureTextWithJapaneseCharsCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>

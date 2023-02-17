@@ -71,7 +71,7 @@ internal sealed class ConfigManager : CoreConfig
     public static bool TextBoxIsReadOnly { get; set; } = true;
     private static bool TextBoxApplyDropShadowEffect { get; set; } = true;
     public static bool CaptureTextFromClipboard { get; set; } = true;
-    public static bool OnlyCaptureTextWithJapaneseCharsFromClipboard { get; private set; } = true;
+    public static bool OnlyCaptureTextWithJapaneseChars { get; private set; } = true;
     public static bool DisableLookupsForNonJapaneseCharsInMainWindow { get; private set; } = false;
     public static bool MainWindowFocusOnHover { get; private set; } = false;
     public static bool SteppedBacklogWithMouseWheel { get; private set; } = false;
@@ -218,7 +218,7 @@ internal sealed class ConfigManager : CoreConfig
         TextBoxRemoveNewlines = GetValueFromConfig(TextBoxRemoveNewlines, nameof(TextBoxRemoveNewlines), bool.TryParse);
         CaptureTextFromClipboard = GetValueFromConfig(CaptureTextFromClipboard, nameof(CaptureTextFromClipboard), bool.TryParse);
         CaptureTextFromWebSocket = GetValueFromConfig(CaptureTextFromWebSocket, nameof(CaptureTextFromWebSocket), bool.TryParse);
-        OnlyCaptureTextWithJapaneseCharsFromClipboard = GetValueFromConfig(OnlyCaptureTextWithJapaneseCharsFromClipboard, nameof(OnlyCaptureTextWithJapaneseCharsFromClipboard), bool.TryParse);
+        OnlyCaptureTextWithJapaneseChars = GetValueFromConfig(OnlyCaptureTextWithJapaneseChars, nameof(OnlyCaptureTextWithJapaneseChars), bool.TryParse);
         DisableLookupsForNonJapaneseCharsInMainWindow = GetValueFromConfig(DisableLookupsForNonJapaneseCharsInMainWindow, nameof(DisableLookupsForNonJapaneseCharsInMainWindow), bool.TryParse);
         MainWindowFocusOnHover = GetValueFromConfig(MainWindowFocusOnHover, nameof(MainWindowFocusOnHover), bool.TryParse);
         SteppedBacklogWithMouseWheel = GetValueFromConfig(SteppedBacklogWithMouseWheel, nameof(SteppedBacklogWithMouseWheel), bool.TryParse);
@@ -664,7 +664,7 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked = CaptureTextFromClipboard;
         preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked = CaptureTextFromWebSocket;
 
-        preferenceWindow.OnlyCaptureTextWithJapaneseCharsFromClipboardCheckBox.IsChecked = OnlyCaptureTextWithJapaneseCharsFromClipboard;
+        preferenceWindow.OnlyCaptureTextWithJapaneseCharsCheckBox.IsChecked = OnlyCaptureTextWithJapaneseChars;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInMainWindow;
         preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked = MainWindowFocusOnHover;
         preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked = SteppedBacklogWithMouseWheel;
@@ -840,8 +840,8 @@ internal sealed class ConfigManager : CoreConfig
         config.AppSettings.Settings[nameof(CaptureTextFromWebSocket)].Value =
             preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked.ToString();
 
-        config.AppSettings.Settings[nameof(OnlyCaptureTextWithJapaneseCharsFromClipboard)].Value =
-            preferenceWindow.OnlyCaptureTextWithJapaneseCharsFromClipboardCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings[nameof(OnlyCaptureTextWithJapaneseChars)].Value =
+            preferenceWindow.OnlyCaptureTextWithJapaneseCharsCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(DisableLookupsForNonJapaneseCharsInMainWindow)].Value =
             preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(MainWindowFocusOnHover)].Value =

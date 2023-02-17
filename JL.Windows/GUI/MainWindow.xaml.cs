@@ -102,7 +102,7 @@ internal sealed partial class MainWindow : Window
             {
                 string text = Clipboard.GetText();
                 gotTextFromClipboard = true;
-                if (!ConfigManager.OnlyCaptureTextWithJapaneseCharsFromClipboard || Storage.JapaneseRegex.IsMatch(text))
+                if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || Storage.JapaneseRegex.IsMatch(text))
                 {
                     text = SanitizeText(text);
 
@@ -121,7 +121,7 @@ internal sealed partial class MainWindow : Window
 
     public async Task CopyFromWebSocket(string text)
     {
-        if (!ConfigManager.OnlyCaptureTextWithJapaneseCharsFromClipboard || Storage.JapaneseRegex.IsMatch(text))
+        if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || Storage.JapaneseRegex.IsMatch(text))
         {
             text = SanitizeText(text);
 
@@ -186,13 +186,13 @@ internal sealed partial class MainWindow : Window
             --_currentTextIndex;
         }
 
-        MainTextBox.Text = _backlog.Count > 0
-            ? _backlog[_currentTextIndex]
-            : "";
-
         MainTextBox.Foreground = _currentTextIndex < _backlog.Count - 1
             ? ConfigManager.MainWindowBacklogTextColor
             : ConfigManager.MainWindowTextColor;
+
+        MainTextBox.Text = _backlog.Count > 0
+            ? _backlog[_currentTextIndex]
+            : "";
     }
 
     private async Task Precache(string input)
