@@ -394,9 +394,9 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Hide dictionary buttons with no results"
+                            <TextBlock HorizontalAlignment="Left" Text="Hide dictionary tabs with no results"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <CheckBox x:Name="HideDictButtonsWithNoResultsCheckBox"  HorizontalAlignment="Right" />
+                            <CheckBox x:Name="HideDictTabsWithNoResultsCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>

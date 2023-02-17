@@ -113,7 +113,7 @@ internal sealed class ConfigManager : CoreConfig
     public static Brush DictTypeColor { get; private set; } = Brushes.LightBlue;
     public static int DictTypeFontSize { get; set; } = 15;
     public static Brush SeparatorColor { get; private set; } = Brushes.White;
-    public static bool HideDictButtonsWithNoResults { get; private set; } = false;
+    public static bool HideDictTabsWithNoResults { get; private set; } = false;
     public static bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } = false;
     public static int AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 3000;
 
@@ -226,7 +226,7 @@ internal sealed class ConfigManager : CoreConfig
         MainWindowDynamicWidth = GetValueFromConfig(MainWindowDynamicWidth, nameof(MainWindowDynamicWidth), bool.TryParse);
         PopupDynamicHeight = GetValueFromConfig(PopupDynamicHeight, nameof(PopupDynamicHeight), bool.TryParse);
         PopupDynamicWidth = GetValueFromConfig(PopupDynamicWidth, nameof(PopupDynamicWidth), bool.TryParse);
-        HideDictButtonsWithNoResults = GetValueFromConfig(HideDictButtonsWithNoResults, nameof(HideDictButtonsWithNoResults), bool.TryParse);
+        HideDictTabsWithNoResults = GetValueFromConfig(HideDictTabsWithNoResults, nameof(HideDictTabsWithNoResults), bool.TryParse);
         AutoHidePopupIfMouseIsNotOverIt = GetValueFromConfig(AutoHidePopupIfMouseIsNotOverIt, nameof(AutoHidePopupIfMouseIsNotOverIt), bool.TryParse);
 
         TextBoxIsReadOnly = GetValueFromConfig(TextBoxIsReadOnly, nameof(TextBoxIsReadOnly), bool.TryParse);
@@ -727,7 +727,7 @@ internal sealed class ConfigManager : CoreConfig
 
         preferenceWindow.ShowMiningModeReminderCheckBox.IsChecked = ShowMiningModeReminder;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInPopups;
-        preferenceWindow.HideDictButtonsWithNoResultsCheckBox.IsChecked = HideDictButtonsWithNoResults;
+        preferenceWindow.HideDictTabsWithNoResultsCheckBox.IsChecked = HideDictTabsWithNoResults;
         preferenceWindow.AutoHidePopupIfMouseIsNotOverItCheckBox.IsChecked = AutoHidePopupIfMouseIsNotOverIt;
     }
 
@@ -977,8 +977,8 @@ internal sealed class ConfigManager : CoreConfig
         config.AppSettings.Settings[nameof(DisableLookupsForNonJapaneseCharsInPopups)].Value =
             preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked.ToString();
 
-        config.AppSettings.Settings[nameof(HideDictButtonsWithNoResults)].Value =
-            preferenceWindow.HideDictButtonsWithNoResultsCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings[nameof(HideDictTabsWithNoResults)].Value =
+            preferenceWindow.HideDictTabsWithNoResultsCheckBox.IsChecked.ToString();
 
         config.AppSettings.Settings[nameof(AutoHidePopupIfMouseIsNotOverIt)].Value =
             preferenceWindow.AutoHidePopupIfMouseIsNotOverItCheckBox.IsChecked.ToString();
