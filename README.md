@@ -43,8 +43,12 @@ IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries,
 * Stats (read character/line count, spent time etc.)
 
 ## FAQ
+### How does it work?
+JL grabs the text from the clipboard by default. It can also be configured to capture it from a WebSocket.
+
+You need another program to copy the text to the clipboard and/or to a WebSocket (e.g. [Textractor](https://github.com/Artikash/Textractor) for visual novels). 
 ### Why can't I look anything up?
-Make sure you're not in pass-through mode or kanji mode and you did not disable lookups with the "Toggle lookup" hotkey.
+Make sure you're not in pass-through mode and you did not disable lookups with the "Toggle lookup" hotkey.
 ### Why can't I scroll down the results list?
 You need to be in mining mode in order to interact with the popup window. You can activate the mining mode with a middle mouse click or with the mining mode hotkey (by default it's the key "M")
 ### How do I disable pass-through mode?
@@ -54,7 +58,9 @@ Enable the "Preferences>General>Always on top" option. This option will make sur
 
 Optional: Give UI Access to JL. This allows JL to be on top of Magpie even before any clipboard change occurs. See [UI Access](https://github.com/rampaa/JL/blob/master/UI%20Access.md) page for more details.
 
-Disable the "Preferences>Popup>Focus on lookup" option. When this option is disabled, JL popup won't steal the focus away from other windows.
+Disable the "Preferences>Main Window>Focus on hover" option.
+
+Disable the "Preferences>Popup>Focus on lookup" option.
 
 Optional: Disable the "Preferences>General>Focusable" option. When this option is disabled, JL won't steal the focus away from other windows, even in case of a mouse click. This allows you to open popups within popups without Magpie exiting the fullscreen mode. Note that if this option is disabled, you won't be able to use hotkeys because JL won't have the keyboard focus. You can use the middle mouse button to activate the mining mode.
 
