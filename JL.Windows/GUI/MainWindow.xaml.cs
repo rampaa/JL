@@ -154,8 +154,28 @@ internal sealed partial class MainWindow : Window
     {
         _backlog.Add(text);
         _currentTextIndex = _backlog.Count - 1;
+
         await Stats.IncrementStat(StatType.Characters, new StringInfo(text).LengthInTextElements).ConfigureAwait(false);
         await Stats.IncrementStat(StatType.Lines).ConfigureAwait(false);
+
+        if (SizeToContent is SizeToContent.Manual && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
+        {
+            WindowsUtils.SetSizeToContentForMainWindow(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight,
+                ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
+        }
+
+        if (ConfigManager.AlwaysOnTop
+            && !FirstPopupWindow.IsVisible
+            && !ManageDictionariesWindow.IsItVisible()
+            && !ManageFrequenciesWindow.IsItVisible()
+            && !AddNameWindow.IsItVisible()
+            && !AddWordWindow.IsItVisible()
+            && !PreferencesWindow.IsItVisible()
+            && !StatsWindow.IsItVisible()
+            && !MainTextboxContextMenu.IsVisible)
+        {
+            WinApi.BringToFront(WindowHandle);
+        }
 
         if (ConfigManager.Precaching && Storage.DictsReady
             && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic
@@ -258,25 +278,6 @@ internal sealed partial class MainWindow : Window
         {
             _lastClipboardChangeTime = currentTime;
             CopyFromClipboard();
-
-            if (SizeToContent is SizeToContent.Manual && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
-            {
-                WindowsUtils.SetSizeToContentForMainWindow(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight,
-                    ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
-            }
-
-            if (ConfigManager.AlwaysOnTop
-                && !FirstPopupWindow.IsVisible
-                && !ManageDictionariesWindow.IsItVisible()
-                && !ManageFrequenciesWindow.IsItVisible()
-                && !AddNameWindow.IsItVisible()
-                && !AddWordWindow.IsItVisible()
-                && !PreferencesWindow.IsItVisible()
-                && !StatsWindow.IsItVisible()
-                && !MainTextboxContextMenu.IsVisible)
-            {
-                WinApi.BringToFront(WindowHandle);
-            }
         }
     }
 
