@@ -551,6 +551,23 @@ internal static class WindowsUtils
             window.Height = height;
         }
     }
+    public static void SetSizeToContent(bool dynamicWidth, bool dynamicHeight, Window window)
+    {
+        if (dynamicWidth && dynamicHeight)
+        {
+            window.SizeToContent = SizeToContent.WidthAndHeight;
+        }
+
+        else if (dynamicWidth)
+        {
+            window.SizeToContent = SizeToContent.Width;
+        }
+
+        else if (dynamicHeight)
+        {
+            window.SizeToContent = SizeToContent.Height;
+        }
+    }
 
     public static void CopyTextToClipboard(string? text)
     {

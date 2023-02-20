@@ -158,11 +158,13 @@ internal sealed partial class MainWindow : Window
         await Stats.IncrementStat(StatType.Characters, new StringInfo(text).LengthInTextElements).ConfigureAwait(false);
         await Stats.IncrementStat(StatType.Lines).ConfigureAwait(false);
 
-        if (SizeToContent is SizeToContent.Manual && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
+        Dispatcher.Invoke(() =>
         {
-            WindowsUtils.SetSizeToContentForMainWindow(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight,
-                ConfigManager.MainWindowMaxDynamicWidth, ConfigManager.MainWindowMaxDynamicHeight, ConfigManager.MainWindowWidth, ConfigManager.MainWindowHeight, this);
-        }
+            if (SizeToContent is SizeToContent.Manual && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
+            {
+                WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, this);
+            }
+        });
 
         if (ConfigManager.AlwaysOnTop
             && !FirstPopupWindow.IsVisible
