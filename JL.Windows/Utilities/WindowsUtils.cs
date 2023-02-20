@@ -497,16 +497,16 @@ internal static class WindowsUtils
             window.SizeToContent = SizeToContent.WidthAndHeight;
         }
 
-        else if (dynamicWidth)
-        {
-            window.SizeToContent = SizeToContent.Width;
-            window.Height = maxHeight;
-        }
-
         else if (dynamicHeight)
         {
             window.SizeToContent = SizeToContent.Height;
             window.Width = maxWidth;
+        }
+
+        else if (dynamicWidth)
+        {
+            window.SizeToContent = SizeToContent.Width;
+            window.Height = maxHeight;
         }
 
         else
@@ -526,20 +526,20 @@ internal static class WindowsUtils
             window.SizeToContent = SizeToContent.WidthAndHeight;
         }
 
-        else if (dynamicWidth)
-        {
-            window.MaxHeight = double.PositiveInfinity;
-            window.MaxWidth = maxWidth;
-            window.SizeToContent = SizeToContent.Width;
-            window.Height = height;
-        }
-
         else if (dynamicHeight)
         {
             window.MaxHeight = maxHeight;
             window.MaxWidth = double.PositiveInfinity;
             window.SizeToContent = SizeToContent.Height;
             window.Width = width;
+        }
+
+        else if (dynamicWidth)
+        {
+            window.MaxHeight = double.PositiveInfinity;
+            window.MaxWidth = maxWidth;
+            window.SizeToContent = SizeToContent.Width;
+            window.Height = height;
         }
 
         else
@@ -558,14 +558,14 @@ internal static class WindowsUtils
             window.SizeToContent = SizeToContent.WidthAndHeight;
         }
 
-        else if (dynamicWidth)
-        {
-            window.SizeToContent = SizeToContent.Width;
-        }
-
         else if (dynamicHeight)
         {
             window.SizeToContent = SizeToContent.Height;
+        }
+
+        else if (dynamicWidth)
+        {
+            window.SizeToContent = SizeToContent.Width;
         }
     }
 
