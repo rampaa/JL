@@ -278,6 +278,19 @@ internal static class PopupWindowUtils
 
                 else
                 {
+                    if (!MainWindow.Instance.IsMouseOver)
+                    {
+                        if (ConfigManager.TextOnlyVisibleOnHover)
+                        {
+                            MainWindow.Instance.MainGrid.Opacity = 0;
+                        }
+
+                        if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+                        {
+                            MainWindow.Instance.Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
+                        }
+                    }
+
                     break;
                 }
             }
