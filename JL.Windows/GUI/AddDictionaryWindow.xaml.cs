@@ -84,10 +84,7 @@ internal sealed partial class AddDictionaryWindow : Window
             // }
 
             // TODO?
-            var options =
-                new DictOptions(
-                    newlineOption,
-                    examplesOption);
+            DictOptions options = new(newlineOption, examplesOption);
 
             Storage.Dicts.Add(name,
                 new Dict(type, name, path, true, Storage.Dicts.Count + 1, 0, options));

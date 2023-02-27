@@ -248,7 +248,7 @@ internal sealed partial class MainWindow : Window
                 List<LookupResult>? lookupResults = Lookup.LookupText(text);
                 if (lookupResults is { Count: > 0 })
                 {
-                    var stackPanels = new List<StackPanel>();
+                    List<StackPanel> stackPanels = new();
                     for (int i = 0; i < lookupResults.Count; i++)
                     {
                         if (i > ConfigManager.MaxNumResultsNotInMiningMode)

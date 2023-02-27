@@ -1061,7 +1061,7 @@ internal sealed partial class PopupWindow : Window
         ItemsControlButtons.Visibility = Visibility.Collapsed;
         Hide();
 
-        var miningParams = new Dictionary<JLField, string>();
+        Dictionary<JLField, string> miningParams = new();
 
         if (_currentText is not null)
         {

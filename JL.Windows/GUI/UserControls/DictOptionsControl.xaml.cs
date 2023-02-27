@@ -140,27 +140,25 @@ internal sealed partial class DictOptionsControl : UserControl
             DictOptionManager.PitchAccentMarkerColor = WindowsUtils.FrozenBrushFromHex(pitchAccentMarkerColorOption.Value.Value)!;
         }
 
-        var options =
-            new DictOptions(
-                newlineOption,
-                examplesOption,
-                noAllOption,
-                wordClassOption,
-                dialectOption,
-                pOrthographyInfoOption,
-                pOrthographyInfoColorOption,
-                pOrthographyInfoFontSize,
-                aOrthographyInfoOption,
-                rOrthographyInfoOption,
-                wordTypeOption,
-                spellingRestrictionInfo,
-                extraDefinitionInfo,
-                miscInfoOption,
-                relatedTermOption,
-                antonymOption,
-                loanwordEtymology,
-                pitchAccentMarkerColorOption
-            );
+        DictOptions options = new(
+            newlineOption,
+            examplesOption,
+            noAllOption,
+            wordClassOption,
+            dialectOption,
+            pOrthographyInfoOption,
+            pOrthographyInfoColorOption,
+            pOrthographyInfoFontSize,
+            aOrthographyInfoOption,
+            rOrthographyInfoOption,
+            wordTypeOption,
+            spellingRestrictionInfo,
+            extraDefinitionInfo,
+            miscInfoOption,
+            relatedTermOption,
+            antonymOption,
+            loanwordEtymology,
+            pitchAccentMarkerColorOption);
 
         return options;
     }
