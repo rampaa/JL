@@ -415,6 +415,19 @@ internal sealed partial class PreferencesWindow : Window
 
     #endregion
 
+    private void SaveAnkiConnectUrlButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (Uri.IsWellFormedUriString(AnkiUriTextBox.Text, UriKind.Absolute))
+        {
+            ConfigManager.Instance.AnkiConnectUri = new Uri(AnkiUriTextBox.Text);
+        }
+
+        else
+        {
+            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
+        }
+    }
+
     private void Button_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         string title = "JL Fields for ";
