@@ -415,7 +415,7 @@ internal sealed partial class PreferencesWindow : Window
 
     #endregion
 
-    private void SaveAnkiConnectUrlButton_Click(object sender, RoutedEventArgs e)
+    private void ApplyAnkiConnectUrlButton_Click(object sender, RoutedEventArgs e)
     {
         if (Uri.IsWellFormedUriString(AnkiUriTextBox.Text, UriKind.Absolute))
         {
