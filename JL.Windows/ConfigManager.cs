@@ -77,6 +77,7 @@ internal sealed class ConfigManager : CoreConfig
     public static bool SteppedBacklogWithMouseWheel { get; private set; } = false;
     public static bool CaptureTextFromWebSocket { get; set; } = false;
     public static Uri WebSocketUri { get; private set; } = new("ws://127.0.0.1:6677");
+    public static bool HorizontallyCenterMainWindowText { get; private set; } = false;
 
     #endregion
 
@@ -228,6 +229,11 @@ internal sealed class ConfigManager : CoreConfig
         PopupDynamicWidth = GetValueFromConfig(PopupDynamicWidth, nameof(PopupDynamicWidth), bool.TryParse);
         HideDictTabsWithNoResults = GetValueFromConfig(HideDictTabsWithNoResults, nameof(HideDictTabsWithNoResults), bool.TryParse);
         AutoHidePopupIfMouseIsNotOverIt = GetValueFromConfig(AutoHidePopupIfMouseIsNotOverIt, nameof(AutoHidePopupIfMouseIsNotOverIt), bool.TryParse);
+
+        HorizontallyCenterMainWindowText = GetValueFromConfig(HorizontallyCenterMainWindowText, nameof(HorizontallyCenterMainWindowText), bool.TryParse);
+        mainWindow.MainTextBox.HorizontalContentAlignment = HorizontallyCenterMainWindowText
+            ? HorizontalAlignment.Center
+            : HorizontalAlignment.Left;
 
         TextBoxIsReadOnly = GetValueFromConfig(TextBoxIsReadOnly, nameof(TextBoxIsReadOnly), bool.TryParse);
         mainWindow.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
@@ -669,6 +675,8 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked = MainWindowFocusOnHover;
         preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked = SteppedBacklogWithMouseWheel;
 
+        preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked = HorizontallyCenterMainWindowText;
+
         preferenceWindow.ThemeComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("Theme");
         preferenceWindow.MinimumLogLevelComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("MinimumLogLevel");
 
@@ -680,7 +688,6 @@ internal sealed class ConfigManager : CoreConfig
         {
             preferenceWindow.MainWindowFontComboBox.SelectedIndex = 0;
         }
-
 
         preferenceWindow.PopupFontComboBox.ItemsSource = s_popupJapaneseFonts;
         preferenceWindow.PopupFontComboBox.SelectedIndex =
@@ -847,7 +854,10 @@ internal sealed class ConfigManager : CoreConfig
         config.AppSettings.Settings[nameof(MainWindowFocusOnHover)].Value =
             preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(SteppedBacklogWithMouseWheel)].Value =
-    preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked.ToString();
+            preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked.ToString();
+
+        config.AppSettings.Settings[nameof(HorizontallyCenterMainWindowText)].Value =
+            preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked.ToString();
 
         config.AppSettings.Settings[nameof(MainWindowTextColor)].Value =
             preferenceWindow.TextboxTextColorButton.Tag.ToString();
