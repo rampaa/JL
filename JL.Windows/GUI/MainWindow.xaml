@@ -24,7 +24,20 @@
         <Border Name="BottomLeftBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="5" Height="5" Background="Transparent"/>
         <Border Name="BottomRightBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="5" Height="5" Background="Transparent"/>
         <Border Name="TopLeftBorder"  MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Top" HorizontalAlignment="left" Height="5" Width="5" Background="Transparent"/>
-        <Rectangle Name="TitleBar" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="15" Margin="5,5,5,5" Opacity="1" Fill="Transparent"/>
+        
+        <Rectangle Name="TitleBar" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="15" Margin="5,5,5,5" Opacity="1" Fill="Transparent">
+            <Rectangle.ContextMenu>
+                <ContextMenu>
+                    <MenuItem
+                        Header="Minimize"
+                        Click="MinimizeWindow" />
+                    <MenuItem
+                        Header="Close"
+                        Click="CloseWindow"
+                        InputGestureText="Alt+F4"/>
+                </ContextMenu>
+            </Rectangle.ContextMenu>
+        </Rectangle>
 
         <TextBox x:Name="MainTextBox" Margin="5,20,5,5" TextWrapping="Wrap" VerticalContentAlignment="Top"
                  Background="Transparent" FontSize="{Binding Value, ElementName=FontSizeSlider}"
@@ -37,34 +50,34 @@
             <TextBox.ContextMenu>
                 <ContextMenu Name="MainTextboxContextMenu">
                     <MenuItem
-                        Name="AddNameButton"
+                        Name="AddNameMenuItem"
                         Header="Add name"
                         Click="AddName" />
                     <MenuItem
-                        Name="AddWordButton"
+                        Name="AddWordMenuItem"
                         Header="Add word"
                         Click="AddWord" />
                     <MenuItem
                         Header="Copy"
                         Command="Copy" />
                     <MenuItem
-                        Name="SearchButton"
+                        Name="SearchMenuItem"
                         Header="Search"
                         Click="SearchWithBrowser" />
                     <MenuItem
-                        Name="StatsButton"
+                        Name="StatsMenuItem"
                         Header="Stats"
                         Click="ShowStats" />
                     <MenuItem
-                        Name="ManageFrequenciesButton"
+                        Name="ManageFrequenciesMenuItem"
                         Header="Manage frequencies"
                         Click="ShowManageFrequenciesWindow" />
                     <MenuItem
-                        Name="ManageDictionariesButton"
+                        Name="ManageDictionariesMenuItem"
                         Header="Manage dictionaries"
                         Click="ShowManageDictionariesWindow" />
                     <MenuItem
-                        Name="PreferencesButton"
+                        Name="PreferencesMenuItem"
                         Header="Preferences"
                         Click="ShowPreferences" />
                 </ContextMenu>

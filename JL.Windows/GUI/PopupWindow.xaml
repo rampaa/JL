@@ -58,22 +58,22 @@
     <Window.ContextMenu>
         <ContextMenu Name="PopupContextMenu">
             <MenuItem
-                Name="AddNameButton"
+                Name="AddNameMenuItem"
                 Header="Add name"
                 Click="AddName" />
             <MenuItem
-                Name="AddWordButton"
+                Name="AddWordMenuItem"
                 Header="Add word"
                 Click="AddWord" />
             <MenuItem
                 Header="Copy"
                 Command="Copy" />
             <MenuItem
-                Name="SearchButton"
+                Name="SearchMenuItem"
                 Header="Search"
                 Click="SearchWithBrowser" />
             <MenuItem
-                Name="StatsButton"
+                Name="StatsMenuItem"
                 Header="Stats"
                 Click="ShowStats" />
         </ContextMenu>

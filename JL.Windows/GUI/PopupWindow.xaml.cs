@@ -87,10 +87,10 @@ internal sealed partial class PopupWindow : Window
 
         WindowsUtils.SetSizeToContentForPopup(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxWidth, WindowsUtils.DpiAwarePopupMaxHeight, this);
 
-        WindowsUtils.SetInputGestureText(AddNameButton, ConfigManager.ShowAddNameWindowKeyGesture);
-        WindowsUtils.SetInputGestureText(AddWordButton, ConfigManager.ShowAddWordWindowKeyGesture);
-        WindowsUtils.SetInputGestureText(SearchButton, ConfigManager.SearchWithBrowserKeyGesture);
-        WindowsUtils.SetInputGestureText(StatsButton, ConfigManager.ShowStatsKeyGesture);
+        WindowsUtils.SetInputGestureText(AddNameMenuItem, ConfigManager.ShowAddNameWindowKeyGesture);
+        WindowsUtils.SetInputGestureText(AddWordMenuItem, ConfigManager.ShowAddWordWindowKeyGesture);
+        WindowsUtils.SetInputGestureText(SearchMenuItem, ConfigManager.SearchWithBrowserKeyGesture);
+        WindowsUtils.SetInputGestureText(StatsMenuItem, ConfigManager.ShowStatsKeyGesture);
 
         if (ConfigManager.ShowMiningModeReminder)
         {
@@ -988,8 +988,8 @@ internal sealed partial class PopupWindow : Window
 
     private void TextBoxPreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
-        AddNameButton.IsEnabled = Storage.DictsReady;
-        AddWordButton.IsEnabled = Storage.DictsReady;
+        AddNameMenuItem.IsEnabled = Storage.DictsReady;
+        AddWordMenuItem.IsEnabled = Storage.DictsReady;
 
         _lastSelectedText = ((TextBox)sender).SelectedText;
     }

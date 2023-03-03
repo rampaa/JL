@@ -287,7 +287,6 @@ internal sealed partial class MainWindow : Window
     {
         if (ConfigManager.LookupOnSelectOnly
             || ConfigManager.LookupOnLeftClickOnly
-            || Background.Opacity is 0
             || MainTextboxContextMenu.IsVisible
             || FontSizeSlider.IsVisible
             || OpacitySlider.IsVisible
@@ -395,12 +394,6 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    private void MinimizeButton_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-    {
-        OpacitySlider.Visibility = Visibility.Collapsed;
-        FontSizeSlider.Visibility = Visibility.Collapsed;
-        WindowState = WindowState.Minimized;
-    }
 
     private void Button_MouseEnter(object sender, MouseEventArgs e)
     {
@@ -662,6 +655,42 @@ internal sealed partial class MainWindow : Window
         {
             await DeleteCurrentLine().ConfigureAwait(false);
         }
+
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ToggleVisibilityOfAllMainWindowButtonsKeyGesture))
+        {
+            ConfigManager.HideAllMainWindowButtons = !ConfigManager.HideAllMainWindowButtons;
+            ChangeVisibilityOfAllButtons();
+        }
+    }
+
+    internal void ChangeVisibilityOfAllButtons()
+    {
+        if (ConfigManager.HideAllMainWindowButtons)
+        {
+            OpacityButton.Visibility = Visibility.Collapsed;
+            FontSizeButton.Visibility = Visibility.Collapsed;
+            MinimizeButton.Visibility = Visibility.Collapsed;
+            CloseButton.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            OpacityButton.Visibility = Visibility.Visible;
+            FontSizeButton.Visibility = Visibility.Visible;
+            MinimizeButton.Visibility = Visibility.Visible;
+            CloseButton.Visibility = Visibility.Visible;
+        }
+    }
+
+    private void CloseWindow(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
+    private void MinimizeWindow(object sender, RoutedEventArgs e)
+    {
+        OpacitySlider.Visibility = Visibility.Collapsed;
+        FontSizeSlider.Visibility = Visibility.Collapsed;
+        WindowState = WindowState.Minimized;
     }
 
     private void AddName(object sender, RoutedEventArgs e)
@@ -734,7 +763,7 @@ internal sealed partial class MainWindow : Window
     private void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         if ((!ConfigManager.LookupOnSelectOnly && !ConfigManager.LookupOnLeftClickOnly)
-            || Background.Opacity is 0
+            // || Background.Opacity is 0
             || ConfigManager.InactiveLookupMode
             || FirstPopupWindow.MiningMode
             || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
@@ -943,20 +972,20 @@ internal sealed partial class MainWindow : Window
 
     private void MainTextBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        ManageDictionariesButton.IsEnabled = Storage.DictsReady
+        ManageDictionariesMenuItem.IsEnabled = Storage.DictsReady
                                       && !Storage.UpdatingJMdict
                                       && !Storage.UpdatingJMnedict
                                       && !Storage.UpdatingKanjidic;
 
-        ManageFrequenciesButton.IsEnabled = Storage.FreqsReady;
+        ManageFrequenciesMenuItem.IsEnabled = Storage.FreqsReady;
 
-        AddNameButton.IsEnabled = Storage.DictsReady;
-        AddWordButton.IsEnabled = Storage.DictsReady;
+        AddNameMenuItem.IsEnabled = Storage.DictsReady;
+        AddWordMenuItem.IsEnabled = Storage.DictsReady;
     }
 
     private void Window_MouseLeave(object sender, MouseEventArgs e)
     {
-        if (Background.Opacity is 0 || ConfigManager.InvisibleMode)
+        if (ConfigManager.InvisibleMode)
         {
             return;
         }
@@ -976,7 +1005,7 @@ internal sealed partial class MainWindow : Window
                 MainGrid.Opacity = 0;
             }
 
-            if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+            if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0)
             {
                 Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
             }
@@ -985,7 +1014,7 @@ internal sealed partial class MainWindow : Window
 
     private void Window_MouseEnter(object sender, MouseEventArgs e)
     {
-        if (Background.Opacity is 0 || ConfigManager.InvisibleMode)
+        if (ConfigManager.InvisibleMode)
         {
             return;
         }
@@ -995,7 +1024,7 @@ internal sealed partial class MainWindow : Window
             MainGrid.Opacity = 1;
         }
 
-        if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+        if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0)
         {
             Background.Opacity = OpacitySlider.Value / 100;
         }

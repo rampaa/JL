@@ -78,6 +78,7 @@ internal sealed class ConfigManager : CoreConfig
     public static bool CaptureTextFromWebSocket { get; set; } = false;
     public static Uri WebSocketUri { get; private set; } = new("ws://127.0.0.1:6677");
     public static bool HorizontallyCenterMainWindowText { get; private set; } = false;
+    public static bool HideAllMainWindowButtons { get; set; } = false;
 
     #endregion
 
@@ -158,6 +159,7 @@ internal sealed class ConfigManager : CoreConfig
     public static KeyGesture CaptureTextFromWebSocketdKeyGesture { get; private set; } = new(Key.F11, ModifierKeys.Windows);
     public static KeyGesture ReconnectToWebSocketServerKeyGesture { get; private set; } = new(Key.F9, ModifierKeys.Windows);
     public static KeyGesture DeleteCurrentLineKeyGesture { get; private set; } = new(Key.Delete, ModifierKeys.Windows);
+    public static KeyGesture ToggleVisibilityOfAllMainWindowButtonsKeyGesture { get; private set; } = new(Key.F2, ModifierKeys.Windows);
 
     #endregion
 
@@ -234,6 +236,9 @@ internal sealed class ConfigManager : CoreConfig
         mainWindow.MainTextBox.HorizontalContentAlignment = HorizontallyCenterMainWindowText
             ? HorizontalAlignment.Center
             : HorizontalAlignment.Left;
+
+        HideAllMainWindowButtons = GetValueFromConfig(HideAllMainWindowButtons, nameof(HideAllMainWindowButtons), bool.TryParse);
+        mainWindow.ChangeVisibilityOfAllButtons();
 
         TextBoxIsReadOnly = GetValueFromConfig(TextBoxIsReadOnly, nameof(TextBoxIsReadOnly), bool.TryParse);
         mainWindow.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
@@ -348,6 +353,7 @@ internal sealed class ConfigManager : CoreConfig
         CaptureTextFromWebSocketdKeyGesture = WindowsUtils.SetKeyGesture(nameof(CaptureTextFromWebSocketdKeyGesture), CaptureTextFromWebSocketdKeyGesture);
         ReconnectToWebSocketServerKeyGesture = WindowsUtils.SetKeyGesture(nameof(ReconnectToWebSocketServerKeyGesture), ReconnectToWebSocketServerKeyGesture);
         DeleteCurrentLineKeyGesture = WindowsUtils.SetKeyGesture(nameof(DeleteCurrentLineKeyGesture), DeleteCurrentLineKeyGesture);
+        ToggleVisibilityOfAllMainWindowButtonsKeyGesture = WindowsUtils.SetKeyGesture(nameof(ToggleVisibilityOfAllMainWindowButtonsKeyGesture), ToggleVisibilityOfAllMainWindowButtonsKeyGesture);
 
         ShowPreferencesWindowKeyGesture =
             WindowsUtils.SetKeyGesture(nameof(ShowPreferencesWindowKeyGesture), ShowPreferencesWindowKeyGesture);
@@ -378,13 +384,13 @@ internal sealed class ConfigManager : CoreConfig
             WindowsUtils.SetKeyGesture(nameof(ShowManageFrequenciesWindowKeyGesture),
                 ShowManageFrequenciesWindowKeyGesture);
 
-        WindowsUtils.SetInputGestureText(mainWindow.AddNameButton, ShowAddNameWindowKeyGesture);
-        WindowsUtils.SetInputGestureText(mainWindow.AddWordButton, ShowAddWordWindowKeyGesture);
-        WindowsUtils.SetInputGestureText(mainWindow.SearchButton, SearchWithBrowserKeyGesture);
-        WindowsUtils.SetInputGestureText(mainWindow.PreferencesButton, ShowPreferencesWindowKeyGesture);
-        WindowsUtils.SetInputGestureText(mainWindow.ManageDictionariesButton, ShowManageDictionariesWindowKeyGesture);
-        WindowsUtils.SetInputGestureText(mainWindow.ManageFrequenciesButton, ShowManageFrequenciesWindowKeyGesture);
-        WindowsUtils.SetInputGestureText(mainWindow.StatsButton, ShowStatsKeyGesture);
+        WindowsUtils.SetInputGestureText(mainWindow.AddNameMenuItem, ShowAddNameWindowKeyGesture);
+        WindowsUtils.SetInputGestureText(mainWindow.AddWordMenuItem, ShowAddWordWindowKeyGesture);
+        WindowsUtils.SetInputGestureText(mainWindow.SearchMenuItem, SearchWithBrowserKeyGesture);
+        WindowsUtils.SetInputGestureText(mainWindow.PreferencesMenuItem, ShowPreferencesWindowKeyGesture);
+        WindowsUtils.SetInputGestureText(mainWindow.ManageDictionariesMenuItem, ShowManageDictionariesWindowKeyGesture);
+        WindowsUtils.SetInputGestureText(mainWindow.ManageFrequenciesMenuItem, ShowManageFrequenciesWindowKeyGesture);
+        WindowsUtils.SetInputGestureText(mainWindow.StatsMenuItem, ShowStatsKeyGesture);
 
         string? themeStr = ConfigurationManager.AppSettings.Get("Theme");
         if (themeStr is null)
@@ -542,10 +548,10 @@ internal sealed class ConfigManager : CoreConfig
 
             WindowsUtils.SetSizeToContentForPopup(PopupDynamicWidth, PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxHeight, WindowsUtils.DpiAwarePopupMaxWidth, currentPopupWindow);
 
-            WindowsUtils.SetInputGestureText(currentPopupWindow.AddNameButton, ShowAddNameWindowKeyGesture);
-            WindowsUtils.SetInputGestureText(currentPopupWindow.AddWordButton, ShowAddWordWindowKeyGesture);
-            WindowsUtils.SetInputGestureText(currentPopupWindow.SearchButton, SearchWithBrowserKeyGesture);
-            WindowsUtils.SetInputGestureText(currentPopupWindow.StatsButton, ShowStatsKeyGesture);
+            WindowsUtils.SetInputGestureText(currentPopupWindow.AddNameMenuItem, ShowAddNameWindowKeyGesture);
+            WindowsUtils.SetInputGestureText(currentPopupWindow.AddWordMenuItem, ShowAddWordWindowKeyGesture);
+            WindowsUtils.SetInputGestureText(currentPopupWindow.SearchMenuItem, SearchWithBrowserKeyGesture);
+            WindowsUtils.SetInputGestureText(currentPopupWindow.StatsMenuItem, ShowStatsKeyGesture);
 
             currentPopupWindow = currentPopupWindow.ChildPopupWindow;
         }
@@ -611,6 +617,8 @@ internal sealed class ConfigManager : CoreConfig
             WindowsUtils.KeyGestureToString(ReconnectToWebSocketServerKeyGesture);
         preferenceWindow.DeleteCurrentLineKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(DeleteCurrentLineKeyGesture);
+        preferenceWindow.ToggleVisibilityOfAllMainWindowButtonsKeyGestureTextBox.Text =
+            WindowsUtils.KeyGestureToString(ToggleVisibilityOfAllMainWindowButtonsKeyGesture);
 
         WindowsUtils.SetButtonColor(preferenceWindow.HighlightColorButton, HighlightColor);
         WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, mainWindow.Background.CloneCurrentValue());
@@ -666,15 +674,13 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked = TextBoxTrimWhiteSpaceCharacters;
         preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked = TextBoxRemoveNewlines;
         preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked = TextBoxApplyDropShadowEffect;
-
         preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked = CaptureTextFromClipboard;
         preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked = CaptureTextFromWebSocket;
-
         preferenceWindow.OnlyCaptureTextWithJapaneseCharsCheckBox.IsChecked = OnlyCaptureTextWithJapaneseChars;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInMainWindow;
         preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked = MainWindowFocusOnHover;
         preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked = SteppedBacklogWithMouseWheel;
-
+        preferenceWindow.HideAllMainWindowButtonsCheckBox.IsChecked = HideAllMainWindowButtons;
         preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked = HorizontallyCenterMainWindowText;
 
         preferenceWindow.ThemeComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("Theme");
@@ -794,6 +800,8 @@ internal sealed class ConfigManager : CoreConfig
             preferenceWindow.ReconnectToWebSocketServerKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(DeleteCurrentLineKeyGesture),
             preferenceWindow.DeleteCurrentLineKeyGestureTextBox.Text);
+        SaveKeyGesture(nameof(ToggleVisibilityOfAllMainWindowButtonsKeyGesture),
+            preferenceWindow.ToggleVisibilityOfAllMainWindowButtonsKeyGestureTextBox.Text);
 
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
@@ -855,7 +863,8 @@ internal sealed class ConfigManager : CoreConfig
             preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(SteppedBacklogWithMouseWheel)].Value =
             preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked.ToString();
-
+        config.AppSettings.Settings[nameof(HideAllMainWindowButtons)].Value =
+            preferenceWindow.HideAllMainWindowButtonsCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(HorizontallyCenterMainWindowText)].Value =
             preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked.ToString();
 
