@@ -276,18 +276,18 @@ internal sealed partial class PreferencesWindow : Window
         }
     }
 
-    private static AnkiConfig? GetAnkiConfigFromPreferences(ComboBox deckNamesComboBox, ComboBox modelNamesComboBox, Panel miningPanel, TextBox tagsTextBox, IReadOnlyCollection<JLField> jlFieldList)
+    private static AnkiConfig? GetAnkiConfigFromPreferences(Selector deckNamesSelector, Selector modelNamesSelector, Panel miningPanel, TextBox tagsTextBox, IReadOnlyCollection<JLField> jlFieldList)
     {
-        if (deckNamesComboBox.SelectedItem is null ||
-            modelNamesComboBox.SelectedItem is null)
+        if (deckNamesSelector.SelectedItem is null ||
+            modelNamesSelector.SelectedItem is null)
         {
             Storage.Frontend.Alert(AlertLevel.Error, "Save failed: Incomplete Anki config");
             Utils.Logger.Error("Save failed: Incomplete Anki config");
             return null;
         }
 
-        string deckName = deckNamesComboBox.SelectedItem.ToString()!;
-        string modelName = modelNamesComboBox.SelectedItem.ToString()!;
+        string deckName = deckNamesSelector.SelectedItem.ToString()!;
+        string modelName = modelNamesSelector.SelectedItem.ToString()!;
 
         Dictionary<string, JLField> dict = new();
         foreach (StackPanel stackPanel in miningPanel.Children)

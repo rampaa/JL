@@ -134,7 +134,7 @@ public static class Utils
 
                 if (deserializedDicts is not null)
                 {
-                    IOrderedEnumerable<Dict> orderedDicts = deserializedDicts.Values.OrderBy(d => d.Priority);
+                    IOrderedEnumerable<Dict> orderedDicts = deserializedDicts.Values.OrderBy(static d => d.Priority);
                     int priority = 1;
 
                     foreach (Dict dict in orderedDicts)
@@ -218,7 +218,7 @@ public static class Utils
 
                 if (deserializedFreqs is not null)
                 {
-                    IOrderedEnumerable<Freq> orderedFreqs = deserializedFreqs.Values.OrderBy(f => f.Priority);
+                    IOrderedEnumerable<Freq> orderedFreqs = deserializedFreqs.Values.OrderBy(static f => f.Priority);
                     int priority = 1;
 
                     foreach (Freq freq in orderedFreqs)

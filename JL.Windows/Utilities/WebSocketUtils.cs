@@ -19,14 +19,14 @@ internal static class WebSocketUtils
         else if (s_webSocketTask is null)
         {
             s_webSocketCancellationTokenSource?.Dispose();
-            s_webSocketCancellationTokenSource = new();
+            s_webSocketCancellationTokenSource = new CancellationTokenSource();
             ListenWebSocket(s_webSocketCancellationTokenSource.Token);
         }
         else
         {
             s_webSocketCancellationTokenSource!.Cancel();
             s_webSocketCancellationTokenSource.Dispose();
-            s_webSocketCancellationTokenSource = new();
+            s_webSocketCancellationTokenSource = new CancellationTokenSource();
             ListenWebSocket(s_webSocketCancellationTokenSource.Token);
         }
     }

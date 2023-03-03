@@ -59,7 +59,7 @@ public static class ResourceUpdater
 
                 else
                 {
-                    Utils.Logger.Error("Unexpected error while downloading {ResourceName. Status code: {StatusCode}}",
+                    Utils.Logger.Error("Unexpected error while downloading {ResourceName}. Status code: {StatusCode}",
                         resourceName, response.StatusCode);
 
                     if (!noPrompt)

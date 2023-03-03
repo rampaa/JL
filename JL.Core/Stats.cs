@@ -83,6 +83,8 @@ public sealed class Stats
                 SessionStats.TimesPlayedAudio = 0;
                 SessionStats.Imoutos = 0;
                 break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(statsMode), statsMode, null);
         }
     }
 

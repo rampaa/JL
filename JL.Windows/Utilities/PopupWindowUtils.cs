@@ -16,22 +16,14 @@ internal static class PopupWindowUtils
 {
     public static string GradeToText(int grade)
     {
-        string gradeText = "";
-        switch (grade)
+        string gradeText = grade switch
         {
-            case 0:
-                gradeText = "Hyougai";
-                break;
-            case <= 6:
-                gradeText = $"{grade} (Kyouiku)";
-                break;
-            case 8:
-                gradeText = $"{grade} (Jouyou)";
-                break;
-            case <= 10:
-                gradeText = $"{grade} (Jinmeiyou)";
-                break;
-        }
+            0 => "Hyougai",
+            <= 6 => $"{grade} (Kyouiku)",
+            8 => $"{grade} (Jouyou)",
+            <= 10 => $"{grade} (Jinmeiyou)",
+            _ => ""
+        };
 
         return gradeText;
     }
@@ -255,7 +247,7 @@ internal static class PopupWindowUtils
 
     private static void PopupAutoHideTimerEvent(object? sender, ElapsedEventArgs e)
     {
-        _ = MainWindow.Instance.FirstPopupWindow.Dispatcher.BeginInvoke(() =>
+        _ = MainWindow.Instance.FirstPopupWindow.Dispatcher.BeginInvoke(static () =>
         {
             PopupWindow lastPopupWindow = MainWindow.Instance.FirstPopupWindow;
             while (lastPopupWindow.ChildPopupWindow?.IsVisible ?? false)

@@ -394,6 +394,12 @@ internal sealed partial class MainWindow : Window
         }
     }
 
+    private void MinimizeButton_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        OpacitySlider.Visibility = Visibility.Collapsed;
+        FontSizeSlider.Visibility = Visibility.Collapsed;
+        WindowState = WindowState.Minimized;
+    }
 
     private void Button_MouseEnter(object sender, MouseEventArgs e)
     {
@@ -763,7 +769,6 @@ internal sealed partial class MainWindow : Window
     private void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         if ((!ConfigManager.LookupOnSelectOnly && !ConfigManager.LookupOnLeftClickOnly)
-            // || Background.Opacity is 0
             || ConfigManager.InactiveLookupMode
             || FirstPopupWindow.MiningMode
             || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))

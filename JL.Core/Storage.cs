@@ -581,7 +581,7 @@ public static class Storage
 
             if (dictRemoved)
             {
-                IOrderedEnumerable<Dict> orderedDicts = Dicts.Values.OrderBy(d => d.Priority);
+                IOrderedEnumerable<Dict> orderedDicts = Dicts.Values.OrderBy(static d => d.Priority);
                 int priority = 1;
 
                 foreach (Dict dict in orderedDicts)
@@ -689,7 +689,7 @@ public static class Storage
 
             if (freqRemoved)
             {
-                IOrderedEnumerable<Freq> orderedFreqs = FreqDicts.Values.OrderBy(f => f.Priority);
+                IOrderedEnumerable<Freq> orderedFreqs = FreqDicts.Values.OrderBy(static f => f.Priority);
                 int priority = 1;
 
                 foreach (Freq freq in orderedFreqs)

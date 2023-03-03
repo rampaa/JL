@@ -451,8 +451,7 @@ internal static class WindowsUtils
         window.ShowDialog(picker, false);
     }
 
-    private static void ConfirmColor(Button button, Brush selectedBrush,
-    HandyControl.Controls.PopupWindow window)
+    private static void ConfirmColor(Button button, Brush selectedBrush, Window window)
     {
         SetButtonColor(button, selectedBrush);
         window.Close();
