@@ -669,7 +669,7 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    internal void ChangeVisibilityOfAllButtons()
+    public void ChangeVisibilityOfAllButtons()
     {
         if (ConfigManager.HideAllMainWindowButtons)
         {
