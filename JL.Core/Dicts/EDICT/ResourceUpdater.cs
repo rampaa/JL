@@ -94,7 +94,7 @@ public static class ResourceUpdater
 
     public static async Task UpdateJmdict()
     {
-        Storage.UpdatingJMdict = true;
+        Storage.UpdatingJmdict = true;
 
         Dict dict = Storage.Dicts.Values.First(static dict => dict.Type is DictType.JMdict);
         bool isDownloaded = await UpdateResource(dict.Path,
@@ -124,12 +124,12 @@ public static class ResourceUpdater
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
         }
 
-        Storage.UpdatingJMdict = false;
+        Storage.UpdatingJmdict = false;
     }
 
     public static async Task UpdateJmnedict()
     {
-        Storage.UpdatingJMnedict = true;
+        Storage.UpdatingJmnedict = true;
 
         Dict dict = Storage.Dicts.Values.First(static dict => dict.Type is DictType.JMnedict);
         bool isDownloaded = await UpdateResource(dict.Path,
@@ -153,7 +153,7 @@ public static class ResourceUpdater
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
         }
 
-        Storage.UpdatingJMnedict = false;
+        Storage.UpdatingJmnedict = false;
     }
 
     public static async Task UpdateKanjidic()

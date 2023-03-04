@@ -143,11 +143,11 @@ internal sealed partial class ManageDictionariesWindow : Window
             switch (dict.Type)
             {
                 case DictType.JMdict:
-                    buttonUpdate.IsEnabled = !Storage.UpdatingJMdict;
+                    buttonUpdate.IsEnabled = !Storage.UpdatingJmdict;
                     break;
 
                 case DictType.JMnedict:
-                    buttonUpdate.IsEnabled = !Storage.UpdatingJMnedict;
+                    buttonUpdate.IsEnabled = !Storage.UpdatingJmnedict;
                     break;
 
                 case DictType.Kanjidic:
@@ -364,11 +364,9 @@ internal sealed partial class ManageDictionariesWindow : Window
         {
             Owner = this,
             Title = title,
-            InfoTextBox = { Text = EntityDictToString(entityDict) }
+            InfoTextBox = { Text = EntityDictToString(entityDict) },
+            WindowStartupLocation = WindowStartupLocation.CenterScreen
         };
-
-        infoWindow.Owner = this;
-        infoWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
         _ = infoWindow.ShowDialog();
     }

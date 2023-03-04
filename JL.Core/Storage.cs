@@ -39,8 +39,8 @@ public static class Storage
     public static readonly Uri JmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     public static readonly Uri KanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
     public static bool DictsReady { get; private set; } = false;
-    public static bool UpdatingJMdict { get; set; } = false;
-    public static bool UpdatingJMnedict { get; set; } = false;
+    public static bool UpdatingJmdict { get; set; } = false;
+    public static bool UpdatingJmnedict { get; set; } = false;
     public static bool UpdatingKanjidic { get; set; } = false;
     public static bool FreqsReady { get; private set; } = false;
     public static Dictionary<string, List<JmdictWordClass>> WordClassDictionary { get; internal set; } = new(65536); // 2022/10/29: 48909
@@ -342,7 +342,7 @@ public static class Storage
             switch (dict.Type)
             {
                 case DictType.JMdict:
-                    if (dict is { Active: true, Contents.Count: 0 } && !UpdatingJMdict)
+                    if (dict is { Active: true, Contents.Count: 0 } && !UpdatingJmdict)
                     {
                         Task jMDictTask = Task.Run(async () =>
                         {
@@ -353,7 +353,7 @@ public static class Storage
                         tasks.Add(jMDictTask);
                     }
 
-                    else if (dict is { Active: false, Contents.Count: > 0 } && !UpdatingJMdict)
+                    else if (dict is { Active: false, Contents.Count: > 0 } && !UpdatingJmdict)
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;
@@ -361,7 +361,7 @@ public static class Storage
                     break;
 
                 case DictType.JMnedict:
-                    if (dict is { Active: true, Contents.Count: 0 } && !UpdatingJMnedict)
+                    if (dict is { Active: true, Contents.Count: 0 } && !UpdatingJmnedict)
                     {
                         tasks.Add(Task.Run(async () =>
                         {
@@ -370,7 +370,7 @@ public static class Storage
                         }));
                     }
 
-                    else if (dict is { Active: false, Contents.Count: > 0 } && !UpdatingJMnedict)
+                    else if (dict is { Active: false, Contents.Count: > 0 } && !UpdatingJmnedict)
                     {
                         dict.Contents.Clear();
                         dictRemoved = true;

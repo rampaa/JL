@@ -12,15 +12,17 @@ internal sealed class CustomWordRecord : IDictRecordWithGetFrequency
     public List<string>? Readings { get; }
     private List<string> Definitions { get; }
     public List<string> WordClasses { get; }
+    public bool HasUserDefinedWordClass { get; }
 
     public CustomWordRecord(string primarySpelling, List<string>? alternativeSpellings, List<string>? readings,
-        List<string> definitions, List<string> wordClasses)
+        List<string> definitions, List<string> wordClasses, bool hasUserDefinedWordClass)
     {
         PrimarySpelling = primarySpelling;
         AlternativeSpellings = alternativeSpellings;
         Readings = readings;
         Definitions = definitions;
         WordClasses = wordClasses;
+        HasUserDefinedWordClass = hasUserDefinedWordClass;
     }
 
     public string BuildFormattedDefinition(DictOptions? options)
@@ -39,17 +41,21 @@ internal sealed class CustomWordRecord : IDictRecordWithGetFrequency
             {
                 tempWordClass = "adjective";
             }
-            else if (WordClasses.Contains("v1"))
-            {
-                tempWordClass = "verb";
-            }
             else if (WordClasses.Contains("noun"))
             {
                 tempWordClass = "noun";
             }
-            else
+            else if (WordClasses.Contains("other"))
             {
                 tempWordClass = "other";
+            }
+            else if (HasUserDefinedWordClass)
+            {
+                tempWordClass = string.Join(", ", WordClasses);
+            }
+            else
+            {
+                tempWordClass = "verb";
             }
 
             _ = defResult.Append(CultureInfo.InvariantCulture, $"({tempWordClass}) ");

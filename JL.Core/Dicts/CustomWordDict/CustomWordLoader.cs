@@ -13,7 +13,7 @@ public static class CustomWordLoader
             {
                 string[] lParts = lines[i].Split("\t");
 
-                if (lParts.Length is 4)
+                if (lParts.Length > 3)
                 {
                     string[] spellings = lParts[0].Split(';').Select(static s => s.Trim()).ToArray();
 
@@ -25,16 +25,22 @@ public static class CustomWordLoader
                     }
 
                     List<string> definitions = lParts[2].Split(';').Select(static d => d.Trim()).ToList();
-                    string wordClass = lParts[3].Trim();
+                    string partOfSpeech = lParts[3].Trim();
 
-                    AddToDictionary(spellings, readings, definitions, wordClass);
+                    List<string>? wordClasses = null;
+                    if (lParts.Length is 5)
+                    {
+                        wordClasses = lParts[4].Split(';').Select(static wc => wc.Trim()).ToList();
+                    }
+
+                    AddToDictionary(spellings, readings, definitions, partOfSpeech, wordClasses);
                 }
             }
         }
     }
 
     public static void AddToDictionary(string[] spellings, List<string>? readings, List<string> definitions,
-        string rawWordClass)
+        string rawPartOfSpeech, List<string>? wordClasses)
     {
         for (int i = 0; i < spellings.Length; i++)
         {
@@ -48,46 +54,54 @@ public static class CustomWordLoader
 
             string spelling = spellings[i];
 
-            List<string> wordClass = new();
+            bool hasUserDefinedWordClasses = wordClasses?.Count > 0;
+            List<string> wordClassList = new();
 
-            switch (rawWordClass)
+            switch (rawPartOfSpeech)
             {
                 case "Verb":
-                    wordClass.Add("v1");
-                    wordClass.Add("v1-s");
-                    wordClass.Add("v4r");
-                    wordClass.Add("v5aru");
-                    wordClass.Add("v5b");
-                    wordClass.Add("v5g");
-                    wordClass.Add("v5k");
-                    wordClass.Add("v5k-s");
-                    wordClass.Add("v5m");
-                    wordClass.Add("v5n");
-                    wordClass.Add("v5r");
-                    wordClass.Add("v5r-i");
-                    wordClass.Add("v5s");
-                    wordClass.Add("v5t");
-                    wordClass.Add("v5u");
-                    wordClass.Add("v5u-s");
-                    wordClass.Add("vk");
-                    wordClass.Add("vs-c");
-                    wordClass.Add("vs-i");
-                    wordClass.Add("vs-s");
-                    wordClass.Add("vz");
+                    if (hasUserDefinedWordClasses)
+                    {
+                        wordClassList.AddRange(wordClasses!);
+                    }
+                    else
+                    {
+                        wordClassList.Add("v1");
+                        wordClassList.Add("v1-s");
+                        wordClassList.Add("v4r");
+                        wordClassList.Add("v5aru");
+                        wordClassList.Add("v5b");
+                        wordClassList.Add("v5g");
+                        wordClassList.Add("v5k");
+                        wordClassList.Add("v5k-s");
+                        wordClassList.Add("v5m");
+                        wordClassList.Add("v5n");
+                        wordClassList.Add("v5r");
+                        wordClassList.Add("v5r-i");
+                        wordClassList.Add("v5s");
+                        wordClassList.Add("v5t");
+                        wordClassList.Add("v5u");
+                        wordClassList.Add("v5u-s");
+                        wordClassList.Add("vk");
+                        wordClassList.Add("vs-c");
+                        wordClassList.Add("vs-i");
+                        wordClassList.Add("vs-s");
+                        wordClassList.Add("vz");
+                    }
                     break;
                 case "Adjective":
-                    wordClass.Add("adj-i");
-                    wordClass.Add("adj-na");
+                    wordClassList.Add("adj-i");
+                    wordClassList.Add("adj-na");
                     break;
                 case "Noun":
-                    wordClass.Add("noun");
+                    wordClassList.Add("noun");
                     break;
                 default:
-                    wordClass.Add("other");
+                    wordClassList.Add("other");
                     break;
             }
 
-            CustomWordRecord newWordRecord = new(spelling, alternativeSpellings, readings, definitions, wordClass);
+            CustomWordRecord newWordRecord = new(spelling, alternativeSpellings, readings, definitions, wordClassList, hasUserDefinedWordClasses);
 
             Dictionary<string, List<IDictRecord>> customWordDictionary = Storage.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary).Contents;
 

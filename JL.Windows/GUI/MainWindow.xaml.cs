@@ -180,7 +180,7 @@ internal sealed partial class MainWindow : Window
         }
 
         if (ConfigManager.Precaching && Storage.DictsReady
-            && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic
+            && !Storage.UpdatingJmdict && !Storage.UpdatingJmnedict && !Storage.UpdatingKanjidic
             && Storage.FreqsReady && MainTextBox.Text.Length < Storage.CacheSize)
         {
             _ = Dispatcher.Invoke(DispatcherPriority.Render, static () => { }); // let MainTextBox text update
@@ -563,8 +563,8 @@ internal sealed partial class MainWindow : Window
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
         {
             if (Storage.DictsReady
-                && !Storage.UpdatingJMdict
-                && !Storage.UpdatingJMnedict
+                && !Storage.UpdatingJmdict
+                && !Storage.UpdatingJmnedict
                 && !Storage.UpdatingKanjidic)
             {
                 WindowsUtils.ShowManageDictionariesWindow();
@@ -978,8 +978,8 @@ internal sealed partial class MainWindow : Window
     private void MainTextBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
         ManageDictionariesMenuItem.IsEnabled = Storage.DictsReady
-                                      && !Storage.UpdatingJMdict
-                                      && !Storage.UpdatingJMnedict
+                                      && !Storage.UpdatingJmdict
+                                      && !Storage.UpdatingJmnedict
                                       && !Storage.UpdatingKanjidic;
 
         ManageFrequenciesMenuItem.IsEnabled = Storage.FreqsReady;

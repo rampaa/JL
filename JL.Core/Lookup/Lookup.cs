@@ -69,8 +69,8 @@ public static class Lookup
                 : null;
         }
 
-        Dictionary<string, IntermediaryResult> jMdictResults = new();
-        Dictionary<string, IntermediaryResult> jMnedictResults = new();
+        Dictionary<string, IntermediaryResult> jmdictResults = new();
+        Dictionary<string, IntermediaryResult> jmnedictResults = new();
         List<Dictionary<string, IntermediaryResult>> epwingYomichanWordResultsList = new();
         List<Dictionary<string, IntermediaryResult>> epwingYomichanKanjiResultsList = new();
         List<Dictionary<string, IntermediaryResult>> epwingYomichanNameResultsList = new();
@@ -109,12 +109,12 @@ public static class Lookup
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
-                        jMdictResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList,
+                        jmdictResults = GetWordResults(textList, textInHiraganaList, deconjugationResultsList,
                             dict);
                         break;
 
                     case DictType.JMnedict:
-                        jMnedictResults = GetNameResults(textList, textInHiraganaList, dict);
+                        jmnedictResults = GetNameResults(textList, textInHiraganaList, dict);
                         break;
 
                     case DictType.Kanjidic:
@@ -193,14 +193,14 @@ public static class Lookup
             }
         }
 
-        if (jMdictResults.Count > 0)
+        if (jmdictResults.Count > 0)
         {
-            lookupResults.AddRange(BuildJmdictResult(jMdictResults));
+            lookupResults.AddRange(BuildJmdictResult(jmdictResults));
         }
 
-        if (jMnedictResults.Count > 0)
+        if (jmnedictResults.Count > 0)
         {
-            lookupResults.AddRange(BuildJmnedictResult(jMnedictResults));
+            lookupResults.AddRange(BuildJmnedictResult(jmnedictResults));
         }
 
         if (kanjidicResults.Count > 0)
@@ -463,7 +463,6 @@ public static class Lookup
                                     //if (!r.Processes?[index].Any(p => p.SequenceEqual(deconjugationResult.Process)) ?? false)
                                     r.Processes?[index].Add(deconjugationResult.Process);
                                 }
-
                                 else
                                 {
                                     r.Results.Add(resultsList);
@@ -636,18 +635,18 @@ public static class Lookup
 
                 for (int j = 0; j < resultCount; j++)
                 {
-                    var jMnedictResult = (JmnedictRecord)nameResult.Results[i][j];
+                    var jmnedictRecord = (JmnedictRecord)nameResult.Results[i][j];
 
                     LookupResult result = new
                     (
-                        edictId: jMnedictResult.Id,
-                        primarySpelling: jMnedictResult.PrimarySpelling,
-                        alternativeSpellings: jMnedictResult.AlternativeSpellings,
-                        readings: jMnedictResult.Readings,
+                        edictId: jmnedictRecord.Id,
+                        primarySpelling: jmnedictRecord.PrimarySpelling,
+                        alternativeSpellings: jmnedictRecord.AlternativeSpellings,
+                        readings: jmnedictRecord.Readings,
                         matchedText: nameResult.MatchedText,
                         deconjugatedMatchedText: nameResult.DeconjugatedMatchedText,
                         dict: nameResult.Dict,
-                        formattedDefinitions: jMnedictResult.BuildFormattedDefinition()
+                        formattedDefinitions: jmnedictRecord.BuildFormattedDefinition()
                     );
 
                     results.Add(result);
@@ -863,17 +862,15 @@ public static class Lookup
                             freqResult.Freq = -i;
                         }
                     }
-
                     LookupResult result = new
                     (
                         frequencies: freqs,
                         primarySpelling: customWordDictResult.PrimarySpelling,
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        //process: ProcessProcess(wordResult.Processes?[i]
-                        //    .GroupBy(c => string.Join(",", c))
-                        //    .Select(c => c.First().ToList())
-                        //    .ToList()),
+                        process: customWordDictResult.HasUserDefinedWordClass
+                            ? ProcessProcess(wordResult.Processes?[i])
+                            : null,
                         dict: wordResult.Dict,
                         readings: customWordDictResult.Readings,
                         alternativeSpellings: customWordDictResult.AlternativeSpellings,

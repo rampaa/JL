@@ -390,7 +390,7 @@ internal sealed partial class PopupWindow : Window
             UpdateLayout();
 
             // we might cache incomplete results if we don't wait until all dicts are loaded
-            if (text is not null && Storage.DictsReady && !Storage.UpdatingJMdict && !Storage.UpdatingJMnedict && !Storage.UpdatingKanjidic)
+            if (text is not null && Storage.DictsReady && !Storage.UpdatingJmdict && !Storage.UpdatingJmnedict && !Storage.UpdatingKanjidic)
             {
                 StackPanelCache.AddReplace(text, ResultStackPanels.ToArray());
             }
