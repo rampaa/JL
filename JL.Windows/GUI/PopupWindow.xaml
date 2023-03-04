@@ -56,7 +56,7 @@
         </Grid>
     </ScrollViewer>
     <Window.ContextMenu>
-        <ContextMenu Name="PopupContextMenu">
+        <ContextMenu Name="PopupContextMenu" IsVisibleChanged="PopupContextMenu_IsVisibleChanged">
             <MenuItem
                 Name="AddNameMenuItem"
                 Header="Add name"

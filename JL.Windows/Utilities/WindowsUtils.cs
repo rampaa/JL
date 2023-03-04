@@ -180,10 +180,11 @@ internal static class WindowsUtils
         return japaneseFonts;
     }
 
-    public static void ShowAddNameWindow(string? selectedText)
+    public static void ShowAddNameWindow(string? selectedText, string reading = "")
     {
         AddNameWindow addNameWindowInstance = AddNameWindow.Instance;
         addNameWindowInstance.SpellingTextBox.Text = selectedText;
+        addNameWindowInstance.ReadingTextBox.Text = reading;
         addNameWindowInstance.Owner = MainWindow.Instance;
         addNameWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         Storage.StatsStopWatch.Stop();
