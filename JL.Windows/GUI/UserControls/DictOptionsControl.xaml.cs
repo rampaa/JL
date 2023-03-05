@@ -17,7 +17,7 @@ internal sealed partial class DictOptionsControl : UserControl
 
     private void ShowColorPicker(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.ShowColorPicker(sender, e);
+        WindowsUtils.ShowColorPicker((Button)sender);
     }
 
     public DictOptions GetDictOptions(DictType type)

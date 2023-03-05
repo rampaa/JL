@@ -7,7 +7,7 @@ using JL.Core.Dicts.EDICT.JMdict;
 
 namespace JL.Core.WordClass;
 
-public static class JmdictWordClassUtils
+internal static class JmdictWordClassUtils
 {
     public static async Task Load()
     {

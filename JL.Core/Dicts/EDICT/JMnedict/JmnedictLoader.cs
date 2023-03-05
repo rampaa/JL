@@ -2,7 +2,7 @@ using System.Xml;
 
 namespace JL.Core.Dicts.EDICT.JMnedict;
 
-public static class JmnedictLoader
+internal static class JmnedictLoader
 {
     public static async Task Load(Dict dict)
     {
@@ -13,16 +13,17 @@ public static class JmnedictLoader
             // The downside of using XmlTextReader is that it does not support async methods
             // And we cannot set some settings (e.g. MaxCharactersFromEntities)
 
-            using XmlReader xmlTextReader = new XmlTextReader(dict.Path)
+            using (XmlReader xmlTextReader = new XmlTextReader(dict.Path)
             {
                 DtdProcessing = DtdProcessing.Parse,
                 WhitespaceHandling = WhitespaceHandling.None,
                 EntityHandling = EntityHandling.ExpandCharEntities
-            };
-
-            while (xmlTextReader.ReadToFollowing("entry"))
+            })
             {
-                JmnedictRecordBuilder.AddToDictionary(ReadEntry(xmlTextReader), dict.Contents);
+                while (xmlTextReader.ReadToFollowing("entry"))
+                {
+                    JmnedictRecordBuilder.AddToDictionary(ReadEntry(xmlTextReader), dict.Contents);
+                }
             }
 
             dict.Contents.TrimExcess();
@@ -32,7 +33,7 @@ public static class JmnedictLoader
                      "Download JMnedict?"))
         {
             _ = await ResourceUpdater.UpdateResource(dict.Path,
-                Storage.JmnedictUrl,
+                Storage.s_jmnedictUrl,
                 DictType.JMnedict.ToString(), false, false).ConfigureAwait(false);
             await Load(dict).ConfigureAwait(false);
         }

@@ -286,8 +286,6 @@ internal static class WindowsUtils
             Stream downloadResponseStream = await downloadResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
             await using (downloadResponseStream.ConfigureAwait(false))
             {
-                using ZipArchive archive = new(downloadResponseStream);
-
                 string tmpDirectory = Path.Join(Storage.ApplicationPath, "tmp");
 
                 if (Directory.Exists(tmpDirectory))
@@ -296,6 +294,8 @@ internal static class WindowsUtils
                 }
 
                 _ = Directory.CreateDirectory(tmpDirectory);
+
+                using ZipArchive archive = new(downloadResponseStream);
                 archive.ExtractToDirectory(tmpDirectory);
             }
 
@@ -433,11 +433,11 @@ internal static class WindowsUtils
             : "";
     }
 
-    public static void ShowColorPicker(object sender, RoutedEventArgs e)
+    public static void ShowColorPicker(Button button)
     {
         ColorPicker picker = SingleOpenHelper.CreateControl<ColorPicker>();
         var window = new HandyControl.Controls.PopupWindow { PopupElement = picker };
-        picker.SelectedBrush = (SolidColorBrush)((Button)sender).Tag;
+        picker.SelectedBrush = (SolidColorBrush)button.Tag;
 
         picker.Canceled += delegate
         {
@@ -446,7 +446,7 @@ internal static class WindowsUtils
 
         picker.Confirmed += delegate
         {
-            ConfirmColor((Button)sender, picker.SelectedBrush, window);
+            ConfirmColor(button, picker.SelectedBrush, window);
         };
 
         window.ShowDialog(picker, false);

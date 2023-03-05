@@ -118,6 +118,7 @@ internal static class EpwingNazekaLoader
                 }
             }
         }
-        nazekaEpwingDict.TrimExcess();
+
+        dict.Contents.TrimExcess();
     }
 }

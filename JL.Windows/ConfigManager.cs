@@ -156,7 +156,7 @@ internal sealed class ConfigManager : CoreConfig
     public static KeyGesture TextOnlyVisibleOnHoverKeyGesture { get; private set; } = new(Key.E, ModifierKeys.Windows);
     public static KeyGesture TextBoxIsReadOnlyKeyGesture { get; private set; } = new(Key.U, ModifierKeys.Windows);
     public static KeyGesture CaptureTextFromClipboardKeyGesture { get; private set; } = new(Key.F12, ModifierKeys.Windows);
-    public static KeyGesture CaptureTextFromWebSocketdKeyGesture { get; private set; } = new(Key.F11, ModifierKeys.Windows);
+    public static KeyGesture CaptureTextFromWebSocketKeyGesture { get; private set; } = new(Key.F11, ModifierKeys.Windows);
     public static KeyGesture ReconnectToWebSocketServerKeyGesture { get; private set; } = new(Key.F9, ModifierKeys.Windows);
     public static KeyGesture DeleteCurrentLineKeyGesture { get; private set; } = new(Key.Delete, ModifierKeys.Windows);
     public static KeyGesture ToggleVisibilityOfAllMainWindowButtonsKeyGesture { get; private set; } = new(Key.F2, ModifierKeys.Windows);
@@ -190,7 +190,7 @@ internal sealed class ConfigManager : CoreConfig
                 "Information" => Serilog.Events.LogEventLevel.Information,
                 "Debug" => Serilog.Events.LogEventLevel.Debug,
                 "Verbose" => Serilog.Events.LogEventLevel.Verbose,
-                _ => Serilog.Events.LogEventLevel.Error,
+                _ => Serilog.Events.LogEventLevel.Error
             };
         }
 
@@ -350,7 +350,7 @@ internal sealed class ConfigManager : CoreConfig
         TextOnlyVisibleOnHoverKeyGesture = WindowsUtils.SetKeyGesture(nameof(TextOnlyVisibleOnHoverKeyGesture), TextOnlyVisibleOnHoverKeyGesture);
         TextBoxIsReadOnlyKeyGesture = WindowsUtils.SetKeyGesture(nameof(TextBoxIsReadOnlyKeyGesture), TextBoxIsReadOnlyKeyGesture);
         CaptureTextFromClipboardKeyGesture = WindowsUtils.SetKeyGesture(nameof(CaptureTextFromClipboardKeyGesture), CaptureTextFromClipboardKeyGesture);
-        CaptureTextFromWebSocketdKeyGesture = WindowsUtils.SetKeyGesture(nameof(CaptureTextFromWebSocketdKeyGesture), CaptureTextFromWebSocketdKeyGesture);
+        CaptureTextFromWebSocketKeyGesture = WindowsUtils.SetKeyGesture(nameof(CaptureTextFromWebSocketKeyGesture), CaptureTextFromWebSocketKeyGesture);
         ReconnectToWebSocketServerKeyGesture = WindowsUtils.SetKeyGesture(nameof(ReconnectToWebSocketServerKeyGesture), ReconnectToWebSocketServerKeyGesture);
         DeleteCurrentLineKeyGesture = WindowsUtils.SetKeyGesture(nameof(DeleteCurrentLineKeyGesture), DeleteCurrentLineKeyGesture);
         ToggleVisibilityOfAllMainWindowButtonsKeyGesture = WindowsUtils.SetKeyGesture(nameof(ToggleVisibilityOfAllMainWindowButtonsKeyGesture), ToggleVisibilityOfAllMainWindowButtonsKeyGesture);
@@ -612,7 +612,7 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.CaptureTextFromClipboardKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(CaptureTextFromClipboardKeyGesture);
         preferenceWindow.CaptureTextFromWebSocketKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(CaptureTextFromWebSocketdKeyGesture);
+            WindowsUtils.KeyGestureToString(CaptureTextFromWebSocketKeyGesture);
         preferenceWindow.ReconnectToWebSocketServerKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(ReconnectToWebSocketServerKeyGesture);
         preferenceWindow.DeleteCurrentLineKeyGestureTextBox.Text =
@@ -794,7 +794,7 @@ internal sealed class ConfigManager : CoreConfig
             preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(CaptureTextFromClipboardKeyGesture),
             preferenceWindow.CaptureTextFromClipboardKeyGestureTextBox.Text);
-        SaveKeyGesture(nameof(CaptureTextFromWebSocketdKeyGesture),
+        SaveKeyGesture(nameof(CaptureTextFromWebSocketKeyGesture),
             preferenceWindow.CaptureTextFromWebSocketKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(ReconnectToWebSocketServerKeyGesture),
             preferenceWindow.ReconnectToWebSocketServerKeyGestureTextBox.Text);

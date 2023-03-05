@@ -31,7 +31,7 @@ internal static class WebSocketUtils
         }
     }
 
-    public static void ListenWebSocket(CancellationToken cancellationToken)
+    private static void ListenWebSocket(CancellationToken cancellationToken)
     {
         s_webSocketTask = Task.Factory.StartNew(async () =>
         {

@@ -638,7 +638,7 @@ internal sealed partial class MainWindow : Window
             ConfigManager.CaptureTextFromClipboard = !ConfigManager.CaptureTextFromClipboard;
         }
 
-        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.CaptureTextFromWebSocketdKeyGesture))
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.CaptureTextFromWebSocketKeyGesture))
         {
             ConfigManager.CaptureTextFromWebSocket = !ConfigManager.CaptureTextFromWebSocket;
             WebSocketUtils.HandleWebSocket();

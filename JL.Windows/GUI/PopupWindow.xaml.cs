@@ -1233,7 +1233,7 @@ internal sealed partial class PopupWindow : Window
         string primarySpelling = _lastLookupResults[_listBoxIndex].PrimarySpelling;
 
         List<string>? readingList = _lastLookupResults[_listBoxIndex].Readings;
-        string? readings = readingList is null
+        string readings = readingList is null
             ? ""
             : string.Join("; ", readingList);
 
@@ -1630,7 +1630,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
             {
-                if (ContextMenu.IsVisible
+                if (PopupContextMenu.IsVisible
                     || AddWordWindow.IsItVisible()
                     || AddNameWindow.IsItVisible()
                     || StatsWindow.IsItVisible())

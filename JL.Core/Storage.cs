@@ -35,15 +35,15 @@ public static class Storage
     public static readonly HttpClient Client = new(new HttpClientHandler { UseProxy = false }) { Timeout = TimeSpan.FromMinutes(10) };
     public static readonly Version JLVersion = new(1, 17, 0);
     internal static readonly Uri s_gitHubApiUrlForLatestJLRelease = new("https://api.github.com/repos/rampaa/JL/releases/latest");
-    public static readonly Uri JmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
-    public static readonly Uri JmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
-    public static readonly Uri KanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
+    internal static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
+    internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
+    internal static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
     public static bool DictsReady { get; private set; } = false;
-    public static bool UpdatingJmdict { get; set; } = false;
-    public static bool UpdatingJmnedict { get; set; } = false;
-    public static bool UpdatingKanjidic { get; set; } = false;
+    public static bool UpdatingJmdict { get; internal set; } = false;
+    public static bool UpdatingJmnedict { get; internal set; } = false;
+    public static bool UpdatingKanjidic { get; internal set; } = false;
     public static bool FreqsReady { get; private set; } = false;
-    public static Dictionary<string, List<JmdictWordClass>> WordClassDictionary { get; internal set; } = new(65536); // 2022/10/29: 48909
+    internal static Dictionary<string, List<JmdictWordClass>> WordClassDictionary { get; set; } = new(65536); // 2022/10/29: 48909
     internal static readonly Dictionary<string, string> s_kanjiCompositionDict = new(86934);
     public static Dictionary<string, Freq> FreqDicts { get; internal set; } = new();
 
@@ -728,7 +728,7 @@ public static class Storage
                 {
                     deleteJmdictFile = true;
                     _ = await ResourceUpdater.UpdateResource(dict.Path,
-                        JmdictUrl,
+                        s_jmdictUrl,
                         dict.Type.ToString(), false, true).ConfigureAwait(false);
                 }
 

@@ -3,7 +3,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EDICT.KANJIDIC;
 
-public static class KanjidicLoader
+internal static class KanjidicLoader
 {
     public static async Task Load(Dict dict)
     {
@@ -16,12 +16,12 @@ public static class KanjidicLoader
                 IgnoreWhitespace = true
             };
 
-            using XmlReader xmlReader = XmlReader.Create(dict.Path, xmlReaderSettings);
-
-            dict.Contents = new Dictionary<string, List<IDictRecord>>();
-            while (xmlReader.ReadToFollowing("literal"))
+            using (XmlReader xmlReader = XmlReader.Create(dict.Path, xmlReaderSettings))
             {
-                await ReadCharacter(xmlReader, dict).ConfigureAwait(false);
+                while (xmlReader.ReadToFollowing("literal"))
+                {
+                    await ReadCharacter(xmlReader, dict).ConfigureAwait(false);
+                }
             }
 
             dict.Contents.TrimExcess();
@@ -32,7 +32,7 @@ public static class KanjidicLoader
                      "Download KANJIDIC2?"))
         {
             _ = await ResourceUpdater.UpdateResource(dict.Path,
-                Storage.KanjidicUrl,
+                Storage.s_kanjidicUrl,
                 DictType.Kanjidic.ToString(), false, false).ConfigureAwait(false);
             await Load(dict).ConfigureAwait(false);
         }

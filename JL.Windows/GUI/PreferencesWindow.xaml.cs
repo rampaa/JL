@@ -79,7 +79,7 @@ internal sealed partial class PreferencesWindow : Window
 
     private void ShowColorPicker(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.ShowColorPicker(sender, e);
+        WindowsUtils.ShowColorPicker((Button)sender);
     }
 
     private async void SaveButton_Click(object sender, RoutedEventArgs e)

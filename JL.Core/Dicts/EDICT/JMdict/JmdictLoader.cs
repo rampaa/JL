@@ -4,7 +4,7 @@ using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EDICT.JMdict;
 
-public static class JmdictLoader
+internal static class JmdictLoader
 {
     private static bool s_canHandleCulture = true;
 
@@ -17,16 +17,17 @@ public static class JmdictLoader
             // The downside of using XmlTextReader is that it does not support async methods
             // And we cannot set some settings (e.g. MaxCharactersFromEntities)
 
-            using XmlReader xmlReader = new XmlTextReader(dict.Path)
+            using (XmlReader xmlReader = new XmlTextReader(dict.Path)
             {
                 DtdProcessing = DtdProcessing.Parse,
                 WhitespaceHandling = WhitespaceHandling.None,
                 EntityHandling = EntityHandling.ExpandCharEntities
-            };
-
-            while (xmlReader.ReadToFollowing("entry"))
+            })
             {
-                JmdictRecordBuilder.AddToDictionary(ReadEntry(xmlReader), dict.Contents);
+                while (xmlReader.ReadToFollowing("entry"))
+                {
+                    JmdictRecordBuilder.AddToDictionary(ReadEntry(xmlReader), dict.Contents);
+                }
             }
 
             dict.Contents.TrimExcess();
@@ -37,7 +38,7 @@ public static class JmdictLoader
                      "Download JMdict?"))
         {
             _ = await ResourceUpdater.UpdateResource(dict.Path,
-                Storage.JmdictUrl,
+                Storage.s_jmdictUrl,
                 DictType.JMdict.ToString(), false, false).ConfigureAwait(false);
             await Load(dict).ConfigureAwait(false);
         }
