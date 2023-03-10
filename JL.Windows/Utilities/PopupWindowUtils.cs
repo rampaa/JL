@@ -165,9 +165,9 @@ internal static class PopupWindowUtils
                 {
                     var pitchAccentDictResult = (PitchAccentRecord)pitchAccentDictResultList[j];
 
-                    if (!hasReading || (pitchAccentDictResult.Reading is not null &&
-                                        normalizedExpression ==
-                                        Kana.KatakanaToHiragana(pitchAccentDictResult.Reading)))
+                    if ((!hasReading && pitchAccentDictResult.Reading is null)
+                        || (pitchAccentDictResult.Reading is not null
+                            && normalizedExpression == Kana.KatakanaToHiragana(pitchAccentDictResult.Reading)))
                     {
                         if (primarySpelling == pitchAccentDictResult.Spelling)
                         {
