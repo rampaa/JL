@@ -475,7 +475,7 @@ public static class Utils
         byte[]? sound = await AudioUtils.GetAudioPrioritizedAudio(foundSpelling, reading).ConfigureAwait(false);
         if (sound is not null)
         {
-            Storage.Frontend.PlayAudio(sound, Storage.Frontend.CoreConfig.AudioVolume);
+            Storage.Frontend.PlayAudio(sound, Storage.Frontend.CoreConfig.AudioVolume / 100);
             await Stats.IncrementStat(StatType.TimesPlayedAudio).ConfigureAwait(false);
         }
     }

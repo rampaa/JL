@@ -81,12 +81,12 @@ public class AudioUtils
 
     public static async Task<byte[]?> GetAudioFromPath(Uri uri)
     {
-        if (File.Exists(uri.OriginalString))
+        if (File.Exists(uri.LocalPath))
         {
-            return await File.ReadAllBytesAsync(uri.OriginalString).ConfigureAwait(false);
+            return await File.ReadAllBytesAsync(uri.LocalPath).ConfigureAwait(false);
         }
 
-        Utils.Logger.Information("Error getting audio from {uri}", uri.AbsolutePath);
+        Utils.Logger.Information("Error getting audio from {LocalPath}", uri.LocalPath);
         return null;
     }
 
