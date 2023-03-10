@@ -260,6 +260,14 @@ internal static class WindowsUtils
         _ = statsWindow.ShowDialog();
     }
 
+    public static void ShowManageAudioSourcesWindow()
+    {
+        ManageAudioSourcesWindow manageAudioSourcesWindow = ManageAudioSourcesWindow.Instance;
+        manageAudioSourcesWindow.Owner = MainWindow.Instance;
+        manageAudioSourcesWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        _ = manageAudioSourcesWindow.ShowDialog();
+    }
+
     public static void SearchWithBrowser(string? selectedText)
     {
         string browserPath = "";

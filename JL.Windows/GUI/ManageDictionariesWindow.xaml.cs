@@ -245,7 +245,7 @@ internal sealed partial class ManageDictionariesWindow : Window
             };
             buttonRemove.Click += (_, _) =>
             {
-                if (Storage.Frontend.ShowYesNoDialog("Really remove dictionary?", "Confirmation"))
+                if (Storage.Frontend.ShowYesNoDialog("Do you really want to remove this dictionary?", "Confirmation"))
                 {
                     dict.Contents.Clear();
                     _ = Storage.Dicts.Remove(dict.Name);

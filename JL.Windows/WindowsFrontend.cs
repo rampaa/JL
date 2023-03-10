@@ -26,4 +26,6 @@ internal sealed class WindowsFrontend : IFrontend
     public void InvalidateDisplayCache() => PopupWindow.StackPanelCache.Clear();
 
     public void ApplyDictOptions() => DictOptionManager.ApplyDictOptions();
+
+    public Task CopyFromWebSocket(string text) => MainWindow.Instance.CopyFromWebSocket(text);
 }

@@ -1,5 +1,4 @@
 using JL.Core.Dicts;
-using JL.Core.Network;
 using JL.Core.Utilities;
 
 namespace JL.Core.Anki;
@@ -78,7 +77,7 @@ public static class Mining
         bool needsAudio = userFields.Values.Any(static jlField => jlField is JLField.Audio);
         if (needsAudio)
         {
-            audioRes = await Networking.GetAudioFromJpod101(primarySpelling, reading).ConfigureAwait(false);
+            audioRes = await Audio.AudioUtils.GetAudioPrioritizedAudio(primarySpelling, reading).ConfigureAwait(false);
         }
 
         Dictionary<string, object?>[] audio =

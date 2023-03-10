@@ -112,12 +112,11 @@
                             <CheckBox x:Name="CheckForJLUpdatesOnStartUpCheckBox" 
                                       HorizontalAlignment="Right" />
                         </DockPanel>
-
-                        <DockPanel>
-                            <Button x:Name="CheckForJLUpdatesButton" Content="Check for updates"
+                        
+                        <Button x:Name="CheckForJLUpdatesButton" Content="Check for updates"
                                     Width="119" Height="32" HorizontalAlignment="Center"
                                     Click="CheckForJLUpdatesButton_Click" />
-                        </DockPanel>
+                        
                         <TextBlock x:Name="JLVersionTextBlock" TextWrapping="Wrap" HorizontalAlignment="Left"
                                    VerticalAlignment="Bottom" />
 
@@ -898,6 +897,17 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="ShowManageAudioSourcesWindowKeyGestureTextBox"
+                                    
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Manage audio sources" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
                             <TextBox x:Name="ShowPreferencesWindowKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -1173,6 +1183,18 @@
                             </ComboBox>
                         </DockPanel>
 
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Audio volume"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       ToolTip="Improves performance when using a lot of dictionaries at the same time"
+                                       Cursor="Help"/>
+                            <hc:NumericUpDown x:Name="AudioVolumeNumericUpDown" Maximum="100"
+                                              Minimum="0"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <Button Content="Manage Audio Sources" Click="Button_Click"/>
+                        
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

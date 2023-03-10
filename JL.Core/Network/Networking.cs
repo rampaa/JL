@@ -5,27 +5,6 @@ namespace JL.Core.Network;
 
 public static class Networking
 {
-    internal static async Task<byte[]?> GetAudioFromJpod101(string foundSpelling, string reading)
-    {
-        try
-        {
-            Uri uri = new(
-                "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=" +
-                foundSpelling +
-                "&kana=" +
-                reading
-            );
-            HttpResponseMessage getResponse = await Storage.Client.GetAsync(uri).ConfigureAwait(false);
-            return await getResponse.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            Storage.Frontend.Alert(AlertLevel.Error, "Error getting audio from jpod101");
-            Utils.Logger.Error(ex, "Error getting audio from jpod101");
-            return null;
-        }
-    }
-
     public static async Task CheckForJLUpdates(bool isAutoCheck)
     {
         try

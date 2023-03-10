@@ -1,18 +1,15 @@
-using System.IO;
 using System.Net.WebSockets;
 using System.Text;
-using JL.Core;
 using JL.Core.Utilities;
-using JL.Windows.GUI;
 
-namespace JL.Windows.Utilities;
-internal static class WebSocketUtils
+namespace JL.Core.Network;
+public static class WebSocketUtils
 {
     private static Task? s_webSocketTask = null;
     private static CancellationTokenSource? s_webSocketCancellationTokenSource = null;
     public static void HandleWebSocket()
     {
-        if (!ConfigManager.CaptureTextFromWebSocket)
+        if (!Storage.Frontend.CoreConfig.CaptureTextFromWebSocket)
         {
             s_webSocketTask = null;
         }
@@ -38,16 +35,16 @@ internal static class WebSocketUtils
             try
             {
                 using ClientWebSocket webSocketClient = new();
-                await webSocketClient.ConnectAsync(ConfigManager.WebSocketUri, CancellationToken.None).ConfigureAwait(false);
+                await webSocketClient.ConnectAsync(Storage.Frontend.CoreConfig.WebSocketUri, CancellationToken.None).ConfigureAwait(false);
                 byte[] buffer = new byte[1024];
 
-                while (ConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested && webSocketClient.State == WebSocketState.Open)
+                while (Storage.Frontend.CoreConfig.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested && webSocketClient.State == WebSocketState.Open)
                 {
                     try
                     {
                         WebSocketReceiveResult result = await webSocketClient.ReceiveAsync(buffer, CancellationToken.None).ConfigureAwait(false);
 
-                        if (!ConfigManager.CaptureTextFromWebSocket || cancellationToken.IsCancellationRequested)
+                        if (!Storage.Frontend.CoreConfig.CaptureTextFromWebSocket || cancellationToken.IsCancellationRequested)
                         {
                             return;
                         }
@@ -66,7 +63,7 @@ internal static class WebSocketUtils
                             _ = memoryStream.Seek(0, SeekOrigin.Begin);
 
                             string text = Encoding.UTF8.GetString(memoryStream.ToArray());
-                            _ = Task.Run(async () => await MainWindow.Instance.CopyFromWebSocket(text).ConfigureAwait(false)).ConfigureAwait(false);
+                            _ = Task.Run(async () => await Storage.Frontend.CopyFromWebSocket(text).ConfigureAwait(false)).ConfigureAwait(false);
                         }
                     }
                     catch (WebSocketException webSocketException)

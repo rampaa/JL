@@ -9,6 +9,7 @@ using System.Windows.Threading;
 using HandyControl.Tools;
 using JL.Core;
 using JL.Core.Lookup;
+using JL.Core.Network;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using Microsoft.Win32;
@@ -611,6 +612,11 @@ internal sealed partial class MainWindow : Window
             await WindowsUtils.ShowStatsWindow().ConfigureAwait(false);
         }
 
+        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowManageAudioSourcesWindowKeyGesture))
+        {
+            WindowsUtils.ShowManageAudioSourcesWindow();
+        }
+
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.AlwaysOnTopKeyGesture))
         {
             ConfigManager.AlwaysOnTop = !ConfigManager.AlwaysOnTop;
@@ -640,13 +646,13 @@ internal sealed partial class MainWindow : Window
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.CaptureTextFromWebSocketKeyGesture))
         {
-            ConfigManager.CaptureTextFromWebSocket = !ConfigManager.CaptureTextFromWebSocket;
+            Storage.Frontend.CoreConfig.CaptureTextFromWebSocket = !Storage.Frontend.CoreConfig.CaptureTextFromWebSocket;
             WebSocketUtils.HandleWebSocket();
         }
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ReconnectToWebSocketServerKeyGesture))
         {
-            ConfigManager.CaptureTextFromWebSocket = true;
+            Storage.Frontend.CoreConfig.CaptureTextFromWebSocket = true;
             WebSocketUtils.HandleWebSocket();
         }
 

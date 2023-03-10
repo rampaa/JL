@@ -29,4 +29,6 @@ internal sealed class DummyFrontend : IFrontend
     public void ApplyDictOptions()
     {
     }
+
+    public Task CopyFromWebSocket(string text) => Task.CompletedTask;
 }

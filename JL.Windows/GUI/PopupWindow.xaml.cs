@@ -1522,7 +1522,7 @@ internal sealed partial class PopupWindow : Window
 
         if (primarySpelling is not null)
         {
-            await Utils.GetAndPlayAudioFromJpod101(primarySpelling, reading, 1).ConfigureAwait(false);
+            await Utils.GetAndPlayAudio(primarySpelling, reading).ConfigureAwait(false);
         }
     }
 

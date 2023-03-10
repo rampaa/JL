@@ -5,9 +5,9 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Timers;
+using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
-using JL.Core.Network;
 using Serilog;
 using Serilog.Core;
 
@@ -78,6 +78,27 @@ public static class Utils
         }
     }
 
+    public static void CreateDefaultAudioSourceConfig()
+    {
+        var jso = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            Converters = { new JsonStringEnumConverter() }
+        };
+
+        try
+        {
+            _ = Directory.CreateDirectory(Storage.ConfigPath);
+            File.WriteAllText(Path.Join(Storage.ConfigPath, "AudioSourceConfig.json"),
+                JsonSerializer.Serialize(Storage.s_builtInAudioSources, jso));
+        }
+        catch (Exception ex)
+        {
+            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't write default audio source config");
+            Logger.Error(ex, "Couldn't write default audio source config");
+        }
+    }
+
     public static async Task SerializeDicts()
     {
         try
@@ -117,6 +138,27 @@ public static class Utils
         catch (Exception ex)
         {
             Logger.Fatal(ex, "SerializeFreqs failed");
+            throw;
+        }
+    }
+
+    public static async Task SerializeAudioSources()
+    {
+        try
+        {
+            var jso = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+
+            await File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "AudioSourceConfig.json"),
+                JsonSerializer.Serialize(Storage.AudioSources, jso)).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            Logger.Fatal(ex, "SerializeAudioSources failed");
             throw;
         }
     }
@@ -249,6 +291,38 @@ public static class Utils
         catch (Exception ex)
         {
             Logger.Fatal(ex, "DeserializeFreqs failed");
+            throw;
+        }
+    }
+
+    private static async Task DeserializeAudioSources()
+    {
+        try
+        {
+            var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+            Stream audioSourceConfigStream = new StreamReader(Path.Join(Storage.ConfigPath, "AudioSourceConfig.json")).BaseStream;
+            await using (audioSourceConfigStream.ConfigureAwait(false))
+            {
+                Dictionary<string, AudioSource>? deserializedAudioSources = await JsonSerializer
+                    .DeserializeAsync<Dictionary<string, AudioSource>>(audioSourceConfigStream, jso).ConfigureAwait(false);
+
+                if (deserializedAudioSources is not null)
+                {
+                    foreach (KeyValuePair<string, AudioSource> audioSource in deserializedAudioSources)
+                    {
+                        Storage.AudioSources.Add(audioSource.Key, audioSource.Value);
+                    }
+                }
+                else
+                {
+                    Storage.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/AudioSourceConfig.json");
+                    Logger.Fatal("Couldn't load Config/AudioSourceConfig.json");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Fatal(ex, "DeserializeAudioSources failed");
             throw;
         }
     }
@@ -391,25 +465,17 @@ public static class Utils
         return sentence;
     }
 
-    public static async Task GetAndPlayAudioFromJpod101(string foundSpelling, string? reading, float volume)
+    public static async Task GetAndPlayAudio(string foundSpelling, string? reading)
     {
-        Logger.Information("Attempting to play audio from jpod101: {FoundSpelling} {Reading}", foundSpelling, reading);
-
         if (string.IsNullOrEmpty(reading))
         {
             reading = foundSpelling;
         }
 
-        byte[]? sound = await Networking.GetAudioFromJpod101(foundSpelling, reading).ConfigureAwait(false);
+        byte[]? sound = await AudioUtils.GetAudioPrioritizedAudio(foundSpelling, reading).ConfigureAwait(false);
         if (sound is not null)
         {
-            if (GetMd5String(sound) is Storage.Jpod101NoAudioMd5Hash)
-            {
-                // TODO sound = shortErrorSound
-                return;
-            }
-
-            Storage.Frontend.PlayAudio(sound, volume);
+            Storage.Frontend.PlayAudio(sound, Storage.Frontend.CoreConfig.AudioVolume);
             await Stats.IncrementStat(StatType.TimesPlayedAudio).ConfigureAwait(false);
         }
     }
@@ -430,6 +496,11 @@ public static class Utils
             CreateDefaultFreqsConfig();
         }
 
+        if (!File.Exists($"{Storage.ConfigPath}/AudioSourceConfig.json"))
+        {
+            CreateDefaultAudioSourceConfig();
+        }
+
         if (!File.Exists($"{Storage.ResourcesPath}/custom_words.txt"))
         {
             await File.Create($"{Storage.ResourcesPath}/custom_words.txt").DisposeAsync().ConfigureAwait(false);
@@ -443,16 +514,17 @@ public static class Utils
         List<Task> tasks = new()
         {
             Task.Run(static async () =>
-        {
-            await DeserializeDicts().ConfigureAwait(false);
-            Storage.Frontend.ApplyDictOptions();
-            await Storage.LoadDictionaries(false).ConfigureAwait(false);
-            await SerializeDicts().ConfigureAwait(false);
-            await Storage.InitializeWordClassDictionary().ConfigureAwait(false);
-        }),
+            {
+                await DeserializeDicts().ConfigureAwait(false);
+                Storage.Frontend.ApplyDictOptions();
+                await Storage.LoadDictionaries(false).ConfigureAwait(false);
+                await SerializeDicts().ConfigureAwait(false);
+                await Storage.InitializeWordClassDictionary().ConfigureAwait(false);
+            }),
 
             Task.Run(static async () =>
             {
+                await DeserializeAudioSources().ConfigureAwait(false);
                 await DeserializeFreqs().ConfigureAwait(false);
                 await Storage.LoadFrequencies(false).ConfigureAwait(false);
             })

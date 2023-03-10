@@ -9,6 +9,7 @@ using System.Windows.Media.Effects;
 using System.Xml;
 using HandyControl.Data;
 using JL.Core;
+using JL.Core.Network;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
 using JL.Windows.Utilities;
@@ -75,8 +76,6 @@ internal sealed class ConfigManager : CoreConfig
     public static bool DisableLookupsForNonJapaneseCharsInMainWindow { get; private set; } = false;
     public static bool MainWindowFocusOnHover { get; private set; } = false;
     public static bool SteppedBacklogWithMouseWheel { get; private set; } = false;
-    public static bool CaptureTextFromWebSocket { get; set; } = false;
-    public static Uri WebSocketUri { get; private set; } = new("ws://127.0.0.1:6677");
     public static bool HorizontallyCenterMainWindowText { get; private set; } = false;
     public static bool HideAllMainWindowButtons { get; set; } = false;
 
@@ -160,6 +159,7 @@ internal sealed class ConfigManager : CoreConfig
     public static KeyGesture ReconnectToWebSocketServerKeyGesture { get; private set; } = new(Key.F9, ModifierKeys.Windows);
     public static KeyGesture DeleteCurrentLineKeyGesture { get; private set; } = new(Key.Delete, ModifierKeys.Windows);
     public static KeyGesture ToggleVisibilityOfAllMainWindowButtonsKeyGesture { get; private set; } = new(Key.F2, ModifierKeys.Windows);
+    public static KeyGesture ShowManageAudioSourcesWindowKeyGesture { get; private set; } = new(Key.Z, ModifierKeys.Windows);
 
     #endregion
 
@@ -175,23 +175,25 @@ internal sealed class ConfigManager : CoreConfig
 
     public void ApplyPreferences()
     {
-        string? minimumLogLevelStr = ConfigurationManager.AppSettings.Get("MinimumLogLevel");
-        if (minimumLogLevelStr is null)
         {
-            AddToConfig("MinimumLogLevel", "Error");
-        }
-        else
-        {
-            Utils.LoggingLevelSwitch.MinimumLevel = minimumLogLevelStr switch
+            string? minimumLogLevelStr = ConfigurationManager.AppSettings.Get("MinimumLogLevel");
+            if (minimumLogLevelStr is null)
             {
-                "Fatal" => Serilog.Events.LogEventLevel.Fatal,
-                "Error" => Serilog.Events.LogEventLevel.Error,
-                "Warning" => Serilog.Events.LogEventLevel.Warning,
-                "Information" => Serilog.Events.LogEventLevel.Information,
-                "Debug" => Serilog.Events.LogEventLevel.Debug,
-                "Verbose" => Serilog.Events.LogEventLevel.Verbose,
-                _ => Serilog.Events.LogEventLevel.Error
-            };
+                AddToConfig("MinimumLogLevel", "Error");
+            }
+            else
+            {
+                Utils.LoggingLevelSwitch.MinimumLevel = minimumLogLevelStr switch
+                {
+                    "Fatal" => Serilog.Events.LogEventLevel.Fatal,
+                    "Error" => Serilog.Events.LogEventLevel.Error,
+                    "Warning" => Serilog.Events.LogEventLevel.Warning,
+                    "Information" => Serilog.Events.LogEventLevel.Information,
+                    "Debug" => Serilog.Events.LogEventLevel.Debug,
+                    "Verbose" => Serilog.Events.LogEventLevel.Verbose,
+                    _ => Serilog.Events.LogEventLevel.Error
+                };
+            }
         }
 
         MainWindow mainWindow = MainWindow.Instance;
@@ -267,6 +269,7 @@ internal sealed class ConfigManager : CoreConfig
         DeconjugationInfoFontSize = GetValueFromConfig(DeconjugationInfoFontSize, nameof(DeconjugationInfoFontSize), int.TryParse);
         DictTypeFontSize = GetValueFromConfig(DictTypeFontSize, nameof(DictTypeFontSize), int.TryParse);
         MaxNumResultsNotInMiningMode = GetValueFromConfig(MaxNumResultsNotInMiningMode, nameof(MaxNumResultsNotInMiningMode), int.TryParse);
+        AudioVolume = GetValueFromConfig(AudioVolume, nameof(AudioVolume), int.TryParse);
 
         AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = GetValueFromConfig(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds), int.TryParse);
         PopupWindow.PopupAutoHideTimer.Enabled = false;
@@ -384,6 +387,10 @@ internal sealed class ConfigManager : CoreConfig
             WindowsUtils.SetKeyGesture(nameof(ShowManageFrequenciesWindowKeyGesture),
                 ShowManageFrequenciesWindowKeyGesture);
 
+        ShowManageAudioSourcesWindowKeyGesture =
+            WindowsUtils.SetKeyGesture(nameof(ShowManageAudioSourcesWindowKeyGesture),
+                ShowManageAudioSourcesWindowKeyGesture);
+
         WindowsUtils.SetInputGestureText(mainWindow.AddNameMenuItem, ShowAddNameWindowKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.AddWordMenuItem, ShowAddWordWindowKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.SearchMenuItem, SearchWithBrowserKeyGesture);
@@ -392,151 +399,179 @@ internal sealed class ConfigManager : CoreConfig
         WindowsUtils.SetInputGestureText(mainWindow.ManageFrequenciesMenuItem, ShowManageFrequenciesWindowKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.StatsMenuItem, ShowStatsKeyGesture);
 
-        string? themeStr = ConfigurationManager.AppSettings.Get("Theme");
-        if (themeStr is null)
         {
-            themeStr = "Dark";
-            AddToConfig("Theme", themeStr);
-        }
-        WindowsUtils.ChangeTheme(themeStr is "Dark" ? SkinType.Dark : SkinType.Default);
-
-        string? ankiConnectUriStr = ConfigurationManager.AppSettings.Get(nameof(AnkiConnectUri));
-        if (ankiConnectUriStr is null)
-        {
-            AddToConfig(nameof(AnkiConnectUri), AnkiConnectUri.OriginalString);
-        }
-        else if (Uri.TryCreate(ankiConnectUriStr, UriKind.Absolute, out Uri? ankiConnectUri))
-        {
-            AnkiConnectUri = ankiConnectUri;
-        }
-        else
-        {
-            Utils.Logger.Warning("Couldn't save AnkiConnect server address, invalid URL");
-            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
+            string? themeStr = ConfigurationManager.AppSettings.Get("Theme");
+            if (themeStr is null)
+            {
+                themeStr = "Dark";
+                AddToConfig("Theme", themeStr);
+            }
+            WindowsUtils.ChangeTheme(themeStr is "Dark" ? SkinType.Dark : SkinType.Default);
         }
 
-        string? webSocketUriStr = ConfigurationManager.AppSettings.Get(nameof(WebSocketUri));
-        if (webSocketUriStr is null)
         {
-            AddToConfig(nameof(WebSocketUri), WebSocketUri.OriginalString);
-        }
-        else if (Uri.TryCreate(webSocketUriStr, UriKind.Absolute, out Uri? webSocketUri))
-        {
-            WebSocketUri = webSocketUri;
-        }
-        else
-        {
-            Utils.Logger.Warning("Couldn't save WebSocket address, invalid URL");
-            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save WebSocket address, invalid URL");
-        }
-        WebSocketUtils.HandleWebSocket();
+            string? ankiConnectUriStr = ConfigurationManager.AppSettings.Get(nameof(AnkiConnectUri));
+            if (ankiConnectUriStr is null)
+            {
+                AddToConfig(nameof(AnkiConnectUri), AnkiConnectUri.OriginalString);
+            }
 
-        string? searchUrlStr = ConfigurationManager.AppSettings.Get(nameof(SearchUrl));
-        if (searchUrlStr is null)
-        {
-            AddToConfig(nameof(SearchUrl), SearchUrl);
-        }
-        else if (!Uri.IsWellFormedUriString(searchUrlStr.Replace("{SearchTerm}", ""), UriKind.Absolute))
-        {
-            Utils.Logger.Warning("Couldn't save Search URL, invalid URL");
-            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save Search URL, invalid URL");
-        }
-        else
-        {
-            SearchUrl = searchUrlStr;
+            else
+            {
+                ankiConnectUriStr = ankiConnectUriStr.Replace("://localhost", "://127.0.0.1");
+
+                if (Uri.TryCreate(ankiConnectUriStr, UriKind.Absolute, out Uri? ankiConnectUri))
+                {
+                    AnkiConnectUri = ankiConnectUri;
+                }
+                else
+                {
+                    Utils.Logger.Warning("Couldn't save AnkiConnect server address, invalid URL");
+                    Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
+                }
+            }
         }
 
-        string? browserPathStr = ConfigurationManager.AppSettings.Get(nameof(BrowserPath));
-        if (browserPathStr is null)
         {
-            AddToConfig(nameof(BrowserPath), BrowserPath);
-        }
-        else if (!string.IsNullOrWhiteSpace(browserPathStr) && !Path.IsPathFullyQualified(browserPathStr))
-        {
-            Utils.Logger.Warning("Couldn't save Browser Path, invalid path");
-            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save Browser Path, invalid path");
-        }
-        else
-        {
-            BrowserPath = browserPathStr;
-        }
-
-        string? mainWindowFontStr = ConfigurationManager.AppSettings.Get("MainWindowFont");
-        if (mainWindowFontStr is null)
-        {
-            AddToConfig("MainWindowFont", "Meiryo");
-            mainWindowFontStr = "Meiryo";
-        }
-        mainWindow.MainTextBox.FontFamily = new FontFamily(mainWindowFontStr);
-
-        string? popupFlipStr = ConfigurationManager.AppSettings.Get("PopupFlip");
-        if (popupFlipStr is null)
-        {
-            popupFlipStr = "Both";
-            AddToConfig("PopupFlip", popupFlipStr);
+            string? webSocketUriStr = ConfigurationManager.AppSettings.Get(nameof(WebSocketUri));
+            if (webSocketUriStr is null)
+            {
+                AddToConfig(nameof(WebSocketUri), WebSocketUri.OriginalString);
+            }
+            else
+            {
+                webSocketUriStr = webSocketUriStr.Replace("://localhost", "://127.0.0.1");
+                if (Uri.TryCreate(webSocketUriStr, UriKind.Absolute, out Uri? webSocketUri))
+                {
+                    WebSocketUri = webSocketUri;
+                }
+                else
+                {
+                    Utils.Logger.Warning("Couldn't save WebSocket address, invalid URL");
+                    Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save WebSocket address, invalid URL");
+                }
+            }
+            WebSocketUtils.HandleWebSocket();
         }
 
-        switch (popupFlipStr)
         {
-            case "X":
-                PopupFlipX = true;
-                PopupFlipY = false;
-                break;
-
-            case "Y":
-                PopupFlipX = false;
-                PopupFlipY = true;
-                break;
-
-            case "Both":
-                PopupFlipX = true;
-                PopupFlipY = true;
-                break;
-
-            default:
-                PopupFlipX = true;
-                PopupFlipY = true;
-                break;
+            string? searchUrlStr = ConfigurationManager.AppSettings.Get(nameof(SearchUrl));
+            if (searchUrlStr is null)
+            {
+                AddToConfig(nameof(SearchUrl), SearchUrl);
+            }
+            else if (!Uri.IsWellFormedUriString(searchUrlStr.Replace("{SearchTerm}", ""), UriKind.Absolute))
+            {
+                Utils.Logger.Warning("Couldn't save Search URL, invalid URL");
+                Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save Search URL, invalid URL");
+            }
+            else
+            {
+                SearchUrl = searchUrlStr;
+            }
         }
 
-        string? lookupModeStr = ConfigurationManager.AppSettings.Get("LookupMode");
-        if (lookupModeStr is null)
         {
-            lookupModeStr = "Hover";
-            AddToConfig("LookupMode", lookupModeStr);
+            string? browserPathStr = ConfigurationManager.AppSettings.Get(nameof(BrowserPath));
+            if (browserPathStr is null)
+            {
+                AddToConfig(nameof(BrowserPath), BrowserPath);
+            }
+            else if (!string.IsNullOrWhiteSpace(browserPathStr) && !Path.IsPathFullyQualified(browserPathStr))
+            {
+                Utils.Logger.Warning("Couldn't save Browser Path, invalid path");
+                Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save Browser Path, invalid path");
+            }
+            else
+            {
+                BrowserPath = browserPathStr;
+            }
         }
 
-        switch (lookupModeStr)
         {
-            case "Hover":
-                LookupOnLeftClickOnly = false;
-                LookupOnSelectOnly = false;
-                break;
-
-            case "Click":
-                LookupOnLeftClickOnly = true;
-                LookupOnSelectOnly = false;
-                break;
-
-            case "Select":
-                LookupOnLeftClickOnly = false;
-                LookupOnSelectOnly = true;
-                break;
-
-            default:
-                LookupOnLeftClickOnly = false;
-                LookupOnSelectOnly = false;
-                break;
+            string? mainWindowFontStr = ConfigurationManager.AppSettings.Get("MainWindowFont");
+            if (mainWindowFontStr is null)
+            {
+                AddToConfig("MainWindowFont", "Meiryo");
+                mainWindowFontStr = "Meiryo";
+            }
+            mainWindow.MainTextBox.FontFamily = new FontFamily(mainWindowFontStr);
         }
 
-        string? popupFontStr = ConfigurationManager.AppSettings.Get(nameof(PopupFont));
-        if (popupFontStr is null)
         {
-            AddToConfig(nameof(PopupFont), PopupFont.Source);
+            string? popupFlipStr = ConfigurationManager.AppSettings.Get("PopupFlip");
+            if (popupFlipStr is null)
+            {
+                popupFlipStr = "Both";
+                AddToConfig("PopupFlip", popupFlipStr);
+            }
+
+            switch (popupFlipStr)
+            {
+                case "X":
+                    PopupFlipX = true;
+                    PopupFlipY = false;
+                    break;
+
+                case "Y":
+                    PopupFlipX = false;
+                    PopupFlipY = true;
+                    break;
+
+                case "Both":
+                    PopupFlipX = true;
+                    PopupFlipY = true;
+                    break;
+
+                default:
+                    PopupFlipX = true;
+                    PopupFlipY = true;
+                    break;
+            }
         }
-        else
+
         {
-            PopupFont = new FontFamily(popupFontStr);
+            string? lookupModeStr = ConfigurationManager.AppSettings.Get("LookupMode");
+            if (lookupModeStr is null)
+            {
+                lookupModeStr = "Hover";
+                AddToConfig("LookupMode", lookupModeStr);
+            }
+
+            switch (lookupModeStr)
+            {
+                case "Hover":
+                    LookupOnLeftClickOnly = false;
+                    LookupOnSelectOnly = false;
+                    break;
+
+                case "Click":
+                    LookupOnLeftClickOnly = true;
+                    LookupOnSelectOnly = false;
+                    break;
+
+                case "Select":
+                    LookupOnLeftClickOnly = false;
+                    LookupOnSelectOnly = true;
+                    break;
+
+                default:
+                    LookupOnLeftClickOnly = false;
+                    LookupOnSelectOnly = false;
+                    break;
+            }
+        }
+
+        {
+            string? popupFontStr = ConfigurationManager.AppSettings.Get(nameof(PopupFont));
+            if (popupFontStr is null)
+            {
+                AddToConfig(nameof(PopupFont), PopupFont.Source);
+            }
+            else
+            {
+                PopupFont = new FontFamily(popupFontStr);
+            }
         }
 
         PopupWindow? currentPopupWindow = mainWindow.FirstPopupWindow;
@@ -575,6 +610,8 @@ internal sealed class ConfigManager : CoreConfig
             WindowsUtils.KeyGestureToString(ShowManageDictionariesWindowKeyGesture);
         preferenceWindow.ShowManageFrequenciesWindowKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(ShowManageFrequenciesWindowKeyGesture);
+        preferenceWindow.ShowManageAudioSourcesWindowKeyGestureTextBox.Text =
+            WindowsUtils.KeyGestureToString(ShowManageAudioSourcesWindowKeyGesture);
         preferenceWindow.ShowPreferencesWindowKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(ShowPreferencesWindowKeyGesture);
         preferenceWindow.ShowAddNameWindowKeyGestureTextBox.Text =
@@ -708,6 +745,7 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.PopupMaxWidthNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;
 
         preferenceWindow.MaxNumResultsNotInMiningModeNumericUpDown.Value = MaxNumResultsNotInMiningMode;
+        preferenceWindow.AudioVolumeNumericUpDown.Value = AudioVolume;
 
         preferenceWindow.PopupMaxHeightNumericUpDown.Value = PopupMaxHeight;
         preferenceWindow.PopupMaxWidthNumericUpDown.Value = PopupMaxWidth;
@@ -756,6 +794,8 @@ internal sealed class ConfigManager : CoreConfig
             preferenceWindow.ShowManageDictionariesWindowKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(ShowManageFrequenciesWindowKeyGesture),
             preferenceWindow.ShowManageFrequenciesWindowKeyGestureTextBox.Text);
+        SaveKeyGesture(nameof(ShowManageAudioSourcesWindowKeyGesture),
+            preferenceWindow.ShowManageAudioSourcesWindowKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(ShowPreferencesWindowKeyGesture),
             preferenceWindow.ShowPreferencesWindowKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(ShowAddNameWindowKeyGesture),
@@ -926,6 +966,9 @@ internal sealed class ConfigManager : CoreConfig
 
         config.AppSettings.Settings[nameof(MaxNumResultsNotInMiningMode)].Value =
             preferenceWindow.MaxNumResultsNotInMiningModeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
+
+        config.AppSettings.Settings[nameof(AudioVolume)].Value =
+            preferenceWindow.AudioVolumeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
 
         config.AppSettings.Settings[nameof(PopupMaxWidth)].Value =
             preferenceWindow.PopupMaxWidthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);

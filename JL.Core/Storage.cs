@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Runtime;
 using System.Text.RegularExpressions;
 using JL.Core.Anki;
+using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomNameDict;
 using JL.Core.Dicts.CustomWordDict;
@@ -48,6 +49,8 @@ public static class Storage
     public static Dictionary<string, Freq> FreqDicts { get; internal set; } = new();
 
     public static readonly Dictionary<string, Dict> Dicts = new();
+
+    public static readonly Dictionary<string, AudioSource> AudioSources = new();
 
     public static readonly Dictionary<string, Dict> BuiltInDicts =
         new()
@@ -113,6 +116,14 @@ public static class Storage
         {
             "Novel (Nazeka)",
             new Freq(FreqType.Nazeka, "Novel (Nazeka)", "Resources/freqlist_novels.json", false, 3, 114348)
+        }
+    };
+
+    internal static Dictionary<string, AudioSource> s_builtInAudioSources = new()
+    {
+        {
+            "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={Term}&kana={Reading}",
+                new AudioSource(AudioSourceType.Url, true, 1)
         }
     };
 

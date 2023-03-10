@@ -157,7 +157,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
 
             buttonRemove.Click += (_, _) =>
             {
-                if (Storage.Frontend.ShowYesNoDialog("Really remove frequency?", "Confirmation"))
+                if (Storage.Frontend.ShowYesNoDialog("Do you really want to remove this frequency dictionary?", "Confirmation"))
                 {
                     freq.Contents.Clear();
                     _ = Storage.FreqDicts.Remove(freq.Name);
