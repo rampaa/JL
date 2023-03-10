@@ -57,16 +57,20 @@ internal static class AnkiConnect
                 .PostAsync(Storage.Frontend.CoreConfig.AnkiConnectUri, payload)
                 .ConfigureAwait(false);
 
-            Response? json = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);
-            Utils.Logger.Information("json result: {JsonResult}", json?.Result ?? "null");
-
-            if (json?.Error is null)
+            if (postResponse.IsSuccessStatusCode)
             {
-                return json;
+                Response? json = await postResponse.Content.ReadFromJsonAsync<Response>().ConfigureAwait(false);
+                Utils.Logger.Information("json result: {JsonResult}", json?.Result ?? "null");
+
+                if (json?.Error is null)
+                {
+                    return json;
+                }
+
+                Storage.Frontend.Alert(AlertLevel.Error, json.Error.ToString()!);
+                Utils.Logger.Error("{JsonError}", json.Error.ToString());
             }
 
-            Storage.Frontend.Alert(AlertLevel.Error, json.Error.ToString()!);
-            Utils.Logger.Error("{JsonError}", json.Error.ToString());
             return null;
         }
         catch (HttpRequestException ex)
