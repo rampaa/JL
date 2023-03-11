@@ -171,6 +171,7 @@ internal sealed partial class MainWindow : Window
             && !FirstPopupWindow.IsVisible
             && !ManageDictionariesWindow.IsItVisible()
             && !ManageFrequenciesWindow.IsItVisible()
+            && !ManageAudioSourcesWindow.IsItVisible()
             && !AddNameWindow.IsItVisible()
             && !AddWordWindow.IsItVisible()
             && !PreferencesWindow.IsItVisible()
@@ -1004,6 +1005,7 @@ internal sealed partial class MainWindow : Window
         if (!FirstPopupWindow.IsVisible
             && !ManageDictionariesWindow.IsItVisible()
             && !ManageFrequenciesWindow.IsItVisible()
+            && !ManageAudioSourcesWindow.IsItVisible()
             && !AddNameWindow.IsItVisible()
             && !AddWordWindow.IsItVisible()
             && !PreferencesWindow.IsItVisible()

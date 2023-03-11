@@ -1,13 +1,13 @@
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using JL.Core.Utilities;
 using JL.Core;
-using JL.Windows.Utilities;
-using System.Globalization;
 using JL.Core.Audio;
+using JL.Core.Utilities;
+using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
 /// <summary>
@@ -66,7 +66,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
     {
         List<DockPanel> resultDockPanels = new();
 
-        foreach ((string uri, AudioSource audioSource) in Storage.AudioSources.OrderBy(a => a.Value.Priority))
+        foreach ((string uri, AudioSource audioSource) in Storage.AudioSources.OrderBy(static a => a.Value.Priority))
         {
             DockPanel dockPanel = new();
 

@@ -1,13 +1,13 @@
-using System.Diagnostics;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using JL.Core.Utilities;
 
 namespace JL.Core.Audio;
-public class AudioUtils
+
+internal static class AudioUtils
 {
-    public static async Task<byte[]?> GetAudioFromUrl(Uri url)
+    private static async Task<byte[]?> GetAudioFromUrl(Uri url)
     {
         try
         {
@@ -22,22 +22,20 @@ public class AudioUtils
                     : audioBytes;
             }
 
-            Utils.Logger.Information("Error getting audio from {url}", url.OriginalString);
+            Utils.Logger.Information("Error getting audio from {Url}", url.OriginalString);
             return null;
         }
         catch (Exception ex)
         {
-            Utils.Logger.Error(ex, "Error getting audio from {url}", url.OriginalString);
+            Utils.Logger.Error(ex, "Error getting audio from {Url}", url.OriginalString);
             return null;
         }
     }
 
-    public static async Task<byte[]?> GetAudioFromJsonReturningUrl(Uri url)
+    private static async Task<byte[]?> GetAudioFromJsonReturningUrl(Uri url)
     {
         try
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
             HttpResponseMessage response = await Storage.Client.GetAsync(url).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
@@ -69,17 +67,17 @@ public class AudioUtils
                 }
             }
 
-            Utils.Logger.Information("Error getting audio from {url}", url.OriginalString);
+            Utils.Logger.Information("Error getting audio from {Url}", url.OriginalString);
             return null;
         }
         catch (Exception ex)
         {
-            Utils.Logger.Error(ex, "Error getting audio from {url}", url.OriginalString);
+            Utils.Logger.Error(ex, "Error getting audio from {Url}", url.OriginalString);
             return null;
         }
     }
 
-    public static async Task<byte[]?> GetAudioFromPath(Uri uri)
+    private static async Task<byte[]?> GetAudioFromPath(Uri uri)
     {
         if (File.Exists(uri.LocalPath))
         {
@@ -94,10 +92,10 @@ public class AudioUtils
     {
         byte[]? audioBytes = null;
 
-        IOrderedEnumerable<KeyValuePair<string, AudioSource>> orderedAudioSorces = Storage.AudioSources.OrderBy(static a => a.Value.Priority);
-        foreach ((string uri, AudioSource audioSorce) in orderedAudioSorces)
+        IOrderedEnumerable<KeyValuePair<string, AudioSource>> orderedAudioSources = Storage.AudioSources.OrderBy(static a => a.Value.Priority);
+        foreach ((string uri, AudioSource audioSource) in orderedAudioSources)
         {
-            if (audioSorce.Active)
+            if (audioSource.Active)
             {
                 StringBuilder stringBuilder = new StringBuilder(uri)
                     .Replace("://localhost", "://127.0.0.1")
@@ -106,18 +104,13 @@ public class AudioUtils
 
                 Uri normalizedUri = new(stringBuilder.ToString());
 
-                switch (audioSorce.Type)
+                audioBytes = audioSource.Type switch
                 {
-                    case AudioSourceType.Url:
-                        audioBytes = await GetAudioFromUrl(normalizedUri).ConfigureAwait(false);
-                        break;
-                    case AudioSourceType.UrlJson:
-                        audioBytes = await GetAudioFromJsonReturningUrl(normalizedUri).ConfigureAwait(false);
-                        break;
-                    case AudioSourceType.LocalPath:
-                        audioBytes = await GetAudioFromPath(normalizedUri).ConfigureAwait(false);
-                        break;
-                }
+                    AudioSourceType.Url => await GetAudioFromUrl(normalizedUri).ConfigureAwait(false),
+                    AudioSourceType.UrlJson => await GetAudioFromJsonReturningUrl(normalizedUri).ConfigureAwait(false),
+                    AudioSourceType.LocalPath => await GetAudioFromPath(normalizedUri).ConfigureAwait(false),
+                    _ => audioBytes
+                };
 
                 if (audioBytes is not null)
                 {

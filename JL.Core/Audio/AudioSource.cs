@@ -1,5 +1,5 @@
 namespace JL.Core.Audio;
-public class AudioSource
+public sealed class AudioSource
 {
     public AudioSourceType Type { get; }
     public bool Active { get; set; }

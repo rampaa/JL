@@ -78,7 +78,7 @@ public static class Utils
         }
     }
 
-    public static void CreateDefaultAudioSourceConfig()
+    private static void CreateDefaultAudioSourceConfig()
     {
         var jso = new JsonSerializerOptions
         {
@@ -475,7 +475,7 @@ public static class Utils
         byte[]? sound = await AudioUtils.GetAudioPrioritizedAudio(foundSpelling, reading).ConfigureAwait(false);
         if (sound is not null)
         {
-            Storage.Frontend.PlayAudio(sound, Storage.Frontend.CoreConfig.AudioVolume / 100);
+            Storage.Frontend.PlayAudio(sound, Storage.Frontend.CoreConfig.AudioVolume / 100f);
             await Stats.IncrementStat(StatType.TimesPlayedAudio).ConfigureAwait(false);
         }
     }
