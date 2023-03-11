@@ -654,11 +654,11 @@ internal static class WindowsUtils
 
                     if (image is not null)
                     {
-                        PngBitmapEncoder encoder = new();
-                        encoder.Frames.Add(BitmapFrame.Create(image));
+                        PngBitmapEncoder pngBitmapEncoder = new();
+                        pngBitmapEncoder.Frames.Add(BitmapFrame.Create(image));
 
-                        using var stream = new MemoryStream();
-                        encoder.Save(stream);
+                        using MemoryStream stream = new();
+                        pngBitmapEncoder.Save(stream);
                         imageBytes = stream.ToArray();
                     }
 
