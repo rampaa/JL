@@ -89,19 +89,19 @@ public static class Mining
                     { "fields", audioFields }
                 };
 
-        List<string> pictureFields = FindFields(JLField.Image, userFields);
-        bool needsPicture = pictureFields.Count > 0;
-        byte[]? pictureBytes = needsPicture
+        List<string> imageFields = FindFields(JLField.Image, userFields);
+        bool needsImage = imageFields.Count > 0;
+        byte[]? imageBytes = needsImage
             ? Storage.Frontend.GetImageFromClipboardAsByteArray()
             : null;
 
-        Dictionary<string, object>? picture = pictureBytes is null
+        Dictionary<string, object>? image = imageBytes is null
             ? null
             : new Dictionary<string, object>
                 {
-                    { "data", pictureBytes },
+                    { "data", imageBytes },
                     { "filename", $"JL_image_{reading}_{primarySpelling}.png" },
-                    { "fields", pictureFields }
+                    { "fields", imageFields }
                 };
 
         Dictionary<string, object> options = new()
@@ -109,7 +109,7 @@ public static class Mining
             { "allowDuplicate", Storage.Frontend.CoreConfig.AllowDuplicateCards }
         };
 
-        Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, options, ankiConfig.Tags, audio, null, picture);
+        Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, options, ankiConfig.Tags, audio, null, image);
         Response? response = await AnkiConnect.AddNoteToDeck(note).ConfigureAwait(false);
 
         if (response is null)
