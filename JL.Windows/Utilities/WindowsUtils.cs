@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools;
@@ -637,5 +638,39 @@ internal static class WindowsUtils
         {
             Source = new Uri("pack://application:,,,/HandyControl;component/Themes/Theme.xaml")
         });
+    }
+
+    public static byte[]? GetImageFromClipboardAsByteArray()
+    {
+        byte[]? imageBytes = null;
+
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            while (Clipboard.ContainsImage())
+            {
+                try
+                {
+                    BitmapSource? image = Clipboard.GetImage();
+
+                    if (image is not null)
+                    {
+                        PngBitmapEncoder encoder = new();
+                        encoder.Frames.Add(BitmapFrame.Create(image));
+
+                        using var stream = new MemoryStream();
+                        encoder.Save(stream);
+                        imageBytes = stream.ToArray();
+                    }
+
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Utils.Logger.Warning(ex, "GetImageFromClipboard failed");
+                }
+            }
+        });
+
+        return imageBytes;
     }
 }

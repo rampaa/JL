@@ -12,13 +12,13 @@ public enum JLField
     [Description("Alternative Spellings")] AlternativeSpellings,
     [Description("Dictionary Name")] DictionaryName,
     Audio,
+    Image,
     Sentence,
     [Description("Source Text")] SourceText,
     [Description("Matched Text")] MatchedText,
     [Description("EDICT ID")] EdictId,
     [Description("Local Time")] LocalTime,
     Frequencies,
-    // Screenshot? Image? Picture?
 
     // Word dictionaries
     [Description("Deconjugated Matched Text")] DeconjugatedMatchedText,

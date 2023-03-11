@@ -6,7 +6,7 @@ public interface IFrontend
 {
     public CoreConfig CoreConfig { get; }
 
-    public void PlayAudio(byte[] sound, float volume);
+    public void PlayAudio(byte[] audio, float volume);
 
     public void Alert(AlertLevel alertLevel, string message);
 
@@ -21,4 +21,6 @@ public interface IFrontend
     public void InvalidateDisplayCache();
 
     public void ApplyDictOptions();
+
+    public byte[]? GetImageFromClipboardAsByteArray();
 }

@@ -119,7 +119,7 @@ public static class Storage
         }
     };
 
-    internal static Dictionary<string, AudioSource> s_builtInAudioSources = new()
+    internal static readonly Dictionary<string, AudioSource> s_builtInAudioSources = new()
     {
         {
             "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={Term}&kana={Reading}",
@@ -232,6 +232,7 @@ public static class Storage
         JLField.Definitions,
         JLField.DictionaryName,
         JLField.Audio,
+        JLField.Image,
         JLField.SourceText,
         JLField.Sentence,
         JLField.MatchedText,
@@ -255,6 +256,8 @@ public static class Storage
         JLField.KanjiComposition,
         JLField.Definitions,
         JLField.DictionaryName,
+        JLField.Audio,
+        JLField.Image,
         JLField.SourceText,
         JLField.Sentence,
         JLField.Frequencies,
@@ -270,6 +273,8 @@ public static class Storage
         JLField.AlternativeSpellings,
         JLField.Definitions,
         JLField.DictionaryName,
+        JLField.Audio,
+        JLField.Image,
         JLField.SourceText,
         JLField.Sentence,
         JLField.EdictId,

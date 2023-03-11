@@ -6,7 +6,7 @@ internal sealed class DummyFrontend : IFrontend
 {
     public CoreConfig CoreConfig { get; } = new();
 
-    public void PlayAudio(byte[] sound, float volume)
+    public void PlayAudio(byte[] audio, float volume)
     {
     }
 
@@ -31,4 +31,6 @@ internal sealed class DummyFrontend : IFrontend
     }
 
     public Task CopyFromWebSocket(string text) => Task.CompletedTask;
+
+    public byte[]? GetImageFromClipboardAsByteArray() => null;
 }

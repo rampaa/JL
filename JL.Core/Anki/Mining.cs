@@ -73,30 +73,43 @@ public static class Mining
         Dictionary<string, JLField> userFields = ankiConfig.Fields;
         Dictionary<string, object> fields = ConvertFields(userFields, miningParams);
 
-        byte[]? audioRes = null;
-        bool needsAudio = userFields.Values.Any(static jlField => jlField is JLField.Audio);
-        if (needsAudio)
-        {
-            audioRes = await Audio.AudioUtils.GetAudioPrioritizedAudio(primarySpelling, reading).ConfigureAwait(false);
-        }
+        List<string> audioFields = FindFields(JLField.Audio, userFields);
+        bool needsAudio = audioFields.Count > 0;
+        byte[]? audioBytes = needsAudio
+            ? await Audio.AudioUtils.GetAudioPrioritizedAudio(primarySpelling, reading).ConfigureAwait(false)
+            : null;
 
-        Dictionary<string, object?>[] audio =
-        {
-                new()
+        Dictionary<string, object>? audio = audioBytes is null
+            ? null
+            : new Dictionary<string, object>
                 {
-                    { "data", audioRes },
+                    { "data", audioBytes },
                     { "filename", $"JL_audio_{reading}_{primarySpelling}.mp3" },
                     { "skipHash", Storage.Jpod101NoAudioMd5Hash },
-                    { "fields", FindAudioFields(userFields) }
-                }
-            };
+                    { "fields", audioFields }
+                };
+
+        List<string> pictureFields = FindFields(JLField.Image, userFields);
+        bool needsPicture = pictureFields.Count > 0;
+        byte[]? pictureBytes = needsPicture
+            ? Storage.Frontend.GetImageFromClipboardAsByteArray()
+            : null;
+
+        Dictionary<string, object>? picture = pictureBytes is null
+            ? null
+            : new Dictionary<string, object>
+                {
+                    { "data", pictureBytes },
+                    { "filename", $"JL_image_{reading}_{primarySpelling}.png" },
+                    { "fields", pictureFields }
+                };
 
         Dictionary<string, object> options = new()
-            {
-                { "allowDuplicate", Storage.Frontend.CoreConfig.AllowDuplicateCards }
-            };
+        {
+            { "allowDuplicate", Storage.Frontend.CoreConfig.AllowDuplicateCards }
+        };
 
-        Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, options, ankiConfig.Tags, audio, video: null, picture: null);
+        Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, options, ankiConfig.Tags, audio, null, picture);
         Response? response = await AnkiConnect.AddNoteToDeck(note).ConfigureAwait(false);
 
         if (response is null)
@@ -106,7 +119,7 @@ public static class Mining
             return false;
         }
 
-        if (needsAudio && (audioRes is null || Utils.GetMd5String(audioRes) is Storage.Jpod101NoAudioMd5Hash))
+        if (needsAudio && (audioBytes is null || Utils.GetMd5String(audioBytes) is Storage.Jpod101NoAudioMd5Hash))
         {
             Storage.Frontend.Alert(AlertLevel.Warning, $"Mined {primarySpelling} (no audio)");
             Utils.Logger.Information("Mined {FoundSpelling} (no audio)", primarySpelling);
@@ -148,8 +161,8 @@ public static class Mining
         return dict;
     }
 
-    private static List<string> FindAudioFields(Dictionary<string, JLField> userFields)
+    private static List<string> FindFields(JLField jlField, Dictionary<string, JLField> userFields)
     {
-        return userFields.Keys.Where(key => userFields[key] is JLField.Audio).ToList();
+        return userFields.Keys.Where(key => userFields[key] == jlField).ToList();
     }
 }

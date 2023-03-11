@@ -10,7 +10,7 @@ internal sealed class WindowsFrontend : IFrontend
 {
     public CoreConfig CoreConfig { get; } = ConfigManager.Instance;
 
-    public void PlayAudio(byte[] sound, float volume) => WindowsUtils.PlayAudio(sound, volume);
+    public void PlayAudio(byte[] audio, float volume) => WindowsUtils.PlayAudio(audio, volume);
 
     public void Alert(AlertLevel alertLevel, string message) => WindowsUtils.Alert(alertLevel, message);
 
@@ -28,4 +28,6 @@ internal sealed class WindowsFrontend : IFrontend
     public void ApplyDictOptions() => DictOptionManager.ApplyDictOptions();
 
     public Task CopyFromWebSocket(string text) => MainWindow.Instance.CopyFromWebSocket(text);
+
+    public byte[]? GetImageFromClipboardAsByteArray() => WindowsUtils.GetImageFromClipboardAsByteArray();
 }
