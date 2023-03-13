@@ -122,9 +122,10 @@ internal sealed partial class PopupWindow : Window
 
     public async void TextBox_MouseMove(TextBox tb)
     {
-        if (MiningMode || ConfigManager.InactiveLookupMode
-                       || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
-                       || (ConfigManager.FixedPopupPositioning && Owner != MainWindow.Instance)
+        if (ConfigManager.InactiveLookupMode
+            || (MiningMode && !ConfigManager.LookupOnLeftClickOnly)
+            || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
+            || (ConfigManager.FixedPopupPositioning && Owner != MainWindow.Instance)
            )
         {
             return;
