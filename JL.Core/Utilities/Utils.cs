@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Runtime;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -576,5 +577,16 @@ public static class Utils
         }
 
         return listClone;
+    }
+
+    public static string RemovePunctuation(string text)
+    {
+        StringBuilder stringBuilder = new(text, text.Length);
+        foreach (string punctuationMark in Storage.s_japanesePunctuation)
+        {
+            _ = stringBuilder.Replace(punctuationMark, "");
+        }
+
+        return stringBuilder.ToString();
     }
 }

@@ -156,7 +156,7 @@ internal sealed partial class MainWindow : Window
         _backlog.Add(text);
         _currentTextIndex = _backlog.Count - 1;
 
-        await Stats.IncrementStat(StatType.Characters, new StringInfo(text).LengthInTextElements).ConfigureAwait(false);
+        await Stats.IncrementStat(StatType.Characters, new StringInfo(Utils.RemovePunctuation(text)).LengthInTextElements).ConfigureAwait(false);
         await Stats.IncrementStat(StatType.Lines).ConfigureAwait(false);
 
         Dispatcher.Invoke(() =>
@@ -198,7 +198,7 @@ internal sealed partial class MainWindow : Window
         }
 
         await Stats.IncrementStat(StatType.Characters,
-            new StringInfo(_backlog[_currentTextIndex]).LengthInTextElements * -1)
+            new StringInfo(Utils.RemovePunctuation(_backlog[_currentTextIndex])).LengthInTextElements * -1)
             .ConfigureAwait(false);
 
         await Stats.IncrementStat(StatType.Lines, -1).ConfigureAwait(false);
