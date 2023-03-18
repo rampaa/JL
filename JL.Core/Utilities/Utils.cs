@@ -363,33 +363,50 @@ public static class Utils
 
     public static string FindSentence(string text, int position)
     {
-        List<string> japanesePunctuationLite = new()
+        List<string> sentenceTerminatingCharacters = new()
         {
             "。",
             "！",
             "？",
             "…",
             ".",
+            "!",
+            "?",
             "\n"
         };
 
-        Dictionary<string, string> japaneseParentheses = new() { { "「", "」" }, { "『", "』" }, { "（", "）" } };
+        Dictionary<string, string> brackets = new() {
+            { "「", "」" },
+            { "『", "』" },
+            { "【", "】"},
+            { "《", "》" },
+            { "〔", "〕" },
+            { "（", "）" },
+            { "［", "］" },
+            { "〈", "〉" },
+            { "｛", "｝" },
+            { "〝", "〟" },
+            { "⟨", "⟩" },
+            { "(", ")" },
+            { "[", "]" },
+            { "{", "}" },
+        };
 
         int startPosition = -1;
         int endPosition = -1;
 
-        for (int i = 0; i < japanesePunctuationLite.Count; i++)
+        for (int i = 0; i < sentenceTerminatingCharacters.Count; i++)
         {
-            string punctuation = japanesePunctuationLite[i];
+            string terminatingCharacter = sentenceTerminatingCharacters[i];
 
-            int tempIndex = text.LastIndexOf(punctuation, position, StringComparison.Ordinal);
+            int tempIndex = text.LastIndexOf(terminatingCharacter, position, StringComparison.Ordinal);
 
             if (tempIndex > startPosition)
             {
                 startPosition = tempIndex;
             }
 
-            tempIndex = text.IndexOf(punctuation, position, StringComparison.Ordinal);
+            tempIndex = text.IndexOf(terminatingCharacter, position, StringComparison.Ordinal);
 
             if (tempIndex is not -1 && (endPosition is -1 || tempIndex < endPosition))
             {
@@ -410,17 +427,17 @@ public static class Utils
 
         if (sentence.Length > 1)
         {
-            if (japaneseParentheses.ContainsValue(sentence.First().ToString()))
+            if (brackets.ContainsValue(sentence.First().ToString()))
             {
                 sentence = sentence[1..];
             }
 
-            if (japaneseParentheses.ContainsKey(sentence.LastOrDefault().ToString()))
+            if (brackets.ContainsKey(sentence.LastOrDefault().ToString()))
             {
                 sentence = sentence[..^1];
             }
 
-            if (japaneseParentheses.TryGetValue(sentence.FirstOrDefault().ToString(), out string? rightParenthesis))
+            if (brackets.TryGetValue(sentence.FirstOrDefault().ToString(), out string? rightParenthesis))
             {
                 if (sentence.Last().ToString() == rightParenthesis)
                 {
@@ -442,9 +459,9 @@ public static class Utils
                 }
             }
 
-            else if (japaneseParentheses.ContainsValue(sentence.LastOrDefault().ToString()))
+            else if (brackets.ContainsValue(sentence.LastOrDefault().ToString()))
             {
-                string leftParenthesis = japaneseParentheses.First(p => p.Value == sentence.Last().ToString()).Key;
+                string leftParenthesis = brackets.First(p => p.Value == sentence.Last().ToString()).Key;
 
                 if (!sentence.Contains(leftParenthesis))
                 {
