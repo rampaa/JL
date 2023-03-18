@@ -205,7 +205,7 @@ internal static class WindowsUtils
     public static void ShowPreferencesWindow()
     {
         PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
-        ConfigManager.Instance.LoadPreferences(preferencesWindow);
+        ConfigManager.LoadPreferences(preferencesWindow);
         preferencesWindow.Owner = MainWindow.Instance;
         preferencesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Storage.StatsStopWatch.Stop();

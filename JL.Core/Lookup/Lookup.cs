@@ -26,7 +26,7 @@ public static class Lookup
     public static List<LookupResult>? LookupText(string text) //, bool useCache = true
     {
         DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
-        if ((preciseTimeNow - s_lastLookupTime).TotalMilliseconds < Storage.Frontend.CoreConfig.LookupRate)
+        if ((preciseTimeNow - s_lastLookupTime).TotalMilliseconds < CoreConfig.LookupRate)
         {
             return null;
         }
@@ -38,7 +38,7 @@ public static class Lookup
 
         List<LookupResult> lookupResults = new();
 
-        if (Storage.Frontend.CoreConfig.KanjiMode)
+        if (CoreConfig.KanjiMode)
         {
             foreach (Dict dict in Storage.Dicts.Values)
             {

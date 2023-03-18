@@ -106,7 +106,7 @@ public static class Mining
 
         Dictionary<string, object> options = new()
         {
-            { "allowDuplicate", Storage.Frontend.CoreConfig.AllowDuplicateCards }
+            { "allowDuplicate", CoreConfig.AllowDuplicateCards }
         };
 
         Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, options, ankiConfig.Tags, audio, null, image);
@@ -131,7 +131,7 @@ public static class Mining
             Utils.Logger.Information("Mined {FoundSpelling}", primarySpelling);
         }
 
-        if (Storage.Frontend.CoreConfig.ForceSyncAnki)
+        if (CoreConfig.ForceSyncAnki)
         {
             await AnkiConnect.Sync().ConfigureAwait(false);
         }

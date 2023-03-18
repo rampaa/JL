@@ -85,7 +85,7 @@ internal sealed partial class PreferencesWindow : Window
     private async void SaveButton_Click(object sender, RoutedEventArgs e)
     {
         Storage.Frontend.InvalidateDisplayCache();
-        await ConfigManager.Instance.SavePreferences(this).ConfigureAwait(true);
+        await ConfigManager.SavePreferences(this).ConfigureAwait(true);
         Close();
     }
 
@@ -424,7 +424,7 @@ internal sealed partial class PreferencesWindow : Window
     {
         if (Uri.IsWellFormedUriString(AnkiUriTextBox.Text, UriKind.Absolute))
         {
-            ConfigManager.Instance.AnkiConnectUri = new Uri(AnkiUriTextBox.Text);
+            CoreConfig.AnkiConnectUri = new Uri(AnkiUriTextBox.Text);
         }
 
         else

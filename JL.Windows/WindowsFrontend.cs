@@ -8,8 +8,6 @@ using MessageBox = HandyControl.Controls.MessageBox;
 namespace JL.Windows;
 internal sealed class WindowsFrontend : IFrontend
 {
-    public CoreConfig CoreConfig { get; } = ConfigManager.Instance;
-
     public void PlayAudio(byte[] audio, float volume) => WindowsUtils.PlayAudio(audio, volume);
 
     public void Alert(AlertLevel alertLevel, string message) => WindowsUtils.Alert(alertLevel, message);

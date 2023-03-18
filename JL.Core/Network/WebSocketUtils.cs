@@ -9,7 +9,7 @@ public static class WebSocketUtils
     private static CancellationTokenSource? s_webSocketCancellationTokenSource = null;
     public static void HandleWebSocket()
     {
-        if (!Storage.Frontend.CoreConfig.CaptureTextFromWebSocket)
+        if (!CoreConfig.CaptureTextFromWebSocket)
         {
             s_webSocketTask = null;
         }
@@ -35,16 +35,16 @@ public static class WebSocketUtils
             try
             {
                 using ClientWebSocket webSocketClient = new();
-                await webSocketClient.ConnectAsync(Storage.Frontend.CoreConfig.WebSocketUri, CancellationToken.None).ConfigureAwait(false);
+                await webSocketClient.ConnectAsync(CoreConfig.WebSocketUri, CancellationToken.None).ConfigureAwait(false);
                 byte[] buffer = new byte[1024];
 
-                while (Storage.Frontend.CoreConfig.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested && webSocketClient.State == WebSocketState.Open)
+                while (CoreConfig.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested && webSocketClient.State == WebSocketState.Open)
                 {
                     try
                     {
                         WebSocketReceiveResult result = await webSocketClient.ReceiveAsync(buffer, CancellationToken.None).ConfigureAwait(false);
 
-                        if (!Storage.Frontend.CoreConfig.CaptureTextFromWebSocket || cancellationToken.IsCancellationRequested)
+                        if (!CoreConfig.CaptureTextFromWebSocket || cancellationToken.IsCancellationRequested)
                         {
                             return;
                         }

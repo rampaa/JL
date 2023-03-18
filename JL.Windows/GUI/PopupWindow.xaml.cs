@@ -1300,7 +1300,7 @@ internal sealed partial class PopupWindow : Window
         }
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.KanjiModeKeyGesture))
         {
-            Storage.Frontend.CoreConfig.KanjiMode = !Storage.Frontend.CoreConfig.KanjiMode;
+            CoreConfig.KanjiMode = !CoreConfig.KanjiMode;
             LastText = "";
             Storage.Frontend.InvalidateDisplayCache();
             if (Owner != MainWindow.Instance)
@@ -1748,7 +1748,7 @@ internal sealed partial class PopupWindow : Window
 
     private static bool NoAllDictFilter(object item)
     {
-        if (Storage.Frontend.CoreConfig.KanjiMode)
+        if (CoreConfig.KanjiMode)
         {
             return true;
         }

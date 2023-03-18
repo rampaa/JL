@@ -67,7 +67,7 @@ internal sealed partial class MainWindow : Window
         _winApi.SubscribeToClipboardChanged(this, WindowHandle);
         _winApi.ClipboardChanged += ClipboardChanged;
 
-        ConfigManager.Instance.ApplyPreferences();
+        ConfigManager.ApplyPreferences();
 
         if (ConfigManager.CaptureTextFromClipboard)
         {
@@ -540,7 +540,7 @@ internal sealed partial class MainWindow : Window
             // fixes double toggling KanjiMode
             e.Handled = true;
 
-            Storage.Frontend.CoreConfig.KanjiMode = !Storage.Frontend.CoreConfig.KanjiMode;
+            CoreConfig.KanjiMode = !CoreConfig.KanjiMode;
             FirstPopupWindow.LastText = "";
             Storage.Frontend.InvalidateDisplayCache();
             MainTextBox_MouseMove(null, null);
@@ -647,13 +647,13 @@ internal sealed partial class MainWindow : Window
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.CaptureTextFromWebSocketKeyGesture))
         {
-            Storage.Frontend.CoreConfig.CaptureTextFromWebSocket = !Storage.Frontend.CoreConfig.CaptureTextFromWebSocket;
+            CoreConfig.CaptureTextFromWebSocket = !CoreConfig.CaptureTextFromWebSocket;
             WebSocketUtils.HandleWebSocket();
         }
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ReconnectToWebSocketServerKeyGesture))
         {
-            Storage.Frontend.CoreConfig.CaptureTextFromWebSocket = true;
+            CoreConfig.CaptureTextFromWebSocket = true;
             WebSocketUtils.HandleWebSocket();
         }
 

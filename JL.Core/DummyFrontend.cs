@@ -4,8 +4,6 @@ namespace JL.Core;
 
 internal sealed class DummyFrontend : IFrontend
 {
-    public CoreConfig CoreConfig { get; } = new();
-
     public void PlayAudio(byte[] audio, float volume)
     {
     }

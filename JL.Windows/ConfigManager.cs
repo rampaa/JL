@@ -16,12 +16,8 @@ using JL.Windows.Utilities;
 
 namespace JL.Windows;
 
-internal sealed class ConfigManager : CoreConfig
+internal static class ConfigManager
 {
-    private static ConfigManager? s_instance;
-
-    public static ConfigManager Instance => s_instance ??= new ConfigManager();
-
     #region General
 
     private static readonly List<ComboBoxItem> s_japaneseFonts =
@@ -173,7 +169,7 @@ internal sealed class ConfigManager : CoreConfig
 
     #endregion
 
-    public void ApplyPreferences()
+    public static void ApplyPreferences()
     {
         {
             string? minimumLogLevelStr = ConfigurationManager.AppSettings.Get("MinimumLogLevel");
@@ -210,9 +206,9 @@ internal sealed class ConfigManager : CoreConfig
         DisableHotkeys = GetValueFromConfig(DisableHotkeys, nameof(DisableHotkeys), bool.TryParse);
         Focusable = GetValueFromConfig(Focusable, nameof(Focusable), bool.TryParse);
         AnkiIntegration = GetValueFromConfig(AnkiIntegration, nameof(AnkiIntegration), bool.TryParse);
-        KanjiMode = GetValueFromConfig(KanjiMode, nameof(KanjiMode), bool.TryParse);
-        ForceSyncAnki = GetValueFromConfig(ForceSyncAnki, nameof(ForceSyncAnki), bool.TryParse);
-        AllowDuplicateCards = GetValueFromConfig(AllowDuplicateCards, nameof(AllowDuplicateCards), bool.TryParse);
+        CoreConfig.KanjiMode = GetValueFromConfig(CoreConfig.KanjiMode, nameof(CoreConfig.KanjiMode), bool.TryParse);
+        CoreConfig.ForceSyncAnki = GetValueFromConfig(CoreConfig.ForceSyncAnki, nameof(CoreConfig.ForceSyncAnki), bool.TryParse);
+        CoreConfig.AllowDuplicateCards = GetValueFromConfig(CoreConfig.AllowDuplicateCards, nameof(CoreConfig.AllowDuplicateCards), bool.TryParse);
         PopupFocusOnLookup = GetValueFromConfig(PopupFocusOnLookup, nameof(PopupFocusOnLookup), bool.TryParse);
         ShowMiningModeReminder = GetValueFromConfig(ShowMiningModeReminder, nameof(ShowMiningModeReminder), bool.TryParse);
         DisableLookupsForNonJapaneseCharsInPopups = GetValueFromConfig(DisableLookupsForNonJapaneseCharsInPopups, nameof(DisableLookupsForNonJapaneseCharsInPopups), bool.TryParse);
@@ -222,7 +218,7 @@ internal sealed class ConfigManager : CoreConfig
         TextBoxTrimWhiteSpaceCharacters = GetValueFromConfig(TextBoxTrimWhiteSpaceCharacters, nameof(TextBoxTrimWhiteSpaceCharacters), bool.TryParse);
         TextBoxRemoveNewlines = GetValueFromConfig(TextBoxRemoveNewlines, nameof(TextBoxRemoveNewlines), bool.TryParse);
         CaptureTextFromClipboard = GetValueFromConfig(CaptureTextFromClipboard, nameof(CaptureTextFromClipboard), bool.TryParse);
-        CaptureTextFromWebSocket = GetValueFromConfig(CaptureTextFromWebSocket, nameof(CaptureTextFromWebSocket), bool.TryParse);
+        CoreConfig.CaptureTextFromWebSocket = GetValueFromConfig(CoreConfig.CaptureTextFromWebSocket, nameof(CoreConfig.CaptureTextFromWebSocket), bool.TryParse);
         OnlyCaptureTextWithJapaneseChars = GetValueFromConfig(OnlyCaptureTextWithJapaneseChars, nameof(OnlyCaptureTextWithJapaneseChars), bool.TryParse);
         DisableLookupsForNonJapaneseCharsInMainWindow = GetValueFromConfig(DisableLookupsForNonJapaneseCharsInMainWindow, nameof(DisableLookupsForNonJapaneseCharsInMainWindow), bool.TryParse);
         MainWindowFocusOnHover = GetValueFromConfig(MainWindowFocusOnHover, nameof(MainWindowFocusOnHover), bool.TryParse);
@@ -260,7 +256,7 @@ internal sealed class ConfigManager : CoreConfig
         }
 
         MaxSearchLength = GetValueFromConfig(MaxSearchLength, nameof(MaxSearchLength), int.TryParse);
-        LookupRate = GetValueFromConfig(LookupRate, nameof(LookupRate), int.TryParse);
+        CoreConfig.LookupRate = GetValueFromConfig(CoreConfig.LookupRate, nameof(CoreConfig.LookupRate), int.TryParse);
         PrimarySpellingFontSize = GetValueFromConfig(PrimarySpellingFontSize, nameof(PrimarySpellingFontSize), int.TryParse);
         ReadingsFontSize = GetValueFromConfig(ReadingsFontSize, nameof(ReadingsFontSize), int.TryParse);
         AlternativeSpellingsFontSize = GetValueFromConfig(AlternativeSpellingsFontSize, nameof(AlternativeSpellingsFontSize), int.TryParse);
@@ -269,7 +265,7 @@ internal sealed class ConfigManager : CoreConfig
         DeconjugationInfoFontSize = GetValueFromConfig(DeconjugationInfoFontSize, nameof(DeconjugationInfoFontSize), int.TryParse);
         DictTypeFontSize = GetValueFromConfig(DictTypeFontSize, nameof(DictTypeFontSize), int.TryParse);
         MaxNumResultsNotInMiningMode = GetValueFromConfig(MaxNumResultsNotInMiningMode, nameof(MaxNumResultsNotInMiningMode), int.TryParse);
-        AudioVolume = GetValueFromConfig(AudioVolume, nameof(AudioVolume), int.TryParse);
+        CoreConfig.AudioVolume = GetValueFromConfig(CoreConfig.AudioVolume, nameof(CoreConfig.AudioVolume), int.TryParse);
 
         AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = GetValueFromConfig(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds), int.TryParse);
         PopupWindow.PopupAutoHideTimer.Enabled = false;
@@ -410,10 +406,10 @@ internal sealed class ConfigManager : CoreConfig
         }
 
         {
-            string? ankiConnectUriStr = ConfigurationManager.AppSettings.Get(nameof(AnkiConnectUri));
+            string? ankiConnectUriStr = ConfigurationManager.AppSettings.Get(nameof(CoreConfig.AnkiConnectUri));
             if (ankiConnectUriStr is null)
             {
-                AddToConfig(nameof(AnkiConnectUri), AnkiConnectUri.OriginalString);
+                AddToConfig(nameof(CoreConfig.AnkiConnectUri), CoreConfig.AnkiConnectUri.OriginalString);
             }
 
             else
@@ -422,7 +418,7 @@ internal sealed class ConfigManager : CoreConfig
 
                 if (Uri.TryCreate(ankiConnectUriStr, UriKind.Absolute, out Uri? ankiConnectUri))
                 {
-                    AnkiConnectUri = ankiConnectUri;
+                    CoreConfig.AnkiConnectUri = ankiConnectUri;
                 }
                 else
                 {
@@ -433,17 +429,17 @@ internal sealed class ConfigManager : CoreConfig
         }
 
         {
-            string? webSocketUriStr = ConfigurationManager.AppSettings.Get(nameof(WebSocketUri));
+            string? webSocketUriStr = ConfigurationManager.AppSettings.Get(nameof(CoreConfig.WebSocketUri));
             if (webSocketUriStr is null)
             {
-                AddToConfig(nameof(WebSocketUri), WebSocketUri.OriginalString);
+                AddToConfig(nameof(CoreConfig.WebSocketUri), CoreConfig.WebSocketUri.OriginalString);
             }
             else
             {
                 webSocketUriStr = webSocketUriStr.Replace("://localhost", "://127.0.0.1");
                 if (Uri.TryCreate(webSocketUriStr, UriKind.Absolute, out Uri? webSocketUri))
                 {
-                    WebSocketUri = webSocketUri;
+                    CoreConfig.WebSocketUri = webSocketUri;
                 }
                 else
                 {
@@ -592,7 +588,7 @@ internal sealed class ConfigManager : CoreConfig
         }
     }
 
-    public void LoadPreferences(PreferencesWindow preferenceWindow)
+    public static void LoadPreferences(PreferencesWindow preferenceWindow)
     {
         CreateDefaultAppConfig();
 
@@ -674,12 +670,12 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.SearchUrlTextBox.Text = SearchUrl;
         preferenceWindow.BrowserPathTextBox.Text = BrowserPath;
         preferenceWindow.MaxSearchLengthNumericUpDown.Value = MaxSearchLength;
-        preferenceWindow.AnkiUriTextBox.Text = AnkiConnectUri.OriginalString;
-        preferenceWindow.WebSocketUriTextBox.Text = WebSocketUri.OriginalString;
-        preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = ForceSyncAnki;
-        preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = AllowDuplicateCards;
-        preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
-        preferenceWindow.KanjiModeCheckBox.IsChecked = KanjiMode;
+        preferenceWindow.AnkiUriTextBox.Text = CoreConfig.AnkiConnectUri.OriginalString;
+        preferenceWindow.WebSocketUriTextBox.Text = CoreConfig.WebSocketUri.OriginalString;
+        preferenceWindow.ForceSyncAnkiCheckBox.IsChecked = CoreConfig.ForceSyncAnki;
+        preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked = CoreConfig.AllowDuplicateCards;
+        preferenceWindow.LookupRateNumericUpDown.Value = CoreConfig.LookupRate;
+        preferenceWindow.KanjiModeCheckBox.IsChecked = CoreConfig.KanjiMode;
         preferenceWindow.AutoAdjustFontSizesOnResolutionChange.IsChecked = AutoAdjustFontSizesOnResolutionChange;
         preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
         preferenceWindow.AutoPlayAudioCheckBox.IsChecked = AutoPlayAudio;
@@ -691,7 +687,7 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.FocusableCheckBox.IsChecked = Focusable;
         preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked = TextOnlyVisibleOnHover;
         preferenceWindow.AnkiIntegrationCheckBox.IsChecked = AnkiIntegration;
-        preferenceWindow.LookupRateNumericUpDown.Value = LookupRate;
+        preferenceWindow.LookupRateNumericUpDown.Value = CoreConfig.LookupRate;
 
         preferenceWindow.MainWindowDynamicWidthCheckBox.IsChecked = MainWindowDynamicWidth;
         preferenceWindow.MainWindowDynamicHeightCheckBox.IsChecked = MainWindowDynamicHeight;
@@ -712,7 +708,7 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked = TextBoxRemoveNewlines;
         preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked = TextBoxApplyDropShadowEffect;
         preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked = CaptureTextFromClipboard;
-        preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked = CaptureTextFromWebSocket;
+        preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked = CoreConfig.CaptureTextFromWebSocket;
         preferenceWindow.OnlyCaptureTextWithJapaneseCharsCheckBox.IsChecked = OnlyCaptureTextWithJapaneseChars;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInMainWindow;
         preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked = MainWindowFocusOnHover;
@@ -745,7 +741,7 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.PopupMaxWidthNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;
 
         preferenceWindow.MaxNumResultsNotInMiningModeNumericUpDown.Value = MaxNumResultsNotInMiningMode;
-        preferenceWindow.AudioVolumeNumericUpDown.Value = AudioVolume;
+        preferenceWindow.AudioVolumeNumericUpDown.Value = CoreConfig.AudioVolume;
 
         preferenceWindow.PopupMaxHeightNumericUpDown.Value = PopupMaxHeight;
         preferenceWindow.PopupMaxWidthNumericUpDown.Value = PopupMaxWidth;
@@ -782,7 +778,7 @@ internal sealed class ConfigManager : CoreConfig
         preferenceWindow.AutoHidePopupIfMouseIsNotOverItCheckBox.IsChecked = AutoHidePopupIfMouseIsNotOverIt;
     }
 
-    public async Task SavePreferences(PreferencesWindow preferenceWindow)
+    public static async Task SavePreferences(PreferencesWindow preferenceWindow)
     {
         SaveKeyGesture(nameof(DisableHotkeysKeyGesture), preferenceWindow.DisableHotkeysKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(MiningModeKeyGesture), preferenceWindow.MiningModeKeyGestureTextBox.Text);
@@ -851,10 +847,10 @@ internal sealed class ConfigManager : CoreConfig
 
         config.AppSettings.Settings[nameof(MaxSearchLength)].Value =
             preferenceWindow.MaxSearchLengthNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
-        config.AppSettings.Settings[nameof(AnkiConnectUri)].Value =
+        config.AppSettings.Settings[nameof(CoreConfig.AnkiConnectUri)].Value =
             preferenceWindow.AnkiUriTextBox.Text;
 
-        config.AppSettings.Settings[nameof(WebSocketUri)].Value =
+        config.AppSettings.Settings[nameof(CoreConfig.WebSocketUri)].Value =
             preferenceWindow.WebSocketUriTextBox.Text;
 
         config.AppSettings.Settings[nameof(MainWindowDynamicWidth)].Value =
@@ -892,7 +888,7 @@ internal sealed class ConfigManager : CoreConfig
 
         config.AppSettings.Settings[nameof(CaptureTextFromClipboard)].Value =
             preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked.ToString();
-        config.AppSettings.Settings[nameof(CaptureTextFromWebSocket)].Value =
+        config.AppSettings.Settings[nameof(CoreConfig.CaptureTextFromWebSocket)].Value =
             preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked.ToString();
 
         config.AppSettings.Settings[nameof(OnlyCaptureTextWithJapaneseChars)].Value =
@@ -925,13 +921,13 @@ internal sealed class ConfigManager : CoreConfig
         config.AppSettings.Settings[nameof(PopupFont)].Value =
             preferenceWindow.PopupFontComboBox.SelectedValue.ToString();
 
-        config.AppSettings.Settings[nameof(KanjiMode)].Value =
+        config.AppSettings.Settings[nameof(CoreConfig.KanjiMode)].Value =
             preferenceWindow.KanjiModeCheckBox.IsChecked.ToString();
-        config.AppSettings.Settings[nameof(ForceSyncAnki)].Value =
+        config.AppSettings.Settings[nameof(CoreConfig.ForceSyncAnki)].Value =
             preferenceWindow.ForceSyncAnkiCheckBox.IsChecked.ToString();
-        config.AppSettings.Settings[nameof(AllowDuplicateCards)].Value =
+        config.AppSettings.Settings[nameof(CoreConfig.AllowDuplicateCards)].Value =
             preferenceWindow.AllowDuplicateCardsCheckBox.IsChecked.ToString();
-        config.AppSettings.Settings[nameof(LookupRate)].Value =
+        config.AppSettings.Settings[nameof(CoreConfig.LookupRate)].Value =
             preferenceWindow.LookupRateNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings[nameof(AutoAdjustFontSizesOnResolutionChange)].Value =
             preferenceWindow.AutoAdjustFontSizesOnResolutionChange.IsChecked.ToString();
@@ -967,7 +963,7 @@ internal sealed class ConfigManager : CoreConfig
         config.AppSettings.Settings[nameof(MaxNumResultsNotInMiningMode)].Value =
             preferenceWindow.MaxNumResultsNotInMiningModeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
 
-        config.AppSettings.Settings[nameof(AudioVolume)].Value =
+        config.AppSettings.Settings[nameof(CoreConfig.AudioVolume)].Value =
             preferenceWindow.AudioVolumeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
 
         config.AppSettings.Settings[nameof(PopupMaxWidth)].Value =

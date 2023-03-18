@@ -54,7 +54,7 @@ internal static class AnkiConnect
             Utils.Logger.Information("Sending: {Payload}", await payload.ReadAsStringAsync().ConfigureAwait(false));
 
             HttpResponseMessage postResponse = await Storage.Client
-                .PostAsync(Storage.Frontend.CoreConfig.AnkiConnectUri, payload)
+                .PostAsync(CoreConfig.AnkiConnectUri, payload)
                 .ConfigureAwait(false);
 
             if (postResponse.IsSuccessStatusCode)
