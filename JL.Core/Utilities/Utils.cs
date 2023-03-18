@@ -347,7 +347,7 @@ public static class Utils
         {
             if (char.IsPunctuation(text[i]) || char.IsWhiteSpace(text[i]))
             {
-                endPosition = i > 0 ? i : 1;
+                endPosition = i;
                 break;
             }
         }
