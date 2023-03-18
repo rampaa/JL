@@ -341,21 +341,15 @@ public static class Utils
 
     public static int FindWordBoundary(string text, int position)
     {
-        int endPosition = -1;
+        int endPosition = text.Length;
 
-        for (int i = 0; i < Storage.s_japanesePunctuation.Count; i++)
+        for (int i = position; i < text.Length; i++)
         {
-            int tempIndex = text.IndexOf(Storage.s_japanesePunctuation[i], position, StringComparison.Ordinal);
-
-            if (tempIndex is not -1 && (endPosition is -1 || tempIndex < endPosition))
+            if (char.IsPunctuation(text[i]) || char.IsWhiteSpace(text[i]))
             {
-                endPosition = tempIndex;
+                endPosition = i > 0 ? i : 1;
+                break;
             }
-        }
-
-        if (endPosition is -1)
-        {
-            endPosition = text.Length;
         }
 
         return endPosition;
