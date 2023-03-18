@@ -581,10 +581,13 @@ public static class Utils
 
     public static string RemovePunctuation(string text)
     {
-        StringBuilder stringBuilder = new(text, text.Length);
-        foreach (string punctuationMark in Storage.s_japanesePunctuation)
+        StringBuilder stringBuilder = new(text.Length);
+        foreach (char character in text)
         {
-            _ = stringBuilder.Replace(punctuationMark, "");
+            if (char.IsLetterOrDigit(character) || char.IsSurrogate(character))
+            {
+                _ = stringBuilder.Append(character);
+            }
         }
 
         return stringBuilder.ToString();
