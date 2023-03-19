@@ -59,7 +59,11 @@ internal static class EpwingUtils
                         }
                     }
                 }
-                return FilterDuplicateEntries(epwingRecord, dict);
+                if (epwingRecord.Definitions is not null)
+                {
+                    epwingRecord.Definitions = epwingRecord.Definitions.Select(static def => def.Replace("┏", "")).ToList();
+                }
+                break;
 
             case DictType.Daijirin:
                 if (epwingRecord.Definitions is not null)
@@ -76,7 +80,6 @@ internal static class EpwingUtils
                         return false;
                     }
                 }
-                // todo: missing FilterDuplicateEntries call?
                 break;
 
             case DictType.Daijisen:
@@ -85,14 +88,10 @@ internal static class EpwingUtils
                 {
                     return false;
                 }
-
-                return FilterDuplicateEntries(epwingRecord, dict);
-
-            default:
-                return FilterDuplicateEntries(epwingRecord, dict);
+                break;
         }
 
-        return true;
+        return FilterDuplicateEntries(epwingRecord, dict);
     }
 
     private static bool FilterDuplicateEntries(IEpwingRecord epwingRecord, Dict dict)
@@ -108,8 +107,6 @@ internal static class EpwingUtils
 
                 if (epwingRecord.Definitions is not null)
                 {
-                    epwingRecord.Definitions = epwingRecord.Definitions.Select(static def => def.Replace("┏", "")).ToList();
-
                     if (previousResult.Definitions?.SequenceEqual(epwingRecord.Definitions ?? new List<string>()) ?? epwingRecord.Definitions is null)
                     {
                         // If an entry has reading info while others don't, keep the one with the reading info.
@@ -126,9 +123,27 @@ internal static class EpwingUtils
             }
         }
 
-        else if (epwingRecord.Definitions is not null)
+        else if (epwingRecord.Reading is not null && dict.Contents.TryGetValue(
+                Kana.KatakanaToHiragana(epwingRecord.Reading),
+                out previousResults))
         {
-            epwingRecord.Definitions = epwingRecord.Definitions.Select(static def => def.Replace("┏", "")).ToList();
+            int prevResultCount = previousResults.Count;
+            for (int i = 0; i < prevResultCount; i++)
+            {
+                var previousResult = (IEpwingRecord)previousResults[i];
+
+                if (epwingRecord.Definitions is not null)
+                {
+                    if (previousResult.Definitions?.SequenceEqual(epwingRecord.Definitions ?? new List<string>()) ?? epwingRecord.Definitions is null)
+                    {
+                        if (string.IsNullOrEmpty(previousResult.Reading))
+                        {
+                            previousResults.RemoveAt(i);
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         return true;
