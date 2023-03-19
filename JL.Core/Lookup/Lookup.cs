@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text;
 using JL.Core.Deconjugation;
@@ -71,12 +72,12 @@ public static class Lookup
 
         Dictionary<string, IntermediaryResult> jmdictResults = new();
         Dictionary<string, IntermediaryResult> jmnedictResults = new();
-        List<Dictionary<string, IntermediaryResult>> epwingYomichanWordResultsList = new();
-        List<Dictionary<string, IntermediaryResult>> epwingYomichanKanjiResultsList = new();
-        List<Dictionary<string, IntermediaryResult>> epwingYomichanNameResultsList = new();
-        List<Dictionary<string, IntermediaryResult>> epwingNazekaWordResultsList = new();
-        List<Dictionary<string, IntermediaryResult>> epwingNazekaKanjiResultsList = new();
-        List<Dictionary<string, IntermediaryResult>> epwingNazekaNameResultsList = new();
+        ConcurrentBag<Dictionary<string, IntermediaryResult>> epwingYomichanWordResultsList = new();
+        ConcurrentBag<Dictionary<string, IntermediaryResult>> epwingYomichanKanjiResultsList = new();
+        ConcurrentBag<Dictionary<string, IntermediaryResult>> epwingYomichanNameResultsList = new();
+        ConcurrentBag<Dictionary<string, IntermediaryResult>> epwingNazekaWordResultsList = new();
+        ConcurrentBag<Dictionary<string, IntermediaryResult>> epwingNazekaKanjiResultsList = new();
+        ConcurrentBag<Dictionary<string, IntermediaryResult>> epwingNazekaNameResultsList = new();
         Dictionary<string, IntermediaryResult> kanjidicResults = new();
         Dictionary<string, IntermediaryResult> customWordResults = new();
         Dictionary<string, IntermediaryResult> customNameResults = new();
@@ -102,7 +103,7 @@ public static class Lookup
             deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
         }
 
-        foreach (Dict dict in Storage.Dicts.Values.ToList())
+        _ = Parallel.ForEach(Storage.Dicts.Values.ToList(), dict =>
         {
             if (dict.Active)
             {
@@ -191,7 +192,7 @@ public static class Lookup
                         throw new ArgumentOutOfRangeException(null, "Invalid DictType");
                 }
             }
-        }
+        });
 
         if (jmdictResults.Count > 0)
         {
@@ -218,34 +219,34 @@ public static class Lookup
             lookupResults.AddRange(BuildCustomNameResult(customNameResults));
         }
 
-        for (int i = 0; i < epwingYomichanWordResultsList.Count; i++)
+        foreach (Dictionary<string, IntermediaryResult> result in epwingYomichanWordResultsList)
         {
-            lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanWordResultsList[i]));
+            lookupResults.AddRange(BuildEpwingYomichanResult(result));
         }
 
-        for (int i = 0; i < epwingYomichanKanjiResultsList.Count; i++)
+        foreach (Dictionary<string, IntermediaryResult> result in epwingYomichanKanjiResultsList)
         {
-            lookupResults.AddRange(BuildYomichanKanjiResult(epwingYomichanKanjiResultsList[i]));
+            lookupResults.AddRange(BuildYomichanKanjiResult(result));
         }
 
-        for (int i = 0; i < epwingYomichanNameResultsList.Count; i++)
+        foreach (Dictionary<string, IntermediaryResult> result in epwingYomichanNameResultsList)
         {
-            lookupResults.AddRange(BuildEpwingYomichanResult(epwingYomichanNameResultsList[i]));
+            lookupResults.AddRange(BuildEpwingYomichanResult(result));
         }
 
-        for (int i = 0; i < epwingNazekaWordResultsList.Count; i++)
+        foreach (Dictionary<string, IntermediaryResult> result in epwingNazekaWordResultsList)
         {
-            lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaWordResultsList[i]));
+            lookupResults.AddRange(BuildEpwingNazekaResult(result));
         }
 
-        for (int i = 0; i < epwingNazekaNameResultsList.Count; i++)
+        foreach (Dictionary<string, IntermediaryResult> result in epwingNazekaNameResultsList)
         {
-            lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaNameResultsList[i]));
+            lookupResults.AddRange(BuildEpwingNazekaResult(result));
         }
 
-        for (int i = 0; i < epwingNazekaKanjiResultsList.Count; i++)
+        foreach (Dictionary<string, IntermediaryResult> result in epwingNazekaKanjiResultsList)
         {
-            lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaKanjiResultsList[i]));
+            lookupResults.AddRange(BuildEpwingNazekaResult(result));
         }
 
         if (lookupResults.Count > 0)
