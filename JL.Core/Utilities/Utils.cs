@@ -372,7 +372,7 @@ public static class Utils
         Dictionary<string, string> brackets = new() {
             { "「", "」" },
             { "『", "』" },
-            { "【", "】"},
+            { "【", "】" },
             { "《", "》" },
             { "〔", "〕" },
             { "（", "）" },
@@ -380,6 +380,9 @@ public static class Utils
             { "〈", "〉" },
             { "｛", "｝" },
             { "〝", "〟" },
+            { "＂", "＂" },
+            { "＇", "＇" },
+            { "｢", "｣" },
             { "⟨", "⟩" },
             { "(", ")" },
             { "[", "]" },
@@ -431,22 +434,22 @@ public static class Utils
                 sentence = sentence[..^1];
             }
 
-            if (brackets.TryGetValue(sentence.FirstOrDefault().ToString(), out string? rightParenthesis))
+            if (brackets.TryGetValue(sentence.FirstOrDefault().ToString(), out string? rightBracket))
             {
-                if (sentence.Last().ToString() == rightParenthesis)
+                if (sentence.Last().ToString() == rightBracket)
                 {
                     sentence = sentence[1..^1];
                 }
-                else if (!sentence.Contains(rightParenthesis))
+                else if (!sentence.Contains(rightBracket))
                 {
                     sentence = sentence[1..];
                 }
-                else if (sentence.Contains(rightParenthesis))
+                else if (sentence.Contains(rightBracket))
                 {
-                    int numberOfLeftParentheses = sentence.Count(p => p == sentence[0]);
-                    int numberOfRightParentheses = sentence.Count(p => p == rightParenthesis[0]);
+                    int numberOfLeftBrackets = sentence.Count(p => p == sentence[0]);
+                    int numberOfRightBrackets = sentence.Count(p => p == rightBracket[0]);
 
-                    if (numberOfLeftParentheses == numberOfRightParentheses + 1)
+                    if (numberOfLeftBrackets == numberOfRightBrackets + 1)
                     {
                         sentence = sentence[1..];
                     }
@@ -455,18 +458,18 @@ public static class Utils
 
             else if (brackets.ContainsValue(sentence.LastOrDefault().ToString()))
             {
-                string leftParenthesis = brackets.First(p => p.Value == sentence.Last().ToString()).Key;
+                string leftBrackets = brackets.First(p => p.Value == sentence.Last().ToString()).Key;
 
-                if (!sentence.Contains(leftParenthesis))
+                if (!sentence.Contains(leftBrackets))
                 {
                     sentence = sentence[..^1];
                 }
-                else if (sentence.Contains(leftParenthesis))
+                else if (sentence.Contains(leftBrackets))
                 {
-                    int numberOfLeftParentheses = sentence.Count(p => p == leftParenthesis[0]);
-                    int numberOfRightParentheses = sentence.Count(p => p == sentence.Last());
+                    int numberOfLeftBrackets = sentence.Count(p => p == leftBrackets[0]);
+                    int numberOfRightBrackets = sentence.Count(p => p == sentence.Last());
 
-                    if (numberOfRightParentheses == numberOfLeftParentheses + 1)
+                    if (numberOfRightBrackets == numberOfLeftBrackets + 1)
                     {
                         sentence = sentence[..^1];
                     }
