@@ -33,36 +33,28 @@ internal sealed partial class EditFrequencyWindow : Window
         bool isValid = true;
 
         string path = TextBlockPath.Text;
-        if (_freq.Path != path)
+        if (string.IsNullOrEmpty(path)
+            || (!Directory.Exists(path) && !File.Exists(path))
+            || (_freq.Path != path && Storage.FreqDicts.Values.Any(dict => dict.Path == path)))
         {
-            if (string.IsNullOrEmpty(path)
-                || (!Directory.Exists(path) && !File.Exists(path))
-                || Storage.FreqDicts.Values.Any(dict => dict.Path == path))
-            {
-                TextBlockPath.BorderBrush = Brushes.Red;
-                isValid = false;
-            }
-
-            else if (TextBlockPath.BorderBrush == Brushes.Red)
-            {
-                TextBlockPath.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
-            }
+            TextBlockPath.BorderBrush = Brushes.Red;
+            isValid = false;
+        }
+        else if (TextBlockPath.BorderBrush == Brushes.Red)
+        {
+            TextBlockPath.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
         }
 
         string name = NameTextBox.Text;
-        if (_freq.Name != name)
+        if (string.IsNullOrEmpty(name)
+            || (_freq.Name != name && Storage.FreqDicts.Values.Any(dict => dict.Name == name)))
         {
-            if (string.IsNullOrEmpty(name)
-                || Storage.FreqDicts.Values.Any(dict => dict.Name == name))
-            {
-                NameTextBox.BorderBrush = Brushes.Red;
-                isValid = false;
-            }
-
-            else if (NameTextBox.BorderBrush == Brushes.Red)
-            {
-                NameTextBox.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
-            }
+            NameTextBox.BorderBrush = Brushes.Red;
+            isValid = false;
+        }
+        else if (NameTextBox.BorderBrush == Brushes.Red)
+        {
+            NameTextBox.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
         }
 
         if (isValid)

@@ -78,15 +78,12 @@ internal sealed partial class EditAudioSourceWindow : Window
             }
         }
 
-        else if (_uri != uri)
+        else if (string.IsNullOrEmpty(uri)
+            || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "").Replace("{Reading}", ""), UriKind.Absolute)
+            || (_uri != uri && Storage.AudioSources.ContainsKey(uri)))
         {
-            if (string.IsNullOrEmpty(uri)
-                || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "").Replace("{Reading}", ""), UriKind.Absolute)
-                || Storage.AudioSources.ContainsKey(uri))
-            {
-                TextBlockUri.BorderBrush = Brushes.Red;
-                isValid = false;
-            }
+            TextBlockUri.BorderBrush = Brushes.Red;
+            isValid = false;
         }
 
         if (isValid)
