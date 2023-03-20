@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Manage Dictionaries" Height="700" Width="800" Closing="Window_Closing" ResizeMode="NoResize" IsVisibleChanged="Window_IsVisibleChanged"
+        Title="Manage Dictionaries" Height="700" Width="900" Closing="Window_Closing" ResizeMode="NoResize" IsVisibleChanged="Window_IsVisibleChanged"
         SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Background="{DynamicResource RegionBrush}" Topmost="True" ShowInTaskbar="False"
         x:ClassModifier="internal">
     <Grid>

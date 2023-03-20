@@ -119,11 +119,6 @@ internal sealed partial class PreferencesWindow : Window
         CheckForJLUpdatesButton.IsEnabled = true;
     }
 
-    private void Button_Click(object sender, RoutedEventArgs e)
-    {
-        WindowsUtils.ShowManageAudioSourcesWindow();
-    }
-
     #endregion
 
     #region MiningSetup

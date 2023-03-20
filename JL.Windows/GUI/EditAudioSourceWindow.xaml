@@ -6,22 +6,18 @@
         xmlns:local="clr-namespace:JL.Windows"
         mc:Ignorable="d"
         Background="{DynamicResource RegionBrush}"
-        Title="Edit Audio Source" Width="380" ResizeMode="NoResize" SizeToContent="Height"
-        Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False" x:ClassModifier="internal">
+        Title="Edit Audio Source" Height="Auto" Width="480" ResizeMode="NoResize" SizeToContent="Height"
+        Topmost="True" ShowInTaskbar="False" x:ClassModifier="internal">
     <Grid>
-        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,20">
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,60">
             <TextBlock Text="Audio Source Type" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
-            <ComboBox Name="AudioSourceTypeComboBox" Width="285" Margin="10" HorizontalAlignment="Left" IsEnabled="False" />
+            <ComboBox Name="AudioSourceTypeComboBox" Width="400" Margin="10" HorizontalAlignment="Left" IsEnabled="False" />
 
             <TextBlock Text="URI" TextWrapping="Wrap" Margin="0,10,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
-            <WrapPanel>
-                <TextBox Name="TextBlockUri" Width="285"
-                         Text=""
-                         Margin="10" />
-            </WrapPanel>
+            <TextBox Name="TextBlockUri" Width="400" Text="" TextWrapping="Wrap" MaxHeight="300" Margin="10" />
         </StackPanel>
 
-        <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="20,120,20,20">
+        <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="20,20,20,20">
             <Button Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                     Margin="0,200,50,0" FontSize="16" Width="70" Height="35" Click="CancelButton_Click" />
             <Button Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom"

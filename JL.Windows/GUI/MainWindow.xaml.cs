@@ -727,6 +727,11 @@ internal sealed partial class MainWindow : Window
         WindowsUtils.UpdateMainWindowVisibility();
     }
 
+    private void ShowManageAudioSourcesWindow(object sender, RoutedEventArgs e)
+    {
+        WindowsUtils.ShowManageAudioSourcesWindow();
+    }
+
     private void ShowManageDictionariesWindow(object sender, RoutedEventArgs e)
     {
         WindowsUtils.ShowManageDictionariesWindow();

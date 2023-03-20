@@ -20,6 +20,11 @@ internal sealed partial class EditAudioSourceWindow : Window
         _uri = uri;
         _audioSource = audioSource;
         InitializeComponent();
+
+        string type = _audioSource.Type.GetDescription() ?? _audioSource.Type.ToString();
+        _ = AudioSourceTypeComboBox.Items.Add(type);
+        AudioSourceTypeComboBox.SelectedValue = type;
+        TextBlockUri.Text = _uri;
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -82,13 +87,5 @@ internal sealed partial class EditAudioSourceWindow : Window
 
             Close();
         }
-    }
-
-    private void Window_Loaded(object sender, RoutedEventArgs e)
-    {
-        string type = _audioSource.Type.GetDescription() ?? _audioSource.Type.ToString();
-        _ = AudioSourceTypeComboBox.Items.Add(type);
-        AudioSourceTypeComboBox.SelectedValue = type;
-        TextBlockUri.Text = _uri;
     }
 }

@@ -80,9 +80,33 @@ internal sealed partial class ManageDictionariesWindow : Window
         {
             DockPanel dockPanel = new();
 
-            var checkBox = new CheckBox { Width = 20, IsChecked = dict.Active, Margin = new Thickness(10) };
-            var buttonIncreasePriority = new Button { Width = 25, Content = "↑", Margin = new Thickness(1) };
-            var buttonDecreasePriority = new Button { Width = 25, Content = "↓", Margin = new Thickness(1) };
+            var checkBox = new CheckBox
+            {
+                Width = 20,
+                IsChecked = dict.Active,
+                Margin = new Thickness(10),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            var buttonIncreasePriority = new Button
+            {
+                Width = 25,
+                Content = "↑",
+                Margin = new Thickness(1),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            var buttonDecreasePriority = new Button
+            {
+                Width = 25,
+                Content = "↓",
+                Margin = new Thickness(1),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
             var priority = new TextBlock
             {
                 Name = "priority",
@@ -94,27 +118,32 @@ internal sealed partial class ManageDictionariesWindow : Window
             };
             var dictTypeDisplay = new TextBlock
             {
-                Width = 177,
+                Width = 150,
                 Text = dict.Name,
+                TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(10)
             };
+
+            bool invalidPath = !Directory.Exists(dict.Path) && !File.Exists(dict.Path);
             var dictPathValidityDisplay = new TextBlock
             {
                 Width = 13,
-                Text = "❌",
-                ToolTip = "Invalid Path",
+                Text = invalidPath ? "❌" : "",
+                ToolTip = invalidPath ? "Invalid Path" : null,
                 Foreground = Brushes.Crimson,
                 Margin = new Thickness(1),
                 VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Right,
-                Visibility = !Directory.Exists(dict.Path) && !File.Exists(dict.Path)
-                    ? Visibility.Visible
-                    : Visibility.Collapsed
+                HorizontalAlignment = HorizontalAlignment.Center,
             };
             var dictPathDisplay = new TextBlock
             {
-                Width = 200,
+                Width = 300,
                 Text = dict.Path,
+                TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(10),
                 Cursor = Cursors.Hand
             };
@@ -129,7 +158,9 @@ internal sealed partial class ManageDictionariesWindow : Window
             {
                 Width = 75,
                 Height = 30,
-                Content = Directory.Exists(dict.Path) || File.Exists(dict.Path) ? "Update" : "Download",
+                Content = invalidPath ? "Download" : "Update",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
                 Foreground = Brushes.White,
                 Background = Brushes.DarkGreen,
                 BorderThickness = new Thickness(1),
@@ -180,6 +211,8 @@ internal sealed partial class ManageDictionariesWindow : Window
                 Width = 75,
                 Height = 30,
                 Content = "Remove",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
                 Foreground = Brushes.White,
                 Background = Brushes.Red,
                 BorderThickness = new Thickness(1),
@@ -194,6 +227,8 @@ internal sealed partial class ManageDictionariesWindow : Window
                 Width = 45,
                 Height = 30,
                 Content = "Edit",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
                 Foreground = Brushes.White,
                 Background = Brushes.DodgerBlue,
                 BorderThickness = new Thickness(1),
@@ -209,10 +244,12 @@ internal sealed partial class ManageDictionariesWindow : Window
                 Width = 50,
                 Height = 30,
                 Content = "Info",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
                 Foreground = Brushes.White,
                 Background = Brushes.LightSlateGray,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(0, 0, 5, 0),
+                Margin = new Thickness(5, 0, 0, 0),
                 Visibility = dict.Type is DictType.JMdict or DictType.JMnedict
                     ? Visibility.Visible
                     : Visibility.Collapsed

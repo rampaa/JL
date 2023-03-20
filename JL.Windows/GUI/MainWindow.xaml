@@ -69,6 +69,10 @@
                         Header="Stats"
                         Click="ShowStats" />
                     <MenuItem
+                        Name="ManageAudioSourcesMenuItem"
+                        Header="Manage audio sources"
+                        Click="ShowManageAudioSourcesWindow" />
+                    <MenuItem
                         Name="ManageFrequenciesMenuItem"
                         Header="Manage frequencies"
                         Click="ShowManageFrequenciesWindow" />

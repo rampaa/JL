@@ -393,6 +393,7 @@ internal static class ConfigManager
         WindowsUtils.SetInputGestureText(mainWindow.PreferencesMenuItem, ShowPreferencesWindowKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.ManageDictionariesMenuItem, ShowManageDictionariesWindowKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.ManageFrequenciesMenuItem, ShowManageFrequenciesWindowKeyGesture);
+        WindowsUtils.SetInputGestureText(mainWindow.ManageAudioSourcesMenuItem, ShowManageAudioSourcesWindowKeyGesture);
         WindowsUtils.SetInputGestureText(mainWindow.StatsMenuItem, ShowStatsKeyGesture);
 
         {

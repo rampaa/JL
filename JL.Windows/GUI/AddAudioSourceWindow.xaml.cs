@@ -80,4 +80,26 @@ internal sealed partial class AddAudioSourceWindow : Window
     {
         AudioSourceTypeComboBox.ItemsSource = Enum.GetValues<AudioSourceType>().Select(static audioSourceType => audioSourceType.GetDescription() ?? audioSourceType.ToString());
     }
+
+    private void InfoButton_Click(object sender, RoutedEventArgs e)
+    {
+        const string audioSourceTypeInfo = @"1) Local files through ""Local Path"" type:
+e.g. C:\Users\User\Desktop\jpod_files\{Term} - {Reading}.mp3
+
+2) URLs returning an audio directly through ""URL"" type:
+e.g. http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={Term}&kana={Reading}
+
+3) URLs returning a JSON response in Custom Audio List format through ""URL (JSON)"" type:
+e.g. http://127.0.0.1:5050/?sources=jpod,jpod_alternate,nhk16,forvo&term={Term}&reading={Reading}";
+
+        InfoWindow infoWindow = new()
+        {
+            Owner = this,
+            Title = "Audio Source Types",
+            InfoTextBox = { Text = audioSourceTypeInfo },
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+        };
+
+        _ = infoWindow.ShowDialog();
+    }
 }

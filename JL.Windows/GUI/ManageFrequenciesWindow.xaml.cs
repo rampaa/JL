@@ -76,9 +76,33 @@ internal sealed partial class ManageFrequenciesWindow : Window
         {
             DockPanel dockPanel = new();
 
-            var checkBox = new CheckBox { Width = 20, IsChecked = freq.Active, Margin = new Thickness(10) };
-            var buttonIncreasePriority = new Button { Width = 25, Content = "↑", Margin = new Thickness(1) };
-            var buttonDecreasePriority = new Button { Width = 25, Content = "↓", Margin = new Thickness(1) };
+            var checkBox = new CheckBox
+            {
+                Width = 20,
+                IsChecked = freq.Active,
+                Margin = new Thickness(10),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            var buttonIncreasePriority = new Button
+            {
+                Width = 25,
+                Content = "↑",
+                Margin = new Thickness(1),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            var buttonDecreasePriority = new Button
+            {
+                Width = 25,
+                Content = "↓",
+                Margin = new Thickness(1),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
             var priority = new TextBlock
             {
                 Name = "priority",
@@ -92,25 +116,30 @@ internal sealed partial class ManageFrequenciesWindow : Window
             {
                 Width = 177,
                 Text = freq.Name,
+                TextWrapping = TextWrapping.Wrap,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(10)
             };
+
+            bool invalidPath = !Directory.Exists(freq.Path) && !File.Exists(freq.Path);
             var freqPathValidityDisplay = new TextBlock
             {
                 Width = 13,
-                Text = "❌",
-                ToolTip = "Invalid Path",
+                Text = invalidPath ? "❌" : "",
+                ToolTip = invalidPath ? "Invalid Path" : null,
                 Foreground = Brushes.Crimson,
                 Margin = new Thickness(1),
                 VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Right,
-                Visibility = !Directory.Exists(freq.Path) && !File.Exists(freq.Path)
-                    ? Visibility.Visible
-                    : Visibility.Collapsed
+                HorizontalAlignment = HorizontalAlignment.Center,
             };
             var freqPathDisplay = new TextBlock
             {
-                Width = 200,
+                Width = 300,
                 Text = freq.Path,
+                TextWrapping = TextWrapping.Wrap,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(10),
                 Cursor = Cursors.Hand
             };
@@ -124,6 +153,8 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 Width = 75,
                 Height = 30,
                 Content = "Remove",
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Left,
                 Foreground = Brushes.White,
                 Background = Brushes.Red,
                 BorderThickness = new Thickness(1)
@@ -134,6 +165,8 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 Width = 45,
                 Height = 30,
                 Content = "Edit",
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Left,
                 Foreground = Brushes.White,
                 Background = Brushes.DodgerBlue,
                 BorderThickness = new Thickness(1),

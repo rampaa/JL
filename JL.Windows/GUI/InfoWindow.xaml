@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="" MaxHeight="800" MaxWidth="800" ShowInTaskbar="False" Topmost="True" SizeToContent="WidthAndHeight" Background="{DynamicResource RegionBrush}"
+        Title="" MaxHeight="800" MaxWidth="1000" ShowInTaskbar="False" Topmost="True" SizeToContent="WidthAndHeight" Background="{DynamicResource RegionBrush}"
         x:ClassModifier="internal">
     <Grid>
         <TextBox Name="InfoTextBox" Padding="20" FontSize="20" IsReadOnly="true" IsUndoEnabled="False" VerticalScrollBarVisibility="Auto"

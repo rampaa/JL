@@ -70,9 +70,33 @@ internal sealed partial class ManageAudioSourcesWindow : Window
         {
             DockPanel dockPanel = new();
 
-            var checkBox = new CheckBox { Width = 20, IsChecked = audioSource.Active, Margin = new Thickness(10) };
-            var buttonIncreasePriority = new Button { Width = 25, Content = "↑", Margin = new Thickness(1) };
-            var buttonDecreasePriority = new Button { Width = 25, Content = "↓", Margin = new Thickness(1) };
+            var checkBox = new CheckBox
+            {
+                Width = 20,
+                IsChecked = audioSource.Active,
+                Margin = new Thickness(10),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+
+            var buttonIncreasePriority = new Button
+            {
+                Width = 25,
+                Content = "↑",
+                Margin = new Thickness(1),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+
+            var buttonDecreasePriority = new Button
+            {
+                Width = 25,
+                Content = "↓",
+                Margin = new Thickness(1),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+
             var priority = new TextBlock
             {
                 Name = "priority",
@@ -82,16 +106,22 @@ internal sealed partial class ManageAudioSourcesWindow : Window
                 Visibility = Visibility.Collapsed
                 // Margin = new Thickness(10),
             };
+
             var audioSourceTypeDisplay = new TextBlock
             {
                 Width = 60,
                 Text = audioSource.Type.GetDescription(),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(10)
             };
             var audioSourceUriDisplay = new TextBlock
             {
-                Width = 570,
+                Width = 470,
                 Text = uri,
+                TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(10),
                 Cursor = Cursors.Hand
             };
@@ -104,6 +134,8 @@ internal sealed partial class ManageAudioSourcesWindow : Window
                 Width = 75,
                 Height = 30,
                 Content = "Remove",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
                 Foreground = Brushes.White,
                 Background = Brushes.Red,
                 BorderThickness = new Thickness(1)
@@ -114,6 +146,8 @@ internal sealed partial class ManageAudioSourcesWindow : Window
                 Width = 45,
                 Height = 30,
                 Content = "Edit",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
                 Foreground = Brushes.White,
                 Background = Brushes.DodgerBlue,
                 BorderThickness = new Thickness(1),

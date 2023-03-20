@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Background="{DynamicResource RegionBrush}"
-        Title="Add Dictionary" Height="350" Width="650" ResizeMode="NoResize" SizeToContent="Height"
+        Title="Add Dictionary" Height="Auto" Width="660" ResizeMode="NoResize" SizeToContent="Height"
         Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False" x:ClassModifier="internal">
     <Grid>
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,20">
