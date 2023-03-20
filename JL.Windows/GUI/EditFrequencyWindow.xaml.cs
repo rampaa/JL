@@ -35,7 +35,7 @@ internal sealed partial class EditFrequencyWindow : Window
         string path = TextBlockPath.Text;
         if (string.IsNullOrEmpty(path)
             || (!Directory.Exists(path) && !File.Exists(path))
-            || Storage.FreqDicts.Values.Count(dict => dict.Path == path) > 1)
+            || (_freq.Path != path && Storage.FreqDicts.Values.Any(dict => dict.Path == path)))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
             isValid = false;

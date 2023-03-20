@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using JL.Core;
@@ -47,10 +48,18 @@ internal sealed partial class AddAudioSourceWindow : Window
 
         if (type == AudioSourceType.LocalPath)
         {
-            if (Path.IsPathFullyQualified(uri))
+            if (Path.IsPathFullyQualified(uri)
+                && Directory.Exists(Path.GetDirectoryName(uri))
+                && !string.IsNullOrEmpty(Path.GetFileName(uri)))
             {
                 string relativePath = Path.GetRelativePath(Storage.ApplicationPath, uri);
                 uri = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
+
+                if (Storage.AudioSources.ContainsKey(uri))
+                {
+                    TextBlockUri.BorderBrush = Brushes.Red;
+                    isValid = false;
+                }
             }
             else
             {
@@ -84,7 +93,7 @@ internal sealed partial class AddAudioSourceWindow : Window
     private void InfoButton_Click(object sender, RoutedEventArgs e)
     {
         const string audioSourceTypeInfo = @"1) Local files through ""Local Path"" type:
-e.g. C:\Users\User\Desktop\jpod_files\{Term} - {Reading}.mp3
+e.g. C:\Users\User\Desktop\jpod_files\{Reading} - {Term}.mp3
 
 2) URLs returning an audio directly through ""URL"" type:
 e.g. http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={Term}&kana={Reading}

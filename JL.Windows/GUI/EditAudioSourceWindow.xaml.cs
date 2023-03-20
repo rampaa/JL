@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using JL.Core;
@@ -57,10 +58,18 @@ internal sealed partial class EditAudioSourceWindow : Window
 
         if (type == AudioSourceType.LocalPath)
         {
-            if (Path.IsPathFullyQualified(uri))
+            if (Path.IsPathFullyQualified(uri)
+                && Directory.Exists(Path.GetDirectoryName(uri))
+                && !string.IsNullOrEmpty(Path.GetFileName(uri)))
             {
                 string relativePath = Path.GetRelativePath(Storage.ApplicationPath, uri);
                 uri = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
+
+                if (Storage.AudioSources.ContainsKey(uri))
+                {
+                    TextBlockUri.BorderBrush = Brushes.Red;
+                    isValid = false;
+                }
             }
             else
             {
@@ -71,7 +80,7 @@ internal sealed partial class EditAudioSourceWindow : Window
 
         else if (string.IsNullOrEmpty(uri)
             || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "").Replace("{Reading}", ""), UriKind.Absolute)
-            || Storage.AudioSources.Keys.Count(audioSourceUri => audioSourceUri == uri) > 1)
+            || (_uri != uri && Storage.AudioSources.ContainsKey(uri)))
         {
             TextBlockUri.BorderBrush = Brushes.Red;
             isValid = false;

@@ -40,7 +40,7 @@ internal sealed partial class EditDictionaryWindow : Window
         string path = TextBlockPath.Text;
         if (string.IsNullOrEmpty(path)
             || (!Directory.Exists(path) && !File.Exists(path))
-            || Storage.Dicts.Values.Count(dict => dict.Path == path) > 1)
+            || (_dict.Path != path && Storage.Dicts.Values.Any(dict => dict.Path == path)))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
             isValid = false;
