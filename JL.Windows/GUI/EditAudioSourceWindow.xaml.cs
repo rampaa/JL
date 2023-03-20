@@ -65,7 +65,7 @@ internal sealed partial class EditAudioSourceWindow : Window
                 string relativePath = Path.GetRelativePath(Storage.ApplicationPath, uri);
                 uri = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
 
-                if (Storage.AudioSources.ContainsKey(uri))
+                if (_uri != uri && Storage.AudioSources.ContainsKey(uri))
                 {
                     TextBlockUri.BorderBrush = Brushes.Red;
                     isValid = false;
