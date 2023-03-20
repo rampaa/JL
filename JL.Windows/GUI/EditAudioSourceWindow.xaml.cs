@@ -56,7 +56,7 @@ internal sealed partial class EditAudioSourceWindow : Window
 
         string uri = TextBlockUri.Text.Replace("://localhost", "://127.0.0.1");
 
-        if (type == AudioSourceType.LocalPath)
+        if (type is AudioSourceType.LocalPath)
         {
             if (Path.IsPathFullyQualified(uri)
                 && Directory.Exists(Path.GetDirectoryName(uri))
@@ -78,12 +78,15 @@ internal sealed partial class EditAudioSourceWindow : Window
             }
         }
 
-        else if (string.IsNullOrEmpty(uri)
-            || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "").Replace("{Reading}", ""), UriKind.Absolute)
-            || (_uri != uri && Storage.AudioSources.ContainsKey(uri)))
+        else if (_uri != uri)
         {
-            TextBlockUri.BorderBrush = Brushes.Red;
-            isValid = false;
+            if (string.IsNullOrEmpty(uri)
+                || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "").Replace("{Reading}", ""), UriKind.Absolute)
+                || Storage.AudioSources.ContainsKey(uri))
+            {
+                TextBlockUri.BorderBrush = Brushes.Red;
+                isValid = false;
+            }
         }
 
         if (isValid)

@@ -46,7 +46,7 @@ internal sealed partial class AddAudioSourceWindow : Window
 
         string uri = TextBlockUri.Text.Replace("://localhost", "://127.0.0.1");
 
-        if (type == AudioSourceType.LocalPath)
+        if (type is AudioSourceType.LocalPath)
         {
             if (Path.IsPathFullyQualified(uri)
                 && Directory.Exists(Path.GetDirectoryName(uri))

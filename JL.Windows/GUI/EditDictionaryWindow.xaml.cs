@@ -38,27 +38,35 @@ internal sealed partial class EditDictionaryWindow : Window
         bool isValid = true;
 
         string path = TextBlockPath.Text;
-        if (string.IsNullOrEmpty(path)
-            || (!Directory.Exists(path) && !File.Exists(path))
-            || (_dict.Path != path && Storage.Dicts.Values.Any(dict => dict.Path == path)))
+        if (_dict.Path != path)
         {
-            TextBlockPath.BorderBrush = Brushes.Red;
-            isValid = false;
-        }
-        else if (TextBlockPath.BorderBrush == Brushes.Red)
-        {
-            TextBlockPath.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
+            if (string.IsNullOrEmpty(path)
+                || (!Directory.Exists(path) && !File.Exists(path))
+                || Storage.Dicts.Values.Any(dict => dict.Path == path))
+            {
+                TextBlockPath.BorderBrush = Brushes.Red;
+                isValid = false;
+            }
+
+            else if (TextBlockPath.BorderBrush == Brushes.Red)
+            {
+                TextBlockPath.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
+            }
         }
 
         string name = NameTextBox.Text;
-        if (string.IsNullOrEmpty(name) || Storage.Dicts.Values.Count(dict => dict.Name == name) > 1)
+        if (_dict.Name != name)
         {
-            NameTextBox.BorderBrush = Brushes.Red;
-            isValid = false;
-        }
-        else if (NameTextBox.BorderBrush == Brushes.Red)
-        {
-            NameTextBox.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
+            if (string.IsNullOrEmpty(name)
+                || Storage.Dicts.ContainsKey(name))
+            {
+                NameTextBox.BorderBrush = Brushes.Red;
+                isValid = false;
+            }
+            else if (NameTextBox.BorderBrush == Brushes.Red)
+            {
+                NameTextBox.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
+            }
         }
 
         if (isValid)
