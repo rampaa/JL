@@ -231,9 +231,16 @@ internal static class ConfigManager
         AutoHidePopupIfMouseIsNotOverIt = GetValueFromConfig(AutoHidePopupIfMouseIsNotOverIt, nameof(AutoHidePopupIfMouseIsNotOverIt), bool.TryParse);
 
         HorizontallyCenterMainWindowText = GetValueFromConfig(HorizontallyCenterMainWindowText, nameof(HorizontallyCenterMainWindowText), bool.TryParse);
-        mainWindow.MainTextBox.HorizontalContentAlignment = HorizontallyCenterMainWindowText
-            ? HorizontalAlignment.Center
-            : HorizontalAlignment.Left;
+        if (HorizontallyCenterMainWindowText)
+        {
+            mainWindow.MainTextBox.HorizontalAlignment = HorizontalAlignment.Center;
+            mainWindow.MainTextBox.HorizontalContentAlignment = HorizontalAlignment.Center;
+        }
+        else
+        {
+            mainWindow.MainTextBox.HorizontalAlignment = HorizontalAlignment.Left;
+            mainWindow.MainTextBox.HorizontalContentAlignment = HorizontalAlignment.Left;
+        }
 
         HideAllMainWindowButtons = GetValueFromConfig(HideAllMainWindowButtons, nameof(HideAllMainWindowButtons), bool.TryParse);
         mainWindow.ChangeVisibilityOfAllButtons();
