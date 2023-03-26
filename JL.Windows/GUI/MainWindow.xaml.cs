@@ -293,7 +293,8 @@ internal sealed partial class MainWindow : Window
             || FontSizeSlider.IsVisible
             || OpacitySlider.IsVisible
             || FirstPopupWindow.MiningMode
-            || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
+            || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
+            || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current.ImeState is InputMethodState.On))
         {
             return;
         }
@@ -1016,7 +1017,8 @@ internal sealed partial class MainWindow : Window
             && !PreferencesWindow.IsItVisible()
             && !StatsWindow.IsItVisible()
             && !MainTextboxContextMenu.IsVisible
-            && e.LeftButton is MouseButtonState.Released)
+            && e.LeftButton is MouseButtonState.Released
+            && (ConfigManager.TextBoxIsReadOnly || InputMethod.Current.ImeState is not InputMethodState.On))
         {
             if (ConfigManager.TextOnlyVisibleOnHover)
             {
