@@ -1008,7 +1008,8 @@ internal sealed partial class MainWindow : Window
             return;
         }
 
-        if (!FirstPopupWindow.IsVisible
+        if (!FirstPopupWindow.IsMouseOver
+            && !FirstPopupWindow.IsVisible
             && !ManageDictionariesWindow.IsItVisible()
             && !ManageFrequenciesWindow.IsItVisible()
             && !ManageAudioSourcesWindow.IsItVisible()
