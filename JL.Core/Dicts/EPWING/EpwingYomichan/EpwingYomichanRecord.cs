@@ -27,30 +27,20 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFr
             Reading = null;
         }
 
-        DefinitionTags = new List<string>();
-
         JsonElement definitionTagsElement = jsonElement[2];
-        if (definitionTagsElement.ValueKind is JsonValueKind.Array)
+        if (definitionTagsElement.ValueKind is JsonValueKind.String)
         {
-            foreach (JsonElement definitionTag in definitionTagsElement.EnumerateArray())
+            DefinitionTags = new List<string>();
+
+            DefinitionTags = definitionTagsElement.ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            if (DefinitionTags.Count is 0)
             {
-                DefinitionTags.Add(definitionTag.ToString());
+                DefinitionTags = null;
             }
         }
 
-        else //if (definitionTagsElement.ValueKind is JsonValueKind.String)
-        {
-            DefinitionTags = definitionTagsElement.ToString()
-                .Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
-        }
-
-        if (DefinitionTags.Count is 0)
-        {
-            DefinitionTags = null;
-        }
-
-        WordClasses = jsonElement[3].ToString().Split(" ").ToList();
-
+        WordClasses = jsonElement[3].ToString().Split(' ').ToList();
         if (WordClasses.Count is 0)
         {
             WordClasses = null;
@@ -59,32 +49,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFr
         //jsonElement[4].TryGetInt32(out int score);
         //Score = score;
 
-        Definitions = new List<string>();
-
-        JsonElement definitionsArray = jsonElement[5];
-        if (definitionsArray.GetArrayLength() > 1)
-        {
-            foreach (JsonElement definitionElement in jsonElement[5].EnumerateArray())
-            {
-                Definitions.Add(definitionElement.ToString());
-            }
-        }
-
-        else
-        {
-            JsonElement definitionElement = jsonElement[5][0];
-
-            if (definitionElement.ValueKind is JsonValueKind.Object)
-            {
-                definitionElement = definitionElement.GetProperty("content")[0];
-            }
-
-            Definitions = definitionElement.ToString()
-                .Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-                .Select(static s => s.Replace("\\\"", "\""))
-                .ToList();
-        }
-
+        Definitions = GetDefinitionsFromJsonArray(jsonElement[5]);
         if (Definitions.Count is 0)
         {
             Definitions = null;
@@ -164,5 +129,55 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFr
         }
 
         return frequency;
+    }
+
+    private static List<string>? GetDefinitionsFromJsonElement(JsonElement jsonElement)
+    {
+        return jsonElement.ValueKind switch
+        {
+            JsonValueKind.Array => GetDefinitionsFromJsonArray(jsonElement),
+            JsonValueKind.Object => GetDefinitionsFromJsonObject(jsonElement),
+            JsonValueKind.String => GetDefinitionsFromJsonString(jsonElement),
+            JsonValueKind.Number => null,
+            JsonValueKind.Undefined => null,
+            JsonValueKind.True => null,
+            JsonValueKind.False => null,
+            JsonValueKind.Null => null,
+            _ => null
+        };
+    }
+
+    private static List<string> GetDefinitionsFromJsonArray(JsonElement jsonElement)
+    {
+        List<string> definitions = new();
+
+        foreach (JsonElement definitionElement in jsonElement.EnumerateArray())
+        {
+            List<string>? defs = GetDefinitionsFromJsonElement(definitionElement);
+            if (defs is not null)
+            {
+                definitions.AddRange(defs);
+            }
+        }
+
+        return definitions;
+    }
+
+    private static List<string>? GetDefinitionsFromJsonObject(JsonElement jsonElement)
+    {
+        if (jsonElement.TryGetProperty("content", out JsonElement contentElement))
+        {
+            return GetDefinitionsFromJsonElement(contentElement);
+        }
+
+        return null;
+    }
+
+    private static List<string> GetDefinitionsFromJsonString(JsonElement jsonElement)
+    {
+        return jsonElement.ToString()
+            .Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Select(static s => s.Replace("\\\"", "\""))
+            .ToList();
     }
 }
