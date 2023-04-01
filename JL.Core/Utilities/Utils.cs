@@ -279,6 +279,9 @@ public static class Utils
                         freq.Priority = priority;
                         ++priority;
 
+                        string relativePath = Path.GetRelativePath(Storage.ApplicationPath, freq.Path);
+                        freq.Path = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
+
                         Storage.FreqDicts.Add(freq.Name, freq);
                     }
                 }
