@@ -409,26 +409,6 @@ internal sealed partial class MainWindow : Window
         ((TextBlock)sender).Foreground = Brushes.SteelBlue;
     }
 
-    private void MainTextBox_MouseLeave(object sender, MouseEventArgs e)
-    {
-        if (FirstPopupWindow.MiningMode
-            || ConfigManager.LookupOnSelectOnly
-            || ConfigManager.LookupOnLeftClickOnly
-            || ConfigManager.FixedPopupPositioning
-            || FirstPopupWindow is { UnavoidableMouseEnter: true, IsMouseOver: true })
-        {
-            return;
-        }
-
-        FirstPopupWindow.Hide();
-        FirstPopupWindow.LastText = "";
-
-        if (ConfigManager.HighlightLongestMatch && !MainTextboxContextMenu.IsVisible)
-        {
-            WindowsUtils.Unselect(MainTextBox);
-        }
-    }
-
     private void Button_MouseLeave(object sender, MouseEventArgs e)
     {
         ((TextBlock)sender).Foreground = Brushes.White;
@@ -1003,33 +983,36 @@ internal sealed partial class MainWindow : Window
 
     private void Window_MouseLeave(object sender, MouseEventArgs e)
     {
-        if (ConfigManager.InvisibleMode)
+        if (FirstPopupWindow.IsMouseOver
+            || FirstPopupWindow.IsVisible
+            || ManageDictionariesWindow.IsItVisible()
+            || ManageFrequenciesWindow.IsItVisible()
+            || ManageAudioSourcesWindow.IsItVisible()
+            || AddNameWindow.IsItVisible()
+            || AddWordWindow.IsItVisible()
+            || PreferencesWindow.IsItVisible()
+            || StatsWindow.IsItVisible()
+            || MainTextboxContextMenu.IsVisible
+            || e.LeftButton is MouseButtonState.Pressed
+            || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current.ImeState is InputMethodState.On)
+            || ConfigManager.InvisibleMode)
         {
             return;
         }
 
-        if (!FirstPopupWindow.IsMouseOver
-            && !FirstPopupWindow.IsVisible
-            && !ManageDictionariesWindow.IsItVisible()
-            && !ManageFrequenciesWindow.IsItVisible()
-            && !ManageAudioSourcesWindow.IsItVisible()
-            && !AddNameWindow.IsItVisible()
-            && !AddWordWindow.IsItVisible()
-            && !PreferencesWindow.IsItVisible()
-            && !StatsWindow.IsItVisible()
-            && !MainTextboxContextMenu.IsVisible
-            && e.LeftButton is MouseButtonState.Released
-            && (ConfigManager.TextBoxIsReadOnly || InputMethod.Current.ImeState is not InputMethodState.On))
+        if (ConfigManager.TextOnlyVisibleOnHover)
         {
-            if (ConfigManager.TextOnlyVisibleOnHover)
-            {
-                MainGrid.Opacity = 0;
-            }
+            MainGrid.Opacity = 0;
+        }
 
-            if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0)
-            {
-                Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
-            }
+        if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0)
+        {
+            Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
+        }
+
+        if (ConfigManager.HighlightLongestMatch)
+        {
+            WindowsUtils.Unselect(MainTextBox);
         }
     }
 
