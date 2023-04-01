@@ -30,6 +30,11 @@
                 </DockPanel>
 
                 <DockPanel>
+                    <TextBlock Text="Characters per minute: " TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                    <TextBlock Name="TextBlockCharactersPerMinute" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </DockPanel>
+
+                <DockPanel>
                     <TextBlock Text="Cards mined: " TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                     <TextBlock Name="TextBlockCardsMined" TextWrapping="Wrap"
                                        Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
