@@ -4,7 +4,7 @@ using JL.Core.Freqs;
 
 namespace JL.Core.Dicts.EPWING.EpwingNazeka;
 
-internal sealed class EpwingNazekaRecord : IEpwingRecord, IDictRecordWithGetFrequency
+internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
 {
     public string PrimarySpelling { get; }
     public string? Reading { get; }

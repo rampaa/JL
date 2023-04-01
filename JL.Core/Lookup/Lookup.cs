@@ -194,6 +194,7 @@ public static class Lookup
             }
         });
 
+        // Parallel Invoke?
         if (jmdictResults.Count > 0)
         {
             lookupResults.AddRange(BuildJmdictResult(jmdictResults));
@@ -716,6 +717,7 @@ public static class Lookup
     private static IEnumerable<LookupResult> BuildYomichanKanjiResult(
         Dictionary<string, IntermediaryResult> kanjiResults)
     {
+        // Parallel Foreach?
         List<LookupResult> results = new();
 
         foreach (KeyValuePair<string, IntermediaryResult> kanjiResult in kanjiResults.ToList())
@@ -766,6 +768,7 @@ public static class Lookup
     private static IEnumerable<LookupResult> BuildEpwingYomichanResult(
         Dictionary<string, IntermediaryResult> epwingResults)
     {
+        // Parallel Foreach?
         List<LookupResult> results = new();
 
         foreach (IntermediaryResult wordResult in epwingResults.Values.ToList())
@@ -803,6 +806,7 @@ public static class Lookup
     private static IEnumerable<LookupResult> BuildEpwingNazekaResult(
         Dictionary<string, IntermediaryResult> epwingNazekaResults)
     {
+        // Parallel.Foreach?
         List<LookupResult> results = new();
 
         foreach (IntermediaryResult wordResult in epwingNazekaResults.Values.ToList())
@@ -922,7 +926,7 @@ public static class Lookup
         return results;
     }
 
-    private static List<LookupFrequencyResult> GetWordFrequencies(IDictRecordWithGetFrequency record)
+    private static List<LookupFrequencyResult> GetWordFrequencies(IGetFrequency record)
     {
         List<LookupFrequencyResult> freqsList = new();
 

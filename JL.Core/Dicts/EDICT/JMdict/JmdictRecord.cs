@@ -5,7 +5,7 @@ using JL.Core.Freqs;
 
 namespace JL.Core.Dicts.EDICT.JMdict;
 
-internal sealed class JmdictRecord : IDictRecordWithGetFrequency
+internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 {
     public string PrimarySpelling { get; }
     public int Id { get; set; }

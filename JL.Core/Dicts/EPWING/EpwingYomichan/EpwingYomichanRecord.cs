@@ -6,7 +6,7 @@ using JL.Core.Freqs;
 
 namespace JL.Core.Dicts.EPWING.EpwingYomichan;
 
-internal sealed class EpwingYomichanRecord : IEpwingRecord, IDictRecordWithGetFrequency
+internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
 {
     public List<string>? Definitions { get; set; }
     public string? Reading { get; }
