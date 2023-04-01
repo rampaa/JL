@@ -27,7 +27,7 @@
         
         <Rectangle Name="TitleBar" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="15" Margin="5,5,5,5" Opacity="1" Fill="Transparent">
             <Rectangle.ContextMenu>
-                <ContextMenu>
+                <ContextMenu Name="TitleBarContextMenu">
                     <MenuItem
                         Header="Minimize"
                         Click="MinimizeWindow" />

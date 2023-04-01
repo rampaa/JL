@@ -266,6 +266,7 @@ internal static class WindowsUtils
         ManageAudioSourcesWindow manageAudioSourcesWindow = ManageAudioSourcesWindow.Instance;
         manageAudioSourcesWindow.Owner = MainWindow.Instance;
         manageAudioSourcesWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        Storage.StatsStopWatch.Stop();
         _ = manageAudioSourcesWindow.ShowDialog();
     }
 

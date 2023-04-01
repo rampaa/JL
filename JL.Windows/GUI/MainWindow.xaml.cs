@@ -176,7 +176,8 @@ internal sealed partial class MainWindow : Window
             && !AddWordWindow.IsItVisible()
             && !PreferencesWindow.IsItVisible()
             && !StatsWindow.IsItVisible()
-            && !MainTextboxContextMenu.IsVisible)
+            && !MainTextboxContextMenu.IsVisible
+            && !TitleBarContextMenu.IsVisible)
         {
             WinApi.BringToFront(WindowHandle);
         }
@@ -290,6 +291,7 @@ internal sealed partial class MainWindow : Window
         if (ConfigManager.LookupOnSelectOnly
             || ConfigManager.LookupOnLeftClickOnly
             || MainTextboxContextMenu.IsVisible
+            || TitleBarContextMenu.IsVisible
             || FontSizeSlider.IsVisible
             || OpacitySlider.IsVisible
             || FirstPopupWindow.MiningMode
@@ -993,6 +995,7 @@ internal sealed partial class MainWindow : Window
             || PreferencesWindow.IsItVisible()
             || StatsWindow.IsItVisible()
             || MainTextboxContextMenu.IsVisible
+            || TitleBarContextMenu.IsVisible
             || e.LeftButton is MouseButtonState.Pressed
             || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current.ImeState is InputMethodState.On)
             || ConfigManager.InvisibleMode)
