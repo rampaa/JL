@@ -34,7 +34,7 @@ internal static class PopupWindowUtils
 
         if (frequencies.Count is 1 && frequencies[0].Freq is > 0 and not int.MaxValue)
         {
-            freqStr = "#" + frequencies.First().Freq;
+            freqStr = $"#{frequencies.First().Freq}";
         }
 
         else if (frequencies.Count > 1)

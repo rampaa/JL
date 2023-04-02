@@ -64,7 +64,7 @@ public static class Mining
         }
 
         // idk if this gets the right audio for every word
-        string? reading = miningParams.GetValueOrDefault(JLField.Readings)?.Split(",")[0];
+        string? reading = miningParams.GetValueOrDefault(JLField.Readings)?.Split(',')[0];
         if (string.IsNullOrEmpty(reading))
         {
             reading = primarySpelling;

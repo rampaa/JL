@@ -169,7 +169,7 @@ internal sealed partial class PreferencesWindow : Window
         deckNamesSelector.SelectedItem = ankiConfig.DeckName;
         modelNamesComboBox.ItemsSource = new List<string> { ankiConfig.ModelName };
         modelNamesComboBox.SelectedItem = ankiConfig.ModelName;
-        tagTextBox.Text = string.Join(",", ankiConfig.Tags);
+        tagTextBox.Text = string.Join(", ", ankiConfig.Tags);
     }
 
     private async Task PopulateDeckAndModelNames()

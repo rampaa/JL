@@ -165,12 +165,9 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
 
     private static List<string>? GetDefinitionsFromJsonObject(JsonElement jsonElement)
     {
-        if (jsonElement.TryGetProperty("content", out JsonElement contentElement))
-        {
-            return GetDefinitionsFromJsonElement(contentElement);
-        }
-
-        return null;
+        return jsonElement.TryGetProperty("content", out JsonElement contentElement)
+            ? GetDefinitionsFromJsonElement(contentElement)
+            : null;
     }
 
     private static List<string> GetDefinitionsFromJsonString(JsonElement jsonElement)

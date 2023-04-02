@@ -88,7 +88,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
             var buttonIncreasePriority = new Button
             {
                 Width = 25,
-                Content = "↑",
+                Content = '↑',
                 Margin = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center
@@ -97,7 +97,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
             var buttonDecreasePriority = new Button
             {
                 Width = 25,
-                Content = "↓",
+                Content = '↓',
                 Margin = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center
@@ -131,7 +131,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 Foreground = Brushes.Crimson,
                 Margin = new Thickness(1),
                 VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
             };
             var freqPathDisplay = new TextBlock
             {

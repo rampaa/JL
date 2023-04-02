@@ -242,7 +242,7 @@ internal static class JmdictLoader
 
                             if (glossType is not null)
                             {
-                                gloss = "(" + glossType + ".) ";
+                                gloss = $"({glossType}.) ";
                             }
                         }
 

@@ -296,7 +296,7 @@ internal sealed partial class MainWindow : Window
             || OpacitySlider.IsVisible
             || FirstPopupWindow.MiningMode
             || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
-            || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current.ImeState is InputMethodState.On))
+            || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On))
         {
             return;
         }
@@ -991,7 +991,7 @@ internal sealed partial class MainWindow : Window
         if (FirstPopupWindow.MiningMode
             || (FirstPopupWindow.IsMouseOver
                 && (ConfigManager.FixedPopupPositioning
-                    || FirstPopupWindow is { UnavoidableMouseEnter: true, IsMouseOver: true })))
+                    || FirstPopupWindow is { UnavoidableMouseEnter: true })))
         {
             return;
         }
@@ -1011,7 +1011,7 @@ internal sealed partial class MainWindow : Window
             || MainTextboxContextMenu.IsVisible
             || TitleBarContextMenu.IsVisible
             || e.LeftButton is MouseButtonState.Pressed
-            || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current.ImeState is InputMethodState.On)
+            || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On)
             || ConfigManager.InvisibleMode)
         {
             return;

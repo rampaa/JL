@@ -626,7 +626,7 @@ internal sealed partial class PopupWindow : Window
             List<string> alternativeSpellings = result.AlternativeSpellings;
             string alternativeSpellingsText = aOrthographyInfoList.Count > 0 && (result.Dict.Options?.AOrthographyInfo?.Value ?? true)
                 ? PopupWindowUtils.AlternativeSpellingsToText(alternativeSpellings, aOrthographyInfoList)
-                : "(" + string.Join(", ", alternativeSpellings) + ")";
+                : $"({string.Join(", ", alternativeSpellings)})";
 
             if (alternativeSpellingsText is not "")
             {
@@ -1478,7 +1478,7 @@ internal sealed partial class PopupWindow : Window
                 switch (chi.Name)
                 {
                     case nameof(LookupResult.Readings):
-                        reading = chi.Text.Split(",")[0];
+                        reading = chi.Text.Split(',')[0];
                         break;
                 }
             }
@@ -1491,7 +1491,7 @@ internal sealed partial class PopupWindow : Window
                         primarySpelling = ch.Text;
                         break;
                     case nameof(LookupResult.Readings):
-                        reading = ch.Text.Split(",")[0];
+                        reading = ch.Text.Split(',')[0];
                         break;
                 }
             }
@@ -1508,7 +1508,7 @@ internal sealed partial class PopupWindow : Window
                                 primarySpelling = textBlockCg.Text;
                                 break;
                             case nameof(LookupResult.Readings):
-                                reading = textBlockCg.Text.Split(",")[0];
+                                reading = textBlockCg.Text.Split(',')[0];
                                 break;
                         }
                     }
@@ -1517,7 +1517,7 @@ internal sealed partial class PopupWindow : Window
                         switch (textBoxCg.Name)
                         {
                             case nameof(LookupResult.Readings):
-                                reading = textBoxCg.Text.Split(",")[0];
+                                reading = textBoxCg.Text.Split(',')[0];
                                 break;
                         }
                     }

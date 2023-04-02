@@ -76,25 +76,25 @@ internal sealed partial class ManageAudioSourcesWindow : Window
                 IsChecked = audioSource.Active,
                 Margin = new Thickness(10),
                 HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
             };
 
             var buttonIncreasePriority = new Button
             {
                 Width = 25,
-                Content = "↑",
+                Content = '↑',
                 Margin = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
             };
 
             var buttonDecreasePriority = new Button
             {
                 Width = 25,
-                Content = "↓",
+                Content = '↓',
                 Margin = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
             };
 
             var priority = new TextBlock

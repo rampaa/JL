@@ -106,7 +106,7 @@ e.g. http://127.0.0.1:5050/?sources=jpod,jpod_alternate,nhk16,forvo&term={Term}&
             Owner = this,
             Title = "Audio Source Types",
             InfoTextBox = { Text = audioSourceTypeInfo },
-            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen
         };
 
         _ = infoWindow.ShowDialog();

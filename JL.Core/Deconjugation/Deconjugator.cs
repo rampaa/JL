@@ -275,7 +275,7 @@ internal static class Deconjugator
         }
 
         string baseText = myForm.Text[..^myRule.ConEnd.First().Length];
-        return !baseText.EndsWith("さ", StringComparison.Ordinal);
+        return !baseText.EndsWith('さ');
     }
 
     public static HashSet<Form> Deconjugate(string myText, bool useCache = true)

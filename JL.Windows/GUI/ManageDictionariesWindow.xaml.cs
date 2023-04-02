@@ -92,7 +92,7 @@ internal sealed partial class ManageDictionariesWindow : Window
             var buttonIncreasePriority = new Button
             {
                 Width = 25,
-                Content = "↑",
+                Content = '↑',
                 Margin = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center
@@ -101,7 +101,7 @@ internal sealed partial class ManageDictionariesWindow : Window
             var buttonDecreasePriority = new Button
             {
                 Width = 25,
-                Content = "↓",
+                Content = '↓',
                 Margin = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center
@@ -135,7 +135,7 @@ internal sealed partial class ManageDictionariesWindow : Window
                 Foreground = Brushes.Crimson,
                 Margin = new Thickness(1),
                 VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
             };
             var dictPathDisplay = new TextBlock
             {

@@ -595,7 +595,7 @@ internal static class ConfigManager
 
         MainWindow mainWindow = MainWindow.Instance;
 
-        preferenceWindow.JLVersionTextBlock.Text = "v" + Storage.JLVersion;
+        preferenceWindow.JLVersionTextBlock.Text = $"v{Storage.JLVersion}";
 
         preferenceWindow.DisableHotkeysKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(DisableHotkeysKeyGesture);
         preferenceWindow.MiningModeKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(MiningModeKeyGesture);

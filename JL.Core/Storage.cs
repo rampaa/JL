@@ -758,7 +758,7 @@ public static class Storage
 
                 if (lParts.Length is 3)
                 {
-                    int endIndex = lParts[2].IndexOf("[", StringComparison.Ordinal);
+                    int endIndex = lParts[2].IndexOf('[', StringComparison.Ordinal);
 
                     s_kanjiCompositionDict.Add(lParts[1],
                         endIndex is -1 ? lParts[2] : lParts[2][..endIndex]);
@@ -770,7 +770,7 @@ public static class Storage
                     {
                         if (lParts[j].Contains('J'))
                         {
-                            int endIndex = lParts[j].IndexOf("[", StringComparison.Ordinal);
+                            int endIndex = lParts[j].IndexOf('[', StringComparison.Ordinal);
                             if (endIndex is not -1)
                             {
                                 s_kanjiCompositionDict.Add(lParts[1], lParts[j][..endIndex]);

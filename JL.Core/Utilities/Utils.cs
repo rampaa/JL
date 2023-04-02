@@ -345,7 +345,6 @@ public static class Utils
     public static int FindWordBoundary(string text, int position)
     {
         int endPosition = text.Length;
-
         for (int i = position; i < text.Length; i++)
         {
             if (char.IsPunctuation(text[i]) || char.IsWhiteSpace(text[i]))
@@ -360,36 +359,36 @@ public static class Utils
 
     public static string FindSentence(string text, int position)
     {
-        List<string> sentenceTerminatingCharacters = new()
+        List<char> sentenceTerminatingCharacters = new()
         {
-            "。",
-            "！",
-            "？",
-            "…",
-            ".",
-            "!",
-            "?",
-            "\n"
+            '。',
+            '！',
+            '？',
+            '…',
+            '.',
+            '!',
+            '?',
+            '\n'
         };
 
-        Dictionary<string, string> brackets = new() {
-            { "「", "」" },
-            { "『", "』" },
-            { "【", "】" },
-            { "《", "》" },
-            { "〔", "〕" },
-            { "（", "）" },
-            { "［", "］" },
-            { "〈", "〉" },
-            { "｛", "｝" },
-            { "〝", "〟" },
-            { "＂", "＂" },
-            { "＇", "＇" },
-            { "｢", "｣" },
-            { "⟨", "⟩" },
-            { "(", ")" },
-            { "[", "]" },
-            { "{", "}" },
+        Dictionary<char, char> brackets = new() {
+            { '「', '」' },
+            { '『', '』' },
+            { '【', '】' },
+            { '《', '》' },
+            { '〔', '〕' },
+            { '（', '）' },
+            { '［', '］' },
+            { '〈', '〉' },
+            { '｛', '｝' },
+            { '〝', '〟' },
+            { '＂', '＂' },
+            { '＇', '＇' },
+            { '｢', '｣'},
+            { '⟨', '⟩' },
+            { '(', ')' },
+            { '[', ']' },
+            { '{', '}' }
         };
 
         int startPosition = -1;
@@ -397,16 +396,16 @@ public static class Utils
 
         for (int i = 0; i < sentenceTerminatingCharacters.Count; i++)
         {
-            string terminatingCharacter = sentenceTerminatingCharacters[i];
+            char terminatingCharacter = sentenceTerminatingCharacters[i];
 
-            int tempIndex = text.LastIndexOf(terminatingCharacter, position, StringComparison.Ordinal);
+            int tempIndex = text.LastIndexOf(terminatingCharacter, position);
 
             if (tempIndex > startPosition)
             {
                 startPosition = tempIndex;
             }
 
-            tempIndex = text.IndexOf(terminatingCharacter, position, StringComparison.Ordinal);
+            tempIndex = text.IndexOf(terminatingCharacter, position);
 
             if (tempIndex is not -1 && (endPosition is -1 || tempIndex < endPosition))
             {
@@ -427,19 +426,19 @@ public static class Utils
 
         if (sentence.Length > 1)
         {
-            if (brackets.ContainsValue(sentence.First().ToString()))
+            if (brackets.ContainsValue(sentence.First()))
             {
                 sentence = sentence[1..];
             }
 
-            if (brackets.ContainsKey(sentence.LastOrDefault().ToString()))
+            if (brackets.ContainsKey(sentence.LastOrDefault()))
             {
                 sentence = sentence[..^1];
             }
 
-            if (brackets.TryGetValue(sentence.FirstOrDefault().ToString(), out string? rightBracket))
+            if (brackets.TryGetValue(sentence.FirstOrDefault(), out char rightBracket))
             {
-                if (sentence.Last().ToString() == rightBracket)
+                if (sentence.Last() == rightBracket)
                 {
                     sentence = sentence[1..^1];
                 }
@@ -447,10 +446,10 @@ public static class Utils
                 {
                     sentence = sentence[1..];
                 }
-                else if (sentence.Contains(rightBracket))
+                else
                 {
                     int numberOfLeftBrackets = sentence.Count(p => p == sentence[0]);
-                    int numberOfRightBrackets = sentence.Count(p => p == rightBracket[0]);
+                    int numberOfRightBrackets = sentence.Count(p => p == rightBracket);
 
                     if (numberOfLeftBrackets == numberOfRightBrackets + 1)
                     {
@@ -459,17 +458,17 @@ public static class Utils
                 }
             }
 
-            else if (brackets.ContainsValue(sentence.LastOrDefault().ToString()))
+            else if (brackets.ContainsValue(sentence.LastOrDefault()))
             {
-                string leftBrackets = brackets.First(p => p.Value == sentence.Last().ToString()).Key;
+                char leftBracket = brackets.First(p => p.Value == sentence.Last()).Key;
 
-                if (!sentence.Contains(leftBrackets))
+                if (!sentence.Contains(leftBracket))
                 {
                     sentence = sentence[..^1];
                 }
-                else if (sentence.Contains(leftBrackets))
+                else
                 {
-                    int numberOfLeftBrackets = sentence.Count(p => p == leftBrackets[0]);
+                    int numberOfLeftBrackets = sentence.Count(p => p == leftBracket);
                     int numberOfRightBrackets = sentence.Count(p => p == sentence.Last());
 
                     if (numberOfRightBrackets == numberOfLeftBrackets + 1)

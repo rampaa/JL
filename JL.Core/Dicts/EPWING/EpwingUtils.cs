@@ -6,11 +6,9 @@ internal static class EpwingUtils
 {
     public static bool IsValidEpwingResultForDictType(IEpwingRecord epwingRecord, Dict dict)
     {
-        string[] badCharacters = { "�", "(", "=", "＝", "［", "〔", "「", "『", "（", "【", "[" };
-
-        foreach (string badCharacter in badCharacters)
+        foreach (char c in epwingRecord.PrimarySpelling)
         {
-            if (epwingRecord.PrimarySpelling.Contains(badCharacter))
+            if (c is '�' || char.IsPunctuation(c) || char.IsWhiteSpace(c))
             {
                 return false;
             }
