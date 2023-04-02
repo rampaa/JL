@@ -981,10 +981,24 @@ internal sealed partial class MainWindow : Window
 
         AddNameMenuItem.IsEnabled = Storage.DictsReady;
         AddWordMenuItem.IsEnabled = Storage.DictsReady;
+
+        FirstPopupWindow.Hide();
+        FirstPopupWindow.LastText = "";
     }
 
     private void Window_MouseLeave(object sender, MouseEventArgs e)
     {
+        if (FirstPopupWindow.MiningMode
+            || (FirstPopupWindow.IsMouseOver
+                && (ConfigManager.FixedPopupPositioning
+                    || FirstPopupWindow is { UnavoidableMouseEnter: true, IsMouseOver: true })))
+        {
+            return;
+        }
+
+        FirstPopupWindow.Hide();
+        FirstPopupWindow.LastText = "";
+
         if (FirstPopupWindow.IsMouseOver
             || FirstPopupWindow.IsVisible
             || ManageDictionariesWindow.IsItVisible()
