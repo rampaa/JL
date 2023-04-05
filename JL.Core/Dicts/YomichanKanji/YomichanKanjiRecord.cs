@@ -14,55 +14,41 @@ internal sealed class YomichanKanjiRecord : IDictRecord
 
     public YomichanKanjiRecord(IReadOnlyList<JsonElement> jsonElement)
     {
-        OnReadings = jsonElement[1].ToString().Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
+        OnReadings = jsonElement[1].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
         if (OnReadings.Count is 0)
         {
             OnReadings = null;
         }
 
-        KunReadings = jsonElement[2].ToString().Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
+        KunReadings = jsonElement[2].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
         if (KunReadings.Count is 0)
         {
             KunReadings = null;
         }
 
-        //Tags = jsonElement[3].ToString().Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
+        //Tags = jsonElement[3].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
         //if (Tags.Count is 0)
         //{
         //    Tags = null;
         //}
 
         JsonElement definitionsArray = jsonElement[4];
-        if (definitionsArray.ValueKind is JsonValueKind.Array)
+        Definitions = new List<string>();
+        foreach (JsonElement definition in definitionsArray.EnumerateArray())
         {
-            Definitions = new List<string>();
-            foreach (JsonElement definition in definitionsArray.EnumerateArray())
-            {
-                Definitions.Add(definition.ToString());
-            }
+            Definitions.Add(definition.ToString());
+        }
 
-            if (Definitions.Count is 0)
-            {
-                Definitions = null;
-            }
+        if (Definitions.Count is 0)
+        {
+            Definitions = null;
         }
 
         JsonElement statsElement = jsonElement[5];
         Stats = new List<string>();
-        if (statsElement.ValueKind is JsonValueKind.Array)
+        foreach (JsonProperty stat in statsElement.EnumerateObject())
         {
-            foreach (JsonElement stat in statsElement.EnumerateArray())
-            {
-                Stats.Add(stat.ToString());
-            }
-        }
-
-        else if (statsElement.ValueKind is JsonValueKind.Object)
-        {
-            foreach (JsonProperty stat in statsElement.EnumerateObject())
-            {
-                Stats.Add(stat.Name + ": " + stat.Value);
-            }
+            Stats.Add($"{stat.Name}: {stat.Value}");
         }
 
         if (Stats.Count is 0)
