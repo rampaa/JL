@@ -294,8 +294,8 @@ internal sealed partial class PopupWindow : Window
         double mouseX = cursorPosition.X / WindowsUtils.Dpi.DpiScaleX;
         double mouseY = cursorPosition.Y / WindowsUtils.Dpi.DpiScaleY;
 
-        bool needsFlipX = ConfigManager.PopupFlipX && mouseX + Width > WindowsUtils.DpiAwareWorkAreaWidth;
-        bool needsFlipY = ConfigManager.PopupFlipY && mouseY + Height > WindowsUtils.DpiAwareWorkAreaHeight;
+        bool needsFlipX = ConfigManager.PopupFlipX && mouseX + Width > WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth;
+        bool needsFlipY = ConfigManager.PopupFlipY && mouseY + Height > WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight;
 
         double newLeft;
         double newTop;
@@ -306,9 +306,9 @@ internal sealed partial class PopupWindow : Window
         {
             // flip Leftwards while preventing -OOB
             newLeft = mouseX - (Width + (WindowsUtils.DpiAwareXOffset / 2));
-            if (newLeft < 0)
+            if (newLeft < WindowsUtils.ActiveScreen.Bounds.X)
             {
-                newLeft = 0;
+                newLeft = WindowsUtils.ActiveScreen.Bounds.X;
             }
         }
         else
@@ -321,9 +321,9 @@ internal sealed partial class PopupWindow : Window
         {
             // flip Upwards while preventing -OOB
             newTop = mouseY - (Height + (WindowsUtils.DpiAwareYOffset / 2));
-            if (newTop < 0)
+            if (newTop < WindowsUtils.ActiveScreen.Bounds.Y)
             {
-                newTop = 0;
+                newTop = WindowsUtils.ActiveScreen.Bounds.Y;
             }
         }
         else
@@ -333,14 +333,14 @@ internal sealed partial class PopupWindow : Window
         }
 
         // stick to edges if +OOB
-        if (newLeft + Width > WindowsUtils.DpiAwareWorkAreaWidth)
+        if (newLeft + Width > WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth)
         {
-            newLeft = WindowsUtils.DpiAwareWorkAreaWidth - Width;
+            newLeft = WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth - Width;
         }
 
-        if (newTop + Height > WindowsUtils.DpiAwareWorkAreaHeight)
+        if (newTop + Height > WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight)
         {
-            newTop = WindowsUtils.DpiAwareWorkAreaHeight - Height;
+            newTop = WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight - Height;
         }
 
         if (mouseX >= newLeft && mouseX <= newLeft + Width && mouseY >= newTop && mouseY <= newTop + Height)

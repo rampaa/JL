@@ -884,6 +884,8 @@ internal sealed partial class MainWindow : Window
     {
         WindowsUtils.Dpi = e.NewDpi;
         WindowsUtils.ActiveScreen = System.Windows.Forms.Screen.FromHandle(WindowHandle);
+        PreferencesWindow.Instance.PopupMaxHeightNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Height;
+        PreferencesWindow.Instance.PopupMaxWidthNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;
         WindowsUtils.DpiAwareWorkAreaWidth = WindowsUtils.ActiveScreen.Bounds.Width / e.NewDpi.DpiScaleX;
         WindowsUtils.DpiAwareWorkAreaHeight = WindowsUtils.ActiveScreen.Bounds.Height / e.NewDpi.DpiScaleY;
         WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / e.NewDpi.DpiScaleX;
@@ -1068,6 +1070,25 @@ internal sealed partial class MainWindow : Window
         else
         {
             Storage.StatsStopWatch.Start();
+        }
+    }
+
+    private void Window_LocationChanged(object sender, EventArgs e)
+    {
+        System.Windows.Forms.Screen newScreen = System.Windows.Forms.Screen.FromHandle(WindowHandle);
+
+        if (WindowsUtils.ActiveScreen.DeviceName != newScreen.DeviceName)
+        {
+            WindowsUtils.ActiveScreen = System.Windows.Forms.Screen.FromHandle(WindowHandle);
+            WindowsUtils.Dpi = VisualTreeHelper.GetDpi(this);
+            WindowsUtils.DpiAwareWorkAreaWidth = WindowsUtils.ActiveScreen.Bounds.Width / WindowsUtils.Dpi.DpiScaleX;
+            WindowsUtils.DpiAwareWorkAreaHeight = WindowsUtils.ActiveScreen.Bounds.Height / WindowsUtils.Dpi.DpiScaleY;
+            WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
+            WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
+            WindowsUtils.DpiAwareFixedPopupXPosition = ConfigManager.FixedPopupXPosition / WindowsUtils.Dpi.DpiScaleX;
+            WindowsUtils.DpiAwareFixedPopupYPosition = ConfigManager.FixedPopupYPosition / WindowsUtils.Dpi.DpiScaleY;
+            WindowsUtils.DpiAwarePopupMaxWidth = ConfigManager.PopupMaxWidth / WindowsUtils.Dpi.DpiScaleX;
+            WindowsUtils.DpiAwarePopupMaxHeight = ConfigManager.PopupMaxHeight / WindowsUtils.Dpi.DpiScaleY;
         }
     }
 }
