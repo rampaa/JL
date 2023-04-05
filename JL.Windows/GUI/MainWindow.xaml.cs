@@ -850,8 +850,6 @@ internal sealed partial class MainWindow : Window
             Height = (int)Math.Round(HeightBeforeResolutionChange / ratioY);
             HeightBeforeResolutionChange = Height;
 
-            PreferencesWindow.Instance.PopupMaxHeightNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Height;
-            PreferencesWindow.Instance.PopupMaxWidthNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;
             ConfigManager.PopupMaxHeight = (int)Math.Round(ConfigManager.PopupMaxHeight / ratioY);
             ConfigManager.PopupMaxWidth = (int)Math.Round(ConfigManager.PopupMaxWidth / ratioX);
             WindowsUtils.DpiAwarePopupMaxHeight = ConfigManager.PopupMaxHeight / WindowsUtils.Dpi.DpiScaleY;
@@ -884,8 +882,6 @@ internal sealed partial class MainWindow : Window
     {
         WindowsUtils.Dpi = e.NewDpi;
         WindowsUtils.ActiveScreen = System.Windows.Forms.Screen.FromHandle(WindowHandle);
-        PreferencesWindow.Instance.PopupMaxHeightNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Height;
-        PreferencesWindow.Instance.PopupMaxWidthNumericUpDown.Maximum = WindowsUtils.ActiveScreen.Bounds.Width;
         WindowsUtils.DpiAwareWorkAreaWidth = WindowsUtils.ActiveScreen.Bounds.Width / e.NewDpi.DpiScaleX;
         WindowsUtils.DpiAwareWorkAreaHeight = WindowsUtils.ActiveScreen.Bounds.Height / e.NewDpi.DpiScaleY;
         WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / e.NewDpi.DpiScaleX;
@@ -927,14 +923,6 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    //private void Resize(object sender, DragDeltaEventArgs e)
-    //{
-    //Left += e.HorizontalChange;
-    //Top += e.VerticalChange;
-    //            WindowResizer.SetWindowPos(_windowResizer.windowHandle, IntPtr.Zero, Convert.ToInt32(Left + e.HorizontalChange), Convert.ToInt32(Top + e.VerticalChange), Convert.ToInt32(Width), Convert.ToInt32(Height),
-    //WindowResizer.SetWindowPosFlags.SWP_SHOWWINDOW | WindowResizer.SetWindowPosFlags.SWP_NOREDRAW);
-    //}
-
     private void ResizeWindow(object sender, MouseButtonEventArgs e)
     {
         WinApi.ResizeWindow(WindowHandle, ((Border)sender).Name);
@@ -944,22 +932,6 @@ internal sealed partial class MainWindow : Window
         HeightBeforeResolutionChange = Height;
         WidthBeforeResolutionChange = Width;
     }
-
-    //public bool IsMouseOnTitleBar(int lParam)
-    //{
-    //    int x = lParam << 16 >> 16;
-    //    int y = lParam >> 16;
-    //    Point cursorPoint = PointFromScreen(new Point(x, y));
-
-    //    HitTestResult? hitTestResult = VisualTreeHelper.HitTest(this, cursorPoint);
-
-    //    if (hitTestResult is not null)
-    //    {
-    //        return hitTestResult.VisualHit == TitleBar;
-    //    }
-
-    //    return false;
-    //}
 
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
