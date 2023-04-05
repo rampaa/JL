@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         mc:Ignorable="d"
-        Title="PopupWindow"
+        Title="PopupWindow" ContextMenuOpening="Window_ContextMenuOpening" PreviewMouseDown="Window_PreviewMouseDown"
         Width="Auto" Height="Auto" SizeToContent="Height" MaxWidth="700" MaxHeight="520"
         Topmost="True" WindowStyle="None" AllowsTransparency="true" ShowInTaskbar="False"
         KeyDown="Window_KeyDown" Closing="Window_Closing" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave"

@@ -1578,10 +1578,6 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        //if (ConfigManager.RequireLookupKeyPress
-        //    && !Keyboard.Modifiers.HasFlag(ConfigManager.LookupKey))
-        //    return;
-
         ChildPopupWindow ??= new PopupWindow { Owner = this };
 
         if (ConfigManager.LookupOnSelectOnly)
@@ -1617,10 +1613,7 @@ internal sealed partial class PopupWindow : Window
 
     private void OnMouseLeave(object sender, MouseEventArgs e)
     {
-        if (!ConfigManager.LookupOnSelectOnly
-            && !ConfigManager.LookupOnLeftClickOnly
-            && !ConfigManager.FixedPopupPositioning
-            && ChildPopupWindow is { MiningMode: false, UnavoidableMouseEnter: false })
+        if (ChildPopupWindow is { MiningMode: false, UnavoidableMouseEnter: false })
         {
             ChildPopupWindow.Hide();
             ChildPopupWindow.LastText = "";
@@ -1669,17 +1662,6 @@ internal sealed partial class PopupWindow : Window
         popupWindow.ResultStackPanels.Clear();
         popupWindow.DisplayResults(true);
     }
-
-    //private void Window_Deactivated(object sender, EventArgs e)
-    //{
-    //    if (!IsKeyboardFocusWithin && (!ChildPopupWindow?.IsVisible ?? true))
-    //        MainWindow.Instance.FocusEllipse.Fill = Brushes.Transparent;
-    //}
-
-    //private void Window_Activated(object sender, EventArgs e)
-    //{
-    //    MainWindow.Instance.FocusEllipse.Fill = Brushes.Green;
-    //}
 
     private void GenerateDictTypeButtons()
     {
@@ -1766,6 +1748,36 @@ internal sealed partial class PopupWindow : Window
         if (!(bool)e.NewValue)
         {
             PopupAutoHideTimer.Start();
+        }
+    }
+
+    private void Window_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+    {
+        if (ChildPopupWindow is { MiningMode: false })
+        {
+            ChildPopupWindow.Hide();
+            ChildPopupWindow.LastText = "";
+        }
+    }
+
+    private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.MiddleButton is not MouseButtonState.Pressed)
+        {
+            PopupWindow? childPopupWindow = ChildPopupWindow;
+
+            while (childPopupWindow != null)
+            {
+                childPopupWindow.MiningMode = false;
+                childPopupWindow.TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
+                childPopupWindow.ItemsControlButtons.Visibility = Visibility.Collapsed;
+                childPopupWindow.PopUpScrollViewer.ScrollToTop();
+                childPopupWindow.Hide();
+
+                childPopupWindow = childPopupWindow.ChildPopupWindow;
+            }
+
+            e.Handled = true;
         }
     }
 }
