@@ -419,7 +419,9 @@ internal sealed partial class PreferencesWindow : Window
     {
         if (Uri.IsWellFormedUriString(AnkiUriTextBox.Text, UriKind.Absolute))
         {
-            CoreConfig.AnkiConnectUri = new Uri(AnkiUriTextBox.Text);
+            string normalizedUrl = AnkiUriTextBox.Text.Replace("://localhost", "://127.0.0.1");
+            CoreConfig.AnkiConnectUri = new Uri(normalizedUrl);
+            AnkiUriTextBox.Text = normalizedUrl;
         }
 
         else
