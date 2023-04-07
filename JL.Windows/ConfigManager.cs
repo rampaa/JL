@@ -457,14 +457,18 @@ internal static class ConfigManager
             {
                 AddToConfig(nameof(SearchUrl), SearchUrl);
             }
-            else if (!Uri.IsWellFormedUriString(searchUrlStr.Replace("{SearchTerm}", ""), UriKind.Absolute))
-            {
-                Utils.Logger.Warning("Couldn't save Search URL, invalid URL");
-                Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save Search URL, invalid URL");
-            }
             else
             {
-                SearchUrl = searchUrlStr;
+                searchUrlStr = searchUrlStr.Replace("://localhost", "://127.0.0.1");
+                if (!Uri.IsWellFormedUriString(searchUrlStr.Replace("{SearchTerm}", ""), UriKind.Absolute))
+                {
+                    Utils.Logger.Warning("Couldn't save Search URL, invalid URL");
+                    Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save Search URL, invalid URL");
+                }
+                else
+                {
+                    SearchUrl = searchUrlStr;
+                }
             }
         }
 
