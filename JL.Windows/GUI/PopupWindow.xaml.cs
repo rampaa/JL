@@ -196,6 +196,11 @@ internal sealed partial class PopupWindow : Window
                 {
                     EnableMiningMode();
                     DisplayResults(true, text);
+
+                    if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
+                    {
+                        PopupWindowUtils.SetPopupAutoHideTimer();
+                    }
                 }
 
                 else
@@ -265,6 +270,11 @@ internal sealed partial class PopupWindow : Window
             _lastLookupResults = lookupResults;
             EnableMiningMode();
             DisplayResults(true, tb.SelectedText);
+
+            if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
+            {
+                PopupWindowUtils.SetPopupAutoHideTimer();
+            }
 
             Show();
             _ = tb.Focus();
@@ -1278,6 +1288,11 @@ internal sealed partial class PopupWindow : Window
 
             ResultStackPanels.Clear();
             DisplayResults(true);
+
+            if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
+            {
+                PopupWindowUtils.SetPopupAutoHideTimer();
+            }
         }
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.PlayAudioKeyGesture))
         {
@@ -1448,11 +1463,6 @@ internal sealed partial class PopupWindow : Window
         ItemsControlButtons.Visibility = Visibility.Visible;
 
         PopUpScrollViewer.ScrollToTop();
-
-        if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
-        {
-            PopupWindowUtils.SetPopupAutoHideTimer();
-        }
     }
 
     private async Task PlayAudio()
@@ -1661,6 +1671,11 @@ internal sealed partial class PopupWindow : Window
         WinApi.BringToFront(popupWindow._windowHandle);
         popupWindow.ResultStackPanels.Clear();
         popupWindow.DisplayResults(true);
+
+        if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
+        {
+            PopupWindowUtils.SetPopupAutoHideTimer();
+        }
     }
 
     private void GenerateDictTypeButtons()
@@ -1776,8 +1791,6 @@ internal sealed partial class PopupWindow : Window
 
                 childPopupWindow = childPopupWindow.ChildPopupWindow;
             }
-
-            e.Handled = true;
         }
     }
 }

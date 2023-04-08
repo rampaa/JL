@@ -323,6 +323,11 @@ internal sealed partial class MainWindow : Window
 
     private void ShowPreviousBacklogItem()
     {
+        if (FirstPopupWindow.MiningMode)
+        {
+            return;
+        }
+
         if (_currentTextIndex > 0)
         {
             --_currentTextIndex;
