@@ -1659,6 +1659,11 @@ internal sealed partial class PopupWindow : Window
         Hide();
         LastText = "";
 
+        if (Owner == MainWindow.Instance)
+        {
+            MainWindow.Instance.Window_MouseLeave(null, null);
+        }
+
         if (ConfigManager.HighlightLongestMatch && !PopupContextMenu.IsVisible)
         {
             WindowsUtils.Unselect(_lastTextBox);

@@ -965,9 +965,10 @@ internal sealed partial class MainWindow : Window
         FirstPopupWindow.LastText = "";
     }
 
-    private void Window_MouseLeave(object sender, MouseEventArgs e)
+    public void Window_MouseLeave(object? sender, MouseEventArgs? e)
     {
-        if (FirstPopupWindow.MiningMode
+        if (IsMouseOver
+            || FirstPopupWindow.MiningMode
             || (FirstPopupWindow.IsMouseOver
                 && (ConfigManager.FixedPopupPositioning
                     || FirstPopupWindow is { UnavoidableMouseEnter: true })))
@@ -989,7 +990,7 @@ internal sealed partial class MainWindow : Window
             || StatsWindow.IsItVisible()
             || MainTextboxContextMenu.IsVisible
             || TitleBarContextMenu.IsVisible
-            || e.LeftButton is MouseButtonState.Pressed
+            || e?.LeftButton is MouseButtonState.Pressed
             || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On)
             || ConfigManager.InvisibleMode)
         {
