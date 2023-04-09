@@ -594,6 +594,8 @@ internal sealed partial class MainWindow : Window
             FirstPopupWindow.PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
             FirstPopupWindow.Hide();
             PopupWindow.PopupAutoHideTimer.Stop();
+
+            ChangeVisibility();
         }
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowStatsKeyGesture))
@@ -965,7 +967,25 @@ internal sealed partial class MainWindow : Window
         FirstPopupWindow.LastText = "";
     }
 
-    public void Window_MouseLeave(object? sender, MouseEventArgs? e)
+    public void ChangeVisibility()
+    {
+        if (IsMouseOver || ConfigManager.InvisibleMode)
+        {
+            return;
+        }
+
+        if (ConfigManager.TextOnlyVisibleOnHover)
+        {
+            MainGrid.Opacity = 0;
+        }
+
+        if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0)
+        {
+            Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
+        }
+    }
+
+    private void Window_MouseLeave(object sender, MouseEventArgs e)
     {
         if (IsMouseOver
             || FirstPopupWindow.MiningMode
@@ -990,7 +1010,7 @@ internal sealed partial class MainWindow : Window
             || StatsWindow.IsItVisible()
             || MainTextboxContextMenu.IsVisible
             || TitleBarContextMenu.IsVisible
-            || e?.LeftButton is MouseButtonState.Pressed
+            || e.LeftButton is MouseButtonState.Pressed
             || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On)
             || ConfigManager.InvisibleMode)
         {

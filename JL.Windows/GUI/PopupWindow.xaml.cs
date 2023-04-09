@@ -1316,6 +1316,11 @@ internal sealed partial class PopupWindow : Window
             Hide();
 
             PopupAutoHideTimer.Stop();
+
+            if (Owner == MainWindow.Instance)
+            {
+                MainWindow.Instance.ChangeVisibility();
+            }
         }
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.KanjiModeKeyGesture))
         {
@@ -1661,7 +1666,7 @@ internal sealed partial class PopupWindow : Window
 
         if (Owner == MainWindow.Instance)
         {
-            MainWindow.Instance.Window_MouseLeave(null, null);
+            MainWindow.Instance.ChangeVisibility();
         }
 
         if (ConfigManager.HighlightLongestMatch && !PopupContextMenu.IsVisible)
