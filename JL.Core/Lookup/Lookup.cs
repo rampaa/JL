@@ -21,10 +21,7 @@ public static class Lookup
 {
     private static DateTime s_lastLookupTime;
 
-    // public static readonly LRUCache<string, List<LookupResult>?> LookupResultCache = new(
-    //     Storage.CacheSize, Storage.CacheSize / 8);
-
-    public static List<LookupResult>? LookupText(string text) //, bool useCache = true
+    public static List<LookupResult>? LookupText(string text)
     {
         DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
         if ((preciseTimeNow - s_lastLookupTime).TotalMilliseconds < CoreConfig.LookupRate)
@@ -34,14 +31,11 @@ public static class Lookup
 
         s_lastLookupTime = preciseTimeNow;
 
-        // if (useCache && LookupResultCache.TryGet(text, out List<LookupResult>? data))
-        //     return data;
-
         List<LookupResult> lookupResults = new();
 
         if (CoreConfig.KanjiMode)
         {
-            foreach (Dict dict in Storage.Dicts.Values)
+            _ = Parallel.ForEach(Storage.Dicts.Values.ToList(), dict =>
             {
                 if (dict.Active)
                 {
@@ -63,7 +57,7 @@ public static class Lookup
                         }
                     }
                 }
-            }
+            });
 
             return lookupResults.Count > 0
                 ? SortLookupResults(lookupResults)
@@ -72,12 +66,12 @@ public static class Lookup
 
         Dictionary<string, IntermediaryResult> jmdictResults = new();
         Dictionary<string, IntermediaryResult> jmnedictResults = new();
-        ConcurrentBag<Dictionary<string, IntermediaryResult>> epwingYomichanWordResultsList = new();
-        ConcurrentBag<Dictionary<string, IntermediaryResult>> epwingYomichanKanjiResultsList = new();
-        ConcurrentBag<Dictionary<string, IntermediaryResult>> epwingYomichanNameResultsList = new();
-        ConcurrentBag<Dictionary<string, IntermediaryResult>> epwingNazekaWordResultsList = new();
-        ConcurrentBag<Dictionary<string, IntermediaryResult>> epwingNazekaKanjiResultsList = new();
-        ConcurrentBag<Dictionary<string, IntermediaryResult>> epwingNazekaNameResultsList = new();
+        ConcurrentQueue<Dictionary<string, IntermediaryResult>> epwingYomichanWordResultsList = new();
+        ConcurrentQueue<Dictionary<string, IntermediaryResult>> epwingYomichanKanjiResultsList = new();
+        ConcurrentQueue<Dictionary<string, IntermediaryResult>> epwingYomichanNameResultsList = new();
+        ConcurrentQueue<Dictionary<string, IntermediaryResult>> epwingNazekaWordResultsList = new();
+        ConcurrentQueue<Dictionary<string, IntermediaryResult>> epwingNazekaKanjiResultsList = new();
+        ConcurrentQueue<Dictionary<string, IntermediaryResult>> epwingNazekaNameResultsList = new();
         Dictionary<string, IntermediaryResult> kanjidicResults = new();
         Dictionary<string, IntermediaryResult> customWordResults = new();
         Dictionary<string, IntermediaryResult> customNameResults = new();
@@ -125,7 +119,7 @@ public static class Lookup
                     case DictType.KanjigenYomichan:
                         // Template-wise, Kanjigen is a word dictionary that's why its results are put into Yomichan Word Results
                         // Content-wise though it's a kanji dictionary, that's why GetKanjiResults is being used for the lookup
-                        epwingYomichanWordResultsList.Add(GetKanjiResults(text, dict));
+                        epwingYomichanWordResultsList.Enqueue(GetKanjiResults(text, dict));
                         break;
 
                     case DictType.CustomWordDictionary:
@@ -138,11 +132,11 @@ public static class Lookup
                         break;
 
                     case DictType.NonspecificKanjiYomichan:
-                        epwingYomichanKanjiResultsList.Add(GetKanjiResults(text, dict));
+                        epwingYomichanKanjiResultsList.Enqueue(GetKanjiResults(text, dict));
                         break;
 
                     case DictType.NonspecificNameYomichan:
-                        epwingYomichanNameResultsList.Add(GetNameResults(textList, textInHiraganaList, dict));
+                        epwingYomichanNameResultsList.Enqueue(GetNameResults(textList, textInHiraganaList, dict));
                         break;
 
                     case DictType.Kenkyuusha:
@@ -165,16 +159,16 @@ public static class Lookup
                     case DictType.KireiCakeYomichan:
                     case DictType.NonspecificWordYomichan:
                     case DictType.NonspecificYomichan:
-                        epwingYomichanWordResultsList.Add(GetWordResults(textList, textInHiraganaList,
+                        epwingYomichanWordResultsList.Enqueue(GetWordResults(textList, textInHiraganaList,
                             deconjugationResultsList, dict));
                         break;
 
                     case DictType.NonspecificKanjiNazeka:
-                        epwingNazekaKanjiResultsList.Add(GetNameResults(textList, textInHiraganaList, dict));
+                        epwingNazekaKanjiResultsList.Enqueue(GetNameResults(textList, textInHiraganaList, dict));
                         break;
 
                     case DictType.NonspecificNameNazeka:
-                        epwingNazekaNameResultsList.Add(GetNameResults(textList, textInHiraganaList, dict));
+                        epwingNazekaNameResultsList.Enqueue(GetNameResults(textList, textInHiraganaList, dict));
                         break;
 
                     case DictType.DaijirinNazeka:
@@ -182,7 +176,7 @@ public static class Lookup
                     case DictType.ShinmeikaiNazeka:
                     case DictType.NonspecificWordNazeka:
                     case DictType.NonspecificNazeka:
-                        epwingNazekaWordResultsList.Add(GetWordResults(textList, textInHiraganaList, deconjugationResultsList, dict));
+                        epwingNazekaWordResultsList.Enqueue(GetWordResults(textList, textInHiraganaList, deconjugationResultsList, dict));
                         break;
 
                     case DictType.PitchAccentYomichan:
@@ -194,7 +188,6 @@ public static class Lookup
             }
         });
 
-        // Parallel Invoke?
         if (jmdictResults.Count > 0)
         {
             lookupResults.AddRange(BuildJmdictResult(jmdictResults));
@@ -250,15 +243,9 @@ public static class Lookup
             lookupResults.AddRange(BuildEpwingNazekaResult(result));
         }
 
-        if (lookupResults.Count > 0)
-        {
-            lookupResults = SortLookupResults(lookupResults);
-        }
-
-        // if (useCache)
-        //     LookupResultCache.AddReplace(text, lookupResults.ToList());
-
-        return lookupResults;
+        return lookupResults.Count > 0
+            ? SortLookupResults(lookupResults)
+            : null;
     }
 
     private static List<LookupResult> SortLookupResults(IReadOnlyCollection<LookupResult> lookupResults)
@@ -556,9 +543,9 @@ public static class Lookup
     private static IEnumerable<LookupResult> BuildJmdictResult(
         Dictionary<string, IntermediaryResult> jmdictResults)
     {
-        List<LookupResult> results = new();
+        ConcurrentQueue<LookupResult> results = new();
 
-        foreach (IntermediaryResult wordResult in jmdictResults.Values.ToList())
+        _ = Parallel.ForEach(jmdictResults.Values.ToList(), wordResult =>
         {
             int resultsListCount = wordResult.Results.Count;
             for (int i = 0; i < resultsListCount; i++)
@@ -615,10 +602,10 @@ public static class Lookup
                         formattedDefinitions: jMDictResult.BuildFormattedDefinition(wordResult.Dict.Options)
                     );
 
-                    results.Add(result);
+                    results.Enqueue(result);
                 }
             }
-        }
+        });
 
         return results;
     }
@@ -626,9 +613,9 @@ public static class Lookup
     private static IEnumerable<LookupResult> BuildJmnedictResult(
         Dictionary<string, IntermediaryResult> jmnedictResults)
     {
-        List<LookupResult> results = new();
+        ConcurrentQueue<LookupResult> results = new();
 
-        foreach (IntermediaryResult nameResult in jmnedictResults.Values.ToList())
+        _ = Parallel.ForEach(jmnedictResults.Values.ToList(), nameResult =>
         {
             int resultsListCount = nameResult.Results.Count;
             for (int i = 0; i < resultsListCount; i++)
@@ -651,10 +638,10 @@ public static class Lookup
                         formattedDefinitions: jmnedictRecord.BuildFormattedDefinition()
                     );
 
-                    results.Add(result);
+                    results.Enqueue(result);
                 }
             }
-        }
+        });
 
         return results;
     }
@@ -717,10 +704,9 @@ public static class Lookup
     private static IEnumerable<LookupResult> BuildYomichanKanjiResult(
         Dictionary<string, IntermediaryResult> kanjiResults)
     {
-        // Parallel Foreach?
-        List<LookupResult> results = new();
+        ConcurrentQueue<LookupResult> results = new();
 
-        foreach (KeyValuePair<string, IntermediaryResult> kanjiResult in kanjiResults.ToList())
+        _ = Parallel.ForEach(kanjiResults.ToList(), kanjiResult =>
         {
             int resultsListCount = kanjiResult.Value.Results.Count;
             for (int i = 0; i < resultsListCount; i++)
@@ -757,10 +743,10 @@ public static class Lookup
                         dict: kanjiResult.Value.Dict,
                         formattedDefinitions: yomichanKanjiDictResult.BuildFormattedDefinition(kanjiResult.Value.Dict.Options)
                     );
-                    results.Add(result);
+                    results.Enqueue(result);
                 }
             }
-        }
+        });
 
         return results;
     }
@@ -768,10 +754,9 @@ public static class Lookup
     private static IEnumerable<LookupResult> BuildEpwingYomichanResult(
         Dictionary<string, IntermediaryResult> epwingResults)
     {
-        // Parallel Foreach?
-        List<LookupResult> results = new();
+        ConcurrentQueue<LookupResult> results = new();
 
-        foreach (IntermediaryResult wordResult in epwingResults.Values.ToList())
+        _ = Parallel.ForEach(epwingResults.Values.ToList(), wordResult =>
         {
             int resultsListCount = wordResult.Results.Count;
             for (int i = 0; i < resultsListCount; i++)
@@ -795,10 +780,10 @@ public static class Lookup
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options)
                     );
 
-                    results.Add(result);
+                    results.Enqueue(result);
                 }
             }
-        }
+        });
 
         return results;
     }
@@ -806,10 +791,9 @@ public static class Lookup
     private static IEnumerable<LookupResult> BuildEpwingNazekaResult(
         Dictionary<string, IntermediaryResult> epwingNazekaResults)
     {
-        // Parallel.Foreach?
-        List<LookupResult> results = new();
+        ConcurrentQueue<LookupResult> results = new();
 
-        foreach (IntermediaryResult wordResult in epwingNazekaResults.Values.ToList())
+        _ = Parallel.ForEach(epwingNazekaResults.Values.ToList(), wordResult =>
         {
             int resultsListCount = wordResult.Results.Count;
             for (int i = 0; i < resultsListCount; i++)
@@ -835,10 +819,10 @@ public static class Lookup
                         formattedDefinitions: epwingResult.BuildFormattedDefinition(wordResult.Dict.Options)
                     );
 
-                    results.Add(result);
+                    results.Enqueue(result);
                 }
             }
-        }
+        });
 
         return results;
     }
@@ -846,9 +830,9 @@ public static class Lookup
     private static IEnumerable<LookupResult> BuildCustomWordResult(
         Dictionary<string, IntermediaryResult> customWordResults)
     {
-        List<LookupResult> results = new();
+        ConcurrentQueue<LookupResult> results = new();
 
-        foreach (IntermediaryResult wordResult in customWordResults.Values.ToList())
+        _ = Parallel.ForEach(customWordResults.Values.ToList(), wordResult =>
         {
             int wordResultsListCount = wordResult.Results.Count;
             for (int i = 0; i < wordResultsListCount; i++)
@@ -882,10 +866,10 @@ public static class Lookup
                         formattedDefinitions: customWordDictResult.BuildFormattedDefinition(wordResult.Dict.Options)
                     );
 
-                    results.Add(result);
+                    results.Enqueue(result);
                 }
             }
-        }
+        });
 
         return results;
     }
@@ -893,9 +877,9 @@ public static class Lookup
     private static IEnumerable<LookupResult> BuildCustomNameResult(
         Dictionary<string, IntermediaryResult> customNameResults)
     {
-        List<LookupResult> results = new();
+        ConcurrentQueue<LookupResult> results = new();
 
-        foreach (KeyValuePair<string, IntermediaryResult> customNameResult in customNameResults.ToList())
+        _ = Parallel.ForEach(customNameResults.ToList(), customNameResult =>
         {
             int resultsListCount = customNameResult.Value.Results.Count;
             int freq = 0;
@@ -918,10 +902,10 @@ public static class Lookup
                     );
 
                     ++freq;
-                    results.Add(result);
+                    results.Enqueue(result);
                 }
             }
-        }
+        });
 
         return results;
     }
@@ -930,7 +914,7 @@ public static class Lookup
     {
         List<LookupFrequencyResult> freqsList = new();
 
-        foreach (Freq freq in Storage.FreqDicts.Values)
+        foreach (Freq freq in Storage.FreqDicts.Values.ToList().OrderBy(f => f.Priority))
         {
             if (freq is { Active: true, Type: not FreqType.YomichanKanji })
             {
