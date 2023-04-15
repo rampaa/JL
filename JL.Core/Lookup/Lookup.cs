@@ -529,7 +529,7 @@ public static class Lookup
     {
         Dictionary<string, IntermediaryResult> kanjiResults = new();
 
-        string? kanji = text.EnumerateUnicodeCharacters().FirstOrDefault();
+        string? kanji = text.ListUnicodeCharacters().FirstOrDefault();
 
         if (kanji is not null && dict.Contents.TryGetValue(kanji, out List<IDictRecord>? result))
         {

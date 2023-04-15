@@ -195,14 +195,12 @@ public static class Kana
 
     public static string KatakanaToHiragana(string text)
     {
-        List<string> unicodeCharacters = text.Normalize(NormalizationForm.FormKC).EnumerateUnicodeCharacters().ToList();
+        List<string> unicodeCharacters = text.Normalize(NormalizationForm.FormKC).ListUnicodeCharacters();
+        StringBuilder textInHiragana = new(text.Length);
 
-        int listLength = unicodeCharacters.Count;
-        StringBuilder textInHiragana = new(listLength);
-
-        for (int i = 0; i < listLength; i++)
+        for (int i = 0; i < unicodeCharacters.Count; i++)
         {
-            if (listLength > i + 1
+            if (unicodeCharacters.Count > i + 1
                 && s_compositeHalfWidthKatakanaToFullWidthHiraganaDict.TryGetValue(
                     unicodeCharacters[i] + unicodeCharacters[i + 1], out string? compositeStr))
             {
@@ -241,7 +239,7 @@ public static class Kana
 
     internal static List<string> LongVowelMarkToKana(string text)
     {
-        List<string> unicodeTextList = text.EnumerateUnicodeCharacters().ToList();
+        List<string> unicodeTextList = text.ListUnicodeCharacters();
 
         List<StringBuilder> stringBuilders = new(4)
         {
@@ -299,7 +297,7 @@ public static class Kana
 
     public static List<string> CreateCombinedForm(string text)
     {
-        List<string> unicodeCharacterList = text.EnumerateUnicodeCharacters().ToList();
+        List<string> unicodeCharacterList = text.ListUnicodeCharacters();
         List<string> combinedForm = new(unicodeCharacterList.Count);
 
         for (int i = 0; i < unicodeCharacterList.Count; i++)
@@ -327,6 +325,6 @@ public static class Kana
 
     internal static bool IsKatakana(string text)
     {
-        return s_katakanaToHiraganaDict.ContainsKey(text.EnumerateUnicodeCharacters().First());
+        return s_katakanaToHiraganaDict.ContainsKey(text.ListUnicodeCharacters().First());
     }
 }

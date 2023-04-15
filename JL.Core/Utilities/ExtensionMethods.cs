@@ -38,22 +38,25 @@ public static class ExtensionMethods
         // return default;
     }
 
-    internal static IEnumerable<string> EnumerateUnicodeCharacters(this string s)
+    internal static List<string> ListUnicodeCharacters(this string s)
     {
+        List<string> textBlocks = new(s.Length);
         for (int i = 0; i < s.Length; i++)
         {
             if (char.IsHighSurrogate(s, i)
                 && s.Length > i + 1
                 && char.IsLowSurrogate(s, i + 1))
             {
-                yield return char.ConvertFromUtf32(char.ConvertToUtf32(s, i));
+                textBlocks.Add(char.ConvertFromUtf32(char.ConvertToUtf32(s, i)));
 
                 ++i;
             }
             else
             {
-                yield return s[i].ToString();
+                textBlocks.Add(s[i].ToString());
             }
         }
+
+        return textBlocks;
     }
 }
