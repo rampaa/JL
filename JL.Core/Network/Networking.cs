@@ -5,14 +5,17 @@ namespace JL.Core.Network;
 
 public static class Networking
 {
+    public static readonly HttpClient Client = new(new HttpClientHandler { UseProxy = false }) { Timeout = TimeSpan.FromMinutes(10) };
+    internal const string Jpod101NoAudioMd5Hash = "7E-2C-2F-95-4E-F6-05-13-73-BA-91-6F-00-01-68-DC";
+    private static readonly Uri s_gitHubApiUrlForLatestJLRelease = new("https://api.github.com/repos/rampaa/JL/releases/latest");
     public static async Task CheckForJLUpdates(bool isAutoCheck)
     {
         try
         {
-            HttpRequestMessage gitHubApiRequest = new(HttpMethod.Get, Storage.s_gitHubApiUrlForLatestJLRelease);
+            HttpRequestMessage gitHubApiRequest = new(HttpMethod.Get, s_gitHubApiUrlForLatestJLRelease);
             gitHubApiRequest.Headers.Add("User-Agent", "JL");
 
-            HttpResponseMessage gitHubApiResponse = await Storage.Client.SendAsync(gitHubApiRequest).ConfigureAwait(false);
+            HttpResponseMessage gitHubApiResponse = await Client.SendAsync(gitHubApiRequest).ConfigureAwait(false);
 
             if (gitHubApiResponse.IsSuccessStatusCode)
             {
@@ -23,7 +26,7 @@ public static class Networking
                     JsonElement rootElement = jsonDocument.RootElement;
                     Version latestJLVersion = new(rootElement.GetProperty("tag_name").ToString());
 
-                    if (latestJLVersion > Storage.JLVersion)
+                    if (latestJLVersion > Utils.JLVersion)
                     {
                         bool foundRelease = false;
                         string architecture = Environment.Is64BitProcess ? "x64" : "x86";
@@ -38,13 +41,13 @@ public static class Networking
                             {
                                 foundRelease = true;
 
-                                if (Storage.Frontend.ShowYesNoDialog(
+                                if (Utils.Frontend.ShowYesNoDialog(
                                     "A new version of JL is available. Would you like to download it now?", "Update JL?"))
                                 {
-                                    Storage.Frontend.ShowOkDialog(
+                                    Utils.Frontend.ShowOkDialog(
                                         "This may take a while. Please don't manually shut down the program until it's updated.", "Info");
 
-                                    await Storage.Frontend.UpdateJL(new Uri(latestReleaseUrl)).ConfigureAwait(false);
+                                    await Utils.Frontend.UpdateJL(new Uri(latestReleaseUrl)).ConfigureAwait(false);
                                 }
                                 break;
                             }
@@ -52,14 +55,14 @@ public static class Networking
 
                         if (!isAutoCheck && !foundRelease)
                         {
-                            Storage.Frontend.ShowOkDialog("JL is up to date", "Info");
+                            Utils.Frontend.ShowOkDialog("JL is up to date", "Info");
                         }
 
                     }
 
                     else if (!isAutoCheck)
                     {
-                        Storage.Frontend.ShowOkDialog("JL is up to date", "Info");
+                        Utils.Frontend.ShowOkDialog("JL is up to date", "Info");
                     }
                 }
             }
@@ -67,13 +70,13 @@ public static class Networking
             else
             {
                 Utils.Logger.Error("Couldn't check for JL updates. GitHub API problem. {StatusCode} {ReasonPhrase}", gitHubApiResponse.StatusCode, gitHubApiResponse.ReasonPhrase);
-                Storage.Frontend.Alert(AlertLevel.Error, "Couldn't check for JL updates. GitHub API problem.");
+                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't check for JL updates. GitHub API problem.");
             }
         }
         catch (Exception ex)
         {
             Utils.Logger.Error(ex, "Couldn't check for JL updates");
-            Storage.Frontend.Alert(AlertLevel.Warning, "Couldn't check for JL updates");
+            Utils.Frontend.Alert(AlertLevel.Warning, "Couldn't check for JL updates");
         }
     }
 }

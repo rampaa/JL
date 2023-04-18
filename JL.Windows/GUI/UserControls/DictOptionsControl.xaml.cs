@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
 using JL.Windows.Utilities;
@@ -167,7 +166,7 @@ internal sealed partial class DictOptionsControl : UserControl
     {
         if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dict.Type))
         {
-            bool isEpwing = Storage.YomichanDictTypes.Concat(Storage.NazekaDictTypes).All(dt => dt != dict.Type);
+            bool isEpwing = DictUtils.YomichanDictTypes.Concat(DictUtils.NazekaDictTypes).All(dt => dt != dict.Type);
             NewlineCheckBox.IsChecked = dict.Options?.NewlineBetweenDefinitions?.Value ?? isEpwing;
             NewlineCheckBox.Visibility = Visibility.Visible;
         }

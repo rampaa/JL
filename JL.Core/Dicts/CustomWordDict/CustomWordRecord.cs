@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.CustomWordDict;
 
@@ -83,7 +84,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
     {
         int frequency = int.MaxValue;
 
-        if (freq.Contents.TryGetValue(Kana.KatakanaToHiragana(PrimarySpelling),
+        if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling),
                 out List<FrequencyRecord>? freqResults))
         {
             int freqResultsCount = freqResults.Count;
@@ -106,7 +107,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
                 for (int i = 0; i < alternativeSpellingsCount; i++)
                 {
                     if (freq.Contents.TryGetValue(
-                            Kana.KatakanaToHiragana(AlternativeSpellings[i]),
+                            JapaneseUtils.KatakanaToHiragana(AlternativeSpellings[i]),
                             out List<FrequencyRecord>? alternativeSpellingFreqResults))
                     {
                         int alternativeSpellingFreqResultsCount = alternativeSpellingFreqResults.Count;
@@ -134,7 +135,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
             {
                 string reading = Readings[i];
 
-                if (freq.Contents.TryGetValue(Kana.KatakanaToHiragana(reading),
+                if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading),
                         out List<FrequencyRecord>? readingFreqResults))
                 {
                     int readingFreqResultsCount = readingFreqResults.Count;
@@ -142,7 +143,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
                     {
                         FrequencyRecord readingFreqResult = readingFreqResults[j];
 
-                        if ((reading == readingFreqResult.Spelling && Kana.IsKatakana(reading))
+                        if ((reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(reading))
                             || (AlternativeSpellings?.Contains(readingFreqResult.Spelling) ?? false))
                         {
                             if (frequency > readingFreqResult.Frequency)

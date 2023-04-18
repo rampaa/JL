@@ -1,9 +1,7 @@
-using System.Diagnostics;
 using System.Runtime;
-using System.Text.RegularExpressions;
-using JL.Core.Anki;
-using JL.Core.Audio;
-using JL.Core.Dicts;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using JL.Core.Dicts.CustomNameDict;
 using JL.Core.Dicts.CustomWordDict;
 using JL.Core.Dicts.EDICT;
@@ -14,47 +12,28 @@ using JL.Core.Dicts.EPWING.EpwingNazeka;
 using JL.Core.Dicts.EPWING.EpwingYomichan;
 using JL.Core.Dicts.Options;
 using JL.Core.Dicts.YomichanKanji;
-using JL.Core.Freqs;
-using JL.Core.Freqs.FrequencyNazeka;
-using JL.Core.Freqs.FrequencyYomichan;
 using JL.Core.PitchAccent;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
-using Timer = System.Timers.Timer;
 
-namespace JL.Core;
 
-public static class Storage
+namespace JL.Core.Dicts;
+
+public static class DictUtils
 {
-    internal static Timer Timer { get; } = new();
-    public static Stopwatch StatsStopWatch { get; } = new();
-    internal const string Jpod101NoAudioMd5Hash = "7E-2C-2F-95-4E-F6-05-13-73-BA-91-6F-00-01-68-DC";
-    public static IFrontend Frontend { get; set; } = new DummyFrontend();
-    public static readonly string ApplicationPath = AppContext.BaseDirectory;
-    public static readonly string ResourcesPath = Path.Join(AppContext.BaseDirectory, "Resources");
-    public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
-    public static readonly HttpClient Client = new(new HttpClientHandler { UseProxy = false }) { Timeout = TimeSpan.FromMinutes(10) };
-    public static readonly Version JLVersion = new(1, 18, 0);
-    internal static readonly Uri s_gitHubApiUrlForLatestJLRelease = new("https://api.github.com/repos/rampaa/JL/releases/latest");
-    internal static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
-    internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
-    internal static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
     public static bool DictsReady { get; private set; } = false;
     public static bool UpdatingJmdict { get; internal set; } = false;
     public static bool UpdatingJmnedict { get; internal set; } = false;
     public static bool UpdatingKanjidic { get; internal set; } = false;
-    public static bool FreqsReady { get; private set; } = false;
+    public static readonly Dictionary<string, Dict> Dicts = new();
     internal static Dictionary<string, List<JmdictWordClass>> WordClassDictionary { get; set; } = new(65536); // 2022/10/29: 48909
     internal static readonly Dictionary<string, string> s_kanjiCompositionDict = new(86934);
-    public static Dictionary<string, Freq> FreqDicts { get; internal set; } = new();
+    internal static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
+    internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
+    internal static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
 
-    public static readonly Dictionary<string, Dict> Dicts = new();
-
-    public static readonly Dictionary<string, AudioSource> AudioSources = new();
-
-    public static readonly Dictionary<string, Dict> BuiltInDicts =
-        new()
-        {
+    public static readonly Dictionary<string, Dict> BuiltInDicts = new()
+    {
             {
                 "CustomWordDictionary",
                 new Dict(DictType.CustomWordDictionary,
@@ -101,30 +80,19 @@ public static class Storage
             }
         };
 
-    internal static readonly Dictionary<string, Freq> s_builtInFreqs = new()
+    public static readonly Dictionary<string, string> JmdictEntities = new();
+
+    public static readonly Dictionary<string, string> JmnedictEntities = new()
     {
-        {
-            "VN (Nazeka)",
-            new Freq(FreqType.Nazeka, "VN (Nazeka)", "Resources/freqlist_vns.json", true, 1, 57273)
-        },
-
-        {
-            "Narou (Nazeka)",
-            new Freq(FreqType.Nazeka, "Narou (Nazeka)", "Resources/freqlist_narou.json", false, 2, 75588)
-        },
-
-        {
-            "Novel (Nazeka)",
-            new Freq(FreqType.Nazeka, "Novel (Nazeka)", "Resources/freqlist_novels.json", false, 3, 114348)
-        }
-    };
-
-    internal static readonly Dictionary<string, AudioSource> s_builtInAudioSources = new()
-    {
-        {
-            "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={Term}&kana={Reading}",
-                new AudioSource(AudioSourceType.Url, true, 1)
-        }
+        #pragma warning disable format
+        {"char", "character"}, {"company", "company name"}, {"creat", "creature"}, {"dei", "deity"},
+        {"doc", "document"}, {"ev", "event"}, {"fem", "female given name or forename"}, {"fict", "fiction"},
+        {"given", "given name or forename, gender not specified"},
+        {"group", "group"}, {"leg", "legend"}, {"masc", "male given name or forename"}, {"myth", "mythology"},
+        {"obj", "object"}, {"organization", "organization name"}, {"oth", "other"}, {"person", "full name of a particular person"},
+        {"place", "place name"}, {"product", "product name"}, {"relig", "religion"}, {"serv", "service"},
+        {"station", "railway station"}, {"surname", "family or surname"}, {"unclass", "unclassified name"}, {"work", "work of art, literature, music, etc. name"},
+        #pragma warning restore format
     };
 
     public static readonly List<DictType> YomichanDictTypes = new()
@@ -223,110 +191,6 @@ public static class Storage
         DictType.NonspecificWordNazeka
     };
 
-    public static readonly List<JLField> JLFieldsForWordDicts = new()
-    {
-        JLField.Nothing,
-        JLField.PrimarySpelling,
-        JLField.AlternativeSpellings,
-        JLField.Readings,
-        JLField.Definitions,
-        JLField.DictionaryName,
-        JLField.Audio,
-        JLField.Image,
-        JLField.SourceText,
-        JLField.Sentence,
-        JLField.MatchedText,
-        JLField.DeconjugatedMatchedText,
-        JLField.DeconjugationProcess,
-        JLField.Frequencies,
-        JLField.EdictId,
-        JLField.LocalTime
-    };
-
-    public static readonly List<JLField> JLFieldsForKanjiDicts = new()
-    {
-        JLField.Nothing,
-        JLField.PrimarySpelling,
-        JLField.Readings,
-        JLField.KunReadings,
-        JLField.OnReadings,
-        JLField.NanoriReadings,
-        JLField.StrokeCount,
-        JLField.KanjiGrade,
-        JLField.KanjiComposition,
-        JLField.Definitions,
-        JLField.DictionaryName,
-        JLField.Audio,
-        JLField.Image,
-        JLField.SourceText,
-        JLField.Sentence,
-        JLField.Frequencies,
-        JLField.EdictId,
-        JLField.LocalTime
-    };
-
-    public static readonly List<JLField> JLFieldsForNameDicts = new()
-    {
-        JLField.Nothing,
-        JLField.PrimarySpelling,
-        JLField.Readings,
-        JLField.AlternativeSpellings,
-        JLField.Definitions,
-        JLField.DictionaryName,
-        JLField.Audio,
-        JLField.Image,
-        JLField.SourceText,
-        JLField.Sentence,
-        JLField.EdictId,
-        JLField.LocalTime
-    };
-
-    // Matches the following Unicode ranges:
-    // CJK Radicals Supplement (2E80–2EFF)
-    // Kangxi Radicals (2F00–2FDF)
-    // Ideographic Description Characters (2FF0–2FFF)
-    // CJK Symbols and Punctuation (3000–303F)
-    // Hiragana (3040–309F)
-    // Katakana (30A0–30FF)
-    // Kanbun (3190–319F)
-    // CJK Strokes (31C0–31EF)
-    // Katakana Phonetic Extensions (31F0–31FF)
-    // Enclosed CJK Letters and Months (3200–32FF)
-    // CJK Compatibility (3300–33FF)
-    // CJK Unified Ideographs Extension A (3400–4DBF)
-    // CJK Unified Ideographs (4E00–9FFF)
-    // CJK Compatibility Ideographs (F900–FAFF)
-    // CJK Compatibility Forms (FE30–FE4F)
-    // CJK Unified Ideographs Extension B (20000–2A6DF)
-    // CJK Unified Ideographs Extension C (2A700–2B73F)
-    // CJK Unified Ideographs Extension D (2B740–2B81F)
-    // CJK Unified Ideographs Extension E (2B820–2CEAF)
-    // CJK Unified Ideographs Extension F (2CEB0–2EBEF)
-    // CJK Compatibility Ideographs Supplement (2F800–2FA1F)
-    // CJK Unified Ideographs Extension G (30000–3134F)
-    // CJK Unified Ideographs Extension H (31350–323AF)
-    public static readonly Regex JapaneseRegex =
-        new(
-            @"[\u2e80-\u30ff\u3190–\u319f\u31c0-\u4dbf\u4e00-\u9fff\uf900-\ufaff\ufe30-\ufe4f\uff00-\uffef]|\ud82c[\udc00-\udcff]|\ud83c[\ude00-\udeff]|\ud840[\udc00-\udfff]|[\ud841-\ud868][\udc00-\udfff]|\ud869[\udc00-\udedf]|\ud869[\udf00-\udfff]|[\ud86a-\ud879][\udc00-\udfff]|\ud87a[\udc00-\udfef]|\ud87e[\udc00-\ude1f]|\ud880[\udc00-\udfff]|[\ud881-\ud883][\udc00-\udfff]|\ud884[\udc00-\udfff]|[\ud885-\ud887][\udc00-\udfff]|\ud888[\udc00-\udfaf]",
-            RegexOptions.Compiled);
-
-    public static readonly Dictionary<string, string> JmdictEntities = new();
-
-    public static readonly Dictionary<string, string> JmnedictEntities = new()
-    {
-        #pragma warning disable format
-        {"char", "character"}, {"company", "company name"}, {"creat", "creature"}, {"dei", "deity"},
-        {"doc", "document"}, {"ev", "event"}, {"fem", "female given name or forename"}, {"fict", "fiction"},
-        {"given", "given name or forename, gender not specified"},
-        {"group", "group"}, {"leg", "legend"}, {"masc", "male given name or forename"}, {"myth", "mythology"},
-        {"obj", "object"}, {"organization", "organization name"}, {"oth", "other"}, {"person", "full name of a particular person"},
-        {"place", "place name"}, {"product", "product name"}, {"relig", "religion"}, {"serv", "service"},
-        {"station", "railway station"}, {"surname", "family or surname"}, {"unclass", "unclassified name"}, {"work", "work of art, literature, music, etc. name"},
-        #pragma warning restore format
-    };
-
-    public const int CacheSize = 1000;
-
     public static async Task LoadDictionaries(bool runGC = true)
     {
         DictsReady = false;
@@ -341,13 +205,13 @@ public static class Storage
                 case DictType.JMdict:
                     if (dict is { Active: true, Contents.Count: 0 } && !UpdatingJmdict)
                     {
-                        Task jMDictTask = Task.Run(async () =>
+                        Task jmdictTask = Task.Run(async () =>
                         {
                             await JmdictLoader.Load(dict).ConfigureAwait(false);
                             dict.Size = dict.Contents.Count;
                         });
 
-                        tasks.Add(jMDictTask);
+                        tasks.Add(jmdictTask);
                     }
 
                     else if (dict is { Active: false, Contents.Count: > 0 } && !UpdatingJmdict)
@@ -425,7 +289,7 @@ public static class Storage
 
                             catch (Exception ex)
                             {
-                                Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
@@ -453,7 +317,7 @@ public static class Storage
 
                             catch (Exception ex)
                             {
-                                Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
@@ -521,7 +385,7 @@ public static class Storage
 
                             catch (Exception ex)
                             {
-                                Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
@@ -549,7 +413,7 @@ public static class Storage
 
                             catch (Exception ex)
                             {
-                                Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
@@ -588,7 +452,7 @@ public static class Storage
                 }
             }
 
-            Frontend.InvalidateDisplayCache();
+            Utils.Frontend.InvalidateDisplayCache();
 
             if (runGC)
             {
@@ -600,118 +464,10 @@ public static class Storage
         DictsReady = true;
     }
 
-    public static async Task LoadFrequencies(bool runGC = true)
-    {
-        FreqsReady = false;
-
-        List<Task> tasks = new();
-        bool freqRemoved = false;
-
-        foreach (Freq freq in FreqDicts.Values.ToList())
-        {
-            switch (freq.Type)
-            {
-                case FreqType.Nazeka:
-                    if (freq is { Active: true, Contents.Count: 0 })
-                    {
-                        Task nazekaFreqTask = Task.Run(async () =>
-                        {
-                            try
-                            {
-                                await FrequencyNazekaLoader.Load(freq).ConfigureAwait(false);
-                                freq.Size = freq.Contents.Count;
-                            }
-
-                            catch (Exception ex)
-                            {
-                                Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
-                                Utils.Logger.Error(ex, "Couldn't import {FreqName}", freq.Type);
-                                _ = FreqDicts.Remove(freq.Name);
-                                freqRemoved = true;
-                            }
-                        });
-
-                        tasks.Add(nazekaFreqTask);
-                    }
-
-                    else if (freq is { Active: false, Contents.Count: > 0 })
-                    {
-                        freq.Contents.Clear();
-                        freqRemoved = true;
-                    }
-                    break;
-
-                case FreqType.Yomichan:
-                case FreqType.YomichanKanji:
-                    if (freq is { Active: true, Contents.Count: 0 })
-                    {
-                        Task yomichanFreqTask = Task.Run(async () =>
-                        {
-                            try
-                            {
-                                await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false);
-                                freq.Size = freq.Contents.Count;
-                            }
-
-                            catch (Exception ex)
-                            {
-                                Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
-                                Utils.Logger.Error(ex, "Couldn't import {FreqName}", freq.Type);
-                                _ = FreqDicts.Remove(freq.Name);
-                                freqRemoved = true;
-                            }
-                        });
-
-                        tasks.Add(yomichanFreqTask);
-                    }
-
-                    else if (freq is { Active: false, Contents.Count: > 0 })
-                    {
-                        freq.Contents.Clear();
-                        freqRemoved = true;
-                    }
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(null, "Invalid freq type");
-            }
-        }
-
-        if (tasks.Count > 0 || freqRemoved)
-        {
-            if (tasks.Count > 0)
-            {
-                await Task.WhenAll(tasks).ConfigureAwait(false);
-            }
-
-            if (freqRemoved)
-            {
-                IOrderedEnumerable<Freq> orderedFreqs = FreqDicts.Values.OrderBy(static f => f.Priority);
-                int priority = 1;
-
-                foreach (Freq freq in orderedFreqs)
-                {
-                    freq.Priority = priority;
-                    ++priority;
-                }
-            }
-
-            Frontend.InvalidateDisplayCache();
-
-            if (runGC)
-            {
-                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-            }
-        }
-
-        FreqsReady = true;
-    }
-
     internal static async Task InitializeWordClassDictionary()
     {
         Dict dict = Dicts.Values.First(static dict => dict.Type is DictType.JMdict);
-        if (!File.Exists($"{ResourcesPath}/PoS.json"))
+        if (!File.Exists($"{Utils.ResourcesPath}/PoS.json"))
         {
             if (dict.Active)
             {
@@ -746,10 +502,10 @@ public static class Storage
 
     internal static async Task InitializeKanjiCompositionDict()
     {
-        if (File.Exists($"{ResourcesPath}/ids.txt"))
+        if (File.Exists($"{Utils.ResourcesPath}/ids.txt"))
         {
             string[] lines = await File
-                .ReadAllLinesAsync($"{ResourcesPath}/ids.txt")
+                .ReadAllLinesAsync($"{Utils.ResourcesPath}/ids.txt")
                 .ConfigureAwait(false);
 
             for (int i = 0; i < lines.Length; i++)
@@ -782,6 +538,133 @@ public static class Storage
             }
 
             s_kanjiCompositionDict.TrimExcess();
+        }
+    }
+
+    public static void CreateDefaultDictsConfig()
+    {
+        var jso = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            Converters = { new JsonStringEnumConverter() }
+        };
+
+        try
+        {
+            _ = Directory.CreateDirectory(Utils.ConfigPath);
+            File.WriteAllText(Path.Join(Utils.ConfigPath, "dicts.json"),
+                JsonSerializer.Serialize(BuiltInDicts, jso));
+        }
+        catch (Exception ex)
+        {
+            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't write default Dicts config");
+            Utils.Logger.Error(ex, "Couldn't write default Dicts config");
+        }
+    }
+
+    public static async Task SerializeDicts()
+    {
+        try
+        {
+            var jso = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Converters = { new JsonStringEnumConverter() },
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            };
+
+            await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
+                JsonSerializer.Serialize(Dicts, jso)).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            Utils.Logger.Fatal(ex, "SerializeDicts failed");
+            throw;
+        }
+    }
+
+    internal static async Task DeserializeDicts()
+    {
+        try
+        {
+            var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+            Stream dictStream = new StreamReader(Path.Join(Utils.ConfigPath, "dicts.json")).BaseStream;
+            await using (dictStream.ConfigureAwait(false))
+            {
+                Dictionary<string, Dict>? deserializedDicts = await JsonSerializer
+                    .DeserializeAsync<Dictionary<string, Dict>>(dictStream, jso).ConfigureAwait(false);
+
+                if (deserializedDicts is not null)
+                {
+                    IOrderedEnumerable<Dict> orderedDicts = deserializedDicts.Values.OrderBy(static d => d.Priority);
+                    int priority = 1;
+
+                    foreach (Dict dict in orderedDicts)
+                    {
+                        dict.Contents = dict.Size is not 0
+                            ? new Dictionary<string, List<IDictRecord>>(dict.Size)
+                            : dict.Type switch
+                            {
+                                DictType.CustomNameDictionary => new Dictionary<string, List<IDictRecord>>(1024),
+                                DictType.CustomWordDictionary => new Dictionary<string, List<IDictRecord>>(1024),
+                                DictType.JMdict => new Dictionary<string, List<IDictRecord>>(500000), //2022/05/11: 394949, 2022/08/15: 398303
+                                DictType.JMnedict => new Dictionary<string, List<IDictRecord>>(700000), //2022/05/11: 608833, 2022/08/15: 609117
+                                DictType.Kanjidic => new Dictionary<string, List<IDictRecord>>(13108), //2022/05/11: 13108, 2022/08/15: 13108
+                                DictType.Daijirin => new Dictionary<string, List<IDictRecord>>(420429),
+                                DictType.DaijirinNazeka => new Dictionary<string, List<IDictRecord>>(420429),
+                                DictType.Daijisen => new Dictionary<string, List<IDictRecord>>(679115),
+                                DictType.Gakken => new Dictionary<string, List<IDictRecord>>(254558),
+                                DictType.GakkenYojijukugoYomichan => new Dictionary<string, List<IDictRecord>>(7989),
+                                DictType.IwanamiYomichan => new Dictionary<string, List<IDictRecord>>(101929),
+                                DictType.JitsuyouYomichan => new Dictionary<string, List<IDictRecord>>(69746),
+                                DictType.KanjigenYomichan => new Dictionary<string, List<IDictRecord>>(64730),
+                                DictType.Kenkyuusha => new Dictionary<string, List<IDictRecord>>(303677),
+                                DictType.KenkyuushaNazeka => new Dictionary<string, List<IDictRecord>>(191804),
+                                DictType.KireiCakeYomichan => new Dictionary<string, List<IDictRecord>>(332628),
+                                DictType.Kotowaza => new Dictionary<string, List<IDictRecord>>(30846),
+                                DictType.Koujien => new Dictionary<string, List<IDictRecord>>(402571),
+                                DictType.Meikyou => new Dictionary<string, List<IDictRecord>>(107367),
+                                DictType.NikkokuYomichan => new Dictionary<string, List<IDictRecord>>(451455),
+                                DictType.OubunshaYomichan => new Dictionary<string, List<IDictRecord>>(138935),
+                                DictType.PitchAccentYomichan => new Dictionary<string, List<IDictRecord>>(434991),
+                                DictType.ShinjirinYomichan => new Dictionary<string, List<IDictRecord>>(229758),
+                                DictType.ShinmeikaiYomichan => new Dictionary<string, List<IDictRecord>>(126049),
+                                DictType.ShinmeikaiNazeka => new Dictionary<string, List<IDictRecord>>(126049),
+                                DictType.ShinmeikaiYojijukugoYomichan => new Dictionary<string, List<IDictRecord>>(6088),
+                                DictType.WeblioKogoYomichan => new Dictionary<string, List<IDictRecord>>(30838),
+                                DictType.ZokugoYomichan => new Dictionary<string, List<IDictRecord>>(2392),
+                                DictType.NonspecificWordYomichan => new Dictionary<string, List<IDictRecord>>(250000),
+                                DictType.NonspecificKanjiYomichan => new Dictionary<string, List<IDictRecord>>(250000),
+                                DictType.NonspecificNameYomichan => new Dictionary<string, List<IDictRecord>>(250000),
+                                DictType.NonspecificYomichan => new Dictionary<string, List<IDictRecord>>(250000),
+                                DictType.NonspecificWordNazeka => new Dictionary<string, List<IDictRecord>>(250000),
+                                DictType.NonspecificKanjiNazeka => new Dictionary<string, List<IDictRecord>>(250000),
+                                DictType.NonspecificNameNazeka => new Dictionary<string, List<IDictRecord>>(250000),
+                                DictType.NonspecificNazeka => new Dictionary<string, List<IDictRecord>>(250000),
+                                _ => new Dictionary<string, List<IDictRecord>>(250000)
+                            };
+
+                        dict.Priority = priority;
+                        ++priority;
+
+                        string relativePath = Path.GetRelativePath(Utils.ApplicationPath, dict.Path);
+                        dict.Path = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
+
+                        Dicts.Add(dict.Name, dict);
+                    }
+                }
+                else
+                {
+                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/dicts.json");
+                    Utils.Logger.Fatal("Couldn't load Config/dicts.json");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Utils.Logger.Fatal(ex, "DeserializeDicts failed");
+            throw;
         }
     }
 

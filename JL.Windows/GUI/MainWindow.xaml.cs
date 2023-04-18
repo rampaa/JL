@@ -8,8 +8,11 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using HandyControl.Tools;
 using JL.Core;
+using JL.Core.Dicts;
+using JL.Core.Freqs;
 using JL.Core.Lookup;
 using JL.Core.Network;
+using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using Microsoft.Win32;
@@ -103,7 +106,7 @@ internal sealed partial class MainWindow : Window
             {
                 string text = Clipboard.GetText();
                 gotTextFromClipboard = true;
-                if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || Storage.JapaneseRegex.IsMatch(text))
+                if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || JapaneseUtils.JapaneseRegex.IsMatch(text))
                 {
                     text = SanitizeText(text);
 
@@ -122,7 +125,7 @@ internal sealed partial class MainWindow : Window
 
     public async Task CopyFromWebSocket(string text)
     {
-        if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || Storage.JapaneseRegex.IsMatch(text))
+        if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || JapaneseUtils.JapaneseRegex.IsMatch(text))
         {
             text = SanitizeText(text);
 
@@ -156,7 +159,7 @@ internal sealed partial class MainWindow : Window
         _backlog.Add(text);
         _currentTextIndex = _backlog.Count - 1;
 
-        await Stats.IncrementStat(StatType.Characters, new StringInfo(Utils.RemovePunctuation(text)).LengthInTextElements).ConfigureAwait(false);
+        await Stats.IncrementStat(StatType.Characters, new StringInfo(JapaneseUtils.RemovePunctuation(text)).LengthInTextElements).ConfigureAwait(false);
         await Stats.IncrementStat(StatType.Lines).ConfigureAwait(false);
 
         Dispatcher.Invoke(() =>
@@ -182,9 +185,9 @@ internal sealed partial class MainWindow : Window
             WinApi.BringToFront(WindowHandle);
         }
 
-        if (ConfigManager.Precaching && Storage.DictsReady
-            && !Storage.UpdatingJmdict && !Storage.UpdatingJmnedict && !Storage.UpdatingKanjidic
-            && Storage.FreqsReady && MainTextBox.Text.Length < Storage.CacheSize)
+        if (ConfigManager.Precaching && DictUtils.DictsReady
+            && !DictUtils.UpdatingJmdict && !DictUtils.UpdatingJmnedict && !DictUtils.UpdatingKanjidic
+            && FreqUtils.FreqsReady && MainTextBox.Text.Length < Utils.CacheSize)
         {
             _ = Dispatcher.Invoke(DispatcherPriority.Render, static () => { }); // let MainTextBox text update
             await Precache(MainTextBox.Text).ConfigureAwait(false);
@@ -199,7 +202,7 @@ internal sealed partial class MainWindow : Window
         }
 
         await Stats.IncrementStat(StatType.Characters,
-            new StringInfo(Utils.RemovePunctuation(_backlog[_currentTextIndex])).LengthInTextElements * -1)
+            new StringInfo(JapaneseUtils.RemovePunctuation(_backlog[_currentTextIndex])).LengthInTextElements * -1)
             .ConfigureAwait(false);
 
         await Stats.IncrementStat(StatType.Lines, -1).ConfigureAwait(false);
@@ -241,8 +244,8 @@ internal sealed partial class MainWindow : Window
             }
 
             int endPosition = input.Length - charPosition > ConfigManager.MaxSearchLength
-                ? Utils.FindWordBoundary(input[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
-                : Utils.FindWordBoundary(input, charPosition);
+                ? JapaneseUtils.FindWordBoundary(input[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
+                : JapaneseUtils.FindWordBoundary(input, charPosition);
 
             string text = input[charPosition..endPosition];
 
@@ -468,7 +471,7 @@ internal sealed partial class MainWindow : Window
     {
         ConfigManager.SaveBeforeClosing();
 
-        await Stats.IncrementStat(StatType.Time, Storage.StatsStopWatch.ElapsedTicks).ConfigureAwait(false);
+        await Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks).ConfigureAwait(false);
         await Stats.UpdateLifetimeStats().ConfigureAwait(false);
     }
 
@@ -530,13 +533,13 @@ internal sealed partial class MainWindow : Window
 
             CoreConfig.KanjiMode = !CoreConfig.KanjiMode;
             FirstPopupWindow.LastText = "";
-            Storage.Frontend.InvalidateDisplayCache();
+            Utils.Frontend.InvalidateDisplayCache();
             MainTextBox_MouseMove(null, null);
         }
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowAddNameWindowKeyGesture))
         {
-            if (Storage.DictsReady)
+            if (DictUtils.DictsReady)
             {
                 WindowsUtils.ShowAddNameWindow(MainTextBox.SelectedText);
             }
@@ -544,7 +547,7 @@ internal sealed partial class MainWindow : Window
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowAddWordWindowKeyGesture))
         {
-            if (Storage.DictsReady)
+            if (DictUtils.DictsReady)
             {
                 WindowsUtils.ShowAddWordWindow(MainTextBox.SelectedText);
             }
@@ -552,10 +555,10 @@ internal sealed partial class MainWindow : Window
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowManageDictionariesWindowKeyGesture))
         {
-            if (Storage.DictsReady
-                && !Storage.UpdatingJmdict
-                && !Storage.UpdatingJmnedict
-                && !Storage.UpdatingKanjidic)
+            if (DictUtils.DictsReady
+                && !DictUtils.UpdatingJmdict
+                && !DictUtils.UpdatingJmnedict
+                && !DictUtils.UpdatingKanjidic)
             {
                 WindowsUtils.ShowManageDictionariesWindow();
             }
@@ -563,7 +566,7 @@ internal sealed partial class MainWindow : Window
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowManageFrequenciesWindowKeyGesture))
         {
-            if (Storage.FreqsReady)
+            if (FreqUtils.FreqsReady)
             {
                 WindowsUtils.ShowManageFrequenciesWindow();
             }
@@ -953,15 +956,15 @@ internal sealed partial class MainWindow : Window
 
     private void MainTextBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        ManageDictionariesMenuItem.IsEnabled = Storage.DictsReady
-                                      && !Storage.UpdatingJmdict
-                                      && !Storage.UpdatingJmnedict
-                                      && !Storage.UpdatingKanjidic;
+        ManageDictionariesMenuItem.IsEnabled = DictUtils.DictsReady
+                                      && !DictUtils.UpdatingJmdict
+                                      && !DictUtils.UpdatingJmnedict
+                                      && !DictUtils.UpdatingKanjidic;
 
-        ManageFrequenciesMenuItem.IsEnabled = Storage.FreqsReady;
+        ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady;
 
-        AddNameMenuItem.IsEnabled = Storage.DictsReady;
-        AddWordMenuItem.IsEnabled = Storage.DictsReady;
+        AddNameMenuItem.IsEnabled = DictUtils.DictsReady;
+        AddWordMenuItem.IsEnabled = DictUtils.DictsReady;
 
         FirstPopupWindow.Hide();
         FirstPopupWindow.LastText = "";
@@ -1062,12 +1065,12 @@ internal sealed partial class MainWindow : Window
     {
         if (WindowState is WindowState.Minimized)
         {
-            Storage.StatsStopWatch.Stop();
+            StatsUtils.StatsStopWatch.Stop();
         }
 
         else
         {
-            Storage.StatsStopWatch.Start();
+            StatsUtils.StatsStopWatch.Start();
         }
     }
 

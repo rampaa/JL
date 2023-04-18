@@ -1,3 +1,4 @@
+using JL.Core.Utilities;
 using NUnit.Framework;
 
 namespace JL.Core.Tests;
@@ -14,7 +15,7 @@ public class KanaTests
     //    string text = "あ";
 
     //    // Act
-    //    string result = Kana.HiraganaToKatakana(text);
+    //    string result = JapaneseUtils.HiraganaToKatakana(text);
 
     //    // Assert
     //    StringAssert.AreEqualIgnoringCase(expected, result);
@@ -29,7 +30,7 @@ public class KanaTests
         const string text = "ア";
 
         // Act
-        string result = Kana.KatakanaToHiragana(
+        string result = JapaneseUtils.KatakanaToHiragana(
             text);
 
         // Assert
@@ -44,7 +45,7 @@ public class KanaTests
         const string text1 = "㋕";
 
         // Act
-        string result1 = Kana.KatakanaToHiragana(
+        string result1 = JapaneseUtils.KatakanaToHiragana(
             text1);
 
         // Assert
@@ -59,7 +60,7 @@ public class KanaTests
         const string text2 = "㌀";
 
         // Act
-        string result2 = Kana.KatakanaToHiragana(
+        string result2 = JapaneseUtils.KatakanaToHiragana(
             text2);
 
         // Assert
@@ -76,7 +77,7 @@ public class KanaTests
         const string text3 = "㋿";
 
         // Act
-        string result3 = Kana.KatakanaToHiragana(
+        string result3 = JapaneseUtils.KatakanaToHiragana(
             text3);
 
         // Assert
@@ -92,7 +93,7 @@ public class KanaTests
         const string text = "オー";
 
         // Act
-        List<string> result = Kana.LongVowelMarkToKana(
+        List<string> result = JapaneseUtils.LongVowelMarkToKana(
             text);
 
         // Assert

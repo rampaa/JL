@@ -1,10 +1,38 @@
 using System.Text;
-using JL.Core.Utilities;
+using System.Text.RegularExpressions;
 
-namespace JL.Core;
+namespace JL.Core.Utilities;
 
-public static class Kana
+public static class JapaneseUtils
 {
+    // Matches the following Unicode ranges:
+    // CJK Radicals Supplement (2E80–2EFF)
+    // Kangxi Radicals (2F00–2FDF)
+    // Ideographic Description Characters (2FF0–2FFF)
+    // CJK Symbols and Punctuation (3000–303F)
+    // Hiragana (3040–309F)
+    // Katakana (30A0–30FF)
+    // Kanbun (3190–319F)
+    // CJK Strokes (31C0–31EF)
+    // Katakana Phonetic Extensions (31F0–31FF)
+    // Enclosed CJK Letters and Months (3200–32FF)
+    // CJK Compatibility (3300–33FF)
+    // CJK Unified Ideographs Extension A (3400–4DBF)
+    // CJK Unified Ideographs (4E00–9FFF)
+    // CJK Compatibility Ideographs (F900–FAFF)
+    // CJK Compatibility Forms (FE30–FE4F)
+    // CJK Unified Ideographs Extension B (20000–2A6DF)
+    // CJK Unified Ideographs Extension C (2A700–2B73F)
+    // CJK Unified Ideographs Extension D (2B740–2B81F)
+    // CJK Unified Ideographs Extension E (2B820–2CEAF)
+    // CJK Unified Ideographs Extension F (2CEB0–2EBEF)
+    // CJK Compatibility Ideographs Supplement (2F800–2FA1F)
+    // CJK Unified Ideographs Extension G (30000–3134F)
+    // CJK Unified Ideographs Extension H (31350–323AF)
+    public static readonly Regex JapaneseRegex = new(
+            @"[\u2e80-\u30ff\u3190–\u319f\u31c0-\u4dbf\u4e00-\u9fff\uf900-\ufaff\ufe30-\ufe4f\uff00-\uffef]|\ud82c[\udc00-\udcff]|\ud83c[\ude00-\udeff]|\ud840[\udc00-\udfff]|[\ud841-\ud868][\udc00-\udfff]|\ud869[\udc00-\udedf]|\ud869[\udf00-\udfff]|[\ud86a-\ud879][\udc00-\udfff]|\ud87a[\udc00-\udfef]|\ud87e[\udc00-\ude1f]|\ud880[\udc00-\udfff]|[\ud881-\ud883][\udc00-\udfff]|\ud884[\udc00-\udfff]|[\ud885-\ud887][\udc00-\udfff]|\ud888[\udc00-\udfaf]",
+            RegexOptions.Compiled);
+
     //private static readonly Dictionary<string, string> s_hiraganaToKatakanaDict = new()
     //{
     //    #pragma warning disable format
@@ -326,5 +354,159 @@ public static class Kana
     internal static bool IsKatakana(string text)
     {
         return s_katakanaToHiraganaDict.ContainsKey(text.ListUnicodeCharacters().First());
+    }
+
+    public static int FindWordBoundary(string text, int position)
+    {
+        int endPosition = text.Length;
+        for (int i = position; i < text.Length; i++)
+        {
+            if (char.IsPunctuation(text[i]) || char.IsWhiteSpace(text[i]))
+            {
+                endPosition = i;
+                break;
+            }
+        }
+
+        return endPosition;
+    }
+
+    public static string FindSentence(string text, int position)
+    {
+        List<char> sentenceTerminatingCharacters = new()
+        {
+            '。',
+            '！',
+            '？',
+            '…',
+            '.',
+            '!',
+            '?',
+            '\n'
+        };
+
+        Dictionary<char, char> brackets = new() {
+            { '「', '」' },
+            { '『', '』' },
+            { '【', '】' },
+            { '《', '》' },
+            { '〔', '〕' },
+            { '（', '）' },
+            { '［', '］' },
+            { '〈', '〉' },
+            { '｛', '｝' },
+            { '〝', '〟' },
+            { '＂', '＂' },
+            { '＇', '＇' },
+            { '｢', '｣'},
+            { '⟨', '⟩' },
+            { '(', ')' },
+            { '[', ']' },
+            { '{', '}' }
+        };
+
+        int startPosition = -1;
+        int endPosition = -1;
+
+        for (int i = 0; i < sentenceTerminatingCharacters.Count; i++)
+        {
+            char terminatingCharacter = sentenceTerminatingCharacters[i];
+
+            int tempIndex = text.LastIndexOf(terminatingCharacter, position);
+
+            if (tempIndex > startPosition)
+            {
+                startPosition = tempIndex;
+            }
+
+            tempIndex = text.IndexOf(terminatingCharacter, position);
+
+            if (tempIndex is not -1 && (endPosition is -1 || tempIndex < endPosition))
+            {
+                endPosition = tempIndex;
+            }
+        }
+
+        ++startPosition;
+
+        if (endPosition is -1)
+        {
+            endPosition = text.Length - 1;
+        }
+
+        string sentence = startPosition < endPosition
+            ? text[startPosition..(endPosition + 1)].Trim('\n', '\t', '\r', ' ', '　')
+            : "";
+
+        if (sentence.Length > 1)
+        {
+            if (brackets.ContainsValue(sentence.First()))
+            {
+                sentence = sentence[1..];
+            }
+
+            if (brackets.ContainsKey(sentence.LastOrDefault()))
+            {
+                sentence = sentence[..^1];
+            }
+
+            if (brackets.TryGetValue(sentence.FirstOrDefault(), out char rightBracket))
+            {
+                if (sentence.Last() == rightBracket)
+                {
+                    sentence = sentence[1..^1];
+                }
+                else if (!sentence.Contains(rightBracket))
+                {
+                    sentence = sentence[1..];
+                }
+                else
+                {
+                    int numberOfLeftBrackets = sentence.Count(p => p == sentence[0]);
+                    int numberOfRightBrackets = sentence.Count(p => p == rightBracket);
+
+                    if (numberOfLeftBrackets == numberOfRightBrackets + 1)
+                    {
+                        sentence = sentence[1..];
+                    }
+                }
+            }
+
+            else if (brackets.ContainsValue(sentence.LastOrDefault()))
+            {
+                char leftBracket = brackets.First(p => p.Value == sentence.Last()).Key;
+
+                if (!sentence.Contains(leftBracket))
+                {
+                    sentence = sentence[..^1];
+                }
+                else
+                {
+                    int numberOfLeftBrackets = sentence.Count(p => p == leftBracket);
+                    int numberOfRightBrackets = sentence.Count(p => p == sentence.Last());
+
+                    if (numberOfRightBrackets == numberOfLeftBrackets + 1)
+                    {
+                        sentence = sentence[..^1];
+                    }
+                }
+            }
+        }
+
+        return sentence;
+    }
+
+    public static string RemovePunctuation(string text)
+    {
+        StringBuilder stringBuilder = new(text.Length);
+        foreach (char character in text)
+        {
+            if (char.IsLetterOrDigit(character) || char.IsSurrogate(character))
+            {
+                _ = stringBuilder.Append(character);
+            }
+        }
+
+        return stringBuilder.ToString();
     }
 }

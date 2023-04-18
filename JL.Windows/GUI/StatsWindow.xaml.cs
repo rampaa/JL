@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
-using JL.Core;
+using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 
@@ -101,7 +101,7 @@ internal sealed partial class StatsWindow : Window
 
     private async void ButtonResetStats_OnClick(object sender, RoutedEventArgs e)
     {
-        if (Storage.Frontend.ShowYesNoDialog(
+        if (Utils.Frontend.ShowYesNoDialog(
             $"Are you really sure that you want to reset the {ButtonSwapStats.Content.ToString()!.ToLowerInvariant()} stats?",
             $"Reset {ButtonSwapStats.Content} Stats?"))
         {

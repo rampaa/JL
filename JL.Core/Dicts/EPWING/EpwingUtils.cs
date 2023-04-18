@@ -1,4 +1,5 @@
 using JL.Core.Dicts.Options;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EPWING;
 
@@ -73,7 +74,7 @@ internal static class EpwingUtils
                     }
 
                     // english definitions
-                    if (!epwingRecord.Definitions.Any(Storage.JapaneseRegex.IsMatch))
+                    if (!epwingRecord.Definitions.Any(JapaneseUtils.JapaneseRegex.IsMatch))
                     {
                         return false;
                     }
@@ -95,7 +96,7 @@ internal static class EpwingUtils
     private static bool FilterDuplicateEntries(IEpwingRecord epwingRecord, Dict dict)
     {
         if (dict.Contents.TryGetValue(
-                Kana.KatakanaToHiragana(epwingRecord.PrimarySpelling),
+                JapaneseUtils.KatakanaToHiragana(epwingRecord.PrimarySpelling),
                 out List<IDictRecord>? previousResults))
         {
             for (int i = 0; i < previousResults.Count; i++)
@@ -121,7 +122,7 @@ internal static class EpwingUtils
         }
 
         else if (epwingRecord.Reading is not null && dict.Contents.TryGetValue(
-                Kana.KatakanaToHiragana(epwingRecord.Reading),
+                JapaneseUtils.KatakanaToHiragana(epwingRecord.Reading),
                 out previousResults))
         {
             for (int i = 0; i < previousResults.Count; i++)

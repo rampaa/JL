@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using JL.Core.Dicts;
 using JL.Core.Dicts.EDICT.JMdict;
+using JL.Core.Utilities;
 
 namespace JL.Core.WordClass;
 
@@ -11,13 +12,13 @@ internal static class JmdictWordClassUtils
 {
     public static async Task Load()
     {
-        FileStream openStream = File.OpenRead($"{Storage.ResourcesPath}/PoS.json");
+        FileStream openStream = File.OpenRead($"{Utils.ResourcesPath}/PoS.json");
         await using (openStream.ConfigureAwait(false))
         {
-            Storage.WordClassDictionary = (await JsonSerializer.DeserializeAsync<Dictionary<string, List<JmdictWordClass>>>(openStream).ConfigureAwait(false))!;
+            DictUtils.WordClassDictionary = (await JsonSerializer.DeserializeAsync<Dictionary<string, List<JmdictWordClass>>>(openStream).ConfigureAwait(false))!;
         }
 
-        foreach (List<JmdictWordClass> jmdictWordClassList in Storage.WordClassDictionary.Values.ToList())
+        foreach (List<JmdictWordClass> jmdictWordClassList in DictUtils.WordClassDictionary.Values.ToList())
         {
             int jmdictWordClassListCount = jmdictWordClassList.Count;
             for (int i = 0; i < jmdictWordClassListCount; i++)
@@ -31,21 +32,21 @@ internal static class JmdictWordClassUtils
                     {
                         string reading = jmdictWordClass.Readings[j];
 
-                        if (Storage.WordClassDictionary.TryGetValue(reading, out List<JmdictWordClass>? result))
+                        if (DictUtils.WordClassDictionary.TryGetValue(reading, out List<JmdictWordClass>? result))
                         {
                             result.Add(jmdictWordClass);
                         }
 
                         else
                         {
-                            Storage.WordClassDictionary.Add(reading, new List<JmdictWordClass> { jmdictWordClass });
+                            DictUtils.WordClassDictionary.Add(reading, new List<JmdictWordClass> { jmdictWordClass });
                         }
                     }
                 }
             }
         }
 
-        Storage.WordClassDictionary.TrimExcess();
+        DictUtils.WordClassDictionary.TrimExcess();
     }
 
     public static async Task SerializeJmdictWordClass()
@@ -58,7 +59,7 @@ internal static class JmdictWordClassUtils
             "v5n", "v5r", "v5r-i", "v5s", "v5t", "v5u", "v5u-s", "vk", "vs-c", "vs-i", "vs-s", "vz"
         };
 
-        foreach (List<IDictRecord> jmdictRecordList in Storage.Dicts.Values.First(static dict => dict.Type is DictType.JMdict).Contents.Values.ToList())
+        foreach (List<IDictRecord> jmdictRecordList in DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict).Contents.Values.ToList())
         {
             int jmdictRecordListCount = jmdictRecordList.Count;
             for (int i = 0; i < jmdictRecordListCount; i++)
@@ -126,7 +127,7 @@ internal static class JmdictWordClassUtils
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
-        await File.WriteAllBytesAsync($"{Storage.ResourcesPath}/PoS.json",
+        await File.WriteAllBytesAsync($"{Utils.ResourcesPath}/PoS.json",
             JsonSerializer.SerializeToUtf8Bytes(jmdictWordClassDictionary, options)).ConfigureAwait(false);
     }
 }

@@ -1,12 +1,13 @@
 using System.Text.Json;
 using Caching;
+using JL.Core.Utilities;
 
 namespace JL.Core.Deconjugation;
 
 // translated from https://github.com/wareya/nazeka/blob/master/background-script.js
 internal static class Deconjugator
 {
-    private static readonly Rule[] s_rules = JsonSerializer.Deserialize<Rule[]>(File.ReadAllText($"{Storage.ResourcesPath}/deconjugation_rules.json"))!;
+    private static readonly Rule[] s_rules = JsonSerializer.Deserialize<Rule[]>(File.ReadAllText($"{Utils.ResourcesPath}/deconjugation_rules.json"))!;
 
     private static readonly LRUCache<string, HashSet<Form>> s_cache = new(777, 88);
 

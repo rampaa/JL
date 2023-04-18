@@ -1,4 +1,5 @@
 using System.Xml;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EDICT.JMnedict;
 
@@ -29,11 +30,11 @@ internal static class JmnedictLoader
             dict.Contents.TrimExcess();
         }
 
-        else if (Storage.Frontend.ShowYesNoDialog("Couldn't find JMnedict.xml. Would you like to download it now?",
+        else if (Utils.Frontend.ShowYesNoDialog("Couldn't find JMnedict.xml. Would you like to download it now?",
                      "Download JMnedict?"))
         {
             _ = await ResourceUpdater.UpdateResource(dict.Path,
-                Storage.s_jmnedictUrl,
+                DictUtils.s_jmnedictUrl,
                 DictType.JMnedict.ToString(), false, false).ConfigureAwait(false);
             await Load(dict).ConfigureAwait(false);
         }

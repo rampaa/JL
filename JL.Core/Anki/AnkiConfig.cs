@@ -49,8 +49,8 @@ public sealed class AnkiConfig
     {
         try
         {
-            _ = Directory.CreateDirectory(Storage.ConfigPath);
-            await File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "AnkiConfig.json"),
+            _ = Directory.CreateDirectory(Utils.ConfigPath);
+            await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AnkiConfig.json"),
                 JsonSerializer.Serialize(ankiConfig,
                     new JsonSerializerOptions
                     {
@@ -64,7 +64,7 @@ public sealed class AnkiConfig
         }
         catch (Exception ex)
         {
-            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't write AnkiConfig");
+            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't write AnkiConfig");
             Utils.Logger.Error(ex, "Couldn't write AnkiConfig");
             return false;
         }
@@ -72,25 +72,25 @@ public sealed class AnkiConfig
 
     public static async Task<Dictionary<MineType, AnkiConfig>?> ReadAnkiConfig()
     {
-        if (File.Exists(Path.Join(Storage.ConfigPath, "AnkiConfig.json")))
+        if (File.Exists(Path.Join(Utils.ConfigPath, "AnkiConfig.json")))
         {
             try
             {
                 return JsonSerializer.Deserialize<Dictionary<MineType, AnkiConfig>>(
-                    await File.ReadAllTextAsync(Path.Join(Storage.ConfigPath, "AnkiConfig.json"))
+                    await File.ReadAllTextAsync(Path.Join(Utils.ConfigPath, "AnkiConfig.json"))
                         .ConfigureAwait(false),
                     new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } });
             }
 
             catch (Exception ex)
             {
-                Storage.Frontend.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
+                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
                 Utils.Logger.Error(ex, "Couldn't read AnkiConfig");
                 return null;
             }
         }
 
-        // Storage.FrontEnd.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
+        // Utils.Frontend.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
         Utils.Logger.Warning("AnkiConfig.json doesn't exist");
         return null;
     }

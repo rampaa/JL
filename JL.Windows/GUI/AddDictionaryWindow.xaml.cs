@@ -1,7 +1,6 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
-using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
 using JL.Core.Utilities;
@@ -44,7 +43,7 @@ internal sealed partial class AddDictionaryWindow : Window
         string path = TextBlockPath.Text;
         if (string.IsNullOrEmpty(path)
             || (!Directory.Exists(path) && !File.Exists(path))
-            || Storage.Dicts.Values.Select(static dict => dict.Path).Contains(path))
+            || DictUtils.Dicts.Values.Select(static dict => dict.Path).Contains(path))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
             isValid = false;
@@ -55,7 +54,7 @@ internal sealed partial class AddDictionaryWindow : Window
         }
 
         string name = NameTextBox.Text;
-        if (string.IsNullOrEmpty(name) || Storage.Dicts.Values.Select(static dict => dict.Name).Contains(name))
+        if (string.IsNullOrEmpty(name) || DictUtils.Dicts.Values.Select(static dict => dict.Name).Contains(name))
         {
             NameTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -72,7 +71,7 @@ internal sealed partial class AddDictionaryWindow : Window
             NewlineBetweenDefinitionsOption? newlineOption = null;
             if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(type))
             {
-                bool isEpwing = Storage.YomichanDictTypes.Concat(Storage.NazekaDictTypes).Contains(type);
+                bool isEpwing = DictUtils.YomichanDictTypes.Concat(DictUtils.NazekaDictTypes).Contains(type);
                 newlineOption = new NewlineBetweenDefinitionsOption { Value = isEpwing };
             }
 
@@ -86,8 +85,8 @@ internal sealed partial class AddDictionaryWindow : Window
             // TODO?
             DictOptions options = new(newlineOption, examplesOption);
 
-            Storage.Dicts.Add(name,
-                new Dict(type, name, path, true, Storage.Dicts.Count + 1, 0, options));
+            DictUtils.Dicts.Add(name,
+                new Dict(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options));
 
             Close();
         }
@@ -95,23 +94,23 @@ internal sealed partial class AddDictionaryWindow : Window
 
     private void BrowseForDictionaryFile(string filter)
     {
-        OpenFileDialog openFileDialog = new() { InitialDirectory = Storage.ApplicationPath, Filter = filter };
+        OpenFileDialog openFileDialog = new() { InitialDirectory = Utils.ApplicationPath, Filter = filter };
 
         if (openFileDialog.ShowDialog() is true)
         {
-            string relativePath = Path.GetRelativePath(Storage.ApplicationPath, openFileDialog.FileName);
+            string relativePath = Path.GetRelativePath(Utils.ApplicationPath, openFileDialog.FileName);
             TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
         }
     }
 
     private void BrowseForDictionaryFolder()
     {
-        using var fbd = new System.Windows.Forms.FolderBrowserDialog { SelectedPath = Storage.ApplicationPath };
+        using var fbd = new System.Windows.Forms.FolderBrowserDialog { SelectedPath = Utils.ApplicationPath };
 
         if (fbd.ShowDialog() is System.Windows.Forms.DialogResult.OK &&
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))
         {
-            string relativePath = Path.GetRelativePath(Storage.ApplicationPath, fbd.SelectedPath);
+            string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fbd.SelectedPath);
             TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
         }
     }
@@ -119,23 +118,23 @@ internal sealed partial class AddDictionaryWindow : Window
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         RadioButtonYomichanImport.IsChecked = true;
-        FillDictTypesCombobox(Storage.YomichanDictTypes);
+        FillDictTypesCombobox(DictUtils.YomichanDictTypes);
     }
 
     private void RadioButtonYomichanImport_OnClick(object sender, RoutedEventArgs e)
     {
-        FillDictTypesCombobox(Storage.YomichanDictTypes);
+        FillDictTypesCombobox(DictUtils.YomichanDictTypes);
     }
 
     private void RadioButtonNazekaEpwingConverter_OnClick(object sender, RoutedEventArgs e)
     {
-        FillDictTypesCombobox(Storage.NazekaDictTypes);
+        FillDictTypesCombobox(DictUtils.NazekaDictTypes);
     }
 
     private void FillDictTypesCombobox(IEnumerable<DictType> types)
     {
-        IEnumerable<DictType> loadedDictTypes = Storage.Dicts.Values.Select(static dict => dict.Type);
-        IEnumerable<DictType> validTypes = types.Except(loadedDictTypes.Except(Storage.NonspecificDictTypes));
+        IEnumerable<DictType> loadedDictTypes = DictUtils.Dicts.Values.Select(static dict => dict.Type);
+        IEnumerable<DictType> validTypes = types.Except(loadedDictTypes.Except(DictUtils.NonspecificDictTypes));
 
         ComboBoxDictType.ItemsSource = validTypes.Select(static d => d.GetDescription() ?? d.ToString());
     }

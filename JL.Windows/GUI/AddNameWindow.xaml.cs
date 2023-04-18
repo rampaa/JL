@@ -3,9 +3,9 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomNameDict;
+using JL.Core.Utilities;
 using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
@@ -38,7 +38,7 @@ internal sealed partial class AddNameWindow : Window
     {
         bool isValid = true;
 
-        if (!Storage.JapaneseRegex.IsMatch(SpellingTextBox.Text))
+        if (!JapaneseUtils.JapaneseRegex.IsMatch(SpellingTextBox.Text))
         {
             SpellingTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -66,7 +66,7 @@ internal sealed partial class AddNameWindow : Window
             string spelling = SpellingTextBox.Text.Replace("\t", "  ").Trim();
             string reading = ReadingTextBox.Text.Replace("\t", "  ").Trim();
             CustomNameLoader.AddToDictionary(spelling, reading, nameType);
-            Storage.Frontend.InvalidateDisplayCache();
+            Utils.Frontend.InvalidateDisplayCache();
             Close();
             await WriteToFile(spelling, reading, nameType).ConfigureAwait(false);
         }
@@ -82,7 +82,7 @@ internal sealed partial class AddNameWindow : Window
             .Append(type)
             .Append(Environment.NewLine);
 
-        string customNameDictPath = Storage.Dicts.Values.First(static dict => dict.Type is DictType.CustomNameDictionary).Path;
+        string customNameDictPath = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomNameDictionary).Path;
         await File.AppendAllTextAsync(customNameDictPath,
             stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);
     }

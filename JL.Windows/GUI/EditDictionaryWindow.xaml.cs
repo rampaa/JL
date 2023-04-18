@@ -1,7 +1,6 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
-using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
@@ -40,7 +39,7 @@ internal sealed partial class EditDictionaryWindow : Window
         string path = TextBlockPath.Text;
         if (string.IsNullOrEmpty(path)
             || (!Directory.Exists(path) && !File.Exists(path))
-            || (_dict.Path != path && Storage.Dicts.Values.Any(dict => dict.Path == path)))
+            || (_dict.Path != path && DictUtils.Dicts.Values.Any(dict => dict.Path == path)))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
             isValid = false;
@@ -52,7 +51,7 @@ internal sealed partial class EditDictionaryWindow : Window
 
         string name = NameTextBox.Text;
         if (string.IsNullOrEmpty(name)
-            || (_dict.Name != name && Storage.Dicts.ContainsKey(name)))
+            || (_dict.Name != name && DictUtils.Dicts.ContainsKey(name)))
         {
             NameTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -80,7 +79,7 @@ internal sealed partial class EditDictionaryWindow : Window
             }
 
             _dict.Options = options;
-            Storage.Frontend.InvalidateDisplayCache();
+            Utils.Frontend.InvalidateDisplayCache();
 
             Close();
         }
@@ -88,23 +87,23 @@ internal sealed partial class EditDictionaryWindow : Window
 
     private void BrowseForDictionaryFile(string filter)
     {
-        OpenFileDialog openFileDialog = new() { InitialDirectory = Storage.ApplicationPath, Filter = filter };
+        OpenFileDialog openFileDialog = new() { InitialDirectory = Utils.ApplicationPath, Filter = filter };
 
         if (openFileDialog.ShowDialog() is true)
         {
-            string relativePath = Path.GetRelativePath(Storage.ApplicationPath, openFileDialog.FileName);
+            string relativePath = Path.GetRelativePath(Utils.ApplicationPath, openFileDialog.FileName);
             TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
         }
     }
 
     private void BrowseForDictionaryFolder()
     {
-        using var fbd = new System.Windows.Forms.FolderBrowserDialog { SelectedPath = Storage.ApplicationPath };
+        using var fbd = new System.Windows.Forms.FolderBrowserDialog { SelectedPath = Utils.ApplicationPath };
 
         if (fbd.ShowDialog() is System.Windows.Forms.DialogResult.OK &&
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))
         {
-            string relativePath = Path.GetRelativePath(Storage.ApplicationPath, fbd.SelectedPath);
+            string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fbd.SelectedPath);
             TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
         }
     }

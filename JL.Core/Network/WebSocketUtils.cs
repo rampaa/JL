@@ -63,13 +63,13 @@ public static class WebSocketUtils
                             _ = memoryStream.Seek(0, SeekOrigin.Begin);
 
                             string text = Encoding.UTF8.GetString(memoryStream.ToArray());
-                            _ = Task.Run(async () => await Storage.Frontend.CopyFromWebSocket(text).ConfigureAwait(false)).ConfigureAwait(false);
+                            _ = Task.Run(async () => await Utils.Frontend.CopyFromWebSocket(text).ConfigureAwait(false)).ConfigureAwait(false);
                         }
                     }
                     catch (WebSocketException webSocketException)
                     {
                         Utils.Logger.Warning(webSocketException, "WebSocket server is closed unexpectedly");
-                        Storage.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
+                        Utils.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
                         break;
                     }
                 }
@@ -78,7 +78,7 @@ public static class WebSocketUtils
             catch (WebSocketException webSocketException)
             {
                 Utils.Logger.Warning(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
-                Storage.Frontend.Alert(AlertLevel.Error, "Couldn't connect to the WebSocket server, probably because it is not running");
+                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't connect to the WebSocket server, probably because it is not running");
             }
         }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
     }

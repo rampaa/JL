@@ -424,7 +424,7 @@ internal static class ConfigManager
                 else
                 {
                     Utils.Logger.Warning("Couldn't save AnkiConnect server address, invalid URL");
-                    Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
+                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
                 }
             }
         }
@@ -445,7 +445,7 @@ internal static class ConfigManager
                 else
                 {
                     Utils.Logger.Warning("Couldn't save WebSocket address, invalid URL");
-                    Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save WebSocket address, invalid URL");
+                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't save WebSocket address, invalid URL");
                 }
             }
             WebSocketUtils.HandleWebSocket();
@@ -463,7 +463,7 @@ internal static class ConfigManager
                 if (!Uri.IsWellFormedUriString(searchUrlStr.Replace("{SearchTerm}", ""), UriKind.Absolute))
                 {
                     Utils.Logger.Warning("Couldn't save Search URL, invalid URL");
-                    Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save Search URL, invalid URL");
+                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't save Search URL, invalid URL");
                 }
                 else
                 {
@@ -481,7 +481,7 @@ internal static class ConfigManager
             else if (!string.IsNullOrWhiteSpace(browserPathStr) && !Path.IsPathFullyQualified(browserPathStr))
             {
                 Utils.Logger.Warning("Couldn't save Browser Path, invalid path");
-                Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save Browser Path, invalid path");
+                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't save Browser Path, invalid path");
             }
             else
             {
@@ -599,7 +599,7 @@ internal static class ConfigManager
 
         MainWindow mainWindow = MainWindow.Instance;
 
-        preferenceWindow.JLVersionTextBlock.Text = $"v{Storage.JLVersion}";
+        preferenceWindow.JLVersionTextBlock.Text = $"v{Utils.JLVersion}";
 
         preferenceWindow.DisableHotkeysKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(DisableHotkeysKeyGesture);
         preferenceWindow.MiningModeKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(MiningModeKeyGesture);

@@ -1,7 +1,6 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
-using JL.Core;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
@@ -35,7 +34,7 @@ internal sealed partial class EditFrequencyWindow : Window
         string path = TextBlockPath.Text;
         if (string.IsNullOrEmpty(path)
             || (!Directory.Exists(path) && !File.Exists(path))
-            || (_freq.Path != path && Storage.FreqDicts.Values.Any(dict => dict.Path == path)))
+            || (_freq.Path != path && FreqUtils.FreqDicts.Values.Any(dict => dict.Path == path)))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
             isValid = false;
@@ -47,7 +46,7 @@ internal sealed partial class EditFrequencyWindow : Window
 
         string name = NameTextBox.Text;
         if (string.IsNullOrEmpty(name)
-            || (_freq.Name != name && Storage.FreqDicts.Values.Any(dict => dict.Name == name)))
+            || (_freq.Name != name && FreqUtils.FreqDicts.Values.Any(dict => dict.Name == name)))
         {
             NameTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -67,7 +66,7 @@ internal sealed partial class EditFrequencyWindow : Window
 
             _freq.Name = name;
 
-            Storage.Frontend.InvalidateDisplayCache();
+            Utils.Frontend.InvalidateDisplayCache();
 
             Close();
         }
@@ -75,23 +74,23 @@ internal sealed partial class EditFrequencyWindow : Window
 
     private void BrowseForFrequencyFile(string filter)
     {
-        OpenFileDialog openFileDialog = new() { InitialDirectory = Storage.ApplicationPath, Filter = filter };
+        OpenFileDialog openFileDialog = new() { InitialDirectory = Utils.ApplicationPath, Filter = filter };
 
         if (openFileDialog.ShowDialog() is true)
         {
-            string relativePath = Path.GetRelativePath(Storage.ApplicationPath, openFileDialog.FileName);
+            string relativePath = Path.GetRelativePath(Utils.ApplicationPath, openFileDialog.FileName);
             TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
         }
     }
 
     private void BrowseForFrequencyFolder()
     {
-        using var fbd = new System.Windows.Forms.FolderBrowserDialog { SelectedPath = Storage.ApplicationPath };
+        using var fbd = new System.Windows.Forms.FolderBrowserDialog { SelectedPath = Utils.ApplicationPath };
 
         if (fbd.ShowDialog() is System.Windows.Forms.DialogResult.OK &&
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))
         {
-            string relativePath = Path.GetRelativePath(Storage.ApplicationPath, fbd.SelectedPath);
+            string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fbd.SelectedPath);
             TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
         }
     }

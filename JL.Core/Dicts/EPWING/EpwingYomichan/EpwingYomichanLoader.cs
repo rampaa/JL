@@ -1,4 +1,5 @@
 using System.Text.Json;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EPWING.EpwingYomichan;
 
@@ -48,13 +49,13 @@ internal static class EpwingYomichanLoader
             return;
         }
 
-        string hiraganaExpression = Kana.KatakanaToHiragana(yomichanRecord.PrimarySpelling);
+        string hiraganaExpression = JapaneseUtils.KatakanaToHiragana(yomichanRecord.PrimarySpelling);
 
         List<IDictRecord>? records;
 
         if (!string.IsNullOrEmpty(yomichanRecord.Reading))
         {
-            string hiraganaReading = Kana.KatakanaToHiragana(yomichanRecord.Reading);
+            string hiraganaReading = JapaneseUtils.KatakanaToHiragana(yomichanRecord.Reading);
 
             if (dict.Contents.TryGetValue(hiraganaReading, out records))
             {

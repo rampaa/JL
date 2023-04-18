@@ -1,4 +1,5 @@
 using System.Text.Json;
+using JL.Core.Utilities;
 
 namespace JL.Core.Freqs.FrequencyNazeka;
 
@@ -37,7 +38,7 @@ internal static class FrequencyNazekaLoader
                         new List<FrequencyRecord> { new(exactSpelling, frequencyRank) });
                 }
 
-                string exactSpellingInHiragana = Kana.KatakanaToHiragana(exactSpelling);
+                string exactSpellingInHiragana = JapaneseUtils.KatakanaToHiragana(exactSpelling);
 
                 if (exactSpellingInHiragana != reading)
                 {

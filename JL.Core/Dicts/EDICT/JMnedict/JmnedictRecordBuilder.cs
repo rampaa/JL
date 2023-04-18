@@ -51,7 +51,7 @@ internal static class JmnedictRecordBuilder
             int rebListCount = entry.RebList.Count;
             for (int i = 0; i < rebListCount; i++)
             {
-                string key = Kana.KatakanaToHiragana(entry.RebList[i]);
+                string key = JapaneseUtils.KatakanaToHiragana(entry.RebList[i]);
 
                 if (recordDictionary.ContainsKey(key))
                 {
@@ -87,7 +87,7 @@ internal static class JmnedictRecordBuilder
             recordKeyValuePair.Value.Readings = Utils.TrimStringList(recordKeyValuePair.Value.Readings!);
             recordKeyValuePair.Value.Id = entry.Id;
 
-            string key = Kana.KatakanaToHiragana(recordKeyValuePair.Key);
+            string key = JapaneseUtils.KatakanaToHiragana(recordKeyValuePair.Key);
             if (jmnedictDictionary.TryGetValue(key, out List<IDictRecord>? tempRecordList))
             {
                 tempRecordList.Add(recordKeyValuePair.Value);

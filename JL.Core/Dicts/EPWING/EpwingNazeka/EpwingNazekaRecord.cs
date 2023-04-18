@@ -1,6 +1,7 @@
 using System.Text;
 using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EPWING.EpwingNazeka;
 
@@ -44,7 +45,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
     {
         int frequency = int.MaxValue;
 
-        if (freq.Contents.TryGetValue(Kana.KatakanaToHiragana(PrimarySpelling),
+        if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling),
                 out List<FrequencyRecord>? freqResults))
         {
             int freqResultsCount = freqResults.Count;
@@ -67,7 +68,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
                 for (int i = 0; i < alternativeSpellingsCount; i++)
                 {
                     if (freq.Contents.TryGetValue(
-                            Kana.KatakanaToHiragana(AlternativeSpellings[i]),
+                            JapaneseUtils.KatakanaToHiragana(AlternativeSpellings[i]),
                             out List<FrequencyRecord>? alternativeSpellingFreqResults))
                     {
                         int alternativeSpellingFreqResultsCount = alternativeSpellingFreqResults.Count;
@@ -90,7 +91,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
 
         else if (Reading is not null)
         {
-            if (freq.Contents.TryGetValue(Kana.KatakanaToHiragana(Reading),
+            if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading),
                     out List<FrequencyRecord>? readingFreqResults))
             {
                 int readingFreqResultsCount = readingFreqResults.Count;
@@ -98,7 +99,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
                 {
                     FrequencyRecord readingFreqResult = readingFreqResults[j];
 
-                    if ((Reading == readingFreqResult.Spelling && Kana.IsKatakana(Reading))
+                    if ((Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading))
                         || (AlternativeSpellings?.Contains(readingFreqResult.Spelling) ?? false))
                     {
                         if (frequency > readingFreqResult.Frequency)

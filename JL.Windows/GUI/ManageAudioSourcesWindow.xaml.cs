@@ -4,7 +4,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using JL.Core;
 using JL.Core.Audio;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
@@ -54,11 +53,11 @@ internal sealed partial class ManageAudioSourcesWindow : Window
 
     private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        Storage.Frontend.InvalidateDisplayCache();
+        Utils.Frontend.InvalidateDisplayCache();
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
         s_instance = null;
-        await Utils.SerializeAudioSources().ConfigureAwait(false);
+        await AudioUtils.SerializeAudioSources().ConfigureAwait(false);
     }
 
     // probably should be split into several methods
@@ -66,7 +65,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
     {
         List<DockPanel> resultDockPanels = new();
 
-        foreach ((string uri, AudioSource audioSource) in Storage.AudioSources.OrderBy(static a => a.Value.Priority))
+        foreach ((string uri, AudioSource audioSource) in AudioUtils.AudioSources.OrderBy(static a => a.Value.Priority))
         {
             DockPanel dockPanel = new();
 
@@ -171,13 +170,13 @@ internal sealed partial class ManageAudioSourcesWindow : Window
 
             buttonRemove.Click += (_, _) =>
             {
-                if (Storage.Frontend.ShowYesNoDialog("Do you really want to remove this audio source?", "Confirmation"))
+                if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this audio source?", "Confirmation"))
                 {
-                    _ = Storage.AudioSources.Remove(uri);
+                    _ = AudioUtils.AudioSources.Remove(uri);
 
                     int priorityOfDeletedAudioSource = audioSource.Priority;
 
-                    foreach (AudioSource a in Storage.AudioSources.Values)
+                    foreach (AudioSource a in AudioUtils.AudioSources.Values)
                     {
                         if (a.Priority > priorityOfDeletedAudioSource)
                         {
@@ -220,18 +219,18 @@ internal sealed partial class ManageAudioSourcesWindow : Window
             return;
         }
 
-        Storage.AudioSources.First(f => f.Value.Priority == audioSource.Priority - 1).Value.Priority += 1;
+        AudioUtils.AudioSources.First(f => f.Value.Priority == audioSource.Priority - 1).Value.Priority += 1;
         audioSource.Priority -= 1;
     }
 
     private static void UnPrioritizeAudioSource(AudioSource audioSource)
     {
-        if (audioSource.Priority == Storage.AudioSources.Count)
+        if (audioSource.Priority == AudioUtils.AudioSources.Count)
         {
             return;
         }
 
-        Storage.AudioSources.First(a => a.Value.Priority == audioSource.Priority + 1).Value.Priority -= 1;
+        AudioUtils.AudioSources.First(a => a.Value.Priority == audioSource.Priority + 1).Value.Priority -= 1;
         audioSource.Priority += 1;
     }
 

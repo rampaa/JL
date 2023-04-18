@@ -35,7 +35,7 @@ public static class Lookup
 
         if (CoreConfig.KanjiMode)
         {
-            _ = Parallel.ForEach(Storage.Dicts.Values.ToList(), dict =>
+            _ = Parallel.ForEach(DictUtils.Dicts.Values.ToList(), dict =>
             {
                 if (dict.Active)
                 {
@@ -44,14 +44,14 @@ public static class Lookup
                         lookupResults.AddRange(BuildKanjidicResult(GetKanjiResults(text, dict)));
                     }
 
-                    else if (Storage.s_kanjiDictTypes.Contains(dict.Type))
+                    else if (DictUtils.s_kanjiDictTypes.Contains(dict.Type))
                     {
-                        if (Storage.NazekaDictTypes.Contains(dict.Type))
+                        if (DictUtils.NazekaDictTypes.Contains(dict.Type))
                         {
                             lookupResults.AddRange(BuildEpwingNazekaResult(GetKanjiResults(text, dict)));
                         }
 
-                        else // if (Storage.YomichanDictTypes.Contains(dict.Type))
+                        else // if (DictUtils.YomichanDictTypes.Contains(dict.Type))
                         {
                             lookupResults.AddRange(BuildYomichanKanjiResult(GetKanjiResults(text, dict)));
                         }
@@ -91,13 +91,13 @@ public static class Lookup
 
             textList.Add(currentText);
 
-            string textInHiragana = Kana.KatakanaToHiragana(currentText);
+            string textInHiragana = JapaneseUtils.KatakanaToHiragana(currentText);
             textInHiraganaList.Add(textInHiragana);
 
             deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
         }
 
-        _ = Parallel.ForEach(Storage.Dicts.Values.ToList(), dict =>
+        _ = Parallel.ForEach(DictUtils.Dicts.Values.ToList(), dict =>
         {
             if (dict.Active)
             {
@@ -366,7 +366,7 @@ public static class Lookup
                                         resultsList.Add(dictResult);
                                     }
 
-                                    else if (Storage.WordClassDictionary.TryGetValue(deconjugationResult.Text,
+                                    else if (DictUtils.WordClassDictionary.TryGetValue(deconjugationResult.Text,
                                                  out List<JmdictWordClass>? jmdictWcResults))
                                     {
                                         for (int j = 0; j < jmdictWcResults.Count; j++)
@@ -407,7 +407,7 @@ public static class Lookup
                                         resultsList.Add(dictResult);
                                     }
 
-                                    else if (Storage.WordClassDictionary.TryGetValue(deconjugationResult.Text,
+                                    else if (DictUtils.WordClassDictionary.TryGetValue(deconjugationResult.Text,
                                                  out List<JmdictWordClass>? jmdictWcResults))
                                     {
                                         for (int j = 0; j < jmdictWcResults.Count; j++)
@@ -495,7 +495,7 @@ public static class Lookup
             if (tryLongVowelConversion && textInHiraganaList[i].Contains('ー') &&
                 textInHiraganaList[i][0] is not 'ー')
             {
-                List<string> textWithoutLongVowelMarkList = Kana.LongVowelMarkToKana(textInHiraganaList[i]);
+                List<string> textWithoutLongVowelMarkList = JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i]);
 
                 for (int j = 0; j < textWithoutLongVowelMarkList.Count; j++)
                 {
@@ -689,7 +689,7 @@ public static class Lookup
             nanoriReadings: kanjiRecord.NanoriReadings,
             strokeCount: kanjiRecord.StrokeCount,
             kanjiGrade: kanjiRecord.Grade,
-            kanjiComposition: Storage.s_kanjiCompositionDict.GetValueOrDefault(dictResult.Key),
+            kanjiComposition: DictUtils.s_kanjiCompositionDict.GetValueOrDefault(dictResult.Key),
             frequencies: GetKanjidicFrequencies(dictResult.Key, kanjiRecord.Frequency),
             matchedText: intermediaryResult.MatchedText,
             deconjugatedMatchedText: intermediaryResult.DeconjugatedMatchedText,
@@ -735,7 +735,7 @@ public static class Lookup
                         readings: allReadings,
                         onReadings: yomichanKanjiDictResult.OnReadings,
                         kunReadings: yomichanKanjiDictResult.KunReadings,
-                        kanjiComposition: Storage.s_kanjiCompositionDict.GetValueOrDefault(kanjiResult.Key),
+                        kanjiComposition: DictUtils.s_kanjiCompositionDict.GetValueOrDefault(kanjiResult.Key),
                         kanjiStats: yomichanKanjiDictResult.BuildFormattedStats(),
                         frequencies: GetYomichanKanjiFrequencies(kanjiResult.Key),
                         matchedText: kanjiResult.Value.MatchedText,
@@ -914,7 +914,7 @@ public static class Lookup
     {
         List<LookupFrequencyResult> freqsList = new();
 
-        foreach (Freq freq in Storage.FreqDicts.Values.ToList().OrderBy(f => f.Priority))
+        foreach (Freq freq in FreqUtils.FreqDicts.Values.ToList().OrderBy(static f => f.Priority))
         {
             if (freq is { Active: true, Type: not FreqType.YomichanKanji })
             {
@@ -929,7 +929,7 @@ public static class Lookup
     {
         List<LookupFrequencyResult> freqsList = new();
 
-        Freq? kanjiFreq = Storage.FreqDicts.Values.FirstOrDefault(static f => f.Type is FreqType.YomichanKanji);
+        Freq? kanjiFreq = FreqUtils.FreqDicts.Values.FirstOrDefault(static f => f.Type is FreqType.YomichanKanji);
 
         if (kanjiFreq?.Active ?? false)
         {

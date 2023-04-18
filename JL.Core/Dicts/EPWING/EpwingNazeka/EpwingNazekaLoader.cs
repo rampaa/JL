@@ -1,4 +1,5 @@
 using System.Text.Json;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EPWING.EpwingNazeka;
 
@@ -51,7 +52,7 @@ internal static class EpwingNazekaLoader
                 List<string>? alternativeSpellings = spellings.ToList();
                 alternativeSpellings.RemoveAt(0);
 
-                string key = Kana.KatakanaToHiragana(reading);
+                string key = JapaneseUtils.KatakanaToHiragana(reading);
 
                 EpwingNazekaRecord tempRecord = new(primarySpelling, reading, alternativeSpellings,
                     definitions);
@@ -77,7 +78,7 @@ internal static class EpwingNazekaLoader
                         alternativeSpellings = null;
                     }
 
-                    key = Kana.KatakanaToHiragana(primarySpelling);
+                    key = JapaneseUtils.KatakanaToHiragana(primarySpelling);
 
                     tempRecord = new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions);
 
@@ -99,7 +100,7 @@ internal static class EpwingNazekaLoader
 
             else
             {
-                string key = Kana.KatakanaToHiragana(reading);
+                string key = JapaneseUtils.KatakanaToHiragana(reading);
 
                 EpwingNazekaRecord tempRecord = new(reading, null, null, definitions);
 

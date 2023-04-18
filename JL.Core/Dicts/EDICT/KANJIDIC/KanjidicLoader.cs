@@ -27,12 +27,12 @@ internal static class KanjidicLoader
             dict.Contents.TrimExcess();
         }
 
-        else if (Storage.Frontend.ShowYesNoDialog(
+        else if (Utils.Frontend.ShowYesNoDialog(
                      "Couldn't find kanjidic2.xml. Would you like to download it now?",
                      "Download KANJIDIC2?"))
         {
             _ = await ResourceUpdater.UpdateResource(dict.Path,
-                Storage.s_kanjidicUrl,
+                DictUtils.s_kanjidicUrl,
                 DictType.Kanjidic.ToString(), false, false).ConfigureAwait(false);
             await Load(dict).ConfigureAwait(false);
         }

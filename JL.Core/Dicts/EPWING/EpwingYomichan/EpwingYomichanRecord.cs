@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EPWING.EpwingYomichan;
 
@@ -91,7 +92,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
     {
         int frequency = int.MaxValue;
 
-        if (freq.Contents.TryGetValue(Kana.KatakanaToHiragana(PrimarySpelling),
+        if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling),
                 out List<FrequencyRecord>? freqResults))
         {
             int freqResultsCount = freqResults.Count;
@@ -110,7 +111,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         }
 
         else if (!string.IsNullOrEmpty(Reading)
-                 && freq.Contents.TryGetValue(Kana.KatakanaToHiragana(Reading),
+                 && freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading),
                      out List<FrequencyRecord>? readingFreqResults))
         {
             int readingFreqResultsCount = readingFreqResults.Count;
@@ -118,7 +119,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
             {
                 FrequencyRecord readingFreqResult = readingFreqResults[i];
 
-                if (Reading == readingFreqResult.Spelling && Kana.IsKatakana(Reading))
+                if (Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading))
                 {
                     if (frequency > readingFreqResult.Frequency)
                     {

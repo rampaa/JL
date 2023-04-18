@@ -1,4 +1,5 @@
 using System.Text.Json;
+using JL.Core.Utilities;
 
 namespace JL.Core.Freqs.FrequencyYomichan;
 
@@ -30,7 +31,7 @@ internal static class FrequencyYomichanLoader
             foreach (List<JsonElement> value in frequencyJson!)
             {
                 string spelling = value[0].ToString();
-                string spellingInHiragana = Kana.KatakanaToHiragana(spelling);
+                string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(spelling);
                 string reading = "";
                 int frequency = int.MaxValue;
                 JsonElement thirdElement = value[2];
@@ -82,7 +83,7 @@ internal static class FrequencyYomichanLoader
 
                     else
                     {
-                        string readingInHiragana = Kana.KatakanaToHiragana(reading);
+                        string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading);
                         if (freqDict.TryGetValue(readingInHiragana, out List<FrequencyRecord>? readingFreqResult))
                         {
                             readingFreqResult.Add(new FrequencyRecord(spelling, frequency));

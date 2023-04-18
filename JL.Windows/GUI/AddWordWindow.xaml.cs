@@ -3,9 +3,9 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomWordDict;
+using JL.Core.Utilities;
 using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
@@ -38,7 +38,7 @@ internal sealed partial class AddWordWindow : Window
     {
         bool isValid = true;
 
-        if (!Storage.JapaneseRegex.IsMatch(SpellingsTextBox.Text))
+        if (!JapaneseUtils.JapaneseRegex.IsMatch(SpellingsTextBox.Text))
         {
             SpellingsTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -86,7 +86,7 @@ internal sealed partial class AddWordWindow : Window
                 : rawWordClasses.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static wc => wc.Trim()).ToList();
 
             CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawPartOfSpeech, wordClasses);
-            Storage.Frontend.InvalidateDisplayCache();
+            Utils.Frontend.InvalidateDisplayCache();
 
             Close();
 
@@ -113,7 +113,7 @@ internal sealed partial class AddWordWindow : Window
 
         _ = stringBuilder.Append(Environment.NewLine);
 
-        string customWordDictPath = Storage.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary).Path;
+        string customWordDictPath = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary).Path;
         await File.AppendAllTextAsync(customWordDictPath,
             stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);
     }

@@ -15,8 +15,10 @@ using System.Windows.Media.Imaging;
 using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools;
-using JL.Core;
+using JL.Core.Dicts;
+using JL.Core.Freqs;
 using JL.Core.Network;
+using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
 using NAudio.Wave;
@@ -188,7 +190,7 @@ internal static class WindowsUtils
         addNameWindowInstance.ReadingTextBox.Text = reading;
         addNameWindowInstance.Owner = MainWindow.Instance;
         addNameWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-        Storage.StatsStopWatch.Stop();
+        StatsUtils.StatsStopWatch.Stop();
         _ = addNameWindowInstance.ShowDialog();
     }
 
@@ -198,7 +200,7 @@ internal static class WindowsUtils
         addWordWindowInstance.SpellingsTextBox.Text = selectedText;
         addWordWindowInstance.Owner = MainWindow.Instance;
         addWordWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-        Storage.StatsStopWatch.Stop();
+        StatsUtils.StatsStopWatch.Stop();
         _ = addWordWindowInstance.ShowDialog();
     }
 
@@ -208,52 +210,52 @@ internal static class WindowsUtils
         ConfigManager.LoadPreferences(preferencesWindow);
         preferencesWindow.Owner = MainWindow.Instance;
         preferencesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        Storage.StatsStopWatch.Stop();
+        StatsUtils.StatsStopWatch.Stop();
         _ = preferencesWindow.ShowDialog();
     }
 
     public static void ShowManageDictionariesWindow()
     {
-        if (!File.Exists(Path.Join(Storage.ConfigPath, "dicts.json")))
+        if (!File.Exists(Path.Join(Utils.ConfigPath, "dicts.json")))
         {
-            Utils.CreateDefaultDictsConfig();
+            DictUtils.CreateDefaultDictsConfig();
         }
 
-        if (!File.Exists($"{Storage.ResourcesPath}/custom_words.txt"))
+        if (!File.Exists($"{Utils.ResourcesPath}/custom_words.txt"))
         {
-            File.Create($"{Storage.ResourcesPath}/custom_words.txt").Dispose();
+            File.Create($"{Utils.ResourcesPath}/custom_words.txt").Dispose();
         }
 
-        if (!File.Exists($"{Storage.ResourcesPath}/custom_names.txt"))
+        if (!File.Exists($"{Utils.ResourcesPath}/custom_names.txt"))
         {
-            File.Create($"{Storage.ResourcesPath}/custom_names.txt").Dispose();
+            File.Create($"{Utils.ResourcesPath}/custom_names.txt").Dispose();
         }
 
         ManageDictionariesWindow manageDictionariesWindow = ManageDictionariesWindow.Instance;
         manageDictionariesWindow.Owner = MainWindow.Instance;
         manageDictionariesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        Storage.StatsStopWatch.Stop();
+        StatsUtils.StatsStopWatch.Stop();
         _ = manageDictionariesWindow.ShowDialog();
     }
 
     public static void ShowManageFrequenciesWindow()
     {
-        if (!File.Exists(Path.Join(Storage.ConfigPath, "freqs.json")))
+        if (!File.Exists(Path.Join(Utils.ConfigPath, "freqs.json")))
         {
-            Utils.CreateDefaultFreqsConfig();
+            FreqUtils.CreateDefaultFreqsConfig();
         }
 
         ManageFrequenciesWindow manageFrequenciesWindow = ManageFrequenciesWindow.Instance;
         manageFrequenciesWindow.Owner = MainWindow.Instance;
         manageFrequenciesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        Storage.StatsStopWatch.Stop();
+        StatsUtils.StatsStopWatch.Stop();
         _ = manageFrequenciesWindow.ShowDialog();
     }
 
     public static async Task ShowStatsWindow()
     {
-        await Stats.IncrementStat(StatType.Time, Storage.StatsStopWatch.ElapsedTicks).ConfigureAwait(true);
-        Storage.StatsStopWatch.Reset();
+        await Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks).ConfigureAwait(true);
+        StatsUtils.StatsStopWatch.Reset();
 
         StatsWindow statsWindow = StatsWindow.Instance;
         statsWindow.Owner = MainWindow.Instance;
@@ -266,7 +268,7 @@ internal static class WindowsUtils
         ManageAudioSourcesWindow manageAudioSourcesWindow = ManageAudioSourcesWindow.Instance;
         manageAudioSourcesWindow.Owner = MainWindow.Instance;
         manageAudioSourcesWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-        Storage.StatsStopWatch.Stop();
+        StatsUtils.StatsStopWatch.Stop();
         _ = manageAudioSourcesWindow.ShowDialog();
     }
 
@@ -289,14 +291,14 @@ internal static class WindowsUtils
     public static async Task UpdateJL(Uri latestReleaseUrl)
     {
         HttpRequestMessage downloadRequest = new(HttpMethod.Get, latestReleaseUrl);
-        HttpResponseMessage downloadResponse = await Storage.Client.SendAsync(downloadRequest).ConfigureAwait(false);
+        HttpResponseMessage downloadResponse = await Networking.Client.SendAsync(downloadRequest).ConfigureAwait(false);
 
         if (downloadResponse.IsSuccessStatusCode)
         {
             Stream downloadResponseStream = await downloadResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
             await using (downloadResponseStream.ConfigureAwait(false))
             {
-                string tmpDirectory = Path.Join(Storage.ApplicationPath, "tmp");
+                string tmpDirectory = Path.Join(Utils.ApplicationPath, "tmp");
 
                 if (Directory.Exists(tmpDirectory))
                 {
@@ -313,20 +315,20 @@ internal static class WindowsUtils
 
             _ = Process.Start(
                 new ProcessStartInfo("cmd",
-                $"/c start \"JL Updater\" \"{Path.Join(Storage.ApplicationPath, "update-helper.cmd")}\"")
+                $"/c start \"JL Updater\" \"{Path.Join(Utils.ApplicationPath, "update-helper.cmd")}\"")
                 { UseShellExecute = true, Verb = "runas" });
         }
 
         else
         {
             Utils.Logger.Error("Couldn't update JL. {StatusCode} {ReasonPhrase}", downloadResponse.StatusCode, downloadResponse.ReasonPhrase);
-            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't update JL");
+            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't update JL");
         }
     }
 
     public static async Task InitializeMainWindow()
     {
-        Storage.Frontend = new WindowsFrontend();
+        Utils.Frontend = new WindowsFrontend();
 
         await Utils.CoreInitialize().ConfigureAwait(true);
 
@@ -355,7 +357,7 @@ internal static class WindowsUtils
             catch (Exception ex)
             {
                 Utils.Logger.Error(ex, "Error playing audio: {Audio}", JsonSerializer.Serialize(audio));
-                Storage.Frontend.Alert(AlertLevel.Error, "Error playing audio");
+                Utils.Frontend.Alert(AlertLevel.Error, "Error playing audio");
             }
         });
     }
@@ -366,13 +368,13 @@ internal static class WindowsUtils
         {
             Random rand = new();
 
-            string[] filePaths = Directory.GetFiles($"{Storage.ResourcesPath}/Motivation");
+            string[] filePaths = Directory.GetFiles($"{Utils.ResourcesPath}/Motivation");
             int numFiles = filePaths.Length;
 
             if (numFiles is 0)
             {
                 Utils.Logger.Warning("Motivation folder is empty!");
-                Storage.Frontend.Alert(AlertLevel.Warning, "Motivation folder is empty!");
+                Utils.Frontend.Alert(AlertLevel.Warning, "Motivation folder is empty!");
                 return;
             }
 
@@ -384,7 +386,7 @@ internal static class WindowsUtils
         catch (Exception ex)
         {
             Utils.Logger.Error(ex, "Error motivating");
-            Storage.Frontend.Alert(AlertLevel.Error, "Error motivating");
+            Utils.Frontend.Alert(AlertLevel.Error, "Error motivating");
         }
     }
 
@@ -622,7 +624,7 @@ internal static class WindowsUtils
             }
         }
 
-        Storage.StatsStopWatch.Start();
+        StatsUtils.StatsStopWatch.Start();
     }
 
     public static void ChangeTheme(SkinType skin)

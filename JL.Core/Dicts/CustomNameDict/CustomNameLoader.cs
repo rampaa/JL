@@ -1,3 +1,5 @@
+using JL.Core.Utilities;
+
 namespace JL.Core.Dicts.CustomNameDict;
 
 public static class CustomNameLoader
@@ -25,9 +27,9 @@ public static class CustomNameLoader
     {
         CustomNameRecord newNameRecord = new(spelling, reading, nameType);
 
-        Dictionary<string, List<IDictRecord>> customNameDictionary = Storage.Dicts.Values.First(static dict => dict.Type is DictType.CustomNameDictionary).Contents;
+        Dictionary<string, List<IDictRecord>> customNameDictionary = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomNameDictionary).Contents;
 
-        if (customNameDictionary.TryGetValue(Kana.KatakanaToHiragana(spelling), out List<IDictRecord>? entry))
+        if (customNameDictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(spelling), out List<IDictRecord>? entry))
         {
             if (!entry.Contains(newNameRecord))
             {
@@ -37,7 +39,7 @@ public static class CustomNameLoader
 
         else
         {
-            customNameDictionary.Add(Kana.KatakanaToHiragana(spelling),
+            customNameDictionary.Add(JapaneseUtils.KatakanaToHiragana(spelling),
                 new List<IDictRecord> { newNameRecord });
         }
     }

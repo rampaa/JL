@@ -2,7 +2,9 @@ using System.Text.Json;
 using JL.Core.Dicts;
 using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Dicts.Options;
+using JL.Core.Freqs;
 using JL.Core.Lookup;
+using JL.Core.Utilities;
 using NUnit.Framework;
 
 namespace JL.Core.Tests;
@@ -13,11 +15,11 @@ public class LookupTests
     [OneTimeSetUp]
     public void ClassInit()
     {
-        Storage.Frontend = new DummyFrontend();
+        Utils.Frontend = new DummyFrontend();
 
         string jmdictPath = Path.Join(AppContext.BaseDirectory, "Resources/MockJMdict.xml");
 
-        Storage.Dicts.Add("JMdict",
+        DictUtils.Dicts.Add("JMdict",
             new Dict(DictType.JMdict, "JMdict", jmdictPath, true, 0, 500000,
                     new DictOptions(
                         new NewlineBetweenDefinitionsOption { Value = false },
@@ -35,9 +37,9 @@ public class LookupTests
                         loanwordEtymology: new LoanwordEtymologyOption { Value = true }
                         )));
 
-        JmdictLoader.Load(Storage.Dicts.Values.First(static dict => dict.Type is DictType.JMdict)).Wait();
-        Storage.FreqDicts = Storage.s_builtInFreqs;
-        Storage.LoadFrequencies().Wait();
+        JmdictLoader.Load(DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict)).Wait();
+        FreqUtils.FreqDicts = FreqUtils.s_builtInFreqs;
+        FreqUtils.LoadFrequencies().Wait();
     }
 
     [Test]
@@ -50,7 +52,7 @@ public class LookupTests
                 new LookupResult
                 (
                     matchedText: "始まる",
-                    dict: Storage.Dicts.Values.First(static dict => dict.Type is DictType.JMdict),
+                    dict: DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict),
                     frequencies: new List<LookupFrequencyResult> {new ("VN (Nazeka)", 759 ) },
                     primarySpelling: "始まる",
                     deconjugatedMatchedText: "始まる",

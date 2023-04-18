@@ -33,12 +33,12 @@ internal static class JmdictLoader
             dict.Contents.TrimExcess();
         }
 
-        else if (Storage.Frontend.ShowYesNoDialog(
+        else if (Utils.Frontend.ShowYesNoDialog(
                      "Couldn't find JMdict.xml. Would you like to download it now?",
                      "Download JMdict?"))
         {
             _ = await ResourceUpdater.UpdateResource(dict.Path,
-                Storage.s_jmdictUrl,
+                DictUtils.s_jmdictUrl,
                 DictType.JMdict.ToString(), false, false).ConfigureAwait(false);
             await Load(dict).ConfigureAwait(false);
         }
@@ -326,7 +326,7 @@ internal static class JmdictLoader
             xmlReader.ResolveEntity();
             _ = xmlReader.Read();
 
-            _ = Storage.JmdictEntities.TryAdd(entityName, xmlReader.Value);
+            _ = DictUtils.JmdictEntities.TryAdd(entityName, xmlReader.Value);
 
             _ = xmlReader.Read();
         }

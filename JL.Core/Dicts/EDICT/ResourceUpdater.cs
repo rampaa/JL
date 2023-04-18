@@ -4,6 +4,7 @@ using System.Runtime;
 using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Dicts.EDICT.JMnedict;
 using JL.Core.Dicts.EDICT.KANJIDIC;
+using JL.Core.Network;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
 
@@ -16,7 +17,7 @@ public static class ResourceUpdater
     {
         try
         {
-            if (!isUpdate || Storage.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {resourceName}?",
+            if (!isUpdate || Utils.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {resourceName}?",
                 "Update dictionary?"))
             {
                 HttpRequestMessage request = new(HttpMethod.Get, resourceDownloadUri);
@@ -28,12 +29,12 @@ public static class ResourceUpdater
 
                 if (!noPrompt)
                 {
-                    Storage.Frontend.ShowOkDialog(
+                    Utils.Frontend.ShowOkDialog(
                         $"This may take a while. Please don't shut down the program until {resourceName} is downloaded.",
                         "Info");
                 }
 
-                HttpResponseMessage response = await Storage.Client.SendAsync(request).ConfigureAwait(false);
+                HttpResponseMessage response = await Networking.Client.SendAsync(request).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
                     Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
@@ -44,7 +45,7 @@ public static class ResourceUpdater
 
                     if (!noPrompt)
                     {
-                        Storage.Frontend.ShowOkDialog($"{resourceName} has been downloaded successfully.",
+                        Utils.Frontend.ShowOkDialog($"{resourceName} has been downloaded successfully.",
                             "Info");
                     }
 
@@ -53,7 +54,7 @@ public static class ResourceUpdater
 
                 if (response.StatusCode is HttpStatusCode.NotModified && !noPrompt)
                 {
-                    Storage.Frontend.ShowOkDialog($"{resourceName} is up to date.",
+                    Utils.Frontend.ShowOkDialog($"{resourceName} is up to date.",
                         "Info");
                 }
 
@@ -64,7 +65,7 @@ public static class ResourceUpdater
 
                     if (!noPrompt)
                     {
-                        Storage.Frontend.ShowOkDialog($"Unexpected error while downloading {resourceName}.", "Info");
+                        Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {resourceName}.", "Info");
                     }
                 }
             }
@@ -72,7 +73,7 @@ public static class ResourceUpdater
 
         catch (Exception ex)
         {
-            Storage.Frontend.ShowOkDialog($"Unexpected error while downloading {resourceName}.", "Info");
+            Utils.Frontend.ShowOkDialog($"Unexpected error while downloading {resourceName}.", "Info");
             Utils.Logger.Error(ex, "Unexpected error while downloading {ResourceName}", resourceName);
         }
 
@@ -94,11 +95,11 @@ public static class ResourceUpdater
 
     public static async Task UpdateJmdict()
     {
-        Storage.UpdatingJmdict = true;
+        DictUtils.UpdatingJmdict = true;
 
-        Dict dict = Storage.Dicts.Values.First(static dict => dict.Type is DictType.JMdict);
+        Dict dict = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict);
         bool isDownloaded = await UpdateResource(dict.Path,
-                Storage.s_jmdictUrl,
+                DictUtils.s_jmdictUrl,
                 DictType.JMdict.ToString(), true, false)
             .ConfigureAwait(false);
 
@@ -111,7 +112,7 @@ public static class ResourceUpdater
 
             await JmdictWordClassUtils.SerializeJmdictWordClass().ConfigureAwait(false);
 
-            Storage.WordClassDictionary.Clear();
+            DictUtils.WordClassDictionary.Clear();
 
             await JmdictWordClassUtils.Load().ConfigureAwait(false);
 
@@ -124,16 +125,16 @@ public static class ResourceUpdater
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
         }
 
-        Storage.UpdatingJmdict = false;
+        DictUtils.UpdatingJmdict = false;
     }
 
     public static async Task UpdateJmnedict()
     {
-        Storage.UpdatingJmnedict = true;
+        DictUtils.UpdatingJmnedict = true;
 
-        Dict dict = Storage.Dicts.Values.First(static dict => dict.Type is DictType.JMnedict);
+        Dict dict = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMnedict);
         bool isDownloaded = await UpdateResource(dict.Path,
-                Storage.s_jmnedictUrl,
+                DictUtils.s_jmnedictUrl,
                 DictType.JMnedict.ToString(), true, false)
             .ConfigureAwait(false);
 
@@ -153,16 +154,16 @@ public static class ResourceUpdater
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
         }
 
-        Storage.UpdatingJmnedict = false;
+        DictUtils.UpdatingJmnedict = false;
     }
 
     public static async Task UpdateKanjidic()
     {
-        Storage.UpdatingKanjidic = true;
+        DictUtils.UpdatingKanjidic = true;
 
-        Dict dict = Storage.Dicts.Values.First(static dict => dict.Type is DictType.Kanjidic);
+        Dict dict = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.Kanjidic);
         bool isDownloaded = await UpdateResource(dict.Path,
-                Storage.s_kanjidicUrl,
+                DictUtils.s_kanjidicUrl,
                 DictType.Kanjidic.ToString(), true, false)
             .ConfigureAwait(false);
 
@@ -182,6 +183,6 @@ public static class ResourceUpdater
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
         }
 
-        Storage.UpdatingKanjidic = false;
+        DictUtils.UpdatingKanjidic = false;
     }
 }

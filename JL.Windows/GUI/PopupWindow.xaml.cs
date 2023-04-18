@@ -8,8 +8,10 @@ using System.Windows.Media;
 using Caching;
 using JL.Core;
 using JL.Core.Anki;
+using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
+using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using Timer = System.Timers.Timer;
@@ -52,7 +54,7 @@ internal sealed partial class PopupWindow : Window
     public static Timer PopupAutoHideTimer { get; } = new();
 
     public static LRUCache<string, StackPanel[]> StackPanelCache { get; } = new(
-        Storage.CacheSize, Storage.CacheSize / 8);
+        Utils.CacheSize, Utils.CacheSize / 8);
 
     public PopupWindow()
     {
@@ -148,9 +150,9 @@ internal sealed partial class PopupWindow : Window
 
             if (Owner != MainWindow.Instance
                 ? ConfigManager.DisableLookupsForNonJapaneseCharsInPopups
-                    && !Storage.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString())
+                    && !JapaneseUtils.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString())
                 : ConfigManager.DisableLookupsForNonJapaneseCharsInMainWindow
-                    && !Storage.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString()))
+                    && !JapaneseUtils.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString()))
             {
                 if (ConfigManager.HighlightLongestMatch)
                 {
@@ -162,8 +164,8 @@ internal sealed partial class PopupWindow : Window
             }
 
             int endPosition = tb.Text.Length - charPosition > ConfigManager.MaxSearchLength
-                ? Utils.FindWordBoundary(tb.Text[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
-                : Utils.FindWordBoundary(tb.Text, charPosition);
+                ? JapaneseUtils.FindWordBoundary(tb.Text[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
+                : JapaneseUtils.FindWordBoundary(tb.Text, charPosition);
 
             string text = tb.Text[charPosition..endPosition];
 
@@ -406,7 +408,7 @@ internal sealed partial class PopupWindow : Window
             UpdateLayout();
 
             // we might cache incomplete results if we don't wait until all dicts are loaded
-            if (text is not null && Storage.DictsReady && !Storage.UpdatingJmdict && !Storage.UpdatingJmnedict && !Storage.UpdatingKanjidic)
+            if (text is not null && DictUtils.DictsReady && !DictUtils.UpdatingJmdict && !DictUtils.UpdatingJmnedict && !DictUtils.UpdatingKanjidic)
             {
                 StackPanelCache.AddReplace(text, ResultStackPanels.ToArray());
             }
@@ -851,7 +853,7 @@ internal sealed partial class PopupWindow : Window
 
                 if (textBlock.Name is "PrimarySpelling" or "Readings")
                 {
-                    Dict? pitchDict = Storage.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.PitchAccentYomichan);
+                    Dict? pitchDict = DictUtils.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.PitchAccentYomichan);
                     if (pitchDict?.Active ?? false)
                     {
                         List<string>? readings = result.Readings;
@@ -905,7 +907,7 @@ internal sealed partial class PopupWindow : Window
 
                 if (textBox.Name is "PrimarySpelling" or "Readings")
                 {
-                    Dict? pitchDict = Storage.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.PitchAccentYomichan);
+                    Dict? pitchDict = DictUtils.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.PitchAccentYomichan);
                     if (pitchDict?.Active ?? false)
                     {
                         List<string>? readings = result.Readings;
@@ -1004,8 +1006,8 @@ internal sealed partial class PopupWindow : Window
 
     private void TextBoxPreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
-        AddNameMenuItem.IsEnabled = Storage.DictsReady;
-        AddWordMenuItem.IsEnabled = Storage.DictsReady;
+        AddNameMenuItem.IsEnabled = DictUtils.DictsReady;
+        AddWordMenuItem.IsEnabled = DictUtils.DictsReady;
         _lastSelectedText = ((TextBox)sender).SelectedText;
     }
 
@@ -1082,7 +1084,7 @@ internal sealed partial class PopupWindow : Window
         if (_currentText is not null)
         {
             miningParams[JLField.SourceText] = _currentText;
-            miningParams[JLField.Sentence] = Utils.FindSentence(_currentText, _currentCharPosition);
+            miningParams[JLField.Sentence] = JapaneseUtils.FindSentence(_currentText, _currentCharPosition);
         }
 
         var textBlock = (TextBlock)sender;
@@ -1220,7 +1222,7 @@ internal sealed partial class PopupWindow : Window
 
     private void Definitions_MouseMove(TextBox tb)
     {
-        if (Storage.JapaneseRegex.IsMatch(tb.Text))
+        if (JapaneseUtils.JapaneseRegex.IsMatch(tb.Text))
         {
             TextBox_MouseMove(tb);
         }
@@ -1326,7 +1328,7 @@ internal sealed partial class PopupWindow : Window
         {
             CoreConfig.KanjiMode = !CoreConfig.KanjiMode;
             LastText = "";
-            Storage.Frontend.InvalidateDisplayCache();
+            Utils.Frontend.InvalidateDisplayCache();
             if (Owner != MainWindow.Instance)
             {
                 TextBox_MouseMove(_lastTextBox!);
@@ -1339,7 +1341,7 @@ internal sealed partial class PopupWindow : Window
         }
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowAddNameWindowKeyGesture))
         {
-            if (Storage.DictsReady)
+            if (DictUtils.DictsReady)
             {
                 ShowAddNameWindow();
                 PopupAutoHideTimer.Start();
@@ -1347,7 +1349,7 @@ internal sealed partial class PopupWindow : Window
         }
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowAddWordWindowKeyGesture))
         {
-            if (Storage.DictsReady)
+            if (DictUtils.DictsReady)
             {
                 WindowsUtils.ShowAddWordWindow(_lastSelectedText);
                 PopupAutoHideTimer.Start();
@@ -1542,7 +1544,7 @@ internal sealed partial class PopupWindow : Window
 
         if (primarySpelling is not null)
         {
-            await Utils.GetAndPlayAudio(primarySpelling, reading).ConfigureAwait(false);
+            await AudioUtils.GetAndPlayAudio(primarySpelling, reading).ConfigureAwait(false);
         }
     }
 
@@ -1704,7 +1706,7 @@ internal sealed partial class PopupWindow : Window
             foundDicts.Add(foundDict);
         }
 
-        foreach (Dict dict in Storage.Dicts.Values.OrderBy(static dict => dict.Priority).ToList())
+        foreach (Dict dict in DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority).ToList())
         {
             if (!dict.Active || dict.Type is DictType.PitchAccentYomichan || (ConfigManager.HideDictTabsWithNoResults && !foundDicts.Contains(dict)))
             {

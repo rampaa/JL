@@ -1,4 +1,5 @@
 using JL.Core.Dicts;
+using JL.Core.Network;
 using JL.Core.Utilities;
 
 namespace JL.Core.Anki;
@@ -13,7 +14,7 @@ public static class Mining
 
         if (ankiConfigDict is null)
         {
-            Storage.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
+            Utils.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
             return false;
         }
 
@@ -23,7 +24,7 @@ public static class Mining
 
         if (miningParams.TryGetValue(JLField.DictionaryName, out string? dictionaryName))
         {
-            if (Storage.Dicts.TryGetValue(dictionaryName, out Dict? dict))
+            if (DictUtils.Dicts.TryGetValue(dictionaryName, out Dict? dict))
             {
                 dictType = dict.Type;
             }
@@ -31,23 +32,23 @@ public static class Mining
 
         if (dictType is null)
         {
-            Storage.Frontend.Alert(AlertLevel.Error, $"Mining failed for {primarySpelling}. Cannot find the type of {JLField.DictionaryName.GetDescription()}");
+            Utils.Frontend.Alert(AlertLevel.Error, $"Mining failed for {primarySpelling}. Cannot find the type of {JLField.DictionaryName.GetDescription()}");
             Utils.Logger.Error("Mining failed for {FoundSpelling}. Cannot find the type of {DictionaryName}", primarySpelling, JLField.DictionaryName.GetDescription());
             return false;
         }
 
 
-        if (Storage.s_wordDictTypes.Contains(dictType.Value))
+        if (DictUtils.s_wordDictTypes.Contains(dictType.Value))
         {
             _ = ankiConfigDict.TryGetValue(MineType.Word, out ankiConfig);
         }
 
-        else if (Storage.s_kanjiDictTypes.Contains(dictType.Value))
+        else if (DictUtils.s_kanjiDictTypes.Contains(dictType.Value))
         {
             _ = ankiConfigDict.TryGetValue(MineType.Kanji, out ankiConfig);
         }
 
-        else if (Storage.s_nameDictTypes.Contains(dictType.Value))
+        else if (DictUtils.s_nameDictTypes.Contains(dictType.Value))
         {
             _ = ankiConfigDict.TryGetValue(MineType.Name, out ankiConfig);
         }
@@ -59,7 +60,7 @@ public static class Mining
 
         if (ankiConfig is null)
         {
-            Storage.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
+            Utils.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
             return false;
         }
 
@@ -76,7 +77,7 @@ public static class Mining
         List<string> audioFields = FindFields(JLField.Audio, userFields);
         bool needsAudio = audioFields.Count > 0;
         byte[]? audioBytes = needsAudio
-            ? await Audio.AudioUtils.GetAudioPrioritizedAudio(primarySpelling, reading).ConfigureAwait(false)
+            ? await Audio.AudioUtils.GetPrioritizedAudio(primarySpelling, reading).ConfigureAwait(false)
             : null;
 
         Dictionary<string, object>? audio = audioBytes is null
@@ -85,14 +86,14 @@ public static class Mining
                 {
                     { "data", audioBytes },
                     { "filename", $"JL_audio_{reading}_{primarySpelling}.mp3" },
-                    { "skipHash", Storage.Jpod101NoAudioMd5Hash },
+                    { "skipHash", Networking.Jpod101NoAudioMd5Hash },
                     { "fields", audioFields }
                 };
 
         List<string> imageFields = FindFields(JLField.Image, userFields);
         bool needsImage = imageFields.Count > 0;
         byte[]? imageBytes = needsImage
-            ? Storage.Frontend.GetImageFromClipboardAsByteArray()
+            ? Utils.Frontend.GetImageFromClipboardAsByteArray()
             : null;
 
         Dictionary<string, object>? image = imageBytes is null
@@ -114,20 +115,20 @@ public static class Mining
 
         if (response is null)
         {
-            Storage.Frontend.Alert(AlertLevel.Error, $"Mining failed for {primarySpelling}");
+            Utils.Frontend.Alert(AlertLevel.Error, $"Mining failed for {primarySpelling}");
             Utils.Logger.Error("Mining failed for {FoundSpelling}", primarySpelling);
             return false;
         }
 
-        if (needsAudio && (audioBytes is null || Utils.GetMd5String(audioBytes) is Storage.Jpod101NoAudioMd5Hash))
+        if (needsAudio && (audioBytes is null || Utils.GetMd5String(audioBytes) is Networking.Jpod101NoAudioMd5Hash))
         {
-            Storage.Frontend.Alert(AlertLevel.Warning, $"Mined {primarySpelling} (no audio)");
+            Utils.Frontend.Alert(AlertLevel.Warning, $"Mined {primarySpelling} (no audio)");
             Utils.Logger.Information("Mined {FoundSpelling} (no audio)", primarySpelling);
         }
 
         else
         {
-            Storage.Frontend.Alert(AlertLevel.Success, $"Mined {primarySpelling}");
+            Utils.Frontend.Alert(AlertLevel.Success, $"Mined {primarySpelling}");
             Utils.Logger.Information("Mined {FoundSpelling}", primarySpelling);
         }
 

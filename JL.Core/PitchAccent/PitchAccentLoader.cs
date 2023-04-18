@@ -1,5 +1,6 @@
 using System.Text.Json;
 using JL.Core.Dicts;
+using JL.Core.Utilities;
 
 namespace JL.Core.PitchAccent;
 
@@ -41,7 +42,7 @@ internal static class PitchAccentLoader
                     continue;
                 }
 
-                string spellingInHiragana = Kana.KatakanaToHiragana(newEntry.Spelling);
+                string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Spelling);
 
                 if (pitchDict.TryGetValue(spellingInHiragana, out List<IDictRecord>? result))
                 {
@@ -55,7 +56,7 @@ internal static class PitchAccentLoader
 
                 if (!string.IsNullOrEmpty(newEntry.Reading))
                 {
-                    string readingInHiragana = Kana.KatakanaToHiragana(newEntry.Reading);
+                    string readingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Reading);
 
                     if (pitchDict.TryGetValue(readingInHiragana, out List<IDictRecord>? readingResult))
                     {

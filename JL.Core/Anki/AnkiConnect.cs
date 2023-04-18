@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using JL.Core.Network;
 using JL.Core.Utilities;
 
 namespace JL.Core.Anki;
@@ -53,7 +54,7 @@ internal static class AnkiConnect
                 new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }));
             Utils.Logger.Information("Sending: {Payload}", await payload.ReadAsStringAsync().ConfigureAwait(false));
 
-            HttpResponseMessage postResponse = await Storage.Client
+            HttpResponseMessage postResponse = await Networking.Client
                 .PostAsync(CoreConfig.AnkiConnectUri, payload)
                 .ConfigureAwait(false);
 
@@ -67,7 +68,7 @@ internal static class AnkiConnect
                     return json;
                 }
 
-                Storage.Frontend.Alert(AlertLevel.Error, json.Error.ToString()!);
+                Utils.Frontend.Alert(AlertLevel.Error, json.Error.ToString()!);
                 Utils.Logger.Error("{JsonError}", json.Error.ToString());
             }
 
@@ -75,13 +76,13 @@ internal static class AnkiConnect
         }
         catch (HttpRequestException ex)
         {
-            Storage.Frontend.Alert(AlertLevel.Error, "Communication error: Is Anki open?");
+            Utils.Frontend.Alert(AlertLevel.Error, "Communication error: Is Anki open?");
             Utils.Logger.Error(ex, "Communication error: Is Anki open?");
             return null;
         }
         catch (Exception ex)
         {
-            Storage.Frontend.Alert(AlertLevel.Error, "Communication error: Unknown error");
+            Utils.Frontend.Alert(AlertLevel.Error, "Communication error: Unknown error");
             Utils.Logger.Error(ex, "Communication error: Unknown error");
             return null;
         }

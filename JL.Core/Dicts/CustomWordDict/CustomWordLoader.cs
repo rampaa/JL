@@ -1,3 +1,5 @@
+using JL.Core.Utilities;
+
 namespace JL.Core.Dicts.CustomWordDict;
 
 public static class CustomWordLoader
@@ -103,9 +105,9 @@ public static class CustomWordLoader
 
             CustomWordRecord newWordRecord = new(spelling, alternativeSpellings, readings, definitions, wordClassList, hasUserDefinedWordClasses);
 
-            Dictionary<string, List<IDictRecord>> customWordDictionary = Storage.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary).Contents;
+            Dictionary<string, List<IDictRecord>> customWordDictionary = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary).Contents;
 
-            if (customWordDictionary.TryGetValue(Kana.KatakanaToHiragana(spelling), out List<IDictRecord>? result))
+            if (customWordDictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(spelling), out List<IDictRecord>? result))
             {
                 if (result.Contains(newWordRecord))
                 {
@@ -116,7 +118,7 @@ public static class CustomWordLoader
             }
             else
             {
-                customWordDictionary.Add(Kana.KatakanaToHiragana(spelling),
+                customWordDictionary.Add(JapaneseUtils.KatakanaToHiragana(spelling),
                     new List<IDictRecord> { newWordRecord });
             }
         }

@@ -1,7 +1,6 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
-using JL.Core;
 using JL.Core.Audio;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
@@ -52,10 +51,10 @@ internal sealed partial class AddAudioSourceWindow : Window
                 && Directory.Exists(Path.GetDirectoryName(uri))
                 && !string.IsNullOrEmpty(Path.GetFileName(uri)))
             {
-                string relativePath = Path.GetRelativePath(Storage.ApplicationPath, uri);
+                string relativePath = Path.GetRelativePath(Utils.ApplicationPath, uri);
                 uri = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
 
-                if (Storage.AudioSources.ContainsKey(uri))
+                if (AudioUtils.AudioSources.ContainsKey(uri))
                 {
                     TextBlockUri.BorderBrush = Brushes.Red;
                     isValid = false;
@@ -70,7 +69,7 @@ internal sealed partial class AddAudioSourceWindow : Window
 
         else if (string.IsNullOrEmpty(uri)
             || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "").Replace("{Reading}", ""), UriKind.Absolute)
-            || Storage.AudioSources.ContainsKey(uri))
+            || AudioUtils.AudioSources.ContainsKey(uri))
         {
             TextBlockUri.BorderBrush = Brushes.Red;
             isValid = false;
@@ -78,8 +77,8 @@ internal sealed partial class AddAudioSourceWindow : Window
 
         if (isValid)
         {
-            Storage.AudioSources.Add(uri,
-                new AudioSource(type!.Value, true, Storage.AudioSources.Count + 1));
+            AudioUtils.AudioSources.Add(uri,
+                new AudioSource(type!.Value, true, AudioUtils.AudioSources.Count + 1));
 
             Close();
         }

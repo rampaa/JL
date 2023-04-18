@@ -7,7 +7,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using JL.Core;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
@@ -59,12 +58,12 @@ internal sealed partial class ManageFrequenciesWindow : Window
 
     private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        Storage.Frontend.InvalidateDisplayCache();
+        Utils.Frontend.InvalidateDisplayCache();
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
         s_instance = null;
-        await Utils.SerializeFreqs().ConfigureAwait(false);
-        await Storage.LoadFrequencies().ConfigureAwait(false);
+        await FreqUtils.SerializeFreqs().ConfigureAwait(false);
+        await FreqUtils.LoadFrequencies().ConfigureAwait(false);
     }
 
     // probably should be split into several methods
@@ -72,7 +71,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
     {
         List<DockPanel> resultDockPanels = new();
 
-        foreach (Freq freq in Storage.FreqDicts.Values.ToList())
+        foreach (Freq freq in FreqUtils.FreqDicts.Values.ToList())
         {
             DockPanel dockPanel = new();
 
@@ -190,14 +189,14 @@ internal sealed partial class ManageFrequenciesWindow : Window
 
             buttonRemove.Click += (_, _) =>
             {
-                if (Storage.Frontend.ShowYesNoDialog("Do you really want to remove this frequency dictionary?", "Confirmation"))
+                if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this frequency dictionary?", "Confirmation"))
                 {
                     freq.Contents.Clear();
-                    _ = Storage.FreqDicts.Remove(freq.Name);
+                    _ = FreqUtils.FreqDicts.Remove(freq.Name);
 
                     int priorityOfDeletedFreq = freq.Priority;
 
-                    foreach (Freq f in Storage.FreqDicts.Values)
+                    foreach (Freq f in FreqUtils.FreqDicts.Values)
                     {
                         if (f.Priority > priorityOfDeletedFreq)
                         {
@@ -259,18 +258,18 @@ internal sealed partial class ManageFrequenciesWindow : Window
             return;
         }
 
-        Storage.FreqDicts.First(f => f.Value.Priority == freq.Priority - 1).Value.Priority += 1;
+        FreqUtils.FreqDicts.First(f => f.Value.Priority == freq.Priority - 1).Value.Priority += 1;
         freq.Priority -= 1;
     }
 
     private static void UnPrioritizeFreq(Freq freq)
     {
-        if (freq.Priority == Storage.FreqDicts.Count)
+        if (freq.Priority == FreqUtils.FreqDicts.Count)
         {
             return;
         }
 
-        Storage.FreqDicts.First(f => f.Value.Priority == freq.Priority + 1).Value.Priority -= 1;
+        FreqUtils.FreqDicts.First(f => f.Value.Priority == freq.Priority + 1).Value.Priority -= 1;
         freq.Priority += 1;
     }
 

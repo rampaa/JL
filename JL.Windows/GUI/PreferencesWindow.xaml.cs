@@ -84,7 +84,7 @@ internal sealed partial class PreferencesWindow : Window
 
     private async void SaveButton_Click(object sender, RoutedEventArgs e)
     {
-        Storage.Frontend.InvalidateDisplayCache();
+        Utils.Frontend.InvalidateDisplayCache();
         await ConfigManager.SavePreferences(this).ConfigureAwait(true);
         Close();
     }
@@ -141,19 +141,19 @@ internal sealed partial class PreferencesWindow : Window
         if (wordAnkiConfig is not null)
         {
             SetPreviousMiningConfig(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordTagsTextBox, wordAnkiConfig);
-            CreateFieldElements(wordAnkiConfig.Fields, Storage.JLFieldsForWordDicts, WordMiningSetupStackPanelFields);
+            CreateFieldElements(wordAnkiConfig.Fields, JLFieldUtils.JLFieldsForWordDicts, WordMiningSetupStackPanelFields);
         }
 
         if (kanjiAnkiConfig is not null)
         {
             SetPreviousMiningConfig(KanjiMiningSetupComboBoxDeckNames, KanjiMiningSetupComboBoxModelNames, KanjiTagsTextBox, kanjiAnkiConfig);
-            CreateFieldElements(kanjiAnkiConfig.Fields, Storage.JLFieldsForKanjiDicts, KanjiMiningSetupStackPanelFields);
+            CreateFieldElements(kanjiAnkiConfig.Fields, JLFieldUtils.JLFieldsForKanjiDicts, KanjiMiningSetupStackPanelFields);
         }
 
         if (nameAnkiConfig is not null)
         {
             SetPreviousMiningConfig(NameMiningSetupComboBoxDeckNames, NameMiningSetupComboBoxModelNames, NameTagsTextBox, nameAnkiConfig);
-            CreateFieldElements(nameAnkiConfig.Fields, Storage.JLFieldsForNameDicts, NameMiningSetupStackPanelFields);
+            CreateFieldElements(nameAnkiConfig.Fields, JLFieldUtils.JLFieldsForNameDicts, NameMiningSetupStackPanelFields);
         }
 
         if (otherAnkiConfig is not null)
@@ -195,14 +195,14 @@ internal sealed partial class PreferencesWindow : Window
 
             else
             {
-                Storage.Frontend.Alert(AlertLevel.Error, "Error getting model names form Anki");
+                Utils.Frontend.Alert(AlertLevel.Error, "Error getting model names form Anki");
                 Utils.Logger.Error("Error getting model names from Anki");
             }
         }
 
         else
         {
-            Storage.Frontend.Alert(AlertLevel.Error, "Error getting deck names form Anki");
+            Utils.Frontend.Alert(AlertLevel.Error, "Error getting deck names form Anki");
             Utils.Logger.Error("Error getting deck names from Anki");
         }
     }
@@ -228,29 +228,29 @@ internal sealed partial class PreferencesWindow : Window
 
         else
         {
-            Storage.Frontend.Alert(AlertLevel.Error, "Error getting fields from AnkiConnect");
+            Utils.Frontend.Alert(AlertLevel.Error, "Error getting fields from AnkiConnect");
             Utils.Logger.Error("Error getting fields from AnkiConnect");
         }
     }
 
     private async void WordMiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
     {
-        await GetFields(WordMiningSetupComboBoxModelNames, WordMiningSetupStackPanelFields, Storage.JLFieldsForWordDicts).ConfigureAwait(false);
+        await GetFields(WordMiningSetupComboBoxModelNames, WordMiningSetupStackPanelFields, JLFieldUtils.JLFieldsForWordDicts).ConfigureAwait(false);
     }
 
     private async void KanjiMiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
     {
-        await GetFields(KanjiMiningSetupComboBoxModelNames, KanjiMiningSetupStackPanelFields, Storage.JLFieldsForKanjiDicts).ConfigureAwait(false);
+        await GetFields(KanjiMiningSetupComboBoxModelNames, KanjiMiningSetupStackPanelFields, JLFieldUtils.JLFieldsForKanjiDicts).ConfigureAwait(false);
     }
 
     private async void NameMiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
     {
-        await GetFields(NameMiningSetupComboBoxModelNames, NameMiningSetupStackPanelFields, Storage.JLFieldsForNameDicts).ConfigureAwait(false);
+        await GetFields(NameMiningSetupComboBoxModelNames, NameMiningSetupStackPanelFields, JLFieldUtils.JLFieldsForNameDicts).ConfigureAwait(false);
     }
 
     private async void OtherMiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
     {
-        await GetFields(OtherMiningSetupComboBoxModelNames, OtherMiningSetupStackPanelFields, Storage.JLFieldsForWordDicts).ConfigureAwait(false);
+        await GetFields(OtherMiningSetupComboBoxModelNames, OtherMiningSetupStackPanelFields, JLFieldUtils.JLFieldsForWordDicts).ConfigureAwait(false);
     }
 
     private static void CreateFieldElements(Dictionary<string, JLField> fields, IEnumerable<JLField> fieldList, Panel fieldPanel)
@@ -281,7 +281,7 @@ internal sealed partial class PreferencesWindow : Window
         if (deckNamesSelector.SelectedItem is null ||
             modelNamesSelector.SelectedItem is null)
         {
-            Storage.Frontend.Alert(AlertLevel.Error, "Save failed: Incomplete Anki config");
+            Utils.Frontend.Alert(AlertLevel.Error, "Save failed: Incomplete Anki config");
             Utils.Logger.Error("Save failed: Incomplete Anki config");
             return null;
         }
@@ -319,25 +319,25 @@ internal sealed partial class PreferencesWindow : Window
 
         Dictionary<MineType, AnkiConfig> ankiConfigDict = new();
 
-        AnkiConfig? ankiConfig = GetAnkiConfigFromPreferences(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordMiningSetupStackPanelFields, WordTagsTextBox, Storage.JLFieldsForWordDicts);
+        AnkiConfig? ankiConfig = GetAnkiConfigFromPreferences(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordMiningSetupStackPanelFields, WordTagsTextBox, JLFieldUtils.JLFieldsForWordDicts);
         if (ankiConfig is not null)
         {
             ankiConfigDict.Add(MineType.Word, ankiConfig);
         }
 
-        ankiConfig = GetAnkiConfigFromPreferences(KanjiMiningSetupComboBoxDeckNames, KanjiMiningSetupComboBoxModelNames, KanjiMiningSetupStackPanelFields, KanjiTagsTextBox, Storage.JLFieldsForKanjiDicts);
+        ankiConfig = GetAnkiConfigFromPreferences(KanjiMiningSetupComboBoxDeckNames, KanjiMiningSetupComboBoxModelNames, KanjiMiningSetupStackPanelFields, KanjiTagsTextBox, JLFieldUtils.JLFieldsForKanjiDicts);
         if (ankiConfig is not null)
         {
             ankiConfigDict.Add(MineType.Kanji, ankiConfig);
         }
 
-        ankiConfig = GetAnkiConfigFromPreferences(NameMiningSetupComboBoxDeckNames, NameMiningSetupComboBoxModelNames, NameMiningSetupStackPanelFields, NameTagsTextBox, Storage.JLFieldsForNameDicts);
+        ankiConfig = GetAnkiConfigFromPreferences(NameMiningSetupComboBoxDeckNames, NameMiningSetupComboBoxModelNames, NameMiningSetupStackPanelFields, NameTagsTextBox, JLFieldUtils.JLFieldsForNameDicts);
         if (ankiConfig is not null)
         {
             ankiConfigDict.Add(MineType.Name, ankiConfig);
         }
 
-        ankiConfig = GetAnkiConfigFromPreferences(OtherMiningSetupComboBoxDeckNames, OtherMiningSetupComboBoxModelNames, OtherMiningSetupStackPanelFields, OtherTagsTextBox, Storage.JLFieldsForWordDicts);
+        ankiConfig = GetAnkiConfigFromPreferences(OtherMiningSetupComboBoxDeckNames, OtherMiningSetupComboBoxModelNames, OtherMiningSetupStackPanelFields, OtherTagsTextBox, JLFieldUtils.JLFieldsForWordDicts);
         if (ankiConfig is not null)
         {
             ankiConfigDict.Add(MineType.Other, ankiConfig);
@@ -350,7 +350,7 @@ internal sealed partial class PreferencesWindow : Window
 
         else
         {
-            Storage.Frontend.Alert(AlertLevel.Error, "Error saving AnkiConfig");
+            Utils.Frontend.Alert(AlertLevel.Error, "Error saving AnkiConfig");
             Utils.Logger.Error("Error saving AnkiConfig");
             ConfigManager.AnkiIntegration = false;
         }
@@ -426,7 +426,7 @@ internal sealed partial class PreferencesWindow : Window
 
         else
         {
-            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
+            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
         }
     }
 

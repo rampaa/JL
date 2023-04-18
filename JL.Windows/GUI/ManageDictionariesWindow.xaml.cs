@@ -8,7 +8,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Dicts.EDICT;
 using JL.Core.Utilities;
@@ -63,12 +62,12 @@ internal sealed partial class ManageDictionariesWindow : Window
 
     private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        Storage.Frontend.InvalidateDisplayCache();
+        Utils.Frontend.InvalidateDisplayCache();
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
         s_instance = null;
-        await Utils.SerializeDicts().ConfigureAwait(false);
-        await Storage.LoadDictionaries().ConfigureAwait(false);
+        await DictUtils.SerializeDicts().ConfigureAwait(false);
+        await DictUtils.LoadDictionaries().ConfigureAwait(false);
     }
 
     // probably should be split into several methods
@@ -76,7 +75,7 @@ internal sealed partial class ManageDictionariesWindow : Window
     {
         List<DockPanel> resultDockPanels = new();
 
-        foreach (Dict dict in Storage.Dicts.Values.ToList())
+        foreach (Dict dict in DictUtils.Dicts.Values.ToList())
         {
             DockPanel dockPanel = new();
 
@@ -174,15 +173,15 @@ internal sealed partial class ManageDictionariesWindow : Window
             switch (dict.Type)
             {
                 case DictType.JMdict:
-                    buttonUpdate.IsEnabled = !Storage.UpdatingJmdict;
+                    buttonUpdate.IsEnabled = !DictUtils.UpdatingJmdict;
                     break;
 
                 case DictType.JMnedict:
-                    buttonUpdate.IsEnabled = !Storage.UpdatingJmnedict;
+                    buttonUpdate.IsEnabled = !DictUtils.UpdatingJmnedict;
                     break;
 
                 case DictType.Kanjidic:
-                    buttonUpdate.IsEnabled = !Storage.UpdatingKanjidic;
+                    buttonUpdate.IsEnabled = !DictUtils.UpdatingKanjidic;
                     break;
             }
 
@@ -216,7 +215,7 @@ internal sealed partial class ManageDictionariesWindow : Window
                 Foreground = Brushes.White,
                 Background = Brushes.Red,
                 BorderThickness = new Thickness(1),
-                Visibility = Storage.BuiltInDicts.Values
+                Visibility = DictUtils.BuiltInDicts.Values
                     .Select(static d => d.Type).Contains(dict.Type)
                     ? Visibility.Collapsed
                     : Visibility.Visible
@@ -233,7 +232,7 @@ internal sealed partial class ManageDictionariesWindow : Window
                 Background = Brushes.DodgerBlue,
                 BorderThickness = new Thickness(1),
                 Margin = new Thickness(0, 0, 5, 0)
-                // Visibility = Storage.BuiltInDicts.Values
+                // Visibility = DictUtils.BuiltInDicts.Values
                 //     .Select(t => t.Type).ToList().Contains(dict.Type)
                 //     ? Visibility.Collapsed
                 //     : Visibility.Visible,
@@ -258,7 +257,7 @@ internal sealed partial class ManageDictionariesWindow : Window
             switch (dict.Type)
             {
                 case DictType.JMdict:
-                    buttonInfo.IsEnabled = Storage.JmdictEntities.Count > 0;
+                    buttonInfo.IsEnabled = DictUtils.JmdictEntities.Count > 0;
                     buttonInfo.Click += JmdictInfoButton_Click;
                     break;
                 case DictType.JMnedict:
@@ -282,14 +281,14 @@ internal sealed partial class ManageDictionariesWindow : Window
             };
             buttonRemove.Click += (_, _) =>
             {
-                if (Storage.Frontend.ShowYesNoDialog("Do you really want to remove this dictionary?", "Confirmation"))
+                if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this dictionary?", "Confirmation"))
                 {
                     dict.Contents.Clear();
-                    _ = Storage.Dicts.Remove(dict.Name);
+                    _ = DictUtils.Dicts.Remove(dict.Name);
 
                     int priorityOfDeletedDict = dict.Priority;
 
-                    foreach (Dict d in Storage.Dicts.Values)
+                    foreach (Dict d in DictUtils.Dicts.Values)
                     {
                         if (d.Priority > priorityOfDeletedDict)
                         {
@@ -339,7 +338,7 @@ internal sealed partial class ManageDictionariesWindow : Window
         {
             if (File.Exists(path))
             {
-                path = Path.GetDirectoryName(path) ?? Storage.ApplicationPath;
+                path = Path.GetDirectoryName(path) ?? Utils.ApplicationPath;
             }
 
             _ = Process.Start("explorer.exe", path);
@@ -353,18 +352,18 @@ internal sealed partial class ManageDictionariesWindow : Window
             return;
         }
 
-        Storage.Dicts.First(d => d.Value.Priority == dict.Priority - 1).Value.Priority += 1;
+        DictUtils.Dicts.First(d => d.Value.Priority == dict.Priority - 1).Value.Priority += 1;
         dict.Priority -= 1;
     }
 
     private static void UnPrioritizeDict(Dict dict)
     {
-        if (dict.Priority == Storage.Dicts.Count)
+        if (dict.Priority == DictUtils.Dicts.Count)
         {
             return;
         }
 
-        Storage.Dicts.First(d => d.Value.Priority == dict.Priority + 1).Value.Priority -= 1;
+        DictUtils.Dicts.First(d => d.Value.Priority == dict.Priority + 1).Value.Priority -= 1;
         dict.Priority += 1;
     }
 
@@ -410,12 +409,12 @@ internal sealed partial class ManageDictionariesWindow : Window
 
     private void JmdictInfoButton_Click(object sender, RoutedEventArgs e)
     {
-        ShowInfoWindow(Storage.JmdictEntities, "JMdict Abbreviations");
+        ShowInfoWindow(DictUtils.JmdictEntities, "JMdict Abbreviations");
     }
 
     private void JmnedictInfoButton_Click(object sender, RoutedEventArgs e)
     {
-        ShowInfoWindow(Storage.JmnedictEntities, "JMnedict Abbreviations");
+        ShowInfoWindow(DictUtils.JmnedictEntities, "JMnedict Abbreviations");
     }
 
     private void Window_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)

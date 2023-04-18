@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using JL.Core.Utilities;
 
-namespace JL.Core;
+namespace JL.Core.Statistics;
 
 public sealed class Stats
 {
@@ -98,31 +98,31 @@ public sealed class Stats
     {
         try
         {
-            _ = Directory.CreateDirectory(Storage.ConfigPath);
-            await File.WriteAllTextAsync(Path.Join(Storage.ConfigPath, "Stats.json"),
+            _ = Directory.CreateDirectory(Utils.ConfigPath);
+            await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "Stats.json"),
                     JsonSerializer.Serialize(lifetimeStats, new JsonSerializerOptions { WriteIndented = true }))
                 .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            Storage.Frontend.Alert(AlertLevel.Error, "Couldn't write Stats");
+            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't write Stats");
             Utils.Logger.Error(ex, "Couldn't write Stats");
         }
     }
 
     private static async Task<Stats> ReadLifetimeStats()
     {
-        if (File.Exists(Path.Join(Storage.ConfigPath, "Stats.json")))
+        if (File.Exists(Path.Join(Utils.ConfigPath, "Stats.json")))
         {
             try
             {
                 return JsonSerializer.Deserialize<Stats>(
-                   await File.ReadAllTextAsync(Path.Join(Storage.ConfigPath, "Stats.json")).ConfigureAwait(false)) ?? new Stats();
+                   await File.ReadAllTextAsync(Path.Join(Utils.ConfigPath, "Stats.json")).ConfigureAwait(false)) ?? new Stats();
             }
 
             catch (Exception ex)
             {
-                Storage.Frontend.Alert(AlertLevel.Error, "Couldn't read Stats");
+                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't read Stats");
                 Utils.Logger.Error(ex, "Couldn't read Stats");
                 return new Stats();
             }

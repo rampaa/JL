@@ -5,10 +5,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
 using JL.Core.PitchAccent;
+using JL.Core.Utilities;
 using JL.Windows.GUI;
 
 namespace JL.Windows.Utilities;
@@ -148,8 +148,8 @@ internal static class PopupWindowUtils
 
         for (int i = 0; i < expressions.Count; i++)
         {
-            string normalizedExpression = Kana.KatakanaToHiragana(expressions[i]);
-            List<string> combinedFormList = Kana.CreateCombinedForm(expressions[i]);
+            string normalizedExpression = JapaneseUtils.KatakanaToHiragana(expressions[i]);
+            List<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expressions[i]);
 
             if (i > 0)
             {
@@ -167,7 +167,7 @@ internal static class PopupWindowUtils
 
                     if ((!hasReading && pitchAccentDictResult.Reading is null)
                         || (pitchAccentDictResult.Reading is not null
-                            && normalizedExpression == Kana.KatakanaToHiragana(pitchAccentDictResult.Reading)))
+                            && normalizedExpression == JapaneseUtils.KatakanaToHiragana(pitchAccentDictResult.Reading)))
                     {
                         if (primarySpelling == pitchAccentDictResult.Spelling)
                         {
