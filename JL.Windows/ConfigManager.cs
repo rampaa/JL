@@ -195,7 +195,7 @@ internal static class ConfigManager
 
         CaptureTextFromClipboard = GetValueFromConfig(CaptureTextFromClipboard, nameof(CaptureTextFromClipboard), bool.TryParse);
         CoreConfig.CaptureTextFromWebSocket = GetValueFromConfig(CoreConfig.CaptureTextFromWebSocket, nameof(CoreConfig.CaptureTextFromWebSocket), bool.TryParse);
-        if (!CoreConfig.CaptureTextFromWebSocket && !ConfigManager.CaptureTextFromClipboard)
+        if (!CoreConfig.CaptureTextFromWebSocket && !CaptureTextFromClipboard)
         {
             StatsUtils.StatsStopWatch.Stop();
             StatsUtils.StopStatsTimer();

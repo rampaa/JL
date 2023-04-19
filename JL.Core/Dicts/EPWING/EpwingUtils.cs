@@ -9,7 +9,7 @@ internal static class EpwingUtils
     {
         foreach (char c in epwingRecord.PrimarySpelling)
         {
-            if (c is '�' || char.IsPunctuation(c) || char.IsWhiteSpace(c))
+            if (char.IsSymbol(c) || char.IsPunctuation(c) || char.IsWhiteSpace(c))
             {
                 return false;
             }

@@ -361,7 +361,8 @@ public static class JapaneseUtils
         int endPosition = text.Length;
         for (int i = position; i < text.Length; i++)
         {
-            if (char.IsPunctuation(text[i]) || char.IsWhiteSpace(text[i]))
+            char c = text[i];
+            if (char.IsPunctuation(c) || char.IsSymbol(c) || char.IsWhiteSpace(c))
             {
                 endPosition = i;
                 break;
