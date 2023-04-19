@@ -53,7 +53,7 @@ public static class Utils
 
     public static async Task CoreInitialize()
     {
-        StatsUtils.SetTimer();
+        StatsUtils.StartTimer();
 
         StatsUtils.StatsStopWatch.Start();
 

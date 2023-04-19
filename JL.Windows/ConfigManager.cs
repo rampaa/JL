@@ -10,6 +10,7 @@ using System.Xml;
 using HandyControl.Data;
 using JL.Core;
 using JL.Core.Network;
+using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
 using JL.Windows.Utilities;
@@ -192,6 +193,19 @@ internal static class ConfigManager
             }
         }
 
+        CaptureTextFromClipboard = GetValueFromConfig(CaptureTextFromClipboard, nameof(CaptureTextFromClipboard), bool.TryParse);
+        CoreConfig.CaptureTextFromWebSocket = GetValueFromConfig(CoreConfig.CaptureTextFromWebSocket, nameof(CoreConfig.CaptureTextFromWebSocket), bool.TryParse);
+        if (!CoreConfig.CaptureTextFromWebSocket && !ConfigManager.CaptureTextFromClipboard)
+        {
+            StatsUtils.StatsStopWatch.Stop();
+            StatsUtils.StopTimer();
+        }
+        else
+        {
+            StatsUtils.StatsStopWatch.Start();
+            StatsUtils.StartTimer();
+        }
+
         MainWindow mainWindow = MainWindow.Instance;
 
         AutoAdjustFontSizesOnResolutionChange = GetValueFromConfig(AutoAdjustFontSizesOnResolutionChange, nameof(AutoAdjustFontSizesOnResolutionChange), bool.TryParse);
@@ -217,8 +231,6 @@ internal static class ConfigManager
         TextOnlyVisibleOnHover = GetValueFromConfig(TextOnlyVisibleOnHover, nameof(TextOnlyVisibleOnHover), bool.TryParse);
         TextBoxTrimWhiteSpaceCharacters = GetValueFromConfig(TextBoxTrimWhiteSpaceCharacters, nameof(TextBoxTrimWhiteSpaceCharacters), bool.TryParse);
         TextBoxRemoveNewlines = GetValueFromConfig(TextBoxRemoveNewlines, nameof(TextBoxRemoveNewlines), bool.TryParse);
-        CaptureTextFromClipboard = GetValueFromConfig(CaptureTextFromClipboard, nameof(CaptureTextFromClipboard), bool.TryParse);
-        CoreConfig.CaptureTextFromWebSocket = GetValueFromConfig(CoreConfig.CaptureTextFromWebSocket, nameof(CoreConfig.CaptureTextFromWebSocket), bool.TryParse);
         OnlyCaptureTextWithJapaneseChars = GetValueFromConfig(OnlyCaptureTextWithJapaneseChars, nameof(OnlyCaptureTextWithJapaneseChars), bool.TryParse);
         DisableLookupsForNonJapaneseCharsInMainWindow = GetValueFromConfig(DisableLookupsForNonJapaneseCharsInMainWindow, nameof(DisableLookupsForNonJapaneseCharsInMainWindow), bool.TryParse);
         MainWindowFocusOnHover = GetValueFromConfig(MainWindowFocusOnHover, nameof(MainWindowFocusOnHover), bool.TryParse);

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
@@ -9,12 +9,20 @@ public static class StatsUtils
     public static Stopwatch StatsStopWatch { get; } = new();
     internal static Timer StatsTimer { get; } = new();
 
-    internal static void SetTimer()
+    public static void StartTimer()
     {
-        StatsTimer.Interval = TimeSpan.FromMinutes(5).TotalMilliseconds;
-        StatsTimer.Elapsed += OnTimedEvent;
-        StatsTimer.AutoReset = true;
-        StatsTimer.Enabled = true;
+        if (!StatsTimer.Enabled)
+        {
+            StatsTimer.Interval = TimeSpan.FromMinutes(5).TotalMilliseconds;
+            StatsTimer.Elapsed += OnTimedEvent;
+            StatsTimer.AutoReset = true;
+            StatsTimer.Enabled = true;
+        }
+    }
+
+    public static void StopTimer()
+    {
+        StatsTimer.Enabled = false;
     }
 
     private static async void OnTimedEvent(object? sender, ElapsedEventArgs e)

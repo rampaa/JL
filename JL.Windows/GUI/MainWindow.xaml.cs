@@ -636,12 +636,33 @@ internal sealed partial class MainWindow : Window
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.CaptureTextFromClipboardKeyGesture))
         {
             ConfigManager.CaptureTextFromClipboard = !ConfigManager.CaptureTextFromClipboard;
+            if (!CoreConfig.CaptureTextFromWebSocket && !ConfigManager.CaptureTextFromClipboard)
+            {
+                StatsUtils.StatsStopWatch.Stop();
+                StatsUtils.StopTimer();
+            }
+            else
+            {
+                StatsUtils.StatsStopWatch.Start();
+                StatsUtils.StartTimer();
+            }
         }
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.CaptureTextFromWebSocketKeyGesture))
         {
             CoreConfig.CaptureTextFromWebSocket = !CoreConfig.CaptureTextFromWebSocket;
             WebSocketUtils.HandleWebSocket();
+
+            if (!CoreConfig.CaptureTextFromWebSocket && !ConfigManager.CaptureTextFromClipboard)
+            {
+                StatsUtils.StatsStopWatch.Stop();
+                StatsUtils.StopTimer();
+            }
+            else
+            {
+                StatsUtils.StatsStopWatch.Start();
+                StatsUtils.StartTimer();
+            }
         }
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ReconnectToWebSocketServerKeyGesture))
