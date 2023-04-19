@@ -9,7 +9,7 @@ public static class StatsUtils
     public static Stopwatch StatsStopWatch { get; } = new();
     internal static Timer StatsTimer { get; } = new();
 
-    public static void StartTimer()
+    public static void StartStatsTimer()
     {
         if (!StatsTimer.Enabled)
         {
@@ -20,7 +20,7 @@ public static class StatsUtils
         }
     }
 
-    public static void StopTimer()
+    public static void StopStatsTimer()
     {
         StatsTimer.Enabled = false;
     }

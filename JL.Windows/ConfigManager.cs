@@ -198,12 +198,12 @@ internal static class ConfigManager
         if (!CoreConfig.CaptureTextFromWebSocket && !ConfigManager.CaptureTextFromClipboard)
         {
             StatsUtils.StatsStopWatch.Stop();
-            StatsUtils.StopTimer();
+            StatsUtils.StopStatsTimer();
         }
         else
         {
             StatsUtils.StatsStopWatch.Start();
-            StatsUtils.StartTimer();
+            StatsUtils.StartStatsTimer();
         }
 
         MainWindow mainWindow = MainWindow.Instance;
