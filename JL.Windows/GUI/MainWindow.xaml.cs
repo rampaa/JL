@@ -590,15 +590,7 @@ internal sealed partial class MainWindow : Window
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ClosePopupKeyGesture))
         {
-            FirstPopupWindow.MiningMode = false;
-            FirstPopupWindow.TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
-            FirstPopupWindow.ItemsControlButtons.Visibility = Visibility.Collapsed;
-
-            FirstPopupWindow.PopUpScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
-            FirstPopupWindow.Hide();
-            PopupWindow.PopupAutoHideTimer.Stop();
-
-            ChangeVisibility();
+            FirstPopupWindow.HidePopup();
         }
 
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowStatsKeyGesture))
@@ -833,18 +825,11 @@ internal sealed partial class MainWindow : Window
 
         else
         {
-            PopupWindow.PopupAutoHideTimer.Stop();
-
             PopupWindow? currentPopupWindow = FirstPopupWindow;
 
             while (currentPopupWindow is not null)
             {
-                currentPopupWindow.MiningMode = false;
-                currentPopupWindow.TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
-                currentPopupWindow.ItemsControlButtons.Visibility = Visibility.Collapsed;
-                currentPopupWindow.PopUpScrollViewer.ScrollToTop();
-                currentPopupWindow.Hide();
-
+                currentPopupWindow.HidePopup();
                 currentPopupWindow = currentPopupWindow.ChildPopupWindow;
             }
         }

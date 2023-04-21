@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}"
         mc:Ignorable="d"
         Title="PopupWindow" ContextMenuOpening="Window_ContextMenuOpening" PreviewMouseDown="Window_PreviewMouseDown"
         Width="Auto" Height="Auto" SizeToContent="Height" MaxWidth="700" MaxHeight="520"
@@ -11,50 +10,46 @@
         KeyDown="Window_KeyDown" Closing="Window_Closing" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave"
         x:ClassModifier="internal">
 
-    <ScrollViewer x:Name="PopUpScrollViewer" VerticalScrollBarVisibility="Auto"
-                  VerticalContentAlignment="Top"
-                  CanContentScroll="True">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Name="TextBlockMiningModeReminder" FontSize="13" Padding="5,1,0,1"
+        <TextBlock Grid.Row="0" Name="TextBlockMiningModeReminder" FontSize="13" Padding="5,1,0,1"
                        Visibility="Collapsed" TextWrapping="Wrap"
                        Background="{Binding Path=Background,
-                  RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
+                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
                        Foreground="{Binding Path=Foreground,
-                  RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
-            </TextBlock>
+                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
+        </TextBlock>
 
-            <ItemsControl Grid.Row="1" Name="ItemsControlButtons" Visibility="Collapsed"
-                          ItemsSource="{Binding Path=DictTypeButtons}"
+        <ItemsControl Grid.Row="1" Name="ItemsControlButtons" Visibility="Collapsed"
                           Background="{Binding Path=Background,
                   RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
 
-            <ListBox Grid.Row="2" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
-                     BorderThickness="0"
-                     Background="{Binding Path=Background,
-                  RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
-                     PreviewMouseWheel="PopupListBox_PreviewMouseWheel"
-                     x:Name="PopupListBox" ItemsSource="{Binding Path=ResultStackPanels}" Opacity="70">
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListBoxItem}">
-                        <Setter Property="Focusable" Value="False" />
-                    </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>
+        <ListView Grid.Row="2" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.ScrollUnit="Pixel"
+                  BorderThickness="0" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto" VirtualizingPanel.IsContainerVirtualizable="True"
+                  Background="{Binding Path=Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
+                  x:Name="PopupListBox" Opacity="70">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="Focusable" Value="False" />
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+    </Grid>
 
-        </Grid>
-    </ScrollViewer>
     <Window.ContextMenu>
         <ContextMenu Name="PopupContextMenu" IsVisibleChanged="PopupContextMenu_IsVisibleChanged">
             <MenuItem

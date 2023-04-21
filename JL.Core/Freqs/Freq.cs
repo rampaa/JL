@@ -13,16 +13,13 @@ public sealed class Freq
 
     [JsonIgnore] public Dictionary<string, List<FrequencyRecord>> Contents { get; internal set; } = new();
 
-    //public DictOptions? Options { get; set; } // can be null for dicts.json files generated before version 1.10
-
     public Freq(FreqType type, string name, string path, bool active, int priority, int size)
     {
         Type = type;
-        Name = name; //?? type.GetDescription() ?? type.ToString();
+        Name = name;
         Path = path;
         Active = active;
         Priority = priority;
         Size = size;
-        //Options = options;
     }
 }

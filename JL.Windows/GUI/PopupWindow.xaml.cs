@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,6 +38,8 @@ internal sealed partial class PopupWindow : Window
 
     private List<LookupResult> _lastLookupResults = new();
 
+    private readonly HashSet<Dict> _dictsWithResults = new();
+
     private Dict? _filteredDict = null;
 
     public bool UnavoidableMouseEnter { get; private set; } = false;
@@ -46,10 +47,6 @@ internal sealed partial class PopupWindow : Window
     public string? LastText { get; set; }
 
     public bool MiningMode { get; set; }
-
-    public ObservableCollection<StackPanel> ResultStackPanels { get; } = new();
-
-    public ObservableCollection<Button> DictTypeButtons { get; } = new();
 
     public static Timer PopupAutoHideTimer { get; } = new();
 
@@ -154,12 +151,7 @@ internal sealed partial class PopupWindow : Window
                 : ConfigManager.DisableLookupsForNonJapaneseCharsInMainWindow
                     && !JapaneseUtils.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString()))
             {
-                if (ConfigManager.HighlightLongestMatch)
-                {
-                    WindowsUtils.Unselect(_lastTextBox);
-                }
-
-                Visibility = Visibility.Hidden;
+                HidePopup();
                 return;
             }
 
@@ -176,7 +168,6 @@ internal sealed partial class PopupWindow : Window
 
             LastText = text;
 
-            ResultStackPanels.Clear();
             List<LookupResult>? lookupResults = Lookup.LookupText(text);
 
             if (lookupResults is { Count: > 0 })
@@ -228,24 +219,12 @@ internal sealed partial class PopupWindow : Window
             }
             else
             {
-                LastText = "";
-                Visibility = Visibility.Hidden;
-
-                //if (ConfigManager.HighlightLongestMatch)
-                //{
-                //    //Unselect(tb);
-                //}
+                HidePopup();
             }
         }
         else
         {
-            LastText = "";
-            Visibility = Visibility.Hidden;
-
-            if (ConfigManager.HighlightLongestMatch)
-            {
-                WindowsUtils.Unselect(tb);
-            }
+            HidePopup();
         }
     }
 
@@ -259,14 +238,10 @@ internal sealed partial class PopupWindow : Window
         _lastTextBox = tb;
         _lastSelectedText = tb.SelectedText;
 
-        PopUpScrollViewer.ScrollToTop();
-
         List<LookupResult>? lookupResults = Lookup.LookupText(tb.SelectedText);
 
         if (lookupResults?.Count > 0)
         {
-            ResultStackPanels.Clear();
-
             Init();
 
             _lastLookupResults = lookupResults;
@@ -372,45 +347,50 @@ internal sealed partial class PopupWindow : Window
 
     private void DisplayResults(bool generateAllResults, string? text = null)
     {
-        // TODO: Should be configurable
+        _dictsWithResults.Clear();
+
         PopupListBox.Items.Filter = NoAllDictFilter;
 
         if (text is not null && !generateAllResults && StackPanelCache.TryGet(text, out StackPanel[] data))
         {
-            for (int i = 0; i < data.Length; i++)
-            {
-                if (i > ConfigManager.MaxNumResultsNotInMiningMode)
-                {
-                    break;
-                }
+            int resultCount = Math.Min(data.Length, ConfigManager.MaxNumResultsNotInMiningMode);
+            StackPanel[] popupItemSource = new StackPanel[resultCount];
 
-                ResultStackPanels.Add(data[i]);
+            for (int i = 0; i < resultCount; i++)
+            {
+                StackPanel stackPanel = data[i];
+                _ = _dictsWithResults.Add((Dict)stackPanel.Tag);
+                popupItemSource[i] = stackPanel;
             }
 
+            PopupListBox.ItemsSource = popupItemSource;
             GenerateDictTypeButtons();
             UpdateLayout();
         }
 
         else
         {
-            int resultCount = _lastLookupResults.Count;
-            for (int index = 0; index < resultCount; index++)
-            {
-                if (!generateAllResults && index > ConfigManager.MaxNumResultsNotInMiningMode)
-                {
-                    break;
-                }
+            int resultCount = generateAllResults
+                ? _lastLookupResults.Count
+                : Math.Min(_lastLookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
 
-                ResultStackPanels.Add(MakeResultStackPanel(_lastLookupResults[index], index, resultCount));
+            StackPanel[] popupItemSource = new StackPanel[resultCount];
+
+            for (int i = 0; i < resultCount; i++)
+            {
+                LookupResult lookupResult = _lastLookupResults[i];
+                _ = _dictsWithResults.Add(lookupResult.Dict);
+                popupItemSource[i] = MakeResultStackPanel(lookupResult, i, resultCount);
             }
 
+            PopupListBox.ItemsSource = popupItemSource;
             GenerateDictTypeButtons();
             UpdateLayout();
 
             // we might cache incomplete results if we don't wait until all dicts are loaded
             if (text is not null && DictUtils.DictsReady && !DictUtils.UpdatingJmdict && !DictUtils.UpdatingJmnedict && !DictUtils.UpdatingKanjidic)
             {
-                StackPanelCache.AddReplace(text, ResultStackPanels.ToArray());
+                StackPanelCache.AddReplace(text, popupItemSource);
             }
         }
     }
@@ -1074,10 +1054,7 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        MiningMode = false;
-        TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
-        ItemsControlButtons.Visibility = Visibility.Collapsed;
-        Hide();
+        HidePopup();
 
         Dictionary<JLField, string> miningParams = new();
 
@@ -1233,18 +1210,6 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    private void PopupListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-    {
-        e.Handled = true;
-
-        MouseWheelEventArgs e2 = new(e.MouseDevice, e.Timestamp, e.Delta)
-        {
-            RoutedEvent = MouseWheelEvent,
-            Source = e.Source
-        };
-        PopupListBox.RaiseEvent(e2);
-    }
-
     private void ShowAddNameWindow()
     {
         string primarySpelling = _lastLookupResults[_listBoxIndex].PrimarySpelling;
@@ -1288,7 +1253,6 @@ internal sealed partial class PopupWindow : Window
             _ = Activate();
             _ = Focus();
 
-            ResultStackPanels.Clear();
             DisplayResults(true);
 
             if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
@@ -1302,27 +1266,9 @@ internal sealed partial class PopupWindow : Window
         }
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ClosePopupKeyGesture))
         {
-            MiningMode = false;
-            TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
-            ItemsControlButtons.Visibility = Visibility.Collapsed;
-
-            PopUpScrollViewer.ScrollToTop();
-
-            if (ConfigManager.LookupOnSelectOnly)
-            {
-                WindowsUtils.Unselect(_lastTextBox);
-            }
-
             _ = Owner.Focus();
 
-            Hide();
-
-            PopupAutoHideTimer.Stop();
-
-            if (Owner == MainWindow.Instance)
-            {
-                MainWindow.Instance.ChangeVisibility();
-            }
+            HidePopup();
         }
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.KanjiModeKeyGesture))
         {
@@ -1468,8 +1414,6 @@ internal sealed partial class PopupWindow : Window
         }
 
         ItemsControlButtons.Visibility = Visibility.Visible;
-
-        PopUpScrollViewer.ScrollToTop();
     }
 
     private async Task PlayAudio()
@@ -1551,7 +1495,7 @@ internal sealed partial class PopupWindow : Window
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         e.Cancel = true;
-        Hide();
+        HidePopup();
     }
 
     private void OnMouseEnter(object sender, MouseEventArgs e)
@@ -1561,8 +1505,7 @@ internal sealed partial class PopupWindow : Window
             && !ConfigManager.FixedPopupPositioning
             && ChildPopupWindow is { MiningMode: false })
         {
-            ChildPopupWindow.Hide();
-            ChildPopupWindow.LastText = "";
+            ChildPopupWindow.HidePopup();
         }
 
         if (MiningMode)
@@ -1580,8 +1523,7 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        Hide();
-        LastText = "";
+        HidePopup();
     }
 
     private void UiElement_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -1632,8 +1574,7 @@ internal sealed partial class PopupWindow : Window
     {
         if (ChildPopupWindow is { MiningMode: false, UnavoidableMouseEnter: false })
         {
-            ChildPopupWindow.Hide();
-            ChildPopupWindow.LastText = "";
+            ChildPopupWindow.HidePopup();
         }
 
         if (IsMouseOver || ConfigManager.FixedPopupPositioning)
@@ -1663,25 +1604,13 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        Hide();
-        LastText = "";
-
-        if (Owner == MainWindow.Instance)
-        {
-            MainWindow.Instance.ChangeVisibility();
-        }
-
-        if (ConfigManager.HighlightLongestMatch && !PopupContextMenu.IsVisible)
-        {
-            WindowsUtils.Unselect(_lastTextBox);
-        }
+        HidePopup();
     }
 
     public static void PopupWindow_PreviewMouseDown(PopupWindow popupWindow)
     {
         popupWindow.EnableMiningMode();
         WinApi.BringToFront(popupWindow._windowHandle);
-        popupWindow.ResultStackPanels.Clear();
         popupWindow.DisplayResults(true);
 
         if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
@@ -1692,23 +1621,14 @@ internal sealed partial class PopupWindow : Window
 
     private void GenerateDictTypeButtons()
     {
-        DictTypeButtons.Clear();
-
+        List<Button> buttons = new(DictUtils.Dicts.Values.Count);
         var buttonAll = new Button { Content = "All", Margin = new Thickness(1), Background = Brushes.DodgerBlue };
         buttonAll.Click += ButtonAllOnClick;
-        DictTypeButtons.Add(buttonAll);
-
-        List<Dict> foundDicts = new();
-
-        foreach (StackPanel stackPanel in ResultStackPanels)
-        {
-            Dict foundDict = (Dict)stackPanel.Tag;
-            foundDicts.Add(foundDict);
-        }
+        buttons.Add(buttonAll);
 
         foreach (Dict dict in DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority).ToList())
         {
-            if (!dict.Active || dict.Type is DictType.PitchAccentYomichan || (ConfigManager.HideDictTabsWithNoResults && !foundDicts.Contains(dict)))
+            if (!dict.Active || dict.Type is DictType.PitchAccentYomichan || (ConfigManager.HideDictTabsWithNoResults && !_dictsWithResults.Contains(dict)))
             {
                 continue;
             }
@@ -1716,13 +1636,15 @@ internal sealed partial class PopupWindow : Window
             var button = new Button { Content = dict.Name, Margin = new Thickness(1), Tag = dict };
             button.Click += DictTypeButtonOnClick;
 
-            if (!foundDicts.Contains(dict))
+            if (!_dictsWithResults.Contains(dict))
             {
                 button.IsEnabled = false;
             }
 
-            DictTypeButtons.Add(button);
+            buttons.Add(button);
         }
+
+        ItemsControlButtons.ItemsSource = buttons;
     }
 
     private void ButtonAllOnClick(object sender, RoutedEventArgs e)
@@ -1782,8 +1704,7 @@ internal sealed partial class PopupWindow : Window
     {
         if (ChildPopupWindow is { MiningMode: false })
         {
-            ChildPopupWindow.Hide();
-            ChildPopupWindow.LastText = "";
+            ChildPopupWindow.HidePopup();
         }
     }
 
@@ -1795,14 +1716,33 @@ internal sealed partial class PopupWindow : Window
 
             while (childPopupWindow != null)
             {
-                childPopupWindow.MiningMode = false;
-                childPopupWindow.TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
-                childPopupWindow.ItemsControlButtons.Visibility = Visibility.Collapsed;
-                childPopupWindow.PopUpScrollViewer.ScrollToTop();
-                childPopupWindow.Hide();
+                childPopupWindow.HidePopup();
 
                 childPopupWindow = childPopupWindow.ChildPopupWindow;
             }
+        }
+    }
+
+    public void HidePopup()
+    {
+        MiningMode = false;
+        TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
+        ItemsControlButtons.Visibility = Visibility.Collapsed;
+        ItemsControlButtons.ItemsSource = null;
+        PopupListBox.ItemsSource = null;
+        LastText = "";
+        PopupAutoHideTimer.Stop();
+
+        if (ConfigManager.HighlightLongestMatch && !PopupContextMenu.IsVisible)
+        {
+            WindowsUtils.Unselect(_lastTextBox);
+        }
+
+        Hide();
+
+        if (Owner == MainWindow.Instance)
+        {
+            MainWindow.Instance.ChangeVisibility();
         }
     }
 }

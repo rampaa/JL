@@ -260,7 +260,6 @@ internal static class PopupWindowUtils
                 lastPopupWindow.MiningMode = false;
                 lastPopupWindow.TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
                 lastPopupWindow.ItemsControlButtons.Visibility = Visibility.Collapsed;
-                lastPopupWindow.PopUpScrollViewer.ScrollToTop();
                 lastPopupWindow.Hide();
 
                 if (lastPopupWindow.Owner is PopupWindow parentPopupWindow)
