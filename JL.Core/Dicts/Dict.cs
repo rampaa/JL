@@ -14,7 +14,7 @@ public sealed class Dict
 
     [JsonIgnore] public Dictionary<string, List<IDictRecord>> Contents { get; internal set; } = new();
 
-    public DictOptions Options { get; set; }
+    public DictOptions? Options { get; set; }  // can be null for dicts.json files generated before version 1.10
 
     public Dict(DictType type, string name, string path, bool active, int priority, int size, DictOptions options)
     {

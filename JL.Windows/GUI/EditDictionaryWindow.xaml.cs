@@ -73,7 +73,7 @@ internal sealed partial class EditDictionaryWindow : Window
 
             Core.Dicts.Options.DictOptions options = _dictOptionsControl.GetDictOptions(_dict.Type);
 
-            if (_dict.Options.Examples?.Value != options.Examples?.Value)
+            if (_dict.Options?.Examples?.Value != options.Examples?.Value)
             {
                 _dict.Contents.Clear();
             }

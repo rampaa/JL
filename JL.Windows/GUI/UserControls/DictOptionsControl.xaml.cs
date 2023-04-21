@@ -167,39 +167,39 @@ internal sealed partial class DictOptionsControl : UserControl
         if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dict.Type))
         {
             bool isEpwing = DictUtils.YomichanDictTypes.Concat(DictUtils.NazekaDictTypes).All(dt => dt != dict.Type);
-            NewlineCheckBox.IsChecked = dict.Options.NewlineBetweenDefinitions?.Value ?? isEpwing;
+            NewlineCheckBox.IsChecked = dict.Options?.NewlineBetweenDefinitions?.Value ?? isEpwing;
             NewlineCheckBox.Visibility = Visibility.Visible;
         }
 
         if (ExamplesOption.ValidDictTypes.Contains(dict.Type))
         {
             ExamplesComboBox.ItemsSource = Enum.GetValues<ExamplesOptionValue>().ToArray();
-            ExamplesComboBox.SelectedValue = dict.Options.Examples?.Value ?? ExamplesOptionValue.None;
+            ExamplesComboBox.SelectedValue = dict.Options?.Examples?.Value ?? ExamplesOptionValue.None;
 
             ExamplesDockPanel.Visibility = Visibility.Visible;
         }
 
         if (NoAllOption.ValidDictTypes.Contains(dict.Type))
         {
-            NoAllCheckBox.IsChecked = dict.Options.NoAll?.Value ?? false;
+            NoAllCheckBox.IsChecked = dict.Options?.NoAll?.Value ?? false;
             NoAllCheckBox.Visibility = Visibility.Visible;
         }
 
         if (WordClassInfoOption.ValidDictTypes.Contains(dict.Type))
         {
-            WordClassInfoCheckBox.IsChecked = dict.Options.WordClassInfo?.Value ?? true;
+            WordClassInfoCheckBox.IsChecked = dict.Options?.WordClassInfo?.Value ?? true;
             WordClassInfoCheckBox.Visibility = Visibility.Visible;
         }
 
         if (DialectInfoOption.ValidDictTypes.Contains(dict.Type))
         {
-            DialectInfoCheckBox.IsChecked = dict.Options.DialectInfo?.Value ?? true;
+            DialectInfoCheckBox.IsChecked = dict.Options?.DialectInfo?.Value ?? true;
             DialectInfoCheckBox.Visibility = Visibility.Visible;
         }
 
         if (POrthographyInfoOption.ValidDictTypes.Contains(dict.Type))
         {
-            POrthographyInfoCheckBox.IsChecked = dict.Options.POrthographyInfo?.Value ?? true;
+            POrthographyInfoCheckBox.IsChecked = dict.Options?.POrthographyInfo?.Value ?? true;
             POrthographyInfoCheckBox.Visibility = Visibility.Visible;
         }
 
@@ -212,61 +212,61 @@ internal sealed partial class DictOptionsControl : UserControl
 
         if (POrthographyInfoFontSizeOption.ValidDictTypes.Contains(dict.Type))
         {
-            POrthographyInfoFontSizeNumericUpDown.Value = dict.Options.POrthographyInfoFontSize?.Value ?? 15;
+            POrthographyInfoFontSizeNumericUpDown.Value = dict.Options?.POrthographyInfoFontSize?.Value ?? 15;
             POrthographyInfoFontSizeDockPanel.Visibility = Visibility.Visible;
         }
 
         if (AOrthographyInfoOption.ValidDictTypes.Contains(dict.Type))
         {
-            AOrthographyInfoCheckBox.IsChecked = dict.Options.AOrthographyInfo?.Value ?? true;
+            AOrthographyInfoCheckBox.IsChecked = dict.Options?.AOrthographyInfo?.Value ?? true;
             AOrthographyInfoCheckBox.Visibility = Visibility.Visible;
         }
 
         if (ROrthographyInfoOption.ValidDictTypes.Contains(dict.Type))
         {
-            ROrthographyInfoCheckBox.IsChecked = dict.Options.ROrthographyInfo?.Value ?? true;
+            ROrthographyInfoCheckBox.IsChecked = dict.Options?.ROrthographyInfo?.Value ?? true;
             ROrthographyInfoCheckBox.Visibility = Visibility.Visible;
         }
 
         if (WordTypeInfoOption.ValidDictTypes.Contains(dict.Type))
         {
-            WordTypeInfoCheckBox.IsChecked = dict.Options.WordTypeInfo?.Value ?? true;
+            WordTypeInfoCheckBox.IsChecked = dict.Options?.WordTypeInfo?.Value ?? true;
             WordTypeInfoCheckBox.Visibility = Visibility.Visible;
         }
 
         if (SpellingRestrictionInfoOption.ValidDictTypes.Contains(dict.Type))
         {
-            SpellingRestrictionInfoCheckBox.IsChecked = dict.Options.SpellingRestrictionInfo?.Value ?? true;
+            SpellingRestrictionInfoCheckBox.IsChecked = dict.Options?.SpellingRestrictionInfo?.Value ?? true;
             SpellingRestrictionInfoCheckBox.Visibility = Visibility.Visible;
         }
 
         if (ExtraDefinitionInfoOption.ValidDictTypes.Contains(dict.Type))
         {
-            ExtraDefinitionInfoCheckBox.IsChecked = dict.Options.ExtraDefinitionInfo?.Value ?? true;
+            ExtraDefinitionInfoCheckBox.IsChecked = dict.Options?.ExtraDefinitionInfo?.Value ?? true;
             ExtraDefinitionInfoCheckBox.Visibility = Visibility.Visible;
         }
 
         if (MiscInfoOption.ValidDictTypes.Contains(dict.Type))
         {
-            MiscInfoCheckBox.IsChecked = dict.Options.MiscInfo?.Value ?? true;
+            MiscInfoCheckBox.IsChecked = dict.Options?.MiscInfo?.Value ?? true;
             MiscInfoCheckBox.Visibility = Visibility.Visible;
         }
 
         if (RelatedTermOption.ValidDictTypes.Contains(dict.Type))
         {
-            RelatedTermCheckBox.IsChecked = dict.Options.RelatedTerm?.Value ?? false;
+            RelatedTermCheckBox.IsChecked = dict.Options?.RelatedTerm?.Value ?? false;
             RelatedTermCheckBox.Visibility = Visibility.Visible;
         }
 
         if (AntonymOption.ValidDictTypes.Contains(dict.Type))
         {
-            AntonymCheckBox.IsChecked = dict.Options.Antonym?.Value ?? false;
+            AntonymCheckBox.IsChecked = dict.Options?.Antonym?.Value ?? false;
             AntonymCheckBox.Visibility = Visibility.Visible;
         }
 
         if (LoanwordEtymologyOption.ValidDictTypes.Contains(dict.Type))
         {
-            LoanwordEtymologyCheckBox.IsChecked = dict.Options.LoanwordEtymology?.Value ?? true;
+            LoanwordEtymologyCheckBox.IsChecked = dict.Options?.LoanwordEtymology?.Value ?? true;
             LoanwordEtymologyCheckBox.Visibility = Visibility.Visible;
         }
 
