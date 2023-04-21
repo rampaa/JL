@@ -225,6 +225,8 @@ internal sealed partial class MainWindow : Window
 
     private async Task Precache(string input)
     {
+        FirstPopupWindow.DictsWithResults.Clear();
+
         for (int charPosition = 0; charPosition < input.Length; charPosition++)
         {
             if (_stopPrecache)
@@ -254,20 +256,21 @@ internal sealed partial class MainWindow : Window
                 List<LookupResult>? lookupResults = Lookup.LookupText(text);
                 if (lookupResults is { Count: > 0 })
                 {
-                    List<StackPanel> stackPanels = new();
-                    for (int i = 0; i < lookupResults.Count; i++)
+                    int resultCount = Math.Min(lookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
+                    var popupItemSource = new StackPanel[resultCount];
+                    for (int i = 0; i < resultCount; i++)
                     {
-                        if (i > ConfigManager.MaxNumResultsNotInMiningMode)
+                        LookupResult lookupResult = lookupResults[i];
+
+                        if (!FirstPopupWindow.DictsWithResults.Contains(lookupResult.Dict))
                         {
-                            break;
+                            FirstPopupWindow.DictsWithResults.Add(lookupResult.Dict);
                         }
 
-                        LookupResult lookupResult = lookupResults[i];
-                        StackPanel stackPanel = FirstPopupWindow.MakeResultStackPanel(lookupResult, i, lookupResults.Count);
-                        stackPanels.Add(stackPanel);
+                        popupItemSource[i] = FirstPopupWindow.MakeResultStackPanel(lookupResult, i, lookupResults.Count);
                     }
 
-                    PopupWindow.StackPanelCache.AddReplace(text, stackPanels.ToArray());
+                    PopupWindow.StackPanelCache.AddReplace(text, popupItemSource);
                 }
             }
         }
@@ -972,13 +975,29 @@ internal sealed partial class MainWindow : Window
         AddNameMenuItem.IsEnabled = DictUtils.DictsReady;
         AddWordMenuItem.IsEnabled = DictUtils.DictsReady;
 
-        FirstPopupWindow.Hide();
-        FirstPopupWindow.LastText = "";
+        FirstPopupWindow.HidePopup();
     }
 
-    public void ChangeVisibility()
+    public async Task ChangeVisibility()
     {
-        if (IsMouseOver || ConfigManager.InvisibleMode)
+        // Prevents main window background flicker
+        await Task.Delay(5).ConfigureAwait(true);
+
+        if (IsMouseOver
+            || FirstPopupWindow.IsMouseOver
+            || FirstPopupWindow.IsVisible
+            || ManageDictionariesWindow.IsItVisible()
+            || ManageFrequenciesWindow.IsItVisible()
+            || ManageAudioSourcesWindow.IsItVisible()
+            || AddNameWindow.IsItVisible()
+            || AddWordWindow.IsItVisible()
+            || PreferencesWindow.IsItVisible()
+            || StatsWindow.IsItVisible()
+            || MainTextboxContextMenu.IsVisible
+            || TitleBarContextMenu.IsVisible
+            || Mouse.LeftButton is MouseButtonState.Pressed
+            || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On)
+            || ConfigManager.InvisibleMode)
         {
             return;
         }
@@ -1005,36 +1024,7 @@ internal sealed partial class MainWindow : Window
             return;
         }
 
-        FirstPopupWindow.Hide();
-        FirstPopupWindow.LastText = "";
-
-        if (FirstPopupWindow.IsMouseOver
-            || FirstPopupWindow.IsVisible
-            || ManageDictionariesWindow.IsItVisible()
-            || ManageFrequenciesWindow.IsItVisible()
-            || ManageAudioSourcesWindow.IsItVisible()
-            || AddNameWindow.IsItVisible()
-            || AddWordWindow.IsItVisible()
-            || PreferencesWindow.IsItVisible()
-            || StatsWindow.IsItVisible()
-            || MainTextboxContextMenu.IsVisible
-            || TitleBarContextMenu.IsVisible
-            || e.LeftButton is MouseButtonState.Pressed
-            || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On)
-            || ConfigManager.InvisibleMode)
-        {
-            return;
-        }
-
-        if (ConfigManager.TextOnlyVisibleOnHover)
-        {
-            MainGrid.Opacity = 0;
-        }
-
-        if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover && Background.Opacity is not 0)
-        {
-            Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
-        }
+        FirstPopupWindow.HidePopup();
 
         if (ConfigManager.HighlightLongestMatch)
         {

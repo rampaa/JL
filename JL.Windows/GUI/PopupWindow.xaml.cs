@@ -38,7 +38,7 @@ internal sealed partial class PopupWindow : Window
 
     private List<LookupResult> _lastLookupResults = new();
 
-    private readonly List<Dict> _dictsWithResults = new();
+    public List<Dict> DictsWithResults { get; } = new();
 
     private Dict? _filteredDict = null;
 
@@ -272,7 +272,7 @@ internal sealed partial class PopupWindow : Window
         }
         else
         {
-            Visibility = Visibility.Hidden;
+            HidePopup();
         }
     }
 
@@ -347,23 +347,23 @@ internal sealed partial class PopupWindow : Window
 
     private void DisplayResults(bool generateAllResults, string? text = null)
     {
-        _dictsWithResults.Clear();
+        DictsWithResults.Clear();
 
         PopupListBox.Items.Filter = NoAllDictFilter;
 
         if (text is not null && !generateAllResults && StackPanelCache.TryGet(text, out StackPanel[] data))
         {
             int resultCount = Math.Min(data.Length, ConfigManager.MaxNumResultsNotInMiningMode);
-            StackPanel[] popupItemSource = new StackPanel[resultCount];
+            var popupItemSource = new StackPanel[resultCount];
 
             for (int i = 0; i < resultCount; i++)
             {
                 StackPanel stackPanel = data[i];
 
                 Dict dict = (Dict)stackPanel.Tag;
-                if (!_dictsWithResults.Contains(dict))
+                if (!DictsWithResults.Contains(dict))
                 {
-                    _dictsWithResults.Add(dict);
+                    DictsWithResults.Add(dict);
                 }
 
                 popupItemSource[i] = stackPanel;
@@ -380,15 +380,15 @@ internal sealed partial class PopupWindow : Window
                 ? _lastLookupResults.Count
                 : Math.Min(_lastLookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
 
-            StackPanel[] popupItemSource = new StackPanel[resultCount];
+            var popupItemSource = new StackPanel[resultCount];
 
             for (int i = 0; i < resultCount; i++)
             {
                 LookupResult lookupResult = _lastLookupResults[i];
 
-                if (!_dictsWithResults.Contains(lookupResult.Dict))
+                if (!DictsWithResults.Contains(lookupResult.Dict))
                 {
-                    _dictsWithResults.Add(lookupResult.Dict);
+                    DictsWithResults.Add(lookupResult.Dict);
                 }
 
                 popupItemSource[i] = MakeResultStackPanel(lookupResult, i, resultCount);
@@ -1280,11 +1280,6 @@ internal sealed partial class PopupWindow : Window
             _ = Owner.Focus();
 
             HidePopup();
-
-            if (Owner == MainWindow.Instance)
-            {
-                MainWindow.Instance.ChangeVisibility();
-            }
         }
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.KanjiModeKeyGesture))
         {
@@ -1621,11 +1616,6 @@ internal sealed partial class PopupWindow : Window
         }
 
         HidePopup();
-
-        if (Owner == MainWindow.Instance)
-        {
-            MainWindow.Instance.ChangeVisibility();
-        }
     }
 
     public static void PopupWindow_PreviewMouseDown(PopupWindow popupWindow)
@@ -1649,7 +1639,7 @@ internal sealed partial class PopupWindow : Window
 
         foreach (Dict dict in DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority).ToList())
         {
-            if (!dict.Active || dict.Type is DictType.PitchAccentYomichan || (ConfigManager.HideDictTabsWithNoResults && !_dictsWithResults.Contains(dict)))
+            if (!dict.Active || dict.Type is DictType.PitchAccentYomichan || (ConfigManager.HideDictTabsWithNoResults && !DictsWithResults.Contains(dict)))
             {
                 continue;
             }
@@ -1657,7 +1647,7 @@ internal sealed partial class PopupWindow : Window
             var button = new Button { Content = dict.Name, Margin = new Thickness(1), Tag = dict };
             button.Click += DictTypeButtonOnClick;
 
-            if (!_dictsWithResults.Contains(dict))
+            if (!DictsWithResults.Contains(dict))
             {
                 button.IsEnabled = false;
             }
@@ -1760,5 +1750,10 @@ internal sealed partial class PopupWindow : Window
         }
 
         Hide();
+
+        if (Owner == MainWindow.Instance && (ConfigManager.TextOnlyVisibleOnHover || ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover))
+        {
+            _ = MainWindow.Instance.ChangeVisibility().ConfigureAwait(false);
+        }
     }
 }
