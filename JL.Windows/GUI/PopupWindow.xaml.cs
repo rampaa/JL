@@ -38,7 +38,7 @@ internal sealed partial class PopupWindow : Window
 
     private List<LookupResult> _lastLookupResults = new();
 
-    private readonly HashSet<Dict> _dictsWithResults = new();
+    private readonly List<Dict> _dictsWithResults = new();
 
     private Dict? _filteredDict = null;
 
@@ -359,7 +359,13 @@ internal sealed partial class PopupWindow : Window
             for (int i = 0; i < resultCount; i++)
             {
                 StackPanel stackPanel = data[i];
-                _ = _dictsWithResults.Add((Dict)stackPanel.Tag);
+
+                Dict dict = (Dict)stackPanel.Tag;
+                if (!_dictsWithResults.Contains(dict))
+                {
+                    _dictsWithResults.Add(dict);
+                }
+
                 popupItemSource[i] = stackPanel;
             }
 
@@ -379,7 +385,12 @@ internal sealed partial class PopupWindow : Window
             for (int i = 0; i < resultCount; i++)
             {
                 LookupResult lookupResult = _lastLookupResults[i];
-                _ = _dictsWithResults.Add(lookupResult.Dict);
+
+                if (!_dictsWithResults.Contains(lookupResult.Dict))
+                {
+                    _dictsWithResults.Add(lookupResult.Dict);
+                }
+
                 popupItemSource[i] = MakeResultStackPanel(lookupResult, i, resultCount);
             }
 
@@ -503,7 +514,7 @@ internal sealed partial class PopupWindow : Window
         {
             List<string> rOrthographyInfoList = result.ReadingsOrthographyInfoList ?? new List<string>();
             List<string> readings = result.Readings;
-            string readingsText = rOrthographyInfoList.Count > 0 && (result.Dict.Options?.ROrthographyInfo?.Value ?? true)
+            string readingsText = rOrthographyInfoList.Count > 0 && (result.Dict.Options.ROrthographyInfo?.Value ?? true)
                 ? PopupWindowUtils.ReadingsToText(readings, rOrthographyInfoList)
                 : string.Join(", ", result.Readings);
 
@@ -616,7 +627,7 @@ internal sealed partial class PopupWindow : Window
         {
             List<string> aOrthographyInfoList = result.AlternativeSpellingsOrthographyInfoList ?? new List<string>();
             List<string> alternativeSpellings = result.AlternativeSpellings;
-            string alternativeSpellingsText = aOrthographyInfoList.Count > 0 && (result.Dict.Options?.AOrthographyInfo?.Value ?? true)
+            string alternativeSpellingsText = aOrthographyInfoList.Count > 0 && (result.Dict.Options.AOrthographyInfo?.Value ?? true)
                 ? PopupWindowUtils.AlternativeSpellingsToText(alternativeSpellings, aOrthographyInfoList)
                 : $"({string.Join(", ", alternativeSpellings)})";
 
@@ -684,14 +695,14 @@ internal sealed partial class PopupWindow : Window
         }
 
         if (result.PrimarySpellingOrthographyInfoList?.Count > 0
-            && (result.Dict.Options?.POrthographyInfo?.Value ?? true))
+            && (result.Dict.Options.POrthographyInfo?.Value ?? true))
         {
             textBlockPOrthographyInfo = new TextBlock
             {
                 Name = nameof(result.PrimarySpellingOrthographyInfoList),
                 Text = $"({string.Join(", ", result.PrimarySpellingOrthographyInfoList)})",
                 Foreground = DictOptionManager.POrthographyInfoColor,
-                FontSize = result.Dict.Options?.POrthographyInfoFontSize?.Value ?? 15,
+                FontSize = result.Dict.Options.POrthographyInfoFontSize?.Value ?? 15,
                 Margin = new Thickness(5, 0, 0, 0),
                 TextWrapping = TextWrapping.Wrap,
                 HorizontalAlignment = HorizontalAlignment.Left,
@@ -1699,7 +1710,7 @@ internal sealed partial class PopupWindow : Window
         }
 
         var dict = (Dict)((StackPanel)item).Tag;
-        return !dict?.Options?.NoAll?.Value ?? true;
+        return !dict?.Options.NoAll?.Value ?? true;
     }
 
     private void PopupContextMenu_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)

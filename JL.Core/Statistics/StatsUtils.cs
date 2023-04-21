@@ -7,7 +7,7 @@ namespace JL.Core.Statistics;
 public static class StatsUtils
 {
     public static Stopwatch StatsStopWatch { get; } = new();
-    internal static Timer StatsTimer { get; } = new();
+    private static Timer StatsTimer { get; } = new();
 
     public static void StartStatsTimer()
     {
