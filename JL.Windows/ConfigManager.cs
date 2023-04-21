@@ -111,7 +111,7 @@ internal static class ConfigManager
     public static Brush DictTypeColor { get; private set; } = Brushes.LightBlue;
     public static int DictTypeFontSize { get; set; } = 15;
     public static Brush SeparatorColor { get; private set; } = Brushes.White;
-    public static bool HideDictTabsWithNoResults { get; private set; } = false;
+    public static bool HideDictTabsWithNoResults { get; private set; } = true;
     public static bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } = false;
     public static int AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 3000;
 

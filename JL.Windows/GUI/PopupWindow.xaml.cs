@@ -292,7 +292,7 @@ internal sealed partial class PopupWindow : Window
         if (needsFlipX)
         {
             // flip Leftwards while preventing -OOB
-            newLeft = mouseX - (Width + (WindowsUtils.DpiAwareXOffset / 2));
+            newLeft = mouseX - (Width + WindowsUtils.DpiAwareXOffset);
             if (newLeft < WindowsUtils.ActiveScreen.Bounds.X)
             {
                 newLeft = WindowsUtils.ActiveScreen.Bounds.X;
@@ -307,7 +307,7 @@ internal sealed partial class PopupWindow : Window
         if (needsFlipY)
         {
             // flip Upwards while preventing -OOB
-            newTop = mouseY - (Height + (WindowsUtils.DpiAwareYOffset / 2));
+            newTop = mouseY - (Height + WindowsUtils.DpiAwareYOffset);
             if (newTop < WindowsUtils.ActiveScreen.Bounds.Y)
             {
                 newTop = WindowsUtils.ActiveScreen.Bounds.Y;
@@ -1269,6 +1269,11 @@ internal sealed partial class PopupWindow : Window
             _ = Owner.Focus();
 
             HidePopup();
+
+            if (Owner == MainWindow.Instance)
+            {
+                MainWindow.Instance.ChangeVisibility();
+            }
         }
         else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.KanjiModeKeyGesture))
         {
@@ -1605,6 +1610,11 @@ internal sealed partial class PopupWindow : Window
         }
 
         HidePopup();
+
+        if (Owner == MainWindow.Instance)
+        {
+            MainWindow.Instance.ChangeVisibility();
+        }
     }
 
     public static void PopupWindow_PreviewMouseDown(PopupWindow popupWindow)
@@ -1739,10 +1749,5 @@ internal sealed partial class PopupWindow : Window
         }
 
         Hide();
-
-        if (Owner == MainWindow.Instance)
-        {
-            MainWindow.Instance.ChangeVisibility();
-        }
     }
 }
