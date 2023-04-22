@@ -35,6 +35,7 @@
 * Other name dictionaries through "Nonspecific Name Dictionary (Yomichan)" type
 * Other dictionaries (such as grammar dictionaries) through "Nonspecific (Yomichan)" type
 
+Note: JL *can* import Yomichan dictionaries with structured content but it will trim off the non-content parts (e.g. HTML tags) so whether the displayed result will be satisfactory depends on the dictionary.
 
 #### [Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter) format
 * Daijirin
