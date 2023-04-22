@@ -17,7 +17,7 @@
 * Iwanami
 * Jitsuyou
 * Kanjigen
-* Kenkyuusha (has an option keep no/one/all example sentences)
+* Kenkyuusha (has an option to keep no/one/all example sentences)
 * Kirei Cake
 * Kotowaza
 * Koujien
