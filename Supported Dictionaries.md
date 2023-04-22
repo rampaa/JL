@@ -2,7 +2,7 @@
 
 ### EDICT
 
-* JMdict
+* JMdict (displayed info can be customized through Manage Dictionaries->JMdict->Edit->Options)
 * JMnedict
 * KANJIDIC (with de/composition data)
 
@@ -17,7 +17,7 @@
 * Iwanami
 * Jitsuyou
 * Kanjigen
-* Kenkyuusha
+* Kenkyuusha (has an option keep no/one/all example sentences)
 * Kirei Cake
 * Kotowaza
 * Koujien
@@ -35,7 +35,7 @@
 * Other name dictionaries through "Nonspecific Name Dictionary (Yomichan)" type
 * Other dictionaries (such as grammar dictionaries) through "Nonspecific (Yomichan)" type
 
-Note: JL *can* import Yomichan dictionaries with structured content but it will trim off the non-content parts (e.g. HTML tags) so whether the displayed result will be satisfactory depends on the dictionary.
+Note: JL *can* import Yomichan dictionaries with structured content but it will strip the non-content parts (e.g. HTML tags) so whether the displayed result will be satisfactory depends on the dictionary.
 
 #### [Nazeka EPWING Converter](https://github.com/wareya/nazeka_epwing_converter) format
 * Daijirin
