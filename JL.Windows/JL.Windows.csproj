@@ -45,10 +45,4 @@
     <ProjectReference Include="..\JL.Core\JL.Core.csproj" />
   </ItemGroup>
 
-  <ProjectExtensions>
-    <VisualStudio>
-      <UserProperties resources_4freqlist_3vns_1json__JsonSchema="https://beaujs.com/schema.json" />
-    </VisualStudio>
-  </ProjectExtensions>
-
 </Project>
