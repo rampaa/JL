@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Xml;
 using JL.Core.Utilities;
+using JL.Core.WordClass;
 
 namespace JL.Core.Dicts.EDICT.JMdict;
 
@@ -37,10 +38,18 @@ internal static class JmdictLoader
                      "Couldn't find JMdict.xml. Would you like to download it now?",
                      "Download JMdict?"))
         {
-            _ = await ResourceUpdater.UpdateResource(dict.Path,
+            bool downloaded = await ResourceUpdater.UpdateResource(dict.Path,
                 DictUtils.s_jmdictUrl,
                 DictType.JMdict.ToString(), false, false).ConfigureAwait(false);
-            await Load(dict).ConfigureAwait(false);
+
+            if (downloaded)
+            {
+                await Load(dict).ConfigureAwait(false);
+
+                await JmdictWordClassUtils.SerializeJmdictWordClass().ConfigureAwait(false);
+                DictUtils.WordClassDictionary.Clear();
+                await JmdictWordClassUtils.Load().ConfigureAwait(false);
+            }
         }
 
         else

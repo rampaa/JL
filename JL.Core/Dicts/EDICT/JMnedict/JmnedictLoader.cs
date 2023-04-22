@@ -33,10 +33,14 @@ internal static class JmnedictLoader
         else if (Utils.Frontend.ShowYesNoDialog("Couldn't find JMnedict.xml. Would you like to download it now?",
                      "Download JMnedict?"))
         {
-            _ = await ResourceUpdater.UpdateResource(dict.Path,
+            bool downloaded = await ResourceUpdater.UpdateResource(dict.Path,
                 DictUtils.s_jmnedictUrl,
                 DictType.JMnedict.ToString(), false, false).ConfigureAwait(false);
-            await Load(dict).ConfigureAwait(false);
+
+            if (downloaded)
+            {
+                await Load(dict).ConfigureAwait(false);
+            }
         }
 
         else

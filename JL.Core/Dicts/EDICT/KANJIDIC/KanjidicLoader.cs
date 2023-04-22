@@ -31,10 +31,14 @@ internal static class KanjidicLoader
                      "Couldn't find kanjidic2.xml. Would you like to download it now?",
                      "Download KANJIDIC2?"))
         {
-            _ = await ResourceUpdater.UpdateResource(dict.Path,
+            bool downloaded = await ResourceUpdater.UpdateResource(dict.Path,
                 DictUtils.s_kanjidicUrl,
                 DictType.Kanjidic.ToString(), false, false).ConfigureAwait(false);
-            await Load(dict).ConfigureAwait(false);
+
+            if (downloaded)
+            {
+                await Load(dict).ConfigureAwait(false);
+            }
         }
 
         else
