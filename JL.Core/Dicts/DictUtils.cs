@@ -26,7 +26,7 @@ public static class DictUtils
     public static bool UpdatingJmnedict { get; internal set; } = false;
     public static bool UpdatingKanjidic { get; internal set; } = false;
     public static readonly Dictionary<string, Dict> Dicts = new();
-    internal static Dictionary<string, List<JmdictWordClass>> WordClassDictionary { get; set; } = new(65536); // 2022/10/29: 48909
+    internal static Dictionary<string, List<JmdictWordClass>> WordClassDictionary { get; set; } = new(60000); // 2022/10/29: 48909, 2023/04/22: 49503
     internal static readonly Dictionary<string, string> s_kanjiCompositionDict = new(86934);
     internal static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
     internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
@@ -608,9 +608,9 @@ public static class DictUtils
                             {
                                 DictType.CustomNameDictionary => new Dictionary<string, List<IDictRecord>>(1024),
                                 DictType.CustomWordDictionary => new Dictionary<string, List<IDictRecord>>(1024),
-                                DictType.JMdict => new Dictionary<string, List<IDictRecord>>(500000), //2022/05/11: 394949, 2022/08/15: 398303
-                                DictType.JMnedict => new Dictionary<string, List<IDictRecord>>(700000), //2022/05/11: 608833, 2022/08/15: 609117
-                                DictType.Kanjidic => new Dictionary<string, List<IDictRecord>>(13108), //2022/05/11: 13108, 2022/08/15: 13108
+                                DictType.JMdict => new Dictionary<string, List<IDictRecord>>(450000), //2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739
+                                DictType.JMnedict => new Dictionary<string, List<IDictRecord>>(630000), //2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055
+                                DictType.Kanjidic => new Dictionary<string, List<IDictRecord>>(13108), //2022/05/11: 13108, 2022/08/15: 13108, 2023/04/22: 13108
                                 DictType.Daijirin => new Dictionary<string, List<IDictRecord>>(420429),
                                 DictType.DaijirinNazeka => new Dictionary<string, List<IDictRecord>>(420429),
                                 DictType.Daijisen => new Dictionary<string, List<IDictRecord>>(679115),
