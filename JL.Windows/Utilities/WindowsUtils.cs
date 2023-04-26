@@ -50,7 +50,7 @@ internal static class WindowsUtils
     {
         if (keyGesture.Modifiers is ModifierKeys.Windows)
         {
-            return (keyGesture.Key == e.Key || (keyGesture.Key == Key.F10 && e.SystemKey == Key.F10)) && Keyboard.Modifiers is 0;
+            return (keyGesture.Key == e.Key || (keyGesture.Key is Key.F10 && e.SystemKey is Key.F10)) && Keyboard.Modifiers is 0;
         }
 
         if (keyGesture.Modifiers is 0)

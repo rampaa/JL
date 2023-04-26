@@ -480,9 +480,14 @@ public static class DictUtils
                 if (!File.Exists(dict.Path))
                 {
                     deleteJmdictFile = true;
-                    _ = await ResourceUpdater.UpdateResource(dict.Path,
+                    bool downloaded = await ResourceUpdater.UpdateResource(dict.Path,
                         s_jmdictUrl,
                         dict.Type.ToString(), false, true).ConfigureAwait(false);
+
+                    if (!downloaded)
+                    {
+                        return;
+                    }
                 }
 
                 await Task.Run(async () =>

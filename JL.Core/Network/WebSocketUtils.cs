@@ -38,7 +38,7 @@ public static class WebSocketUtils
                 await webSocketClient.ConnectAsync(CoreConfig.WebSocketUri, CancellationToken.None).ConfigureAwait(false);
                 byte[] buffer = new byte[1024];
 
-                while (CoreConfig.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested && webSocketClient.State == WebSocketState.Open)
+                while (CoreConfig.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested && webSocketClient.State is WebSocketState.Open)
                 {
                     try
                     {
@@ -49,7 +49,7 @@ public static class WebSocketUtils
                             return;
                         }
 
-                        if (result.MessageType == WebSocketMessageType.Text)
+                        if (result.MessageType is WebSocketMessageType.Text)
                         {
                             using MemoryStream memoryStream = new();
                             memoryStream.Write(buffer, 0, result.Count);

@@ -44,7 +44,7 @@ internal sealed partial class EditAudioSourceWindow : Window
         }
         else if (AudioSourceTypeComboBox.BorderBrush == Brushes.Red)
         {
-            AudioSourceTypeComboBox.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
+            AudioSourceTypeComboBox.ClearValue(BorderBrushProperty);
         }
 
         AudioSourceType? type = null;

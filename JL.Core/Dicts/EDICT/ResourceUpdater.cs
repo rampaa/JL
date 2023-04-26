@@ -98,12 +98,12 @@ public static class ResourceUpdater
         DictUtils.UpdatingJmdict = true;
 
         Dict dict = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict);
-        bool isDownloaded = await UpdateResource(dict.Path,
+        bool downloaded = await UpdateResource(dict.Path,
                 DictUtils.s_jmdictUrl,
                 DictType.JMdict.ToString(), true, false)
             .ConfigureAwait(false);
 
-        if (isDownloaded)
+        if (downloaded)
         {
             dict.Contents.Clear();
 
@@ -133,12 +133,12 @@ public static class ResourceUpdater
         DictUtils.UpdatingJmnedict = true;
 
         Dict dict = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMnedict);
-        bool isDownloaded = await UpdateResource(dict.Path,
+        bool downloaded = await UpdateResource(dict.Path,
                 DictUtils.s_jmnedictUrl,
                 DictType.JMnedict.ToString(), true, false)
             .ConfigureAwait(false);
 
-        if (isDownloaded)
+        if (downloaded)
         {
             dict.Contents.Clear();
 
@@ -162,12 +162,12 @@ public static class ResourceUpdater
         DictUtils.UpdatingKanjidic = true;
 
         Dict dict = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.Kanjidic);
-        bool isDownloaded = await UpdateResource(dict.Path,
+        bool downloaded = await UpdateResource(dict.Path,
                 DictUtils.s_kanjidicUrl,
                 DictType.Kanjidic.ToString(), true, false)
             .ConfigureAwait(false);
 
-        if (isDownloaded)
+        if (downloaded)
         {
             dict.Contents.Clear();
 

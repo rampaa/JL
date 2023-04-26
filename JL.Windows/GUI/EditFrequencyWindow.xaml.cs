@@ -41,7 +41,7 @@ internal sealed partial class EditFrequencyWindow : Window
         }
         else if (TextBlockPath.BorderBrush == Brushes.Red)
         {
-            TextBlockPath.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
+            TextBlockPath.ClearValue(BorderBrushProperty);
         }
 
         string name = NameTextBox.Text;
@@ -53,7 +53,7 @@ internal sealed partial class EditFrequencyWindow : Window
         }
         else if (NameTextBox.BorderBrush == Brushes.Red)
         {
-            NameTextBox.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
+            NameTextBox.ClearValue(BorderBrushProperty);
         }
 
         if (isValid)

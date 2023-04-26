@@ -45,7 +45,7 @@ internal sealed partial class AddWordWindow : Window
         }
         else if (SpellingsTextBox.BorderBrush == Brushes.Red)
         {
-            SpellingsTextBox.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
+            SpellingsTextBox.ClearValue(BorderBrushProperty);
         }
 
         if (ReadingsTextBox.Text is "")
@@ -55,7 +55,7 @@ internal sealed partial class AddWordWindow : Window
         }
         else if (ReadingsTextBox.BorderBrush == Brushes.Red)
         {
-            ReadingsTextBox.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
+            ReadingsTextBox.ClearValue(BorderBrushProperty);
         }
 
         if (DefinitionsTextBox.Text is "")
@@ -65,7 +65,7 @@ internal sealed partial class AddWordWindow : Window
         }
         else if (DefinitionsTextBox.BorderBrush == Brushes.Red)
         {
-            DefinitionsTextBox.BorderBrush = WindowsUtils.FrozenBrushFromHex("#FF3F3F46")!;
+            DefinitionsTextBox.ClearValue(BorderBrushProperty);
         }
 
         if (isValid)
