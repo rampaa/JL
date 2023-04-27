@@ -541,8 +541,6 @@ public static class DictUtils
                     }
                 }
             }
-
-            s_kanjiCompositionDict.TrimExcess();
         }
     }
 

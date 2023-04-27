@@ -56,8 +56,7 @@ internal static class Deconjugator
         return newForm;
     }
 
-    private static HashSet<Form>? StdruleDeconjugate(Form myForm,
-        Rule myRule)
+    private static HashSet<Form>? StdruleDeconjugate(Form myForm, Rule myRule)
     {
         // can't deconjugate nothingness
         if (myForm.Text is "")
@@ -262,8 +261,7 @@ internal static class Deconjugator
         return myTag is not "stem-ren";
     }
 
-    private static bool SaspecialCheck(Form myForm,
-        Rule myRule)
+    private static bool SaspecialCheck(Form myForm, Rule myRule)
     {
         if (myForm.Text is "")
         {
@@ -279,9 +277,9 @@ internal static class Deconjugator
         return !baseText.EndsWith('さ');
     }
 
-    public static HashSet<Form> Deconjugate(string myText, bool useCache = true)
+    public static HashSet<Form> Deconjugate(string myText)
     {
-        if (useCache && s_cache.TryGet(myText, out HashSet<Form> data))
+        if (s_cache.TryGet(myText, out HashSet<Form> data))
         {
             return data;
         }
@@ -338,10 +336,7 @@ internal static class Deconjugator
             novel = newNovel;
         }
 
-        if (useCache)
-        {
-            s_cache.AddReplace(myText, processed);
-        }
+        s_cache.AddReplace(myText, processed);
 
         return processed;
     }
