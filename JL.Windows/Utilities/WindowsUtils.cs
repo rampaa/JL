@@ -221,14 +221,14 @@ internal static class WindowsUtils
             DictUtils.CreateDefaultDictsConfig();
         }
 
-        if (!File.Exists($"{Utils.ResourcesPath}/custom_words.txt"))
+        if (!File.Exists(Path.Join(Utils.ResourcesPath, "custom_words.txt")))
         {
-            File.Create($"{Utils.ResourcesPath}/custom_words.txt").Dispose();
+            File.Create(Path.Join(Utils.ResourcesPath, "custom_words.txt")).Dispose();
         }
 
-        if (!File.Exists($"{Utils.ResourcesPath}/custom_names.txt"))
+        if (!File.Exists(Path.Join(Utils.ResourcesPath, "custom_names.txt")))
         {
-            File.Create($"{Utils.ResourcesPath}/custom_names.txt").Dispose();
+            File.Create(Path.Join(Utils.ResourcesPath, "custom_names.txt")).Dispose();
         }
 
         ManageDictionariesWindow manageDictionariesWindow = ManageDictionariesWindow.Instance;
@@ -368,7 +368,7 @@ internal static class WindowsUtils
         {
             Random rand = new();
 
-            string[] filePaths = Directory.GetFiles($"{Utils.ResourcesPath}/Motivation");
+            string[] filePaths = Directory.GetFiles(Path.Join(Utils.ResourcesPath, "Motivation"));
             int numFiles = filePaths.Length;
 
             if (numFiles is 0)

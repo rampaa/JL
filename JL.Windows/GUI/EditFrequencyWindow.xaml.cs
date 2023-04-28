@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Media;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
-using JL.Windows.Utilities;
 using Microsoft.Win32;
 using Path = System.IO.Path;
 

@@ -4,7 +4,6 @@ using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
 using JL.Core.Utilities;
-using JL.Windows.Utilities;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Path = System.IO.Path;
 

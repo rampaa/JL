@@ -4,7 +4,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using JL.Core.Dicts.CustomNameDict;
 using JL.Core.Dicts.CustomWordDict;
-using JL.Core.Dicts.EDICT;
 using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Dicts.EDICT.JMnedict;
 using JL.Core.Dicts.EDICT.KANJIDIC;
@@ -464,53 +463,12 @@ public static class DictUtils
         DictsReady = true;
     }
 
-    internal static async Task InitializeWordClassDictionary()
-    {
-        Dict dict = Dicts.Values.First(static dict => dict.Type is DictType.JMdict);
-        if (!File.Exists($"{Utils.ResourcesPath}/PoS.json"))
-        {
-            if (dict.Active)
-            {
-                await JmdictWordClassUtils.SerializeJmdictWordClass().ConfigureAwait(false);
-            }
-
-            else
-            {
-                bool deleteJmdictFile = false;
-                if (!File.Exists(dict.Path))
-                {
-                    deleteJmdictFile = true;
-                    bool downloaded = await ResourceUpdater.UpdateResource(dict.Path,
-                        s_jmdictUrl,
-                        dict.Type.ToString(), false, true).ConfigureAwait(false);
-
-                    if (!downloaded)
-                    {
-                        return;
-                    }
-                }
-
-                await Task.Run(async () =>
-                    await JmdictLoader.Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
-                await JmdictWordClassUtils.SerializeJmdictWordClass().ConfigureAwait(false);
-                dict.Contents.Clear();
-
-                if (deleteJmdictFile)
-                {
-                    File.Delete(dict.Path);
-                }
-            }
-        }
-
-        await JmdictWordClassUtils.Load().ConfigureAwait(false);
-    }
-
     internal static async Task InitializeKanjiCompositionDict()
     {
-        if (File.Exists($"{Utils.ResourcesPath}/ids.txt"))
+        if (File.Exists(Path.Join(Utils.ResourcesPath, "ids.txt")))
         {
             string[] lines = await File
-                .ReadAllLinesAsync($"{Utils.ResourcesPath}/ids.txt")
+                .ReadAllLinesAsync(Path.Join(Utils.ResourcesPath, "ids.txt"))
                 .ConfigureAwait(false);
 
             for (int i = 0; i < lines.Length; i++)

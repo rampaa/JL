@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using JL.Core.Dicts;
+using JL.Core.Dicts.EDICT;
 using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Utilities;
 
@@ -12,7 +13,7 @@ internal static class JmdictWordClassUtils
 {
     public static async Task Load()
     {
-        FileStream openStream = File.OpenRead($"{Utils.ResourcesPath}/PoS.json");
+        FileStream openStream = File.OpenRead(Path.Join(Utils.ResourcesPath, "PoS.json"));
         await using (openStream.ConfigureAwait(false))
         {
             DictUtils.WordClassDictionary = (await JsonSerializer.DeserializeAsync<Dictionary<string, List<JmdictWordClass>>>(openStream).ConfigureAwait(false))!;
@@ -49,7 +50,7 @@ internal static class JmdictWordClassUtils
         DictUtils.WordClassDictionary.TrimExcess();
     }
 
-    public static async Task SerializeJmdictWordClass()
+    public static async Task Serialize()
     {
         Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary = new();
 
@@ -127,7 +128,48 @@ internal static class JmdictWordClassUtils
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
-        await File.WriteAllBytesAsync($"{Utils.ResourcesPath}/PoS.json",
+        await File.WriteAllBytesAsync(Path.Join(Utils.ResourcesPath, "PoS.json"),
             JsonSerializer.SerializeToUtf8Bytes(jmdictWordClassDictionary, options)).ConfigureAwait(false);
+    }
+
+    internal static async Task Initialize()
+    {
+        Dict dict = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict);
+        if (!File.Exists(Path.Join(Utils.ResourcesPath, "PoS.json")))
+        {
+            if (dict.Active)
+            {
+                await Serialize().ConfigureAwait(false);
+            }
+
+            else
+            {
+                bool deleteJmdictFile = false;
+                if (!File.Exists(dict.Path))
+                {
+                    deleteJmdictFile = true;
+                    bool downloaded = await ResourceUpdater.UpdateResource(dict.Path,
+                        DictUtils.s_jmdictUrl,
+                        dict.Type.ToString(), false, true).ConfigureAwait(false);
+
+                    if (!downloaded)
+                    {
+                        return;
+                    }
+                }
+
+                await Task.Run(async () =>
+                    await JmdictLoader.Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
+                await Serialize().ConfigureAwait(false);
+                dict.Contents.Clear();
+
+                if (deleteJmdictFile)
+                {
+                    File.Delete(dict.Path);
+                }
+            }
+        }
+
+        await Load().ConfigureAwait(false);
     }
 }

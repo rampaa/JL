@@ -46,7 +46,7 @@ internal static class JmdictLoader
             {
                 await Load(dict).ConfigureAwait(false);
 
-                await JmdictWordClassUtils.SerializeJmdictWordClass().ConfigureAwait(false);
+                await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
                 DictUtils.WordClassDictionary.Clear();
                 await JmdictWordClassUtils.Load().ConfigureAwait(false);
             }

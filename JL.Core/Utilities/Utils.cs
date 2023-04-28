@@ -5,6 +5,7 @@ using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
 using JL.Core.Statistics;
+using JL.Core.WordClass;
 using Serilog;
 using Serilog.Core;
 
@@ -57,29 +58,29 @@ public static class Utils
 
         StatsUtils.StatsStopWatch.Start();
 
-        if (!File.Exists($"{ConfigPath}/dicts.json"))
+        if (!File.Exists(Path.Join(ConfigPath, "dicts.json")))
         {
             DictUtils.CreateDefaultDictsConfig();
         }
 
-        if (!File.Exists($"{ConfigPath}/freqs.json"))
+        if (!File.Exists(Path.Join(ConfigPath, "freqs.json")))
         {
             FreqUtils.CreateDefaultFreqsConfig();
         }
 
-        if (!File.Exists($"{ConfigPath}/AudioSourceConfig.json"))
+        if (!File.Exists(Path.Join(ConfigPath, "AudioSourceConfig.json")))
         {
             AudioUtils.CreateDefaultAudioSourceConfig();
         }
 
-        if (!File.Exists($"{ResourcesPath}/custom_words.txt"))
+        if (!File.Exists(Path.Join(ResourcesPath, "custom_words.txt")))
         {
-            await File.Create($"{ResourcesPath}/custom_words.txt").DisposeAsync().ConfigureAwait(false);
+            await File.Create(Path.Join(ResourcesPath, "custom_words.txt")).DisposeAsync().ConfigureAwait(false);
         }
 
-        if (!File.Exists($"{ResourcesPath}/custom_names.txt"))
+        if (!File.Exists(Path.Join(ResourcesPath, "custom_names.txt")))
         {
-            await File.Create($"{ResourcesPath}/custom_names.txt").DisposeAsync().ConfigureAwait(false);
+            await File.Create(Path.Join(ResourcesPath, "custom_names.txt")).DisposeAsync().ConfigureAwait(false);
         }
 
         List<Task> tasks = new()
@@ -90,7 +91,7 @@ public static class Utils
                 Frontend.ApplyDictOptions();
                 await DictUtils.LoadDictionaries(false).ConfigureAwait(false);
                 await DictUtils.SerializeDicts().ConfigureAwait(false);
-                await DictUtils.InitializeWordClassDictionary().ConfigureAwait(false);
+                await JmdictWordClassUtils.Initialize().ConfigureAwait(false);
             }),
 
             Task.Run(static async () =>

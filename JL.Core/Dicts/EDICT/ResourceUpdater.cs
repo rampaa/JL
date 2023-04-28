@@ -110,7 +110,7 @@ public static class ResourceUpdater
             await Task.Run(async () => await JmdictLoader
                 .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
 
-            await JmdictWordClassUtils.SerializeJmdictWordClass().ConfigureAwait(false);
+            await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
 
             DictUtils.WordClassDictionary.Clear();
 
