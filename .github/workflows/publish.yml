@@ -10,7 +10,7 @@ jobs:
     name: Release
     strategy:
       matrix:
-        kind: ['windowsx64', 'windowsx86']
+        kind: ['windowsx64', 'windowsx86', 'windowsarm64']
         include:
           - kind: windowsx64
             os: windows-2022
@@ -18,6 +18,9 @@ jobs:
           - kind: windowsx86
             os: windows-2022
             target: win-x86
+          - kind: windowsarm64
+            os: windows-2022
+            target: win-arm64
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
