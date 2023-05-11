@@ -332,10 +332,10 @@ internal static class JmdictLoader
         {
             entityName = xmlReader.Name;
 
-            xmlReader.ResolveEntity();
-            _ = xmlReader.Read();
+            //xmlReader.ResolveEntity();
+            //_ = xmlReader.Read();
 
-            _ = DictUtils.JmdictEntities.TryAdd(entityName, xmlReader.Value);
+            //_ = DictUtils.JmdictEntities.TryAdd(entityName, xmlReader.Value);
 
             _ = xmlReader.Read();
         }

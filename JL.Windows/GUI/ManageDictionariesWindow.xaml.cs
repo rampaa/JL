@@ -257,7 +257,6 @@ internal sealed partial class ManageDictionariesWindow : Window
             switch (dict.Type)
             {
                 case DictType.JMdict:
-                    buttonInfo.IsEnabled = DictUtils.JmdictEntities.Count > 0;
                     buttonInfo.Click += JmdictInfoButton_Click;
                     break;
                 case DictType.JMnedict:
