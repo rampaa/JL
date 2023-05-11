@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using JL.Core.Utilities;
 
@@ -29,7 +30,10 @@ public static class Networking
                     if (latestJLVersion > Utils.JLVersion)
                     {
                         bool foundRelease = false;
-                        string architecture = Environment.Is64BitProcess ? "x64" : "x86";
+                        string architecture = RuntimeInformation.ProcessArchitecture is Architecture.Arm64
+                            ? "arm64"
+                            : Environment.Is64BitProcess ? "x64" : "x86";
+
                         JsonElement assets = jsonDocument.RootElement.GetProperty("assets");
 
                         foreach (JsonElement asset in assets.EnumerateArray())
