@@ -50,7 +50,7 @@ You need another program to copy the text to the clipboard and/or to a WebSocket
 ### Why can't I look anything up?
 Make sure you're not in pass-through mode and you did not disable lookups with the "Toggle lookup" hotkey.
 ### Why can't I scroll down the results list?
-You need to be in mining mode in order to interact with the popup window. You can activate the mining mode with a middle mouse click or with the mining mode hotkey (by default it's the key "M")
+You need to be in mining mode in order to interact with the popup window. "Left click/Touch" and "Text select" lookup modes will automatically activate the mining mode. If you are using the "Mouse move" lookup mode, you can activate the mining mode with a middle mouse click or with the mining mode hotkey (by default it's the key "M").
 ### How do I disable pass-through mode?
 Press the opacity slider button located top-left of the main window.
 ### How can I use JL with Magpie?
