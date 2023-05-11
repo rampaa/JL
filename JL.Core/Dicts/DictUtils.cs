@@ -338,7 +338,6 @@ public static class DictUtils
         {"vz", "\"Ichidan verb - zuru verb (alternative form of -jiru verbs)\""},
 
         {"gikun", "\"gikun (meaning as reading) or jukujikun (special kanji reading)\""},
-        {"ik", "\"word containing irregular kana usage\""},
         {"ok", "\"out-dated or obsolete kana usage\""},
         {"sk", "\"search-only kana form\""},
     };
