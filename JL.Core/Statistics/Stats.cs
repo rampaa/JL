@@ -134,19 +134,3 @@ public sealed class Stats
         return lifetimeStats;
     }
 }
-
-public enum StatsMode
-{
-    Session,
-    Lifetime
-}
-
-public enum StatType
-{
-    Characters,
-    Lines,
-    Time,
-    CardsMined,
-    TimesPlayedAudio,
-    Imoutos
-}
