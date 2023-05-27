@@ -31,8 +31,6 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         JsonElement definitionTagsElement = jsonElement[2];
         if (definitionTagsElement.ValueKind is JsonValueKind.String)
         {
-            DefinitionTags = new List<string>();
-
             DefinitionTags = definitionTagsElement.ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
 
             if (DefinitionTags.Count is 0)
