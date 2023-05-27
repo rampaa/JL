@@ -44,16 +44,21 @@ public static class Lookup
                         lookupResults.AddRange(BuildKanjidicResult(GetKanjiResults(text, dict)));
                     }
 
+                    else if (dict.Type is DictType.KanjigenYomichan)
+                    {
+                        lookupResults.AddRange(BuildEpwingYomichanResult(GetKanjiResults(text, dict)));
+                    }
+
                     else if (DictUtils.s_kanjiDictTypes.Contains(dict.Type))
                     {
-                        if (DictUtils.NazekaDictTypes.Contains(dict.Type))
-                        {
-                            lookupResults.AddRange(BuildEpwingNazekaResult(GetKanjiResults(text, dict)));
-                        }
-
-                        else // if (DictUtils.YomichanDictTypes.Contains(dict.Type))
+                        if (DictUtils.YomichanDictTypes.Contains(dict.Type))
                         {
                             lookupResults.AddRange(BuildYomichanKanjiResult(GetKanjiResults(text, dict)));
+                        }
+
+                        else //if (DictUtils.NazekaDictTypes.Contains(dict.Type))
+                        {
+                            lookupResults.AddRange(BuildEpwingNazekaResult(GetKanjiResults(text, dict)));
                         }
                     }
                 }
