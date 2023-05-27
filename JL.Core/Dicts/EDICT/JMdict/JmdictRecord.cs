@@ -52,11 +52,9 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
     public string BuildFormattedDefinition(DictOptions? options)
     {
-        bool newlines = options is { NewlineBetweenDefinitions.Value: true };
+        bool newlines = options?.NewlineBetweenDefinitions?.Value ?? true;
 
         string separator = newlines ? "\n" : "";
-
-        int count = 1;
 
         StringBuilder defResult = new();
 
@@ -66,7 +64,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
         {
             if (newlines)
             {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"({count}) ");
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
             if ((options?.WordClassInfo?.Value ?? true) && WordClasses?[i]?.Count > 0)
@@ -78,7 +76,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
             if (!newlines)
             {
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"({count}) ");
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
             if ((options?.DialectInfo?.Value ?? true) && Dialects?[i]?.Count > 0)
@@ -182,8 +180,6 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
             }
 
             _ = defResult.Append(separator);
-
-            ++count;
         }
 
         return defResult.ToString().TrimEnd(' ', '\n');

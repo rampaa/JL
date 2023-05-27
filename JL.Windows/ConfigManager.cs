@@ -54,7 +54,7 @@ internal static class ConfigManager
 
     public static double MainWindowWidth { get; set; } = 800;
     public static double MainWindowHeight { get; set; } = 200;
-    public static bool MainWindowDynamicHeight { get; private set; } = false;
+    public static bool MainWindowDynamicHeight { get; private set; } = true;
     public static bool MainWindowDynamicWidth { get; private set; } = false;
     public static double MainWindowMaxDynamicWidth { get; private set; } = 800;
     public static double MainWindowMaxDynamicHeight { get; private set; } = 269;
@@ -113,7 +113,7 @@ internal static class ConfigManager
     public static Brush SeparatorColor { get; private set; } = Brushes.White;
     public static bool HideDictTabsWithNoResults { get; private set; } = true;
     public static bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } = false;
-    public static int AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 3000;
+    public static int AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 2000;
 
     #endregion
 

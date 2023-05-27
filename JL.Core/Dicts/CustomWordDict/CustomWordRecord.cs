@@ -28,9 +28,9 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
 
     public string BuildFormattedDefinition(DictOptions? options)
     {
-        string separator = options is { NewlineBetweenDefinitions.Value: true }
-            ? "\n"
-            : "";
+        string separator = options is { NewlineBetweenDefinitions.Value: false }
+            ? ""
+            : "\n";
 
         int count = 1;
         StringBuilder defResult = new();

@@ -39,7 +39,7 @@ public static class DictUtils
                     "Custom Word Dictionary",
                     "Resources/custom_words.txt",
                     true, 1, 128,
-                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }))
+                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = true }))
             },
             {
                 "CustomNameDictionary",
@@ -52,7 +52,7 @@ public static class DictUtils
                 "JMdict",
                 new Dict(DictType.JMdict, "JMdict", "Resources/JMdict.xml", true, 3, 500000,
                     new DictOptions(
-                        new NewlineBetweenDefinitionsOption { Value = false },
+                        new NewlineBetweenDefinitionsOption { Value = true },
                         wordClassInfo: new WordClassInfoOption { Value = true },
                         dialectInfo: new DialectInfoOption { Value = true },
                         pOrthographyInfo: new POrthographyInfoOption { Value = true },
@@ -75,7 +75,7 @@ public static class DictUtils
             {
                 "JMnedict",
                 new Dict(DictType.JMnedict, "JMnedict", "Resources/JMnedict.xml", true, 5, 700000,
-                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = false }))
+                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = true }))
             }
         };
 
@@ -339,7 +339,7 @@ public static class DictUtils
 
         {"gikun", "\"gikun (meaning as reading) or jukujikun (special kanji reading)\""},
         {"ok", "\"out-dated or obsolete kana usage\""},
-        {"sk", "\"search-only kana form\""},
+        {"sk", "\"search-only kana form\""}
     };
 
     public static readonly Dictionary<string, string> JmnedictEntities = new()
