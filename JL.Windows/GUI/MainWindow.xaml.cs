@@ -246,8 +246,8 @@ internal sealed partial class MainWindow : Window
             }
 
             int endPosition = input.Length - charPosition > ConfigManager.MaxSearchLength
-                ? JapaneseUtils.FindWordBoundary(input[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
-                : JapaneseUtils.FindWordBoundary(input, charPosition);
+                ? JapaneseUtils.FindExpressionBoundary(input[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
+                : JapaneseUtils.FindExpressionBoundary(input, charPosition);
 
             string text = input[charPosition..endPosition];
 

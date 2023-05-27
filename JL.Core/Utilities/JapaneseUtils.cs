@@ -221,6 +221,52 @@ public static class JapaneseUtils
         #pragma warning restore format
     };
 
+    private static readonly List<char> s_sentenceTerminatingCharacters = new()
+    {
+        '。',
+        '！',
+        '？',
+        '…',
+        '.',
+        '!',
+        '?',
+        '\n'
+    };
+
+    private static readonly Dictionary<char, char> s_bracketsDict = new()
+    {
+        { '「', '」' },
+        { '『', '』' },
+        { '【', '】' },
+        { '《', '》' },
+        { '〔', '〕' },
+        { '（', '）' },
+        { '［', '］' },
+        { '〈', '〉' },
+        { '｛', '｝' },
+        { '＜', '＞' },
+        { '〝', '〟' },
+        { '＂', '＂' },
+        { '＇', '＇' },
+        { '｢', '｣' },
+        { '⟨', '⟩' },
+        { '(', ')' },
+        { '[', ']' },
+        { '{', '}' }
+    };
+
+    private static readonly HashSet<char> s_brackets = new()
+    {
+        #pragma warning disable format
+         '「', '」' , '『', '』' , '【', '】',
+        '《', '》', '〔', '〕', '（', '）',
+        '［', '］', '〈', '〉', '｛', '｝',
+        '＜', '＞', '〝', '〟', '＂', '＂',
+        '＇', '＇', '｢', '｣', '⟨', '⟩',
+        '(', ')', '[', ']', '{', '}'
+        #pragma warning restore format
+    };
+
     public static string KatakanaToHiragana(string text)
     {
         List<string> unicodeCharacters = text.Normalize(NormalizationForm.FormKC).ListUnicodeCharacters();
@@ -356,13 +402,13 @@ public static class JapaneseUtils
         return s_katakanaToHiraganaDict.ContainsKey(text.ListUnicodeCharacters().First());
     }
 
-    public static int FindWordBoundary(string text, int position)
+    public static int FindExpressionBoundary(string text, int position)
     {
         int endPosition = text.Length;
         for (int i = position; i < text.Length; i++)
         {
             char c = text[i];
-            if (char.IsPunctuation(c) || char.IsSymbol(c) || char.IsWhiteSpace(c))
+            if (s_brackets.Contains(c) || char.IsWhiteSpace(c))
             {
                 endPosition = i;
                 break;
@@ -374,44 +420,12 @@ public static class JapaneseUtils
 
     public static string FindSentence(string text, int position)
     {
-        List<char> sentenceTerminatingCharacters = new()
-        {
-            '。',
-            '！',
-            '？',
-            '…',
-            '.',
-            '!',
-            '?',
-            '\n'
-        };
-
-        Dictionary<char, char> brackets = new() {
-            { '「', '」' },
-            { '『', '』' },
-            { '【', '】' },
-            { '《', '》' },
-            { '〔', '〕' },
-            { '（', '）' },
-            { '［', '］' },
-            { '〈', '〉' },
-            { '｛', '｝' },
-            { '〝', '〟' },
-            { '＂', '＂' },
-            { '＇', '＇' },
-            { '｢', '｣'},
-            { '⟨', '⟩' },
-            { '(', ')' },
-            { '[', ']' },
-            { '{', '}' }
-        };
-
         int startPosition = -1;
         int endPosition = -1;
 
-        for (int i = 0; i < sentenceTerminatingCharacters.Count; i++)
+        for (int i = 0; i < s_sentenceTerminatingCharacters.Count; i++)
         {
-            char terminatingCharacter = sentenceTerminatingCharacters[i];
+            char terminatingCharacter = s_sentenceTerminatingCharacters[i];
 
             int tempIndex = text.LastIndexOf(terminatingCharacter, position);
 
@@ -441,17 +455,17 @@ public static class JapaneseUtils
 
         if (sentence.Length > 1)
         {
-            if (brackets.ContainsValue(sentence.First()))
+            if (s_bracketsDict.ContainsValue(sentence.First()))
             {
                 sentence = sentence[1..];
             }
 
-            if (brackets.ContainsKey(sentence.LastOrDefault()))
+            if (s_bracketsDict.ContainsKey(sentence.LastOrDefault()))
             {
                 sentence = sentence[..^1];
             }
 
-            if (brackets.TryGetValue(sentence.FirstOrDefault(), out char rightBracket))
+            if (s_bracketsDict.TryGetValue(sentence.FirstOrDefault(), out char rightBracket))
             {
                 if (sentence.Last() == rightBracket)
                 {
@@ -473,9 +487,9 @@ public static class JapaneseUtils
                 }
             }
 
-            else if (brackets.ContainsValue(sentence.LastOrDefault()))
+            else if (s_bracketsDict.ContainsValue(sentence.LastOrDefault()))
             {
-                char leftBracket = brackets.First(p => p.Value == sentence.Last()).Key;
+                char leftBracket = s_bracketsDict.First(p => p.Value == sentence.Last()).Key;
 
                 if (!sentence.Contains(leftBracket))
                 {

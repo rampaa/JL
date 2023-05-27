@@ -156,8 +156,8 @@ internal sealed partial class PopupWindow : Window
             }
 
             int endPosition = tb.Text.Length - charPosition > ConfigManager.MaxSearchLength
-                ? JapaneseUtils.FindWordBoundary(tb.Text[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
-                : JapaneseUtils.FindWordBoundary(tb.Text, charPosition);
+                ? JapaneseUtils.FindExpressionBoundary(tb.Text[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
+                : JapaneseUtils.FindExpressionBoundary(tb.Text, charPosition);
 
             string text = tb.Text[charPosition..endPosition];
 

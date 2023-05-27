@@ -5,11 +5,31 @@ namespace JL.Core.Dicts.EPWING;
 
 internal static class EpwingUtils
 {
+    //'×', '‐', '。', '、', '⻖', '/', '-', '・', '+', ':', '！', '！', '●',
+    //'？', '～', '〃', '､', '!', '−', '＆', '?', '&', '－', '／', '√', '$',
+    //'＄', '°', '＋', ',', '®', '＼', '─', '─', '．', '■', '’', '⻌', '◎',
+    //'Ⓒ', 'Ⓡ', '’', '＠', '〒', '@', '〜', '，', '㏄', '\'', '％', '#',
+    //'△', '~', '%', '℃', '：', '※', '㊙', '©', '—', '‘', '△', '*', '≒',
+    //'←', '↑', '↓', '☆', '.', '･'
+    private static readonly HashSet<char> s_invalidCharacters = new()
+    {
+        '�', '〓', '㋝', '㋜',
+        '（', '）', '(', ')',
+        '【', '】', '「', '」',
+        '［', '］', '[', ']',
+        '{', '}', '〈', '〉',
+        '＜', '＞', '〔', '〕',
+        '《', '》', '<', '>',
+        '○', '∘', '＝', '=',
+        '…', '‥', ';', '；',
+        '→', '━'
+    };
+
     public static bool IsValidEpwingResultForDictType(IEpwingRecord epwingRecord, Dict dict)
     {
         foreach (char c in epwingRecord.PrimarySpelling)
         {
-            if (char.IsSymbol(c) || char.IsPunctuation(c) || char.IsWhiteSpace(c))
+            if (s_invalidCharacters.Contains(c) || char.IsWhiteSpace(c))
             {
                 return false;
             }
@@ -67,13 +87,13 @@ internal static class EpwingUtils
             case DictType.Daijirin:
                 if (epwingRecord.Definitions is not null)
                 {
-                    // english definitions
+                    // English definitions
                     if (epwingRecord.Definitions.Any(static def => def.Contains("→英和") || def.Contains("\\u003")))
                     {
                         return false;
                     }
 
-                    // english definitions
+                    // English definitions
                     if (!epwingRecord.Definitions.Any(JapaneseUtils.JapaneseRegex.IsMatch))
                     {
                         return false;
@@ -82,8 +102,22 @@ internal static class EpwingUtils
                 break;
 
             case DictType.Daijisen:
-                // kanji definitions
+                // English words
+                if (!JapaneseUtils.JapaneseRegex.IsMatch(epwingRecord.PrimarySpelling))
+                {
+                    return false;
+                }
+
+                // Kanji definitions
                 if (epwingRecord.Definitions?.Any(static def => def.Contains("［音］")) ?? false)
+                {
+                    return false;
+                }
+                break;
+
+            case DictType.Koujien:
+                // English words
+                if (!JapaneseUtils.JapaneseRegex.IsMatch(epwingRecord.PrimarySpelling))
                 {
                     return false;
                 }
