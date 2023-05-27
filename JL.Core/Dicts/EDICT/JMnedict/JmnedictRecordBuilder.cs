@@ -23,9 +23,9 @@ internal static class JmnedictRecordBuilder
                 {
                     Translation translation = entry.TranslationList[j];
 
-                    record.Definitions!.AddRange(translation.TransDetList);
-                    record.NameTypes!.AddRange(translation.NameTypeList);
-                    // record.RelatedTerms.AddRange(translation.XRefList);
+                    record.Definitions!.Add(translation.TransDetList);
+                    record.NameTypes!.Add(translation.NameTypeList);
+                    // record.RelatedTerms.Add(translation.XRefList);
                 }
 
                 recordDictionary.Add(record.PrimarySpelling, record);
@@ -65,11 +65,9 @@ internal static class JmnedictRecordBuilder
                 {
                     Translation translation = entry.TranslationList[j];
 
-                    record.Definitions!.AddRange(translation.TransDetList);
-
-                    record.NameTypes!.AddRange(translation.NameTypeList);
-
-                    //record.RelatedTerms.AddRange(translation.XRefList);
+                    record.Definitions!.Add(translation.TransDetList);
+                    record.NameTypes!.Add(translation.NameTypeList);
+                    //record.RelatedTerms.Add(translation.XRefList);
                 }
 
                 record.AlternativeSpellings = entry.RebList.ToList();
@@ -81,9 +79,9 @@ internal static class JmnedictRecordBuilder
 
         foreach (KeyValuePair<string, JmnedictRecord> recordKeyValuePair in recordDictionary)
         {
+            recordKeyValuePair.Value.Definitions = Utils.TrimListOfLists(recordKeyValuePair.Value.Definitions!);
+            recordKeyValuePair.Value.NameTypes = Utils.TrimListOfLists(recordKeyValuePair.Value.NameTypes!);
             recordKeyValuePair.Value.AlternativeSpellings = Utils.TrimStringList(recordKeyValuePair.Value.AlternativeSpellings!);
-            recordKeyValuePair.Value.Definitions = Utils.TrimStringList(recordKeyValuePair.Value.Definitions!);
-            recordKeyValuePair.Value.NameTypes = Utils.TrimStringList(recordKeyValuePair.Value.NameTypes!);
             recordKeyValuePair.Value.Readings = Utils.TrimStringList(recordKeyValuePair.Value.Readings!);
             recordKeyValuePair.Value.Id = entry.Id;
 

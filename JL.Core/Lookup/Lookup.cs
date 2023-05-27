@@ -640,7 +640,7 @@ public static class Lookup
                         matchedText: nameResult.MatchedText,
                         deconjugatedMatchedText: nameResult.DeconjugatedMatchedText,
                         dict: nameResult.Dict,
-                        formattedDefinitions: jmnedictRecord.BuildFormattedDefinition()
+                        formattedDefinitions: jmnedictRecord.BuildFormattedDefinition(nameResult.Dict.Options)
                     );
 
                     results.Enqueue(result);

@@ -109,6 +109,28 @@ public static class Utils
         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
     }
 
+    internal static List<List<T>?>? TrimListOfLists<T>(List<List<T>?> listOfLists)
+    {
+        List<List<T>?>? listOfListClone = listOfLists;
+
+        if (listOfListClone.Count is 0 || listOfListClone.All(static l => l is null || l.Count is 0))
+        {
+            listOfListClone = null;
+        }
+        else
+        {
+            listOfListClone.TrimExcess();
+
+            int counter = listOfListClone.Count;
+            for (int i = 0; i < counter; i++)
+            {
+                listOfListClone[i]?.TrimExcess();
+            }
+        }
+
+        return listOfListClone;
+    }
+
     internal static List<string>? TrimStringList(List<string> list)
     {
         List<string>? listClone = list;

@@ -149,18 +149,18 @@ internal static class JmdictRecordBuilder
             recordKeyValuePair.Value.AlternativeSpellings = Utils.TrimStringList(recordKeyValuePair.Value.AlternativeSpellings!);
             recordKeyValuePair.Value.PrimarySpellingOrthographyInfoList = Utils.TrimStringList(recordKeyValuePair.Value.PrimarySpellingOrthographyInfoList!);
             recordKeyValuePair.Value.DefinitionInfo = Utils.TrimStringList(recordKeyValuePair.Value.DefinitionInfo!)!;
-            recordKeyValuePair.Value.Definitions = TrimListOfLists(recordKeyValuePair.Value.Definitions!)!;
-            recordKeyValuePair.Value.ReadingRestrictions = TrimListOfLists(recordKeyValuePair.Value.ReadingRestrictions!);
-            recordKeyValuePair.Value.SpellingRestrictions = TrimListOfLists(recordKeyValuePair.Value.SpellingRestrictions!);
-            recordKeyValuePair.Value.Dialects = TrimListOfLists(recordKeyValuePair.Value.Dialects!);
-            recordKeyValuePair.Value.MiscList = TrimListOfLists(recordKeyValuePair.Value.MiscList!);
-            recordKeyValuePair.Value.AlternativeSpellingsOrthographyInfoList = TrimListOfLists(recordKeyValuePair.Value.AlternativeSpellingsOrthographyInfoList!);
-            recordKeyValuePair.Value.ReadingsOrthographyInfoList = TrimListOfLists(recordKeyValuePair.Value.ReadingsOrthographyInfoList!);
-            recordKeyValuePair.Value.FieldList = TrimListOfLists(recordKeyValuePair.Value.FieldList!);
-            recordKeyValuePair.Value.WordClasses = TrimListOfLists(recordKeyValuePair.Value.WordClasses!);
-            recordKeyValuePair.Value.RelatedTerms = TrimListOfLists(recordKeyValuePair.Value.RelatedTerms!);
-            recordKeyValuePair.Value.Antonyms = TrimListOfLists(recordKeyValuePair.Value.Antonyms!);
-            recordKeyValuePair.Value.LoanwordEtymology = TrimListOfLists(recordKeyValuePair.Value.LoanwordEtymology!);
+            recordKeyValuePair.Value.Definitions = Utils.TrimListOfLists(recordKeyValuePair.Value.Definitions!)!;
+            recordKeyValuePair.Value.ReadingRestrictions = Utils.TrimListOfLists(recordKeyValuePair.Value.ReadingRestrictions!);
+            recordKeyValuePair.Value.SpellingRestrictions = Utils.TrimListOfLists(recordKeyValuePair.Value.SpellingRestrictions!);
+            recordKeyValuePair.Value.Dialects = Utils.TrimListOfLists(recordKeyValuePair.Value.Dialects!);
+            recordKeyValuePair.Value.MiscList = Utils.TrimListOfLists(recordKeyValuePair.Value.MiscList!);
+            recordKeyValuePair.Value.AlternativeSpellingsOrthographyInfoList = Utils.TrimListOfLists(recordKeyValuePair.Value.AlternativeSpellingsOrthographyInfoList!);
+            recordKeyValuePair.Value.ReadingsOrthographyInfoList = Utils.TrimListOfLists(recordKeyValuePair.Value.ReadingsOrthographyInfoList!);
+            recordKeyValuePair.Value.FieldList = Utils.TrimListOfLists(recordKeyValuePair.Value.FieldList!);
+            recordKeyValuePair.Value.WordClasses = Utils.TrimListOfLists(recordKeyValuePair.Value.WordClasses!);
+            recordKeyValuePair.Value.RelatedTerms = Utils.TrimListOfLists(recordKeyValuePair.Value.RelatedTerms!);
+            recordKeyValuePair.Value.Antonyms = Utils.TrimListOfLists(recordKeyValuePair.Value.Antonyms!);
+            recordKeyValuePair.Value.LoanwordEtymology = Utils.TrimListOfLists(recordKeyValuePair.Value.LoanwordEtymology!);
 
             recordKeyValuePair.Value.Id = entry.Id;
             string key = JapaneseUtils.KatakanaToHiragana(recordKeyValuePair.Key);
@@ -189,27 +189,5 @@ internal static class JmdictRecordBuilder
         jmdictRecord.RelatedTerms!.Add(sense.XRefList.Count > 0 ? sense.XRefList : null);
         jmdictRecord.Antonyms!.Add(sense.AntList.Count > 0 ? sense.AntList : null);
         jmdictRecord.LoanwordEtymology!.Add(sense.LSourceList.Count > 0 ? sense.LSourceList : null);
-    }
-
-    private static List<List<T>?>? TrimListOfLists<T>(List<List<T>?> listOfLists)
-    {
-        List<List<T>?>? listOfListClone = listOfLists;
-
-        if (listOfListClone.Count is 0 || listOfListClone.All(static l => l is null || l.Count is 0))
-        {
-            listOfListClone = null;
-        }
-        else
-        {
-            listOfListClone.TrimExcess();
-
-            int counter = listOfListClone.Count;
-            for (int i = 0; i < counter; i++)
-            {
-                listOfListClone[i]?.TrimExcess();
-            }
-        }
-
-        return listOfListClone;
     }
 }
