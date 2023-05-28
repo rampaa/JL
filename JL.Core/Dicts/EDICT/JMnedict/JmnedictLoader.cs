@@ -98,14 +98,12 @@ internal static class JmnedictLoader
     {
         _ = xmlReader.ReadToFollowing("keb");
         return xmlReader.ReadElementContentAsString();
-        //xmlReader.ReadToFollowing("k_ele");
     }
 
     private static string ReadREle(XmlReader xmlReader)
     {
         _ = xmlReader.ReadToFollowing("reb");
         return xmlReader.ReadElementContentAsString();
-        //xmlReader.ReadToFollowing("r_ele");
     }
 
     private static Translation ReadTrans(XmlReader xmlReader)

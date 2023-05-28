@@ -18,7 +18,7 @@ internal static class JmdictRecordBuilder
         {
             KanjiElement kanjiElement = entry.KanjiElements[i];
 
-            JmdictRecord record = new(kanjiElement.Keb!)
+            JmdictRecord record = new(kanjiElement.Keb)
             {
                 PrimarySpellingOrthographyInfoList = kanjiElement.KeInfList
             };

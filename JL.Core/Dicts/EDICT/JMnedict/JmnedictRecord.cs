@@ -12,6 +12,7 @@ internal sealed class JmnedictRecord : IDictRecord
     public List<string>? Readings { get; set; }
     public List<List<string>?>? NameTypes { get; set; }
     public List<List<string>?>? Definitions { get; set; }
+    //public List<List<string>?>? RelatedTerms { get; set; }
 
     public JmnedictRecord(string primarySpelling)
     {
@@ -20,6 +21,7 @@ internal sealed class JmnedictRecord : IDictRecord
         Readings = new List<string>();
         NameTypes = new List<List<string>?>();
         Definitions = new List<List<string>?>();
+        //RelatedTerms = new List<List<string>?>();
     }
 
     public string? BuildFormattedDefinition(DictOptions? options)
@@ -60,6 +62,13 @@ internal sealed class JmnedictRecord : IDictRecord
                     .Append(") ");
                 }
             }
+
+            //if ((options?.RelatedTerm?.Value ?? false) && RelatedTerms?[i]?.Count > 0)
+            //{
+            //    _ = defResult.Append("(related terms: ")
+            //        .Append(string.Join(", ", RelatedTerms[i]!))
+            //        .Append(") ");
+            //}
 
             _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", definitions)} ")
                 .Append(separator);
