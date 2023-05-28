@@ -63,11 +63,15 @@ internal sealed class JmnedictRecord : IDictRecord
                 }
             }
 
-            //if ((options?.RelatedTerm?.Value ?? false) && RelatedTerms?[i]?.Count > 0)
+            //if (options?.RelatedTerm?.Value ?? false)
             //{
-            //    _ = defResult.Append("(related terms: ")
-            //        .Append(string.Join(", ", RelatedTerms[i]!))
-            //        .Append(") ");
+            //    List<string>? relatedTerms = RelatedTerms?[i];
+            //    if (relatedTerms?.Count > 0)
+            //    {
+            //        _ = defResult.Append("(related terms: ")
+            //            .Append(string.Join(", ", relatedTerms))
+            //            .Append(") ");
+            //    }
             //}
 
             _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", definitions)} ")

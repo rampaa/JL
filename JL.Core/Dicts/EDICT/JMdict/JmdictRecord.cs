@@ -67,11 +67,15 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
-            if ((options?.WordClassInfo?.Value ?? true) && WordClasses?[i]?.Count > 0)
+            if (options?.WordClassInfo?.Value ?? true)
             {
-                _ = defResult.Append('(')
-                    .Append(string.Join(", ", WordClasses[i]!))
-                    .Append(") ");
+                List<string>? wordClasses = WordClasses?[i];
+                if (wordClasses?.Count > 0)
+                {
+                    _ = defResult.Append('(')
+                        .Append(string.Join(", ", wordClasses))
+                        .Append(") ");
+                }
             }
 
             if (!newlines)
@@ -79,11 +83,15 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
-            if ((options?.DialectInfo?.Value ?? true) && Dialects?[i]?.Count > 0)
+            if (options?.DialectInfo?.Value ?? true)
             {
-                _ = defResult.Append('(')
-                    .Append(string.Join(", ", Dialects[i]!))
-                    .Append(") ");
+                List<string>? dialects = Dialects?[i];
+                if (dialects?.Count > 0)
+                {
+                    _ = defResult.Append('(')
+                        .Append(string.Join(", ", dialects))
+                        .Append(") ");
+                }
             }
 
             if ((options?.ExtraDefinitionInfo?.Value ?? true)
@@ -95,88 +103,110 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                     .Append(") ");
             }
 
-            if ((options?.MiscInfo?.Value ?? true) && MiscList?[i]?.Count > 0)
+            if (options?.MiscInfo?.Value ?? true)
             {
-                _ = defResult.Append('(')
-                    .Append(string.Join(", ", MiscList[i]!))
-                    .Append(") ");
+                List<string>? misc = MiscList?[i];
+                if (misc?.Count > 0)
+                {
+                    _ = defResult.Append('(')
+                        .Append(string.Join(", ", misc))
+                        .Append(") ");
+                }
             }
 
-            if ((options?.WordTypeInfo?.Value ?? true) && FieldList?[i]?.Count > 0)
+            if (options?.WordTypeInfo?.Value ?? true)
             {
-                _ = defResult.Append('(')
-                    .Append(string.Join(", ", FieldList[i]!))
+                List<string>? fields = FieldList?[i];
+                if (fields?.Count > 0)
+                {
+                    _ = defResult.Append('(')
+                    .Append(string.Join(", ", fields))
                     .Append(") ");
+                }
             }
 
             _ = defResult.Append(string.Join("; ", Definitions[i]) + " ");
 
-            if ((options?.SpellingRestrictionInfo?.Value ?? true)
-                && (ReadingRestrictions?[i]?.Count > 0
-                    || SpellingRestrictions?[i]?.Count > 0))
+            if (options?.SpellingRestrictionInfo?.Value ?? true)
             {
-                _ = defResult.Append("(only applies to ");
+                List<string>? spellingRestrictions = SpellingRestrictions?[i];
+                List<string>? readingRestrictions = ReadingRestrictions?[i];
 
-                if (SpellingRestrictions?[i]?.Count > 0)
+                if (spellingRestrictions?.Count > 0 || readingRestrictions?.Count > 0)
                 {
-                    _ = defResult.Append(string.Join("; ", SpellingRestrictions[i]!));
-                }
+                    _ = defResult.Append("(only applies to ");
 
-                if (ReadingRestrictions?[i]?.Count > 0)
-                {
-                    if (SpellingRestrictions?[i]?.Count > 0)
+                    if (spellingRestrictions?.Count > 0)
                     {
-                        _ = defResult.Append("; ");
+                        _ = defResult.Append(string.Join("; ", spellingRestrictions));
                     }
 
-                    _ = defResult.Append(string.Join("; ", ReadingRestrictions[i]!));
-                }
+                    if (readingRestrictions?.Count > 0)
+                    {
+                        if (spellingRestrictions?.Count > 0)
+                        {
+                            _ = defResult.Append("; ");
+                        }
 
-                _ = defResult.Append(") ");
+                        _ = defResult.Append(string.Join("; ", readingRestrictions));
+                    }
+
+                    _ = defResult.Append(") ");
+                }
             }
 
-            if ((options?.LoanwordEtymology?.Value ?? true) && LoanwordEtymology?[i]?.Count > 0)
+            if (options?.LoanwordEtymology?.Value ?? true)
             {
-                _ = defResult.Append('(');
-
-                List<LoanwordSource> lSources = LoanwordEtymology[i]!;
-
-                int lSourceCount = lSources.Count;
-                for (int j = 0; j < lSourceCount; j++)
+                List<LoanwordSource>? lSources = LoanwordEtymology?[i];
+                if (lSources?.Count > 0)
                 {
-                    if (lSources[j].IsWasei)
+                    _ = defResult.Append('(');
+
+                    int lSourceCount = lSources.Count;
+                    for (int j = 0; j < lSourceCount; j++)
                     {
-                        _ = defResult.Append("Wasei ");
+                        if (lSources[j].IsWasei)
+                        {
+                            _ = defResult.Append("Wasei ");
+                        }
+
+                        _ = defResult.Append(lSources[j].Language);
+
+                        if (lSources[j].OriginalWord is not null)
+                        {
+                            _ = defResult.Append(": ").Append(lSources[j].OriginalWord);
+                        }
+
+                        if (j + 1 < lSourceCount)
+                        {
+                            _ = defResult.Append(lSources[j].IsPart ? " + " : ", ");
+                        }
                     }
 
-                    _ = defResult.Append(lSources[j].Language);
-
-                    if (lSources[j].OriginalWord is not null)
-                    {
-                        _ = defResult.Append(": ").Append(lSources[j].OriginalWord);
-                    }
-
-                    if (j + 1 < lSourceCount)
-                    {
-                        _ = defResult.Append(lSources[j].IsPart ? " + " : ", ");
-                    }
+                    _ = defResult.Append(") ");
                 }
-
-                _ = defResult.Append(") ");
             }
 
-            if ((options?.RelatedTerm?.Value ?? false) && RelatedTerms?[i]?.Count > 0)
+            if (options?.RelatedTerm?.Value ?? false)
             {
-                _ = defResult.Append("(related terms: ")
-                    .Append(string.Join(", ", RelatedTerms[i]!))
-                    .Append(") ");
+                List<string>? relatedTerms = RelatedTerms?[i];
+                if (relatedTerms?.Count > 0)
+                {
+                    _ = defResult.Append("(related terms: ")
+                        .Append(string.Join(", ", relatedTerms))
+                        .Append(") ");
+                }
             }
 
-            if ((options?.Antonym?.Value ?? false) && Antonyms?[i]?.Count > 0)
+            if (options?.Antonym?.Value ?? false)
             {
-                _ = defResult.Append("(antonyms: ")
-                    .Append(string.Join(", ", Antonyms[i]!))
-                    .Append(") ");
+                List<string>? antonyms = Antonyms?[i];
+                if (antonyms?.Count > 0)
+                {
+                    _ = defResult.Append("(antonyms: ")
+                        .Append(string.Join(", ", antonyms))
+                        .Append(") ");
+                }
             }
 
             _ = defResult.Append(separator);
