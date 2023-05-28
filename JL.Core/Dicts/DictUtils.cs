@@ -463,55 +463,64 @@ public static class DictUtils
             switch (dict.Type)
             {
                 case DictType.JMdict:
-                    if (dict is { Active: true, Contents.Count: 0 } && !UpdatingJmdict)
+                    if (!UpdatingJmdict)
                     {
-                        Task jmdictTask = Task.Run(async () =>
+                        if (dict is { Active: true, Contents.Count: 0 })
                         {
-                            await JmdictLoader.Load(dict).ConfigureAwait(false);
-                            dict.Size = dict.Contents.Count;
-                        });
+                            Task jmdictTask = Task.Run(async () =>
+                            {
+                                await JmdictLoader.Load(dict).ConfigureAwait(false);
+                                dict.Size = dict.Contents.Count;
+                            });
 
-                        tasks.Add(jmdictTask);
-                    }
+                            tasks.Add(jmdictTask);
+                        }
 
-                    else if (dict is { Active: false, Contents.Count: > 0 } && !UpdatingJmdict)
-                    {
-                        dict.Contents.Clear();
-                        dictRemoved = true;
+                        else if (dict is { Active: false, Contents.Count: > 0 })
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
+                        }
                     }
                     break;
 
                 case DictType.JMnedict:
-                    if (dict is { Active: true, Contents.Count: 0 } && !UpdatingJmnedict)
+                    if (!UpdatingJmnedict)
                     {
-                        tasks.Add(Task.Run(async () =>
+                        if (dict is { Active: true, Contents.Count: 0 })
                         {
-                            await JmnedictLoader.Load(dict).ConfigureAwait(false);
-                            dict.Size = dict.Contents.Count;
-                        }));
-                    }
+                            tasks.Add(Task.Run(async () =>
+                            {
+                                await JmnedictLoader.Load(dict).ConfigureAwait(false);
+                                dict.Size = dict.Contents.Count;
+                            }));
+                        }
 
-                    else if (dict is { Active: false, Contents.Count: > 0 } && !UpdatingJmnedict)
-                    {
-                        dict.Contents.Clear();
-                        dictRemoved = true;
+                        else if (dict is { Active: false, Contents.Count: > 0 })
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
+                        }
                     }
 
                     break;
                 case DictType.Kanjidic:
-                    if (dict is { Active: true, Contents.Count: 0 } && !UpdatingKanjidic)
+                    if (!UpdatingKanjidic)
                     {
-                        tasks.Add(Task.Run(async () =>
+                        if (dict is { Active: true, Contents.Count: 0 })
                         {
-                            await KanjidicLoader.Load(dict).ConfigureAwait(false);
-                            dict.Size = dict.Contents.Count;
-                        }));
-                    }
+                            tasks.Add(Task.Run(async () =>
+                            {
+                                await KanjidicLoader.Load(dict).ConfigureAwait(false);
+                                dict.Size = dict.Contents.Count;
+                            }));
+                        }
 
-                    else if (dict is { Active: false, Contents.Count: > 0 } && !UpdatingKanjidic)
-                    {
-                        dict.Contents.Clear();
-                        dictRemoved = true;
+                        else if (dict is { Active: false, Contents.Count: > 0 })
+                        {
+                            dict.Contents.Clear();
+                            dictRemoved = true;
+                        }
                     }
                     break;
 
