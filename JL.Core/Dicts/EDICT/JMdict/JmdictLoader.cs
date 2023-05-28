@@ -127,7 +127,7 @@ internal static class JmdictLoader
                         break;
 
                     case "ke_inf":
-                        kanjiElement.KeInfList.Add(ReadEntity(xmlReader)!);
+                        kanjiElement.KeInfList.Add(ReadEntity(xmlReader));
                         break;
 
                     //case "ke_pri":
@@ -175,7 +175,7 @@ internal static class JmdictLoader
                         break;
 
                     case "re_inf":
-                        readingElement.ReInfList.Add(ReadEntity(xmlReader)!);
+                        readingElement.ReInfList.Add(ReadEntity(xmlReader));
                         break;
 
                     //case "re_pri":
@@ -223,15 +223,15 @@ internal static class JmdictLoader
                         break;
 
                     case "pos":
-                        sense.PosList.Add(ReadEntity(xmlReader)!);
+                        sense.PosList.Add(ReadEntity(xmlReader));
                         break;
 
                     case "field":
-                        sense.FieldList.Add(ReadEntity(xmlReader)!);
+                        sense.FieldList.Add(ReadEntity(xmlReader));
                         break;
 
                     case "misc":
-                        sense.MiscList.Add(ReadEntity(xmlReader)!);
+                        sense.MiscList.Add(ReadEntity(xmlReader));
                         break;
 
                     case "s_inf":
@@ -239,7 +239,7 @@ internal static class JmdictLoader
                         break;
 
                     case "dial":
-                        sense.DialList.Add(ReadEntity(xmlReader)!);
+                        sense.DialList.Add(ReadEntity(xmlReader));
                         break;
 
                     case "gloss":
@@ -322,23 +322,13 @@ internal static class JmdictLoader
         return sense;
     }
 
-    private static string? ReadEntity(XmlReader xmlReader)
+    private static string ReadEntity(XmlReader xmlReader)
     {
-        string? entityName = null;
-
         _ = xmlReader.Read();
 
-        if (xmlReader.NodeType is XmlNodeType.EntityReference)
-        {
-            entityName = xmlReader.Name;
+        string entityName = xmlReader.Name;
 
-            //xmlReader.ResolveEntity();
-            //_ = xmlReader.Read();
-
-            //_ = DictUtils.JmdictEntities.TryAdd(entityName, xmlReader.Value);
-
-            _ = xmlReader.Read();
-        }
+        _ = xmlReader.Read();
 
         return entityName;
     }
