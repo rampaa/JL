@@ -315,7 +315,7 @@ internal static class WindowsUtils
 
             _ = Process.Start(
                 new ProcessStartInfo("cmd",
-                $"/c start \"JL Updater\" \"{Path.Join(Utils.ApplicationPath, "update-helper.cmd")}\"")
+                $"/c start \"JL Updater\" \"{Path.Join(Utils.ApplicationPath, "update-helper.cmd")}\" {Environment.ProcessId}")
                 { UseShellExecute = true, Verb = "runas" });
         }
 
