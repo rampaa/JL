@@ -58,11 +58,11 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
         StringBuilder defResult = new();
 
-        int definitionCount = Definitions.Count;
+        bool multipleDefinitions = Definitions.Count > 1;
 
-        for (int i = 0; i < definitionCount; i++)
+        for (int i = 0; i < Definitions.Count; i++)
         {
-            if (newlines && definitionCount > 1)
+            if (newlines && multipleDefinitions)
             {
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
@@ -78,7 +78,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                 }
             }
 
-            if (!newlines && definitionCount > 1)
+            if (!newlines && multipleDefinitions)
             {
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }

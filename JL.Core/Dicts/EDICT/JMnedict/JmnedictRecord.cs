@@ -35,6 +35,8 @@ internal sealed class JmnedictRecord : IDictRecord
             ? ""
             : "\n";
 
+        bool multipleDefinitions = Definitions.Count > 1;
+
         StringBuilder defResult = new();
 
         for (int i = 0; i < Definitions.Count; i++)
@@ -45,7 +47,7 @@ internal sealed class JmnedictRecord : IDictRecord
                 continue;
             }
 
-            if (Definitions.Count > 1)
+            if (multipleDefinitions)
             {
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
