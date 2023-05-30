@@ -62,7 +62,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
         for (int i = 0; i < definitionCount; i++)
         {
-            if (newlines)
+            if (newlines && definitionCount > 1)
             {
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
@@ -78,7 +78,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                 }
             }
 
-            if (!newlines)
+            if (!newlines && definitionCount > 1)
             {
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
