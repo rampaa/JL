@@ -163,6 +163,16 @@ internal sealed partial class PopupWindow : Window
 
             if (text == LastText && IsVisible)
             {
+                if (ConfigManager.FixedPopupPositioning)
+                {
+                    UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+                }
+
+                else
+                {
+                    UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+                }
+
                 return;
             }
 
@@ -180,8 +190,6 @@ internal sealed partial class PopupWindow : Window
                     _ = tb.Focus();
                     tb.Select(charPosition, lookupResults[0].MatchedText.Length);
                 }
-
-                Init();
 
                 _lastLookupResults = lookupResults;
 
@@ -202,6 +210,16 @@ internal sealed partial class PopupWindow : Window
                 }
 
                 Show();
+
+                if (ConfigManager.FixedPopupPositioning)
+                {
+                    UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+                }
+
+                else
+                {
+                    UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+                }
 
                 if (ConfigManager.Focusable && ConfigManager.PopupFocusOnLookup)
                 {
@@ -242,8 +260,6 @@ internal sealed partial class PopupWindow : Window
 
         if (lookupResults?.Count > 0)
         {
-            Init();
-
             _lastLookupResults = lookupResults;
             EnableMiningMode();
             DisplayResults(true, tb.SelectedText);
@@ -254,6 +270,17 @@ internal sealed partial class PopupWindow : Window
             }
 
             Show();
+
+            if (ConfigManager.FixedPopupPositioning)
+            {
+                UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+            }
+
+            else
+            {
+                UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+            }
+
             _ = tb.Focus();
 
             if (ConfigManager.Focusable)
@@ -281,8 +308,8 @@ internal sealed partial class PopupWindow : Window
         double mouseX = cursorPosition.X / WindowsUtils.Dpi.DpiScaleX;
         double mouseY = cursorPosition.Y / WindowsUtils.Dpi.DpiScaleY;
 
-        bool needsFlipX = ConfigManager.PopupFlipX && mouseX + Width > WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth;
-        bool needsFlipY = ConfigManager.PopupFlipY && mouseY + Height > WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight;
+        bool needsFlipX = ConfigManager.PopupFlipX && mouseX + ActualWidth > WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth;
+        bool needsFlipY = ConfigManager.PopupFlipY && mouseY + ActualHeight > WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight;
 
         double newLeft;
         double newTop;
@@ -292,7 +319,7 @@ internal sealed partial class PopupWindow : Window
         if (needsFlipX)
         {
             // flip Leftwards while preventing -OOB
-            newLeft = mouseX - (Width + WindowsUtils.DpiAwareXOffset);
+            newLeft = mouseX - (ActualWidth + WindowsUtils.DpiAwareXOffset);
             if (newLeft < WindowsUtils.ActiveScreen.Bounds.X)
             {
                 newLeft = WindowsUtils.ActiveScreen.Bounds.X;
@@ -307,7 +334,7 @@ internal sealed partial class PopupWindow : Window
         if (needsFlipY)
         {
             // flip Upwards while preventing -OOB
-            newTop = mouseY - (Height + WindowsUtils.DpiAwareYOffset);
+            newTop = mouseY - (ActualHeight + WindowsUtils.DpiAwareYOffset);
             if (newTop < WindowsUtils.ActiveScreen.Bounds.Y)
             {
                 newTop = WindowsUtils.ActiveScreen.Bounds.Y;
@@ -320,17 +347,17 @@ internal sealed partial class PopupWindow : Window
         }
 
         // stick to edges if +OOB
-        if (newLeft + Width > WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth)
+        if (newLeft + ActualWidth > WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth)
         {
-            newLeft = WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth - Width;
+            newLeft = WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth - ActualWidth;
         }
 
-        if (newTop + Height > WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight)
+        if (newTop + ActualHeight > WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight)
         {
-            newTop = WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight - Height;
+            newTop = WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight - ActualHeight;
         }
 
-        if (mouseX >= newLeft && mouseX <= newLeft + Width && mouseY >= newTop && mouseY <= newTop + Height)
+        if (mouseX >= newLeft && mouseX <= newLeft + ActualWidth && mouseY >= newTop && mouseY <= newTop + ActualHeight)
         {
             UnavoidableMouseEnter = true;
         }
@@ -1023,20 +1050,6 @@ internal sealed partial class PopupWindow : Window
         if (MiningMode)
         {
             ChildPopupWindow.Definitions_MouseMove((TextBox)sender);
-
-            if (!ChildPopupWindow.MiningMode)
-            {
-                if (ConfigManager.FixedPopupPositioning)
-                {
-                    ChildPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition,
-                        WindowsUtils.DpiAwareFixedPopupYPosition);
-                }
-
-                else
-                {
-                    ChildPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
-                }
-            }
         }
     }
 
@@ -1558,17 +1571,6 @@ internal sealed partial class PopupWindow : Window
         else
         {
             ChildPopupWindow.TextBox_MouseMove((TextBox)sender);
-        }
-
-        if (ConfigManager.FixedPopupPositioning)
-        {
-            ChildPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition,
-                WindowsUtils.DpiAwareFixedPopupYPosition);
-        }
-
-        else
-        {
-            ChildPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
         }
     }
 

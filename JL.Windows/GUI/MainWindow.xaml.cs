@@ -309,16 +309,6 @@ internal sealed partial class MainWindow : Window
 
         _stopPrecache = true;
         FirstPopupWindow.TextBox_MouseMove(MainTextBox);
-
-        if (ConfigManager.FixedPopupPositioning)
-        {
-            FirstPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
-        }
-
-        else
-        {
-            FirstPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
-        }
     }
 
     private void MainWindow_Closed(object sender, EventArgs e)
@@ -778,13 +768,9 @@ internal sealed partial class MainWindow : Window
 
     private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        if (double.IsNaN(Height) || double.IsNaN(Width))
-        {
-            return;
-        }
-
-        ConfigManager.MainWindowHeight = Height;
-        ConfigManager.MainWindowWidth = Width;
+        Size newSize = e.NewSize;
+        ConfigManager.MainWindowWidth = newSize.Width;
+        ConfigManager.MainWindowHeight = newSize.Height;
     }
 
     private void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -805,16 +791,6 @@ internal sealed partial class MainWindow : Window
         else
         {
             FirstPopupWindow.TextBox_MouseMove(MainTextBox);
-        }
-
-        if (ConfigManager.FixedPopupPositioning)
-        {
-            FirstPopupWindow.UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
-        }
-
-        else
-        {
-            FirstPopupWindow.UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
         }
     }
 
@@ -884,6 +860,13 @@ internal sealed partial class MainWindow : Window
             WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
             WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
 
+            PopupWindow? currentPopupWindow = FirstPopupWindow;
+            while (currentPopupWindow is not null)
+            {
+                WindowsUtils.SetSizeToContentForPopup(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxWidth, WindowsUtils.DpiAwarePopupMaxHeight, currentPopupWindow);
+                currentPopupWindow = currentPopupWindow.ChildPopupWindow;
+            }
+
             if (ConfigManager.AutoAdjustFontSizesOnResolutionChange)
             {
                 ConfigManager.AlternativeSpellingsFontSize = (int)Math.Round(ConfigManager.AlternativeSpellingsFontSize / fontScale);
@@ -948,8 +931,8 @@ internal sealed partial class MainWindow : Window
 
         LeftPositionBeforeResolutionChange = Left;
         TopPositionBeforeResolutionChange = Top;
-        HeightBeforeResolutionChange = Height;
-        WidthBeforeResolutionChange = Width;
+        WidthBeforeResolutionChange = ActualWidth;
+        HeightBeforeResolutionChange = ActualHeight;
     }
 
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -1086,6 +1069,13 @@ internal sealed partial class MainWindow : Window
             WindowsUtils.DpiAwareFixedPopupYPosition = ConfigManager.FixedPopupYPosition / WindowsUtils.Dpi.DpiScaleY;
             WindowsUtils.DpiAwarePopupMaxWidth = ConfigManager.PopupMaxWidth / WindowsUtils.Dpi.DpiScaleX;
             WindowsUtils.DpiAwarePopupMaxHeight = ConfigManager.PopupMaxHeight / WindowsUtils.Dpi.DpiScaleY;
+
+            PopupWindow? currentPopupWindow = FirstPopupWindow;
+            while (currentPopupWindow is not null)
+            {
+                WindowsUtils.SetSizeToContentForPopup(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxWidth, WindowsUtils.DpiAwarePopupMaxHeight, currentPopupWindow);
+                currentPopupWindow = currentPopupWindow.ChildPopupWindow;
+            }
         }
     }
 }
