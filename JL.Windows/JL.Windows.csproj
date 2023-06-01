@@ -6,7 +6,7 @@
     <LangVersion>latest</LangVersion>
     <RollForward>LatestMajor</RollForward>
     <UseWPF>true</UseWPF>
-    <Platforms>AnyCPU;x86;x64</Platforms>
+    <Platforms>AnyCPU;x86;x64;ARM64</Platforms>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <PackageId>JL.Windows</PackageId>
