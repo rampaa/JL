@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title="JL"
         AllowsTransparency="True"
-        mc:Ignorable="d" MinWidth="100" MinHeight="50" WindowStyle="None" ResizeMode="NoResize" Topmost="True"
+        mc:Ignorable="d" MinWidth="100" MinHeight="50" Width="800" Height="200" WindowStyle="None" ResizeMode="NoResize" Topmost="True"
         Closed="MainWindow_Closed" Closing="MainWindow_Closing" PreviewKeyDown="Window_PreviewKeyDown"
         SizeChanged="MainWindow_SizeChanged" LocationChanged="Window_LocationChanged"
         PreviewMouseDown="Window_PreviewMouseDown" DpiChanged="Window_DpiChanged" MouseLeave="Window_MouseLeave" MouseEnter="Window_MouseEnter" StateChanged="Window_StateChanged"
@@ -25,7 +25,7 @@
         <Border Name="BottomRightBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="5" Height="5" Background="Transparent"/>
         <Border Name="TopLeftBorder"  MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Top" HorizontalAlignment="left" Height="5" Width="5" Background="Transparent"/>
         
-        <Rectangle Name="TitleBar" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="15" Margin="5,5,5,5" Opacity="1" Fill="Transparent">
+        <Rectangle Name="TitleBar" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="15" Margin="5,5,5,5" Opacity="1" Fill="Transparent" MouseEnter="TitleBar_MouseEnter" MouseLeave="TitleBar_MouseLeave">
             <Rectangle.ContextMenu>
                 <ContextMenu Name="TitleBarContextMenu">
                     <MenuItem
@@ -143,7 +143,7 @@
             </TextBlock.Background>
         </TextBlock>-->
 
-        <TextBlock x:Name="FontSizeButton" HorizontalAlignment="Left"
+        <TextBlock x:Name="FontSizeButton" HorizontalAlignment="Left" MouseLeave="TitleBarButtonMouseLeave"
                    Margin="37,0,10,0" Text="T" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" RenderTransformOrigin="-0.222,0.567" FontFamily="Meiryo UI"
                    MouseLeftButtonDown="FontSizeButton_MouseLeftButtonDown" ToolTip="Font Size" FontSize="18">
             <TextBlock.Background>
@@ -154,7 +154,7 @@
             </TextBlock.Effect>
         </TextBlock>
 
-        <TextBlock x:Name="OpacityButton" HorizontalAlignment="Left"
+        <TextBlock x:Name="OpacityButton" HorizontalAlignment="Left" MouseLeave="TitleBarButtonMouseLeave"
                    Margin="10,0,10,0" Text="☯" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" FontFamily="Meiryo UI" Padding="0,0,0,0"
                    MouseLeftButtonDown="OpacityButton_MouseLeftButtonDown" ToolTip="Opacity" FontWeight="Normal" FontSize="18">
             <TextBlock.Background>

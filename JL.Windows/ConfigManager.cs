@@ -74,7 +74,7 @@ internal static class ConfigManager
     public static bool MainWindowFocusOnHover { get; private set; } = false;
     public static bool SteppedBacklogWithMouseWheel { get; private set; } = false;
     public static bool HorizontallyCenterMainWindowText { get; private set; } = false;
-    public static bool HideAllMainWindowButtons { get; set; } = false;
+    public static bool HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar { get; set; } = false;
 
     #endregion
 
@@ -155,7 +155,6 @@ internal static class ConfigManager
     public static KeyGesture CaptureTextFromWebSocketKeyGesture { get; private set; } = new(Key.F11, ModifierKeys.Windows);
     public static KeyGesture ReconnectToWebSocketServerKeyGesture { get; private set; } = new(Key.F9, ModifierKeys.Windows);
     public static KeyGesture DeleteCurrentLineKeyGesture { get; private set; } = new(Key.Delete, ModifierKeys.Windows);
-    public static KeyGesture ToggleVisibilityOfAllMainWindowButtonsKeyGesture { get; private set; } = new(Key.F2, ModifierKeys.Windows);
     public static KeyGesture ShowManageAudioSourcesWindowKeyGesture { get; private set; } = new(Key.Z, ModifierKeys.Windows);
 
     #endregion
@@ -247,8 +246,8 @@ internal static class ConfigManager
             ? HorizontalAlignment.Center
             : HorizontalAlignment.Left;
 
-        HideAllMainWindowButtons = GetValueFromConfig(HideAllMainWindowButtons, nameof(HideAllMainWindowButtons), bool.TryParse);
-        mainWindow.ChangeVisibilityOfAllButtons();
+        HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar = GetValueFromConfig(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), bool.TryParse);
+        mainWindow.ChangeVisibilityOfTitleBarButtons();
 
         TextBoxIsReadOnly = GetValueFromConfig(TextBoxIsReadOnly, nameof(TextBoxIsReadOnly), bool.TryParse);
         mainWindow.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
@@ -364,7 +363,6 @@ internal static class ConfigManager
         CaptureTextFromWebSocketKeyGesture = WindowsUtils.SetKeyGesture(nameof(CaptureTextFromWebSocketKeyGesture), CaptureTextFromWebSocketKeyGesture);
         ReconnectToWebSocketServerKeyGesture = WindowsUtils.SetKeyGesture(nameof(ReconnectToWebSocketServerKeyGesture), ReconnectToWebSocketServerKeyGesture);
         DeleteCurrentLineKeyGesture = WindowsUtils.SetKeyGesture(nameof(DeleteCurrentLineKeyGesture), DeleteCurrentLineKeyGesture);
-        ToggleVisibilityOfAllMainWindowButtonsKeyGesture = WindowsUtils.SetKeyGesture(nameof(ToggleVisibilityOfAllMainWindowButtonsKeyGesture), ToggleVisibilityOfAllMainWindowButtonsKeyGesture);
 
         ShowPreferencesWindowKeyGesture =
             WindowsUtils.SetKeyGesture(nameof(ShowPreferencesWindowKeyGesture), ShowPreferencesWindowKeyGesture);
@@ -667,8 +665,6 @@ internal static class ConfigManager
             WindowsUtils.KeyGestureToString(ReconnectToWebSocketServerKeyGesture);
         preferenceWindow.DeleteCurrentLineKeyGestureTextBox.Text =
             WindowsUtils.KeyGestureToString(DeleteCurrentLineKeyGesture);
-        preferenceWindow.ToggleVisibilityOfAllMainWindowButtonsKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(ToggleVisibilityOfAllMainWindowButtonsKeyGesture);
 
         WindowsUtils.SetButtonColor(preferenceWindow.HighlightColorButton, HighlightColor);
         WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, mainWindow.Background.CloneCurrentValue());
@@ -730,7 +726,7 @@ internal static class ConfigManager
         preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInMainWindow;
         preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked = MainWindowFocusOnHover;
         preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked = SteppedBacklogWithMouseWheel;
-        preferenceWindow.HideAllMainWindowButtonsCheckBox.IsChecked = HideAllMainWindowButtons;
+        preferenceWindow.ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox.IsChecked = HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar;
         preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked = HorizontallyCenterMainWindowText;
 
         preferenceWindow.ThemeComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("Theme");
@@ -853,8 +849,6 @@ internal static class ConfigManager
             preferenceWindow.ReconnectToWebSocketServerKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(DeleteCurrentLineKeyGesture),
             preferenceWindow.DeleteCurrentLineKeyGestureTextBox.Text);
-        SaveKeyGesture(nameof(ToggleVisibilityOfAllMainWindowButtonsKeyGesture),
-            preferenceWindow.ToggleVisibilityOfAllMainWindowButtonsKeyGestureTextBox.Text);
 
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
@@ -916,8 +910,8 @@ internal static class ConfigManager
             preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(SteppedBacklogWithMouseWheel)].Value =
             preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked.ToString();
-        config.AppSettings.Settings[nameof(HideAllMainWindowButtons)].Value =
-            preferenceWindow.HideAllMainWindowButtonsCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings[nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar)].Value =
+            preferenceWindow.ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(HorizontallyCenterMainWindowText)].Value =
             preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked.ToString();
 

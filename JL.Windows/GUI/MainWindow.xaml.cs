@@ -415,6 +415,15 @@ internal sealed partial class MainWindow : Window
     private void Button_MouseLeave(object sender, MouseEventArgs e)
     {
         ((TextBlock)sender).Foreground = Brushes.White;
+
+        if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar
+            || FontSizeSlider.IsVisible
+            || OpacitySlider.IsVisible)
+        {
+            return;
+        }
+
+        HideTitleBarButtons();
     }
 
     private void CloseButton_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -667,29 +676,48 @@ internal sealed partial class MainWindow : Window
         {
             await DeleteCurrentLine().ConfigureAwait(false);
         }
-
-        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ToggleVisibilityOfAllMainWindowButtonsKeyGesture))
-        {
-            ConfigManager.HideAllMainWindowButtons = !ConfigManager.HideAllMainWindowButtons;
-            ChangeVisibilityOfAllButtons();
-        }
     }
 
-    public void ChangeVisibilityOfAllButtons()
+    private void ShowTitleBarButtons()
     {
-        if (ConfigManager.HideAllMainWindowButtons)
+        OpacityButton.Visibility = Visibility.Visible;
+        FontSizeButton.Visibility = Visibility.Visible;
+        MinimizeButton.Visibility = Visibility.Visible;
+        CloseButton.Visibility = Visibility.Visible;
+    }
+
+    private void HideTitleBarButtons()
+    {
+        OpacityButton.Visibility = Visibility.Collapsed;
+        FontSizeButton.Visibility = Visibility.Collapsed;
+        MinimizeButton.Visibility = Visibility.Collapsed;
+        CloseButton.Visibility = Visibility.Collapsed;
+    }
+
+    public void ChangeVisibilityOfTitleBarButtons()
+    {
+        if (ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar)
         {
-            OpacityButton.Visibility = Visibility.Collapsed;
-            FontSizeButton.Visibility = Visibility.Collapsed;
-            MinimizeButton.Visibility = Visibility.Collapsed;
-            CloseButton.Visibility = Visibility.Collapsed;
+            if (TitleBar.IsMouseOver
+                || FontSizeButton.IsMouseOver
+                || OpacityButton.IsMouseOver
+                || MinimizeButton.IsMouseOver
+                || CloseButton.IsMouseOver
+                || FontSizeSlider.IsVisible
+                || OpacitySlider.IsVisible)
+            {
+                ShowTitleBarButtons();
+            }
+
+            else
+            {
+                HideTitleBarButtons();
+            }
         }
+
         else
         {
-            OpacityButton.Visibility = Visibility.Visible;
-            FontSizeButton.Visibility = Visibility.Visible;
-            MinimizeButton.Visibility = Visibility.Visible;
-            CloseButton.Visibility = Visibility.Visible;
+            ShowTitleBarButtons();
         }
     }
 
@@ -749,21 +777,49 @@ internal sealed partial class MainWindow : Window
     private void OpacitySlider_LostMouseCapture(object sender, MouseEventArgs e)
     {
         OpacitySlider.Visibility = Visibility.Collapsed;
+
+        if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar || FontSizeSlider.IsVisible)
+        {
+            return;
+        }
+
+        HideTitleBarButtons();
     }
 
     private void OpacitySlider_LostFocus(object sender, RoutedEventArgs e)
     {
         OpacitySlider.Visibility = Visibility.Collapsed;
+
+        if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar || FontSizeSlider.IsVisible)
+        {
+            return;
+        }
+
+        HideTitleBarButtons();
     }
 
     private void FontSizeSlider_LostMouseCapture(object sender, MouseEventArgs e)
     {
         FontSizeSlider.Visibility = Visibility.Collapsed;
+
+        if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar || OpacitySlider.IsVisible)
+        {
+            return;
+        }
+
+        HideTitleBarButtons();
     }
 
     private void FontSizeSlider_LostFocus(object sender, RoutedEventArgs e)
     {
         FontSizeSlider.Visibility = Visibility.Collapsed;
+
+        if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar || OpacitySlider.IsVisible)
+        {
+            return;
+        }
+
+        HideTitleBarButtons();
     }
 
     private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -1077,5 +1133,43 @@ internal sealed partial class MainWindow : Window
                 currentPopupWindow = currentPopupWindow.ChildPopupWindow;
             }
         }
+    }
+
+    private void TitleBar_MouseEnter(object sender, MouseEventArgs e)
+    {
+        if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar)
+        {
+            return;
+        }
+
+        ShowTitleBarButtons();
+    }
+
+    private void TitleBar_MouseLeave(object sender, MouseEventArgs e)
+    {
+        if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar
+            || FontSizeButton.IsMouseOver
+            || OpacityButton.IsMouseOver
+            || MinimizeButton.IsMouseOver
+            || CloseButton.IsMouseOver
+            || FontSizeSlider.IsVisible
+            || OpacitySlider.IsVisible)
+        {
+            return;
+        }
+
+        HideTitleBarButtons();
+    }
+
+    private void TitleBarButtonMouseLeave(object sender, MouseEventArgs e)
+    {
+        if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar
+            || FontSizeSlider.IsVisible
+            || OpacitySlider.IsVisible)
+        {
+            return;
+        }
+
+        HideTitleBarButtons();
     }
 }
