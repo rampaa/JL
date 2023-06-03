@@ -1159,7 +1159,7 @@
                             <TextBlock HorizontalAlignment="Left" Text="Global hotkeys"
                                        TextWrapping="Wrap"
                                        ToolTip="Enable global hotkeys. This allows hotkeys to be used even when JL doesn't have the focus.
-                                       &#10;Only hotkeys with modifiers (e.g. Ctrl+T), function keys (except for F12) and numpad keys can be used as global hotkeys."
+                                       &#10;Only hotkeys with modifiers (e.g. Alt+T), function keys (except for F12) and numpad keys can be used as global hotkeys."
                                        Cursor="Help"/>
                             <CheckBox x:Name="GlobalHotKeysCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
