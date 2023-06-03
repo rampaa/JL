@@ -349,11 +349,8 @@ internal static class ConfigManager
             ? MainWindowBackgroundOpacityOnUnhover / 100
             : mainWindow.OpacitySlider.Value / 100;
 
-        if (GlobalHotKeys)
-        {
-            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
-            KeyGestureUtils.KeyGestureDict.Clear();
-        }
+        WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+        KeyGestureUtils.KeyGestureDict.Clear();
 
         DisableHotkeysKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(DisableHotkeysKeyGesture), DisableHotkeysKeyGesture);
         MiningModeKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(MiningModeKeyGesture), MiningModeKeyGesture);
