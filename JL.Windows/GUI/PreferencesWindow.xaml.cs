@@ -96,7 +96,11 @@ internal sealed partial class PreferencesWindow : Window
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        WinApi.RegisterAllHotKeys(MainWindow.Instance.WindowHandle);
+        if (ConfigManager.GlobalHotKeys)
+        {
+            WinApi.RegisterAllHotKeys(MainWindow.Instance.WindowHandle);
+        }
+
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
         s_instance = null;

@@ -1263,6 +1263,18 @@ internal sealed partial class PopupWindow : Window
         if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.DisableHotkeysKeyGesture))
         {
             ConfigManager.DisableHotkeys = !ConfigManager.DisableHotkeys;
+
+            if (ConfigManager.GlobalHotKeys)
+            {
+                if (ConfigManager.DisableHotkeys)
+                {
+                    WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
+                }
+                else
+                {
+                    WinApi.RegisterAllHotKeys(MainWindow.Instance.WindowHandle);
+                }
+            }
         }
 
         if (ConfigManager.DisableHotkeys)

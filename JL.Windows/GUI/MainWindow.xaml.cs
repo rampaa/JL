@@ -498,6 +498,18 @@ internal sealed partial class MainWindow : Window
         if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.DisableHotkeysKeyGesture))
         {
             ConfigManager.DisableHotkeys = !ConfigManager.DisableHotkeys;
+
+            if (ConfigManager.GlobalHotKeys)
+            {
+                if (ConfigManager.DisableHotkeys)
+                {
+                    WinApi.UnregisterAllHotKeys(WindowHandle);
+                }
+                else
+                {
+                    WinApi.RegisterAllHotKeys(WindowHandle);
+                }
+            }
         }
 
         if (ConfigManager.DisableHotkeys)

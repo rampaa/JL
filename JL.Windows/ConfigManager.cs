@@ -349,8 +349,11 @@ internal static class ConfigManager
             ? MainWindowBackgroundOpacityOnUnhover / 100
             : mainWindow.OpacitySlider.Value / 100;
 
-        WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
-        KeyGestureUtils.KeyGestureDict.Clear();
+        if (GlobalHotKeys)
+        {
+            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+            KeyGestureUtils.KeyGestureDict.Clear();
+        }
 
         DisableHotkeysKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(DisableHotkeysKeyGesture), DisableHotkeysKeyGesture);
         MiningModeKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(MiningModeKeyGesture), MiningModeKeyGesture);
@@ -404,7 +407,10 @@ internal static class ConfigManager
             KeyGestureUtils.SetKeyGesture(nameof(ToggleMinimizedStateKeyGesture),
                 ToggleMinimizedStateKeyGesture);
 
-        WinApi.RegisterAllHotKeys(mainWindow.WindowHandle);
+        if (GlobalHotKeys)
+        {
+            WinApi.RegisterAllHotKeys(mainWindow.WindowHandle);
+        }
 
         KeyGestureUtils.SetInputGestureText(mainWindow.AddNameMenuItem, ShowAddNameWindowKeyGesture);
         KeyGestureUtils.SetInputGestureText(mainWindow.AddWordMenuItem, ShowAddWordWindowKeyGesture);
@@ -618,7 +624,10 @@ internal static class ConfigManager
 
         MainWindow mainWindow = MainWindow.Instance;
 
-        WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+        if (GlobalHotKeys)
+        {
+            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+        }
 
         preferenceWindow.JLVersionTextBlock.Text = $"v{Utils.JLVersion}";
 
