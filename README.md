@@ -29,7 +29,6 @@ IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries,
 * Anki mining (allows different configurations for word/kanji/name mining)
 * Allows different opacity level on un/hover
 * Pass-through mode (i.e. mouse clicks will pass through JL)
-* Invisible mode (see https://github.com/rampaa/JL/pull/7#issuecomment-1069236589)
 * Recursive lookups (i.e. popup within popup)
 * Remembers last window position
 * Halfwidth -> Fullwidth conversions (and vice-versa)
@@ -48,11 +47,11 @@ JL grabs the text from the clipboard by default. It can also be configured to ca
 
 You need another program to copy the text to the clipboard and/or to a WebSocket (e.g. [Textractor](https://github.com/Artikash/Textractor) for visual novels). 
 ### Why can't I look anything up?
-Make sure you're not in pass-through mode and you did not disable lookups with the "Toggle lookup" hotkey.
+Make sure you're not did not disable lookups with the "Toggle lookup" hotkey and active dictionaries under Manage Dictionaries window.
 ### Why can't I scroll down the results list?
 You need to be in mining mode in order to interact with the popup window. "Left click/Touch" and "Text select" lookup modes will automatically activate the mining mode. If you are using the "Mouse move" lookup mode, you can activate the mining mode with a middle mouse click or with the mining mode hotkey (by default it's the key "M").
 ### How do I disable pass-through mode?
-Press the opacity slider button located top-left of the main window.
+Press the opacity slider button located top-left of the main window. You can also disable it with the same hotkey you've enabled it if you have the global hotkeys enabled and if its hotkey is a valid global hotkey. (Only hotkeys with modifiers (e.g. Alt+T), function keys (except for F12) and numpad keys can be used as global hotkeys.)
 ### How can I use JL with Magpie?
 Enable the "Preferences>General>Always on top" option. This option will make sure that JL is the topmost window on every clipboard change.
 
@@ -62,7 +61,7 @@ Disable the "Preferences>Main Window>Focus on hover" option.
 
 Disable the "Preferences>Popup>Focus on lookup" option.
 
-Optional: Disable the "Preferences>General>Focusable" option. When this option is disabled, JL won't steal the focus away from other windows, even in case of a mouse click. This allows you to open popups within popups without Magpie exiting the fullscreen mode. Note that if this option is disabled, you won't be able to use hotkeys because JL won't have the keyboard focus. You can use the middle mouse button to activate the mining mode.
+Optional if you use the "Mouse move" look up mode, required otherwise: Disable the "Preferences>General>Focusable" option. When this option is disabled, JL won't steal the focus away from other windows, even in case of a mouse click. This allows you to open popups within popups without Magpie exiting the fullscreen mode. Note that if this option is disabled, you won't be able to use hotkeys unless you enable the global hotkeys option and assign valid global hotkeys, because JL won't have the keyboard focus. You can also use the middle mouse button to activate the mining mode.
 
 ### How do I add EPWING dictionaries?
 
@@ -73,6 +72,7 @@ Select the file you got from [Nazeka EPWING Converter](https://github.com/wareya
 
 ### Where are my settings stored?
 * Anki settings: Config/AnkiConfig.json
+* Audio settings: AudioSourceConfig.json
 * Dictionary settings: Config/dicts.json
 * Frequency settings: Config/freqs.json
 * Stats: Config/Stats.json
