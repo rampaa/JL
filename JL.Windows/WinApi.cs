@@ -2,7 +2,6 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using static JL.Windows.WinApi.NativeMethods;
 
@@ -27,7 +26,7 @@ internal sealed class WinApi
         internal const int GWL_EXSTYLE = -20;
         internal const int WS_EX_NOACTIVATE = 0x08000000;
         internal const int WM_HOTKEY = 0x0312;
-        public static readonly IntPtr WVR_VALIDRECTS = new(0x0400);
+        // public static readonly IntPtr WVR_VALIDRECTS = new(0x0400);
         public static readonly IntPtr HWND_TOPMOST = new(-1);
 
         internal enum ResizeDirection
@@ -42,12 +41,12 @@ internal sealed class WinApi
             BottomRight = 61448
         }
 
-        //RECT Structure
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct RECT
-        {
-            public int left, top, right, bottom;
-        }
+        // RECT Structure
+        // [StructLayout(LayoutKind.Sequential)]
+        // internal struct RECT
+        // {
+        //     public int left, top, right, bottom;
+        // }
 
         //NCCALCSIZE_PARAMS Structure
         // [StructLayout(LayoutKind.Sequential)]
@@ -147,7 +146,7 @@ internal sealed class WinApi
 
             if (modifierKeys is ModifierKeys.None)
             {
-                newKeyGesture = new(keyGesture.Key, modifierKeys);
+                newKeyGesture = new KeyGesture(keyGesture.Key, modifierKeys);
             }
 
             KeyGestureUtils.KeyGestureDict.Add(id, newKeyGesture);

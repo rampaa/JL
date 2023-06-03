@@ -1,11 +1,12 @@
 using System.Configuration;
 using System.Text;
-using JL.Windows.GUI;
-using System.Windows.Input;
 using System.Windows.Controls;
+using System.Windows.Input;
+using JL.Windows.GUI;
 
 namespace JL.Windows.Utilities;
-public static class KeyGestureUtils
+
+internal static class KeyGestureUtils
 {
     public static readonly Dictionary<int, KeyGesture> KeyGestureDict = new();
 
@@ -27,7 +28,7 @@ public static class KeyGestureUtils
 
         Key.Multiply, Key.Add, Key.Separator, Key.Subtract, Key.Multiply,
         Key.Decimal, Key.Divide
-          
+
         #pragma warning restore format
     };
 

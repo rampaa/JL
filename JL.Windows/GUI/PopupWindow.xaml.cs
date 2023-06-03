@@ -303,7 +303,7 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    public void UpdatePosition(Point cursorPosition)
+    private void UpdatePosition(Point cursorPosition)
     {
         double mouseX = cursorPosition.X / WindowsUtils.Dpi.DpiScaleX;
         double mouseY = cursorPosition.Y / WindowsUtils.Dpi.DpiScaleY;
@@ -366,7 +366,7 @@ internal sealed partial class PopupWindow : Window
         Top = newTop;
     }
 
-    public void UpdatePosition(double x, double y)
+    private void UpdatePosition(double x, double y)
     {
         Left = x;
         Top = y;
