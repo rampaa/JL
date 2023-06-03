@@ -154,7 +154,7 @@ internal static class ConfigManager
     public static KeyGesture ReconnectToWebSocketServerKeyGesture { get; private set; } = new(Key.F9, ModifierKeys.Windows);
     public static KeyGesture DeleteCurrentLineKeyGesture { get; private set; } = new(Key.Delete, ModifierKeys.Windows);
     public static KeyGesture ShowManageAudioSourcesWindowKeyGesture { get; private set; } = new(Key.Z, ModifierKeys.Windows);
-    public static KeyGesture ToggleMinimizedStateKeyGesture { get; private set; } = new(Key.X, ModifierKeys.Control);
+    public static KeyGesture ToggleMinimizedStateKeyGesture { get; private set; } = new(Key.X, ModifierKeys.Control | ModifierKeys.Alt);
 
     #endregion
 
