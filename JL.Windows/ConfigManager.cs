@@ -618,6 +618,8 @@ internal static class ConfigManager
 
         MainWindow mainWindow = MainWindow.Instance;
 
+        WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+
         preferenceWindow.JLVersionTextBlock.Text = $"v{Utils.JLVersion}";
 
         preferenceWindow.DisableHotkeysKeyGestureTextBox.Text = KeyGestureUtils.KeyGestureToString(DisableHotkeysKeyGesture);

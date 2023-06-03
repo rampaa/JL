@@ -103,10 +103,10 @@ public static class KeyGestureUtils
     {
         if (keyGesture2.Modifiers is ModifierKeys.Windows)
         {
-            return keyGesture2.Key == keyGesture1.Key && Keyboard.Modifiers is 0;
+            return keyGesture2.Key == keyGesture1.Key && keyGesture1.Modifiers is ModifierKeys.None;
         }
 
-        if (keyGesture2.Modifiers is 0)
+        if (keyGesture2.Modifiers is ModifierKeys.None)
         {
             return keyGesture2.Key == keyGesture1.Key;
         }
@@ -118,13 +118,14 @@ public static class KeyGestureUtils
     {
         if (keyGesture.Modifiers is ModifierKeys.Windows)
         {
-            return Keyboard.IsKeyDown(keyGesture.Key) && (Keyboard.Modifiers & ModifierKeys.Windows) is 0;
+            return Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers is ModifierKeys.None;
         }
 
-        if (keyGesture.Modifiers is 0)
+        if (keyGesture.Modifiers is ModifierKeys.None)
         {
             return Keyboard.IsKeyDown(keyGesture.Key);
         }
+
         return Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers == keyGesture.Modifiers;
     }
 
