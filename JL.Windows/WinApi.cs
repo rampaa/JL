@@ -146,7 +146,7 @@ internal sealed class WinApi
 
             if (modifierKeys is ModifierKeys.None)
             {
-                newKeyGesture = new KeyGesture(keyGesture.Key, modifierKeys);
+                newKeyGesture = new KeyGesture(keyGesture.Key, ModifierKeys.None);
             }
 
             KeyGestureUtils.KeyGestureDict.Add(id, newKeyGesture);
