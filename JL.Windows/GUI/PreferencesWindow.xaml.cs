@@ -96,7 +96,7 @@ internal sealed partial class PreferencesWindow : Window
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        if (ConfigManager.GlobalHotKeys)
+        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
         {
             WinApi.RegisterAllHotKeys(MainWindow.Instance.WindowHandle);
         }

@@ -404,7 +404,7 @@ internal static class ConfigManager
             KeyGestureUtils.SetKeyGesture(nameof(ToggleMinimizedStateKeyGesture),
                 ToggleMinimizedStateKeyGesture);
 
-        if (GlobalHotKeys)
+        if (GlobalHotKeys && !DisableHotkeys)
         {
             WinApi.RegisterAllHotKeys(mainWindow.WindowHandle);
         }
@@ -621,7 +621,7 @@ internal static class ConfigManager
 
         MainWindow mainWindow = MainWindow.Instance;
 
-        if (GlobalHotKeys)
+        if (GlobalHotKeys && !DisableHotkeys)
         {
             WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
         }
