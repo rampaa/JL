@@ -39,15 +39,15 @@ public static class KeyGestureUtils
             modifierKeys = ModifierKeys.Windows;
         }
 
-        if (e.Key is Key.LeftCtrl or Key.RightCtrl or Key.LeftAlt or Key.RightAlt or Key.LWin or Key.RWin
+        Key key = e.Key is Key.System
+            ? e.SystemKey
+            : e.Key;
+
+        if (key is Key.LeftCtrl or Key.RightCtrl or Key.LeftAlt or Key.RightAlt or Key.LWin or Key.RWin
             || modifierKeys is ModifierKeys.Shift)
         {
             modifierKeys = ModifierKeys.None;
         }
-
-        Key key = e.Key is Key.System
-            ? e.SystemKey
-            : e.Key;
 
         KeyGesture pressedKeyGesture = new(key, modifierKeys);
 
