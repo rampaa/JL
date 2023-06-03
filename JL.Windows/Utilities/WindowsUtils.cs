@@ -1,14 +1,11 @@
-using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
-using System.Text;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -24,7 +21,6 @@ using JL.Windows.GUI;
 using NAudio.Wave;
 using Application = System.Windows.Application;
 using Button = System.Windows.Controls.Button;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Window = System.Windows.Window;
 
 namespace JL.Windows.Utilities;
@@ -45,92 +41,6 @@ internal static class WindowsUtils
     public static double DpiAwareYOffset { get; set; } = ConfigManager.PopupYOffset / Dpi.DpiScaleY;
     public static double DpiAwareFixedPopupXPosition { get; set; } = ConfigManager.FixedPopupXPosition / Dpi.DpiScaleX;
     public static double DpiAwareFixedPopupYPosition { get; set; } = ConfigManager.FixedPopupYPosition / Dpi.DpiScaleY;
-
-    public static bool CompareKeyGesture(KeyEventArgs e, KeyGesture keyGesture)
-    {
-        if (keyGesture.Modifiers is ModifierKeys.Windows)
-        {
-            return (keyGesture.Key == e.Key || (keyGesture.Key is Key.F10 && e.SystemKey is Key.F10)) && Keyboard.Modifiers is 0;
-        }
-
-        if (keyGesture.Modifiers is 0)
-        {
-            return keyGesture.Key == e.Key;
-        }
-        return keyGesture.Matches(null, e);
-    }
-
-    public static bool CompareKeyGesture(KeyGesture keyGesture)
-    {
-        if (keyGesture.Modifiers is ModifierKeys.Windows)
-        {
-            return Keyboard.IsKeyDown(keyGesture.Key) && (Keyboard.Modifiers & ModifierKeys.Windows) is 0;
-        }
-
-        if (keyGesture.Modifiers is 0)
-        {
-            return Keyboard.IsKeyDown(keyGesture.Key);
-        }
-        return Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers == keyGesture.Modifiers;
-    }
-
-    public static string KeyGestureToString(KeyGesture keyGesture)
-    {
-        StringBuilder keyGestureStringBuilder = new();
-
-        if (keyGesture.Key is Key.LeftShift or Key.RightShift
-            or Key.LeftCtrl or Key.RightCtrl
-            or Key.LeftAlt or Key.RightAlt)
-        {
-            _ = keyGestureStringBuilder.Append(keyGesture.Key.ToString());
-        }
-
-        else
-        {
-            if (keyGesture.Modifiers.HasFlag(ModifierKeys.Control))
-            {
-                _ = keyGestureStringBuilder.Append("Ctrl+");
-            }
-
-            if (keyGesture.Modifiers.HasFlag(ModifierKeys.Alt))
-            {
-                _ = keyGestureStringBuilder.Append("Alt+");
-            }
-
-            if (keyGesture.Modifiers.HasFlag(ModifierKeys.Shift) && keyGestureStringBuilder.Length > 0)
-            {
-                _ = keyGestureStringBuilder.Append("Shift+");
-            }
-
-            if (keyGesture.Key is not Key.None)
-            {
-                _ = keyGestureStringBuilder.Append(keyGesture.Key.ToString());
-            }
-        }
-
-        return keyGestureStringBuilder.ToString();
-    }
-
-    public static KeyGesture SetKeyGesture(string keyGestureName, KeyGesture keyGesture)
-    {
-        string? rawKeyGesture = ConfigurationManager.AppSettings.Get(keyGestureName);
-
-        if (rawKeyGesture is not null)
-        {
-            KeyGestureConverter keyGestureConverter = new();
-
-            return rawKeyGesture.Contains("Ctrl") || rawKeyGesture.Contains("Alt") || rawKeyGesture.Contains("Shift")
-                ? (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture)!
-                : (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture)!;
-        }
-
-        Configuration config =
-            ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-        config.AppSettings.Settings.Add(keyGestureName, KeyGestureToString(keyGesture));
-        config.Save(ConfigurationSaveMode.Modified);
-
-        return keyGesture;
-    }
 
     public static IEnumerable<ComboBoxItem> FindJapaneseFonts()
     {
@@ -434,15 +344,6 @@ internal static class WindowsUtils
             Dpi.PixelsPerDip);
 
         return new Size(formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
-    }
-
-    public static void SetInputGestureText(MenuItem menuItem, KeyGesture keyGesture)
-    {
-        string keyGestureString = KeyGestureToString(keyGesture);
-
-        menuItem.InputGestureText = keyGestureString is not "None"
-            ? keyGestureString
-            : "";
     }
 
     public static void ShowColorPicker(Button button)

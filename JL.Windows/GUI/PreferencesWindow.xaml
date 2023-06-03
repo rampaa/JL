@@ -858,17 +858,7 @@
                             <TextBox x:Name="MousePassThroughModeKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Mouse pass-through mode" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                       VerticalAlignment="Center" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
-                                    Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="InvisibleToggleModeKeyGestureTextBox"
-                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Invisible toggle" TextWrapping="Wrap" HorizontalAlignment="Left"
+                            <TextBlock Text="Toggle mouse pass-through mode" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1078,6 +1068,16 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="ToggleMinimizedStateKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Minimize/Restore the main window" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
                             <TextBox x:Name="DeleteCurrentLineKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -1153,6 +1153,15 @@
                                        &#10;Not recommended unless you feel that lookup is slow."
                                        Cursor="Help"/>
                             <CheckBox x:Name="PrecachingCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel Margin="0,10,0,0">
+                            <TextBlock HorizontalAlignment="Left" Text="Global hotkeys"
+                                       TextWrapping="Wrap"
+                                       ToolTip="Enable global hotkeys. This allows hotkeys to be used even when JL doesn't have the focus.
+                                       &#10;Only hotkeys with modifiers (e.g. Ctrl+T), function keys (except for F12) and numpad keys can be used as global hotkeys."
+                                       Cursor="Help"/>
+                            <CheckBox x:Name="GlobalHotKeysCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>

@@ -86,10 +86,10 @@ internal sealed partial class PopupWindow : Window
 
         WindowsUtils.SetSizeToContentForPopup(ConfigManager.PopupDynamicWidth, ConfigManager.PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxWidth, WindowsUtils.DpiAwarePopupMaxHeight, this);
 
-        WindowsUtils.SetInputGestureText(AddNameMenuItem, ConfigManager.ShowAddNameWindowKeyGesture);
-        WindowsUtils.SetInputGestureText(AddWordMenuItem, ConfigManager.ShowAddWordWindowKeyGesture);
-        WindowsUtils.SetInputGestureText(SearchMenuItem, ConfigManager.SearchWithBrowserKeyGesture);
-        WindowsUtils.SetInputGestureText(StatsMenuItem, ConfigManager.ShowStatsKeyGesture);
+        KeyGestureUtils.SetInputGestureText(AddNameMenuItem, ConfigManager.ShowAddNameWindowKeyGesture);
+        KeyGestureUtils.SetInputGestureText(AddWordMenuItem, ConfigManager.ShowAddWordWindowKeyGesture);
+        KeyGestureUtils.SetInputGestureText(SearchMenuItem, ConfigManager.SearchWithBrowserKeyGesture);
+        KeyGestureUtils.SetInputGestureText(StatsMenuItem, ConfigManager.ShowStatsKeyGesture);
 
         if (ConfigManager.ShowMiningModeReminder)
         {
@@ -123,7 +123,7 @@ internal sealed partial class PopupWindow : Window
     {
         if (ConfigManager.InactiveLookupMode
             || (MiningMode && !ConfigManager.LookupOnLeftClickOnly)
-            || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
+            || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
             || (ConfigManager.FixedPopupPositioning && Owner != MainWindow.Instance)
            )
         {
@@ -1034,7 +1034,7 @@ internal sealed partial class PopupWindow : Window
         if (ConfigManager.LookupOnSelectOnly
             || ConfigManager.LookupOnLeftClickOnly
             || (ConfigManager.RequireLookupKeyPress
-                && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
+                && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
         {
             return;
         }
@@ -1255,7 +1255,12 @@ internal sealed partial class PopupWindow : Window
     {
         e.Handled = true;
 
-        if (WindowsUtils.CompareKeyGesture(e, ConfigManager.DisableHotkeysKeyGesture))
+        await KeyGestureUtils.HandleKeyDown(e).ConfigureAwait(false);
+    }
+
+    public async Task HandleHotKey(KeyGesture keyGesture)
+    {
+        if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.DisableHotkeysKeyGesture))
         {
             ConfigManager.DisableHotkeys = !ConfigManager.DisableHotkeys;
         }
@@ -1265,7 +1270,7 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        if (WindowsUtils.CompareKeyGesture(e, ConfigManager.MiningModeKeyGesture))
+        if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MiningModeKeyGesture))
         {
             if (MiningMode)
             {
@@ -1284,17 +1289,20 @@ internal sealed partial class PopupWindow : Window
                 PopupWindowUtils.SetPopupAutoHideTimer();
             }
         }
-        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.PlayAudioKeyGesture))
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.PlayAudioKeyGesture))
         {
             await PlayAudio().ConfigureAwait(false);
         }
-        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ClosePopupKeyGesture))
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ClosePopupKeyGesture))
         {
             _ = Owner.Focus();
 
             HidePopup();
         }
-        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.KanjiModeKeyGesture))
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.KanjiModeKeyGesture))
         {
             CoreConfig.KanjiMode = !CoreConfig.KanjiMode;
             LastText = "";
@@ -1309,7 +1317,8 @@ internal sealed partial class PopupWindow : Window
                 MainWindow.Instance.MainTextBox_MouseMove(null, null);
             }
         }
-        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowAddNameWindowKeyGesture))
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowAddNameWindowKeyGesture))
         {
             if (DictUtils.DictsReady)
             {
@@ -1317,7 +1326,8 @@ internal sealed partial class PopupWindow : Window
                 PopupAutoHideTimer.Start();
             }
         }
-        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowAddWordWindowKeyGesture))
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowAddWordWindowKeyGesture))
         {
             if (DictUtils.DictsReady)
             {
@@ -1325,24 +1335,29 @@ internal sealed partial class PopupWindow : Window
                 PopupAutoHideTimer.Start();
             }
         }
-        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.SearchWithBrowserKeyGesture))
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SearchWithBrowserKeyGesture))
         {
             WindowsUtils.SearchWithBrowser(_lastSelectedText);
         }
-        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.InactiveLookupModeKeyGesture))
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.InactiveLookupModeKeyGesture))
         {
             ConfigManager.InactiveLookupMode = !ConfigManager.InactiveLookupMode;
         }
-        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.MotivationKeyGesture))
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MotivationKeyGesture))
         {
             await WindowsUtils.Motivate().ConfigureAwait(false);
         }
-        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.ShowStatsKeyGesture))
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowStatsKeyGesture))
         {
             await WindowsUtils.ShowStatsWindow().ConfigureAwait(false);
             PopupAutoHideTimer.Start();
         }
-        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.NextDictKeyGesture))
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.NextDictKeyGesture))
         {
             bool foundSelectedButton = false;
             bool movedToNextDict = false;
@@ -1376,7 +1391,8 @@ internal sealed partial class PopupWindow : Window
                 PopupListBox.Items.Filter = NoAllDictFilter;
             }
         }
-        else if (WindowsUtils.CompareKeyGesture(e, ConfigManager.PreviousDictKeyGesture))
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.PreviousDictKeyGesture))
         {
             bool foundSelectedButton = false;
             bool movedToPreviousDict = false;
@@ -1555,7 +1571,7 @@ internal sealed partial class PopupWindow : Window
         if ((!ConfigManager.LookupOnSelectOnly && !ConfigManager.LookupOnLeftClickOnly)
             || Background.Opacity is 0
             || ConfigManager.InactiveLookupMode
-            || (ConfigManager.RequireLookupKeyPress && !WindowsUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
+            || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
             || (ConfigManager.FixedPopupPositioning && Owner != MainWindow.Instance))
         {
             return;

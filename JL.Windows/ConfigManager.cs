@@ -34,7 +34,6 @@ internal static class ConfigManager
         });
 
     public static bool InactiveLookupMode { get; set; } = false; // todo checkbox?
-    public static bool InvisibleMode { get; set; } = false;
     public static Brush HighlightColor { get; private set; } = Brushes.AliceBlue;
     public static bool RequireLookupKeyPress { get; private set; } = false;
     public static bool LookupOnSelectOnly { get; private set; } = false;
@@ -138,8 +137,7 @@ internal static class ConfigManager
     public static KeyGesture ShowAddNameWindowKeyGesture { get; private set; } = new(Key.N, ModifierKeys.Windows);
     public static KeyGesture ShowAddWordWindowKeyGesture { get; private set; } = new(Key.W, ModifierKeys.Windows);
     public static KeyGesture SearchWithBrowserKeyGesture { get; private set; } = new(Key.S, ModifierKeys.Windows);
-    public static KeyGesture MousePassThroughModeKeyGesture { get; private set; } = new(Key.T, ModifierKeys.Windows);
-    public static KeyGesture InvisibleToggleModeKeyGesture { get; private set; } = new(Key.I, ModifierKeys.Windows);
+    public static KeyGesture MousePassThroughModeKeyGesture { get; private set; } = new(Key.T, ModifierKeys.Control);
     public static KeyGesture SteppedBacklogBackwardsKeyGesture { get; private set; } = new(Key.Left, ModifierKeys.Windows);
     public static KeyGesture SteppedBacklogForwardsKeyGesture { get; private set; } = new(Key.Right, ModifierKeys.Windows);
     public static KeyGesture InactiveLookupModeKeyGesture { get; private set; } = new(Key.Q, ModifierKeys.Windows);
@@ -148,14 +146,15 @@ internal static class ConfigManager
     public static KeyGesture ShowStatsKeyGesture { get; private set; } = new(Key.Y, ModifierKeys.Windows);
     public static KeyGesture NextDictKeyGesture { get; private set; } = new(Key.PageDown, ModifierKeys.Windows);
     public static KeyGesture PreviousDictKeyGesture { get; private set; } = new(Key.PageUp, ModifierKeys.Windows);
-    public static KeyGesture AlwaysOnTopKeyGesture { get; private set; } = new(Key.R, ModifierKeys.Windows);
+    public static KeyGesture AlwaysOnTopKeyGesture { get; private set; } = new(Key.R, ModifierKeys.Control);
     public static KeyGesture TextOnlyVisibleOnHoverKeyGesture { get; private set; } = new(Key.E, ModifierKeys.Windows);
     public static KeyGesture TextBoxIsReadOnlyKeyGesture { get; private set; } = new(Key.U, ModifierKeys.Windows);
-    public static KeyGesture CaptureTextFromClipboardKeyGesture { get; private set; } = new(Key.F12, ModifierKeys.Windows);
+    public static KeyGesture CaptureTextFromClipboardKeyGesture { get; private set; } = new(Key.F10, ModifierKeys.Windows);
     public static KeyGesture CaptureTextFromWebSocketKeyGesture { get; private set; } = new(Key.F11, ModifierKeys.Windows);
     public static KeyGesture ReconnectToWebSocketServerKeyGesture { get; private set; } = new(Key.F9, ModifierKeys.Windows);
     public static KeyGesture DeleteCurrentLineKeyGesture { get; private set; } = new(Key.Delete, ModifierKeys.Windows);
     public static KeyGesture ShowManageAudioSourcesWindowKeyGesture { get; private set; } = new(Key.Z, ModifierKeys.Windows);
+    public static KeyGesture ToggleMinimizedStateKeyGesture { get; private set; } = new(Key.X, ModifierKeys.Control);
 
     #endregion
 
@@ -166,6 +165,7 @@ internal static class ConfigManager
     public static bool Precaching { get; private set; } = false;
     public static string SearchUrl { get; private set; } = "https://www.google.com/search?q={SearchTerm}&hl=ja";
     public static string BrowserPath { get; private set; } = "";
+    public static bool GlobalHotKeys { get; private set; } = false;
 
     #endregion
 
@@ -211,6 +211,7 @@ internal static class ConfigManager
         HighlightLongestMatch = GetValueFromConfig(HighlightLongestMatch, nameof(HighlightLongestMatch), bool.TryParse);
         AutoPlayAudio = GetValueFromConfig(AutoPlayAudio, nameof(AutoPlayAudio), bool.TryParse);
         Precaching = GetValueFromConfig(Precaching, nameof(Precaching), bool.TryParse);
+        GlobalHotKeys = GetValueFromConfig(GlobalHotKeys, nameof(GlobalHotKeys), bool.TryParse);
         CheckForJLUpdatesOnStartUp = GetValueFromConfig(CheckForJLUpdatesOnStartUp, nameof(CheckForJLUpdatesOnStartUp), bool.TryParse);
         AlwaysOnTop = GetValueFromConfig(AlwaysOnTop, nameof(AlwaysOnTop), bool.TryParse);
         mainWindow.Topmost = AlwaysOnTop;
@@ -323,6 +324,7 @@ internal static class ConfigManager
         // MAKE SURE YOU FREEZE ANY NEW COLOR OBJECTS YOU ADD
         // OR THE PROGRAM WILL CRASH AND BURN
         MainWindowTextColor = GetFrozenBrushFromConfig(MainWindowTextColor, nameof(MainWindowTextColor));
+        mainWindow.MainTextBox.Foreground = MainWindowTextColor;
 
         MainWindowBacklogTextColor = GetFrozenBrushFromConfig(MainWindowBacklogTextColor, nameof(MainWindowBacklogTextColor));
         PrimarySpellingColor = GetFrozenBrushFromConfig(PrimarySpellingColor, nameof(PrimarySpellingColor));
@@ -347,64 +349,71 @@ internal static class ConfigManager
             ? MainWindowBackgroundOpacityOnUnhover / 100
             : mainWindow.OpacitySlider.Value / 100;
 
-        DisableHotkeysKeyGesture = WindowsUtils.SetKeyGesture(nameof(DisableHotkeysKeyGesture), DisableHotkeysKeyGesture);
-        MiningModeKeyGesture = WindowsUtils.SetKeyGesture(nameof(MiningModeKeyGesture), MiningModeKeyGesture);
-        PlayAudioKeyGesture = WindowsUtils.SetKeyGesture(nameof(PlayAudioKeyGesture), PlayAudioKeyGesture);
-        KanjiModeKeyGesture = WindowsUtils.SetKeyGesture(nameof(KanjiModeKeyGesture), KanjiModeKeyGesture);
-        LookupKeyKeyGesture = WindowsUtils.SetKeyGesture(nameof(LookupKeyKeyGesture), LookupKeyKeyGesture);
-        ClosePopupKeyGesture = WindowsUtils.SetKeyGesture(nameof(ClosePopupKeyGesture), ClosePopupKeyGesture);
-        ShowStatsKeyGesture = WindowsUtils.SetKeyGesture(nameof(ShowStatsKeyGesture), ShowStatsKeyGesture);
-        NextDictKeyGesture = WindowsUtils.SetKeyGesture(nameof(NextDictKeyGesture), NextDictKeyGesture);
-        PreviousDictKeyGesture = WindowsUtils.SetKeyGesture(nameof(PreviousDictKeyGesture), PreviousDictKeyGesture);
-        AlwaysOnTopKeyGesture = WindowsUtils.SetKeyGesture(nameof(AlwaysOnTopKeyGesture), AlwaysOnTopKeyGesture);
-        TextOnlyVisibleOnHoverKeyGesture = WindowsUtils.SetKeyGesture(nameof(TextOnlyVisibleOnHoverKeyGesture), TextOnlyVisibleOnHoverKeyGesture);
-        TextBoxIsReadOnlyKeyGesture = WindowsUtils.SetKeyGesture(nameof(TextBoxIsReadOnlyKeyGesture), TextBoxIsReadOnlyKeyGesture);
-        CaptureTextFromClipboardKeyGesture = WindowsUtils.SetKeyGesture(nameof(CaptureTextFromClipboardKeyGesture), CaptureTextFromClipboardKeyGesture);
-        CaptureTextFromWebSocketKeyGesture = WindowsUtils.SetKeyGesture(nameof(CaptureTextFromWebSocketKeyGesture), CaptureTextFromWebSocketKeyGesture);
-        ReconnectToWebSocketServerKeyGesture = WindowsUtils.SetKeyGesture(nameof(ReconnectToWebSocketServerKeyGesture), ReconnectToWebSocketServerKeyGesture);
-        DeleteCurrentLineKeyGesture = WindowsUtils.SetKeyGesture(nameof(DeleteCurrentLineKeyGesture), DeleteCurrentLineKeyGesture);
+        WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+        KeyGestureUtils.KeyGestureDict.Clear();
+
+        DisableHotkeysKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(DisableHotkeysKeyGesture), DisableHotkeysKeyGesture);
+        MiningModeKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(MiningModeKeyGesture), MiningModeKeyGesture);
+        PlayAudioKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(PlayAudioKeyGesture), PlayAudioKeyGesture);
+        KanjiModeKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(KanjiModeKeyGesture), KanjiModeKeyGesture);
+        LookupKeyKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(LookupKeyKeyGesture), LookupKeyKeyGesture);
+        ClosePopupKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(ClosePopupKeyGesture), ClosePopupKeyGesture);
+        ShowStatsKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(ShowStatsKeyGesture), ShowStatsKeyGesture);
+        NextDictKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(NextDictKeyGesture), NextDictKeyGesture);
+        PreviousDictKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(PreviousDictKeyGesture), PreviousDictKeyGesture);
+        AlwaysOnTopKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(AlwaysOnTopKeyGesture), AlwaysOnTopKeyGesture);
+        TextOnlyVisibleOnHoverKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(TextOnlyVisibleOnHoverKeyGesture), TextOnlyVisibleOnHoverKeyGesture);
+        TextBoxIsReadOnlyKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(TextBoxIsReadOnlyKeyGesture), TextBoxIsReadOnlyKeyGesture);
+        CaptureTextFromClipboardKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(CaptureTextFromClipboardKeyGesture), CaptureTextFromClipboardKeyGesture);
+        CaptureTextFromWebSocketKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(CaptureTextFromWebSocketKeyGesture), CaptureTextFromWebSocketKeyGesture);
+        ReconnectToWebSocketServerKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(ReconnectToWebSocketServerKeyGesture), ReconnectToWebSocketServerKeyGesture);
+        DeleteCurrentLineKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(DeleteCurrentLineKeyGesture), DeleteCurrentLineKeyGesture);
 
         ShowPreferencesWindowKeyGesture =
-            WindowsUtils.SetKeyGesture(nameof(ShowPreferencesWindowKeyGesture), ShowPreferencesWindowKeyGesture);
+            KeyGestureUtils.SetKeyGesture(nameof(ShowPreferencesWindowKeyGesture), ShowPreferencesWindowKeyGesture);
         ShowAddNameWindowKeyGesture =
-            WindowsUtils.SetKeyGesture(nameof(ShowAddNameWindowKeyGesture), ShowAddNameWindowKeyGesture);
+            KeyGestureUtils.SetKeyGesture(nameof(ShowAddNameWindowKeyGesture), ShowAddNameWindowKeyGesture);
         ShowAddWordWindowKeyGesture =
-            WindowsUtils.SetKeyGesture(nameof(ShowAddWordWindowKeyGesture), ShowAddWordWindowKeyGesture);
+            KeyGestureUtils.SetKeyGesture(nameof(ShowAddWordWindowKeyGesture), ShowAddWordWindowKeyGesture);
         SearchWithBrowserKeyGesture =
-            WindowsUtils.SetKeyGesture(nameof(SearchWithBrowserKeyGesture), SearchWithBrowserKeyGesture);
+            KeyGestureUtils.SetKeyGesture(nameof(SearchWithBrowserKeyGesture), SearchWithBrowserKeyGesture);
         MousePassThroughModeKeyGesture =
-            WindowsUtils.SetKeyGesture(nameof(MousePassThroughModeKeyGesture), MousePassThroughModeKeyGesture);
-        InvisibleToggleModeKeyGesture =
-            WindowsUtils.SetKeyGesture(nameof(InvisibleToggleModeKeyGesture), InvisibleToggleModeKeyGesture);
+            KeyGestureUtils.SetKeyGesture(nameof(MousePassThroughModeKeyGesture), MousePassThroughModeKeyGesture);
         SteppedBacklogBackwardsKeyGesture =
-            WindowsUtils.SetKeyGesture(nameof(SteppedBacklogBackwardsKeyGesture), SteppedBacklogBackwardsKeyGesture);
+            KeyGestureUtils.SetKeyGesture(nameof(SteppedBacklogBackwardsKeyGesture), SteppedBacklogBackwardsKeyGesture);
         SteppedBacklogForwardsKeyGesture =
-            WindowsUtils.SetKeyGesture(nameof(SteppedBacklogForwardsKeyGesture), SteppedBacklogForwardsKeyGesture);
+            KeyGestureUtils.SetKeyGesture(nameof(SteppedBacklogForwardsKeyGesture), SteppedBacklogForwardsKeyGesture);
         InactiveLookupModeKeyGesture =
-            WindowsUtils.SetKeyGesture(nameof(InactiveLookupModeKeyGesture), InactiveLookupModeKeyGesture);
+            KeyGestureUtils.SetKeyGesture(nameof(InactiveLookupModeKeyGesture), InactiveLookupModeKeyGesture);
         MotivationKeyGesture =
-            WindowsUtils.SetKeyGesture(nameof(MotivationKeyGesture), MotivationKeyGesture);
+            KeyGestureUtils.SetKeyGesture(nameof(MotivationKeyGesture), MotivationKeyGesture);
 
         ShowManageDictionariesWindowKeyGesture =
-            WindowsUtils.SetKeyGesture(nameof(ShowManageDictionariesWindowKeyGesture),
+            KeyGestureUtils.SetKeyGesture(nameof(ShowManageDictionariesWindowKeyGesture),
                 ShowManageDictionariesWindowKeyGesture);
 
         ShowManageFrequenciesWindowKeyGesture =
-            WindowsUtils.SetKeyGesture(nameof(ShowManageFrequenciesWindowKeyGesture),
+            KeyGestureUtils.SetKeyGesture(nameof(ShowManageFrequenciesWindowKeyGesture),
                 ShowManageFrequenciesWindowKeyGesture);
 
         ShowManageAudioSourcesWindowKeyGesture =
-            WindowsUtils.SetKeyGesture(nameof(ShowManageAudioSourcesWindowKeyGesture),
+            KeyGestureUtils.SetKeyGesture(nameof(ShowManageAudioSourcesWindowKeyGesture),
                 ShowManageAudioSourcesWindowKeyGesture);
 
-        WindowsUtils.SetInputGestureText(mainWindow.AddNameMenuItem, ShowAddNameWindowKeyGesture);
-        WindowsUtils.SetInputGestureText(mainWindow.AddWordMenuItem, ShowAddWordWindowKeyGesture);
-        WindowsUtils.SetInputGestureText(mainWindow.SearchMenuItem, SearchWithBrowserKeyGesture);
-        WindowsUtils.SetInputGestureText(mainWindow.PreferencesMenuItem, ShowPreferencesWindowKeyGesture);
-        WindowsUtils.SetInputGestureText(mainWindow.ManageDictionariesMenuItem, ShowManageDictionariesWindowKeyGesture);
-        WindowsUtils.SetInputGestureText(mainWindow.ManageFrequenciesMenuItem, ShowManageFrequenciesWindowKeyGesture);
-        WindowsUtils.SetInputGestureText(mainWindow.ManageAudioSourcesMenuItem, ShowManageAudioSourcesWindowKeyGesture);
-        WindowsUtils.SetInputGestureText(mainWindow.StatsMenuItem, ShowStatsKeyGesture);
+        ToggleMinimizedStateKeyGesture =
+            KeyGestureUtils.SetKeyGesture(nameof(ToggleMinimizedStateKeyGesture),
+                ToggleMinimizedStateKeyGesture);
+
+        WinApi.RegisterAllHotKeys(mainWindow.WindowHandle);
+
+        KeyGestureUtils.SetInputGestureText(mainWindow.AddNameMenuItem, ShowAddNameWindowKeyGesture);
+        KeyGestureUtils.SetInputGestureText(mainWindow.AddWordMenuItem, ShowAddWordWindowKeyGesture);
+        KeyGestureUtils.SetInputGestureText(mainWindow.SearchMenuItem, SearchWithBrowserKeyGesture);
+        KeyGestureUtils.SetInputGestureText(mainWindow.PreferencesMenuItem, ShowPreferencesWindowKeyGesture);
+        KeyGestureUtils.SetInputGestureText(mainWindow.ManageDictionariesMenuItem, ShowManageDictionariesWindowKeyGesture);
+        KeyGestureUtils.SetInputGestureText(mainWindow.ManageFrequenciesMenuItem, ShowManageFrequenciesWindowKeyGesture);
+        KeyGestureUtils.SetInputGestureText(mainWindow.ManageAudioSourcesMenuItem, ShowManageAudioSourcesWindowKeyGesture);
+        KeyGestureUtils.SetInputGestureText(mainWindow.StatsMenuItem, ShowStatsKeyGesture);
 
         {
             string? themeStr = ConfigurationManager.AppSettings.Get("Theme");
@@ -594,10 +603,10 @@ internal static class ConfigManager
 
             WindowsUtils.SetSizeToContentForPopup(PopupDynamicWidth, PopupDynamicHeight, WindowsUtils.DpiAwarePopupMaxWidth, WindowsUtils.DpiAwarePopupMaxHeight, currentPopupWindow);
 
-            WindowsUtils.SetInputGestureText(currentPopupWindow.AddNameMenuItem, ShowAddNameWindowKeyGesture);
-            WindowsUtils.SetInputGestureText(currentPopupWindow.AddWordMenuItem, ShowAddWordWindowKeyGesture);
-            WindowsUtils.SetInputGestureText(currentPopupWindow.SearchMenuItem, SearchWithBrowserKeyGesture);
-            WindowsUtils.SetInputGestureText(currentPopupWindow.StatsMenuItem, ShowStatsKeyGesture);
+            KeyGestureUtils.SetInputGestureText(currentPopupWindow.AddNameMenuItem, ShowAddNameWindowKeyGesture);
+            KeyGestureUtils.SetInputGestureText(currentPopupWindow.AddWordMenuItem, ShowAddWordWindowKeyGesture);
+            KeyGestureUtils.SetInputGestureText(currentPopupWindow.SearchMenuItem, SearchWithBrowserKeyGesture);
+            KeyGestureUtils.SetInputGestureText(currentPopupWindow.StatsMenuItem, ShowStatsKeyGesture);
 
             currentPopupWindow = currentPopupWindow.ChildPopupWindow;
         }
@@ -611,60 +620,60 @@ internal static class ConfigManager
 
         preferenceWindow.JLVersionTextBlock.Text = $"v{Utils.JLVersion}";
 
-        preferenceWindow.DisableHotkeysKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(DisableHotkeysKeyGesture);
-        preferenceWindow.MiningModeKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(MiningModeKeyGesture);
-        preferenceWindow.PlayAudioKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(PlayAudioKeyGesture);
-        preferenceWindow.KanjiModeKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(KanjiModeKeyGesture);
-        preferenceWindow.LookupKeyKeyGestureTextBox.Text = WindowsUtils.KeyGestureToString(LookupKeyKeyGesture);
+        preferenceWindow.DisableHotkeysKeyGestureTextBox.Text = KeyGestureUtils.KeyGestureToString(DisableHotkeysKeyGesture);
+        preferenceWindow.MiningModeKeyGestureTextBox.Text = KeyGestureUtils.KeyGestureToString(MiningModeKeyGesture);
+        preferenceWindow.PlayAudioKeyGestureTextBox.Text = KeyGestureUtils.KeyGestureToString(PlayAudioKeyGesture);
+        preferenceWindow.KanjiModeKeyGestureTextBox.Text = KeyGestureUtils.KeyGestureToString(KanjiModeKeyGesture);
+        preferenceWindow.LookupKeyKeyGestureTextBox.Text = KeyGestureUtils.KeyGestureToString(LookupKeyKeyGesture);
 
         preferenceWindow.ShowManageDictionariesWindowKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(ShowManageDictionariesWindowKeyGesture);
+            KeyGestureUtils.KeyGestureToString(ShowManageDictionariesWindowKeyGesture);
         preferenceWindow.ShowManageFrequenciesWindowKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(ShowManageFrequenciesWindowKeyGesture);
+            KeyGestureUtils.KeyGestureToString(ShowManageFrequenciesWindowKeyGesture);
         preferenceWindow.ShowManageAudioSourcesWindowKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(ShowManageAudioSourcesWindowKeyGesture);
+            KeyGestureUtils.KeyGestureToString(ShowManageAudioSourcesWindowKeyGesture);
         preferenceWindow.ShowPreferencesWindowKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(ShowPreferencesWindowKeyGesture);
+            KeyGestureUtils.KeyGestureToString(ShowPreferencesWindowKeyGesture);
         preferenceWindow.ShowAddNameWindowKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(ShowAddNameWindowKeyGesture);
+            KeyGestureUtils.KeyGestureToString(ShowAddNameWindowKeyGesture);
         preferenceWindow.ShowAddWordWindowKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(ShowAddWordWindowKeyGesture);
+            KeyGestureUtils.KeyGestureToString(ShowAddWordWindowKeyGesture);
         preferenceWindow.SearchWithBrowserKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(SearchWithBrowserKeyGesture);
+            KeyGestureUtils.KeyGestureToString(SearchWithBrowserKeyGesture);
         preferenceWindow.MousePassThroughModeKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(MousePassThroughModeKeyGesture);
-        preferenceWindow.InvisibleToggleModeKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(InvisibleToggleModeKeyGesture);
+            KeyGestureUtils.KeyGestureToString(MousePassThroughModeKeyGesture);
         preferenceWindow.SteppedBacklogBackwardsKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(SteppedBacklogBackwardsKeyGesture);
+            KeyGestureUtils.KeyGestureToString(SteppedBacklogBackwardsKeyGesture);
         preferenceWindow.SteppedBacklogForwardsKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(SteppedBacklogForwardsKeyGesture);
+            KeyGestureUtils.KeyGestureToString(SteppedBacklogForwardsKeyGesture);
         preferenceWindow.InactiveLookupModeKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(InactiveLookupModeKeyGesture);
+            KeyGestureUtils.KeyGestureToString(InactiveLookupModeKeyGesture);
         preferenceWindow.MotivationKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(MotivationKeyGesture);
+            KeyGestureUtils.KeyGestureToString(MotivationKeyGesture);
         preferenceWindow.ClosePopupKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(ClosePopupKeyGesture);
+            KeyGestureUtils.KeyGestureToString(ClosePopupKeyGesture);
         preferenceWindow.ShowStatsKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(ShowStatsKeyGesture);
+            KeyGestureUtils.KeyGestureToString(ShowStatsKeyGesture);
         preferenceWindow.NextDictKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(NextDictKeyGesture);
+            KeyGestureUtils.KeyGestureToString(NextDictKeyGesture);
         preferenceWindow.PreviousDictKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(PreviousDictKeyGesture);
+            KeyGestureUtils.KeyGestureToString(PreviousDictKeyGesture);
         preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(AlwaysOnTopKeyGesture);
+            KeyGestureUtils.KeyGestureToString(AlwaysOnTopKeyGesture);
         preferenceWindow.TextOnlyVisibleOnHoverKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(TextOnlyVisibleOnHoverKeyGesture);
+            KeyGestureUtils.KeyGestureToString(TextOnlyVisibleOnHoverKeyGesture);
         preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(TextBoxIsReadOnlyKeyGesture);
+            KeyGestureUtils.KeyGestureToString(TextBoxIsReadOnlyKeyGesture);
         preferenceWindow.CaptureTextFromClipboardKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(CaptureTextFromClipboardKeyGesture);
+            KeyGestureUtils.KeyGestureToString(CaptureTextFromClipboardKeyGesture);
         preferenceWindow.CaptureTextFromWebSocketKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(CaptureTextFromWebSocketKeyGesture);
+            KeyGestureUtils.KeyGestureToString(CaptureTextFromWebSocketKeyGesture);
         preferenceWindow.ReconnectToWebSocketServerKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(ReconnectToWebSocketServerKeyGesture);
+            KeyGestureUtils.KeyGestureToString(ReconnectToWebSocketServerKeyGesture);
         preferenceWindow.DeleteCurrentLineKeyGestureTextBox.Text =
-            WindowsUtils.KeyGestureToString(DeleteCurrentLineKeyGesture);
+            KeyGestureUtils.KeyGestureToString(DeleteCurrentLineKeyGesture);
+        preferenceWindow.ToggleMinimizedStateKeyGestureTextBox.Text =
+            KeyGestureUtils.KeyGestureToString(ToggleMinimizedStateKeyGesture);
 
         WindowsUtils.SetButtonColor(preferenceWindow.HighlightColorButton, HighlightColor);
         WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, mainWindow.Background.CloneCurrentValue());
@@ -694,6 +703,7 @@ internal static class ConfigManager
         preferenceWindow.AutoPlayAudioCheckBox.IsChecked = AutoPlayAudio;
         preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = CheckForJLUpdatesOnStartUp;
         preferenceWindow.PrecachingCheckBox.IsChecked = Precaching;
+        preferenceWindow.GlobalHotKeysCheckBox.IsChecked = GlobalHotKeys;
         preferenceWindow.AlwaysOnTopCheckBox.IsChecked = AlwaysOnTop;
         preferenceWindow.RequireLookupKeyPressCheckBox.IsChecked = RequireLookupKeyPress;
         preferenceWindow.DisableHotkeysCheckBox.IsChecked = DisableHotkeys;
@@ -815,8 +825,6 @@ internal static class ConfigManager
             preferenceWindow.SearchWithBrowserKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(MousePassThroughModeKeyGesture),
             preferenceWindow.MousePassThroughModeKeyGestureTextBox.Text);
-        SaveKeyGesture(nameof(InvisibleToggleModeKeyGesture),
-            preferenceWindow.InvisibleToggleModeKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(SteppedBacklogBackwardsKeyGesture),
             preferenceWindow.SteppedBacklogBackwardsKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(SteppedBacklogForwardsKeyGesture),
@@ -849,6 +857,9 @@ internal static class ConfigManager
             preferenceWindow.ReconnectToWebSocketServerKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(DeleteCurrentLineKeyGesture),
             preferenceWindow.DeleteCurrentLineKeyGestureTextBox.Text);
+
+        SaveKeyGesture(nameof(ToggleMinimizedStateKeyGesture),
+            preferenceWindow.ToggleMinimizedStateKeyGestureTextBox.Text);
 
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
@@ -948,6 +959,9 @@ internal static class ConfigManager
             preferenceWindow.AutoPlayAudioCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(Precaching)].Value =
             preferenceWindow.PrecachingCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings[nameof(GlobalHotKeys)].Value =
+            preferenceWindow.GlobalHotKeysCheckBox.IsChecked.ToString();
+
         config.AppSettings.Settings[nameof(CheckForJLUpdatesOnStartUp)].Value =
             preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked.ToString();
 

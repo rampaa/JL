@@ -1,6 +1,9 @@
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Interop;
+using JL.Core.Utilities;
+using JL.Windows.Utilities;
 using static JL.Windows.WinApi.NativeMethods;
 
 namespace JL.Windows;
@@ -23,7 +26,8 @@ internal sealed class WinApi
         internal const int SWP_SHOWWINDOW = 0x0040;
         internal const int GWL_EXSTYLE = -20;
         internal const int WS_EX_NOACTIVATE = 0x08000000;
-        // public static readonly IntPtr WVR_VALIDRECTS = new(0x0400);
+        internal const int WM_HOTKEY = 0x0312;
+        public static readonly IntPtr WVR_VALIDRECTS = new(0x0400);
         public static readonly IntPtr HWND_TOPMOST = new(-1);
 
         internal enum ResizeDirection
@@ -101,12 +105,18 @@ internal sealed class WinApi
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         internal static extern IntPtr DefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        internal static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+
+        [DllImport("user32.dll")]
+        internal static extern bool UnregisterHotKey(IntPtr hWnd, int id);
     }
 #pragma warning restore IDE1006
 
     public event EventHandler? ClipboardChanged;
 
-    private void SubscribeToWndProc(Window windowSource)
+    public void SubscribeToWndProc(Window windowSource)
     {
         if (PresentationSource.FromVisual(windowSource) is not HwndSource source)
         {
@@ -118,10 +128,46 @@ internal sealed class WinApi
         source.AddHook(WndProc);
     }
 
-    public void SubscribeToClipboardChanged(Window windowSource, IntPtr windowHandle)
+    public static void SubscribeToClipboardChanged(IntPtr windowHandle)
     {
-        SubscribeToWndProc(windowSource);
         _ = AddClipboardFormatListener(windowHandle);
+    }
+
+    public static void AddHotKeyToKeyGestureDict(string hotkeyName, KeyGesture keyGesture)
+    {
+        int id = hotkeyName.GetHashCode();
+
+        ModifierKeys modifierKeys = keyGesture.Modifiers is ModifierKeys.Windows
+            ? ModifierKeys.None
+            : keyGesture.Modifiers;
+
+        if (modifierKeys is not ModifierKeys.None || KeyGestureUtils.ValidKeys.Contains(keyGesture.Key))
+        {
+            KeyGesture newKeyGesture = keyGesture;
+
+            if (modifierKeys is ModifierKeys.None)
+            {
+                newKeyGesture = new(keyGesture.Key, modifierKeys);
+            }
+
+            KeyGestureUtils.KeyGestureDict.Add(id, newKeyGesture);
+        }
+    }
+
+    public static void RegisterAllHotKeys(IntPtr windowHandle)
+    {
+        foreach (KeyValuePair<int, KeyGesture> keyValuePair in KeyGestureUtils.KeyGestureDict)
+        {
+            _ = RegisterHotKey(windowHandle, keyValuePair.Key, (uint)keyValuePair.Value.Modifiers, (uint)KeyInterop.VirtualKeyFromKey(keyValuePair.Value.Key));
+        }
+    }
+
+    public static void UnregisterAllHotKeys(IntPtr windowHandle)
+    {
+        foreach (int id in KeyGestureUtils.KeyGestureDict.Keys)
+        {
+            _ = UnregisterHotKey(windowHandle, id);
+        }
     }
 
     private void OnClipboardChanged()
@@ -181,6 +227,13 @@ internal sealed class WinApi
                 windowPos.flags |= SWP_NOCOPYBITS;
                 Marshal.StructureToPtr(windowPos, lParam, true);
                 handled = true;
+                break;
+
+            case WM_HOTKEY:
+                if (KeyGestureUtils.KeyGestureDict.TryGetValue(wParam.ToInt32(), out KeyGesture? keygesture))
+                {
+                    _ = KeyGestureUtils.HandleHotKey(keygesture).ConfigureAwait(false);
+                }
                 break;
 
             default:
