@@ -1137,6 +1137,11 @@ internal sealed partial class MainWindow : Window
                 {
                     WinApi.UnregisterAllHotKeys(WindowHandle, id);
                 }
+
+                else
+                {
+                    WinApi.UnregisterAllHotKeys(WindowHandle);
+                }
             }
         }
 
