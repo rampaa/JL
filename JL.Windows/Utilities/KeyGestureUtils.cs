@@ -59,21 +59,8 @@ internal static class KeyGestureUtils
     public static async Task HandleHotKey(KeyGesture keyGesture)
     {
         MainWindow mainWindow = MainWindow.Instance;
-
-        if (!mainWindow.IsVisible
-            || ManageDictionariesWindow.IsItVisible()
-            || ManageFrequenciesWindow.IsItVisible()
-            || ManageAudioSourcesWindow.IsItVisible()
-            || AddNameWindow.IsItVisible()
-            || AddWordWindow.IsItVisible()
-            || PreferencesWindow.IsItVisible()
-            || StatsWindow.IsItVisible())
-        {
-            return;
-        }
-
-        PopupWindow? lastPopup = null;
         PopupWindow? currentPopup = mainWindow.FirstPopupWindow;
+        PopupWindow? lastPopup = null;
 
         while (currentPopup is not null)
         {
