@@ -134,7 +134,8 @@ internal sealed class WinApi
 
     public static void AddHotKeyToKeyGestureDict(string hotkeyName, KeyGesture keyGesture)
     {
-        int id = hotkeyName.GetHashCode();
+        int id = KeyGestureUtils.KeyGestureDict.Count;
+        KeyGestureUtils.KeyGestureNameToIntDict.Add(hotkeyName, id);
 
         ModifierKeys modifierKeys = keyGesture.Modifiers is ModifierKeys.Windows
             ? ModifierKeys.None

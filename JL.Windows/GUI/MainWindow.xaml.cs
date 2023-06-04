@@ -1133,7 +1133,10 @@ internal sealed partial class MainWindow : Window
 
             if (ConfigManager.GlobalHotKeys)
             {
-                WinApi.UnregisterAllHotKeys(WindowHandle, nameof(ConfigManager.ToggleMinimizedStateKeyGesture).GetHashCode());
+                if (KeyGestureUtils.KeyGestureNameToIntDict.TryGetValue(nameof(ConfigManager.ToggleMinimizedStateKeyGesture), out int id))
+                {
+                    WinApi.UnregisterAllHotKeys(WindowHandle, id);
+                }
             }
         }
 

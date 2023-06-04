@@ -351,6 +351,7 @@ internal static class ConfigManager
 
         WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
         KeyGestureUtils.KeyGestureDict.Clear();
+        KeyGestureUtils.KeyGestureNameToIntDict.Clear();
 
         DisableHotkeysKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(DisableHotkeysKeyGesture), DisableHotkeysKeyGesture);
         MiningModeKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(MiningModeKeyGesture), MiningModeKeyGesture);
