@@ -92,15 +92,10 @@ internal static class KeyGestureUtils
     {
         if (keyGesture2.Modifiers is ModifierKeys.Windows)
         {
-            return keyGesture2.Key == keyGesture1.Key && keyGesture1.Modifiers is ModifierKeys.None;
+            return keyGesture1.Key == keyGesture2.Key && Keyboard.Modifiers is ModifierKeys.None;
         }
 
-        if (keyGesture2.Modifiers is ModifierKeys.None)
-        {
-            return keyGesture2.Key == keyGesture1.Key;
-        }
-
-        return keyGesture1 == keyGesture2;
+        return keyGesture1.Key == keyGesture2.Key && keyGesture1.Modifiers == keyGesture2.Modifiers;
     }
 
     public static bool CompareKeyGesture(KeyGesture keyGesture)
