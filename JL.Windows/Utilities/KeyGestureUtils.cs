@@ -105,11 +105,6 @@ internal static class KeyGestureUtils
             return Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers is ModifierKeys.None;
         }
 
-        if (keyGesture.Modifiers is ModifierKeys.None)
-        {
-            return Keyboard.IsKeyDown(keyGesture.Key);
-        }
-
         return Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers == keyGesture.Modifiers;
     }
 
