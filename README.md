@@ -47,7 +47,7 @@ JL grabs the text from the clipboard by default. It can also be configured to ca
 
 You need another program to copy the text to the clipboard and/or to a WebSocket (e.g. [Textractor](https://github.com/Artikash/Textractor) for visual novels). 
 ### Why can't I look anything up?
-Make sure you're not did not disable lookups with the "Toggle lookup" hotkey and active dictionaries under Manage Dictionaries window.
+Make sure you're not did not disable lookups with the "Toggle lookup" hotkey. Also make sure that you have active dictionaries under Manage Dictionaries window.
 ### Why can't I scroll down the results list?
 You need to be in mining mode in order to interact with the popup window. "Left click/Touch" and "Text select" lookup modes will automatically activate the mining mode. If you are using the "Mouse move" lookup mode, you can activate the mining mode with a middle mouse click or with the mining mode hotkey (by default it's the key "M").
 ### How do I disable pass-through mode?
