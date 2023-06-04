@@ -135,7 +135,6 @@ internal sealed class WinApi
     public static void AddHotKeyToKeyGestureDict(string hotkeyName, KeyGesture keyGesture)
     {
         int id = KeyGestureUtils.KeyGestureDict.Count;
-        KeyGestureUtils.KeyGestureNameToIntDict.Add(hotkeyName, id);
 
         ModifierKeys modifierKeys = keyGesture.Modifiers is ModifierKeys.Windows
             ? ModifierKeys.None
@@ -151,6 +150,7 @@ internal sealed class WinApi
             }
 
             KeyGestureUtils.KeyGestureDict.Add(id, newKeyGesture);
+            KeyGestureUtils.KeyGestureNameToIntDict.Add(hotkeyName, id);
         }
     }
 

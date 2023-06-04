@@ -98,9 +98,16 @@ internal static class WindowsUtils
         AddNameWindow addNameWindowInstance = AddNameWindow.Instance;
         addNameWindowInstance.SpellingTextBox.Text = selectedText;
         addNameWindowInstance.ReadingTextBox.Text = reading;
-        addNameWindowInstance.Owner = MainWindow.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
+        addNameWindowInstance.Owner = mainWindow;
         addNameWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         StatsUtils.StatsStopWatch.Stop();
+
+        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
+        {
+            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+        }
+
         _ = addNameWindowInstance.ShowDialog();
     }
 
@@ -108,9 +115,16 @@ internal static class WindowsUtils
     {
         AddWordWindow addWordWindowInstance = AddWordWindow.Instance;
         addWordWindowInstance.SpellingsTextBox.Text = selectedText;
-        addWordWindowInstance.Owner = MainWindow.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
+        addWordWindowInstance.Owner = mainWindow;
         addWordWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         StatsUtils.StatsStopWatch.Stop();
+
+        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
+        {
+            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+        }
+
         _ = addWordWindowInstance.ShowDialog();
     }
 
@@ -118,9 +132,16 @@ internal static class WindowsUtils
     {
         PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
         ConfigManager.LoadPreferences(preferencesWindow);
-        preferencesWindow.Owner = MainWindow.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
+        preferencesWindow.Owner = mainWindow;
         preferencesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StatsStopWatch.Stop();
+
+        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
+        {
+            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+        }
+
         _ = preferencesWindow.ShowDialog();
     }
 
@@ -142,9 +163,16 @@ internal static class WindowsUtils
         }
 
         ManageDictionariesWindow manageDictionariesWindow = ManageDictionariesWindow.Instance;
-        manageDictionariesWindow.Owner = MainWindow.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
+        manageDictionariesWindow.Owner = mainWindow;
         manageDictionariesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StatsStopWatch.Stop();
+
+        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
+        {
+            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+        }
+
         _ = manageDictionariesWindow.ShowDialog();
     }
 
@@ -156,9 +184,16 @@ internal static class WindowsUtils
         }
 
         ManageFrequenciesWindow manageFrequenciesWindow = ManageFrequenciesWindow.Instance;
-        manageFrequenciesWindow.Owner = MainWindow.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
+        manageFrequenciesWindow.Owner = mainWindow;
         manageFrequenciesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StatsStopWatch.Stop();
+
+        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
+        {
+            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+        }
+
         _ = manageFrequenciesWindow.ShowDialog();
     }
 
@@ -168,17 +203,31 @@ internal static class WindowsUtils
         StatsUtils.StatsStopWatch.Reset();
 
         StatsWindow statsWindow = StatsWindow.Instance;
-        statsWindow.Owner = MainWindow.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
+        statsWindow.Owner = mainWindow;
         statsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+
+        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
+        {
+            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+        }
+
         _ = statsWindow.ShowDialog();
     }
 
     public static void ShowManageAudioSourcesWindow()
     {
         ManageAudioSourcesWindow manageAudioSourcesWindow = ManageAudioSourcesWindow.Instance;
-        manageAudioSourcesWindow.Owner = MainWindow.Instance;
+        MainWindow mainWindow = MainWindow.Instance;
+        manageAudioSourcesWindow.Owner = mainWindow;
         manageAudioSourcesWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         StatsUtils.StatsStopWatch.Stop();
+
+        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
+        {
+            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+        }
+
         _ = manageAudioSourcesWindow.ShowDialog();
     }
 
@@ -526,6 +575,11 @@ internal static class WindowsUtils
         }
 
         StatsUtils.StatsStopWatch.Start();
+
+        if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
+        {
+            WinApi.RegisterAllHotKeys(MainWindow.Instance.WindowHandle);
+        }
     }
 
     public static void ChangeTheme(SkinType skin)
