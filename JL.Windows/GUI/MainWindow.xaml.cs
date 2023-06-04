@@ -1130,11 +1130,21 @@ internal sealed partial class MainWindow : Window
         if (WindowState is WindowState.Minimized)
         {
             StatsUtils.StatsStopWatch.Stop();
+
+            if (ConfigManager.GlobalHotKeys)
+            {
+                WinApi.UnregisterAllHotKeys(WindowHandle, nameof(ConfigManager.ToggleMinimizedStateKeyGesture).GetHashCode());
+            }
         }
 
         else
         {
             StatsUtils.StatsStopWatch.Start();
+
+            if (ConfigManager.GlobalHotKeys)
+            {
+                WinApi.RegisterAllHotKeys(WindowHandle);
+            }
         }
     }
 
