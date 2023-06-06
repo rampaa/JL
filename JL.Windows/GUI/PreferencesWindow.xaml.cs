@@ -402,14 +402,25 @@ internal sealed partial class PreferencesWindow : Window
             _ = hotkeyTextBuilder.Append(key.ToString());
         }
 
-        ((TextBox)sender).Text = hotkeyTextBuilder.ToString();
+        string hotKeyText = hotkeyTextBuilder.ToString();
+        TextBox currentTextBox = (TextBox)sender;
+        currentTextBox.Text = hotKeyText;
+
+        foreach (DockPanel dockPanel in HotKeysStackPanel.Children.OfType<DockPanel>())
+        {
+            TextBox textBox = dockPanel.Children.OfType<TextBox>().First();
+            if (textBox.Text == hotKeyText && textBox != currentTextBox)
+            {
+                textBox.Text = "None";
+            }
+        }
     }
 
     private void ClearKeyGestureButton_Click(object sender, RoutedEventArgs e)
     {
         var button = (Button)sender;
         var dockPanel = (DockPanel)button.Parent;
-        TextBox textBox = dockPanel.Children.OfType<TextBox>().ToArray()[0];
+        TextBox textBox = dockPanel.Children.OfType<TextBox>().First();
         textBox.Text = "None";
     }
 

@@ -815,7 +815,7 @@
             </TabItem>
             <TabItem Header="Hotkeys">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                    <StackPanel Margin="20,10,20,10">
+                    <StackPanel Margin="20,10,20,10" Name="HotKeysStackPanel">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type DockPanel}">
                                 <Setter Property="Margin" Value="0,10,0,0" />
