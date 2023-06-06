@@ -373,37 +373,44 @@ internal sealed partial class PreferencesWindow : Window
             return;
         }
 
-        StringBuilder hotkeyTextBuilder = new();
+        StringBuilder hotKeyTextBuilder = new();
 
         if (key is Key.LeftShift or Key.RightShift
             or Key.LeftCtrl or Key.RightCtrl
             or Key.LeftAlt or Key.RightAlt)
         {
-            _ = hotkeyTextBuilder.Append(key.ToString());
+            _ = hotKeyTextBuilder.Append(key.ToString());
         }
 
         else
         {
             if ((Keyboard.Modifiers & ModifierKeys.Control) is not 0)
             {
-                _ = hotkeyTextBuilder.Append("Ctrl+");
+                _ = hotKeyTextBuilder.Append("Ctrl+");
             }
 
             if ((Keyboard.Modifiers & ModifierKeys.Alt) is not 0)
             {
-                _ = hotkeyTextBuilder.Append("Alt+");
+                _ = hotKeyTextBuilder.Append("Alt+");
             }
 
-            if ((Keyboard.Modifiers & ModifierKeys.Shift) is not 0 && hotkeyTextBuilder.Length > 0)
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) is not 0 && hotKeyTextBuilder.Length > 0)
             {
-                _ = hotkeyTextBuilder.Append("Shift+");
+                _ = hotKeyTextBuilder.Append("Shift+");
             }
 
-            _ = hotkeyTextBuilder.Append(key.ToString());
+            _ = hotKeyTextBuilder.Append(key.ToString());
         }
 
-        string hotKeyText = hotkeyTextBuilder.ToString();
+        string hotKeyText = hotKeyTextBuilder.ToString();
         TextBox currentTextBox = (TextBox)sender;
+
+        if (LookupKeyKeyGestureTextBox != currentTextBox
+            && LookupKeyKeyGestureTextBox.Text == hotKeyText)
+        {
+            return;
+        }
+
         currentTextBox.Text = hotKeyText;
 
         foreach (DockPanel dockPanel in HotKeysStackPanel.Children.OfType<DockPanel>())

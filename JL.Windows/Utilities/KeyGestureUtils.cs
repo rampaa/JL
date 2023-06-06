@@ -105,7 +105,22 @@ internal static class KeyGestureUtils
             return Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers is ModifierKeys.None;
         }
 
-        return Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers == keyGesture.Modifiers;
+        return Keyboard.IsKeyDown(keyGesture.Key)
+            && (ModifierAsKeyPress(keyGesture.Key)
+                ? keyGesture.Modifiers is ModifierKeys.None
+                : Keyboard.Modifiers == keyGesture.Modifiers);
+    }
+
+    public static bool ModifierAsKeyPress(Key key)
+    {
+        if ((key is Key.LeftCtrl or Key.RightCtrl && Keyboard.Modifiers is ModifierKeys.Control)
+            || (key is Key.LeftAlt or Key.RightAlt && Keyboard.Modifiers is ModifierKeys.Alt)
+            || (key is Key.LeftShift or Key.RightShift && Keyboard.Modifiers is ModifierKeys.Shift))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public static string KeyGestureToString(KeyGesture keyGesture)
@@ -147,7 +162,7 @@ internal static class KeyGestureUtils
             : "None";
     }
 
-    public static KeyGesture SetKeyGesture(string keyGestureName, KeyGesture keyGesture)
+    public static KeyGesture SetKeyGesture(string keyGestureName, KeyGesture keyGesture, bool setAsGlobalHotKey = true)
     {
         string? rawKeyGesture = ConfigurationManager.AppSettings.Get(keyGestureName);
 
@@ -159,7 +174,7 @@ internal static class KeyGestureUtils
                 ? (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture)!
                 : (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture)!;
 
-            if (ConfigManager.GlobalHotKeys)
+            if (ConfigManager.GlobalHotKeys && setAsGlobalHotKey)
             {
                 WinApi.AddHotKeyToKeyGestureDict(keyGestureName, newKeyGesture);
             }
@@ -172,7 +187,7 @@ internal static class KeyGestureUtils
         config.AppSettings.Settings.Add(keyGestureName, KeyGestureToString(keyGesture));
         config.Save(ConfigurationSaveMode.Modified);
 
-        if (ConfigManager.GlobalHotKeys)
+        if (ConfigManager.GlobalHotKeys && setAsGlobalHotKey)
         {
             WinApi.AddHotKeyToKeyGestureDict(keyGestureName, keyGesture);
         }

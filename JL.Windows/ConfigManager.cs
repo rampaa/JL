@@ -357,7 +357,7 @@ internal static class ConfigManager
         MiningModeKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(MiningModeKeyGesture), MiningModeKeyGesture);
         PlayAudioKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(PlayAudioKeyGesture), PlayAudioKeyGesture);
         KanjiModeKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(KanjiModeKeyGesture), KanjiModeKeyGesture);
-        LookupKeyKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(LookupKeyKeyGesture), LookupKeyKeyGesture);
+        LookupKeyKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(LookupKeyKeyGesture), LookupKeyKeyGesture, false);
         ClosePopupKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(ClosePopupKeyGesture), ClosePopupKeyGesture);
         ShowStatsKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(ShowStatsKeyGesture), ShowStatsKeyGesture);
         NextDictKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(NextDictKeyGesture), NextDictKeyGesture);
