@@ -419,7 +419,8 @@ internal sealed partial class MainWindow : Window
 
         if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar
             || FontSizeSlider.IsVisible
-            || OpacitySlider.IsVisible)
+            || OpacitySlider.IsVisible
+            || (Background.Opacity is 0 && !ConfigManager.GlobalHotKeys))
         {
             return;
         }
@@ -538,6 +539,12 @@ internal sealed partial class MainWindow : Window
                 Background.Opacity = 0;
                 FontSizeSlider.Visibility = Visibility.Collapsed;
                 OpacitySlider.Visibility = Visibility.Collapsed;
+
+                if (!ConfigManager.GlobalHotKeys)
+                {
+                    ShowTitleBarButtons();
+                }
+
                 Keyboard.ClearFocus();
             }
 
@@ -723,7 +730,7 @@ internal sealed partial class MainWindow : Window
 
     public void ChangeVisibilityOfTitleBarButtons()
     {
-        if (Background.Opacity is 0)
+        if (Background.Opacity is 0 && !ConfigManager.GlobalHotKeys)
         {
             return;
         }
@@ -1212,7 +1219,8 @@ internal sealed partial class MainWindow : Window
     {
         if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar
             || FontSizeSlider.IsVisible
-            || OpacitySlider.IsVisible)
+            || OpacitySlider.IsVisible
+            || (Background.Opacity is 0 && !ConfigManager.GlobalHotKeys))
         {
             return;
         }
