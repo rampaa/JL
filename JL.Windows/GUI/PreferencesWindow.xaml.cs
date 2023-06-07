@@ -195,14 +195,14 @@ internal sealed partial class PreferencesWindow : Window
 
             else
             {
-                Utils.Frontend.Alert(AlertLevel.Error, "Error getting model names form Anki");
+                Utils.Frontend.Alert(AlertLevel.Error, "Error getting model names from Anki");
                 Utils.Logger.Error("Error getting model names from Anki");
             }
         }
 
         else
         {
-            Utils.Frontend.Alert(AlertLevel.Error, "Error getting deck names form Anki");
+            Utils.Frontend.Alert(AlertLevel.Error, "Error getting deck names from Anki");
             Utils.Logger.Error("Error getting deck names from Anki");
         }
     }
