@@ -111,16 +111,11 @@ internal static class KeyGestureUtils
                 : Keyboard.Modifiers == keyGesture.Modifiers);
     }
 
-    public static bool ModifierAsKeyPress(Key key)
+    private static bool ModifierAsKeyPress(Key key)
     {
-        if ((key is Key.LeftCtrl or Key.RightCtrl && Keyboard.Modifiers is ModifierKeys.Control)
-            || (key is Key.LeftAlt or Key.RightAlt && Keyboard.Modifiers is ModifierKeys.Alt)
-            || (key is Key.LeftShift or Key.RightShift && Keyboard.Modifiers is ModifierKeys.Shift))
-        {
-            return true;
-        }
-
-        return false;
+        return (key is Key.LeftCtrl or Key.RightCtrl && Keyboard.Modifiers is ModifierKeys.Control)
+               || (key is Key.LeftAlt or Key.RightAlt && Keyboard.Modifiers is ModifierKeys.Alt)
+               || (key is Key.LeftShift or Key.RightShift && Keyboard.Modifiers is ModifierKeys.Shift);
     }
 
     public static string KeyGestureToString(KeyGesture keyGesture)
