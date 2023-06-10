@@ -55,7 +55,7 @@ jobs:
           #Sign with self-signed certificate
           pfxCertFilePath=${release_name}/JLCertificate.pfx
           echo "${BASE64_PFX}" | base64 --decode > "${pfxCertFilePath}"
-          pwsh -c '$pwd = ConvertTo-SecureString -String '"${PFX_PASSWORD}"' -Force -AsPlainText;''$pfx = Get-PfxCertificate -FilePath '"$pfxCertFilePath"' -Password $pwd -NoPromptForPassword;''Set-AuthenticodeSignature -FilePath '"$release_name"'/JL.exe -Certificate $pfx -HashAlgorithm SHA256;'
+          pwsh -c '$pwd = ConvertTo-SecureString -String '"${PFX_PASSWORD}"' -Force -AsPlainText;''$pfx = Get-PfxCertificate -FilePath '"$pfxCertFilePath"' -Password $pwd -NoPromptForPassword;''Set-AuthenticodeSignature -FilePath '"$release_name"'/JL.exe -Certificate $pfx;'
           rm "${pfxCertFilePath}"
           
           # Pack files
