@@ -48,7 +48,6 @@ internal sealed partial class MainWindow : Window
         s_instance = this;
         ConfigHelper.Instance.SetLang("en");
         FirstPopupWindow = new PopupWindow();
-        _ = MainTextBox.Focus();
     }
 
     protected override async void OnSourceInitialized(EventArgs e)
@@ -73,6 +72,9 @@ internal sealed partial class MainWindow : Window
 
         ConfigManager.ApplyPreferences();
 
+        WinApi.RestoreWindow(WindowHandle);
+        _ = Focus();
+
         if (ConfigManager.CaptureTextFromClipboard)
         {
             CopyFromClipboard();
@@ -82,20 +84,6 @@ internal sealed partial class MainWindow : Window
         FirstPopupWindow.Owner = this;
 
         await WindowsUtils.InitializeMainWindow().ConfigureAwait(false);
-    }
-
-    protected override void OnActivated(EventArgs e)
-    {
-        base.OnActivated(e);
-
-        if (ConfigManager.Focusable)
-        {
-            WinApi.AllowActivation(WindowHandle);
-        }
-        else
-        {
-            WinApi.PreventActivation(WindowHandle);
-        }
     }
 
     private async void CopyFromClipboard()
@@ -401,13 +389,6 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    private void MinimizeButton_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-    {
-        OpacitySlider.Visibility = Visibility.Collapsed;
-        FontSizeSlider.Visibility = Visibility.Collapsed;
-        WindowState = WindowState.Minimized;
-    }
-
     private void Button_MouseEnter(object sender, MouseEventArgs e)
     {
         ((TextBlock)sender).Foreground = Brushes.SteelBlue;
@@ -426,11 +407,6 @@ internal sealed partial class MainWindow : Window
         }
 
         HideTitleBarButtons();
-    }
-
-    private void CloseButton_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-    {
-        Close();
     }
 
     private void OpacityButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -705,9 +681,29 @@ internal sealed partial class MainWindow : Window
         {
             if (!FirstPopupWindow.IsVisible)
             {
-                WindowState = WindowState is WindowState.Minimized
-                    ? WindowState.Normal
-                    : WindowState.Minimized;
+                if (ConfigManager.Focusable)
+                {
+                    WindowState = WindowState is WindowState.Minimized
+                        ? WindowState.Normal
+                        : WindowState.Minimized;
+                }
+
+                else
+                {
+                    // If another window is not set as active window
+                    // Main Window gets activated on restore
+                    WinApi.ChangeActiveWindow(FirstPopupWindow.WindowHandle);
+
+                    if (WindowState is WindowState.Minimized)
+                    {
+                        WinApi.RestoreWindow(WindowHandle);
+                    }
+
+                    else
+                    {
+                        WinApi.MinimizeWindow(WindowHandle);
+                    }
+                }
             }
         }
     }
@@ -769,7 +765,15 @@ internal sealed partial class MainWindow : Window
     {
         OpacitySlider.Visibility = Visibility.Collapsed;
         FontSizeSlider.Visibility = Visibility.Collapsed;
-        WindowState = WindowState.Minimized;
+
+        if (ConfigManager.Focusable)
+        {
+            WindowState = WindowState.Minimized;
+        }
+        else
+        {
+            WinApi.MinimizeWindow(WindowHandle);
+        }
     }
 
     private void AddName(object sender, RoutedEventArgs e)

@@ -218,7 +218,17 @@ internal static class ConfigManager
 
         RequireLookupKeyPress = GetValueFromConfig(RequireLookupKeyPress, nameof(RequireLookupKeyPress), bool.TryParse);
         DisableHotkeys = GetValueFromConfig(DisableHotkeys, nameof(DisableHotkeys), bool.TryParse);
+
         Focusable = GetValueFromConfig(Focusable, nameof(Focusable), bool.TryParse);
+        if (Focusable)
+        {
+            WinApi.AllowActivation(mainWindow.WindowHandle);
+        }
+        else
+        {
+            WinApi.PreventActivation(mainWindow.WindowHandle);
+        }
+
         AnkiIntegration = GetValueFromConfig(AnkiIntegration, nameof(AnkiIntegration), bool.TryParse);
         CoreConfig.KanjiMode = GetValueFromConfig(CoreConfig.KanjiMode, nameof(CoreConfig.KanjiMode), bool.TryParse);
         CoreConfig.ForceSyncAnki = GetValueFromConfig(CoreConfig.ForceSyncAnki, nameof(CoreConfig.ForceSyncAnki), bool.TryParse);

@@ -34,7 +34,7 @@ internal sealed partial class PopupWindow : Window
 
     private string? _lastSelectedText;
 
-    private IntPtr _windowHandle;
+    public IntPtr WindowHandle { get; private set; }
 
     private List<LookupResult> _lastLookupResults = new();
 
@@ -62,7 +62,7 @@ internal sealed partial class PopupWindow : Window
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
-        _windowHandle = new WindowInteropHelper(this).Handle;
+        WindowHandle = new WindowInteropHelper(this).Handle;
     }
     protected override void OnActivated(EventArgs e)
     {
@@ -70,11 +70,11 @@ internal sealed partial class PopupWindow : Window
 
         if (ConfigManager.Focusable)
         {
-            WinApi.AllowActivation(_windowHandle);
+            WinApi.AllowActivation(WindowHandle);
         }
         else
         {
-            WinApi.PreventActivation(_windowHandle);
+            WinApi.PreventActivation(WindowHandle);
         }
     }
 
@@ -228,7 +228,7 @@ internal sealed partial class PopupWindow : Window
 
                 _ = Focus();
 
-                WinApi.BringToFront(_windowHandle);
+                WinApi.BringToFront(WindowHandle);
 
                 if (ConfigManager.AutoPlayAudio)
                 {
@@ -290,7 +290,7 @@ internal sealed partial class PopupWindow : Window
 
             _ = Focus();
 
-            WinApi.BringToFront(_windowHandle);
+            WinApi.BringToFront(WindowHandle);
 
             if (ConfigManager.AutoPlayAudio)
             {
@@ -1651,7 +1651,7 @@ internal sealed partial class PopupWindow : Window
     public static void PopupWindow_PreviewMouseDown(PopupWindow popupWindow)
     {
         popupWindow.EnableMiningMode();
-        WinApi.BringToFront(popupWindow._windowHandle);
+        WinApi.BringToFront(popupWindow.WindowHandle);
         popupWindow.DisplayResults(true);
 
         if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)

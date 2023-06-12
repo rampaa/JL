@@ -14,17 +14,20 @@ internal sealed class WinApi
     internal static class NativeMethods
     {
         internal const int WM_WINDOWPOSCHANGING = 0x0046;
-        internal const int SWP_NOCOPYBITS = 0x0100;
         internal const int WM_CLIPBOARDUPDATE = 0x031D;
         internal const int WM_ERASEBKGND = 0x0014;
         internal const int WM_SYSCOMMAND = 0x0112;
         // internal const int WM_NCCALCSIZE = 0x0083;
         // internal const int WM_NCHITTEST = 0x0084;
+        internal const int SWP_NOCOPYBITS = 0x0100;
         internal const int SWP_NOSIZE = 0x0001;
         internal const int SWP_NOMOVE = 0x0002;
+        internal const int SWP_NOACTIVATE = 0x0010;
         internal const int SWP_SHOWWINDOW = 0x0040;
         internal const int GWL_EXSTYLE = -20;
         internal const int WS_EX_NOACTIVATE = 0x08000000;
+        internal const int SW_SHOWNOACTIVATE = 4;
+        internal const int SW_SHOWMINNOACTIVE = 7;
         internal const int WM_HOTKEY = 0x0312;
         // public static readonly IntPtr WVR_VALIDRECTS = new(0x0400);
         public static readonly IntPtr HWND_TOPMOST = new(-1);
@@ -110,6 +113,12 @@ internal sealed class WinApi
 
         [DllImport("user32.dll")]
         internal static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+
+        [DllImport("user32.dll")]
+        internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr SetActiveWindow(IntPtr handle);
     }
 #pragma warning restore IDE1006
 
@@ -208,7 +217,17 @@ internal sealed class WinApi
 
     public static void BringToFront(IntPtr windowHandle)
     {
-        _ = SetWindowPos(windowHandle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+        _ = SetWindowPos(windowHandle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW | SWP_NOACTIVATE);
+    }
+
+    public static void MinimizeWindow(IntPtr windowHandle)
+    {
+        _ = ShowWindow(windowHandle, SW_SHOWMINNOACTIVE);
+    }
+
+    public static void RestoreWindow(IntPtr windowHandle)
+    {
+        _ = ShowWindow(windowHandle, SW_SHOWNOACTIVATE);
     }
 
     public static void PreventActivation(IntPtr windowHandle)
@@ -219,6 +238,11 @@ internal sealed class WinApi
     public static void AllowActivation(IntPtr windowHandle)
     {
         _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, IntPtr.Zero);
+    }
+
+    public static void ChangeActiveWindow(IntPtr handle)
+    {
+        _ = SetActiveWindow(handle);
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
