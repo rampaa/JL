@@ -53,10 +53,10 @@ internal static class KeyGestureUtils
 
         KeyGesture pressedKeyGesture = new(key, modifierKeys);
 
-        await HandleHotKey(pressedKeyGesture).ConfigureAwait(false);
+        await HandleHotKey(pressedKeyGesture, e).ConfigureAwait(false);
     }
 
-    public static async Task HandleHotKey(KeyGesture keyGesture)
+    public static async Task HandleHotKey(KeyGesture keyGesture, KeyEventArgs? e = null)
     {
         MainWindow mainWindow = MainWindow.Instance;
         PopupWindow? currentPopup = mainWindow.FirstPopupWindow;
@@ -84,7 +84,7 @@ internal static class KeyGestureUtils
 
         else
         {
-            await mainWindow.HandleHotKey(keyGesture).ConfigureAwait(false);
+            await mainWindow.HandleHotKey(keyGesture, e).ConfigureAwait(false);
         }
     }
 

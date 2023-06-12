@@ -470,7 +470,7 @@ internal sealed partial class MainWindow : Window
         await KeyGestureUtils.HandleKeyDown(e).ConfigureAwait(false);
     }
 
-    public async Task HandleHotKey(KeyGesture keyGesture)
+    public async Task HandleHotKey(KeyGesture keyGesture, KeyEventArgs? e)
     {
         if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.DisableHotkeysKeyGesture))
         {
@@ -492,6 +492,11 @@ internal sealed partial class MainWindow : Window
         if (ConfigManager.DisableHotkeys)
         {
             return;
+        }
+
+        if (e is not null)
+        {
+            e.Handled = true;
         }
 
         if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SteppedBacklogBackwardsKeyGesture))
