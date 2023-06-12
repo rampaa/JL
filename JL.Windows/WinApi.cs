@@ -118,7 +118,7 @@ internal sealed class WinApi
         internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
         [DllImport("user32.dll")]
-        public static extern IntPtr SetActiveWindow(IntPtr handle);
+        public static extern IntPtr SetActiveWindow(IntPtr hWnd);
     }
 #pragma warning restore IDE1006
 
@@ -240,9 +240,9 @@ internal sealed class WinApi
         _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, IntPtr.Zero);
     }
 
-    public static void ChangeActiveWindow(IntPtr handle)
+    public static void ChangeActiveWindow(IntPtr windowHandle)
     {
-        _ = SetActiveWindow(handle);
+        _ = SetActiveWindow(windowHandle);
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
