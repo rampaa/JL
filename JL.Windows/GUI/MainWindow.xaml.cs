@@ -478,6 +478,11 @@ internal sealed partial class MainWindow : Window
     {
         if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.DisableHotkeysKeyGesture))
         {
+            if (e is not null)
+            {
+                e.Handled = true;
+            }
+
             ConfigManager.DisableHotkeys = !ConfigManager.DisableHotkeys;
 
             if (ConfigManager.GlobalHotKeys)
@@ -498,28 +503,33 @@ internal sealed partial class MainWindow : Window
             return;
         }
 
-        if (e is not null)
-        {
-            e.Handled = true;
-        }
+        bool handled = false;
 
         if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SteppedBacklogBackwardsKeyGesture))
         {
+            handled = true;
+
             ShowPreviousBacklogItem();
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SteppedBacklogForwardsKeyGesture))
         {
+            handled = true;
+
             ShowNextBacklogItem();
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowPreferencesWindowKeyGesture))
         {
+            handled = true;
+
             WindowsUtils.ShowPreferencesWindow();
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MousePassThroughModeKeyGesture))
         {
+            handled = true;
+
             if (Background.Opacity is not 0)
             {
                 Background.Opacity = 0;
@@ -543,6 +553,8 @@ internal sealed partial class MainWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.KanjiModeKeyGesture))
         {
+            handled = true;
+
             CoreConfig.KanjiMode = !CoreConfig.KanjiMode;
             FirstPopupWindow.LastText = "";
             Utils.Frontend.InvalidateDisplayCache();
@@ -551,6 +563,8 @@ internal sealed partial class MainWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowAddNameWindowKeyGesture))
         {
+            handled = true;
+
             if (DictUtils.DictsReady)
             {
                 WindowsUtils.ShowAddNameWindow(MainTextBox.SelectedText);
@@ -559,6 +573,8 @@ internal sealed partial class MainWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowAddWordWindowKeyGesture))
         {
+            handled = true;
+
             if (DictUtils.DictsReady)
             {
                 WindowsUtils.ShowAddWordWindow(MainTextBox.SelectedText);
@@ -567,6 +583,8 @@ internal sealed partial class MainWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowManageDictionariesWindowKeyGesture))
         {
+            handled = true;
+
             if (DictUtils.DictsReady
                 && !DictUtils.UpdatingJmdict
                 && !DictUtils.UpdatingJmnedict
@@ -578,6 +596,8 @@ internal sealed partial class MainWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowManageFrequenciesWindowKeyGesture))
         {
+            handled = true;
+
             if (FreqUtils.FreqsReady)
             {
                 WindowsUtils.ShowManageFrequenciesWindow();
@@ -586,37 +606,51 @@ internal sealed partial class MainWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SearchWithBrowserKeyGesture))
         {
+            handled = true;
+
             WindowsUtils.SearchWithBrowser(MainTextBox.SelectedText);
             WindowsUtils.UpdateMainWindowVisibility();
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.InactiveLookupModeKeyGesture))
         {
+            handled = true;
+
             ConfigManager.InactiveLookupMode = !ConfigManager.InactiveLookupMode;
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MotivationKeyGesture))
         {
+            handled = true;
+
             await WindowsUtils.Motivate().ConfigureAwait(false);
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ClosePopupKeyGesture))
         {
+            handled = true;
+
             FirstPopupWindow.HidePopup();
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowStatsKeyGesture))
         {
+            handled = true;
+
             await WindowsUtils.ShowStatsWindow().ConfigureAwait(false);
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowManageAudioSourcesWindowKeyGesture))
         {
+            handled = true;
+
             WindowsUtils.ShowManageAudioSourcesWindow();
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.AlwaysOnTopKeyGesture))
         {
+            handled = true;
+
             ConfigManager.AlwaysOnTop = !ConfigManager.AlwaysOnTop;
 
             Topmost = ConfigManager.AlwaysOnTop;
@@ -624,6 +658,8 @@ internal sealed partial class MainWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.TextOnlyVisibleOnHoverKeyGesture))
         {
+            handled = true;
+
             ConfigManager.TextOnlyVisibleOnHover = !ConfigManager.TextOnlyVisibleOnHover;
 
             if (ConfigManager.TextOnlyVisibleOnHover && Background.Opacity is not 0)
@@ -639,6 +675,8 @@ internal sealed partial class MainWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.CaptureTextFromClipboardKeyGesture))
         {
+            handled = true;
+
             ConfigManager.CaptureTextFromClipboard = !ConfigManager.CaptureTextFromClipboard;
             if (!CoreConfig.CaptureTextFromWebSocket && !ConfigManager.CaptureTextFromClipboard)
             {
@@ -654,6 +692,8 @@ internal sealed partial class MainWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.CaptureTextFromWebSocketKeyGesture))
         {
+            handled = true;
+
             CoreConfig.CaptureTextFromWebSocket = !CoreConfig.CaptureTextFromWebSocket;
             WebSocketUtils.HandleWebSocket();
 
@@ -671,12 +711,16 @@ internal sealed partial class MainWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ReconnectToWebSocketServerKeyGesture))
         {
+            handled = true;
+
             CoreConfig.CaptureTextFromWebSocket = true;
             WebSocketUtils.HandleWebSocket();
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.TextBoxIsReadOnlyKeyGesture))
         {
+            handled = true;
+
             ConfigManager.TextBoxIsReadOnly = !ConfigManager.TextBoxIsReadOnly;
             MainTextBox.IsReadOnly = ConfigManager.TextBoxIsReadOnly;
             MainTextBox.IsUndoEnabled = !ConfigManager.TextBoxIsReadOnly;
@@ -684,11 +728,15 @@ internal sealed partial class MainWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.DeleteCurrentLineKeyGesture))
         {
+            handled = true;
+
             await DeleteCurrentLine().ConfigureAwait(false);
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ToggleMinimizedStateKeyGesture))
         {
+            handled = true;
+
             if (!FirstPopupWindow.IsVisible)
             {
                 if (ConfigManager.Focusable)
@@ -715,6 +763,11 @@ internal sealed partial class MainWindow : Window
                     }
                 }
             }
+        }
+
+        if (handled && e is not null)
+        {
+            e.Handled = true;
         }
     }
 
