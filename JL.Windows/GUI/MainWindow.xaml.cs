@@ -83,6 +83,10 @@ internal sealed partial class MainWindow : Window
 
         FirstPopupWindow.Owner = this;
 
+        // Can't use ActivateWindow for FirstPopupWindow if it's not shown at least once
+        FirstPopupWindow.Show();
+        FirstPopupWindow.Hide();
+
         await WindowsUtils.InitializeMainWindow().ConfigureAwait(false);
     }
 
@@ -503,6 +507,7 @@ internal sealed partial class MainWindow : Window
         {
             ShowPreviousBacklogItem();
         }
+
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SteppedBacklogForwardsKeyGesture))
         {
             ShowNextBacklogItem();
@@ -695,12 +700,12 @@ internal sealed partial class MainWindow : Window
 
                 else
                 {
-                    // If another window is not set as active window
-                    // Main Window gets activated on restore
-                    WinApi.ChangeActiveWindow(FirstPopupWindow.WindowHandle);
-
                     if (WindowState is WindowState.Minimized)
                     {
+                        // If another window is not set as active window
+                        // Main Window gets activated on restore
+                        WinApi.ActivateWindow(FirstPopupWindow.WindowHandle);
+
                         WinApi.RestoreWindow(WindowHandle);
                     }
 

@@ -240,7 +240,7 @@ internal sealed class WinApi
         _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, IntPtr.Zero);
     }
 
-    public static void ChangeActiveWindow(IntPtr windowHandle)
+    public static void ActivateWindow(IntPtr windowHandle)
     {
         _ = SetActiveWindow(windowHandle);
     }
