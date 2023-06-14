@@ -149,7 +149,7 @@ internal static class EpwingUtils
                             break;
                         }
 
-                        else if (epwingRecord.Reading == previousResult.Reading)
+                        if (epwingRecord.Reading == previousResult.Reading)
                         {
                             return false;
                         }
