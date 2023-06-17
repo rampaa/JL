@@ -206,8 +206,14 @@ public static class AudioUtils
 
                 if (deserializedAudioSources is not null)
                 {
-                    foreach (KeyValuePair<string, AudioSource> audioSource in deserializedAudioSources)
+                    IOrderedEnumerable<KeyValuePair<string, AudioSource>> audioSources = deserializedAudioSources.OrderBy(static d => d.Value.Priority);
+                    int priority = 1;
+
+                    foreach (KeyValuePair<string, AudioSource> audioSource in audioSources)
                     {
+                        audioSource.Value.Priority = priority;
+                        ++priority;
+
                         AudioSources.Add(audioSource.Key, audioSource.Value);
                     }
                 }

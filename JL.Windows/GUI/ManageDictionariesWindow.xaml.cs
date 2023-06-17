@@ -275,7 +275,7 @@ internal sealed partial class ManageDictionariesWindow : Window
             };
             buttonDecreasePriority.Click += (_, _) =>
             {
-                UnPrioritizeDict(dict);
+                DeprioritizeDict(dict);
                 UpdateDictionariesDisplay();
             };
             buttonRemove.Click += (_, _) =>
@@ -291,7 +291,7 @@ internal sealed partial class ManageDictionariesWindow : Window
                     {
                         if (d.Priority > priorityOfDeletedDict)
                         {
-                            dict.Priority -= 1;
+                            d.Priority -= 1;
                         }
                     }
 
@@ -355,7 +355,7 @@ internal sealed partial class ManageDictionariesWindow : Window
         dict.Priority -= 1;
     }
 
-    private static void UnPrioritizeDict(Dict dict)
+    private static void DeprioritizeDict(Dict dict)
     {
         if (dict.Priority == DictUtils.Dicts.Count)
         {

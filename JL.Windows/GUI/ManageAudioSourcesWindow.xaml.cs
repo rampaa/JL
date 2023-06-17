@@ -164,7 +164,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
 
             buttonDecreasePriority.Click += (_, _) =>
             {
-                UnPrioritizeAudioSource(audioSource);
+                DeprioritizeAudioSource(audioSource);
                 UpdateAudioSourcesDisplay();
             };
 
@@ -180,7 +180,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
                     {
                         if (a.Priority > priorityOfDeletedAudioSource)
                         {
-                            audioSource.Priority -= 1;
+                            a.Priority -= 1;
                         }
                     }
 
@@ -223,7 +223,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
         audioSource.Priority -= 1;
     }
 
-    private static void UnPrioritizeAudioSource(AudioSource audioSource)
+    private static void DeprioritizeAudioSource(AudioSource audioSource)
     {
         if (audioSource.Priority == AudioUtils.AudioSources.Count)
         {

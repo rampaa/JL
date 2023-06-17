@@ -183,7 +183,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
 
             buttonDecreasePriority.Click += (_, _) =>
             {
-                UnPrioritizeFreq(freq);
+                DeprioritizeFreq(freq);
                 UpdateFreqsDisplay();
             };
 
@@ -200,7 +200,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
                     {
                         if (f.Priority > priorityOfDeletedFreq)
                         {
-                            freq.Priority -= 1;
+                            f.Priority -= 1;
                         }
                     }
 
@@ -262,7 +262,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
         freq.Priority -= 1;
     }
 
-    private static void UnPrioritizeFreq(Freq freq)
+    private static void DeprioritizeFreq(Freq freq)
     {
         if (freq.Priority == FreqUtils.FreqDicts.Count)
         {
@@ -272,7 +272,6 @@ internal sealed partial class ManageFrequenciesWindow : Window
         FreqUtils.FreqDicts.First(f => f.Value.Priority == freq.Priority + 1).Value.Priority -= 1;
         freq.Priority += 1;
     }
-
 
     private void ButtonAddFrequency_OnClick(object sender, RoutedEventArgs e)
     {
