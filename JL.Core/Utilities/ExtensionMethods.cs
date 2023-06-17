@@ -24,9 +24,9 @@ public static class ExtensionMethods
         return null;
     }
 
-    public static T GetEnum<T>(this string description) where T : Enum
+    public static T GetEnum<T>(this string description) where T : struct, Enum
     {
-        foreach (T enumItem in Enum.GetValues(typeof(T)))
+        foreach (T enumItem in Enum.GetValues<T>())
         {
             if (enumItem.GetDescription() == description)
             {
