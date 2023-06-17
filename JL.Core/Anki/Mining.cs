@@ -1,3 +1,4 @@
+using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Network;
 using JL.Core.Utilities;
@@ -76,16 +77,16 @@ public static class Mining
 
         List<string> audioFields = FindFields(JLField.Audio, userFields);
         bool needsAudio = audioFields.Count > 0;
-        byte[]? audioBytes = needsAudio
-            ? await Audio.AudioUtils.GetPrioritizedAudio(primarySpelling, reading).ConfigureAwait(false)
+        AudioResponse? audioResponse = needsAudio
+            ? await AudioUtils.GetPrioritizedAudio(primarySpelling, reading).ConfigureAwait(false)
             : null;
 
-        Dictionary<string, object>? audio = audioBytes is null
+        Dictionary<string, object>? audio = audioResponse is null
             ? null
             : new Dictionary<string, object>
                 {
-                    { "data", audioBytes },
-                    { "filename", $"JL_audio_{reading}_{primarySpelling}.mp3" },
+                    { "data", audioResponse.AudioData },
+                    { "filename", $"JL_audio_{reading}_{primarySpelling}.{audioResponse.AudioFormat}" },
                     { "skipHash", Networking.Jpod101NoAudioMd5Hash },
                     { "fields", audioFields }
                 };
@@ -120,7 +121,7 @@ public static class Mining
             return false;
         }
 
-        if (needsAudio && (audioBytes is null || Utils.GetMd5String(audioBytes) is Networking.Jpod101NoAudioMd5Hash))
+        if (needsAudio && (audioResponse is null || Utils.GetMd5String(audioResponse.AudioData) is Networking.Jpod101NoAudioMd5Hash))
         {
             Utils.Frontend.Alert(AlertLevel.Warning, $"Mined {primarySpelling} (no audio)");
             Utils.Logger.Information("Mined {FoundSpelling} (no audio)", primarySpelling);

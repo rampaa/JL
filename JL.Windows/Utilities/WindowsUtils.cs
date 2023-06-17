@@ -18,6 +18,7 @@ using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
+using NAudio.Vorbis;
 using NAudio.Wave;
 using Application = System.Windows.Application;
 using Button = System.Windows.Controls.Button;
@@ -300,17 +301,20 @@ internal static class WindowsUtils
         }
     }
 
-    public static void PlayAudio(byte[] audio, float volume)
+    public static void PlayAudio(byte[] audio, string audioFormat, float volume)
     {
         _ = Application.Current.Dispatcher.BeginInvoke(() =>
         {
             try
             {
                 s_audioPlayer?.Dispose();
-
                 s_audioPlayer = new WaveOut { Volume = volume };
 
-                s_audioPlayer.Init(new Mp3FileReader(new MemoryStream(audio)));
+                IWaveProvider waveProvider = audioFormat is "ogg" or "oga"
+                    ? new VorbisWaveReader(new MemoryStream(audio))
+                    : new StreamMediaFoundationReader(new MemoryStream(audio));
+
+                s_audioPlayer.Init(waveProvider);
                 s_audioPlayer.Play();
             }
             catch (Exception ex)
@@ -338,8 +342,8 @@ internal static class WindowsUtils
             }
 
             string randomFilePath = filePaths[rand.Next(numFiles)];
-            byte[] randomFile = await File.ReadAllBytesAsync(randomFilePath).ConfigureAwait(false);
-            PlayAudio(randomFile, 1);
+            byte[] audioData = await File.ReadAllBytesAsync(randomFilePath).ConfigureAwait(false);
+            PlayAudio(audioData, "mp3", 1);
             await Stats.IncrementStat(StatType.Imoutos).ConfigureAwait(false);
         }
         catch (Exception ex)

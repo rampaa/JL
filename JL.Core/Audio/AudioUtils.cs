@@ -21,7 +21,17 @@ public static class AudioUtils
         }
     };
 
-    private static async Task<byte[]?> GetAudioFromUrl(Uri url)
+    private static readonly Dictionary<string, string> s_mediaTypeToExtentionDict = new()
+    {
+        { "mpeg", "mp3" },
+        { "3gpp", "3gp" },
+        { "3gpp2", "3g2" },
+        { "vorbis", "ogg" },
+        { "vorbis-config", "ogg" },
+        { "x-midi", "midi" }
+    };
+
+    private static async Task<AudioResponse?> GetAudioFromUrl(Uri url)
     {
         try
         {
@@ -29,11 +39,18 @@ public static class AudioUtils
 
             if (response.IsSuccessStatusCode)
             {
-                byte[] audioBytes = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+                string audioFormat = response.Content.Headers.ContentType?.MediaType?.Split('/').LastOrDefault("mp3") ?? "mp3";
 
-                return Utils.GetMd5String(audioBytes) is Networking.Jpod101NoAudioMd5Hash
+                if (s_mediaTypeToExtentionDict.TryGetValue(audioFormat, out string? fileSuffix))
+                {
+                    audioFormat = fileSuffix;
+                }
+
+                byte[] audioData = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+
+                return Utils.GetMd5String(audioData) is Networking.Jpod101NoAudioMd5Hash
                     ? null
-                    : audioBytes;
+                    : new AudioResponse(audioFormat, audioData);
             }
 
             Utils.Logger.Information("Error getting audio from {Url}", url.OriginalString);
@@ -46,7 +63,7 @@ public static class AudioUtils
         }
     }
 
-    private static async Task<byte[]?> GetAudioFromJsonReturningUrl(Uri url)
+    private static async Task<AudioResponse?> GetAudioFromJsonReturningUrl(Uri url)
     {
         try
         {
@@ -68,11 +85,11 @@ public static class AudioUtils
                                 urlStr = urlStr.Replace("://localhost", "://127.0.0.1");
                                 if (Uri.TryCreate(urlStr, UriKind.Absolute, out Uri? resultUrl))
                                 {
-                                    byte[]? audioBytes = await GetAudioFromUrl(resultUrl).ConfigureAwait(false);
+                                    AudioResponse? audioResponse = await GetAudioFromUrl(resultUrl).ConfigureAwait(false);
 
-                                    if (audioBytes is not null)
+                                    if (audioResponse is not null)
                                     {
-                                        return audioBytes;
+                                        return audioResponse;
                                     }
                                 }
                             }
@@ -91,20 +108,22 @@ public static class AudioUtils
         }
     }
 
-    private static async Task<byte[]?> GetAudioFromPath(Uri uri)
+    private static async Task<AudioResponse?> GetAudioFromPath(Uri uri)
     {
         if (File.Exists(uri.LocalPath))
         {
-            return await File.ReadAllBytesAsync(uri.LocalPath).ConfigureAwait(false);
+            string audioFormat = Path.GetExtension(uri.LocalPath)[1..];
+            byte[] audioData = await File.ReadAllBytesAsync(uri.LocalPath).ConfigureAwait(false);
+            return new AudioResponse(audioFormat, audioData);
         }
 
         Utils.Logger.Information("Error getting audio from {LocalPath}", uri.LocalPath);
         return null;
     }
 
-    internal static async Task<byte[]?> GetPrioritizedAudio(string foundSpelling, string reading)
+    internal static async Task<AudioResponse?> GetPrioritizedAudio(string foundSpelling, string reading)
     {
-        byte[]? audioBytes = null;
+        AudioResponse? audioResponse = null;
 
         IOrderedEnumerable<KeyValuePair<string, AudioSource>> orderedAudioSources = AudioSources.OrderBy(static a => a.Value.Priority);
         foreach ((string uri, AudioSource audioSource) in orderedAudioSources)
@@ -118,22 +137,22 @@ public static class AudioUtils
 
                 Uri normalizedUri = new(stringBuilder.ToString());
 
-                audioBytes = audioSource.Type switch
+                audioResponse = audioSource.Type switch
                 {
                     AudioSourceType.Url => await GetAudioFromUrl(normalizedUri).ConfigureAwait(false),
                     AudioSourceType.UrlJson => await GetAudioFromJsonReturningUrl(normalizedUri).ConfigureAwait(false),
                     AudioSourceType.LocalPath => await GetAudioFromPath(normalizedUri).ConfigureAwait(false),
-                    _ => audioBytes
+                    _ => audioResponse
                 };
 
-                if (audioBytes is not null)
+                if (audioResponse is not null)
                 {
                     break;
                 }
             }
         }
 
-        return audioBytes;
+        return audioResponse;
     }
 
     public static async Task GetAndPlayAudio(string foundSpelling, string? reading)
@@ -143,10 +162,10 @@ public static class AudioUtils
             reading = foundSpelling;
         }
 
-        byte[]? sound = await GetPrioritizedAudio(foundSpelling, reading).ConfigureAwait(false);
-        if (sound is not null)
+        AudioResponse? audioResponse = await GetPrioritizedAudio(foundSpelling, reading).ConfigureAwait(false);
+        if (audioResponse is not null)
         {
-            Utils.Frontend.PlayAudio(sound, CoreConfig.AudioVolume / 100f);
+            Utils.Frontend.PlayAudio(audioResponse.AudioData, audioResponse.AudioFormat, CoreConfig.AudioVolume / 100f);
             await Stats.IncrementStat(StatType.TimesPlayedAudio).ConfigureAwait(false);
         }
     }

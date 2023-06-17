@@ -4,7 +4,7 @@ namespace JL.Core;
 
 internal sealed class DummyFrontend : IFrontend
 {
-    public void PlayAudio(byte[] audio, float volume)
+    public void PlayAudio(byte[] audio, string audioFormat, float volume)
     {
     }
 

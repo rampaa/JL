@@ -4,7 +4,7 @@ namespace JL.Core;
 
 public interface IFrontend
 {
-    public void PlayAudio(byte[] audio, float volume);
+    public void PlayAudio(byte[] audio, string audioFormat, float volume);
 
     public void Alert(AlertLevel alertLevel, string message);
 
