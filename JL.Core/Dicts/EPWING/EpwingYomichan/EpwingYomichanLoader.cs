@@ -13,7 +13,7 @@ internal static class EpwingYomichanLoader
         }
 
         string[] jsonFiles = Directory.EnumerateFiles(dict.Path, "*_bank_*.json", SearchOption.TopDirectoryOnly)
-            .Where(static s => s.Contains("term") || s.Contains("kanji"))
+            .Where(static s => s.Contains("term", StringComparison.Ordinal) || s.Contains("kanji", StringComparison.Ordinal))
             .ToArray();
 
         foreach (string jsonFile in jsonFiles)

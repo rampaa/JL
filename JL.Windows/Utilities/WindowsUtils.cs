@@ -243,14 +243,14 @@ internal static class WindowsUtils
         if (selectedText?.Length > 0)
         {
             _ = Process.Start(new ProcessStartInfo("cmd",
-                $"/c start \"\" {browserPath} \"{ConfigManager.SearchUrl.Replace("{SearchTerm}", System.Web.HttpUtility.UrlEncode(selectedText))}\"")
+                $"/c start \"\" {browserPath} \"{ConfigManager.SearchUrl.Replace("{SearchTerm}", System.Web.HttpUtility.UrlEncode(selectedText), StringComparison.Ordinal)}\"")
             { CreateNoWindow = true });
         }
     }
 
     public static async Task UpdateJL(Uri latestReleaseUrl)
     {
-        HttpRequestMessage downloadRequest = new(HttpMethod.Get, latestReleaseUrl);
+        using HttpRequestMessage downloadRequest = new(HttpMethod.Get, latestReleaseUrl);
         HttpResponseMessage downloadResponse = await Networking.Client.SendAsync(downloadRequest).ConfigureAwait(false);
 
         if (downloadResponse.IsSuccessStatusCode)
@@ -325,6 +325,7 @@ internal static class WindowsUtils
         });
     }
 
+#pragma warning disable CA5394
     public static async Task Motivate()
     {
         try
@@ -352,6 +353,7 @@ internal static class WindowsUtils
             Utils.Frontend.Alert(AlertLevel.Error, "Error motivating");
         }
     }
+#pragma warning restore CA5394
 
     public static Brush? BrushFromHex(string hexColorString)
     {

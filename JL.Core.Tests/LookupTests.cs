@@ -68,7 +68,7 @@ public class LookupTests
         const string text = "始まる";
 
         // Act
-        List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+        List<LookupResult>? result = LookupUtils.LookupText(text);
 
         // Assert
         StringAssert.AreEqualIgnoringCase(JsonSerializer.Serialize(expected), JsonSerializer.Serialize(result));
@@ -83,7 +83,7 @@ public class LookupTests
         const string text = "た";
 
         // Act
-        List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+        List<LookupResult>? result = LookupUtils.LookupText(text);
         int actual = result is not null
             ? result.First(static x => x.PrimarySpelling is "他").Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
@@ -101,7 +101,7 @@ public class LookupTests
         const string text = "た";
 
         // Act
-        List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+        List<LookupResult>? result = LookupUtils.LookupText(text);
         int actual = result is not null
             ? result.First(static x => x.PrimarySpelling is "多").Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
@@ -119,7 +119,7 @@ public class LookupTests
         const string text = "た";
 
         // Act
-        List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+        List<LookupResult>? result = LookupUtils.LookupText(text);
         int actual = result is not null
             ? result.First(static x => x.PrimarySpelling is "田").Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
@@ -137,7 +137,7 @@ public class LookupTests
         const string text = "日";
 
         // Act
-        List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+        List<LookupResult>? result = LookupUtils.LookupText(text);
         int actual = result is not null
             ? result.First(static x => x.Readings?.Contains("ひ") ?? false).Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
@@ -155,7 +155,7 @@ public class LookupTests
         const string text = "日";
 
         // Act
-        List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+        List<LookupResult>? result = LookupUtils.LookupText(text);
         int actual = result is not null
             ? result.First(static x => x.Readings?.Contains("にち") ?? false).Frequencies?.First().Freq ?? int.MaxValue
             : int.MaxValue;
@@ -173,7 +173,7 @@ public class LookupTests
         const string text = "日";
 
         // Act
-        List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+        List<LookupResult>? result = LookupUtils.LookupText(text);
 
         int actual = result is not null
             ? result.First(static x => x.Readings?.Contains("か") ?? false).Frequencies?.First().Freq ?? int.MaxValue
@@ -192,7 +192,7 @@ public class LookupTests
         const string text = "あんまり";
 
         // Act
-        List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+        List<LookupResult>? result = LookupUtils.LookupText(text);
 
         int actual = result is not null
             ? result.First(static x => x.PrimarySpelling is "余り").Frequencies?.First().Freq ?? int.MaxValue
@@ -211,7 +211,7 @@ public class LookupTests
         const string text = "懐かしい";
 
         // Act
-        List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+        List<LookupResult>? result = LookupUtils.LookupText(text);
 
         int actual = result is not null
             ? result.First(static x => x.Readings?.Contains("なつかしい") ?? false).Frequencies?.First().Freq ?? int.MaxValue
@@ -230,7 +230,7 @@ public class LookupTests
         const string text = "廃虚";
 
         // Act
-        List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+        List<LookupResult>? result = LookupUtils.LookupText(text);
 
         int actual = result is not null
             ? result.First(static x => x.Readings?.Contains("はいきょ") ?? false).Frequencies?.First().Freq ?? int.MaxValue
@@ -249,7 +249,7 @@ public class LookupTests
         const string text = "廃墟";
 
         // Act
-        List<LookupResult>? result = Lookup.Lookup.LookupText(text);
+        List<LookupResult>? result = LookupUtils.LookupText(text);
 
         int actual = result is not null
             ? result.First(static x => x.Readings?.Contains("はいきょ") ?? false).Frequencies?.First().Freq ?? int.MaxValue

@@ -181,13 +181,13 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
         {
             int hash = 17;
 
-            hash = (hash * 37) + PrimarySpelling.GetHashCode();
+            hash = (hash * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
 
             if (AlternativeSpellings is not null)
             {
                 foreach (string spelling in AlternativeSpellings)
                 {
-                    hash = (hash * 37) + spelling.GetHashCode();
+                    hash = (hash * 37) + spelling.GetHashCode(StringComparison.Ordinal);
                 }
             }
             else
@@ -200,7 +200,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
             {
                 foreach (string readings in Readings)
                 {
-                    hash = (hash * 37) + readings.GetHashCode();
+                    hash = (hash * 37) + readings.GetHashCode(StringComparison.Ordinal);
                 }
             }
 
@@ -211,12 +211,12 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
 
             foreach (string definition in Definitions)
             {
-                hash = (hash * 37) + definition.GetHashCode();
+                hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
             }
 
             foreach (string wordClass in WordClasses)
             {
-                hash = (hash * 37) + wordClass.GetHashCode();
+                hash = (hash * 37) + wordClass.GetHashCode(StringComparison.Ordinal);
             }
 
             return hash;

@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace JL.Core.Dicts.CustomNameDict;
 
 internal sealed class CustomNameRecord : IDictRecord
@@ -17,7 +15,7 @@ internal sealed class CustomNameRecord : IDictRecord
 
     public string BuildFormattedDefinition()
     {
-        return $"({NameType.ToLower(CultureInfo.InvariantCulture)}) {Reading}";
+        return $"({NameType.ToLowerInvariant()}) {Reading}";
     }
 
     public override bool Equals(object? obj)

@@ -14,7 +14,7 @@ internal static class JmnedictLoader
             // The downside of using XmlTextReader is that it does not support async methods
             // And we cannot set some settings (e.g. MaxCharactersFromEntities)
 
-            using (XmlReader xmlTextReader = new XmlTextReader(dict.Path)
+            using (XmlTextReader xmlTextReader = new(dict.Path)
             {
                 DtdProcessing = DtdProcessing.Parse,
                 WhitespaceHandling = WhitespaceHandling.None,
@@ -49,7 +49,7 @@ internal static class JmnedictLoader
         }
     }
 
-    private static JmnedictEntry ReadEntry(XmlReader xmlReader)
+    private static JmnedictEntry ReadEntry(XmlTextReader xmlReader)
     {
         JmnedictEntry entry = new();
         while (!xmlReader.EOF)
@@ -94,19 +94,19 @@ internal static class JmnedictLoader
         return entry;
     }
 
-    private static string ReadKEle(XmlReader xmlReader)
+    private static string ReadKEle(XmlTextReader xmlReader)
     {
         _ = xmlReader.ReadToFollowing("keb");
         return xmlReader.ReadElementContentAsString();
     }
 
-    private static string ReadREle(XmlReader xmlReader)
+    private static string ReadREle(XmlTextReader xmlReader)
     {
         _ = xmlReader.ReadToFollowing("reb");
         return xmlReader.ReadElementContentAsString();
     }
 
-    private static Translation ReadTrans(XmlReader xmlReader)
+    private static Translation ReadTrans(XmlTextReader xmlReader)
     {
         Translation translation = new();
         while (!xmlReader.EOF)
@@ -147,7 +147,7 @@ internal static class JmnedictLoader
         return translation;
     }
 
-    private static string ReadEntity(XmlReader xmlReader)
+    private static string ReadEntity(XmlTextReader xmlReader)
     {
         _ = xmlReader.Read();
 

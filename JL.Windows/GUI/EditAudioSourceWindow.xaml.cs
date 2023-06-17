@@ -52,7 +52,7 @@ internal sealed partial class EditAudioSourceWindow : Window
             type = typeString.GetEnum<AudioSourceType>();
         }
 
-        string uri = TextBlockUri.Text.Replace("://localhost", "://127.0.0.1");
+        string uri = TextBlockUri.Text.Replace("://localhost", "://127.0.0.1", StringComparison.Ordinal);
 
         if (type is AudioSourceType.LocalPath)
         {
@@ -77,7 +77,7 @@ internal sealed partial class EditAudioSourceWindow : Window
         }
 
         else if (string.IsNullOrEmpty(uri)
-            || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "").Replace("{Reading}", ""), UriKind.Absolute)
+            || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "", StringComparison.Ordinal).Replace("{Reading}", "", StringComparison.Ordinal), UriKind.Absolute)
             || (_uri != uri && AudioUtils.AudioSources.ContainsKey(uri)))
         {
             TextBlockUri.BorderBrush = Brushes.Red;

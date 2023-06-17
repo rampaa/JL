@@ -246,7 +246,7 @@ internal sealed partial class MainWindow : Window
 
             if (!PopupWindow.StackPanelCache.Contains(text))
             {
-                List<LookupResult>? lookupResults = Lookup.LookupText(text);
+                List<LookupResult>? lookupResults = LookupUtils.LookupText(text);
                 if (lookupResults is { Count: > 0 })
                 {
                     int resultCount = Math.Min(lookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);

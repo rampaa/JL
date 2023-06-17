@@ -168,12 +168,12 @@ internal static class Deconjugator
 
     private static Form? SubstitutionInner(Form myForm, Rule myRule)
     {
-        if (!myForm.Text.Contains(myRule.ConEnd.First()))
+        if (!myForm.Text.Contains(myRule.ConEnd.First(), StringComparison.Ordinal))
         {
             return null;
         }
 
-        string newText = myForm.Text.Replace(myRule.ConEnd.First(), myRule.DecEnd.First());
+        string newText = myForm.Text.Replace(myRule.ConEnd.First(), myRule.DecEnd.First(), StringComparison.Ordinal);
 
         Form newForm = new(
             newText,

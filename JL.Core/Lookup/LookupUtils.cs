@@ -17,7 +17,7 @@ using JL.Core.WordClass;
 
 namespace JL.Core.Lookup;
 
-public static class Lookup
+public static class LookupUtils
 {
     private static DateTime s_lastLookupTime;
 
@@ -497,7 +497,7 @@ public static class Lookup
             (bool tryLongVowelConversion, succAttempt) = GetWordResultsHelper(dict, results,
                 deconjugationResultsList[i], textList[i], textInHiraganaList[i], succAttempt);
 
-            if (tryLongVowelConversion && textInHiraganaList[i].Contains('ー') &&
+            if (tryLongVowelConversion && textInHiraganaList[i].Contains('ー', StringComparison.Ordinal) &&
                 textInHiraganaList[i][0] is not 'ー')
             {
                 List<string> textWithoutLongVowelMarkList = JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i]);
@@ -545,7 +545,7 @@ public static class Lookup
         return kanjiResults;
     }
 
-    private static IEnumerable<LookupResult> BuildJmdictResult(
+    private static ConcurrentQueue<LookupResult> BuildJmdictResult(
         Dictionary<string, IntermediaryResult> jmdictResults)
     {
         ConcurrentQueue<LookupResult> results = new();
@@ -615,7 +615,7 @@ public static class Lookup
         return results;
     }
 
-    private static IEnumerable<LookupResult> BuildJmnedictResult(
+    private static ConcurrentQueue<LookupResult> BuildJmnedictResult(
         Dictionary<string, IntermediaryResult> jmnedictResults)
     {
         ConcurrentQueue<LookupResult> results = new();
@@ -651,7 +651,7 @@ public static class Lookup
         return results;
     }
 
-    private static IEnumerable<LookupResult> BuildKanjidicResult(
+    private static List<LookupResult> BuildKanjidicResult(
         Dictionary<string, IntermediaryResult> kanjiResults)
     {
         List<LookupResult> results = new();
@@ -706,7 +706,7 @@ public static class Lookup
         return results;
     }
 
-    private static IEnumerable<LookupResult> BuildYomichanKanjiResult(
+    private static ConcurrentQueue<LookupResult> BuildYomichanKanjiResult(
         Dictionary<string, IntermediaryResult> kanjiResults)
     {
         ConcurrentQueue<LookupResult> results = new();
@@ -756,7 +756,7 @@ public static class Lookup
         return results;
     }
 
-    private static IEnumerable<LookupResult> BuildEpwingYomichanResult(
+    private static ConcurrentQueue<LookupResult> BuildEpwingYomichanResult(
         Dictionary<string, IntermediaryResult> epwingResults)
     {
         ConcurrentQueue<LookupResult> results = new();
@@ -793,7 +793,7 @@ public static class Lookup
         return results;
     }
 
-    private static IEnumerable<LookupResult> BuildEpwingNazekaResult(
+    private static ConcurrentQueue<LookupResult> BuildEpwingNazekaResult(
         Dictionary<string, IntermediaryResult> epwingNazekaResults)
     {
         ConcurrentQueue<LookupResult> results = new();
@@ -832,7 +832,7 @@ public static class Lookup
         return results;
     }
 
-    private static IEnumerable<LookupResult> BuildCustomWordResult(
+    private static ConcurrentQueue<LookupResult> BuildCustomWordResult(
         Dictionary<string, IntermediaryResult> customWordResults)
     {
         ConcurrentQueue<LookupResult> results = new();
@@ -879,7 +879,7 @@ public static class Lookup
         return results;
     }
 
-    private static IEnumerable<LookupResult> BuildCustomNameResult(
+    private static ConcurrentQueue<LookupResult> BuildCustomNameResult(
         Dictionary<string, IntermediaryResult> customNameResults)
     {
         ConcurrentQueue<LookupResult> results = new();
@@ -967,7 +967,7 @@ public static class Lookup
 
     private static string? ProcessProcess(IReadOnlyList<List<string>>? processList)
     {
-        StringBuilder deconj = new();
+        StringBuilder deconjugation = new();
         bool first = true;
 
         int processListListCount = processList?.Count ?? 0;
@@ -1004,15 +1004,15 @@ public static class Lookup
             if (formText.Length is not 0)
             {
                 _ = first
-                    ? deconj.Append('～')
-                    : deconj.Append("; ");
+                    ? deconjugation.Append('～')
+                    : deconjugation.Append("; ");
 
-                _ = deconj.Append(formText);
+                _ = deconjugation.Append(formText);
             }
 
             first = false;
         }
 
-        return deconj.Length is 0 ? null : deconj.ToString();
+        return deconjugation.Length is 0 ? null : deconjugation.ToString();
     }
 }

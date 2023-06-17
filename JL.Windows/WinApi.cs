@@ -267,9 +267,9 @@ internal sealed class WinApi
                 break;
 
             case WM_HOTKEY:
-                if (KeyGestureUtils.KeyGestureDict.TryGetValue(wParam.ToInt32(), out KeyGesture? keygesture))
+                if (KeyGestureUtils.KeyGestureDict.TryGetValue(wParam.ToInt32(), out KeyGesture? keyGesture))
                 {
-                    _ = KeyGestureUtils.HandleHotKey(keygesture).ConfigureAwait(false);
+                    _ = KeyGestureUtils.HandleHotKey(keyGesture).ConfigureAwait(false);
                 }
                 break;
 

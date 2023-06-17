@@ -80,7 +80,7 @@ internal static class EpwingUtils
                 }
                 if (epwingRecord.Definitions is not null)
                 {
-                    epwingRecord.Definitions = epwingRecord.Definitions.Select(static def => def.Replace("┏", "")).ToList();
+                    epwingRecord.Definitions = epwingRecord.Definitions.Select(static def => def.Replace("┏", "", StringComparison.Ordinal)).ToList();
                 }
                 break;
 
@@ -88,7 +88,7 @@ internal static class EpwingUtils
                 if (epwingRecord.Definitions is not null)
                 {
                     // English definitions
-                    if (epwingRecord.Definitions.Any(static def => def.Contains("→英和") || def.Contains("\\u003")))
+                    if (epwingRecord.Definitions.Any(static def => def.Contains("→英和", StringComparison.Ordinal) || def.Contains("\\u003", StringComparison.Ordinal)))
                     {
                         return false;
                     }
@@ -109,7 +109,7 @@ internal static class EpwingUtils
                 }
 
                 // Kanji definitions
-                if (epwingRecord.Definitions?.Any(static def => def.Contains("［音］")) ?? false)
+                if (epwingRecord.Definitions?.Any(static def => def.Contains("［音］", StringComparison.Ordinal)) ?? false)
                 {
                     return false;
                 }

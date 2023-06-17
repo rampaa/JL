@@ -13,7 +13,7 @@ public static class Networking
     {
         try
         {
-            HttpRequestMessage gitHubApiRequest = new(HttpMethod.Get, s_gitHubApiUrlForLatestJLRelease);
+            using HttpRequestMessage gitHubApiRequest = new(HttpMethod.Get, s_gitHubApiUrlForLatestJLRelease);
             gitHubApiRequest.Headers.Add("User-Agent", "JL");
 
             HttpResponseMessage gitHubApiResponse = await Client.SendAsync(gitHubApiRequest).ConfigureAwait(false);
@@ -41,7 +41,7 @@ public static class Networking
                             string latestReleaseUrl = asset.GetProperty("browser_download_url").ToString();
 
                             // Add OS check?
-                            if (latestReleaseUrl.Contains(architecture))
+                            if (latestReleaseUrl.Contains(architecture, StringComparison.Ordinal))
                             {
                                 foundRelease = true;
 

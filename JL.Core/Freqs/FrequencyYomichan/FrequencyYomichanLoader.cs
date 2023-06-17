@@ -15,13 +15,13 @@ internal static class FrequencyYomichanLoader
         Dictionary<string, List<FrequencyRecord>> freqDict = freq.Contents;
 
         string[] jsonFiles = Directory.EnumerateFiles(freq.Path, "*_bank_*.json", SearchOption.TopDirectoryOnly)
-            .Where(static s => s.Contains("term") || s.Contains("kanji"))
+            .Where(static s => s.Contains("term", StringComparison.Ordinal) || s.Contains("kanji", StringComparison.Ordinal))
             .ToArray();
 
         foreach (string jsonFile in jsonFiles)
         {
-            FileStream openStream = File.OpenRead(jsonFile);
             List<List<JsonElement>>? frequencyJson;
+            FileStream openStream = File.OpenRead(jsonFile);
             await using (openStream.ConfigureAwait(false))
             {
                 frequencyJson = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream)

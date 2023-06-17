@@ -165,7 +165,9 @@ internal static class KeyGestureUtils
         {
             KeyGestureConverter keyGestureConverter = new();
 
-            KeyGesture newKeyGesture = rawKeyGesture.Contains("Ctrl") || rawKeyGesture.Contains("Alt") || rawKeyGesture.Contains("Shift")
+            KeyGesture newKeyGesture = rawKeyGesture.Contains("Ctrl", StringComparison.Ordinal)
+                || rawKeyGesture.Contains("Alt", StringComparison.Ordinal)
+                || rawKeyGesture.Contains("Shift", StringComparison.Ordinal)
                 ? (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture)!
                 : (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture)!;
 

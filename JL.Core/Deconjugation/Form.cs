@@ -39,22 +39,22 @@ internal sealed class Form
         {
             int hash = 17;
 
-            hash = (hash * 37) + Text.GetHashCode();
-            hash = (hash * 37) + OriginalText.GetHashCode();
+            hash = (hash * 37) + Text.GetHashCode(StringComparison.Ordinal);
+            hash = (hash * 37) + OriginalText.GetHashCode(StringComparison.Ordinal);
 
             foreach (string tag in Tags)
             {
-                hash = (hash * 37) + tag.GetHashCode();
+                hash = (hash * 37) + tag.GetHashCode(StringComparison.Ordinal);
             }
 
             foreach (string process in Process)
             {
-                hash = (hash * 37) + process.GetHashCode();
+                hash = (hash * 37) + process.GetHashCode(StringComparison.Ordinal);
             }
 
             foreach (string seenText in SeenText)
             {
-                hash = (hash * 37) + seenText.GetHashCode();
+                hash = (hash * 37) + seenText.GetHashCode(StringComparison.Ordinal);
             }
 
             return hash;

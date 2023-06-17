@@ -63,8 +63,8 @@ internal sealed partial class AddNameWindow : Window
             string nameType =
                 NameTypeStackPanel.Children.OfType<RadioButton>()
                     .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
-            string spelling = SpellingTextBox.Text.Replace("\t", "  ").Trim();
-            string reading = ReadingTextBox.Text.Replace("\t", "  ").Trim();
+            string spelling = SpellingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
+            string reading = ReadingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
             CustomNameLoader.AddToDictionary(spelling, reading, nameType);
             Utils.Frontend.InvalidateDisplayCache();
             Close();

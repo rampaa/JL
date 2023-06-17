@@ -173,7 +173,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
     {
         return jsonElement.ToString()
             .Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-            .Select(static s => s.Replace("\\\"", "\""))
+            .Select(static s => s.Replace("\\\"", "\"", StringComparison.Ordinal))
             .ToList();
     }
 }

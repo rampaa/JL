@@ -82,7 +82,7 @@ public static class AudioUtils
 
                             if (urlStr is not null)
                             {
-                                urlStr = urlStr.Replace("://localhost", "://127.0.0.1");
+                                urlStr = urlStr.Replace("://localhost", "://127.0.0.1", StringComparison.Ordinal);
                                 if (Uri.TryCreate(urlStr, UriKind.Absolute, out Uri? resultUrl))
                                 {
                                     AudioResponse? audioResponse = await GetAudioFromUrl(resultUrl).ConfigureAwait(false);

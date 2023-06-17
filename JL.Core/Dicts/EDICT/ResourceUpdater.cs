@@ -20,7 +20,7 @@ public static class ResourceUpdater
             if (!isUpdate || Utils.Frontend.ShowYesNoDialog($"Do you want to download the latest version of {resourceName}?",
                 "Update dictionary?"))
             {
-                HttpRequestMessage request = new(HttpMethod.Get, resourceDownloadUri);
+                using HttpRequestMessage request = new(HttpMethod.Get, resourceDownloadUri);
 
                 if (File.Exists(resourcePath))
                 {

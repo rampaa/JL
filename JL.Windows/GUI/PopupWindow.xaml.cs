@@ -178,7 +178,7 @@ internal sealed partial class PopupWindow : Window
 
             LastText = text;
 
-            List<LookupResult>? lookupResults = Lookup.LookupText(text);
+            List<LookupResult>? lookupResults = LookupUtils.LookupText(text);
 
             if (lookupResults is { Count: > 0 })
             {
@@ -256,7 +256,7 @@ internal sealed partial class PopupWindow : Window
         _lastTextBox = tb;
         _lastSelectedText = tb.SelectedText;
 
-        List<LookupResult>? lookupResults = Lookup.LookupText(tb.SelectedText);
+        List<LookupResult>? lookupResults = LookupUtils.LookupText(tb.SelectedText);
 
         if (lookupResults?.Count > 0)
         {
@@ -1172,7 +1172,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (child is TextBox textBox)
             {
-                miningParams[JLField.Definitions] = textBox.Text.Replace("\n", "<br/>");
+                miningParams[JLField.Definitions] = textBox.Text.Replace("\n", "<br/>", StringComparison.Ordinal);
                 continue;
             }
 

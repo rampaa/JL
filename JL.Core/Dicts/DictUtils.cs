@@ -757,7 +757,7 @@ public static class DictUtils
                 {
                     for (int j = 2; j < lParts.Length; j++)
                     {
-                        if (lParts[j].Contains('J'))
+                        if (lParts[j].Contains('J', StringComparison.Ordinal))
                         {
                             int endIndex = lParts[j].IndexOf('[', StringComparison.Ordinal);
                             if (endIndex is not -1)

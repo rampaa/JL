@@ -70,12 +70,12 @@ internal sealed partial class AddWordWindow : Window
 
         if (isValid)
         {
-            string rawSpellings = SpellingsTextBox.Text.Replace("\t", "  ");
-            string rawReadings = ReadingsTextBox.Text.Replace("\t", "  ");
-            string rawDefinitions = DefinitionsTextBox.Text.Replace("\t", "  ");
+            string rawSpellings = SpellingsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
+            string rawReadings = ReadingsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
+            string rawDefinitions = DefinitionsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
             string rawPartOfSpeech = PartOfSpeechStackPanel.Children.OfType<RadioButton>()
                 .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
-            string rawWordClasses = WordClassTextBox.Text.Replace("\t", "  ");
+            string rawWordClasses = WordClassTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
 
 
             string[] spellings = rawSpellings.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static s => s.Trim()).ToArray();

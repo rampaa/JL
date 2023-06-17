@@ -52,12 +52,12 @@ public static class WebSocketUtils
                         if (result.MessageType is WebSocketMessageType.Text)
                         {
                             using MemoryStream memoryStream = new();
-                            memoryStream.Write(buffer, 0, result.Count);
+                            await memoryStream.WriteAsync(buffer.AsMemory(0, result.Count)).ConfigureAwait(false);
 
                             while (!result.EndOfMessage)
                             {
                                 result = await webSocketClient.ReceiveAsync(buffer, CancellationToken.None).ConfigureAwait(false);
-                                memoryStream.Write(buffer, 0, result.Count);
+                                await memoryStream.WriteAsync(buffer.AsMemory(0, result.Count)).ConfigureAwait(false);
                             }
 
                             _ = memoryStream.Seek(0, SeekOrigin.Begin);
