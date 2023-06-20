@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Runtime;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -206,8 +205,8 @@ internal sealed partial class ManageFrequenciesWindow : Window
 
                     UpdateFreqsDisplay();
 
-                    GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+                    //GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                    //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
                 }
             };
             buttonEdit.Click += (_, _) =>
@@ -238,16 +237,19 @@ internal sealed partial class ManageFrequenciesWindow : Window
 
     private void PathTextbox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        string path = ((TextBlock)sender).Text;
+        string? path = ((TextBlock)sender).Text;
 
         if (File.Exists(path) || Directory.Exists(path))
         {
             if (File.Exists(path))
             {
-                path = Path.GetDirectoryName(path)!;
+                path = Path.GetDirectoryName(path);
             }
 
-            _ = Process.Start("explorer.exe", path ?? throw new InvalidOperationException());
+            if (path is not null)
+            {
+                _ = Process.Start("explorer.exe", path);
+            }
         }
     }
 

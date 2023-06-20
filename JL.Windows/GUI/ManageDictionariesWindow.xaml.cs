@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Runtime;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -297,8 +296,8 @@ internal sealed partial class ManageDictionariesWindow : Window
 
                     UpdateDictionariesDisplay();
 
-                    GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+                    //GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                    //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
                 }
             };
             buttonEdit.Click += (_, _) =>

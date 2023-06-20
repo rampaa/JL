@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Runtime;
 using System.Security.Cryptography;
 using JL.Core.Audio;
 using JL.Core.Dicts;
@@ -89,7 +88,7 @@ public static class Utils
             {
                 await DictUtils.DeserializeDicts().ConfigureAwait(false);
                 Frontend.ApplyDictOptions();
-                await DictUtils.LoadDictionaries(false).ConfigureAwait(false);
+                await DictUtils.LoadDictionaries().ConfigureAwait(false);
                 await DictUtils.SerializeDicts().ConfigureAwait(false);
                 await JmdictWordClassUtils.Initialize().ConfigureAwait(false);
             }),
@@ -98,15 +97,15 @@ public static class Utils
             {
                 await AudioUtils.DeserializeAudioSources().ConfigureAwait(false);
                 await FreqUtils.DeserializeFreqs().ConfigureAwait(false);
-                await FreqUtils.LoadFrequencies(false).ConfigureAwait(false);
+                await FreqUtils.LoadFrequencies().ConfigureAwait(false);
             })
         };
 
         await DictUtils.InitializeKanjiCompositionDict().ConfigureAwait(false);
         await Task.WhenAll(tasks).ConfigureAwait(false);
 
-        GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+        //GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+        //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
     }
 
     internal static List<List<T>?>? TrimListOfLists<T>(List<List<T>?> listOfLists)

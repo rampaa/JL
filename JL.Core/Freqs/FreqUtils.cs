@@ -1,4 +1,3 @@
-using System.Runtime;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -31,7 +30,7 @@ public static class FreqUtils
         }
     };
 
-    public static async Task LoadFrequencies(bool runGC = true)
+    public static async Task LoadFrequencies()
     {
         FreqsReady = false;
 
@@ -129,11 +128,11 @@ public static class FreqUtils
 
             Utils.Frontend.InvalidateDisplayCache();
 
-            if (runGC)
-            {
-                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-            }
+            //if (runGC)
+            //{
+            //    GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+            //    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+            //}
         }
 
         FreqsReady = true;

@@ -1,6 +1,5 @@
 using System.IO.Compression;
 using System.Net;
-using System.Runtime;
 using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Dicts.EDICT.JMnedict;
 using JL.Core.Dicts.EDICT.KANJIDIC;
@@ -121,8 +120,8 @@ public static class ResourceUpdater
                 dict.Contents.Clear();
             }
 
-            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+            //GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+            //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
         }
 
         DictUtils.UpdatingJmdict = false;
@@ -150,8 +149,8 @@ public static class ResourceUpdater
                 dict.Contents.Clear();
             }
 
-            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+            //GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+            //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
         }
 
         DictUtils.UpdatingJmnedict = false;
@@ -179,8 +178,8 @@ public static class ResourceUpdater
                 dict.Contents.Clear();
             }
 
-            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+            //GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+            //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
         }
 
         DictUtils.UpdatingKanjidic = false;

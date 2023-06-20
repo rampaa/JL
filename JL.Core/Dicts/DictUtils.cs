@@ -1,4 +1,3 @@
-using System.Runtime;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -451,7 +450,7 @@ public static class DictUtils
         DictType.NonspecificWordNazeka
     };
 
-    public static async Task LoadDictionaries(bool runGC = true)
+    public static async Task LoadDictionaries()
     {
         DictsReady = false;
 
@@ -723,11 +722,11 @@ public static class DictUtils
 
             Utils.Frontend.InvalidateDisplayCache();
 
-            if (runGC)
-            {
-                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-            }
+            //if (runGC)
+            //{
+            //    GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+            //    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+            //}
         }
 
         DictsReady = true;
