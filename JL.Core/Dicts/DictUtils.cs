@@ -38,7 +38,7 @@ public static class DictUtils
                     "Custom Word Dictionary",
                     "Resources/custom_words.txt",
                     true, 1, 128,
-                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = true }))
+                    new DictOptions(new NewlineBetweenDefinitionsOption(true)))
             },
             {
                 "CustomNameDictionary",
@@ -51,30 +51,30 @@ public static class DictUtils
                 "JMdict",
                 new Dict(DictType.JMdict, "JMdict", "Resources/JMdict.xml", true, 3, 500000,
                     new DictOptions(
-                        new NewlineBetweenDefinitionsOption { Value = true },
-                        wordClassInfo: new WordClassInfoOption { Value = true },
-                        dialectInfo: new DialectInfoOption { Value = true },
-                        pOrthographyInfo: new POrthographyInfoOption { Value = true },
-                        pOrthographyInfoColor: new POrthographyInfoColorOption { Value = "#FFD2691E" },
-                        pOrthographyInfoFontSize: new POrthographyInfoFontSizeOption { Value = 15 },
-                        aOrthographyInfo: new AOrthographyInfoOption { Value = true },
-                        rOrthographyInfo: new ROrthographyInfoOption { Value = true },
-                        wordTypeInfo: new WordTypeInfoOption { Value = true },
-                        miscInfo: new MiscInfoOption { Value = true },
-                        relatedTerm: new RelatedTermOption { Value = false },
-                        antonym: new AntonymOption { Value = false },
-                        loanwordEtymology: new LoanwordEtymologyOption { Value = true}
+                        new NewlineBetweenDefinitionsOption(true),
+                        wordClassInfo: new WordClassInfoOption(true),
+                        dialectInfo: new DialectInfoOption(true),
+                        pOrthographyInfo: new POrthographyInfoOption(true),
+                        pOrthographyInfoColor: new POrthographyInfoColorOption("#FFD2691E"),
+                        pOrthographyInfoFontSize: new POrthographyInfoFontSizeOption(15),
+                        aOrthographyInfo: new AOrthographyInfoOption(true),
+                        rOrthographyInfo: new ROrthographyInfoOption(true),
+                        wordTypeInfo: new WordTypeInfoOption(true),
+                        miscInfo: new MiscInfoOption(true),
+                        relatedTerm: new RelatedTermOption(false),
+                        antonym: new AntonymOption(false),
+                        loanwordEtymology: new LoanwordEtymologyOption(true)
                         ))
             },
             {
                 "Kanjidic",
                 new Dict(DictType.Kanjidic, "Kanjidic", "Resources/kanjidic2.xml", true, 4, 13108,
-                    new DictOptions(noAll: new NoAllOption { Value = false }))
+                    new DictOptions(noAll: new NoAllOption(false)))
             },
             {
                 "JMnedict",
                 new Dict(DictType.JMnedict, "JMnedict", "Resources/JMnedict.xml", true, 5, 700000,
-                    new DictOptions(new NewlineBetweenDefinitionsOption { Value = true }))
+                    new DictOptions(new NewlineBetweenDefinitionsOption(true)))
             }
         };
 

@@ -1,6 +1,6 @@
 namespace JL.Core.Freqs;
 
-public sealed class FrequencyRecord
+public readonly record struct FrequencyRecord
 {
     internal string Spelling { get; }
     internal int Frequency { get; }

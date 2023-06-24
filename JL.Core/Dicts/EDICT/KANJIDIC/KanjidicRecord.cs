@@ -17,6 +17,8 @@ internal sealed class KanjidicRecord : IDictRecord
         KunReadings = new List<string>();
         NanoriReadings = new List<string>();
         Grade = -1;
+        StrokeCount = 0;
+        Frequency = 0;
     }
 
     public string? BuildFormattedDefinition()

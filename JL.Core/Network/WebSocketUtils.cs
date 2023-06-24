@@ -52,18 +52,18 @@ public static class WebSocketUtils
                         if (result.MessageType is WebSocketMessageType.Text)
                         {
                             using MemoryStream memoryStream = new();
-                            await memoryStream.WriteAsync(buffer.AsMemory(0, result.Count)).ConfigureAwait(false);
+                            await memoryStream.WriteAsync(buffer.AsMemory(0, result.Count), cancellationToken).ConfigureAwait(false);
 
                             while (!result.EndOfMessage)
                             {
-                                result = await webSocketClient.ReceiveAsync(buffer, CancellationToken.None).ConfigureAwait(false);
-                                await memoryStream.WriteAsync(buffer.AsMemory(0, result.Count)).ConfigureAwait(false);
+                                result = await webSocketClient.ReceiveAsync(buffer, cancellationToken).ConfigureAwait(false);
+                                await memoryStream.WriteAsync(buffer.AsMemory(0, result.Count), cancellationToken).ConfigureAwait(false);
                             }
 
                             _ = memoryStream.Seek(0, SeekOrigin.Begin);
 
                             string text = Encoding.UTF8.GetString(memoryStream.ToArray());
-                            _ = Task.Run(async () => await Utils.Frontend.CopyFromWebSocket(text).ConfigureAwait(false)).ConfigureAwait(false);
+                            _ = Task.Run(async () => await Utils.Frontend.CopyFromWebSocket(text).ConfigureAwait(false), cancellationToken).ConfigureAwait(false);
                         }
                     }
                     catch (WebSocketException webSocketException)

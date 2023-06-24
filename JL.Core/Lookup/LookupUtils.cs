@@ -849,13 +849,16 @@ public static class LookupUtils
                     var customWordDictResult = (CustomWordRecord)wordResult.Results[i][j];
 
                     List<LookupFrequencyResult> freqs = GetWordFrequencies(customWordDictResult);
-                    foreach (LookupFrequencyResult freqResult in freqs)
+                    for (int k = 0; k < freqs.Count; k++)
                     {
+                        LookupFrequencyResult freqResult = freqs[k];
+
                         if (freqResult.Freq is int.MaxValue)
                         {
                             freqResult.Freq = -i;
                         }
                     }
+
                     LookupResult result = new
                     (
                         frequencies: freqs,
@@ -940,9 +943,9 @@ public static class LookupUtils
         {
             if (kanjiFreq.Contents.TryGetValue(kanji, out List<FrequencyRecord>? freqResultList))
             {
-                int frequency = freqResultList.FirstOrDefault()?.Frequency ?? int.MaxValue;
+                int frequency = freqResultList.FirstOrDefault().Frequency;
 
-                if (frequency is not int.MaxValue)
+                if (frequency is not 0)
                 {
                     freqsList.Add(new LookupFrequencyResult(kanjiFreq.Name, frequency));
                 }

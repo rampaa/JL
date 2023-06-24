@@ -26,6 +26,7 @@ public sealed class DictOptions
         NewlineBetweenDefinitionsOption? newlineBetweenDefinitions = null,
         ExamplesOption? examples = null,
         NoAllOption? noAll = null,
+        PitchAccentMarkerColorOption? pitchAccentMarkerColor = null,
         WordClassInfoOption? wordClassInfo = null,
         DialectInfoOption? dialectInfo = null,
         POrthographyInfoOption? pOrthographyInfo = null,
@@ -39,8 +40,7 @@ public sealed class DictOptions
         MiscInfoOption? miscInfo = null,
         RelatedTermOption? relatedTerm = null,
         AntonymOption? antonym = null,
-        LoanwordEtymologyOption? loanwordEtymology = null,
-        PitchAccentMarkerColorOption? pitchAccentMarkerColor = null
+        LoanwordEtymologyOption? loanwordEtymology = null
         )
     {
         NewlineBetweenDefinitions = newlineBetweenDefinitions;

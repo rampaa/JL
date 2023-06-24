@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
@@ -71,18 +72,28 @@ internal sealed partial class AddDictionaryWindow : Window
             if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(type))
             {
                 bool isEpwing = DictUtils.YomichanDictTypes.Concat(DictUtils.NazekaDictTypes).Contains(type);
-                newlineOption = new NewlineBetweenDefinitionsOption { Value = isEpwing };
+                newlineOption = new NewlineBetweenDefinitionsOption(isEpwing);
             }
 
             ExamplesOption? examplesOption = null;
-            // if (ExamplesOption.ValidDictTypes.Contains(type)) //todo
-            // {
-            //     Enum.TryParse<ExamplesOptionValue>(ComboBoxExamples.SelectedValue?.ToString(), out var eov);
-            //     examplesOption = new ExamplesOption { Value = eov };
-            // }
+            if (ExamplesOption.ValidDictTypes.Contains(type))
+            {
+                examplesOption = new ExamplesOption(ExamplesOptionValue.None);
+            }
 
-            // TODO?
-            DictOptions options = new(newlineOption, examplesOption);
+            NoAllOption? noAllOption = null;
+            if (NoAllOption.ValidDictTypes.Contains(type))
+            {
+                noAllOption = new NoAllOption(false);
+            }
+
+            PitchAccentMarkerColorOption? pitchAccentMarkerColorOption = null;
+            if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(type))
+            {
+                pitchAccentMarkerColorOption = new PitchAccentMarkerColorOption(DictOptionManager.PitchAccentMarkerColor.ToString(CultureInfo.InvariantCulture));
+            }
+
+            DictOptions options = new(newlineOption, examplesOption, noAllOption, pitchAccentMarkerColorOption);
 
             DictUtils.Dicts.Add(name,
                 new Dict(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options));

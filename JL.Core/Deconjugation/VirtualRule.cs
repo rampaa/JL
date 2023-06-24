@@ -1,6 +1,6 @@
 namespace JL.Core.Deconjugation;
 
-internal readonly struct VirtualRule
+internal readonly record struct VirtualRule
 {
     public string DecEnd { get; }
     public string ConEnd { get; }

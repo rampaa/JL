@@ -9,6 +9,7 @@ internal ref struct JmdictEntry
 
     public JmdictEntry()
     {
+        Id = 0;
         KanjiElements = new List<KanjiElement>();
         ReadingElements = new List<ReadingElement>();
         SenseList = new List<Sense>();

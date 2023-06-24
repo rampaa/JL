@@ -21,7 +21,7 @@ public static class AudioUtils
         }
     };
 
-    private static readonly Dictionary<string, string> s_mediaTypeToExtentionDict = new()
+    private static readonly Dictionary<string, string> s_mediaTypeToExtensionDict = new()
     {
         { "mpeg", "mp3" },
         { "3gpp", "3gp" },
@@ -41,7 +41,7 @@ public static class AudioUtils
             {
                 string audioFormat = response.Content.Headers.ContentType?.MediaType?.Split('/').LastOrDefault("mp3") ?? "mp3";
 
-                if (s_mediaTypeToExtentionDict.TryGetValue(audioFormat, out string? fileSuffix))
+                if (s_mediaTypeToExtensionDict.TryGetValue(audioFormat, out string? fileSuffix))
                 {
                     audioFormat = fileSuffix;
                 }
@@ -228,12 +228,13 @@ public static class AudioUtils
                     IOrderedEnumerable<KeyValuePair<string, AudioSource>> audioSources = deserializedAudioSources.OrderBy(static d => d.Value.Priority);
                     int priority = 1;
 
-                    foreach (KeyValuePair<string, AudioSource> audioSource in audioSources)
+                    foreach (KeyValuePair<string, AudioSource> audioSourceKeyValuePair in audioSources)
                     {
-                        audioSource.Value.Priority = priority;
-                        ++priority;
+                        AudioSource audioSource = audioSourceKeyValuePair.Value;
+                        audioSource.Priority = priority;
+                        AudioSources.Add(audioSourceKeyValuePair.Key, audioSource);
 
-                        AudioSources.Add(audioSource.Key, audioSource.Value);
+                        ++priority;
                     }
                 }
                 else

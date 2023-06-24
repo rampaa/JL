@@ -9,131 +9,218 @@ public enum ExamplesOptionValue
     All
 }
 
-public readonly struct ExamplesOption
+public readonly record struct ExamplesOption
 {
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.Kenkyuusha };
-
     public ExamplesOptionValue Value { get; init; }
+
+    public ExamplesOption(ExamplesOptionValue value)
+    {
+        Value = value;
+    }
 }
 
-public readonly struct NewlineBetweenDefinitionsOption
+public readonly record struct NewlineBetweenDefinitionsOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes =
         Enum.GetValues<DictType>().Except(new[] { DictType.PitchAccentYomichan, DictType.Kanjidic, DictType.CustomNameDictionary })
             .ToArray();
     public bool Value { get; init; }
+
+    public NewlineBetweenDefinitionsOption(bool value)
+    {
+        Value = value;
+    }
 }
 
-public readonly struct NoAllOption
+public readonly record struct NoAllOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = Enum.GetValues<DictType>()
         .Except(new[] { DictType.PitchAccentYomichan }).ToArray();
-
     public bool Value { get; init; }
+
+    public NoAllOption(bool value)
+    {
+        Value = value;
+    }
 }
 
-public readonly struct WordClassInfoOption
+public readonly record struct WordClassInfoOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
     public bool Value { get; init; }
+    public WordClassInfoOption(bool value)
+    {
+        Value = value;
+    }
 }
 
-public readonly struct DialectInfoOption
+public readonly record struct DialectInfoOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
     public bool Value { get; init; }
+
+    public DialectInfoOption(bool value)
+    {
+        Value = value;
+    }
 }
 
-public readonly struct POrthographyInfoOption
+public readonly record struct POrthographyInfoOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
     public bool Value { get; init; }
+
+    public POrthographyInfoOption(bool value)
+    {
+        Value = value;
+    }
 }
 
-public readonly struct POrthographyInfoColorOption
+public readonly record struct POrthographyInfoColorOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
     public string Value { get; init; }
+
+    public POrthographyInfoColorOption(string value)
+    {
+        Value = value;
+    }
 }
 
-public readonly struct POrthographyInfoFontSizeOption
+public readonly record struct POrthographyInfoFontSizeOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
     public double Value { get; init; }
+
+    public POrthographyInfoFontSizeOption(double value)
+    {
+        Value = value;
+    }
 }
 
-public readonly struct AOrthographyInfoOption
+public readonly record struct AOrthographyInfoOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
     public bool Value { get; init; }
+
+    public AOrthographyInfoOption(bool value)
+    {
+        Value = value;
+    }
 }
-public readonly struct ROrthographyInfoOption
+public readonly record struct ROrthographyInfoOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
     public bool Value { get; init; }
+
+    public ROrthographyInfoOption(bool value)
+    {
+        Value = value;
+    }
 }
 
-public readonly struct WordTypeInfoOption
+public readonly record struct WordTypeInfoOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
     public bool Value { get; init; }
+
+    public WordTypeInfoOption(bool value)
+    {
+        Value = value;
+    }
 }
 
-public readonly struct SpellingRestrictionInfoOption
+public readonly record struct SpellingRestrictionInfoOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
     public bool Value { get; init; }
+
+    public SpellingRestrictionInfoOption(bool value)
+    {
+        Value = value;
+    }
 }
 
-public readonly struct ExtraDefinitionInfoOption
+public readonly record struct ExtraDefinitionInfoOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
     public bool Value { get; init; }
+
+    public ExtraDefinitionInfoOption(bool value)
+    {
+        Value = value;
+    }
 }
 
-public readonly struct MiscInfoOption
+public readonly record struct MiscInfoOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
     public bool Value { get; init; }
+
+    public MiscInfoOption(bool value)
+    {
+        Value = value;
+    }
 }
 
-public readonly struct RelatedTermOption
+public readonly record struct RelatedTermOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
     public bool Value { get; init; }
+
+    public RelatedTermOption(bool value)
+    {
+        Value = value;
+    }
 }
 
-public readonly struct AntonymOption
+public readonly record struct AntonymOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
     public bool Value { get; init; }
+
+    public AntonymOption(bool value)
+    {
+        Value = value;
+    }
 }
 
-public readonly struct LoanwordEtymologyOption
+public readonly record struct LoanwordEtymologyOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
     public bool Value { get; init; }
+
+    public LoanwordEtymologyOption(bool value)
+    {
+        Value = value;
+    }
 }
 
-public readonly struct PitchAccentMarkerColorOption
+public readonly record struct PitchAccentMarkerColorOption
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = { DictType.PitchAccentYomichan };
     public string Value { get; init; }
+
+    public PitchAccentMarkerColorOption(string value)
+    {
+        Value = value;
+    }
 }

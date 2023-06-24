@@ -145,33 +145,34 @@ internal static class JmdictRecordBuilder
 
         foreach (KeyValuePair<string, JmdictRecord> recordKeyValuePair in recordDictionary)
         {
-            recordKeyValuePair.Value.Readings = Utils.TrimStringList(recordKeyValuePair.Value.Readings!);
-            recordKeyValuePair.Value.AlternativeSpellings = Utils.TrimStringList(recordKeyValuePair.Value.AlternativeSpellings!);
-            recordKeyValuePair.Value.PrimarySpellingOrthographyInfoList = Utils.TrimStringList(recordKeyValuePair.Value.PrimarySpellingOrthographyInfoList!);
-            recordKeyValuePair.Value.DefinitionInfo = Utils.TrimStringList(recordKeyValuePair.Value.DefinitionInfo!)!;
-            recordKeyValuePair.Value.Definitions = Utils.TrimListOfLists(recordKeyValuePair.Value.Definitions!)!;
-            recordKeyValuePair.Value.ReadingRestrictions = Utils.TrimListOfLists(recordKeyValuePair.Value.ReadingRestrictions!);
-            recordKeyValuePair.Value.SpellingRestrictions = Utils.TrimListOfLists(recordKeyValuePair.Value.SpellingRestrictions!);
-            recordKeyValuePair.Value.Dialects = Utils.TrimListOfLists(recordKeyValuePair.Value.Dialects!);
-            recordKeyValuePair.Value.MiscList = Utils.TrimListOfLists(recordKeyValuePair.Value.MiscList!);
-            recordKeyValuePair.Value.AlternativeSpellingsOrthographyInfoList = Utils.TrimListOfLists(recordKeyValuePair.Value.AlternativeSpellingsOrthographyInfoList!);
-            recordKeyValuePair.Value.ReadingsOrthographyInfoList = Utils.TrimListOfLists(recordKeyValuePair.Value.ReadingsOrthographyInfoList!);
-            recordKeyValuePair.Value.FieldList = Utils.TrimListOfLists(recordKeyValuePair.Value.FieldList!);
-            recordKeyValuePair.Value.WordClasses = Utils.TrimListOfLists(recordKeyValuePair.Value.WordClasses!);
-            recordKeyValuePair.Value.RelatedTerms = Utils.TrimListOfLists(recordKeyValuePair.Value.RelatedTerms!);
-            recordKeyValuePair.Value.Antonyms = Utils.TrimListOfLists(recordKeyValuePair.Value.Antonyms!);
-            recordKeyValuePair.Value.LoanwordEtymology = Utils.TrimListOfLists(recordKeyValuePair.Value.LoanwordEtymology!);
+            JmdictRecord jmdictRecord = recordKeyValuePair.Value;
 
-            recordKeyValuePair.Value.Id = entry.Id;
+            jmdictRecord.Readings = Utils.TrimStringList(recordKeyValuePair.Value.Readings!);
+            jmdictRecord.AlternativeSpellings = Utils.TrimStringList(recordKeyValuePair.Value.AlternativeSpellings!);
+            jmdictRecord.PrimarySpellingOrthographyInfoList = Utils.TrimStringList(recordKeyValuePair.Value.PrimarySpellingOrthographyInfoList!);
+            jmdictRecord.DefinitionInfo = Utils.TrimStringList(recordKeyValuePair.Value.DefinitionInfo!)!;
+            jmdictRecord.Definitions = Utils.TrimListOfLists(recordKeyValuePair.Value.Definitions!)!;
+            jmdictRecord.ReadingRestrictions = Utils.TrimListOfLists(recordKeyValuePair.Value.ReadingRestrictions!);
+            jmdictRecord.SpellingRestrictions = Utils.TrimListOfLists(recordKeyValuePair.Value.SpellingRestrictions!);
+            jmdictRecord.Dialects = Utils.TrimListOfLists(recordKeyValuePair.Value.Dialects!);
+            jmdictRecord.MiscList = Utils.TrimListOfLists(recordKeyValuePair.Value.MiscList!);
+            jmdictRecord.AlternativeSpellingsOrthographyInfoList = Utils.TrimListOfLists(recordKeyValuePair.Value.AlternativeSpellingsOrthographyInfoList!);
+            jmdictRecord.ReadingsOrthographyInfoList = Utils.TrimListOfLists(recordKeyValuePair.Value.ReadingsOrthographyInfoList!);
+            jmdictRecord.FieldList = Utils.TrimListOfLists(recordKeyValuePair.Value.FieldList!);
+            jmdictRecord.WordClasses = Utils.TrimListOfLists(recordKeyValuePair.Value.WordClasses!);
+            jmdictRecord.RelatedTerms = Utils.TrimListOfLists(recordKeyValuePair.Value.RelatedTerms!);
+            jmdictRecord.Antonyms = Utils.TrimListOfLists(recordKeyValuePair.Value.Antonyms!);
+            jmdictRecord.LoanwordEtymology = Utils.TrimListOfLists(recordKeyValuePair.Value.LoanwordEtymology!);
+            jmdictRecord.Id = entry.Id;
+
             string key = JapaneseUtils.KatakanaToHiragana(recordKeyValuePair.Key);
-
             if (jmdictDictionary.TryGetValue(key, out List<IDictRecord>? tempRecordList))
             {
-                tempRecordList.Add(recordKeyValuePair.Value);
+                tempRecordList.Add(jmdictRecord);
             }
             else
             {
-                jmdictDictionary.Add(key, new List<IDictRecord> { recordKeyValuePair.Value });
+                jmdictDictionary.Add(key, new List<IDictRecord> { jmdictRecord });
             }
         }
     }

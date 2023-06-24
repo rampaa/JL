@@ -17,6 +17,7 @@ internal sealed class JmnedictRecord : IDictRecord
     public JmnedictRecord(string primarySpelling)
     {
         PrimarySpelling = primarySpelling;
+        Id = 0;
         AlternativeSpellings = new List<string>();
         Readings = new List<string>();
         NameTypes = new List<List<string>?>();

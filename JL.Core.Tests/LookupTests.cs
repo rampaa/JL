@@ -22,19 +22,19 @@ public class LookupTests
         DictUtils.Dicts.Add("JMdict",
             new Dict(DictType.JMdict, "JMdict", jmdictPath, true, 0, 500000,
                     new DictOptions(
-                        new NewlineBetweenDefinitionsOption { Value = false },
-                        wordClassInfo: new WordClassInfoOption { Value = true },
-                        dialectInfo: new DialectInfoOption { Value = true },
-                        pOrthographyInfo: new POrthographyInfoOption { Value = true },
-                        pOrthographyInfoColor: new POrthographyInfoColorOption { Value = "#FFD2691E" },
-                        pOrthographyInfoFontSize: new POrthographyInfoFontSizeOption { Value = 15 },
-                        aOrthographyInfo: new AOrthographyInfoOption { Value = true },
-                        rOrthographyInfo: new ROrthographyInfoOption { Value = true },
-                        wordTypeInfo: new WordTypeInfoOption { Value = true },
-                        miscInfo: new MiscInfoOption { Value = true },
-                        relatedTerm: new RelatedTermOption { Value = false },
-                        antonym: new AntonymOption { Value = false },
-                        loanwordEtymology: new LoanwordEtymologyOption { Value = true }
+                        new NewlineBetweenDefinitionsOption(false),
+                        wordClassInfo: new WordClassInfoOption(true),
+                        dialectInfo: new DialectInfoOption(true),
+                        pOrthographyInfo: new POrthographyInfoOption(true),
+                        pOrthographyInfoColor: new POrthographyInfoColorOption("#FFD2691E"),
+                        pOrthographyInfoFontSize: new POrthographyInfoFontSizeOption(15),
+                        aOrthographyInfo: new AOrthographyInfoOption(true),
+                        rOrthographyInfo: new ROrthographyInfoOption(true),
+                        wordTypeInfo: new WordTypeInfoOption(true),
+                        miscInfo: new MiscInfoOption(true),
+                        relatedTerm: new RelatedTermOption(false),
+                        antonym: new AntonymOption(false),
+                        loanwordEtymology: new LoanwordEtymologyOption(true)
                         )));
 
         JmdictLoader.Load(DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict)).Wait();

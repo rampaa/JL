@@ -24,7 +24,7 @@ internal sealed class Form
             return false;
         }
 
-        Form form = (obj as Form)!;
+        Form form = (Form)obj;
 
         return Text == form.Text
                && OriginalText == form.OriginalText

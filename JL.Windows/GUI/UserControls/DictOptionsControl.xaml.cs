@@ -24,7 +24,7 @@ internal sealed partial class DictOptionsControl : UserControl
         NewlineBetweenDefinitionsOption? newlineOption = null;
         if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(type))
         {
-            newlineOption = new NewlineBetweenDefinitionsOption { Value = NewlineCheckBox.IsChecked!.Value };
+            newlineOption = new NewlineBetweenDefinitionsOption(NewlineCheckBox.IsChecked!.Value);
         }
 
         ExamplesOption? examplesOption = null;
@@ -32,39 +32,39 @@ internal sealed partial class DictOptionsControl : UserControl
         {
             if (Enum.TryParse(ExamplesComboBox.SelectedValue?.ToString(), out ExamplesOptionValue eov))
             {
-                examplesOption = new ExamplesOption { Value = eov };
+                examplesOption = new ExamplesOption(eov);
             }
         }
 
         NoAllOption? noAllOption = null;
         if (NoAllOption.ValidDictTypes.Contains(type))
         {
-            noAllOption = new NoAllOption { Value = NoAllCheckBox.IsChecked!.Value };
+            noAllOption = new NoAllOption(NoAllCheckBox.IsChecked!.Value);
         }
 
         WordClassInfoOption? wordClassOption = null;
         if (WordClassInfoOption.ValidDictTypes.Contains(type))
         {
-            wordClassOption = new WordClassInfoOption { Value = WordClassInfoCheckBox.IsChecked!.Value };
+            wordClassOption = new WordClassInfoOption(WordClassInfoCheckBox.IsChecked!.Value);
         }
 
         DialectInfoOption? dialectOption = null;
         if (DialectInfoOption.ValidDictTypes.Contains(type))
         {
-            dialectOption = new DialectInfoOption { Value = DialectInfoCheckBox.IsChecked!.Value };
+            dialectOption = new DialectInfoOption(DialectInfoCheckBox.IsChecked!.Value);
         }
 
         POrthographyInfoOption? pOrthographyInfoOption = null;
         if (POrthographyInfoOption.ValidDictTypes.Contains(type))
         {
-            pOrthographyInfoOption = new POrthographyInfoOption { Value = POrthographyInfoCheckBox.IsChecked!.Value };
+            pOrthographyInfoOption = new POrthographyInfoOption(POrthographyInfoCheckBox.IsChecked!.Value);
         }
 
         POrthographyInfoColorOption? pOrthographyInfoColorOption = null;
         if (POrthographyInfoColorOption.ValidDictTypes.Contains(type))
         {
             pOrthographyInfoColorOption =
-                new POrthographyInfoColorOption { Value = POrthographyInfoColorButton.Background.ToString(CultureInfo.InvariantCulture) };
+                new POrthographyInfoColorOption(POrthographyInfoColorButton.Background.ToString(CultureInfo.InvariantCulture));
 
             DictOptionManager.POrthographyInfoColor = WindowsUtils.FrozenBrushFromHex(pOrthographyInfoColorOption.Value.Value)!;
         }
@@ -73,69 +73,69 @@ internal sealed partial class DictOptionsControl : UserControl
         if (POrthographyInfoFontSizeOption.ValidDictTypes.Contains(type))
         {
             pOrthographyInfoFontSize =
-                new POrthographyInfoFontSizeOption { Value = POrthographyInfoFontSizeNumericUpDown.Value };
+                new POrthographyInfoFontSizeOption(POrthographyInfoFontSizeNumericUpDown.Value);
         }
 
         AOrthographyInfoOption? aOrthographyInfoOption = null;
         if (AOrthographyInfoOption.ValidDictTypes.Contains(type))
         {
-            aOrthographyInfoOption = new AOrthographyInfoOption { Value = AOrthographyInfoCheckBox.IsChecked!.Value };
+            aOrthographyInfoOption = new AOrthographyInfoOption(AOrthographyInfoCheckBox.IsChecked!.Value);
         }
 
         ROrthographyInfoOption? rOrthographyInfoOption = null;
         if (ROrthographyInfoOption.ValidDictTypes.Contains(type))
         {
-            rOrthographyInfoOption = new ROrthographyInfoOption { Value = ROrthographyInfoCheckBox.IsChecked!.Value };
+            rOrthographyInfoOption = new ROrthographyInfoOption(ROrthographyInfoCheckBox.IsChecked!.Value);
         }
 
         WordTypeInfoOption? wordTypeOption = null;
         if (WordTypeInfoOption.ValidDictTypes.Contains(type))
         {
-            wordTypeOption = new WordTypeInfoOption { Value = WordTypeInfoCheckBox.IsChecked!.Value };
+            wordTypeOption = new WordTypeInfoOption(WordTypeInfoCheckBox.IsChecked!.Value);
         }
 
         SpellingRestrictionInfoOption? spellingRestrictionInfo = null;
         if (SpellingRestrictionInfoOption.ValidDictTypes.Contains(type))
         {
             spellingRestrictionInfo =
-                new SpellingRestrictionInfoOption { Value = SpellingRestrictionInfoCheckBox.IsChecked!.Value };
+                new SpellingRestrictionInfoOption(SpellingRestrictionInfoCheckBox.IsChecked!.Value);
         }
 
         ExtraDefinitionInfoOption? extraDefinitionInfo = null;
         if (ExtraDefinitionInfoOption.ValidDictTypes.Contains(type))
         {
             extraDefinitionInfo =
-                new ExtraDefinitionInfoOption { Value = ExtraDefinitionInfoCheckBox.IsChecked!.Value };
+                new ExtraDefinitionInfoOption(ExtraDefinitionInfoCheckBox.IsChecked!.Value);
         }
 
         MiscInfoOption? miscInfoOption = null;
         if (MiscInfoOption.ValidDictTypes.Contains(type))
         {
-            miscInfoOption = new MiscInfoOption { Value = MiscInfoCheckBox.IsChecked!.Value };
+            miscInfoOption = new MiscInfoOption(MiscInfoCheckBox.IsChecked!.Value);
         }
 
         RelatedTermOption? relatedTermOption = null;
         if (RelatedTermOption.ValidDictTypes.Contains(type))
         {
-            relatedTermOption = new RelatedTermOption { Value = RelatedTermCheckBox.IsChecked!.Value };
+            relatedTermOption = new RelatedTermOption(RelatedTermCheckBox.IsChecked!.Value);
         }
 
         AntonymOption? antonymOption = null;
         if (AntonymOption.ValidDictTypes.Contains(type))
         {
-            antonymOption = new AntonymOption { Value = AntonymCheckBox.IsChecked!.Value };
+            antonymOption = new AntonymOption(AntonymCheckBox.IsChecked!.Value);
         }
 
         LoanwordEtymologyOption? loanwordEtymology = null;
         if (LoanwordEtymologyOption.ValidDictTypes.Contains(type))
         {
-            loanwordEtymology = new LoanwordEtymologyOption { Value = LoanwordEtymologyCheckBox.IsChecked!.Value };
+            loanwordEtymology = new LoanwordEtymologyOption(LoanwordEtymologyCheckBox.IsChecked!.Value);
         }
 
         PitchAccentMarkerColorOption? pitchAccentMarkerColorOption = null;
         if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(type))
         {
-            pitchAccentMarkerColorOption = new PitchAccentMarkerColorOption { Value = PitchAccentMarkerColorButton.Background.ToString(CultureInfo.InvariantCulture) };
+            pitchAccentMarkerColorOption = new PitchAccentMarkerColorOption(PitchAccentMarkerColorButton.Background.ToString(CultureInfo.InvariantCulture));
             DictOptionManager.PitchAccentMarkerColor = WindowsUtils.FrozenBrushFromHex(pitchAccentMarkerColorOption.Value.Value)!;
         }
 
@@ -143,6 +143,7 @@ internal sealed partial class DictOptionsControl : UserControl
             newlineOption,
             examplesOption,
             noAllOption,
+            pitchAccentMarkerColorOption,
             wordClassOption,
             dialectOption,
             pOrthographyInfoOption,
@@ -156,8 +157,7 @@ internal sealed partial class DictOptionsControl : UserControl
             miscInfoOption,
             relatedTermOption,
             antonymOption,
-            loanwordEtymology,
-            pitchAccentMarkerColorOption);
+            loanwordEtymology);
 
         return options;
     }

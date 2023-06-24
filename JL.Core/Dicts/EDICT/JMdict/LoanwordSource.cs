@@ -1,6 +1,6 @@
 namespace JL.Core.Dicts.EDICT.JMdict;
 
-internal readonly struct LoanwordSource
+internal readonly record struct LoanwordSource
 {
     public bool IsWasei { get; }
     public bool IsPart { get; }

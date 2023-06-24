@@ -27,8 +27,10 @@ internal static class DictOptionManager
         Dict? pitchAccentDict = DictUtils.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.PitchAccentYomichan);
         if (pitchAccentDict is not null)
         {
-            PitchAccentMarkerColor = WindowsUtils.FrozenBrushFromHex(pitchAccentDict.Options?.PitchAccentMarkerColor?.Value
-                ?? Colors.DeepSkyBlue.ToString(CultureInfo.InvariantCulture))!;
+            if (pitchAccentDict.Options?.PitchAccentMarkerColor is not null)
+            {
+                PitchAccentMarkerColor = WindowsUtils.FrozenBrushFromHex(pitchAccentDict.Options.PitchAccentMarkerColor.Value.Value)!;
+            }
         }
 
         else

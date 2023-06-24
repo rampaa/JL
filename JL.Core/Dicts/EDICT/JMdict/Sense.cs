@@ -16,6 +16,7 @@ internal sealed class Sense
 
     public Sense()
     {
+        SInf = null;
         StagKList = new List<string>();
         StagRList = new List<string>();
         PosList = new List<string>();

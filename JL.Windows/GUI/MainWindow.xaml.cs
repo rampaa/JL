@@ -930,9 +930,12 @@ internal sealed partial class MainWindow : Window
 
     private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        Size newSize = e.NewSize;
-        ConfigManager.MainWindowWidth = newSize.Width;
-        ConfigManager.MainWindowHeight = newSize.Height;
+        if (e.PreviousSize.Width is not 0)
+        {
+            Size newSize = e.NewSize;
+            ConfigManager.MainWindowWidth = newSize.Width;
+            ConfigManager.MainWindowHeight = newSize.Height;
+        }
     }
 
     private void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

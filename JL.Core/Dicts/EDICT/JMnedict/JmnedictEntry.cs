@@ -9,6 +9,7 @@ internal ref struct JmnedictEntry
 
     public JmnedictEntry()
     {
+        Id = 0;
         KebList = new List<string>();
         RebList = new List<string>();
         TranslationList = new List<Translation>();

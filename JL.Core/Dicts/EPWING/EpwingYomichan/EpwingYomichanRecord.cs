@@ -38,6 +38,10 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
                 DefinitionTags = null;
             }
         }
+        else
+        {
+            DefinitionTags = null;
+        }
 
         WordClasses = jsonElement[3].ToString().Split(' ').ToList();
         if (WordClasses.Count is 0)

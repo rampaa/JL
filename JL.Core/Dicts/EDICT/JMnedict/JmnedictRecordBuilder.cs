@@ -79,21 +79,22 @@ internal static class JmnedictRecordBuilder
 
         foreach (KeyValuePair<string, JmnedictRecord> recordKeyValuePair in recordDictionary)
         {
-            recordKeyValuePair.Value.Definitions = Utils.TrimListOfLists(recordKeyValuePair.Value.Definitions!);
-            recordKeyValuePair.Value.NameTypes = Utils.TrimListOfLists(recordKeyValuePair.Value.NameTypes!);
-            //recordKeyValuePair.Value.RelatedTerms = Utils.TrimListOfLists(recordKeyValuePair.Value.RelatedTerms!);
-            recordKeyValuePair.Value.AlternativeSpellings = Utils.TrimStringList(recordKeyValuePair.Value.AlternativeSpellings!);
-            recordKeyValuePair.Value.Readings = Utils.TrimStringList(recordKeyValuePair.Value.Readings!);
-            recordKeyValuePair.Value.Id = entry.Id;
+            JmnedictRecord jmnedictRecord = recordKeyValuePair.Value;
+            jmnedictRecord.Definitions = Utils.TrimListOfLists(recordKeyValuePair.Value.Definitions!);
+            jmnedictRecord.NameTypes = Utils.TrimListOfLists(recordKeyValuePair.Value.NameTypes!);
+            //jmnedictRecord.RelatedTerms = Utils.TrimListOfLists(recordKeyValuePair.Value.RelatedTerms!);
+            jmnedictRecord.AlternativeSpellings = Utils.TrimStringList(recordKeyValuePair.Value.AlternativeSpellings!);
+            jmnedictRecord.Readings = Utils.TrimStringList(recordKeyValuePair.Value.Readings!);
+            jmnedictRecord.Id = entry.Id;
 
             string key = JapaneseUtils.KatakanaToHiragana(recordKeyValuePair.Key);
             if (jmnedictDictionary.TryGetValue(key, out List<IDictRecord>? tempRecordList))
             {
-                tempRecordList.Add(recordKeyValuePair.Value);
+                tempRecordList.Add(jmnedictRecord);
             }
             else
             {
-                jmnedictDictionary.Add(key, new List<IDictRecord> { recordKeyValuePair.Value });
+                jmnedictDictionary.Add(key, new List<IDictRecord> { jmnedictRecord });
             }
         }
     }
