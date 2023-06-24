@@ -30,8 +30,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
     public JmdictRecord(string primarySpelling)
     {
-        Id = 0;
         PrimarySpelling = primarySpelling;
+        Id = 0;
         Definitions = new List<List<string>>();
         ReadingRestrictions = new List<List<string>?>();
         SpellingRestrictions = new List<List<string>?>();

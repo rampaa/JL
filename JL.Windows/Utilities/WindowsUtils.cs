@@ -69,7 +69,9 @@ internal static class WindowsUtils
                 {
                     if (typeFace.TryGetGlyphTypeface(out GlyphTypeface glyphTypeFace))
                     {
-                        if (glyphTypeFace.CharacterToGlyphMap.ContainsKey(20685))
+                        // 0x30F8 -> ヸ
+                        // 0x67A0 -> 枠, kokuji
+                        if (glyphTypeFace.CharacterToGlyphMap.ContainsKey(0x30F8))
                         {
                             japaneseFonts.Add(comboBoxItem);
                             foundGlyph = true;
