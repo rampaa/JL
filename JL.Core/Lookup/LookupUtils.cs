@@ -265,6 +265,13 @@ public static class LookupUtils
             .ThenByDescending(static dict => dict.PrimarySpelling.Length)
             .ThenBy(static dict => dict.Dict.Priority)
             .ThenBy(static dict => dict.Frequencies?.Count > 0 ? dict.Frequencies.First().Freq : int.MaxValue)
+            .ThenBy(static dict =>
+            {
+                int index = dict.Readings?.IndexOf(dict.MatchedText) ?? -1;
+                return index is not -1
+                    ? index
+                    : int.MaxValue;
+            })
             .ToList();
     }
 
