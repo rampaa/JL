@@ -10,8 +10,8 @@ internal sealed class JmnedictRecord : IDictRecord
     public string PrimarySpelling { get; }
     public List<string>? AlternativeSpellings { get; set; }
     public List<string>? Readings { get; set; }
-    public List<List<string>?>? NameTypes { get; set; }
-    public List<List<string>?>? Definitions { get; set; }
+    public List<List<string>> NameTypes { get; set; }
+    public List<List<string>> Definitions { get; set; }
     //public List<List<string>?>? RelatedTerms { get; set; }
 
     public JmnedictRecord(string primarySpelling)
@@ -20,18 +20,13 @@ internal sealed class JmnedictRecord : IDictRecord
         Id = 0;
         AlternativeSpellings = new List<string>();
         Readings = new List<string>();
-        NameTypes = new List<List<string>?>();
-        Definitions = new List<List<string>?>();
+        NameTypes = new List<List<string>>();
+        Definitions = new List<List<string>>();
         //RelatedTerms = new List<List<string>?>();
     }
 
-    public string? BuildFormattedDefinition(DictOptions? options)
+    public string BuildFormattedDefinition(DictOptions? options)
     {
-        if (Definitions is null)
-        {
-            return null;
-        }
-
         string separator = options is { NewlineBetweenDefinitions.Value: false }
             ? ""
             : "\n";
@@ -42,11 +37,7 @@ internal sealed class JmnedictRecord : IDictRecord
 
         for (int i = 0; i < Definitions.Count; i++)
         {
-            List<string>? definitions = Definitions[i];
-            if (definitions is null)
-            {
-                continue;
-            }
+            List<string> definitions = Definitions[i];
 
             if (multipleDefinitions)
             {
@@ -55,10 +46,9 @@ internal sealed class JmnedictRecord : IDictRecord
 
             if (NameTypes?.Count >= i)
             {
-                List<string>? nameTypes = NameTypes[i];
+                List<string> nameTypes = NameTypes[i];
 
-                if (nameTypes is not null &&
-                    (nameTypes.Count > 1 || !nameTypes.Contains("unclass")))
+                if (nameTypes.Count > 1 || !nameTypes.Contains("unclass"))
                 {
                     _ = defResult.Append('(')
                     .Append(string.Join(", ", nameTypes))

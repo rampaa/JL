@@ -26,6 +26,16 @@
                     <TextBlock Text="Don't show results under All" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
+                <DockPanel x:Name="PitchAccentMarkerColorDockPanel" Visibility="Collapsed">
+                    <Button x:Name="PitchAccentMarkerColorButton" Content="" HorizontalAlignment="Left"
+                            Width="50" Height="25" Click="ShowColorPicker" Margin="10, 0, 0, 0"
+                            VerticalAlignment="Center"
+                            BorderThickness="2" BorderBrush="#FF707070" />
+                    <TextBlock Text="Pitch Accent Marker Color"
+                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
+                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
+                </DockPanel>
+
                 <CheckBox Name="WordClassInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Show word class info" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
@@ -86,6 +96,10 @@
                 <CheckBox Name="MiscInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Show misc info" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
+                
+                <CheckBox Name="LoanwordEtymologyCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show the etymology of loanwords" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
 
                 <CheckBox Name="RelatedTermCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Show related terms" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
@@ -94,21 +108,7 @@
                 <CheckBox Name="AntonymCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Show antonyms" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
-
-                <CheckBox Name="LoanwordEtymologyCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Text="Show the etymology of loanwords" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
-                </CheckBox>
-
-                <DockPanel x:Name="PitchAccentMarkerColorDockPanel" Visibility="Collapsed">
-                    <Button x:Name="PitchAccentMarkerColorButton" Content="" HorizontalAlignment="Left"
-                            Width="50" Height="25" Click="ShowColorPicker" Margin="10, 0, 0, 0"
-                            VerticalAlignment="Center"
-                            BorderThickness="2" BorderBrush="#FF707070" />
-                    <TextBlock Text="Pitch Accent Marker Color"
-                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
-                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
-                </DockPanel>
-
+                
             </StackPanel>
         </ScrollViewer>
     </StackPanel>

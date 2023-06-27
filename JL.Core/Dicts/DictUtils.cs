@@ -61,9 +61,9 @@ public static class DictUtils
                         rOrthographyInfo: new ROrthographyInfoOption(true),
                         wordTypeInfo: new WordTypeInfoOption(true),
                         miscInfo: new MiscInfoOption(true),
+                        loanwordEtymology: new LoanwordEtymologyOption(true),
                         relatedTerm: new RelatedTermOption(false),
-                        antonym: new AntonymOption(false),
-                        loanwordEtymology: new LoanwordEtymologyOption(true)
+                        antonym: new AntonymOption(false)
                         ))
             },
             {

@@ -317,9 +317,8 @@ public static class LookupUtils
                                 {
                                     var dictResult = (JmdictRecord)dictResults[i];
 
-                                    if (deconjugationResult.Tags.Count is 0 || (dictResult.WordClasses
-                                            ?.Where(static pos => pos is not null)
-                                            .SelectMany(static pos => pos!).Contains(lastTag) ?? false))
+                                    if (deconjugationResult.Tags.Count is 0
+                                        || dictResult.WordClasses.SelectMany(static pos => pos).Contains(lastTag))
                                     {
                                         resultsList.Add(dictResult);
                                     }

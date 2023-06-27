@@ -32,9 +32,9 @@ public class LookupTests
                         rOrthographyInfo: new ROrthographyInfoOption(true),
                         wordTypeInfo: new WordTypeInfoOption(true),
                         miscInfo: new MiscInfoOption(true),
+                        loanwordEtymology: new LoanwordEtymologyOption(true),
                         relatedTerm: new RelatedTermOption(false),
-                        antonym: new AntonymOption(false),
-                        loanwordEtymology: new LoanwordEtymologyOption(true)
+                        antonym: new AntonymOption(false)
                         )));
 
         JmdictLoader.Load(DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict)).Wait();

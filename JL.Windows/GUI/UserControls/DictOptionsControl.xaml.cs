@@ -42,6 +42,13 @@ internal sealed partial class DictOptionsControl : UserControl
             noAllOption = new NoAllOption(NoAllCheckBox.IsChecked!.Value);
         }
 
+        PitchAccentMarkerColorOption? pitchAccentMarkerColorOption = null;
+        if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(type))
+        {
+            pitchAccentMarkerColorOption = new PitchAccentMarkerColorOption(PitchAccentMarkerColorButton.Background.ToString(CultureInfo.InvariantCulture));
+            DictOptionManager.PitchAccentMarkerColor = WindowsUtils.FrozenBrushFromHex(pitchAccentMarkerColorOption.Value.Value)!;
+        }
+
         WordClassInfoOption? wordClassOption = null;
         if (WordClassInfoOption.ValidDictTypes.Contains(type))
         {
@@ -114,6 +121,12 @@ internal sealed partial class DictOptionsControl : UserControl
             miscInfoOption = new MiscInfoOption(MiscInfoCheckBox.IsChecked!.Value);
         }
 
+        LoanwordEtymologyOption? loanwordEtymology = null;
+        if (LoanwordEtymologyOption.ValidDictTypes.Contains(type))
+        {
+            loanwordEtymology = new LoanwordEtymologyOption(LoanwordEtymologyCheckBox.IsChecked!.Value);
+        }
+
         RelatedTermOption? relatedTermOption = null;
         if (RelatedTermOption.ValidDictTypes.Contains(type))
         {
@@ -124,19 +137,6 @@ internal sealed partial class DictOptionsControl : UserControl
         if (AntonymOption.ValidDictTypes.Contains(type))
         {
             antonymOption = new AntonymOption(AntonymCheckBox.IsChecked!.Value);
-        }
-
-        LoanwordEtymologyOption? loanwordEtymology = null;
-        if (LoanwordEtymologyOption.ValidDictTypes.Contains(type))
-        {
-            loanwordEtymology = new LoanwordEtymologyOption(LoanwordEtymologyCheckBox.IsChecked!.Value);
-        }
-
-        PitchAccentMarkerColorOption? pitchAccentMarkerColorOption = null;
-        if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(type))
-        {
-            pitchAccentMarkerColorOption = new PitchAccentMarkerColorOption(PitchAccentMarkerColorButton.Background.ToString(CultureInfo.InvariantCulture));
-            DictOptionManager.PitchAccentMarkerColor = WindowsUtils.FrozenBrushFromHex(pitchAccentMarkerColorOption.Value.Value)!;
         }
 
         DictOptions options = new(
@@ -155,9 +155,9 @@ internal sealed partial class DictOptionsControl : UserControl
             spellingRestrictionInfo,
             extraDefinitionInfo,
             miscInfoOption,
+            loanwordEtymology,
             relatedTermOption,
-            antonymOption,
-            loanwordEtymology);
+            antonymOption);
 
         return options;
     }
@@ -183,6 +183,13 @@ internal sealed partial class DictOptionsControl : UserControl
         {
             NoAllCheckBox.IsChecked = dict.Options?.NoAll?.Value ?? false;
             NoAllCheckBox.Visibility = Visibility.Visible;
+        }
+
+        if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(dict.Type))
+        {
+            PitchAccentMarkerColorButton.Background = DictOptionManager.PitchAccentMarkerColor;
+
+            PitchAccentMarkerColorDockPanel.Visibility = Visibility.Visible;
         }
 
         if (WordClassInfoOption.ValidDictTypes.Contains(dict.Type))
@@ -252,6 +259,12 @@ internal sealed partial class DictOptionsControl : UserControl
             MiscInfoCheckBox.Visibility = Visibility.Visible;
         }
 
+        if (LoanwordEtymologyOption.ValidDictTypes.Contains(dict.Type))
+        {
+            LoanwordEtymologyCheckBox.IsChecked = dict.Options?.LoanwordEtymology?.Value ?? true;
+            LoanwordEtymologyCheckBox.Visibility = Visibility.Visible;
+        }
+
         if (RelatedTermOption.ValidDictTypes.Contains(dict.Type))
         {
             RelatedTermCheckBox.IsChecked = dict.Options?.RelatedTerm?.Value ?? false;
@@ -264,23 +277,8 @@ internal sealed partial class DictOptionsControl : UserControl
             AntonymCheckBox.Visibility = Visibility.Visible;
         }
 
-        if (LoanwordEtymologyOption.ValidDictTypes.Contains(dict.Type))
-        {
-            LoanwordEtymologyCheckBox.IsChecked = dict.Options?.LoanwordEtymology?.Value ?? true;
-            LoanwordEtymologyCheckBox.Visibility = Visibility.Visible;
-        }
-
-        if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(dict.Type))
-        {
-            PitchAccentMarkerColorButton.Background = DictOptionManager.PitchAccentMarkerColor;
-
-            PitchAccentMarkerColorDockPanel.Visibility = Visibility.Visible;
-        }
-
-        if (
-            NoAllCheckBox.Visibility is Visibility.Visible
-            || PitchAccentMarkerColorDockPanel.Visibility is Visibility.Visible
-           )
+        if (NoAllCheckBox.Visibility is Visibility.Visible
+            || PitchAccentMarkerColorDockPanel.Visibility is Visibility.Visible)
         {
             OptionsTextBlock.Visibility = Visibility.Visible;
             OptionsStackPanel.Visibility = Visibility.Visible;

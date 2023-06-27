@@ -5,6 +5,7 @@ public sealed class DictOptions
     public NewlineBetweenDefinitionsOption? NewlineBetweenDefinitions { get; }
     public ExamplesOption? Examples { get; }
     public NoAllOption? NoAll { get; }
+    public PitchAccentMarkerColorOption? PitchAccentMarkerColor { get; }
     public WordClassInfoOption? WordClassInfo { get; }
     public DialectInfoOption? DialectInfo { get; }
     public POrthographyInfoOption? POrthographyInfo { get; }
@@ -19,7 +20,6 @@ public sealed class DictOptions
     public RelatedTermOption? RelatedTerm { get; }
     public AntonymOption? Antonym { get; }
     public LoanwordEtymologyOption? LoanwordEtymology { get; }
-    public PitchAccentMarkerColorOption? PitchAccentMarkerColor { get; }
 
     public DictOptions
         (
@@ -38,14 +38,15 @@ public sealed class DictOptions
         SpellingRestrictionInfoOption? spellingRestrictionInfo = null,
         ExtraDefinitionInfoOption? extraDefinitionInfo = null,
         MiscInfoOption? miscInfo = null,
+        LoanwordEtymologyOption? loanwordEtymology = null,
         RelatedTermOption? relatedTerm = null,
-        AntonymOption? antonym = null,
-        LoanwordEtymologyOption? loanwordEtymology = null
+        AntonymOption? antonym = null
         )
     {
         NewlineBetweenDefinitions = newlineBetweenDefinitions;
         Examples = examples;
         NoAll = noAll;
+        PitchAccentMarkerColor = pitchAccentMarkerColor;
         WordClassInfo = wordClassInfo;
         DialectInfo = dialectInfo;
         POrthographyInfo = pOrthographyInfo;
@@ -57,9 +58,8 @@ public sealed class DictOptions
         SpellingRestrictionInfo = spellingRestrictionInfo;
         ExtraDefinitionInfo = extraDefinitionInfo;
         MiscInfo = miscInfo;
+        LoanwordEtymology = loanwordEtymology;
         RelatedTerm = relatedTerm;
         Antonym = antonym;
-        LoanwordEtymology = loanwordEtymology;
-        PitchAccentMarkerColor = pitchAccentMarkerColor;
     }
 }

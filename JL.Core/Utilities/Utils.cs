@@ -108,24 +108,45 @@ public static class Utils
         //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
     }
 
-    internal static List<List<T>?>? TrimListOfLists<T>(List<List<T>?> listOfLists)
+    internal static List<List<T>?>? TrimNullableListOfLists<T>(List<List<T>?> listOfLists)
     {
-        List<List<T>?>? listOfListClone = listOfLists;
+        List<List<T>?> listOfListClone = listOfLists;
 
-        if (listOfListClone.Count is 0 || listOfListClone.All(static l => l is null || l.Count is 0))
+        bool returnNull = true;
+        for (int i = 0; i < listOfListClone.Count; i++)
         {
-            listOfListClone = null;
-        }
-        else
-        {
-            listOfListClone.TrimExcess();
+            List<T>? list = listOfListClone[i];
 
-            int counter = listOfListClone.Count;
-            for (int i = 0; i < counter; i++)
+            if (list?.Count > 0)
             {
-                listOfListClone[i]?.TrimExcess();
+                returnNull = false;
+                list.TrimExcess();
+            }
+            else
+            {
+                listOfListClone[i] = null;
             }
         }
+
+        if (returnNull)
+        {
+            return null;
+        }
+
+        listOfListClone.TrimExcess();
+        return listOfListClone;
+    }
+
+    internal static List<List<T>> TrimListOfLists<T>(List<List<T>> listOfLists)
+    {
+        List<List<T>> listOfListClone = listOfLists;
+
+        for (int i = 0; i < listOfListClone.Count; i++)
+        {
+            listOfListClone[i].TrimExcess();
+        }
+
+        listOfListClone.TrimExcess();
 
         return listOfListClone;
     }

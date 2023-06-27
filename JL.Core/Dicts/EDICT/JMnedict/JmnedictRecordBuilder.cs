@@ -23,8 +23,8 @@ internal static class JmnedictRecordBuilder
                 {
                     Translation translation = entry.TranslationList[j];
 
-                    record.Definitions!.Add(translation.TransDetList.Count > 0 ? translation.TransDetList : null);
-                    record.NameTypes!.Add(translation.NameTypeList.Count > 0 ? translation.NameTypeList : null);
+                    record.Definitions.Add(translation.TransDetList);
+                    record.NameTypes.Add(translation.NameTypeList);
                     //record.RelatedTerms!.Add(translation.XRefList > 0 ? translation.XRefList : null);
                 }
 
@@ -65,8 +65,8 @@ internal static class JmnedictRecordBuilder
                 {
                     Translation translation = entry.TranslationList[j];
 
-                    record.Definitions!.Add(translation.TransDetList.Count > 0 ? translation.TransDetList : null);
-                    record.NameTypes!.Add(translation.NameTypeList.Count > 0 ? translation.NameTypeList : null);
+                    record.Definitions.Add(translation.TransDetList);
+                    record.NameTypes.Add(translation.NameTypeList);
                     //record.RelatedTerms!.Add(translation.XRefList > 0 ? translation.XRefList : null);
                 }
 
@@ -80,11 +80,11 @@ internal static class JmnedictRecordBuilder
         foreach (KeyValuePair<string, JmnedictRecord> recordKeyValuePair in recordDictionary)
         {
             JmnedictRecord jmnedictRecord = recordKeyValuePair.Value;
-            jmnedictRecord.Definitions = Utils.TrimListOfLists(recordKeyValuePair.Value.Definitions!);
-            jmnedictRecord.NameTypes = Utils.TrimListOfLists(recordKeyValuePair.Value.NameTypes!);
-            //jmnedictRecord.RelatedTerms = Utils.TrimListOfLists(recordKeyValuePair.Value.RelatedTerms!);
-            jmnedictRecord.AlternativeSpellings = Utils.TrimStringList(recordKeyValuePair.Value.AlternativeSpellings!);
-            jmnedictRecord.Readings = Utils.TrimStringList(recordKeyValuePair.Value.Readings!);
+            jmnedictRecord.Definitions = Utils.TrimListOfLists(jmnedictRecord.Definitions);
+            jmnedictRecord.NameTypes = Utils.TrimListOfLists(jmnedictRecord.NameTypes);
+            //jmnedictRecord.RelatedTerms = Utils.TrimListOfLists(jmnedictRecord.RelatedTerms!);
+            jmnedictRecord.AlternativeSpellings = Utils.TrimStringList(jmnedictRecord.AlternativeSpellings!);
+            jmnedictRecord.Readings = Utils.TrimStringList(jmnedictRecord.Readings!);
             jmnedictRecord.Id = entry.Id;
 
             string key = JapaneseUtils.KatakanaToHiragana(recordKeyValuePair.Key);

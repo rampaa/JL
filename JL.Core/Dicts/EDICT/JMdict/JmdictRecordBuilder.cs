@@ -147,22 +147,22 @@ internal static class JmdictRecordBuilder
         {
             JmdictRecord jmdictRecord = recordKeyValuePair.Value;
 
-            jmdictRecord.Readings = Utils.TrimStringList(recordKeyValuePair.Value.Readings!);
-            jmdictRecord.AlternativeSpellings = Utils.TrimStringList(recordKeyValuePair.Value.AlternativeSpellings!);
-            jmdictRecord.PrimarySpellingOrthographyInfoList = Utils.TrimStringList(recordKeyValuePair.Value.PrimarySpellingOrthographyInfoList!);
-            jmdictRecord.DefinitionInfo = Utils.TrimStringList(recordKeyValuePair.Value.DefinitionInfo!)!;
-            jmdictRecord.Definitions = Utils.TrimListOfLists(recordKeyValuePair.Value.Definitions!)!;
-            jmdictRecord.ReadingRestrictions = Utils.TrimListOfLists(recordKeyValuePair.Value.ReadingRestrictions!);
-            jmdictRecord.SpellingRestrictions = Utils.TrimListOfLists(recordKeyValuePair.Value.SpellingRestrictions!);
-            jmdictRecord.Dialects = Utils.TrimListOfLists(recordKeyValuePair.Value.Dialects!);
-            jmdictRecord.MiscList = Utils.TrimListOfLists(recordKeyValuePair.Value.MiscList!);
-            jmdictRecord.AlternativeSpellingsOrthographyInfoList = Utils.TrimListOfLists(recordKeyValuePair.Value.AlternativeSpellingsOrthographyInfoList!);
-            jmdictRecord.ReadingsOrthographyInfoList = Utils.TrimListOfLists(recordKeyValuePair.Value.ReadingsOrthographyInfoList!);
-            jmdictRecord.FieldList = Utils.TrimListOfLists(recordKeyValuePair.Value.FieldList!);
-            jmdictRecord.WordClasses = Utils.TrimListOfLists(recordKeyValuePair.Value.WordClasses!);
-            jmdictRecord.RelatedTerms = Utils.TrimListOfLists(recordKeyValuePair.Value.RelatedTerms!);
-            jmdictRecord.Antonyms = Utils.TrimListOfLists(recordKeyValuePair.Value.Antonyms!);
-            jmdictRecord.LoanwordEtymology = Utils.TrimListOfLists(recordKeyValuePair.Value.LoanwordEtymology!);
+            jmdictRecord.Definitions = Utils.TrimListOfLists(jmdictRecord.Definitions);
+            jmdictRecord.WordClasses = Utils.TrimListOfLists(jmdictRecord.WordClasses);
+            jmdictRecord.Readings = Utils.TrimStringList(jmdictRecord.Readings!);
+            jmdictRecord.AlternativeSpellings = Utils.TrimStringList(jmdictRecord.AlternativeSpellings!);
+            jmdictRecord.PrimarySpellingOrthographyInfoList = Utils.TrimStringList(jmdictRecord.PrimarySpellingOrthographyInfoList!);
+            jmdictRecord.DefinitionInfo = Utils.TrimStringList(jmdictRecord.DefinitionInfo!)!;
+            jmdictRecord.ReadingRestrictions = Utils.TrimNullableListOfLists(jmdictRecord.ReadingRestrictions!);
+            jmdictRecord.SpellingRestrictions = Utils.TrimNullableListOfLists(jmdictRecord.SpellingRestrictions!);
+            jmdictRecord.Dialects = Utils.TrimNullableListOfLists(jmdictRecord.Dialects!);
+            jmdictRecord.MiscList = Utils.TrimNullableListOfLists(jmdictRecord.MiscList!);
+            jmdictRecord.AlternativeSpellingsOrthographyInfoList = Utils.TrimNullableListOfLists(jmdictRecord.AlternativeSpellingsOrthographyInfoList!);
+            jmdictRecord.ReadingsOrthographyInfoList = Utils.TrimNullableListOfLists(jmdictRecord.ReadingsOrthographyInfoList!);
+            jmdictRecord.FieldList = Utils.TrimNullableListOfLists(jmdictRecord.FieldList!);
+            jmdictRecord.RelatedTerms = Utils.TrimNullableListOfLists(jmdictRecord.RelatedTerms!);
+            jmdictRecord.Antonyms = Utils.TrimNullableListOfLists(jmdictRecord.Antonyms!);
+            jmdictRecord.LoanwordEtymology = Utils.TrimNullableListOfLists(jmdictRecord.LoanwordEtymology!);
             jmdictRecord.Id = entry.Id;
 
             string key = JapaneseUtils.KatakanaToHiragana(recordKeyValuePair.Key);
@@ -180,15 +180,15 @@ internal static class JmdictRecordBuilder
     private static void ProcessSense(JmdictRecord jmdictRecord, Sense sense)
     {
         jmdictRecord.Definitions.Add(sense.GlossList);
-        jmdictRecord.ReadingRestrictions!.Add(sense.StagRList.Count > 0 ? sense.StagRList : null);
-        jmdictRecord.SpellingRestrictions!.Add(sense.StagKList.Count > 0 ? sense.StagKList : null);
-        jmdictRecord.WordClasses!.Add(sense.PosList.Count > 0 ? sense.PosList : null);
-        jmdictRecord.FieldList!.Add(sense.FieldList.Count > 0 ? sense.FieldList : null);
-        jmdictRecord.MiscList!.Add(sense.MiscList.Count > 0 ? sense.MiscList : null);
-        jmdictRecord.Dialects!.Add(sense.DialList.Count > 0 ? sense.DialList : null);
+        jmdictRecord.WordClasses.Add(sense.PosList);
+        jmdictRecord.ReadingRestrictions!.Add(sense.StagRList);
+        jmdictRecord.SpellingRestrictions!.Add(sense.StagKList);
+        jmdictRecord.FieldList!.Add(sense.FieldList);
+        jmdictRecord.MiscList!.Add(sense.MiscList);
+        jmdictRecord.Dialects!.Add(sense.DialList);
         jmdictRecord.DefinitionInfo!.Add(sense.SInf);
-        jmdictRecord.RelatedTerms!.Add(sense.XRefList.Count > 0 ? sense.XRefList : null);
-        jmdictRecord.Antonyms!.Add(sense.AntList.Count > 0 ? sense.AntList : null);
-        jmdictRecord.LoanwordEtymology!.Add(sense.LSourceList.Count > 0 ? sense.LSourceList : null);
+        jmdictRecord.RelatedTerms!.Add(sense.XRefList);
+        jmdictRecord.Antonyms!.Add(sense.AntList);
+        jmdictRecord.LoanwordEtymology!.Add(sense.LSourceList);
     }
 }

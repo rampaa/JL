@@ -47,6 +47,18 @@ public readonly record struct NoAllOption
     }
 }
 
+public readonly record struct PitchAccentMarkerColorOption
+{
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes = { DictType.PitchAccentYomichan };
+    public string Value { get; init; }
+
+    public PitchAccentMarkerColorOption(string value)
+    {
+        Value = value;
+    }
+}
+
 public readonly record struct WordClassInfoOption
 {
     [JsonIgnore]
@@ -177,6 +189,18 @@ public readonly record struct MiscInfoOption
     }
 }
 
+public readonly record struct LoanwordEtymologyOption
+{
+    [JsonIgnore]
+    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
+    public bool Value { get; init; }
+
+    public LoanwordEtymologyOption(bool value)
+    {
+        Value = value;
+    }
+}
+
 public readonly record struct RelatedTermOption
 {
     [JsonIgnore]
@@ -196,30 +220,6 @@ public readonly record struct AntonymOption
     public bool Value { get; init; }
 
     public AntonymOption(bool value)
-    {
-        Value = value;
-    }
-}
-
-public readonly record struct LoanwordEtymologyOption
-{
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
-    public bool Value { get; init; }
-
-    public LoanwordEtymologyOption(bool value)
-    {
-        Value = value;
-    }
-}
-
-public readonly record struct PitchAccentMarkerColorOption
-{
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.PitchAccentYomichan };
-    public string Value { get; init; }
-
-    public PitchAccentMarkerColorOption(string value)
     {
         Value = value;
     }
