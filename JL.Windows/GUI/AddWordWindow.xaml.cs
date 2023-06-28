@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -96,26 +97,12 @@ internal sealed partial class AddWordWindow : Window
 
     private static async Task WriteToFile(string spellings, string readings, string definitions, string partOfSpeech, string wordClasses)
     {
-        StringBuilder stringBuilder = new();
-        stringBuilder = stringBuilder.Append(spellings)
-            .Append('\t')
-            .Append(readings)
-            .Append('\t')
-            .Append(definitions)
-            .Append('\t')
-            .Append(partOfSpeech);
-
-        if (!string.IsNullOrWhiteSpace(wordClasses))
-        {
-            stringBuilder = stringBuilder.Append('\t')
-                .Append(wordClasses);
-        }
-
-        _ = stringBuilder.Append(Environment.NewLine);
+        string line = string.IsNullOrWhiteSpace(wordClasses)
+            ? string.Create(CultureInfo.InvariantCulture, $"{spellings}\t{readings}\t{definitions}\t{partOfSpeech}\n")
+            : string.Create(CultureInfo.InvariantCulture, $"{spellings}\t{readings}\t{definitions}\t{partOfSpeech}\t{wordClasses}\n");
 
         string customWordDictPath = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary).Path;
-        await File.AppendAllTextAsync(customWordDictPath,
-            stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);
+        await File.AppendAllTextAsync(customWordDictPath, line, Encoding.UTF8).ConfigureAwait(false);
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e)

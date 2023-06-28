@@ -1,3 +1,4 @@
+using System.Globalization;
 using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Network;
@@ -33,7 +34,7 @@ public static class Mining
 
         if (dictType is null)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, $"Mining failed for {primarySpelling}. Cannot find the type of {JLField.DictionaryName.GetDescription()}");
+            Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Mining failed for {primarySpelling}. Cannot find the type of {JLField.DictionaryName.GetDescription()}"));
             Utils.Logger.Error("Mining failed for {FoundSpelling}. Cannot find the type of {DictionaryName}", primarySpelling, JLField.DictionaryName.GetDescription());
             return false;
         }
@@ -86,7 +87,7 @@ public static class Mining
             : new Dictionary<string, object>
                 {
                     { "data", audioResponse.AudioData },
-                    { "filename", $"JL_audio_{reading}_{primarySpelling}.{audioResponse.AudioFormat}" },
+                    { "filename", string.Create(CultureInfo.InvariantCulture, $"JL_audio_{reading}_{primarySpelling}.{audioResponse.AudioFormat}") },
                     { "skipHash", Networking.Jpod101NoAudioMd5Hash },
                     { "fields", audioFields }
                 };
@@ -102,7 +103,7 @@ public static class Mining
             : new Dictionary<string, object>
                 {
                     { "data", imageBytes },
-                    { "filename", $"JL_image_{reading}_{primarySpelling}.png" },
+                    { "filename", string.Create(CultureInfo.InvariantCulture, $"JL_image_{reading}_{primarySpelling}.png") },
                     { "fields", imageFields }
                 };
 
@@ -116,20 +117,20 @@ public static class Mining
 
         if (response is null)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, $"Mining failed for {primarySpelling}");
+            Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Mining failed for {primarySpelling}"));
             Utils.Logger.Error("Mining failed for {FoundSpelling}", primarySpelling);
             return false;
         }
 
         if (needsAudio && (audioResponse is null || Utils.GetMd5String(audioResponse.AudioData) is Networking.Jpod101NoAudioMd5Hash))
         {
-            Utils.Frontend.Alert(AlertLevel.Warning, $"Mined {primarySpelling} (no audio)");
+            Utils.Frontend.Alert(AlertLevel.Warning, string.Create(CultureInfo.InvariantCulture, $"Mined {primarySpelling} (no audio)"));
             Utils.Logger.Information("Mined {FoundSpelling} (no audio)", primarySpelling);
         }
 
         else
         {
-            Utils.Frontend.Alert(AlertLevel.Success, $"Mined {primarySpelling}");
+            Utils.Frontend.Alert(AlertLevel.Success, string.Create(CultureInfo.InvariantCulture, $"Mined {primarySpelling}"));
             Utils.Logger.Information("Mined {FoundSpelling}", primarySpelling);
         }
 

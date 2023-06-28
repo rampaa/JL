@@ -50,9 +50,7 @@ internal sealed class JmnedictRecord : IDictRecord
 
                 if (nameTypes.Count > 1 || !nameTypes.Contains("unclass"))
                 {
-                    _ = defResult.Append('(')
-                    .Append(string.Join(", ", nameTypes))
-                    .Append(") ");
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", nameTypes)}) ");
                 }
             }
 
@@ -61,16 +59,13 @@ internal sealed class JmnedictRecord : IDictRecord
             //    List<string>? relatedTerms = RelatedTerms?[i];
             //    if (relatedTerms?.Count > 0)
             //    {
-            //        _ = defResult.Append("(related terms: ")
-            //            .Append(string.Join(", ", relatedTerms))
-            //            .Append(") ");
+            //        _ = defResult.Append("(related terms: {string.Join(", ", relatedTerms)}) ");
             //    }
             //}
 
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", definitions)} ")
-                .Append(separator);
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", definitions)} {separator}");
         }
 
-        return defResult.ToString().TrimEnd(' ', '\n');
+        return defResult.Remove(defResult.Length - separator.Length - 1, separator.Length + 1).ToString();
     }
 }

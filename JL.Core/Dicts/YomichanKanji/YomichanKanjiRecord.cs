@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using JL.Core.Dicts.Options;
@@ -48,7 +49,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
         Stats = new List<string>();
         foreach (JsonProperty stat in statsElement.EnumerateObject())
         {
-            Stats.Add($"{stat.Name}: {stat.Value}");
+            Stats.Add(string.Create(CultureInfo.InvariantCulture, $"{stat.Name}: {stat.Value}"));
         }
 
         if (Stats.Count is 0)
@@ -71,10 +72,10 @@ internal sealed class YomichanKanjiRecord : IDictRecord
 
         for (int i = 0; i < Definitions.Count; i++)
         {
-            _ = defResult.Append(Definitions[i] + separator);
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"{Definitions[i]}{separator}");
         }
 
-        return defResult.ToString().TrimEnd(' ', '\n');
+        return defResult.Remove(defResult.Length - separator.Length, separator.Length).ToString();
     }
 
     public string? BuildFormattedStats()
@@ -88,9 +89,9 @@ internal sealed class YomichanKanjiRecord : IDictRecord
 
         for (int i = 0; i < Stats.Count; i++)
         {
-            _ = statResult.Append(Stats[i] + "\n");
+            _ = statResult.Append(CultureInfo.InvariantCulture, $"{Stats[i]}\n");
         }
 
-        return statResult.ToString().TrimEnd('\n');
+        return statResult.Remove(statResult.Length - 1, 1).ToString();
     }
 }

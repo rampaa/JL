@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -74,17 +75,9 @@ internal sealed partial class AddNameWindow : Window
 
     private static async Task WriteToFile(string spelling, string reading, string type)
     {
-        StringBuilder stringBuilder = new();
-        _ = stringBuilder.Append(spelling)
-            .Append('\t')
-            .Append(reading)
-            .Append('\t')
-            .Append(type)
-            .Append(Environment.NewLine);
-
+        string line = string.Create(CultureInfo.InvariantCulture, $"{spelling}\t{reading}\t{type}\n");
         string customNameDictPath = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomNameDictionary).Path;
-        await File.AppendAllTextAsync(customNameDictPath,
-            stringBuilder.ToString(), Encoding.UTF8).ConfigureAwait(false);
+        await File.AppendAllTextAsync(customNameDictPath, line, Encoding.UTF8).ConfigureAwait(false);
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e)

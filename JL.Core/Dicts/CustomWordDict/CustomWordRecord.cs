@@ -71,13 +71,13 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"({count}) ");
                 }
 
-                _ = defResult.Append(string.Join("; ", Definitions[i]) + " ").Append(separator);
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", Definitions[i])} {separator}");
 
                 ++count;
             }
         }
 
-        return defResult.ToString().TrimEnd(' ', '\n');
+        return defResult.Remove(defResult.Length - separator.Length - 1, separator.Length + 1).ToString();
     }
 
     public int GetFrequency(Freq freq)

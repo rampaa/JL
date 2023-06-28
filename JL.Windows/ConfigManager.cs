@@ -632,7 +632,7 @@ internal static class ConfigManager
 
         MainWindow mainWindow = MainWindow.Instance;
 
-        preferenceWindow.JLVersionTextBlock.Text = $"v{Utils.JLVersion}";
+        preferenceWindow.JLVersionTextBlock.Text = string.Create(CultureInfo.InvariantCulture, $"v{Utils.JLVersion}");
 
         preferenceWindow.DisableHotkeysKeyGestureTextBox.Text = KeyGestureUtils.KeyGestureToString(DisableHotkeysKeyGesture);
         preferenceWindow.MiningModeKeyGestureTextBox.Text = KeyGestureUtils.KeyGestureToString(MiningModeKeyGesture);
@@ -1136,7 +1136,7 @@ internal static class ConfigManager
 
     private static void CreateDefaultAppConfig()
     {
-        string configPath = System.Reflection.Assembly.GetExecutingAssembly().Location + ".config";
+        string configPath = string.Create(CultureInfo.InvariantCulture, $"{System.Reflection.Assembly.GetExecutingAssembly().Location}.config");
         if (!File.Exists(configPath))
         {
             using (XmlWriter writer = XmlWriter.Create(configPath, new XmlWriterSettings { Indent = true }))

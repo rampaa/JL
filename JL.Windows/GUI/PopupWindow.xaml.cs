@@ -93,9 +93,8 @@ internal sealed partial class PopupWindow : Window
 
         if (ConfigManager.ShowMiningModeReminder)
         {
-            TextBlockMiningModeReminder.Text =
-                "Click on an entry's main spelling to mine it," + Environment.NewLine +
-                $"or press {ConfigManager.ClosePopupKeyGesture.Key} or click on the main window to exit.";
+            TextBlockMiningModeReminder.Text = string.Create(CultureInfo.InvariantCulture,
+                $"Click on an entry's main spelling to mine it,\nor press {ConfigManager.ClosePopupKeyGesture.Key} or click on the main window to exit.");
         }
     }
 
@@ -656,7 +655,7 @@ internal sealed partial class PopupWindow : Window
             List<string> alternativeSpellings = result.AlternativeSpellings;
             string alternativeSpellingsText = aOrthographyInfoList.Count > 0 && (result.Dict.Options?.AOrthographyInfo?.Value ?? true)
                 ? PopupWindowUtils.AlternativeSpellingsToText(alternativeSpellings, aOrthographyInfoList)
-                : $"({string.Join(", ", alternativeSpellings)})";
+                : string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", alternativeSpellings)})");
 
             if (alternativeSpellingsText is not "")
             {
@@ -727,7 +726,7 @@ internal sealed partial class PopupWindow : Window
             textBlockPOrthographyInfo = new TextBlock
             {
                 Name = nameof(result.PrimarySpellingOrthographyInfoList),
-                Text = $"({string.Join(", ", result.PrimarySpellingOrthographyInfoList)})",
+                Text = string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", result.PrimarySpellingOrthographyInfoList)})"),
                 Foreground = DictOptionManager.POrthographyInfoColor,
                 FontSize = result.Dict.Options?.POrthographyInfoFontSize?.Value ?? 15,
                 Margin = new Thickness(5, 0, 0, 0),
@@ -743,7 +742,7 @@ internal sealed partial class PopupWindow : Window
             textBlockOnReadings = new TextBlock
             {
                 Name = nameof(result.OnReadings),
-                Text = "On" + ": " + string.Join(", ", result.OnReadings),
+                Text = string.Create(CultureInfo.InvariantCulture, $"On: {string.Join(", ", result.OnReadings)}"),
                 Foreground = ConfigManager.ReadingsColor,
                 FontSize = ConfigManager.ReadingsFontSize,
                 Margin = new Thickness(2, 0, 0, 0),
@@ -758,7 +757,7 @@ internal sealed partial class PopupWindow : Window
             textBlockKunReadings = new TextBlock
             {
                 Name = nameof(result.KunReadings),
-                Text = "Kun" + ": " + string.Join(", ", result.KunReadings),
+                Text = string.Create(CultureInfo.InvariantCulture, $"Kun: {string.Join(", ", result.KunReadings)}"),
                 Foreground = ConfigManager.ReadingsColor,
                 FontSize = ConfigManager.ReadingsFontSize,
                 Margin = new Thickness(2, 0, 0, 0),
@@ -773,7 +772,7 @@ internal sealed partial class PopupWindow : Window
             textBlockNanoriReadings = new TextBlock
             {
                 Name = nameof(result.NanoriReadings),
-                Text = "Nanori Readings: " + string.Join(", ", result.NanoriReadings),
+                Text = string.Create(CultureInfo.InvariantCulture, $"Nanori Readings: {string.Join(", ", result.NanoriReadings)}"),
                 Foreground = ConfigManager.ReadingsColor,
                 FontSize = ConfigManager.ReadingsFontSize,
                 Margin = new Thickness(2, 0, 0, 0),
@@ -788,7 +787,7 @@ internal sealed partial class PopupWindow : Window
             textBlockStrokeCount = new TextBlock
             {
                 Name = nameof(result.StrokeCount),
-                Text = "Strokes" + ": " + result.StrokeCount,
+                Text = string.Create(CultureInfo.InvariantCulture, $"Strokes: {result.StrokeCount}"),
                 Foreground = ConfigManager.DefinitionsColor,
                 FontSize = ConfigManager.DefinitionsFontSize,
                 Margin = new Thickness(2, 2, 2, 2),
@@ -804,7 +803,7 @@ internal sealed partial class PopupWindow : Window
             textBlockGrade = new TextBlock
             {
                 Name = nameof(result.KanjiGrade),
-                Text = nameof(result.KanjiGrade) + ": " + gradeText,
+                Text = string.Create(CultureInfo.InvariantCulture, $"{nameof(result.KanjiGrade)}: {gradeText}"),
                 Foreground = ConfigManager.DefinitionsColor,
                 FontSize = ConfigManager.DefinitionsFontSize,
                 Margin = new Thickness(2, 2, 2, 2),
@@ -819,7 +818,7 @@ internal sealed partial class PopupWindow : Window
             textBlockComposition = new TextBlock
             {
                 Name = nameof(result.KanjiComposition),
-                Text = "Composition: " + result.KanjiComposition,
+                Text = string.Create(CultureInfo.InvariantCulture, $"Composition: {result.KanjiComposition}"),
                 Foreground = ConfigManager.DefinitionsColor,
                 FontSize = ConfigManager.DefinitionsFontSize,
                 Margin = new Thickness(2, 2, 2, 2),
@@ -834,7 +833,7 @@ internal sealed partial class PopupWindow : Window
             textBlockKanjiStats = new TextBlock
             {
                 Name = nameof(result.KanjiStats),
-                Text = "Statistics:\n" + result.KanjiStats,
+                Text = string.Create(CultureInfo.InvariantCulture, $"Statistics:\n{result.KanjiStats}"),
                 Foreground = ConfigManager.DefinitionsColor,
                 FontSize = ConfigManager.DefinitionsFontSize,
                 Margin = new Thickness(2, 2, 2, 2),

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -275,8 +276,8 @@ public static class JapaneseUtils
         for (int i = 0; i < unicodeCharacters.Count; i++)
         {
             if (unicodeCharacters.Count > i + 1
-                && s_compositeHalfWidthKatakanaToFullWidthHiraganaDict.TryGetValue(
-                    unicodeCharacters[i] + unicodeCharacters[i + 1], out string? compositeStr))
+                && s_compositeHalfWidthKatakanaToFullWidthHiraganaDict.TryGetValue(string.Create(CultureInfo.InvariantCulture,
+                $"{unicodeCharacters[i]}{unicodeCharacters[i + 1]}"), out string? compositeStr))
             {
                 _ = textInHiragana.Append(compositeStr);
                 ++i;
@@ -379,7 +380,7 @@ public static class JapaneseUtils
             if (i + 1 < unicodeCharacterList.Count
                 && s_smallCombiningKanaSet.Contains(unicodeCharacterList[i + 1]))
             {
-                combinedForm.Add(unicodeCharacterList[i] + unicodeCharacterList[i + 1]);
+                combinedForm.Add(string.Create(CultureInfo.InvariantCulture, $"{unicodeCharacterList[i]}{unicodeCharacterList[i + 1]}"));
                 ++i;
             }
 
@@ -513,15 +514,15 @@ public static class JapaneseUtils
 
     public static string RemovePunctuation(string text)
     {
-        StringBuilder stringBuilder = new(text.Length);
+        StringBuilder sb = new(text.Length);
         foreach (char character in text)
         {
             if (char.IsLetterOrDigit(character) || char.IsSurrogate(character))
             {
-                _ = stringBuilder.Append(character);
+                _ = sb.Append(character);
             }
         }
 
-        return stringBuilder.ToString();
+        return sb.ToString();
     }
 }

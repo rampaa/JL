@@ -83,9 +83,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                 List<string>? wordClasses = WordClasses?[i];
                 if (wordClasses?.Count > 0)
                 {
-                    _ = defResult.Append('(')
-                        .Append(string.Join(", ", wordClasses))
-                        .Append(") ");
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", wordClasses)}) ");
                 }
             }
 
@@ -99,19 +97,17 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                 List<string>? dialects = Dialects?[i];
                 if (dialects?.Count > 0)
                 {
-                    _ = defResult.Append('(')
-                        .Append(string.Join(", ", dialects))
-                        .Append(") ");
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", dialects)}) ");
                 }
             }
 
-            if (showExtraDefinitionInfo
-                && definitionInfoExists
-                && DefinitionInfo![i] is not null)
+            if (showExtraDefinitionInfo && definitionInfoExists)
             {
-                _ = defResult.Append('(')
-                    .Append(DefinitionInfo[i])
-                    .Append(") ");
+                string? definitionInfo = DefinitionInfo![i];
+                if (definitionInfo is not null)
+                {
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({definitionInfo}) ");
+                }
             }
 
             if (showMiscInfo)
@@ -119,9 +115,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                 List<string>? misc = MiscList?[i];
                 if (misc?.Count > 0)
                 {
-                    _ = defResult.Append('(')
-                        .Append(string.Join(", ", misc))
-                        .Append(") ");
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", misc)}) ");
                 }
             }
 
@@ -130,9 +124,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                 List<string>? fields = FieldList?[i];
                 if (fields?.Count > 0)
                 {
-                    _ = defResult.Append('(')
-                    .Append(string.Join(", ", fields))
-                    .Append(") ");
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", fields)}) ");
                 }
             }
 
@@ -176,21 +168,22 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                     int lSourceCount = lSources.Count;
                     for (int j = 0; j < lSourceCount; j++)
                     {
-                        if (lSources[j].IsWasei)
+                        LoanwordSource lSource = lSources[j];
+                        if (lSource.IsWasei)
                         {
                             _ = defResult.Append("Wasei ");
                         }
 
-                        _ = defResult.Append(lSources[j].Language);
+                        _ = defResult.Append(lSource.Language);
 
-                        if (lSources[j].OriginalWord is not null)
+                        if (lSource.OriginalWord is not null)
                         {
-                            _ = defResult.Append(": ").Append(lSources[j].OriginalWord);
+                            _ = defResult.Append(CultureInfo.InvariantCulture, $": {lSource.OriginalWord}");
                         }
 
                         if (j + 1 < lSourceCount)
                         {
-                            _ = defResult.Append(lSources[j].IsPart ? " + " : ", ");
+                            _ = defResult.Append(lSource.IsPart ? " + " : ", ");
                         }
                     }
 
@@ -203,9 +196,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                 List<string>? relatedTerms = RelatedTerms?[i];
                 if (relatedTerms?.Count > 0)
                 {
-                    _ = defResult.Append("(related terms: ")
-                        .Append(string.Join(", ", relatedTerms))
-                        .Append(") ");
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"(related terms: {string.Join(", ", relatedTerms)}) ");
                 }
             }
 
@@ -214,16 +205,14 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                 List<string>? antonyms = Antonyms?[i];
                 if (antonyms?.Count > 0)
                 {
-                    _ = defResult.Append("(antonyms: ")
-                        .Append(string.Join(", ", antonyms))
-                        .Append(") ");
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"(antonyms: {string.Join(", ", antonyms)}) ");
                 }
             }
 
             _ = defResult.Append(separator);
         }
 
-        return defResult.ToString().TrimEnd(' ', '\n');
+        return defResult.Remove(defResult.Length - separator.Length - 1, separator.Length + 1).ToString();
     }
 
     public int GetFrequency(Freq freq)

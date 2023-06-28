@@ -379,17 +379,16 @@ internal sealed partial class ManageDictionariesWindow : Window
     private static string EntityDictToString(Dictionary<string, string> entityDict)
     {
         StringBuilder sb = new();
-        IOrderedEnumerable<KeyValuePair<string, string>> sortedJmdictEntities = entityDict.OrderBy(static e => e.Key);
 
+        IOrderedEnumerable<KeyValuePair<string, string>> sortedJmdictEntities = entityDict.OrderBy(static e => e.Key);
         foreach (KeyValuePair<string, string> entity in sortedJmdictEntities)
         {
-            _ = sb.Append(entity.Key)
-                .Append(": ")
-                .Append(entity.Value)
-                .Append(Environment.NewLine);
+            _ = sb.Append(CultureInfo.InvariantCulture, $"{entity.Key}: {entity.Value}\n");
         }
 
-        return sb.ToString()[..^Environment.NewLine.Length];
+        return sb.Length > 0
+            ? sb.Remove(sb.Length - 1, 1).ToString()
+            : "";
     }
 
     private void ShowInfoWindow(Dictionary<string, string> entityDict, string title)

@@ -239,13 +239,13 @@ internal static class WindowsUtils
         string browserPath = "";
         if (!string.IsNullOrWhiteSpace(ConfigManager.BrowserPath))
         {
-            browserPath = $"\"{ConfigManager.BrowserPath}\"";
+            browserPath = string.Create(CultureInfo.InvariantCulture, $"\"{ConfigManager.BrowserPath}\"");
         }
 
         if (selectedText?.Length > 0)
         {
             _ = Process.Start(new ProcessStartInfo("cmd",
-                $"/c start \"\" {browserPath} \"{ConfigManager.SearchUrl.Replace("{SearchTerm}", System.Web.HttpUtility.UrlEncode(selectedText), StringComparison.Ordinal)}\"")
+                string.Create(CultureInfo.InvariantCulture, $"/c start \"\" {browserPath} \"{ConfigManager.SearchUrl.Replace("{SearchTerm}", System.Web.HttpUtility.UrlEncode(selectedText), StringComparison.Ordinal)}\""))
             { CreateNoWindow = true });
         }
     }
@@ -277,7 +277,7 @@ internal static class WindowsUtils
 
             _ = Process.Start(
                 new ProcessStartInfo("cmd",
-                $"/c start \"JL Updater\" \"{Path.Join(Utils.ApplicationPath, "update-helper.cmd")}\" {Environment.ProcessId}")
+                string.Create(CultureInfo.InvariantCulture, $"/c start \"JL Updater\" \"{Path.Join(Utils.ApplicationPath, "update-helper.cmd")}\" {Environment.ProcessId}"))
                 { UseShellExecute = true, Verb = "runas" });
         }
 
@@ -598,7 +598,7 @@ internal static class WindowsUtils
         resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("ResourceDictionary.xaml", UriKind.Relative) });
         resources.MergedDictionaries.Add(new ResourceDictionary
         {
-            Source = new Uri($"pack://application:,,,/HandyControl;component/Themes/Skin{skin}.xaml")
+            Source = new Uri(string.Create(CultureInfo.InvariantCulture, $"pack://application:,,,/HandyControl;component/Themes/Skin{skin}.xaml"))
         });
         resources.MergedDictionaries.Add(new ResourceDictionary
         {

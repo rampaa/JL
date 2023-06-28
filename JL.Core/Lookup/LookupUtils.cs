@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
@@ -576,24 +577,32 @@ public static class LookupUtils
                     {
                         StringBuilder formattedROrthographyInfo = new();
 
-                        for (int l = 0; l < rLists[k]?.Count; l++)
+                        List<string>? rList = rLists[k];
+                        if (rList?.Count > 0)
                         {
-                            _ = formattedROrthographyInfo.Append(rLists[k]![l]).Append(", ");
-                        }
+                            for (int l = 0; l < rList.Count; l++)
+                            {
+                                _ = formattedROrthographyInfo.Append(CultureInfo.InvariantCulture, $"{rList[l]}, ");
+                            }
 
-                        rOrthographyInfoList.Add(formattedROrthographyInfo.ToString().TrimEnd(", ".ToCharArray()));
+                            rOrthographyInfoList.Add(formattedROrthographyInfo.Remove(formattedROrthographyInfo.Length - 2, 2).ToString());
+                        }
                     }
 
                     for (int k = 0; k < aLists.Count; k++)
                     {
                         StringBuilder formattedAOrthographyInfo = new();
 
-                        for (int l = 0; l < aLists[k]?.Count; l++)
+                        List<string>? aList = aLists[k];
+                        if (aList?.Count > 0)
                         {
-                            _ = formattedAOrthographyInfo.Append(aLists[k]![l]).Append(", ");
-                        }
+                            for (int l = 0; l < aList.Count; l++)
+                            {
+                                _ = formattedAOrthographyInfo.Append(CultureInfo.InvariantCulture, $"{aList[l]}, ");
+                            }
 
-                        aOrthographyInfoList.Add(formattedAOrthographyInfo.ToString().TrimEnd(", ".ToCharArray()));
+                            aOrthographyInfoList.Add(formattedAOrthographyInfo.Remove(formattedAOrthographyInfo.Length - 2, 2).ToString());
+                        }
                     }
 
                     LookupResult result = new
@@ -1013,10 +1022,8 @@ public static class LookupUtils
             if (formText.Length is not 0)
             {
                 _ = first
-                    ? deconjugation.Append('～')
-                    : deconjugation.Append("; ");
-
-                _ = deconjugation.Append(formText);
+                    ? deconjugation.Append(CultureInfo.InvariantCulture, $"～{formText}")
+                    : deconjugation.Append(CultureInfo.InvariantCulture, $"; {formText}");
             }
 
             first = false;

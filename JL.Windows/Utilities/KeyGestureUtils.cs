@@ -1,4 +1,5 @@
 using System.Configuration;
+using System.Globalization;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -120,40 +121,37 @@ internal static class KeyGestureUtils
 
     public static string KeyGestureToString(KeyGesture keyGesture)
     {
-        StringBuilder keyGestureStringBuilder = new();
-
         if (keyGesture.Key is Key.LeftShift or Key.RightShift
             or Key.LeftCtrl or Key.RightCtrl
             or Key.LeftAlt or Key.RightAlt)
         {
-            _ = keyGestureStringBuilder.Append(keyGesture.Key.ToString());
+            return keyGesture.Key.ToString();
         }
 
-        else
+        StringBuilder sb = new();
+
+        if (keyGesture.Modifiers.HasFlag(ModifierKeys.Control))
         {
-            if (keyGesture.Modifiers.HasFlag(ModifierKeys.Control))
-            {
-                _ = keyGestureStringBuilder.Append("Ctrl+");
-            }
-
-            if (keyGesture.Modifiers.HasFlag(ModifierKeys.Alt))
-            {
-                _ = keyGestureStringBuilder.Append("Alt+");
-            }
-
-            if (keyGesture.Modifiers.HasFlag(ModifierKeys.Shift) && keyGestureStringBuilder.Length > 0)
-            {
-                _ = keyGestureStringBuilder.Append("Shift+");
-            }
-
-            if (keyGesture.Key is not Key.None)
-            {
-                _ = keyGestureStringBuilder.Append(keyGesture.Key.ToString());
-            }
+            _ = sb.Append("Ctrl+");
         }
 
-        return keyGestureStringBuilder.Length > 0
-            ? keyGestureStringBuilder.ToString()
+        if (keyGesture.Modifiers.HasFlag(ModifierKeys.Alt))
+        {
+            _ = sb.Append("Alt+");
+        }
+
+        if (keyGesture.Modifiers.HasFlag(ModifierKeys.Shift) && sb.Length > 0)
+        {
+            _ = sb.Append("Shift+");
+        }
+
+        if (keyGesture.Key is not Key.None)
+        {
+            _ = sb.Append(keyGesture.Key.ToString());
+        }
+
+        return sb.Length > 0
+            ? sb.ToString()
             : "None";
     }
 
@@ -169,7 +167,7 @@ internal static class KeyGestureUtils
                 || rawKeyGesture.Contains("Alt", StringComparison.Ordinal)
                 || rawKeyGesture.Contains("Shift", StringComparison.Ordinal)
                 ? (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture)!
-                : (KeyGesture)keyGestureConverter.ConvertFromString("Win+" + rawKeyGesture)!;
+                : (KeyGesture)keyGestureConverter.ConvertFromString(string.Create(CultureInfo.InvariantCulture, $"Win+{rawKeyGesture}"))!;
 
             if (ConfigManager.GlobalHotKeys && setAsGlobalHotKey)
             {

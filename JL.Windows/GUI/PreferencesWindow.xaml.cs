@@ -373,36 +373,35 @@ internal sealed partial class PreferencesWindow : Window
             return;
         }
 
-        StringBuilder hotKeyTextBuilder = new();
-
+        string hotKeyText;
         if (key is Key.LeftShift or Key.RightShift
             or Key.LeftCtrl or Key.RightCtrl
             or Key.LeftAlt or Key.RightAlt)
         {
-            _ = hotKeyTextBuilder.Append(key.ToString());
+            hotKeyText = key.ToString();
         }
-
         else
         {
+            StringBuilder sb = new();
+
             if ((Keyboard.Modifiers & ModifierKeys.Control) is not 0)
             {
-                _ = hotKeyTextBuilder.Append("Ctrl+");
+                _ = sb.Append("Ctrl+");
             }
 
             if ((Keyboard.Modifiers & ModifierKeys.Alt) is not 0)
             {
-                _ = hotKeyTextBuilder.Append("Alt+");
+                _ = sb.Append("Alt+");
             }
 
-            if ((Keyboard.Modifiers & ModifierKeys.Shift) is not 0 && hotKeyTextBuilder.Length > 0)
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) is not 0 && sb.Length > 0)
             {
-                _ = hotKeyTextBuilder.Append("Shift+");
+                _ = sb.Append("Shift+");
             }
 
-            _ = hotKeyTextBuilder.Append(key.ToString());
+            hotKeyText = sb.Append(key.ToString()).ToString();
         }
 
-        string hotKeyText = hotKeyTextBuilder.ToString();
         TextBox currentTextBox = (TextBox)sender;
 
         if (LookupKeyKeyGestureTextBox != currentTextBox

@@ -19,9 +19,9 @@ internal static class PopupWindowUtils
         string gradeText = grade switch
         {
             0 => "Hyougai",
-            <= 6 => $"{grade} (Kyouiku)",
-            8 => $"{grade} (Jouyou)",
-            <= 10 => $"{grade} (Jinmeiyou)",
+            <= 6 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Kyouiku)"),
+            8 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Jouyou)"),
+            <= 10 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Jinmeiyou)"),
             _ => ""
         };
 
@@ -30,37 +30,31 @@ internal static class PopupWindowUtils
 
     public static string FrequenciesToText(List<LookupFrequencyResult> frequencies)
     {
-        string freqStr = "";
-
         if (frequencies.Count is 1 && frequencies[0].Freq is > 0 and not int.MaxValue)
         {
-            freqStr = $"#{frequencies.First().Freq}";
+            return string.Create(CultureInfo.InvariantCulture, $"#{frequencies.First().Freq}");
         }
 
-        else if (frequencies.Count > 1)
+        if (frequencies.Count > 1)
         {
             int freqResultCount = 0;
-            StringBuilder freqStrBuilder = new();
+            StringBuilder sb = new();
             foreach (LookupFrequencyResult lookupFreqResult in frequencies)
             {
-                if (lookupFreqResult.Freq is int.MaxValue or <= 0)
+                if (lookupFreqResult.Freq is > 0 and < int.MaxValue)
                 {
-                    continue;
+                    _ = sb.Append(CultureInfo.InvariantCulture, $"{lookupFreqResult.Name}: #{lookupFreqResult.Freq}, ");
+                    ++freqResultCount;
                 }
-
-                _ = freqStrBuilder.Append(CultureInfo.InvariantCulture, $"{lookupFreqResult.Name}: #{lookupFreqResult.Freq}, ");
-                ++freqResultCount;
             }
 
             if (freqResultCount > 0)
             {
-                _ = freqStrBuilder.Remove(freqStrBuilder.Length - 2, 1);
-
-                freqStr = freqStrBuilder.ToString();
+                return sb.Remove(sb.Length - 2, 2).ToString();
             }
         }
 
-        return freqStr;
+        return "";
     }
 
     public static string ReadingsToText(IReadOnlyList<string> readings, IReadOnlyList<string> rOrthographyInfoList)
@@ -80,9 +74,7 @@ internal static class PopupWindowUtils
             {
                 if (!string.IsNullOrEmpty(rOrthographyInfoList[index]))
                 {
-                    _ = sb.Append(" (")
-                        .Append(rOrthographyInfoList[index])
-                        .Append(')');
+                    _ = sb.Append(CultureInfo.InvariantCulture, $" ({rOrthographyInfoList[index]})");
                 }
             }
 
@@ -114,9 +106,7 @@ internal static class PopupWindowUtils
             {
                 if (!string.IsNullOrEmpty(aOrthographyInfoList[index]))
                 {
-                    _ = sb.Append(" (")
-                        .Append(aOrthographyInfoList[index])
-                        .Append(')');
+                    _ = sb.Append(CultureInfo.InvariantCulture, $" ({aOrthographyInfoList[index]})");
                 }
             }
 
@@ -154,7 +144,7 @@ internal static class PopupWindowUtils
             if (i > 0)
             {
                 horizontalOffsetForReading +=
-                    WindowsUtils.MeasureTextSize(splitReadingsWithRInfo[i - 1] + ", ", fontSize).Width;
+                    WindowsUtils.MeasureTextSize(string.Create(CultureInfo.InvariantCulture, $"{splitReadingsWithRInfo[i - 1]}, "), fontSize).Width;
             }
 
             if (dict.Contents.TryGetValue(normalizedExpression, out List<IDictRecord>? pitchAccentDictResultList))
