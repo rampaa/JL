@@ -27,22 +27,36 @@ internal static class EpwingNazekaLoader
         {
             string reading = jsonObj.GetProperty("r").ToString();
 
-            List<string>? spellings = jsonObj.GetProperty("s").ToString().TrimStart('[').TrimEnd(']')
-                .Split("\",", StringSplitOptions.RemoveEmptyEntries)
-                .Select(static select => select.Trim('\n', ' ', '"')).ToList();
+            List<string>? spellings = new();
+            foreach (JsonElement spellingJsonElement in jsonObj.GetProperty("s").EnumerateArray())
+            {
+                string spelling = spellingJsonElement.ToString();
 
-            List<string>? definitions = jsonObj.GetProperty("l").ToString().TrimStart('[').TrimEnd(']')
-                .Split("\",", StringSplitOptions.RemoveEmptyEntries)
-                .Select(static select => select.Trim('\n', ' ', '"')).ToList();
+                if (!string.IsNullOrWhiteSpace(spelling))
+                {
+                    spellings.Add(spelling);
+                }
+            }
+
+            if (spellings.Count is 0)
+            {
+                spellings = null;
+            }
+
+            List<string>? definitions = new();
+            foreach (JsonElement definitionJsonElement in jsonObj.GetProperty("l").EnumerateArray())
+            {
+                string definition = definitionJsonElement.ToString();
+
+                if (!string.IsNullOrWhiteSpace(definition))
+                {
+                    definitions.Add(definition);
+                }
+            }
 
             if (definitions.Count is 0)
             {
                 definitions = null;
-            }
-
-            if (spellings.Count is 1 && spellings[0] is "")
-            {
-                spellings = null;
             }
 
             if (spellings is not null)

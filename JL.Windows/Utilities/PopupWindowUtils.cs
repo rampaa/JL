@@ -30,7 +30,7 @@ internal static class PopupWindowUtils
 
     public static string FrequenciesToText(List<LookupFrequencyResult> frequencies)
     {
-        if (frequencies.Count is 1 && frequencies[0].Freq is > 0 and not int.MaxValue)
+        if (frequencies.Count is 1 && frequencies[0].Freq is > 0 and < int.MaxValue)
         {
             return string.Create(CultureInfo.InvariantCulture, $"#{frequencies.First().Freq}");
         }

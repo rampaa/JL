@@ -157,12 +157,10 @@ public static class Utils
 
         if (listClone.Count is 0 || listClone.All(string.IsNullOrEmpty))
         {
-            listClone = null;
+            return null;
         }
-        else
-        {
-            listClone.TrimExcess();
-        }
+
+        listClone.TrimExcess();
 
         return listClone;
     }
