@@ -121,18 +121,18 @@ internal static class PopupWindowUtils
         return sb.ToString();
     }
 
-    public static Grid CreatePitchAccentGrid(string primarySpelling, IReadOnlyList<string> alternativeSpellings,
-    IReadOnlyList<string> readings, IReadOnlyList<string> splitReadingsWithRInfo, double leftMargin, Dict dict)
+    public static Grid CreatePitchAccentGrid(string primarySpelling, IReadOnlyList<string>? alternativeSpellings,
+    IReadOnlyList<string>? readings, IReadOnlyList<string> splitReadingsWithRInfo, double leftMargin, Dict dict)
     {
         Grid pitchAccentGrid = new();
 
-        bool hasReading = readings.Count > 0;
+        bool hasReading = readings?.Count > 0;
 
         int fontSize = hasReading
             ? ConfigManager.ReadingsFontSize
             : ConfigManager.PrimarySpellingFontSize;
 
-        IReadOnlyList<string> expressions = hasReading ? readings : new List<string> { primarySpelling };
+        IReadOnlyList<string> expressions = hasReading ? readings! : new List<string> { primarySpelling };
 
         double horizontalOffsetForReading = leftMargin;
 

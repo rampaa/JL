@@ -169,8 +169,8 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
         var customWordRecordObj = (CustomWordRecord)obj;
 
         return PrimarySpelling == customWordRecordObj.PrimarySpelling
-               && (customWordRecordObj.AlternativeSpellings?.SequenceEqual(AlternativeSpellings ?? new List<string>()) ?? AlternativeSpellings is null)
-               && (customWordRecordObj.Readings?.SequenceEqual(Readings ?? new List<string>()) ?? Readings is null)
+               && (customWordRecordObj.AlternativeSpellings?.SequenceEqual(AlternativeSpellings ?? Enumerable.Empty<string>()) ?? AlternativeSpellings is null)
+               && (customWordRecordObj.Readings?.SequenceEqual(Readings ?? Enumerable.Empty<string>()) ?? Readings is null)
                && customWordRecordObj.Definitions.SequenceEqual(Definitions)
                && customWordRecordObj.WordClasses.SequenceEqual(WordClasses);
     }

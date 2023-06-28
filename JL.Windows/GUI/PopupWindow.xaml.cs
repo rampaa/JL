@@ -538,9 +538,9 @@ internal sealed partial class PopupWindow : Window
 
         if (result.Readings?.Count > 0)
         {
-            List<string> rOrthographyInfoList = result.ReadingsOrthographyInfoList ?? new List<string>();
+            List<string>? rOrthographyInfoList = result.ReadingsOrthographyInfoList;
             List<string> readings = result.Readings;
-            string readingsText = rOrthographyInfoList.Count > 0 && (result.Dict.Options?.ROrthographyInfo?.Value ?? true)
+            string readingsText = rOrthographyInfoList?.Count > 0 && (result.Dict.Options?.ROrthographyInfo?.Value ?? true)
                 ? PopupWindowUtils.ReadingsToText(readings, rOrthographyInfoList)
                 : string.Join(", ", result.Readings);
 
@@ -651,9 +651,9 @@ internal sealed partial class PopupWindow : Window
 
         if (result.AlternativeSpellings?.Count > 0)
         {
-            List<string> aOrthographyInfoList = result.AlternativeSpellingsOrthographyInfoList ?? new List<string>();
+            List<string>? aOrthographyInfoList = result.AlternativeSpellingsOrthographyInfoList;
             List<string> alternativeSpellings = result.AlternativeSpellings;
-            string alternativeSpellingsText = aOrthographyInfoList.Count > 0 && (result.Dict.Options?.AOrthographyInfo?.Value ?? true)
+            string alternativeSpellingsText = aOrthographyInfoList?.Count > 0 && (result.Dict.Options?.AOrthographyInfo?.Value ?? true)
                 ? PopupWindowUtils.AlternativeSpellingsToText(alternativeSpellings, aOrthographyInfoList)
                 : string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", alternativeSpellings)})");
 
@@ -883,8 +883,8 @@ internal sealed partial class PopupWindow : Window
                         else
                         {
                             Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
-                                result.AlternativeSpellings ?? new List<string>(),
-                                readings ?? new List<string>(),
+                                result.AlternativeSpellings,
+                                readings,
                                 textBlock.Text.Split(", ").ToList(),
                                 textBlock.Margin.Left,
                                 pitchDict);
@@ -937,8 +937,8 @@ internal sealed partial class PopupWindow : Window
                         else
                         {
                             Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
-                                result.AlternativeSpellings ?? new List<string>(),
-                                readings ?? new List<string>(),
+                                result.AlternativeSpellings,
+                                readings,
                                 textBox.Text.Split(", ").ToList(),
                                 textBox.Margin.Left,
                                 pitchDict);

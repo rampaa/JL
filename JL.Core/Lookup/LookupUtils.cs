@@ -568,12 +568,12 @@ public static class LookupUtils
                 {
                     var jMDictResult = (JmdictRecord)wordResult.Results[i][j];
 
-                    List<List<string>?> rLists = jMDictResult.ReadingsOrthographyInfoList ?? new List<List<string>?>();
-                    List<List<string>?> aLists = jMDictResult.AlternativeSpellingsOrthographyInfoList ?? new List<List<string>?>();
+                    List<List<string>?>? rLists = jMDictResult.ReadingsOrthographyInfoList;
+                    List<List<string>?>? aLists = jMDictResult.AlternativeSpellingsOrthographyInfoList;
                     List<string> rOrthographyInfoList = new();
                     List<string> aOrthographyInfoList = new();
 
-                    for (int k = 0; k < rLists.Count; k++)
+                    for (int k = 0; k < rLists?.Count; k++)
                     {
                         StringBuilder formattedROrthographyInfo = new();
 
@@ -589,7 +589,7 @@ public static class LookupUtils
                         }
                     }
 
-                    for (int k = 0; k < aLists.Count; k++)
+                    for (int k = 0; k < aLists?.Count; k++)
                     {
                         StringBuilder formattedAOrthographyInfo = new();
 

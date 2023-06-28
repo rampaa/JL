@@ -139,7 +139,7 @@ internal static class EpwingUtils
 
                 if (epwingRecord.Definitions is not null)
                 {
-                    if (previousResult.Definitions?.SequenceEqual(epwingRecord.Definitions ?? new List<string>()) ?? epwingRecord.Definitions is null)
+                    if (previousResult.Definitions?.SequenceEqual(epwingRecord.Definitions ?? Enumerable.Empty<string>()) ?? epwingRecord.Definitions is null)
                     {
                         // If an entry has reading info while others don't, keep the one with the reading info.
                         if (string.IsNullOrEmpty(previousResult.Reading) &&
@@ -168,7 +168,7 @@ internal static class EpwingUtils
 
                 if (epwingRecord.Definitions is not null)
                 {
-                    if (previousResult.Definitions?.SequenceEqual(epwingRecord.Definitions ?? new List<string>()) ?? epwingRecord.Definitions is null)
+                    if (previousResult.Definitions?.SequenceEqual(epwingRecord.Definitions ?? Enumerable.Empty<string>()) ?? epwingRecord.Definitions is null)
                     {
                         if (string.IsNullOrEmpty(previousResult.Reading))
                         {
