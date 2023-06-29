@@ -30,6 +30,7 @@ public static class Utils
             shared: true)
         .CreateLogger();
 
+
     internal static readonly Dictionary<string, string> s_iso6392BTo2T = new()
     {
         #pragma warning disable format
@@ -40,10 +41,10 @@ public static class Utils
         #pragma warning restore format
     };
 
+
 #pragma warning disable CA5351
     internal static string GetMd5String(byte[] bytes)
     {
-
         byte[] hash = MD5.HashData(bytes);
         string encoded = BitConverter.ToString(hash);
 
@@ -110,12 +111,10 @@ public static class Utils
 
     internal static List<List<T>?>? TrimNullableListOfLists<T>(List<List<T>?> listOfLists)
     {
-        List<List<T>?> listOfListClone = listOfLists;
-
         bool returnNull = true;
-        for (int i = 0; i < listOfListClone.Count; i++)
+        for (int i = 0; i < listOfLists.Count; i++)
         {
-            List<T>? list = listOfListClone[i];
+            List<T>? list = listOfLists[i];
 
             if (list?.Count > 0)
             {
@@ -124,7 +123,7 @@ public static class Utils
             }
             else
             {
-                listOfListClone[i] = null;
+                listOfLists[i] = null;
             }
         }
 
@@ -133,35 +132,31 @@ public static class Utils
             return null;
         }
 
-        listOfListClone.TrimExcess();
-        return listOfListClone;
+        listOfLists.TrimExcess();
+        return listOfLists;
     }
 
     internal static List<List<T>> TrimListOfLists<T>(List<List<T>> listOfLists)
     {
-        List<List<T>> listOfListClone = listOfLists;
-
-        for (int i = 0; i < listOfListClone.Count; i++)
+        for (int i = 0; i < listOfLists.Count; i++)
         {
-            listOfListClone[i].TrimExcess();
+            listOfLists[i].TrimExcess();
         }
 
-        listOfListClone.TrimExcess();
+        listOfLists.TrimExcess();
 
-        return listOfListClone;
+        return listOfLists;
     }
 
     internal static List<string>? TrimStringList(List<string> list)
     {
-        List<string>? listClone = list;
-
-        if (listClone.Count is 0 || listClone.All(string.IsNullOrEmpty))
+        if (list.Count is 0 || list.All(string.IsNullOrEmpty))
         {
             return null;
         }
 
-        listClone.TrimExcess();
+        list.TrimExcess();
 
-        return listClone;
+        return list;
     }
 }

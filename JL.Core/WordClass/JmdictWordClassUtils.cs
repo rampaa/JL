@@ -54,7 +54,7 @@ internal static class JmdictWordClassUtils
     {
         Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary = new();
 
-        string[] usedWordClasses =
+        HashSet<string> usedWordClasses = new()
         {
             "adj-i", "adj-na", "v1", "v1-s", "v4r", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m",
             "v5n", "v5r", "v5r-i", "v5s", "v5t", "v5u", "v5u-s", "vk", "vs-c", "vs-i", "vs-s", "vz"
@@ -67,12 +67,7 @@ internal static class JmdictWordClassUtils
             {
                 var value = (JmdictRecord)jmdictRecordList[i];
 
-                if (value.WordClasses?.Count is 0)
-                {
-                    continue;
-                }
-
-                List<string> wordClasses = value.WordClasses?.Where(static wc => wc is not null).SelectMany(static wc => wc!).ToHashSet().Intersect(usedWordClasses).ToList() ?? new List<string>();
+                List<string> wordClasses = usedWordClasses.Intersect(value.WordClasses.SelectMany(static wc => wc)).ToList();
 
                 if (wordClasses.Count is 0)
                 {
@@ -82,7 +77,7 @@ internal static class JmdictWordClassUtils
                 if (jmdictWordClassDictionary.TryGetValue(value.PrimarySpelling, out List<JmdictWordClass>? psr))
                 {
                     if (!psr.Any(r =>
-                            r.Readings?.SequenceEqual(value.Readings ?? new List<string>()) ??
+                            r.Readings?.SequenceEqual(value.Readings ?? Enumerable.Empty<string>()) ??
                             (value.Readings is null && r.Spelling == value.PrimarySpelling)))
                     {
                         psr.Add(new JmdictWordClass(value.PrimarySpelling, value.Readings, wordClasses));
@@ -105,7 +100,7 @@ internal static class JmdictWordClassUtils
                         if (jmdictWordClassDictionary.TryGetValue(spelling, out List<JmdictWordClass>? asr))
                         {
                             if (!asr.Any(r =>
-                                    r.Readings?.SequenceEqual(value.Readings ?? new List<string>()) ??
+                                    r.Readings?.SequenceEqual(value.Readings ?? Enumerable.Empty<string>()) ??
                                     (value.Readings is null && r.Spelling == spelling)))
                             {
                                 asr.Add(new JmdictWordClass(spelling, value.Readings, wordClasses));

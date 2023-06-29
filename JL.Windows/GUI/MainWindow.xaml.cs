@@ -77,7 +77,7 @@ internal sealed partial class MainWindow : Window
 
         if (ConfigManager.CaptureTextFromClipboard)
         {
-            CopyFromClipboard();
+            await CopyFromClipboard().ConfigureAwait(true);
             _lastClipboardChangeTime = new DateTime(Stopwatch.GetTimestamp());
         }
 
@@ -90,7 +90,7 @@ internal sealed partial class MainWindow : Window
         await WindowsUtils.InitializeMainWindow().ConfigureAwait(false);
     }
 
-    private async void CopyFromClipboard()
+    private async Task CopyFromClipboard()
     {
         bool gotTextFromClipboard = false;
         while (Clipboard.ContainsText() && !gotTextFromClipboard)
@@ -269,7 +269,7 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    private void ClipboardChanged(object? sender, EventArgs? e)
+    private async void ClipboardChanged(object? sender, EventArgs? e)
     {
         if (!ConfigManager.CaptureTextFromClipboard)
         {
@@ -281,11 +281,11 @@ internal sealed partial class MainWindow : Window
         if ((currentTime - _lastClipboardChangeTime).TotalMilliseconds > 5)
         {
             _lastClipboardChangeTime = currentTime;
-            CopyFromClipboard();
+            await CopyFromClipboard().ConfigureAwait(false);
         }
     }
 
-    public void MainTextBox_MouseMove(object? sender, MouseEventArgs? e)
+    public async void MainTextBox_MouseMove(object? sender, MouseEventArgs? e)
     {
         if (ConfigManager.LookupOnSelectOnly
             || ConfigManager.LookupOnLeftClickOnly
@@ -301,7 +301,7 @@ internal sealed partial class MainWindow : Window
         }
 
         _stopPrecache = true;
-        FirstPopupWindow.TextBox_MouseMove(MainTextBox);
+        await FirstPopupWindow.TextBox_MouseMove(MainTextBox).ConfigureAwait(false);
     }
 
     private void MainWindow_Closed(object sender, EventArgs e)
@@ -938,7 +938,7 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    private void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    private async void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         if ((!ConfigManager.LookupOnSelectOnly && !ConfigManager.LookupOnLeftClickOnly)
             || ConfigManager.InactiveLookupMode
@@ -950,12 +950,12 @@ internal sealed partial class MainWindow : Window
 
         if (ConfigManager.LookupOnSelectOnly)
         {
-            FirstPopupWindow.LookupOnSelect(MainTextBox);
+            await FirstPopupWindow.LookupOnSelect(MainTextBox).ConfigureAwait(false);
         }
 
         else
         {
-            FirstPopupWindow.TextBox_MouseMove(MainTextBox);
+            await FirstPopupWindow.TextBox_MouseMove(MainTextBox).ConfigureAwait(false);
         }
     }
 

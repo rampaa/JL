@@ -119,7 +119,7 @@ internal sealed partial class PopupWindow : Window
         await WindowsUtils.ShowStatsWindow().ConfigureAwait(false);
     }
 
-    public async void TextBox_MouseMove(TextBox tb)
+    public async Task TextBox_MouseMove(TextBox tb)
     {
         if (ConfigManager.InactiveLookupMode
             || (MiningMode && !ConfigManager.LookupOnLeftClickOnly)
@@ -246,7 +246,7 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    public async void LookupOnSelect(TextBox tb)
+    public async Task LookupOnSelect(TextBox tb)
     {
         if (string.IsNullOrWhiteSpace(tb.SelectedText))
         {
@@ -1029,7 +1029,7 @@ internal sealed partial class PopupWindow : Window
         _lastSelectedText = ((TextBox)sender).SelectedText;
     }
 
-    private void PopupMouseMove(object sender, MouseEventArgs e)
+    private async void PopupMouseMove(object sender, MouseEventArgs e)
     {
         if (ConfigManager.LookupOnSelectOnly
             || ConfigManager.LookupOnLeftClickOnly
@@ -1049,7 +1049,7 @@ internal sealed partial class PopupWindow : Window
         // prevents stray PopupWindows being created when you move your mouse too fast
         if (MiningMode)
         {
-            ChildPopupWindow.Definitions_MouseMove((TextBox)sender);
+            await ChildPopupWindow.Definitions_MouseMove((TextBox)sender).ConfigureAwait(false);
         }
     }
 
@@ -1221,11 +1221,11 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    private void Definitions_MouseMove(TextBox tb)
+    private async Task Definitions_MouseMove(TextBox tb)
     {
         if (JapaneseUtils.JapaneseRegex.IsMatch(tb.Text))
         {
-            TextBox_MouseMove(tb);
+            await TextBox_MouseMove(tb).ConfigureAwait(false);
         }
 
         else if (ConfigManager.HighlightLongestMatch)
@@ -1321,7 +1321,7 @@ internal sealed partial class PopupWindow : Window
             Utils.Frontend.InvalidateDisplayCache();
             if (Owner != MainWindow.Instance)
             {
-                TextBox_MouseMove(_lastTextBox!);
+                await TextBox_MouseMove(_lastTextBox!).ConfigureAwait(false);
             }
 
             else
@@ -1578,7 +1578,7 @@ internal sealed partial class PopupWindow : Window
         HidePopup();
     }
 
-    private void UiElement_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    private async void UiElement_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         if ((!ConfigManager.LookupOnSelectOnly && !ConfigManager.LookupOnLeftClickOnly)
             || Background.Opacity is 0
@@ -1593,12 +1593,12 @@ internal sealed partial class PopupWindow : Window
 
         if (ConfigManager.LookupOnSelectOnly)
         {
-            ChildPopupWindow.LookupOnSelect((TextBox)sender);
+            await ChildPopupWindow.LookupOnSelect((TextBox)sender).ConfigureAwait(false);
         }
 
         else
         {
-            ChildPopupWindow.TextBox_MouseMove((TextBox)sender);
+            await ChildPopupWindow.TextBox_MouseMove((TextBox)sender).ConfigureAwait(false);
         }
     }
 

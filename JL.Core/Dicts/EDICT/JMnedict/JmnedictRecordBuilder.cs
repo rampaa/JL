@@ -77,7 +77,7 @@ internal static class JmnedictRecordBuilder
             }
         }
 
-        foreach ((string? dictKey, JmnedictRecord? jmnedictRecord) in recordDictionary)
+        foreach ((string dictKey, JmnedictRecord jmnedictRecord) in recordDictionary)
         {
             jmnedictRecord.Definitions = Utils.TrimListOfLists(jmnedictRecord.Definitions);
             jmnedictRecord.NameTypes = Utils.TrimListOfLists(jmnedictRecord.NameTypes);

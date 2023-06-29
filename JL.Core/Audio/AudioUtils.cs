@@ -227,7 +227,7 @@ public static class AudioUtils
                     IOrderedEnumerable<KeyValuePair<string, AudioSource>> audioSources = deserializedAudioSources.OrderBy(static d => d.Value.Priority);
                     int priority = 1;
 
-                    foreach ((string? key, AudioSource? audioSource) in audioSources)
+                    foreach ((string key, AudioSource audioSource) in audioSources)
                     {
                         audioSource.Priority = priority;
                         AudioSources.Add(key, audioSource);

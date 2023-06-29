@@ -14,7 +14,7 @@ internal static class KeyGestureUtils
 
     public static readonly HashSet<Key> ValidKeys = new()
     {
-#pragma warning disable format
+        #pragma warning disable format
 
         // Function keys
         // The F12 key is reserved for use by the debugger at all times so it cannot be used as a global key
@@ -31,7 +31,7 @@ internal static class KeyGestureUtils
         Key.Multiply, Key.Add, Key.Separator, Key.Subtract, Key.Multiply,
         Key.Decimal, Key.Divide
 
-#pragma warning restore format
+        #pragma warning restore format
     };
 
     public static async Task HandleKeyDown(KeyEventArgs e)

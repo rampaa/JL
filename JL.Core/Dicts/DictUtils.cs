@@ -339,7 +339,7 @@ public static class DictUtils
 
     public static readonly Dictionary<string, string> JmnedictEntities = new()
     {
-#pragma warning disable format
+        #pragma warning disable format
         { "char", "character" }, { "company", "company name" }, { "creat", "creature" }, { "dei", "deity" },
         { "doc", "document" }, { "ev", "event" }, { "fem", "female given name or forename" }, { "fict", "fiction" },
         { "given", "given name or forename, gender not specified" },
@@ -347,7 +347,7 @@ public static class DictUtils
         { "obj", "object" }, { "organization", "organization name" }, { "oth", "other" }, { "person", "full name of a particular person" },
         { "place", "place name" }, { "product", "product name" }, { "relig", "religion" }, { "serv", "service" },
         { "station", "railway station" }, { "surname", "family or surname" }, { "unclass", "unclassified name" }, { "work", "work of art, literature, music, etc. name" },
-#pragma warning restore format
+        #pragma warning restore format
     };
 
     public static readonly List<DictType> YomichanDictTypes = new()

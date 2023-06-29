@@ -143,7 +143,7 @@ internal static class JmdictRecordBuilder
             recordDictionary.Add(key, record);
         }
 
-        foreach ((string? dictKey, JmdictRecord? jmdictRecord) in recordDictionary)
+        foreach ((string dictKey, JmdictRecord jmdictRecord) in recordDictionary)
         {
             jmdictRecord.Definitions = Utils.TrimListOfLists(jmdictRecord.Definitions);
             jmdictRecord.WordClasses = Utils.TrimListOfLists(jmdictRecord.WordClasses);
