@@ -24,7 +24,7 @@
         <Border Name="BottomLeftBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="5" Height="5" Background="Transparent"/>
         <Border Name="BottomRightBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="5" Height="5" Background="Transparent"/>
         <Border Name="TopLeftBorder"  MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Top" HorizontalAlignment="left" Height="5" Width="5" Background="Transparent"/>
-        
+
         <Rectangle Name="TitleBar" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="15" Margin="5,5,5,5" Opacity="1" Fill="Transparent" MouseEnter="TitleBar_MouseEnter" MouseLeave="TitleBar_MouseLeave">
             <Rectangle.ContextMenu>
                 <ContextMenu Name="TitleBarContextMenu">
@@ -48,7 +48,7 @@
                  PreviewMouseLeftButtonUp="MainTextBox_PreviewMouseLeftButtonUp" ContextMenuOpening="MainTextBox_ContextMenuOpening" AcceptsReturn="True" AcceptsTab="True">
 
             <TextBox.ContextMenu>
-                <ContextMenu Name="MainTextboxContextMenu">
+                <ContextMenu Name="MainTextBoxContextMenu">
                     <MenuItem
                         Name="AddNameMenuItem"
                         Header="Add name"

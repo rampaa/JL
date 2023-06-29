@@ -696,8 +696,8 @@ internal static class ConfigManager
 
         WindowsUtils.SetButtonColor(preferenceWindow.HighlightColorButton, HighlightColor);
         WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, mainWindow.Background.CloneCurrentValue());
-        WindowsUtils.SetButtonColor(preferenceWindow.TextboxTextColorButton, MainWindowTextColor);
-        WindowsUtils.SetButtonColor(preferenceWindow.TextboxBacklogTextColorButton, MainWindowBacklogTextColor);
+        WindowsUtils.SetButtonColor(preferenceWindow.TextBoxTextColorButton, MainWindowTextColor);
+        WindowsUtils.SetButtonColor(preferenceWindow.TextBoxBacklogTextColorButton, MainWindowBacklogTextColor);
         WindowsUtils.SetButtonColor(preferenceWindow.DeconjugationInfoColorButton, DeconjugationInfoColor);
         WindowsUtils.SetButtonColor(preferenceWindow.DefinitionsColorButton, DefinitionsColor);
         WindowsUtils.SetButtonColor(preferenceWindow.FrequencyColorButton, FrequencyColor);
@@ -739,7 +739,7 @@ internal static class ConfigManager
 
         preferenceWindow.MainWindowHeightNumericUpDown.Value = MainWindowHeight;
         preferenceWindow.MainWindowWidthNumericUpDown.Value = MainWindowWidth;
-        preferenceWindow.TextboxFontSizeNumericUpDown.Value = mainWindow.FontSizeSlider.Value;
+        preferenceWindow.TextBoxFontSizeNumericUpDown.Value = mainWindow.FontSizeSlider.Value;
         preferenceWindow.MainWindowOpacityNumericUpDown.Value = mainWindow.OpacitySlider.Value;
 
         preferenceWindow.ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox.IsChecked = ChangeMainWindowBackgroundOpacityOnUnhover;
@@ -946,11 +946,11 @@ internal static class ConfigManager
             preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked.ToString();
 
         config.AppSettings.Settings[nameof(MainWindowTextColor)].Value =
-            preferenceWindow.TextboxTextColorButton.Tag.ToString();
+            preferenceWindow.TextBoxTextColorButton.Tag.ToString();
         config.AppSettings.Settings[nameof(MainWindowBacklogTextColor)].Value =
-            preferenceWindow.TextboxBacklogTextColorButton.Tag.ToString();
+            preferenceWindow.TextBoxBacklogTextColorButton.Tag.ToString();
         config.AppSettings.Settings["MainWindowFontSize"].Value =
-            preferenceWindow.TextboxFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
+            preferenceWindow.TextBoxFontSizeNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["MainWindowOpacity"].Value =
             preferenceWindow.MainWindowOpacityNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings["Theme"].Value =
