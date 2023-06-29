@@ -297,7 +297,7 @@ internal sealed partial class PreferencesWindow : Window
 
             string selectedDescription = comboBox.SelectionBoxItem.ToString()!;
             JLField result = jlFieldList.FirstOrDefault(jlFieldName =>
-                    (jlFieldName.GetDescription() ?? jlFieldName.ToString()) == selectedDescription, JLField.Nothing);
+                (jlFieldName.GetDescription() ?? jlFieldName.ToString()) == selectedDescription, JLField.Nothing);
 
             dict.Add(textBlock.Text, result);
         }

@@ -50,7 +50,7 @@ public sealed class LookupResult
         int edictId = 0,
         int strokeCount = 0,
         int kanjiGrade = -1
-        )
+    )
     {
         MatchedText = matchedText;
         DeconjugatedMatchedText = deconjugatedMatchedText;

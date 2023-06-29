@@ -18,6 +18,7 @@ internal static class Deconjugator
         {
             return null;
         }
+
         // ending doesn't match
         if (!myForm.Text.EndsWith(myRule.ConEnd, StringComparison.Ordinal))
         {
@@ -63,16 +64,19 @@ internal static class Deconjugator
         {
             return null;
         }
+
         // deconjugated form too much longer than conjugated form
         if (myForm.Text.Length > myForm.OriginalText.Length + 10)
         {
             return null;
         }
+
         // impossibly information-dense
         if (myForm.Tags.Count > myForm.OriginalText.Length + 6)
         {
             return null;
         }
+
         // blank detail mean it can't be the last (first applied, but rightmost) rule
         if (myRule.Detail is "" && myForm.Tags.Count is 0)
         {

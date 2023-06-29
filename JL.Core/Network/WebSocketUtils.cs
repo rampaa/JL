@@ -3,10 +3,12 @@ using System.Text;
 using JL.Core.Utilities;
 
 namespace JL.Core.Network;
+
 public static class WebSocketUtils
 {
     private static Task? s_webSocketTask = null;
     private static CancellationTokenSource? s_webSocketCancellationTokenSource = null;
+
     public static void HandleWebSocket()
     {
         if (!CoreConfig.CaptureTextFromWebSocket)

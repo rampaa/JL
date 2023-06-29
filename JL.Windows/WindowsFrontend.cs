@@ -6,6 +6,7 @@ using JL.Windows.Utilities;
 using MessageBox = HandyControl.Controls.MessageBox;
 
 namespace JL.Windows;
+
 internal sealed class WindowsFrontend : IFrontend
 {
     public void PlayAudio(byte[] audio, string audioFormat, float volume) => WindowsUtils.PlayAudio(audio, audioFormat, volume);

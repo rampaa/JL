@@ -70,6 +70,7 @@ public static class FreqUtils
                         freq.Contents.Clear();
                         freqRemoved = true;
                     }
+
                     break;
 
                 case FreqType.Yomichan:
@@ -101,6 +102,7 @@ public static class FreqUtils
                         freq.Contents.Clear();
                         freqRemoved = true;
                     }
+
                     break;
 
                 default:

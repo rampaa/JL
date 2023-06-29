@@ -14,7 +14,7 @@ internal static class KeyGestureUtils
 
     public static readonly HashSet<Key> ValidKeys = new()
     {
-        #pragma warning disable format
+#pragma warning disable format
 
         // Function keys
         // The F12 key is reserved for use by the debugger at all times so it cannot be used as a global key
@@ -31,7 +31,7 @@ internal static class KeyGestureUtils
         Key.Multiply, Key.Add, Key.Separator, Key.Subtract, Key.Multiply,
         Key.Decimal, Key.Divide
 
-        #pragma warning restore format
+#pragma warning restore format
     };
 
     public static async Task HandleKeyDown(KeyEventArgs e)
@@ -107,9 +107,9 @@ internal static class KeyGestureUtils
         }
 
         return Keyboard.IsKeyDown(keyGesture.Key)
-            && (ModifierAsKeyPress(keyGesture.Key)
-                ? keyGesture.Modifiers is ModifierKeys.None
-                : Keyboard.Modifiers == keyGesture.Modifiers);
+               && (ModifierAsKeyPress(keyGesture.Key)
+                   ? keyGesture.Modifiers is ModifierKeys.None
+                   : Keyboard.Modifiers == keyGesture.Modifiers);
     }
 
     private static bool ModifierAsKeyPress(Key key)
@@ -164,8 +164,8 @@ internal static class KeyGestureUtils
             KeyGestureConverter keyGestureConverter = new();
 
             KeyGesture newKeyGesture = rawKeyGesture.Contains("Ctrl", StringComparison.Ordinal)
-                || rawKeyGesture.Contains("Alt", StringComparison.Ordinal)
-                || rawKeyGesture.Contains("Shift", StringComparison.Ordinal)
+                                       || rawKeyGesture.Contains("Alt", StringComparison.Ordinal)
+                                       || rawKeyGesture.Contains("Shift", StringComparison.Ordinal)
                 ? (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture)!
                 : (KeyGesture)keyGestureConverter.ConvertFromString(string.Create(CultureInfo.InvariantCulture, $"Win+{rawKeyGesture}"))!;
 

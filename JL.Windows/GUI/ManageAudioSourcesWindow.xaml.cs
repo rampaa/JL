@@ -9,6 +9,7 @@ using JL.Core.Utilities;
 using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
+
 /// <summary>
 /// Interaction logic for ManageAudioSourcesWindow.xaml
 /// </summary>

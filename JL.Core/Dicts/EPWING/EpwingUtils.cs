@@ -78,10 +78,12 @@ internal static class EpwingUtils
                         }
                     }
                 }
+
                 if (epwingRecord.Definitions is not null)
                 {
                     epwingRecord.Definitions = epwingRecord.Definitions.Select(static def => def.Replace("┏", "", StringComparison.Ordinal)).ToList();
                 }
+
                 break;
 
             case DictType.Daijirin:
@@ -99,6 +101,7 @@ internal static class EpwingUtils
                         return false;
                     }
                 }
+
                 break;
 
             case DictType.Daijisen:
@@ -113,6 +116,7 @@ internal static class EpwingUtils
                 {
                     return false;
                 }
+
                 break;
 
             case DictType.Koujien:
@@ -121,6 +125,7 @@ internal static class EpwingUtils
                 {
                     return false;
                 }
+
                 break;
         }
 
@@ -159,8 +164,8 @@ internal static class EpwingUtils
         }
 
         else if (epwingRecord.Reading is not null && dict.Contents.TryGetValue(
-                JapaneseUtils.KatakanaToHiragana(epwingRecord.Reading),
-                out previousResults))
+                     JapaneseUtils.KatakanaToHiragana(epwingRecord.Reading),
+                     out previousResults))
         {
             for (int i = 0; i < previousResults.Count; i++)
             {

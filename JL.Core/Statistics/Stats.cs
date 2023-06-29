@@ -117,7 +117,7 @@ public sealed class Stats
             try
             {
                 return JsonSerializer.Deserialize<Stats>(
-                   await File.ReadAllTextAsync(Path.Join(Utils.ConfigPath, "Stats.json")).ConfigureAwait(false)) ?? new Stats();
+                    await File.ReadAllTextAsync(Path.Join(Utils.ConfigPath, "Stats.json")).ConfigureAwait(false)) ?? new Stats();
             }
 
             catch (Exception ex)

@@ -57,6 +57,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
             Stats = null;
         }
     }
+
     public string? BuildFormattedDefinition(DictOptions? options)
     {
         if (Definitions is null)

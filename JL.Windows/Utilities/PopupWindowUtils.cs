@@ -12,6 +12,7 @@ using JL.Core.Utilities;
 using JL.Windows.GUI;
 
 namespace JL.Windows.Utilities;
+
 internal static class PopupWindowUtils
 {
     public static string GradeToText(int grade)
@@ -122,7 +123,7 @@ internal static class PopupWindowUtils
     }
 
     public static Grid CreatePitchAccentGrid(string primarySpelling, IReadOnlyList<string>? alternativeSpellings,
-    IReadOnlyList<string>? readings, IReadOnlyList<string> splitReadingsWithRInfo, double leftMargin, Dict dict)
+        IReadOnlyList<string>? readings, IReadOnlyList<string> splitReadingsWithRInfo, double leftMargin, Dict dict)
     {
         Grid pitchAccentGrid = new();
 

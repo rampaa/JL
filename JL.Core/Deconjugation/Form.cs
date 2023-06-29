@@ -7,6 +7,7 @@ internal sealed class Form
     public List<string> Tags { get; }
     public HashSet<string> SeenText { get; }
     public List<string> Process { get; }
+
     public Form(string text, string originalText, List<string> tags, HashSet<string> seenText,
         List<string> process)
     {
@@ -60,5 +61,4 @@ internal sealed class Form
             return hash;
         }
     }
-
 }

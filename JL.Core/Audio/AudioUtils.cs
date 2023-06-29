@@ -16,8 +16,7 @@ public static class AudioUtils
     private static readonly Dictionary<string, AudioSource> s_builtInAudioSources = new()
     {
         {
-            "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={Term}&kana={Reading}",
-            new AudioSource(AudioSourceType.Url, true, 1)
+            "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={Term}&kana={Reading}", new AudioSource(AudioSourceType.Url, true, 1)
         }
     };
 
@@ -228,11 +227,10 @@ public static class AudioUtils
                     IOrderedEnumerable<KeyValuePair<string, AudioSource>> audioSources = deserializedAudioSources.OrderBy(static d => d.Value.Priority);
                     int priority = 1;
 
-                    foreach (KeyValuePair<string, AudioSource> audioSourceKeyValuePair in audioSources)
+                    foreach ((string? key, AudioSource? audioSource) in audioSources)
                     {
-                        AudioSource audioSource = audioSourceKeyValuePair.Value;
                         audioSource.Priority = priority;
-                        AudioSources.Add(audioSourceKeyValuePair.Key, audioSource);
+                        AudioSources.Add(key, audioSource);
 
                         ++priority;
                     }

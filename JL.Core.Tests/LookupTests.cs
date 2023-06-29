@@ -21,21 +21,21 @@ public class LookupTests
 
         DictUtils.Dicts.Add("JMdict",
             new Dict(DictType.JMdict, "JMdict", jmdictPath, true, 0, 500000,
-                    new DictOptions(
-                        new NewlineBetweenDefinitionsOption(false),
-                        wordClassInfo: new WordClassInfoOption(true),
-                        dialectInfo: new DialectInfoOption(true),
-                        pOrthographyInfo: new POrthographyInfoOption(true),
-                        pOrthographyInfoColor: new POrthographyInfoColorOption("#FFD2691E"),
-                        pOrthographyInfoFontSize: new POrthographyInfoFontSizeOption(15),
-                        aOrthographyInfo: new AOrthographyInfoOption(true),
-                        rOrthographyInfo: new ROrthographyInfoOption(true),
-                        wordTypeInfo: new WordTypeInfoOption(true),
-                        miscInfo: new MiscInfoOption(true),
-                        loanwordEtymology: new LoanwordEtymologyOption(true),
-                        relatedTerm: new RelatedTermOption(false),
-                        antonym: new AntonymOption(false)
-                        )));
+                new DictOptions(
+                    new NewlineBetweenDefinitionsOption(false),
+                    wordClassInfo: new WordClassInfoOption(true),
+                    dialectInfo: new DialectInfoOption(true),
+                    pOrthographyInfo: new POrthographyInfoOption(true),
+                    pOrthographyInfoColor: new POrthographyInfoColorOption("#FFD2691E"),
+                    pOrthographyInfoFontSize: new POrthographyInfoFontSizeOption(15),
+                    aOrthographyInfo: new AOrthographyInfoOption(true),
+                    rOrthographyInfo: new ROrthographyInfoOption(true),
+                    wordTypeInfo: new WordTypeInfoOption(true),
+                    miscInfo: new MiscInfoOption(true),
+                    loanwordEtymology: new LoanwordEtymologyOption(true),
+                    relatedTerm: new RelatedTermOption(false),
+                    antonym: new AntonymOption(false)
+                )));
 
         JmdictLoader.Load(DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict)).Wait();
         FreqUtils.FreqDicts = FreqUtils.s_builtInFreqs;
@@ -53,12 +53,11 @@ public class LookupTests
                 (
                     matchedText: "始まる",
                     dict: DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict),
-                    frequencies: new List<LookupFrequencyResult> {new ("VN (Nazeka)", 759 ) },
+                    frequencies: new List<LookupFrequencyResult> { new("VN (Nazeka)", 759) },
                     primarySpelling: "始まる",
                     deconjugatedMatchedText: "始まる",
                     readings: new List<string> { "はじまる" },
-                    formattedDefinitions:
-                        "(v5r, vi) (1) to begin; to start; to commence (v5r, vi) (2) to happen (again); to begin (anew) (v5r, vi) (3) to date (from); to originate (in)",
+                    formattedDefinitions: "(v5r, vi) (1) to begin; to start; to commence (v5r, vi) (2) to happen (again); to begin (anew) (v5r, vi) (3) to date (from); to originate (in)",
                     edictId: 1307500,
                     alternativeSpellingsOrthographyInfoList: new List<string>(),
                     readingsOrthographyInfoList: new List<string>()

@@ -6,6 +6,7 @@ using JL.Core.Utilities;
 using Path = System.IO.Path;
 
 namespace JL.Windows.GUI;
+
 /// <summary>
 /// Interaction logic for EditAudioSourceWindow.xaml
 /// </summary>
@@ -77,8 +78,8 @@ internal sealed partial class EditAudioSourceWindow : Window
         }
 
         else if (string.IsNullOrEmpty(uri)
-            || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "", StringComparison.Ordinal).Replace("{Reading}", "", StringComparison.Ordinal), UriKind.Absolute)
-            || (_uri != uri && AudioUtils.AudioSources.ContainsKey(uri)))
+                 || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "", StringComparison.Ordinal).Replace("{Reading}", "", StringComparison.Ordinal), UriKind.Absolute)
+                 || (_uri != uri && AudioUtils.AudioSources.ContainsKey(uri)))
         {
             TextBlockUri.BorderBrush = Brushes.Red;
             isValid = false;

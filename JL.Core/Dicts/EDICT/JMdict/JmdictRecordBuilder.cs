@@ -143,10 +143,8 @@ internal static class JmdictRecordBuilder
             recordDictionary.Add(key, record);
         }
 
-        foreach (KeyValuePair<string, JmdictRecord> recordKeyValuePair in recordDictionary)
+        foreach ((string? dictKey, JmdictRecord? jmdictRecord) in recordDictionary)
         {
-            JmdictRecord jmdictRecord = recordKeyValuePair.Value;
-
             jmdictRecord.Definitions = Utils.TrimListOfLists(jmdictRecord.Definitions);
             jmdictRecord.WordClasses = Utils.TrimListOfLists(jmdictRecord.WordClasses);
             jmdictRecord.Readings = Utils.TrimStringList(jmdictRecord.Readings!);
@@ -165,7 +163,7 @@ internal static class JmdictRecordBuilder
             jmdictRecord.LoanwordEtymology = Utils.TrimNullableListOfLists(jmdictRecord.LoanwordEtymology!);
             jmdictRecord.Id = entry.Id;
 
-            string key = JapaneseUtils.KatakanaToHiragana(recordKeyValuePair.Key);
+            string key = JapaneseUtils.KatakanaToHiragana(dictKey);
             if (jmdictDictionary.TryGetValue(key, out List<IDictRecord>? tempRecordList))
             {
                 tempRecordList.Add(jmdictRecord);

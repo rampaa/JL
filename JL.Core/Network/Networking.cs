@@ -9,6 +9,7 @@ public static class Networking
     public static readonly HttpClient Client = new(new HttpClientHandler { UseProxy = false }) { Timeout = TimeSpan.FromMinutes(10) };
     internal const string Jpod101NoAudioMd5Hash = "7E-2C-2F-95-4E-F6-05-13-73-BA-91-6F-00-01-68-DC";
     private static readonly Uri s_gitHubApiUrlForLatestJLRelease = new("https://api.github.com/repos/rampaa/JL/releases/latest");
+
     public static async Task CheckForJLUpdates(bool isAutoCheck)
     {
         try
@@ -32,7 +33,9 @@ public static class Networking
                         bool foundRelease = false;
                         string architecture = RuntimeInformation.ProcessArchitecture is Architecture.Arm64
                             ? "arm64"
-                            : Environment.Is64BitProcess ? "x64" : "x86";
+                            : Environment.Is64BitProcess
+                                ? "x64"
+                                : "x86";
 
                         JsonElement assets = jsonDocument.RootElement.GetProperty("assets");
 
@@ -46,13 +49,14 @@ public static class Networking
                                 foundRelease = true;
 
                                 if (Utils.Frontend.ShowYesNoDialog(
-                                    "A new version of JL is available. Would you like to download it now?", "Update JL?"))
+                                        "A new version of JL is available. Would you like to download it now?", "Update JL?"))
                                 {
                                     Utils.Frontend.ShowOkDialog(
                                         "This may take a while. Please don't manually shut down the program until it's updated.", "Info");
 
                                     await Utils.Frontend.UpdateJL(new Uri(latestReleaseUrl)).ConfigureAwait(false);
                                 }
+
                                 break;
                             }
                         }
@@ -61,7 +65,6 @@ public static class Networking
                         {
                             Utils.Frontend.ShowOkDialog("JL is up to date", "Info");
                         }
-
                     }
 
                     else if (!isAutoCheck)

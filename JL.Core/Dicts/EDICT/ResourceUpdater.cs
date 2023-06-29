@@ -18,8 +18,8 @@ public static class ResourceUpdater
         try
         {
             if (!isUpdate || Utils.Frontend.ShowYesNoDialog(string.Create(CultureInfo.InvariantCulture,
-                $"Do you want to download the latest version of {resourceName}?"),
-                "Update dictionary?"))
+                        $"Do you want to download the latest version of {resourceName}?"),
+                    "Update dictionary?"))
             {
                 using HttpRequestMessage request = new(HttpMethod.Get, resourceDownloadUri);
 
@@ -31,7 +31,7 @@ public static class ResourceUpdater
                 if (!noPrompt)
                 {
                     Utils.Frontend.ShowOkDialog(string.Create(CultureInfo.InvariantCulture,
-                        $"This may take a while. Please don't shut down the program until {resourceName} is downloaded."),
+                            $"This may take a while. Please don't shut down the program until {resourceName} is downloaded."),
                         "Info");
                 }
 
@@ -47,7 +47,7 @@ public static class ResourceUpdater
                     if (!noPrompt)
                     {
                         Utils.Frontend.ShowOkDialog(string.Create(CultureInfo.InvariantCulture,
-                            $"{resourceName} has been downloaded successfully."),
+                                $"{resourceName} has been downloaded successfully."),
                             "Info");
                     }
 
@@ -57,7 +57,7 @@ public static class ResourceUpdater
                 if (response.StatusCode is HttpStatusCode.NotModified && !noPrompt)
                 {
                     Utils.Frontend.ShowOkDialog(string.Create(CultureInfo.InvariantCulture,
-                        $"{resourceName} is up to date."),
+                            $"{resourceName} is up to date."),
                         "Info");
                 }
 
@@ -69,7 +69,7 @@ public static class ResourceUpdater
                     if (!noPrompt)
                     {
                         Utils.Frontend.ShowOkDialog(string.Create(CultureInfo.InvariantCulture,
-                            $"Unexpected error while downloading {resourceName}."),
+                                $"Unexpected error while downloading {resourceName}."),
                             "Info");
                     }
                 }
@@ -79,7 +79,7 @@ public static class ResourceUpdater
         catch (Exception ex)
         {
             Utils.Frontend.ShowOkDialog(string.Create(CultureInfo.InvariantCulture,
-                $"Unexpected error while downloading {resourceName}."),
+                    $"Unexpected error while downloading {resourceName}."),
                 "Info");
 
             Utils.Logger.Error(ex, "Unexpected error while downloading {ResourceName}", resourceName);

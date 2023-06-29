@@ -77,9 +77,8 @@ internal static class JmnedictRecordBuilder
             }
         }
 
-        foreach (KeyValuePair<string, JmnedictRecord> recordKeyValuePair in recordDictionary)
+        foreach ((string? dictKey, JmnedictRecord? jmnedictRecord) in recordDictionary)
         {
-            JmnedictRecord jmnedictRecord = recordKeyValuePair.Value;
             jmnedictRecord.Definitions = Utils.TrimListOfLists(jmnedictRecord.Definitions);
             jmnedictRecord.NameTypes = Utils.TrimListOfLists(jmnedictRecord.NameTypes);
             //jmnedictRecord.RelatedTerms = Utils.TrimListOfLists(jmnedictRecord.RelatedTerms!);
@@ -87,7 +86,7 @@ internal static class JmnedictRecordBuilder
             jmnedictRecord.Readings = Utils.TrimStringList(jmnedictRecord.Readings!);
             jmnedictRecord.Id = entry.Id;
 
-            string key = JapaneseUtils.KatakanaToHiragana(recordKeyValuePair.Key);
+            string key = JapaneseUtils.KatakanaToHiragana(dictKey);
             if (jmnedictDictionary.TryGetValue(key, out List<IDictRecord>? tempRecordList))
             {
                 tempRecordList.Add(jmnedictRecord);

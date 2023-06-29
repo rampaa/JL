@@ -516,6 +516,7 @@ public static class LookupUtils
                 }
             }
         }
+
         return results;
     }
 
@@ -818,7 +819,6 @@ public static class LookupUtils
             int resultsListCount = wordResult.Results.Count;
             for (int i = 0; i < resultsListCount; i++)
             {
-
                 int resultCount = wordResult.Results[i].Count;
                 for (int j = 0; j < resultCount; j++)
                 {

@@ -86,6 +86,7 @@ internal static class KanjidicLoader
                         {
                             _ = await xmlReader.ReadAsync().ConfigureAwait(false);
                         }
+
                         break;
 
                     case "nanori":
@@ -107,6 +108,7 @@ internal static class KanjidicLoader
                                 _ = await xmlReader.ReadAsync().ConfigureAwait(false);
                                 break;
                         }
+
                         break;
 
                     default:

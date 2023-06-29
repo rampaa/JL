@@ -142,7 +142,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 Cursor = Cursors.Hand
             };
 
-            freqPathDisplay.PreviewMouseLeftButtonUp += PathTextbox_PreviewMouseLeftButtonUp;
+            freqPathDisplay.PreviewMouseLeftButtonUp += PathTextBox_PreviewMouseLeftButtonUp;
             freqPathDisplay.MouseEnter += (_, _) => freqPathDisplay.TextDecorations = TextDecorations.Underline;
             freqPathDisplay.MouseLeave += (_, _) => freqPathDisplay.TextDecorations = null;
 
@@ -235,7 +235,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 .Select(static textBlockPriority => Convert.ToInt32(textBlockPriority.Text, CultureInfo.InvariantCulture)).First());
     }
 
-    private void PathTextbox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    private void PathTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         string? path = ((TextBlock)sender).Text;
 
@@ -280,6 +280,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
         _ = new AddFrequencyWindow { Owner = this }.ShowDialog();
         UpdateFreqsDisplay();
     }
+
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
         Close();

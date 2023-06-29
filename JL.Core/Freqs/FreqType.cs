@@ -6,6 +6,5 @@ public enum FreqType
 {
     Nazeka,
     Yomichan,
-    [Description("Yomichan (Kanji)")]
-    YomichanKanji
+    [Description("Yomichan (Kanji)")] YomichanKanji
 }

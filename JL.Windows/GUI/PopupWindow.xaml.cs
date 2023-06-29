@@ -64,6 +64,7 @@ internal sealed partial class PopupWindow : Window
         base.OnSourceInitialized(e);
         WindowHandle = new WindowInteropHelper(this).Handle;
     }
+
     protected override void OnActivated(EventArgs e)
     {
         base.OnActivated(e);
@@ -145,10 +146,10 @@ internal sealed partial class PopupWindow : Window
             _currentCharPosition = charPosition;
 
             if (Owner != MainWindow.Instance
-                ? ConfigManager.DisableLookupsForNonJapaneseCharsInPopups
-                    && !JapaneseUtils.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString())
-                : ConfigManager.DisableLookupsForNonJapaneseCharsInMainWindow
-                    && !JapaneseUtils.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString()))
+                    ? ConfigManager.DisableLookupsForNonJapaneseCharsInPopups
+                      && !JapaneseUtils.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString())
+                    : ConfigManager.DisableLookupsForNonJapaneseCharsInMainWindow
+                      && !JapaneseUtils.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString()))
             {
                 HidePopup();
                 return;
@@ -1715,6 +1716,7 @@ internal sealed partial class PopupWindow : Window
 
         PopupListBox.Items.Filter = DictFilter;
     }
+
     private bool DictFilter(object item)
     {
         StackPanel items = (StackPanel)item;

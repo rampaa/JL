@@ -117,7 +117,9 @@ internal static class ConfigManager
     #endregion
 
     #region Anki
+
     public static bool AnkiIntegration { get; set; } = false;
+
     #endregion
 
     #region Hotkeys
@@ -436,6 +438,7 @@ internal static class ConfigManager
                 themeStr = "Dark";
                 AddToConfig("Theme", themeStr);
             }
+
             WindowsUtils.ChangeTheme(themeStr is "Dark" ? SkinType.Dark : SkinType.Default);
         }
 
@@ -481,6 +484,7 @@ internal static class ConfigManager
                     Utils.Frontend.Alert(AlertLevel.Error, "Couldn't save WebSocket address, invalid URL");
                 }
             }
+
             WebSocketUtils.HandleWebSocket();
         }
 
@@ -529,6 +533,7 @@ internal static class ConfigManager
                 AddToConfig("MainWindowFont", "Meiryo");
                 mainWindowFontStr = "Meiryo";
             }
+
             mainWindow.MainTextBox.FontFamily = new FontFamily(mainWindowFontStr);
         }
 
@@ -1154,6 +1159,7 @@ internal static class ConfigManager
     }
 
     private delegate bool TryParseHandler<T>(string value, out T? result);
+
     private delegate bool TryParseHandlerWithCultureInfo<T>(string value, NumberStyles numberStyles, CultureInfo cultureInfo, out T result);
 
     private static T GetValueFromConfig<T>(T variable, string configKey, TryParseHandler<T> tryParseHandler) where T : struct
@@ -1205,6 +1211,7 @@ internal static class ConfigManager
 
         return number;
     }
+
     private static Brush GetBrushFromConfig(Brush solidColorBrush, string configKey)
     {
         Brush? brushFromConfig = null;

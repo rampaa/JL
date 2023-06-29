@@ -9,7 +9,6 @@ namespace JL.Windows;
 
 internal sealed class WinApi
 {
-
 #pragma warning disable IDE1006
     internal static class NativeMethods
     {
@@ -271,6 +270,7 @@ internal sealed class WinApi
                 {
                     _ = KeyGestureUtils.HandleHotKey(keyGesture).ConfigureAwait(false);
                 }
+
                 break;
 
             default:

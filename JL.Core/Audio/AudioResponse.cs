@@ -1,4 +1,5 @@
 namespace JL.Core.Audio;
+
 internal sealed class AudioResponse
 {
     public string AudioFormat { get; }

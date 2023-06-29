@@ -179,8 +179,8 @@ internal sealed partial class MainWindow : Window
         }
 
         if (ConfigManager.Precaching && DictUtils.DictsReady
-            && !DictUtils.UpdatingJmdict && !DictUtils.UpdatingJmnedict && !DictUtils.UpdatingKanjidic
-            && FreqUtils.FreqsReady && MainTextBox.Text.Length < Utils.CacheSize)
+                                     && !DictUtils.UpdatingJmdict && !DictUtils.UpdatingJmnedict && !DictUtils.UpdatingKanjidic
+                                     && FreqUtils.FreqsReady && MainTextBox.Text.Length < Utils.CacheSize)
         {
             _ = Dispatcher.Invoke(DispatcherPriority.Render, static () => { }); // let MainTextBox text update
             await Precache(MainTextBox.Text).ConfigureAwait(false);
@@ -195,7 +195,7 @@ internal sealed partial class MainWindow : Window
         }
 
         await Stats.IncrementStat(StatType.Characters,
-            new StringInfo(JapaneseUtils.RemovePunctuation(_backlog[_currentTextIndex])).LengthInTextElements * -1)
+                new StringInfo(JapaneseUtils.RemovePunctuation(_backlog[_currentTextIndex])).LengthInTextElements * -1)
             .ConfigureAwait(false);
 
         await Stats.IncrementStat(StatType.Lines, -1).ConfigureAwait(false);
@@ -1082,6 +1082,7 @@ internal sealed partial class MainWindow : Window
             _ => Cursors.Arrow
         };
     }
+
     private void Border_OnMouseLeave(object sender, MouseEventArgs e)
     {
         if (Mouse.LeftButton is MouseButtonState.Released)
@@ -1114,9 +1115,9 @@ internal sealed partial class MainWindow : Window
     private void MainTextBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
         ManageDictionariesMenuItem.IsEnabled = DictUtils.DictsReady
-                                      && !DictUtils.UpdatingJmdict
-                                      && !DictUtils.UpdatingJmnedict
-                                      && !DictUtils.UpdatingKanjidic;
+                                               && !DictUtils.UpdatingJmdict
+                                               && !DictUtils.UpdatingJmnedict
+                                               && !DictUtils.UpdatingKanjidic;
 
         ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady;
 

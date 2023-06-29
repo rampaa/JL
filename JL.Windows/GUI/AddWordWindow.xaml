@@ -19,7 +19,7 @@
                 <TextBlock Text="Definitions" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 <TextBox x:Name="DefinitionsTextBox" HorizontalAlignment="Left" TextWrapping="Wrap" Width="300" Margin="0,0,0,20"
                          Cursor="Help" ToolTip="Separated by a semicolon" />
-                <StackPanel x:Name="WordClassStackPasnel" Visibility="Visible">
+                <StackPanel x:Name="WordClassStackPanel" Visibility="Visible">
                     <TextBlock Text="Word Classes" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                     <DockPanel>
                         <TextBox x:Name="WordClassTextBox" TextWrapping="Wrap" Width="300" Margin="0,0,10,0"

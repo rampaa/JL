@@ -22,7 +22,7 @@ public sealed class DictOptions
     public LoanwordEtymologyOption? LoanwordEtymology { get; }
 
     public DictOptions
-        (
+    (
         NewlineBetweenDefinitionsOption? newlineBetweenDefinitions = null,
         ExamplesOption? examples = null,
         NoAllOption? noAll = null,
@@ -41,7 +41,7 @@ public sealed class DictOptions
         LoanwordEtymologyOption? loanwordEtymology = null,
         RelatedTermOption? relatedTerm = null,
         AntonymOption? antonym = null
-        )
+    )
     {
         NewlineBetweenDefinitions = newlineBetweenDefinitions;
         Examples = examples;

@@ -85,12 +85,12 @@ public static class Mining
         Dictionary<string, object>? audio = audioResponse is null
             ? null
             : new Dictionary<string, object>
-                {
-                    { "data", audioResponse.AudioData },
-                    { "filename", string.Create(CultureInfo.InvariantCulture, $"JL_audio_{reading}_{primarySpelling}.{audioResponse.AudioFormat}") },
-                    { "skipHash", Networking.Jpod101NoAudioMd5Hash },
-                    { "fields", audioFields }
-                };
+            {
+                { "data", audioResponse.AudioData },
+                { "filename", string.Create(CultureInfo.InvariantCulture, $"JL_audio_{reading}_{primarySpelling}.{audioResponse.AudioFormat}") },
+                { "skipHash", Networking.Jpod101NoAudioMd5Hash },
+                { "fields", audioFields }
+            };
 
         List<string> imageFields = FindFields(JLField.Image, userFields);
         bool needsImage = imageFields.Count > 0;
@@ -101,11 +101,11 @@ public static class Mining
         Dictionary<string, object>? image = imageBytes is null
             ? null
             : new Dictionary<string, object>
-                {
-                    { "data", imageBytes },
-                    { "filename", string.Create(CultureInfo.InvariantCulture, $"JL_image_{reading}_{primarySpelling}.png") },
-                    { "fields", imageFields }
-                };
+            {
+                { "data", imageBytes },
+                { "filename", string.Create(CultureInfo.InvariantCulture, $"JL_image_{reading}_{primarySpelling}.png") },
+                { "fields", imageFields }
+            };
 
         Dictionary<string, object> options = new()
         {

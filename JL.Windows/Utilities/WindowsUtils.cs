@@ -246,7 +246,9 @@ internal static class WindowsUtils
         {
             _ = Process.Start(new ProcessStartInfo("cmd",
                 string.Create(CultureInfo.InvariantCulture, $"/c start \"\" {browserPath} \"{ConfigManager.SearchUrl.Replace("{SearchTerm}", System.Web.HttpUtility.UrlEncode(selectedText), StringComparison.Ordinal)}\""))
-            { CreateNoWindow = true });
+            {
+                CreateNoWindow = true
+            });
         }
     }
 
@@ -277,8 +279,11 @@ internal static class WindowsUtils
 
             _ = Process.Start(
                 new ProcessStartInfo("cmd",
-                string.Create(CultureInfo.InvariantCulture, $"/c start \"JL Updater\" \"{Path.Join(Utils.ApplicationPath, "update-helper.cmd")}\" {Environment.ProcessId}"))
-                { UseShellExecute = true, Verb = "runas" });
+                    string.Create(CultureInfo.InvariantCulture, $"/c start \"JL Updater\" \"{Path.Join(Utils.ApplicationPath, "update-helper.cmd")}\" {Environment.ProcessId}"))
+                {
+                    UseShellExecute = true,
+                    Verb = "runas"
+                });
         }
 
         else
@@ -327,7 +332,6 @@ internal static class WindowsUtils
         });
     }
 
-#pragma warning disable CA5394
     public static async Task Motivate()
     {
         try
@@ -355,7 +359,6 @@ internal static class WindowsUtils
             Utils.Frontend.Alert(AlertLevel.Error, "Error motivating");
         }
     }
-#pragma warning restore CA5394
 
     public static Brush? BrushFromHex(string hexColorString)
     {
@@ -521,6 +524,7 @@ internal static class WindowsUtils
             window.Height = height;
         }
     }
+
     public static void SetSizeToContent(bool dynamicWidth, bool dynamicHeight, Window window)
     {
         if (dynamicWidth && dynamicHeight)
@@ -558,8 +562,7 @@ internal static class WindowsUtils
             {
                 Utils.Logger.Warning(ex, "CopyTextToClipboard failed");
             }
-        }
-        while (retry);
+        } while (retry);
     }
 
     public static void UpdateMainWindowVisibility()

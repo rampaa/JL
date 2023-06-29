@@ -90,6 +90,7 @@ public static class CustomWordLoader
                         wordClassList.Add("vs-s");
                         wordClassList.Add("vz");
                     }
+
                     break;
                 case "Adjective":
                     wordClassList.Add("adj-i");

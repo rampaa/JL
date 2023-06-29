@@ -119,13 +119,13 @@ internal sealed partial class AddWordWindow : Window
 
     private void VerbRadioButton_Checked(object sender, RoutedEventArgs e)
     {
-        WordClassStackPasnel.Visibility = Visibility.Visible;
+        WordClassStackPanel.Visibility = Visibility.Visible;
     }
 
     private void OtherRadioButtons_Checked(object sender, RoutedEventArgs e)
     {
         WordClassTextBox.Text = "";
-        WordClassStackPasnel.Visibility = Visibility.Collapsed;
+        WordClassStackPanel.Visibility = Visibility.Collapsed;
     }
 
     private void InfoButton_Click(object sender, RoutedEventArgs e)

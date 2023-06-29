@@ -14,6 +14,7 @@ using JL.Windows.Utilities;
 using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
 using Cursors = System.Windows.Input.Cursors;
+
 namespace JL.Windows.GUI;
 
 /// <summary>
@@ -146,7 +147,7 @@ internal sealed partial class ManageDictionariesWindow : Window
                 Cursor = Cursors.Hand
             };
 
-            dictPathDisplay.PreviewMouseLeftButtonUp += PathTextbox_PreviewMouseLeftButtonUp;
+            dictPathDisplay.PreviewMouseLeftButtonUp += PathTextBox_PreviewMouseLeftButtonUp;
 
             dictPathDisplay.MouseEnter += (_, _) => dictPathDisplay.TextDecorations = TextDecorations.Underline;
 
@@ -328,7 +329,7 @@ internal sealed partial class ManageDictionariesWindow : Window
                 .Select(static textBlockPriority => Convert.ToInt32(textBlockPriority.Text, CultureInfo.InvariantCulture)).First());
     }
 
-    private void PathTextbox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    private void PathTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         string? path = ((TextBlock)sender).Text;
 

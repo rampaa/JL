@@ -9,218 +9,97 @@ public enum ExamplesOptionValue
     All
 }
 
-public readonly record struct ExamplesOption
+public readonly record struct ExamplesOption(ExamplesOptionValue Value)
 {
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.Kenkyuusha };
-    public ExamplesOptionValue Value { get; init; }
-
-    public ExamplesOption(ExamplesOptionValue value)
-    {
-        Value = value;
-    }
 }
 
-public readonly record struct NewlineBetweenDefinitionsOption
+public readonly record struct NewlineBetweenDefinitionsOption(bool Value)
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes =
         Enum.GetValues<DictType>().Except(new[] { DictType.PitchAccentYomichan, DictType.Kanjidic, DictType.CustomNameDictionary })
             .ToArray();
-    public bool Value { get; init; }
-
-    public NewlineBetweenDefinitionsOption(bool value)
-    {
-        Value = value;
-    }
 }
 
-public readonly record struct NoAllOption
+public readonly record struct NoAllOption(bool Value)
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = Enum.GetValues<DictType>()
         .Except(new[] { DictType.PitchAccentYomichan }).ToArray();
-    public bool Value { get; init; }
-
-    public NoAllOption(bool value)
-    {
-        Value = value;
-    }
 }
 
-public readonly record struct PitchAccentMarkerColorOption
+public readonly record struct PitchAccentMarkerColorOption(string Value)
 {
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.PitchAccentYomichan };
-    public string Value { get; init; }
-
-    public PitchAccentMarkerColorOption(string value)
-    {
-        Value = value;
-    }
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.PitchAccentYomichan };
 }
 
-public readonly record struct WordClassInfoOption
+public readonly record struct WordClassInfoOption(bool Value)
 {
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
-    public bool Value { get; init; }
-    public WordClassInfoOption(bool value)
-    {
-        Value = value;
-    }
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
 }
 
-public readonly record struct DialectInfoOption
+public readonly record struct DialectInfoOption(bool Value)
 {
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
-    public bool Value { get; init; }
-
-    public DialectInfoOption(bool value)
-    {
-        Value = value;
-    }
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
 }
 
-public readonly record struct POrthographyInfoOption
+public readonly record struct POrthographyInfoOption(bool Value)
 {
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
-    public bool Value { get; init; }
-
-    public POrthographyInfoOption(bool value)
-    {
-        Value = value;
-    }
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
 }
 
-public readonly record struct POrthographyInfoColorOption
+public readonly record struct POrthographyInfoColorOption(string Value)
 {
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
-    public string Value { get; init; }
-
-    public POrthographyInfoColorOption(string value)
-    {
-        Value = value;
-    }
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
 }
 
-public readonly record struct POrthographyInfoFontSizeOption
+public readonly record struct POrthographyInfoFontSizeOption(double Value)
 {
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
-    public double Value { get; init; }
-
-    public POrthographyInfoFontSizeOption(double value)
-    {
-        Value = value;
-    }
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
 }
 
-public readonly record struct AOrthographyInfoOption
+public readonly record struct AOrthographyInfoOption(bool Value)
 {
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
-    public bool Value { get; init; }
-
-    public AOrthographyInfoOption(bool value)
-    {
-        Value = value;
-    }
-}
-public readonly record struct ROrthographyInfoOption
-{
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
-    public bool Value { get; init; }
-
-    public ROrthographyInfoOption(bool value)
-    {
-        Value = value;
-    }
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
 }
 
-public readonly record struct WordTypeInfoOption
+public readonly record struct ROrthographyInfoOption(bool Value)
 {
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
-    public bool Value { get; init; }
-
-    public WordTypeInfoOption(bool value)
-    {
-        Value = value;
-    }
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
 }
 
-public readonly record struct SpellingRestrictionInfoOption
+public readonly record struct WordTypeInfoOption(bool Value)
 {
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
-    public bool Value { get; init; }
-
-    public SpellingRestrictionInfoOption(bool value)
-    {
-        Value = value;
-    }
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
 }
 
-public readonly record struct ExtraDefinitionInfoOption
+public readonly record struct SpellingRestrictionInfoOption(bool Value)
 {
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
-    public bool Value { get; init; }
-
-    public ExtraDefinitionInfoOption(bool value)
-    {
-        Value = value;
-    }
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
 }
 
-public readonly record struct MiscInfoOption
+public readonly record struct ExtraDefinitionInfoOption(bool Value)
 {
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
-    public bool Value { get; init; }
-
-    public MiscInfoOption(bool value)
-    {
-        Value = value;
-    }
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
 }
 
-public readonly record struct LoanwordEtymologyOption
+public readonly record struct MiscInfoOption(bool Value)
 {
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
-    public bool Value { get; init; }
-
-    public LoanwordEtymologyOption(bool value)
-    {
-        Value = value;
-    }
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
 }
 
-public readonly record struct RelatedTermOption
+public readonly record struct LoanwordEtymologyOption(bool Value)
 {
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
-    public bool Value { get; init; }
-
-    public RelatedTermOption(bool value)
-    {
-        Value = value;
-    }
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
 }
 
-public readonly record struct AntonymOption
+public readonly record struct RelatedTermOption(bool Value)
 {
-    [JsonIgnore]
-    public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
-    public bool Value { get; init; }
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
+}
 
-    public AntonymOption(bool value)
-    {
-        Value = value;
-    }
+public readonly record struct AntonymOption(bool Value)
+{
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
 }

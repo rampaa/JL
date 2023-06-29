@@ -4,6 +4,7 @@ using JL.Core.Dicts;
 using JL.Windows.Utilities;
 
 namespace JL.Windows;
+
 internal static class DictOptionManager
 {
     public static Brush POrthographyInfoColor { get; set; } = Brushes.Chocolate;
@@ -15,7 +16,7 @@ internal static class DictOptionManager
         if (jmdict is not null)
         {
             POrthographyInfoColor = WindowsUtils.FrozenBrushFromHex(jmdict.Options?.POrthographyInfoColor?.Value
-                ?? ConfigManager.PrimarySpellingColor.ToString(CultureInfo.InvariantCulture))!;
+                                                                    ?? ConfigManager.PrimarySpellingColor.ToString(CultureInfo.InvariantCulture))!;
         }
 
         else

@@ -31,8 +31,8 @@ public static class JapaneseUtils
     // CJK Unified Ideographs Extension G (30000–3134F)
     // CJK Unified Ideographs Extension H (31350–323AF)
     public static readonly Regex JapaneseRegex = new(
-            @"[\u2e80-\u30ff\u3190–\u319f\u31c0-\u4dbf\u4e00-\u9fff\uf900-\ufaff\ufe30-\ufe4f\uff00-\uffef]|\ud82c[\udc00-\udcff]|\ud83c[\ude00-\udeff]|\ud840[\udc00-\udfff]|[\ud841-\ud868][\udc00-\udfff]|\ud869[\udc00-\udedf]|\ud869[\udf00-\udfff]|[\ud86a-\ud879][\udc00-\udfff]|\ud87a[\udc00-\udfef]|\ud87e[\udc00-\ude1f]|\ud880[\udc00-\udfff]|[\ud881-\ud883][\udc00-\udfff]|\ud884[\udc00-\udfff]|[\ud885-\ud887][\udc00-\udfff]|\ud888[\udc00-\udfaf]",
-            RegexOptions.Compiled);
+        @"[\u2e80-\u30ff\u3190–\u319f\u31c0-\u4dbf\u4e00-\u9fff\uf900-\ufaff\ufe30-\ufe4f\uff00-\uffef]|\ud82c[\udc00-\udcff]|\ud83c[\ude00-\udeff]|\ud840[\udc00-\udfff]|[\ud841-\ud868][\udc00-\udfff]|\ud869[\udc00-\udedf]|\ud869[\udf00-\udfff]|[\ud86a-\ud879][\udc00-\udfff]|\ud87a[\udc00-\udfef]|\ud87e[\udc00-\ude1f]|\ud880[\udc00-\udfff]|[\ud881-\ud883][\udc00-\udfff]|\ud884[\udc00-\udfff]|[\ud885-\ud887][\udc00-\udfff]|\ud888[\udc00-\udfaf]",
+        RegexOptions.Compiled);
 
     //private static readonly Dictionary<string, string> s_hiraganaToKatakanaDict = new()
     //{
@@ -69,7 +69,7 @@ public static class JapaneseUtils
 
     private static readonly Dictionary<string, string> s_katakanaToHiraganaDict = new()
     {
-        #pragma warning disable format
+#pragma warning disable format
         { "ア", "あ" }, { "イ", "い" }, { "ウ", "う" }, { "エ", "え" }, { "オ", "お" },
         { "カ", "か" }, { "キ", "き" }, { "ク", "く" }, { "ケ", "け" }, { "コ", "こ" },
         { "サ", "さ" }, { "シ", "し" }, { "ス", "す" }, { "セ", "せ" }, { "ソ", "そ" },
@@ -97,12 +97,12 @@ public static class JapaneseUtils
         { "ヴ", "ゔ" }, { "ヽ", "ゝ" }, { "ヾ", "ゞ" }, { "ッ", "っ" },
 
         { "ヸ", "ゐ゙" }, { "ヹ", "ゑ゙" }, { "ヺ", "を゙" }
-        #pragma warning restore format
+#pragma warning restore format
     };
 
     private static readonly Dictionary<string, char> s_kanaFinalVowelDict = new()
     {
-        #pragma warning disable format
+#pragma warning disable format
         // Katakana
         { "ア", 'ア' }, { "カ", 'ア' }, { "サ", 'ア' }, { "タ", 'ア' }, { "ナ", 'ア' }, { "ハ", 'ア' },
         { "マ", 'ア' }, { "ラ", 'ア' }, { "ガ", 'ア' }, { "ザ", 'ア' }, { "ダ", 'ア' }, { "バ", 'ア' },
@@ -146,12 +146,12 @@ public static class JapaneseUtils
         { "お", 'お' }, { "こ", 'お' }, { "そ", 'お' }, { "と", 'お' }, { "の", 'お' }, { "ほ", 'お' },
         { "も", 'お' }, { "ろ", 'お' }, { "ご", 'お' }, { "ぞ", 'お' }, { "ど", 'お' }, { "ぼ", 'お' },
         { "ぽ", 'お' }, { "を", 'お' }, { "よ", 'お' }, { "ぉ", 'お' }, { "ょ", 'お' }, { "を゙", 'オ' }
-        #pragma warning restore format
+#pragma warning restore format
     };
 
     private static readonly Dictionary<string, string> s_halfWidthToFullWidthDict = new()
     {
-        #pragma warning disable format
+#pragma warning disable format
         // Half-width katakana
         { "ｱ", "あ" }, { "ｲ", "い" }, { "ｳ", "う" }, { "ｴ", "え" }, { "ｵ", "お" },
         { "ｶ", "か" }, { "ｷ", "き" }, { "ｸ", "く" }, { "ｹ", "け" }, { "ｺ", "こ" },
@@ -196,30 +196,30 @@ public static class JapaneseUtils
         { "@", "＠" }, { "[", "［" }, { "\\", "＼" }, { "]", "］" }, { "^", "＾" }, { "{", "｛" },
         { "|", "｜" }, { "}", "｝" }, { "~", "～" }, { "ｰ", "ー" }
         // ，－ ．＿｀｟｡｢｣､･￠￡
-        #pragma warning restore format
+#pragma warning restore format
     };
 
     private static readonly Dictionary<string, string> s_compositeHalfWidthKatakanaToFullWidthHiraganaDict = new()
     {
-        #pragma warning disable format
+#pragma warning disable format
         { "ｶﾞ", "が" }, { "ｷﾞ", "ぎ" }, { "ｸﾞ", "ぐ" }, { "ｹﾞ", "げ" }, { "ｺﾞ", "ご" },
         { "ｻﾞ", "ざ" }, { "ｼﾞ", "じ" }, { "ｽﾞ", "ず" }, { "ｾﾞ", "ぜ" }, { "ｿﾞ", "ぞ" },
         { "ﾀﾞ", "だ" }, { "ﾁﾞ", "ぢ" }, { "ﾂﾞ", "づ" }, { "ﾃﾞ", "で" }, { "ﾄﾞ", "ど" },
         { "ﾊﾞ", "ば" }, { "ﾋﾞ", "び" }, { "ﾌﾞ", "ぶ" }, { "ﾍﾞ", "べ" }, { "ﾎﾞ", "ぼ" },
         { "ﾊﾟ", "ぱ" }, { "ﾋﾟ", "ぴ" }, { "ﾌﾟ", "ぷ" }, { "ﾍﾟ", "ぺ" }, { "ﾎﾟ", "ぽ" },
         { "ｳﾞ", "ゔ" }
-        #pragma warning restore format
+#pragma warning restore format
     };
 
     private static readonly HashSet<string> s_smallCombiningKanaSet = new()
     {
-        #pragma warning disable format
+#pragma warning disable format
         "ァ", "ィ", "ゥ", "ェ", "ォ", "ヮ",
         "ャ", "ュ", "ョ",
 
         "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゎ",
         "ゃ", "ゅ", "ょ"
-        #pragma warning restore format
+#pragma warning restore format
     };
 
     private static readonly List<char> s_sentenceTerminatingCharacters = new()
@@ -258,14 +258,14 @@ public static class JapaneseUtils
 
     private static readonly HashSet<char> s_brackets = new()
     {
-        #pragma warning disable format
-         '「', '」' , '『', '』' , '【', '】',
+#pragma warning disable format
+        '「', '」' , '『', '』' , '【', '】',
         '《', '》', '〔', '〕', '（', '）',
         '［', '］', '〈', '〉', '｛', '｝',
         '＜', '＞', '〝', '〟', '＂', '＂',
         '＇', '＇', '｢', '｣', '⟨', '⟩',
         '(', ')', '[', ']', '{', '}'
-        #pragma warning restore format
+#pragma warning restore format
     };
 
     public static string KatakanaToHiragana(string text)
@@ -277,7 +277,7 @@ public static class JapaneseUtils
         {
             if (unicodeCharacters.Count > i + 1
                 && s_compositeHalfWidthKatakanaToFullWidthHiraganaDict.TryGetValue(string.Create(CultureInfo.InvariantCulture,
-                $"{unicodeCharacters[i]}{unicodeCharacters[i + 1]}"), out string? compositeStr))
+                    $"{unicodeCharacters[i]}{unicodeCharacters[i + 1]}"), out string? compositeStr))
             {
                 _ = textInHiragana.Append(compositeStr);
                 ++i;
