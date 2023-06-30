@@ -778,7 +778,7 @@ public static class DictUtils
         {
             _ = Directory.CreateDirectory(Utils.ConfigPath);
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
-                JsonSerializer.Serialize(BuiltInDicts, Utils.s_jsoWithEnumConverterAndIndendation)).ConfigureAwait(false);
+                JsonSerializer.Serialize(BuiltInDicts, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -792,7 +792,7 @@ public static class DictUtils
         try
         {
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
-                JsonSerializer.Serialize(Dicts, Utils.s_jsoWithEnumConverterAndIndendation)).ConfigureAwait(false);
+                JsonSerializer.Serialize(Dicts, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

@@ -51,7 +51,7 @@ public sealed class AnkiConfig
         {
             _ = Directory.CreateDirectory(Utils.ConfigPath);
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AnkiConfig.json"),
-                JsonSerializer.Serialize(ankiConfig, Utils.s_jsoWithEnumConverterAndIndendation)).ConfigureAwait(false);
+                JsonSerializer.Serialize(ankiConfig, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
 
             return true;
         }

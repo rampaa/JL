@@ -46,14 +46,14 @@ public static class Utils
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
-    internal static readonly JsonSerializerOptions s_jsoWithIndendation = new()
+    internal static readonly JsonSerializerOptions s_jsoWithIndentation = new()
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         WriteIndented = true
     };
 
-    internal static readonly JsonSerializerOptions s_jsoWithEnumConverterAndIndendation = new()
+    internal static readonly JsonSerializerOptions s_jsoWithEnumConverterAndIndentation = new()
     {
         Converters = { new JsonStringEnumConverter() },
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,

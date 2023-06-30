@@ -172,7 +172,7 @@ public static class AudioUtils
         try
         {
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
-                JsonSerializer.Serialize(AudioSources, Utils.s_jsoWithEnumConverterAndIndendation)).ConfigureAwait(false);
+                JsonSerializer.Serialize(AudioSources, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -187,7 +187,7 @@ public static class AudioUtils
         {
             _ = Directory.CreateDirectory(Utils.ConfigPath);
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
-                JsonSerializer.Serialize(s_builtInAudioSources, Utils.s_jsoWithEnumConverterAndIndendation)).ConfigureAwait(false);
+                JsonSerializer.Serialize(s_builtInAudioSources, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

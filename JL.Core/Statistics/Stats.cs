@@ -100,7 +100,7 @@ public sealed class Stats
         {
             _ = Directory.CreateDirectory(Utils.ConfigPath);
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "Stats.json"),
-                    JsonSerializer.Serialize(lifetimeStats, Utils.s_jsoWithIndendation))
+                    JsonSerializer.Serialize(lifetimeStats, Utils.s_jsoWithIndentation))
                 .ConfigureAwait(false);
         }
         catch (Exception ex)

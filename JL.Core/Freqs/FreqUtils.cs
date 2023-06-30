@@ -145,7 +145,7 @@ public static class FreqUtils
         {
             _ = Directory.CreateDirectory(Utils.ConfigPath);
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
-                JsonSerializer.Serialize(s_builtInFreqs, Utils.s_jsoWithEnumConverterAndIndendation)).ConfigureAwait(false);
+                JsonSerializer.Serialize(s_builtInFreqs, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -159,7 +159,7 @@ public static class FreqUtils
         try
         {
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
-                JsonSerializer.Serialize(FreqDicts, Utils.s_jsoWithEnumConverterAndIndendation)).ConfigureAwait(false);
+                JsonSerializer.Serialize(FreqDicts, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
