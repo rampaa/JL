@@ -11,7 +11,7 @@ internal static class Deconjugator
 
     private static readonly LRUCache<string, HashSet<Form>> s_cache = new(777, 88);
 
-    public static async Task<Rule[]> GetRules()
+    public static async ValueTask<Rule[]> GetRules()
     {
         if (s_rules is null)
         {
