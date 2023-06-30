@@ -33,27 +33,27 @@ public static class Utils
             shared: true)
         .CreateLogger();
 
-    internal static readonly JsonSerializerOptions s_defaultJsonSerializerOptions = new()
+    internal static readonly JsonSerializerOptions s_defaultJso = new()
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
-    internal static readonly JsonSerializerOptions s_jsonSerializerOptionsWithEnumConverter = new()
+    internal static readonly JsonSerializerOptions s_jsoWithEnumConverter = new()
     {
         Converters = { new JsonStringEnumConverter() },
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
-    internal static readonly JsonSerializerOptions s_defaultJsonSerializerOptionsWithIndendation = new()
+    internal static readonly JsonSerializerOptions s_jsoWithIndendation = new()
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         WriteIndented = true
     };
 
-    internal static readonly JsonSerializerOptions s_defaultJsonSerializerOptionsWithEnumConverterAndIndendation = new()
+    internal static readonly JsonSerializerOptions s_jsoWithEnumConverterAndIndendation = new()
     {
         Converters = { new JsonStringEnumConverter() },
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,

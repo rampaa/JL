@@ -51,7 +51,7 @@ public sealed class AnkiConfig
         {
             _ = Directory.CreateDirectory(Utils.ConfigPath);
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AnkiConfig.json"),
-                JsonSerializer.Serialize(ankiConfig, Utils.s_defaultJsonSerializerOptionsWithEnumConverterAndIndendation)).ConfigureAwait(false);
+                JsonSerializer.Serialize(ankiConfig, Utils.s_jsoWithEnumConverterAndIndendation)).ConfigureAwait(false);
 
             return true;
         }
@@ -74,7 +74,7 @@ public sealed class AnkiConfig
                 await using (ankiConfigStream.ConfigureAwait(false))
                 {
                     return await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream,
-                        Utils.s_jsonSerializerOptionsWithEnumConverter).ConfigureAwait(false);
+                        Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
                 }
             }
 

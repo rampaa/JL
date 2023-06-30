@@ -18,7 +18,7 @@ internal static class Deconjugator
             FileStream fileStream = File.OpenRead(Path.Join(Utils.ResourcesPath, "deconjugation_rules.json"));
             await using (fileStream.ConfigureAwait(false))
             {
-                s_rules = await JsonSerializer.DeserializeAsync<Rule[]>(fileStream, Utils.s_defaultJsonSerializerOptions).ConfigureAwait(false);
+                s_rules = await JsonSerializer.DeserializeAsync<Rule[]>(fileStream, Utils.s_defaultJso).ConfigureAwait(false);
             }
         }
 

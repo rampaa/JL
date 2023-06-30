@@ -778,7 +778,7 @@ public static class DictUtils
         {
             _ = Directory.CreateDirectory(Utils.ConfigPath);
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
-                JsonSerializer.Serialize(BuiltInDicts, Utils.s_defaultJsonSerializerOptionsWithEnumConverterAndIndendation)).ConfigureAwait(false);
+                JsonSerializer.Serialize(BuiltInDicts, Utils.s_jsoWithEnumConverterAndIndendation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -792,7 +792,7 @@ public static class DictUtils
         try
         {
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
-                JsonSerializer.Serialize(Dicts, Utils.s_defaultJsonSerializerOptionsWithEnumConverterAndIndendation)).ConfigureAwait(false);
+                JsonSerializer.Serialize(Dicts, Utils.s_jsoWithEnumConverterAndIndendation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -809,7 +809,7 @@ public static class DictUtils
             await using (dictStream.ConfigureAwait(false))
             {
                 Dictionary<string, Dict>? deserializedDicts = await JsonSerializer
-                    .DeserializeAsync<Dictionary<string, Dict>>(dictStream, Utils.s_jsonSerializerOptionsWithEnumConverter).ConfigureAwait(false);
+                    .DeserializeAsync<Dictionary<string, Dict>>(dictStream, Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
 
                 if (deserializedDicts is not null)
                 {

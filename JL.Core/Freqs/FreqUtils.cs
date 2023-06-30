@@ -145,7 +145,7 @@ public static class FreqUtils
         {
             _ = Directory.CreateDirectory(Utils.ConfigPath);
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
-                JsonSerializer.Serialize(s_builtInFreqs, Utils.s_defaultJsonSerializerOptionsWithEnumConverterAndIndendation)).ConfigureAwait(false);
+                JsonSerializer.Serialize(s_builtInFreqs, Utils.s_jsoWithEnumConverterAndIndendation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -159,7 +159,7 @@ public static class FreqUtils
         try
         {
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
-                JsonSerializer.Serialize(FreqDicts, Utils.s_defaultJsonSerializerOptionsWithEnumConverterAndIndendation)).ConfigureAwait(false);
+                JsonSerializer.Serialize(FreqDicts, Utils.s_jsoWithEnumConverterAndIndendation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -176,7 +176,7 @@ public static class FreqUtils
             await using (fileStream.ConfigureAwait(false))
             {
                 Dictionary<string, Freq>? deserializedFreqs = await JsonSerializer
-                    .DeserializeAsync<Dictionary<string, Freq>>(fileStream, Utils.s_jsonSerializerOptionsWithEnumConverter).ConfigureAwait(false);
+                    .DeserializeAsync<Dictionary<string, Freq>>(fileStream, Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
 
                 if (deserializedFreqs is not null)
                 {

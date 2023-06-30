@@ -172,7 +172,7 @@ public static class AudioUtils
         try
         {
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
-                JsonSerializer.Serialize(AudioSources, Utils.s_defaultJsonSerializerOptionsWithEnumConverterAndIndendation)).ConfigureAwait(false);
+                JsonSerializer.Serialize(AudioSources, Utils.s_jsoWithEnumConverterAndIndendation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -187,7 +187,7 @@ public static class AudioUtils
         {
             _ = Directory.CreateDirectory(Utils.ConfigPath);
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
-                JsonSerializer.Serialize(s_builtInAudioSources, Utils.s_defaultJsonSerializerOptionsWithEnumConverterAndIndendation)).ConfigureAwait(false);
+                JsonSerializer.Serialize(s_builtInAudioSources, Utils.s_jsoWithEnumConverterAndIndendation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -204,7 +204,7 @@ public static class AudioUtils
             await using (fileStream.ConfigureAwait(false))
             {
                 Dictionary<string, AudioSource>? deserializedAudioSources = await JsonSerializer
-                    .DeserializeAsync<Dictionary<string, AudioSource>>(fileStream, Utils.s_jsonSerializerOptionsWithEnumConverter).ConfigureAwait(false);
+                    .DeserializeAsync<Dictionary<string, AudioSource>>(fileStream, Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
 
                 if (deserializedAudioSources is not null)
                 {

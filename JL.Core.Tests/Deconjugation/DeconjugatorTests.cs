@@ -16,7 +16,7 @@ public class DeconjugatorTests
 
         // Act
         HashSet<Form> result = Deconjugator.Deconjugate("わからない").AsTask().Result;
-        string actual = JsonSerializer.Serialize(result, Utils.s_defaultJsonSerializerOptions);
+        string actual = JsonSerializer.Serialize(result, Utils.s_defaultJso);
 
         // Assert
         StringAssert.AreEqualIgnoringCase(expected, actual);
@@ -30,7 +30,7 @@ public class DeconjugatorTests
 
         // Act
         HashSet<Form> result = Deconjugator.Deconjugate("このスレってよくなくなくなくなくなくなくなくないじゃなくなくなくなくない").AsTask().Result;
-        string actual = JsonSerializer.Serialize(result, Utils.s_defaultJsonSerializerOptions);
+        string actual = JsonSerializer.Serialize(result, Utils.s_defaultJso);
 
         // Assert
         StringAssert.AreEqualIgnoringCase(expected, actual);

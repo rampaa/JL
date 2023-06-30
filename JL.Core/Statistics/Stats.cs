@@ -100,7 +100,7 @@ public sealed class Stats
         {
             _ = Directory.CreateDirectory(Utils.ConfigPath);
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "Stats.json"),
-                    JsonSerializer.Serialize(lifetimeStats, Utils.s_defaultJsonSerializerOptionsWithIndendation))
+                    JsonSerializer.Serialize(lifetimeStats, Utils.s_jsoWithIndendation))
                 .ConfigureAwait(false);
         }
         catch (Exception ex)
@@ -121,7 +121,7 @@ public sealed class Stats
                 await using (fileStream.ConfigureAwait(false))
                 {
                     return await JsonSerializer.DeserializeAsync<Stats>(fileStream,
-                        Utils.s_jsonSerializerOptionsWithEnumConverter).ConfigureAwait(false) ?? new Stats();
+                        Utils.s_jsoWithEnumConverter).ConfigureAwait(false) ?? new Stats();
                 }
             }
 
