@@ -21,10 +21,10 @@ internal static class PitchAccentLoader
         {
             List<List<JsonElement>>? jsonObjects;
 
-            FileStream openStream = File.OpenRead(jsonFile);
-            await using (openStream.ConfigureAwait(false))
+            FileStream fileStream = File.OpenRead(jsonFile);
+            await using (fileStream.ConfigureAwait(false))
             {
-                jsonObjects = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream)
+                jsonObjects = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(fileStream)
                     .ConfigureAwait(false);
             }
 

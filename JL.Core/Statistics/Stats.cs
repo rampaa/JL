@@ -22,12 +22,12 @@ public sealed class Stats
 
     [JsonIgnore] private static Stats? s_lifetimeStats;
 
-    public static async Task<Stats> GetLifetimeStats()
+    public static async ValueTask<Stats> GetLifetimeStats()
     {
         return s_lifetimeStats ??= await ReadLifetimeStats().ConfigureAwait(false);
     }
 
-    public static async Task IncrementStat(StatType type, long amount = 1)
+    public static async ValueTask IncrementStat(StatType type, long amount = 1)
     {
         Stats lifetimeStats = await GetLifetimeStats().ConfigureAwait(false);
         switch (type)
@@ -61,7 +61,7 @@ public sealed class Stats
         }
     }
 
-    public static async Task ResetStats(StatsMode statsMode)
+    public static async ValueTask ResetStats(StatsMode statsMode)
     {
         switch (statsMode)
         {
@@ -100,7 +100,7 @@ public sealed class Stats
         {
             _ = Directory.CreateDirectory(Utils.ConfigPath);
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "Stats.json"),
-                    JsonSerializer.Serialize(lifetimeStats, new JsonSerializerOptions { WriteIndented = true }))
+                    JsonSerializer.Serialize(lifetimeStats, Utils.s_defaultJsonSerializerOptionsWithIndendation))
                 .ConfigureAwait(false);
         }
         catch (Exception ex)
@@ -112,12 +112,17 @@ public sealed class Stats
 
     private static async Task<Stats> ReadLifetimeStats()
     {
-        if (File.Exists(Path.Join(Utils.ConfigPath, "Stats.json")))
+        string filePath = Path.Join(Utils.ConfigPath, "Stats.json");
+        if (File.Exists(filePath))
         {
             try
             {
-                return JsonSerializer.Deserialize<Stats>(
-                    await File.ReadAllTextAsync(Path.Join(Utils.ConfigPath, "Stats.json")).ConfigureAwait(false)) ?? new Stats();
+                FileStream fileStream = File.OpenRead(filePath);
+                await using (fileStream.ConfigureAwait(false))
+                {
+                    return await JsonSerializer.DeserializeAsync<Stats>(fileStream,
+                        Utils.s_jsonSerializerOptionsWithEnumConverter).ConfigureAwait(false) ?? new Stats();
+                }
             }
 
             catch (Exception ex)

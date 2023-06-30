@@ -1,7 +1,5 @@
 using System.Globalization;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using JL.Core.Dicts.CustomNameDict;
 using JL.Core.Dicts.CustomWordDict;
 using JL.Core.Dicts.EDICT.JMdict;
@@ -738,11 +736,10 @@ public static class DictUtils
 
     internal static async Task InitializeKanjiCompositionDict()
     {
-        if (File.Exists(Path.Join(Utils.ResourcesPath, "ids.txt")))
+        string filePath = Path.Join(Utils.ResourcesPath, "ids.txt");
+        if (File.Exists(filePath))
         {
-            string[] lines = await File
-                .ReadAllLinesAsync(Path.Join(Utils.ResourcesPath, "ids.txt"))
-                .ConfigureAwait(false);
+            string[] lines = await File.ReadAllLinesAsync(filePath).ConfigureAwait(false);
 
             for (int i = 0; i < lines.Length; i++)
             {
@@ -775,19 +772,13 @@ public static class DictUtils
         }
     }
 
-    public static void CreateDefaultDictsConfig()
+    public static async Task CreateDefaultDictsConfig()
     {
-        var jso = new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            Converters = { new JsonStringEnumConverter() }
-        };
-
         try
         {
             _ = Directory.CreateDirectory(Utils.ConfigPath);
-            File.WriteAllText(Path.Join(Utils.ConfigPath, "dicts.json"),
-                JsonSerializer.Serialize(BuiltInDicts, jso));
+            await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
+                JsonSerializer.Serialize(BuiltInDicts, Utils.s_defaultJsonSerializerOptionsWithEnumConverterAndIndendation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -800,16 +791,8 @@ public static class DictUtils
     {
         try
         {
-            var jso = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Converters = { new JsonStringEnumConverter() },
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            };
-
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
-                JsonSerializer.Serialize(Dicts, jso)).ConfigureAwait(false);
+                JsonSerializer.Serialize(Dicts, Utils.s_defaultJsonSerializerOptionsWithEnumConverterAndIndendation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -822,12 +805,11 @@ public static class DictUtils
     {
         try
         {
-            var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
-            Stream dictStream = new StreamReader(Path.Join(Utils.ConfigPath, "dicts.json")).BaseStream;
+            FileStream dictStream = File.OpenRead(Path.Join(Utils.ConfigPath, "dicts.json"));
             await using (dictStream.ConfigureAwait(false))
             {
                 Dictionary<string, Dict>? deserializedDicts = await JsonSerializer
-                    .DeserializeAsync<Dictionary<string, Dict>>(dictStream, jso).ConfigureAwait(false);
+                    .DeserializeAsync<Dictionary<string, Dict>>(dictStream, Utils.s_jsonSerializerOptionsWithEnumConverter).ConfigureAwait(false);
 
                 if (deserializedDicts is not null)
                 {

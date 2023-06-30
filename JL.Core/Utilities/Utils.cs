@@ -1,5 +1,8 @@
 using System.Globalization;
 using System.Security.Cryptography;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
@@ -30,6 +33,33 @@ public static class Utils
             shared: true)
         .CreateLogger();
 
+    internal static readonly JsonSerializerOptions s_defaultJsonSerializerOptions = new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
+
+    internal static readonly JsonSerializerOptions s_jsonSerializerOptionsWithEnumConverter = new()
+    {
+        Converters = { new JsonStringEnumConverter() },
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
+
+    internal static readonly JsonSerializerOptions s_defaultJsonSerializerOptionsWithIndendation = new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        WriteIndented = true
+    };
+
+    internal static readonly JsonSerializerOptions s_defaultJsonSerializerOptionsWithEnumConverterAndIndendation = new()
+    {
+        Converters = { new JsonStringEnumConverter() },
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        WriteIndented = true
+    };
 
     internal static readonly Dictionary<string, string> s_iso6392BTo2T = new()
     {
@@ -60,27 +90,29 @@ public static class Utils
 
         if (!File.Exists(Path.Join(ConfigPath, "dicts.json")))
         {
-            DictUtils.CreateDefaultDictsConfig();
+            await DictUtils.CreateDefaultDictsConfig().ConfigureAwait(false);
         }
 
         if (!File.Exists(Path.Join(ConfigPath, "freqs.json")))
         {
-            FreqUtils.CreateDefaultFreqsConfig();
+            await FreqUtils.CreateDefaultFreqsConfig().ConfigureAwait(false);
         }
 
         if (!File.Exists(Path.Join(ConfigPath, "AudioSourceConfig.json")))
         {
-            AudioUtils.CreateDefaultAudioSourceConfig();
+            await AudioUtils.CreateDefaultAudioSourceConfig().ConfigureAwait(false);
         }
 
-        if (!File.Exists(Path.Join(ResourcesPath, "custom_words.txt")))
+        string customWordsPath = Path.Join(ResourcesPath, "custom_words.txt");
+        if (!File.Exists(customWordsPath))
         {
-            await File.Create(Path.Join(ResourcesPath, "custom_words.txt")).DisposeAsync().ConfigureAwait(false);
+            await File.Create(customWordsPath).DisposeAsync().ConfigureAwait(false);
         }
 
-        if (!File.Exists(Path.Join(ResourcesPath, "custom_names.txt")))
+        string customNamesPath = Path.Join(ResourcesPath, "custom_names.txt");
+        if (!File.Exists(customNamesPath))
         {
-            await File.Create(Path.Join(ResourcesPath, "custom_names.txt")).DisposeAsync().ConfigureAwait(false);
+            await File.Create(customNamesPath).DisposeAsync().ConfigureAwait(false);
         }
 
         List<Task> tasks = new()

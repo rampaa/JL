@@ -21,10 +21,10 @@ internal static class FrequencyYomichanLoader
         foreach (string jsonFile in jsonFiles)
         {
             List<List<JsonElement>>? frequencyJson;
-            FileStream openStream = File.OpenRead(jsonFile);
-            await using (openStream.ConfigureAwait(false))
+            FileStream fileStream = File.OpenRead(jsonFile);
+            await using (fileStream.ConfigureAwait(false))
             {
-                frequencyJson = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(openStream)
+                frequencyJson = await JsonSerializer.DeserializeAsync<List<List<JsonElement>>>(fileStream)
                     .ConfigureAwait(false);
             }
 

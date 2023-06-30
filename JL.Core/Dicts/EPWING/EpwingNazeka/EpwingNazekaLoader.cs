@@ -14,10 +14,10 @@ internal static class EpwingNazekaLoader
 
         List<JsonElement>? jsonObjects;
 
-        FileStream openStream = File.OpenRead(dict.Path);
-        await using (openStream.ConfigureAwait(false))
+        FileStream fileStream = File.OpenRead(dict.Path);
+        await using (fileStream.ConfigureAwait(false))
         {
-            jsonObjects = await JsonSerializer.DeserializeAsync<List<JsonElement>>(openStream)
+            jsonObjects = await JsonSerializer.DeserializeAsync<List<JsonElement>>(fileStream)
                 .ConfigureAwait(false);
         }
 

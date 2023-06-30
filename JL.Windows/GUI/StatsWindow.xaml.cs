@@ -54,7 +54,7 @@ internal sealed partial class StatsWindow : Window
         await UpdateStatsDisplay(StatsMode.Session).ConfigureAwait(false);
     }
 
-    private async Task UpdateStatsDisplay(StatsMode mode)
+    private async ValueTask UpdateStatsDisplay(StatsMode mode)
     {
         Stats stats = mode switch
         {

@@ -1,7 +1,4 @@
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.Unicode;
 using JL.Core.Dicts;
 using JL.Core.Dicts.EDICT;
 using JL.Core.Dicts.EDICT.JMdict;
@@ -13,10 +10,10 @@ internal static class JmdictWordClassUtils
 {
     public static async Task Load()
     {
-        FileStream openStream = File.OpenRead(Path.Join(Utils.ResourcesPath, "PoS.json"));
-        await using (openStream.ConfigureAwait(false))
+        FileStream fileStream = File.OpenRead(Path.Join(Utils.ResourcesPath, "PoS.json"));
+        await using (fileStream.ConfigureAwait(false))
         {
-            DictUtils.WordClassDictionary = (await JsonSerializer.DeserializeAsync<Dictionary<string, List<JmdictWordClass>>>(openStream).ConfigureAwait(false))!;
+            DictUtils.WordClassDictionary = (await JsonSerializer.DeserializeAsync<Dictionary<string, List<JmdictWordClass>>>(fileStream).ConfigureAwait(false))!;
         }
 
         foreach (List<JmdictWordClass> jmdictWordClassList in DictUtils.WordClassDictionary.Values.ToList())
@@ -117,14 +114,8 @@ internal static class JmdictWordClassUtils
             }
         }
 
-        var options = new JsonSerializerOptions
-        {
-            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-
         await File.WriteAllBytesAsync(Path.Join(Utils.ResourcesPath, "PoS.json"),
-            JsonSerializer.SerializeToUtf8Bytes(jmdictWordClassDictionary, options)).ConfigureAwait(false);
+            JsonSerializer.SerializeToUtf8Bytes(jmdictWordClassDictionary, Utils.s_defaultJsonSerializerOptions)).ConfigureAwait(false);
     }
 
     internal static async Task Initialize()

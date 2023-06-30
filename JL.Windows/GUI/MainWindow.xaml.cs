@@ -187,7 +187,7 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    private async Task DeleteCurrentLine()
+    private async ValueTask DeleteCurrentLine()
     {
         if (_backlog.Count is 0 || MainTextBox.Text != _backlog[_currentTextIndex])
         {
@@ -246,7 +246,7 @@ internal sealed partial class MainWindow : Window
 
             if (!PopupWindow.StackPanelCache.Contains(text))
             {
-                List<LookupResult>? lookupResults = LookupUtils.LookupText(text);
+                List<LookupResult>? lookupResults = await LookupUtils.LookupText(text).ConfigureAwait(true);
                 if (lookupResults is { Count: > 0 })
                 {
                     int resultCount = Math.Min(lookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
@@ -590,7 +590,7 @@ internal sealed partial class MainWindow : Window
                 && !DictUtils.UpdatingJmnedict
                 && !DictUtils.UpdatingKanjidic)
             {
-                WindowsUtils.ShowManageDictionariesWindow();
+                await WindowsUtils.ShowManageDictionariesWindow().ConfigureAwait(false);
             }
         }
 
@@ -600,7 +600,7 @@ internal sealed partial class MainWindow : Window
 
             if (FreqUtils.FreqsReady)
             {
-                WindowsUtils.ShowManageFrequenciesWindow();
+                await WindowsUtils.ShowManageFrequenciesWindow().ConfigureAwait(false);
             }
         }
 
@@ -644,7 +644,7 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            WindowsUtils.ShowManageAudioSourcesWindow();
+            await WindowsUtils.ShowManageAudioSourcesWindow().ConfigureAwait(false);
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.AlwaysOnTopKeyGesture))
@@ -860,19 +860,19 @@ internal sealed partial class MainWindow : Window
         WindowsUtils.UpdateMainWindowVisibility();
     }
 
-    private void ShowManageAudioSourcesWindow(object sender, RoutedEventArgs e)
+    private async void ShowManageAudioSourcesWindow(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.ShowManageAudioSourcesWindow();
+        await WindowsUtils.ShowManageAudioSourcesWindow().ConfigureAwait(false);
     }
 
-    private void ShowManageDictionariesWindow(object sender, RoutedEventArgs e)
+    private async void ShowManageDictionariesWindow(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.ShowManageDictionariesWindow();
+        await WindowsUtils.ShowManageDictionariesWindow().ConfigureAwait(false);
     }
 
-    private void ShowManageFrequenciesWindow(object sender, RoutedEventArgs e)
+    private async void ShowManageFrequenciesWindow(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.ShowManageFrequenciesWindow();
+        await WindowsUtils.ShowManageFrequenciesWindow().ConfigureAwait(false);
     }
 
     private async void ShowStats(object sender, RoutedEventArgs e)

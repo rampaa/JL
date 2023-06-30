@@ -10,10 +10,10 @@ internal static class FrequencyNazekaLoader
         Dictionary<string, List<FrequencyRecord>> freqDict = freq.Contents;
         Dictionary<string, List<List<JsonElement>>>? frequencyJson;
 
-        FileStream openStream = File.OpenRead(freq.Path);
-        await using (openStream.ConfigureAwait(false))
+        FileStream fileStream = File.OpenRead(freq.Path);
+        await using (fileStream.ConfigureAwait(false))
         {
-            frequencyJson = await JsonSerializer.DeserializeAsync<Dictionary<string, List<List<JsonElement>>>>(openStream)
+            frequencyJson = await JsonSerializer.DeserializeAsync<Dictionary<string, List<List<JsonElement>>>>(fileStream)
                 .ConfigureAwait(false);
         }
 

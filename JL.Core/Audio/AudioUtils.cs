@@ -1,8 +1,6 @@
 using System.Net.Http.Json;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -173,15 +171,8 @@ public static class AudioUtils
     {
         try
         {
-            var jso = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            };
-
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
-                JsonSerializer.Serialize(AudioSources, jso)).ConfigureAwait(false);
+                JsonSerializer.Serialize(AudioSources, Utils.s_defaultJsonSerializerOptionsWithEnumConverterAndIndendation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -190,19 +181,13 @@ public static class AudioUtils
         }
     }
 
-    internal static void CreateDefaultAudioSourceConfig()
+    public static async Task CreateDefaultAudioSourceConfig()
     {
-        var jso = new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            Converters = { new JsonStringEnumConverter() }
-        };
-
         try
         {
             _ = Directory.CreateDirectory(Utils.ConfigPath);
-            File.WriteAllText(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
-                JsonSerializer.Serialize(s_builtInAudioSources, jso));
+            await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
+                JsonSerializer.Serialize(s_builtInAudioSources, Utils.s_defaultJsonSerializerOptionsWithEnumConverterAndIndendation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -215,12 +200,11 @@ public static class AudioUtils
     {
         try
         {
-            var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
-            Stream audioSourceConfigStream = new StreamReader(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json")).BaseStream;
-            await using (audioSourceConfigStream.ConfigureAwait(false))
+            FileStream fileStream = File.OpenRead(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"));
+            await using (fileStream.ConfigureAwait(false))
             {
                 Dictionary<string, AudioSource>? deserializedAudioSources = await JsonSerializer
-                    .DeserializeAsync<Dictionary<string, AudioSource>>(audioSourceConfigStream, jso).ConfigureAwait(false);
+                    .DeserializeAsync<Dictionary<string, AudioSource>>(fileStream, Utils.s_jsonSerializerOptionsWithEnumConverter).ConfigureAwait(false);
 
                 if (deserializedAudioSources is not null)
                 {

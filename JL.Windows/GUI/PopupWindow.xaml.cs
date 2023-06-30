@@ -178,7 +178,7 @@ internal sealed partial class PopupWindow : Window
 
             LastText = text;
 
-            List<LookupResult>? lookupResults = LookupUtils.LookupText(text);
+            List<LookupResult>? lookupResults = await LookupUtils.LookupText(text).ConfigureAwait(true);
 
             if (lookupResults is { Count: > 0 })
             {
@@ -256,9 +256,9 @@ internal sealed partial class PopupWindow : Window
         _lastTextBox = tb;
         _lastSelectedText = tb.SelectedText;
 
-        List<LookupResult>? lookupResults = LookupUtils.LookupText(tb.SelectedText);
+        List<LookupResult>? lookupResults = await LookupUtils.LookupText(tb.SelectedText).ConfigureAwait(true);
 
-        if (lookupResults?.Count > 0)
+        if (lookupResults is { Count: > 0 })
         {
             _lastLookupResults = lookupResults;
             EnableMiningMode();

@@ -22,7 +22,7 @@ public static class LookupUtils
 {
     private static DateTime s_lastLookupTime;
 
-    public static List<LookupResult>? LookupText(string text)
+    public static async ValueTask<List<LookupResult>?> LookupText(string text)
     {
         DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
         if ((preciseTimeNow - s_lastLookupTime).TotalMilliseconds < CoreConfig.LookupRate)
@@ -100,7 +100,7 @@ public static class LookupUtils
             string textInHiragana = JapaneseUtils.KatakanaToHiragana(currentText);
             textInHiraganaList.Add(textInHiragana);
 
-            deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
+            deconjugationResultsList.Add(await Deconjugator.Deconjugate(textInHiragana).ConfigureAwait(false));
         }
 
         _ = Parallel.ForEach(DictUtils.Dicts.Values.ToList(), dict =>

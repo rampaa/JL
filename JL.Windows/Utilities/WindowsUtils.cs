@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools;
+using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
 using JL.Core.Network;
@@ -148,21 +149,23 @@ internal static class WindowsUtils
         _ = preferencesWindow.ShowDialog();
     }
 
-    public static void ShowManageDictionariesWindow()
+    public static async Task ShowManageDictionariesWindow()
     {
         if (!File.Exists(Path.Join(Utils.ConfigPath, "dicts.json")))
         {
-            DictUtils.CreateDefaultDictsConfig();
+            await DictUtils.CreateDefaultDictsConfig().ConfigureAwait(true);
         }
 
-        if (!File.Exists(Path.Join(Utils.ResourcesPath, "custom_words.txt")))
+        string customWordsPath = Path.Join(Utils.ResourcesPath, "custom_words.txt");
+        if (!File.Exists(customWordsPath))
         {
-            File.Create(Path.Join(Utils.ResourcesPath, "custom_words.txt")).Dispose();
+            await File.Create(customWordsPath).DisposeAsync().ConfigureAwait(true);
         }
 
-        if (!File.Exists(Path.Join(Utils.ResourcesPath, "custom_names.txt")))
+        string customNamesPath = Path.Join(Utils.ResourcesPath, "custom_names.txt");
+        if (!File.Exists(customNamesPath))
         {
-            File.Create(Path.Join(Utils.ResourcesPath, "custom_names.txt")).Dispose();
+            await File.Create(customNamesPath).DisposeAsync().ConfigureAwait(true);
         }
 
         ManageDictionariesWindow manageDictionariesWindow = ManageDictionariesWindow.Instance;
@@ -179,11 +182,11 @@ internal static class WindowsUtils
         _ = manageDictionariesWindow.ShowDialog();
     }
 
-    public static void ShowManageFrequenciesWindow()
+    public static async Task ShowManageFrequenciesWindow()
     {
         if (!File.Exists(Path.Join(Utils.ConfigPath, "freqs.json")))
         {
-            FreqUtils.CreateDefaultFreqsConfig();
+            await FreqUtils.CreateDefaultFreqsConfig().ConfigureAwait(true);
         }
 
         ManageFrequenciesWindow manageFrequenciesWindow = ManageFrequenciesWindow.Instance;
@@ -200,7 +203,7 @@ internal static class WindowsUtils
         _ = manageFrequenciesWindow.ShowDialog();
     }
 
-    public static async Task ShowStatsWindow()
+    public static async ValueTask ShowStatsWindow()
     {
         await Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks).ConfigureAwait(true);
         StatsUtils.StatsStopWatch.Reset();
@@ -218,8 +221,13 @@ internal static class WindowsUtils
         _ = statsWindow.ShowDialog();
     }
 
-    public static void ShowManageAudioSourcesWindow()
+    public static async Task ShowManageAudioSourcesWindow()
     {
+        if (!File.Exists(Path.Join(Utils.ConfigPath, "AudioSources.json")))
+        {
+            await AudioUtils.CreateDefaultAudioSourceConfig().ConfigureAwait(true);
+        }
+
         ManageAudioSourcesWindow manageAudioSourcesWindow = ManageAudioSourcesWindow.Instance;
         MainWindow mainWindow = MainWindow.Instance;
         manageAudioSourcesWindow.Owner = mainWindow;

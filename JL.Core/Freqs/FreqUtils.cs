@@ -1,7 +1,5 @@
 using System.Globalization;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using JL.Core.Freqs.FrequencyNazeka;
 using JL.Core.Freqs.FrequencyYomichan;
 using JL.Core.Utilities;
@@ -141,19 +139,13 @@ public static class FreqUtils
         FreqsReady = true;
     }
 
-    public static void CreateDefaultFreqsConfig()
+    public static async Task CreateDefaultFreqsConfig()
     {
-        var jso = new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            Converters = { new JsonStringEnumConverter() }
-        };
-
         try
         {
             _ = Directory.CreateDirectory(Utils.ConfigPath);
-            File.WriteAllText(Path.Join(Utils.ConfigPath, "freqs.json"),
-                JsonSerializer.Serialize(s_builtInFreqs, jso));
+            await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
+                JsonSerializer.Serialize(s_builtInFreqs, Utils.s_defaultJsonSerializerOptionsWithEnumConverterAndIndendation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -166,15 +158,8 @@ public static class FreqUtils
     {
         try
         {
-            var jso = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            };
-
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
-                JsonSerializer.Serialize(FreqDicts, jso)).ConfigureAwait(false);
+                JsonSerializer.Serialize(FreqDicts, Utils.s_defaultJsonSerializerOptionsWithEnumConverterAndIndendation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -187,12 +172,11 @@ public static class FreqUtils
     {
         try
         {
-            var jso = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
-            Stream freqStream = new StreamReader(Path.Join(Utils.ConfigPath, "freqs.json")).BaseStream;
-            await using (freqStream.ConfigureAwait(false))
+            FileStream fileStream = File.OpenRead(Path.Join(Utils.ConfigPath, "freqs.json"));
+            await using (fileStream.ConfigureAwait(false))
             {
                 Dictionary<string, Freq>? deserializedFreqs = await JsonSerializer
-                    .DeserializeAsync<Dictionary<string, Freq>>(freqStream, jso).ConfigureAwait(false);
+                    .DeserializeAsync<Dictionary<string, Freq>>(fileStream, Utils.s_jsonSerializerOptionsWithEnumConverter).ConfigureAwait(false);
 
                 if (deserializedFreqs is not null)
                 {

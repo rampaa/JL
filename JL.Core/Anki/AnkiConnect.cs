@@ -1,6 +1,5 @@
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using JL.Core.Network;
 using JL.Core.Utilities;
 
@@ -50,8 +49,7 @@ internal static class AnkiConnect
         try
         {
             // AnkiConnect doesn't like null values
-            using StringContent payload = new(JsonSerializer.Serialize(req,
-                new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }));
+            using StringContent payload = new(JsonSerializer.Serialize(req, Utils.s_defaultJsonSerializerOptions));
             Utils.Logger.Information("Sending: {Payload}", await payload.ReadAsStringAsync().ConfigureAwait(false));
 
             HttpResponseMessage postResponse = await Networking.Client

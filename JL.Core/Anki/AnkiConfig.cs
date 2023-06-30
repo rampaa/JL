@@ -51,14 +51,7 @@ public sealed class AnkiConfig
         {
             _ = Directory.CreateDirectory(Utils.ConfigPath);
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AnkiConfig.json"),
-                JsonSerializer.Serialize(ankiConfig,
-                    new JsonSerializerOptions
-                    {
-                        // Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                        WriteIndented = true,
-                        Converters = { new JsonStringEnumConverter() }
-                    })
-            ).ConfigureAwait(false);
+                JsonSerializer.Serialize(ankiConfig, Utils.s_defaultJsonSerializerOptionsWithEnumConverterAndIndendation)).ConfigureAwait(false);
 
             return true;
         }
@@ -72,14 +65,17 @@ public sealed class AnkiConfig
 
     public static async Task<Dictionary<MineType, AnkiConfig>?> ReadAnkiConfig()
     {
-        if (File.Exists(Path.Join(Utils.ConfigPath, "AnkiConfig.json")))
+        string filePath = Path.Join(Utils.ConfigPath, "AnkiConfig.json");
+        if (File.Exists(filePath))
         {
             try
             {
-                return JsonSerializer.Deserialize<Dictionary<MineType, AnkiConfig>>(
-                    await File.ReadAllTextAsync(Path.Join(Utils.ConfigPath, "AnkiConfig.json"))
-                        .ConfigureAwait(false),
-                    new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } });
+                FileStream ankiConfigStream = File.OpenRead(filePath);
+                await using (ankiConfigStream.ConfigureAwait(false))
+                {
+                    return await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream,
+                        Utils.s_jsonSerializerOptionsWithEnumConverter).ConfigureAwait(false);
+                }
             }
 
             catch (Exception ex)
