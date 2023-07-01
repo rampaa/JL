@@ -14,6 +14,8 @@ public sealed class AnkiConfig
 
     [JsonPropertyName("tags")] public string[] Tags { get; set; }
 
+    [JsonIgnore] private static Dictionary<MineType, AnkiConfig>? s_ankiConfigDict;
+
     public AnkiConfig(string deckName, string modelName, Dictionary<string, JLField> fields, string[] tags)
     {
         DeckName = deckName;
@@ -53,6 +55,8 @@ public sealed class AnkiConfig
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AnkiConfig.json"),
                 JsonSerializer.Serialize(ankiConfig, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
 
+            s_ankiConfigDict = ankiConfig;
+
             return true;
         }
         catch (Exception ex)
@@ -65,29 +69,34 @@ public sealed class AnkiConfig
 
     public static async ValueTask<Dictionary<MineType, AnkiConfig>?> ReadAnkiConfig()
     {
-        string filePath = Path.Join(Utils.ConfigPath, "AnkiConfig.json");
-        if (File.Exists(filePath))
+        if (s_ankiConfigDict is null)
         {
-            try
+            string filePath = Path.Join(Utils.ConfigPath, "AnkiConfig.json");
+            if (File.Exists(filePath))
             {
-                FileStream ankiConfigStream = File.OpenRead(filePath);
-                await using (ankiConfigStream.ConfigureAwait(false))
+                try
                 {
-                    return await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream,
-                        Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
+                    FileStream ankiConfigStream = File.OpenRead(filePath);
+                    await using (ankiConfigStream.ConfigureAwait(false))
+                    {
+                        s_ankiConfigDict = await JsonSerializer.DeserializeAsync<Dictionary<MineType, AnkiConfig>>(ankiConfigStream,
+                            Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
+                    }
+                }
+
+                catch (Exception ex)
+                {
+                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
+                    Utils.Logger.Error(ex, "Couldn't read AnkiConfig");
+                    return null;
                 }
             }
 
-            catch (Exception ex)
-            {
-                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't read AnkiConfig");
-                Utils.Logger.Error(ex, "Couldn't read AnkiConfig");
-                return null;
-            }
+            // Utils.Frontend.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
+            Utils.Logger.Warning("AnkiConfig.json doesn't exist");
+            return null;
         }
 
-        // Utils.Frontend.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
-        Utils.Logger.Warning("AnkiConfig.json doesn't exist");
-        return null;
+        return s_ankiConfigDict;
     }
 }
