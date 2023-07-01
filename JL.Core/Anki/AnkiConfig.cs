@@ -59,6 +59,7 @@ public sealed class AnkiConfig
 
             return true;
         }
+
         catch (Exception ex)
         {
             Utils.Frontend.Alert(AlertLevel.Error, "Couldn't write AnkiConfig");
@@ -92,9 +93,12 @@ public sealed class AnkiConfig
                 }
             }
 
-            // Utils.Frontend.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
-            Utils.Logger.Warning("AnkiConfig.json doesn't exist");
-            return null;
+            else
+            {
+                // Utils.Frontend.Alert(AlertLevel.Error, "AnkiConfig.json doesn't exist");
+                Utils.Logger.Warning("AnkiConfig.json doesn't exist");
+                return null;
+            }
         }
 
         return s_ankiConfigDict;
