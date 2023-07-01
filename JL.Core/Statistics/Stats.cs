@@ -43,16 +43,15 @@ public sealed class Stats
                 {
                     Utils.Frontend.Alert(AlertLevel.Error, "Couldn't read Stats");
                     Utils.Logger.Error(ex, "Couldn't read Stats");
-                    return new Stats();
+                    s_lifetimeStats = new Stats();
                 }
             }
 
             else
             {
                 Utils.Logger.Information("Stats.json doesn't exist, creating it");
-                Stats lifetimeStats = new();
-                await WriteLifetimeStats(lifetimeStats).ConfigureAwait(false);
-                return lifetimeStats;
+                s_lifetimeStats = new Stats();
+                await WriteLifetimeStats(s_lifetimeStats).ConfigureAwait(false);
             }
         }
 
