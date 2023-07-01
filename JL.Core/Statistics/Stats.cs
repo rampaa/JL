@@ -27,7 +27,7 @@ public sealed class Stats
         return s_lifetimeStats ??= await ReadLifetimeStats().ConfigureAwait(false);
     }
 
-    public static async ValueTask IncrementStat(StatType type, long amount = 1)
+    public static async Task IncrementStat(StatType type, long amount = 1)
     {
         Stats lifetimeStats = await GetLifetimeStats().ConfigureAwait(false);
         switch (type)
@@ -61,7 +61,7 @@ public sealed class Stats
         }
     }
 
-    public static async ValueTask ResetStats(StatsMode statsMode)
+    public static async Task ResetStats(StatsMode statsMode)
     {
         switch (statsMode)
         {
@@ -110,7 +110,7 @@ public sealed class Stats
         }
     }
 
-    private static async Task<Stats> ReadLifetimeStats()
+    private static async ValueTask<Stats> ReadLifetimeStats()
     {
         string filePath = Path.Join(Utils.ConfigPath, "Stats.json");
         if (File.Exists(filePath))

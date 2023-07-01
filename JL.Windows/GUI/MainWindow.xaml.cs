@@ -187,7 +187,7 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    private async ValueTask DeleteCurrentLine()
+    private async Task DeleteCurrentLine()
     {
         if (_backlog.Count is 0 || MainTextBox.Text != _backlog[_currentTextIndex])
         {

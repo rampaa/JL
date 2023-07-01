@@ -63,7 +63,7 @@ public sealed class AnkiConfig
         }
     }
 
-    public static async Task<Dictionary<MineType, AnkiConfig>?> ReadAnkiConfig()
+    public static async ValueTask<Dictionary<MineType, AnkiConfig>?> ReadAnkiConfig()
     {
         string filePath = Path.Join(Utils.ConfigPath, "AnkiConfig.json");
         if (File.Exists(filePath))

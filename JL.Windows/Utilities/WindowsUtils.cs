@@ -203,7 +203,7 @@ internal static class WindowsUtils
         _ = manageFrequenciesWindow.ShowDialog();
     }
 
-    public static async ValueTask ShowStatsWindow()
+    public static async Task ShowStatsWindow()
     {
         await Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks).ConfigureAwait(true);
         StatsUtils.StatsStopWatch.Reset();
