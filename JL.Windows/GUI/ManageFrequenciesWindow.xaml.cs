@@ -191,6 +191,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this frequency dictionary?", "Confirmation"))
                 {
                     freq.Contents.Clear();
+                    freq.Contents.TrimExcess();
                     _ = FreqUtils.FreqDicts.Remove(freq.Name);
 
                     int priorityOfDeletedFreq = freq.Priority;

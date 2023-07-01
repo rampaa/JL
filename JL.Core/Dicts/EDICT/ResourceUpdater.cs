@@ -127,6 +127,7 @@ public static class ResourceUpdater
             if (!dict.Active)
             {
                 dict.Contents.Clear();
+                dict.Contents.TrimExcess();
             }
 
             //GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
@@ -156,6 +157,7 @@ public static class ResourceUpdater
             if (!dict.Active)
             {
                 dict.Contents.Clear();
+                dict.Contents.TrimExcess();
             }
 
             //GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
@@ -185,6 +187,7 @@ public static class ResourceUpdater
             if (!dict.Active)
             {
                 dict.Contents.Clear();
+                dict.Contents.TrimExcess();
             }
 
             //GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;

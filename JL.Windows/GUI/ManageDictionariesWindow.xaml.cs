@@ -283,6 +283,7 @@ internal sealed partial class ManageDictionariesWindow : Window
                 if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this dictionary?", "Confirmation"))
                 {
                     dict.Contents.Clear();
+                    dict.Contents.TrimExcess();
                     _ = DictUtils.Dicts.Remove(dict.Name);
 
                     int priorityOfDeletedDict = dict.Priority;

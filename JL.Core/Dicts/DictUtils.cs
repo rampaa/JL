@@ -472,6 +472,7 @@ public static class DictUtils
                         else if (dict is { Active: false, Contents.Count: > 0 })
                         {
                             dict.Contents.Clear();
+                            dict.Contents.TrimExcess();
                             dictRemoved = true;
                         }
                     }
@@ -493,6 +494,7 @@ public static class DictUtils
                         else if (dict is { Active: false, Contents.Count: > 0 })
                         {
                             dict.Contents.Clear();
+                            dict.Contents.TrimExcess();
                             dictRemoved = true;
                         }
                     }
@@ -513,6 +515,7 @@ public static class DictUtils
                         else if (dict is { Active: false, Contents.Count: > 0 })
                         {
                             dict.Contents.Clear();
+                            dict.Contents.TrimExcess();
                             dictRemoved = true;
                         }
                     }
@@ -564,6 +567,7 @@ public static class DictUtils
                     else if (dict is { Active: false, Contents.Count: > 0 })
                     {
                         dict.Contents.Clear();
+                        dict.Contents.TrimExcess();
                         dictRemoved = true;
                     }
 
@@ -593,6 +597,7 @@ public static class DictUtils
                     else if (dict is { Active: false, Contents.Count: > 0 })
                     {
                         dict.Contents.Clear();
+                        dict.Contents.TrimExcess();
                         dictRemoved = true;
                     }
 
@@ -611,6 +616,7 @@ public static class DictUtils
                     else if (dict is { Active: false, Contents.Count: > 0 })
                     {
                         dict.Contents.Clear();
+                        dict.Contents.TrimExcess();
                         dictRemoved = true;
                     }
 
@@ -629,6 +635,7 @@ public static class DictUtils
                     else if (dict is { Active: false, Contents.Count: > 0 })
                     {
                         dict.Contents.Clear();
+                        dict.Contents.TrimExcess();
                         dictRemoved = true;
                     }
 
@@ -664,6 +671,7 @@ public static class DictUtils
                     else if (dict is { Active: false, Contents.Count: > 0 })
                     {
                         dict.Contents.Clear();
+                        dict.Contents.TrimExcess();
                         dictRemoved = true;
                     }
 
@@ -693,6 +701,7 @@ public static class DictUtils
                     else if (dict is { Active: false, Contents.Count: > 0 })
                     {
                         dict.Contents.Clear();
+                        dict.Contents.TrimExcess();
                         dictRemoved = true;
                     }
 

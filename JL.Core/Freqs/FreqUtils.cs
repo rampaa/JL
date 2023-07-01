@@ -66,6 +66,7 @@ public static class FreqUtils
                     else if (freq is { Active: false, Contents.Count: > 0 })
                     {
                         freq.Contents.Clear();
+                        freq.Contents.TrimExcess();
                         freqRemoved = true;
                     }
 
@@ -98,6 +99,7 @@ public static class FreqUtils
                     else if (freq is { Active: false, Contents.Count: > 0 })
                     {
                         freq.Contents.Clear();
+                        freq.Contents.TrimExcess();
                         freqRemoved = true;
                     }
 
