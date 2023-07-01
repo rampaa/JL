@@ -24,7 +24,39 @@ public sealed class Stats
 
     public static async ValueTask<Stats> GetLifetimeStats()
     {
-        return s_lifetimeStats ??= await ReadLifetimeStats().ConfigureAwait(false);
+        if (s_lifetimeStats is null)
+        {
+            string filePath = Path.Join(Utils.ConfigPath, "Stats.json");
+            if (File.Exists(filePath))
+            {
+                try
+                {
+                    FileStream fileStream = File.OpenRead(filePath);
+                    await using (fileStream.ConfigureAwait(false))
+                    {
+                        s_lifetimeStats = await JsonSerializer.DeserializeAsync<Stats>(fileStream,
+                            Utils.s_jsoWithEnumConverter).ConfigureAwait(false) ?? new Stats();
+                    }
+                }
+
+                catch (Exception ex)
+                {
+                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't read Stats");
+                    Utils.Logger.Error(ex, "Couldn't read Stats");
+                    return new Stats();
+                }
+            }
+
+            else
+            {
+                Utils.Logger.Information("Stats.json doesn't exist, creating it");
+                Stats lifetimeStats = new();
+                await WriteLifetimeStats(lifetimeStats).ConfigureAwait(false);
+                return lifetimeStats;
+            }
+        }
+
+        return s_lifetimeStats;
     }
 
     public static async Task IncrementStat(StatType type, long amount = 1)
@@ -108,34 +140,5 @@ public sealed class Stats
             Utils.Frontend.Alert(AlertLevel.Error, "Couldn't write Stats");
             Utils.Logger.Error(ex, "Couldn't write Stats");
         }
-    }
-
-    private static async ValueTask<Stats> ReadLifetimeStats()
-    {
-        string filePath = Path.Join(Utils.ConfigPath, "Stats.json");
-        if (File.Exists(filePath))
-        {
-            try
-            {
-                FileStream fileStream = File.OpenRead(filePath);
-                await using (fileStream.ConfigureAwait(false))
-                {
-                    return await JsonSerializer.DeserializeAsync<Stats>(fileStream,
-                        Utils.s_jsoWithEnumConverter).ConfigureAwait(false) ?? new Stats();
-                }
-            }
-
-            catch (Exception ex)
-            {
-                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't read Stats");
-                Utils.Logger.Error(ex, "Couldn't read Stats");
-                return new Stats();
-            }
-        }
-
-        Utils.Logger.Information("Stats.json doesn't exist, creating it");
-        Stats lifetimeStats = new();
-        await WriteLifetimeStats(lifetimeStats).ConfigureAwait(false);
-        return lifetimeStats;
     }
 }

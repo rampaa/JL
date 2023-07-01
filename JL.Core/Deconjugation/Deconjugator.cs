@@ -295,9 +295,9 @@ internal static class Deconjugator
         return !baseText.EndsWith('さ');
     }
 
-    public static async ValueTask<HashSet<Form>> Deconjugate(string myText)
+    public static async ValueTask<HashSet<Form>> Deconjugate(string text)
     {
-        if (s_cache.TryGet(myText, out HashSet<Form> data))
+        if (s_cache.TryGet(text, out HashSet<Form> data))
         {
             return data;
         }
@@ -309,8 +309,8 @@ internal static class Deconjugator
 
         Form startForm = new
         (
-            myText,
-            myText,
+            text,
+            text,
             new List<string>(),
             new HashSet<string>(),
             new List<string>()
@@ -356,7 +356,7 @@ internal static class Deconjugator
             novel = newNovel;
         }
 
-        s_cache.AddReplace(myText, processed);
+        s_cache.AddReplace(text, processed);
 
         return processed;
     }
