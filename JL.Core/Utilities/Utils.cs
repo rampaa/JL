@@ -4,6 +4,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using JL.Core.Audio;
+using JL.Core.Deconjugation;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
 using JL.Core.Statistics;
@@ -128,9 +129,14 @@ public static class Utils
 
             Task.Run(static async () =>
             {
-                await AudioUtils.DeserializeAudioSources().ConfigureAwait(false);
                 await FreqUtils.DeserializeFreqs().ConfigureAwait(false);
                 await FreqUtils.LoadFrequencies().ConfigureAwait(false);
+            }),
+
+            Task.Run(static async() =>
+            {
+                await AudioUtils.DeserializeAudioSources().ConfigureAwait(false);
+                await DeconjugatorUtils.DeserializeRules().ConfigureAwait(true);
             })
         };
 

@@ -8,7 +8,6 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using HandyControl.Tools;
 using JL.Core;
-using JL.Core.Deconjugation;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
 using JL.Core.Lookup;
@@ -76,7 +75,6 @@ internal sealed partial class MainWindow : Window
         WinApi.RestoreWindow(WindowHandle);
         _ = Focus();
 
-        await DeconjugatorUtils.DeserializeRules().ConfigureAwait(true);
         await StatsUtils.DeserializeLifetimeStats().ConfigureAwait(true);
 
         if (ConfigManager.CaptureTextFromClipboard)
