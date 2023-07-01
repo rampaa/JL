@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using HandyControl.Tools;
 using JL.Core;
+using JL.Core.Deconjugation;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
 using JL.Core.Lookup;
@@ -74,6 +75,9 @@ internal sealed partial class MainWindow : Window
 
         WinApi.RestoreWindow(WindowHandle);
         _ = Focus();
+
+        await DeconjugatorUtils.DeserializeRules().ConfigureAwait(true);
+        await StatsUtils.DeserializeLifetimeStats().ConfigureAwait(true);
 
         if (ConfigManager.CaptureTextFromClipboard)
         {
@@ -152,8 +156,8 @@ internal sealed partial class MainWindow : Window
         _backlog.Add(text);
         _currentTextIndex = _backlog.Count - 1;
 
-        await Stats.IncrementStat(StatType.Characters, new StringInfo(JapaneseUtils.RemovePunctuation(text)).LengthInTextElements).ConfigureAwait(false);
-        await Stats.IncrementStat(StatType.Lines).ConfigureAwait(false);
+        Stats.IncrementStat(StatType.Characters, new StringInfo(JapaneseUtils.RemovePunctuation(text)).LengthInTextElements);
+        Stats.IncrementStat(StatType.Lines);
 
         Dispatcher.Invoke(() =>
         {
@@ -187,18 +191,17 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    private async Task DeleteCurrentLine()
+    private void DeleteCurrentLine()
     {
         if (_backlog.Count is 0 || MainTextBox.Text != _backlog[_currentTextIndex])
         {
             return;
         }
 
-        await Stats.IncrementStat(StatType.Characters,
-                new StringInfo(JapaneseUtils.RemovePunctuation(_backlog[_currentTextIndex])).LengthInTextElements * -1)
-            .ConfigureAwait(false);
+        Stats.IncrementStat(StatType.Characters,
+                new StringInfo(JapaneseUtils.RemovePunctuation(_backlog[_currentTextIndex])).LengthInTextElements * -1);
 
-        await Stats.IncrementStat(StatType.Lines, -1).ConfigureAwait(false);
+        Stats.IncrementStat(StatType.Lines, -1);
 
         _backlog.RemoveAt(_currentTextIndex);
 
@@ -246,7 +249,7 @@ internal sealed partial class MainWindow : Window
 
             if (!PopupWindow.StackPanelCache.Contains(text))
             {
-                List<LookupResult>? lookupResults = await LookupUtils.LookupText(text).ConfigureAwait(true);
+                List<LookupResult>? lookupResults = LookupUtils.LookupText(text);
                 if (lookupResults is { Count: > 0 })
                 {
                     int resultCount = Math.Min(lookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
@@ -455,8 +458,8 @@ internal sealed partial class MainWindow : Window
     {
         ConfigManager.SaveBeforeClosing();
 
-        await Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks).ConfigureAwait(false);
-        await Stats.UpdateLifetimeStats().ConfigureAwait(false);
+        Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
+        await Stats.SerializeLifetimeStats().ConfigureAwait(false);
     }
 
     private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -637,7 +640,7 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            await WindowsUtils.ShowStatsWindow().ConfigureAwait(false);
+            WindowsUtils.ShowStatsWindow();
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowManageAudioSourcesWindowKeyGesture))
@@ -730,7 +733,7 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            await DeleteCurrentLine().ConfigureAwait(false);
+            DeleteCurrentLine();
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ToggleMinimizedStateKeyGesture))
@@ -875,9 +878,9 @@ internal sealed partial class MainWindow : Window
         await WindowsUtils.ShowManageFrequenciesWindow().ConfigureAwait(false);
     }
 
-    private async void ShowStats(object sender, RoutedEventArgs e)
+    private void ShowStats(object sender, RoutedEventArgs e)
     {
-        await WindowsUtils.ShowStatsWindow().ConfigureAwait(false);
+        WindowsUtils.ShowStatsWindow();
     }
 
     private void OpacitySlider_LostMouseCapture(object sender, MouseEventArgs e)

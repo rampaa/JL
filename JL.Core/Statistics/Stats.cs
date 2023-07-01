@@ -20,90 +20,52 @@ public sealed class Stats
 
     [JsonIgnore] public static Stats SessionStats { get; set; } = new();
 
-    [JsonIgnore] private static Stats? s_lifetimeStats;
+    [JsonIgnore] public static Stats LifetimeStats { get; set; } = new();
 
-    public static async ValueTask<Stats> GetLifetimeStats()
+    public static void IncrementStat(StatType type, long amount = 1)
     {
-        if (s_lifetimeStats is null)
-        {
-            string filePath = Path.Join(Utils.ConfigPath, "Stats.json");
-            if (File.Exists(filePath))
-            {
-                try
-                {
-                    FileStream fileStream = File.OpenRead(filePath);
-                    await using (fileStream.ConfigureAwait(false))
-                    {
-                        s_lifetimeStats = await JsonSerializer.DeserializeAsync<Stats>(fileStream,
-                            Utils.s_jsoWithEnumConverter).ConfigureAwait(false) ?? new Stats();
-                    }
-                }
-
-                catch (Exception ex)
-                {
-                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't read Stats");
-                    Utils.Logger.Error(ex, "Couldn't read Stats");
-                    s_lifetimeStats = new Stats();
-                }
-            }
-
-            else
-            {
-                Utils.Logger.Information("Stats.json doesn't exist, creating it");
-                s_lifetimeStats = new Stats();
-                await WriteLifetimeStats(s_lifetimeStats).ConfigureAwait(false);
-            }
-        }
-
-        return s_lifetimeStats;
-    }
-
-    public static async Task IncrementStat(StatType type, long amount = 1)
-    {
-        Stats lifetimeStats = await GetLifetimeStats().ConfigureAwait(false);
         switch (type)
         {
             case StatType.Characters:
                 SessionStats.Characters += amount;
-                lifetimeStats.Characters += amount;
+                LifetimeStats.Characters += amount;
                 break;
             case StatType.Lines:
                 SessionStats.Lines += amount;
-                lifetimeStats.Lines += amount;
+                LifetimeStats.Lines += amount;
                 break;
             case StatType.Time:
                 SessionStats.Time = SessionStats.Time.Add(TimeSpan.FromTicks(amount));
-                lifetimeStats.Time = lifetimeStats.Time.Add(TimeSpan.FromTicks(amount));
+                LifetimeStats.Time = LifetimeStats.Time.Add(TimeSpan.FromTicks(amount));
                 break;
             case StatType.CardsMined:
                 SessionStats.CardsMined += amount;
-                lifetimeStats.CardsMined += amount;
+                LifetimeStats.CardsMined += amount;
                 break;
             case StatType.TimesPlayedAudio:
                 SessionStats.TimesPlayedAudio += amount;
-                lifetimeStats.TimesPlayedAudio += amount;
+                LifetimeStats.TimesPlayedAudio += amount;
                 break;
             case StatType.Imoutos:
                 SessionStats.Imoutos += amount;
-                lifetimeStats.Imoutos += amount;
+                LifetimeStats.Imoutos += amount;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
     }
 
-    public static async Task ResetStats(StatsMode statsMode)
+    public static void ResetStats(StatsMode statsMode)
     {
         switch (statsMode)
         {
             case StatsMode.Lifetime:
-                Stats lifetimeStats = await GetLifetimeStats().ConfigureAwait(false);
-                lifetimeStats.Characters = 0;
-                lifetimeStats.Lines = 0;
-                lifetimeStats.Time = TimeSpan.Zero;
-                lifetimeStats.CardsMined = 0;
-                lifetimeStats.TimesPlayedAudio = 0;
-                lifetimeStats.Imoutos = 0;
+                LifetimeStats.Characters = 0;
+                LifetimeStats.Lines = 0;
+                LifetimeStats.Time = TimeSpan.Zero;
+                LifetimeStats.CardsMined = 0;
+                LifetimeStats.TimesPlayedAudio = 0;
+                LifetimeStats.Imoutos = 0;
                 break;
 
             case StatsMode.Session:
@@ -119,19 +81,13 @@ public sealed class Stats
         }
     }
 
-    public static async Task UpdateLifetimeStats()
-    {
-        Stats lifetimeStats = await GetLifetimeStats().ConfigureAwait(false);
-        await WriteLifetimeStats(lifetimeStats).ConfigureAwait(false);
-    }
-
-    private static async Task WriteLifetimeStats(Stats lifetimeStats)
+    public static async Task SerializeLifetimeStats()
     {
         try
         {
             _ = Directory.CreateDirectory(Utils.ConfigPath);
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "Stats.json"),
-                    JsonSerializer.Serialize(lifetimeStats, Utils.s_jsoWithIndentation))
+                    JsonSerializer.Serialize(LifetimeStats, Utils.s_jsoWithIndentation))
                 .ConfigureAwait(false);
         }
         catch (Exception ex)

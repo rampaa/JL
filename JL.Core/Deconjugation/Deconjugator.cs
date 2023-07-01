@@ -1,29 +1,12 @@
-using System.Text.Json;
 using Caching;
-using JL.Core.Utilities;
 
 namespace JL.Core.Deconjugation;
 
 // translated from https://github.com/wareya/nazeka/blob/master/background-script.js
 internal static class Deconjugator
 {
-    private static Rule[]? s_rules;
-
     private static readonly LRUCache<string, HashSet<Form>> s_cache = new(777, 88);
-
-    public static async ValueTask<Rule[]> GetRules()
-    {
-        if (s_rules is null)
-        {
-            FileStream fileStream = File.OpenRead(Path.Join(Utils.ResourcesPath, "deconjugation_rules.json"));
-            await using (fileStream.ConfigureAwait(false))
-            {
-                s_rules = await JsonSerializer.DeserializeAsync<Rule[]>(fileStream, Utils.s_defaultJso).ConfigureAwait(false);
-            }
-        }
-
-        return s_rules!;
-    }
+    public static Rule[] Rules { get; set; } = Array.Empty<Rule>();
 
     private static Form? StdruleDeconjugateInner(Form myForm, VirtualRule myRule)
     {
@@ -295,14 +278,12 @@ internal static class Deconjugator
         return !baseText.EndsWith('さ');
     }
 
-    public static async ValueTask<HashSet<Form>> Deconjugate(string text)
+    public static HashSet<Form> Deconjugate(string text)
     {
         if (s_cache.TryGet(text, out HashSet<Form> data))
         {
             return data;
         }
-
-        Rule[] rules = await GetRules().ConfigureAwait(false);
 
         HashSet<Form> processed = new();
         HashSet<Form> novel = new();
@@ -322,7 +303,7 @@ internal static class Deconjugator
             HashSet<Form> newNovel = new();
             foreach (Form form in novel)
             {
-                foreach (Rule rule in rules)
+                foreach (Rule rule in Rules)
                 {
                     HashSet<Form>? newForm = rule.Type switch
                     {

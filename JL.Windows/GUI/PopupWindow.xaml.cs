@@ -114,9 +114,9 @@ internal sealed partial class PopupWindow : Window
         WindowsUtils.SearchWithBrowser(_lastSelectedText);
     }
 
-    private async void ShowStats(object sender, RoutedEventArgs e)
+    private void ShowStats(object sender, RoutedEventArgs e)
     {
-        await WindowsUtils.ShowStatsWindow().ConfigureAwait(false);
+        WindowsUtils.ShowStatsWindow();
     }
 
     public async Task TextBox_MouseMove(TextBox tb)
@@ -178,7 +178,7 @@ internal sealed partial class PopupWindow : Window
 
             LastText = text;
 
-            List<LookupResult>? lookupResults = await LookupUtils.LookupText(text).ConfigureAwait(true);
+            List<LookupResult>? lookupResults = LookupUtils.LookupText(text);
 
             if (lookupResults is { Count: > 0 })
             {
@@ -256,7 +256,7 @@ internal sealed partial class PopupWindow : Window
         _lastTextBox = tb;
         _lastSelectedText = tb.SelectedText;
 
-        List<LookupResult>? lookupResults = await LookupUtils.LookupText(tb.SelectedText).ConfigureAwait(true);
+        List<LookupResult>? lookupResults = LookupUtils.LookupText(tb.SelectedText);
 
         if (lookupResults is { Count: > 0 })
         {
@@ -1213,11 +1213,11 @@ internal sealed partial class PopupWindow : Window
 
         miningParams[JLField.LocalTime] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
 
-        bool miningResult = await Mining.Mine(miningParams).ConfigureAwait(false);
+        bool mined = await Mining.Mine(miningParams).ConfigureAwait(false);
 
-        if (miningResult)
+        if (mined)
         {
-            await Stats.IncrementStat(StatType.CardsMined).ConfigureAwait(false);
+            Stats.IncrementStat(StatType.CardsMined);
         }
     }
 
@@ -1365,7 +1365,7 @@ internal sealed partial class PopupWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowStatsKeyGesture))
         {
-            await WindowsUtils.ShowStatsWindow().ConfigureAwait(false);
+            WindowsUtils.ShowStatsWindow();
             PopupAutoHideTimer.Start();
         }
 

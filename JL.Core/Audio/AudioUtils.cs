@@ -163,7 +163,7 @@ public static class AudioUtils
         if (audioResponse is not null)
         {
             Utils.Frontend.PlayAudio(audioResponse.AudioData, audioResponse.AudioFormat, CoreConfig.AudioVolume / 100f);
-            await Stats.IncrementStat(StatType.TimesPlayedAudio).ConfigureAwait(false);
+            Stats.IncrementStat(StatType.TimesPlayedAudio);
         }
     }
 

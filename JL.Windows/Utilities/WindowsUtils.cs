@@ -203,9 +203,9 @@ internal static class WindowsUtils
         _ = manageFrequenciesWindow.ShowDialog();
     }
 
-    public static async Task ShowStatsWindow()
+    public static void ShowStatsWindow()
     {
-        await Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks).ConfigureAwait(true);
+        Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
         StatsUtils.StatsStopWatch.Reset();
 
         StatsWindow statsWindow = StatsWindow.Instance;
@@ -359,7 +359,7 @@ internal static class WindowsUtils
             string randomFilePath = filePaths[rand.Next(numFiles)];
             byte[] audioData = await File.ReadAllBytesAsync(randomFilePath).ConfigureAwait(false);
             PlayAudio(audioData, "mp3", 1);
-            await Stats.IncrementStat(StatType.Imoutos).ConfigureAwait(false);
+            Stats.IncrementStat(StatType.Imoutos);
         }
         catch (Exception ex)
         {
