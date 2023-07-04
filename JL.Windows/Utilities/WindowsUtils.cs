@@ -29,7 +29,7 @@ namespace JL.Windows.Utilities;
 
 internal static class WindowsUtils
 {
-    private static WaveOut? s_audioPlayer;
+    public static WaveOut? AudioPlayer { get; private set; }
 
     public static System.Windows.Forms.Screen ActiveScreen { get; set; } =
         System.Windows.Forms.Screen.FromHandle(MainWindow.Instance.WindowHandle);
@@ -283,7 +283,7 @@ internal static class WindowsUtils
                 archive.ExtractToDirectory(tmpDirectory);
             }
 
-            await MainWindow.Instance.Dispatcher.BeginInvoke(ConfigManager.SaveBeforeClosing);
+            await MainWindow.Instance.Dispatcher.InvokeAsync(ConfigManager.SaveBeforeClosing);
 
             _ = Process.Start(
                 new ProcessStartInfo("cmd",
@@ -318,20 +318,30 @@ internal static class WindowsUtils
 
     public static void PlayAudio(byte[] audio, string audioFormat, float volume)
     {
-        _ = Application.Current.Dispatcher.BeginInvoke(() =>
+        _ = Application.Current.Dispatcher.InvokeAsync(async () =>
         {
             try
             {
-                s_audioPlayer?.Dispose();
-                s_audioPlayer = new WaveOut { Volume = volume };
+                AudioPlayer?.Dispose();
+                AudioPlayer = new WaveOut { Volume = volume };
 
-                IWaveProvider waveProvider = audioFormat is "ogg" or "oga"
-                    ? new VorbisWaveReader(new MemoryStream(audio))
-                    : new StreamMediaFoundationReader(new MemoryStream(audio));
+                MemoryStream audioStream = new(audio);
+                await using (audioStream.ConfigureAwait(false))
+                {
+                    IWaveProvider waveProvider = audioFormat is "ogg" or "oga"
+                        ? new VorbisWaveReader(audioStream)
+                        : new StreamMediaFoundationReader(audioStream);
 
-                s_audioPlayer.Init(waveProvider);
-                s_audioPlayer.Play();
+                    AudioPlayer.Init(waveProvider);
+                    AudioPlayer.Play();
+
+                    while (AudioPlayer.PlaybackState is PlaybackState.Playing)
+                    {
+                        await Task.Delay(500).ConfigureAwait(false);
+                    }
+                }
             }
+
             catch (Exception ex)
             {
                 Utils.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio), audioFormat);
@@ -342,6 +352,11 @@ internal static class WindowsUtils
 
     public static async Task Motivate()
     {
+        if (AudioPlayer?.PlaybackState is PlaybackState.Playing)
+        {
+            return;
+        }
+
         try
         {
             Random rand = new();

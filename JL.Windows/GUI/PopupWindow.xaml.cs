@@ -13,6 +13,7 @@ using JL.Core.Lookup;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
+using NAudio.Wave;
 using Timer = System.Timers.Timer;
 
 namespace JL.Windows.GUI;
@@ -47,6 +48,10 @@ internal sealed partial class PopupWindow : Window
     public string? LastText { get; set; }
 
     public bool MiningMode { get; set; }
+
+    private static string? s_primarySpellingOfLastPlayedAudio = null;
+
+    private static string? s_readingOfLastPlayedAudio = null;
 
     public static Timer PopupAutoHideTimer { get; } = new();
 
@@ -1540,6 +1545,16 @@ internal sealed partial class PopupWindow : Window
 
         if (primarySpelling is not null)
         {
+            if (WindowsUtils.AudioPlayer?.PlaybackState is PlaybackState.Playing
+                && s_primarySpellingOfLastPlayedAudio == primarySpelling
+                && s_readingOfLastPlayedAudio == reading)
+            {
+                return;
+            }
+
+            s_primarySpellingOfLastPlayedAudio = primarySpelling;
+            s_readingOfLastPlayedAudio = reading;
+
             await AudioUtils.GetAndPlayAudio(primarySpelling, reading).ConfigureAwait(false);
         }
     }
