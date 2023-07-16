@@ -350,6 +350,7 @@ internal static class WindowsUtils
         });
     }
 
+#pragma warning disable CA5394
     public static async Task Motivate()
     {
         if (AudioPlayer?.PlaybackState is PlaybackState.Playing)
@@ -382,6 +383,7 @@ internal static class WindowsUtils
             Utils.Frontend.Alert(AlertLevel.Error, "Error motivating");
         }
     }
+#pragma warning restore CA5394
 
     public static Brush? BrushFromHex(string hexColorString)
     {
@@ -636,7 +638,7 @@ internal static class WindowsUtils
     {
         byte[]? imageBytes = null;
 
-        Application.Current.Dispatcher.Invoke(() =>
+        _ = Application.Current.Dispatcher.InvokeAsync(() =>
         {
             while (Clipboard.ContainsImage())
             {

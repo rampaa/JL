@@ -69,19 +69,24 @@ internal sealed class WinApi
         }
 
         [DllImport("user32.dll", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool AddClipboardFormatListener(IntPtr hwnd);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         internal static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
         [DllImport("user32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         internal static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
         [DllImport("user32.dll", EntryPoint = "SetWindowLong")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern int SetWindowLong32(IntPtr hWnd, int nIndex, int dwNewLong);
 
         [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
         internal static IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
@@ -92,9 +97,11 @@ internal sealed class WinApi
         }
 
         [DllImport("user32.dll", EntryPoint = "GetWindowLong")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern int GetWindowLongPtr32(IntPtr hWnd, int nIndex);
 
         [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern IntPtr GetWindowLongPtr64(IntPtr hWnd, int nIndex);
 
         internal static IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex)
@@ -105,18 +112,23 @@ internal sealed class WinApi
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         internal static extern IntPtr DefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
         [DllImport("user32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         internal static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
 
         [DllImport("user32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         internal static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
         [DllImport("user32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
         [DllImport("user32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static extern IntPtr SetActiveWindow(IntPtr hWnd);
     }
 #pragma warning restore IDE1006

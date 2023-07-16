@@ -99,6 +99,7 @@ internal sealed partial class StatsWindow : Window
         }
     }
 
+#pragma warning disable CA1308
     private async void ButtonResetStats_OnClick(object sender, RoutedEventArgs e)
     {
         if (Utils.Frontend.ShowYesNoDialog(
@@ -123,6 +124,7 @@ internal sealed partial class StatsWindow : Window
             }
         }
     }
+#pragma warning restore CA1308
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {

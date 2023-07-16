@@ -2,7 +2,7 @@ using System.Text.Json;
 using JL.Core.Utilities;
 
 namespace JL.Core.Deconjugation;
-public class DeconjugatorUtils
+public static class DeconjugatorUtils
 {
     public static async Task DeserializeRules()
     {
