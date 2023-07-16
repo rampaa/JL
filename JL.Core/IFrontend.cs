@@ -12,7 +12,7 @@ public interface IFrontend
 
     public void ShowOkDialog(string text, string caption);
 
-    public Task CopyFromWebSocket(string text);
+    public void CopyFromWebSocket(string text);
 
     public Task UpdateJL(Uri downloadUrlOfLatestJLRelease);
 

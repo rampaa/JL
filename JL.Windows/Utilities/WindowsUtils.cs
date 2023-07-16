@@ -283,7 +283,7 @@ internal static class WindowsUtils
                 archive.ExtractToDirectory(tmpDirectory);
             }
 
-            await MainWindow.Instance.Dispatcher.InvokeAsync(ConfigManager.SaveBeforeClosing);
+            Application.Current.Dispatcher.Invoke(ConfigManager.SaveBeforeClosing);
 
             _ = Process.Start(
                 new ProcessStartInfo("cmd",
@@ -337,7 +337,7 @@ internal static class WindowsUtils
 
                     while (AudioPlayer.PlaybackState is PlaybackState.Playing)
                     {
-                        await Task.Delay(500).ConfigureAwait(false);
+                        await Task.Delay(200).ConfigureAwait(false);
                     }
                 }
             }
@@ -399,15 +399,14 @@ internal static class WindowsUtils
 
     public static void Alert(AlertLevel alertLevel, string message)
     {
-        _ = Application.Current?.Dispatcher.InvokeAsync(async () =>
+        _ = Application.Current.Dispatcher.InvokeAsync(async () =>
         {
             List<AlertWindow> alertWindowList = Application.Current.Windows.OfType<AlertWindow>().ToList();
 
             AlertWindow alertWindow = new();
 
             alertWindow.Left = DpiAwareWorkAreaWidth - alertWindow.Width - 30;
-            alertWindow.Top =
-                (alertWindowList.Count * ((alertWindowList.LastOrDefault()?.ActualHeight ?? 0) + 2)) + 30;
+            alertWindow.Top = alertWindowList.Sum(alertWindow => alertWindow.ActualHeight + 2) + 30;
 
             alertWindow.SetAlert(alertLevel, message);
             alertWindow.Show();
@@ -594,7 +593,7 @@ internal static class WindowsUtils
     {
         MainWindow mainWindow = MainWindow.Instance;
 
-        if (!mainWindow.FirstPopupWindow.IsVisible)
+        if (!MainWindow.FirstPopupWindow.IsVisible)
         {
             if (!mainWindow.IsMouseOver)
             {
@@ -636,9 +635,7 @@ internal static class WindowsUtils
 
     public static byte[]? GetImageFromClipboardAsByteArray()
     {
-        byte[]? imageBytes = null;
-
-        _ = Application.Current.Dispatcher.InvokeAsync(() =>
+        return Application.Current.Dispatcher.Invoke(() =>
         {
             while (Clipboard.ContainsImage())
             {
@@ -653,18 +650,18 @@ internal static class WindowsUtils
 
                         using MemoryStream stream = new();
                         pngBitmapEncoder.Save(stream);
-                        imageBytes = stream.ToArray();
+                        return stream.ToArray();
                     }
 
-                    break;
+                    return null;
                 }
                 catch (Exception ex)
                 {
                     Utils.Logger.Warning(ex, "GetImageFromClipboard failed");
                 }
             }
-        });
 
-        return imageBytes;
+            return null;
+        });
     }
 }

@@ -74,6 +74,8 @@ internal static class ConfigManager
     public static bool SteppedBacklogWithMouseWheel { get; private set; } = false;
     public static bool HorizontallyCenterMainWindowText { get; private set; } = false;
     public static bool HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar { get; set; } = false;
+    public static bool EnableBacklog { get; private set; } = true;
+    public static bool AutoSaveBacklogBeforeClosing { get; private set; } = false;
 
     #endregion
 
@@ -259,6 +261,15 @@ internal static class ConfigManager
             ? HorizontalAlignment.Center
             : HorizontalAlignment.Left;
 
+        EnableBacklog = GetValueFromConfig(EnableBacklog, nameof(EnableBacklog), bool.TryParse);
+        if (!EnableBacklog)
+        {
+            BacklogUtils.Backlog.Clear();
+            BacklogUtils.Backlog.TrimExcess();
+        }
+
+        AutoSaveBacklogBeforeClosing = GetValueFromConfig(AutoSaveBacklogBeforeClosing, nameof(AutoSaveBacklogBeforeClosing), bool.TryParse);
+
         HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar = GetValueFromConfig(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), bool.TryParse);
         mainWindow.ChangeVisibilityOfTitleBarButtons();
 
@@ -336,9 +347,12 @@ internal static class ConfigManager
         // MAKE SURE YOU FREEZE ANY NEW COLOR OBJECTS YOU ADD
         // OR THE PROGRAM WILL CRASH AND BURN
         MainWindowTextColor = GetFrozenBrushFromConfig(MainWindowTextColor, nameof(MainWindowTextColor));
-        mainWindow.MainTextBox.Foreground = MainWindowTextColor;
-
         MainWindowBacklogTextColor = GetFrozenBrushFromConfig(MainWindowBacklogTextColor, nameof(MainWindowBacklogTextColor));
+
+        mainWindow.MainTextBox.Foreground = !EnableBacklog || mainWindow.MainTextBox.Text == BacklogUtils.Backlog.LastOrDefault("")
+            ? MainWindowTextColor
+            : MainWindowBacklogTextColor;
+
         PrimarySpellingColor = GetFrozenBrushFromConfig(PrimarySpellingColor, nameof(PrimarySpellingColor));
         ReadingsColor = GetFrozenBrushFromConfig(ReadingsColor, nameof(ReadingsColor));
         AlternativeSpellingsColor = GetFrozenBrushFromConfig(AlternativeSpellingsColor, nameof(AlternativeSpellingsColor));
@@ -613,7 +627,7 @@ internal static class ConfigManager
             }
         }
 
-        PopupWindow? currentPopupWindow = mainWindow.FirstPopupWindow;
+        PopupWindow? currentPopupWindow = MainWindow.FirstPopupWindow;
         while (currentPopupWindow is not null)
         {
             currentPopupWindow.Background = PopupBackgroundColor;
@@ -755,6 +769,8 @@ internal static class ConfigManager
         preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInMainWindow;
         preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked = MainWindowFocusOnHover;
         preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked = SteppedBacklogWithMouseWheel;
+        preferenceWindow.EnableBacklogCheckBox.IsChecked = EnableBacklog;
+        preferenceWindow.AutoSaveBacklogBeforeClosingCheckBox.IsChecked = AutoSaveBacklogBeforeClosing;
         preferenceWindow.ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox.IsChecked = HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar;
         preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked = HorizontallyCenterMainWindowText;
 
@@ -940,6 +956,10 @@ internal static class ConfigManager
             preferenceWindow.MainWindowFocusOnHoverCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(SteppedBacklogWithMouseWheel)].Value =
             preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings[nameof(EnableBacklog)].Value =
+            preferenceWindow.EnableBacklogCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings[nameof(AutoSaveBacklogBeforeClosing)].Value =
+            preferenceWindow.AutoSaveBacklogBeforeClosingCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar)].Value =
             preferenceWindow.ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(HorizontallyCenterMainWindowText)].Value =

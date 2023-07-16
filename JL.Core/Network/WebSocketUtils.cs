@@ -65,7 +65,7 @@ public static class WebSocketUtils
                             _ = memoryStream.Seek(0, SeekOrigin.Begin);
 
                             string text = Encoding.UTF8.GetString(memoryStream.ToArray());
-                            _ = Task.Run(async () => await Utils.Frontend.CopyFromWebSocket(text).ConfigureAwait(false), cancellationToken).ConfigureAwait(false);
+                            _ = Task.Run(() => Utils.Frontend.CopyFromWebSocket(text), cancellationToken).ConfigureAwait(false);
                         }
                     }
                     catch (WebSocketException webSocketException)

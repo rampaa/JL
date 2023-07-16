@@ -114,8 +114,8 @@ internal static class JmdictWordClassUtils
             }
         }
 
-        await File.WriteAllBytesAsync(Path.Join(Utils.ResourcesPath, "PoS.json"),
-            JsonSerializer.SerializeToUtf8Bytes(jmdictWordClassDictionary, Utils.s_defaultJso)).ConfigureAwait(false);
+        await File.WriteAllTextAsync(Path.Join(Utils.ResourcesPath, "PoS.json"),
+            JsonSerializer.Serialize(jmdictWordClassDictionary, Utils.s_defaultJso)).ConfigureAwait(false);
     }
 
     internal static async Task Initialize()

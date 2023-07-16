@@ -185,7 +185,7 @@ internal sealed partial class PopupWindow : Window
 
             List<LookupResult>? lookupResults = LookupUtils.LookupText(text);
 
-            if (lookupResults is { Count: > 0 })
+            if (lookupResults?.Count > 0)
             {
                 _lastTextBox = tb;
                 _lastSelectedText = lookupResults[0].MatchedText;

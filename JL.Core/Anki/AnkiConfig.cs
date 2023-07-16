@@ -6,13 +6,13 @@ namespace JL.Core.Anki;
 
 public sealed class AnkiConfig
 {
-    [JsonPropertyName("deckName")] public string DeckName { get; set; }
+    [JsonPropertyName("deckName")] public string DeckName { get; }
 
-    [JsonPropertyName("modelName")] public string ModelName { get; set; }
+    [JsonPropertyName("modelName")] public string ModelName { get; }
 
-    [JsonPropertyName("fields")] public Dictionary<string, JLField> Fields { get; set; }
+    [JsonPropertyName("fields")] public Dictionary<string, JLField> Fields { get; }
 
-    [JsonPropertyName("tags")] public string[] Tags { get; set; }
+    [JsonPropertyName("tags")] public string[] Tags { get; }
 
     [JsonIgnore] private static Dictionary<MineType, AnkiConfig>? s_ankiConfigDict;
 

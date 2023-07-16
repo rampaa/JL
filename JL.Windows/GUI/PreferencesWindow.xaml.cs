@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -276,13 +277,14 @@ internal sealed partial class PreferencesWindow : Window
         }
     }
 
-    private static AnkiConfig? GetAnkiConfigFromPreferences(Selector deckNamesSelector, Selector modelNamesSelector, Panel miningPanel, TextBox tagsTextBox, IReadOnlyCollection<JLField> jlFieldList)
+    private static AnkiConfig? GetAnkiConfigFromPreferences(Selector deckNamesSelector, Selector modelNamesSelector, Panel miningPanel, TextBox tagsTextBox, IReadOnlyCollection<JLField> jlFieldList, MineType mineType)
     {
         if (deckNamesSelector.SelectedItem is null ||
             modelNamesSelector.SelectedItem is null)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, "Save failed: Incomplete Anki config");
-            Utils.Logger.Error("Save failed: Incomplete Anki config");
+            string mineTypeStr = mineType.ToString();
+            Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Save failed: Incomplete Anki config for {mineTypeStr} dictionaries"));
+            Utils.Logger.Error(string.Create(CultureInfo.InvariantCulture, $"Save failed: Incomplete Anki config for {mineTypeStr} dictionaries"));
             return null;
         }
 
@@ -319,25 +321,25 @@ internal sealed partial class PreferencesWindow : Window
 
         Dictionary<MineType, AnkiConfig> ankiConfigDict = new();
 
-        AnkiConfig? ankiConfig = GetAnkiConfigFromPreferences(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordMiningSetupStackPanelFields, WordTagsTextBox, JLFieldUtils.JLFieldsForWordDicts);
+        AnkiConfig? ankiConfig = GetAnkiConfigFromPreferences(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordMiningSetupStackPanelFields, WordTagsTextBox, JLFieldUtils.JLFieldsForWordDicts, MineType.Word);
         if (ankiConfig is not null)
         {
             ankiConfigDict.Add(MineType.Word, ankiConfig);
         }
 
-        ankiConfig = GetAnkiConfigFromPreferences(KanjiMiningSetupComboBoxDeckNames, KanjiMiningSetupComboBoxModelNames, KanjiMiningSetupStackPanelFields, KanjiTagsTextBox, JLFieldUtils.JLFieldsForKanjiDicts);
+        ankiConfig = GetAnkiConfigFromPreferences(KanjiMiningSetupComboBoxDeckNames, KanjiMiningSetupComboBoxModelNames, KanjiMiningSetupStackPanelFields, KanjiTagsTextBox, JLFieldUtils.JLFieldsForKanjiDicts, MineType.Kanji);
         if (ankiConfig is not null)
         {
             ankiConfigDict.Add(MineType.Kanji, ankiConfig);
         }
 
-        ankiConfig = GetAnkiConfigFromPreferences(NameMiningSetupComboBoxDeckNames, NameMiningSetupComboBoxModelNames, NameMiningSetupStackPanelFields, NameTagsTextBox, JLFieldUtils.JLFieldsForNameDicts);
+        ankiConfig = GetAnkiConfigFromPreferences(NameMiningSetupComboBoxDeckNames, NameMiningSetupComboBoxModelNames, NameMiningSetupStackPanelFields, NameTagsTextBox, JLFieldUtils.JLFieldsForNameDicts, MineType.Name);
         if (ankiConfig is not null)
         {
             ankiConfigDict.Add(MineType.Name, ankiConfig);
         }
 
-        ankiConfig = GetAnkiConfigFromPreferences(OtherMiningSetupComboBoxDeckNames, OtherMiningSetupComboBoxModelNames, OtherMiningSetupStackPanelFields, OtherTagsTextBox, JLFieldUtils.JLFieldsForWordDicts);
+        ankiConfig = GetAnkiConfigFromPreferences(OtherMiningSetupComboBoxDeckNames, OtherMiningSetupComboBoxModelNames, OtherMiningSetupStackPanelFields, OtherTagsTextBox, JLFieldUtils.JLFieldsForWordDicts, MineType.Other);
         if (ankiConfig is not null)
         {
             ankiConfigDict.Add(MineType.Other, ankiConfig);

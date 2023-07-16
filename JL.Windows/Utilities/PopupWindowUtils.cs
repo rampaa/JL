@@ -238,9 +238,9 @@ internal static class PopupWindowUtils
 
     private static void PopupAutoHideTimerEvent(object? sender, ElapsedEventArgs e)
     {
-        _ = MainWindow.Instance.FirstPopupWindow.Dispatcher.InvokeAsync(static () =>
+        _ = MainWindow.FirstPopupWindow.Dispatcher.InvokeAsync(static () =>
         {
-            PopupWindow lastPopupWindow = MainWindow.Instance.FirstPopupWindow;
+            PopupWindow lastPopupWindow = MainWindow.FirstPopupWindow;
             while (lastPopupWindow.ChildPopupWindow?.IsVisible ?? false)
             {
                 lastPopupWindow = lastPopupWindow.ChildPopupWindow;

@@ -25,14 +25,11 @@ namespace JL.Windows.GUI;
 /// </summary>
 internal sealed partial class MainWindow : Window
 {
-    private readonly List<string> _backlog = new();
-    private int _currentTextIndex = 0;
-    private bool _stopPrecache = false;
     private DateTime _lastClipboardChangeTime;
     private WinApi? _winApi;
     public IntPtr WindowHandle { get; private set; }
 
-    public PopupWindow FirstPopupWindow { get; }
+    public static PopupWindow FirstPopupWindow { get; } = new PopupWindow();
 
     private static MainWindow? s_instance;
     public static MainWindow Instance => s_instance ??= new MainWindow();
@@ -42,12 +39,13 @@ internal sealed partial class MainWindow : Window
     public double HeightBeforeResolutionChange { get; set; }
     public double WidthBeforeResolutionChange { get; set; }
 
+    private static CancellationTokenSource s_precacheCancellationTokenSource = new();
+
     public MainWindow()
     {
         InitializeComponent();
         s_instance = this;
         ConfigHelper.Instance.SetLang("en");
-        FirstPopupWindow = new PopupWindow();
     }
 
     protected override async void OnSourceInitialized(EventArgs e)
@@ -79,7 +77,7 @@ internal sealed partial class MainWindow : Window
 
         if (ConfigManager.CaptureTextFromClipboard)
         {
-            await CopyFromClipboard().ConfigureAwait(true);
+            CopyFromClipboard();
             _lastClipboardChangeTime = new DateTime(Stopwatch.GetTimestamp());
         }
 
@@ -92,7 +90,7 @@ internal sealed partial class MainWindow : Window
         await WindowsUtils.InitializeMainWindow().ConfigureAwait(false);
     }
 
-    private async Task CopyFromClipboard()
+    private void CopyFromClipboard()
     {
         bool gotTextFromClipboard = false;
         while (Clipboard.ContainsText() && !gotTextFromClipboard)
@@ -105,10 +103,13 @@ internal sealed partial class MainWindow : Window
                 {
                     text = SanitizeText(text);
 
-                    MainTextBox.Text = text;
-                    MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+                    Dispatcher.Invoke(() =>
+                    {
+                        MainTextBox.Text = text;
+                        MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+                    }, DispatcherPriority.Send);
 
-                    await HandlePostCopy(text).ConfigureAwait(false);
+                    HandlePostCopy(text);
                 }
             }
             catch (Exception ex)
@@ -118,7 +119,7 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    public async Task CopyFromWebSocket(string text)
+    public void CopyFromWebSocket(string text)
     {
         if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || JapaneseUtils.JapaneseRegex.IsMatch(text))
         {
@@ -128,9 +129,9 @@ internal sealed partial class MainWindow : Window
             {
                 MainTextBox.Text = text;
                 MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
-            });
+            }, DispatcherPriority.Send);
 
-            await HandlePostCopy(text).ConfigureAwait(false);
+            HandlePostCopy(text);
         }
     }
 
@@ -149,21 +150,15 @@ internal sealed partial class MainWindow : Window
         return text;
     }
 
-    private async Task HandlePostCopy(string text)
+    private void HandlePostCopy(string text)
     {
-        _backlog.Add(text);
-        _currentTextIndex = _backlog.Count - 1;
-
-        Stats.IncrementStat(StatType.Characters, new StringInfo(JapaneseUtils.RemovePunctuation(text)).LengthInTextElements);
-        Stats.IncrementStat(StatType.Lines);
-
         Dispatcher.Invoke(() =>
         {
             if (SizeToContent is SizeToContent.Manual && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
             {
                 WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, this);
             }
-        });
+        }, DispatcherPriority.Send);
 
         if (ConfigManager.AlwaysOnTop
             && !FirstPopupWindow.IsVisible
@@ -180,63 +175,43 @@ internal sealed partial class MainWindow : Window
             WinApi.BringToFront(WindowHandle);
         }
 
+        BacklogUtils.AddToBacklog(text);
+
+        Stats.IncrementStat(StatType.Lines);
+        Stats.IncrementStat(StatType.Characters, new StringInfo(JapaneseUtils.RemovePunctuation(text)).LengthInTextElements);
+
         if (ConfigManager.Precaching && DictUtils.DictsReady
                                      && !DictUtils.UpdatingJmdict && !DictUtils.UpdatingJmnedict && !DictUtils.UpdatingKanjidic
-                                     && FreqUtils.FreqsReady && MainTextBox.Text.Length < Utils.CacheSize)
+                                     && FreqUtils.FreqsReady
+                                     && MainTextBox.Text.Length < Utils.CacheSize)
         {
-            _ = Dispatcher.Invoke(DispatcherPriority.Render, static () => { }); // let MainTextBox text update
-            await Precache(MainTextBox.Text).ConfigureAwait(false);
+            s_precacheCancellationTokenSource.Cancel();
+            s_precacheCancellationTokenSource.Dispose();
+            s_precacheCancellationTokenSource = new CancellationTokenSource();
+
+            _ = Dispatcher.InvokeAsync(async () => await Precache(MainTextBox.Text, s_precacheCancellationTokenSource.Token).ConfigureAwait(false), DispatcherPriority.Background);
         }
     }
 
-    private void DeleteCurrentLine()
-    {
-        if (_backlog.Count is 0 || MainTextBox.Text != _backlog[_currentTextIndex])
-        {
-            return;
-        }
-
-        Stats.IncrementStat(StatType.Characters,
-                new StringInfo(JapaneseUtils.RemovePunctuation(_backlog[_currentTextIndex])).LengthInTextElements * -1);
-
-        Stats.IncrementStat(StatType.Lines, -1);
-
-        _backlog.RemoveAt(_currentTextIndex);
-
-        if (_currentTextIndex > 0)
-        {
-            --_currentTextIndex;
-        }
-
-        MainTextBox.Foreground = _currentTextIndex < _backlog.Count - 1
-            ? ConfigManager.MainWindowBacklogTextColor
-            : ConfigManager.MainWindowTextColor;
-
-        MainTextBox.Text = _backlog.Count > 0
-            ? _backlog[_currentTextIndex]
-            : "";
-    }
-
-    private async Task Precache(string input)
+    private static async Task Precache(string input, CancellationToken cancellationToken)
     {
         FirstPopupWindow.DictsWithResults.Clear();
 
         for (int charPosition = 0; charPosition < input.Length; charPosition++)
         {
-            if (_stopPrecache)
+            if (charPosition % 10 is 0)
             {
-                _stopPrecache = false;
+                await Task.Delay(1, CancellationToken.None).ConfigureAwait(true); // let user interact with the GUI while this method is running
+            }
+
+            if (cancellationToken.IsCancellationRequested)
+            {
                 return;
             }
 
             if (charPosition > 0 && char.IsHighSurrogate(input[charPosition - 1]))
             {
                 --charPosition;
-            }
-
-            if (charPosition % 10 is 0)
-            {
-                await Task.Delay(1).ConfigureAwait(true); // let user interact with the GUI while this method is running
             }
 
             int endPosition = input.Length - charPosition > ConfigManager.MaxSearchLength
@@ -248,7 +223,7 @@ internal sealed partial class MainWindow : Window
             if (!PopupWindow.StackPanelCache.Contains(text))
             {
                 List<LookupResult>? lookupResults = LookupUtils.LookupText(text);
-                if (lookupResults is { Count: > 0 })
+                if (lookupResults?.Count > 0)
                 {
                     int resultCount = Math.Min(lookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
                     var popupItemSource = new StackPanel[resultCount];
@@ -270,7 +245,7 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    private async void ClipboardChanged(object? sender, EventArgs? e)
+    private void ClipboardChanged(object? sender, EventArgs? e)
     {
         if (!ConfigManager.CaptureTextFromClipboard)
         {
@@ -282,7 +257,7 @@ internal sealed partial class MainWindow : Window
         if ((currentTime - _lastClipboardChangeTime).TotalMilliseconds > 5)
         {
             _lastClipboardChangeTime = currentTime;
-            await CopyFromClipboard().ConfigureAwait(false);
+            CopyFromClipboard();
         }
     }
 
@@ -301,7 +276,7 @@ internal sealed partial class MainWindow : Window
             return;
         }
 
-        _stopPrecache = true;
+        s_precacheCancellationTokenSource.Cancel();
         await FirstPopupWindow.TextBox_MouseMove(MainTextBox).ConfigureAwait(false);
     }
 
@@ -309,38 +284,6 @@ internal sealed partial class MainWindow : Window
     {
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
         Application.Current.Shutdown();
-    }
-
-    private void ShowPreviousBacklogItem()
-    {
-        if (FirstPopupWindow.MiningMode)
-        {
-            return;
-        }
-
-        if (_currentTextIndex > 0)
-        {
-            --_currentTextIndex;
-            MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
-        }
-
-        MainTextBox.Text = _backlog[_currentTextIndex];
-    }
-
-    private void ShowNextBacklogItem()
-    {
-        if (_currentTextIndex < _backlog.Count - 1)
-        {
-            ++_currentTextIndex;
-            MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
-        }
-
-        if (_currentTextIndex == _backlog.Count - 1)
-        {
-            MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
-        }
-
-        MainTextBox.Text = _backlog[_currentTextIndex];
     }
 
     private void MainTextBox_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -362,18 +305,18 @@ internal sealed partial class MainWindow : Window
         {
             if (e.Delta > 0)
             {
-                ShowPreviousBacklogItem();
+                BacklogUtils.ShowPreviousBacklogItem();
             }
 
             else if (e.Delta < 0)
             {
-                ShowNextBacklogItem();
+                BacklogUtils.ShowNextBacklogItem();
             }
         }
 
         else if (e.Delta > 0)
         {
-            string allBacklogText = string.Join("\n", _backlog);
+            string allBacklogText = string.Join("\n", BacklogUtils.Backlog);
             if (MainTextBox.Text != allBacklogText)
             {
                 if (MainTextBox.GetFirstVisibleLineIndex() is 0)
@@ -455,9 +398,9 @@ internal sealed partial class MainWindow : Window
     private async void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         ConfigManager.SaveBeforeClosing();
-
         Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
         await Stats.SerializeLifetimeStats().ConfigureAwait(false);
+        await BacklogUtils.WriteBacklog().ConfigureAwait(false);
     }
 
     private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -510,14 +453,14 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            ShowPreviousBacklogItem();
+            BacklogUtils.ShowPreviousBacklogItem();
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SteppedBacklogForwardsKeyGesture))
         {
             handled = true;
 
-            ShowNextBacklogItem();
+            BacklogUtils.ShowNextBacklogItem();
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowPreferencesWindowKeyGesture))
@@ -731,7 +674,7 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            DeleteCurrentLine();
+            BacklogUtils.DeleteCurrentLine();
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ToggleMinimizedStateKeyGesture))
