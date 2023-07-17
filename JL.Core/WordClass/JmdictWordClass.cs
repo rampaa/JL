@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace JL.Core.WordClass;
 
-public sealed class JmdictWordClass
+internal sealed class JmdictWordClass
 {
     [JsonPropertyName("S")] public string Spelling { get; }
 

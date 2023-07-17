@@ -284,7 +284,7 @@ internal sealed partial class PreferencesWindow : Window
         {
             string mineTypeStr = mineType.ToString();
             Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Save failed: Incomplete Anki config for {mineTypeStr} dictionaries"));
-            Utils.Logger.Error(string.Create(CultureInfo.InvariantCulture, $"Save failed: Incomplete Anki config for {mineTypeStr} dictionaries"));
+            Utils.Logger.Error("Save failed: Incomplete Anki config for {MineType} dictionaries", mineTypeStr);
             return null;
         }
 

@@ -73,7 +73,7 @@ internal static class ConfigManager
     public static bool OnlyCaptureTextWithJapaneseChars { get; private set; } = true;
     public static bool DisableLookupsForNonJapaneseCharsInMainWindow { get; private set; } = false;
     public static bool MainWindowFocusOnHover { get; private set; } = false;
-    public static bool SteppedBacklogWithMouseWheel { get; private set; } = false;
+    public static bool SteppedBacklogWithMouseWheel { get; private set; } = true;
     public static bool HorizontallyCenterMainWindowText { get; private set; } = false;
     public static bool HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar { get; set; } = false;
     public static bool EnableBacklog { get; private set; } = true;

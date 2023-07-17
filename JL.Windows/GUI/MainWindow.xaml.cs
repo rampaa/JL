@@ -29,7 +29,7 @@ internal sealed partial class MainWindow : Window
     private WinApi? _winApi;
     public IntPtr WindowHandle { get; private set; }
 
-    public static PopupWindow FirstPopupWindow { get; } = new PopupWindow();
+    public static PopupWindow FirstPopupWindow { get; } = new();
 
     private static MainWindow? s_instance;
     public static MainWindow Instance => s_instance ??= new MainWindow();

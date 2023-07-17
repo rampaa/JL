@@ -406,7 +406,7 @@ internal static class WindowsUtils
             AlertWindow alertWindow = new();
 
             alertWindow.Left = DpiAwareWorkAreaWidth - alertWindow.Width - 30;
-            alertWindow.Top = alertWindowList.Sum(alertWindow => alertWindow.ActualHeight + 2) + 30;
+            alertWindow.Top = alertWindowList.Sum(static aw => aw.ActualHeight + 2) + 30;
 
             alertWindow.SetAlert(alertLevel, message);
             alertWindow.Show();
@@ -635,7 +635,7 @@ internal static class WindowsUtils
 
     public static byte[]? GetImageFromClipboardAsByteArray()
     {
-        return Application.Current.Dispatcher.Invoke(() =>
+        return Application.Current.Dispatcher.Invoke(static () =>
         {
             while (Clipboard.ContainsImage())
             {
