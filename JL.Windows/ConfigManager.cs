@@ -37,7 +37,7 @@ internal static class ConfigManager
     public static Brush HighlightColor { get; private set; } = Brushes.AliceBlue;
     public static bool RequireLookupKeyPress { get; private set; } = false;
     public static bool LookupOnSelectOnly { get; private set; } = false;
-    public static bool LookupOnLeftClickOnly { get; private set; } = false;
+    public static bool LookupOnMouseClickOnly { get; private set; } = false;
     public static bool AutoAdjustFontSizesOnResolutionChange { get; private set; } = true;
 
     public static KeyGesture LookupKeyKeyGesture { get; private set; } = new(Key.LeftShift, ModifierKeys.None);
@@ -46,6 +46,8 @@ internal static class ConfigManager
     public static bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
     public static bool DisableHotkeys { get; set; } = false;
     public static bool Focusable { get; private set; } = true;
+    public static MouseButton MiningModeMouseButton { get; private set; } = MouseButton.Middle;
+    public static MouseButton LookupOnClickMouseButton { get; private set; } = MouseButton.Left;
 
     #endregion
 
@@ -115,6 +117,8 @@ internal static class ConfigManager
     public static bool HideDictTabsWithNoResults { get; private set; } = true;
     public static bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } = false;
     public static int AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 2000;
+    public static MouseButton MineMouseButton { get; private set; } = MouseButton.Left;
+    public static MouseButton CopyPrimarySpellingToClipboardMouseButton { get; private set; } = MouseButton.Middle;
 
     #endregion
 
@@ -208,6 +212,11 @@ internal static class ConfigManager
             StatsUtils.StatsStopWatch.Start();
             StatsUtils.StartStatsTimer();
         }
+
+        LookupOnClickMouseButton = GetValueFromConfig(LookupOnClickMouseButton, nameof(LookupOnClickMouseButton), Enum.TryParse);
+        MiningModeMouseButton = GetValueFromConfig(MiningModeMouseButton, nameof(MiningModeMouseButton), Enum.TryParse);
+        MineMouseButton = GetValueFromConfig(MineMouseButton, nameof(MineMouseButton), Enum.TryParse);
+        CopyPrimarySpellingToClipboardMouseButton = GetValueFromConfig(CopyPrimarySpellingToClipboardMouseButton, nameof(CopyPrimarySpellingToClipboardMouseButton), Enum.TryParse);
 
         MainWindow mainWindow = MainWindow.Instance;
 
@@ -594,22 +603,22 @@ internal static class ConfigManager
             switch (lookupModeStr)
             {
                 case "Hover":
-                    LookupOnLeftClickOnly = false;
+                    LookupOnMouseClickOnly = false;
                     LookupOnSelectOnly = false;
                     break;
 
                 case "Click":
-                    LookupOnLeftClickOnly = true;
+                    LookupOnMouseClickOnly = true;
                     LookupOnSelectOnly = false;
                     break;
 
                 case "Select":
-                    LookupOnLeftClickOnly = false;
+                    LookupOnMouseClickOnly = false;
                     LookupOnSelectOnly = true;
                     break;
 
                 default:
-                    LookupOnLeftClickOnly = false;
+                    LookupOnMouseClickOnly = false;
                     LookupOnSelectOnly = false;
                     break;
             }
@@ -829,6 +838,11 @@ internal static class ConfigManager
         {
             preferenceWindow.LookupModeComboBox.SelectedIndex = 0;
         }
+
+        preferenceWindow.LookupOnClickMouseButtonComboBox.SelectedValue = LookupOnClickMouseButton.ToString();
+        preferenceWindow.MiningModeMouseButtonComboBox.SelectedValue = MiningModeMouseButton.ToString();
+        preferenceWindow.MineMouseButtonComboBox.SelectedValue = MineMouseButton.ToString();
+        preferenceWindow.CopyPrimarySpellingToClipboardMouseButtonComboBox.SelectedValue = CopyPrimarySpellingToClipboardMouseButton.ToString();
 
         preferenceWindow.ShowMiningModeReminderCheckBox.IsChecked = ShowMiningModeReminder;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInPopups;
@@ -1110,6 +1124,18 @@ internal static class ConfigManager
 
         config.AppSettings.Settings["LookupMode"].Value =
             preferenceWindow.LookupModeComboBox.SelectedValue.ToString();
+
+        config.AppSettings.Settings[nameof(LookupOnClickMouseButton)].Value =
+            preferenceWindow.LookupOnClickMouseButtonComboBox.SelectedValue.ToString();
+
+        config.AppSettings.Settings[nameof(MiningModeMouseButton)].Value =
+            preferenceWindow.MiningModeMouseButtonComboBox.SelectedValue.ToString();
+
+        config.AppSettings.Settings[nameof(MineMouseButton)].Value =
+            preferenceWindow.MineMouseButtonComboBox.SelectedValue.ToString();
+
+        config.AppSettings.Settings[nameof(CopyPrimarySpellingToClipboardMouseButton)].Value =
+            preferenceWindow.CopyPrimarySpellingToClipboardMouseButtonComboBox.SelectedValue.ToString();
 
         MainWindow mainWindow = MainWindow.Instance;
         config.AppSettings.Settings["MainWindowTopPosition"].Value = mainWindow.Top.ToString(CultureInfo.InvariantCulture);

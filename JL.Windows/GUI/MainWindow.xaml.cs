@@ -264,7 +264,7 @@ internal sealed partial class MainWindow : Window
     public async void MainTextBox_MouseMove(object? sender, MouseEventArgs? e)
     {
         if (ConfigManager.LookupOnSelectOnly
-            || ConfigManager.LookupOnLeftClickOnly
+            || ConfigManager.LookupOnMouseClickOnly
             || MainTextBoxContextMenu.IsVisible
             || TitleBarContextMenu.IsVisible
             || FontSizeSlider.IsVisible
@@ -882,9 +882,9 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    private async void MainTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    private async void MainTextBox_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        if ((!ConfigManager.LookupOnSelectOnly && !ConfigManager.LookupOnLeftClickOnly)
+        if ((!ConfigManager.LookupOnSelectOnly && (!ConfigManager.LookupOnMouseClickOnly || e.ChangedButton != ConfigManager.LookupOnClickMouseButton))
             || ConfigManager.InactiveLookupMode
             || FirstPopupWindow.MiningMode
             || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
@@ -905,12 +905,11 @@ internal sealed partial class MainWindow : Window
 
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.MiddleButton is MouseButtonState.Pressed && FirstPopupWindow is { IsVisible: true, MiningMode: false })
+        if (e.ChangedButton == ConfigManager.MiningModeMouseButton && FirstPopupWindow is { IsVisible: true, MiningMode: false })
         {
             e.Handled = true;
             PopupWindow.PopupWindow_PreviewMouseDown(FirstPopupWindow);
         }
-
         else
         {
             PopupWindow? currentPopupWindow = FirstPopupWindow;

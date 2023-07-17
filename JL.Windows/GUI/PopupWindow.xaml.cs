@@ -127,7 +127,7 @@ internal sealed partial class PopupWindow : Window
     public async Task TextBox_MouseMove(TextBox tb)
     {
         if (ConfigManager.InactiveLookupMode
-            || (MiningMode && !ConfigManager.LookupOnLeftClickOnly)
+            || (MiningMode && !ConfigManager.LookupOnMouseClickOnly)
             || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
             || (ConfigManager.FixedPopupPositioning && Owner != MainWindow.Instance)
            )
@@ -198,7 +198,7 @@ internal sealed partial class PopupWindow : Window
 
                 _lastLookupResults = lookupResults;
 
-                if (ConfigManager.LookupOnLeftClickOnly)
+                if (ConfigManager.LookupOnMouseClickOnly)
                 {
                     EnableMiningMode();
                     DisplayResults(true, text);
@@ -575,8 +575,8 @@ internal sealed partial class PopupWindow : Window
                         VerticalAlignment = VerticalAlignment.Center
                     };
 
-                    uiElementReadings.PreviewMouseLeftButtonUp += UiElement_PreviewMouseLeftButtonUp;
-                    uiElementReadings.PreviewMouseDown += UiElement_PreviewMouseButtonDown;
+                    uiElementReadings.PreviewMouseUp += UiElement_PreviewMouseUp;
+                    uiElementReadings.PreviewMouseDown += UiElement_PreviewMouseDown;
                     uiElementReadings.MouseMove += PopupMouseMove;
                     uiElementReadings.LostFocus += Unselect;
                     uiElementReadings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
@@ -623,8 +623,8 @@ internal sealed partial class PopupWindow : Window
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                uiElementDefinitions.PreviewMouseLeftButtonUp += UiElement_PreviewMouseLeftButtonUp;
-                uiElementDefinitions.PreviewMouseDown += UiElement_PreviewMouseButtonDown;
+                uiElementDefinitions.PreviewMouseUp += UiElement_PreviewMouseUp;
+                uiElementDefinitions.PreviewMouseDown += UiElement_PreviewMouseDown;
                 uiElementDefinitions.MouseMove += PopupMouseMove;
                 uiElementDefinitions.LostFocus += Unselect;
                 uiElementDefinitions.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
@@ -688,8 +688,8 @@ internal sealed partial class PopupWindow : Window
                         VerticalAlignment = VerticalAlignment.Center
                     };
 
-                    uiElementAlternativeSpellings.PreviewMouseLeftButtonUp += UiElement_PreviewMouseLeftButtonUp;
-                    uiElementAlternativeSpellings.PreviewMouseDown += UiElement_PreviewMouseButtonDown;
+                    uiElementAlternativeSpellings.PreviewMouseUp += UiElement_PreviewMouseUp;
+                    uiElementAlternativeSpellings.PreviewMouseDown += UiElement_PreviewMouseDown;
                     uiElementAlternativeSpellings.MouseMove += PopupMouseMove;
                     uiElementAlternativeSpellings.LostFocus += Unselect;
                     uiElementAlternativeSpellings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
@@ -1037,7 +1037,7 @@ internal sealed partial class PopupWindow : Window
     private async void PopupMouseMove(object sender, MouseEventArgs e)
     {
         if (ConfigManager.LookupOnSelectOnly
-            || ConfigManager.LookupOnLeftClickOnly
+            || ConfigManager.LookupOnMouseClickOnly
             || (ConfigManager.RequireLookupKeyPress
                 && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
         {
@@ -1072,13 +1072,12 @@ internal sealed partial class PopupWindow : Window
 
     private async void PrimarySpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton is MouseButton.Middle)
+        if (e.ChangedButton == ConfigManager.CopyPrimarySpellingToClipboardMouseButton)
         {
             WindowsUtils.CopyTextToClipboard(((TextBlock)sender).Text);
-            return;
         }
 
-        if (!MiningMode || e.ChangedButton is MouseButton.Right)
+        if (!MiningMode || e.ChangedButton != ConfigManager.MineMouseButton)
         {
             return;
         }
@@ -1568,7 +1567,7 @@ internal sealed partial class PopupWindow : Window
     private void OnMouseEnter(object sender, MouseEventArgs e)
     {
         if (!ConfigManager.LookupOnSelectOnly
-            && !ConfigManager.LookupOnLeftClickOnly
+            && !ConfigManager.LookupOnMouseClickOnly
             && !ConfigManager.FixedPopupPositioning
             && ChildPopupWindow is { MiningMode: false })
         {
@@ -1593,9 +1592,9 @@ internal sealed partial class PopupWindow : Window
         HidePopup();
     }
 
-    private async void UiElement_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    private async void UiElement_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        if ((!ConfigManager.LookupOnSelectOnly && !ConfigManager.LookupOnLeftClickOnly)
+        if ((!ConfigManager.LookupOnSelectOnly && (!ConfigManager.LookupOnMouseClickOnly || e.ChangedButton != ConfigManager.LookupOnClickMouseButton))
             || Background.Opacity is 0
             || ConfigManager.InactiveLookupMode
             || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
@@ -1617,9 +1616,9 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    private void UiElement_PreviewMouseButtonDown(object sender, MouseButtonEventArgs e)
+    private void UiElement_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.MiddleButton is MouseButtonState.Pressed && ChildPopupWindow is { IsVisible: true, MiningMode: false })
+        if (e.ChangedButton == ConfigManager.MiningModeMouseButton && ChildPopupWindow is { IsVisible: true, MiningMode: false })
         {
             e.Handled = true;
             PopupWindow_PreviewMouseDown(ChildPopupWindow);
@@ -1767,16 +1766,13 @@ internal sealed partial class PopupWindow : Window
 
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.MiddleButton is not MouseButtonState.Pressed)
+        PopupWindow? childPopupWindow = ChildPopupWindow;
+
+        while (childPopupWindow != null)
         {
-            PopupWindow? childPopupWindow = ChildPopupWindow;
+            childPopupWindow.HidePopup();
 
-            while (childPopupWindow != null)
-            {
-                childPopupWindow.HidePopup();
-
-                childPopupWindow = childPopupWindow.ChildPopupWindow;
-            }
+            childPopupWindow = childPopupWindow.ChildPopupWindow;
         }
     }
 
