@@ -584,7 +584,9 @@ internal static class WindowsUtils
         {
             try
             {
-                Clipboard.SetText(text);
+                // Using Clipboard.SetText or setting the "copy" parameter of SetDataObject to true
+                // Results in "System.Runtime.InteropServices.COMException (0x800401D0): OpenClipboard Failed (0x800401D0 (CLIPBRD_E_CANT_OPEN))"
+                Clipboard.SetDataObject(text, false);
                 retry = false;
             }
             catch (Exception ex)
