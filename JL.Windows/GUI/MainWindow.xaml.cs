@@ -178,6 +178,8 @@ internal sealed partial class MainWindow : Window
 
         BacklogUtils.AddToBacklog(text);
 
+        HidePopups();
+
         Stats.IncrementStat(StatType.Lines);
         Stats.IncrementStat(StatType.Characters, new StringInfo(JapaneseUtils.RemovePunctuation(text)).LengthInTextElements);
 
@@ -913,13 +915,18 @@ internal sealed partial class MainWindow : Window
         }
         else
         {
-            PopupWindow? currentPopupWindow = FirstPopupWindow;
+            HidePopups();
+        }
+    }
 
-            while (currentPopupWindow is not null)
-            {
-                currentPopupWindow.HidePopup();
-                currentPopupWindow = currentPopupWindow.ChildPopupWindow;
-            }
+    private void HidePopups()
+    {
+        PopupWindow? currentPopupWindow = FirstPopupWindow;
+
+        while (currentPopupWindow?.IsVisible ?? false)
+        {
+            currentPopupWindow.HidePopup();
+            currentPopupWindow = currentPopupWindow.ChildPopupWindow;
         }
     }
 

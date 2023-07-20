@@ -1768,7 +1768,7 @@ internal sealed partial class PopupWindow : Window
     {
         PopupWindow? childPopupWindow = ChildPopupWindow;
 
-        while (childPopupWindow != null)
+        while (childPopupWindow?.IsVisible ?? false)
         {
             childPopupWindow.HidePopup();
 
