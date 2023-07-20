@@ -71,8 +71,7 @@ internal sealed partial class AddDictionaryWindow : Window
             NewlineBetweenDefinitionsOption? newlineOption = null;
             if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(type))
             {
-                bool isEpwing = DictUtils.YomichanDictTypes.Concat(DictUtils.NazekaDictTypes).Contains(type);
-                newlineOption = new NewlineBetweenDefinitionsOption(isEpwing);
+                newlineOption = new NewlineBetweenDefinitionsOption(true);
             }
 
             ExamplesOption? examplesOption = null;

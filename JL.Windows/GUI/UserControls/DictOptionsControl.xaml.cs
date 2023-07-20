@@ -166,8 +166,7 @@ internal sealed partial class DictOptionsControl : UserControl
     {
         if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dict.Type))
         {
-            bool isEpwing = DictUtils.YomichanDictTypes.Concat(DictUtils.NazekaDictTypes).All(dt => dt != dict.Type);
-            NewlineCheckBox.IsChecked = dict.Options?.NewlineBetweenDefinitions?.Value ?? isEpwing;
+            NewlineCheckBox.IsChecked = dict.Options?.NewlineBetweenDefinitions?.Value ?? true;
             NewlineCheckBox.Visibility = Visibility.Visible;
         }
 
