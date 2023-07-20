@@ -25,7 +25,7 @@ internal static class BacklogUtils
     {
         MainWindow mainWindow = MainWindow.Instance;
 
-        if (!ConfigManager.EnableBacklog || MainWindow.FirstPopupWindow.MiningMode)
+        if (!ConfigManager.EnableBacklog || mainWindow.FirstPopupWindow.MiningMode)
         {
             return;
         }
@@ -43,7 +43,7 @@ internal static class BacklogUtils
     {
         MainWindow mainWindow = MainWindow.Instance;
 
-        if (!ConfigManager.EnableBacklog || MainWindow.FirstPopupWindow.MiningMode)
+        if (!ConfigManager.EnableBacklog || mainWindow.FirstPopupWindow.MiningMode)
         {
             return;
         }

@@ -29,7 +29,7 @@ internal sealed partial class MainWindow : Window
     private WinApi? _winApi;
     public IntPtr WindowHandle { get; private set; }
 
-    public static PopupWindow FirstPopupWindow { get; } = new();
+    public PopupWindow FirstPopupWindow { get; }
 
     private static MainWindow? s_instance;
     public static MainWindow Instance => s_instance ??= new MainWindow();
@@ -46,6 +46,7 @@ internal sealed partial class MainWindow : Window
         InitializeComponent();
         s_instance = this;
         ConfigHelper.Instance.SetLang("en");
+        FirstPopupWindow = new();
     }
 
     protected override async void OnSourceInitialized(EventArgs e)
@@ -193,7 +194,7 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    private static async Task Precache(string input, CancellationToken cancellationToken)
+    private async Task Precache(string input, CancellationToken cancellationToken)
     {
         FirstPopupWindow.DictsWithResults.Clear();
 

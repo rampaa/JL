@@ -636,7 +636,7 @@ internal static class ConfigManager
             }
         }
 
-        PopupWindow? currentPopupWindow = MainWindow.FirstPopupWindow;
+        PopupWindow? currentPopupWindow = MainWindow.Instance.FirstPopupWindow;
         while (currentPopupWindow is not null)
         {
             currentPopupWindow.Background = PopupBackgroundColor;

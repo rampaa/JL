@@ -598,7 +598,7 @@ internal static class WindowsUtils
     {
         MainWindow mainWindow = MainWindow.Instance;
 
-        if (!MainWindow.FirstPopupWindow.IsVisible)
+        if (!mainWindow.FirstPopupWindow.IsVisible)
         {
             if (!mainWindow.IsMouseOver)
             {
