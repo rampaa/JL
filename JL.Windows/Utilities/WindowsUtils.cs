@@ -29,6 +29,7 @@ namespace JL.Windows.Utilities;
 
 internal static class WindowsUtils
 {
+    private static DateTime s_lastAudioPlayTime = new();
     public static WaveOut? AudioPlayer { get; private set; }
 
     public static System.Windows.Forms.Screen ActiveScreen { get; set; } =
@@ -353,10 +354,14 @@ internal static class WindowsUtils
 #pragma warning disable CA5394
     public static async Task Motivate()
     {
-        if (AudioPlayer?.PlaybackState is PlaybackState.Playing)
+        DateTime currentTime = DateTime.Now;
+        if (AudioPlayer?.PlaybackState is PlaybackState.Playing && (currentTime - s_lastAudioPlayTime).TotalMilliseconds < 500)
         {
+            s_lastAudioPlayTime = currentTime;
             return;
         }
+
+        s_lastAudioPlayTime = currentTime;
 
         try
         {

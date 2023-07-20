@@ -136,7 +136,7 @@ public static class Utils
             Task.Run(static async() =>
             {
                 await AudioUtils.DeserializeAudioSources().ConfigureAwait(false);
-                await DeconjugatorUtils.DeserializeRules().ConfigureAwait(true);
+                await DeconjugatorUtils.DeserializeRules().ConfigureAwait(false);
             })
         };
 

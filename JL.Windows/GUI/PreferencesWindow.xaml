@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         mc:Ignorable="d"
-        Title="Preferences" Height="720" Width="800" Topmost="True" Closing="Window_Closing"
+        Title="Preferences" Height="770" Width="800" Topmost="True" Closing="Window_Closing"
         SizeToContent="Manual" ScrollViewer.CanContentScroll="True" ShowInTaskbar="False" Background="{DynamicResource RegionBrush}"
         x:ClassModifier="internal">
     <Grid>
