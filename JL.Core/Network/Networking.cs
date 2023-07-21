@@ -6,7 +6,7 @@ namespace JL.Core.Network;
 
 public static class Networking
 {
-    public static readonly HttpClient Client = new(new HttpClientHandler { UseProxy = false }) { Timeout = TimeSpan.FromMinutes(10) };
+    public static readonly HttpClient Client = new(new HttpClientHandler { UseProxy = false, CheckCertificateRevocationList = true });
     internal const string Jpod101NoAudioMd5Hash = "7E-2C-2F-95-4E-F6-05-13-73-BA-91-6F-00-01-68-DC";
     private static readonly Uri s_gitHubApiUrlForLatestJLRelease = new("https://api.github.com/repos/rampaa/JL/releases/latest");
 
@@ -17,7 +17,7 @@ public static class Networking
             using HttpRequestMessage gitHubApiRequest = new(HttpMethod.Get, s_gitHubApiUrlForLatestJLRelease);
             gitHubApiRequest.Headers.Add("User-Agent", "JL");
 
-            HttpResponseMessage gitHubApiResponse = await Client.SendAsync(gitHubApiRequest).ConfigureAwait(false);
+            using HttpResponseMessage gitHubApiResponse = await Client.SendAsync(gitHubApiRequest, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
             if (gitHubApiResponse.IsSuccessStatusCode)
             {

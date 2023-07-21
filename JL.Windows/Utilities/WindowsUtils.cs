@@ -30,6 +30,7 @@ namespace JL.Windows.Utilities;
 
 internal static class WindowsUtils
 {
+    private static readonly Random s_random = new();
     private static DateTime s_lastAudioPlayTime = new();
     public static WaveOut? AudioPlayer { get; private set; }
 
@@ -264,23 +265,22 @@ internal static class WindowsUtils
 
     public static async Task UpdateJL(Uri latestReleaseUrl)
     {
-        using HttpRequestMessage downloadRequest = new(HttpMethod.Get, latestReleaseUrl);
-        HttpResponseMessage downloadResponse = await Networking.Client.SendAsync(downloadRequest).ConfigureAwait(false);
+        using HttpResponseMessage downloadResponse = await Networking.Client.GetAsync(latestReleaseUrl, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
         if (downloadResponse.IsSuccessStatusCode)
         {
+            string tmpDirectory = Path.Join(Utils.ApplicationPath, "tmp");
+
+            if (Directory.Exists(tmpDirectory))
+            {
+                Directory.Delete(tmpDirectory, true);
+            }
+
+            _ = Directory.CreateDirectory(tmpDirectory);
+
             Stream downloadResponseStream = await downloadResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
             await using (downloadResponseStream.ConfigureAwait(false))
             {
-                string tmpDirectory = Path.Join(Utils.ApplicationPath, "tmp");
-
-                if (Directory.Exists(tmpDirectory))
-                {
-                    Directory.Delete(tmpDirectory, true);
-                }
-
-                _ = Directory.CreateDirectory(tmpDirectory);
-
                 using ZipArchive archive = new(downloadResponseStream);
                 archive.ExtractToDirectory(tmpDirectory);
             }
@@ -352,7 +352,6 @@ internal static class WindowsUtils
         });
     }
 
-#pragma warning disable CA5394
     public static async Task Motivate()
     {
         DateTime currentTime = DateTime.Now;
@@ -366,8 +365,6 @@ internal static class WindowsUtils
 
         try
         {
-            Random rand = new();
-
             string[] filePaths = Directory.GetFiles(Path.Join(Utils.ResourcesPath, "Motivation"));
             int numFiles = filePaths.Length;
 
@@ -378,7 +375,10 @@ internal static class WindowsUtils
                 return;
             }
 
-            string randomFilePath = filePaths[rand.Next(numFiles)];
+#pragma warning disable CA5394
+            string randomFilePath = filePaths[s_random.Next(numFiles)];
+#pragma warning restore CA5394
+
             byte[] audioData = await File.ReadAllBytesAsync(randomFilePath).ConfigureAwait(false);
             PlayAudio(audioData, "mp3", 1);
             Stats.IncrementStat(StatType.Imoutos);
@@ -389,7 +389,6 @@ internal static class WindowsUtils
             Utils.Frontend.Alert(AlertLevel.Error, "Error motivating");
         }
     }
-#pragma warning restore CA5394
 
     public static Brush? BrushFromHex(string hexColorString)
     {

@@ -32,7 +32,7 @@ public static class AudioUtils
     {
         try
         {
-            HttpResponseMessage response = await Networking.Client.GetAsync(url).ConfigureAwait(false);
+            using HttpResponseMessage response = await Networking.Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {
@@ -64,7 +64,7 @@ public static class AudioUtils
     {
         try
         {
-            HttpResponseMessage response = await Networking.Client.GetAsync(url).ConfigureAwait(false);
+            using HttpResponseMessage response = await Networking.Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {

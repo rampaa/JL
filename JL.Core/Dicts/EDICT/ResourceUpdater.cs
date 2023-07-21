@@ -35,7 +35,7 @@ public static class ResourceUpdater
                         "Info");
                 }
 
-                HttpResponseMessage response = await Networking.Client.SendAsync(request).ConfigureAwait(false);
+                using HttpResponseMessage response = await Networking.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
                     Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);

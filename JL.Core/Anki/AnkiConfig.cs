@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using JL.Core.Utilities;
@@ -12,11 +13,11 @@ public sealed class AnkiConfig
 
     [JsonPropertyName("fields")] public Dictionary<string, JLField> Fields { get; }
 
-    [JsonPropertyName("tags")] public string[] Tags { get; }
+    [JsonPropertyName("tags")] public ImmutableArray<string> Tags { get; }
 
     [JsonIgnore] private static Dictionary<MineType, AnkiConfig>? s_ankiConfigDict;
 
-    public AnkiConfig(string deckName, string modelName, Dictionary<string, JLField> fields, string[] tags)
+    public AnkiConfig(string deckName, string modelName, Dictionary<string, JLField> fields, ImmutableArray<string> tags)
     {
         DeckName = deckName;
         ModelName = modelName;
