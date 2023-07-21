@@ -23,6 +23,7 @@ using NAudio.Vorbis;
 using NAudio.Wave;
 using Application = System.Windows.Application;
 using Button = System.Windows.Controls.Button;
+using PopupWindow = JL.Windows.GUI.PopupWindow;
 using Window = System.Windows.Window;
 
 namespace JL.Windows.Utilities;
@@ -569,6 +570,17 @@ internal static class WindowsUtils
         else if (dynamicWidth)
         {
             window.SizeToContent = SizeToContent.Width;
+        }
+    }
+
+    public static void HidePopups(PopupWindow? rootPopup)
+    {
+        PopupWindow? currentPopupWindow = rootPopup;
+
+        while (currentPopupWindow?.IsVisible ?? false)
+        {
+            currentPopupWindow.HidePopup();
+            currentPopupWindow = currentPopupWindow.ChildPopupWindow;
         }
     }
 

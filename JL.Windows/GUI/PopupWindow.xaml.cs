@@ -1766,14 +1766,7 @@ internal sealed partial class PopupWindow : Window
 
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        PopupWindow? childPopupWindow = ChildPopupWindow;
-
-        while (childPopupWindow?.IsVisible ?? false)
-        {
-            childPopupWindow.HidePopup();
-
-            childPopupWindow = childPopupWindow.ChildPopupWindow;
-        }
+        WindowsUtils.HidePopups(ChildPopupWindow);
     }
 
     public void HidePopup()

@@ -178,7 +178,7 @@ internal sealed partial class MainWindow : Window
 
         BacklogUtils.AddToBacklog(text);
 
-        HidePopups();
+        WindowsUtils.HidePopups(FirstPopupWindow);
 
         Stats.IncrementStat(StatType.Lines);
         Stats.IncrementStat(StatType.Characters, new StringInfo(JapaneseUtils.RemovePunctuation(text)).LengthInTextElements);
@@ -915,18 +915,7 @@ internal sealed partial class MainWindow : Window
         }
         else
         {
-            HidePopups();
-        }
-    }
-
-    private void HidePopups()
-    {
-        PopupWindow? currentPopupWindow = FirstPopupWindow;
-
-        while (currentPopupWindow?.IsVisible ?? false)
-        {
-            currentPopupWindow.HidePopup();
-            currentPopupWindow = currentPopupWindow.ChildPopupWindow;
+            WindowsUtils.HidePopups(FirstPopupWindow);
         }
     }
 
