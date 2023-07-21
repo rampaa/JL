@@ -128,9 +128,7 @@ internal sealed partial class PopupWindow : Window
     {
         if (ConfigManager.InactiveLookupMode
             || (MiningMode && !ConfigManager.LookupOnMouseClickOnly)
-            || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
-            || (ConfigManager.FixedPopupPositioning && Owner != MainWindow.Instance)
-           )
+            || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
         {
             return;
         }
@@ -168,7 +166,7 @@ internal sealed partial class PopupWindow : Window
 
             if (text == LastText && IsVisible)
             {
-                if (ConfigManager.FixedPopupPositioning)
+                if (ConfigManager.FixedPopupPositioning && Owner == MainWindow.Instance)
                 {
                     UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
                 }
@@ -201,7 +199,7 @@ internal sealed partial class PopupWindow : Window
                 if (ConfigManager.LookupOnMouseClickOnly)
                 {
                     EnableMiningMode();
-                    DisplayResults(true, text);
+                    DisplayResults(true);
 
                     if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
                     {
@@ -216,7 +214,7 @@ internal sealed partial class PopupWindow : Window
 
                 Show();
 
-                if (ConfigManager.FixedPopupPositioning)
+                if (ConfigManager.FixedPopupPositioning && Owner == MainWindow.Instance)
                 {
                     UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
                 }
@@ -267,7 +265,7 @@ internal sealed partial class PopupWindow : Window
         {
             _lastLookupResults = lookupResults;
             EnableMiningMode();
-            DisplayResults(true, tb.SelectedText);
+            DisplayResults(true);
 
             if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
             {
@@ -276,7 +274,7 @@ internal sealed partial class PopupWindow : Window
 
             Show();
 
-            if (ConfigManager.FixedPopupPositioning)
+            if (ConfigManager.FixedPopupPositioning && Owner == MainWindow.Instance)
             {
                 UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
             }
@@ -431,7 +429,7 @@ internal sealed partial class PopupWindow : Window
             UpdateLayout();
 
             // we might cache incomplete results if we don't wait until all dicts are loaded
-            if (text is not null && DictUtils.DictsReady && !DictUtils.UpdatingJmdict && !DictUtils.UpdatingJmnedict && !DictUtils.UpdatingKanjidic)
+            if (text is not null && !generateAllResults && DictUtils.DictsReady && !DictUtils.UpdatingJmdict && !DictUtils.UpdatingJmnedict && !DictUtils.UpdatingKanjidic)
             {
                 StackPanelCache.AddReplace(text, popupItemSource);
             }
@@ -576,7 +574,6 @@ internal sealed partial class PopupWindow : Window
                     };
 
                     uiElementReadings.PreviewMouseUp += UiElement_PreviewMouseUp;
-                    uiElementReadings.PreviewMouseDown += UiElement_PreviewMouseDown;
                     uiElementReadings.MouseMove += PopupMouseMove;
                     uiElementReadings.LostFocus += Unselect;
                     uiElementReadings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
@@ -624,7 +621,6 @@ internal sealed partial class PopupWindow : Window
                 };
 
                 uiElementDefinitions.PreviewMouseUp += UiElement_PreviewMouseUp;
-                uiElementDefinitions.PreviewMouseDown += UiElement_PreviewMouseDown;
                 uiElementDefinitions.MouseMove += PopupMouseMove;
                 uiElementDefinitions.LostFocus += Unselect;
                 uiElementDefinitions.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
@@ -689,7 +685,6 @@ internal sealed partial class PopupWindow : Window
                     };
 
                     uiElementAlternativeSpellings.PreviewMouseUp += UiElement_PreviewMouseUp;
-                    uiElementAlternativeSpellings.PreviewMouseDown += UiElement_PreviewMouseDown;
                     uiElementAlternativeSpellings.MouseMove += PopupMouseMove;
                     uiElementAlternativeSpellings.LostFocus += Unselect;
                     uiElementAlternativeSpellings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
@@ -1568,8 +1563,7 @@ internal sealed partial class PopupWindow : Window
     {
         if (!ConfigManager.LookupOnSelectOnly
             && !ConfigManager.LookupOnMouseClickOnly
-            && !ConfigManager.FixedPopupPositioning
-            && ChildPopupWindow is { MiningMode: false })
+            && ChildPopupWindow is { IsVisible: true, MiningMode: false })
         {
             ChildPopupWindow.HidePopup();
         }
@@ -1584,7 +1578,8 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        if (ConfigManager.FixedPopupPositioning || UnavoidableMouseEnter)
+        if (UnavoidableMouseEnter
+            || (ConfigManager.FixedPopupPositioning && Owner == MainWindow.Instance))
         {
             return;
         }
@@ -1594,11 +1589,10 @@ internal sealed partial class PopupWindow : Window
 
     private async void UiElement_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        if ((!ConfigManager.LookupOnSelectOnly && (!ConfigManager.LookupOnMouseClickOnly || e.ChangedButton != ConfigManager.LookupOnClickMouseButton))
-            || Background.Opacity is 0
+        if (((!ConfigManager.LookupOnSelectOnly || e.ChangedButton is not MouseButton.Left)
+                && (!ConfigManager.LookupOnMouseClickOnly || e.ChangedButton != ConfigManager.LookupOnClickMouseButton))
             || ConfigManager.InactiveLookupMode
-            || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
-            || (ConfigManager.FixedPopupPositioning && Owner != MainWindow.Instance))
+            || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
         {
             return;
         }
@@ -1616,23 +1610,14 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    private void UiElement_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-    {
-        if (e.ChangedButton == ConfigManager.MiningModeMouseButton && ChildPopupWindow is { IsVisible: true, MiningMode: false })
-        {
-            e.Handled = true;
-            PopupWindow_PreviewMouseDown(ChildPopupWindow);
-        }
-    }
-
     private void OnMouseLeave(object sender, MouseEventArgs e)
     {
-        if (ChildPopupWindow is { MiningMode: false, UnavoidableMouseEnter: false })
+        if (ChildPopupWindow is { IsVisible: true, MiningMode: false, UnavoidableMouseEnter: false })
         {
             ChildPopupWindow.HidePopup();
         }
 
-        if (IsMouseOver || ConfigManager.FixedPopupPositioning)
+        if (IsMouseOver)
         {
             return;
         }
@@ -1662,7 +1647,7 @@ internal sealed partial class PopupWindow : Window
         HidePopup();
     }
 
-    public static void PopupWindow_PreviewMouseDown(PopupWindow popupWindow)
+    public static void ShowMiningModeResults(PopupWindow popupWindow)
     {
         popupWindow.EnableMiningMode();
         WinApi.BringToFront(popupWindow.WindowHandle);
@@ -1756,19 +1741,24 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    private void Window_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-    {
-        if (ChildPopupWindow is { MiningMode: false })
-        {
-            ChildPopupWindow.HidePopup();
-        }
-    }
-
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
         if (ChildPopupWindow is { MiningMode: true })
         {
             WindowsUtils.HidePopups(ChildPopupWindow);
+        }
+
+        else if (e.ChangedButton == ConfigManager.MiningModeMouseButton)
+        {
+            if (!MiningMode)
+            {
+                ShowMiningModeResults(this);
+            }
+
+            else if (ChildPopupWindow is { IsVisible: true, MiningMode: false })
+            {
+                ShowMiningModeResults(ChildPopupWindow);
+            }
         }
     }
 
