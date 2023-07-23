@@ -12,24 +12,25 @@ internal sealed class WinApi
 #pragma warning disable IDE1006
     internal static class NativeMethods
     {
-        internal const int WM_WINDOWPOSCHANGING = 0x0046;
-        internal const int WM_CLIPBOARDUPDATE = 0x031D;
-        internal const int WM_ERASEBKGND = 0x0014;
-        internal const int WM_SYSCOMMAND = 0x0112;
-        // internal const int WM_NCCALCSIZE = 0x0083;
-        // internal const int WM_NCHITTEST = 0x0084;
-        internal const int SWP_NOCOPYBITS = 0x0100;
-        internal const int SWP_NOSIZE = 0x0001;
-        internal const int SWP_NOMOVE = 0x0002;
-        internal const int SWP_NOACTIVATE = 0x0010;
-        internal const int SWP_SHOWWINDOW = 0x0040;
         internal const int GWL_EXSTYLE = -20;
-        internal const int WS_EX_NOACTIVATE = 0x08000000;
+        // public const nint HTCAPTION = 2;
+        internal const nint HWND_TOPMOST = -1;
+        internal const int SWP_NOACTIVATE = 0x0010;
+        internal const int SWP_NOCOPYBITS = 0x0100;
+        internal const int SWP_NOMOVE = 0x0002;
+        internal const int SWP_NOSIZE = 0x0001;
+        internal const int SWP_SHOWWINDOW = 0x0040;
         internal const int SW_SHOWNOACTIVATE = 4;
         internal const int SW_SHOWMINNOACTIVE = 7;
+        internal const int WM_CLIPBOARDUPDATE = 0x031D;
+        internal const int WM_ERASEBKGND = 0x0014;
         internal const int WM_HOTKEY = 0x0312;
-        // public const nint WVR_VALIDRECTS = new(0x0400);
-        public const nint HWND_TOPMOST = -1;
+        // internal const int WM_NCCALCSIZE = 0x0083;
+        // internal const int WM_NCHITTEST = 0x0084;
+        internal const int WM_SYSCOMMAND = 0x0112;
+        internal const int WM_WINDOWPOSCHANGING = 0x0046;
+        internal const int WS_EX_NOACTIVATE = 0x08000000;
+        // public const nint WVR_VALIDRECTS = 0x0400;
 
         internal enum ResizeDirection
         {
@@ -289,7 +290,7 @@ internal sealed class WinApi
                 return 0;
 
                 //case WM_NCCALCSIZE:
-                //    if (wParam != 0)
+                //    if (wParam is not 0)
                 //    {
                 //        NCCALCSIZE_PARAMS calcSizeParams = Marshal.PtrToStructure<NCCALCSIZE_PARAMS>(lParam);
                 //        calcSizeParams.rgrc1.left = 0;
@@ -312,7 +313,7 @@ internal sealed class WinApi
                 //    if (MainWindow.Instance.IsMouseOnTitleBar(lParam.ToInt32()))
                 //    {
                 //        handled = true;
-                //        return 2; // HTCAPTION
+                //        return HTCAPTION;
                 //    }
                 //    break;
         }
