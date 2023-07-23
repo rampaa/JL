@@ -88,13 +88,12 @@ public class KanaTests
     public void LongVowelMarkConverter_オーToオオAndオウ()
     {
         // Arrange
-        List<string> expected = new() { "オオ", "オウ" };
+        List<string> expected = new() { "おお", "おう" };
 
         const string text = "オー";
 
         // Act
-        List<string> result = JapaneseUtils.LongVowelMarkToKana(
-            text);
+        List<string> result = JapaneseUtils.LongVowelMarkToKana(JapaneseUtils.KatakanaToHiragana(text));
 
         // Assert
         Assert.AreEqual(expected, result);
