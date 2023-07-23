@@ -159,6 +159,9 @@ internal sealed partial class MainWindow : Window
             {
                 WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, this);
             }
+
+            TitleBarContextMenu.IsOpen = false;
+            MainTextBoxContextMenu.IsOpen = false;
         }, DispatcherPriority.Send);
 
         if (ConfigManager.AlwaysOnTop
@@ -178,8 +181,6 @@ internal sealed partial class MainWindow : Window
 
         BacklogUtils.AddToBacklog(text);
 
-        TitleBarContextMenu.IsOpen = false;
-        MainTextBoxContextMenu.IsOpen = false;
         WindowsUtils.HidePopups(FirstPopupWindow);
 
         Stats.IncrementStat(StatType.Lines);
