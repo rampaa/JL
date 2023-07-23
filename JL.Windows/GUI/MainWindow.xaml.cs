@@ -178,6 +178,8 @@ internal sealed partial class MainWindow : Window
 
         BacklogUtils.AddToBacklog(text);
 
+        TitleBarContextMenu.IsOpen = false;
+        MainTextBoxContextMenu.IsOpen = false;
         WindowsUtils.HidePopups(FirstPopupWindow);
 
         Stats.IncrementStat(StatType.Lines);
@@ -684,30 +686,29 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            if (!FirstPopupWindow.IsVisible)
+            WindowsUtils.HidePopups(FirstPopupWindow);
+
+            if (ConfigManager.Focusable)
             {
-                if (ConfigManager.Focusable)
+                WindowState = WindowState is WindowState.Minimized
+                    ? WindowState.Normal
+                    : WindowState.Minimized;
+            }
+
+            else
+            {
+                if (WindowState is WindowState.Minimized)
                 {
-                    WindowState = WindowState is WindowState.Minimized
-                        ? WindowState.Normal
-                        : WindowState.Minimized;
+                    // If another window is not set as active window
+                    // Main Window gets activated on restore
+                    WinApi.ActivateWindow(FirstPopupWindow.WindowHandle);
+
+                    WinApi.RestoreWindow(WindowHandle);
                 }
 
                 else
                 {
-                    if (WindowState is WindowState.Minimized)
-                    {
-                        // If another window is not set as active window
-                        // Main Window gets activated on restore
-                        WinApi.ActivateWindow(FirstPopupWindow.WindowHandle);
-
-                        WinApi.RestoreWindow(WindowHandle);
-                    }
-
-                    else
-                    {
-                        WinApi.MinimizeWindow(WindowHandle);
-                    }
+                    WinApi.MinimizeWindow(WindowHandle);
                 }
             }
         }
