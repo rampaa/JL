@@ -24,7 +24,7 @@ internal sealed partial class ManageDictionariesWindow : Window
 {
     private static ManageDictionariesWindow? s_instance;
 
-    private IntPtr _windowHandle;
+    private nint _windowHandle;
 
     public static ManageDictionariesWindow Instance => s_instance ??= new ManageDictionariesWindow();
 

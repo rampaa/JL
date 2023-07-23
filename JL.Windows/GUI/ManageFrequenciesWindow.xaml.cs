@@ -19,7 +19,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
 {
     private static ManageFrequenciesWindow? s_instance;
 
-    private IntPtr _windowHandle;
+    private nint _windowHandle;
 
     public static ManageFrequenciesWindow Instance => s_instance ??= new ManageFrequenciesWindow();
 

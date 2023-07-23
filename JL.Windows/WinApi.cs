@@ -28,8 +28,8 @@ internal sealed class WinApi
         internal const int SW_SHOWNOACTIVATE = 4;
         internal const int SW_SHOWMINNOACTIVE = 7;
         internal const int WM_HOTKEY = 0x0312;
-        // public static readonly IntPtr WVR_VALIDRECTS = new(0x0400);
-        public static readonly IntPtr HWND_TOPMOST = new(-1);
+        // public const nint WVR_VALIDRECTS = new(0x0400);
+        public const nint HWND_TOPMOST = -1;
 
         internal enum ResizeDirection
         {
@@ -62,8 +62,8 @@ internal sealed class WinApi
         [StructLayout(LayoutKind.Sequential)]
         internal struct WINDOWPOS
         {
-            public IntPtr hwnd;
-            public IntPtr hwndinsertafter;
+            public nint hwnd;
+            public nint hwndinsertafter;
             public int x, y, cx, cy;
             public int flags;
         }
@@ -71,65 +71,65 @@ internal sealed class WinApi
         [DllImport("user32.dll", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool AddClipboardFormatListener(IntPtr hwnd);
+        internal static extern bool AddClipboardFormatListener(nint hwnd);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        internal static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+        internal static extern nint SendMessage(nint hWnd, uint msg, nint wParam, nint lParam);
 
         [DllImport("user32.dll")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        internal static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+        internal static extern bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
         [DllImport("user32.dll", EntryPoint = "SetWindowLong")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static extern int SetWindowLong32(IntPtr hWnd, int nIndex, int dwNewLong);
+        private static extern int SetWindowLong32(nint hWnd, int nIndex, int dwNewLong);
 
         [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+        private static extern nint SetWindowLongPtr64(nint hWnd, int nIndex, nint dwNewLong);
 
-        internal static IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
+        internal static nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong)
         {
             return Environment.Is64BitProcess
                 ? SetWindowLongPtr64(hWnd, nIndex, dwNewLong)
-                : new IntPtr(SetWindowLong32(hWnd, nIndex, dwNewLong.ToInt32()));
+                : SetWindowLong32(hWnd, nIndex, (int)dwNewLong);
         }
 
         [DllImport("user32.dll", EntryPoint = "GetWindowLong")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static extern int GetWindowLongPtr32(IntPtr hWnd, int nIndex);
+        private static extern int GetWindowLongPtr32(nint hWnd, int nIndex);
 
         [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static extern IntPtr GetWindowLongPtr64(IntPtr hWnd, int nIndex);
+        private static extern nint GetWindowLongPtr64(nint hWnd, int nIndex);
 
-        internal static IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex)
+        internal static nint GetWindowLongPtr(nint hWnd, int nIndex)
         {
             return Environment.Is64BitProcess
                 ? GetWindowLongPtr64(hWnd, nIndex)
-                : new IntPtr(GetWindowLongPtr32(hWnd, nIndex));
+                : GetWindowLongPtr32(hWnd, nIndex);
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        internal static extern IntPtr DefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+        internal static extern nint DefWindowProc(nint hWnd, int msg, nint wParam, nint lParam);
 
         [DllImport("user32.dll")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        internal static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+        internal static extern bool RegisterHotKey(nint hWnd, int id, uint fsModifiers, uint vk);
 
         [DllImport("user32.dll")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        internal static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+        internal static extern bool UnregisterHotKey(nint hWnd, int id);
 
         [DllImport("user32.dll")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        internal static extern bool ShowWindow(nint hWnd, int nCmdShow);
 
         [DllImport("user32.dll")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        public static extern IntPtr SetActiveWindow(IntPtr hWnd);
+        public static extern nint SetActiveWindow(nint hWnd);
     }
 #pragma warning restore IDE1006
 
@@ -147,7 +147,7 @@ internal sealed class WinApi
         source.AddHook(WndProc);
     }
 
-    public static void SubscribeToClipboardChanged(IntPtr windowHandle)
+    public static void SubscribeToClipboardChanged(nint windowHandle)
     {
         _ = AddClipboardFormatListener(windowHandle);
     }
@@ -174,7 +174,7 @@ internal sealed class WinApi
         }
     }
 
-    public static void RegisterAllHotKeys(IntPtr windowHandle)
+    public static void RegisterAllHotKeys(nint windowHandle)
     {
         foreach (KeyValuePair<int, KeyGesture> keyValuePair in KeyGestureUtils.KeyGestureDict)
         {
@@ -182,7 +182,7 @@ internal sealed class WinApi
         }
     }
 
-    public static void UnregisterAllHotKeys(IntPtr windowHandle)
+    public static void UnregisterAllHotKeys(nint windowHandle)
     {
         foreach (int id in KeyGestureUtils.KeyGestureDict.Keys)
         {
@@ -190,7 +190,7 @@ internal sealed class WinApi
         }
     }
 
-    public static void UnregisterAllHotKeys(IntPtr windowHandle, int idToIgnore)
+    public static void UnregisterAllHotKeys(nint windowHandle, int idToIgnore)
     {
         foreach (int id in KeyGestureUtils.KeyGestureDict.Keys)
         {
@@ -208,55 +208,55 @@ internal sealed class WinApi
         ClipboardChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    public static void ResizeWindow(IntPtr windowHandle, string borderName)
+    public static void ResizeWindow(nint windowHandle, string borderName)
     {
-        IntPtr wParam = borderName switch
+        nint wParam = borderName switch
         {
-            "LeftBorder" => (IntPtr)ResizeDirection.Left,
-            "RightBorder" => (IntPtr)ResizeDirection.Right,
-            "TopBorder" => (IntPtr)ResizeDirection.Top,
-            "TopRightBorder" => (IntPtr)ResizeDirection.TopRight,
-            "BottomBorder" => (IntPtr)ResizeDirection.Bottom,
-            "BottomLeftBorder" => (IntPtr)ResizeDirection.BottomLeft,
-            "BottomRightBorder" => (IntPtr)ResizeDirection.BottomRight,
-            "TopLeftBorder" => (IntPtr)ResizeDirection.TopLeft,
-            _ => IntPtr.Zero
+            "LeftBorder" => (nint)ResizeDirection.Left,
+            "RightBorder" => (nint)ResizeDirection.Right,
+            "TopBorder" => (nint)ResizeDirection.Top,
+            "TopRightBorder" => (nint)ResizeDirection.TopRight,
+            "BottomBorder" => (nint)ResizeDirection.Bottom,
+            "BottomLeftBorder" => (nint)ResizeDirection.BottomLeft,
+            "BottomRightBorder" => (nint)ResizeDirection.BottomRight,
+            "TopLeftBorder" => (nint)ResizeDirection.TopLeft,
+            _ => 0
         };
 
-        _ = SendMessage(windowHandle, WM_SYSCOMMAND, wParam, IntPtr.Zero);
+        _ = SendMessage(windowHandle, WM_SYSCOMMAND, wParam, 0);
     }
 
-    public static void BringToFront(IntPtr windowHandle)
+    public static void BringToFront(nint windowHandle)
     {
         _ = SetWindowPos(windowHandle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW | SWP_NOACTIVATE);
     }
 
-    public static void MinimizeWindow(IntPtr windowHandle)
+    public static void MinimizeWindow(nint windowHandle)
     {
         _ = ShowWindow(windowHandle, SW_SHOWMINNOACTIVE);
     }
 
-    public static void RestoreWindow(IntPtr windowHandle)
+    public static void RestoreWindow(nint windowHandle)
     {
         _ = ShowWindow(windowHandle, SW_SHOWNOACTIVATE);
     }
 
-    public static void PreventActivation(IntPtr windowHandle)
+    public static void PreventActivation(nint windowHandle)
     {
-        _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, new IntPtr(GetWindowLongPtr(windowHandle, GWL_EXSTYLE).ToInt32() | WS_EX_NOACTIVATE));
+        _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, GetWindowLongPtr(windowHandle, GWL_EXSTYLE) | WS_EX_NOACTIVATE);
     }
 
-    public static void AllowActivation(IntPtr windowHandle)
+    public static void AllowActivation(nint windowHandle)
     {
-        _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, IntPtr.Zero);
+        _ = SetWindowLongPtr(windowHandle, GWL_EXSTYLE, 0);
     }
 
-    public static void ActivateWindow(IntPtr windowHandle)
+    public static void ActivateWindow(nint windowHandle)
     {
         _ = SetActiveWindow(windowHandle);
     }
 
-    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
     {
         switch (msg)
         {
@@ -267,7 +267,7 @@ internal sealed class WinApi
 
             case WM_ERASEBKGND:
                 handled = true;
-                return new IntPtr(1);
+                return 1;
 
             case WM_WINDOWPOSCHANGING:
                 _ = DefWindowProc(hwnd, msg, wParam, lParam);
@@ -278,7 +278,7 @@ internal sealed class WinApi
                 break;
 
             case WM_HOTKEY:
-                if (KeyGestureUtils.KeyGestureDict.TryGetValue(wParam.ToInt32(), out KeyGesture? keyGesture))
+                if (KeyGestureUtils.KeyGestureDict.TryGetValue((int)wParam, out KeyGesture? keyGesture))
                 {
                     _ = KeyGestureUtils.HandleHotKey(keyGesture).ConfigureAwait(false);
                 }
@@ -286,10 +286,10 @@ internal sealed class WinApi
                 break;
 
             default:
-                return IntPtr.Zero;
+                return 0;
 
                 //case WM_NCCALCSIZE:
-                //    if (wParam != IntPtr.Zero)
+                //    if (wParam != 0)
                 //    {
                 //        NCCALCSIZE_PARAMS calcSizeParams = Marshal.PtrToStructure<NCCALCSIZE_PARAMS>(lParam);
                 //        calcSizeParams.rgrc1.left = 0;
@@ -312,11 +312,11 @@ internal sealed class WinApi
                 //    if (MainWindow.Instance.IsMouseOnTitleBar(lParam.ToInt32()))
                 //    {
                 //        handled = true;
-                //        return (IntPtr)2; // HTCAPTION
+                //        return 2; // HTCAPTION
                 //    }
                 //    break;
         }
 
-        return IntPtr.Zero;
+        return 0;
     }
 }

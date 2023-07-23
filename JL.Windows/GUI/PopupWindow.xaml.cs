@@ -35,7 +35,7 @@ internal sealed partial class PopupWindow : Window
 
     private string? _lastSelectedText;
 
-    public IntPtr WindowHandle { get; private set; }
+    public nint WindowHandle { get; private set; }
 
     private List<LookupResult> _lastLookupResults = new();
 

@@ -27,7 +27,7 @@ internal sealed partial class MainWindow : Window
 {
     private DateTime _lastClipboardChangeTime;
     private WinApi? _winApi;
-    public IntPtr WindowHandle { get; private set; }
+    public nint WindowHandle { get; private set; }
 
     public PopupWindow FirstPopupWindow { get; }
 

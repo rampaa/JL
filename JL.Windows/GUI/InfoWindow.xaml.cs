@@ -8,7 +8,7 @@ namespace JL.Windows.GUI;
 /// </summary>
 internal sealed partial class InfoWindow : Window
 {
-    private IntPtr _windowHandle;
+    private nint _windowHandle;
 
     public InfoWindow()
     {

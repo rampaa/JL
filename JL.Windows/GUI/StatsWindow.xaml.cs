@@ -14,7 +14,7 @@ namespace JL.Windows.GUI;
 internal sealed partial class StatsWindow : Window
 {
     private static StatsWindow? s_instance;
-    private IntPtr _windowHandle;
+    private nint _windowHandle;
 
     public static StatsWindow Instance => s_instance ??= new StatsWindow();
 

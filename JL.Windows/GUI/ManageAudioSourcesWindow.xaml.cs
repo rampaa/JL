@@ -17,7 +17,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
 {
     private static ManageAudioSourcesWindow? s_instance;
 
-    private IntPtr _windowHandle;
+    private nint _windowHandle;
     public static ManageAudioSourcesWindow Instance => s_instance ??= new ManageAudioSourcesWindow();
 
     public ManageAudioSourcesWindow()
