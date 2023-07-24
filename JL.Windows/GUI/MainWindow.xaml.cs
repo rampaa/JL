@@ -41,6 +41,8 @@ internal sealed partial class MainWindow : Window
 
     private static CancellationTokenSource s_precacheCancellationTokenSource = new();
 
+    private static string? s_lastTextCopiedWhileMinimized = null;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -104,11 +106,14 @@ internal sealed partial class MainWindow : Window
                 {
                     text = SanitizeText(text);
 
-                    Dispatcher.Invoke(() =>
+                    if (WindowState is not WindowState.Minimized)
                     {
-                        MainTextBox.Text = text;
-                        MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
-                    }, DispatcherPriority.Send);
+                        Dispatcher.Invoke(() =>
+                        {
+                            MainTextBox.Text = text;
+                            MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+                        }, DispatcherPriority.Send);
+                    }
 
                     HandlePostCopy(text);
                 }
@@ -126,11 +131,14 @@ internal sealed partial class MainWindow : Window
         {
             text = SanitizeText(text);
 
-            Dispatcher.Invoke(() =>
+            if (WindowState is not WindowState.Minimized)
             {
-                MainTextBox.Text = text;
-                MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
-            }, DispatcherPriority.Send);
+                Dispatcher.Invoke(() =>
+                {
+                    MainTextBox.Text = text;
+                    MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+                }, DispatcherPriority.Send);
+            }
 
             HandlePostCopy(text);
         }
@@ -153,6 +161,10 @@ internal sealed partial class MainWindow : Window
 
     private void HandlePostCopy(string text)
     {
+        s_lastTextCopiedWhileMinimized = WindowState is WindowState.Minimized
+            ? text
+            : null;
+
         Dispatcher.Invoke(() =>
         {
             if (SizeToContent is SizeToContent.Manual && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
@@ -1169,6 +1181,12 @@ internal sealed partial class MainWindow : Window
 
         else
         {
+            if (s_lastTextCopiedWhileMinimized is not null)
+            {
+                MainTextBox.Text = s_lastTextCopiedWhileMinimized;
+                MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+            }
+
             StatsUtils.StatsStopWatch.Start();
 
             if (ConfigManager.GlobalHotKeys)
