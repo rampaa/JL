@@ -542,9 +542,9 @@ public static class LookupUtils
     {
         Dictionary<string, IntermediaryResult> kanjiResults = new();
 
-        string? kanji = text.ListUnicodeCharacters().FirstOrDefault();
+        string kanji = text.EnumerateRunes().FirstOrDefault().ToString();
 
-        if (kanji is not null && dict.Contents.TryGetValue(kanji, out List<IDictRecord>? result))
+        if (dict.Contents.TryGetValue(kanji, out List<IDictRecord>? result))
         {
             kanjiResults.Add(kanji,
                 new IntermediaryResult(new List<List<IDictRecord>> { result }, null, kanji, kanji, dict));
