@@ -367,11 +367,11 @@ public static class JapaneseUtils
     public static string RemovePunctuation(string text)
     {
         StringBuilder sb = new(text.Length);
-        foreach (char character in text)
+        foreach (Rune rune in text.EnumerateRunes())
         {
-            if (char.IsLetterOrDigit(character) || char.IsSurrogate(character))
+            if (Rune.IsLetterOrDigit(rune))
             {
-                _ = sb.Append(character);
+                _ = sb.Append(rune);
             }
         }
 
