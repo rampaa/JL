@@ -185,7 +185,7 @@ public static class JapaneseUtils
         {
             if (unicodeTextList[i] is "ー" && s_kanaFinalVowelDict.TryGetValue(unicodeTextList[i - 1], out char vowel))
             {
-                if (vowel is not 'お' and not 'え' and not 'オ' and not 'エ')
+                if (vowel is not 'お' and not 'え')
                 {
                     for (int j = 0; j < stringBuilders.Count; j++)
                     {
@@ -199,8 +199,6 @@ public static class JapaneseUtils
                     {
                         'お' => 'う',
                         'え' => 'い',
-                        'オ' => 'ウ',
-                        'エ' => 'イ',
                         _ => ' '
                     };
 
