@@ -9,14 +9,14 @@ namespace JL.Core.Dicts.CustomWordDict;
 internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
 {
     public string PrimarySpelling { get; }
-    public List<string>? AlternativeSpellings { get; }
-    public List<string>? Readings { get; }
-    private List<string> Definitions { get; }
+    public string[]? AlternativeSpellings { get; }
+    public string[]? Readings { get; }
+    private string[] Definitions { get; }
     public List<string> WordClasses { get; }
     public bool HasUserDefinedWordClass { get; }
 
-    public CustomWordRecord(string primarySpelling, List<string>? alternativeSpellings, List<string>? readings,
-        List<string> definitions, List<string> wordClasses, bool hasUserDefinedWordClass)
+    public CustomWordRecord(string primarySpelling, string[]? alternativeSpellings, string[]? readings,
+        string[] definitions, List<string> wordClasses, bool hasUserDefinedWordClass)
     {
         PrimarySpelling = primarySpelling;
         AlternativeSpellings = alternativeSpellings;
@@ -62,11 +62,11 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
             _ = defResult.Append(CultureInfo.InvariantCulture, $"({tempWordClass}) ");
         }
 
-        for (int i = 0; i < Definitions.Count; i++)
+        for (int i = 0; i < Definitions.Length; i++)
         {
-            if (Definitions.Count > 0)
+            if (Definitions.Length > 0)
             {
-                if (Definitions.Count > 1)
+                if (Definitions.Length > 1)
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"({count}) ");
                 }
@@ -103,8 +103,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
 
             if (frequency is int.MaxValue && AlternativeSpellings is not null)
             {
-                int alternativeSpellingsCount = AlternativeSpellings.Count;
-                for (int i = 0; i < alternativeSpellingsCount; i++)
+                for (int i = 0; i < AlternativeSpellings.Length; i++)
                 {
                     if (freq.Contents.TryGetValue(
                             JapaneseUtils.KatakanaToHiragana(AlternativeSpellings[i]),
@@ -130,7 +129,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
 
         else if (Readings is not null)
         {
-            int readingCount = Readings.Count;
+            int readingCount = Readings.Length;
             for (int i = 0; i < readingCount; i++)
             {
                 string reading = Readings[i];

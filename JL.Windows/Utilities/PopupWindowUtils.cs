@@ -33,7 +33,7 @@ internal static class PopupWindowUtils
     {
         if (frequencies.Count is 1 && frequencies[0].Freq is > 0 and < int.MaxValue)
         {
-            return string.Create(CultureInfo.InvariantCulture, $"#{frequencies.First().Freq}");
+            return string.Create(CultureInfo.InvariantCulture, $"#{frequencies[0].Freq}");
         }
 
         if (frequencies.Count > 1)
@@ -58,7 +58,7 @@ internal static class PopupWindowUtils
         return "";
     }
 
-    public static string ReadingsToText(IReadOnlyList<string> readings, IReadOnlyList<string> rOrthographyInfoList)
+    public static string ReadingsToText(IList<string> readings, IReadOnlyList<string> rOrthographyInfoList)
     {
         if (readings.Count is 0)
         {
@@ -123,7 +123,7 @@ internal static class PopupWindowUtils
     }
 
     public static Grid CreatePitchAccentGrid(string primarySpelling, IReadOnlyList<string>? alternativeSpellings,
-        IReadOnlyList<string>? readings, IReadOnlyList<string> splitReadingsWithRInfo, double leftMargin, Dict dict)
+        IList<string>? readings, string[] splitReadingsWithRInfo, double leftMargin, Dict dict)
     {
         Grid pitchAccentGrid = new();
 
@@ -133,7 +133,7 @@ internal static class PopupWindowUtils
             ? ConfigManager.ReadingsFontSize
             : ConfigManager.PrimarySpellingFontSize;
 
-        IReadOnlyList<string> expressions = hasReading ? readings! : new List<string> { primarySpelling };
+        IList<string> expressions = hasReading ? readings! : new List<string> { primarySpelling };
 
         double horizontalOffsetForReading = leftMargin;
 

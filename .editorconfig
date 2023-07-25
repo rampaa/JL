@@ -229,6 +229,9 @@ dotnet_diagnostic.CA1031.severity = none
 # CA1062: Validate arguments of public methods
 dotnet_diagnostic.CA1062.severity = none
 
+# CA1819: Properties should not return arrays
+dotnet_diagnostic.CA1819.severity = none
+
 # IDE0005: Remove unnecessary usings
 dotnet_diagnostic.IDE0005.severity = warning
 

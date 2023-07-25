@@ -306,9 +306,9 @@ internal sealed partial class PreferencesWindow : Window
         }
 
         string rawTags = tagsTextBox.Text;
-        ImmutableArray<string> tags = string.IsNullOrEmpty(rawTags)
-            ? ImmutableArray<string>.Empty
-            : rawTags.Split(',').Select(static s => s.Trim()).ToImmutableArray();
+        string[] tags = string.IsNullOrEmpty(rawTags)
+            ? Array.Empty<string>()
+            : rawTags.Split(',').Select(static s => s.Trim()).ToArray();
 
         return new AnkiConfig(deckName, modelName, dict, tags);
     }

@@ -19,14 +19,14 @@ public static class CustomWordLoader
                 {
                     string[] spellings = lParts[0].Split(';').Select(static s => s.Trim()).ToArray();
 
-                    List<string>? readings = lParts[1].Split(';').Select(static r => r.Trim()).ToList();
+                    string[]? readings = lParts[1].Split(';').Select(static r => r.Trim()).ToArray();
 
-                    if (readings.Count is 0)
+                    if (readings.Length is 0)
                     {
                         readings = null;
                     }
 
-                    List<string> definitions = lParts[2].Split(';').Select(static d => d.Trim()).ToList();
+                    string[] definitions = lParts[2].Split(';').Select(static d => d.Trim()).ToArray();
                     string partOfSpeech = lParts[3].Trim();
 
                     List<string>? wordClasses = null;
@@ -41,15 +41,13 @@ public static class CustomWordLoader
         }
     }
 
-    public static void AddToDictionary(string[] spellings, List<string>? readings, List<string> definitions,
+    public static void AddToDictionary(string[] spellings, string[]? readings, string[] definitions,
         string rawPartOfSpeech, List<string>? wordClasses)
     {
         for (int i = 0; i < spellings.Length; i++)
         {
-            List<string>? alternativeSpellings = spellings.ToList();
-            alternativeSpellings.RemoveAt(i);
-
-            if (alternativeSpellings.Count is 0)
+            string[]? alternativeSpellings = spellings.RemoveAt(i);
+            if (alternativeSpellings.Length is 0)
             {
                 alternativeSpellings = null;
             }

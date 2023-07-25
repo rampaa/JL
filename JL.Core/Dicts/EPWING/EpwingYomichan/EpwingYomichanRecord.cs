@@ -11,9 +11,9 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
 {
     public List<string>? Definitions { get; set; }
     public string? Reading { get; }
-    public List<string>? WordClasses { get; }
+    public string[]? WordClasses { get; }
     public string PrimarySpelling { get; }
-    private List<string>? DefinitionTags { get; }
+    private string[]? DefinitionTags { get; }
     //public int Score { get; init; }
     //public int Sequence { get; init; }
     //public string TermTags { get; init; }
@@ -31,9 +31,9 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         JsonElement definitionTagsElement = jsonElement[2];
         if (definitionTagsElement.ValueKind is JsonValueKind.String)
         {
-            DefinitionTags = definitionTagsElement.ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
+            DefinitionTags = definitionTagsElement.ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
 
-            if (DefinitionTags.Count is 0)
+            if (DefinitionTags.Length is 0)
             {
                 DefinitionTags = null;
             }
@@ -43,8 +43,8 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
             DefinitionTags = null;
         }
 
-        WordClasses = jsonElement[3].ToString().Split(' ').ToList();
-        if (WordClasses.Count is 0)
+        WordClasses = jsonElement[3].ToString().Split(' ').ToArray();
+        if (WordClasses.Length is 0)
         {
             WordClasses = null;
         }
@@ -79,7 +79,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
 
         for (int i = 0; i < Definitions.Count; i++)
         {
-            if (DefinitionTags?.Count > i)
+            if (DefinitionTags?.Length > i)
             {
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({DefinitionTags[i]}) ");
             }

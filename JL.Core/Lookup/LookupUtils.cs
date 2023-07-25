@@ -937,7 +937,7 @@ public static class LookupUtils
     {
         List<LookupFrequencyResult> freqsList = new();
 
-        foreach (Freq freq in FreqUtils.FreqDicts.Values.ToList().OrderBy(static f => f.Priority))
+        foreach (Freq freq in FreqUtils.FreqDicts.Values.OrderBy(static f => f.Priority).ToList())
         {
             if (freq is { Active: true, Type: not FreqType.YomichanKanji })
             {

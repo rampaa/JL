@@ -10,10 +10,10 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
 {
     public string PrimarySpelling { get; }
     public string? Reading { get; }
-    public List<string>? AlternativeSpellings { get; }
+    public string[]? AlternativeSpellings { get; }
     public List<string>? Definitions { get; set; }
 
-    public EpwingNazekaRecord(string primarySpelling, string? reading, List<string>? alternativeSpellings, List<string>? definitions)
+    public EpwingNazekaRecord(string primarySpelling, string? reading, string[]? alternativeSpellings, List<string>? definitions)
     {
         PrimarySpelling = primarySpelling;
         Reading = reading;
@@ -65,8 +65,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
 
             if (frequency is int.MaxValue && AlternativeSpellings is not null)
             {
-                int alternativeSpellingsCount = AlternativeSpellings.Count;
-                for (int i = 0; i < alternativeSpellingsCount; i++)
+                for (int i = 0; i < AlternativeSpellings.Length; i++)
                 {
                     if (freq.Contents.TryGetValue(
                             JapaneseUtils.KatakanaToHiragana(AlternativeSpellings[i]),

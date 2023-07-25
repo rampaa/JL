@@ -11,18 +11,18 @@ public sealed class LookupResult
     public Dict Dict { get; }
     public string PrimarySpelling { get; init; }
 
-    public List<string>? Readings { get; init; }
+    public IList<string>? Readings { get; init; }
     public string? FormattedDefinitions { get; init; }
     public int EdictId { get; init; }
-    public List<string>? AlternativeSpellings { get; init; }
+    public IReadOnlyList<string>? AlternativeSpellings { get; init; }
     public string? Process { get; init; }
     public List<string>? PrimarySpellingOrthographyInfoList { get; init; }
     public List<string>? ReadingsOrthographyInfoList { get; }
     public List<string>? AlternativeSpellingsOrthographyInfoList { get; }
 
     // Kanji
-    public List<string>? OnReadings { get; init; }
-    public List<string>? KunReadings { get; init; }
+    public IReadOnlyList<string>? OnReadings { get; init; }
+    public IReadOnlyList<string>? KunReadings { get; init; }
     public List<string>? NanoriReadings { get; init; }
     public int StrokeCount { get; init; }
     public string? KanjiComposition { get; init; }
@@ -34,14 +34,14 @@ public sealed class LookupResult
         string matchedText,
         string deconjugatedMatchedText,
         Dict dict,
-        List<string>? readings,
+        IList<string>? readings,
         List<LookupFrequencyResult>? frequencies = null,
-        List<string>? alternativeSpellings = null,
+        IReadOnlyList<string>? alternativeSpellings = null,
         List<string>? primarySpellingOrthographyInfoList = null,
         List<string>? readingsOrthographyInfoList = null,
         List<string>? alternativeSpellingsOrthographyInfoList = null,
-        List<string>? onReadings = null,
-        List<string>? kunReadings = null,
+        IReadOnlyList<string>? onReadings = null,
+        IReadOnlyList<string>? kunReadings = null,
         List<string>? nanoriReadings = null,
         string? formattedDefinitions = null,
         string? process = null,

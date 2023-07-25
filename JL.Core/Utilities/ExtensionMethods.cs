@@ -59,4 +59,20 @@ public static class ExtensionMethods
 
         return textBlocks;
     }
+
+    public static T[] RemoveAt<T>(this T[] source, int index)
+    {
+        T[] destination = new T[source.Length - 1];
+        if (index > 0)
+        {
+            Array.Copy(source, 0, destination, 0, index);
+        }
+
+        if (index < source.Length - 1)
+        {
+            Array.Copy(source, index + 1, destination, index, source.Length - index - 1);
+        }
+
+        return destination;
+    }
 }

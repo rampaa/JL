@@ -536,7 +536,7 @@ internal sealed partial class PopupWindow : Window
         if (result.Readings?.Count > 0)
         {
             List<string>? rOrthographyInfoList = result.ReadingsOrthographyInfoList;
-            List<string> readings = result.Readings;
+            IList<string> readings = result.Readings;
             string readingsText = rOrthographyInfoList?.Count > 0 && (result.Dict.Options?.ROrthographyInfo?.Value ?? true)
                 ? PopupWindowUtils.ReadingsToText(readings, rOrthographyInfoList)
                 : string.Join(", ", result.Readings);
@@ -647,7 +647,7 @@ internal sealed partial class PopupWindow : Window
         if (result.AlternativeSpellings?.Count > 0)
         {
             List<string>? aOrthographyInfoList = result.AlternativeSpellingsOrthographyInfoList;
-            List<string> alternativeSpellings = result.AlternativeSpellings;
+            IReadOnlyList<string>? alternativeSpellings = result.AlternativeSpellings;
             string alternativeSpellingsText = aOrthographyInfoList?.Count > 0 && (result.Dict.Options?.AOrthographyInfo?.Value ?? true)
                 ? PopupWindowUtils.AlternativeSpellingsToText(alternativeSpellings, aOrthographyInfoList)
                 : string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", alternativeSpellings)})");
@@ -867,7 +867,7 @@ internal sealed partial class PopupWindow : Window
                     Dict? pitchDict = DictUtils.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.PitchAccentYomichan);
                     if (pitchDict?.Active ?? false)
                     {
-                        List<string>? readings = result.Readings;
+                        IList<string>? readings = result.Readings;
 
                         if (textBlock.Name is "PrimarySpelling" && readings?.Count > 0)
                         {
@@ -879,7 +879,7 @@ internal sealed partial class PopupWindow : Window
                             Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
                                 result.AlternativeSpellings,
                                 readings,
-                                textBlock.Text.Split(", ").ToList(),
+                                textBlock.Text.Split(", "),
                                 textBlock.Margin.Left,
                                 pitchDict);
 
@@ -921,7 +921,7 @@ internal sealed partial class PopupWindow : Window
                     Dict? pitchDict = DictUtils.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.PitchAccentYomichan);
                     if (pitchDict?.Active ?? false)
                     {
-                        List<string>? readings = result.Readings;
+                        IList<string>? readings = result.Readings;
 
                         if (textBox.Name is "PrimarySpelling" && readings?.Count > 0)
                         {
@@ -933,7 +933,7 @@ internal sealed partial class PopupWindow : Window
                             Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
                                 result.AlternativeSpellings,
                                 readings,
-                                textBox.Text.Split(", ").ToList(),
+                                textBox.Text.Split(", "),
                                 textBox.Margin.Left,
                                 pitchDict);
 
@@ -1227,7 +1227,7 @@ internal sealed partial class PopupWindow : Window
     {
         string primarySpelling = _lastLookupResults[_listBoxIndex].PrimarySpelling;
 
-        List<string>? readingList = _lastLookupResults[_listBoxIndex].Readings;
+        IList<string>? readingList = _lastLookupResults[_listBoxIndex].Readings;
         string readings = readingList is null
             ? ""
             : string.Join("; ", readingList);

@@ -7,28 +7,28 @@ namespace JL.Core.Dicts.YomichanKanji;
 
 internal sealed class YomichanKanjiRecord : IDictRecord
 {
-    public List<string>? OnReadings { get; }
-    public List<string>? KunReadings { get; }
-    //public List<string>? Tags { get; }
+    public string[]? OnReadings { get; }
+    public string[]? KunReadings { get; }
+    //public string[]? Tags { get; }
     private List<string>? Definitions { get; }
     private List<string>? Stats { get; }
 
     public YomichanKanjiRecord(IReadOnlyList<JsonElement> jsonElement)
     {
-        OnReadings = jsonElement[1].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
-        if (OnReadings.Count is 0)
+        OnReadings = jsonElement[1].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
+        if (OnReadings.Length is 0)
         {
             OnReadings = null;
         }
 
-        KunReadings = jsonElement[2].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
-        if (KunReadings.Count is 0)
+        KunReadings = jsonElement[2].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
+        if (KunReadings.Length is 0)
         {
             KunReadings = null;
         }
 
-        //Tags = jsonElement[3].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
-        //if (Tags.Count is 0)
+        //Tags = jsonElement[3].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        //if (Tags.Length is 0)
         //{
         //    Tags = null;
         //}

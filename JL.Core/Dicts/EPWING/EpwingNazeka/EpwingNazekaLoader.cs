@@ -64,13 +64,11 @@ internal static class EpwingNazekaLoader
             {
                 string primarySpelling = spellings[0];
 
-                List<string>? alternativeSpellings = spellings.ToList();
-                alternativeSpellings.RemoveAt(0);
+                string[]? alternativeSpellings = spellings.Skip(1).ToArray();
 
                 string key = JapaneseUtils.KatakanaToHiragana(reading);
 
-                EpwingNazekaRecord tempRecord = new(primarySpelling, reading, alternativeSpellings,
-                    definitions);
+                EpwingNazekaRecord tempRecord = new(primarySpelling, reading, alternativeSpellings, definitions);
 
                 if (nazekaEpwingDict.TryGetValue(key, out List<IDictRecord>? result))
                 {
@@ -85,10 +83,9 @@ internal static class EpwingNazekaLoader
                 {
                     primarySpelling = spellings[i];
 
-                    alternativeSpellings = spellings.ToList();
-                    alternativeSpellings.RemoveAt(i);
+                    alternativeSpellings = spellings.Where((_, index) => index != i).ToArray();
 
-                    if (alternativeSpellings.Count is 0)
+                    if (alternativeSpellings.Length is 0)
                     {
                         alternativeSpellings = null;
                     }

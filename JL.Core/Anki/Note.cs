@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Text.Json.Serialization;
 
 namespace JL.Core.Anki;
@@ -13,7 +12,7 @@ internal sealed class Note
 
     [JsonPropertyName("options")] public Dictionary<string, object> Options { get; }
 
-    [JsonPropertyName("tags")] public ImmutableArray<string> Tags { get; }
+    [JsonPropertyName("tags")] public string[] Tags { get; }
 
     [JsonPropertyName("audio")] public Dictionary<string, object>? Audio { get; }
 
@@ -26,7 +25,7 @@ internal sealed class Note
         string modelName,
         Dictionary<string, object> fields,
         Dictionary<string, object> options,
-        ImmutableArray<string> tags,
+        string[] tags,
         Dictionary<string, object>? audio,
         Dictionary<string, object>? video,
         Dictionary<string, object>? picture

@@ -80,8 +80,8 @@ internal sealed partial class AddWordWindow : Window
 
 
             string[] spellings = rawSpellings.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static s => s.Trim()).ToArray();
-            List<string> readings = rawReadings.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static r => r.Trim()).ToList();
-            List<string> definitions = rawDefinitions.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static s => s.Trim()).ToList();
+            string[] readings = rawReadings.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static r => r.Trim()).ToArray();
+            string[] definitions = rawDefinitions.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static s => s.Trim()).ToArray();
             List<string>? wordClasses = string.IsNullOrWhiteSpace(rawWordClasses)
                 ? null
                 : rawWordClasses.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static wc => wc.Trim()).ToList();
