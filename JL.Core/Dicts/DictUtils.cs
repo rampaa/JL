@@ -348,7 +348,7 @@ public static class DictUtils
         #pragma warning restore format
     };
 
-    public static readonly List<DictType> YomichanDictTypes = new()
+    public static readonly DictType[] YomichanDictTypes = new[]
     {
         DictType.Daijirin,
         DictType.Daijisen,
@@ -376,7 +376,7 @@ public static class DictUtils
         DictType.NonspecificYomichan
     };
 
-    public static readonly List<DictType> NazekaDictTypes = new()
+    public static readonly DictType[] NazekaDictTypes = new[]
     {
         DictType.DaijirinNazeka,
         DictType.KenkyuushaNazeka,
@@ -387,7 +387,7 @@ public static class DictUtils
         DictType.NonspecificNazeka
     };
 
-    public static readonly List<DictType> NonspecificDictTypes = new()
+    public static readonly DictType[] NonspecificDictTypes = new[]
     {
         DictType.NonspecificWordYomichan,
         DictType.NonspecificKanjiYomichan,
@@ -399,7 +399,7 @@ public static class DictUtils
         DictType.NonspecificNazeka
     };
 
-    internal static readonly List<DictType> s_kanjiDictTypes = new()
+    internal static readonly DictType[] s_kanjiDictTypes = new[]
     {
         DictType.Kanjidic,
         DictType.KanjigenYomichan,
@@ -407,7 +407,7 @@ public static class DictUtils
         DictType.NonspecificKanjiNazeka
     };
 
-    internal static readonly List<DictType> s_nameDictTypes = new()
+    internal static readonly DictType[] s_nameDictTypes = new[]
     {
         DictType.CustomNameDictionary,
         DictType.JMnedict,
@@ -415,7 +415,7 @@ public static class DictUtils
         DictType.NonspecificNameNazeka
     };
 
-    internal static readonly List<DictType> s_wordDictTypes = new()
+    internal static readonly DictType[] s_wordDictTypes = new[]
     {
         DictType.CustomWordDictionary,
         DictType.JMdict,

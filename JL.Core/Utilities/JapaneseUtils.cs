@@ -105,7 +105,7 @@ public static class JapaneseUtils
         #pragma warning restore format
     };
 
-    private static readonly List<char> s_sentenceTerminatingCharacters = new()
+    private static readonly char[] s_sentenceTerminatingCharacters = new[]
     {
         '。',
         '！',
@@ -276,7 +276,7 @@ public static class JapaneseUtils
         int startPosition = -1;
         int endPosition = -1;
 
-        for (int i = 0; i < s_sentenceTerminatingCharacters.Count; i++)
+        for (int i = 0; i < s_sentenceTerminatingCharacters.Length; i++)
         {
             char terminatingCharacter = s_sentenceTerminatingCharacters[i];
 

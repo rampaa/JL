@@ -1,8 +1,8 @@
-﻿namespace JL.Core.Anki;
+namespace JL.Core.Anki;
 
 public static class JLFieldUtils
 {
-    public static readonly List<JLField> JLFieldsForWordDicts = new()
+    public static readonly JLField[] JLFieldsForWordDicts = new[]
     {
         JLField.Nothing,
         JLField.PrimarySpelling,
@@ -22,7 +22,7 @@ public static class JLFieldUtils
         JLField.LocalTime
     };
 
-    public static readonly List<JLField> JLFieldsForKanjiDicts = new()
+    public static readonly JLField[] JLFieldsForKanjiDicts = new[]
     {
         JLField.Nothing,
         JLField.PrimarySpelling,
@@ -44,7 +44,7 @@ public static class JLFieldUtils
         JLField.LocalTime
     };
 
-    public static readonly List<JLField> JLFieldsForNameDicts = new()
+    public static readonly JLField[] JLFieldsForNameDicts = new[]
     {
         JLField.Nothing,
         JLField.PrimarySpelling,
