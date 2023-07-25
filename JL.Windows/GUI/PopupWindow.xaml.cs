@@ -1726,7 +1726,11 @@ internal sealed partial class PopupWindow : Window
 
     private void PopupContextMenu_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        if (!(bool)e.NewValue)
+        if (!(bool)e.NewValue
+            && !IsMouseOver
+            && !AddWordWindow.IsItVisible()
+            && !AddNameWindow.IsItVisible()
+            && !StatsWindow.IsItVisible())
         {
             PopupAutoHideTimer.Start();
         }
