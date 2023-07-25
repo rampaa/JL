@@ -86,7 +86,7 @@ public class LookupTests
         // Act
         List<LookupResult>? result = LookupUtils.LookupText(text);
         int actual = result is not null
-            ? result.First(static x => x.PrimarySpelling is "他").Frequencies?.First().Freq ?? int.MaxValue
+            ? result.First(static x => x.PrimarySpelling is "他").Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -104,7 +104,7 @@ public class LookupTests
         // Act
         List<LookupResult>? result = LookupUtils.LookupText(text);
         int actual = result is not null
-            ? result.First(static x => x.PrimarySpelling is "多").Frequencies?.First().Freq ?? int.MaxValue
+            ? result.First(static x => x.PrimarySpelling is "多").Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -122,7 +122,7 @@ public class LookupTests
         // Act
         List<LookupResult>? result = LookupUtils.LookupText(text);
         int actual = result is not null
-            ? result.First(static x => x.PrimarySpelling is "田").Frequencies?.First().Freq ?? int.MaxValue
+            ? result.First(static x => x.PrimarySpelling is "田").Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -140,7 +140,7 @@ public class LookupTests
         // Act
         List<LookupResult>? result = LookupUtils.LookupText(text);
         int actual = result is not null
-            ? result.First(static x => x.Readings?.Contains("ひ") ?? false).Frequencies?.First().Freq ?? int.MaxValue
+            ? result.First(static x => x.Readings?.Contains("ひ") ?? false).Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -158,7 +158,7 @@ public class LookupTests
         // Act
         List<LookupResult>? result = LookupUtils.LookupText(text);
         int actual = result is not null
-            ? result.First(static x => x.Readings?.Contains("にち") ?? false).Frequencies?.First().Freq ?? int.MaxValue
+            ? result.First(static x => x.Readings?.Contains("にち") ?? false).Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -177,7 +177,7 @@ public class LookupTests
         List<LookupResult>? result = LookupUtils.LookupText(text);
 
         int actual = result is not null
-            ? result.First(static x => x.Readings?.Contains("か") ?? false).Frequencies?.First().Freq ?? int.MaxValue
+            ? result.First(static x => x.Readings?.Contains("か") ?? false).Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -196,7 +196,7 @@ public class LookupTests
         List<LookupResult>? result = LookupUtils.LookupText(text);
 
         int actual = result is not null
-            ? result.First(static x => x.PrimarySpelling is "余り").Frequencies?.First().Freq ?? int.MaxValue
+            ? result.First(static x => x.PrimarySpelling is "余り").Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -215,7 +215,7 @@ public class LookupTests
         List<LookupResult>? result = LookupUtils.LookupText(text);
 
         int actual = result is not null
-            ? result.First(static x => x.Readings?.Contains("なつかしい") ?? false).Frequencies?.First().Freq ?? int.MaxValue
+            ? result.First(static x => x.Readings?.Contains("なつかしい") ?? false).Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -234,7 +234,7 @@ public class LookupTests
         List<LookupResult>? result = LookupUtils.LookupText(text);
 
         int actual = result is not null
-            ? result.First(static x => x.Readings?.Contains("はいきょ") ?? false).Frequencies?.First().Freq ?? int.MaxValue
+            ? result.First(static x => x.Readings?.Contains("はいきょ") ?? false).Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert
@@ -253,7 +253,7 @@ public class LookupTests
         List<LookupResult>? result = LookupUtils.LookupText(text);
 
         int actual = result is not null
-            ? result.First(static x => x.Readings?.Contains("はいきょ") ?? false).Frequencies?.First().Freq ?? int.MaxValue
+            ? result.First(static x => x.Readings?.Contains("はいきょ") ?? false).Frequencies?[0].Freq ?? int.MaxValue
             : int.MaxValue;
 
         // Assert

@@ -105,8 +105,7 @@ public static class JapaneseUtils
         #pragma warning restore format
     };
 
-    private static readonly char[] s_sentenceTerminatingCharacters = new[]
-    {
+    private static readonly char[] s_sentenceTerminatingCharacters = {
         '。',
         '！',
         '？',
@@ -178,7 +177,7 @@ public static class JapaneseUtils
 
         List<StringBuilder> stringBuilders = new(4)
         {
-            new StringBuilder(unicodeTextList[0], unicodeTextList.Count),
+            new StringBuilder(unicodeTextList[0], unicodeTextList.Count)
         };
 
         for (int i = 1; i < unicodeTextList.Count; i++)
@@ -252,7 +251,7 @@ public static class JapaneseUtils
 
     internal static bool IsKatakana(string text)
     {
-        return s_katakanaToHiraganaDict.ContainsKey(text.First());
+        return s_katakanaToHiraganaDict.ContainsKey(text[0]);
     }
 
     public static int FindExpressionBoundary(string text, int position)
@@ -308,7 +307,7 @@ public static class JapaneseUtils
 
         if (sentence.Length > 1)
         {
-            if (s_bracketsDict.ContainsValue(sentence.First()))
+            if (s_bracketsDict.ContainsValue(sentence[0]))
             {
                 sentence = sentence[1..];
             }

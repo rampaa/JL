@@ -36,7 +36,7 @@ internal static class FrequencyYomichanLoader
                 int frequency = int.MaxValue;
                 JsonElement thirdElement = value[2];
 
-                if (int.TryParse(value[2].ToString().Split('/').First(), out int parsedFreq))
+                if (int.TryParse(value[2].ToString().Split('/')[0], out int parsedFreq))
                 {
                     frequency = parsedFreq;
                 }

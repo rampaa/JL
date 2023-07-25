@@ -18,7 +18,7 @@ public readonly record struct NewlineBetweenDefinitionsOption(bool Value)
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes =
-        Enum.GetValues<DictType>().Except(new DictType[] { DictType.PitchAccentYomichan, DictType.Kanjidic, DictType.CustomNameDictionary })
+        Enum.GetValues<DictType>().Except(new[] { DictType.PitchAccentYomichan, DictType.Kanjidic, DictType.CustomNameDictionary })
             .ToArray();
 }
 
@@ -26,7 +26,7 @@ public readonly record struct NoAllOption(bool Value)
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes = Enum.GetValues<DictType>()
-        .Except(new DictType[] { DictType.PitchAccentYomichan }).ToArray();
+        .Except(new[] { DictType.PitchAccentYomichan }).ToArray();
 }
 
 public readonly record struct PitchAccentMarkerColorOption(string Value)

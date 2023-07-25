@@ -48,7 +48,7 @@ internal sealed partial class MainWindow : Window
         InitializeComponent();
         s_instance = this;
         ConfigHelper.Instance.SetLang("en");
-        FirstPopupWindow = new();
+        FirstPopupWindow = new PopupWindow();
     }
 
     protected override async void OnSourceInitialized(EventArgs e)

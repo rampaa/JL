@@ -87,10 +87,10 @@ internal static class Deconjugator
         {
             VirtualRule virtualRule = new
             (
-                myRule.DecEnd.First(),
-                myRule.ConEnd.First(),
-                myRule.DecTag!.First(),
-                myRule.ConTag!.First(),
+                myRule.DecEnd[0],
+                myRule.ConEnd[0],
+                myRule.DecTag![0],
+                myRule.ConTag![0],
                 myRule.Detail
             );
             Form? result = StdruleDeconjugateInner(myForm, virtualRule);
@@ -134,7 +134,7 @@ internal static class Deconjugator
 
     private static HashSet<Form>? RewriteruleDeconjugate(Form myForm, Rule myRule)
     {
-        return myForm.Text != myRule.ConEnd.First()
+        return myForm.Text != myRule.ConEnd[0]
             ? null
             : StdruleDeconjugate(myForm, myRule);
     }
@@ -169,12 +169,12 @@ internal static class Deconjugator
 
     private static Form? SubstitutionInner(Form myForm, Rule myRule)
     {
-        if (!myForm.Text.Contains(myRule.ConEnd.First(), StringComparison.Ordinal))
+        if (!myForm.Text.Contains(myRule.ConEnd[0], StringComparison.Ordinal))
         {
             return null;
         }
 
-        string newText = myForm.Text.Replace(myRule.ConEnd.First(), myRule.DecEnd.First(), StringComparison.Ordinal);
+        string newText = myForm.Text.Replace(myRule.ConEnd[0], myRule.DecEnd[0], StringComparison.Ordinal);
 
         Form newForm = new(
             newText,
@@ -269,12 +269,12 @@ internal static class Deconjugator
             return false;
         }
 
-        if (!myForm.Text.EndsWith(myRule.ConEnd.First(), StringComparison.Ordinal))
+        if (!myForm.Text.EndsWith(myRule.ConEnd[0], StringComparison.Ordinal))
         {
             return false;
         }
 
-        string baseText = myForm.Text[..^myRule.ConEnd.First().Length];
+        string baseText = myForm.Text[..^myRule.ConEnd[0].Length];
         return !baseText.EndsWith('さ');
     }
 
