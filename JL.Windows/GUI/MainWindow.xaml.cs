@@ -1104,9 +1104,7 @@ internal sealed partial class MainWindow : Window
 
     private void Window_MouseLeave(object sender, MouseEventArgs e)
     {
-        if (ConfigManager.LookupOnMouseClickOnly
-            || ConfigManager.LookupOnSelectOnly
-            || IsMouseOver
+        if (IsMouseOver
             || FirstPopupWindow.MiningMode
             || (FirstPopupWindow.IsMouseOver
                 && (ConfigManager.FixedPopupPositioning
