@@ -281,21 +281,22 @@ internal sealed partial class MainWindow : Window
 
     public async void MainTextBox_MouseMove(object? sender, MouseEventArgs? e)
     {
-        if (ConfigManager.LookupOnSelectOnly
+        if (ConfigManager.InactiveLookupMode
+            || ConfigManager.LookupOnSelectOnly
             || ConfigManager.LookupOnMouseClickOnly
             || MainTextBoxContextMenu.IsVisible
             || TitleBarContextMenu.IsVisible
             || FontSizeSlider.IsVisible
             || OpacitySlider.IsVisible
             || FirstPopupWindow.MiningMode
-            || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
-            || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On))
+            || (!ConfigManager.TextBoxIsReadOnly && InputMethod.Current?.ImeState is InputMethodState.On)
+            || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
         {
             return;
         }
 
         s_precacheCancellationTokenSource.Cancel();
-        await FirstPopupWindow.TextBox_MouseMove(MainTextBox).ConfigureAwait(false);
+        await FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox).ConfigureAwait(false);
     }
 
     private void MainWindow_Closed(object sender, EventArgs e)
@@ -899,12 +900,12 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    private async void MainTextBox_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    private async void MainTextBox_PreviewMouseUp(object? sender, MouseButtonEventArgs e)
     {
-        if (((!ConfigManager.LookupOnSelectOnly || e.ChangedButton is not MouseButton.Left)
-                && (!ConfigManager.LookupOnMouseClickOnly || e.ChangedButton != ConfigManager.LookupOnClickMouseButton))
-            || ConfigManager.InactiveLookupMode
-            || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
+        if (ConfigManager.InactiveLookupMode
+            || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
+            || ((!ConfigManager.LookupOnSelectOnly || e.ChangedButton is not MouseButton.Left)
+                && (!ConfigManager.LookupOnMouseClickOnly || e.ChangedButton != ConfigManager.LookupOnClickMouseButton)))
         {
             return;
         }
@@ -916,7 +917,7 @@ internal sealed partial class MainWindow : Window
 
         else
         {
-            await FirstPopupWindow.TextBox_MouseMove(MainTextBox).ConfigureAwait(false);
+            await FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox).ConfigureAwait(false);
         }
     }
 

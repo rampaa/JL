@@ -124,15 +124,8 @@ internal sealed partial class PopupWindow : Window
         WindowsUtils.ShowStatsWindow();
     }
 
-    public async Task TextBox_MouseMove(TextBox tb)
+    public async Task LookupOnMouseMoveOrClick(TextBox tb)
     {
-        if (ConfigManager.InactiveLookupMode
-            || (MiningMode && !ConfigManager.LookupOnMouseClickOnly)
-            || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
-        {
-            return;
-        }
-
         // Set snapToText to the value of HorizontallyCenterMainWindowText
         // This is a dumb workaround for https://github.com/dotnet/wpf/issues/7651
         // Setting snapToText to true creates other problems but it's better than not being able to lookup stuff when the text is centered
@@ -574,7 +567,7 @@ internal sealed partial class PopupWindow : Window
                     };
 
                     uiElementReadings.PreviewMouseUp += UiElement_PreviewMouseUp;
-                    uiElementReadings.MouseMove += PopupMouseMove;
+                    uiElementReadings.MouseMove += UiElement_MouseMove;
                     uiElementReadings.LostFocus += Unselect;
                     uiElementReadings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
                 }
@@ -621,7 +614,7 @@ internal sealed partial class PopupWindow : Window
                 };
 
                 uiElementDefinitions.PreviewMouseUp += UiElement_PreviewMouseUp;
-                uiElementDefinitions.MouseMove += PopupMouseMove;
+                uiElementDefinitions.MouseMove += UiElement_MouseMove;
                 uiElementDefinitions.LostFocus += Unselect;
                 uiElementDefinitions.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
             }
@@ -685,7 +678,7 @@ internal sealed partial class PopupWindow : Window
                     };
 
                     uiElementAlternativeSpellings.PreviewMouseUp += UiElement_PreviewMouseUp;
-                    uiElementAlternativeSpellings.MouseMove += PopupMouseMove;
+                    uiElementAlternativeSpellings.MouseMove += UiElement_MouseMove;
                     uiElementAlternativeSpellings.LostFocus += Unselect;
                     uiElementAlternativeSpellings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
                 }
@@ -1029,10 +1022,12 @@ internal sealed partial class PopupWindow : Window
         _lastSelectedText = ((TextBox)sender).SelectedText;
     }
 
-    private async void PopupMouseMove(object sender, MouseEventArgs e)
+    private async void UiElement_MouseMove(object sender, MouseEventArgs? e)
     {
-        if (ConfigManager.LookupOnSelectOnly
+        if (ConfigManager.InactiveLookupMode
+            || ConfigManager.LookupOnSelectOnly
             || ConfigManager.LookupOnMouseClickOnly
+            || PopupContextMenu.IsVisible
             || (ConfigManager.RequireLookupKeyPress
                 && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
         {
@@ -1046,10 +1041,18 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        // prevents stray PopupWindows being created when you move your mouse too fast
         if (MiningMode)
         {
-            await ChildPopupWindow.Definitions_MouseMove((TextBox)sender).ConfigureAwait(false);
+            var tb = (TextBox)sender;
+            if (JapaneseUtils.JapaneseRegex.IsMatch(tb.Text))
+            {
+                await ChildPopupWindow.LookupOnMouseMoveOrClick(tb).ConfigureAwait(false);
+            }
+
+            else if (ConfigManager.HighlightLongestMatch)
+            {
+                WindowsUtils.Unselect(ChildPopupWindow._lastTextBox);
+            }
         }
     }
 
@@ -1220,19 +1223,6 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    private async Task Definitions_MouseMove(TextBox tb)
-    {
-        if (JapaneseUtils.JapaneseRegex.IsMatch(tb.Text))
-        {
-            await TextBox_MouseMove(tb).ConfigureAwait(false);
-        }
-
-        else if (ConfigManager.HighlightLongestMatch)
-        {
-            WindowsUtils.Unselect(_lastTextBox);
-        }
-    }
-
     private void ShowAddNameWindow()
     {
         string primarySpelling = _lastLookupResults[_listBoxIndex].PrimarySpelling;
@@ -1318,9 +1308,10 @@ internal sealed partial class PopupWindow : Window
             CoreConfig.KanjiMode = !CoreConfig.KanjiMode;
             LastText = "";
             Utils.Frontend.InvalidateDisplayCache();
+
             if (Owner != MainWindow.Instance)
             {
-                await TextBox_MouseMove(_lastTextBox!).ConfigureAwait(false);
+                UiElement_MouseMove(_lastTextBox!, null);
             }
 
             else
@@ -1589,10 +1580,10 @@ internal sealed partial class PopupWindow : Window
 
     private async void UiElement_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        if (((!ConfigManager.LookupOnSelectOnly || e.ChangedButton is not MouseButton.Left)
-                && (!ConfigManager.LookupOnMouseClickOnly || e.ChangedButton != ConfigManager.LookupOnClickMouseButton))
-            || ConfigManager.InactiveLookupMode
-            || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
+        if (ConfigManager.InactiveLookupMode
+            || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
+            || ((!ConfigManager.LookupOnSelectOnly || e.ChangedButton is not MouseButton.Left)
+                && (!ConfigManager.LookupOnMouseClickOnly || e.ChangedButton != ConfigManager.LookupOnClickMouseButton)))
         {
             return;
         }
@@ -1606,7 +1597,7 @@ internal sealed partial class PopupWindow : Window
 
         else
         {
-            await ChildPopupWindow.TextBox_MouseMove((TextBox)sender).ConfigureAwait(false);
+            await ChildPopupWindow.LookupOnMouseMoveOrClick((TextBox)sender).ConfigureAwait(false);
         }
     }
 
