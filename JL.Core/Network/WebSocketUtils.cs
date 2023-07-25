@@ -32,7 +32,7 @@ public static class WebSocketUtils
 
     private static void ListenWebSocket(CancellationToken cancellationToken)
     {
-        s_webSocketTask = Task.Factory.StartNew(async () =>
+        s_webSocketTask = Task.Run(async () =>
         {
             try
             {
@@ -82,6 +82,6 @@ public static class WebSocketUtils
                 Utils.Logger.Warning(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
                 Utils.Frontend.Alert(AlertLevel.Error, "Couldn't connect to the WebSocket server, probably because it is not running");
             }
-        }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        }, cancellationToken);
     }
 }
