@@ -82,9 +82,9 @@ internal sealed partial class AddWordWindow : Window
             string[] spellings = rawSpellings.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static s => s.Trim()).ToArray();
             string[] readings = rawReadings.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static r => r.Trim()).ToArray();
             string[] definitions = rawDefinitions.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static s => s.Trim()).ToArray();
-            List<string>? wordClasses = string.IsNullOrWhiteSpace(rawWordClasses)
+            string[]? wordClasses = string.IsNullOrWhiteSpace(rawWordClasses)
                 ? null
-                : rawWordClasses.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static wc => wc.Trim()).ToList();
+                : rawWordClasses.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static wc => wc.Trim()).ToArray();
 
             CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawPartOfSpeech, wordClasses);
             Utils.Frontend.InvalidateDisplayCache();

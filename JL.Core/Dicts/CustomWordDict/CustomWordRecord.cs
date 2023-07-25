@@ -12,11 +12,11 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
     public string[]? AlternativeSpellings { get; }
     public string[]? Readings { get; }
     private string[] Definitions { get; }
-    public List<string> WordClasses { get; }
+    public string[] WordClasses { get; }
     public bool HasUserDefinedWordClass { get; }
 
     public CustomWordRecord(string primarySpelling, string[]? alternativeSpellings, string[]? readings,
-        string[] definitions, List<string> wordClasses, bool hasUserDefinedWordClass)
+        string[] definitions, string[] wordClasses, bool hasUserDefinedWordClass)
     {
         PrimarySpelling = primarySpelling;
         AlternativeSpellings = alternativeSpellings;
@@ -35,7 +35,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
         int count = 1;
         StringBuilder defResult = new();
 
-        if (WordClasses.Count > 0)
+        if (WordClasses.Length > 0)
         {
             string tempWordClass;
             if (WordClasses.Contains("adj-i"))
