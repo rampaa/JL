@@ -335,24 +335,7 @@ internal sealed partial class MainWindow : Window
 
         else if (e.Delta > 0)
         {
-            string allBacklogText = string.Join("\n", BacklogUtils.Backlog);
-            if (MainTextBox.Text != allBacklogText)
-            {
-                if (MainTextBox.GetFirstVisibleLineIndex() is 0)
-                {
-                    int caretIndex = allBacklogText.Length - MainTextBox.Text.Length;
-
-                    MainTextBox.Text = allBacklogText;
-                    MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
-
-                    if (caretIndex >= 0)
-                    {
-                        MainTextBox.CaretIndex = caretIndex;
-                    }
-
-                    MainTextBox.ScrollToEnd();
-                }
-            }
+            BacklogUtils.ShowAllBacklog();
         }
     }
 

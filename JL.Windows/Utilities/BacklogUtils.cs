@@ -92,6 +92,35 @@ internal static class BacklogUtils
             : "";
     }
 
+    public static void ShowAllBacklog()
+    {
+        MainWindow mainWindow = MainWindow.Instance;
+
+        if (!ConfigManager.EnableBacklog || mainWindow.FirstPopupWindow.MiningMode || Backlog.Count is 0)
+        {
+            return;
+        }
+
+        string allBacklogText = string.Join("\n", Backlog);
+        if (mainWindow.MainTextBox.Text != allBacklogText)
+        {
+            if (mainWindow.MainTextBox.GetFirstVisibleLineIndex() is 0)
+            {
+                int caretIndex = allBacklogText.Length - mainWindow.MainTextBox.Text.Length;
+
+                mainWindow.MainTextBox.Text = allBacklogText;
+                mainWindow.MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
+
+                if (caretIndex >= 0)
+                {
+                    mainWindow.MainTextBox.CaretIndex = caretIndex;
+                }
+
+                mainWindow.MainTextBox.ScrollToEnd();
+            }
+        }
+    }
+
     public static async Task WriteBacklog()
     {
         if (ConfigManager.EnableBacklog
