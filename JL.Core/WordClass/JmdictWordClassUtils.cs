@@ -64,9 +64,9 @@ internal static class JmdictWordClassUtils
             {
                 var value = (JmdictRecord)jmdictRecordList[i];
 
-                List<string> wordClasses = usedWordClasses.Intersect(value.WordClasses.SelectMany(static wc => wc)).ToList();
+                string[] wordClasses = usedWordClasses.Intersect(value.WordClasses.SelectMany(static wc => wc)).ToArray();
 
-                if (wordClasses.Count is 0)
+                if (wordClasses.Length is 0)
                 {
                     continue;
                 }

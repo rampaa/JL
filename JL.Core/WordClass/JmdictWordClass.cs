@@ -8,9 +8,9 @@ internal sealed class JmdictWordClass
 
     [JsonPropertyName("R")] public List<string>? Readings { get; }
 
-    [JsonPropertyName("C")] public List<string> WordClasses { get; }
+    [JsonPropertyName("C")] public string[] WordClasses { get; }
 
-    public JmdictWordClass(string spelling, List<string>? readings, List<string> wordClasses)
+    public JmdictWordClass(string spelling, List<string>? readings, string[] wordClasses)
     {
         Spelling = spelling;
         Readings = readings;
