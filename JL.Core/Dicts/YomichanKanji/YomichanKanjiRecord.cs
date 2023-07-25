@@ -15,13 +15,13 @@ internal sealed class YomichanKanjiRecord : IDictRecord
 
     public YomichanKanjiRecord(IReadOnlyList<JsonElement> jsonElement)
     {
-        OnReadings = jsonElement[1].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
+        OnReadings = jsonElement[1].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (OnReadings.Length is 0)
         {
             OnReadings = null;
         }
 
-        KunReadings = jsonElement[2].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
+        KunReadings = jsonElement[2].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (KunReadings.Length is 0)
         {
             KunReadings = null;

@@ -172,9 +172,8 @@ internal sealed partial class DictOptionsControl : UserControl
 
         if (ExamplesOption.ValidDictTypes.Contains(dict.Type))
         {
-            ExamplesComboBox.ItemsSource = Enum.GetValues<ExamplesOptionValue>().ToArray();
+            ExamplesComboBox.ItemsSource = Enum.GetValues<ExamplesOptionValue>();
             ExamplesComboBox.SelectedValue = dict.Options?.Examples?.Value ?? ExamplesOptionValue.None;
-
             ExamplesDockPanel.Visibility = Visibility.Visible;
         }
 
@@ -187,7 +186,6 @@ internal sealed partial class DictOptionsControl : UserControl
         if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(dict.Type))
         {
             PitchAccentMarkerColorButton.Background = DictOptionManager.PitchAccentMarkerColor;
-
             PitchAccentMarkerColorDockPanel.Visibility = Visibility.Visible;
         }
 
@@ -212,7 +210,6 @@ internal sealed partial class DictOptionsControl : UserControl
         if (POrthographyInfoColorOption.ValidDictTypes.Contains(dict.Type))
         {
             POrthographyInfoColorButton.Background = DictOptionManager.POrthographyInfoColor;
-
             POrthographyInfoColorDockPanel.Visibility = Visibility.Visible;
         }
 

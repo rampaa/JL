@@ -14,9 +14,9 @@ internal static class FrequencyYomichanLoader
 
         Dictionary<string, List<FrequencyRecord>> freqDict = freq.Contents;
 
-        string[] jsonFiles = Directory.EnumerateFiles(freq.Path, "*_bank_*.json", SearchOption.TopDirectoryOnly)
+        List<string> jsonFiles = Directory.EnumerateFiles(freq.Path, "*_bank_*.json", SearchOption.TopDirectoryOnly)
             .Where(static s => s.Contains("term", StringComparison.Ordinal) || s.Contains("kanji", StringComparison.Ordinal))
-            .ToArray();
+            .ToList();
 
         foreach (string jsonFile in jsonFiles)
         {

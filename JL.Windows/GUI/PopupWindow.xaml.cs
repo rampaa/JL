@@ -1463,10 +1463,10 @@ internal sealed partial class PopupWindow : Window
         string? primarySpelling = null;
         string? reading = null;
 
-        StackPanel[] visibleStackPanels = PopupListBox.Items.Cast<StackPanel>()
-            .Where(static stackPanel => stackPanel.Visibility is Visibility.Visible).ToArray();
+        List<StackPanel> visibleStackPanels = PopupListBox.Items.Cast<StackPanel>()
+            .Where(static stackPanel => stackPanel.Visibility is Visibility.Visible).ToList();
 
-        if (visibleStackPanels.Length is 0)
+        if (visibleStackPanels.Count is 0)
         {
             return;
         }

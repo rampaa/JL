@@ -17,16 +17,16 @@ public static class CustomWordLoader
 
                 if (lParts.Length > 3)
                 {
-                    string[] spellings = lParts[0].Split(';').Select(static s => s.Trim()).ToArray();
+                    string[] spellings = lParts[0].Split(';');
 
-                    string[]? readings = lParts[1].Split(';').Select(static r => r.Trim()).ToArray();
+                    string[]? readings = lParts[1].Split(';');
 
                     if (readings.Length is 0)
                     {
                         readings = null;
                     }
 
-                    string[] definitions = lParts[2].Split(';').Select(static d => d.Trim()).ToArray();
+                    string[] definitions = lParts[2].Split(';');
                     string partOfSpeech = lParts[3].Trim();
 
                     List<string>? wordClasses = null;
