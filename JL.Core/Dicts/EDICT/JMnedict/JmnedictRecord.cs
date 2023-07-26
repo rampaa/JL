@@ -8,20 +8,19 @@ internal sealed class JmnedictRecord : IDictRecord
 {
     public int Id { get; set; }
     public string PrimarySpelling { get; }
-    public List<string>? AlternativeSpellings { get; set; }
-    public List<string>? Readings { get; set; }
-    public List<List<string>> NameTypes { get; set; }
-    public List<List<string>> Definitions { get; set; }
+    public string[]? AlternativeSpellings { get; set; }
+    public string[]? Readings { get; set; }
+    public string[][] NameTypes { get; set; }
+    public string[][] Definitions { get; set; }
     //public List<List<string>?>? RelatedTerms { get; set; }
 
-    public JmnedictRecord(string primarySpelling)
+    public JmnedictRecord(string primarySpelling, string[]? readings, string[][] definitions, string[][] nameTypes)
     {
         PrimarySpelling = primarySpelling;
+        Readings = readings;
+        Definitions = definitions;
+        NameTypes = nameTypes;
         Id = 0;
-        AlternativeSpellings = new List<string>();
-        Readings = new List<string>();
-        NameTypes = new List<List<string>>();
-        Definitions = new List<List<string>>();
         //RelatedTerms = new List<List<string>?>();
     }
 
@@ -31,24 +30,24 @@ internal sealed class JmnedictRecord : IDictRecord
             ? ""
             : "\n";
 
-        bool multipleDefinitions = Definitions.Count > 1;
+        bool multipleDefinitions = Definitions.Length > 1;
 
         StringBuilder defResult = new();
 
-        for (int i = 0; i < Definitions.Count; i++)
+        for (int i = 0; i < Definitions.Length; i++)
         {
-            List<string> definitions = Definitions[i];
+            string[] definitions = Definitions[i];
 
             if (multipleDefinitions)
             {
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
-            if (NameTypes?.Count >= i)
+            if (NameTypes?.Length >= i)
             {
-                List<string> nameTypes = NameTypes[i];
+                string[] nameTypes = NameTypes[i];
 
-                if (nameTypes.Count > 1 || !nameTypes.Contains("unclass"))
+                if (nameTypes.Length > 1 || !nameTypes.Contains("unclass"))
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", nameTypes)}) ");
                 }

@@ -18,64 +18,104 @@ internal static class JmdictRecordBuilder
         {
             KanjiElement kanjiElement = entry.KanjiElements[i];
 
-            JmdictRecord record = new(kanjiElement.Keb)
-            {
-                PrimarySpellingOrthographyInfoList = kanjiElement.KeInfList
-            };
-
             //record.PriorityList = kanjiElement.KePriList;
 
-            int lREleListCount = entry.ReadingElements.Count;
-            for (int j = 0; j < lREleListCount; j++)
+            List<string> readingList = new();
+            List<string[]?> readingsOrthographyInfoList = new();
+            for (int j = 0; j < entry.ReadingElements.Count; j++)
             {
                 ReadingElement readingElement = entry.ReadingElements[j];
 
-                if (readingElement.ReRestrList.Count is 0 || readingElement.ReRestrList.Contains(record.PrimarySpelling))
+                if (readingElement.ReRestrList.Count is 0 || readingElement.ReRestrList.Contains(kanjiElement.Keb))
                 {
-                    record.Readings?.Add(readingElement.Reb);
-                    record.ReadingsOrthographyInfoList?.Add(readingElement.ReInfList);
+                    readingList.Add(readingElement.Reb);
+                    readingsOrthographyInfoList.Add(readingElement.ReInfList.ToArray().TrimStringArray());
                 }
             }
 
-            int senseListCount = entry.SenseList.Count;
-            for (int j = 0; j < senseListCount; j++)
+            List<string[]> definitionList = new();
+            List<string[]> wordClassList = new();
+            List<string[]?> readingRestrictionList = new();
+            List<string[]?> spellingRestrictionList = new();
+            List<string[]?> fieldList = new();
+            List<string[]?> miscList = new();
+            List<string[]?> dialectList = new();
+            List<string?> definitionInfoList = new();
+            List<string[]?> relatedTermList = new();
+            List<string[]?> antonymList = new();
+            List<LoanwordSource[]?> loanwordSourceList = new();
+            for (int j = 0; j < entry.SenseList.Count; j++)
             {
                 Sense sense = entry.SenseList[j];
 
                 if ((sense.StagKList.Count is 0 && sense.StagRList.Count is 0)
-                    || sense.StagKList.Contains(record.PrimarySpelling)
-                    || sense.StagRList.Intersect(record.Readings!).Any())
+                    || sense.StagKList.Contains(kanjiElement.Keb)
+                    || sense.StagRList.Intersect(readingList).Any())
                 {
-                    ProcessSense(record, sense);
+                    definitionList.Add(sense.GlossList.ToArray());
+                    wordClassList.Add(sense.PosList.ToArray());
+                    readingRestrictionList.Add(sense.StagRList.ToArray().TrimStringArray());
+                    spellingRestrictionList.Add(sense.StagKList.ToArray().TrimStringArray());
+                    fieldList.Add(sense.FieldList.ToArray().TrimStringArray());
+                    miscList.Add(sense.MiscList.ToArray().TrimStringArray());
+                    dialectList.Add(sense.DialList.ToArray().TrimStringArray());
+                    definitionInfoList.Add(sense.SInf);
+                    relatedTermList.Add(sense.XRefList.ToArray().TrimStringArray());
+                    antonymList.Add(sense.AntList.ToArray().TrimStringArray());
+                    loanwordSourceList.Add(sense.LSourceList.TrimListToArray());
                 }
             }
+
+            JmdictRecord record = new(entry.Id,
+                kanjiElement.Keb,
+                kanjiElement.KeInfList.ToArray().TrimStringArray(),
+                readingList.ToArray().TrimStringArray(),
+                readingsOrthographyInfoList.TrimListOfArraysToArrayOfArrays(),
+                definitionList.ToArray(),
+                wordClassList.ToArray(),
+                spellingRestrictionList.TrimListOfArraysToArrayOfArrays(),
+                readingRestrictionList.TrimListOfArraysToArrayOfArrays(),
+                fieldList.TrimListOfArraysToArrayOfArrays(),
+                miscList.TrimListOfArraysToArrayOfArrays(),
+                definitionInfoList.TrimListToArray(),
+                dialectList.TrimListOfArraysToArrayOfArrays(),
+                loanwordSourceList.TrimListOfArraysToArrayOfArrays(),
+                relatedTermList.TrimListOfArraysToArrayOfArrays(),
+                antonymList.TrimListOfArraysToArrayOfArrays());
 
             recordDictionary.Add(record.PrimarySpelling, record);
         }
 
-        List<string> alternativeSpellings = recordDictionary.Keys.ToList();
+        List<string> allSpellings = recordDictionary.Keys.ToList();
 
         foreach ((string key, JmdictRecord result) in recordDictionary)
         {
-            int alternativeSpellingsCount = alternativeSpellings.Count;
-            for (int i = 0; i < alternativeSpellingsCount; i++)
+            List<string> alternativeSpellingList = new();
+            List<string[]?> alternativeSpellingsOrthographyInfoList = new();
+            for (int i = 0; i < allSpellings.Count; i++)
             {
-                string spelling = alternativeSpellings[i];
+                string spelling = allSpellings[i];
 
                 if (key != spelling)
                 {
-                    result.AlternativeSpellings!.Add(spelling);
+                    alternativeSpellingList.Add(spelling);
 
                     if (recordDictionary.TryGetValue(spelling, out JmdictRecord? tempResult))
                     {
-                        result.AlternativeSpellingsOrthographyInfoList!.Add(tempResult.PrimarySpellingOrthographyInfoList);
+                        alternativeSpellingsOrthographyInfoList.Add(tempResult.PrimarySpellingOrthographyInfo);
                     }
                 }
             }
+
+            result.AlternativeSpellings = alternativeSpellingList.Count > 0
+                ? alternativeSpellingList.ToArray()
+                : null;
+
+            result.AlternativeSpellingsOrthographyInfo = alternativeSpellingsOrthographyInfoList.TrimListOfArraysToArrayOfArrays();
         }
 
         List<string> allReadings = entry.ReadingElements.Select(static rEle => rEle.Reb).ToList();
-        List<List<string>> allROrthographyInfoLists = entry.ReadingElements.Select(static rEle => rEle.ReInfList).ToList();
+        List<string[]?> allROrthographyInfoLists = entry.ReadingElements.Select(static rEle => rEle.ReInfList.ToArray().TrimStringArray()).ToList();
 
         int rEleListCount = entry.ReadingElements.Count;
         for (int i = 0; i < rEleListCount; i++)
@@ -89,80 +129,104 @@ internal static class JmdictRecordBuilder
                 continue;
             }
 
-            JmdictRecord record;
+            string primarySpelling;
+            string[]? primarySpellingOrthographyInfo = null;
+            string[]? readings = null;
+            string[]?[]? readingsOrthographyInfo = null;
+            string[]? alternativeSpellings;
+            string[]?[]? alternativeSpellingsOrthographyInfo = null;
 
-            if (readingElement.ReRestrList.Count > 0 || alternativeSpellings.Count > 0)
+            if (readingElement.ReRestrList.Count > 0 || allSpellings.Count > 0)
             {
                 if (readingElement.ReRestrList.Count > 0)
                 {
-                    record = new JmdictRecord(readingElement.ReRestrList[0]) { AlternativeSpellings = readingElement.ReRestrList };
+                    primarySpelling = readingElement.ReRestrList[0];
+                    alternativeSpellings = readingElement.ReRestrList.RemoveAtToArray(0);
                 }
 
                 else
                 {
-                    record = new JmdictRecord(alternativeSpellings[0]) { AlternativeSpellings = alternativeSpellings.ToList() };
+                    primarySpelling = allSpellings[0];
+                    alternativeSpellings = allSpellings.RemoveAtToArray(0);
                 }
 
-                record.AlternativeSpellings.RemoveAt(0);
-
-                if (recordDictionary.TryGetValue(record.PrimarySpelling, out JmdictRecord? mainEntry))
+                if (recordDictionary.TryGetValue(primarySpelling, out JmdictRecord? mainEntry))
                 {
-                    record.Readings = mainEntry.Readings;
-                    record.AlternativeSpellingsOrthographyInfoList = mainEntry.AlternativeSpellingsOrthographyInfoList;
-                    record.ReadingsOrthographyInfoList = mainEntry.ReadingsOrthographyInfoList;
+                    readings = mainEntry.Readings;
+                    alternativeSpellingsOrthographyInfo = mainEntry.AlternativeSpellingsOrthographyInfo;
+                    readingsOrthographyInfo = mainEntry.ReadingsOrthographyInfo;
                 }
             }
 
             else
             {
-                record = new JmdictRecord(readingElement.Reb)
-                {
-                    PrimarySpellingOrthographyInfoList = readingElement.ReInfList,
-                    AlternativeSpellings = allReadings.ToList(),
-                    AlternativeSpellingsOrthographyInfoList = allROrthographyInfoLists.ToList()!
-                };
+                primarySpelling = readingElement.Reb;
+                primarySpellingOrthographyInfo = readingElement.ReInfList.ToArray().TrimStringArray();
 
-                record.AlternativeSpellings.RemoveAt(i);
-                record.AlternativeSpellingsOrthographyInfoList.RemoveAt(i);
+                alternativeSpellings = allReadings.RemoveAtToArray(i);
+                alternativeSpellingsOrthographyInfo = allROrthographyInfoLists.RemoveAtToArray(i);
             }
 
-            int senseListCount = entry.SenseList.Count;
-            for (int j = 0; j < senseListCount; j++)
+            List<string[]> definitionList = new();
+            List<string[]> wordClassList = new();
+            List<string[]?> readingRestrictionList = new();
+            List<string[]?> spellingRestrictionList = new();
+            List<string[]?> fieldList = new();
+            List<string[]?> miscList = new();
+            List<string[]?> dialectList = new();
+            List<string?> definitionInfoList = new();
+            List<string[]?> relatedTermList = new();
+            List<string[]?> antonymList = new();
+            List<LoanwordSource[]?> loanwordSourceList = new();
+            for (int j = 0; j < entry.SenseList.Count; j++)
             {
                 Sense sense = entry.SenseList[j];
 
                 if ((sense.StagKList.Count is 0 && sense.StagRList.Count is 0)
                     || sense.StagRList.Contains(readingElement.Reb)
-                    || sense.StagKList.Contains(record.PrimarySpelling)
-                    || sense.StagKList.Intersect(record.AlternativeSpellings).Any())
+                    || sense.StagKList.Contains(primarySpelling)
+                    || (alternativeSpellings is not null && sense.StagKList.Intersect(alternativeSpellings).Any()))
                 {
-                    ProcessSense(record, sense);
+                    definitionList.Add(sense.GlossList.ToArray());
+                    wordClassList.Add(sense.PosList.ToArray());
+                    readingRestrictionList.Add(sense.StagRList.ToArray().TrimStringArray());
+                    spellingRestrictionList.Add(sense.StagKList.ToArray().TrimStringArray());
+                    fieldList.Add(sense.FieldList.ToArray().TrimStringArray());
+                    miscList.Add(sense.MiscList.ToArray().TrimStringArray());
+                    dialectList.Add(sense.DialList.ToArray().TrimStringArray());
+                    definitionInfoList.Add(sense.SInf);
+                    relatedTermList.Add(sense.XRefList.ToArray().TrimStringArray());
+                    antonymList.Add(sense.AntList.ToArray().TrimStringArray());
+                    loanwordSourceList.Add(sense.LSourceList.TrimListToArray());
                 }
             }
+
+            JmdictRecord record = new(entry.Id,
+                primarySpelling,
+                primarySpellingOrthographyInfo,
+                readings,
+                readingsOrthographyInfo,
+                definitionList.ToArray(),
+                wordClassList.ToArray(),
+                spellingRestrictionList.TrimListOfArraysToArrayOfArrays(),
+                readingRestrictionList.TrimListOfArraysToArrayOfArrays(),
+                fieldList.TrimListOfArraysToArrayOfArrays(),
+                miscList.TrimListOfArraysToArrayOfArrays(),
+                definitionInfoList.TrimListToArray(),
+                dialectList.TrimListOfArraysToArrayOfArrays(),
+                loanwordSourceList.TrimListOfArraysToArrayOfArrays(),
+                relatedTermList.TrimListOfArraysToArrayOfArrays(),
+                antonymList.TrimListOfArraysToArrayOfArrays())
+            {
+                AlternativeSpellings = alternativeSpellings,
+                AlternativeSpellingsOrthographyInfo = alternativeSpellingsOrthographyInfo
+            };
 
             recordDictionary.Add(key, record);
         }
 
         foreach ((string dictKey, JmdictRecord jmdictRecord) in recordDictionary)
         {
-            jmdictRecord.Definitions = Utils.TrimListOfLists(jmdictRecord.Definitions);
-            jmdictRecord.WordClasses = Utils.TrimListOfLists(jmdictRecord.WordClasses);
-            jmdictRecord.Readings = Utils.TrimStringList(jmdictRecord.Readings!);
-            jmdictRecord.AlternativeSpellings = Utils.TrimStringList(jmdictRecord.AlternativeSpellings!);
-            jmdictRecord.PrimarySpellingOrthographyInfoList = Utils.TrimStringList(jmdictRecord.PrimarySpellingOrthographyInfoList!);
-            jmdictRecord.DefinitionInfo = Utils.TrimStringList(jmdictRecord.DefinitionInfo!)!;
-            jmdictRecord.ReadingRestrictions = Utils.TrimNullableListOfLists(jmdictRecord.ReadingRestrictions!);
-            jmdictRecord.SpellingRestrictions = Utils.TrimNullableListOfLists(jmdictRecord.SpellingRestrictions!);
-            jmdictRecord.Dialects = Utils.TrimNullableListOfLists(jmdictRecord.Dialects!);
-            jmdictRecord.MiscList = Utils.TrimNullableListOfLists(jmdictRecord.MiscList!);
-            jmdictRecord.AlternativeSpellingsOrthographyInfoList = Utils.TrimNullableListOfLists(jmdictRecord.AlternativeSpellingsOrthographyInfoList!);
-            jmdictRecord.ReadingsOrthographyInfoList = Utils.TrimNullableListOfLists(jmdictRecord.ReadingsOrthographyInfoList!);
-            jmdictRecord.FieldList = Utils.TrimNullableListOfLists(jmdictRecord.FieldList!);
-            jmdictRecord.RelatedTerms = Utils.TrimNullableListOfLists(jmdictRecord.RelatedTerms!);
-            jmdictRecord.Antonyms = Utils.TrimNullableListOfLists(jmdictRecord.Antonyms!);
-            jmdictRecord.LoanwordEtymology = Utils.TrimNullableListOfLists(jmdictRecord.LoanwordEtymology!);
-            jmdictRecord.Id = entry.Id;
-
             string key = JapaneseUtils.KatakanaToHiragana(dictKey);
             if (jmdictDictionary.TryGetValue(key, out List<IDictRecord>? tempRecordList))
             {
@@ -173,20 +237,5 @@ internal static class JmdictRecordBuilder
                 jmdictDictionary.Add(key, new List<IDictRecord> { jmdictRecord });
             }
         }
-    }
-
-    private static void ProcessSense(JmdictRecord jmdictRecord, Sense sense)
-    {
-        jmdictRecord.Definitions.Add(sense.GlossList);
-        jmdictRecord.WordClasses.Add(sense.PosList);
-        jmdictRecord.ReadingRestrictions!.Add(sense.StagRList);
-        jmdictRecord.SpellingRestrictions!.Add(sense.StagKList);
-        jmdictRecord.FieldList!.Add(sense.FieldList);
-        jmdictRecord.MiscList!.Add(sense.MiscList);
-        jmdictRecord.Dialects!.Add(sense.DialList);
-        jmdictRecord.DefinitionInfo!.Add(sense.SInf);
-        jmdictRecord.RelatedTerms!.Add(sense.XRefList);
-        jmdictRecord.Antonyms!.Add(sense.AntList);
-        jmdictRecord.LoanwordEtymology!.Add(sense.LSourceList);
     }
 }

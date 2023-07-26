@@ -75,4 +75,68 @@ public static class ExtensionMethods
 
         return destination;
     }
+
+    public static T[]? RemoveAtToArray<T>(this List<T> list, int index)
+    {
+        if (index >= list.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
+        if (list.Count is 1 || list.All(l => l is null))
+        {
+            return null;
+        }
+
+        var array = new T[list.Count - 1];
+
+        bool hasNonNullElement = false;
+        int arrayIndex = 0;
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (i != index)
+            {
+                T element = list[i];
+                array[arrayIndex] = element;
+                ++arrayIndex;
+
+                if (element is not null)
+                {
+                    hasNonNullElement = true;
+                }
+            }
+        }
+
+        return hasNonNullElement ? array : null;
+    }
+
+    internal static string[]? TrimStringArray(this string[]? array)
+    {
+        if (array is null || array.Length is 0 || array.All(string.IsNullOrEmpty))
+        {
+            return null;
+        }
+
+        return array;
+    }
+
+    internal static T[]?[]? TrimListOfArraysToArrayOfArrays<T>(this List<T[]?> list)
+    {
+        if (list.Count is 0 || list.All(array => array is null))
+        {
+            return null;
+        }
+
+        return list.ToArray();
+    }
+
+    internal static T?[]? TrimListToArray<T>(this List<T?> list)
+    {
+        if (list.Count is 0 || list.All(array => array is null))
+        {
+            return null;
+        }
+
+        return list.ToArray();
+    }
 }

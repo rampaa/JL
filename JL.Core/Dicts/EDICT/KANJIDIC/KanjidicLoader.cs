@@ -51,7 +51,13 @@ internal static class KanjidicLoader
     {
         string key = await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false);
 
-        KanjidicRecord entry = new();
+        int grade = -1;
+        int strokeCount = 0;
+        int frequency = 0;
+        List<string> definitionList = new();
+        List<string> nanoriReadingList = new();
+        List<string> onReadingList = new();
+        List<string> kunReadingList = new();
 
         while (!xmlReader.EOF)
         {
@@ -65,22 +71,22 @@ internal static class KanjidicLoader
                 switch (xmlReader.Name)
                 {
                     case "grade":
-                        entry.Grade = xmlReader.ReadElementContentAsInt();
+                        grade = xmlReader.ReadElementContentAsInt();
                         break;
 
                     case "stroke_count":
-                        entry.StrokeCount = xmlReader.ReadElementContentAsInt();
+                        strokeCount = xmlReader.ReadElementContentAsInt();
                         break;
 
                     case "freq":
-                        entry.Frequency = xmlReader.ReadElementContentAsInt();
+                        frequency = xmlReader.ReadElementContentAsInt();
                         break;
 
                     case "meaning":
                         // English definition
                         if (!xmlReader.HasAttributes)
                         {
-                            entry.Definitions!.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+                            definitionList.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
                         }
                         else
                         {
@@ -90,18 +96,18 @@ internal static class KanjidicLoader
                         break;
 
                     case "nanori":
-                        entry.NanoriReadings!.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+                        nanoriReadingList.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
                         break;
 
                     case "reading":
                         switch (xmlReader.GetAttribute("r_type"))
                         {
                             case "ja_on":
-                                entry.OnReadings!.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+                                onReadingList.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
                                 break;
 
                             case "ja_kun":
-                                entry.KunReadings!.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+                                kunReadingList.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
                                 break;
 
                             default:
@@ -123,10 +129,12 @@ internal static class KanjidicLoader
             }
         }
 
-        entry.NanoriReadings = Utils.TrimStringList(entry.NanoriReadings!);
-        entry.Definitions = Utils.TrimStringList(entry.Definitions!);
-        entry.OnReadings = Utils.TrimStringList(entry.OnReadings!);
-        entry.KunReadings = Utils.TrimStringList(entry.KunReadings!);
+        string[]? definitions = definitionList.ToArray().TrimStringArray();
+        string[]? onReadings = onReadingList.ToArray().TrimStringArray();
+        string[]? kunReadings = kunReadingList.ToArray().TrimStringArray();
+        string[]? nanoriReadings = nanoriReadingList.ToArray().TrimStringArray();
+
+        KanjidicRecord entry = new(definitions, onReadings, kunReadings, nanoriReadings, strokeCount, grade, frequency);
 
         kanjidicDictionary.Add(key, new List<IDictRecord> { entry });
     }

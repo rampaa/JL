@@ -25,8 +25,7 @@ internal static class JmdictWordClassUtils
 
                 if (jmdictWordClass.Readings is not null)
                 {
-                    int readingCount = jmdictWordClass.Readings.Count;
-                    for (int j = 0; j < readingCount; j++)
+                    for (int j = 0; j < jmdictWordClass.Readings.Length; j++)
                     {
                         string reading = jmdictWordClass.Readings[j];
 
@@ -89,8 +88,7 @@ internal static class JmdictWordClassUtils
 
                 if (value.AlternativeSpellings is not null)
                 {
-                    int alternativeSpellingCount = value.AlternativeSpellings.Count;
-                    for (int j = 0; j < alternativeSpellingCount; j++)
+                    for (int j = 0; j < value.AlternativeSpellings.Length; j++)
                     {
                         string spelling = value.AlternativeSpellings[j];
 

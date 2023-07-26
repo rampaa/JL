@@ -569,19 +569,20 @@ public static class LookupUtils
                 {
                     var jMDictResult = (JmdictRecord)wordResult.Results[i][j];
 
-                    List<List<string>?>? rLists = jMDictResult.ReadingsOrthographyInfoList;
-                    List<List<string>?>? aLists = jMDictResult.AlternativeSpellingsOrthographyInfoList;
+
+                    string[]?[]? rLists = jMDictResult.ReadingsOrthographyInfo;
+                    string[]?[]? aLists = jMDictResult.AlternativeSpellingsOrthographyInfo;
                     List<string> rOrthographyInfoList = new();
                     List<string> aOrthographyInfoList = new();
 
-                    for (int k = 0; k < rLists?.Count; k++)
+                    for (int k = 0; k < rLists?.Length; k++)
                     {
                         StringBuilder formattedROrthographyInfo = new();
 
-                        List<string>? rList = rLists[k];
-                        if (rList?.Count > 0)
+                        string[]? rList = rLists[k];
+                        if (rList?.Length > 0)
                         {
-                            for (int l = 0; l < rList.Count; l++)
+                            for (int l = 0; l < rList.Length; l++)
                             {
                                 _ = formattedROrthographyInfo.Append(CultureInfo.InvariantCulture, $"{rList[l]}, ");
                             }
@@ -590,14 +591,14 @@ public static class LookupUtils
                         }
                     }
 
-                    for (int k = 0; k < aLists?.Count; k++)
+                    for (int k = 0; k < aLists?.Length; k++)
                     {
                         StringBuilder formattedAOrthographyInfo = new();
 
-                        List<string>? aList = aLists[k];
-                        if (aList?.Count > 0)
+                        string[]? aList = aLists[k];
+                        if (aList?.Length > 0)
                         {
-                            for (int l = 0; l < aList.Count; l++)
+                            for (int l = 0; l < aList.Length; l++)
                             {
                                 _ = formattedAOrthographyInfo.Append(CultureInfo.InvariantCulture, $"{aList[l]}, ");
                             }
@@ -616,7 +617,7 @@ public static class LookupUtils
                         alternativeSpellings: jMDictResult.AlternativeSpellings,
                         process: ProcessProcess(wordResult.Processes?[i]),
                         frequencies: GetWordFrequencies(jMDictResult),
-                        primarySpellingOrthographyInfoList: jMDictResult.PrimarySpellingOrthographyInfoList,
+                        primarySpellingOrthographyInfoList: jMDictResult.PrimarySpellingOrthographyInfo,
                         readingsOrthographyInfoList: rOrthographyInfoList,
                         alternativeSpellingsOrthographyInfoList: aOrthographyInfoList,
                         dict: wordResult.Dict,

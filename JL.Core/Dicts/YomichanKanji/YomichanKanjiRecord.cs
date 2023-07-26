@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using JL.Core.Dicts.Options;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.YomichanKanji;
 
@@ -10,8 +11,8 @@ internal sealed class YomichanKanjiRecord : IDictRecord
     public string[]? OnReadings { get; }
     public string[]? KunReadings { get; }
     //public string[]? Tags { get; }
-    private List<string>? Definitions { get; }
-    private List<string>? Stats { get; }
+    private string[]? Definitions { get; }
+    private string[]? Stats { get; }
 
     public YomichanKanjiRecord(IReadOnlyList<JsonElement> jsonElement)
     {
@@ -33,29 +34,23 @@ internal sealed class YomichanKanjiRecord : IDictRecord
         //    Tags = null;
         //}
 
+        List<string> definitionList = new();
         JsonElement definitionsArray = jsonElement[4];
-        Definitions = new List<string>();
         foreach (JsonElement definition in definitionsArray.EnumerateArray())
         {
-            Definitions.Add(definition.ToString());
+            definitionList.Add(definition.ToString());
         }
 
-        if (Definitions.Count is 0)
-        {
-            Definitions = null;
-        }
+        Definitions = definitionList.ToArray().TrimStringArray();
 
+        List<string> statList = new();
         JsonElement statsElement = jsonElement[5];
-        Stats = new List<string>();
         foreach (JsonProperty stat in statsElement.EnumerateObject())
         {
-            Stats.Add(string.Create(CultureInfo.InvariantCulture, $"{stat.Name}: {stat.Value}"));
+            statList.Add(string.Create(CultureInfo.InvariantCulture, $"{stat.Name}: {stat.Value}"));
         }
 
-        if (Stats.Count is 0)
-        {
-            Stats = null;
-        }
+        Stats = statList.Count > 0 ? statList.ToArray() : null;
     }
 
     public string? BuildFormattedDefinition(DictOptions? options)
@@ -71,7 +66,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
             ? "\n"
             : "; ";
 
-        for (int i = 0; i < Definitions.Count; i++)
+        for (int i = 0; i < Definitions.Length; i++)
         {
             _ = defResult.Append(CultureInfo.InvariantCulture, $"{Definitions[i]}{separator}");
         }
@@ -88,7 +83,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
 
         StringBuilder statResult = new();
 
-        for (int i = 0; i < Stats.Count; i++)
+        for (int i = 0; i < Stats.Length; i++)
         {
             _ = statResult.Append(CultureInfo.InvariantCulture, $"{Stats[i]}\n");
         }

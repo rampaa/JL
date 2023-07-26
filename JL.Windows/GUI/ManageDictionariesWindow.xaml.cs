@@ -297,9 +297,6 @@ internal sealed partial class ManageDictionariesWindow : Window
                     }
 
                     UpdateDictionariesDisplay();
-
-                    //GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                    //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
                 }
             };
             buttonEdit.Click += (_, _) =>

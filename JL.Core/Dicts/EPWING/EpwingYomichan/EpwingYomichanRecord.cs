@@ -9,7 +9,7 @@ namespace JL.Core.Dicts.EPWING.EpwingYomichan;
 
 internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
 {
-    public List<string>? Definitions { get; set; }
+    public string[]? Definitions { get; set; }
     public string? Reading { get; }
     public string[]? WordClasses { get; }
     public string PrimarySpelling { get; }
@@ -52,11 +52,8 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         //jsonElement[4].TryGetInt32(out int score);
         //Score = score;
 
-        Definitions = GetDefinitionsFromJsonArray(jsonElement[5]);
-        if (Definitions.Count is 0)
-        {
-            Definitions = null;
-        }
+        List<string> definitionList = GetDefinitionsFromJsonArray(jsonElement[5]);
+        Definitions = definitionList.ToArray().TrimStringArray();
 
         //jsonElement[6].TryGetInt32(out int sequence);
         //Sequence = sequence;
@@ -77,7 +74,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
             ? ""
             : "\n";
 
-        for (int i = 0; i < Definitions.Count; i++)
+        for (int i = 0; i < Definitions.Length; i++)
         {
             if (DefinitionTags?.Length > i)
             {

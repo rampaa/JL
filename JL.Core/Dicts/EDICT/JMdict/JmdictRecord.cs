@@ -8,47 +8,44 @@ namespace JL.Core.Dicts.EDICT.JMdict;
 
 internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 {
+    public int Id { get; }
     public string PrimarySpelling { get; }
-    public int Id { get; set; }
-    public List<string>? AlternativeSpellings { get; set; }
-    public List<List<string>> Definitions { get; set; }
-    public List<List<string>?>? ReadingRestrictions { get; set; }
-    public List<List<string>?>? SpellingRestrictions { get; set; }
-    public List<string>? Readings { get; set; }
-    public List<string>? PrimarySpellingOrthographyInfoList { get; set; }
-    public List<List<string>?>? AlternativeSpellingsOrthographyInfoList { get; set; }
-    public List<List<string>?>? ReadingsOrthographyInfoList { get; set; }
-    public List<List<string>> WordClasses { get; set; } //e.g. noun +
-    public List<List<string>?>? FieldList { get; set; } // e.g. "martial arts"
-    public List<List<string>?>? MiscList { get; set; } // e.g. "abbr" +
-    public List<string?>? DefinitionInfo { get; set; } // e.g. "often derog" +
-    public List<List<string>?>? Dialects { get; set; } // e.g. ksb
+    public string[]? PrimarySpellingOrthographyInfo { get; }
+    public string[]? AlternativeSpellings { get; set; }
+    public string[]?[]? AlternativeSpellingsOrthographyInfo { get; set; }
+    public string[]? Readings { get; }
+    public string[]?[]? ReadingsOrthographyInfo { get; }
+    private string[][] Definitions { get; }
+    public string[][] WordClasses { get; } //e.g. noun +
+    private string[]?[]? SpellingRestrictions { get; }
+    private string[]?[]? ReadingRestrictions { get; }
+    private string[]?[]? Fields { get; } // e.g. "martial arts"
+    private string[]?[]? Misc { get; } // e.g. "abbr" +
+    private string?[]? DefinitionInfo { get; } // e.g. "often derog" +
+    private string[]?[]? Dialects { get; } // e.g. ksb
+    private LoanwordSource[]?[]? LoanwordEtymology { get; }
+    private string[]?[]? RelatedTerms { get; }
+    private string[]?[]? Antonyms { get; }
     //public List<string> PriorityList { get; set; } // e.g. gai1
-    public List<List<string>?>? RelatedTerms { get; set; }
-    public List<List<string>?>? Antonyms { get; set; }
-    public List<List<LoanwordSource>?>? LoanwordEtymology { get; set; }
 
-    public JmdictRecord(string primarySpelling)
+    public JmdictRecord(int id, string primarySpelling, string[]? primarySpellingOrthographyInfo, string[]? readings, string[]?[]? readingsOrthographyInfo, string[][] definitions, string[][] wordClasses, string[]?[]? spellingRestrictions, string[]?[]? readingRestrictions, string[]?[]? fields, string[]?[]? misc, string?[]? definitionInfo, string[]?[]? dialects, LoanwordSource[]?[]? loanwordEtymology, string[]?[]? relatedTerms, string[]?[]? antonyms)
     {
+        Id = id;
         PrimarySpelling = primarySpelling;
-        Id = 0;
-        Definitions = new List<List<string>>();
-        ReadingRestrictions = new List<List<string>?>();
-        SpellingRestrictions = new List<List<string>?>();
-        Readings = new List<string>();
-        AlternativeSpellings = new List<string>();
-        PrimarySpellingOrthographyInfoList = new List<string>();
-        AlternativeSpellingsOrthographyInfoList = new List<List<string>?>();
-        ReadingsOrthographyInfoList = new List<List<string>?>();
-        WordClasses = new List<List<string>>();
-        FieldList = new List<List<string>?>();
-        MiscList = new List<List<string>?>();
-        DefinitionInfo = new List<string?>();
-        Dialects = new List<List<string>?>();
-        //PriorityList = new List<string>();
-        RelatedTerms = new List<List<string>?>();
-        Antonyms = new List<List<string>?>();
-        LoanwordEtymology = new List<List<LoanwordSource>?>();
+        PrimarySpellingOrthographyInfo = primarySpellingOrthographyInfo;
+        Readings = readings;
+        ReadingsOrthographyInfo = readingsOrthographyInfo;
+        Definitions = definitions;
+        WordClasses = wordClasses;
+        SpellingRestrictions = spellingRestrictions;
+        ReadingRestrictions = readingRestrictions;
+        Fields = fields;
+        Misc = misc;
+        DefinitionInfo = definitionInfo;
+        Dialects = dialects;
+        LoanwordEtymology = loanwordEtymology;
+        RelatedTerms = relatedTerms;
+        Antonyms = antonyms;
     }
 
     public string BuildFormattedDefinition(DictOptions? options)
@@ -59,11 +56,11 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
         StringBuilder defResult = new();
 
-        bool multipleDefinitions = Definitions.Count > 1;
+        bool multipleDefinitions = Definitions.Length > 1;
         bool showWordClassInfo = options?.WordClassInfo?.Value ?? true;
         bool showDialectInfo = options?.DialectInfo?.Value ?? true;
         bool showExtraDefinitionInfo = options?.ExtraDefinitionInfo?.Value ?? true;
-        bool definitionInfoExists = DefinitionInfo?.Count > 0;
+        bool definitionInfoExists = DefinitionInfo?.Length > 0;
         bool showMiscInfo = options?.MiscInfo?.Value ?? true;
         bool showWordTypeInfo = options?.WordTypeInfo?.Value ?? true;
         bool showSpellingRestrictionInfo = options?.SpellingRestrictionInfo?.Value ?? true;
@@ -71,7 +68,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
         bool showRelatedTerms = options?.RelatedTerm?.Value ?? false;
         bool showAntonyms = options?.Antonym?.Value ?? false;
 
-        for (int i = 0; i < Definitions.Count; i++)
+        for (int i = 0; i < Definitions.Length; i++)
         {
             if (newlines && multipleDefinitions)
             {
@@ -80,8 +77,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
             if (showWordClassInfo)
             {
-                List<string>? wordClasses = WordClasses?[i];
-                if (wordClasses?.Count > 0)
+                string[]? wordClasses = WordClasses?[i];
+                if (wordClasses?.Length > 0)
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", wordClasses)}) ");
                 }
@@ -94,8 +91,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
             if (showDialectInfo)
             {
-                List<string>? dialects = Dialects?[i];
-                if (dialects?.Count > 0)
+                string[]? dialects = Dialects?[i];
+                if (dialects?.Length > 0)
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", dialects)}) ");
                 }
@@ -112,8 +109,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
             if (showMiscInfo)
             {
-                List<string>? misc = MiscList?[i];
-                if (misc?.Count > 0)
+                string[]? misc = Misc?[i];
+                if (misc?.Length > 0)
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", misc)}) ");
                 }
@@ -121,8 +118,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
             if (showWordTypeInfo)
             {
-                List<string>? fields = FieldList?[i];
-                if (fields?.Count > 0)
+                string[]? fields = Fields?[i];
+                if (fields?.Length > 0)
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", fields)}) ");
                 }
@@ -132,21 +129,21 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
             if (showSpellingRestrictionInfo)
             {
-                List<string>? spellingRestrictions = SpellingRestrictions?[i];
-                List<string>? readingRestrictions = ReadingRestrictions?[i];
+                string[]? spellingRestrictions = SpellingRestrictions?[i];
+                string[]? readingRestrictions = ReadingRestrictions?[i];
 
-                if (spellingRestrictions?.Count > 0 || readingRestrictions?.Count > 0)
+                if (spellingRestrictions?.Length > 0 || readingRestrictions?.Length > 0)
                 {
                     _ = defResult.Append("(only applies to ");
 
-                    if (spellingRestrictions?.Count > 0)
+                    if (spellingRestrictions?.Length > 0)
                     {
                         _ = defResult.Append(string.Join("; ", spellingRestrictions));
                     }
 
-                    if (readingRestrictions?.Count > 0)
+                    if (readingRestrictions?.Length > 0)
                     {
-                        if (spellingRestrictions?.Count > 0)
+                        if (spellingRestrictions?.Length > 0)
                         {
                             _ = defResult.Append("; ");
                         }
@@ -160,13 +157,12 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
             if (showLoanwordEtymology)
             {
-                List<LoanwordSource>? lSources = LoanwordEtymology?[i];
-                if (lSources?.Count > 0)
+                LoanwordSource[]? lSources = LoanwordEtymology?[i];
+                if (lSources?.Length > 0)
                 {
                     _ = defResult.Append('(');
 
-                    int lSourceCount = lSources.Count;
-                    for (int j = 0; j < lSourceCount; j++)
+                    for (int j = 0; j < lSources.Length; j++)
                     {
                         LoanwordSource lSource = lSources[j];
                         if (lSource.IsWasei)
@@ -181,7 +177,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                             _ = defResult.Append(CultureInfo.InvariantCulture, $": {lSource.OriginalWord}");
                         }
 
-                        if (j + 1 < lSourceCount)
+                        if (j + 1 < lSources.Length)
                         {
                             _ = defResult.Append(lSource.IsPart ? " + " : ", ");
                         }
@@ -193,8 +189,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
             if (showRelatedTerms)
             {
-                List<string>? relatedTerms = RelatedTerms?[i];
-                if (relatedTerms?.Count > 0)
+                string[]? relatedTerms = RelatedTerms?[i];
+                if (relatedTerms?.Length > 0)
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"(related terms: {string.Join(", ", relatedTerms)}) ");
                 }
@@ -202,8 +198,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
             if (showAntonyms)
             {
-                List<string>? antonyms = Antonyms?[i];
-                if (antonyms?.Count > 0)
+                string[]? antonyms = Antonyms?[i];
+                if (antonyms?.Length > 0)
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"(antonyms: {string.Join(", ", antonyms)}) ");
                 }
@@ -237,8 +233,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
             if (frequency is int.MaxValue && AlternativeSpellings is not null)
             {
-                int alternativeSpellingsCount = AlternativeSpellings.Count;
-                for (int i = 0; i < alternativeSpellingsCount; i++)
+                for (int i = 0; i < AlternativeSpellings.Length; i++)
                 {
                     if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(AlternativeSpellings[i]),
                             out List<FrequencyRecord>? alternativeSpellingFreqResults))
@@ -263,8 +258,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
         else if (Readings is not null)
         {
-            int readingCount = Readings.Count;
-            for (int i = 0; i < readingCount; i++)
+            for (int i = 0; i < Readings.Length; i++)
             {
                 string reading = Readings[i];
 

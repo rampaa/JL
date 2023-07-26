@@ -40,13 +40,13 @@ internal static class EpwingUtils
             case DictType.Kenkyuusha:
                 if ((dict.Options?.Examples?.Value ?? ExamplesOptionValue.None) is ExamplesOptionValue.None)
                 {
-                    if (epwingRecord.Definitions?.Count > 2)
+                    if (epwingRecord.Definitions?.Length > 2)
                     {
-                        for (int i = 2; i < epwingRecord.Definitions.Count; i++)
+                        for (int i = 2; i < epwingRecord.Definitions.Length; i++)
                         {
                             if (!char.IsDigit(epwingRecord.Definitions[i][0]))
                             {
-                                epwingRecord.Definitions.RemoveAt(i);
+                                epwingRecord.Definitions = epwingRecord.Definitions.RemoveAt(i);
                                 --i;
                             }
                         }
@@ -54,11 +54,11 @@ internal static class EpwingUtils
                 }
                 else if (dict.Options is { Examples.Value: ExamplesOptionValue.One })
                 {
-                    if (epwingRecord.Definitions?.Count > 2)
+                    if (epwingRecord.Definitions?.Length > 2)
                     {
                         bool isMainExample = true;
 
-                        for (int i = 2; i < epwingRecord.Definitions.Count; i++)
+                        for (int i = 2; i < epwingRecord.Definitions.Length; i++)
                         {
                             if (char.IsDigit(epwingRecord.Definitions[i][0]))
                             {
@@ -69,7 +69,7 @@ internal static class EpwingUtils
                             {
                                 if (!isMainExample)
                                 {
-                                    epwingRecord.Definitions.RemoveAt(i);
+                                    epwingRecord.Definitions = epwingRecord.Definitions.RemoveAt(i);
                                     --i;
                                 }
 
@@ -81,7 +81,7 @@ internal static class EpwingUtils
 
                 if (epwingRecord.Definitions is not null)
                 {
-                    epwingRecord.Definitions = epwingRecord.Definitions.Select(static def => def.Replace("┏", "", StringComparison.Ordinal)).ToList();
+                    epwingRecord.Definitions = epwingRecord.Definitions.Select(static def => def.Replace("┏", "", StringComparison.Ordinal)).ToArray();
                 }
 
                 break;

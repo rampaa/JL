@@ -644,7 +644,7 @@ internal sealed partial class PopupWindow : Window
             };
         }
 
-        if (result.AlternativeSpellings?.Count > 0)
+        if (result.AlternativeSpellings?.Length > 0)
         {
             List<string>? aOrthographyInfoList = result.AlternativeSpellingsOrthographyInfoList;
             IReadOnlyList<string>? alternativeSpellings = result.AlternativeSpellings;
@@ -714,7 +714,7 @@ internal sealed partial class PopupWindow : Window
             };
         }
 
-        if (result.PrimarySpellingOrthographyInfoList?.Count > 0
+        if (result.PrimarySpellingOrthographyInfoList?.Length > 0
             && (result.Dict.Options?.POrthographyInfo?.Value ?? true))
         {
             textBlockPOrthographyInfo = new TextBlock
@@ -731,7 +731,7 @@ internal sealed partial class PopupWindow : Window
         }
 
         // KANJIDIC
-        if (result.OnReadings?.Count > 0)
+        if (result.OnReadings?.Length > 0)
         {
             textBlockOnReadings = new TextBlock
             {
@@ -746,7 +746,7 @@ internal sealed partial class PopupWindow : Window
             };
         }
 
-        if (result.KunReadings?.Count > 0)
+        if (result.KunReadings?.Length > 0)
         {
             textBlockKunReadings = new TextBlock
             {
@@ -761,7 +761,7 @@ internal sealed partial class PopupWindow : Window
             };
         }
 
-        if (result.NanoriReadings?.Count > 0)
+        if (result.NanoriReadings?.Length > 0)
         {
             textBlockNanoriReadings = new TextBlock
             {

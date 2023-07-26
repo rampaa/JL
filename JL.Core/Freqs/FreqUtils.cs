@@ -130,12 +130,6 @@ public static class FreqUtils
             }
 
             Utils.Frontend.InvalidateDisplayCache();
-
-            //if (runGC)
-            //{
-            //    GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            //    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-            //}
         }
 
         FreqsReady = true;

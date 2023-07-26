@@ -129,9 +129,6 @@ public static class ResourceUpdater
                 dict.Contents.Clear();
                 dict.Contents.TrimExcess();
             }
-
-            //GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
         }
 
         DictUtils.UpdatingJmdict = false;
@@ -159,9 +156,6 @@ public static class ResourceUpdater
                 dict.Contents.Clear();
                 dict.Contents.TrimExcess();
             }
-
-            //GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
         }
 
         DictUtils.UpdatingJmnedict = false;
@@ -189,9 +183,6 @@ public static class ResourceUpdater
                 dict.Contents.Clear();
                 dict.Contents.TrimExcess();
             }
-
-            //GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
         }
 
         DictUtils.UpdatingKanjidic = false;

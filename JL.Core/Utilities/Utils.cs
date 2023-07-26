@@ -142,59 +142,5 @@ public static class Utils
 
         await DictUtils.InitializeKanjiCompositionDict().ConfigureAwait(false);
         await Task.WhenAll(tasks).ConfigureAwait(false);
-
-        //GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-        //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-    }
-
-    internal static List<List<T>?>? TrimNullableListOfLists<T>(List<List<T>?> listOfLists)
-    {
-        bool returnNull = true;
-        for (int i = 0; i < listOfLists.Count; i++)
-        {
-            List<T>? list = listOfLists[i];
-
-            if (list?.Count > 0)
-            {
-                returnNull = false;
-                list.TrimExcess();
-            }
-            else
-            {
-                listOfLists[i] = null;
-            }
-        }
-
-        if (returnNull)
-        {
-            return null;
-        }
-
-        listOfLists.TrimExcess();
-        return listOfLists;
-    }
-
-    internal static List<List<T>> TrimListOfLists<T>(List<List<T>> listOfLists)
-    {
-        for (int i = 0; i < listOfLists.Count; i++)
-        {
-            listOfLists[i].TrimExcess();
-        }
-
-        listOfLists.TrimExcess();
-
-        return listOfLists;
-    }
-
-    internal static List<string>? TrimStringList(List<string> list)
-    {
-        if (list.Count is 0 || list.All(string.IsNullOrEmpty))
-        {
-            return null;
-        }
-
-        list.TrimExcess();
-
-        return list;
     }
 }

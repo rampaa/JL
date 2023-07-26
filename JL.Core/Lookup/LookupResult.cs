@@ -14,16 +14,16 @@ public sealed class LookupResult
     public IList<string>? Readings { get; init; }
     public string? FormattedDefinitions { get; init; }
     public int EdictId { get; init; }
-    public IReadOnlyList<string>? AlternativeSpellings { get; init; }
+    public string[]? AlternativeSpellings { get; init; }
     public string? Process { get; init; }
-    public List<string>? PrimarySpellingOrthographyInfoList { get; init; }
+    public string[]? PrimarySpellingOrthographyInfoList { get; init; }
     public List<string>? ReadingsOrthographyInfoList { get; }
     public List<string>? AlternativeSpellingsOrthographyInfoList { get; }
 
     // Kanji
-    public IReadOnlyList<string>? OnReadings { get; init; }
-    public IReadOnlyList<string>? KunReadings { get; init; }
-    public List<string>? NanoriReadings { get; init; }
+    public string[]? OnReadings { get; init; }
+    public string[]? KunReadings { get; init; }
+    public string[]? NanoriReadings { get; init; }
     public int StrokeCount { get; init; }
     public string? KanjiComposition { get; init; }
     public int KanjiGrade { get; init; }
@@ -36,13 +36,13 @@ public sealed class LookupResult
         Dict dict,
         IList<string>? readings,
         List<LookupFrequencyResult>? frequencies = null,
-        IReadOnlyList<string>? alternativeSpellings = null,
-        List<string>? primarySpellingOrthographyInfoList = null,
+        string[]? alternativeSpellings = null,
+        string[]? primarySpellingOrthographyInfoList = null,
         List<string>? readingsOrthographyInfoList = null,
         List<string>? alternativeSpellingsOrthographyInfoList = null,
-        IReadOnlyList<string>? onReadings = null,
-        IReadOnlyList<string>? kunReadings = null,
-        List<string>? nanoriReadings = null,
+        string[]? onReadings = null,
+        string[]? kunReadings = null,
+        string[]? nanoriReadings = null,
         string? formattedDefinitions = null,
         string? process = null,
         string? kanjiComposition = null,
