@@ -4,6 +4,43 @@ namespace JL.Core.Dicts.CustomWordDict;
 
 public static class CustomWordLoader
 {
+    private static readonly string[] s_verbs = {
+        "v1",
+        "v1-s",
+        "v4r",
+        "v5aru",
+        "v5b",
+        "v5g",
+        "v5k",
+        "v5k-s",
+        "v5m",
+        "v5n",
+        "v5r",
+        "v5r-i",
+        "v5s",
+        "v5t",
+        "v5u",
+        "v5u-s",
+        "vk",
+        "vs-c",
+        "vs-i",
+        "vs-s",
+        "vz"
+    };
+
+    private static readonly string[] s_adjectives = {
+        "adj-i",
+        "adj-na"
+    };
+
+    private static readonly string[] s_noun = {
+        "noun"
+    };
+
+    private static readonly string[] s_other = {
+        "other"
+    };
+
     internal static async Task Load(string customWordDictPath)
     {
         if (File.Exists(customWordDictPath))
@@ -55,63 +92,14 @@ public static class CustomWordLoader
             string spelling = spellings[i];
 
             bool hasUserDefinedWordClasses = wordClasses?.Length > 0;
-            string[] wordClassArray;
 
-            switch (rawPartOfSpeech)
+            string[] wordClassArray = rawPartOfSpeech switch
             {
-                case "Verb":
-                    if (hasUserDefinedWordClasses)
-                    {
-                        wordClassArray = wordClasses!;
-                    }
-                    else
-                    {
-                        wordClassArray = new[] {
-                            "v1",
-                            "v1-s",
-                            "v4r",
-                            "v5aru",
-                            "v5b",
-                            "v5g",
-                            "v5k",
-                            "v5k-s",
-                            "v5m",
-                            "v5n",
-                            "v5r",
-                            "v5r-i",
-                            "v5s",
-                            "v5t",
-                            "v5u",
-                            "v5u-s",
-                            "vk",
-                            "vs-c",
-                            "vs-i",
-                            "vs-s",
-                            "vz"
-                        };
-                    }
-
-                    break;
-                case "Adjective":
-                    wordClassArray = new[] {
-                        "adj-i",
-                        "adj-na"
-                    };
-
-                    break;
-                case "Noun":
-                    wordClassArray = new[] {
-                        "noun"
-                    };
-
-                    break;
-                default:
-                    wordClassArray = new[] {
-                        "other"
-                    };
-
-                    break;
-            }
+                "Verb" => hasUserDefinedWordClasses ? wordClasses! : s_verbs,
+                "Adjective" => s_adjectives,
+                "Noun" => s_noun,
+                _ => s_other,
+            };
 
             CustomWordRecord newWordRecord = new(spelling, alternativeSpellings, readings, definitions, wordClassArray, hasUserDefinedWordClasses);
 
