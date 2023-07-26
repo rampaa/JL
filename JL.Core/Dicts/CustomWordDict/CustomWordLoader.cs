@@ -41,11 +41,11 @@ public static class CustomWordLoader
         "other"
     };
 
-    internal static async Task Load(string customWordDictPath)
+    internal static async Task Load(Dict dict)
     {
-        if (File.Exists(customWordDictPath))
+        if (File.Exists(dict.Path))
         {
-            string[] lines = await File.ReadAllLinesAsync(customWordDictPath)
+            string[] lines = await File.ReadAllLinesAsync(dict.Path)
                 .ConfigureAwait(false);
 
             for (int i = 0; i < lines.Length; i++)
@@ -72,14 +72,14 @@ public static class CustomWordLoader
                         wordClasses = lParts[4].Split(';');
                     }
 
-                    AddToDictionary(spellings, readings, definitions, partOfSpeech, wordClasses);
+                    AddToDictionary(spellings, readings, definitions, partOfSpeech, wordClasses, dict.Contents);
                 }
             }
         }
     }
 
     public static void AddToDictionary(string[] spellings, string[]? readings, string[] definitions,
-        string rawPartOfSpeech, string[]? wordClasses)
+        string rawPartOfSpeech, string[]? wordClasses, Dictionary<string, List<IDictRecord>> customWordDictionary)
     {
         for (int i = 0; i < spellings.Length; i++)
         {
@@ -102,8 +102,6 @@ public static class CustomWordLoader
             };
 
             CustomWordRecord newWordRecord = new(spelling, alternativeSpellings, readings, definitions, wordClassArray, hasUserDefinedWordClasses);
-
-            Dictionary<string, List<IDictRecord>> customWordDictionary = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary).Contents;
 
             if (customWordDictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(spelling), out List<IDictRecord>? result))
             {

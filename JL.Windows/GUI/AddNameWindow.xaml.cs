@@ -20,6 +20,8 @@ internal sealed partial class AddNameWindow : Window
 
     public static AddNameWindow Instance => s_instance ??= new AddNameWindow();
 
+    private static readonly Dictionary<string, List<IDictRecord>> s_customNameDictionary = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomNameDictionary).Contents;
+
     public AddNameWindow()
     {
         InitializeComponent();
@@ -66,7 +68,7 @@ internal sealed partial class AddNameWindow : Window
                     .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
             string spelling = SpellingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
             string reading = ReadingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
-            CustomNameLoader.AddToDictionary(spelling, reading, nameType);
+            CustomNameLoader.AddToDictionary(spelling, reading, nameType, s_customNameDictionary);
             Utils.Frontend.InvalidateDisplayCache();
             Close();
             await WriteToFile(spelling, reading, nameType).ConfigureAwait(false);

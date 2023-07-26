@@ -20,7 +20,7 @@ internal static class KanjidicLoader
             {
                 while (xmlReader.ReadToFollowing("literal"))
                 {
-                    await ReadCharacter(xmlReader, dict).ConfigureAwait(false);
+                    await ReadCharacter(xmlReader, dict.Contents).ConfigureAwait(false);
                 }
             }
 
@@ -47,7 +47,7 @@ internal static class KanjidicLoader
         }
     }
 
-    private static async Task ReadCharacter(XmlReader xmlReader, Dict dict)
+    private static async Task ReadCharacter(XmlReader xmlReader, Dictionary<string, List<IDictRecord>> kanjidicDictionary)
     {
         string key = await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false);
 
@@ -128,6 +128,6 @@ internal static class KanjidicLoader
         entry.OnReadings = Utils.TrimStringList(entry.OnReadings!);
         entry.KunReadings = Utils.TrimStringList(entry.KunReadings!);
 
-        dict.Contents.Add(key, new List<IDictRecord> { entry });
+        kanjidicDictionary.Add(key, new List<IDictRecord> { entry });
     }
 }

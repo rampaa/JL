@@ -7,7 +7,7 @@ internal static class FrequencyYomichanLoader
 {
     public static async Task Load(Freq freq)
     {
-        if (!Directory.Exists(freq.Path) && !File.Exists(freq.Path))
+        if (!Directory.Exists(freq.Path))
         {
             return;
         }

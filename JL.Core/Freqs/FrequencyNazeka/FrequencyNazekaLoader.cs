@@ -7,6 +7,11 @@ internal static class FrequencyNazekaLoader
 {
     public static async Task Load(Freq freq)
     {
+        if (!File.Exists(freq.Path))
+        {
+            return;
+        }
+
         Dictionary<string, List<FrequencyRecord>> freqDict = freq.Contents;
         Dictionary<string, List<List<JsonElement>>>? frequencyJson;
 
