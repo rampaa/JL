@@ -602,7 +602,7 @@ public static class DictUtils
                     {
                         tasks.Add(Task.Run(async () =>
                         {
-                            await CustomWordLoader.Load(dict.Path).ConfigureAwait(false);
+                            await CustomWordLoader.Load(dict).ConfigureAwait(false);
                             dict.Size = dict.Contents.Count;
                         }));
                     }
@@ -621,7 +621,7 @@ public static class DictUtils
                     {
                         tasks.Add(Task.Run(async () =>
                         {
-                            await CustomNameLoader.Load(dict.Path).ConfigureAwait(false);
+                            await CustomNameLoader.Load(dict).ConfigureAwait(false);
                             dict.Size = dict.Contents.Count;
                         }));
                     }
