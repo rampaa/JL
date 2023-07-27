@@ -18,8 +18,6 @@ internal static class JmdictRecordBuilder
         {
             KanjiElement kanjiElement = entry.KanjiElements[i];
 
-            //record.PriorityList = kanjiElement.KePriList;
-
             List<string> readingList = new();
             List<string[]?> readingsOrthographyInfoList = new();
             for (int j = 0; j < entry.ReadingElements.Count; j++)
@@ -220,6 +218,7 @@ internal static class JmdictRecordBuilder
             {
                 AlternativeSpellings = alternativeSpellings,
                 AlternativeSpellingsOrthographyInfo = alternativeSpellingsOrthographyInfo
+                // Priorities = kanjiElement.KePriList
             };
 
             recordDictionary.Add(key, record);

@@ -98,7 +98,7 @@ public static class CustomWordLoader
                 "Verb" => hasUserDefinedWordClasses ? wordClasses! : s_verbs,
                 "Adjective" => s_adjectives,
                 "Noun" => s_noun,
-                _ => s_other,
+                _ => s_other
             };
 
             CustomWordRecord newWordRecord = new(spelling, alternativeSpellings, readings, definitions, wordClassArray, hasUserDefinedWordClasses);

@@ -68,8 +68,8 @@ internal sealed partial class AddNameWindow : Window
             string reading = ReadingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
 
             Dictionary<string, List<IDictRecord>> customNameDictionary = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomNameDictionary).Contents;
-
             CustomNameLoader.AddToDictionary(spelling, reading, nameType, customNameDictionary);
+
             Utils.Frontend.InvalidateDisplayCache();
             Close();
             await WriteToFile(spelling, reading, nameType).ConfigureAwait(false);

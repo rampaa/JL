@@ -2,15 +2,21 @@ namespace JL.Core.Dicts.EDICT.KANJIDIC;
 
 internal sealed class KanjidicRecord : IDictRecord
 {
-    public string[]? Definitions { get; set; }
-    public string[]? OnReadings { get; set; }
-    public string[]? KunReadings { get; set; }
-    public string[]? NanoriReadings { get; set; }
-    public int StrokeCount { get; set; }
-    public int Grade { get; set; }
-    public int Frequency { get; set; }
+    private string[]? Definitions { get; }
+    public string[]? OnReadings { get; }
+    public string[]? KunReadings { get; }
+    public string[]? NanoriReadings { get; }
+    public int StrokeCount { get; }
+    public int Grade { get; }
+    public int Frequency { get; }
 
-    public KanjidicRecord(string[]? definitions, string[]? onReadings, string[]? kunReadings, string[]? nanoriReadings, int strokeCount, int grade, int frequency)
+    public KanjidicRecord(string[]? definitions,
+        string[]? onReadings,
+        string[]? kunReadings,
+        string[]? nanoriReadings,
+        int strokeCount,
+        int grade,
+        int frequency)
     {
         Definitions = definitions;
         OnReadings = onReadings;

@@ -60,7 +60,7 @@ public static class ExtensionMethods
         return textBlocks;
     }
 
-    public static T[] RemoveAt<T>(this T[] source, int index)
+    internal static T[] RemoveAt<T>(this T[] source, int index)
     {
         T[] destination = new T[source.Length - 1];
         if (index > 0)
@@ -76,14 +76,14 @@ public static class ExtensionMethods
         return destination;
     }
 
-    public static T[]? RemoveAtToArray<T>(this List<T> list, int index)
+    internal static T[]? RemoveAtToArray<T>(this List<T> list, int index)
     {
         if (index >= list.Count)
         {
             throw new ArgumentOutOfRangeException(nameof(index));
         }
 
-        if (list.Count is 1 || list.All(l => l is null))
+        if (list.Count is 1 || list.All(static l => l is null))
         {
             return null;
         }
@@ -122,7 +122,7 @@ public static class ExtensionMethods
 
     internal static T[]?[]? TrimListOfArraysToArrayOfArrays<T>(this List<T[]?> list)
     {
-        if (list.Count is 0 || list.All(array => array is null))
+        if (list.Count is 0 || list.All(static array => array is null))
         {
             return null;
         }
@@ -132,7 +132,7 @@ public static class ExtensionMethods
 
     internal static T?[]? TrimListToArray<T>(this List<T?> list)
     {
-        if (list.Count is 0 || list.All(array => array is null))
+        if (list.Count is 0 || list.All(static array => array is null))
         {
             return null;
         }

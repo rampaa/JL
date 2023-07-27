@@ -6,16 +6,17 @@ namespace JL.Core.Dicts.EDICT.JMnedict;
 
 internal sealed class JmnedictRecord : IDictRecord
 {
-    public int Id { get; set; }
+    public int Id { get; }
     public string PrimarySpelling { get; }
     public string[]? AlternativeSpellings { get; set; }
-    public string[]? Readings { get; set; }
-    public string[][] NameTypes { get; set; }
-    public string[][] Definitions { get; set; }
-    //public List<List<string>?>? RelatedTerms { get; set; }
+    public string[]? Readings { get; }
+    private string[][] Definitions { get; }
+    private string[][] NameTypes { get; }
+    //public string[]?[]? RelatedTerms { get; set; }
 
-    public JmnedictRecord(string primarySpelling, string[]? readings, string[][] definitions, string[][] nameTypes)
+    public JmnedictRecord(int id, string primarySpelling, string[]? readings, string[][] definitions, string[][] nameTypes)
     {
+        Id = id;
         PrimarySpelling = primarySpelling;
         Readings = readings;
         Definitions = definitions;
@@ -55,7 +56,7 @@ internal sealed class JmnedictRecord : IDictRecord
 
             //if (options?.RelatedTerm?.Value ?? false)
             //{
-            //    List<string>? relatedTerms = RelatedTerms?[i];
+            //    string[]? relatedTerms = RelatedTerms?[i];
             //    if (relatedTerms?.Count > 0)
             //    {
             //        _ = defResult.Append("(related terms: {string.Join(", ", relatedTerms)}) ");
