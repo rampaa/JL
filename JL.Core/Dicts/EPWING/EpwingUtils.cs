@@ -86,6 +86,14 @@ internal static class EpwingUtils
 
                 break;
 
+            case DictType.KenkyuushaNazeka:
+                if (epwingRecord.Definitions is not null)
+                {
+                    epwingRecord.Definitions = epwingRecord.Definitions.Select(static def => def.Replace("┏", "", StringComparison.Ordinal)).ToArray();
+                }
+
+                break;
+
             case DictType.Daijirin:
                 if (epwingRecord.Definitions is not null)
                 {
