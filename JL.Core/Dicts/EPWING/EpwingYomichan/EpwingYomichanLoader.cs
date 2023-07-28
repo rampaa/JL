@@ -39,6 +39,11 @@ internal static class EpwingYomichanLoader
             }
         }
 
+        foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+        {
+            dict.Contents[key] = recordList.ToArray();
+        }
+
         dict.Contents.TrimExcess();
     }
 
@@ -51,7 +56,7 @@ internal static class EpwingYomichanLoader
 
         string hiraganaExpression = JapaneseUtils.KatakanaToHiragana(yomichanRecord.PrimarySpelling);
 
-        List<IDictRecord>? records;
+        IList<IDictRecord>? records;
 
         if (!string.IsNullOrEmpty(yomichanRecord.Reading))
         {

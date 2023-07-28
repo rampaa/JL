@@ -22,11 +22,11 @@ internal static class EpwingNazekaLoader
                 .ConfigureAwait(false);
         }
 
-        Dictionary<string, List<IDictRecord>> nazekaEpwingDict = dict.Contents;
+        Dictionary<string, IList<IDictRecord>> nazekaEpwingDict = dict.Contents;
 
         foreach (JsonElement jsonObj in jsonObjects!.Skip(1))
         {
-            string reading = jsonObj.GetProperty("r").ToString();
+            string reading = jsonObj.GetProperty("r").ToString().GetPooledString();
 
             List<string>? spellingList = new();
             foreach (JsonElement spellingJsonElement in jsonObj.GetProperty("s").EnumerateArray())
@@ -35,7 +35,7 @@ internal static class EpwingNazekaLoader
 
                 if (!string.IsNullOrWhiteSpace(spelling))
                 {
-                    spellingList.Add(spelling);
+                    spellingList.Add(spelling.GetPooledString());
                 }
             }
 
@@ -51,7 +51,7 @@ internal static class EpwingNazekaLoader
 
                 if (!string.IsNullOrWhiteSpace(definition))
                 {
-                    definitionList.Add(definition);
+                    definitionList.Add(definition.GetPooledString());
                 }
             }
 
@@ -61,6 +61,7 @@ internal static class EpwingNazekaLoader
             }
 
             string[]? definitions = definitionList?.ToArray();
+            definitions?.DeduplicateStringsInArray();
 
             if (spellingList is not null)
             {
@@ -68,11 +69,11 @@ internal static class EpwingNazekaLoader
 
                 string[]? alternativeSpellings = spellingList.RemoveAtToArray(0);
 
-                string key = JapaneseUtils.KatakanaToHiragana(reading);
+                string key = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
 
                 EpwingNazekaRecord tempRecord = new(primarySpelling, reading, alternativeSpellings, definitions);
 
-                if (nazekaEpwingDict.TryGetValue(key, out List<IDictRecord>? result))
+                if (nazekaEpwingDict.TryGetValue(key, out IList<IDictRecord>? result))
                 {
                     result.Add(tempRecord);
                 }
@@ -87,7 +88,7 @@ internal static class EpwingNazekaLoader
 
                     alternativeSpellings = spellingList.RemoveAtToArray(i);
 
-                    key = JapaneseUtils.KatakanaToHiragana(primarySpelling);
+                    key = JapaneseUtils.KatakanaToHiragana(primarySpelling).GetPooledString();
 
                     tempRecord = new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions);
 
@@ -109,7 +110,7 @@ internal static class EpwingNazekaLoader
 
             else
             {
-                string key = JapaneseUtils.KatakanaToHiragana(reading);
+                string key = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
 
                 EpwingNazekaRecord tempRecord = new(reading, null, null, definitions);
 
@@ -118,7 +119,7 @@ internal static class EpwingNazekaLoader
                     continue;
                 }
 
-                if (nazekaEpwingDict.TryGetValue(key, out List<IDictRecord>? result))
+                if (nazekaEpwingDict.TryGetValue(key, out IList<IDictRecord>? result))
                 {
                     result.Add(tempRecord);
                 }
@@ -127,6 +128,11 @@ internal static class EpwingNazekaLoader
                     nazekaEpwingDict.Add(key, new List<IDictRecord> { tempRecord });
                 }
             }
+        }
+
+        foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+        {
+            dict.Contents[key] = recordList.ToArray();
         }
 
         dict.Contents.TrimExcess();

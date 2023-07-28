@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using JL.Core.Dicts;
+using JL.Core.Utilities;
 
 namespace JL.Core.PitchAccent;
 
@@ -14,7 +15,7 @@ public sealed class PitchAccentRecord : IDictRecord
 
     internal PitchAccentRecord(IReadOnlyList<JsonElement> jsonObject)
     {
-        Spelling = jsonObject[0].ToString();
+        Spelling = jsonObject[0].ToString().GetPooledString();
 
         if (jsonObject[2].ValueKind is JsonValueKind.Object)
         {
@@ -35,6 +36,11 @@ public sealed class PitchAccentRecord : IDictRecord
         if (Spelling == Reading)
         {
             Reading = null;
+        }
+
+        else
+        {
+            Reading = Reading.GetPooledString();
         }
     }
 }

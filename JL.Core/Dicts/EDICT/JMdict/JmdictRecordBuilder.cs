@@ -4,7 +4,7 @@ namespace JL.Core.Dicts.EDICT.JMdict;
 
 internal static class JmdictRecordBuilder
 {
-    public static void AddToDictionary(JmdictEntry entry, Dictionary<string, List<IDictRecord>> jmdictDictionary)
+    public static void AddToDictionary(JmdictEntry entry, Dictionary<string, IList<IDictRecord>> jmdictDictionary)
     {
         // entry (k_ele*, r_ele+, sense+)
         // k_ele (keb, ke_inf*, ke_pri*)
@@ -13,8 +13,7 @@ internal static class JmdictRecordBuilder
 
         Dictionary<string, JmdictRecord> recordDictionary = new();
 
-        int kEleListCount = entry.KanjiElements.Count;
-        for (int i = 0; i < kEleListCount; i++)
+        for (int i = 0; i < entry.KanjiElements.Count; i++)
         {
             KanjiElement kanjiElement = entry.KanjiElements[i];
 
@@ -120,7 +119,7 @@ internal static class JmdictRecordBuilder
         {
             ReadingElement readingElement = entry.ReadingElements[i];
 
-            string key = JapaneseUtils.KatakanaToHiragana(readingElement.Reb);
+            string key = JapaneseUtils.KatakanaToHiragana(readingElement.Reb).GetPooledString();
 
             if (recordDictionary.ContainsKey(key))
             {
@@ -226,8 +225,8 @@ internal static class JmdictRecordBuilder
 
         foreach ((string dictKey, JmdictRecord jmdictRecord) in recordDictionary)
         {
-            string key = JapaneseUtils.KatakanaToHiragana(dictKey);
-            if (jmdictDictionary.TryGetValue(key, out List<IDictRecord>? tempRecordList))
+            string key = JapaneseUtils.KatakanaToHiragana(dictKey).GetPooledString();
+            if (jmdictDictionary.TryGetValue(key, out IList<IDictRecord>? tempRecordList))
             {
                 tempRecordList.Add(jmdictRecord);
             }

@@ -12,7 +12,7 @@ internal static class FrequencyNazekaLoader
             return;
         }
 
-        Dictionary<string, List<FrequencyRecord>> freqDict = freq.Contents;
+        Dictionary<string, IList<FrequencyRecord>> freqDict = freq.Contents;
         Dictionary<string, List<List<JsonElement>>>? frequencyJson;
 
         FileStream fileStream = File.OpenRead(freq.Path);
@@ -29,25 +29,25 @@ internal static class FrequencyNazekaLoader
             {
                 List<JsonElement> elementList = value[i];
 
-                string exactSpelling = elementList[0].ToString();
+                string exactSpelling = elementList[0].ToString().GetPooledString();
                 _ = elementList[1].TryGetInt32(out int frequencyRank);
 
-                if (freqDict.TryGetValue(reading, out List<FrequencyRecord>? readingFreqResult))
+                if (freqDict.TryGetValue(reading, out IList<FrequencyRecord>? readingFreqResult))
                 {
                     readingFreqResult.Add(new FrequencyRecord(exactSpelling, frequencyRank));
                 }
 
                 else
                 {
-                    freqDict.Add(reading,
+                    freqDict.Add(reading.GetPooledString(),
                         new List<FrequencyRecord> { new(exactSpelling, frequencyRank) });
                 }
 
-                string exactSpellingInHiragana = JapaneseUtils.KatakanaToHiragana(exactSpelling);
+                string exactSpellingInHiragana = JapaneseUtils.KatakanaToHiragana(exactSpelling).GetPooledString();
 
                 if (exactSpellingInHiragana != reading)
                 {
-                    if (freqDict.TryGetValue(exactSpellingInHiragana, out List<FrequencyRecord>? exactSpellingFreqResult))
+                    if (freqDict.TryGetValue(exactSpellingInHiragana, out IList<FrequencyRecord>? exactSpellingFreqResult))
                     {
                         exactSpellingFreqResult.Add(new FrequencyRecord(reading, frequencyRank));
                     }
@@ -59,6 +59,11 @@ internal static class FrequencyNazekaLoader
                     }
                 }
             }
+        }
+
+        foreach ((string key, IList<FrequencyRecord> recordList) in freq.Contents)
+        {
+            freq.Contents[key] = recordList.ToArray();
         }
 
         freqDict.TrimExcess();

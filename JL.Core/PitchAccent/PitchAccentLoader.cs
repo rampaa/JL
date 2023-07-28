@@ -13,7 +13,7 @@ internal static class PitchAccentLoader
             return;
         }
 
-        Dictionary<string, List<IDictRecord>> pitchDict = dict.Contents;
+        Dictionary<string, IList<IDictRecord>> pitchDict = dict.Contents;
 
         string[] jsonFiles = Directory.GetFiles(dict.Path, "term*bank_*.json");
 
@@ -42,9 +42,9 @@ internal static class PitchAccentLoader
                     continue;
                 }
 
-                string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Spelling);
+                string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Spelling).GetPooledString();
 
-                if (pitchDict.TryGetValue(spellingInHiragana, out List<IDictRecord>? result))
+                if (pitchDict.TryGetValue(spellingInHiragana, out IList<IDictRecord>? result))
                 {
                     result.Add(newEntry);
                 }
@@ -56,9 +56,9 @@ internal static class PitchAccentLoader
 
                 if (!string.IsNullOrEmpty(newEntry.Reading))
                 {
-                    string readingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Reading);
+                    string readingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Reading).GetPooledString();
 
-                    if (pitchDict.TryGetValue(readingInHiragana, out List<IDictRecord>? readingResult))
+                    if (pitchDict.TryGetValue(readingInHiragana, out IList<IDictRecord>? readingResult))
                     {
                         readingResult.Add(newEntry);
                     }
@@ -69,6 +69,11 @@ internal static class PitchAccentLoader
                     }
                 }
             }
+        }
+
+        foreach ((string key, IList<IDictRecord> recordList) in pitchDict)
+        {
+            pitchDict[key] = recordList.ToArray();
         }
 
         pitchDict.TrimExcess();

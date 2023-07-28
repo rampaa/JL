@@ -86,7 +86,7 @@ internal sealed partial class AddWordWindow : Window
                 ? null
                 : rawWordClasses.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(static wc => wc.Trim()).ToArray();
 
-            Dictionary<string, List<IDictRecord>> customWordDictionary = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary).Contents;
+            Dictionary<string, IList<IDictRecord>> customWordDictionary = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary).Contents;
 
             CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawPartOfSpeech, wordClasses, customWordDictionary);
             Utils.Frontend.InvalidateDisplayCache();

@@ -230,7 +230,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
     {
         int frequency = int.MaxValue;
         if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling),
-                out List<FrequencyRecord>? freqResults))
+                out IList<FrequencyRecord>? freqResults))
         {
             int freqResultsCount = freqResults.Count;
             for (int i = 0; i < freqResultsCount; i++)
@@ -251,7 +251,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                 for (int i = 0; i < AlternativeSpellings.Length; i++)
                 {
                     if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(AlternativeSpellings[i]),
-                            out List<FrequencyRecord>? alternativeSpellingFreqResults))
+                            out IList<FrequencyRecord>? alternativeSpellingFreqResults))
                     {
                         int alternativeSpellingFreqResultsCount = alternativeSpellingFreqResults.Count;
                         for (int j = 0; j < alternativeSpellingFreqResultsCount; j++)
@@ -278,7 +278,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                 string reading = Readings[i];
 
                 if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading),
-                        out List<FrequencyRecord>? readingFreqResults))
+                        out IList<FrequencyRecord>? readingFreqResults))
                 {
                     int readingFreqResultsCount = readingFreqResults.Count;
                     for (int j = 0; j < readingFreqResultsCount; j++)

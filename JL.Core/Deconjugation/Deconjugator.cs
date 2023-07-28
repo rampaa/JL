@@ -82,8 +82,8 @@ internal static class Deconjugator
 
         HashSet<Form> collection = new();
 
-        List<string> array = myRule.DecEnd;
-        if (array.Count is 1)
+        string[] array = myRule.DecEnd;
+        if (array.Length is 1)
         {
             VirtualRule virtualRule = new
             (
@@ -99,14 +99,14 @@ internal static class Deconjugator
                 _ = collection.Add(result);
             }
         }
-        else if (array.Count > 1)
+        else if (array.Length > 1)
         {
             string maybeDecEnd = myRule.DecEnd[0];
             string maybeConEnd = myRule.ConEnd[0];
             string maybeDecTag = myRule.DecTag![0];
             string maybeConTag = myRule.ConTag![0];
 
-            for (int i = 0; i < array.Count; i++)
+            for (int i = 0; i < array.Length; i++)
             {
                 maybeDecEnd = myRule.DecEnd.ElementAtOrDefault(i) ?? maybeDecEnd;
                 maybeConEnd = myRule.ConEnd.ElementAtOrDefault(i) ?? maybeConEnd;
@@ -211,8 +211,8 @@ internal static class Deconjugator
 
         HashSet<Form> collection = new();
 
-        List<string> array = myRule.DecEnd;
-        if (array.Count is 1)
+        string[] array = myRule.DecEnd;
+        if (array.Length is 1)
         {
             Form? result = SubstitutionInner(myForm, myRule);
             if (result is not null)
@@ -220,12 +220,12 @@ internal static class Deconjugator
                 _ = collection.Add(result);
             }
         }
-        else if (array.Count > 1)
+        else if (array.Length > 1)
         {
             string maybeDecEnd = myRule.DecEnd[0];
             string maybeConEnd = myRule.ConEnd[0];
 
-            for (int i = 0; i < array.Count; i++)
+            for (int i = 0; i < array.Length; i++)
             {
                 maybeDecEnd = myRule.DecEnd.ElementAtOrDefault(i) ?? maybeDecEnd;
                 maybeConEnd = myRule.ConEnd.ElementAtOrDefault(i) ?? maybeConEnd;
@@ -234,8 +234,8 @@ internal static class Deconjugator
                 (
                     myRule.Type,
                     null,
-                    new List<string> { maybeDecEnd },
-                    new List<string> { maybeConEnd },
+                    new[] { maybeDecEnd },
+                    new[] { maybeConEnd },
                     null,
                     null,
                     myRule.Detail

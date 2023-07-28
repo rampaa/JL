@@ -23,7 +23,7 @@ public static class DictUtils
     public static bool UpdatingJmnedict { get; internal set; } = false;
     public static bool UpdatingKanjidic { get; internal set; } = false;
     public static readonly Dictionary<string, Dict> Dicts = new();
-    internal static Dictionary<string, List<JmdictWordClass>> WordClassDictionary { get; set; } = new(60000); // 2022/10/29: 48909, 2023/04/22: 49503
+    internal static Dictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new(55000); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272
     internal static readonly Dictionary<string, string> s_kanjiCompositionDict = new(86934);
     internal static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
     internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
@@ -726,12 +726,6 @@ public static class DictUtils
             }
 
             Utils.Frontend.InvalidateDisplayCache();
-
-            //if (runGC)
-            //{
-            //    GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-            //    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-            //}
         }
 
         DictsReady = true;
@@ -752,7 +746,7 @@ public static class DictUtils
                 {
                     int endIndex = lParts[2].IndexOf('[', StringComparison.Ordinal);
 
-                    s_kanjiCompositionDict.Add(lParts[1],
+                    s_kanjiCompositionDict.Add(lParts[1].GetPooledString(),
                         endIndex is -1 ? lParts[2] : lParts[2][..endIndex]);
                 }
 
@@ -765,7 +759,7 @@ public static class DictUtils
                             int endIndex = lParts[j].IndexOf('[', StringComparison.Ordinal);
                             if (endIndex is not -1)
                             {
-                                s_kanjiCompositionDict.Add(lParts[1], lParts[j][..endIndex]);
+                                s_kanjiCompositionDict.Add(lParts[1].GetPooledString(), lParts[j][..endIndex]);
                                 break;
                             }
                         }
@@ -822,46 +816,46 @@ public static class DictUtils
                     foreach (Dict dict in orderedDicts)
                     {
                         dict.Contents = dict.Size is not 0
-                            ? new Dictionary<string, List<IDictRecord>>(dict.Size)
+                            ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
                             : dict.Type switch
                             {
-                                DictType.CustomNameDictionary => new Dictionary<string, List<IDictRecord>>(1024),
-                                DictType.CustomWordDictionary => new Dictionary<string, List<IDictRecord>>(1024),
-                                DictType.JMdict => new Dictionary<string, List<IDictRecord>>(450000), //2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739
-                                DictType.JMnedict => new Dictionary<string, List<IDictRecord>>(630000), //2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055
-                                DictType.Kanjidic => new Dictionary<string, List<IDictRecord>>(13108), //2022/05/11: 13108, 2022/08/15: 13108, 2023/04/22: 13108
-                                DictType.Daijirin => new Dictionary<string, List<IDictRecord>>(420429),
-                                DictType.DaijirinNazeka => new Dictionary<string, List<IDictRecord>>(420429),
-                                DictType.Daijisen => new Dictionary<string, List<IDictRecord>>(679115),
-                                DictType.Gakken => new Dictionary<string, List<IDictRecord>>(254558),
-                                DictType.GakkenYojijukugoYomichan => new Dictionary<string, List<IDictRecord>>(7989),
-                                DictType.IwanamiYomichan => new Dictionary<string, List<IDictRecord>>(101929),
-                                DictType.JitsuyouYomichan => new Dictionary<string, List<IDictRecord>>(69746),
-                                DictType.KanjigenYomichan => new Dictionary<string, List<IDictRecord>>(64730),
-                                DictType.Kenkyuusha => new Dictionary<string, List<IDictRecord>>(303677),
-                                DictType.KenkyuushaNazeka => new Dictionary<string, List<IDictRecord>>(191804),
-                                DictType.KireiCakeYomichan => new Dictionary<string, List<IDictRecord>>(332628),
-                                DictType.Kotowaza => new Dictionary<string, List<IDictRecord>>(30846),
-                                DictType.Koujien => new Dictionary<string, List<IDictRecord>>(402571),
-                                DictType.Meikyou => new Dictionary<string, List<IDictRecord>>(107367),
-                                DictType.NikkokuYomichan => new Dictionary<string, List<IDictRecord>>(451455),
-                                DictType.OubunshaYomichan => new Dictionary<string, List<IDictRecord>>(138935),
-                                DictType.PitchAccentYomichan => new Dictionary<string, List<IDictRecord>>(434991),
-                                DictType.ShinjirinYomichan => new Dictionary<string, List<IDictRecord>>(229758),
-                                DictType.ShinmeikaiYomichan => new Dictionary<string, List<IDictRecord>>(126049),
-                                DictType.ShinmeikaiNazeka => new Dictionary<string, List<IDictRecord>>(126049),
-                                DictType.ShinmeikaiYojijukugoYomichan => new Dictionary<string, List<IDictRecord>>(6088),
-                                DictType.WeblioKogoYomichan => new Dictionary<string, List<IDictRecord>>(30838),
-                                DictType.ZokugoYomichan => new Dictionary<string, List<IDictRecord>>(2392),
-                                DictType.NonspecificWordYomichan => new Dictionary<string, List<IDictRecord>>(250000),
-                                DictType.NonspecificKanjiYomichan => new Dictionary<string, List<IDictRecord>>(250000),
-                                DictType.NonspecificNameYomichan => new Dictionary<string, List<IDictRecord>>(250000),
-                                DictType.NonspecificYomichan => new Dictionary<string, List<IDictRecord>>(250000),
-                                DictType.NonspecificWordNazeka => new Dictionary<string, List<IDictRecord>>(250000),
-                                DictType.NonspecificKanjiNazeka => new Dictionary<string, List<IDictRecord>>(250000),
-                                DictType.NonspecificNameNazeka => new Dictionary<string, List<IDictRecord>>(250000),
-                                DictType.NonspecificNazeka => new Dictionary<string, List<IDictRecord>>(250000),
-                                _ => new Dictionary<string, List<IDictRecord>>(250000)
+                                DictType.CustomNameDictionary => new Dictionary<string, IList<IDictRecord>>(1024),
+                                DictType.CustomWordDictionary => new Dictionary<string, IList<IDictRecord>>(1024),
+                                DictType.JMdict => new Dictionary<string, IList<IDictRecord>>(450000), //2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739
+                                DictType.JMnedict => new Dictionary<string, IList<IDictRecord>>(630000), //2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055
+                                DictType.Kanjidic => new Dictionary<string, IList<IDictRecord>>(13108), //2022/05/11: 13108, 2022/08/15: 13108, 2023/04/22: 13108
+                                DictType.Daijirin => new Dictionary<string, IList<IDictRecord>>(420429),
+                                DictType.DaijirinNazeka => new Dictionary<string, IList<IDictRecord>>(420429),
+                                DictType.Daijisen => new Dictionary<string, IList<IDictRecord>>(679115),
+                                DictType.Gakken => new Dictionary<string, IList<IDictRecord>>(254558),
+                                DictType.GakkenYojijukugoYomichan => new Dictionary<string, IList<IDictRecord>>(7989),
+                                DictType.IwanamiYomichan => new Dictionary<string, IList<IDictRecord>>(101929),
+                                DictType.JitsuyouYomichan => new Dictionary<string, IList<IDictRecord>>(69746),
+                                DictType.KanjigenYomichan => new Dictionary<string, IList<IDictRecord>>(64730),
+                                DictType.Kenkyuusha => new Dictionary<string, IList<IDictRecord>>(303677),
+                                DictType.KenkyuushaNazeka => new Dictionary<string, IList<IDictRecord>>(191804),
+                                DictType.KireiCakeYomichan => new Dictionary<string, IList<IDictRecord>>(332628),
+                                DictType.Kotowaza => new Dictionary<string, IList<IDictRecord>>(30846),
+                                DictType.Koujien => new Dictionary<string, IList<IDictRecord>>(402571),
+                                DictType.Meikyou => new Dictionary<string, IList<IDictRecord>>(107367),
+                                DictType.NikkokuYomichan => new Dictionary<string, IList<IDictRecord>>(451455),
+                                DictType.OubunshaYomichan => new Dictionary<string, IList<IDictRecord>>(138935),
+                                DictType.PitchAccentYomichan => new Dictionary<string, IList<IDictRecord>>(434991),
+                                DictType.ShinjirinYomichan => new Dictionary<string, IList<IDictRecord>>(229758),
+                                DictType.ShinmeikaiYomichan => new Dictionary<string, IList<IDictRecord>>(126049),
+                                DictType.ShinmeikaiNazeka => new Dictionary<string, IList<IDictRecord>>(126049),
+                                DictType.ShinmeikaiYojijukugoYomichan => new Dictionary<string, IList<IDictRecord>>(6088),
+                                DictType.WeblioKogoYomichan => new Dictionary<string, IList<IDictRecord>>(30838),
+                                DictType.ZokugoYomichan => new Dictionary<string, IList<IDictRecord>>(2392),
+                                DictType.NonspecificWordYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
+                                DictType.NonspecificKanjiYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
+                                DictType.NonspecificNameYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
+                                DictType.NonspecificYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
+                                DictType.NonspecificWordNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
+                                DictType.NonspecificKanjiNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
+                                DictType.NonspecificNameNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
+                                DictType.NonspecificNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
+                                _ => new Dictionary<string, IList<IDictRecord>>(250000)
                             };
 
                         dict.Priority = priority;

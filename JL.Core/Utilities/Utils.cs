@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CommunityToolkit.HighPerformance.Buffers;
 using JL.Core.Audio;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
@@ -20,6 +21,7 @@ public static class Utils
     public static readonly string ApplicationPath = AppContext.BaseDirectory;
     public static readonly string ResourcesPath = Path.Join(AppContext.BaseDirectory, "Resources");
     public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
+    public static StringPool StringPoolInstance => StringPool.Shared;
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
     public const int CacheSize = 1000;
 
@@ -142,5 +144,18 @@ public static class Utils
 
         await DictUtils.InitializeKanjiCompositionDict().ConfigureAwait(false);
         await Task.WhenAll(tasks).ConfigureAwait(false);
+        StringPoolInstance.Reset();
+    }
+
+    public static void ClearStringPoolIfDictsAreReady()
+    {
+        if (DictUtils.DictsReady
+            && FreqUtils.FreqsReady
+            && !DictUtils.UpdatingJmdict
+            && !DictUtils.UpdatingJmnedict
+            && !DictUtils.UpdatingKanjidic)
+        {
+            StringPoolInstance.Reset();
+        }
     }
 }

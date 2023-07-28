@@ -68,6 +68,8 @@ internal sealed partial class ManageDictionariesWindow : Window
         s_instance = null;
         await DictUtils.SerializeDicts().ConfigureAwait(false);
         await DictUtils.LoadDictionaries().ConfigureAwait(false);
+
+        Utils.ClearStringPoolIfDictsAreReady();
     }
 
     // probably should be split into several methods

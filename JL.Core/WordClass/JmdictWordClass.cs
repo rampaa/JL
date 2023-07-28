@@ -4,7 +4,7 @@ namespace JL.Core.WordClass;
 
 internal sealed class JmdictWordClass
 {
-    [JsonPropertyName("S")] public string Spelling { get; }
+    [JsonPropertyName("S")] public string Spelling { get; set; }
 
     [JsonPropertyName("R")] public string[]? Readings { get; }
 

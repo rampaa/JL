@@ -11,7 +11,7 @@ public sealed class Freq
     public int Priority { get; set; }
     public int Size { get; set; }
 
-    [JsonIgnore] public Dictionary<string, List<FrequencyRecord>> Contents { get; internal set; } = new();
+    [JsonIgnore] public Dictionary<string, IList<FrequencyRecord>> Contents { get; internal set; } = new();
 
     public Freq(FreqType type, string name, string path, bool active, int priority, int size)
     {

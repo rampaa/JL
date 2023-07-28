@@ -12,7 +12,7 @@ internal static class FrequencyYomichanLoader
             return;
         }
 
-        Dictionary<string, List<FrequencyRecord>> freqDict = freq.Contents;
+        Dictionary<string, IList<FrequencyRecord>> freqDict = freq.Contents;
 
         List<string> jsonFiles = Directory.EnumerateFiles(freq.Path, "*_bank_*.json", SearchOption.TopDirectoryOnly)
             .Where(static s => s.Contains("term", StringComparison.Ordinal) || s.Contains("kanji", StringComparison.Ordinal))
@@ -30,8 +30,8 @@ internal static class FrequencyYomichanLoader
 
             foreach (List<JsonElement> value in frequencyJson!)
             {
-                string spelling = value[0].ToString();
-                string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(spelling);
+                string spelling = value[0].ToString().GetPooledString();
+                string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(spelling).GetPooledString();
                 string reading = "";
                 int frequency = int.MaxValue;
                 JsonElement thirdElement = value[2];
@@ -43,7 +43,7 @@ internal static class FrequencyYomichanLoader
 
                 else if (thirdElement.TryGetProperty("reading", out JsonElement readingValue))
                 {
-                    reading = readingValue.ToString();
+                    reading = readingValue.ToString().GetPooledString();
                     JsonElement freqElement = thirdElement.GetProperty("frequency");
                     frequency = freqElement.ValueKind is JsonValueKind.Number
                         ? freqElement.GetInt32()
@@ -57,7 +57,7 @@ internal static class FrequencyYomichanLoader
 
                 else if (thirdElement.ValueKind is JsonValueKind.Array)
                 {
-                    reading = thirdElement[0].ToString();
+                    reading = thirdElement[0].ToString().GetPooledString();
                     frequency = thirdElement[1].GetInt32();
                 }
 
@@ -70,7 +70,7 @@ internal static class FrequencyYomichanLoader
                 {
                     if (reading is "")
                     {
-                        if (freqDict.TryGetValue(spellingInHiragana, out List<FrequencyRecord>? spellingFreqResult))
+                        if (freqDict.TryGetValue(spellingInHiragana, out IList<FrequencyRecord>? spellingFreqResult))
                         {
                             spellingFreqResult.Add(new FrequencyRecord(spelling, frequency));
                         }
@@ -83,8 +83,8 @@ internal static class FrequencyYomichanLoader
 
                     else
                     {
-                        string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading);
-                        if (freqDict.TryGetValue(readingInHiragana, out List<FrequencyRecord>? readingFreqResult))
+                        string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
+                        if (freqDict.TryGetValue(readingInHiragana, out IList<FrequencyRecord>? readingFreqResult))
                         {
                             readingFreqResult.Add(new FrequencyRecord(spelling, frequency));
                         }
@@ -96,7 +96,7 @@ internal static class FrequencyYomichanLoader
 
                         if (reading != spelling)
                         {
-                            if (freqDict.TryGetValue(spellingInHiragana, out List<FrequencyRecord>? spellingFreqResult))
+                            if (freqDict.TryGetValue(spellingInHiragana, out IList<FrequencyRecord>? spellingFreqResult))
                             {
                                 spellingFreqResult.Add(new FrequencyRecord(reading, frequency));
                             }
@@ -108,6 +108,11 @@ internal static class FrequencyYomichanLoader
                         }
                     }
                 }
+            }
+
+            foreach ((string key, IList<FrequencyRecord> recordList) in freq.Contents)
+            {
+                freq.Contents[key] = recordList.ToArray();
             }
 
             freqDict.TrimExcess();

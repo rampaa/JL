@@ -9,10 +9,10 @@ namespace JL.Core.Dicts.EPWING.EpwingYomichan;
 
 internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
 {
-    public string[]? Definitions { get; set; }
-    public string? Reading { get; }
-    public string[]? WordClasses { get; }
     public string PrimarySpelling { get; }
+    public string? Reading { get; }
+    public string[]? Definitions { get; set; }
+    public string[]? WordClasses { get; }
     private string[]? DefinitionTags { get; }
     //public int Score { get; init; }
     //public int Sequence { get; init; }
@@ -20,12 +20,17 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
 
     public EpwingYomichanRecord(IReadOnlyList<JsonElement> jsonElement)
     {
-        PrimarySpelling = jsonElement[0].ToString();
+        PrimarySpelling = jsonElement[0].ToString().GetPooledString();
         Reading = jsonElement[1].ToString();
 
         if (Reading is "" || Reading == PrimarySpelling)
         {
             Reading = null;
+        }
+
+        else
+        {
+            Reading = Reading.GetPooledString();
         }
 
         JsonElement definitionTagsElement = jsonElement[2];
@@ -36,6 +41,11 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
             if (DefinitionTags.Length is 0)
             {
                 DefinitionTags = null;
+            }
+
+            else
+            {
+                DefinitionTags.DeduplicateStringsInArray();
             }
         }
         else
@@ -49,11 +59,17 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
             WordClasses = null;
         }
 
+        else
+        {
+            WordClasses.DeduplicateStringsInArray();
+        }
+
         //jsonElement[4].TryGetInt32(out int score);
         //Score = score;
 
         List<string> definitionList = GetDefinitionsFromJsonArray(jsonElement[5]);
         Definitions = definitionList.ToArray().TrimStringArray();
+        Definitions?.DeduplicateStringsInArray();
 
         //jsonElement[6].TryGetInt32(out int sequence);
         //Sequence = sequence;
@@ -92,7 +108,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         int frequency = int.MaxValue;
 
         if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling),
-                out List<FrequencyRecord>? freqResults))
+                out IList<FrequencyRecord>? freqResults))
         {
             int freqResultsCount = freqResults.Count;
             for (int i = 0; i < freqResultsCount; i++)
@@ -111,7 +127,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
 
         else if (!string.IsNullOrEmpty(Reading)
                  && freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading),
-                     out List<FrequencyRecord>? readingFreqResults))
+                     out IList<FrequencyRecord>? readingFreqResults))
         {
             int readingFreqResultsCount = readingFreqResults.Count;
             for (int i = 0; i < readingFreqResultsCount; i++)

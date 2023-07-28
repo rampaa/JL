@@ -283,14 +283,14 @@ public static class LookupUtils
         string textInHiragana,
         int succAttempt)
     {
-        Dictionary<string, List<IDictRecord>> dictionary = dict.Contents;
+        Dictionary<string, IList<IDictRecord>> dictionary = dict.Contents;
 
         bool tryLongVowelConversion = true;
 
-        if (dictionary.TryGetValue(textInHiragana, out List<IDictRecord>? tempResult))
+        if (dictionary.TryGetValue(textInHiragana, out IList<IDictRecord>? tempResult))
         {
             _ = results.TryAdd(textInHiragana,
-                new IntermediaryResult(new List<List<IDictRecord>> { tempResult }, null, matchedText, matchedText,
+                new IntermediaryResult(new List<IList<IDictRecord>> { tempResult }, null, matchedText, matchedText,
                     dict));
             tryLongVowelConversion = false;
         }
@@ -305,7 +305,7 @@ public static class LookupUtils
                     lastTag = deconjugationResult.Tags.Last();
                 }
 
-                if (dictionary.TryGetValue(deconjugationResult.Text, out List<IDictRecord>? dictResults))
+                if (dictionary.TryGetValue(deconjugationResult.Text, out IList<IDictRecord>? dictResults))
                 {
                     List<IDictRecord> resultsList = new();
 
@@ -379,7 +379,7 @@ public static class LookupUtils
                                     }
 
                                     else if (DictUtils.WordClassDictionary.TryGetValue(deconjugationResult.Text,
-                                                 out List<JmdictWordClass>? jmdictWcResults))
+                                                 out IList<JmdictWordClass>? jmdictWcResults))
                                     {
                                         for (int j = 0; j < jmdictWcResults.Count; j++)
                                         {
@@ -420,7 +420,7 @@ public static class LookupUtils
                                     }
 
                                     else if (DictUtils.WordClassDictionary.TryGetValue(deconjugationResult.Text,
-                                                 out List<JmdictWordClass>? jmdictWcResults))
+                                                 out IList<JmdictWordClass>? jmdictWcResults))
                                     {
                                         for (int j = 0; j < jmdictWcResults.Count; j++)
                                         {
@@ -474,7 +474,7 @@ public static class LookupUtils
                         else
                         {
                             results.Add(deconjugationResult.Text,
-                                new IntermediaryResult(new List<List<IDictRecord>> { resultsList },
+                                new IntermediaryResult(new List<IList<IDictRecord>> { resultsList },
                                     new List<List<List<string>>> { new() { deconjugationResult.Process } },
                                     matchedText,
                                     deconjugationResult.Text,
@@ -528,10 +528,10 @@ public static class LookupUtils
         for (int i = 0; i < textList.Count; i++)
         {
             if (dict.Contents
-                .TryGetValue(textInHiraganaList[i], out List<IDictRecord>? result))
+                .TryGetValue(textInHiraganaList[i], out IList<IDictRecord>? result))
             {
                 nameResults.Add(textInHiraganaList[i],
-                    new IntermediaryResult(new List<List<IDictRecord>> { result }, null, textList[i], textList[i], dict));
+                    new IntermediaryResult(new List<IList<IDictRecord>> { result }, null, textList[i], textList[i], dict));
             }
         }
 
@@ -544,10 +544,10 @@ public static class LookupUtils
 
         string kanji = text.EnumerateRunes().FirstOrDefault().ToString();
 
-        if (dict.Contents.TryGetValue(kanji, out List<IDictRecord>? result))
+        if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? result))
         {
             kanjiResults.Add(kanji,
-                new IntermediaryResult(new List<List<IDictRecord>> { result }, null, kanji, kanji, dict));
+                new IntermediaryResult(new List<IList<IDictRecord>> { result }, null, kanji, kanji, dict));
         }
 
         return kanjiResults;
@@ -680,7 +680,7 @@ public static class LookupUtils
 
         KeyValuePair<string, IntermediaryResult> dictResult = kanjiResults.First();
 
-        List<List<IDictRecord>> iResult = dictResult.Value.Results;
+        List<IList<IDictRecord>> iResult = dictResult.Value.Results;
         KanjidicRecord kanjiRecord = (KanjidicRecord)iResult[0][0];
 
         List<string> allReadings = new();
@@ -957,7 +957,7 @@ public static class LookupUtils
 
         if (kanjiFreq?.Active ?? false)
         {
-            if (kanjiFreq.Contents.TryGetValue(kanji, out List<FrequencyRecord>? freqResultList))
+            if (kanjiFreq.Contents.TryGetValue(kanji, out IList<FrequencyRecord>? freqResultList))
             {
                 int frequency = freqResultList.FirstOrDefault().Frequency;
 

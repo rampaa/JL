@@ -144,7 +144,7 @@ internal static class EpwingUtils
     {
         if (dict.Contents.TryGetValue(
                 JapaneseUtils.KatakanaToHiragana(epwingRecord.PrimarySpelling),
-                out List<IDictRecord>? previousResults))
+                out IList<IDictRecord>? previousResults))
         {
             for (int i = 0; i < previousResults.Count; i++)
             {

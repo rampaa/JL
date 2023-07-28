@@ -148,7 +148,7 @@ internal static class PopupWindowUtils
                     WindowsUtils.MeasureTextSize(string.Create(CultureInfo.InvariantCulture, $"{splitReadingsWithRInfo[i - 1]}, "), fontSize).Width;
             }
 
-            if (dict.Contents.TryGetValue(normalizedExpression, out List<IDictRecord>? pitchAccentDictResultList))
+            if (dict.Contents.TryGetValue(normalizedExpression, out IList<IDictRecord>? pitchAccentDictResultList))
             {
                 PitchAccentRecord? chosenPitchAccentDictResult = null;
 

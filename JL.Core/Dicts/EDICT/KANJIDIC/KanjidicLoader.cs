@@ -24,6 +24,11 @@ internal static class KanjidicLoader
                 }
             }
 
+            foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+            {
+                dict.Contents[key] = recordList.ToArray();
+            }
+
             dict.Contents.TrimExcess();
         }
 
@@ -47,7 +52,7 @@ internal static class KanjidicLoader
         }
     }
 
-    private static async Task ReadCharacter(XmlReader xmlReader, Dictionary<string, List<IDictRecord>> kanjidicDictionary)
+    private static async Task ReadCharacter(XmlReader xmlReader, Dictionary<string, IList<IDictRecord>> kanjidicDictionary)
     {
         string key = await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false);
 
@@ -96,18 +101,18 @@ internal static class KanjidicLoader
                         break;
 
                     case "nanori":
-                        nanoriReadingList.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+                        nanoriReadingList.Add((await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false)).GetPooledString());
                         break;
 
                     case "reading":
                         switch (xmlReader.GetAttribute("r_type"))
                         {
                             case "ja_on":
-                                onReadingList.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+                                onReadingList.Add((await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false)).GetPooledString());
                                 break;
 
                             case "ja_kun":
-                                kunReadingList.Add(await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false));
+                                kunReadingList.Add((await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false)).GetPooledString());
                                 break;
 
                             default:

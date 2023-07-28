@@ -182,13 +182,13 @@ public static class FreqUtils
                     foreach (Freq freq in orderedFreqs)
                     {
                         freq.Contents = freq.Size is not 0
-                            ? new Dictionary<string, List<FrequencyRecord>>(freq.Size)
+                            ? new Dictionary<string, IList<FrequencyRecord>>(freq.Size)
                             : freq.Type switch
                             {
-                                FreqType.Yomichan => new Dictionary<string, List<FrequencyRecord>>(1504512),
-                                FreqType.YomichanKanji => new Dictionary<string, List<FrequencyRecord>>(169623),
-                                FreqType.Nazeka => new Dictionary<string, List<FrequencyRecord>>(114348),
-                                _ => new Dictionary<string, List<FrequencyRecord>>(500000)
+                                FreqType.Yomichan => new Dictionary<string, IList<FrequencyRecord>>(1504512),
+                                FreqType.YomichanKanji => new Dictionary<string, IList<FrequencyRecord>>(169623),
+                                FreqType.Nazeka => new Dictionary<string, IList<FrequencyRecord>>(114348),
+                                _ => new Dictionary<string, IList<FrequencyRecord>>(500000)
                             };
 
                         freq.Priority = priority;

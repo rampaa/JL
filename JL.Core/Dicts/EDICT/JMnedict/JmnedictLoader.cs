@@ -27,6 +27,11 @@ internal static class JmnedictLoader
                 }
             }
 
+            foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+            {
+                dict.Contents[key] = recordList.ToArray();
+            }
+
             dict.Contents.TrimExcess();
         }
 
@@ -68,11 +73,11 @@ internal static class JmnedictLoader
                         break;
 
                     case "k_ele":
-                        entry.KebList.Add(ReadKEle(xmlReader));
+                        entry.KebList.Add(ReadKEle(xmlReader).GetPooledString());
                         break;
 
                     case "r_ele":
-                        entry.RebList.Add(ReadREle(xmlReader));
+                        entry.RebList.Add(ReadREle(xmlReader).GetPooledString());
                         break;
 
                     case "trans":
@@ -121,11 +126,11 @@ internal static class JmnedictLoader
                 switch (xmlReader.Name)
                 {
                     case "name_type":
-                        translation.NameTypeList.Add(ReadEntity(xmlReader));
+                        translation.NameTypeList.Add(ReadEntity(xmlReader).GetPooledString());
                         break;
 
                     case "trans_det":
-                        translation.TransDetList.Add(xmlReader.ReadElementContentAsString());
+                        translation.TransDetList.Add(xmlReader.ReadElementContentAsString().GetPooledString());
                         break;
 
                     //case "xref":

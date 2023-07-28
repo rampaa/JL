@@ -79,7 +79,7 @@ public static class CustomWordLoader
     }
 
     public static void AddToDictionary(string[] spellings, string[]? readings, string[] definitions,
-        string rawPartOfSpeech, string[]? wordClasses, Dictionary<string, List<IDictRecord>> customWordDictionary)
+        string rawPartOfSpeech, string[]? wordClasses, Dictionary<string, IList<IDictRecord>> customWordDictionary)
     {
         for (int i = 0; i < spellings.Length; i++)
         {
@@ -103,7 +103,7 @@ public static class CustomWordLoader
 
             CustomWordRecord newWordRecord = new(spelling, alternativeSpellings, readings, definitions, wordClassArray, hasUserDefinedWordClasses);
 
-            if (customWordDictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(spelling), out List<IDictRecord>? result))
+            if (customWordDictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(spelling), out IList<IDictRecord>? result))
             {
                 if (result.Contains(newWordRecord))
                 {

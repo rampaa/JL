@@ -132,6 +132,8 @@ public static class ResourceUpdater
         }
 
         DictUtils.UpdatingJmdict = false;
+
+        Utils.ClearStringPoolIfDictsAreReady();
     }
 
     public static async Task UpdateJmnedict()
@@ -159,6 +161,8 @@ public static class ResourceUpdater
         }
 
         DictUtils.UpdatingJmnedict = false;
+
+        Utils.ClearStringPoolIfDictsAreReady();
     }
 
     public static async Task UpdateKanjidic()
@@ -186,5 +190,7 @@ public static class ResourceUpdater
         }
 
         DictUtils.UpdatingKanjidic = false;
+
+        Utils.ClearStringPoolIfDictsAreReady();
     }
 }

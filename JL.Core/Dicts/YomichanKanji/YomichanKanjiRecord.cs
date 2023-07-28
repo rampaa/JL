@@ -22,10 +22,20 @@ internal sealed class YomichanKanjiRecord : IDictRecord
             OnReadings = null;
         }
 
+        else
+        {
+            OnReadings.DeduplicateStringsInArray();
+        }
+
         KunReadings = jsonElement[2].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (KunReadings.Length is 0)
         {
             KunReadings = null;
+        }
+
+        else
+        {
+            KunReadings.DeduplicateStringsInArray();
         }
 
         //Tags = jsonElement[3].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);

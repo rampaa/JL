@@ -139,4 +139,17 @@ public static class ExtensionMethods
 
         return list.ToArray();
     }
+
+    internal static string GetPooledString(this string str)
+    {
+        return Utils.StringPoolInstance.GetOrAdd(str);
+    }
+
+    internal static void DeduplicateStringsInArray(this string[] strings)
+    {
+        for (int i = 0; i < strings.Length; i++)
+        {
+            strings[i] = strings[i].GetPooledString();
+        }
+    }
 }

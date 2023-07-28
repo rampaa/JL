@@ -23,10 +23,10 @@ public static class CustomNameLoader
         }
     }
 
-    public static void AddToDictionary(string spelling, string reading, string nameType, Dictionary<string, List<IDictRecord>> customNameDictionary)
+    public static void AddToDictionary(string spelling, string reading, string nameType, Dictionary<string, IList<IDictRecord>> customNameDictionary)
     {
         CustomNameRecord newNameRecord = new(spelling, reading, nameType);
-        if (customNameDictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(spelling), out List<IDictRecord>? entry))
+        if (customNameDictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(spelling), out IList<IDictRecord>? entry))
         {
             if (!entry.Contains(newNameRecord))
             {

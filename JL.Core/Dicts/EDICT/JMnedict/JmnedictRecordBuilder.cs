@@ -4,7 +4,7 @@ namespace JL.Core.Dicts.EDICT.JMnedict;
 
 internal static class JmnedictRecordBuilder
 {
-    public static void AddToDictionary(JmnedictEntry entry, Dictionary<string, List<IDictRecord>> jmnedictDictionary)
+    public static void AddToDictionary(JmnedictEntry entry, Dictionary<string, IList<IDictRecord>> jmnedictDictionary)
     {
         Dictionary<string, JmnedictRecord> recordDictionary = new();
 
@@ -53,7 +53,7 @@ internal static class JmnedictRecordBuilder
         {
             for (int i = 0; i < entry.RebList.Count; i++)
             {
-                string key = JapaneseUtils.KatakanaToHiragana(entry.RebList[i]);
+                string key = JapaneseUtils.KatakanaToHiragana(entry.RebList[i]).GetPooledString();
 
                 if (recordDictionary.ContainsKey(key))
                 {
@@ -85,8 +85,8 @@ internal static class JmnedictRecordBuilder
 
         foreach ((string dictKey, JmnedictRecord jmnedictRecord) in recordDictionary)
         {
-            string key = JapaneseUtils.KatakanaToHiragana(dictKey);
-            if (jmnedictDictionary.TryGetValue(key, out List<IDictRecord>? tempRecordList))
+            string key = JapaneseUtils.KatakanaToHiragana(dictKey).GetPooledString();
+            if (jmnedictDictionary.TryGetValue(key, out IList<IDictRecord>? tempRecordList))
             {
                 tempRecordList.Add(jmnedictRecord);
             }

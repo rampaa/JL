@@ -1,4 +1,5 @@
 using System.Text.Json;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.YomichanKanji;
 
@@ -33,9 +34,9 @@ internal static class YomichanKanjiLoader
             foreach (List<JsonElement> jsonObj in jsonObjects)
             {
                 YomichanKanjiRecord yomichanKanjiRecord = new(jsonObj);
-                string kanji = jsonObj[0].ToString();
+                string kanji = jsonObj[0].ToString().GetPooledString();
 
-                if (dict.Contents.TryGetValue(kanji, out List<IDictRecord>? kanjiResult))
+                if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? kanjiResult))
                 {
                     kanjiResult.Add(yomichanKanjiRecord);
                 }
@@ -44,6 +45,11 @@ internal static class YomichanKanjiLoader
                     dict.Contents.Add(kanji, new List<IDictRecord> { yomichanKanjiRecord });
                 }
             }
+        }
+
+        foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+        {
+            dict.Contents[key] = recordList.ToArray();
         }
 
         dict.Contents.TrimExcess();
