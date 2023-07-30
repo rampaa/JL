@@ -1446,6 +1446,32 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ToggleMinimizedStateKeyGesture))
+        {
+            MainWindow mainWindow = MainWindow.Instance;
+            WindowsUtils.HidePopups(mainWindow.FirstPopupWindow);
+
+            if (ConfigManager.Focusable)
+            {
+                mainWindow.WindowState = mainWindow.WindowState is WindowState.Minimized
+                    ? WindowState.Normal
+                    : WindowState.Minimized;
+            }
+
+            else
+            {
+                if (mainWindow.WindowState is WindowState.Minimized)
+                {
+                    WinApi.RestoreWindow(mainWindow.WindowHandle);
+                }
+
+                else
+                {
+                    WinApi.MinimizeWindow(mainWindow.WindowHandle);
+                }
+            }
+        }
+
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SelectedTextToSpeech))
         {
             if (MiningMode
