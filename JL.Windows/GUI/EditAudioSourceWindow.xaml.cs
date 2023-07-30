@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using JL.Core.Audio;
 using JL.Core.Utilities;
+using JL.Windows.SpeechSynthesis;
 using Path = System.IO.Path;
 
 namespace JL.Windows.GUI;
@@ -24,7 +25,34 @@ internal sealed partial class EditAudioSourceWindow : Window
         string type = _audioSource.Type.GetDescription() ?? _audioSource.Type.ToString();
         _ = AudioSourceTypeComboBox.Items.Add(type);
         AudioSourceTypeComboBox.SelectedValue = type;
-        TextBlockUri.Text = _uri;
+
+        switch (_audioSource.Type)
+        {
+            case AudioSourceType.Url:
+            case AudioSourceType.UrlJson:
+                PathType.Text = "URL";
+                TextBlockUri.Text = _uri;
+                TextBlockUri.Visibility = Visibility.Visible;
+                TextToSpeechVoicesComboBox.Visibility = Visibility.Collapsed;
+                break;
+
+            case AudioSourceType.LocalPath:
+                PathType.Text = "Path";
+                TextBlockUri.Text = _uri;
+                TextBlockUri.Visibility = Visibility.Visible;
+                TextToSpeechVoicesComboBox.Visibility = Visibility.Collapsed;
+                break;
+
+            case AudioSourceType.TextToSpeech:
+                PathType.Text = "Text to Speech Voice";
+                TextToSpeechVoicesComboBox.ItemsSource = SpeechSynthesisUtils.InstalledVoices;
+                TextToSpeechVoicesComboBox.SelectedItem = _uri;
+                TextBlockUri.Visibility = Visibility.Collapsed;
+                TextToSpeechVoicesComboBox.Visibility = Visibility.Visible;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(null, "Invalid AudioSourceType");
+        }
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -34,15 +62,14 @@ internal sealed partial class EditAudioSourceWindow : Window
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
-        bool isValid = true;
-
         string? typeString = AudioSourceTypeComboBox.SelectionBoxItem.ToString();
         if (string.IsNullOrEmpty(typeString))
         {
             AudioSourceTypeComboBox.BorderBrush = Brushes.Red;
-            isValid = false;
+            return;
         }
-        else if (AudioSourceTypeComboBox.BorderBrush == Brushes.Red)
+
+        if (AudioSourceTypeComboBox.BorderBrush == Brushes.Red)
         {
             AudioSourceTypeComboBox.ClearValue(BorderBrushProperty);
         }
@@ -53,39 +80,74 @@ internal sealed partial class EditAudioSourceWindow : Window
             type = typeString.GetEnum<AudioSourceType>();
         }
 
-        string uri = TextBlockUri.Text.Replace("://localhost", "://127.0.0.1", StringComparison.Ordinal);
+        bool isValid = true;
+        string? uri;
 
-        if (type is AudioSourceType.LocalPath)
+        switch (type)
         {
-            if (Path.IsPathFullyQualified(uri)
-                && Directory.Exists(Path.GetDirectoryName(uri))
-                && !string.IsNullOrEmpty(Path.GetFileName(uri)))
-            {
-                string relativePath = Path.GetRelativePath(Utils.ApplicationPath, uri);
-                uri = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
+            case AudioSourceType.LocalPath:
+                uri = TextBlockUri.Text;
+                if (Path.IsPathFullyQualified(uri)
+                    && Directory.Exists(Path.GetDirectoryName(uri))
+                    && !string.IsNullOrEmpty(Path.GetFileName(uri)))
+                {
+                    string relativePath = Path.GetRelativePath(Utils.ApplicationPath, uri);
+                    uri = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
 
-                if (_uri != uri && AudioUtils.AudioSources.ContainsKey(uri))
+                    if (_uri != uri && AudioUtils.AudioSources.ContainsKey(uri))
+                    {
+                        TextBlockUri.BorderBrush = Brushes.Red;
+                        isValid = false;
+                    }
+                    else if (AudioSourceTypeComboBox.BorderBrush == Brushes.Red)
+                    {
+                        TextBlockUri.BorderBrush.ClearValue(BorderBrushProperty);
+                    }
+                }
+                else
                 {
                     TextBlockUri.BorderBrush = Brushes.Red;
                     isValid = false;
                 }
-            }
-            else
-            {
-                TextBlockUri.BorderBrush = Brushes.Red;
+                break;
+
+            case AudioSourceType.Url:
+            case AudioSourceType.UrlJson:
+                uri = TextBlockUri.Text.Replace("://localhost", "://127.0.0.1", StringComparison.Ordinal);
+                if (string.IsNullOrEmpty(uri)
+                    || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "", StringComparison.Ordinal).Replace("{Reading}", "", StringComparison.Ordinal), UriKind.Absolute)
+                    || (_uri != uri && AudioUtils.AudioSources.ContainsKey(uri)))
+                {
+                    TextBlockUri.BorderBrush = Brushes.Red;
+                    isValid = false;
+                }
+                else if (AudioSourceTypeComboBox.BorderBrush == Brushes.Red)
+                {
+                    TextBlockUri.BorderBrush.ClearValue(BorderBrushProperty);
+                }
+                break;
+
+            case AudioSourceType.TextToSpeech:
+                uri = TextToSpeechVoicesComboBox.SelectedItem?.ToString();
+                if (string.IsNullOrWhiteSpace(uri)
+                    || (_uri != uri && AudioUtils.AudioSources.ContainsKey(uri)))
+                {
+                    TextToSpeechVoicesComboBox.BorderBrush = Brushes.Red;
+                    isValid = false;
+                }
+                else if (AudioSourceTypeComboBox.BorderBrush == Brushes.Red)
+                {
+                    TextToSpeechVoicesComboBox.BorderBrush.ClearValue(BorderBrushProperty);
+                }
+                break;
+
+            default:
                 isValid = false;
-            }
+                uri = null;
+                break;
         }
 
-        else if (string.IsNullOrEmpty(uri)
-                 || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "", StringComparison.Ordinal).Replace("{Reading}", "", StringComparison.Ordinal), UriKind.Absolute)
-                 || (_uri != uri && AudioUtils.AudioSources.ContainsKey(uri)))
-        {
-            TextBlockUri.BorderBrush = Brushes.Red;
-            isValid = false;
-        }
-
-        if (isValid)
+        if (isValid && !string.IsNullOrEmpty(uri))
         {
             if (_uri != uri)
             {

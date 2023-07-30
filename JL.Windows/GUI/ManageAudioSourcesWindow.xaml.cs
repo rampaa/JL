@@ -6,6 +6,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Core.Audio;
 using JL.Core.Utilities;
+using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
@@ -59,6 +60,8 @@ internal sealed partial class ManageAudioSourcesWindow : Window
         _ = MainWindow.Instance.Focus();
         s_instance = null;
         await AudioUtils.SerializeAudioSources().ConfigureAwait(false);
+
+        SpeechSynthesisUtils.SetInstalledVoiceWithHighestPriority();
     }
 
     // probably should be split into several methods
@@ -109,7 +112,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
 
             var audioSourceTypeDisplay = new TextBlock
             {
-                Width = 60,
+                Width = 80,
                 Text = audioSource.Type.GetDescription(),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center,

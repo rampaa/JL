@@ -14,6 +14,7 @@ using JL.Core.Lookup;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
+using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
 using Microsoft.Win32;
 using Window = System.Windows.Window;
@@ -194,6 +195,12 @@ internal sealed partial class MainWindow : Window
         BacklogUtils.AddToBacklog(text);
 
         WindowsUtils.HidePopups(FirstPopupWindow);
+
+        if (ConfigManager.TextToSpeechOnTextChange
+            && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
+        {
+            _ = SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text, CoreConfig.AudioVolume).ConfigureAwait(false);
+        }
 
         Stats.IncrementStat(StatType.Lines);
         Stats.IncrementStat(StatType.Characters, new StringInfo(JapaneseUtils.RemovePunctuation(text)).LengthInTextElements);
@@ -707,6 +714,16 @@ internal sealed partial class MainWindow : Window
                 {
                     WinApi.MinimizeWindow(WindowHandle);
                 }
+            }
+        }
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SelectedTextToSpeech))
+        {
+            handled = true;
+
+            if (SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
+            {
+                await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, MainTextBox.SelectedText, CoreConfig.AudioVolume).ConfigureAwait(false);
             }
         }
 

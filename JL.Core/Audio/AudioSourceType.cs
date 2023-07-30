@@ -6,5 +6,6 @@ public enum AudioSourceType
 {
     [Description("Local Path")] LocalPath,
     [Description("URL")] Url,
-    [Description("URL (JSON)")] UrlJson
+    [Description("URL (JSON)")] UrlJson,
+    [Description("Text to Speech")] TextToSpeech
 }

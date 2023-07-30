@@ -52,8 +52,8 @@
                     <TextBlock Name="TextBlockImoutos" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>
 
-                <Button Name="ButtonResetStats" Click="ButtonResetStats_OnClick" HorizontalAlignment="Left" Background="DarkRed" Foreground="White"
-                            VerticalAlignment="Top" Margin="0,10,0,20" Content="Reset"/>
+                <Button Click="ButtonResetStats_OnClick" HorizontalAlignment="Left" Background="DarkRed" Foreground="White"
+                        VerticalAlignment="Top" Margin="0,10,0,20" Content="Reset"/>
             </StackPanel>
         </Grid>
     </ScrollViewer>

@@ -28,9 +28,9 @@
                 <RadioButton x:Name="OtherRadioButton" Content="Other" HorizontalAlignment="Stretch" FontSize="16"
                              Height="40" />
             </StackPanel>
-            <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+            <Button Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                     Margin="120,0,0,20" Width="70" Height="35" FontSize="16" Click="CancelButton_Click" />
-            <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+            <Button Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                     Margin="0,0,120,20" FontSize="16" Height="35" Click="SaveButton_Click" Width="70" />
         </Grid>
     </ScrollViewer>

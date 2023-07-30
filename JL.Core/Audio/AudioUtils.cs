@@ -47,7 +47,7 @@ public static class AudioUtils
 
                 return Utils.GetMd5String(audioData) is Networking.Jpod101NoAudioMd5Hash
                     ? null
-                    : new AudioResponse(audioFormat, audioData);
+                    : new AudioResponse(AudioSourceType.Url, audioFormat, audioData);
             }
 
             Utils.Logger.Information("Error getting audio from {Url}", url.OriginalString);
@@ -111,14 +111,14 @@ public static class AudioUtils
         {
             string audioFormat = Path.GetExtension(uri.LocalPath)[1..];
             byte[] audioData = await File.ReadAllBytesAsync(uri.LocalPath).ConfigureAwait(false);
-            return new AudioResponse(audioFormat, audioData);
+            return new AudioResponse(AudioSourceType.LocalPath, audioFormat, audioData);
         }
 
         Utils.Logger.Information("Error getting audio from {LocalPath}", uri.LocalPath);
         return null;
     }
 
-    internal static async Task<AudioResponse?> GetPrioritizedAudio(string foundSpelling, string reading)
+    internal static async Task<AudioResponse?> GetPrioritizedAudio(string spelling, string reading)
     {
         AudioResponse? audioResponse = null;
 
@@ -127,20 +127,41 @@ public static class AudioUtils
         {
             if (audioSource.Active)
             {
-                StringBuilder stringBuilder = new StringBuilder(uri)
-                    .Replace("://localhost", "://127.0.0.1")
-                    .Replace("{Term}", foundSpelling)
-                    .Replace("{Reading}", reading);
-
-                Uri normalizedUri = new(stringBuilder.ToString());
-
-                audioResponse = audioSource.Type switch
+                switch (audioSource.Type)
                 {
-                    AudioSourceType.Url => await GetAudioFromUrl(normalizedUri).ConfigureAwait(false),
-                    AudioSourceType.UrlJson => await GetAudioFromJsonReturningUrl(normalizedUri).ConfigureAwait(false),
-                    AudioSourceType.LocalPath => await GetAudioFromPath(normalizedUri).ConfigureAwait(false),
-                    _ => audioResponse
-                };
+                    case AudioSourceType.Url:
+                    case AudioSourceType.UrlJson:
+                        {
+                            StringBuilder stringBuilder = new StringBuilder(uri)
+                                .Replace("://localhost", "://127.0.0.1")
+                                .Replace("{Term}", spelling)
+                                .Replace("{Reading}", reading);
+
+                            Uri normalizedUri = new(stringBuilder.ToString());
+                            audioResponse = audioSource.Type is AudioSourceType.Url
+                                ? await GetAudioFromUrl(normalizedUri).ConfigureAwait(false)
+                                : await GetAudioFromJsonReturningUrl(normalizedUri).ConfigureAwait(false);
+                        }
+
+                        break;
+
+                    case AudioSourceType.LocalPath:
+                        {
+                            StringBuilder stringBuilder = new StringBuilder(uri)
+                                .Replace("{Term}", spelling)
+                                .Replace("{Reading}", reading);
+
+                            Uri normalizedUri = new(stringBuilder.ToString());
+                            audioResponse = await GetAudioFromPath(normalizedUri).ConfigureAwait(false);
+                        }
+                        break;
+
+                    case AudioSourceType.TextToSpeech:
+                        await Utils.Frontend.TextToSpeech(uri, reading, CoreConfig.AudioVolume).ConfigureAwait(false);
+                        return new AudioResponse(AudioSourceType.TextToSpeech, "wav", null);
+                    default:
+                        throw new ArgumentOutOfRangeException(null, "Invalid AudioSourceType");
+                }
 
                 if (audioResponse is not null)
                 {
@@ -160,8 +181,9 @@ public static class AudioUtils
         }
 
         AudioResponse? audioResponse = await GetPrioritizedAudio(foundSpelling, reading).ConfigureAwait(false);
-        if (audioResponse is not null)
+        if (audioResponse?.AudioData is not null)
         {
+            await Utils.Frontend.StopTextToSpeech().ConfigureAwait(false);
             Utils.Frontend.PlayAudio(audioResponse.AudioData, audioResponse.AudioFormat, CoreConfig.AudioVolume / 100f);
             Stats.IncrementStat(StatType.TimesPlayedAudio);
         }

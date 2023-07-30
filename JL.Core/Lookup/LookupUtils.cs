@@ -668,8 +668,7 @@ public static class LookupUtils
         return results;
     }
 
-    private static List<LookupResult> BuildKanjidicResult(
-        Dictionary<string, IntermediaryResult> kanjiResults)
+    private static List<LookupResult> BuildKanjidicResult(Dictionary<string, IntermediaryResult> kanjiResults)
     {
         List<LookupResult> results = new();
 

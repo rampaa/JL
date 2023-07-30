@@ -138,8 +138,10 @@ public static class Utils
             Task.Run(static async() =>
             {
                 await AudioUtils.DeserializeAudioSources().ConfigureAwait(false);
-                await DeconjugatorUtils.DeserializeRules().ConfigureAwait(false);
-            })
+                Frontend.SetInstalledVoiceWithHighestPriority();
+            }),
+
+            Task.Run(static async() => await DeconjugatorUtils.DeserializeRules().ConfigureAwait(false))
         };
 
         await DictUtils.InitializeKanjiCompositionDict().ConfigureAwait(false);

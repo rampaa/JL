@@ -21,19 +21,19 @@ internal static class ConfigManager
 {
     #region General
 
-    private static readonly List<ComboBoxItem> s_japaneseFonts =
+    private static readonly ComboBoxItem[] s_japaneseFonts =
         WindowsUtils.FindJapaneseFonts().OrderByDescending(static f => f.Foreground.ToString(CultureInfo.InvariantCulture)).ThenBy(static font => font.Content)
-            .ToList();
+            .ToArray();
 
-    private static readonly List<ComboBoxItem> s_popupJapaneseFonts =
-        s_japaneseFonts.ConvertAll(static f => new ComboBoxItem
+    private static readonly ComboBoxItem[] s_popupJapaneseFonts =
+        Array.ConvertAll(s_japaneseFonts, static f => new ComboBoxItem
         {
             Content = f.Content,
             FontFamily = f.FontFamily,
             Foreground = f.Foreground
         });
 
-    public static bool InactiveLookupMode { get; set; } = false; // todo checkbox?
+    public static bool InactiveLookupMode { get; set; } = false;
     public static Brush HighlightColor { get; private set; } = Brushes.AliceBlue;
     public static bool RequireLookupKeyPress { get; private set; } = false;
     public static bool LookupOnSelectOnly { get; private set; } = false;
@@ -78,6 +78,7 @@ internal static class ConfigManager
     public static bool HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar { get; set; } = false;
     public static bool EnableBacklog { get; private set; } = true;
     public static bool AutoSaveBacklogBeforeClosing { get; private set; } = false;
+    public static bool TextToSpeechOnTextChange { get; private set; } = false;
 
     #endregion
 
@@ -163,6 +164,7 @@ internal static class ConfigManager
     public static KeyGesture DeleteCurrentLineKeyGesture { get; private set; } = new(Key.Delete, ModifierKeys.Windows);
     public static KeyGesture ShowManageAudioSourcesWindowKeyGesture { get; private set; } = new(Key.Z, ModifierKeys.Windows);
     public static KeyGesture ToggleMinimizedStateKeyGesture { get; private set; } = new(Key.X, ModifierKeys.Alt);
+    public static KeyGesture SelectedTextToSpeech { get; private set; } = new(Key.F6, ModifierKeys.Windows);
 
     #endregion
 
@@ -278,6 +280,8 @@ internal static class ConfigManager
         }
 
         AutoSaveBacklogBeforeClosing = GetValueFromConfig(AutoSaveBacklogBeforeClosing, nameof(AutoSaveBacklogBeforeClosing), bool.TryParse);
+
+        TextToSpeechOnTextChange = GetValueFromConfig(TextToSpeechOnTextChange, nameof(TextToSpeechOnTextChange), bool.TryParse);
 
         HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar = GetValueFromConfig(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), bool.TryParse);
         mainWindow.ChangeVisibilityOfTitleBarButtons();
@@ -439,6 +443,8 @@ internal static class ConfigManager
         ToggleMinimizedStateKeyGesture =
             KeyGestureUtils.SetKeyGesture(nameof(ToggleMinimizedStateKeyGesture),
                 ToggleMinimizedStateKeyGesture);
+
+        SelectedTextToSpeech = KeyGestureUtils.SetKeyGesture(nameof(SelectedTextToSpeech), SelectedTextToSpeech);
 
         if (GlobalHotKeys && !DisableHotkeys)
         {
@@ -716,6 +722,8 @@ internal static class ConfigManager
             KeyGestureUtils.KeyGestureToString(DeleteCurrentLineKeyGesture);
         preferenceWindow.ToggleMinimizedStateKeyGestureTextBox.Text =
             KeyGestureUtils.KeyGestureToString(ToggleMinimizedStateKeyGesture);
+        preferenceWindow.SelectedTextToSpeechTextBox.Text =
+            KeyGestureUtils.KeyGestureToString(SelectedTextToSpeech);
 
         WindowsUtils.SetButtonColor(preferenceWindow.HighlightColorButton, HighlightColor);
         WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, mainWindow.Background.CloneCurrentValue());
@@ -780,6 +788,8 @@ internal static class ConfigManager
         preferenceWindow.SteppedBacklogWithMouseWheelCheckBox.IsChecked = SteppedBacklogWithMouseWheel;
         preferenceWindow.EnableBacklogCheckBox.IsChecked = EnableBacklog;
         preferenceWindow.AutoSaveBacklogBeforeClosingCheckBox.IsChecked = AutoSaveBacklogBeforeClosing;
+        preferenceWindow.TextToSpeechOnTextChangeCheckBox.IsChecked = TextToSpeechOnTextChange;
+
         preferenceWindow.ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox.IsChecked = HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar;
         preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked = HorizontallyCenterMainWindowText;
 
@@ -787,7 +797,7 @@ internal static class ConfigManager
         preferenceWindow.MinimumLogLevelComboBox.SelectedValue = ConfigurationManager.AppSettings.Get("MinimumLogLevel");
 
         preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
-        preferenceWindow.MainWindowFontComboBox.SelectedIndex = s_japaneseFonts.FindIndex(f =>
+        preferenceWindow.MainWindowFontComboBox.SelectedIndex = Array.FindIndex(s_japaneseFonts, f =>
             f.Content.ToString() == mainWindow.MainTextBox.FontFamily.Source);
 
         if (preferenceWindow.MainWindowFontComboBox.SelectedIndex is -1)
@@ -797,7 +807,7 @@ internal static class ConfigManager
 
         preferenceWindow.PopupFontComboBox.ItemsSource = s_popupJapaneseFonts;
         preferenceWindow.PopupFontComboBox.SelectedIndex =
-            s_popupJapaneseFonts.FindIndex(static f => f.Content.ToString() == PopupFont.Source);
+            Array.FindIndex(s_popupJapaneseFonts, static f => f.Content.ToString() == PopupFont.Source);
 
         if (preferenceWindow.PopupFontComboBox.SelectedIndex is -1)
         {
@@ -906,9 +916,10 @@ internal static class ConfigManager
             preferenceWindow.ReconnectToWebSocketServerKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(DeleteCurrentLineKeyGesture),
             preferenceWindow.DeleteCurrentLineKeyGestureTextBox.Text);
-
         SaveKeyGesture(nameof(ToggleMinimizedStateKeyGesture),
             preferenceWindow.ToggleMinimizedStateKeyGestureTextBox.Text);
+        SaveKeyGesture(nameof(SelectedTextToSpeech),
+            preferenceWindow.SelectedTextToSpeechTextBox.Text);
 
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
@@ -974,6 +985,8 @@ internal static class ConfigManager
             preferenceWindow.EnableBacklogCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(AutoSaveBacklogBeforeClosing)].Value =
             preferenceWindow.AutoSaveBacklogBeforeClosingCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings[nameof(TextToSpeechOnTextChange)].Value =
+            preferenceWindow.TextToSpeechOnTextChangeCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar)].Value =
             preferenceWindow.ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(HorizontallyCenterMainWindowText)].Value =

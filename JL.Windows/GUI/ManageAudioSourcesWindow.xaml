@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Manage Audio Sources" Height="600" Width="900" Closing="Window_Closing" ResizeMode="NoResize"
+        Title="Manage Audio Sources" Height="600" Width="920" Closing="Window_Closing" ResizeMode="NoResize"
         ScrollViewer.CanContentScroll="True" Background="{DynamicResource RegionBrush}"
         Topmost="True" ShowInTaskbar="False" x:ClassModifier="internal">
     <Grid>

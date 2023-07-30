@@ -21,4 +21,12 @@ public interface IFrontend
     public void ApplyDictOptions();
 
     public byte[]? GetImageFromClipboardAsByteArray();
+
+    public Task TextToSpeech(string voiceName, string text, int volume);
+
+    public Task StopTextToSpeech();
+
+    public byte[] GetAudioResponseFromTextToSpeech(string voiceName, string text);
+
+    public void SetInstalledVoiceWithHighestPriority();
 }

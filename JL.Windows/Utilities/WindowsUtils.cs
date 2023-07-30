@@ -19,6 +19,7 @@ using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
+using JL.Windows.SpeechSynthesis;
 using NAudio.Vorbis;
 using NAudio.Wave;
 using Application = System.Windows.Application;
@@ -331,15 +332,15 @@ internal static class WindowsUtils
                 await using (audioStream.ConfigureAwait(false))
                 {
                     IWaveProvider waveProvider = audioFormat is "ogg" or "oga"
-                        ? new VorbisWaveReader(audioStream)
-                        : new StreamMediaFoundationReader(audioStream);
+                    ? new VorbisWaveReader(audioStream)
+                    : new StreamMediaFoundationReader(audioStream);
 
                     AudioPlayer.Init(waveProvider);
                     AudioPlayer.Play();
 
                     while (AudioPlayer.PlaybackState is PlaybackState.Playing)
                     {
-                        await Task.Delay(200).ConfigureAwait(false);
+                        await Task.Delay(100).ConfigureAwait(false);
                     }
                 }
             }
@@ -355,13 +356,15 @@ internal static class WindowsUtils
     public static async Task Motivate()
     {
         DateTime currentTime = DateTime.Now;
-        if (AudioPlayer?.PlaybackState is PlaybackState.Playing && (currentTime - s_lastAudioPlayTime).TotalMilliseconds < 500)
+        if (AudioPlayer?.PlaybackState is PlaybackState.Playing && (currentTime - s_lastAudioPlayTime).TotalMilliseconds < 300)
         {
             s_lastAudioPlayTime = currentTime;
             return;
         }
 
         s_lastAudioPlayTime = currentTime;
+
+        await SpeechSynthesisUtils.StopTextToSpeech().ConfigureAwait(false);
 
         try
         {

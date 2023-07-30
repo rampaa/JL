@@ -12,6 +12,7 @@ using JL.Core.Dicts;
 using JL.Core.Lookup;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
+using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
 using NAudio.Wave;
 using Timer = System.Timers.Timer;
@@ -1444,6 +1445,16 @@ internal sealed partial class PopupWindow : Window
                 }
             }
         }
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SelectedTextToSpeech))
+        {
+            if (MiningMode
+                && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null
+                && _lastSelectedText is not null)
+            {
+                await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, _lastSelectedText, CoreConfig.AudioVolume).ConfigureAwait(false);
+            }
+        }
     }
 
     private void EnableMiningMode()
@@ -1580,6 +1591,8 @@ internal sealed partial class PopupWindow : Window
 
     private async void UiElement_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
+        _lastSelectedText = ((TextBox)sender).SelectedText;
+
         if (ConfigManager.InactiveLookupMode
             || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
             || ((!ConfigManager.LookupOnSelectOnly || e.ChangedButton is not MouseButton.Left)

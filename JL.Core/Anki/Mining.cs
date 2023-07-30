@@ -82,12 +82,23 @@ public static class Mining
             ? await AudioUtils.GetPrioritizedAudio(primarySpelling, reading).ConfigureAwait(false)
             : null;
 
-        Dictionary<string, object>? audio = audioResponse is null
+        byte[]? audioData = audioResponse?.AudioData;
+
+        if (audioResponse?.AudioSource is AudioSourceType.TextToSpeech)
+        {
+            string voiceName = AudioUtils.AudioSources
+                .Where(static a => a.Value is { Active: true, Type: AudioSourceType.TextToSpeech })
+                .Aggregate(static (a1, a2) => a1.Value.Priority < a2.Value.Priority ? a1 : a2).Key;
+
+            audioData = Utils.Frontend.GetAudioResponseFromTextToSpeech(voiceName, reading);
+        }
+
+        Dictionary<string, object>? audio = audioData is null
             ? null
             : new Dictionary<string, object>
             {
-                { "data", audioResponse.AudioData },
-                { "filename", string.Create(CultureInfo.InvariantCulture, $"JL_audio_{reading}_{primarySpelling}.{audioResponse.AudioFormat}") },
+                { "data", audioData },
+                { "filename", string.Create(CultureInfo.InvariantCulture, $"JL_audio_{reading}_{primarySpelling}.{audioResponse!.AudioFormat}") },
                 { "skipHash", Networking.Jpod101NoAudioMd5Hash },
                 { "fields", audioFields }
             };
@@ -122,7 +133,7 @@ public static class Mining
             return false;
         }
 
-        if (needsAudio && (audioResponse is null || Utils.GetMd5String(audioResponse.AudioData) is Networking.Jpod101NoAudioMd5Hash))
+        if (needsAudio && (audioData is null || Utils.GetMd5String(audioData) is Networking.Jpod101NoAudioMd5Hash))
         {
             Utils.Frontend.Alert(AlertLevel.Warning, string.Create(CultureInfo.InvariantCulture, $"Mined {primarySpelling} (no audio)"));
             Utils.Logger.Information("Mined {FoundSpelling} (no audio)", primarySpelling);

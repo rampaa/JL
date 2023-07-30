@@ -33,14 +33,8 @@ public sealed class PitchAccentRecord : IDictRecord
                 : -1;
         }
 
-        if (Spelling == Reading)
-        {
-            Reading = null;
-        }
-
-        else
-        {
-            Reading = Reading.GetPooledString();
-        }
+        Reading = Spelling == Reading
+            ? null
+            : Reading.GetPooledString();
     }
 }

@@ -2,6 +2,7 @@ using System.Windows;
 using JL.Core;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
+using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
 using MessageBox = HandyControl.Controls.MessageBox;
 
@@ -29,4 +30,12 @@ internal sealed class WindowsFrontend : IFrontend
     public void CopyFromWebSocket(string text) => MainWindow.Instance.CopyFromWebSocket(text);
 
     public byte[]? GetImageFromClipboardAsByteArray() => WindowsUtils.GetImageFromClipboardAsByteArray();
+
+    public Task TextToSpeech(string voiceName, string text, int volume) => SpeechSynthesisUtils.TextToSpeech(voiceName, text, volume);
+
+    public Task StopTextToSpeech() => SpeechSynthesisUtils.StopTextToSpeech();
+
+    public byte[] GetAudioResponseFromTextToSpeech(string voiceName, string text) => SpeechSynthesisUtils.GetAudioResponseFromTextToSpeech(voiceName, text);
+
+    public void SetInstalledVoiceWithHighestPriority() => SpeechSynthesisUtils.SetInstalledVoiceWithHighestPriority();
 }

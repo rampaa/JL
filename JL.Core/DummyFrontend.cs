@@ -32,4 +32,14 @@ internal sealed class DummyFrontend : IFrontend
     }
 
     public byte[]? GetImageFromClipboardAsByteArray() => null;
+
+    public Task TextToSpeech(string voiceName, string text, int volume) => Task.CompletedTask;
+
+    public Task StopTextToSpeech() => Task.CompletedTask;
+
+    public byte[] GetAudioResponseFromTextToSpeech(string voiceName, string text) => Array.Empty<byte>();
+
+    public void SetInstalledVoiceWithHighestPriority()
+    {
+    }
 }

@@ -9,13 +9,12 @@
         SizeToContent="Manual" ScrollViewer.CanContentScroll="True" ShowInTaskbar="False" Background="{DynamicResource RegionBrush}"
         x:ClassModifier="internal">
     <Grid>
-        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="20,0,0,20"
+        <Button Content="Cancel" HorizontalAlignment="Left" Margin="20,0,0,20"
                 VerticalAlignment="Bottom" Click="CancelButton_Click" FontSize="16" Height="35" Width="85" />
-        <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Right" Margin="0,0,20,20"
+        <Button Content="Save" HorizontalAlignment="Right" Margin="0,0,20,20"
                 VerticalAlignment="Bottom" Width="85" Click="SaveButton_Click" FontSize="16" Height="35" />
 
-        <TabControl TabStripPlacement="Top" VerticalContentAlignment="Stretch" Margin="0,0,0,65"
-                    Name="TabControl">
+        <TabControl TabStripPlacement="Top" VerticalContentAlignment="Stretch" Margin="0,0,0,65">
             <TabItem Header="General">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
                     <StackPanel  Margin="20,10,20,10">
@@ -72,7 +71,7 @@
                                 <ComboBoxItem Content="Forward button" Tag="XButton2" />
                             </ComboBox>
                         </DockPanel>
-                        
+
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Lookup requires Lookup Key press"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
@@ -352,6 +351,13 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Text to speech on text change"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="TextToSpeechOnTextChangeCheckBox"
+                                              HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Read only"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="TextBoxIsReadOnlyCheckBox"  HorizontalAlignment="Right" />
@@ -363,7 +369,7 @@
                             <CheckBox x:Name="EnableBacklogCheckBox"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
-                        
+
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Auto save backlog before closing JL"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
@@ -679,7 +685,7 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-            <TabItem Name="AnkiTabItem" Header="Anki" Height="33" MouseUp="AnkiTabItem_MouseUp">
+            <TabItem Header="Anki" Height="33" MouseUp="AnkiTabItem_MouseUp">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
                     <StackPanel Margin="20,10,20,10">
                         <StackPanel.Resources>
@@ -730,9 +736,9 @@
                                                 <TextBlock HorizontalAlignment="Center" Text="Deck:"
                                                TextWrapping="Wrap" />
                                                 <ComboBox x:Name="WordMiningSetupComboBoxDeckNames" Width="300" Margin="0,10,0,0" />
-                                                <Button x:Name="WordMiningSetupButtonRefresh" Click="MiningSetupButtonRefresh_Click"
-                                            Width="100"
-                                            Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
+                                                <Button Click="MiningSetupButtonRefresh_Click"
+                                                        Width="100"
+                                                        Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
                                                     Refresh
                                                 </Button>
                                                 <TextBlock HorizontalAlignment="Center" Text="Model:"
@@ -742,7 +748,7 @@
                                                 <Separator Height="15" />
 
                                                 <DockPanel HorizontalAlignment="Center">
-                                                    <Button x:Name="WordMiningSetupButtonGetFields"
+                                                    <Button
                                                         Click="WordMiningSetupButtonGetFields_Click"
                                                         Width="150" Margin="5"
                                                         Content="Get Fields" FontSize="16" Height="35" />
@@ -768,9 +774,9 @@
                                                 <TextBlock HorizontalAlignment="Center" Text="Deck:"
                                                TextWrapping="Wrap" />
                                                 <ComboBox x:Name="KanjiMiningSetupComboBoxDeckNames" Width="300" Margin="0,10,0,0" />
-                                                <Button x:Name="KanjiMiningSetupButtonRefresh" Click="MiningSetupButtonRefresh_Click"
-                                            Width="100"
-                                            Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
+                                                <Button Click="MiningSetupButtonRefresh_Click"
+                                                        Width="100"
+                                                        Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
                                                     Refresh
                                                 </Button>
                                                 <TextBlock HorizontalAlignment="Center" Text="Model:"
@@ -780,7 +786,7 @@
                                                 <Separator Height="15" />
 
                                                 <DockPanel HorizontalAlignment="Center">
-                                                    <Button x:Name="KanjiMiningSetupButtonGetFields"
+                                                    <Button
                                                         Click="KanjiMiningSetupButtonGetFields_Click"
                                                         Width="150" Margin="5"
                                                         Content="Get Fields" FontSize="16" Height="35" />
@@ -806,9 +812,9 @@
                                                 <TextBlock HorizontalAlignment="Center" Text="Deck:"
                                                TextWrapping="Wrap" />
                                                 <ComboBox x:Name="NameMiningSetupComboBoxDeckNames" Width="300" Margin="0,10,0,0" />
-                                                <Button x:Name="NameMiningSetupButtonRefresh" Click="MiningSetupButtonRefresh_Click"
-                                            Width="100"
-                                            Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
+                                                <Button Click="MiningSetupButtonRefresh_Click"
+                                                        Width="100"
+                                                        Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
                                                     Refresh
                                                 </Button>
                                                 <TextBlock HorizontalAlignment="Center" Text="Model:"
@@ -818,7 +824,7 @@
                                                 <Separator Height="15" />
 
                                                 <DockPanel HorizontalAlignment="Center">
-                                                    <Button x:Name="NameMiningSetupButtonGetFields"
+                                                    <Button
                                                         Click="NameMiningSetupButtonGetFields_Click"
                                                         Width="150" Margin="5"
                                                         Content="Get Fields" FontSize="16" Height="35" />
@@ -844,9 +850,9 @@
                                                 <TextBlock HorizontalAlignment="Center" Text="Deck:"
                                                TextWrapping="Wrap" />
                                                 <ComboBox x:Name="OtherMiningSetupComboBoxDeckNames" Width="300" Margin="0,10,0,0" />
-                                                <Button x:Name="OtherMiningSetupButtonRefresh" Click="MiningSetupButtonRefresh_Click"
-                                            Width="100"
-                                            Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
+                                                <Button Click="MiningSetupButtonRefresh_Click"
+                                                        Width="100"
+                                                        Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
                                                     Refresh
                                                 </Button>
                                                 <TextBlock HorizontalAlignment="Center" Text="Model:"
@@ -856,7 +862,7 @@
                                                 <Separator Height="15" />
 
                                                 <DockPanel HorizontalAlignment="Center">
-                                                    <Button x:Name="OtherMiningSetupButtonGetFields"
+                                                    <Button
                                                         Click="OtherMiningSetupButtonGetFields_Click"
                                                         Width="150" Margin="5"
                                                         Content="Get Fields" FontSize="16" Height="35" />
@@ -1139,6 +1145,16 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Minimize/Restore the main window" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="SelectedTextToSpeechTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Selected text to speech" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
