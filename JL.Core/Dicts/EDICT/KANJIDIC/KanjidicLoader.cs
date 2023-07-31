@@ -134,10 +134,10 @@ internal static class KanjidicLoader
             }
         }
 
-        string[]? definitions = definitionList.ToArray().TrimStringArray();
-        string[]? onReadings = onReadingList.ToArray().TrimStringArray();
-        string[]? kunReadings = kunReadingList.ToArray().TrimStringArray();
-        string[]? nanoriReadings = nanoriReadingList.ToArray().TrimStringArray();
+        string[]? definitions = definitionList.TrimStringListToStringArray();
+        string[]? onReadings = onReadingList.TrimStringListToStringArray();
+        string[]? kunReadings = kunReadingList.TrimStringListToStringArray();
+        string[]? nanoriReadings = nanoriReadingList.TrimStringListToStringArray();
 
         KanjidicRecord entry = new(definitions, onReadings, kunReadings, nanoriReadings, strokeCount, grade, frequency);
 

@@ -110,17 +110,17 @@ public static class ExtensionMethods
         return hasNonNullElement ? array : null;
     }
 
-    internal static string[]? TrimStringArray(this string[]? array)
+    internal static string[]? TrimStringListToStringArray(this List<string> list)
     {
-        if (array is null || array.Length is 0 || array.All(string.IsNullOrEmpty))
+        if (list.Count is 0 || list.All(string.IsNullOrEmpty))
         {
             return null;
         }
 
-        return array;
+        return list.ToArray();
     }
 
-    internal static T[]?[]? TrimListOfArraysToArrayOfArrays<T>(this List<T[]?> list)
+    internal static T[]?[]? TrimListOfNullableArraysToArrayOfArrays<T>(this List<T[]?> list)
     {
         if (list.Count is 0 || list.All(static array => array is null))
         {
@@ -130,9 +130,9 @@ public static class ExtensionMethods
         return list.ToArray();
     }
 
-    internal static T?[]? TrimListToArray<T>(this List<T?> list)
+    internal static T?[]? TrimListWithNullableElementsToArray<T>(this List<T?> list)
     {
-        if (list.Count is 0 || list.All(static array => array is null))
+        if (list.Count is 0 || list.All(static element => element is null))
         {
             return null;
         }

@@ -8,16 +8,17 @@ internal sealed class JmnedictRecord : IDictRecord
 {
     public int Id { get; }
     public string PrimarySpelling { get; }
-    public string[]? AlternativeSpellings { get; set; }
+    public string[]? AlternativeSpellings { get; }
     public string[]? Readings { get; }
     private string[][] Definitions { get; }
     private string[][] NameTypes { get; }
     //public string[]?[]? RelatedTerms { get; set; }
 
-    public JmnedictRecord(int id, string primarySpelling, string[]? readings, string[][] definitions, string[][] nameTypes)
+    public JmnedictRecord(int id, string primarySpelling, string[]? alternativeSpellings, string[]? readings, string[][] definitions, string[][] nameTypes)
     {
         Id = id;
         PrimarySpelling = primarySpelling;
+        AlternativeSpellings = alternativeSpellings;
         Readings = readings;
         Definitions = definitions;
         NameTypes = nameTypes;

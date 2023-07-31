@@ -11,8 +11,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
     public int Id { get; }
     public string PrimarySpelling { get; }
     public string[]? PrimarySpellingOrthographyInfo { get; }
-    public string[]? AlternativeSpellings { get; set; }
-    public string[]?[]? AlternativeSpellingsOrthographyInfo { get; set; }
+    public string[]? AlternativeSpellings { get; }
+    public string[]?[]? AlternativeSpellingsOrthographyInfo { get; }
     public string[]? Readings { get; }
     public string[]?[]? ReadingsOrthographyInfo { get; }
     private string[][] Definitions { get; }
@@ -31,6 +31,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
     public JmdictRecord(int id,
         string primarySpelling,
         string[]? primarySpellingOrthographyInfo,
+        string[]? alternativeSpellings,
+        string[]?[]? alternativeSpellingsOrthographyInfo,
         string[]? readings,
         string[]?[]? readingsOrthographyInfo,
         string[][] definitions,
@@ -48,6 +50,8 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
         Id = id;
         PrimarySpelling = primarySpelling;
         PrimarySpellingOrthographyInfo = primarySpellingOrthographyInfo;
+        AlternativeSpellings = alternativeSpellings;
+        AlternativeSpellingsOrthographyInfo = alternativeSpellingsOrthographyInfo;
         Readings = readings;
         ReadingsOrthographyInfo = readingsOrthographyInfo;
         Definitions = definitions;

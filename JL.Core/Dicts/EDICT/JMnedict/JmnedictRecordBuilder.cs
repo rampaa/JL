@@ -12,6 +12,13 @@ internal static class JmnedictRecordBuilder
         {
             for (int i = 0; i < entry.KebList.Count; i++)
             {
+                string key = JapaneseUtils.KatakanaToHiragana(entry.KebList[i]).GetPooledString();
+
+                if (recordDictionary.ContainsKey(key))
+                {
+                    continue;
+                }
+
                 List<string[]> definitionList = new();
                 List<string[]> nameTypeList = new();
                 // List<string[]?> relatedTermList = new();
@@ -25,27 +32,10 @@ internal static class JmnedictRecordBuilder
                     //relatedTermList.Add(translation.XRefList > 0 ? translation.XRefList.ToArray() : null);
                 }
 
-                JmnedictRecord record = new(entry.Id, entry.KebList[i], entry.RebList.ToArray().TrimStringArray(), definitionList.ToArray(), nameTypeList.ToArray());
+                JmnedictRecord record = new(entry.Id, entry.KebList[i], entry.KebList.RemoveAtToArray(i), entry.RebList.TrimStringListToStringArray(), definitionList.ToArray(), nameTypeList.ToArray());
                 //record.RelatedTerms = relatedTermList.TrimListToArray();
 
-                recordDictionary.Add(record.PrimarySpelling, record);
-            }
-
-            List<string> allSpellings = recordDictionary.Keys.ToList();
-
-            foreach (KeyValuePair<string, JmnedictRecord> record in recordDictionary)
-            {
-                List<string> alternativeSpellingList = new();
-
-                for (int i = 0; i < allSpellings.Count; i++)
-                {
-                    if (record.Key != allSpellings[i])
-                    {
-                        alternativeSpellingList.Add(allSpellings[i]);
-                    }
-                }
-
-                record.Value.AlternativeSpellings = alternativeSpellingList.ToArray().TrimStringArray();
+                recordDictionary.Add(key, record);
             }
         }
 
@@ -73,19 +63,15 @@ internal static class JmnedictRecordBuilder
                     // relatedTermList.Add(translation.XRefList > 0 ? translation.XRefList.ToArray() : null);
                 }
 
-                JmnedictRecord record = new(entry.Id, entry.RebList[i], null, definitionList.ToArray(), nameTypeList.ToArray())
-                {
-                    AlternativeSpellings = entry.RebList.RemoveAtToArray(i)
-                    //RelatedTerms = relatedTermList.TrimListToArray()
-                };
+                JmnedictRecord record = new(entry.Id, entry.RebList[i], entry.RebList.RemoveAtToArray(i), null, definitionList.ToArray(), nameTypeList.ToArray());
+                // record.RelatedTerms = relatedTermList.TrimListToArray()
 
                 recordDictionary.Add(key, record);
             }
         }
 
-        foreach ((string dictKey, JmnedictRecord jmnedictRecord) in recordDictionary)
+        foreach ((string key, JmnedictRecord jmnedictRecord) in recordDictionary)
         {
-            string key = JapaneseUtils.KatakanaToHiragana(dictKey).GetPooledString();
             if (jmnedictDictionary.TryGetValue(key, out IList<IDictRecord>? tempRecordList))
             {
                 tempRecordList.Add(jmnedictRecord);

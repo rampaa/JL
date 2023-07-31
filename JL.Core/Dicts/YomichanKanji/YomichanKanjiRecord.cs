@@ -51,7 +51,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
             definitionList.Add(definition.ToString());
         }
 
-        Definitions = definitionList.ToArray().TrimStringArray();
+        Definitions = definitionList.TrimStringListToStringArray();
 
         List<string> statList = new();
         JsonElement statsElement = jsonElement[5];

@@ -68,7 +68,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         //Score = score;
 
         List<string> definitionList = GetDefinitionsFromJsonArray(jsonElement[5]);
-        Definitions = definitionList.ToArray().TrimStringArray();
+        Definitions = definitionList.TrimStringListToStringArray();
         Definitions?.DeduplicateStringsInArray();
 
         //jsonElement[6].TryGetInt32(out int sequence);
