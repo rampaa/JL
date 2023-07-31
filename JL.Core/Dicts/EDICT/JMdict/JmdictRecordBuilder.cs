@@ -8,9 +8,9 @@ internal static class JmdictRecordBuilder
     {
         Dictionary<string, JmdictRecord> recordDictionary = new();
 
-        List<KanjiElement> kanjiElementsWithoutSearchOnlyTerms = entry.KanjiElements.Where(static ke => !ke.KeInfList.Contains("sK")).ToList();
-        List<string> allSpellingsWithoutSearchOnlyTerms = kanjiElementsWithoutSearchOnlyTerms.Select(static ke => ke.Keb).ToList();
-        List<string[]?> allKanjiOrthographyInfoWithoutSearchOnlyTerms = kanjiElementsWithoutSearchOnlyTerms.Select(static ke => ke.KeInfList.TrimStringListToStringArray()).ToList();
+        List<KanjiElement> kanjiElementsWithoutSearchOnlyForms = entry.KanjiElements.Where(static ke => !ke.KeInfList.Contains("sK")).ToList();
+        List<string> allSpellingsWithoutSearchOnlyForms = kanjiElementsWithoutSearchOnlyForms.Select(static ke => ke.Keb).ToList();
+        List<string[]?> allKanjiOrthographyInfoWithoutSearchOnlyForms = kanjiElementsWithoutSearchOnlyForms.Select(static ke => ke.KeInfList.TrimStringListToStringArray()).ToList();
 
         int index = 0;
         for (int i = 0; i < entry.KanjiElements.Count; i++)
@@ -82,9 +82,9 @@ internal static class JmdictRecordBuilder
 
             JmdictRecord record = new(entry.Id,
                 kanjiElement.Keb,
-                allKanjiOrthographyInfoWithoutSearchOnlyTerms[index],
-                allSpellingsWithoutSearchOnlyTerms.RemoveAtToArray(index),
-                allKanjiOrthographyInfoWithoutSearchOnlyTerms.RemoveAtToArray(index),
+                allKanjiOrthographyInfoWithoutSearchOnlyForms[index],
+                allSpellingsWithoutSearchOnlyForms.RemoveAtToArray(index),
+                allKanjiOrthographyInfoWithoutSearchOnlyForms.RemoveAtToArray(index),
                 readingList.TrimStringListToStringArray(),
                 readingsOrthographyInfoList.TrimListOfNullableArraysToArrayOfArrays(),
                 definitionList.ToArray(),
@@ -104,9 +104,9 @@ internal static class JmdictRecordBuilder
             ++index;
         }
 
-        List<ReadingElement> readingElementsWithoutSearchOnlyTerms = entry.ReadingElements.Where(static ke => !ke.ReInfList.Contains("sk")).ToList();
-        List<string> allReadingsWithoutSearchOnlyTerms = readingElementsWithoutSearchOnlyTerms.Select(static rEle => rEle.Reb).ToList();
-        List<string[]?> allROrthographyInfoWithoutSearchOnlyTerms = readingElementsWithoutSearchOnlyTerms.Select(static rEle => rEle.ReInfList.TrimStringListToStringArray()).ToList();
+        List<ReadingElement> readingElementsWithoutSearchOnlyForms = entry.ReadingElements.Where(static ke => !ke.ReInfList.Contains("sk")).ToList();
+        List<string> allReadingsWithoutSearchOnlyForms = readingElementsWithoutSearchOnlyForms.Select(static rEle => rEle.Reb).ToList();
+        List<string[]?> allROrthographyInfoWithoutSearchOnlyForms = readingElementsWithoutSearchOnlyForms.Select(static rEle => rEle.ReInfList.TrimStringListToStringArray()).ToList();
 
         index = 0;
         for (int i = 0; i < entry.ReadingElements.Count; i++)
@@ -137,7 +137,7 @@ internal static class JmdictRecordBuilder
             string[]? alternativeSpellings;
             string[]?[]? alternativeSpellingsOrthographyInfo = null;
 
-            if (readingElement.ReRestrList.Count > 0 || allSpellingsWithoutSearchOnlyTerms.Count > 0)
+            if (readingElement.ReRestrList.Count > 0 || allSpellingsWithoutSearchOnlyForms.Count > 0)
             {
                 if (readingElement.ReRestrList.Count > 0)
                 {
@@ -147,8 +147,8 @@ internal static class JmdictRecordBuilder
 
                 else
                 {
-                    primarySpelling = allSpellingsWithoutSearchOnlyTerms[0];
-                    alternativeSpellings = allSpellingsWithoutSearchOnlyTerms.RemoveAtToArray(0);
+                    primarySpelling = allSpellingsWithoutSearchOnlyForms[0];
+                    alternativeSpellings = allSpellingsWithoutSearchOnlyForms.RemoveAtToArray(0);
                 }
 
                 if (recordDictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(primarySpelling), out JmdictRecord? mainEntry))
@@ -163,10 +163,10 @@ internal static class JmdictRecordBuilder
             else
             {
                 primarySpelling = readingElement.Reb;
-                primarySpellingOrthographyInfo = allROrthographyInfoWithoutSearchOnlyTerms[index];
+                primarySpellingOrthographyInfo = allROrthographyInfoWithoutSearchOnlyForms[index];
 
-                alternativeSpellings = allReadingsWithoutSearchOnlyTerms.RemoveAtToArray(index);
-                alternativeSpellingsOrthographyInfo = allROrthographyInfoWithoutSearchOnlyTerms.RemoveAtToArray(index);
+                alternativeSpellings = allReadingsWithoutSearchOnlyForms.RemoveAtToArray(index);
+                alternativeSpellingsOrthographyInfo = allROrthographyInfoWithoutSearchOnlyForms.RemoveAtToArray(index);
             }
 
             List<string[]> definitionList = new();
@@ -228,7 +228,7 @@ internal static class JmdictRecordBuilder
             ++index;
 
             if (i is 0
-                && allSpellingsWithoutSearchOnlyTerms.Count is 0
+                && allSpellingsWithoutSearchOnlyForms.Count is 0
                 && entry.KanjiElements.Count > 0)
             {
                 for (int j = 0; j < entry.KanjiElements.Count; j++)
