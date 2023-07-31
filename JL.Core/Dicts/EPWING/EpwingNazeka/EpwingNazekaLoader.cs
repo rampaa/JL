@@ -61,7 +61,6 @@ internal static class EpwingNazekaLoader
             }
 
             string[]? definitions = definitionList?.ToArray();
-            definitions?.DeduplicateStringsInArray();
 
             if (spellingList is not null)
             {

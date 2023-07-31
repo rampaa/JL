@@ -307,7 +307,7 @@ internal sealed partial class PreferencesWindow : Window
         string rawTags = tagsTextBox.Text;
         string[] tags = string.IsNullOrEmpty(rawTags)
             ? Array.Empty<string>()
-            : rawTags.Split(',').Select(static s => s.Trim()).ToArray();
+            : rawTags.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
 
         return new AnkiConfig(deckName, modelName, dict, tags);
     }

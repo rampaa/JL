@@ -50,26 +50,26 @@ public static class CustomWordLoader
 
             for (int i = 0; i < lines.Length; i++)
             {
-                string[] lParts = lines[i].Split("\t");
+                string[] lParts = lines[i].Split("\t", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
                 if (lParts.Length > 3)
                 {
-                    string[] spellings = lParts[0].Split(';');
+                    string[] spellings = lParts[0].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
-                    string[]? readings = lParts[1].Split(';');
+                    string[]? readings = lParts[1].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
                     if (readings.Length is 0)
                     {
                         readings = null;
                     }
 
-                    string[] definitions = lParts[2].Split(';');
-                    string partOfSpeech = lParts[3].Trim();
+                    string[] definitions = lParts[2].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                    string partOfSpeech = lParts[3];
 
                     string[]? wordClasses = null;
                     if (lParts.Length is 5)
                     {
-                        wordClasses = lParts[4].Split(';');
+                        wordClasses = lParts[4].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                     }
 
                     AddToDictionary(spellings, readings, definitions, partOfSpeech, wordClasses, dict.Contents);

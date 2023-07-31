@@ -13,11 +13,11 @@ public static class CustomNameLoader
 
             for (int i = 0; i < lines.Length; i++)
             {
-                string[] lParts = lines[i].Split("\t");
+                string[] lParts = lines[i].Split("\t", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
                 if (lParts.Length is 3)
                 {
-                    AddToDictionary(lParts[0].Trim(), lParts[1].Trim(), lParts[2].Trim(), dict.Contents);
+                    AddToDictionary(lParts[0], lParts[1], lParts[2], dict.Contents);
                 }
             }
         }
