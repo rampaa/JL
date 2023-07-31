@@ -17,8 +17,8 @@ public sealed class LookupResult
     public string[]? AlternativeSpellings { get; init; }
     public string? Process { get; init; }
     public string[]? PrimarySpellingOrthographyInfoList { get; init; }
-    public List<string>? ReadingsOrthographyInfoList { get; }
-    public List<string>? AlternativeSpellingsOrthographyInfoList { get; }
+    public List<string?>? ReadingsOrthographyInfoList { get; }
+    public List<string?>? AlternativeSpellingsOrthographyInfoList { get; }
 
     // Kanji
     public string[]? OnReadings { get; init; }
@@ -38,8 +38,8 @@ public sealed class LookupResult
         List<LookupFrequencyResult>? frequencies = null,
         string[]? alternativeSpellings = null,
         string[]? primarySpellingOrthographyInfoList = null,
-        List<string>? readingsOrthographyInfoList = null,
-        List<string>? alternativeSpellingsOrthographyInfoList = null,
+        List<string?>? readingsOrthographyInfoList = null,
+        List<string?>? alternativeSpellingsOrthographyInfoList = null,
         string[]? onReadings = null,
         string[]? kunReadings = null,
         string[]? nanoriReadings = null,

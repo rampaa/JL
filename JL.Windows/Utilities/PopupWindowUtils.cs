@@ -29,7 +29,7 @@ internal static class PopupWindowUtils
         return gradeText;
     }
 
-    public static string FrequenciesToText(List<LookupFrequencyResult> frequencies)
+    public static string? FrequenciesToText(List<LookupFrequencyResult> frequencies)
     {
         if (frequencies.Count is 1 && frequencies[0].Freq is > 0 and < int.MaxValue)
         {
@@ -55,14 +55,14 @@ internal static class PopupWindowUtils
             }
         }
 
-        return "";
+        return null;
     }
 
-    public static string ReadingsToText(IList<string> readings, IReadOnlyList<string> rOrthographyInfoList)
+    public static string? ReadingsToText(IList<string> readings, IReadOnlyList<string?> rOrthographyInfoList)
     {
         if (readings.Count is 0)
         {
-            return "";
+            return null;
         }
 
         StringBuilder sb = new();
@@ -88,11 +88,11 @@ internal static class PopupWindowUtils
         return sb.ToString();
     }
 
-    public static string AlternativeSpellingsToText(IReadOnlyList<string> alternativeSpellings, IReadOnlyList<string> aOrthographyInfoList)
+    public static string? AlternativeSpellingsToText(IReadOnlyList<string> alternativeSpellings, IReadOnlyList<string?> aOrthographyInfoList)
     {
         if (alternativeSpellings.Count is 0)
         {
-            return "";
+            return null;
         }
 
         StringBuilder sb = new();

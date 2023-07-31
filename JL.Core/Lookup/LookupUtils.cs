@@ -572,8 +572,8 @@ public static class LookupUtils
 
                     string[]?[]? rLists = jMDictResult.ReadingsOrthographyInfo;
                     string[]?[]? aLists = jMDictResult.AlternativeSpellingsOrthographyInfo;
-                    List<string> rOrthographyInfoList = new();
-                    List<string> aOrthographyInfoList = new();
+                    List<string?> rOrthographyInfoList = new();
+                    List<string?> aOrthographyInfoList = new();
 
                     for (int k = 0; k < rLists?.Length; k++)
                     {
@@ -588,6 +588,10 @@ public static class LookupUtils
                             }
 
                             rOrthographyInfoList.Add(formattedROrthographyInfo.Remove(formattedROrthographyInfo.Length - 2, 2).ToString());
+                        }
+                        else
+                        {
+                            rOrthographyInfoList.Add(null);
                         }
                     }
 
@@ -604,6 +608,11 @@ public static class LookupUtils
                             }
 
                             aOrthographyInfoList.Add(formattedAOrthographyInfo.Remove(formattedAOrthographyInfo.Length - 2, 2).ToString());
+                        }
+
+                        else
+                        {
+                            aOrthographyInfoList.Add(null);
                         }
                     }
 
@@ -988,10 +997,9 @@ public static class LookupUtils
         StringBuilder deconjugation = new();
         bool first = true;
 
-        int processListListCount = processList?.Count ?? 0;
-        for (int i = 0; i < processListListCount; i++)
+        for (int i = 0; i < processList?.Count; i++)
         {
-            List<string> form = processList![i];
+            List<string> form = processList[i];
 
             StringBuilder formText = new();
             int added = 0;

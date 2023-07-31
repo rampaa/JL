@@ -500,9 +500,9 @@ internal sealed partial class PopupWindow : Window
 
         if (result.Frequencies?.Count > 0)
         {
-            string freqText = PopupWindowUtils.FrequenciesToText(result.Frequencies);
+            string? freqText = PopupWindowUtils.FrequenciesToText(result.Frequencies);
 
-            if (freqText is not "")
+            if (freqText is not null)
             {
                 textBlockFrequency = new TextBlock
                 {
@@ -536,13 +536,11 @@ internal sealed partial class PopupWindow : Window
 
         if (result.Readings?.Count > 0)
         {
-            List<string>? rOrthographyInfoList = result.ReadingsOrthographyInfoList;
-            IList<string> readings = result.Readings;
-            string readingsText = rOrthographyInfoList?.Count > 0 && (result.Dict.Options?.ROrthographyInfo?.Value ?? true)
-                ? PopupWindowUtils.ReadingsToText(readings, rOrthographyInfoList)
+            string? readingsText = result.ReadingsOrthographyInfoList?.Count > 0 && (result.Dict.Options?.ROrthographyInfo?.Value ?? true)
+                ? PopupWindowUtils.ReadingsToText(result.Readings, result.ReadingsOrthographyInfoList)
                 : string.Join(", ", result.Readings);
 
-            if (readingsText is not "")
+            if (readingsText is not null)
             {
                 if (MiningMode)
                 {
@@ -647,13 +645,11 @@ internal sealed partial class PopupWindow : Window
 
         if (result.AlternativeSpellings?.Length > 0)
         {
-            List<string>? aOrthographyInfoList = result.AlternativeSpellingsOrthographyInfoList;
-            IReadOnlyList<string>? alternativeSpellings = result.AlternativeSpellings;
-            string alternativeSpellingsText = aOrthographyInfoList?.Count > 0 && (result.Dict.Options?.AOrthographyInfo?.Value ?? true)
-                ? PopupWindowUtils.AlternativeSpellingsToText(alternativeSpellings, aOrthographyInfoList)
-                : string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", alternativeSpellings)})");
+            string? alternativeSpellingsText = result.AlternativeSpellingsOrthographyInfoList?.Count > 0 && (result.Dict.Options?.AOrthographyInfo?.Value ?? true)
+                ? PopupWindowUtils.AlternativeSpellingsToText(result.AlternativeSpellings, result.AlternativeSpellingsOrthographyInfoList)
+                : string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", result.AlternativeSpellings)})");
 
-            if (alternativeSpellingsText is not "")
+            if (alternativeSpellingsText is not null)
             {
                 if (MiningMode)
                 {
