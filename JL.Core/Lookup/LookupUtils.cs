@@ -569,7 +569,6 @@ public static class LookupUtils
                 {
                     var jMDictResult = (JmdictRecord)wordResult.Results[i][j];
 
-
                     string[]?[]? rLists = jMDictResult.ReadingsOrthographyInfo;
                     string[]?[]? aLists = jMDictResult.AlternativeSpellingsOrthographyInfo;
                     List<string?> rOrthographyInfoList = new();

@@ -948,6 +948,16 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="SelectedTextToSpeechTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Selected text to speech" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
                             <TextBox x:Name="ShowManageDictionariesWindowKeyGestureTextBox"
 
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -1145,16 +1155,6 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Minimize/Restore the main window" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                       VerticalAlignment="Center" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
-                                    Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="SelectedTextToSpeechTextBox"
-                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Selected text to speech" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 

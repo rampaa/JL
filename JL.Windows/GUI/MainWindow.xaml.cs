@@ -723,7 +723,13 @@ internal sealed partial class MainWindow : Window
 
             if (SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
             {
-                await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, MainTextBox.SelectedText, CoreConfig.AudioVolume).ConfigureAwait(false);
+                string selectedText = MainTextBox.SelectedText;
+                if (string.IsNullOrWhiteSpace(selectedText))
+                {
+                    selectedText = MainTextBox.Text;
+                }
+
+                await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, selectedText, CoreConfig.AudioVolume).ConfigureAwait(false);
             }
         }
 
