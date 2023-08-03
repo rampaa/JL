@@ -79,6 +79,7 @@ internal static class ConfigManager
     public static bool EnableBacklog { get; private set; } = true;
     public static bool AutoSaveBacklogBeforeClosing { get; private set; } = false;
     public static bool TextToSpeechOnTextChange { get; private set; } = false;
+    public static bool AlwaysShowMainTextBoxCaret { get; private set; } = false;
 
     #endregion
 
@@ -156,7 +157,6 @@ internal static class ConfigManager
     public static KeyGesture NextDictKeyGesture { get; private set; } = new(Key.PageDown, ModifierKeys.Windows);
     public static KeyGesture PreviousDictKeyGesture { get; private set; } = new(Key.PageUp, ModifierKeys.Windows);
     public static KeyGesture AlwaysOnTopKeyGesture { get; private set; } = new(Key.R, ModifierKeys.Alt);
-    public static KeyGesture TextOnlyVisibleOnHoverKeyGesture { get; private set; } = new(Key.E, ModifierKeys.Windows);
     public static KeyGesture TextBoxIsReadOnlyKeyGesture { get; private set; } = new(Key.U, ModifierKeys.Windows);
     public static KeyGesture CaptureTextFromClipboardKeyGesture { get; private set; } = new(Key.F10, ModifierKeys.Windows);
     public static KeyGesture CaptureTextFromWebSocketKeyGesture { get; private set; } = new(Key.F11, ModifierKeys.Windows);
@@ -164,7 +164,16 @@ internal static class ConfigManager
     public static KeyGesture DeleteCurrentLineKeyGesture { get; private set; } = new(Key.Delete, ModifierKeys.Windows);
     public static KeyGesture ShowManageAudioSourcesWindowKeyGesture { get; private set; } = new(Key.Z, ModifierKeys.Windows);
     public static KeyGesture ToggleMinimizedStateKeyGesture { get; private set; } = new(Key.X, ModifierKeys.Alt);
-    public static KeyGesture SelectedTextToSpeech { get; private set; } = new(Key.F6, ModifierKeys.Windows);
+    public static KeyGesture SelectedTextToSpeechKeyGesture { get; private set; } = new(Key.F6, ModifierKeys.Windows);
+    public static KeyGesture ToggleAlwaysShowMainTextBoxCaretKeyGesture { get; private set; } = new(Key.G, ModifierKeys.Windows);
+    public static KeyGesture MoveCaretLeftKeyGesture { get; private set; } = new(Key.NumPad4, ModifierKeys.Windows);
+    public static KeyGesture MoveCaretRightKeyGesture { get; private set; } = new(Key.NumPad6, ModifierKeys.Windows);
+    public static KeyGesture MoveCaretUpKeyGesture { get; private set; } = new(Key.NumPad8, ModifierKeys.Windows);
+    public static KeyGesture MoveCaretDownKeyGesture { get; private set; } = new(Key.NumPad2, ModifierKeys.Windows);
+    public static KeyGesture LookupTermAtCaretIndexKeyGesture { get; private set; } = new(Key.NumPad5, ModifierKeys.Windows);
+    public static KeyGesture SelectNextLookupResultKeyGesture { get; private set; } = new(Key.Down, ModifierKeys.Control);
+    public static KeyGesture SelectPreviousLookupResultKeyGesture { get; private set; } = new(Key.Up, ModifierKeys.Control);
+    public static KeyGesture MineSelectedLookupResultKeyGesture { get; private set; } = new(Key.Enter, ModifierKeys.Control);
 
     #endregion
 
@@ -290,6 +299,9 @@ internal static class ConfigManager
         mainWindow.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
         mainWindow.MainTextBox.IsUndoEnabled = !TextBoxIsReadOnly;
 
+        AlwaysShowMainTextBoxCaret = GetValueFromConfig(AlwaysShowMainTextBoxCaret, nameof(AlwaysShowMainTextBoxCaret), bool.TryParse);
+        mainWindow.MainTextBox.IsReadOnlyCaretVisible = AlwaysShowMainTextBoxCaret;
+
         TextBoxApplyDropShadowEffect = GetValueFromConfig(TextBoxApplyDropShadowEffect, nameof(TextBoxApplyDropShadowEffect), bool.TryParse);
         if (TextBoxApplyDropShadowEffect)
         {
@@ -402,8 +414,16 @@ internal static class ConfigManager
         NextDictKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(NextDictKeyGesture), NextDictKeyGesture);
         PreviousDictKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(PreviousDictKeyGesture), PreviousDictKeyGesture);
         AlwaysOnTopKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(AlwaysOnTopKeyGesture), AlwaysOnTopKeyGesture);
-        TextOnlyVisibleOnHoverKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(TextOnlyVisibleOnHoverKeyGesture), TextOnlyVisibleOnHoverKeyGesture);
         TextBoxIsReadOnlyKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(TextBoxIsReadOnlyKeyGesture), TextBoxIsReadOnlyKeyGesture);
+        ToggleAlwaysShowMainTextBoxCaretKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(ToggleAlwaysShowMainTextBoxCaretKeyGesture), ToggleAlwaysShowMainTextBoxCaretKeyGesture);
+        MoveCaretLeftKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(MoveCaretLeftKeyGesture), MoveCaretLeftKeyGesture);
+        MoveCaretRightKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(MoveCaretRightKeyGesture), MoveCaretRightKeyGesture);
+        MoveCaretUpKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(MoveCaretUpKeyGesture), MoveCaretUpKeyGesture);
+        MoveCaretDownKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(MoveCaretDownKeyGesture), MoveCaretDownKeyGesture);
+        LookupTermAtCaretIndexKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(LookupTermAtCaretIndexKeyGesture), LookupTermAtCaretIndexKeyGesture);
+        SelectNextLookupResultKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(SelectNextLookupResultKeyGesture), SelectNextLookupResultKeyGesture);
+        SelectPreviousLookupResultKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(SelectPreviousLookupResultKeyGesture), SelectPreviousLookupResultKeyGesture);
+        MineSelectedLookupResultKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(MineSelectedLookupResultKeyGesture), MineSelectedLookupResultKeyGesture);
         CaptureTextFromClipboardKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(CaptureTextFromClipboardKeyGesture), CaptureTextFromClipboardKeyGesture);
         CaptureTextFromWebSocketKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(CaptureTextFromWebSocketKeyGesture), CaptureTextFromWebSocketKeyGesture);
         ReconnectToWebSocketServerKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(ReconnectToWebSocketServerKeyGesture), ReconnectToWebSocketServerKeyGesture);
@@ -444,7 +464,7 @@ internal static class ConfigManager
             KeyGestureUtils.SetKeyGesture(nameof(ToggleMinimizedStateKeyGesture),
                 ToggleMinimizedStateKeyGesture);
 
-        SelectedTextToSpeech = KeyGestureUtils.SetKeyGesture(nameof(SelectedTextToSpeech), SelectedTextToSpeech);
+        SelectedTextToSpeechKeyGesture = KeyGestureUtils.SetKeyGesture(nameof(SelectedTextToSpeechKeyGesture), SelectedTextToSpeechKeyGesture);
 
         if (GlobalHotKeys && !DisableHotkeys)
         {
@@ -708,10 +728,26 @@ internal static class ConfigManager
             KeyGestureUtils.KeyGestureToString(PreviousDictKeyGesture);
         preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text =
             KeyGestureUtils.KeyGestureToString(AlwaysOnTopKeyGesture);
-        preferenceWindow.TextOnlyVisibleOnHoverKeyGestureTextBox.Text =
-            KeyGestureUtils.KeyGestureToString(TextOnlyVisibleOnHoverKeyGesture);
         preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text =
             KeyGestureUtils.KeyGestureToString(TextBoxIsReadOnlyKeyGesture);
+        preferenceWindow.ToggleAlwaysShowMainTextBoxCaretKeyGestureTextBox.Text =
+            KeyGestureUtils.KeyGestureToString(ToggleAlwaysShowMainTextBoxCaretKeyGesture);
+        preferenceWindow.MoveCaretLeftKeyGestureTextBox.Text =
+            KeyGestureUtils.KeyGestureToString(MoveCaretLeftKeyGesture);
+        preferenceWindow.MoveCaretRightKeyGestureTextBox.Text =
+            KeyGestureUtils.KeyGestureToString(MoveCaretRightKeyGesture);
+        preferenceWindow.MoveCaretUpKeyGestureTextBox.Text =
+            KeyGestureUtils.KeyGestureToString(MoveCaretUpKeyGesture);
+        preferenceWindow.MoveCaretDownKeyGestureTextBox.Text =
+            KeyGestureUtils.KeyGestureToString(MoveCaretDownKeyGesture);
+        preferenceWindow.LookupTermAtCaretIndexKeyGestureTextBox.Text =
+            KeyGestureUtils.KeyGestureToString(LookupTermAtCaretIndexKeyGesture);
+        preferenceWindow.SelectNextLookupResultKeyGestureTextBox.Text =
+            KeyGestureUtils.KeyGestureToString(SelectNextLookupResultKeyGesture);
+        preferenceWindow.SelectPreviousLookupResultKeyGestureTextBox.Text =
+            KeyGestureUtils.KeyGestureToString(SelectPreviousLookupResultKeyGesture);
+        preferenceWindow.MineSelectedLookupResultKeyGestureTextBox.Text =
+            KeyGestureUtils.KeyGestureToString(MineSelectedLookupResultKeyGesture);
         preferenceWindow.CaptureTextFromClipboardKeyGestureTextBox.Text =
             KeyGestureUtils.KeyGestureToString(CaptureTextFromClipboardKeyGesture);
         preferenceWindow.CaptureTextFromWebSocketKeyGestureTextBox.Text =
@@ -723,7 +759,7 @@ internal static class ConfigManager
         preferenceWindow.ToggleMinimizedStateKeyGestureTextBox.Text =
             KeyGestureUtils.KeyGestureToString(ToggleMinimizedStateKeyGesture);
         preferenceWindow.SelectedTextToSpeechTextBox.Text =
-            KeyGestureUtils.KeyGestureToString(SelectedTextToSpeech);
+            KeyGestureUtils.KeyGestureToString(SelectedTextToSpeechKeyGesture);
 
         WindowsUtils.SetButtonColor(preferenceWindow.HighlightColorButton, HighlightColor);
         WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, mainWindow.Background.CloneCurrentValue());
@@ -777,6 +813,7 @@ internal static class ConfigManager
         preferenceWindow.MainWindowBackgroundOpacityOnUnhoverNumericUpDown.Value = MainWindowBackgroundOpacityOnUnhover;
 
         preferenceWindow.TextBoxIsReadOnlyCheckBox.IsChecked = TextBoxIsReadOnly;
+        preferenceWindow.AlwaysShowMainTextBoxCaretCheckBox.IsChecked = AlwaysShowMainTextBoxCaret;
         preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked = TextBoxTrimWhiteSpaceCharacters;
         preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked = TextBoxRemoveNewlines;
         preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked = TextBoxApplyDropShadowEffect;
@@ -900,14 +937,28 @@ internal static class ConfigManager
             preferenceWindow.NextDictKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(PreviousDictKeyGesture),
             preferenceWindow.PreviousDictKeyGestureTextBox.Text);
-
         SaveKeyGesture(nameof(AlwaysOnTopKeyGesture),
             preferenceWindow.AlwaysOnTopKeyGestureTextBox.Text);
-        SaveKeyGesture(nameof(TextOnlyVisibleOnHoverKeyGesture),
-            preferenceWindow.TextOnlyVisibleOnHoverKeyGestureTextBox.Text);
-
         SaveKeyGesture(nameof(TextBoxIsReadOnlyKeyGesture),
             preferenceWindow.TextBoxIsReadOnlyKeyGestureTextBox.Text);
+        SaveKeyGesture(nameof(ToggleAlwaysShowMainTextBoxCaretKeyGesture),
+            preferenceWindow.ToggleAlwaysShowMainTextBoxCaretKeyGestureTextBox.Text);
+        SaveKeyGesture(nameof(MoveCaretLeftKeyGesture),
+            preferenceWindow.MoveCaretLeftKeyGestureTextBox.Text);
+        SaveKeyGesture(nameof(MoveCaretRightKeyGesture),
+            preferenceWindow.MoveCaretRightKeyGestureTextBox.Text);
+        SaveKeyGesture(nameof(MoveCaretUpKeyGesture),
+            preferenceWindow.MoveCaretUpKeyGestureTextBox.Text);
+        SaveKeyGesture(nameof(MoveCaretDownKeyGesture),
+            preferenceWindow.MoveCaretDownKeyGestureTextBox.Text);
+        SaveKeyGesture(nameof(LookupTermAtCaretIndexKeyGesture),
+            preferenceWindow.LookupTermAtCaretIndexKeyGestureTextBox.Text);
+        SaveKeyGesture(nameof(SelectNextLookupResultKeyGesture),
+            preferenceWindow.SelectNextLookupResultKeyGestureTextBox.Text);
+        SaveKeyGesture(nameof(SelectPreviousLookupResultKeyGesture),
+            preferenceWindow.SelectPreviousLookupResultKeyGestureTextBox.Text);
+        SaveKeyGesture(nameof(MineSelectedLookupResultKeyGesture),
+            preferenceWindow.MineSelectedLookupResultKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(CaptureTextFromClipboardKeyGesture),
             preferenceWindow.CaptureTextFromClipboardKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(CaptureTextFromWebSocketKeyGesture),
@@ -918,7 +969,7 @@ internal static class ConfigManager
             preferenceWindow.DeleteCurrentLineKeyGestureTextBox.Text);
         SaveKeyGesture(nameof(ToggleMinimizedStateKeyGesture),
             preferenceWindow.ToggleMinimizedStateKeyGestureTextBox.Text);
-        SaveKeyGesture(nameof(SelectedTextToSpeech),
+        SaveKeyGesture(nameof(SelectedTextToSpeechKeyGesture),
             preferenceWindow.SelectedTextToSpeechTextBox.Text);
 
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
@@ -960,6 +1011,8 @@ internal static class ConfigManager
             preferenceWindow.MainWindowBackgroundOpacityOnUnhoverNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
         config.AppSettings.Settings[nameof(TextBoxIsReadOnly)].Value =
             preferenceWindow.TextBoxIsReadOnlyCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings[nameof(AlwaysShowMainTextBoxCaret)].Value =
+            preferenceWindow.AlwaysShowMainTextBoxCaretCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(TextBoxTrimWhiteSpaceCharacters)].Value =
             preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(TextBoxRemoveNewlines)].Value =

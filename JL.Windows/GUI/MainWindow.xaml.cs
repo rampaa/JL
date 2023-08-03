@@ -75,7 +75,8 @@ internal sealed partial class MainWindow : Window
         ConfigManager.ApplyPreferences();
 
         WinApi.RestoreWindow(WindowHandle);
-        _ = Focus();
+        WinApi.ActivateWindow(WindowHandle);
+        FocusManager.SetFocusedElement(this, MainTextBox);
 
         await StatsUtils.DeserializeLifetimeStats().ConfigureAwait(true);
 
@@ -609,23 +610,6 @@ internal sealed partial class MainWindow : Window
             Topmost = ConfigManager.AlwaysOnTop;
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.TextOnlyVisibleOnHoverKeyGesture))
-        {
-            handled = true;
-
-            ConfigManager.TextOnlyVisibleOnHover = !ConfigManager.TextOnlyVisibleOnHover;
-
-            if (ConfigManager.TextOnlyVisibleOnHover && Background.Opacity is not 0)
-            {
-                MainGrid.Opacity = IsMouseOver ? 1 : 0;
-            }
-
-            else
-            {
-                MainGrid.Opacity = 1;
-            }
-        }
-
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.CaptureTextFromClipboardKeyGesture))
         {
             handled = true;
@@ -717,7 +701,7 @@ internal sealed partial class MainWindow : Window
             }
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SelectedTextToSpeech))
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SelectedTextToSpeechKeyGesture))
         {
             handled = true;
 
@@ -731,6 +715,41 @@ internal sealed partial class MainWindow : Window
 
                 await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, selectedText, CoreConfig.AudioVolume).ConfigureAwait(false);
             }
+        }
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MoveCaretLeftKeyGesture))
+        {
+            handled = true;
+
+            MoveCaret(Key.Left);
+        }
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MoveCaretRightKeyGesture))
+        {
+            handled = true;
+
+            MoveCaret(Key.Right);
+        }
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MoveCaretUpKeyGesture))
+        {
+            handled = true;
+
+            MoveCaret(Key.Up);
+        }
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MoveCaretDownKeyGesture))
+        {
+            handled = true;
+
+            MoveCaret(Key.Down);
+        }
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.LookupTermAtCaretIndexKeyGesture))
+        {
+            handled = true;
+
+            await FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true).ConfigureAwait(false);
         }
 
         if (handled && e is not null)
@@ -1264,5 +1283,15 @@ internal sealed partial class MainWindow : Window
         }
 
         HideTitleBarButtons();
+    }
+
+    private void MoveCaret(Key key)
+    {
+        WinApi.ActivateWindow(WindowHandle);
+
+        MainTextBox.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(MainTextBox)!, 0, key)
+        {
+            RoutedEvent = Keyboard.KeyDownEvent
+        });
     }
 }

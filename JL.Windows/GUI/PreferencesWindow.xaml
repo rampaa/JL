@@ -364,6 +364,12 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Always show caret"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <CheckBox x:Name="AlwaysShowMainTextBoxCaretCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Enable backlog"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="EnableBacklogCheckBox"
@@ -1111,16 +1117,6 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="TextOnlyVisibleOnHoverKeyGestureTextBox"
-                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Toggle text only visible on hover" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                       VerticalAlignment="Center" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
-                                    Click="ClearKeyGestureButton_Click" />
                             <TextBox x:Name="CaptureTextFromClipboardKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -1168,6 +1164,96 @@
                                        VerticalAlignment="Center" Cursor="Help"
                                        ToolTip="Delete the currently shown line from the main window.
                                        &#10;Line and character count stats will be updated accordingly."/>
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="ToggleAlwaysShowMainTextBoxCaretKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Toggle always show caret option" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="MoveCaretLeftKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Move caret left" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="MoveCaretRightKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Move caret right" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="MoveCaretUpKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Move caret up" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="MoveCaretDownKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Move caret down" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="LookupTermAtCaretIndexKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Lookup term at caret index" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="SelectNextLookupResultKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Select next lookup result" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="SelectPreviousLookupResultKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Select previous lookup result" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="MineSelectedLookupResultKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Mine selected lookup result" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>

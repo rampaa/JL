@@ -125,6 +125,107 @@ internal sealed partial class PopupWindow : Window
         WindowsUtils.ShowStatsWindow();
     }
 
+    public async Task LookupOnCharPosition(TextBox tb, int charPosition, bool enableMiningMode)
+    {
+        _currentText = tb.Text;
+        _currentCharPosition = charPosition;
+
+        if (Owner != MainWindow.Instance
+                ? ConfigManager.DisableLookupsForNonJapaneseCharsInPopups
+                  && !JapaneseUtils.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString())
+                : ConfigManager.DisableLookupsForNonJapaneseCharsInMainWindow
+                  && !JapaneseUtils.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString()))
+        {
+            HidePopup();
+            return;
+        }
+
+        int endPosition = tb.Text.Length - charPosition > ConfigManager.MaxSearchLength
+            ? JapaneseUtils.FindExpressionBoundary(tb.Text[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
+            : JapaneseUtils.FindExpressionBoundary(tb.Text, charPosition);
+
+        string text = tb.Text[charPosition..endPosition];
+
+        if (text == LastText && IsVisible)
+        {
+            if (ConfigManager.FixedPopupPositioning && Owner == MainWindow.Instance)
+            {
+                UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+            }
+
+            else
+            {
+                UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+            }
+
+            return;
+        }
+
+        LastText = text;
+
+        List<LookupResult>? lookupResults = LookupUtils.LookupText(text);
+
+        if (lookupResults?.Count > 0)
+        {
+            _lastTextBox = tb;
+            _lastSelectedText = lookupResults[0].MatchedText;
+
+            if (ConfigManager.HighlightLongestMatch)
+            {
+                _ = tb.Focus();
+                tb.Select(charPosition, lookupResults[0].MatchedText.Length);
+            }
+
+            _lastLookupResults = lookupResults;
+
+            if (enableMiningMode)
+            {
+                EnableMiningMode();
+                DisplayResults(true);
+
+                if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
+                {
+                    PopupWindowUtils.SetPopupAutoHideTimer();
+                }
+            }
+
+            else
+            {
+                DisplayResults(false, text);
+            }
+
+            Show();
+
+            if (ConfigManager.FixedPopupPositioning && Owner == MainWindow.Instance)
+            {
+                UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+            }
+
+            else
+            {
+                UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+            }
+
+            if (ConfigManager.Focusable && ConfigManager.PopupFocusOnLookup)
+            {
+                _ = Activate();
+            }
+
+            _ = Focus();
+
+            WinApi.BringToFront(WindowHandle);
+
+            if (ConfigManager.AutoPlayAudio)
+            {
+                await PlayAudio().ConfigureAwait(false);
+            }
+        }
+        else
+        {
+            HidePopup();
+        }
+    }
+
     public async Task LookupOnMouseMoveOrClick(TextBox tb)
     {
         // Set snapToText to the value of HorizontallyCenterMainWindowText
@@ -139,103 +240,7 @@ internal sealed partial class PopupWindow : Window
                 --charPosition;
             }
 
-            _currentText = tb.Text;
-            _currentCharPosition = charPosition;
-
-            if (Owner != MainWindow.Instance
-                    ? ConfigManager.DisableLookupsForNonJapaneseCharsInPopups
-                      && !JapaneseUtils.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString())
-                    : ConfigManager.DisableLookupsForNonJapaneseCharsInMainWindow
-                      && !JapaneseUtils.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString()))
-            {
-                HidePopup();
-                return;
-            }
-
-            int endPosition = tb.Text.Length - charPosition > ConfigManager.MaxSearchLength
-                ? JapaneseUtils.FindExpressionBoundary(tb.Text[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
-                : JapaneseUtils.FindExpressionBoundary(tb.Text, charPosition);
-
-            string text = tb.Text[charPosition..endPosition];
-
-            if (text == LastText && IsVisible)
-            {
-                if (ConfigManager.FixedPopupPositioning && Owner == MainWindow.Instance)
-                {
-                    UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
-                }
-
-                else
-                {
-                    UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
-                }
-
-                return;
-            }
-
-            LastText = text;
-
-            List<LookupResult>? lookupResults = LookupUtils.LookupText(text);
-
-            if (lookupResults?.Count > 0)
-            {
-                _lastTextBox = tb;
-                _lastSelectedText = lookupResults[0].MatchedText;
-
-                if (ConfigManager.HighlightLongestMatch)
-                {
-                    _ = tb.Focus();
-                    tb.Select(charPosition, lookupResults[0].MatchedText.Length);
-                }
-
-                _lastLookupResults = lookupResults;
-
-                if (ConfigManager.LookupOnMouseClickOnly)
-                {
-                    EnableMiningMode();
-                    DisplayResults(true);
-
-                    if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
-                    {
-                        PopupWindowUtils.SetPopupAutoHideTimer();
-                    }
-                }
-
-                else
-                {
-                    DisplayResults(false, text);
-                }
-
-                Show();
-
-                if (ConfigManager.FixedPopupPositioning && Owner == MainWindow.Instance)
-                {
-                    UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
-                }
-
-                else
-                {
-                    UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
-                }
-
-                if (ConfigManager.Focusable && ConfigManager.PopupFocusOnLookup)
-                {
-                    _ = Activate();
-                }
-
-                _ = Focus();
-
-                WinApi.BringToFront(WindowHandle);
-
-                if (ConfigManager.AutoPlayAudio)
-                {
-                    await PlayAudio().ConfigureAwait(false);
-                }
-            }
-            else
-            {
-                HidePopup();
-            }
+            await LookupOnCharPosition(tb, charPosition, ConfigManager.LookupOnMouseClickOnly).ConfigureAwait(false);
         }
         else
         {
@@ -1065,20 +1070,8 @@ internal sealed partial class PopupWindow : Window
         _listBoxIndex = 0;
     }
 
-    private async void PrimarySpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    private async Task Mine(Panel top)
     {
-        if (e.ChangedButton == ConfigManager.CopyPrimarySpellingToClipboardMouseButton)
-        {
-            WindowsUtils.CopyTextToClipboard(((TextBlock)sender).Text);
-        }
-
-        if (!MiningMode || e.ChangedButton != ConfigManager.MineMouseButton)
-        {
-            return;
-        }
-
-        HidePopup();
-
         Dictionary<JLField, string> miningParams = new();
 
         if (_currentText is not null)
@@ -1087,11 +1080,7 @@ internal sealed partial class PopupWindow : Window
             miningParams[JLField.Sentence] = JapaneseUtils.FindSentence(_currentText, _currentCharPosition);
         }
 
-        var textBlock = (TextBlock)sender;
-
-        WrapPanel top = textBlock.Parent is Grid primarySpellingGrid
-            ? (WrapPanel)primarySpellingGrid.Parent
-            : (WrapPanel)textBlock.Parent;
+        HidePopup();
 
         foreach (UIElement child in top.Children)
         {
@@ -1180,30 +1169,28 @@ internal sealed partial class PopupWindow : Window
                 continue;
             }
 
-            textBlock = tb;
-
-            switch (textBlock.Name)
+            switch (tb.Name)
             {
                 case nameof(LookupResult.OnReadings):
-                    miningParams[JLField.OnReadings] = textBlock.Text;
+                    miningParams[JLField.OnReadings] = tb.Text;
                     break;
                 case nameof(LookupResult.KunReadings):
-                    miningParams[JLField.KunReadings] = textBlock.Text;
+                    miningParams[JLField.KunReadings] = tb.Text;
                     break;
                 case nameof(LookupResult.NanoriReadings):
-                    miningParams[JLField.NanoriReadings] = textBlock.Text;
+                    miningParams[JLField.NanoriReadings] = tb.Text;
                     break;
                 case nameof(LookupResult.StrokeCount):
-                    miningParams[JLField.StrokeCount] = textBlock.Text;
+                    miningParams[JLField.StrokeCount] = tb.Text;
                     break;
                 case nameof(LookupResult.KanjiGrade):
-                    miningParams[JLField.KanjiGrade] = textBlock.Text;
+                    miningParams[JLField.KanjiGrade] = tb.Text;
                     break;
                 case nameof(LookupResult.KanjiComposition):
-                    miningParams[JLField.KanjiComposition] = textBlock.Text;
+                    miningParams[JLField.KanjiComposition] = tb.Text;
                     break;
                 case nameof(LookupResult.KanjiStats):
-                    miningParams[JLField.KanjiStats] = textBlock.Text;
+                    miningParams[JLField.KanjiStats] = tb.Text;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(null, "Invalid LookupResult type");
@@ -1218,6 +1205,27 @@ internal sealed partial class PopupWindow : Window
         {
             Stats.IncrementStat(StatType.CardsMined);
         }
+    }
+
+    private async void PrimarySpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == ConfigManager.CopyPrimarySpellingToClipboardMouseButton)
+        {
+            WindowsUtils.CopyTextToClipboard(((TextBlock)sender).Text);
+        }
+
+        if (!MiningMode || e.ChangedButton != ConfigManager.MineMouseButton)
+        {
+            return;
+        }
+
+        var textBlock = (TextBlock)sender;
+
+        WrapPanel top = textBlock.Parent is Grid primarySpellingGrid
+            ? (WrapPanel)primarySpellingGrid.Parent
+            : (WrapPanel)textBlock.Parent;
+
+        await Mine(top).ConfigureAwait(false);
     }
 
     private void ShowAddNameWindow()
@@ -1242,6 +1250,28 @@ internal sealed partial class PopupWindow : Window
         e.Handled = true;
 
         await KeyGestureUtils.HandleKeyDown(e).ConfigureAwait(false);
+    }
+
+    private void SelectNextLookupResult()
+    {
+        int nextItemIndex = PopupListBox.SelectedIndex + 1 < PopupListBox.Items.Count
+            ? PopupListBox.SelectedIndex + 1
+            : 0;
+
+        PopupListBox.SelectedIndex = nextItemIndex;
+
+        PopupListBox.ScrollIntoView(PopupListBox.Items.GetItemAt(nextItemIndex));
+    }
+
+    private void SelectPreviousLookupResult()
+    {
+        int nextItemIndex = PopupListBox.SelectedIndex - 1 > -1
+            ? PopupListBox.SelectedIndex - 1
+            : PopupListBox.Items.Count - 1;
+
+        PopupListBox.SelectedIndex = nextItemIndex;
+
+        PopupListBox.ScrollIntoView(PopupListBox.Items.GetItemAt(nextItemIndex));
     }
 
     public async Task HandleHotKey(KeyGesture keyGesture)
@@ -1277,7 +1307,11 @@ internal sealed partial class PopupWindow : Window
 
             EnableMiningMode();
 
-            _ = Activate();
+            if (ConfigManager.Focusable)
+            {
+                _ = Activate();
+            }
+
             _ = Focus();
 
             DisplayResults(true);
@@ -1468,13 +1502,42 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SelectedTextToSpeech))
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SelectedTextToSpeechKeyGesture))
         {
             if (MiningMode
                 && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null
                 && _lastSelectedText is not null)
             {
                 await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, _lastSelectedText, CoreConfig.AudioVolume).ConfigureAwait(false);
+            }
+        }
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SelectNextLookupResultKeyGesture))
+        {
+            if (MiningMode)
+            {
+                SelectNextLookupResult();
+            }
+        }
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SelectPreviousLookupResultKeyGesture))
+        {
+            if (MiningMode)
+            {
+                SelectPreviousLookupResult();
+            }
+        }
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MineSelectedLookupResultKeyGesture))
+        {
+            if (MiningMode)
+            {
+                WrapPanel? top = ((StackPanel)PopupListBox.SelectedItem).Children.OfType<WrapPanel>().FirstOrDefault();
+
+                if (top is not null)
+                {
+                    await Mine(top).ConfigureAwait(false);
+                }
             }
         }
     }
@@ -1811,6 +1874,7 @@ internal sealed partial class PopupWindow : Window
 
         if (Owner == MainWindow.Instance && (ConfigManager.TextOnlyVisibleOnHover || ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover))
         {
+            WinApi.ActivateWindow(MainWindow.Instance.WindowHandle);
             _ = MainWindow.Instance.ChangeVisibility().ConfigureAwait(false);
         }
     }
