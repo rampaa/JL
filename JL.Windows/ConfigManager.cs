@@ -186,6 +186,7 @@ internal static class ConfigManager
     public static string BrowserPath { get; private set; } = "";
     public static bool GlobalHotKeys { get; private set; } = false;
     public static bool StopIncreasingTimeStatWhenMinimized { get; private set; } = true;
+    public static bool StripPunctuationBeforeCalculatingCharacterCount { get; private set; } = true;
 
     #endregion
 
@@ -238,6 +239,7 @@ internal static class ConfigManager
         Precaching = GetValueFromConfig(Precaching, nameof(Precaching), bool.TryParse);
         GlobalHotKeys = GetValueFromConfig(GlobalHotKeys, nameof(GlobalHotKeys), bool.TryParse);
         StopIncreasingTimeStatWhenMinimized = GetValueFromConfig(StopIncreasingTimeStatWhenMinimized, nameof(StopIncreasingTimeStatWhenMinimized), bool.TryParse);
+        StripPunctuationBeforeCalculatingCharacterCount = GetValueFromConfig(StripPunctuationBeforeCalculatingCharacterCount, nameof(StripPunctuationBeforeCalculatingCharacterCount), bool.TryParse);
         CheckForJLUpdatesOnStartUp = GetValueFromConfig(CheckForJLUpdatesOnStartUp, nameof(CheckForJLUpdatesOnStartUp), bool.TryParse);
         AlwaysOnTop = GetValueFromConfig(AlwaysOnTop, nameof(AlwaysOnTop), bool.TryParse);
         mainWindow.Topmost = AlwaysOnTop;
@@ -793,6 +795,7 @@ internal static class ConfigManager
         preferenceWindow.PrecachingCheckBox.IsChecked = Precaching;
         preferenceWindow.GlobalHotKeysCheckBox.IsChecked = GlobalHotKeys;
         preferenceWindow.StopIncreasingTimeStatWhenMinimizedCheckBox.IsChecked = StopIncreasingTimeStatWhenMinimized;
+        preferenceWindow.StripPunctuationBeforeCalculatingCharacterCountCheckBox.IsChecked = StripPunctuationBeforeCalculatingCharacterCount;
         preferenceWindow.AlwaysOnTopCheckBox.IsChecked = AlwaysOnTop;
         preferenceWindow.RequireLookupKeyPressCheckBox.IsChecked = RequireLookupKeyPress;
         preferenceWindow.DisableHotkeysCheckBox.IsChecked = DisableHotkeys;
@@ -1085,6 +1088,8 @@ internal static class ConfigManager
             preferenceWindow.GlobalHotKeysCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(StopIncreasingTimeStatWhenMinimized)].Value =
             preferenceWindow.StopIncreasingTimeStatWhenMinimizedCheckBox.IsChecked.ToString();
+        config.AppSettings.Settings[nameof(StripPunctuationBeforeCalculatingCharacterCount)].Value =
+            preferenceWindow.StripPunctuationBeforeCalculatingCharacterCountCheckBox.IsChecked.ToString();
         config.AppSettings.Settings[nameof(CheckForJLUpdatesOnStartUp)].Value =
             preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked.ToString();
 

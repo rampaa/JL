@@ -208,7 +208,12 @@ internal sealed partial class MainWindow : Window
         }
 
         Stats.IncrementStat(StatType.Lines);
-        Stats.IncrementStat(StatType.Characters, new StringInfo(JapaneseUtils.RemovePunctuation(text)).LengthInTextElements);
+
+        string strippedText = ConfigManager.StripPunctuationBeforeCalculatingCharacterCount
+            ? JapaneseUtils.RemovePunctuation(text)
+            : text;
+
+        Stats.IncrementStat(StatType.Characters, new StringInfo(strippedText).LengthInTextElements);
 
         if (ConfigManager.Precaching && DictUtils.DictsReady
                                      && !DictUtils.UpdatingJmdict && !DictUtils.UpdatingJmnedict && !DictUtils.UpdatingKanjidic

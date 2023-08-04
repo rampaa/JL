@@ -1339,6 +1339,12 @@
                             <CheckBox x:Name="StopIncreasingTimeStatWhenMinimizedCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
+                        <DockPanel Margin="0,10,0,0">
+                            <TextBlock HorizontalAlignment="Left" Text="Strip punctuation before calculating character count"
+                                       TextWrapping="Wrap" />
+                            <CheckBox x:Name="StripPunctuationBeforeCalculatingCharacterCountCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Browser path" VerticalAlignment="Center" TextWrapping="Wrap"
                                        Cursor="Help"
