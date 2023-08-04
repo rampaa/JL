@@ -1191,7 +1191,10 @@ internal sealed partial class MainWindow : Window
     {
         if (WindowState is WindowState.Minimized)
         {
-            StatsUtils.StatsStopWatch.Stop();
+            if (ConfigManager.StopIncreasingTimeStatWhenMinimized)
+            {
+                StatsUtils.StatsStopWatch.Stop();
+            }
 
             if (ConfigManager.GlobalHotKeys)
             {
@@ -1215,7 +1218,10 @@ internal sealed partial class MainWindow : Window
                 MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
             }
 
-            StatsUtils.StatsStopWatch.Start();
+            if (ConfigManager.StopIncreasingTimeStatWhenMinimized)
+            {
+                StatsUtils.StatsStopWatch.Start();
+            }
 
             if (ConfigManager.GlobalHotKeys)
             {

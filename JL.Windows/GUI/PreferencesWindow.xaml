@@ -1333,6 +1333,12 @@
                             <CheckBox x:Name="GlobalHotKeysCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
+                        <DockPanel Margin="0,10,0,0">
+                            <TextBlock HorizontalAlignment="Left" Text="Stop increasing time stat when minimized"
+                                       TextWrapping="Wrap" />
+                            <CheckBox x:Name="StopIncreasingTimeStatWhenMinimizedCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Browser path" VerticalAlignment="Center" TextWrapping="Wrap"
                                        Cursor="Help"
