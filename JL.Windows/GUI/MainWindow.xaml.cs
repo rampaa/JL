@@ -75,8 +75,6 @@ internal sealed partial class MainWindow : Window
         ConfigManager.ApplyPreferences();
 
         WinApi.RestoreWindow(WindowHandle);
-        WinApi.ActivateWindow(WindowHandle);
-        FocusManager.SetFocusedElement(this, MainTextBox);
 
         await StatsUtils.DeserializeLifetimeStats().ConfigureAwait(true);
 
@@ -90,7 +88,13 @@ internal sealed partial class MainWindow : Window
 
         // Can't use ActivateWindow for FirstPopupWindow if it's not shown at least once
         FirstPopupWindow.Show();
-        FirstPopupWindow.Hide();
+        FirstPopupWindow.HidePopup();
+
+        FocusManager.SetFocusedElement(this, MainTextBox);
+        if (ConfigManager.AlwaysShowMainTextBoxCaret)
+        {
+            MoveCaret(Key.Left);
+        }
 
         await WindowsUtils.InitializeMainWindow().ConfigureAwait(false);
     }
