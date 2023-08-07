@@ -868,8 +868,9 @@ public static class DictUtils
                         dict.Priority = priority;
                         ++priority;
 
-                        string relativePath = Path.GetRelativePath(Utils.ApplicationPath, dict.Path);
-                        dict.Path = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath, Utils.ApplicationPath) : relativePath;
+                        string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                        string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fullPath);
+                        dict.Path = relativePath.StartsWith('.') ? fullPath : relativePath;
 
                         Dicts.Add(dict.Name, dict);
                     }

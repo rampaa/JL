@@ -332,15 +332,15 @@ internal sealed partial class ManageDictionariesWindow : Window
 
     private void PathTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        string? path = Path.GetFullPath(((TextBlock)sender).Text, Utils.ApplicationPath);
-        if (File.Exists(path) || Directory.Exists(path))
+        string? fullPath = Path.GetFullPath(((TextBlock)sender).Text, Utils.ApplicationPath);
+        if (File.Exists(fullPath) || Directory.Exists(fullPath))
         {
-            if (File.Exists(path))
+            if (File.Exists(fullPath))
             {
-                path = Path.GetDirectoryName(path) ?? Utils.ApplicationPath;
+                fullPath = Path.GetDirectoryName(fullPath) ?? Utils.ApplicationPath;
             }
 
-            _ = Process.Start("explorer.exe", path);
+            _ = Process.Start("explorer.exe", fullPath);
         }
     }
 

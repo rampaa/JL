@@ -94,7 +94,7 @@ internal sealed partial class EditAudioSourceWindow : Window
                     && Directory.Exists(Path.GetDirectoryName(fullPath))
                     && !string.IsNullOrWhiteSpace(Path.GetFileName(fullPath)))
                 {
-                    string relativePath = Path.GetRelativePath(Utils.ApplicationPath, uri);
+                    string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fullPath);
                     uri = relativePath.StartsWith('.') ? fullPath : relativePath;
 
                     if (_uri != uri && AudioUtils.AudioSources.ContainsKey(uri))

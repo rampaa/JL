@@ -60,7 +60,7 @@ internal sealed partial class AddAudioSourceWindow : Window
                     && Directory.Exists(Path.GetDirectoryName(fullPath))
                     && !string.IsNullOrWhiteSpace(Path.GetFileName(fullPath)))
                 {
-                    string relativePath = Path.GetRelativePath(Utils.ApplicationPath, uri);
+                    string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fullPath);
                     uri = relativePath.StartsWith('.') ? fullPath : relativePath;
 
                     if (AudioUtils.AudioSources.ContainsKey(uri))
