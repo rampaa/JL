@@ -7,14 +7,15 @@ internal static class FrequencyYomichanLoader
 {
     public static async Task Load(Freq freq)
     {
-        if (!Directory.Exists(freq.Path))
+        string fullPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
+        if (!Directory.Exists(fullPath))
         {
             return;
         }
 
         Dictionary<string, IList<FrequencyRecord>> freqDict = freq.Contents;
 
-        List<string> jsonFiles = Directory.EnumerateFiles(freq.Path, "*_bank_*.json", SearchOption.TopDirectoryOnly)
+        List<string> jsonFiles = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly)
             .Where(static s => s.Contains("term", StringComparison.Ordinal) || s.Contains("kanji", StringComparison.Ordinal))
             .ToList();
 

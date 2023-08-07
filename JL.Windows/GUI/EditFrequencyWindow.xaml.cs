@@ -31,8 +31,10 @@ internal sealed partial class EditFrequencyWindow : Window
         bool isValid = true;
 
         string path = TextBlockPath.Text;
-        if (string.IsNullOrEmpty(path)
-            || (!Directory.Exists(path) && !File.Exists(path))
+        string fullPath = Path.GetFullPath(path, Utils.ApplicationPath);
+
+        if (string.IsNullOrWhiteSpace(path)
+            || (!Directory.Exists(fullPath) && !File.Exists(fullPath))
             || (_freq.Path != path && FreqUtils.FreqDicts.Values.Any(dict => dict.Path == path)))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
@@ -78,7 +80,7 @@ internal sealed partial class EditFrequencyWindow : Window
         if (openFileDialog.ShowDialog() is true)
         {
             string relativePath = Path.GetRelativePath(Utils.ApplicationPath, openFileDialog.FileName);
-            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
+            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath, Utils.ApplicationPath) : relativePath;
         }
     }
 
@@ -90,7 +92,7 @@ internal sealed partial class EditFrequencyWindow : Window
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))
         {
             string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fbd.SelectedPath);
-            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
+            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath, Utils.ApplicationPath) : relativePath;
         }
     }
 

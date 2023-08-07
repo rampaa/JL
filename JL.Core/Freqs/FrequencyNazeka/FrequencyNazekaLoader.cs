@@ -7,7 +7,8 @@ internal static class FrequencyNazekaLoader
 {
     public static async Task Load(Freq freq)
     {
-        if (!File.Exists(freq.Path))
+        string fullPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
+        if (!File.Exists(fullPath))
         {
             return;
         }
@@ -15,7 +16,7 @@ internal static class FrequencyNazekaLoader
         Dictionary<string, IList<FrequencyRecord>> freqDict = freq.Contents;
         Dictionary<string, List<List<JsonElement>>>? frequencyJson;
 
-        FileStream fileStream = File.OpenRead(freq.Path);
+        FileStream fileStream = File.OpenRead(fullPath);
         await using (fileStream.ConfigureAwait(false))
         {
             frequencyJson = await JsonSerializer.DeserializeAsync<Dictionary<string, List<List<JsonElement>>>>(fileStream)

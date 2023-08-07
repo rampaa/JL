@@ -7,12 +7,13 @@ internal static class YomichanKanjiLoader
 {
     public static async Task Load(Dict dict)
     {
-        if (!Directory.Exists(dict.Path))
+        string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+        if (!Directory.Exists(fullPath))
         {
             return;
         }
 
-        List<string> jsonFiles = Directory.EnumerateFiles(dict.Path, "kanji_bank_*.json", SearchOption.TopDirectoryOnly).ToList();
+        List<string> jsonFiles = Directory.EnumerateFiles(fullPath, "kanji_bank_*.json", SearchOption.TopDirectoryOnly).ToList();
 
         foreach (string jsonFile in jsonFiles)
         {

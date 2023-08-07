@@ -7,14 +7,15 @@ internal static class JmnedictLoader
 {
     public static async Task Load(Dict dict)
     {
-        if (File.Exists(dict.Path))
+        string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+        if (File.Exists(fullPath))
         {
             // XmlTextReader is preferred over XmlReader here because XmlReader does not have the EntityHandling property
             // And we do need EntityHandling property because we want to get unexpanded entity names
             // The downside of using XmlTextReader is that it does not support async methods
             // And we cannot set some settings (e.g. MaxCharactersFromEntities)
 
-            using (XmlTextReader xmlTextReader = new(dict.Path)
+            using (XmlTextReader xmlTextReader = new(fullPath)
             {
                 DtdProcessing = DtdProcessing.Parse,
                 WhitespaceHandling = WhitespaceHandling.None,
@@ -38,7 +39,7 @@ internal static class JmnedictLoader
         else if (Utils.Frontend.ShowYesNoDialog("Couldn't find JMnedict.xml. Would you like to download it now?",
                      "Download JMnedict?"))
         {
-            bool downloaded = await ResourceUpdater.UpdateResource(dict.Path,
+            bool downloaded = await ResourceUpdater.UpdateResource(fullPath,
                 DictUtils.s_jmnedictUrl,
                 DictType.JMnedict.ToString(), false, false).ConfigureAwait(false);
 

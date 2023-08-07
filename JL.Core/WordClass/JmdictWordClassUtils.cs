@@ -138,10 +138,11 @@ internal static class JmdictWordClassUtils
             else
             {
                 bool deleteJmdictFile = false;
-                if (!File.Exists(dict.Path))
+                string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                if (!File.Exists(fullPath))
                 {
                     deleteJmdictFile = true;
-                    bool downloaded = await ResourceUpdater.UpdateResource(dict.Path,
+                    bool downloaded = await ResourceUpdater.UpdateResource(fullPath,
                         DictUtils.s_jmdictUrl,
                         dict.Type.ToString(), false, true).ConfigureAwait(false);
 
@@ -159,7 +160,7 @@ internal static class JmdictWordClassUtils
 
                 if (deleteJmdictFile)
                 {
-                    File.Delete(dict.Path);
+                    File.Delete(fullPath);
                 }
             }
         }

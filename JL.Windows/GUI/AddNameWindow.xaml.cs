@@ -79,7 +79,7 @@ internal sealed partial class AddNameWindow : Window
     private static async Task WriteToFile(string spelling, string reading, string type)
     {
         string line = string.Create(CultureInfo.InvariantCulture, $"{spelling}\t{reading}\t{type}\n");
-        string customNameDictPath = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomNameDictionary).Path;
+        string customNameDictPath = Path.GetFullPath(DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomNameDictionary).Path, Utils.ApplicationPath);
         await File.AppendAllTextAsync(customNameDictPath, line, Encoding.UTF8).ConfigureAwait(false);
     }
 

@@ -7,7 +7,8 @@ internal static class KanjidicLoader
 {
     public static async Task Load(Dict dict)
     {
-        if (File.Exists(dict.Path))
+        string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+        if (File.Exists(fullPath))
         {
             XmlReaderSettings xmlReaderSettings = new()
             {
@@ -16,7 +17,7 @@ internal static class KanjidicLoader
                 IgnoreWhitespace = true
             };
 
-            using (XmlReader xmlReader = XmlReader.Create(dict.Path, xmlReaderSettings))
+            using (XmlReader xmlReader = XmlReader.Create(fullPath, xmlReaderSettings))
             {
                 while (xmlReader.ReadToFollowing("literal"))
                 {
@@ -36,7 +37,7 @@ internal static class KanjidicLoader
                      "Couldn't find kanjidic2.xml. Would you like to download it now?",
                      "Download KANJIDIC2?"))
         {
-            bool downloaded = await ResourceUpdater.UpdateResource(dict.Path,
+            bool downloaded = await ResourceUpdater.UpdateResource(fullPath,
                 DictUtils.s_kanjidicUrl,
                 DictType.Kanjidic.ToString(), false, false).ConfigureAwait(false);
 

@@ -127,7 +127,8 @@ internal sealed partial class ManageDictionariesWindow : Window
                 Margin = new Thickness(10)
             };
 
-            bool invalidPath = !Directory.Exists(dict.Path) && !File.Exists(dict.Path);
+            string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+            bool invalidPath = !Directory.Exists(fullPath) && !File.Exists(fullPath);
             var dictPathValidityDisplay = new TextBlock
             {
                 Width = 13,
@@ -331,8 +332,7 @@ internal sealed partial class ManageDictionariesWindow : Window
 
     private void PathTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        string? path = ((TextBlock)sender).Text;
-
+        string? path = Path.GetFullPath(((TextBlock)sender).Text, Utils.ApplicationPath);
         if (File.Exists(path) || Directory.Exists(path))
         {
             if (File.Exists(path))

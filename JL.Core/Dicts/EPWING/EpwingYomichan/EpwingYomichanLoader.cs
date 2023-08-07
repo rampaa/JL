@@ -7,12 +7,13 @@ internal static class EpwingYomichanLoader
 {
     public static async Task Load(Dict dict)
     {
-        if (!Directory.Exists(dict.Path))
+        string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+        if (!Directory.Exists(fullPath))
         {
             return;
         }
 
-        List<string> jsonFiles = Directory.EnumerateFiles(dict.Path, "*_bank_*.json", SearchOption.TopDirectoryOnly)
+        List<string> jsonFiles = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly)
             .Where(static s => s.Contains("term", StringComparison.Ordinal) || s.Contains("kanji", StringComparison.Ordinal))
             .ToList();
 

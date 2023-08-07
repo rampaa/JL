@@ -41,8 +41,10 @@ internal sealed partial class AddDictionaryWindow : Window
         }
 
         string path = TextBlockPath.Text;
-        if (string.IsNullOrEmpty(path)
-            || (!Directory.Exists(path) && !File.Exists(path))
+        string fullPath = Path.GetFullPath(path, Utils.ApplicationPath);
+
+        if (string.IsNullOrWhiteSpace(path)
+            || (!Directory.Exists(fullPath) && !File.Exists(fullPath))
             || DictUtils.Dicts.Values.Select(static dict => dict.Path).Contains(path))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
@@ -108,7 +110,7 @@ internal sealed partial class AddDictionaryWindow : Window
         if (openFileDialog.ShowDialog() is true)
         {
             string relativePath = Path.GetRelativePath(Utils.ApplicationPath, openFileDialog.FileName);
-            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
+            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath, Utils.ApplicationPath) : relativePath;
         }
     }
 
@@ -120,7 +122,7 @@ internal sealed partial class AddDictionaryWindow : Window
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))
         {
             string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fbd.SelectedPath);
-            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
+            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath, Utils.ApplicationPath) : relativePath;
         }
     }
 

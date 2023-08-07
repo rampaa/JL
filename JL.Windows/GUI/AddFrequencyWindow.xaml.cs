@@ -38,8 +38,10 @@ internal sealed partial class AddFrequencyWindow : Window
         }
 
         string path = TextBlockPath.Text;
-        if (string.IsNullOrEmpty(path)
-            || (!Directory.Exists(path) && !File.Exists(path))
+        string fullPath = Path.GetFullPath(path, Utils.ApplicationPath);
+
+        if (string.IsNullOrWhiteSpace(path)
+            || (!Directory.Exists(fullPath) && !File.Exists(fullPath))
             || FreqUtils.FreqDicts.Values.Select(static freq => freq.Path).Contains(path))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
@@ -79,7 +81,7 @@ internal sealed partial class AddFrequencyWindow : Window
         if (openFileDialog.ShowDialog() is true)
         {
             string relativePath = Path.GetRelativePath(Utils.ApplicationPath, openFileDialog.FileName);
-            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
+            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath, Utils.ApplicationPath) : relativePath;
         }
     }
 
@@ -91,7 +93,7 @@ internal sealed partial class AddFrequencyWindow : Window
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))
         {
             string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fbd.SelectedPath);
-            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
+            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath, Utils.ApplicationPath) : relativePath;
         }
     }
 

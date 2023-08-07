@@ -18,7 +18,7 @@ public class LookupTests
     {
         Utils.Frontend = new DummyFrontend();
 
-        string jmdictPath = Path.Join(AppContext.BaseDirectory, "Resources/MockJMdict.xml");
+        string jmdictPath = Path.Join(Utils.ResourcesPath, "MockJMdict.xml");
 
         DictUtils.Dicts.Add("JMdict",
             new Dict(DictType.JMdict, "JMdict", jmdictPath, true, 0, 500000,

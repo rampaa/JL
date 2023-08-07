@@ -15,17 +15,23 @@ public static class FreqUtils
     {
         {
             "VN (Nazeka)",
-            new Freq(FreqType.Nazeka, "VN (Nazeka)", "Resources/freqlist_vns.json", true, 1, 57273)
+            new Freq(FreqType.Nazeka, "VN (Nazeka)",
+                Path.Join(Utils.ResourcesPath, "freqlist_vns.json"),
+                true, 1, 57273)
         },
 
         {
             "Narou (Nazeka)",
-            new Freq(FreqType.Nazeka, "Narou (Nazeka)", "Resources/freqlist_narou.json", false, 2, 75588)
+            new Freq(FreqType.Nazeka, "Narou (Nazeka)",
+                Path.Join(Utils.ResourcesPath, "freqlist_narou.json"),
+                false, 2, 75588)
         },
 
         {
             "Novel (Nazeka)",
-            new Freq(FreqType.Nazeka, "Novel (Nazeka)", "Resources/freqlist_novels.json", false, 3, 114348)
+            new Freq(FreqType.Nazeka, "Novel (Nazeka)",
+                Path.Join(Utils.ResourcesPath, "freqlist_novels.json"),
+                false, 3, 114348)
         }
     };
 
@@ -195,7 +201,7 @@ public static class FreqUtils
                         ++priority;
 
                         string relativePath = Path.GetRelativePath(Utils.ApplicationPath, freq.Path);
-                        freq.Path = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
+                        freq.Path = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath, Utils.ApplicationPath) : relativePath;
 
                         FreqDicts.Add(freq.Name, freq);
                     }

@@ -7,7 +7,8 @@ internal static class EpwingNazekaLoader
 {
     public static async Task Load(Dict dict)
     {
-        if (!File.Exists(dict.Path))
+        string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+        if (!File.Exists(fullPath))
         {
             return;
         }
@@ -15,7 +16,7 @@ internal static class EpwingNazekaLoader
         // TODO: Utf8JsonReader?
         List<JsonElement>? jsonObjects;
 
-        FileStream fileStream = File.OpenRead(dict.Path);
+        FileStream fileStream = File.OpenRead(fullPath);
         await using (fileStream.ConfigureAwait(false))
         {
             jsonObjects = await JsonSerializer.DeserializeAsync<List<JsonElement>>(fileStream)

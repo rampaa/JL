@@ -6,9 +6,10 @@ public static class CustomNameLoader
 {
     internal static async Task Load(Dict dict)
     {
-        if (File.Exists(dict.Path))
+        string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+        if (File.Exists(fullPath))
         {
-            string[] lines = await File.ReadAllLinesAsync(dict.Path)
+            string[] lines = await File.ReadAllLinesAsync(fullPath)
                 .ConfigureAwait(false);
 
             for (int i = 0; i < lines.Length; i++)

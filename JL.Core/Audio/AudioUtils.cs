@@ -107,10 +107,11 @@ public static class AudioUtils
 
     private static async Task<AudioResponse?> GetAudioFromPath(Uri uri)
     {
-        if (File.Exists(uri.LocalPath))
+        string fullPath = Path.GetFullPath(uri.LocalPath, Utils.ApplicationPath);
+        if (File.Exists(fullPath))
         {
-            string audioFormat = Path.GetExtension(uri.LocalPath)[1..];
-            byte[] audioData = await File.ReadAllBytesAsync(uri.LocalPath).ConfigureAwait(false);
+            string audioFormat = Path.GetExtension(fullPath)[1..];
+            byte[] audioData = await File.ReadAllBytesAsync(fullPath).ConfigureAwait(false);
             return new AudioResponse(AudioSourceType.LocalPath, audioFormat, audioData);
         }
 

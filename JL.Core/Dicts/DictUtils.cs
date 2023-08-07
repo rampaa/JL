@@ -34,18 +34,21 @@ public static class DictUtils
         {
             "CustomWordDictionary", new Dict(DictType.CustomWordDictionary,
                 "Custom Word Dictionary",
-                "Resources/custom_words.txt",
+                Path.Join(Utils.ResourcesPath, "custom_words.txt"),
                 true, 1, 128,
                 new DictOptions(new NewlineBetweenDefinitionsOption(true)))
         },
         {
             "CustomNameDictionary", new Dict(DictType.CustomNameDictionary,
                 "Custom Name Dictionary",
-                "Resources/custom_names.txt", true, 2, 128,
+                Path.Join(Utils.ResourcesPath, "custom_names.txt"),
+                true, 2, 128,
                 new DictOptions())
         },
         {
-            "JMdict", new Dict(DictType.JMdict, "JMdict", "Resources/JMdict.xml", true, 3, 500000,
+            "JMdict", new Dict(DictType.JMdict, "JMdict",
+                Path.Join(Utils.ResourcesPath, "JMdict.xml"),
+                true, 3, 500000,
                 new DictOptions(
                     new NewlineBetweenDefinitionsOption(true),
                     wordClassInfo: new WordClassInfoOption(true),
@@ -63,11 +66,15 @@ public static class DictUtils
                 ))
         },
         {
-            "Kanjidic", new Dict(DictType.Kanjidic, "Kanjidic", "Resources/kanjidic2.xml", true, 4, 13108,
+            "Kanjidic", new Dict(DictType.Kanjidic, "Kanjidic",
+                Path.Join(Utils.ResourcesPath, "kanjidic2.xml"),
+                true, 4, 13108,
                 new DictOptions(noAll: new NoAllOption(false)))
         },
         {
-            "JMnedict", new Dict(DictType.JMnedict, "JMnedict", "Resources/JMnedict.xml", true, 5, 700000,
+            "JMnedict", new Dict(DictType.JMnedict, "JMnedict",
+                Path.Join(Utils.ResourcesPath, "JMnedict.xml"),
+                true, 5, 700000,
                 new DictOptions(new NewlineBetweenDefinitionsOption(true)))
         }
     };
@@ -862,7 +869,7 @@ public static class DictUtils
                         ++priority;
 
                         string relativePath = Path.GetRelativePath(Utils.ApplicationPath, dict.Path);
-                        dict.Path = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
+                        dict.Path = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath, Utils.ApplicationPath) : relativePath;
 
                         Dicts.Add(dict.Name, dict);
                     }

@@ -103,7 +103,7 @@ internal sealed partial class AddWordWindow : Window
             ? string.Create(CultureInfo.InvariantCulture, $"{spellings}\t{readings}\t{definitions}\t{partOfSpeech}\n")
             : string.Create(CultureInfo.InvariantCulture, $"{spellings}\t{readings}\t{definitions}\t{partOfSpeech}\t{wordClasses}\n");
 
-        string customWordDictPath = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary).Path;
+        string customWordDictPath = Path.GetFullPath(DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary).Path, Utils.ApplicationPath);
         await File.AppendAllTextAsync(customWordDictPath, line, Encoding.UTF8).ConfigureAwait(false);
     }
 

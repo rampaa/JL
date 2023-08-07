@@ -23,9 +23,10 @@ public static class ResourceUpdater
             {
                 using HttpRequestMessage request = new(HttpMethod.Get, resourceDownloadUri);
 
-                if (File.Exists(resourcePath))
+                string fullPath = Path.GetFullPath(resourcePath, Utils.ApplicationPath);
+                if (File.Exists(fullPath))
                 {
-                    request.Headers.IfModifiedSince = File.GetLastWriteTime(resourcePath);
+                    request.Headers.IfModifiedSince = File.GetLastWriteTime(fullPath);
                 }
 
                 if (!noPrompt)
@@ -41,7 +42,7 @@ public static class ResourceUpdater
                     Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                     await using (responseStream.ConfigureAwait(false))
                     {
-                        await DecompressGzipStream(responseStream, resourcePath).ConfigureAwait(false);
+                        await DecompressGzipStream(responseStream, fullPath).ConfigureAwait(false);
                     }
 
                     if (!noPrompt)

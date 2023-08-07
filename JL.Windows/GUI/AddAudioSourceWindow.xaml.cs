@@ -53,12 +53,15 @@ internal sealed partial class AddAudioSourceWindow : Window
         {
             case AudioSourceType.LocalPath:
                 uri = TextBlockUri.Text;
-                if (Path.IsPathFullyQualified(uri)
-                    && Directory.Exists(Path.GetDirectoryName(uri))
-                    && !string.IsNullOrEmpty(Path.GetFileName(uri)))
+                string fullPath = Path.GetFullPath(uri, Utils.ApplicationPath);
+
+                if (!string.IsNullOrWhiteSpace(uri)
+                    && Path.IsPathFullyQualified(fullPath)
+                    && Directory.Exists(Path.GetDirectoryName(fullPath))
+                    && !string.IsNullOrWhiteSpace(Path.GetFileName(fullPath)))
                 {
                     string relativePath = Path.GetRelativePath(Utils.ApplicationPath, uri);
-                    uri = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath) : relativePath;
+                    uri = relativePath.StartsWith('.') ? fullPath : relativePath;
 
                     if (AudioUtils.AudioSources.ContainsKey(uri))
                     {
