@@ -453,6 +453,7 @@ public static class DictUtils
         CustomWordDictReady = false;
         CustomNameDictReady = false;
 
+        bool dictCleared = false;
         bool dictRemoved = false;
 
         List<Task> tasks = new();
@@ -479,6 +480,7 @@ public static class DictUtils
                         {
                             dict.Contents.Clear();
                             dict.Contents.TrimExcess();
+                            dictCleared = true;
                         }
                     }
 
@@ -500,6 +502,7 @@ public static class DictUtils
                         {
                             dict.Contents.Clear();
                             dict.Contents.TrimExcess();
+                            dictCleared = true;
                         }
                     }
 
@@ -520,6 +523,7 @@ public static class DictUtils
                         {
                             dict.Contents.Clear();
                             dict.Contents.TrimExcess();
+                            dictCleared = true;
                         }
                     }
 
@@ -571,6 +575,7 @@ public static class DictUtils
                     {
                         dict.Contents.Clear();
                         dict.Contents.TrimExcess();
+                        dictCleared = true;
                     }
 
                     break;
@@ -600,6 +605,7 @@ public static class DictUtils
                     {
                         dict.Contents.Clear();
                         dict.Contents.TrimExcess();
+                        dictCleared = true;
                     }
 
                     break;
@@ -619,6 +625,7 @@ public static class DictUtils
                     {
                         dict.Contents.Clear();
                         dict.Contents.TrimExcess();
+                        dictCleared = true;
                         CustomWordDictReady = true;
                     }
 
@@ -644,6 +651,7 @@ public static class DictUtils
                     {
                         dict.Contents.Clear();
                         dict.Contents.TrimExcess();
+                        dictCleared = true;
                         CustomNameDictReady = true;
                     }
 
@@ -685,6 +693,7 @@ public static class DictUtils
                     {
                         dict.Contents.Clear();
                         dict.Contents.TrimExcess();
+                        dictCleared = true;
                     }
 
                     break;
@@ -714,6 +723,7 @@ public static class DictUtils
                     {
                         dict.Contents.Clear();
                         dict.Contents.TrimExcess();
+                        dictCleared = true;
                     }
 
                     break;
@@ -723,24 +733,28 @@ public static class DictUtils
             }
         }
 
-        if (tasks.Count > 0)
-        {
-            await Task.WhenAll(tasks).ConfigureAwait(false);
-        }
 
-        if (dictRemoved)
+        if (tasks.Count > 0 || dictCleared)
         {
-            IOrderedEnumerable<Dict> orderedDicts = Dicts.Values.OrderBy(static d => d.Priority);
-            int priority = 1;
-
-            foreach (Dict dict in orderedDicts)
+            if (tasks.Count > 0)
             {
-                dict.Priority = priority;
-                ++priority;
-            }
-        }
+                await Task.WhenAll(tasks).ConfigureAwait(false);
 
-        Utils.Frontend.InvalidateDisplayCache();
+                if (dictRemoved)
+                {
+                    IOrderedEnumerable<Dict> orderedDicts = Dicts.Values.OrderBy(static d => d.Priority);
+                    int priority = 1;
+
+                    foreach (Dict dict in orderedDicts)
+                    {
+                        dict.Priority = priority;
+                        ++priority;
+                    }
+                }
+            }
+
+            Utils.Frontend.InvalidateDisplayCache();
+        }
 
         DictsReady = true;
     }

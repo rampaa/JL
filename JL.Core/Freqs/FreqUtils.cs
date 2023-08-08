@@ -39,8 +39,10 @@ public static class FreqUtils
     {
         FreqsReady = false;
 
-        List<Task> tasks = new();
+        bool freqCleared = false;
         bool freqRemoved = false;
+
+        List<Task> tasks = new();
 
         foreach (Freq freq in FreqDicts.Values.ToList())
         {
@@ -73,6 +75,7 @@ public static class FreqUtils
                     {
                         freq.Contents.Clear();
                         freq.Contents.TrimExcess();
+                        freqCleared = true;
                     }
 
                     break;
@@ -105,6 +108,7 @@ public static class FreqUtils
                     {
                         freq.Contents.Clear();
                         freq.Contents.TrimExcess();
+                        freqCleared = true;
                     }
 
                     break;
@@ -114,24 +118,27 @@ public static class FreqUtils
             }
         }
 
-        if (tasks.Count > 0)
+        if (tasks.Count > 0 || freqCleared)
         {
-            await Task.WhenAll(tasks).ConfigureAwait(false);
-        }
-
-        if (freqRemoved)
-        {
-            IOrderedEnumerable<Freq> orderedFreqs = FreqDicts.Values.OrderBy(static f => f.Priority);
-            int priority = 1;
-
-            foreach (Freq freq in orderedFreqs)
+            if (tasks.Count > 0)
             {
-                freq.Priority = priority;
-                ++priority;
-            }
-        }
+                await Task.WhenAll(tasks).ConfigureAwait(false);
 
-        Utils.Frontend.InvalidateDisplayCache();
+                if (freqRemoved)
+                {
+                    IOrderedEnumerable<Freq> orderedFreqs = FreqDicts.Values.OrderBy(static f => f.Priority);
+                    int priority = 1;
+
+                    foreach (Freq freq in orderedFreqs)
+                    {
+                        freq.Priority = priority;
+                        ++priority;
+                    }
+                }
+            }
+
+            Utils.Frontend.InvalidateDisplayCache();
+        }
 
         FreqsReady = true;
     }
