@@ -454,7 +454,6 @@ public static class DictUtils
         CustomNameDictReady = false;
 
         List<Task> tasks = new();
-        bool dictRemoved = false;
 
         foreach (Dict dict in Dicts.Values.ToList())
         {
@@ -478,7 +477,6 @@ public static class DictUtils
                         {
                             dict.Contents.Clear();
                             dict.Contents.TrimExcess();
-                            dictRemoved = true;
                         }
                     }
 
@@ -500,7 +498,6 @@ public static class DictUtils
                         {
                             dict.Contents.Clear();
                             dict.Contents.TrimExcess();
-                            dictRemoved = true;
                         }
                     }
 
@@ -521,7 +518,6 @@ public static class DictUtils
                         {
                             dict.Contents.Clear();
                             dict.Contents.TrimExcess();
-                            dictRemoved = true;
                         }
                     }
 
@@ -564,7 +560,6 @@ public static class DictUtils
                                 Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't import {dict.Name}"));
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
-                                dictRemoved = true;
                             }
                         }));
                     }
@@ -573,7 +568,6 @@ public static class DictUtils
                     {
                         dict.Contents.Clear();
                         dict.Contents.TrimExcess();
-                        dictRemoved = true;
                     }
 
                     break;
@@ -594,7 +588,6 @@ public static class DictUtils
                                 Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't import {dict.Name}"));
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
-                                dictRemoved = true;
                             }
                         }));
                     }
@@ -603,7 +596,6 @@ public static class DictUtils
                     {
                         dict.Contents.Clear();
                         dict.Contents.TrimExcess();
-                        dictRemoved = true;
                     }
 
                     break;
@@ -623,7 +615,6 @@ public static class DictUtils
                     {
                         dict.Contents.Clear();
                         dict.Contents.TrimExcess();
-                        dictRemoved = true;
                         CustomWordDictReady = true;
                     }
 
@@ -649,7 +640,6 @@ public static class DictUtils
                     {
                         dict.Contents.Clear();
                         dict.Contents.TrimExcess();
-                        dictRemoved = true;
                         CustomNameDictReady = true;
                     }
 
@@ -682,7 +672,6 @@ public static class DictUtils
                                 Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't import {dict.Name}"));
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
-                                dictRemoved = true;
                             }
                         }));
                     }
@@ -691,7 +680,6 @@ public static class DictUtils
                     {
                         dict.Contents.Clear();
                         dict.Contents.TrimExcess();
-                        dictRemoved = true;
                     }
 
                     break;
@@ -712,7 +700,6 @@ public static class DictUtils
                                 Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't import {dict.Name}"));
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
-                                dictRemoved = true;
                             }
                         }));
                     }
@@ -721,7 +708,6 @@ public static class DictUtils
                     {
                         dict.Contents.Clear();
                         dict.Contents.TrimExcess();
-                        dictRemoved = true;
                     }
 
                     break;
@@ -731,27 +717,12 @@ public static class DictUtils
             }
         }
 
-        if (tasks.Count > 0 || dictRemoved)
+        if (tasks.Count > 0)
         {
-            if (tasks.Count > 0)
-            {
-                await Task.WhenAll(tasks).ConfigureAwait(false);
-            }
-
-            if (dictRemoved)
-            {
-                IOrderedEnumerable<Dict> orderedDicts = Dicts.Values.OrderBy(static d => d.Priority);
-                int priority = 1;
-
-                foreach (Dict dict in orderedDicts)
-                {
-                    dict.Priority = priority;
-                    ++priority;
-                }
-            }
-
-            Utils.Frontend.InvalidateDisplayCache();
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
+
+        Utils.Frontend.InvalidateDisplayCache();
 
         DictsReady = true;
     }
