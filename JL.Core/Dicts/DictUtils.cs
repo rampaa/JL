@@ -453,6 +453,8 @@ public static class DictUtils
         CustomWordDictReady = false;
         CustomNameDictReady = false;
 
+        bool dictRemoved = false;
+
         List<Task> tasks = new();
 
         foreach (Dict dict in Dicts.Values.ToList())
@@ -560,6 +562,7 @@ public static class DictUtils
                                 Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't import {dict.Name}"));
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
+                                dictRemoved = true;
                             }
                         }));
                     }
@@ -588,6 +591,7 @@ public static class DictUtils
                                 Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't import {dict.Name}"));
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
+                                dictRemoved = true;
                             }
                         }));
                     }
@@ -672,6 +676,7 @@ public static class DictUtils
                                 Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't import {dict.Name}"));
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
+                                dictRemoved = true;
                             }
                         }));
                     }
@@ -700,6 +705,7 @@ public static class DictUtils
                                 Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't import {dict.Name}"));
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
+                                dictRemoved = true;
                             }
                         }));
                     }
@@ -720,6 +726,18 @@ public static class DictUtils
         if (tasks.Count > 0)
         {
             await Task.WhenAll(tasks).ConfigureAwait(false);
+        }
+
+        if (dictRemoved)
+        {
+            IOrderedEnumerable<Dict> orderedDicts = Dicts.Values.OrderBy(static d => d.Priority);
+            int priority = 1;
+
+            foreach (Dict dict in orderedDicts)
+            {
+                dict.Priority = priority;
+                ++priority;
+            }
         }
 
         Utils.Frontend.InvalidateDisplayCache();

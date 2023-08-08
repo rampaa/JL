@@ -73,7 +73,6 @@ public static class FreqUtils
                     {
                         freq.Contents.Clear();
                         freq.Contents.TrimExcess();
-                        freqRemoved = true;
                     }
 
                     break;
@@ -106,7 +105,6 @@ public static class FreqUtils
                     {
                         freq.Contents.Clear();
                         freq.Contents.TrimExcess();
-                        freqRemoved = true;
                     }
 
                     break;
@@ -116,27 +114,24 @@ public static class FreqUtils
             }
         }
 
-        if (tasks.Count > 0 || freqRemoved)
+        if (tasks.Count > 0)
         {
-            if (tasks.Count > 0)
-            {
-                await Task.WhenAll(tasks).ConfigureAwait(false);
-            }
-
-            if (freqRemoved)
-            {
-                IOrderedEnumerable<Freq> orderedFreqs = FreqDicts.Values.OrderBy(static f => f.Priority);
-                int priority = 1;
-
-                foreach (Freq freq in orderedFreqs)
-                {
-                    freq.Priority = priority;
-                    ++priority;
-                }
-            }
-
-            Utils.Frontend.InvalidateDisplayCache();
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
+
+        if (freqRemoved)
+        {
+            IOrderedEnumerable<Freq> orderedFreqs = FreqDicts.Values.OrderBy(static f => f.Priority);
+            int priority = 1;
+
+            foreach (Freq freq in orderedFreqs)
+            {
+                freq.Priority = priority;
+                ++priority;
+            }
+        }
+
+        Utils.Frontend.InvalidateDisplayCache();
 
         FreqsReady = true;
     }
