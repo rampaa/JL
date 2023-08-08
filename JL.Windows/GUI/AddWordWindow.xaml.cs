@@ -86,13 +86,14 @@ internal sealed partial class AddWordWindow : Window
                 ? null
                 : rawWordClasses.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
 
-            Dictionary<string, IList<IDictRecord>> customWordDictionary = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary).Contents;
-
-            CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawPartOfSpeech, wordClasses, customWordDictionary);
-            Utils.Frontend.InvalidateDisplayCache();
+            Dict dict = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary);
+            if (dict.Active)
+            {
+                CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawPartOfSpeech, wordClasses, dict.Contents);
+                Utils.Frontend.InvalidateDisplayCache();
+            }
 
             Close();
-
             await WriteToFile(rawSpellings, rawReadings, rawDefinitions, rawPartOfSpeech, rawWordClasses).ConfigureAwait(false);
         }
     }

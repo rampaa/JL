@@ -19,6 +19,8 @@ namespace JL.Core.Dicts;
 public static class DictUtils
 {
     public static bool DictsReady { get; private set; } = false;
+    public static bool CustomWordDictReady { get; private set; } = false;
+    public static bool CustomNameDictReady { get; private set; } = false;
     public static bool UpdatingJmdict { get; internal set; } = false;
     public static bool UpdatingJmnedict { get; internal set; } = false;
     public static bool UpdatingKanjidic { get; internal set; } = false;
@@ -448,6 +450,8 @@ public static class DictUtils
     public static async Task LoadDictionaries()
     {
         DictsReady = false;
+        CustomWordDictReady = false;
+        CustomNameDictReady = false;
 
         List<Task> tasks = new();
         bool dictRemoved = false;
@@ -611,6 +615,7 @@ public static class DictUtils
                         {
                             await CustomWordLoader.Load(dict).ConfigureAwait(false);
                             dict.Size = dict.Contents.Count;
+                            CustomWordDictReady = true;
                         }));
                     }
 
@@ -619,6 +624,12 @@ public static class DictUtils
                         dict.Contents.Clear();
                         dict.Contents.TrimExcess();
                         dictRemoved = true;
+                        CustomWordDictReady = true;
+                    }
+
+                    else
+                    {
+                        CustomWordDictReady = true;
                     }
 
                     break;
@@ -630,6 +641,7 @@ public static class DictUtils
                         {
                             await CustomNameLoader.Load(dict).ConfigureAwait(false);
                             dict.Size = dict.Contents.Count;
+                            CustomNameDictReady = true;
                         }));
                     }
 
@@ -638,6 +650,12 @@ public static class DictUtils
                         dict.Contents.Clear();
                         dict.Contents.TrimExcess();
                         dictRemoved = true;
+                        CustomNameDictReady = true;
+                    }
+
+                    else
+                    {
+                        CustomNameDictReady = true;
                     }
 
                     break;

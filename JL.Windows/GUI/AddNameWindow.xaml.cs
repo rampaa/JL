@@ -67,10 +67,13 @@ internal sealed partial class AddNameWindow : Window
             string spelling = SpellingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
             string reading = ReadingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
 
-            Dictionary<string, IList<IDictRecord>> customNameDictionary = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomNameDictionary).Contents;
-            CustomNameLoader.AddToDictionary(spelling, reading, nameType, customNameDictionary);
+            Dict dict = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomNameDictionary);
+            if (dict.Active)
+            {
+                CustomNameLoader.AddToDictionary(spelling, reading, nameType, dict.Contents);
+                Utils.Frontend.InvalidateDisplayCache();
+            }
 
-            Utils.Frontend.InvalidateDisplayCache();
             Close();
             await WriteToFile(spelling, reading, nameType).ConfigureAwait(false);
         }

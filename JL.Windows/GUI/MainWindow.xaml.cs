@@ -528,7 +528,7 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            if (DictUtils.DictsReady)
+            if (DictUtils.CustomNameDictReady)
             {
                 WindowsUtils.ShowAddNameWindow(MainTextBox.SelectedText);
             }
@@ -538,7 +538,7 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            if (DictUtils.DictsReady)
+            if (DictUtils.CustomWordDictReady)
             {
                 WindowsUtils.ShowAddWordWindow(MainTextBox.SelectedText);
             }
@@ -1110,8 +1110,8 @@ internal sealed partial class MainWindow : Window
 
         ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady;
 
-        AddNameMenuItem.IsEnabled = DictUtils.DictsReady;
-        AddWordMenuItem.IsEnabled = DictUtils.DictsReady;
+        AddNameMenuItem.IsEnabled = DictUtils.CustomNameDictReady;
+        AddWordMenuItem.IsEnabled = DictUtils.CustomWordDictReady;
 
         FirstPopupWindow.HidePopup();
     }

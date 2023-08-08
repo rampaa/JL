@@ -1019,8 +1019,8 @@ internal sealed partial class PopupWindow : Window
 
     private void TextBoxPreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
-        AddNameMenuItem.IsEnabled = DictUtils.DictsReady;
-        AddWordMenuItem.IsEnabled = DictUtils.DictsReady;
+        AddNameMenuItem.IsEnabled = DictUtils.CustomNameDictReady;
+        AddWordMenuItem.IsEnabled = DictUtils.CustomWordDictReady;
         _lastSelectedText = ((TextBox)sender).SelectedText;
     }
 
@@ -1353,7 +1353,7 @@ internal sealed partial class PopupWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowAddNameWindowKeyGesture))
         {
-            if (DictUtils.DictsReady)
+            if (DictUtils.CustomNameDictReady)
             {
                 ShowAddNameWindow();
                 PopupAutoHideTimer.Start();
@@ -1362,7 +1362,7 @@ internal sealed partial class PopupWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowAddWordWindowKeyGesture))
         {
-            if (DictUtils.DictsReady)
+            if (DictUtils.CustomWordDictReady)
             {
                 WindowsUtils.ShowAddWordWindow(_lastSelectedText);
                 PopupAutoHideTimer.Start();
