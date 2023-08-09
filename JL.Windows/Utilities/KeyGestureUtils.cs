@@ -62,18 +62,9 @@ internal static class KeyGestureUtils
         PopupWindow? currentPopup = MainWindow.Instance.FirstPopupWindow;
         PopupWindow? lastPopup = null;
 
-        while (currentPopup is not null)
+        while (currentPopup?.IsVisible ?? false)
         {
-            if (currentPopup.IsVisible)
-            {
-                lastPopup = currentPopup;
-            }
-
-            else
-            {
-                break;
-            }
-
+            lastPopup = currentPopup;
             currentPopup = currentPopup.ChildPopupWindow;
         }
 
