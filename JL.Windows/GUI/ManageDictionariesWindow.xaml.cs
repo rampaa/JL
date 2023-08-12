@@ -81,7 +81,7 @@ internal sealed partial class ManageDictionariesWindow : Window
         {
             DockPanel dockPanel = new();
 
-            var checkBox = new CheckBox
+            CheckBox checkBox = new()
             {
                 Width = 20,
                 IsChecked = dict.Active,
@@ -90,7 +90,7 @@ internal sealed partial class ManageDictionariesWindow : Window
                 VerticalAlignment = VerticalAlignment.Center
             };
 
-            var buttonIncreasePriority = new Button
+            Button buttonIncreasePriority = new()
             {
                 Width = 25,
                 Content = '↑',
@@ -99,7 +99,7 @@ internal sealed partial class ManageDictionariesWindow : Window
                 VerticalAlignment = VerticalAlignment.Center
             };
 
-            var buttonDecreasePriority = new Button
+            Button buttonDecreasePriority = new()
             {
                 Width = 25,
                 Content = '↓',
@@ -108,7 +108,7 @@ internal sealed partial class ManageDictionariesWindow : Window
                 VerticalAlignment = VerticalAlignment.Center
             };
 
-            var priority = new TextBlock
+            TextBlock priority = new()
             {
                 Name = "priority",
                 // Width = 20,
@@ -117,7 +117,8 @@ internal sealed partial class ManageDictionariesWindow : Window
                 Visibility = Visibility.Collapsed
                 // Margin = new Thickness(10),
             };
-            var dictTypeDisplay = new TextBlock
+
+            TextBlock dictTypeDisplay = new()
             {
                 Width = 150,
                 Text = dict.Name,
@@ -129,7 +130,7 @@ internal sealed partial class ManageDictionariesWindow : Window
 
             string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
             bool invalidPath = !Directory.Exists(fullPath) && !File.Exists(fullPath);
-            var dictPathValidityDisplay = new TextBlock
+            TextBlock dictPathValidityDisplay = new()
             {
                 Width = 13,
                 Text = invalidPath ? "❌" : "",
@@ -139,7 +140,8 @@ internal sealed partial class ManageDictionariesWindow : Window
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
-            var dictPathDisplay = new TextBlock
+
+            TextBlock dictPathDisplay = new()
             {
                 Width = 300,
                 Text = dict.Path,
@@ -156,7 +158,7 @@ internal sealed partial class ManageDictionariesWindow : Window
 
             dictPathDisplay.MouseLeave += (_, _) => dictPathDisplay.TextDecorations = null;
 
-            var buttonUpdate = new Button
+            Button buttonUpdate = new()
             {
                 Width = 75,
                 Height = 30,
@@ -208,7 +210,7 @@ internal sealed partial class ManageDictionariesWindow : Window
                 UpdateDictionariesDisplay();
             };
 
-            var buttonRemove = new Button
+            Button buttonRemove = new()
             {
                 Width = 75,
                 Height = 30,
@@ -224,7 +226,7 @@ internal sealed partial class ManageDictionariesWindow : Window
                     : Visibility.Visible
             };
 
-            var buttonEdit = new Button
+            Button buttonEdit = new()
             {
                 Width = 45,
                 Height = 30,
@@ -241,7 +243,7 @@ internal sealed partial class ManageDictionariesWindow : Window
                 //     : Visibility.Visible,
             };
 
-            var buttonInfo = new Button
+            Button buttonInfo = new()
             {
                 Width = 50,
                 Height = 30,

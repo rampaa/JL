@@ -91,10 +91,8 @@ internal sealed partial class MainWindow : Window
         FirstPopupWindow.HidePopup();
 
         FocusManager.SetFocusedElement(this, MainTextBox);
-        if (ConfigManager.AlwaysShowMainTextBoxCaret)
-        {
-            MoveCaret(Key.Left);
-        }
+        // Makes caret/highlight visible without any mouse click
+        MoveCaret(Key.Left);
 
         await WindowsUtils.InitializeMainWindow().ConfigureAwait(false);
     }
@@ -261,7 +259,7 @@ internal sealed partial class MainWindow : Window
                 if (lookupResults?.Count > 0)
                 {
                     int resultCount = Math.Min(lookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
-                    var popupItemSource = new StackPanel[resultCount];
+                    StackPanel[] popupItemSource = new StackPanel[resultCount];
                     for (int i = 0; i < resultCount; i++)
                     {
                         LookupResult lookupResult = lookupResults[i];
@@ -670,6 +668,7 @@ internal sealed partial class MainWindow : Window
             ConfigManager.TextBoxIsReadOnly = !ConfigManager.TextBoxIsReadOnly;
             MainTextBox.IsReadOnly = ConfigManager.TextBoxIsReadOnly;
             MainTextBox.IsUndoEnabled = !ConfigManager.TextBoxIsReadOnly;
+            MainTextBox.UndoLimit = ConfigManager.TextBoxIsReadOnly ? 0 : -1;
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.DeleteCurrentLineKeyGesture))
@@ -837,12 +836,24 @@ internal sealed partial class MainWindow : Window
 
     private void AddName(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.ShowAddNameWindow(MainTextBox.SelectedText);
+        string? text = MainTextBox.SelectedText;
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            text = FirstPopupWindow.LastSelectedText;
+        }
+
+        WindowsUtils.ShowAddNameWindow(text);
     }
 
     private void AddWord(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.ShowAddWordWindow(MainTextBox.SelectedText);
+        string? text = MainTextBox.SelectedText;
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            text = FirstPopupWindow.LastSelectedText;
+        }
+
+        WindowsUtils.ShowAddWordWindow(text);
     }
 
     private void ShowPreferences(object sender, RoutedEventArgs e)
@@ -1050,13 +1061,18 @@ internal sealed partial class MainWindow : Window
 
     private void Border_OnMouseEnter(object sender, MouseEventArgs e)
     {
+        if (FirstPopupWindow.IsVisible && !FirstPopupWindow.MiningMode)
+        {
+            FirstPopupWindow.HidePopup();
+        }
+
         // For some reason, when DragMove() is used Mouse.GetPosition() returns Point(0, 0)
         if (e.GetPosition(this) == new Point(0, 0))
         {
             return;
         }
 
-        var border = (Border)sender;
+        Border border = (Border)sender;
 
         Mouse.OverrideCursor = border.Name switch
         {
@@ -1165,11 +1181,6 @@ internal sealed partial class MainWindow : Window
         }
 
         FirstPopupWindow.HidePopup();
-
-        if (ConfigManager.HighlightLongestMatch)
-        {
-            WindowsUtils.Unselect(MainTextBox);
-        }
     }
 
     private void Window_MouseEnter(object sender, MouseEventArgs e)
@@ -1263,6 +1274,11 @@ internal sealed partial class MainWindow : Window
 
     private void TitleBar_MouseEnter(object sender, MouseEventArgs e)
     {
+        if (FirstPopupWindow.IsVisible && !FirstPopupWindow.MiningMode)
+        {
+            FirstPopupWindow.HidePopup();
+        }
+
         if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar)
         {
             return;

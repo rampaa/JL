@@ -70,7 +70,7 @@ internal static class JmdictWordClassUtils
             int jmdictRecordListCount = jmdictRecordList.Count;
             for (int i = 0; i < jmdictRecordListCount; i++)
             {
-                var value = (JmdictRecord)jmdictRecordList[i];
+                JmdictRecord value = (JmdictRecord)jmdictRecordList[i];
 
                 string[] wordClasses = usedWordClasses.Intersect(value.WordClasses.SelectMany(static wc => wc)).ToArray();
 

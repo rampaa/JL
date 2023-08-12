@@ -34,7 +34,7 @@ internal sealed partial class PopupWindow : Window
 
     private string? _currentText;
 
-    private string? _lastSelectedText;
+    public string? LastSelectedText { get; private set; }
 
     public nint WindowHandle { get; private set; }
 
@@ -112,12 +112,12 @@ internal sealed partial class PopupWindow : Window
 
     private void AddWord(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.ShowAddWordWindow(_lastSelectedText);
+        WindowsUtils.ShowAddWordWindow(LastSelectedText);
     }
 
     private void SearchWithBrowser(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.SearchWithBrowser(_lastSelectedText);
+        WindowsUtils.SearchWithBrowser(LastSelectedText);
     }
 
     private void ShowStats(object sender, RoutedEventArgs e)
@@ -168,7 +168,7 @@ internal sealed partial class PopupWindow : Window
         if (lookupResults?.Count > 0)
         {
             _lastTextBox = tb;
-            _lastSelectedText = lookupResults[0].MatchedText;
+            LastSelectedText = lookupResults[0].MatchedText;
 
             if (ConfigManager.HighlightLongestMatch)
             {
@@ -256,7 +256,7 @@ internal sealed partial class PopupWindow : Window
         }
 
         _lastTextBox = tb;
-        _lastSelectedText = tb.SelectedText;
+        LastSelectedText = tb.SelectedText;
 
         List<LookupResult>? lookupResults = LookupUtils.LookupText(tb.SelectedText);
 
@@ -383,7 +383,7 @@ internal sealed partial class PopupWindow : Window
         if (text is not null && !generateAllResults && StackPanelCache.TryGet(text, out StackPanel[] data))
         {
             int resultCount = Math.Min(data.Length, ConfigManager.MaxNumResultsNotInMiningMode);
-            var popupItemSource = new StackPanel[resultCount];
+            StackPanel[] popupItemSource = new StackPanel[resultCount];
 
             for (int i = 0; i < resultCount; i++)
             {
@@ -409,7 +409,7 @@ internal sealed partial class PopupWindow : Window
                 ? _lastLookupResults.Count
                 : Math.Min(_lastLookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
 
-            var popupItemSource = new StackPanel[resultCount];
+            StackPanel[] popupItemSource = new StackPanel[resultCount];
 
             for (int i = 0; i < resultCount; i++)
             {
@@ -438,22 +438,10 @@ internal sealed partial class PopupWindow : Window
     public StackPanel MakeResultStackPanel(LookupResult result,
         int index, int resultsCount)
     {
-        var innerStackPanel = new StackPanel { Margin = new Thickness(4, 2, 4, 2), Tag = result.Dict };
-        WrapPanel top = new();
-        StackPanel bottom = new();
-
-        _ = innerStackPanel.Children.Add(top);
-        _ = innerStackPanel.Children.Add(bottom);
-
         // top
-        TextBlock? textBlockPOrthographyInfo = null;
-        UIElement? uiElementReadings = null;
-        UIElement? uiElementAlternativeSpellings = null;
-        TextBlock? textBlockProcess = null;
-        TextBlock? textBlockFrequency = null;
-        TextBlock? textBlockEdictId = null;
+        WrapPanel top = new();
 
-        var textBlockMatchedText = new TextBlock
+        TextBlock textBlockMatchedText = new()
         {
             Name = nameof(result.MatchedText),
             Text = result.MatchedText,
@@ -461,8 +449,9 @@ internal sealed partial class PopupWindow : Window
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Center
         };
+        _ = top.Children.Add(textBlockMatchedText);
 
-        var textBlockDeconjugatedMatchedText = new TextBlock
+        TextBlock textBlockDeconjugatedMatchedText = new()
         {
             Name = nameof(result.DeconjugatedMatchedText),
             Text = result.DeconjugatedMatchedText,
@@ -470,8 +459,20 @@ internal sealed partial class PopupWindow : Window
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Center
         };
+        _ = top.Children.Add(textBlockDeconjugatedMatchedText);
 
-        var textBlockPrimarySpelling = new TextBlock
+        if (result.EdictId is not 0)
+        {
+            TextBlock edictIdTextBlock = new()
+            {
+                Name = nameof(result.EdictId),
+                Text = result.EdictId.ToString(CultureInfo.InvariantCulture),
+                Visibility = Visibility.Collapsed
+            };
+            _ = top.Children.Add(edictIdTextBlock);
+        }
+
+        TextBlock primarySpellingTextBox = new()
         {
             Name = nameof(result.PrimarySpelling),
             Text = result.PrimarySpelling,
@@ -488,28 +489,253 @@ internal sealed partial class PopupWindow : Window
             Padding = new Thickness(0),
             //IsReadOnly = true,
             //IsUndoEnabled = false,
+            //UndoLimit = 0,
             Cursor = Cursors.Arrow,
             //IsInactiveSelectionHighlightEnabled = true,
             ContextMenu = PopupContextMenu
         };
+        primarySpellingTextBox.MouseEnter += PrimarySpelling_MouseEnter; // for audio
+        primarySpellingTextBox.MouseLeave += PrimarySpelling_MouseLeave; // for audio
+        primarySpellingTextBox.PreviewMouseUp += PrimarySpelling_PreviewMouseUp; // for mining
 
-        // bottom
-        UIElement? uiElementDefinitions = null;
-        TextBlock? textBlockNanoriReadings = null;
-        TextBlock? textBlockOnReadings = null;
-        TextBlock? textBlockKunReadings = null;
-        TextBlock? textBlockStrokeCount = null;
-        TextBlock? textBlockGrade = null;
-        TextBlock? textBlockComposition = null;
-        TextBlock? textBlockKanjiStats = null;
+        Dict? pitchDict = DictUtils.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.PitchAccentYomichan);
+        if (pitchDict?.Active ?? false)
+        {
+            if (result.Readings is not null)
+            {
+                _ = top.Children.Add(primarySpellingTextBox);
+            }
 
-        if (result.Frequencies?.Count > 0)
+            else
+            {
+                Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
+                    result.AlternativeSpellings,
+                    null,
+                    primarySpellingTextBox.Text.Split(", "),
+                    primarySpellingTextBox.Margin.Left,
+                    pitchDict);
+
+                if (pitchAccentGrid.Children.Count is 0)
+                {
+                    _ = top.Children.Add(primarySpellingTextBox);
+                }
+
+                else
+                {
+                    _ = pitchAccentGrid.Children.Add(primarySpellingTextBox);
+                    _ = top.Children.Add(pitchAccentGrid);
+                }
+            }
+        }
+        else
+        {
+            _ = top.Children.Add(primarySpellingTextBox);
+        }
+
+        if (result.PrimarySpellingOrthographyInfoList is not null
+            && (result.Dict.Options?.POrthographyInfo?.Value ?? true))
+        {
+            TextBlock? textBlockPOrthographyInfo = new()
+            {
+                Name = nameof(result.PrimarySpellingOrthographyInfoList),
+                Text = string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", result.PrimarySpellingOrthographyInfoList)})"),
+                Foreground = DictOptionManager.POrthographyInfoColor,
+                FontSize = result.Dict.Options?.POrthographyInfoFontSize?.Value ?? 15,
+                Margin = new Thickness(5, 0, 0, 0),
+                TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            _ = top.Children.Add(textBlockPOrthographyInfo);
+        }
+
+        if (result.Readings is not null)
+        {
+            string readingsText = result.ReadingsOrthographyInfoList?.Count > 0 && (result.Dict.Options?.ROrthographyInfo?.Value ?? true)
+                ? PopupWindowUtils.ReadingsToText(result.Readings, result.ReadingsOrthographyInfoList)
+                : string.Join(", ", result.Readings);
+
+            if (MiningMode)
+            {
+                TextBox readingTextBox = new()
+                {
+                    Name = nameof(result.Readings),
+                    Text = readingsText,
+                    TextWrapping = TextWrapping.Wrap,
+                    Background = Brushes.Transparent,
+                    Foreground = ConfigManager.ReadingsColor,
+                    FontSize = ConfigManager.ReadingsFontSize,
+                    BorderThickness = new Thickness(0, 0, 0, 0),
+                    Margin = new Thickness(5, 0, 0, 0),
+                    Padding = new Thickness(0),
+                    IsReadOnly = true,
+                    IsUndoEnabled = false,
+                    UndoLimit = 0,
+                    Cursor = Cursors.Arrow,
+                    SelectionBrush = ConfigManager.HighlightColor,
+                    IsInactiveSelectionHighlightEnabled = true,
+                    ContextMenu = PopupContextMenu,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Visibility = result.KunReadings is null && result.OnReadings is null
+                    ? Visibility.Visible
+                    : Visibility.Collapsed
+                };
+
+                if (pitchDict?.Active ?? false)
+                {
+                    Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
+                        result.AlternativeSpellings,
+                        result.Readings,
+                        readingTextBox.Text.Split(", "),
+                        readingTextBox.Margin.Left,
+                        pitchDict);
+
+                    if (pitchAccentGrid.Children.Count is 0)
+                    {
+                        _ = top.Children.Add(readingTextBox);
+                    }
+                    else
+                    {
+                        _ = pitchAccentGrid.Children.Add(readingTextBox);
+                        _ = top.Children.Add(pitchAccentGrid);
+                    }
+                }
+
+                else
+                {
+                    _ = top.Children.Add(readingTextBox);
+                }
+
+                readingTextBox.PreviewMouseUp += UiElement_PreviewMouseUp;
+                readingTextBox.MouseMove += UiElement_MouseMove;
+                readingTextBox.LostFocus += Unselect;
+                readingTextBox.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
+                readingTextBox.MouseLeave += OnMouseLeave;
+            }
+
+            else
+            {
+                TextBlock readingTextBlock = new()
+                {
+                    Name = nameof(result.Readings),
+                    Text = readingsText,
+                    TextWrapping = TextWrapping.Wrap,
+                    Foreground = ConfigManager.ReadingsColor,
+                    FontSize = ConfigManager.ReadingsFontSize,
+                    Margin = new Thickness(5, 0, 0, 0),
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Visibility = result.KunReadings is null && result.OnReadings is null
+                    ? Visibility.Visible
+                    : Visibility.Collapsed
+                };
+
+                if (pitchDict?.Active ?? false)
+                {
+                    Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
+                        result.AlternativeSpellings,
+                        result.Readings,
+                        readingTextBlock.Text.Split(", "),
+                        readingTextBlock.Margin.Left,
+                        pitchDict);
+
+                    if (pitchAccentGrid.Children.Count is 0)
+                    {
+                        _ = top.Children.Add(readingTextBlock);
+                    }
+
+                    else
+                    {
+                        _ = pitchAccentGrid.Children.Add(readingTextBlock);
+                        _ = top.Children.Add(pitchAccentGrid);
+                    }
+                }
+
+                else
+                {
+                    _ = top.Children.Add(readingTextBlock);
+                }
+            }
+        }
+
+        if (result.AlternativeSpellings is not null)
+        {
+            string alternativeSpellingsText = result.AlternativeSpellingsOrthographyInfoList?.Count > 0 && (result.Dict.Options?.AOrthographyInfo?.Value ?? true)
+                ? PopupWindowUtils.AlternativeSpellingsToText(result.AlternativeSpellings, result.AlternativeSpellingsOrthographyInfoList)
+                : string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", result.AlternativeSpellings)})");
+
+            if (MiningMode)
+            {
+                TextBox alternativeSpellingsTexBox = new()
+                {
+                    Name = nameof(result.AlternativeSpellings),
+                    Text = alternativeSpellingsText,
+                    TextWrapping = TextWrapping.Wrap,
+                    Background = Brushes.Transparent,
+                    Foreground = ConfigManager.AlternativeSpellingsColor,
+                    FontSize = ConfigManager.AlternativeSpellingsFontSize,
+                    BorderThickness = new Thickness(0, 0, 0, 0),
+                    Margin = new Thickness(5, 0, 0, 0),
+                    Padding = new Thickness(0),
+                    IsReadOnly = true,
+                    IsUndoEnabled = false,
+                    UndoLimit = 0,
+                    Cursor = Cursors.Arrow,
+                    SelectionBrush = ConfigManager.HighlightColor,
+                    IsInactiveSelectionHighlightEnabled = true,
+                    ContextMenu = PopupContextMenu,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                alternativeSpellingsTexBox.PreviewMouseUp += UiElement_PreviewMouseUp;
+                alternativeSpellingsTexBox.MouseMove += UiElement_MouseMove;
+                alternativeSpellingsTexBox.LostFocus += Unselect;
+                alternativeSpellingsTexBox.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
+                alternativeSpellingsTexBox.MouseLeave += OnMouseLeave;
+                _ = top.Children.Add(alternativeSpellingsTexBox);
+            }
+            else
+            {
+                TextBlock alternativeSpellingsTexBlock = new()
+                {
+                    Name = nameof(result.AlternativeSpellings),
+                    Text = alternativeSpellingsText,
+                    TextWrapping = TextWrapping.Wrap,
+                    Foreground = ConfigManager.AlternativeSpellingsColor,
+                    FontSize = ConfigManager.AlternativeSpellingsFontSize,
+                    Margin = new Thickness(5, 0, 0, 0),
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                _ = top.Children.Add(alternativeSpellingsTexBlock);
+            }
+        }
+
+        if (result.Process is not null)
+        {
+            TextBlock processTextBlock = new()
+            {
+                Name = nameof(result.Process),
+                Text = result.Process,
+                Foreground = ConfigManager.DeconjugationInfoColor,
+                FontSize = ConfigManager.DeconjugationInfoFontSize,
+                Margin = new Thickness(5, 0, 0, 0),
+                TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top
+            };
+            _ = top.Children.Add(processTextBlock);
+        }
+
+        if (result.Frequencies is not null)
         {
             string? freqText = PopupWindowUtils.FrequenciesToText(result.Frequencies);
 
             if (freqText is not null)
             {
-                textBlockFrequency = new TextBlock
+                TextBlock frequencyTextBlock = new()
                 {
                     Name = nameof(result.Frequencies),
                     Text = freqText,
@@ -520,10 +746,11 @@ internal sealed partial class PopupWindow : Window
                     HorizontalAlignment = HorizontalAlignment.Left,
                     VerticalAlignment = VerticalAlignment.Top
                 };
+                _ = top.Children.Add(frequencyTextBlock);
             }
         }
 
-        TextBlock textBlockDictType = new()
+        TextBlock dictTypeTextBlock = new()
         {
             Name = nameof(result.Dict.Name),
             Text = result.Dict.Name,
@@ -534,69 +761,16 @@ internal sealed partial class PopupWindow : Window
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Top
         };
+        _ = top.Children.Add(dictTypeTextBlock);
 
-        textBlockPrimarySpelling.MouseEnter += PrimarySpelling_MouseEnter; // for audio
-        textBlockPrimarySpelling.MouseLeave += PrimarySpelling_MouseLeave; // for audio
-        textBlockPrimarySpelling.PreviewMouseUp += PrimarySpelling_PreviewMouseUp; // for mining
+        // bottom
+        StackPanel bottom = new();
 
-        if (result.Readings?.Count > 0)
-        {
-            string? readingsText = result.ReadingsOrthographyInfoList?.Count > 0 && (result.Dict.Options?.ROrthographyInfo?.Value ?? true)
-                ? PopupWindowUtils.ReadingsToText(result.Readings, result.ReadingsOrthographyInfoList)
-                : string.Join(", ", result.Readings);
-
-            if (readingsText is not null)
-            {
-                if (MiningMode)
-                {
-                    uiElementReadings = new TextBox
-                    {
-                        Name = nameof(result.Readings),
-                        Text = readingsText,
-                        TextWrapping = TextWrapping.Wrap,
-                        Background = Brushes.Transparent,
-                        Foreground = ConfigManager.ReadingsColor,
-                        FontSize = ConfigManager.ReadingsFontSize,
-                        BorderThickness = new Thickness(0, 0, 0, 0),
-                        Margin = new Thickness(5, 0, 0, 0),
-                        Padding = new Thickness(0),
-                        IsReadOnly = true,
-                        IsUndoEnabled = false,
-                        Cursor = Cursors.Arrow,
-                        SelectionBrush = ConfigManager.HighlightColor,
-                        IsInactiveSelectionHighlightEnabled = true,
-                        ContextMenu = PopupContextMenu,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment = VerticalAlignment.Center
-                    };
-
-                    uiElementReadings.PreviewMouseUp += UiElement_PreviewMouseUp;
-                    uiElementReadings.MouseMove += UiElement_MouseMove;
-                    uiElementReadings.LostFocus += Unselect;
-                    uiElementReadings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
-                }
-                else
-                {
-                    uiElementReadings = new TextBlock
-                    {
-                        Name = nameof(result.Readings),
-                        Text = readingsText,
-                        TextWrapping = TextWrapping.Wrap,
-                        Foreground = ConfigManager.ReadingsColor,
-                        FontSize = ConfigManager.ReadingsFontSize,
-                        Margin = new Thickness(5, 0, 0, 0),
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment = VerticalAlignment.Center
-                    };
-                }
-            }
-        }
-
-        if (result.FormattedDefinitions?.Length > 0)
+        if (result.FormattedDefinitions is not null)
         {
             if (MiningMode)
             {
-                uiElementDefinitions = new TextBox
+                TextBox definitionsTextBox = new()
                 {
                     Name = nameof(result.FormattedDefinitions),
                     Text = result.FormattedDefinitions,
@@ -609,6 +783,7 @@ internal sealed partial class PopupWindow : Window
                     Padding = new Thickness(0),
                     IsReadOnly = true,
                     IsUndoEnabled = false,
+                    UndoLimit = 0,
                     Cursor = Cursors.Arrow,
                     SelectionBrush = ConfigManager.HighlightColor,
                     IsInactiveSelectionHighlightEnabled = true,
@@ -617,14 +792,17 @@ internal sealed partial class PopupWindow : Window
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                uiElementDefinitions.PreviewMouseUp += UiElement_PreviewMouseUp;
-                uiElementDefinitions.MouseMove += UiElement_MouseMove;
-                uiElementDefinitions.LostFocus += Unselect;
-                uiElementDefinitions.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
+                definitionsTextBox.PreviewMouseUp += UiElement_PreviewMouseUp;
+                definitionsTextBox.MouseMove += UiElement_MouseMove;
+                definitionsTextBox.LostFocus += Unselect;
+                definitionsTextBox.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
+                definitionsTextBox.MouseLeave += OnMouseLeave;
+                _ = bottom.Children.Add(definitionsTextBox);
             }
+
             else
             {
-                uiElementDefinitions = new TextBlock
+                TextBlock definitionsTextBlock = new()
                 {
                     Name = nameof(result.FormattedDefinitions),
                     Text = result.FormattedDefinitions,
@@ -635,168 +813,168 @@ internal sealed partial class PopupWindow : Window
                     HorizontalAlignment = HorizontalAlignment.Left,
                     VerticalAlignment = VerticalAlignment.Center
                 };
+                _ = bottom.Children.Add(definitionsTextBlock);
             }
-        }
-
-        if (result.EdictId is not 0)
-        {
-            textBlockEdictId = new TextBlock
-            {
-                Name = nameof(result.EdictId),
-                Text = result.EdictId.ToString(CultureInfo.InvariantCulture),
-                Visibility = Visibility.Collapsed
-            };
-        }
-
-        if (result.AlternativeSpellings?.Length > 0)
-        {
-            string? alternativeSpellingsText = result.AlternativeSpellingsOrthographyInfoList?.Count > 0 && (result.Dict.Options?.AOrthographyInfo?.Value ?? true)
-                ? PopupWindowUtils.AlternativeSpellingsToText(result.AlternativeSpellings, result.AlternativeSpellingsOrthographyInfoList)
-                : string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", result.AlternativeSpellings)})");
-
-            if (alternativeSpellingsText is not null)
-            {
-                if (MiningMode)
-                {
-                    uiElementAlternativeSpellings = new TextBox
-                    {
-                        Name = nameof(result.AlternativeSpellings),
-                        Text = alternativeSpellingsText,
-                        TextWrapping = TextWrapping.Wrap,
-                        Background = Brushes.Transparent,
-                        Foreground = ConfigManager.AlternativeSpellingsColor,
-                        FontSize = ConfigManager.AlternativeSpellingsFontSize,
-                        BorderThickness = new Thickness(0, 0, 0, 0),
-                        Margin = new Thickness(5, 0, 0, 0),
-                        Padding = new Thickness(0),
-                        IsReadOnly = true,
-                        IsUndoEnabled = false,
-                        Cursor = Cursors.Arrow,
-                        SelectionBrush = ConfigManager.HighlightColor,
-                        IsInactiveSelectionHighlightEnabled = true,
-                        ContextMenu = PopupContextMenu,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment = VerticalAlignment.Center
-                    };
-
-                    uiElementAlternativeSpellings.PreviewMouseUp += UiElement_PreviewMouseUp;
-                    uiElementAlternativeSpellings.MouseMove += UiElement_MouseMove;
-                    uiElementAlternativeSpellings.LostFocus += Unselect;
-                    uiElementAlternativeSpellings.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
-                }
-                else
-                {
-                    uiElementAlternativeSpellings = new TextBlock
-                    {
-                        Name = nameof(result.AlternativeSpellings),
-                        Text = alternativeSpellingsText,
-                        TextWrapping = TextWrapping.Wrap,
-                        Foreground = ConfigManager.AlternativeSpellingsColor,
-                        FontSize = ConfigManager.AlternativeSpellingsFontSize,
-                        Margin = new Thickness(5, 0, 0, 0),
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment = VerticalAlignment.Center
-                    };
-                }
-            }
-        }
-
-        if (result.Process is not null)
-        {
-            textBlockProcess = new TextBlock
-            {
-                Name = nameof(result.Process),
-                Text = result.Process,
-                Foreground = ConfigManager.DeconjugationInfoColor,
-                FontSize = ConfigManager.DeconjugationInfoFontSize,
-                Margin = new Thickness(5, 0, 0, 0),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Top
-            };
-        }
-
-        if (result.PrimarySpellingOrthographyInfoList?.Length > 0
-            && (result.Dict.Options?.POrthographyInfo?.Value ?? true))
-        {
-            textBlockPOrthographyInfo = new TextBlock
-            {
-                Name = nameof(result.PrimarySpellingOrthographyInfoList),
-                Text = string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", result.PrimarySpellingOrthographyInfoList)})"),
-                Foreground = DictOptionManager.POrthographyInfoColor,
-                FontSize = result.Dict.Options?.POrthographyInfoFontSize?.Value ?? 15,
-                Margin = new Thickness(5, 0, 0, 0),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
-            };
         }
 
         // KANJIDIC
-        if (result.OnReadings?.Length > 0)
+        if (result.OnReadings is not null)
         {
-            textBlockOnReadings = new TextBlock
+            if (MiningMode)
             {
-                Name = nameof(result.OnReadings),
-                Text = string.Create(CultureInfo.InvariantCulture, $"On: {string.Join(", ", result.OnReadings)}"),
-                Foreground = ConfigManager.ReadingsColor,
-                FontSize = ConfigManager.ReadingsFontSize,
-                Margin = new Thickness(2, 0, 0, 0),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
-            };
+                TextBox onReadingsTextBox = new()
+                {
+                    Name = nameof(result.OnReadings),
+                    Text = string.Create(CultureInfo.InvariantCulture, $"On: {string.Join(", ", result.OnReadings)}"),
+                    Foreground = ConfigManager.ReadingsColor,
+                    FontSize = ConfigManager.ReadingsFontSize,
+                    Margin = new Thickness(2, 0, 0, 0),
+                    TextWrapping = TextWrapping.Wrap,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Background = Brushes.Transparent,
+                    BorderThickness = new Thickness(0, 0, 0, 0),
+                    Padding = new Thickness(0),
+                    IsReadOnly = true,
+                    IsUndoEnabled = false,
+                    UndoLimit = 0,
+                    Cursor = Cursors.Arrow,
+                    SelectionBrush = ConfigManager.HighlightColor,
+                    IsInactiveSelectionHighlightEnabled = true,
+                    ContextMenu = PopupContextMenu
+                };
+
+                onReadingsTextBox.PreviewMouseUp += UiElement_PreviewMouseUp;
+                onReadingsTextBox.MouseMove += UiElement_MouseMove;
+                onReadingsTextBox.LostFocus += Unselect;
+                onReadingsTextBox.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
+                onReadingsTextBox.MouseLeave += OnMouseLeave;
+                _ = bottom.Children.Add(onReadingsTextBox);
+            }
+
+            else
+            {
+                TextBlock onReadingsTextBlock = new()
+                {
+                    Name = nameof(result.OnReadings),
+                    Text = string.Create(CultureInfo.InvariantCulture, $"On: {string.Join(", ", result.OnReadings)}"),
+                    Foreground = ConfigManager.ReadingsColor,
+                    FontSize = ConfigManager.ReadingsFontSize,
+                    Margin = new Thickness(2, 0, 0, 0),
+                    TextWrapping = TextWrapping.Wrap,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                _ = bottom.Children.Add(onReadingsTextBlock);
+            }
         }
 
-        if (result.KunReadings?.Length > 0)
+        if (result.KunReadings is not null)
         {
-            textBlockKunReadings = new TextBlock
+            if (MiningMode)
             {
-                Name = nameof(result.KunReadings),
-                Text = string.Create(CultureInfo.InvariantCulture, $"Kun: {string.Join(", ", result.KunReadings)}"),
-                Foreground = ConfigManager.ReadingsColor,
-                FontSize = ConfigManager.ReadingsFontSize,
-                Margin = new Thickness(2, 0, 0, 0),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
-            };
+                TextBox kunReadingsTextBox = new()
+                {
+                    Name = nameof(result.KunReadings),
+                    Text = string.Create(CultureInfo.InvariantCulture, $"Kun: {string.Join(", ", result.KunReadings)}"),
+                    Foreground = ConfigManager.ReadingsColor,
+                    FontSize = ConfigManager.ReadingsFontSize,
+                    Margin = new Thickness(2, 0, 0, 0),
+                    TextWrapping = TextWrapping.Wrap,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Background = Brushes.Transparent,
+                    BorderThickness = new Thickness(0, 0, 0, 0),
+                    Padding = new Thickness(0),
+                    IsReadOnly = true,
+                    IsUndoEnabled = false,
+                    UndoLimit = 0,
+                    Cursor = Cursors.Arrow,
+                    SelectionBrush = ConfigManager.HighlightColor,
+                    IsInactiveSelectionHighlightEnabled = true,
+                    ContextMenu = PopupContextMenu
+                };
+
+                kunReadingsTextBox.PreviewMouseUp += UiElement_PreviewMouseUp;
+                kunReadingsTextBox.MouseMove += UiElement_MouseMove;
+                kunReadingsTextBox.LostFocus += Unselect;
+                kunReadingsTextBox.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
+                kunReadingsTextBox.MouseLeave += OnMouseLeave;
+                _ = bottom.Children.Add(kunReadingsTextBox);
+            }
+
+            else
+            {
+                TextBlock kunReadingsTextBlock = new()
+                {
+                    Name = nameof(result.KunReadings),
+                    Text = string.Create(CultureInfo.InvariantCulture, $"Kun: {string.Join(", ", result.KunReadings)}"),
+                    Foreground = ConfigManager.ReadingsColor,
+                    FontSize = ConfigManager.ReadingsFontSize,
+                    Margin = new Thickness(2, 0, 0, 0),
+                    TextWrapping = TextWrapping.Wrap,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                _ = bottom.Children.Add(kunReadingsTextBlock);
+            }
         }
 
-        if (result.NanoriReadings?.Length > 0)
+        if (result.NanoriReadings is not null)
         {
-            textBlockNanoriReadings = new TextBlock
+            if (MiningMode)
             {
-                Name = nameof(result.NanoriReadings),
-                Text = string.Create(CultureInfo.InvariantCulture, $"Nanori Readings: {string.Join(", ", result.NanoriReadings)}"),
-                Foreground = ConfigManager.ReadingsColor,
-                FontSize = ConfigManager.ReadingsFontSize,
-                Margin = new Thickness(2, 0, 0, 0),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-        }
+                TextBox nanoriReadingsTextBox = new()
+                {
+                    Name = nameof(result.NanoriReadings),
+                    Text = string.Create(CultureInfo.InvariantCulture, $"Nanori Readings: {string.Join(", ", result.NanoriReadings)}"),
+                    Foreground = ConfigManager.ReadingsColor,
+                    FontSize = ConfigManager.ReadingsFontSize,
+                    Margin = new Thickness(2, 0, 0, 0),
+                    TextWrapping = TextWrapping.Wrap,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Background = Brushes.Transparent,
+                    BorderThickness = new Thickness(0, 0, 0, 0),
+                    Padding = new Thickness(0),
+                    IsReadOnly = true,
+                    IsUndoEnabled = false,
+                    UndoLimit = 0,
+                    Cursor = Cursors.Arrow,
+                    SelectionBrush = ConfigManager.HighlightColor,
+                    IsInactiveSelectionHighlightEnabled = true,
+                    ContextMenu = PopupContextMenu
+                };
 
-        if (result.StrokeCount > 0)
-        {
-            textBlockStrokeCount = new TextBlock
+                nanoriReadingsTextBox.PreviewMouseUp += UiElement_PreviewMouseUp;
+                nanoriReadingsTextBox.MouseMove += UiElement_MouseMove;
+                nanoriReadingsTextBox.LostFocus += Unselect;
+                nanoriReadingsTextBox.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
+                nanoriReadingsTextBox.MouseLeave += OnMouseLeave;
+                _ = bottom.Children.Add(nanoriReadingsTextBox);
+            }
+
+            else
             {
-                Name = nameof(result.StrokeCount),
-                Text = string.Create(CultureInfo.InvariantCulture, $"Strokes: {result.StrokeCount}"),
-                Foreground = ConfigManager.DefinitionsColor,
-                FontSize = ConfigManager.DefinitionsFontSize,
-                Margin = new Thickness(2, 2, 2, 2),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
-            };
+                TextBlock nanoriReadingsTextBlock = new()
+                {
+                    Name = nameof(result.NanoriReadings),
+                    Text = string.Create(CultureInfo.InvariantCulture, $"Nanori Readings: {string.Join(", ", result.NanoriReadings)}"),
+                    Foreground = ConfigManager.ReadingsColor,
+                    FontSize = ConfigManager.ReadingsFontSize,
+                    Margin = new Thickness(2, 0, 0, 0),
+                    TextWrapping = TextWrapping.Wrap,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                _ = bottom.Children.Add(nanoriReadingsTextBlock);
+            }
         }
 
         if (result.KanjiGrade > -1)
         {
             string gradeText = PopupWindowUtils.GradeToText(result.KanjiGrade);
-            textBlockGrade = new TextBlock
+            TextBlock gradeTextBlock = new()
             {
                 Name = nameof(result.KanjiGrade),
                 Text = string.Create(CultureInfo.InvariantCulture, $"{nameof(result.KanjiGrade)}: {gradeText}"),
@@ -807,14 +985,15 @@ internal sealed partial class PopupWindow : Window
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center
             };
+            _ = bottom.Children.Add(gradeTextBlock);
         }
 
-        if (result.KanjiComposition?.Length > 0)
+        if (result.StrokeCount > 0)
         {
-            textBlockComposition = new TextBlock
+            TextBlock strokeCountTextBlock = new()
             {
-                Name = nameof(result.KanjiComposition),
-                Text = string.Create(CultureInfo.InvariantCulture, $"Composition: {result.KanjiComposition}"),
+                Name = nameof(result.StrokeCount),
+                Text = string.Create(CultureInfo.InvariantCulture, $"Strokes: {result.StrokeCount}"),
                 Foreground = ConfigManager.DefinitionsColor,
                 FontSize = ConfigManager.DefinitionsFontSize,
                 Margin = new Thickness(2, 2, 2, 2),
@@ -822,11 +1001,63 @@ internal sealed partial class PopupWindow : Window
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center
             };
+            _ = bottom.Children.Add(strokeCountTextBlock);
         }
 
-        if (result.KanjiStats?.Length > 0)
+        if (result.KanjiComposition is not null)
         {
-            textBlockKanjiStats = new TextBlock
+            if (MiningMode)
+            {
+                TextBox compositionTextBox = new()
+                {
+                    Name = nameof(result.KanjiComposition),
+                    Text = string.Create(CultureInfo.InvariantCulture, $"Composition: {result.KanjiComposition}"),
+                    Foreground = ConfigManager.DefinitionsColor,
+                    FontSize = ConfigManager.DefinitionsFontSize,
+                    Margin = new Thickness(2, 2, 2, 2),
+                    TextWrapping = TextWrapping.Wrap,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Background = Brushes.Transparent,
+                    BorderThickness = new Thickness(0, 0, 0, 0),
+                    Padding = new Thickness(0),
+                    IsReadOnly = true,
+                    IsUndoEnabled = false,
+                    UndoLimit = 0,
+                    Cursor = Cursors.Arrow,
+                    SelectionBrush = ConfigManager.HighlightColor,
+                    IsInactiveSelectionHighlightEnabled = true,
+                    ContextMenu = PopupContextMenu
+                };
+
+                compositionTextBox.PreviewMouseUp += UiElement_PreviewMouseUp;
+                compositionTextBox.MouseMove += UiElement_MouseMove;
+                compositionTextBox.LostFocus += Unselect;
+                compositionTextBox.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
+                compositionTextBox.MouseLeave += OnMouseLeave;
+                _ = bottom.Children.Add(compositionTextBox);
+            }
+
+            else
+            {
+                TextBlock compositionTextBlock = new()
+                {
+                    Name = nameof(result.KanjiComposition),
+                    Text = string.Create(CultureInfo.InvariantCulture, $"Composition: {result.KanjiComposition}"),
+                    Foreground = ConfigManager.DefinitionsColor,
+                    FontSize = ConfigManager.DefinitionsFontSize,
+                    Margin = new Thickness(2, 2, 2, 2),
+                    TextWrapping = TextWrapping.Wrap,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                _ = bottom.Children.Add(compositionTextBlock);
+            }
+        }
+
+        if (result.KanjiStats is not null)
+        {
+            TextBlock kanjiStatsTextBlock = new()
             {
                 Name = nameof(result.KanjiStats),
                 Text = string.Create(CultureInfo.InvariantCulture, $"Statistics:\n{result.KanjiStats}"),
@@ -837,158 +1068,7 @@ internal sealed partial class PopupWindow : Window
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center
             };
-        }
-
-        UIElement?[] babies =
-        {
-            textBlockPrimarySpelling, textBlockPOrthographyInfo, uiElementReadings, uiElementAlternativeSpellings,
-            textBlockProcess, textBlockMatchedText, textBlockDeconjugatedMatchedText, textBlockEdictId, textBlockFrequency, textBlockDictType
-        };
-
-        for (int i = 0; i < babies.Length; i++)
-        {
-            UIElement? baby = babies[i];
-
-            if (baby is null)
-            {
-                continue;
-            }
-
-            if (baby is TextBlock textBlock)
-            {
-                // common emptiness check
-                if (textBlock.Text is "")
-                {
-                    continue;
-                }
-
-                textBlock.MouseLeave += OnMouseLeave;
-
-                if (textBlock.Name is "PrimarySpelling" or "Readings")
-                {
-                    Dict? pitchDict = DictUtils.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.PitchAccentYomichan);
-                    if (pitchDict?.Active ?? false)
-                    {
-                        IList<string>? readings = result.Readings;
-
-                        if (textBlock.Name is "PrimarySpelling" && readings?.Count > 0)
-                        {
-                            _ = top.Children.Add(textBlock);
-                        }
-
-                        else
-                        {
-                            Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
-                                result.AlternativeSpellings,
-                                readings,
-                                textBlock.Text.Split(", "),
-                                textBlock.Margin.Left,
-                                pitchDict);
-
-                            if (pitchAccentGrid.Children.Count is 0)
-                            {
-                                _ = top.Children.Add(textBlock);
-                            }
-
-                            else
-                            {
-                                _ = pitchAccentGrid.Children.Add(textBlock);
-                                _ = top.Children.Add(pitchAccentGrid);
-                            }
-                        }
-                    }
-
-                    else
-                    {
-                        _ = top.Children.Add(textBlock);
-                    }
-                }
-                else
-                {
-                    _ = top.Children.Add(textBlock);
-                }
-            }
-            else if (baby is TextBox textBox)
-            {
-                // common emptiness check
-                if (textBox.Text is "")
-                {
-                    continue;
-                }
-
-                textBox.MouseLeave += OnMouseLeave;
-
-                if (textBox.Name is "PrimarySpelling" or "Readings")
-                {
-                    Dict? pitchDict = DictUtils.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.PitchAccentYomichan);
-                    if (pitchDict?.Active ?? false)
-                    {
-                        IList<string>? readings = result.Readings;
-
-                        if (textBox.Name is "PrimarySpelling" && readings?.Count > 0)
-                        {
-                            _ = top.Children.Add(textBox);
-                        }
-
-                        else
-                        {
-                            Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
-                                result.AlternativeSpellings,
-                                readings,
-                                textBox.Text.Split(", "),
-                                textBox.Margin.Left,
-                                pitchDict);
-
-                            if (pitchAccentGrid.Children.Count is 0)
-                            {
-                                _ = top.Children.Add(textBox);
-                            }
-                            else
-                            {
-                                _ = pitchAccentGrid.Children.Add(textBox);
-                                _ = top.Children.Add(pitchAccentGrid);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        _ = top.Children.Add(textBox);
-                    }
-                }
-                else
-                {
-                    _ = top.Children.Add(textBox);
-                }
-            }
-        }
-
-        if (uiElementDefinitions is not null)
-        {
-            _ = bottom.Children.Add(uiElementDefinitions);
-        }
-
-        TextBlock?[] babiesKanji =
-        {
-            textBlockOnReadings, textBlockKunReadings, textBlockNanoriReadings, textBlockGrade, textBlockStrokeCount,
-            textBlockComposition, textBlockKanjiStats
-        };
-
-        foreach (TextBlock? baby in babiesKanji)
-        {
-            if (baby is null)
-            {
-                continue;
-            }
-
-            // common emptiness check
-            if (baby.Text is "")
-            {
-                continue;
-            }
-
-            baby.MouseLeave += OnMouseLeave;
-
-            _ = bottom.Children.Add(baby);
+            _ = bottom.Children.Add(kanjiStatsTextBlock);
         }
 
         if (index != resultsCount - 1)
@@ -1003,13 +1083,7 @@ internal sealed partial class PopupWindow : Window
             });
         }
 
-        innerStackPanel.MouseLeave += OnMouseLeave;
-        top.MouseLeave += OnMouseLeave;
-        bottom.MouseLeave += OnMouseLeave;
-
-        PopupListBox.Items.Filter = NoAllDictFilter;
-
-        return innerStackPanel;
+        return new StackPanel { Margin = new Thickness(4, 2, 4, 2), Tag = result.Dict, Children = { top, bottom } };
     }
 
     private static void Unselect(object sender, RoutedEventArgs e)
@@ -1021,7 +1095,7 @@ internal sealed partial class PopupWindow : Window
     {
         AddNameMenuItem.IsEnabled = DictUtils.CustomNameDictReady;
         AddWordMenuItem.IsEnabled = DictUtils.CustomWordDictReady;
-        _lastSelectedText = ((TextBox)sender).SelectedText;
+        LastSelectedText = ((TextBox)sender).SelectedText;
     }
 
     private async void UiElement_MouseMove(object sender, MouseEventArgs? e)
@@ -1045,7 +1119,7 @@ internal sealed partial class PopupWindow : Window
 
         if (MiningMode)
         {
-            var tb = (TextBox)sender;
+            TextBox tb = (TextBox)sender;
             if (JapaneseUtils.JapaneseRegex.IsMatch(tb.Text))
             {
                 await ChildPopupWindow.LookupOnMouseMoveOrClick(tb).ConfigureAwait(false);
@@ -1060,9 +1134,9 @@ internal sealed partial class PopupWindow : Window
 
     private void PrimarySpelling_MouseEnter(object sender, MouseEventArgs e)
     {
-        var textBlock = (TextBlock)sender;
+        TextBlock textBlock = (TextBlock)sender;
         _listBoxIndex = (int)textBlock.Tag;
-        _lastSelectedText = _lastLookupResults[_listBoxIndex].PrimarySpelling;
+        LastSelectedText = _lastLookupResults[_listBoxIndex].PrimarySpelling;
     }
 
     private void PrimarySpelling_MouseLeave(object sender, MouseEventArgs e)
@@ -1154,13 +1228,30 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        var innerStackPanel = (StackPanel)top.Parent;
-        var bottom = (StackPanel)innerStackPanel.Children[1];
+        StackPanel innerStackPanel = (StackPanel)top.Parent;
+        StackPanel bottom = (StackPanel)innerStackPanel.Children[1];
         foreach (object child in bottom.Children)
         {
             if (child is TextBox textBox)
             {
-                miningParams[JLField.Definitions] = textBox.Text.Replace("\n", "<br/>", StringComparison.Ordinal);
+                switch (textBox.Name)
+                {
+                    case nameof(LookupResult.FormattedDefinitions):
+                        miningParams[JLField.Definitions] = textBox.Text.Replace("\n", "<br/>", StringComparison.Ordinal);
+                        break;
+                    case nameof(LookupResult.OnReadings):
+                        miningParams[JLField.OnReadings] = textBox.Text;
+                        break;
+                    case nameof(LookupResult.KunReadings):
+                        miningParams[JLField.KunReadings] = textBox.Text;
+                        break;
+                    case nameof(LookupResult.NanoriReadings):
+                        miningParams[JLField.NanoriReadings] = textBox.Text;
+                        break;
+                    case nameof(LookupResult.KanjiComposition):
+                        miningParams[JLField.KanjiComposition] = textBox.Text;
+                        break;
+                }
                 continue;
             }
 
@@ -1171,23 +1262,11 @@ internal sealed partial class PopupWindow : Window
 
             switch (tb.Name)
             {
-                case nameof(LookupResult.OnReadings):
-                    miningParams[JLField.OnReadings] = tb.Text;
-                    break;
-                case nameof(LookupResult.KunReadings):
-                    miningParams[JLField.KunReadings] = tb.Text;
-                    break;
-                case nameof(LookupResult.NanoriReadings):
-                    miningParams[JLField.NanoriReadings] = tb.Text;
-                    break;
                 case nameof(LookupResult.StrokeCount):
                     miningParams[JLField.StrokeCount] = tb.Text;
                     break;
                 case nameof(LookupResult.KanjiGrade):
                     miningParams[JLField.KanjiGrade] = tb.Text;
-                    break;
-                case nameof(LookupResult.KanjiComposition):
-                    miningParams[JLField.KanjiComposition] = tb.Text;
                     break;
                 case nameof(LookupResult.KanjiStats):
                     miningParams[JLField.KanjiStats] = tb.Text;
@@ -1219,7 +1298,7 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        var textBlock = (TextBlock)sender;
+        TextBlock textBlock = (TextBlock)sender;
 
         WrapPanel top = textBlock.Parent is Grid primarySpellingGrid
             ? (WrapPanel)primarySpellingGrid.Parent
@@ -1242,7 +1321,7 @@ internal sealed partial class PopupWindow : Window
             readings = "";
         }
 
-        WindowsUtils.ShowAddNameWindow(_lastSelectedText, readings);
+        WindowsUtils.ShowAddNameWindow(LastSelectedText, readings);
     }
 
     private async void Window_KeyDown(object sender, KeyEventArgs e)
@@ -1364,14 +1443,14 @@ internal sealed partial class PopupWindow : Window
         {
             if (DictUtils.CustomWordDictReady)
             {
-                WindowsUtils.ShowAddWordWindow(_lastSelectedText);
+                WindowsUtils.ShowAddWordWindow(LastSelectedText);
                 PopupAutoHideTimer.Start();
             }
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SearchWithBrowserKeyGesture))
         {
-            WindowsUtils.SearchWithBrowser(_lastSelectedText);
+            WindowsUtils.SearchWithBrowser(LastSelectedText);
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.InactiveLookupModeKeyGesture))
@@ -1398,7 +1477,7 @@ internal sealed partial class PopupWindow : Window
             int dictCount = ItemsControlButtons.Items.Count;
             for (int i = 0; i < dictCount; i++)
             {
-                var button = (Button)ItemsControlButtons.Items[i];
+                Button button = (Button)ItemsControlButtons.Items[i];
 
                 if (button.Background == Brushes.DodgerBlue)
                 {
@@ -1433,7 +1512,7 @@ internal sealed partial class PopupWindow : Window
             int dictCount = ItemsControlButtons.Items.Count;
             for (int i = dictCount - 1; i > 0; i--)
             {
-                var button = (Button)ItemsControlButtons.Items[i];
+                Button button = (Button)ItemsControlButtons.Items[i];
 
                 if (button.Background == Brushes.DodgerBlue)
                 {
@@ -1463,7 +1542,7 @@ internal sealed partial class PopupWindow : Window
             {
                 for (int i = dictCount - 1; i > 0; i--)
                 {
-                    var btn = (Button)ItemsControlButtons.Items[i];
+                    Button btn = (Button)ItemsControlButtons.Items[i];
                     if (btn.IsEnabled)
                     {
                         _filteredDict = (Dict)btn.Tag;
@@ -1506,9 +1585,9 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode
                 && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null
-                && _lastSelectedText is not null)
+                && LastSelectedText is not null)
             {
-                await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, _lastSelectedText, CoreConfig.AudioVolume).ConfigureAwait(false);
+                await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, LastSelectedText, CoreConfig.AudioVolume).ConfigureAwait(false);
             }
         }
 
@@ -1568,7 +1647,7 @@ internal sealed partial class PopupWindow : Window
         }
 
         StackPanel innerStackPanel = visibleStackPanels[_listBoxIndex];
-        var top = (WrapPanel)innerStackPanel.Children[0];
+        WrapPanel top = (WrapPanel)innerStackPanel.Children[0];
 
         foreach (UIElement child in top.Children)
         {
@@ -1676,7 +1755,7 @@ internal sealed partial class PopupWindow : Window
 
     private async void UiElement_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        _lastSelectedText = ((TextBox)sender).SelectedText;
+        LastSelectedText = ((TextBox)sender).SelectedText;
 
         if (ConfigManager.InactiveLookupMode
             || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
@@ -1751,7 +1830,7 @@ internal sealed partial class PopupWindow : Window
     private void GenerateDictTypeButtons()
     {
         List<Button> buttons = new(DictUtils.Dicts.Values.Count);
-        var buttonAll = new Button { Content = "All", Margin = new Thickness(1), Background = Brushes.DodgerBlue };
+        Button buttonAll = new() { Content = "All", Margin = new Thickness(1), Background = Brushes.DodgerBlue };
         buttonAll.Click += ButtonAllOnClick;
         buttons.Add(buttonAll);
 
@@ -1762,7 +1841,7 @@ internal sealed partial class PopupWindow : Window
                 continue;
             }
 
-            var button = new Button { Content = dict.Name, Margin = new Thickness(1), Tag = dict };
+            Button button = new() { Content = dict.Name, Margin = new Thickness(1), Tag = dict };
             button.Click += DictTypeButtonOnClick;
 
             if (!DictsWithResults.Contains(dict))
@@ -1783,7 +1862,7 @@ internal sealed partial class PopupWindow : Window
             btn.ClearValue(BackgroundProperty);
         }
 
-        var button = (Button)sender;
+        Button button = (Button)sender;
         button.Background = Brushes.DodgerBlue;
 
         PopupListBox.Items.Filter = NoAllDictFilter;
@@ -1796,7 +1875,7 @@ internal sealed partial class PopupWindow : Window
             btn.ClearValue(BackgroundProperty);
         }
 
-        var button = (Button)sender;
+        Button button = (Button)sender;
 
         button.Background = Brushes.DodgerBlue;
 
@@ -1818,8 +1897,8 @@ internal sealed partial class PopupWindow : Window
             return true;
         }
 
-        var dict = (Dict)((StackPanel)item).Tag;
-        return !dict?.Options?.NoAll?.Value ?? true;
+        Dict dict = (Dict)((StackPanel)item).Tag;
+        return !dict.Options?.NoAll?.Value ?? true;
     }
 
     private void PopupContextMenu_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -1872,10 +1951,27 @@ internal sealed partial class PopupWindow : Window
 
         Hide();
 
-        if (Owner == MainWindow.Instance && (ConfigManager.TextOnlyVisibleOnHover || ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover))
+        if (Owner == MainWindow.Instance)
         {
             WinApi.ActivateWindow(MainWindow.Instance.WindowHandle);
-            _ = MainWindow.Instance.ChangeVisibility().ConfigureAwait(false);
+
+            if (ConfigManager.HighlightLongestMatch && !MainWindow.Instance.MainTextBoxContextMenu.IsVisible)
+            {
+                WindowsUtils.Unselect(_lastTextBox);
+            }
+
+            if (ConfigManager.TextOnlyVisibleOnHover || ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+            {
+                _ = MainWindow.Instance.ChangeVisibility().ConfigureAwait(false);
+            }
+        }
+
+        else
+        {
+            if (ConfigManager.HighlightLongestMatch && !PopupContextMenu.IsVisible)
+            {
+                WindowsUtils.Unselect(_lastTextBox);
+            }
         }
     }
 }

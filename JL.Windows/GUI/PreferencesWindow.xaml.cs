@@ -264,8 +264,8 @@ internal sealed partial class PreferencesWindow : Window
         foreach ((string fieldName, JLField jlField) in fields)
         {
             StackPanel stackPanel = new();
-            var textBlockFieldName = new TextBlock { Text = fieldName };
-            var comboBoxJLFields = new ComboBox
+            TextBlock textBlockFieldName = new() { Text = fieldName };
+            ComboBox comboBoxJLFields = new()
             {
                 ItemsSource = descriptions,
                 SelectedItem = jlField.GetDescription() ?? jlField.ToString()
@@ -294,8 +294,8 @@ internal sealed partial class PreferencesWindow : Window
         Dictionary<string, JLField> dict = new();
         foreach (StackPanel stackPanel in miningPanel.Children)
         {
-            var textBlock = (TextBlock)stackPanel.Children[0];
-            var comboBox = (ComboBox)stackPanel.Children[1];
+            TextBlock textBlock = (TextBlock)stackPanel.Children[0];
+            ComboBox comboBox = (ComboBox)stackPanel.Children[1];
 
             string selectedDescription = comboBox.SelectionBoxItem.ToString()!;
             JLField result = jlFieldList.FirstOrDefault(jlFieldName =>
@@ -426,8 +426,8 @@ internal sealed partial class PreferencesWindow : Window
 
     private void ClearKeyGestureButton_Click(object sender, RoutedEventArgs e)
     {
-        var button = (Button)sender;
-        var dockPanel = (DockPanel)button.Parent;
+        Button button = (Button)sender;
+        DockPanel dockPanel = (DockPanel)button.Parent;
         TextBox textBox = dockPanel.Children.OfType<TextBox>().First();
         textBox.Text = "None";
     }

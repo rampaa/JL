@@ -74,7 +74,7 @@ internal sealed partial class StatsWindow : Window
 
     private async void ButtonSwapStats_OnClick(object sender, RoutedEventArgs e)
     {
-        var button = (Button)sender;
+        Button button = (Button)sender;
         if (Enum.TryParse(button.Content.ToString(), out StatsMode mode))
         {
             switch (mode)

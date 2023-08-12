@@ -59,7 +59,7 @@ internal static class SpeechSynthesisReflectionUtils
                     .CreateInstance(s_voiceInfoType.FullName!, true, BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { token }, null, null)
                     ?? throw new NotSupportedException($"Failed to instantiate {s_voiceInfoType}");
 
-                var installedVoice = (InstalledVoice)typeof(SpeechSynthesizer).Assembly
+                InstalledVoice installedVoice = (InstalledVoice)typeof(SpeechSynthesizer).Assembly
                     .CreateInstance(s_installedVoiceType.FullName!, true, BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { voiceSynthesizer, voiceInfo }, null, null)!;
 
                 installedVoices.Add(installedVoice);

@@ -73,7 +73,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
         {
             DockPanel dockPanel = new();
 
-            var checkBox = new CheckBox
+            CheckBox checkBox = new()
             {
                 Width = 20,
                 IsChecked = audioSource.Active,
@@ -82,7 +82,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
                 VerticalAlignment = VerticalAlignment.Center
             };
 
-            var buttonIncreasePriority = new Button
+            Button buttonIncreasePriority = new()
             {
                 Width = 25,
                 Content = '↑',
@@ -91,7 +91,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
                 VerticalAlignment = VerticalAlignment.Center
             };
 
-            var buttonDecreasePriority = new Button
+            Button buttonDecreasePriority = new()
             {
                 Width = 25,
                 Content = '↓',
@@ -100,7 +100,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
                 VerticalAlignment = VerticalAlignment.Center
             };
 
-            var priority = new TextBlock
+            TextBlock priority = new()
             {
                 Name = "priority",
                 // Width = 20,
@@ -110,7 +110,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
                 // Margin = new Thickness(10),
             };
 
-            var audioSourceTypeDisplay = new TextBlock
+            TextBlock audioSourceTypeDisplay = new()
             {
                 Width = 80,
                 Text = audioSource.Type.GetDescription(),
@@ -118,7 +118,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(10)
             };
-            var audioSourceUriDisplay = new TextBlock
+            TextBlock audioSourceUriDisplay = new()
             {
                 Width = 470,
                 Text = uri,
@@ -132,7 +132,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
             audioSourceUriDisplay.MouseEnter += (_, _) => audioSourceUriDisplay.TextDecorations = TextDecorations.Underline;
             audioSourceUriDisplay.MouseLeave += (_, _) => audioSourceUriDisplay.TextDecorations = null;
 
-            var buttonRemove = new Button
+            Button buttonRemove = new()
             {
                 Width = 75,
                 Height = 30,
@@ -144,7 +144,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
                 BorderThickness = new Thickness(1)
             };
 
-            var buttonEdit = new Button
+            Button buttonEdit = new()
             {
                 Width = 45,
                 Height = 30,

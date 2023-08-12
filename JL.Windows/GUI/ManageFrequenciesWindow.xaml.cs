@@ -76,7 +76,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
         {
             DockPanel dockPanel = new();
 
-            var checkBox = new CheckBox
+            CheckBox checkBox = new()
             {
                 Width = 20,
                 IsChecked = freq.Active,
@@ -85,7 +85,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 VerticalAlignment = VerticalAlignment.Center
             };
 
-            var buttonIncreasePriority = new Button
+            Button buttonIncreasePriority = new()
             {
                 Width = 25,
                 Content = '↑',
@@ -94,7 +94,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 VerticalAlignment = VerticalAlignment.Center
             };
 
-            var buttonDecreasePriority = new Button
+            Button buttonDecreasePriority = new()
             {
                 Width = 25,
                 Content = '↓',
@@ -103,7 +103,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 VerticalAlignment = VerticalAlignment.Center
             };
 
-            var priority = new TextBlock
+            TextBlock priority = new()
             {
                 Name = "priority",
                 // Width = 20,
@@ -112,7 +112,8 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 Visibility = Visibility.Collapsed
                 // Margin = new Thickness(10),
             };
-            var freqTypeDisplay = new TextBlock
+
+            TextBlock freqTypeDisplay = new()
             {
                 Width = 177,
                 Text = freq.Name,
@@ -124,7 +125,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
 
             string fullPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
             bool invalidPath = !Directory.Exists(fullPath) && !File.Exists(fullPath);
-            var freqPathValidityDisplay = new TextBlock
+            TextBlock freqPathValidityDisplay = new()
             {
                 Width = 13,
                 Text = invalidPath ? "❌" : "",
@@ -134,7 +135,8 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
-            var freqPathDisplay = new TextBlock
+
+            TextBlock freqPathDisplay = new()
             {
                 Width = 300,
                 Text = freq.Path,
@@ -149,7 +151,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
             freqPathDisplay.MouseEnter += (_, _) => freqPathDisplay.TextDecorations = TextDecorations.Underline;
             freqPathDisplay.MouseLeave += (_, _) => freqPathDisplay.TextDecorations = null;
 
-            var buttonRemove = new Button
+            Button buttonRemove = new()
             {
                 Width = 75,
                 Height = 30,
@@ -161,7 +163,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 BorderThickness = new Thickness(1)
             };
 
-            var buttonEdit = new Button
+            Button buttonEdit = new()
             {
                 Width = 45,
                 Height = 30,

@@ -58,13 +58,8 @@ internal static class PopupWindowUtils
         return null;
     }
 
-    public static string? ReadingsToText(IList<string> readings, IReadOnlyList<string?> rOrthographyInfoList)
+    public static string ReadingsToText(IList<string> readings, IReadOnlyList<string?> rOrthographyInfoList)
     {
-        if (readings.Count is 0)
-        {
-            return null;
-        }
-
         StringBuilder sb = new();
 
         for (int index = 0; index < readings.Count; index++)
@@ -88,13 +83,8 @@ internal static class PopupWindowUtils
         return sb.ToString();
     }
 
-    public static string? AlternativeSpellingsToText(IReadOnlyList<string> alternativeSpellings, IReadOnlyList<string?> aOrthographyInfoList)
+    public static string AlternativeSpellingsToText(IReadOnlyList<string> alternativeSpellings, IReadOnlyList<string?> aOrthographyInfoList)
     {
-        if (alternativeSpellings.Count is 0)
-        {
-            return null;
-        }
-
         StringBuilder sb = new();
 
         _ = sb.Append('(');
@@ -154,7 +144,7 @@ internal static class PopupWindowUtils
 
                 for (int j = 0; j < pitchAccentDictResultList.Count; j++)
                 {
-                    var pitchAccentDictResult = (PitchAccentRecord)pitchAccentDictResultList[j];
+                    PitchAccentRecord pitchAccentDictResult = (PitchAccentRecord)pitchAccentDictResultList[j];
 
                     if ((!hasReading && pitchAccentDictResult.Reading is null)
                         || (pitchAccentDictResult.Reading is not null

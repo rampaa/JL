@@ -88,7 +88,7 @@ public static class ExtensionMethods
             return null;
         }
 
-        var array = new T[list.Count - 1];
+        T[] array = new T[list.Count - 1];
 
         bool hasNonNullElement = false;
         int arrayIndex = 0;

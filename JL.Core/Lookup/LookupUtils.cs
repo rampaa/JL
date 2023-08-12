@@ -316,7 +316,7 @@ public static class LookupUtils
                                 int dictResultsCount = dictResults.Count;
                                 for (int i = 0; i < dictResultsCount; i++)
                                 {
-                                    var dictResult = (JmdictRecord)dictResults[i];
+                                    JmdictRecord dictResult = (JmdictRecord)dictResults[i];
 
                                     if (deconjugationResult.Tags.Count is 0
                                         || dictResult.WordClasses.SelectMany(static pos => pos).Contains(lastTag))
@@ -332,7 +332,7 @@ public static class LookupUtils
                                 int dictResultsCount = dictResults.Count;
                                 for (int i = 0; i < dictResultsCount; i++)
                                 {
-                                    var dictResult = (CustomWordRecord)dictResults[i];
+                                    CustomWordRecord dictResult = (CustomWordRecord)dictResults[i];
 
                                     if (deconjugationResult.Tags.Count is 0 ||
                                         dictResult.WordClasses.Contains(lastTag))
@@ -370,7 +370,7 @@ public static class LookupUtils
                                 int dictResultsCount = dictResults.Count;
                                 for (int i = 0; i < dictResultsCount; i++)
                                 {
-                                    var dictResult = (EpwingYomichanRecord)dictResults[i];
+                                    EpwingYomichanRecord dictResult = (EpwingYomichanRecord)dictResults[i];
 
                                     if (deconjugationResult.Tags.Count is 0 ||
                                         (dictResult.WordClasses?.Contains(lastTag) ?? false))
@@ -412,7 +412,7 @@ public static class LookupUtils
                                 int dictResultsCount = dictResults.Count;
                                 for (int i = 0; i < dictResultsCount; i++)
                                 {
-                                    var dictResult = (EpwingNazekaRecord)dictResults[i];
+                                    EpwingNazekaRecord dictResult = (EpwingNazekaRecord)dictResults[i];
 
                                     if (deconjugationResult.Tags.Count is 0)
                                     {
@@ -567,7 +567,7 @@ public static class LookupUtils
 
                 for (int j = 0; j < resultCount; j++)
                 {
-                    var jMDictResult = (JmdictRecord)wordResult.Results[i][j];
+                    JmdictRecord jMDictResult = (JmdictRecord)wordResult.Results[i][j];
 
                     string[]?[]? rLists = jMDictResult.ReadingsOrthographyInfo;
                     string[]?[]? aLists = jMDictResult.AlternativeSpellingsOrthographyInfo;
@@ -654,7 +654,7 @@ public static class LookupUtils
 
                 for (int j = 0; j < resultCount; j++)
                 {
-                    var jmnedictRecord = (JmnedictRecord)nameResult.Results[i][j];
+                    JmnedictRecord jmnedictRecord = (JmnedictRecord)nameResult.Results[i][j];
 
                     LookupResult result = new
                     (
@@ -744,7 +744,7 @@ public static class LookupUtils
 
                 for (int j = 0; j < resultCount; j++)
                 {
-                    var yomichanKanjiDictResult = (YomichanKanjiRecord)kanjiResult.Value.Results[i][j];
+                    YomichanKanjiRecord yomichanKanjiDictResult = (YomichanKanjiRecord)kanjiResult.Value.Results[i][j];
 
                     List<string> allReadings = new();
 
@@ -793,7 +793,7 @@ public static class LookupUtils
                 int resultCount = wordResult.Results[i].Count;
                 for (int j = 0; j < resultCount; j++)
                 {
-                    var epwingResult = (EpwingYomichanRecord)wordResult.Results[i][j];
+                    EpwingYomichanRecord epwingResult = (EpwingYomichanRecord)wordResult.Results[i][j];
 
                     LookupResult result = new
                     (
@@ -830,7 +830,7 @@ public static class LookupUtils
                 int resultCount = wordResult.Results[i].Count;
                 for (int j = 0; j < resultCount; j++)
                 {
-                    var epwingResult = (EpwingNazekaRecord)wordResult.Results[i][j];
+                    EpwingNazekaRecord epwingResult = (EpwingNazekaRecord)wordResult.Results[i][j];
 
                     LookupResult result = new
                     (
@@ -869,7 +869,7 @@ public static class LookupUtils
 
                 for (int j = 0; j < wordResultCount; j++)
                 {
-                    var customWordDictResult = (CustomWordRecord)wordResult.Results[i][j];
+                    CustomWordRecord customWordDictResult = (CustomWordRecord)wordResult.Results[i][j];
 
                     List<LookupFrequencyResult> freqs = GetWordFrequencies(customWordDictResult);
                     for (int k = 0; k < freqs.Count; k++)
@@ -920,7 +920,7 @@ public static class LookupUtils
 
                 for (int j = 0; j < resultCount; j++)
                 {
-                    var customNameDictResult = (CustomNameRecord)customNameResult.Value.Results[i][j];
+                    CustomNameRecord customNameDictResult = (CustomNameRecord)customNameResult.Value.Results[i][j];
                     LookupResult result = new
                     (
                         primarySpelling: customNameDictResult.PrimarySpelling,

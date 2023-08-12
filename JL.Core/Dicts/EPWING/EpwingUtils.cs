@@ -148,7 +148,7 @@ internal static class EpwingUtils
         {
             for (int i = 0; i < previousResults.Count; i++)
             {
-                var previousResult = (IEpwingRecord)previousResults[i];
+                IEpwingRecord previousResult = (IEpwingRecord)previousResults[i];
 
                 if (epwingRecord.Definitions is not null)
                 {
@@ -177,7 +177,7 @@ internal static class EpwingUtils
         {
             for (int i = 0; i < previousResults.Count; i++)
             {
-                var previousResult = (IEpwingRecord)previousResults[i];
+                IEpwingRecord previousResult = (IEpwingRecord)previousResults[i];
 
                 if (epwingRecord.Definitions is not null)
                 {

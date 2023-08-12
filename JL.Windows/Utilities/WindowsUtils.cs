@@ -441,7 +441,7 @@ internal static class WindowsUtils
     public static void ShowColorPicker(Button button)
     {
         ColorPicker picker = SingleOpenHelper.CreateControl<ColorPicker>();
-        var window = new HandyControl.Controls.PopupWindow { PopupElement = picker };
+        HandyControl.Controls.PopupWindow window = new() { PopupElement = picker };
         picker.SelectedBrush = (SolidColorBrush)button.Tag;
 
         picker.Canceled += delegate

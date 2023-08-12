@@ -302,6 +302,7 @@ internal static class ConfigManager
         TextBoxIsReadOnly = GetValueFromConfig(TextBoxIsReadOnly, nameof(TextBoxIsReadOnly), bool.TryParse);
         mainWindow.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
         mainWindow.MainTextBox.IsUndoEnabled = !TextBoxIsReadOnly;
+        mainWindow.MainTextBox.UndoLimit = TextBoxIsReadOnly ? 0 : -1;
 
         AlwaysShowMainTextBoxCaret = GetValueFromConfig(AlwaysShowMainTextBoxCaret, nameof(AlwaysShowMainTextBoxCaret), bool.TryParse);
         mainWindow.MainTextBox.IsReadOnlyCaretVisible = AlwaysShowMainTextBoxCaret;

@@ -87,7 +87,7 @@ internal sealed partial class AddFrequencyWindow : Window
 
     private void BrowseForFrequencyFolder()
     {
-        using var fbd = new System.Windows.Forms.FolderBrowserDialog { SelectedPath = Utils.ApplicationPath };
+        using System.Windows.Forms.FolderBrowserDialog fbd = new() { SelectedPath = Utils.ApplicationPath };
 
         if (fbd.ShowDialog() is System.Windows.Forms.DialogResult.OK &&
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))
