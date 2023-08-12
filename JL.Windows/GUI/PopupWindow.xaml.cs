@@ -927,7 +927,7 @@ internal sealed partial class PopupWindow : Window
                 TextBox nanoriReadingsTextBox = new()
                 {
                     Name = nameof(result.NanoriReadings),
-                    Text = string.Create(CultureInfo.InvariantCulture, $"Nanori Readings: {string.Join(", ", result.NanoriReadings)}"),
+                    Text = string.Create(CultureInfo.InvariantCulture, $"Nanori: {string.Join(", ", result.NanoriReadings)}"),
                     Foreground = ConfigManager.ReadingsColor,
                     FontSize = ConfigManager.ReadingsFontSize,
                     Margin = new Thickness(2, 0, 0, 0),
@@ -959,7 +959,7 @@ internal sealed partial class PopupWindow : Window
                 TextBlock nanoriReadingsTextBlock = new()
                 {
                     Name = nameof(result.NanoriReadings),
-                    Text = string.Create(CultureInfo.InvariantCulture, $"Nanori Readings: {string.Join(", ", result.NanoriReadings)}"),
+                    Text = string.Create(CultureInfo.InvariantCulture, $"Nanori: {string.Join(", ", result.NanoriReadings)}"),
                     Foreground = ConfigManager.ReadingsColor,
                     FontSize = ConfigManager.ReadingsFontSize,
                     Margin = new Thickness(2, 0, 0, 0),
@@ -1240,16 +1240,16 @@ internal sealed partial class PopupWindow : Window
                         miningParams[JLField.Definitions] = textBox.Text.Replace("\n", "<br/>", StringComparison.Ordinal);
                         break;
                     case nameof(LookupResult.OnReadings):
-                        miningParams[JLField.OnReadings] = textBox.Text;
+                        miningParams[JLField.OnReadings] = textBox.Text[4..];
                         break;
                     case nameof(LookupResult.KunReadings):
-                        miningParams[JLField.KunReadings] = textBox.Text;
+                        miningParams[JLField.KunReadings] = textBox.Text[5..];
                         break;
                     case nameof(LookupResult.NanoriReadings):
-                        miningParams[JLField.NanoriReadings] = textBox.Text;
+                        miningParams[JLField.NanoriReadings] = textBox.Text[8..];
                         break;
                     case nameof(LookupResult.KanjiComposition):
-                        miningParams[JLField.KanjiComposition] = textBox.Text;
+                        miningParams[JLField.KanjiComposition] = textBox.Text[13..];
                         break;
                 }
                 continue;
