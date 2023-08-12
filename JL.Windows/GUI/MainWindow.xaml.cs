@@ -729,50 +729,35 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            if (ConfigManager.AlwaysShowMainTextBoxCaret || !ConfigManager.TextBoxIsReadOnly)
-            {
-                MoveCaret(Key.Left);
-            }
+            MoveCaret(Key.Left);
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MoveCaretRightKeyGesture))
         {
             handled = true;
 
-            if (ConfigManager.AlwaysShowMainTextBoxCaret || !ConfigManager.TextBoxIsReadOnly)
-            {
-                MoveCaret(Key.Right);
-            }
+            MoveCaret(Key.Right);
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MoveCaretUpKeyGesture))
         {
             handled = true;
 
-            if (ConfigManager.AlwaysShowMainTextBoxCaret || !ConfigManager.TextBoxIsReadOnly)
-            {
-                MoveCaret(Key.Up);
-            }
+            MoveCaret(Key.Up);
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MoveCaretDownKeyGesture))
         {
             handled = true;
 
-            if (ConfigManager.AlwaysShowMainTextBoxCaret || !ConfigManager.TextBoxIsReadOnly)
-            {
-                MoveCaret(Key.Down);
-            }
+            MoveCaret(Key.Down);
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.LookupTermAtCaretIndexKeyGesture))
         {
             handled = true;
 
-            if (ConfigManager.AlwaysShowMainTextBoxCaret || !ConfigManager.TextBoxIsReadOnly)
-            {
-                await FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true).ConfigureAwait(false);
-            }
+            await FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true).ConfigureAwait(false);
         }
 
         if (handled && e is not null)
