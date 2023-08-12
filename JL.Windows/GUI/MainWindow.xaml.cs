@@ -135,14 +135,14 @@ internal sealed partial class MainWindow : Window
         {
             text = SanitizeText(text);
 
-            if (WindowState is not WindowState.Minimized)
+            Dispatcher.Invoke(() =>
             {
-                Dispatcher.Invoke(() =>
+                if (WindowState is not WindowState.Minimized)
                 {
                     MainTextBox.Text = text;
                     MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
-                }, DispatcherPriority.Send);
-            }
+                }
+            }, DispatcherPriority.Send);
 
             HandlePostCopy(text);
         }
@@ -165,12 +165,12 @@ internal sealed partial class MainWindow : Window
 
     private void HandlePostCopy(string text)
     {
-        s_lastTextCopiedWhileMinimized = WindowState is WindowState.Minimized
-            ? text
-            : null;
-
         Dispatcher.Invoke(() =>
         {
+            s_lastTextCopiedWhileMinimized = WindowState is WindowState.Minimized
+                ? text
+                : null;
+
             if (SizeToContent is SizeToContent.Manual && (ConfigManager.MainWindowDynamicHeight || ConfigManager.MainWindowDynamicWidth))
             {
                 WindowsUtils.SetSizeToContent(ConfigManager.MainWindowDynamicWidth, ConfigManager.MainWindowDynamicHeight, this);
