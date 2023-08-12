@@ -37,7 +37,7 @@
                 </DockPanel>
 
                 <CheckBox Name="WordClassInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Text="Show word class info" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                    <TextBlock Text="Show part-of-speech info" ToolTip="e.g. n, v5s" Cursor="Help" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <CheckBox Name="DialectInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
@@ -77,24 +77,24 @@
                 </CheckBox>
 
                 <CheckBox Name="WordTypeInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Text="Show word type" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                    <TextBlock Text="Show field info" ToolTip="e.g. comp, sports" Cursor="Help" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <CheckBox Name="SpellingRestrictionInfoCheckBox" Margin="10" Visibility="Collapsed"
                           HorizontalAlignment="Left" >
                     <TextBlock Text="Show spelling restriction info"
-                               ToolTip="e.g. only applies to X"
+                               ToolTip="e.g. only applies to X" Cursor="Help"
                                TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <CheckBox Name="ExtraDefinitionInfoCheckBox" Margin="10" Visibility="Collapsed"
                           HorizontalAlignment="Left">
-                    <TextBlock Text="Show extra definition info" ToolTip="e.g. often derog"
+                    <TextBlock Text="Show extra definition info" ToolTip="e.g. often derog" Cursor="Help"
                                TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <CheckBox Name="MiscInfoCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Text="Show misc info" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                    <TextBlock Text="Show misc info" ToolTip="e.g. uk, col, euph" Cursor="Help" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
                 
                 <CheckBox Name="LoanwordEtymologyCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
