@@ -914,6 +914,26 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="ClosePopupKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Close popup" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="ToggleMinimizedStateKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Minimize/Restore the main window" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
                             <TextBox x:Name="MiningModeKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -924,20 +944,10 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="KanjiModeKeyGestureTextBox"
+                            <TextBox x:Name="ReconnectToWebSocketServerKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Kanji mode" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                       VerticalAlignment="Center" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
-                                    Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="MousePassThroughModeKeyGestureTextBox"
-                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Toggle mouse pass-through mode" TextWrapping="Wrap" HorizontalAlignment="Left"
+                            <TextBlock Text="Reconnect to WebSocket" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -958,49 +968,6 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Selected text to speech" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                       VerticalAlignment="Center" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
-                                    Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="ShowManageDictionariesWindowKeyGestureTextBox"
-
-                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Manage dictionaries" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                       VerticalAlignment="Center" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
-                                    Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="ShowManageFrequenciesWindowKeyGestureTextBox"
-
-                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Manage frequencies" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                       VerticalAlignment="Center" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
-                                    Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="ShowManageAudioSourcesWindowKeyGestureTextBox"
-
-                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Manage audio sources" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                       VerticalAlignment="Center" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
-                                    Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="ShowPreferencesWindowKeyGestureTextBox"
-                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Preferences" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1057,6 +1024,16 @@
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="KanjiModeKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Kanji mode" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
                             <TextBox x:Name="InactiveLookupModeKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
@@ -1066,24 +1043,14 @@
 
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
-                                    Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="ClosePopupKeyGestureTextBox"
-                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Close popup" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                       VerticalAlignment="Center" />
+                                     Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="MousePassThroughModeKeyGestureTextBox"
+                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Toggle mouse pass-through mode" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                        VerticalAlignment="Center" />
                         </DockPanel>
-
-                        <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
-                                    Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="ShowStatsKeyGestureTextBox"
-                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Show stats" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                       VerticalAlignment="Center" />
-                        </DockPanel>
-
+                        
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
@@ -1131,26 +1098,6 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle capture text from WebSocket option" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                       VerticalAlignment="Center" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
-                                    Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="ReconnectToWebSocketServerKeyGestureTextBox"
-                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Reconnect to WebSocket" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                       VerticalAlignment="Center" />
-                        </DockPanel>
-
-                        <DockPanel>
-                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
-                                    Click="ClearKeyGestureButton_Click" />
-                            <TextBox x:Name="ToggleMinimizedStateKeyGestureTextBox"
-                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
-                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Minimize/Restore the main window" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1253,6 +1200,59 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Mine selected lookup result" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                     Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="ShowManageDictionariesWindowKeyGestureTextBox"
+
+                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Manage dictionaries" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                        VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                     Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="ShowManageFrequenciesWindowKeyGestureTextBox"
+
+                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Manage frequencies" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                        VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                     Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="ShowManageAudioSourcesWindowKeyGestureTextBox"
+
+                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Manage audio sources" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                        VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                     Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="ShowPreferencesWindowKeyGestureTextBox"
+                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Preferences" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                        VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="ShowStatsKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Show stats" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
