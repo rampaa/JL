@@ -9,7 +9,7 @@
     <StackPanel>
         <TextBlock Name="OptionsTextBlock" Text="Options" TextWrapping="Wrap" Margin="0,10,0,10"
                    Visibility="Collapsed" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
-        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300" PanningMode="Both">
             <StackPanel x:Name="OptionsStackPanel" VerticalAlignment="Center" HorizontalAlignment="Left">
                 <CheckBox Name="NewlineCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Newline between definitions" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
