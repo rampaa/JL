@@ -1068,7 +1068,7 @@ internal sealed partial class MainWindow : Window
 
     private void Border_OnMouseEnter(object sender, MouseEventArgs e)
     {
-        if (FirstPopupWindow.IsVisible && !FirstPopupWindow.MiningMode)
+        if (FirstPopupWindow is { IsVisible: true, MiningMode: false })
         {
             FirstPopupWindow.HidePopup();
         }
@@ -1079,20 +1079,38 @@ internal sealed partial class MainWindow : Window
             return;
         }
 
-        Border border = (Border)sender;
-
-        Mouse.OverrideCursor = border.Name switch
+        if (LeftBorder == sender)
         {
-            "LeftBorder" => Cursors.SizeWE,
-            "RightBorder" => Cursors.SizeWE,
-            "TopBorder" => Cursors.SizeNS,
-            "TopRightBorder" => Cursors.SizeNESW,
-            "BottomBorder" => Cursors.SizeNS,
-            "BottomLeftBorder" => Cursors.SizeNESW,
-            "BottomRightBorder" => Cursors.SizeNWSE,
-            "TopLeftBorder" => Cursors.SizeNWSE,
-            _ => Cursors.Arrow
-        };
+            Mouse.OverrideCursor = Cursors.SizeWE;
+        }
+        else if (RightBorder == sender)
+        {
+            Mouse.OverrideCursor = Cursors.SizeWE;
+        }
+        else if (TopBorder == sender)
+        {
+            Mouse.OverrideCursor = Cursors.SizeNS;
+        }
+        else if (TopRightBorder == sender)
+        {
+            Mouse.OverrideCursor = Cursors.SizeNESW;
+        }
+        else if (BottomBorder == sender)
+        {
+            Mouse.OverrideCursor = Cursors.SizeNS;
+        }
+        else if (BottomLeftBorder == sender)
+        {
+            Mouse.OverrideCursor = Cursors.SizeNESW;
+        }
+        else if (BottomRightBorder == sender)
+        {
+            Mouse.OverrideCursor = Cursors.SizeNWSE;
+        }
+        else if (TopLeftBorder == sender)
+        {
+            Mouse.OverrideCursor = Cursors.SizeNWSE;
+        }
     }
 
     private void Border_OnMouseLeave(object sender, MouseEventArgs e)
@@ -1281,7 +1299,7 @@ internal sealed partial class MainWindow : Window
 
     private void TitleBar_MouseEnter(object sender, MouseEventArgs e)
     {
-        if (FirstPopupWindow.IsVisible && !FirstPopupWindow.MiningMode)
+        if (FirstPopupWindow is { IsVisible: true, MiningMode: false })
         {
             FirstPopupWindow.HidePopup();
         }
@@ -1337,14 +1355,14 @@ internal sealed partial class MainWindow : Window
     {
         //Swipe down
         if (MainTextBox.VerticalOffset is 0
-            && currentPosition.Y > (_swipeStartPoint.Y + 50))
+            && currentPosition.Y > _swipeStartPoint.Y + 50)
         {
             BacklogUtils.ShowPreviousBacklogItem();
         }
 
         //Swipe up
-        else if (MainTextBox.GetLastVisibleLineIndex() == (MainTextBox.LineCount - 1)
-            && currentPosition.Y < (_swipeStartPoint.Y - 50))
+        else if (MainTextBox.GetLastVisibleLineIndex() == MainTextBox.LineCount - 1
+            && !(currentPosition.Y < _swipeStartPoint.Y - 50))
         {
             BacklogUtils.ShowNextBacklogItem();
         }

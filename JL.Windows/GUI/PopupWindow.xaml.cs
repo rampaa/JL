@@ -536,7 +536,7 @@ internal sealed partial class PopupWindow : Window
         if (result.PrimarySpellingOrthographyInfoList is not null
             && (result.Dict.Options?.POrthographyInfo?.Value ?? true))
         {
-            TextBlock? textBlockPOrthographyInfo = new()
+            TextBlock textBlockPOrthographyInfo = new()
             {
                 Name = nameof(result.PrimarySpellingOrthographyInfoList),
                 Text = string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", result.PrimarySpellingOrthographyInfoList)})"),

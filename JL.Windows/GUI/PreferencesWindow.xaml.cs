@@ -454,27 +454,28 @@ internal sealed partial class PreferencesWindow : Window
         string title = "JL Fields for ";
         string text;
 
-        switch (((Button)sender).Name)
+        if (WordInfoButton == sender)
         {
-            case "WordInfoButton":
-                title += "Words";
-                text = WordJLFieldsInfo;
-                break;
+            title += "Words";
+            text = WordJLFieldsInfo;
+        }
 
-            case "KanjiInfoButton":
-                title += "Kanjis";
-                text = KanjiJLFieldsInfo;
-                break;
+        else if (KanjiInfoButton == sender)
+        {
+            title += "Kanjis";
+            text = KanjiJLFieldsInfo;
+        }
 
-            case "NameInfoButton":
-                title += "Names";
-                text = NameJLFieldsInfo;
-                break;
+        else if (NameInfoButton == sender)
+        {
+            title += "Names";
+            text = NameJLFieldsInfo;
+        }
 
-            default:
-                title += "Others";
-                text = WordJLFieldsInfo;
-                break;
+        else // if (OtherInfoButton == sender)
+        {
+            title += "Others";
+            text = WordJLFieldsInfo;
         }
 
         InfoWindow infoWindow = new()

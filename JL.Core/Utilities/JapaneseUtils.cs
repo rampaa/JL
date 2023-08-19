@@ -158,14 +158,10 @@ public static class JapaneseUtils
         StringBuilder textInHiragana = new(normalizedText.Length);
         for (int i = 0; i < normalizedText.Length; i++)
         {
-            if (s_katakanaToHiraganaDict.TryGetValue(normalizedText[i], out string? hiraganaStr))
-            {
-                _ = textInHiragana.Append(hiraganaStr);
-            }
-            else
-            {
-                _ = textInHiragana.Append(normalizedText[i]);
-            }
+            char character = normalizedText[i];
+            _ = s_katakanaToHiraganaDict.TryGetValue(character, out string? hiraganaStr)
+                ? textInHiragana.Append(hiraganaStr)
+                : textInHiragana.Append(character);
         }
 
         return textInHiragana.ToString();
