@@ -166,11 +166,11 @@ internal static class ConfigManager
     public static KeyGesture ToggleMinimizedStateKeyGesture { get; private set; } = new(Key.X, ModifierKeys.Alt);
     public static KeyGesture SelectedTextToSpeechKeyGesture { get; private set; } = new(Key.F6, ModifierKeys.Windows);
     public static KeyGesture ToggleAlwaysShowMainTextBoxCaretKeyGesture { get; private set; } = new(Key.G, ModifierKeys.Windows);
-    public static KeyGesture MoveCaretLeftKeyGesture { get; private set; } = new(Key.NumPad4, ModifierKeys.Windows);
-    public static KeyGesture MoveCaretRightKeyGesture { get; private set; } = new(Key.NumPad6, ModifierKeys.Windows);
-    public static KeyGesture MoveCaretUpKeyGesture { get; private set; } = new(Key.NumPad8, ModifierKeys.Windows);
-    public static KeyGesture MoveCaretDownKeyGesture { get; private set; } = new(Key.NumPad2, ModifierKeys.Windows);
-    public static KeyGesture LookupTermAtCaretIndexKeyGesture { get; private set; } = new(Key.NumPad5, ModifierKeys.Windows);
+    public static KeyGesture MoveCaretLeftKeyGesture { get; private set; } = new(Key.NumPad4, ModifierKeys.Control);
+    public static KeyGesture MoveCaretRightKeyGesture { get; private set; } = new(Key.NumPad6, ModifierKeys.Control);
+    public static KeyGesture MoveCaretUpKeyGesture { get; private set; } = new(Key.NumPad8, ModifierKeys.Control);
+    public static KeyGesture MoveCaretDownKeyGesture { get; private set; } = new(Key.NumPad2, ModifierKeys.Control);
+    public static KeyGesture LookupTermAtCaretIndexKeyGesture { get; private set; } = new(Key.NumPad5, ModifierKeys.Control);
     public static KeyGesture SelectNextLookupResultKeyGesture { get; private set; } = new(Key.Down, ModifierKeys.Control);
     public static KeyGesture SelectPreviousLookupResultKeyGesture { get; private set; } = new(Key.Up, ModifierKeys.Control);
     public static KeyGesture MineSelectedLookupResultKeyGesture { get; private set; } = new(Key.Enter, ModifierKeys.Control);
@@ -280,6 +280,17 @@ internal static class ConfigManager
         HideDictTabsWithNoResults = GetValueFromConfig(HideDictTabsWithNoResults, nameof(HideDictTabsWithNoResults), bool.TryParse);
         AutoHidePopupIfMouseIsNotOverIt = GetValueFromConfig(AutoHidePopupIfMouseIsNotOverIt, nameof(AutoHidePopupIfMouseIsNotOverIt), bool.TryParse);
 
+        TextBoxIsReadOnly = GetValueFromConfig(TextBoxIsReadOnly, nameof(TextBoxIsReadOnly), bool.TryParse);
+        if (mainWindow.MainTextBox.IsReadOnly != TextBoxIsReadOnly)
+        {
+            mainWindow.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
+            mainWindow.MainTextBox.IsUndoEnabled = !TextBoxIsReadOnly;
+            mainWindow.MainTextBox.UndoLimit = TextBoxIsReadOnly ? 0 : -1;
+        }
+
+        AlwaysShowMainTextBoxCaret = GetValueFromConfig(AlwaysShowMainTextBoxCaret, nameof(AlwaysShowMainTextBoxCaret), bool.TryParse);
+        mainWindow.MainTextBox.IsReadOnlyCaretVisible = AlwaysShowMainTextBoxCaret;
+
         HorizontallyCenterMainWindowText = GetValueFromConfig(HorizontallyCenterMainWindowText, nameof(HorizontallyCenterMainWindowText), bool.TryParse);
         mainWindow.MainTextBox.HorizontalContentAlignment = HorizontallyCenterMainWindowText
             ? HorizontalAlignment.Center
@@ -298,14 +309,6 @@ internal static class ConfigManager
 
         HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar = GetValueFromConfig(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), bool.TryParse);
         mainWindow.ChangeVisibilityOfTitleBarButtons();
-
-        TextBoxIsReadOnly = GetValueFromConfig(TextBoxIsReadOnly, nameof(TextBoxIsReadOnly), bool.TryParse);
-        mainWindow.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
-        mainWindow.MainTextBox.IsUndoEnabled = !TextBoxIsReadOnly;
-        mainWindow.MainTextBox.UndoLimit = TextBoxIsReadOnly ? 0 : -1;
-
-        AlwaysShowMainTextBoxCaret = GetValueFromConfig(AlwaysShowMainTextBoxCaret, nameof(AlwaysShowMainTextBoxCaret), bool.TryParse);
-        mainWindow.MainTextBox.IsReadOnlyCaretVisible = AlwaysShowMainTextBoxCaret;
 
         TextBoxApplyDropShadowEffect = GetValueFromConfig(TextBoxApplyDropShadowEffect, nameof(TextBoxApplyDropShadowEffect), bool.TryParse);
         if (TextBoxApplyDropShadowEffect)
@@ -382,6 +385,8 @@ internal static class ConfigManager
         mainWindow.MainTextBox.Foreground = !EnableBacklog || mainWindow.MainTextBox.Text == BacklogUtils.Backlog.LastOrDefault("")
             ? MainWindowTextColor
             : MainWindowBacklogTextColor;
+
+        mainWindow.MainTextBox.CaretBrush = MainWindowTextColor;
 
         PrimarySpellingColor = GetFrozenBrushFromConfig(PrimarySpellingColor, nameof(PrimarySpellingColor));
         ReadingsColor = GetFrozenBrushFromConfig(ReadingsColor, nameof(ReadingsColor));
