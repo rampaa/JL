@@ -12,6 +12,7 @@ using JL.Core.Dicts;
 using JL.Core.Lookup;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
+using JL.Windows.GUI.UserControls;
 using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
 using NAudio.Wave;
@@ -472,7 +473,7 @@ internal sealed partial class PopupWindow : Window
             _ = top.Children.Add(edictIdTextBlock);
         }
 
-        TextBlock primarySpellingTextBox = new()
+        TextBlock primarySpellingTextBlock = new()
         {
             Name = nameof(result.PrimarySpelling),
             Text = result.PrimarySpelling,
@@ -494,16 +495,16 @@ internal sealed partial class PopupWindow : Window
             //IsInactiveSelectionHighlightEnabled = true,
             ContextMenu = PopupContextMenu
         };
-        primarySpellingTextBox.MouseEnter += PrimarySpelling_MouseEnter; // for audio
-        primarySpellingTextBox.MouseLeave += PrimarySpelling_MouseLeave; // for audio
-        primarySpellingTextBox.PreviewMouseUp += PrimarySpelling_PreviewMouseUp; // for mining
+        primarySpellingTextBlock.MouseEnter += PrimarySpelling_MouseEnter; // for audio
+        primarySpellingTextBlock.MouseLeave += PrimarySpelling_MouseLeave; // for audio
+        primarySpellingTextBlock.PreviewMouseUp += PrimarySpelling_PreviewMouseUp; // for mining
 
         Dict? pitchDict = DictUtils.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.PitchAccentYomichan);
         if (pitchDict?.Active ?? false)
         {
             if (result.Readings is not null)
             {
-                _ = top.Children.Add(primarySpellingTextBox);
+                _ = top.Children.Add(primarySpellingTextBlock);
             }
 
             else
@@ -511,25 +512,25 @@ internal sealed partial class PopupWindow : Window
                 Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
                     result.AlternativeSpellings,
                     null,
-                    primarySpellingTextBox.Text.Split(", "),
-                    primarySpellingTextBox.Margin.Left,
+                    primarySpellingTextBlock.Text.Split(", "),
+                    primarySpellingTextBlock.Margin.Left,
                     pitchDict);
 
                 if (pitchAccentGrid.Children.Count is 0)
                 {
-                    _ = top.Children.Add(primarySpellingTextBox);
+                    _ = top.Children.Add(primarySpellingTextBlock);
                 }
 
                 else
                 {
-                    _ = pitchAccentGrid.Children.Add(primarySpellingTextBox);
+                    _ = pitchAccentGrid.Children.Add(primarySpellingTextBlock);
                     _ = top.Children.Add(pitchAccentGrid);
                 }
             }
         }
         else
         {
-            _ = top.Children.Add(primarySpellingTextBox);
+            _ = top.Children.Add(primarySpellingTextBlock);
         }
 
         if (result.PrimarySpellingOrthographyInfoList is not null
@@ -557,7 +558,7 @@ internal sealed partial class PopupWindow : Window
 
             if (MiningMode)
             {
-                TextBox readingTextBox = new()
+                TouchScreenTextBox readingTextBox = new()
                 {
                     Name = nameof(result.Readings),
                     Text = readingsText,
@@ -667,7 +668,7 @@ internal sealed partial class PopupWindow : Window
 
             if (MiningMode)
             {
-                TextBox alternativeSpellingsTexBox = new()
+                TouchScreenTextBox alternativeSpellingsTexBox = new()
                 {
                     Name = nameof(result.AlternativeSpellings),
                     Text = alternativeSpellingsText,
@@ -770,7 +771,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TextBox definitionsTextBox = new()
+                TouchScreenTextBox definitionsTextBox = new()
                 {
                     Name = nameof(result.FormattedDefinitions),
                     Text = result.FormattedDefinitions,
@@ -822,7 +823,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TextBox onReadingsTextBox = new()
+                TouchScreenTextBox onReadingsTextBox = new()
                 {
                     Name = nameof(result.OnReadings),
                     Text = string.Create(CultureInfo.InvariantCulture, $"On: {string.Join(", ", result.OnReadings)}"),
@@ -873,7 +874,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TextBox kunReadingsTextBox = new()
+                TouchScreenTextBox kunReadingsTextBox = new()
                 {
                     Name = nameof(result.KunReadings),
                     Text = string.Create(CultureInfo.InvariantCulture, $"Kun: {string.Join(", ", result.KunReadings)}"),
@@ -924,7 +925,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TextBox nanoriReadingsTextBox = new()
+                TouchScreenTextBox nanoriReadingsTextBox = new()
                 {
                     Name = nameof(result.NanoriReadings),
                     Text = string.Create(CultureInfo.InvariantCulture, $"Nanori: {string.Join(", ", result.NanoriReadings)}"),
@@ -1008,7 +1009,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TextBox compositionTextBox = new()
+                TouchScreenTextBox compositionTextBox = new()
                 {
                     Name = nameof(result.KanjiComposition),
                     Text = string.Create(CultureInfo.InvariantCulture, $"Composition: {result.KanjiComposition}"),

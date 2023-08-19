@@ -44,6 +44,9 @@ internal sealed partial class MainWindow : Window
 
     private static string? s_lastTextCopiedWhileMinimized = null;
 
+    private static readonly Point s_origin = new(0, 0);
+    private Point _swipeStartPoint;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -393,6 +396,7 @@ internal sealed partial class MainWindow : Window
         else
         {
             OpacitySlider.Visibility = Visibility.Collapsed;
+            _ = MainTextBox.Focus();
         }
     }
 
@@ -409,6 +413,7 @@ internal sealed partial class MainWindow : Window
         else
         {
             FontSizeSlider.Visibility = Visibility.Collapsed;
+            _ = MainTextBox.Focus();
         }
     }
 
@@ -715,11 +720,9 @@ internal sealed partial class MainWindow : Window
 
             if (SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
             {
-                string selectedText = MainTextBox.SelectedText;
-                if (string.IsNullOrWhiteSpace(selectedText))
-                {
-                    selectedText = MainTextBox.Text;
-                }
+                string selectedText = MainTextBox.SelectionLength > 0
+                    ? MainTextBox.SelectedText
+                    : MainTextBox.Text;
 
                 await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, selectedText, CoreConfig.AudioVolume).ConfigureAwait(false);
             }
@@ -757,7 +760,15 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            await FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true).ConfigureAwait(false);
+            if (ConfigManager.LookupOnSelectOnly && MainTextBox.SelectionLength > 0 && MainTextBox.SelectionStart == MainTextBox.CaretIndex)
+            {
+                await FirstPopupWindow.LookupOnSelect(MainTextBox).ConfigureAwait(false);
+            }
+
+            else
+            {
+                await FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true).ConfigureAwait(false);
+            }
         }
 
         if (handled && e is not null)
@@ -836,22 +847,18 @@ internal sealed partial class MainWindow : Window
 
     private void AddName(object sender, RoutedEventArgs e)
     {
-        string? text = MainTextBox.SelectedText;
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            text = FirstPopupWindow.LastSelectedText;
-        }
+        string? text = MainTextBox.SelectionLength > 0
+            ? MainTextBox.SelectedText
+            : FirstPopupWindow.LastSelectedText;
 
         WindowsUtils.ShowAddNameWindow(text);
     }
 
     private void AddWord(object sender, RoutedEventArgs e)
     {
-        string? text = MainTextBox.SelectedText;
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            text = FirstPopupWindow.LastSelectedText;
-        }
+        string? text = MainTextBox.SelectionLength > 0
+            ? MainTextBox.SelectedText
+            : FirstPopupWindow.LastSelectedText;
 
         WindowsUtils.ShowAddWordWindow(text);
     }
@@ -1067,7 +1074,7 @@ internal sealed partial class MainWindow : Window
         }
 
         // For some reason, when DragMove() is used Mouse.GetPosition() returns Point(0, 0)
-        if (e.GetPosition(this) == new Point(0, 0))
+        if (e.GetPosition(this) == s_origin)
         {
             return;
         }
@@ -1324,5 +1331,35 @@ internal sealed partial class MainWindow : Window
         {
             RoutedEvent = Keyboard.KeyDownEvent
         });
+    }
+
+    private void Swipe(Point currentPosition)
+    {
+        //Swipe down
+        if (MainTextBox.VerticalOffset is 0
+            && currentPosition.Y > (_swipeStartPoint.Y + 50))
+        {
+            BacklogUtils.ShowPreviousBacklogItem();
+        }
+
+        //Swipe up
+        else if (MainTextBox.GetLastVisibleLineIndex() == (MainTextBox.LineCount - 1)
+            && currentPosition.Y < (_swipeStartPoint.Y - 50))
+        {
+            BacklogUtils.ShowNextBacklogItem();
+        }
+    }
+
+    private void MainTextBox_PreviewTouchDown(object sender, TouchEventArgs e)
+    {
+        _swipeStartPoint = e.GetTouchPoint(this).Position;
+    }
+
+    private void MainTextBox_PreviewTouchUp(object sender, TouchEventArgs e)
+    {
+        if (!FirstPopupWindow.IsVisible && MainTextBox.SelectionLength is 0)
+        {
+            Swipe(e.GetTouchPoint(this).Position);
+        }
     }
 }

@@ -3,10 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:uc="clr-namespace:JL.Windows.GUI.UserControls"
         Title="JL"
         AllowsTransparency="True"
         mc:Ignorable="d" MinWidth="100" MinHeight="50" Width="800" Height="200" WindowStyle="None" ResizeMode="NoResize" Topmost="True"
-        Closed="MainWindow_Closed" Closing="MainWindow_Closing" PreviewKeyDown="Window_PreviewKeyDown"
+        Closed="MainWindow_Closed" Closing="MainWindow_Closing" PreviewKeyDown="Window_PreviewKeyDown" ScrollViewer.PanningMode="VerticalOnly"
         SizeChanged="MainWindow_SizeChanged" LocationChanged="Window_LocationChanged" WindowState="Minimized"
         PreviewMouseDown="Window_PreviewMouseDown" DpiChanged="Window_DpiChanged" MouseLeave="Window_MouseLeave" MouseEnter="Window_MouseEnter" StateChanged="Window_StateChanged"
         x:ClassModifier="internal">
@@ -39,15 +40,15 @@
             </Rectangle.ContextMenu>
         </Rectangle>
 
-        <TextBox x:Name="MainTextBox" Margin="5,20,5,5" TextWrapping="Wrap" VerticalContentAlignment="Top"
+        <uc:TouchScreenTextBox x:Name="MainTextBox" Margin="5,20,5,5" TextWrapping="Wrap" VerticalContentAlignment="Top"
                  Background="Transparent" FontSize="{Binding Value, ElementName=FontSizeSlider}"
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"
                  VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" AutoWordSelection="False"
-                 MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow"
+                 MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow" PreviewTouchDown="MainTextBox_PreviewTouchDown" PreviewTouchUp="MainTextBox_PreviewTouchUp"
                  FlowDirection="LeftToRight" IsInactiveSelectionHighlightEnabled="True" IsUndoEnabled="False" UndoLimit="0"
                  PreviewMouseUp="MainTextBox_PreviewMouseUp" ContextMenuOpening="MainTextBox_ContextMenuOpening" AcceptsReturn="True" AcceptsTab="True">
 
-            <TextBox.ContextMenu>
+            <uc:TouchScreenTextBox.ContextMenu>
                 <ContextMenu Name="MainTextBoxContextMenu">
                     <MenuItem
                         Name="AddNameMenuItem"
@@ -85,8 +86,8 @@
                         Header="Preferences"
                         Click="ShowPreferences" />
                 </ContextMenu>
-            </TextBox.ContextMenu>
-        </TextBox>
+            </uc:TouchScreenTextBox.ContextMenu>
+        </uc:TouchScreenTextBox>
 
         <Slider x:Name="OpacitySlider" HorizontalAlignment="Left" Margin="-42,70,0,0" VerticalAlignment="Top"
                 Width="120" RenderTransformOrigin="0.5,0.5" Maximum="100" Value="30" Visibility="Collapsed"
