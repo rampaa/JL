@@ -1362,7 +1362,7 @@ internal sealed partial class MainWindow : Window
 
         //Swipe up
         else if (MainTextBox.GetLastVisibleLineIndex() == MainTextBox.LineCount - 1
-            && !(currentPosition.Y < _swipeStartPoint.Y - 50))
+            && currentPosition.Y < _swipeStartPoint.Y - 50)
         {
             BacklogUtils.ShowNextBacklogItem();
         }
