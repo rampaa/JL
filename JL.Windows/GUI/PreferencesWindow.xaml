@@ -16,7 +16,7 @@
 
         <TabControl TabStripPlacement="Top" VerticalContentAlignment="Stretch" Margin="0,0,0,65">
             <TabItem Header="General">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
                     <StackPanel  Margin="20,10,20,10">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type DockPanel}">
@@ -160,7 +160,7 @@
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="Main Window">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
                     <StackPanel  Margin="20,10,20,10">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type DockPanel}">
@@ -398,7 +398,7 @@
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="Popup" HorizontalAlignment="Left" Width="66">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
                     <StackPanel Margin="20,10,20,10">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type DockPanel}">
@@ -692,7 +692,7 @@
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="Anki" Height="33" MouseUp="AnkiTabItem_MouseUp">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
                     <StackPanel Margin="20,10,20,10">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type DockPanel}">
@@ -893,7 +893,7 @@
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="Hotkeys">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
                     <StackPanel Margin="20,10,20,10" Name="HotKeysStackPanel">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type DockPanel}">
@@ -1280,7 +1280,7 @@
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="Advanced">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" PanningMode="Both">
                     <StackPanel Margin="20,10,20,10">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type DockPanel}">
