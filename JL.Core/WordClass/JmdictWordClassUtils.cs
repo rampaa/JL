@@ -52,7 +52,7 @@ internal static class JmdictWordClassUtils
             DictUtils.WordClassDictionary[key] = recordList.ToArray();
         }
 
-        DictUtils.WordClassDictionary.TrimExcess(DictUtils.WordClassDictionary.Count);
+        DictUtils.WordClassDictionary.TrimExcess();
     }
 
     public static async Task Serialize()

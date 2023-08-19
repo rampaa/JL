@@ -37,7 +37,7 @@ internal static class JmdictLoader
                 dict.Contents[key] = recordList.ToArray();
             }
 
-            dict.Contents.TrimExcess(dict.Contents.Count);
+            dict.Contents.TrimExcess();
         }
 
         else if (Utils.Frontend.ShowYesNoDialog(
