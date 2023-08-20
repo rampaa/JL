@@ -31,7 +31,7 @@ public static class DictUtils
     internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     internal static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
 
-    public static readonly Dictionary<string, Dict> BuiltInDicts = new()
+    public static readonly Dictionary<string, Dict> BuiltInDicts = new(5)
     {
         {
             "CustomWordDictionary", new Dict(DictType.CustomWordDictionary,
@@ -81,7 +81,7 @@ public static class DictUtils
         }
     };
 
-    public static readonly Dictionary<string, string> JmdictEntities = new()
+    public static readonly Dictionary<string, string> JmdictEntities = new(254)
     {
         { "bra", "\"Brazilian\"" },
         { "hob", "\"Hokkaido-ben\"" },
@@ -344,7 +344,7 @@ public static class DictUtils
         { "sk", "\"search-only kana form\"" }
     };
 
-    public static readonly Dictionary<string, string> JmnedictEntities = new()
+    public static readonly Dictionary<string, string> JmnedictEntities = new(25)
     {
         #pragma warning disable format
         { "char", "character" }, { "company", "company name" }, { "creat", "creature" }, { "dei", "deity" },
@@ -353,7 +353,7 @@ public static class DictUtils
         { "group", "group" }, { "leg", "legend" }, { "masc", "male given name or forename" }, { "myth", "mythology" },
         { "obj", "object" }, { "organization", "organization name" }, { "oth", "other" }, { "person", "full name of a particular person" },
         { "place", "place name" }, { "product", "product name" }, { "relig", "religion" }, { "serv", "service" },
-        { "station", "railway station" }, { "surname", "family or surname" }, { "unclass", "unclassified name" }, { "work", "work of art, literature, music, etc. name" },
+        { "station", "railway station" }, { "surname", "family or surname" }, { "unclass", "unclassified name" }, { "work", "work of art, literature, music, etc. name" }
         #pragma warning restore format
     };
 

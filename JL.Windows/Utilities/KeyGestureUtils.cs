@@ -12,7 +12,7 @@ internal static class KeyGestureUtils
     public static readonly Dictionary<int, KeyGesture> KeyGestureDict = new();
     public static readonly Dictionary<string, int> KeyGestureNameToIntDict = new();
 
-    public static readonly HashSet<Key> ValidKeys = new()
+    public static readonly HashSet<Key> ValidKeys = new(40)
     {
         #pragma warning disable format
 

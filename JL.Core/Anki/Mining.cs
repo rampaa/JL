@@ -95,7 +95,7 @@ public static class Mining
 
         Dictionary<string, object>? audio = audioData is null
             ? null
-            : new Dictionary<string, object>
+            : new Dictionary<string, object>(4)
             {
                 { "data", audioData },
                 { "filename", string.Create(CultureInfo.InvariantCulture, $"JL_audio_{reading}_{primarySpelling}.{audioResponse!.AudioFormat}") },
@@ -111,14 +111,14 @@ public static class Mining
 
         Dictionary<string, object>? image = imageBytes is null
             ? null
-            : new Dictionary<string, object>
+            : new Dictionary<string, object>(3)
             {
                 { "data", imageBytes },
                 { "filename", string.Create(CultureInfo.InvariantCulture, $"JL_image_{reading}_{primarySpelling}.png") },
                 { "fields", imageFields }
             };
 
-        Dictionary<string, object> options = new()
+        Dictionary<string, object> options = new(1)
         {
             { "allowDuplicate", CoreConfig.AllowDuplicateCards }
         };

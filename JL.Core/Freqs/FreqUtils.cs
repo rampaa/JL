@@ -11,7 +11,7 @@ public static class FreqUtils
     public static bool FreqsReady { get; private set; } = false;
     public static Dictionary<string, Freq> FreqDicts { get; internal set; } = new();
 
-    internal static readonly Dictionary<string, Freq> s_builtInFreqs = new()
+    internal static readonly Dictionary<string, Freq> s_builtInFreqs = new(3)
     {
         {
             "VN (Nazeka)",

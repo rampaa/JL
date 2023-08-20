@@ -34,7 +34,7 @@ public static class JapaneseUtils
         @"[\u2e80-\u30ff\u3190–\u319f\u31c0-\u4dbf\u4e00-\u9fff\uf900-\ufaff\ufe30-\ufe4f\uff00-\uffef]|\ud82c[\udc00-\udcff]|\ud83c[\ude00-\udeff]|\ud840[\udc00-\udfff]|[\ud841-\ud868][\udc00-\udfff]|\ud869[\udc00-\udedf]|\ud869[\udf00-\udfff]|[\ud86a-\ud879][\udc00-\udfff]|\ud87a[\udc00-\udfef]|\ud87e[\udc00-\ude1f]|\ud880[\udc00-\udfff]|[\ud881-\ud883][\udc00-\udfff]|\ud884[\udc00-\udfff]|[\ud885-\ud887][\udc00-\udfff]|\ud888[\udc00-\udfaf]",
         RegexOptions.Compiled);
 
-    private static readonly Dictionary<char, string> s_katakanaToHiraganaDict = new()
+    private static readonly Dictionary<char, string> s_katakanaToHiraganaDict = new(87)
     {
         #pragma warning disable format
         { 'ア', "あ" }, { 'イ', "い" }, { 'ウ', "う" }, { 'エ', "え" }, { 'オ', "お" },
@@ -67,7 +67,7 @@ public static class JapaneseUtils
         #pragma warning restore format
     };
 
-    private static readonly Dictionary<string, char> s_kanaFinalVowelDict = new()
+    private static readonly Dictionary<string, char> s_kanaFinalVowelDict = new(87)
     {
         #pragma warning disable format
         //Hiragana
@@ -94,7 +94,7 @@ public static class JapaneseUtils
         #pragma warning restore format
     };
 
-    private static readonly HashSet<char> s_smallCombiningKanaSet = new()
+    private static readonly HashSet<char> s_smallCombiningKanaSet = new(18)
     {
         #pragma warning disable format
         'ァ', 'ィ', 'ゥ', 'ェ', 'ォ', 'ヮ',
@@ -116,7 +116,7 @@ public static class JapaneseUtils
         '\n'
     };
 
-    private static readonly Dictionary<char, char> s_bracketsDict = new()
+    private static readonly Dictionary<char, char> s_bracketsDict = new(18)
     {
         { '「', '」' },
         { '『', '』' },
@@ -138,7 +138,7 @@ public static class JapaneseUtils
         { '{', '}' }
     };
 
-    private static readonly HashSet<char> s_brackets = new()
+    private static readonly HashSet<char> s_brackets = new(36)
     {
         #pragma warning disable format
         '「', '」' , '『', '』' , '【', '】',

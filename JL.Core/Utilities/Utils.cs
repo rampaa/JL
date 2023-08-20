@@ -64,7 +64,7 @@ public static class Utils
         WriteIndented = true
     };
 
-    internal static readonly Dictionary<string, string> s_iso6392BTo2T = new()
+    internal static readonly Dictionary<string, string> s_iso6392BTo2T = new(20)
     {
         #pragma warning disable format
         { "tib", "bod" }, { "cze", "ces" }, { "wel", "cym" }, { "ger", "deu" }, { "gre", "ell" },

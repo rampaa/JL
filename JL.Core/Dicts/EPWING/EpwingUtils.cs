@@ -11,7 +11,7 @@ internal static class EpwingUtils
     //'Ⓒ', 'Ⓡ', '’', '＠', '〒', '@', '〜', '，', '㏄', '\'', '％', '#',
     //'△', '~', '%', '℃', '：', '※', '㊙', '©', '—', '‘', '△', '*', '≒',
     //'←', '↑', '↓', '☆', '.', '･'
-    private static readonly HashSet<char> s_invalidCharacters = new()
+    private static readonly HashSet<char> s_invalidCharacters = new(38)
     {
         '�', '〓', '㋝', '㋜',
         '（', '）', '(', ')',

@@ -11,14 +11,14 @@ public static class AudioUtils
 {
     public static readonly Dictionary<string, AudioSource> AudioSources = new();
 
-    private static readonly Dictionary<string, AudioSource> s_builtInAudioSources = new()
+    private static readonly Dictionary<string, AudioSource> s_builtInAudioSources = new(1)
     {
         {
             "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={Term}&kana={Reading}", new AudioSource(AudioSourceType.Url, true, 1)
         }
     };
 
-    private static readonly Dictionary<string, string> s_mediaTypeToExtensionDict = new()
+    private static readonly Dictionary<string, string> s_mediaTypeToExtensionDict = new(6)
     {
         { "mpeg", "mp3" },
         { "3gpp", "3gp" },

@@ -59,7 +59,7 @@ internal static class JmdictWordClassUtils
     {
         Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary = new();
 
-        HashSet<string> usedWordClasses = new()
+        HashSet<string> usedWordClasses = new(23)
         {
             "adj-i", "adj-na", "v1", "v1-s", "v4r", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m",
             "v5n", "v5r", "v5r-i", "v5s", "v5t", "v5u", "v5u-s", "vk", "vs-c", "vs-i", "vs-s", "vz"
