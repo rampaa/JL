@@ -1610,7 +1610,7 @@ internal sealed partial class PopupWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MineSelectedLookupResultKeyGesture))
         {
-            if (MiningMode)
+            if (MiningMode && PopupListBox.SelectedItem is not null)
             {
                 WrapPanel? top = ((StackPanel)PopupListBox.SelectedItem).Children.OfType<WrapPanel>().FirstOrDefault();
 
