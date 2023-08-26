@@ -82,7 +82,9 @@ internal sealed partial class AddAudioSourceWindow : Window
 
             case AudioSourceType.Url:
             case AudioSourceType.UrlJson:
-                uri = TextBlockUri.Text.Replace("://localhost", "://127.0.0.1", StringComparison.Ordinal);
+                uri = TextBlockUri.Text
+                    .Replace("://0.0.0.0", "://127.0.0.1", StringComparison.Ordinal)
+                    .Replace("://localhost", "://127.0.0.1", StringComparison.Ordinal);
                 if (string.IsNullOrEmpty(uri)
                     || !Uri.IsWellFormedUriString(uri.Replace("{Term}", "", StringComparison.Ordinal).Replace("{Reading}", "", StringComparison.Ordinal), UriKind.Absolute)
                     || AudioUtils.AudioSources.ContainsKey(uri))
