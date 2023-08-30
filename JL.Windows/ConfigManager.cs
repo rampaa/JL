@@ -511,8 +511,8 @@ internal static class ConfigManager
             else
             {
                 ankiConnectUriStr = ankiConnectUriStr
-                    .Replace("://0.0.0.0", "://127.0.0.1", StringComparison.Ordinal)
-                    .Replace("://localhost", "://127.0.0.1", StringComparison.Ordinal);
+                    .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
+                    .Replace("://localhost:", "://127.0.0.1:", StringComparison.Ordinal);
 
                 if (Uri.TryCreate(ankiConnectUriStr, UriKind.Absolute, out Uri? ankiConnectUri))
                 {
@@ -535,8 +535,8 @@ internal static class ConfigManager
             else
             {
                 webSocketUriStr = webSocketUriStr
-                    .Replace("://0.0.0.0", "://127.0.0.1", StringComparison.Ordinal)
-                    .Replace("://localhost", "://127.0.0.1", StringComparison.Ordinal);
+                    .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
+                    .Replace("://localhost:", "://127.0.0.1:", StringComparison.Ordinal);
 
                 if (Uri.TryCreate(webSocketUriStr, UriKind.Absolute, out Uri? webSocketUri))
                 {
@@ -561,7 +561,7 @@ internal static class ConfigManager
             else
             {
                 searchUrlStr = searchUrlStr
-                    .Replace("://0.0.0.0", "://127.0.0.1", StringComparison.Ordinal)
+                    .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
                     .Replace("://localhost", "://127.0.0.1", StringComparison.Ordinal);
 
                 if (!Uri.IsWellFormedUriString(searchUrlStr.Replace("{SearchTerm}", "", StringComparison.Ordinal), UriKind.Absolute))
