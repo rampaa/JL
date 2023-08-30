@@ -1123,7 +1123,7 @@ internal sealed partial class MainWindow : Window
 
     private void ResizeWindow(object sender, MouseButtonEventArgs e)
     {
-        nint wParam = 0;
+        nint wParam;
         if (LeftBorder == sender)
         {
             wParam = 61441;
@@ -1152,7 +1152,7 @@ internal sealed partial class MainWindow : Window
         {
             wParam = 61447;
         }
-        else if (BottomRightBorder == sender)
+        else // if (BottomRightBorder == sender)
         {
             wParam = 61448;
         }
