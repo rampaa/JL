@@ -72,7 +72,7 @@ Select the file you got from [Nazeka EPWING Converter](https://github.com/wareya
 
 ### Where are my settings stored?
 * Anki settings: Config/AnkiConfig.json
-* Audio source settings: AudioSourceConfig.json
+* Audio source settings: Config/AudioSourceConfig.json
 * Dictionary settings: Config/dicts.json
 * Frequency settings: Config/freqs.json
 * Stats: Config/Stats.json
