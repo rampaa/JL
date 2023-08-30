@@ -1123,7 +1123,41 @@ internal sealed partial class MainWindow : Window
 
     private void ResizeWindow(object sender, MouseButtonEventArgs e)
     {
-        WinApi.ResizeWindow(WindowHandle, ((Border)sender).Name);
+        nint wParam = 0;
+        if (LeftBorder == sender)
+        {
+            wParam = 61441;
+        }
+        else if (RightBorder == sender)
+        {
+            wParam = 61442;
+        }
+        else if (TopBorder == sender)
+        {
+            wParam = 61443;
+        }
+        else if (TopLeftBorder == sender)
+        {
+            wParam = 61444;
+        }
+        else if (TopRightBorder == sender)
+        {
+            wParam = 61445;
+        }
+        else if (BottomBorder == sender)
+        {
+            wParam = 61446;
+        }
+        else if (BottomLeftBorder == sender)
+        {
+            wParam = 61447;
+        }
+        else if (BottomRightBorder == sender)
+        {
+            wParam = 61448;
+        }
+
+        WinApi.ResizeWindow(WindowHandle, wParam);
 
         LeftPositionBeforeResolutionChange = Left;
         TopPositionBeforeResolutionChange = Top;

@@ -32,18 +32,6 @@ internal sealed class WinApi
         internal const int WS_EX_NOACTIVATE = 0x08000000;
         // public const nint WVR_VALIDRECTS = 0x0400;
 
-        internal enum ResizeDirection
-        {
-            Left = 61441,
-            Right = 61442,
-            Top = 61443,
-            TopLeft = 61444,
-            TopRight = 61445,
-            Bottom = 61446,
-            BottomLeft = 61447,
-            BottomRight = 61448
-        }
-
         // RECT Structure
         // [StructLayout(LayoutKind.Sequential)]
         // internal struct RECT
@@ -209,21 +197,8 @@ internal sealed class WinApi
         ClipboardChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    public static void ResizeWindow(nint windowHandle, string borderName)
+    public static void ResizeWindow(nint windowHandle, nint wParam)
     {
-        nint wParam = borderName switch
-        {
-            "LeftBorder" => (nint)ResizeDirection.Left,
-            "RightBorder" => (nint)ResizeDirection.Right,
-            "TopBorder" => (nint)ResizeDirection.Top,
-            "TopRightBorder" => (nint)ResizeDirection.TopRight,
-            "BottomBorder" => (nint)ResizeDirection.Bottom,
-            "BottomLeftBorder" => (nint)ResizeDirection.BottomLeft,
-            "BottomRightBorder" => (nint)ResizeDirection.BottomRight,
-            "TopLeftBorder" => (nint)ResizeDirection.TopLeft,
-            _ => 0
-        };
-
         _ = SendMessage(windowHandle, WM_SYSCOMMAND, wParam, 0);
     }
 
@@ -266,6 +241,14 @@ internal sealed class WinApi
                 handled = true;
                 break;
 
+            case WM_HOTKEY:
+                if (KeyGestureUtils.KeyGestureDict.TryGetValue((int)wParam, out KeyGesture? keyGesture))
+                {
+                    _ = KeyGestureUtils.HandleHotKey(keyGesture).ConfigureAwait(false);
+                }
+
+                break;
+
             case WM_ERASEBKGND:
                 handled = true;
                 return 1;
@@ -276,14 +259,6 @@ internal sealed class WinApi
                 windowPos.flags |= SWP_NOCOPYBITS;
                 Marshal.StructureToPtr(windowPos, lParam, true);
                 handled = true;
-                break;
-
-            case WM_HOTKEY:
-                if (KeyGestureUtils.KeyGestureDict.TryGetValue((int)wParam, out KeyGesture? keyGesture))
-                {
-                    _ = KeyGestureUtils.HandleHotKey(keyGesture).ConfigureAwait(false);
-                }
-
                 break;
 
             default:
