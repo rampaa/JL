@@ -1234,7 +1234,7 @@ internal sealed partial class MainWindow : Window
             || FirstPopupWindow.MiningMode
             || (FirstPopupWindow.IsMouseOver
                 && (ConfigManager.FixedPopupPositioning
-                    || FirstPopupWindow is { UnavoidableMouseEnter: true })))
+                    || FirstPopupWindow.UnavoidableMouseEnter)))
         {
             return;
         }

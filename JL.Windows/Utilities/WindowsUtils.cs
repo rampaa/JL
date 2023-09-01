@@ -52,6 +52,9 @@ internal static class WindowsUtils
     {
         List<ComboBoxItem> japaneseFonts = new();
 
+        XmlLanguage japaneseXmlLanguage = XmlLanguage.GetLanguage("ja-JP");
+        XmlLanguage englishXmlLanguage = XmlLanguage.GetLanguage("en-US");
+
         foreach (FontFamily fontFamily in Fonts.SystemFontFamilies)
         {
             ComboBoxItem comboBoxItem = new()
@@ -61,13 +64,13 @@ internal static class WindowsUtils
                 Foreground = Brushes.White
             };
 
-            if (fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("ja-jp")))
+            if (fontFamily.FamilyNames.ContainsKey(japaneseXmlLanguage))
             {
                 japaneseFonts.Add(comboBoxItem);
             }
 
-            else if (fontFamily.FamilyNames.Keys is { Count: 1 } &&
-                     fontFamily.FamilyNames.ContainsKey(XmlLanguage.GetLanguage("en-US")))
+            else if (fontFamily.FamilyNames.Keys.Count is 1
+                && fontFamily.FamilyNames.ContainsKey(englishXmlLanguage))
             {
                 bool foundGlyph = false;
                 foreach (Typeface typeFace in fontFamily.GetTypefaces())
