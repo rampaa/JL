@@ -238,33 +238,14 @@ internal static class PopupWindowUtils
 
             while (!lastPopupWindow.IsMouseOver)
             {
-                lastPopupWindow.MiningMode = false;
-                lastPopupWindow.TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
-                lastPopupWindow.ItemsControlButtons.Visibility = Visibility.Collapsed;
-                lastPopupWindow.Hide();
+                lastPopupWindow.HidePopup();
 
-                if (lastPopupWindow.Owner is PopupWindow parentPopupWindow)
+                if (lastPopupWindow.Owner is not PopupWindow parentPopupWindow)
                 {
-                    lastPopupWindow = parentPopupWindow;
-                }
-
-                else
-                {
-                    if (!MainWindow.Instance.IsMouseOver)
-                    {
-                        if (ConfigManager.TextOnlyVisibleOnHover)
-                        {
-                            MainWindow.Instance.MainGrid.Opacity = 0;
-                        }
-
-                        if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
-                        {
-                            MainWindow.Instance.Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
-                        }
-                    }
-
                     break;
                 }
+
+                lastPopupWindow = parentPopupWindow;
             }
         });
     }
