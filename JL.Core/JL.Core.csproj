@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -6,6 +6,7 @@
     <RollForward>LatestMajor</RollForward>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PublishReadyToRun>true</PublishReadyToRun>
     <Platforms>AnyCPU;x86;x64;ARM64</Platforms>
   </PropertyGroup>
 
