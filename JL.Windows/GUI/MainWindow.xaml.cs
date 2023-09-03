@@ -181,6 +181,8 @@ internal sealed partial class MainWindow : Window
 
             TitleBarContextMenu.IsOpen = false;
             MainTextBoxContextMenu.IsOpen = false;
+
+            WindowsUtils.HidePopups(FirstPopupWindow);
         }, DispatcherPriority.Send);
 
         if (ConfigManager.AlwaysOnTop
@@ -199,8 +201,6 @@ internal sealed partial class MainWindow : Window
         }
 
         BacklogUtils.AddToBacklog(text);
-
-        WindowsUtils.HidePopups(FirstPopupWindow);
 
         if (ConfigManager.TextToSpeechOnTextChange
             && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
