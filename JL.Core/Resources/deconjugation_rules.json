@@ -907,7 +907,7 @@
     "dec_end": [ "" ],
     "con_end": [ "る" ],
     "dec_tag": [ "stem-izenkei" ],
-    "con_tag": [ "uninflectable" ],
+    "con_tag": [ "v1", "v1-s" ],
     "detail": "potential"
   },
   {
