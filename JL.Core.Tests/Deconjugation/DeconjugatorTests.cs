@@ -1,6 +1,4 @@
-using System.Text.Json;
 using JL.Core.Deconjugation;
-using JL.Core.Utilities;
 using NUnit.Framework;
 
 namespace JL.Core.Tests.Deconjugation;
@@ -43,15 +41,17 @@ public class DeconjugatorTests
     {
         // Arrange
         const string expectedText = "泳ぐ";
-        List<string> expectedProcess = new() { "negative", "past" };
 
         // Act
-        HashSet<Form> result = Deconjugator.Deconjugate("わからない");
+        HashSet<Form> result = Deconjugator.Deconjugate("泳げなかった");
 
         bool success = false;
         foreach (Form form in result)
         {
-            if (form.Text is expectedText && form.Process.SequenceEqual(expectedProcess))
+            if (form.Text is expectedText
+                && form.Process.Contains("potential")
+                && form.Process.Contains("negative")
+                && form.Process.Contains("past"))
             {
                 success = true;
                 break;
