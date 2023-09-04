@@ -959,6 +959,15 @@
     "detail": "short causative"
   },
   {
+    "type": "contextrule",
+    "contextrule": "saspecial",
+    "dec_end": [ "" ],
+    "con_end": [ "す" ],
+    "dec_tag": [ "stem-a" ],
+    "con_tag": [ "v5s" ],
+    "detail": "short causative"
+  },
+  {
     "type": "stdrule",
     "dec_end": [ "" ],
     "con_end": [ "せる" ],
