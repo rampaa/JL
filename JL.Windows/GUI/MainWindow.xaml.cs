@@ -980,7 +980,7 @@ internal sealed partial class MainWindow : Window
             e.Handled = true;
             PopupWindow.ShowMiningModeResults(FirstPopupWindow);
         }
-        else
+        else if (e.ChangedButton is not MouseButton.Right)
         {
             WindowsUtils.HidePopups(FirstPopupWindow);
         }
@@ -1188,7 +1188,9 @@ internal sealed partial class MainWindow : Window
         AddNameMenuItem.IsEnabled = DictUtils.CustomNameDictReady;
         AddWordMenuItem.IsEnabled = DictUtils.CustomWordDictReady;
 
-        FirstPopupWindow.HidePopup();
+        MainTextBoxContextMenu.IsOpen = true;
+
+        WindowsUtils.HidePopups(FirstPopupWindow);
     }
 
     public async Task ChangeVisibility()

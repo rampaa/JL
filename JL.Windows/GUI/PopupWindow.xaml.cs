@@ -1811,11 +1811,12 @@ internal sealed partial class PopupWindow : Window
                     PopupAutoHideTimer.Start();
                 }
             }
-
-            return;
         }
 
-        HidePopup();
+        else
+        {
+            HidePopup();
+        }
     }
 
     public static void ShowMiningModeResults(PopupWindow popupWindow)
@@ -1906,7 +1907,9 @@ internal sealed partial class PopupWindow : Window
 
     private void PopupContextMenu_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        if (!(bool)e.NewValue
+        bool contextMenuIsVisible = (bool)e.NewValue;
+
+        if (!contextMenuIsVisible
             && !IsMouseOver
             && !AddWordWindow.IsItVisible()
             && !AddNameWindow.IsItVisible()
@@ -1914,13 +1917,21 @@ internal sealed partial class PopupWindow : Window
         {
             PopupAutoHideTimer.Start();
         }
+
+        if (contextMenuIsVisible)
+        {
+            WindowsUtils.HidePopups(ChildPopupWindow);
+        }
     }
 
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
         if (ChildPopupWindow is { MiningMode: true })
         {
-            WindowsUtils.HidePopups(ChildPopupWindow);
+            if (e.ChangedButton is not MouseButton.Right)
+            {
+                WindowsUtils.HidePopups(ChildPopupWindow);
+            }
         }
 
         else if (e.ChangedButton == ConfigManager.MiningModeMouseButton)
@@ -1939,6 +1950,11 @@ internal sealed partial class PopupWindow : Window
 
     public void HidePopup()
     {
+        if (!IsVisible)
+        {
+            return;
+        }
+
         MiningMode = false;
         TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
         ItemsControlButtons.Visibility = Visibility.Collapsed;
@@ -1947,18 +1963,13 @@ internal sealed partial class PopupWindow : Window
         LastText = "";
         PopupAutoHideTimer.Stop();
 
-        if (ConfigManager.HighlightLongestMatch && !PopupContextMenu.IsVisible)
-        {
-            WindowsUtils.Unselect(_lastTextBox);
-        }
-
         Hide();
 
         if (Owner == MainWindow.Instance)
         {
             WinApi.ActivateWindow(MainWindow.Instance.WindowHandle);
 
-            if (ConfigManager.HighlightLongestMatch && !MainWindow.Instance.MainTextBoxContextMenu.IsVisible)
+            if (ConfigManager.HighlightLongestMatch && !MainWindow.Instance.MainTextBoxContextMenu.IsOpen)
             {
                 WindowsUtils.Unselect(_lastTextBox);
             }
@@ -1971,7 +1982,7 @@ internal sealed partial class PopupWindow : Window
 
         else
         {
-            if (ConfigManager.HighlightLongestMatch && !PopupContextMenu.IsVisible)
+            if (ConfigManager.HighlightLongestMatch && !((PopupWindow)Owner).PopupContextMenu.IsVisible)
             {
                 WindowsUtils.Unselect(_lastTextBox);
             }
