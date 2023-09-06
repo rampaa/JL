@@ -1628,7 +1628,7 @@ internal sealed partial class PopupWindow : Window
     {
         MiningMode = true;
 
-        if (ConfigManager.ShowMiningModeReminder)
+        if (ConfigManager.ShowMiningModeReminder && Owner == MainWindow.Instance)
         {
             TextBlockMiningModeReminder.Visibility = Visibility.Visible;
         }
@@ -1907,20 +1907,13 @@ internal sealed partial class PopupWindow : Window
 
     private void PopupContextMenu_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        bool contextMenuIsVisible = (bool)e.NewValue;
-
-        if (!contextMenuIsVisible
+        if (!(bool)e.NewValue
             && !IsMouseOver
             && !AddWordWindow.IsItVisible()
             && !AddNameWindow.IsItVisible()
             && !StatsWindow.IsItVisible())
         {
             PopupAutoHideTimer.Start();
-        }
-
-        if (contextMenuIsVisible)
-        {
-            WindowsUtils.HidePopups(ChildPopupWindow);
         }
     }
 
@@ -1969,7 +1962,7 @@ internal sealed partial class PopupWindow : Window
         {
             WinApi.ActivateWindow(MainWindow.Instance.WindowHandle);
 
-            if (ConfigManager.HighlightLongestMatch && !MainWindow.Instance.MainTextBoxContextMenu.IsOpen)
+            if (ConfigManager.HighlightLongestMatch && !MainWindow.Instance.MainTextBoxContextMenu.IsVisible)
             {
                 WindowsUtils.Unselect(_lastTextBox);
             }
@@ -1982,10 +1975,18 @@ internal sealed partial class PopupWindow : Window
 
         else
         {
-            if (ConfigManager.HighlightLongestMatch && !((PopupWindow)Owner).PopupContextMenu.IsVisible)
+            PopupWindow previousPopup = (PopupWindow)Owner;
+            WinApi.ActivateWindow(previousPopup.WindowHandle);
+            if (ConfigManager.HighlightLongestMatch && !previousPopup.PopupContextMenu.IsVisible)
             {
                 WindowsUtils.Unselect(_lastTextBox);
             }
         }
+    }
+
+    private void Window_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+    {
+        PopupContextMenu.Visibility = Visibility.Visible;
+        WindowsUtils.HidePopups(ChildPopupWindow);
     }
 }

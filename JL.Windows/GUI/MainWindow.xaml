@@ -17,16 +17,18 @@
 
     <Grid x:Name="MainGrid">
 
-        <Border Name="TopBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="5" Background="Transparent"/>
-        <Border Name="RightBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="5" Background="Transparent"/>
-        <Border Name="LeftBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="5" Background="Transparent"/>
-        <Border Name="BottomBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="5" Background="Transparent"/>
-        <Border Name="TopRightBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Top" HorizontalAlignment="Right" Width="5" Height="5" Background="Transparent"/>
-        <Border Name="BottomLeftBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="5" Height="5" Background="Transparent"/>
-        <Border Name="BottomRightBorder" MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="5" Height="5" Background="Transparent"/>
-        <Border Name="TopLeftBorder"  MouseLeftButtonDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Top" HorizontalAlignment="left" Height="5" Width="5" Background="Transparent"/>
+        <Border Name="TopBorder" MouseDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="5" Background="Transparent"/>
+        <Border Name="RightBorder" MouseDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="5" Background="Transparent"/>
+        <Border Name="LeftBorder" MouseDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="5" Background="Transparent"/>
+        <Border Name="BottomBorder" MouseDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="5" Background="Transparent"/>
+        <Border Name="TopRightBorder" MouseDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Top" HorizontalAlignment="Right" Width="5" Height="5" Background="Transparent"/>
+        <Border Name="BottomLeftBorder" MouseDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="5" Height="5" Background="Transparent"/>
+        <Border Name="BottomRightBorder" MouseDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="5" Height="5" Background="Transparent"/>
+        <Border Name="TopLeftBorder"  MouseDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Top" HorizontalAlignment="left" Height="5" Width="5" Background="Transparent"/>
 
-        <Rectangle Name="TitleBar" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="15" Margin="5,5,5,5" Opacity="1" Fill="Transparent" MouseEnter="TitleBar_MouseEnter" MouseLeave="TitleBar_MouseLeave">
+        <Rectangle Name="TitleBar" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" VerticalAlignment="Top"
+                   HorizontalAlignment="Stretch" Height="15" Margin="5,5,5,5" Opacity="1" Fill="Transparent"
+                   MouseEnter="TitleBar_MouseEnter" MouseLeave="TitleBar_MouseLeave" ContextMenuOpening="TitleBar_ContextMenuOpening">
             <Rectangle.ContextMenu>
                 <ContextMenu Name="TitleBarContextMenu">
                     <MenuItem
@@ -146,7 +148,7 @@
 
         <TextBlock x:Name="FontSizeButton" HorizontalAlignment="Left" MouseLeave="TitleBarButtonMouseLeave"
                    Margin="37,0,10,0" Text="T" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" RenderTransformOrigin="-0.222,0.567" FontFamily="Meiryo UI"
-                   MouseLeftButtonDown="FontSizeButton_MouseLeftButtonDown" ToolTip="Font Size" FontSize="18">
+                   MouseDown="FontSizeButton_MouseDown" ToolTip="Font Size" FontSize="18">
             <TextBlock.Background>
                 <SolidColorBrush Color="Black" Opacity="0.002"/>
             </TextBlock.Background>
@@ -157,7 +159,7 @@
 
         <TextBlock x:Name="OpacityButton" HorizontalAlignment="Left" MouseLeave="TitleBarButtonMouseLeave"
                    Margin="10,0,10,0" Text="☯" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" FontFamily="Meiryo UI" Padding="0,0,0,0"
-                   MouseLeftButtonDown="OpacityButton_MouseLeftButtonDown" ToolTip="Opacity" FontWeight="Normal" FontSize="18">
+                   MouseDown="OpacityButton_MouseDown" ToolTip="Opacity" FontWeight="Normal" FontSize="18">
             <TextBlock.Background>
                 <SolidColorBrush Color="Black" Opacity="0.002"/>
             </TextBlock.Background>

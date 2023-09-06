@@ -377,43 +377,54 @@ internal sealed partial class MainWindow : Window
         HideTitleBarButtons();
     }
 
-    private void OpacityButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void OpacityButton_MouseDown(object sender, MouseButtonEventArgs e)
     {
-        FontSizeSlider.Visibility = Visibility.Collapsed;
-
-        if (Background.Opacity is 0)
+        if (e.ChangedButton is MouseButton.Left)
         {
-            Background.Opacity = OpacitySlider.Value / 100;
-            _ = MainTextBox.Focus();
+            FontSizeSlider.Visibility = Visibility.Collapsed;
+
+            if (Background.Opacity is 0)
+            {
+                Background.Opacity = OpacitySlider.Value / 100;
+                _ = MainTextBox.Focus();
+            }
+            else if (OpacitySlider.Visibility is Visibility.Collapsed)
+            {
+                OpacitySlider.Visibility = Visibility.Visible;
+                _ = OpacitySlider.Focus();
+            }
+            else
+            {
+                OpacitySlider.Visibility = Visibility.Collapsed;
+                _ = MainTextBox.Focus();
+            }
         }
-
-        else if (OpacitySlider.Visibility is Visibility.Collapsed)
+        else if (e.ChangedButton is MouseButton.Right)
         {
-            OpacitySlider.Visibility = Visibility.Visible;
-            _ = OpacitySlider.Focus();
-        }
-
-        else
-        {
-            OpacitySlider.Visibility = Visibility.Collapsed;
-            _ = MainTextBox.Focus();
+            WindowsUtils.HidePopups(FirstPopupWindow);
         }
     }
 
-    private void FontSizeButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void FontSizeButton_MouseDown(object sender, MouseButtonEventArgs e)
     {
-        OpacitySlider.Visibility = Visibility.Collapsed;
-
-        if (FontSizeSlider.Visibility is Visibility.Collapsed)
+        if (e.ChangedButton is MouseButton.Left)
         {
-            FontSizeSlider.Visibility = Visibility.Visible;
-            _ = FontSizeSlider.Focus();
+            OpacitySlider.Visibility = Visibility.Collapsed;
+
+            if (FontSizeSlider.Visibility is Visibility.Collapsed)
+            {
+                FontSizeSlider.Visibility = Visibility.Visible;
+                _ = FontSizeSlider.Focus();
+            }
+            else
+            {
+                FontSizeSlider.Visibility = Visibility.Collapsed;
+                _ = MainTextBox.Focus();
+            }
         }
-
-        else
+        else if (e.ChangedButton is MouseButton.Right)
         {
-            FontSizeSlider.Visibility = Visibility.Collapsed;
-            _ = MainTextBox.Focus();
+            WindowsUtils.HidePopups(FirstPopupWindow);
         }
     }
 
@@ -1123,46 +1134,53 @@ internal sealed partial class MainWindow : Window
 
     private void ResizeWindow(object sender, MouseButtonEventArgs e)
     {
-        nint wParam;
-        if (LeftBorder == sender)
+        if (e.ChangedButton is MouseButton.Left)
         {
-            wParam = 61441;
-        }
-        else if (RightBorder == sender)
-        {
-            wParam = 61442;
-        }
-        else if (TopBorder == sender)
-        {
-            wParam = 61443;
-        }
-        else if (TopLeftBorder == sender)
-        {
-            wParam = 61444;
-        }
-        else if (TopRightBorder == sender)
-        {
-            wParam = 61445;
-        }
-        else if (BottomBorder == sender)
-        {
-            wParam = 61446;
-        }
-        else if (BottomLeftBorder == sender)
-        {
-            wParam = 61447;
-        }
-        else // if (BottomRightBorder == sender)
-        {
-            wParam = 61448;
-        }
+            nint wParam;
+            if (LeftBorder == sender)
+            {
+                wParam = 61441;
+            }
+            else if (RightBorder == sender)
+            {
+                wParam = 61442;
+            }
+            else if (TopBorder == sender)
+            {
+                wParam = 61443;
+            }
+            else if (TopLeftBorder == sender)
+            {
+                wParam = 61444;
+            }
+            else if (TopRightBorder == sender)
+            {
+                wParam = 61445;
+            }
+            else if (BottomBorder == sender)
+            {
+                wParam = 61446;
+            }
+            else if (BottomLeftBorder == sender)
+            {
+                wParam = 61447;
+            }
+            else // if (BottomRightBorder == sender)
+            {
+                wParam = 61448;
+            }
 
-        WinApi.ResizeWindow(WindowHandle, wParam);
+            WinApi.ResizeWindow(WindowHandle, wParam);
 
-        LeftPositionBeforeResolutionChange = Left;
-        TopPositionBeforeResolutionChange = Top;
-        WidthBeforeResolutionChange = ActualWidth;
-        HeightBeforeResolutionChange = ActualHeight;
+            LeftPositionBeforeResolutionChange = Left;
+            TopPositionBeforeResolutionChange = Top;
+            WidthBeforeResolutionChange = ActualWidth;
+            HeightBeforeResolutionChange = ActualHeight;
+        }
+        else if (e.ChangedButton is MouseButton.Right)
+        {
+            WindowsUtils.HidePopups(FirstPopupWindow);
+        }
     }
 
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -1188,7 +1206,7 @@ internal sealed partial class MainWindow : Window
         AddNameMenuItem.IsEnabled = DictUtils.CustomNameDictReady;
         AddWordMenuItem.IsEnabled = DictUtils.CustomWordDictReady;
 
-        MainTextBoxContextMenu.IsOpen = true;
+        MainTextBoxContextMenu.Visibility = Visibility.Visible;
 
         WindowsUtils.HidePopups(FirstPopupWindow);
     }
@@ -1415,5 +1433,10 @@ internal sealed partial class MainWindow : Window
         {
             Swipe(e.GetTouchPoint(this).Position);
         }
+    }
+
+    private void TitleBar_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+    {
+        WindowsUtils.HidePopups(FirstPopupWindow);
     }
 }
