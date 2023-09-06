@@ -1206,9 +1206,11 @@ internal sealed partial class MainWindow : Window
         AddNameMenuItem.IsEnabled = DictUtils.CustomNameDictReady;
         AddWordMenuItem.IsEnabled = DictUtils.CustomWordDictReady;
 
-        MainTextBoxContextMenu.Visibility = Visibility.Visible;
-
+        // Keep the highlight after right mouse click so that add name/word buttons can be used correctly
+        MainTextBoxContextMenu.IsOpen = true;
         WindowsUtils.HidePopups(FirstPopupWindow);
+        // Fix context menu position
+        MainTextBoxContextMenu.IsOpen = true;
     }
 
     public async Task ChangeVisibility()

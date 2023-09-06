@@ -1986,7 +1986,10 @@ internal sealed partial class PopupWindow : Window
 
     private void Window_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        PopupContextMenu.Visibility = Visibility.Visible;
+        // Keep the highlight after right mouse click so that add name/word buttons can be used correctly
+        PopupContextMenu.IsOpen = true;
         WindowsUtils.HidePopups(ChildPopupWindow);
+        // Fix context menu position
+        PopupContextMenu.IsOpen = true;
     }
 }
