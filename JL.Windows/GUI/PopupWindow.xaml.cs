@@ -1949,7 +1949,7 @@ internal sealed partial class PopupWindow : Window
         if (isFirstPopup
             && (ConfigManager.TextOnlyVisibleOnHover || ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover))
         {
-            _ = mainWindow.ChangeVisibility().ConfigureAwait(false);
+            _ = mainWindow.ChangeVisibility().ConfigureAwait(true);
         }
 
         if (!IsVisible)
