@@ -1943,6 +1943,15 @@ internal sealed partial class PopupWindow : Window
 
     public void HidePopup()
     {
+        MainWindow mainWindow = MainWindow.Instance;
+        bool isFirstPopup = Owner == mainWindow;
+
+        if (isFirstPopup
+            && (ConfigManager.TextOnlyVisibleOnHover || ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover))
+        {
+            _ = mainWindow.ChangeVisibility().ConfigureAwait(false);
+        }
+
         if (!IsVisible)
         {
             return;
@@ -1958,18 +1967,13 @@ internal sealed partial class PopupWindow : Window
 
         Hide();
 
-        if (Owner == MainWindow.Instance)
+        if (isFirstPopup)
         {
-            WinApi.ActivateWindow(MainWindow.Instance.WindowHandle);
+            WinApi.ActivateWindow(mainWindow.WindowHandle);
 
-            if (ConfigManager.HighlightLongestMatch && !MainWindow.Instance.MainTextBoxContextMenu.IsVisible)
+            if (ConfigManager.HighlightLongestMatch && !mainWindow.MainTextBoxContextMenu.IsVisible)
             {
                 WindowsUtils.Unselect(_lastTextBox);
-            }
-
-            if (ConfigManager.TextOnlyVisibleOnHover || ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
-            {
-                _ = MainWindow.Instance.ChangeVisibility().ConfigureAwait(false);
             }
         }
 
