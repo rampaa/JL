@@ -96,9 +96,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Audio volume"
-                                       TextWrapping="Wrap" VerticalAlignment="Center"
-                                       ToolTip="Improves performance when using a lot of dictionaries at the same time"
-                                       Cursor="Help"/>
+                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <hc:NumericUpDown x:Name="AudioVolumeNumericUpDown" Maximum="100"
                                               Minimum="0"
                                               HorizontalAlignment="Right" />
