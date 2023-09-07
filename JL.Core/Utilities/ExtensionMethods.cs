@@ -65,7 +65,7 @@ public static class ExtensionMethods
         T[] destination = new T[source.Length - 1];
         if (index > 0)
         {
-            Array.Copy(source, 0, destination, 0, index);
+            Array.Copy(source, destination, index);
         }
 
         if (index < source.Length - 1)

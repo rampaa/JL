@@ -4,5 +4,5 @@ internal interface IEpwingRecord : IDictRecord
 {
     public string PrimarySpelling { get; }
     public string? Reading { get; }
-    public string[]? Definitions { get; set; }
+    public string[] Definitions { get; set; }
 }

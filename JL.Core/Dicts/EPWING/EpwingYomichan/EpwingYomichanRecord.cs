@@ -11,7 +11,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
 {
     public string PrimarySpelling { get; }
     public string? Reading { get; }
-    public string[]? Definitions { get; set; }
+    public string[] Definitions { get; set; }
     public string[]? WordClasses { get; }
     private string[]? DefinitionTags { get; }
     //public int Score { get; init; }
@@ -68,8 +68,8 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         //Score = score;
 
         List<string> definitionList = GetDefinitionsFromJsonArray(jsonElement[5]);
-        Definitions = definitionList.TrimStringListToStringArray();
-        Definitions?.DeduplicateStringsInArray();
+        Definitions = definitionList.TrimStringListToStringArray() ?? Array.Empty<string>();
+        Definitions.DeduplicateStringsInArray();
 
         //jsonElement[6].TryGetInt32(out int sequence);
         //Sequence = sequence;

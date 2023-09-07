@@ -11,9 +11,9 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
     public string PrimarySpelling { get; }
     public string? Reading { get; }
     public string[]? AlternativeSpellings { get; }
-    public string[]? Definitions { get; set; }
+    public string[] Definitions { get; set; }
 
-    public EpwingNazekaRecord(string primarySpelling, string? reading, string[]? alternativeSpellings, string[]? definitions)
+    public EpwingNazekaRecord(string primarySpelling, string? reading, string[]? alternativeSpellings, string[] definitions)
     {
         PrimarySpelling = primarySpelling;
         Reading = reading;

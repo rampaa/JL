@@ -27,6 +27,11 @@ internal static class EpwingUtils
 
     public static bool IsValidEpwingResultForDictType(IEpwingRecord epwingRecord, Dict dict)
     {
+        if (epwingRecord.Definitions.Length is 0)
+        {
+            return false;
+        }
+
         foreach (char c in epwingRecord.PrimarySpelling)
         {
             if (s_invalidCharacters.Contains(c) || char.IsWhiteSpace(c))
@@ -150,22 +155,19 @@ internal static class EpwingUtils
             {
                 IEpwingRecord previousResult = (IEpwingRecord)previousResults[i];
 
-                if (epwingRecord.Definitions is not null)
+                if (previousResult.Definitions.SequenceEqual(epwingRecord.Definitions))
                 {
-                    if (previousResult.Definitions?.SequenceEqual(epwingRecord.Definitions ?? Enumerable.Empty<string>()) ?? epwingRecord.Definitions is null)
+                    // If an entry has reading info while others don't, keep the one with the reading info.
+                    if (string.IsNullOrEmpty(previousResult.Reading) &&
+                        !string.IsNullOrEmpty(epwingRecord.Reading))
                     {
-                        // If an entry has reading info while others don't, keep the one with the reading info.
-                        if (string.IsNullOrEmpty(previousResult.Reading) &&
-                            !string.IsNullOrEmpty(epwingRecord.Reading))
-                        {
-                            previousResults.RemoveAt(i);
-                            break;
-                        }
+                        previousResults.RemoveAt(i);
+                        break;
+                    }
 
-                        if (epwingRecord.Reading == previousResult.Reading)
-                        {
-                            return false;
-                        }
+                    if (epwingRecord.Reading == previousResult.Reading)
+                    {
+                        return false;
                     }
                 }
             }
@@ -179,15 +181,12 @@ internal static class EpwingUtils
             {
                 IEpwingRecord previousResult = (IEpwingRecord)previousResults[i];
 
-                if (epwingRecord.Definitions is not null)
+                if (previousResult.Definitions.SequenceEqual(epwingRecord.Definitions))
                 {
-                    if (previousResult.Definitions?.SequenceEqual(epwingRecord.Definitions ?? Enumerable.Empty<string>()) ?? epwingRecord.Definitions is null)
+                    if (string.IsNullOrEmpty(previousResult.Reading))
                     {
-                        if (string.IsNullOrEmpty(previousResult.Reading))
-                        {
-                            previousResults.RemoveAt(i);
-                            break;
-                        }
+                        previousResults.RemoveAt(i);
+                        break;
                     }
                 }
             }

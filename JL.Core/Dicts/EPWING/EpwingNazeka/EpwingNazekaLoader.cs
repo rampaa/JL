@@ -45,7 +45,7 @@ internal static class EpwingNazekaLoader
                 spellingList = null;
             }
 
-            List<string>? definitionList = new();
+            List<string> definitionList = new();
             foreach (JsonElement definitionJsonElement in jsonObj.GetProperty("l").EnumerateArray())
             {
                 string definition = definitionJsonElement.ToString();
@@ -58,10 +58,11 @@ internal static class EpwingNazekaLoader
 
             if (definitionList.Count is 0)
             {
-                definitionList = null;
+                continue;
             }
 
-            string[]? definitions = definitionList?.ToArray();
+            string[] definitions = definitionList.ToArray();
+            definitions.DeduplicateStringsInArray();
 
             if (spellingList is not null)
             {
