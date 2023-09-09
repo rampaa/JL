@@ -1208,9 +1208,15 @@ internal sealed partial class MainWindow : Window
         AddNameMenuItem.IsEnabled = DictUtils.CustomNameDictReady;
         AddWordMenuItem.IsEnabled = DictUtils.CustomWordDictReady;
 
-        ContextMenuIsOpening = true;
+        int charIndex = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), ConfigManager.HorizontallyCenterMainWindowText);
+        ContextMenuIsOpening = charIndex >= MainTextBox.SelectionStart && charIndex <= MainTextBox.SelectionStart + MainTextBox.SelectionLength;
 
         WindowsUtils.HidePopups(FirstPopupWindow);
+
+        if (!ContextMenuIsOpening && MainTextBox.SelectionLength > 0)
+        {
+            WindowsUtils.Unselect(MainTextBox);
+        }
 
         ContextMenuIsOpening = false;
     }

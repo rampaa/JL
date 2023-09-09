@@ -233,7 +233,7 @@ internal sealed partial class PopupWindow : Window
         // Set snapToText to the value of HorizontallyCenterMainWindowText
         // This is a dumb workaround for https://github.com/dotnet/wpf/issues/7651
         // Setting snapToText to true creates other problems but it's better than not being able to lookup stuff when the text is centered
-        int charPosition = tb.GetCharacterIndexFromPoint(Mouse.GetPosition(tb), ConfigManager.HorizontallyCenterMainWindowText);
+        int charPosition = tb.GetCharacterIndexFromPoint(Mouse.GetPosition(tb), MainWindow.Instance.MainTextBox == tb && ConfigManager.HorizontallyCenterMainWindowText);
 
         if (charPosition is not -1)
         {
