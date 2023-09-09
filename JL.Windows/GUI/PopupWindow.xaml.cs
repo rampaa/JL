@@ -257,6 +257,7 @@ internal sealed partial class PopupWindow : Window
         }
 
         _lastTextBox = tb;
+        LastText = tb.SelectedText;
         LastSelectedText = tb.SelectedText;
 
         List<LookupResult>? lookupResults = LookupUtils.LookupText(tb.SelectedText);
@@ -379,7 +380,7 @@ internal sealed partial class PopupWindow : Window
     {
         DictsWithResults.Clear();
 
-        PopupListView.Items.Filter = NoAllDictFilter;
+        PopupListBox.Items.Filter = NoAllDictFilter;
 
         if (text is not null && !generateAllResults && StackPanelCache.TryGet(text, out StackPanel[] data))
         {
@@ -399,10 +400,14 @@ internal sealed partial class PopupWindow : Window
                 popupItemSource[i] = stackPanel;
             }
 
-            PopupListView.ItemsSource = popupItemSource;
+            PopupListBox.ItemsSource = popupItemSource;
             GenerateDictTypeButtons();
-            PopupListView.ScrollIntoView(PopupListView.Items[0]);
             UpdateLayout();
+
+            if (PopupListBox.Items.Count > 0)
+            {
+                PopupListBox.ScrollIntoView(PopupListBox.Items[0]);
+            }
         }
 
         else
@@ -425,10 +430,14 @@ internal sealed partial class PopupWindow : Window
                 popupItemSource[i] = MakeResultStackPanel(lookupResult, i, resultCount);
             }
 
-            PopupListView.ItemsSource = popupItemSource;
+            PopupListBox.ItemsSource = popupItemSource;
             GenerateDictTypeButtons();
-            PopupListView.ScrollIntoView(PopupListView.Items[0]);
             UpdateLayout();
+
+            if (PopupListBox.Items.Count > 0)
+            {
+                PopupListBox.ScrollIntoView(PopupListBox.Items[0]);
+            }
 
             // we might cache incomplete results if we don't wait until all dicts are loaded
             if (text is not null && !generateAllResults && DictUtils.DictsReady && !DictUtils.UpdatingJmdict && !DictUtils.UpdatingJmnedict && !DictUtils.UpdatingKanjidic)
@@ -1336,24 +1345,24 @@ internal sealed partial class PopupWindow : Window
 
     private void SelectNextLookupResult()
     {
-        int nextItemIndex = PopupListView.SelectedIndex + 1 < PopupListView.Items.Count
-            ? PopupListView.SelectedIndex + 1
+        int nextItemIndex = PopupListBox.SelectedIndex + 1 < PopupListBox.Items.Count
+            ? PopupListBox.SelectedIndex + 1
             : 0;
 
-        PopupListView.SelectedIndex = nextItemIndex;
+        PopupListBox.SelectedIndex = nextItemIndex;
 
-        PopupListView.ScrollIntoView(PopupListView.Items.GetItemAt(nextItemIndex));
+        PopupListBox.ScrollIntoView(PopupListBox.Items.GetItemAt(nextItemIndex));
     }
 
     private void SelectPreviousLookupResult()
     {
-        int nextItemIndex = PopupListView.SelectedIndex - 1 > -1
-            ? PopupListView.SelectedIndex - 1
-            : PopupListView.Items.Count - 1;
+        int nextItemIndex = PopupListBox.SelectedIndex - 1 > -1
+            ? PopupListBox.SelectedIndex - 1
+            : PopupListBox.Items.Count - 1;
 
-        PopupListView.SelectedIndex = nextItemIndex;
+        PopupListBox.SelectedIndex = nextItemIndex;
 
-        PopupListView.ScrollIntoView(PopupListView.Items.GetItemAt(nextItemIndex));
+        PopupListBox.ScrollIntoView(PopupListBox.Items.GetItemAt(nextItemIndex));
     }
 
     public async Task HandleHotKey(KeyGesture keyGesture)
@@ -1495,7 +1504,7 @@ internal sealed partial class PopupWindow : Window
                     _filteredDict = (Dict)button.Tag;
                     movedToNextDict = true;
                     button.Background = Brushes.DodgerBlue;
-                    PopupListView.Items.Filter = DictFilter;
+                    PopupListBox.Items.Filter = DictFilter;
                     break;
                 }
             }
@@ -1503,7 +1512,7 @@ internal sealed partial class PopupWindow : Window
             if (!movedToNextDict)
             {
                 ((Button)ItemsControlButtons.Items[0]).Background = Brushes.DodgerBlue;
-                PopupListView.Items.Filter = NoAllDictFilter;
+                PopupListBox.Items.Filter = NoAllDictFilter;
             }
         }
 
@@ -1530,7 +1539,7 @@ internal sealed partial class PopupWindow : Window
                     _filteredDict = (Dict)button.Tag;
                     button.Background = Brushes.DodgerBlue;
                     movedToPreviousDict = true;
-                    PopupListView.Items.Filter = DictFilter;
+                    PopupListBox.Items.Filter = DictFilter;
                     break;
                 }
             }
@@ -1538,7 +1547,7 @@ internal sealed partial class PopupWindow : Window
             if (foundSelectedButton && !movedToPreviousDict)
             {
                 ((Button)ItemsControlButtons.Items[0]).Background = Brushes.DodgerBlue;
-                PopupListView.Items.Filter = NoAllDictFilter;
+                PopupListBox.Items.Filter = NoAllDictFilter;
             }
 
             else if (!foundSelectedButton)
@@ -1551,7 +1560,7 @@ internal sealed partial class PopupWindow : Window
                         _filteredDict = (Dict)btn.Tag;
                         btn.Background = Brushes.DodgerBlue;
                         ((Button)ItemsControlButtons.Items[0]).ClearValue(BackgroundProperty);
-                        PopupListView.Items.Filter = DictFilter;
+                        PopupListBox.Items.Filter = DictFilter;
                         break;
                     }
                 }
@@ -1612,9 +1621,9 @@ internal sealed partial class PopupWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.MineSelectedLookupResultKeyGesture))
         {
-            if (MiningMode && PopupListView.SelectedItem is not null)
+            if (MiningMode && PopupListBox.SelectedItem is not null)
             {
-                WrapPanel? top = ((StackPanel)PopupListView.SelectedItem).Children.OfType<WrapPanel>().FirstOrDefault();
+                WrapPanel? top = ((StackPanel)PopupListBox.SelectedItem).Children.OfType<WrapPanel>().FirstOrDefault();
 
                 if (top is not null)
                 {
@@ -1641,7 +1650,7 @@ internal sealed partial class PopupWindow : Window
         string? primarySpelling = null;
         string? reading = null;
 
-        List<StackPanel> visibleStackPanels = PopupListView.Items.Cast<StackPanel>()
+        List<StackPanel> visibleStackPanels = PopupListBox.Items.Cast<StackPanel>()
             .Where(static stackPanel => stackPanel.Visibility is Visibility.Visible).ToList();
 
         if (visibleStackPanels.Count is 0)
@@ -1869,7 +1878,7 @@ internal sealed partial class PopupWindow : Window
         Button button = (Button)sender;
         button.Background = Brushes.DodgerBlue;
 
-        PopupListView.Items.Filter = NoAllDictFilter;
+        PopupListBox.Items.Filter = NoAllDictFilter;
     }
 
     private void DictTypeButtonOnClick(object sender, RoutedEventArgs e)
@@ -1885,7 +1894,7 @@ internal sealed partial class PopupWindow : Window
 
         _filteredDict = (Dict)button.Tag;
 
-        PopupListView.Items.Filter = DictFilter;
+        PopupListBox.Items.Filter = DictFilter;
     }
 
     private bool DictFilter(object item)
@@ -1961,7 +1970,7 @@ internal sealed partial class PopupWindow : Window
         TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
         ItemsControlButtons.Visibility = Visibility.Collapsed;
         ItemsControlButtons.ItemsSource = null;
-        PopupListView.ItemsSource = null;
+        PopupListBox.ItemsSource = null;
         LastText = "";
         PopupAutoHideTimer.Stop();
 
