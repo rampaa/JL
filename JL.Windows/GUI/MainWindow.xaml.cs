@@ -40,6 +40,8 @@ internal sealed partial class MainWindow : Window
     public double HeightBeforeResolutionChange { get; set; }
     public double WidthBeforeResolutionChange { get; set; }
 
+    public bool ContextMenuIsOpening { get; private set; } = false;
+
     private static CancellationTokenSource s_precacheCancellationTokenSource = new();
 
     private static string? s_lastTextCopiedWhileMinimized = null;
@@ -1206,11 +1208,11 @@ internal sealed partial class MainWindow : Window
         AddNameMenuItem.IsEnabled = DictUtils.CustomNameDictReady;
         AddWordMenuItem.IsEnabled = DictUtils.CustomWordDictReady;
 
-        // Keep the highlight after right mouse click so that add name/word buttons can be used correctly
-        MainTextBoxContextMenu.IsOpen = true;
+        ContextMenuIsOpening = true;
+
         WindowsUtils.HidePopups(FirstPopupWindow);
-        // Fix context menu position
-        MainTextBoxContextMenu.IsOpen = true;
+
+        ContextMenuIsOpening = false;
     }
 
     public async Task ChangeVisibility()
@@ -1360,12 +1362,10 @@ internal sealed partial class MainWindow : Window
             FirstPopupWindow.HidePopup();
         }
 
-        if (!ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar)
+        if (ConfigManager.HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar)
         {
-            return;
+            ShowTitleBarButtons();
         }
-
-        ShowTitleBarButtons();
     }
 
     private void TitleBar_MouseLeave(object sender, MouseEventArgs e)

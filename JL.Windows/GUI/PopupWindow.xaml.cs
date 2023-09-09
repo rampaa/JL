@@ -26,6 +26,7 @@ namespace JL.Windows.GUI;
 internal sealed partial class PopupWindow : Window
 {
     public PopupWindow? ChildPopupWindow { get; private set; }
+    public bool ContextMenuIsOpening { get; private set; } = false;
 
     private TextBox? _lastTextBox;
 
@@ -1980,7 +1981,7 @@ internal sealed partial class PopupWindow : Window
         {
             WinApi.ActivateWindow(mainWindow.WindowHandle);
 
-            if (ConfigManager.HighlightLongestMatch && !mainWindow.MainTextBoxContextMenu.IsVisible)
+            if (ConfigManager.HighlightLongestMatch && !mainWindow.ContextMenuIsOpening)
             {
                 WindowsUtils.Unselect(_lastTextBox);
             }
@@ -1990,7 +1991,7 @@ internal sealed partial class PopupWindow : Window
         {
             PopupWindow previousPopup = (PopupWindow)Owner;
             WinApi.ActivateWindow(previousPopup.WindowHandle);
-            if (ConfigManager.HighlightLongestMatch && !previousPopup.PopupContextMenu.IsVisible)
+            if (ConfigManager.HighlightLongestMatch && !previousPopup.ContextMenuIsOpening)
             {
                 WindowsUtils.Unselect(_lastTextBox);
             }
@@ -1999,10 +2000,8 @@ internal sealed partial class PopupWindow : Window
 
     private void Window_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        // Keep the highlight after right mouse click so that add name/word buttons can be used correctly
-        PopupContextMenu.IsOpen = true;
+        ContextMenuIsOpening = true;
         WindowsUtils.HidePopups(ChildPopupWindow);
-        // Fix context menu position
-        PopupContextMenu.IsOpen = true;
+        ContextMenuIsOpening = false;
     }
 }
