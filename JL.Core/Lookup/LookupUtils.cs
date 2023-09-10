@@ -256,19 +256,38 @@ public static class LookupUtils
 
     private static List<LookupResult> SortLookupResults(IReadOnlyCollection<LookupResult> lookupResults)
     {
-        string longestMatchedText = lookupResults.Aggregate(static (r1, r2) => r1.MatchedText.Length > r2.MatchedText.Length ? r1 : r2).MatchedText;
-
         return lookupResults
-            .OrderByDescending(dict => longestMatchedText == dict.PrimarySpelling)
-            .ThenByDescending(dict => dict.Readings?.Contains(longestMatchedText) ?? false)
-            .ThenByDescending(static dict => dict.MatchedText.Length)
-            .ThenByDescending(dict => longestMatchedText.Length >= dict.PrimarySpelling.Length && longestMatchedText[..dict.PrimarySpelling.Length] == dict.PrimarySpelling)
-            .ThenByDescending(static dict => dict.PrimarySpelling.Length)
-            .ThenBy(static dict => dict.Dict.Priority)
-            .ThenBy(static dict => dict.Frequencies?.Count > 0 ? dict.Frequencies[0].Freq : int.MaxValue)
-            .ThenBy(static dict =>
+            .OrderByDescending(static lookupResult => lookupResult.MatchedText.Length)
+            .ThenByDescending(static lookupResult => lookupResult.PrimarySpelling == lookupResult.MatchedText)
+            .ThenBy(static lookupResult =>
             {
-                int index = dict.Readings?.IndexOf(dict.MatchedText) ?? -1;
+                int index = lookupResult.Readings?.IndexOf(lookupResult.MatchedText) ?? -1;
+                if (index is -1)
+                {
+                    return 3;
+                }
+
+                if (lookupResult.ReadingsOrthographyInfoList?.Count > 0)
+                {
+                    string? readingOrthography = lookupResult.ReadingsOrthographyInfoList[index];
+                    if (readingOrthography == "uk")
+                    {
+                        return 0;
+                    }
+
+                    if (readingOrthography == "ok")
+                    {
+                        return 2;
+                    }
+                }
+
+                return 1;
+            })
+            .ThenBy(static lookupResult => lookupResult.Dict.Priority)
+            .ThenBy(static lookupResult => lookupResult.Frequencies?.Count > 0 ? lookupResult.Frequencies[0].Freq : int.MaxValue)
+            .ThenBy(static lookupResult =>
+            {
+                int index = lookupResult.Readings?.IndexOf(lookupResult.MatchedText) ?? -1;
                 return index is not -1
                     ? index
                     : int.MaxValue;
