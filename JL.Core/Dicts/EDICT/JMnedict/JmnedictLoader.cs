@@ -127,7 +127,7 @@ internal static class JmnedictLoader
                 switch (xmlReader.Name)
                 {
                     case "name_type":
-                        translation.NameTypeList.Add(ReadEntity(xmlReader).GetPooledString());
+                        translation.NameTypeList.Add(ReadEntity(xmlReader));
                         break;
 
                     case "trans_det":
@@ -156,8 +156,15 @@ internal static class JmnedictLoader
     private static string ReadEntity(XmlTextReader xmlReader)
     {
         _ = xmlReader.Read();
+        string entityName = xmlReader.Name.GetPooledString();
 
-        string entityName = xmlReader.Name;
+        if (!DictUtils.JmnedictEntities.ContainsKey(entityName))
+        {
+            xmlReader.ResolveEntity();
+            _ = xmlReader.Read();
+
+            DictUtils.JmnedictEntities.Add(entityName, xmlReader.Value.GetPooledString());
+        }
 
         _ = xmlReader.Read();
 

@@ -77,13 +77,8 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         //TermTags = jsonElement[7].ToString();
     }
 
-    public string? BuildFormattedDefinition(DictOptions? options)
+    public string BuildFormattedDefinition(DictOptions? options)
     {
-        if (Definitions is null)
-        {
-            return null;
-        }
-
         StringBuilder defResult = new();
 
         string separator = options is { NewlineBetweenDefinitions.Value: false }

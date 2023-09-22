@@ -1048,7 +1048,7 @@
                             <TextBlock Text="Toggle mouse pass-through mode" TextWrapping="Wrap" HorizontalAlignment="Left"
                                         VerticalAlignment="Center" />
                         </DockPanel>
-                        
+
                         <DockPanel>
                             <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
                                     Click="ClearKeyGestureButton_Click" />
@@ -1285,6 +1285,16 @@
                                 <Setter Property="Margin" Value="0,10,0,0" />
                             </Style>
                         </StackPanel.Resources>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Profile"
+                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <DockPanel HorizontalAlignment="Right">
+                                <ComboBox x:Name="ProfileComboBox" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                          SelectionChanged="ProfileComboBox_SelectionChanged" Width="207" />
+                                <Button Content="⚙️" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,0,0,0" Click="ProfileConfigButton_Click" />
+                            </DockPanel>
+                        </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Maximum Search Length"

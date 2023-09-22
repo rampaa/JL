@@ -57,9 +57,16 @@ internal static class EpwingYomichanLoader
 
         string hiraganaExpression = JapaneseUtils.KatakanaToHiragana(yomichanRecord.PrimarySpelling);
 
-        IList<IDictRecord>? records;
+        if (dict.Contents.TryGetValue(hiraganaExpression, out IList<IDictRecord>? records))
+        {
+            records.Add(yomichanRecord);
+        }
+        else
+        {
+            dict.Contents.Add(hiraganaExpression, new List<IDictRecord> { yomichanRecord });
+        }
 
-        if (!string.IsNullOrEmpty(yomichanRecord.Reading))
+        if (dict.Type is not DictType.NonspecificNameYomichan && !string.IsNullOrEmpty(yomichanRecord.Reading))
         {
             string hiraganaReading = JapaneseUtils.KatakanaToHiragana(yomichanRecord.Reading);
 
@@ -71,15 +78,6 @@ internal static class EpwingYomichanLoader
             {
                 dict.Contents.Add(hiraganaReading, new List<IDictRecord> { yomichanRecord });
             }
-        }
-
-        if (dict.Contents.TryGetValue(hiraganaExpression, out records))
-        {
-            records.Add(yomichanRecord);
-        }
-        else
-        {
-            dict.Contents.Add(hiraganaExpression, new List<IDictRecord> { yomichanRecord });
         }
     }
 }

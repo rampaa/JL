@@ -41,17 +41,22 @@ public static class CustomWordLoader
         "other"
     };
 
-    internal static async Task Load(Dict dict)
+    internal static void Load(Dict dict, CancellationToken cancellationToken)
     {
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
         if (File.Exists(fullPath))
         {
-            string[] lines = await File.ReadAllLinesAsync(fullPath)
-                .ConfigureAwait(false);
+            Dictionary<string, IList<IDictRecord>> customWordDictionary = dict.Contents;
 
-            for (int i = 0; i < lines.Length; i++)
+            foreach (string line in File.ReadLines(fullPath))
             {
-                string[] lParts = lines[i].Split("\t", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    customWordDictionary.Clear();
+                    break;
+                }
+
+                string[] lParts = line.Split("\t", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
                 if (lParts.Length > 3)
                 {
@@ -73,7 +78,7 @@ public static class CustomWordLoader
                         wordClasses = lParts[4].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                     }
 
-                    AddToDictionary(spellings, readings, definitions, partOfSpeech, wordClasses, dict.Contents);
+                    AddToDictionary(spellings, readings, definitions, partOfSpeech, wordClasses, customWordDictionary);
                 }
             }
         }

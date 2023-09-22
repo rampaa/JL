@@ -109,8 +109,7 @@ internal sealed partial class AddDictionaryWindow : Window
 
         if (openFileDialog.ShowDialog() is true)
         {
-            string relativePath = Path.GetRelativePath(Utils.ApplicationPath, openFileDialog.FileName);
-            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath, Utils.ApplicationPath) : relativePath;
+            TextBlockPath.Text = Utils.GetPath(openFileDialog.FileName);
         }
     }
 
@@ -121,8 +120,7 @@ internal sealed partial class AddDictionaryWindow : Window
         if (fbd.ShowDialog() is System.Windows.Forms.DialogResult.OK &&
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))
         {
-            string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fbd.SelectedPath);
-            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath, Utils.ApplicationPath) : relativePath;
+            TextBlockPath.Text = Utils.GetPath(fbd.SelectedPath);
         }
     }
 
@@ -209,6 +207,8 @@ internal sealed partial class AddDictionaryWindow : Window
             case DictType.Kanjidic:
             case DictType.CustomWordDictionary:
             case DictType.CustomNameDictionary:
+            case DictType.ProfileCustomWordDictionary:
+            case DictType.ProfileCustomNameDictionary:
                 break;
 
             default:

@@ -17,7 +17,6 @@ namespace JL.Windows.GUI;
 internal sealed partial class AddNameWindow : Window
 {
     private static AddNameWindow? s_instance;
-
     public static AddNameWindow Instance => s_instance ??= new AddNameWindow();
 
     public AddNameWindow()
@@ -35,7 +34,7 @@ internal sealed partial class AddNameWindow : Window
         Close();
     }
 
-    private async void SaveButton_Click(object sender, RoutedEventArgs e)
+    private async void SaveButton_Click(object? sender, RoutedEventArgs? e)
     {
         bool isValid = true;
 
@@ -67,7 +66,11 @@ internal sealed partial class AddNameWindow : Window
             string spelling = SpellingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
             string reading = ReadingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
 
-            Dict dict = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomNameDictionary);
+            DictType dictType = ComboBoxDictType.SelectedValue.ToString() is "Global"
+                ? DictType.CustomNameDictionary
+                : DictType.ProfileCustomNameDictionary;
+
+            Dict dict = DictUtils.Dicts.Values.First(dict => dict.Type == dictType);
             if (dict.Active)
             {
                 CustomNameLoader.AddToDictionary(spelling, reading, nameType, dict.Contents);
@@ -75,20 +78,11 @@ internal sealed partial class AddNameWindow : Window
             }
 
             Close();
-            await WriteToFile(spelling, reading, nameType).ConfigureAwait(false);
+
+            string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+            string line = string.Create(CultureInfo.InvariantCulture, $"{spelling}\t{reading}\t{nameType}\n");
+            await File.AppendAllTextAsync(path, line, Encoding.UTF8).ConfigureAwait(false);
         }
-    }
-
-    private static async Task WriteToFile(string spelling, string reading, string type)
-    {
-        string line = string.Create(CultureInfo.InvariantCulture, $"{spelling}\t{reading}\t{type}\n");
-        string customNameDictPath = Path.GetFullPath(DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomNameDictionary).Path, Utils.ApplicationPath);
-        await File.AppendAllTextAsync(customNameDictPath, line, Encoding.UTF8).ConfigureAwait(false);
-    }
-
-    private void Window_Loaded(object sender, RoutedEventArgs e)
-    {
-        OtherRadioButton.IsChecked = true;
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -96,5 +90,27 @@ internal sealed partial class AddNameWindow : Window
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
         s_instance = null;
+    }
+
+    private void Window_Loaded(object sender, RoutedEventArgs e)
+    {
+        _ = Activate();
+        if (string.IsNullOrEmpty(SpellingTextBox.Text))
+        {
+            _ = SpellingTextBox.Focus();
+        }
+        else // if (string.IsNullOrEmpty(ReadingTextBox.Text))
+        {
+            _ = ReadingTextBox.Focus();
+        }
+    }
+
+    private void Window_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key is System.Windows.Input.Key.Enter)
+        {
+            e.Handled = true;
+            SaveButton_Click(null, null);
+        }
     }
 }

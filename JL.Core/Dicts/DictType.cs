@@ -10,6 +10,8 @@ public enum DictType
     Kanjidic,
     [Description("Custom Word Dictionary")] CustomWordDictionary,
     [Description("Custom Name Dictionary")] CustomNameDictionary,
+    [Description("Custom Word Dictionary (Profile)")] ProfileCustomWordDictionary,
+    [Description("Custom Name Dictionary (Profile)")] ProfileCustomNameDictionary,
 
     // Yomichan Import
     [Description("Kenkyuusha (Yomichan)")] Kenkyuusha,

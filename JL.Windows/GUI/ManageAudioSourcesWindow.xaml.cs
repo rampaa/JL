@@ -193,7 +193,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
             };
             buttonEdit.Click += (_, _) =>
             {
-                _ = new EditAudioSourceWindow(uri, audioSource) { Owner = this }.ShowDialog();
+                _ = new EditAudioSourceWindow(uri, audioSource) { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
                 UpdateAudioSourcesDisplay();
             };
 
@@ -240,7 +240,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
 
     private void ButtonAddAudioSource_OnClick(object sender, RoutedEventArgs e)
     {
-        _ = new AddAudioSourceWindow { Owner = this }.ShowDialog();
+        _ = new AddAudioSourceWindow { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
         UpdateAudioSourcesDisplay();
     }
 

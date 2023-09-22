@@ -1,6 +1,8 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Text.Json;
 using System.Timers;
+using JL.Core.Profile;
 using JL.Core.Utilities;
 using Timer = System.Timers.Timer;
 
@@ -40,6 +42,46 @@ public static class StatsUtils
         }
     }
 
+    public static async Task DeserializeProfileLifetimeStats()
+    {
+        string filePath = GetStatsPath(ProfileUtils.CurrentProfile);
+        if (File.Exists(filePath))
+        {
+            try
+            {
+                FileStream fileStream = File.OpenRead(filePath);
+                await using (fileStream.ConfigureAwait(false))
+                {
+                    Stats.ProfileLifetimeStats = await JsonSerializer.DeserializeAsync<Stats>(fileStream,
+                        Utils.s_jsoWithEnumConverter).ConfigureAwait(false) ?? Stats.ProfileLifetimeStats;
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't read {ProfileUtils.CurrentProfile} Stats"));
+                Utils.Logger.Error(ex, "Couldn't read {CurrentProfile} Stats", ProfileUtils.CurrentProfile);
+            }
+        }
+
+        else
+        {
+            if (ProfileUtils.DefaultProfiles[0] == ProfileUtils.CurrentProfile)
+            {
+                _ = Directory.CreateDirectory(ProfileUtils.ProfileFolderPath);
+                File.Copy(Path.Join(Utils.ConfigPath, "Stats.json"), filePath);
+                await DeserializeProfileLifetimeStats().ConfigureAwait(false);
+            }
+
+            else
+            {
+                Utils.Logger.Information("{CurrentProfile}_Stats.json doesn't exist, creating it", ProfileUtils.CurrentProfile);
+                Stats.ResetStats(StatsMode.Profile);
+                await Stats.SerializeProfileLifetimeStats().ConfigureAwait(false);
+            }
+        }
+    }
+
     public static void StartStatsTimer()
     {
         if (!StatsTimer.Enabled)
@@ -71,5 +113,11 @@ public static class StatsUtils
         }
 
         await Stats.SerializeLifetimeStats().ConfigureAwait(false);
+        await Stats.SerializeProfileLifetimeStats().ConfigureAwait(false);
+    }
+
+    public static string GetStatsPath(string profileName)
+    {
+        return Path.Join(ProfileUtils.ProfileFolderPath, string.Create(CultureInfo.InvariantCulture, $"{profileName}_Stats.json"));
     }
 }

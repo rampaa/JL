@@ -4,21 +4,26 @@ namespace JL.Core.Dicts.CustomNameDict;
 
 public static class CustomNameLoader
 {
-    internal static async Task Load(Dict dict)
+    internal static void Load(Dict dict, CancellationToken cancellationToken)
     {
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
         if (File.Exists(fullPath))
         {
-            string[] lines = await File.ReadAllLinesAsync(fullPath)
-                .ConfigureAwait(false);
+            Dictionary<string, IList<IDictRecord>> customNameDictionary = dict.Contents;
 
-            for (int i = 0; i < lines.Length; i++)
+            foreach (string line in File.ReadLines(fullPath))
             {
-                string[] lParts = lines[i].Split("\t", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    customNameDictionary.Clear();
+                    break;
+                }
+
+                string[] lParts = line.Split("\t", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
                 if (lParts.Length is 3)
                 {
-                    AddToDictionary(lParts[0], lParts[1], lParts[2], dict.Contents);
+                    AddToDictionary(lParts[0], lParts[1], lParts[2], customNameDictionary);
                 }
             }
         }

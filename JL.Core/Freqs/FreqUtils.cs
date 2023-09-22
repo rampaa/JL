@@ -202,9 +202,7 @@ public static class FreqUtils
                         freq.Priority = priority;
                         ++priority;
 
-                        string fullPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
-                        string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fullPath);
-                        freq.Path = relativePath.StartsWith('.') ? fullPath : relativePath;
+                        freq.Path = Utils.GetPath(freq.Path);
 
                         FreqDicts.Add(freq.Name, freq);
                     }

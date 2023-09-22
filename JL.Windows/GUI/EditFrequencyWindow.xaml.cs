@@ -76,11 +76,9 @@ internal sealed partial class EditFrequencyWindow : Window
     private void BrowseForFrequencyFile(string filter)
     {
         OpenFileDialog openFileDialog = new() { InitialDirectory = Utils.ApplicationPath, Filter = filter };
-
         if (openFileDialog.ShowDialog() is true)
         {
-            string relativePath = Path.GetRelativePath(Utils.ApplicationPath, openFileDialog.FileName);
-            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath, Utils.ApplicationPath) : relativePath;
+            TextBlockPath.Text = Utils.GetPath(openFileDialog.FileName);
         }
     }
 
@@ -91,8 +89,7 @@ internal sealed partial class EditFrequencyWindow : Window
         if (fbd.ShowDialog() is System.Windows.Forms.DialogResult.OK &&
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))
         {
-            string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fbd.SelectedPath);
-            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath, Utils.ApplicationPath) : relativePath;
+            TextBlockPath.Text = Utils.GetPath(fbd.SelectedPath);
         }
     }
 

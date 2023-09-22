@@ -1,3 +1,4 @@
+using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
@@ -12,6 +13,7 @@ using JL.Core.Dicts;
 using JL.Core.Freqs;
 using JL.Core.Lookup;
 using JL.Core.Network;
+using JL.Core.Profile;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.SpeechSynthesis;
@@ -77,11 +79,19 @@ internal sealed partial class MainWindow : Window
         WinApi.SubscribeToClipboardChanged(WindowHandle);
         _winApi.ClipboardChanged += ClipboardChanged;
 
+        await ProfileUtils.DeserializeProfiles().ConfigureAwait(true);
+
+        ConfigManager.MappedExeConfiguration = new ExeConfigurationFileMap
+        {
+            ExeConfigFilename = ProfileUtils.GetProfilePath(ProfileUtils.CurrentProfile)
+        };
+
         ConfigManager.ApplyPreferences();
 
         WinApi.RestoreWindow(WindowHandle);
 
         await StatsUtils.DeserializeLifetimeStats().ConfigureAwait(true);
+        await StatsUtils.DeserializeProfileLifetimeStats().ConfigureAwait(true);
 
         if (ConfigManager.CaptureTextFromClipboard)
         {
@@ -304,6 +314,7 @@ internal sealed partial class MainWindow : Window
         if (ConfigManager.InactiveLookupMode
             || ConfigManager.LookupOnSelectOnly
             || ConfigManager.LookupOnMouseClickOnly
+            || e?.LeftButton is MouseButtonState.Pressed
             || MainTextBoxContextMenu.IsVisible
             || TitleBarContextMenu.IsVisible
             || FontSizeSlider.IsVisible
@@ -435,6 +446,7 @@ internal sealed partial class MainWindow : Window
         ConfigManager.SaveBeforeClosing();
         Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
         await Stats.SerializeLifetimeStats().ConfigureAwait(false);
+        await Stats.SerializeProfileLifetimeStats().ConfigureAwait(false);
         await BacklogUtils.WriteBacklog().ConfigureAwait(false);
     }
 
@@ -544,9 +556,9 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            if (DictUtils.CustomNameDictReady)
+            if (DictUtils.CustomNameDictReady && DictUtils.ProfileCustomNameDictReady)
             {
-                WindowsUtils.ShowAddNameWindow(MainTextBox.SelectedText);
+                ShowAddNameWindow();
             }
         }
 
@@ -554,9 +566,9 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            if (DictUtils.CustomWordDictReady)
+            if (DictUtils.CustomWordDictReady && DictUtils.ProfileCustomWordDictReady)
             {
-                WindowsUtils.ShowAddWordWindow(MainTextBox.SelectedText);
+                ShowAddWordWindow();
             }
         }
 
@@ -860,18 +872,47 @@ internal sealed partial class MainWindow : Window
 
     private void AddName(object sender, RoutedEventArgs e)
     {
+        ShowAddNameWindow();
+    }
+
+    private void ShowAddNameWindow()
+    {
         string? text = MainTextBox.SelectionLength > 0
             ? MainTextBox.SelectedText
-            : FirstPopupWindow.LastSelectedText;
+            : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), ConfigManager.HorizontallyCenterMainWindowText) is not -1
+                ? FirstPopupWindow.LastSelectedText
+                : null;
 
-        WindowsUtils.ShowAddNameWindow(text);
+        string reading = "";
+
+        if (text is not null && FirstPopupWindow.LastSelectedText is not null && text == FirstPopupWindow.LastSelectedText)
+        {
+            IList<string>? readingList = FirstPopupWindow.LastLookupResults[0].Readings;
+            reading = readingList is { Count: 1 }
+                ? readingList[0]
+                : "";
+        }
+
+        if (reading == text)
+        {
+            reading = "";
+        }
+
+        WindowsUtils.ShowAddNameWindow(text, reading);
     }
 
     private void AddWord(object sender, RoutedEventArgs e)
     {
+        ShowAddWordWindow();
+    }
+
+    private void ShowAddWordWindow()
+    {
         string? text = MainTextBox.SelectionLength > 0
             ? MainTextBox.SelectedText
-            : FirstPopupWindow.LastSelectedText;
+            : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), ConfigManager.HorizontallyCenterMainWindowText) is not -1
+                ? FirstPopupWindow.LastSelectedText
+                : null;
 
         WindowsUtils.ShowAddWordWindow(text);
     }
@@ -1192,6 +1233,16 @@ internal sealed partial class MainWindow : Window
             DragMove();
         }
 
+        if (e.ClickCount is 2
+            && !ConfigManager.MainWindowDynamicWidth
+            && ConfigManager.MainWindowDynamicHeight)
+        {
+            Left = WindowsUtils.ActiveScreen.Bounds.X;
+            Top = WindowsUtils.ActiveScreen.Bounds.Y;
+            Width = WindowsUtils.DpiAwareWorkAreaWidth;
+            WidthBeforeResolutionChange = Width;
+        }
+
         LeftPositionBeforeResolutionChange = Left;
         TopPositionBeforeResolutionChange = Top;
     }
@@ -1205,8 +1256,8 @@ internal sealed partial class MainWindow : Window
 
         ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady;
 
-        AddNameMenuItem.IsEnabled = DictUtils.CustomNameDictReady;
-        AddWordMenuItem.IsEnabled = DictUtils.CustomWordDictReady;
+        AddNameMenuItem.IsEnabled = DictUtils.CustomNameDictReady && DictUtils.ProfileCustomNameDictReady;
+        AddWordMenuItem.IsEnabled = DictUtils.CustomWordDictReady && DictUtils.ProfileCustomWordDictReady;
 
         int charIndex = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), ConfigManager.HorizontallyCenterMainWindowText);
         ContextMenuIsOpening = charIndex >= MainTextBox.SelectionStart && charIndex <= MainTextBox.SelectionStart + MainTextBox.SelectionLength;

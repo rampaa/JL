@@ -4,6 +4,7 @@ using JL.Core.Dicts;
 using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
+using JL.Core.Frontend;
 using JL.Core.Lookup;
 using JL.Core.Utilities;
 using NUnit.Framework;

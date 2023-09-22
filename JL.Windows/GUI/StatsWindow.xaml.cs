@@ -49,9 +49,12 @@ internal sealed partial class StatsWindow : Window
         return s_instance?.IsVisible ?? false;
     }
 
-    private void Window_Loaded(object sender, RoutedEventArgs e)
+    private async void Window_Loaded(object sender, RoutedEventArgs e)
     {
         UpdateStatsDisplay(StatsMode.Session);
+
+        await Stats.SerializeProfileLifetimeStats().ConfigureAwait(false);
+        await Stats.SerializeLifetimeStats().ConfigureAwait(false);
     }
 
     private void UpdateStatsDisplay(StatsMode mode)
@@ -59,6 +62,7 @@ internal sealed partial class StatsWindow : Window
         Stats stats = mode switch
         {
             StatsMode.Session => Stats.SessionStats,
+            StatsMode.Profile => Stats.ProfileLifetimeStats,
             StatsMode.Lifetime => Stats.LifetimeStats,
             _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null)
         };
@@ -72,7 +76,7 @@ internal sealed partial class StatsWindow : Window
         TextBlockImoutos.Text = stats.Imoutos.ToString(CultureInfo.InvariantCulture);
     }
 
-    private async void ButtonSwapStats_OnClick(object sender, RoutedEventArgs e)
+    private void ButtonSwapStats_OnClick(object sender, RoutedEventArgs e)
     {
         Button button = (Button)sender;
         if (Enum.TryParse(button.Content.ToString(), out StatsMode mode))
@@ -80,7 +84,10 @@ internal sealed partial class StatsWindow : Window
             switch (mode)
             {
                 case StatsMode.Session:
-                    await Stats.SerializeLifetimeStats().ConfigureAwait(true);
+                    UpdateStatsDisplay(StatsMode.Profile);
+                    button.Content = StatsMode.Profile.ToString();
+                    break;
+                case StatsMode.Profile:
                     UpdateStatsDisplay(StatsMode.Lifetime);
                     button.Content = StatsMode.Lifetime.ToString();
                     break;
@@ -113,6 +120,11 @@ internal sealed partial class StatsWindow : Window
                 if (statsMode is StatsMode.Lifetime)
                 {
                     await Stats.SerializeLifetimeStats().ConfigureAwait(true);
+                }
+
+                else if (statsMode is StatsMode.Profile)
+                {
+                    await Stats.SerializeProfileLifetimeStats().ConfigureAwait(true);
                 }
 
                 UpdateStatsDisplay(statsMode);

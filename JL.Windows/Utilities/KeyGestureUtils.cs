@@ -145,9 +145,11 @@ internal static class KeyGestureUtils
             : "None";
     }
 
-    public static KeyGesture SetKeyGesture(string keyGestureName, KeyGesture keyGesture, bool setAsGlobalHotKey = true)
+    public static KeyGesture SetKeyGesture(Configuration config, string keyGestureName, KeyGesture keyGesture, bool setAsGlobalHotKey = true)
     {
-        string? rawKeyGesture = ConfigurationManager.AppSettings.Get(keyGestureName);
+        KeyValueConfigurationCollection settings = config.AppSettings.Settings;
+
+        string? rawKeyGesture = settings.Get(keyGestureName);
 
         if (rawKeyGesture is not null)
         {
@@ -167,9 +169,7 @@ internal static class KeyGestureUtils
             return newKeyGesture;
         }
 
-        Configuration config =
-            ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-        config.AppSettings.Settings.Add(keyGestureName, KeyGestureToString(keyGesture));
+        settings.Add(keyGestureName, KeyGestureToString(keyGesture));
         config.Save(ConfigurationSaveMode.Modified);
 
         if (ConfigManager.GlobalHotKeys && setAsGlobalHotKey)

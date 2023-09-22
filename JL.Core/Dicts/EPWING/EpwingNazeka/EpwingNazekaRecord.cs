@@ -21,13 +21,8 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
         Definitions = definitions;
     }
 
-    public string? BuildFormattedDefinition(DictOptions? options)
+    public string BuildFormattedDefinition(DictOptions? options)
     {
-        if (Definitions is null)
-        {
-            return null;
-        }
-
         StringBuilder defResult = new();
 
         string separator = options is { NewlineBetweenDefinitions.Value: false }

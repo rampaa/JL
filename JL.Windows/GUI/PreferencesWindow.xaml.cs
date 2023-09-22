@@ -1,3 +1,4 @@
+using System.Configuration;
 using System.Globalization;
 using System.Text;
 using System.Windows;
@@ -6,7 +7,10 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using JL.Core;
 using JL.Core.Anki;
+using JL.Core.Dicts;
 using JL.Core.Network;
+using JL.Core.Profile;
+using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using Button = System.Windows.Controls.Button;
@@ -21,13 +25,18 @@ namespace JL.Windows.GUI;
 internal sealed partial class PreferencesWindow : Window
 {
     private static PreferencesWindow? s_instance;
-    public bool SetAnkiConfig { get; private set; } = false;
-
     public static PreferencesWindow Instance => s_instance ??= new PreferencesWindow();
+    public bool SetAnkiConfig { get; private set; } = false;
+    private string _profileName;
+    private readonly Dict _profileNamesDict;
+    private readonly Dict _profileWordsDict;
 
     public PreferencesWindow()
     {
         InitializeComponent();
+        _profileName = ProfileUtils.CurrentProfile;
+        _profileNamesDict = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.ProfileCustomNameDictionary);
+        _profileWordsDict = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.ProfileCustomWordDictionary);
     }
 
     public static bool IsItVisible()
@@ -95,11 +104,37 @@ internal sealed partial class PreferencesWindow : Window
         Close();
     }
 
-    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
         s_instance = null;
+
+        if (_profileName != ProfileUtils.CurrentProfile)
+        {
+            _profileName = ProfileUtils.CurrentProfile;
+            _profileNamesDict.Path = Utils.GetPath(ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfile));
+            _profileWordsDict.Path = Utils.GetPath(ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfile));
+
+            if (_profileNamesDict.Active || _profileWordsDict.Active)
+            {
+                if (_profileNamesDict.Active)
+                {
+                    DictUtils.ProfileCustomNamesCancellationTokenSource?.Cancel();
+                    _profileNamesDict.Contents = new Dictionary<string, IList<IDictRecord>>();
+                }
+
+                if (_profileWordsDict.Active)
+                {
+                    DictUtils.ProfileCustomWordsCancellationTokenSource?.Cancel();
+                    _profileWordsDict.Contents = new Dictionary<string, IList<IDictRecord>>();
+                }
+
+                await DictUtils.LoadDictionaries().ConfigureAwait(false);
+            }
+
+            await ProfileUtils.SerializeProfiles().ConfigureAwait(false);
+        }
     }
 
     private async void AnkiTabItem_MouseUp(object sender, MouseButtonEventArgs e)
@@ -483,10 +518,39 @@ internal sealed partial class PreferencesWindow : Window
         InfoWindow infoWindow = new()
         {
             Owner = this,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
             Title = title,
             InfoTextBox = { Text = text }
         };
 
         _ = infoWindow.ShowDialog();
+    }
+
+    private async void ProfileComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        string selectedProfile = (string)((ComboBox)sender).SelectedItem;
+        if (selectedProfile != ProfileUtils.CurrentProfile)
+        {
+            await Stats.SerializeProfileLifetimeStats().ConfigureAwait(false);
+            ProfileUtils.CurrentProfile = selectedProfile;
+
+            ConfigManager.MappedExeConfiguration = new ExeConfigurationFileMap
+            {
+                ExeConfigFilename = ProfileUtils.GetProfilePath(ProfileUtils.CurrentProfile)
+            };
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                ConfigManager.ApplyPreferences();
+                ConfigManager.LoadPreferences(this);
+            });
+
+            await StatsUtils.DeserializeProfileLifetimeStats().ConfigureAwait(false);
+        }
+    }
+
+    private void ProfileConfigButton_Click(object sender, RoutedEventArgs e)
+    {
+        _ = new ManageProfilesWindow { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
     }
 }

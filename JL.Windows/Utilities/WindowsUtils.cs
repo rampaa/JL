@@ -69,7 +69,7 @@ internal static class WindowsUtils
                 japaneseFonts.Add(comboBoxItem);
             }
 
-            else if (fontFamily.FamilyNames.Keys.Count is 1
+            else if (fontFamily.FamilyNames.Keys!.Count is 1
                 && fontFamily.FamilyNames.ContainsKey(englishXmlLanguage))
             {
                 bool foundGlyph = false;
@@ -444,7 +444,7 @@ internal static class WindowsUtils
     public static void ShowColorPicker(Button button)
     {
         ColorPicker picker = SingleOpenHelper.CreateControl<ColorPicker>();
-        HandyControl.Controls.PopupWindow window = new() { PopupElement = picker };
+        HandyControl.Controls.PopupWindow window = new() { PopupElement = picker, WindowStartupLocation = WindowStartupLocation.CenterScreen };
         picker.SelectedBrush = (SolidColorBrush)button.Tag;
 
         picker.Canceled += delegate
@@ -645,8 +645,8 @@ internal static class WindowsUtils
     {
         ResourceDictionary resources = Application.Current.Resources;
 
-        resources.MergedDictionaries.Clear();
-        resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("ResourceDictionary.xaml", UriKind.Relative) });
+        //resources.MergedDictionaries.Clear();
+        //resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("ResourceDictionary.xaml", UriKind.Relative) });
         resources.MergedDictionaries.Add(new ResourceDictionary
         {
             Source = new Uri(string.Create(CultureInfo.InvariantCulture, $"pack://application:,,,/HandyControl;component/Themes/Skin{skin}.xaml"))

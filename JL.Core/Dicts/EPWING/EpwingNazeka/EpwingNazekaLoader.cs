@@ -50,6 +50,11 @@ internal static class EpwingNazekaLoader
             {
                 string definition = definitionJsonElement.ToString();
 
+                if (dict.Type is DictType.Kenkyuusha)
+                {
+                    definition = definition.Replace("┏", "", StringComparison.Ordinal);
+                }
+
                 if (!string.IsNullOrWhiteSpace(definition))
                 {
                     definitionList.Add(definition.GetPooledString());
@@ -67,52 +72,38 @@ internal static class EpwingNazekaLoader
             if (spellingList is not null)
             {
                 string primarySpelling = spellingList[0];
-
                 string[]? alternativeSpellings = spellingList.RemoveAtToArray(0);
 
-                string key = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
-
                 EpwingNazekaRecord tempRecord = new(primarySpelling, reading, alternativeSpellings, definitions);
-
-                if (nazekaEpwingDict.TryGetValue(key, out IList<IDictRecord>? result))
+                if (!EpwingUtils.IsValidEpwingResultForDictType(tempRecord, dict))
                 {
-                    result.Add(tempRecord);
-                }
-                else
-                {
-                    nazekaEpwingDict.Add(key, new List<IDictRecord> { tempRecord });
+                    continue;
                 }
 
-                for (int i = 0; i < spellingList.Count; i++)
+                AddRecordToDictionary(primarySpelling, tempRecord, nazekaEpwingDict);
+
+                if (dict.Type is not DictType.NonspecificNameNazeka)
+                {
+                    AddRecordToDictionary(reading, tempRecord, nazekaEpwingDict);
+                }
+
+                for (int i = 1; i < spellingList.Count; i++)
                 {
                     primarySpelling = spellingList[i];
-
                     alternativeSpellings = spellingList.RemoveAtToArray(i);
 
-                    key = JapaneseUtils.KatakanaToHiragana(primarySpelling).GetPooledString();
-
                     tempRecord = new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions);
-
                     if (!EpwingUtils.IsValidEpwingResultForDictType(tempRecord, dict))
                     {
                         continue;
                     }
 
-                    if (nazekaEpwingDict.TryGetValue(key, out result))
-                    {
-                        result.Add(tempRecord);
-                    }
-                    else
-                    {
-                        nazekaEpwingDict.Add(key, new List<IDictRecord> { tempRecord });
-                    }
+                    AddRecordToDictionary(primarySpelling, tempRecord, nazekaEpwingDict);
                 }
             }
 
             else
             {
-                string key = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
-
                 EpwingNazekaRecord tempRecord = new(reading, null, null, definitions);
 
                 if (!EpwingUtils.IsValidEpwingResultForDictType(tempRecord, dict))
@@ -120,14 +111,7 @@ internal static class EpwingNazekaLoader
                     continue;
                 }
 
-                if (nazekaEpwingDict.TryGetValue(key, out IList<IDictRecord>? result))
-                {
-                    result.Add(tempRecord);
-                }
-                else
-                {
-                    nazekaEpwingDict.Add(key, new List<IDictRecord> { tempRecord });
-                }
+                AddRecordToDictionary(reading, tempRecord, nazekaEpwingDict);
             }
         }
 
@@ -137,5 +121,17 @@ internal static class EpwingNazekaLoader
         }
 
         dict.Contents.TrimExcess();
+    }
+
+    private static void AddRecordToDictionary(string key, EpwingNazekaRecord record, Dictionary<string, IList<IDictRecord>> dictionary)
+    {
+        if (dictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(key).GetPooledString(), out IList<IDictRecord>? result))
+        {
+            result.Add(record);
+        }
+        else
+        {
+            dictionary.Add(key, new List<IDictRecord> { record });
+        }
     }
 }

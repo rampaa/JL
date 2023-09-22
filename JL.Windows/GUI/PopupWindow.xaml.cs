@@ -26,7 +26,7 @@ namespace JL.Windows.GUI;
 internal sealed partial class PopupWindow : Window
 {
     public PopupWindow? ChildPopupWindow { get; private set; }
-    public bool ContextMenuIsOpening { get; private set; } = false;
+    private bool ContextMenuIsOpening { get; set; } = false;
 
     private TextBox? _lastTextBox;
 
@@ -40,7 +40,7 @@ internal sealed partial class PopupWindow : Window
 
     public nint WindowHandle { get; private set; }
 
-    private List<LookupResult> _lastLookupResults = new();
+    public List<LookupResult> LastLookupResults { get; private set; } = new();
 
     public List<Dict> DictsWithResults { get; } = new();
 
@@ -50,7 +50,7 @@ internal sealed partial class PopupWindow : Window
 
     public string? LastText { get; set; }
 
-    public bool MiningMode { get; set; }
+    public bool MiningMode { get; private set; }
 
     private static string? s_primarySpellingOfLastPlayedAudio = null;
 
@@ -114,7 +114,11 @@ internal sealed partial class PopupWindow : Window
 
     private void AddWord(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.ShowAddWordWindow(LastSelectedText);
+        string text = ChildPopupWindow?._lastTextBox?.SelectionLength > 0
+            ? ChildPopupWindow._lastTextBox.SelectedText
+            : LastLookupResults[MiningMode ? _listBoxIndex : 0].PrimarySpelling;
+
+        WindowsUtils.ShowAddWordWindow(text);
     }
 
     private void SearchWithBrowser(object sender, RoutedEventArgs e)
@@ -178,7 +182,7 @@ internal sealed partial class PopupWindow : Window
                 tb.Select(charPosition, lookupResults[0].MatchedText.Length);
             }
 
-            _lastLookupResults = lookupResults;
+            LastLookupResults = lookupResults;
 
             if (enableMiningMode)
             {
@@ -265,7 +269,7 @@ internal sealed partial class PopupWindow : Window
 
         if (lookupResults is { Count: > 0 })
         {
-            _lastLookupResults = lookupResults;
+            LastLookupResults = lookupResults;
             EnableMiningMode();
             DisplayResults(true);
 
@@ -414,14 +418,14 @@ internal sealed partial class PopupWindow : Window
         else
         {
             int resultCount = generateAllResults
-                ? _lastLookupResults.Count
-                : Math.Min(_lastLookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
+                ? LastLookupResults.Count
+                : Math.Min(LastLookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
 
             StackPanel[] popupItemSource = new StackPanel[resultCount];
 
             for (int i = 0; i < resultCount; i++)
             {
-                LookupResult lookupResult = _lastLookupResults[i];
+                LookupResult lookupResult = LastLookupResults[i];
 
                 if (!DictsWithResults.Contains(lookupResult.Dict))
                 {
@@ -452,7 +456,7 @@ internal sealed partial class PopupWindow : Window
         int index, int resultsCount)
     {
         // top
-        WrapPanel top = new();
+        WrapPanel top = new() { Tag = index };
 
         TextBlock textBlockMatchedText = new()
         {
@@ -492,23 +496,15 @@ internal sealed partial class PopupWindow : Window
             Tag = index, // for audio
             Foreground = ConfigManager.PrimarySpellingColor,
             Background = Brushes.Transparent,
-            //SelectionTextBrush = ConfigManager.HighlightColor,
             FontSize = ConfigManager.PrimarySpellingFontSize,
             TextWrapping = TextWrapping.Wrap,
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Center,
-            //BorderThickness = new Thickness(0, 0, 0, 0),
             Margin = new Thickness(5, 0, 0, 0),
             Padding = new Thickness(0),
-            //IsReadOnly = true,
-            //IsUndoEnabled = false,
-            //UndoLimit = 0,
             Cursor = Cursors.Arrow,
-            //IsInactiveSelectionHighlightEnabled = true,
             ContextMenu = PopupContextMenu
         };
-        primarySpellingTextBlock.MouseEnter += PrimarySpelling_MouseEnter; // for audio
-        primarySpellingTextBlock.MouseLeave += PrimarySpelling_MouseLeave; // for audio
         primarySpellingTextBlock.PreviewMouseUp += PrimarySpelling_PreviewMouseUp; // for mining
 
         Dict? pitchDict = DictUtils.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.PitchAccentYomichan);
@@ -1088,7 +1084,6 @@ internal sealed partial class PopupWindow : Window
         {
             _ = bottom.Children.Add(new Separator
             {
-                // TODO: Fix width differing from one separator to another
                 Height = 2,
                 Background = ConfigManager.SeparatorColor,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -1096,7 +1091,24 @@ internal sealed partial class PopupWindow : Window
             });
         }
 
-        return new StackPanel { Margin = new Thickness(4, 2, 4, 2), Tag = result.Dict, Children = { top, bottom } };
+        StackPanel stackPanel = new()
+        {
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            Margin = new Thickness(4, 2, 4, 2),
+            Background = Brushes.Transparent,
+            Tag = result.Dict,
+            Children = { top, bottom }
+        };
+
+        stackPanel.MouseEnter += ListBoxItem_MouseEnter;
+
+        return stackPanel;
+    }
+
+    private void ListBoxItem_MouseEnter(object sender, MouseEventArgs e)
+    {
+        _listBoxIndex = (int)((WrapPanel)((StackPanel)sender).Children[0]).Tag;
+        LastSelectedText = LastLookupResults[_listBoxIndex].PrimarySpelling;
     }
 
     private static void Unselect(object sender, RoutedEventArgs e)
@@ -1106,8 +1118,8 @@ internal sealed partial class PopupWindow : Window
 
     private void TextBoxPreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
-        AddNameMenuItem.IsEnabled = DictUtils.CustomNameDictReady;
-        AddWordMenuItem.IsEnabled = DictUtils.CustomWordDictReady;
+        AddNameMenuItem.IsEnabled = DictUtils.CustomNameDictReady && DictUtils.ProfileCustomNameDictReady;
+        AddWordMenuItem.IsEnabled = DictUtils.CustomWordDictReady && DictUtils.ProfileCustomWordDictReady;
         LastSelectedText = ((TextBox)sender).SelectedText;
     }
 
@@ -1116,6 +1128,7 @@ internal sealed partial class PopupWindow : Window
         if (ConfigManager.InactiveLookupMode
             || ConfigManager.LookupOnSelectOnly
             || ConfigManager.LookupOnMouseClickOnly
+            || e?.LeftButton is MouseButtonState.Pressed
             || PopupContextMenu.IsVisible
             || (ConfigManager.RequireLookupKeyPress
                 && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
@@ -1143,18 +1156,6 @@ internal sealed partial class PopupWindow : Window
                 WindowsUtils.Unselect(ChildPopupWindow._lastTextBox);
             }
         }
-    }
-
-    private void PrimarySpelling_MouseEnter(object sender, MouseEventArgs e)
-    {
-        TextBlock textBlock = (TextBlock)sender;
-        _listBoxIndex = (int)textBlock.Tag;
-        LastSelectedText = _lastLookupResults[_listBoxIndex].PrimarySpelling;
-    }
-
-    private void PrimarySpelling_MouseLeave(object sender, MouseEventArgs e)
-    {
-        _listBoxIndex = 0;
     }
 
     private async Task Mine(Panel top)
@@ -1322,19 +1323,37 @@ internal sealed partial class PopupWindow : Window
 
     private void ShowAddNameWindow()
     {
-        string primarySpelling = _lastLookupResults[_listBoxIndex].PrimarySpelling;
+        string text;
+        string readings = "";
+        if (ChildPopupWindow?._lastTextBox?.SelectionLength > 0)
+        {
+            text = ChildPopupWindow._lastTextBox.SelectedText;
 
-        IList<string>? readingList = _lastLookupResults[_listBoxIndex].Readings;
-        string readings = readingList is null
-            ? ""
-            : string.Join("; ", readingList);
+            if (text == ChildPopupWindow.LastSelectedText)
+            {
+                IList<string>? readingList = ChildPopupWindow.LastLookupResults[0].Readings;
+                readings = readingList is { Count: 1 }
+                    ? readingList[0]
+                    : "";
+            }
+        }
+        else
+        {
+            int index = MiningMode ? _listBoxIndex : 0;
+            text = LastLookupResults[index].PrimarySpelling;
 
-        if (readings == primarySpelling)
+            IList<string>? readingList = LastLookupResults[index].Readings;
+            readings = readingList is { Count: 1 }
+                ? readingList[0]
+                : "";
+        }
+
+        if (readings == text)
         {
             readings = "";
         }
 
-        WindowsUtils.ShowAddNameWindow(LastSelectedText, readings);
+        WindowsUtils.ShowAddNameWindow(text, readings);
     }
 
     private async void Window_KeyDown(object sender, KeyEventArgs e)
@@ -1445,8 +1464,13 @@ internal sealed partial class PopupWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowAddNameWindowKeyGesture))
         {
-            if (DictUtils.CustomNameDictReady)
+            if (DictUtils.CustomNameDictReady && DictUtils.ProfileCustomNameDictReady)
             {
+                if (!MiningMode)
+                {
+                    HidePopup();
+                }
+
                 ShowAddNameWindow();
                 PopupAutoHideTimer.Start();
             }
@@ -1454,8 +1478,13 @@ internal sealed partial class PopupWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowAddWordWindowKeyGesture))
         {
-            if (DictUtils.CustomWordDictReady)
+            if (DictUtils.CustomWordDictReady && DictUtils.ProfileCustomWordDictReady)
             {
+                if (!MiningMode)
+                {
+                    HidePopup();
+                }
+
                 WindowsUtils.ShowAddWordWindow(LastSelectedText);
                 PopupAutoHideTimer.Start();
             }
@@ -1659,7 +1688,7 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        StackPanel innerStackPanel = visibleStackPanels[_listBoxIndex];
+        StackPanel innerStackPanel = visibleStackPanels[MiningMode ? _listBoxIndex : 0];
         WrapPanel top = (WrapPanel)innerStackPanel.Children[0];
 
         foreach (UIElement child in top.Children)

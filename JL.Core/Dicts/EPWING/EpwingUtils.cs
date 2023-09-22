@@ -45,7 +45,7 @@ internal static class EpwingUtils
             case DictType.Kenkyuusha:
                 if ((dict.Options?.Examples?.Value ?? ExamplesOptionValue.None) is ExamplesOptionValue.None)
                 {
-                    if (epwingRecord.Definitions?.Length > 2)
+                    if (epwingRecord.Definitions.Length > 2)
                     {
                         for (int i = 2; i < epwingRecord.Definitions.Length; i++)
                         {
@@ -59,7 +59,7 @@ internal static class EpwingUtils
                 }
                 else if (dict.Options is { Examples.Value: ExamplesOptionValue.One })
                 {
-                    if (epwingRecord.Definitions?.Length > 2)
+                    if (epwingRecord.Definitions.Length > 2)
                     {
                         bool isMainExample = true;
 
@@ -84,35 +84,21 @@ internal static class EpwingUtils
                     }
                 }
 
-                if (epwingRecord.Definitions is not null)
-                {
-                    epwingRecord.Definitions = epwingRecord.Definitions.Select(static def => def.Replace("┏", "", StringComparison.Ordinal)).ToArray();
-                }
-
-                break;
-
-            case DictType.KenkyuushaNazeka:
-                if (epwingRecord.Definitions is not null)
-                {
-                    epwingRecord.Definitions = epwingRecord.Definitions.Select(static def => def.Replace("┏", "", StringComparison.Ordinal)).ToArray();
-                }
+                epwingRecord.Definitions = epwingRecord.Definitions.Select(static def => def.Replace("┏", "", StringComparison.Ordinal)).ToArray();
 
                 break;
 
             case DictType.Daijirin:
-                if (epwingRecord.Definitions is not null)
+                // English definitions
+                if (epwingRecord.Definitions.Any(static def => def.Contains("→英和", StringComparison.Ordinal) || def.Contains("\\u003", StringComparison.Ordinal)))
                 {
-                    // English definitions
-                    if (epwingRecord.Definitions.Any(static def => def.Contains("→英和", StringComparison.Ordinal) || def.Contains("\\u003", StringComparison.Ordinal)))
-                    {
-                        return false;
-                    }
+                    return false;
+                }
 
-                    // English definitions
-                    if (!epwingRecord.Definitions.Any(JapaneseUtils.JapaneseRegex.IsMatch))
-                    {
-                        return false;
-                    }
+                // English definitions
+                if (!epwingRecord.Definitions.Any(JapaneseUtils.JapaneseRegex.IsMatch))
+                {
+                    return false;
                 }
 
                 break;
@@ -125,7 +111,7 @@ internal static class EpwingUtils
                 }
 
                 // Kanji definitions
-                if (epwingRecord.Definitions?.Any(static def => def.Contains("［音］", StringComparison.Ordinal)) ?? false)
+                if (epwingRecord.Definitions.Any(static def => def.Contains("［音］", StringComparison.Ordinal)))
                 {
                     return false;
                 }

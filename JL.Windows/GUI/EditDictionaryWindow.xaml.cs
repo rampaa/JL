@@ -89,11 +89,9 @@ internal sealed partial class EditDictionaryWindow : Window
     private void BrowseForDictionaryFile(string filter)
     {
         OpenFileDialog openFileDialog = new() { InitialDirectory = Utils.ApplicationPath, Filter = filter };
-
         if (openFileDialog.ShowDialog() is true)
         {
-            string relativePath = Path.GetRelativePath(Utils.ApplicationPath, openFileDialog.FileName);
-            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath, Utils.ApplicationPath) : relativePath;
+            TextBlockPath.Text = Utils.GetPath(openFileDialog.FileName);
         }
     }
 
@@ -104,8 +102,7 @@ internal sealed partial class EditDictionaryWindow : Window
         if (fbd.ShowDialog() is System.Windows.Forms.DialogResult.OK &&
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))
         {
-            string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fbd.SelectedPath);
-            TextBlockPath.Text = relativePath.StartsWith('.') ? Path.GetFullPath(relativePath, Utils.ApplicationPath) : relativePath;
+            TextBlockPath.Text = Utils.GetPath(fbd.SelectedPath);
         }
     }
 
@@ -115,6 +112,15 @@ internal sealed partial class EditDictionaryWindow : Window
         _ = ComboBoxDictType.Items.Add(type);
         ComboBoxDictType.SelectedValue = type;
         TextBlockPath.Text = _dict.Path;
+
+        bool isNotCustomDict = _dict.Type is not DictType.ProfileCustomNameDictionary
+            and not DictType.ProfileCustomWordDictionary
+            and not DictType.CustomNameDictionary
+            and not DictType.CustomWordDictionary;
+
+        TextBlockPath.IsEnabled = isNotCustomDict;
+        FolderBrowseButton.IsEnabled = isNotCustomDict;
+
         NameTextBox.Text = _dict.Name;
         _dictOptionsControl.GenerateDictOptionsElements(_dict);
     }
@@ -137,10 +143,10 @@ internal sealed partial class EditDictionaryWindow : Window
                 BrowseForDictionaryFile("Kanjidic2 file|Kanjidic2.xml");
                 break;
             case DictType.CustomWordDictionary:
-                BrowseForDictionaryFile("CustomWordDict file|custom_words.txt");
+                BrowseForDictionaryFile("Custom Word Dictionary file|*.txt");
                 break;
             case DictType.CustomNameDictionary:
-                BrowseForDictionaryFile("CustomNameDict file|custom_names.txt");
+                BrowseForDictionaryFile("Custom Name Dictionary file|*.txt");
                 break;
 
             case DictType.Kenkyuusha:
@@ -186,6 +192,10 @@ internal sealed partial class EditDictionaryWindow : Window
             case DictType.NonspecificNameNazeka:
             case DictType.NonspecificNazeka:
                 BrowseForDictionaryFile("Nazeka file|*.json");
+                break;
+
+            case DictType.ProfileCustomWordDictionary:
+            case DictType.ProfileCustomNameDictionary:
                 break;
 
             default:

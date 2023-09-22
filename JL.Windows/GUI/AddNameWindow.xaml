@@ -6,18 +6,23 @@
     x:Class="JL.Windows.GUI.AddNameWindow"
     mc:Ignorable="d"
     Background="{DynamicResource RegionBrush}"
-    Title="Add Name" Height="350" Width="400" Topmost="True" SizeToContent="Height" ResizeMode="NoResize"
+    Title="Add Name" Height="350" Width="450" Topmost="True" SizeToContent="Height" ResizeMode="NoResize" PreviewKeyUp="Window_PreviewKeyUp"
     MaxHeight="600" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" ShowInTaskbar="False" Closing="Window_Closing"
     x:ClassModifier="internal">
 
     <ScrollViewer>
         <Grid>
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,0,70">
+                <TextBlock HorizontalAlignment="Left" Margin="0,0,0,10" Text="Dictionary" Style="{StaticResource TextBlockDefault}" />
+                <ComboBox Name="ComboBoxDictType" Width="300" Margin="0,0,0,30" SelectedIndex="1" HorizontalAlignment="Left" SelectedValuePath="Tag">
+                    <ComboBoxItem Content="Custom Name Dictionary" Tag="Global" />
+                    <ComboBoxItem Content="Custom Name Dictionary (Profile)" Tag="Profile" />
+                </ComboBox>
                 <TextBlock HorizontalAlignment="Left" Margin="0,0,0,10" Text="Spelling" Style="{StaticResource TextBlockDefault}" />
-                <TextBox x:Name="SpellingTextBox" TextWrapping="Wrap" HorizontalAlignment="Stretch" Margin="0,0,0,40"
-                         Width="200" />
+                <TextBox x:Name="SpellingTextBox" TextWrapping="Wrap" HorizontalAlignment="Stretch" Margin="0,0,0,30"
+                         Width="300" />
                 <TextBlock Text="Reading" HorizontalAlignment="Left" Margin="0,0,0,10" Style="{StaticResource TextBlockDefault}" />
-                <TextBox x:Name="ReadingTextBox" TextWrapping="Wrap" HorizontalAlignment="Stretch" Width="200" />
+                <TextBox x:Name="ReadingTextBox" TextWrapping="Wrap" HorizontalAlignment="Stretch" Width="300" />
             </StackPanel>
             <StackPanel x:Name="NameTypeStackPanel" HorizontalAlignment="Right" VerticalAlignment="Top"
                         Margin="0,20,20,70">
@@ -25,12 +30,12 @@
                 <RadioButton Content="Male" HorizontalAlignment="Stretch" FontSize="16" Height="40" />
                 <RadioButton Content="Female" HorizontalAlignment="Stretch" FontSize="16" Height="40" />
                 <RadioButton Content="Surname" HorizontalAlignment="Stretch" FontSize="16" Height="40" />
-                <RadioButton x:Name="OtherRadioButton" Content="Other" HorizontalAlignment="Stretch" FontSize="16"
-                             Height="40" />
+                <RadioButton Content="Place" HorizontalAlignment="Stretch" FontSize="16" Height="40" />
+                <RadioButton Content="Other" HorizontalAlignment="Stretch" FontSize="16" Height="40" IsChecked="True" />
             </StackPanel>
             <Button Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                     Margin="120,0,0,20" Width="70" Height="35" FontSize="16" Click="CancelButton_Click" />
-            <Button Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+            <Button Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom" Focusable="False"
                     Margin="0,0,120,20" FontSize="16" Height="35" Click="SaveButton_Click" Width="70" />
         </Grid>
     </ScrollViewer>

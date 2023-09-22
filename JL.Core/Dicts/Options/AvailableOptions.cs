@@ -18,7 +18,7 @@ public readonly record struct NewlineBetweenDefinitionsOption(bool Value)
 {
     [JsonIgnore]
     public static readonly DictType[] ValidDictTypes =
-        Enum.GetValues<DictType>().Except(new[] { DictType.PitchAccentYomichan, DictType.Kanjidic, DictType.CustomNameDictionary })
+        Enum.GetValues<DictType>().Except(new[] { DictType.PitchAccentYomichan, DictType.Kanjidic, DictType.CustomNameDictionary, DictType.ProfileCustomNameDictionary })
             .ToArray();
 }
 

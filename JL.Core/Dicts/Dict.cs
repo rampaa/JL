@@ -12,7 +12,7 @@ public sealed class Dict
     public int Priority { get; set; }
     public int Size { get; set; }
 
-    [JsonIgnore] public Dictionary<string, IList<IDictRecord>> Contents { get; internal set; } = new();
+    [JsonIgnore] public Dictionary<string, IList<IDictRecord>> Contents { get; set; } = new();
 
     public DictOptions? Options { get; set; } // can be null for dicts.json files generated before version 1.10
 

@@ -35,7 +35,7 @@ internal sealed partial class AddWordWindow : Window
         Close();
     }
 
-    private async void SaveButton_Click(object sender, RoutedEventArgs e)
+    private async void SaveButton_Click(object? sender, RoutedEventArgs? e)
     {
         bool isValid = true;
 
@@ -78,7 +78,6 @@ internal sealed partial class AddWordWindow : Window
                 .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
             string rawWordClasses = WordClassTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
 
-
             string[] spellings = rawSpellings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
             string[] readings = rawReadings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
             string[] definitions = rawDefinitions.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
@@ -86,7 +85,11 @@ internal sealed partial class AddWordWindow : Window
                 ? null
                 : rawWordClasses.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
 
-            Dict dict = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary);
+            DictType dictType = ComboBoxDictType.SelectedValue.ToString() is "Global"
+                ? DictType.CustomWordDictionary
+                : DictType.ProfileCustomWordDictionary;
+
+            Dict dict = DictUtils.Dicts.Values.First(dict => dict.Type == dictType);
             if (dict.Active)
             {
                 CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawPartOfSpeech, wordClasses, dict.Contents);
@@ -94,23 +97,14 @@ internal sealed partial class AddWordWindow : Window
             }
 
             Close();
-            await WriteToFile(rawSpellings, rawReadings, rawDefinitions, rawPartOfSpeech, rawWordClasses).ConfigureAwait(false);
+
+            string line = string.IsNullOrWhiteSpace(rawWordClasses)
+                ? string.Create(CultureInfo.InvariantCulture, $"{spellings}\t{readings}\t{definitions}\t{rawPartOfSpeech}\n")
+                : string.Create(CultureInfo.InvariantCulture, $"{spellings}\t{readings}\t{definitions}\t{rawPartOfSpeech}\t{wordClasses}\n");
+
+            string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+            await File.AppendAllTextAsync(path, line, Encoding.UTF8).ConfigureAwait(false);
         }
-    }
-
-    private static async Task WriteToFile(string spellings, string readings, string definitions, string partOfSpeech, string wordClasses)
-    {
-        string line = string.IsNullOrWhiteSpace(wordClasses)
-            ? string.Create(CultureInfo.InvariantCulture, $"{spellings}\t{readings}\t{definitions}\t{partOfSpeech}\n")
-            : string.Create(CultureInfo.InvariantCulture, $"{spellings}\t{readings}\t{definitions}\t{partOfSpeech}\t{wordClasses}\n");
-
-        string customWordDictPath = Path.GetFullPath(DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.CustomWordDictionary).Path, Utils.ApplicationPath);
-        await File.AppendAllTextAsync(customWordDictPath, line, Encoding.UTF8).ConfigureAwait(false);
-    }
-
-    private void Window_Loaded(object sender, RoutedEventArgs e)
-    {
-        OtherRadioButton.IsChecked = true;
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -164,5 +158,27 @@ vz: Ichidan verb - zuru verb (alternative form of -jiru verbs)";
         };
 
         _ = infoWindow.ShowDialog();
+    }
+
+    private void Window_Loaded(object sender, RoutedEventArgs e)
+    {
+        _ = Activate();
+        if (string.IsNullOrEmpty(SpellingsTextBox.Text))
+        {
+            _ = SpellingsTextBox.Focus();
+        }
+        else // if (string.IsNullOrEmpty(ReadingsTextBox.Text))
+        {
+            _ = ReadingsTextBox.Focus();
+        }
+    }
+
+    private void Window_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key is System.Windows.Input.Key.Enter)
+        {
+            e.Handled = true;
+            SaveButton_Click(null, null);
+        }
     }
 }

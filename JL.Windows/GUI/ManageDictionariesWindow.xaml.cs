@@ -306,7 +306,7 @@ internal sealed partial class ManageDictionariesWindow : Window
             };
             buttonEdit.Click += (_, _) =>
             {
-                _ = new EditDictionaryWindow(dict) { Owner = this }.ShowDialog();
+                _ = new EditDictionaryWindow(dict) { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
                 UpdateDictionariesDisplay();
             };
 
@@ -370,7 +370,7 @@ internal sealed partial class ManageDictionariesWindow : Window
 
     private void ButtonAddDictionary_OnClick(object sender, RoutedEventArgs e)
     {
-        _ = new AddDictionaryWindow { Owner = this }.ShowDialog();
+        _ = new AddDictionaryWindow { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
         UpdateDictionariesDisplay();
     }
 

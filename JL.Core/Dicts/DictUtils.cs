@@ -10,6 +10,7 @@ using JL.Core.Dicts.EPWING.EpwingYomichan;
 using JL.Core.Dicts.Options;
 using JL.Core.Dicts.YomichanKanji;
 using JL.Core.PitchAccent;
+using JL.Core.Profile;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
 
@@ -20,7 +21,10 @@ public static class DictUtils
 {
     public static bool DictsReady { get; private set; } = false;
     public static bool CustomWordDictReady { get; private set; } = false;
+    public static bool ProfileCustomWordDictReady { get; private set; } = false;
     public static bool CustomNameDictReady { get; private set; } = false;
+    public static bool ProfileCustomNameDictReady { get; private set; } = false;
+
     public static bool UpdatingJmdict { get; internal set; } = false;
     public static bool UpdatingJmnedict { get; internal set; } = false;
     public static bool UpdatingKanjidic { get; internal set; } = false;
@@ -31,8 +35,25 @@ public static class DictUtils
     internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     internal static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
 
-    public static readonly Dictionary<string, Dict> BuiltInDicts = new(5)
+    public static CancellationTokenSource? ProfileCustomWordsCancellationTokenSource { get; private set; }
+    public static CancellationTokenSource? ProfileCustomNamesCancellationTokenSource { get; private set; }
+
+    public static readonly Dictionary<string, Dict> BuiltInDicts = new(7)
     {
+        {
+            "ProfileCustomWordDictionary", new Dict(DictType.ProfileCustomWordDictionary,
+                "Custom Word Dictionary (Profile)",
+                Path.Join(ProfileUtils.ProfileFolderPath, "Default_Custom_Words.txt"),
+                true, -1, 128,
+                new DictOptions(new NewlineBetweenDefinitionsOption(true)))
+        },
+        {
+            "ProfileCustomNameDictionary", new Dict(DictType.ProfileCustomNameDictionary,
+                "Custom Name Dictionary (Profile)",
+                Path.Join(ProfileUtils.ProfileFolderPath, "Default_Custom_Names.txt"),
+                true, 0, 128,
+                new DictOptions())
+        },
         {
             "CustomWordDictionary", new Dict(DictType.CustomWordDictionary,
                 "Custom Word Dictionary",
@@ -83,265 +104,265 @@ public static class DictUtils
 
     public static readonly Dictionary<string, string> JmdictEntities = new(254)
     {
-        { "bra", "\"Brazilian\"" },
-        { "hob", "\"Hokkaido-ben\"" },
-        { "ksb", "\"Kansai-ben\"" },
-        { "ktb", "\"Kantou-ben\"" },
-        { "kyb", "\"Kyoto-ben\"" },
-        { "kyu", "\"Kyuushuu-ben\"" },
-        { "nab", "\"Nagano-ben\"" },
-        { "osb", "\"Osaka-ben\"" },
-        { "rkb", "\"Ryuukyuu-ben\"" },
-        { "thb", "\"Touhoku-ben\"" },
-        { "tsb", "\"Tosa-ben\"" },
-        { "tsug", "\"Tsugaru-ben\"" },
+        { "bra", "Brazilian" },
+        { "hob", "Hokkaido-ben" },
+        { "ksb", "Kansai-ben" },
+        { "ktb", "Kantou-ben" },
+        { "kyb", "Kyoto-ben" },
+        { "kyu", "Kyuushuu-ben" },
+        { "nab", "Nagano-ben" },
+        { "osb", "Osaka-ben" },
+        { "rkb", "Ryuukyuu-ben" },
+        { "thb", "Touhoku-ben" },
+        { "tsb", "Tosa-ben" },
+        { "tsug", "Tsugaru-ben" },
 
-        { "agric", "\"agriculture\"" },
-        { "anat", "\"anatomy\"" },
-        { "archeol", "\"archeology\"" },
-        { "archit", "\"architecture\"" },
-        { "art", "\"art, aesthetics\"" },
-        { "astron", "\"astronomy\"" },
-        { "audvid", "\"audiovisual\"" },
-        { "aviat", "\"aviation\"" },
-        { "baseb", "\"baseball\"" },
-        { "biochem", "\"biochemistry\"" },
-        { "biol", "\"biology\"" },
-        { "bot", "\"botany\"" },
-        { "Buddh", "\"Buddhism\"" },
-        { "bus", "\"business\"" },
-        { "cards", "\"card games\"" },
-        { "chem", "\"chemistry\"" },
-        { "Christn", "\"Christianity\"" },
-        { "cloth", "\"clothing\"" },
-        { "comp", "\"computing\"" },
-        { "cryst", "\"crystallography\"" },
-        { "dent", "\"dentistry\"" },
-        { "ecol", "\"ecology\"" },
-        { "econ", "\"economics\"" },
-        { "elec", "\"electricity, elec. eng.\"" },
-        { "electr", "\"electronics\"" },
-        { "embryo", "\"embryology\"" },
-        { "engr", "\"engineering\"" },
-        { "ent", "\"entomology\"" },
-        { "film", "\"film\"" },
-        { "finc", "\"finance\"" },
-        { "fish", "\"fishing\"" },
-        { "food", "\"food, cooking\"" },
-        { "gardn", "\"gardening, horticulture\"" },
-        { "genet", "\"genetics\"" },
-        { "geogr", "\"geography\"" },
-        { "geol", "\"geology\"" },
-        { "geom", "\"geometry\"" },
-        { "go", "\"go (game)\"" },
-        { "golf", "\"golf\"" },
-        { "gramm", "\"grammar\"" },
-        { "grmyth", "\"Greek mythology\"" },
-        { "hanaf", "\"hanafuda\"" },
-        { "horse", "\"horse racing\"" },
-        { "kabuki", "\"kabuki\"" },
-        { "law", "\"law\"" },
-        { "ling", "\"linguistics\"" },
-        { "logic", "\"logic\"" },
-        { "MA", "\"martial arts\"" },
-        { "mahj", "\"mahjong\"" },
-        { "manga", "\"manga\"" },
-        { "math", "\"mathematics\"" },
-        { "mech", "\"mechanical engineering\"" },
-        { "med", "\"medicine\"" },
-        { "met", "\"meteorology\"" },
-        { "mil", "\"military\"" },
-        { "mining", "\"mining\"" },
-        { "music", "\"music\"" },
-        { "noh", "\"noh\"" },
-        { "ornith", "\"ornithology\"" },
-        { "paleo", "\"paleontology\"" },
-        { "pathol", "\"pathology\"" },
-        { "pharm", "\"pharmacology\"" },
-        { "phil", "\"philosophy\"" },
-        { "photo", "\"photography\"" },
-        { "physics", "\"physics\"" },
-        { "physiol", "\"physiology\"" },
-        { "politics", "\"politics\"" },
-        { "print", "\"printing\"" },
-        { "psy", "\"psychiatry\"" },
-        { "psyanal", "\"psychoanalysis\"" },
-        { "psych", "\"psychology\"" },
-        { "rail", "\"railway\"" },
-        { "rommyth", "\"Roman mythology\"" },
-        { "Shinto", "\"Shinto\"" },
-        { "shogi", "\"shogi\"" },
-        { "ski", "\"skiing\"" },
-        { "sports", "\"sports\"" },
-        { "stat", "\"statistics\"" },
-        { "stockm", "\"stock market\"" },
-        { "sumo", "\"sumo\"" },
-        { "telec", "\"telecommunications\"" },
-        { "tradem", "\"trademark\"" },
-        { "tv", "\"television\"" },
-        { "vidg", "\"video games\"" },
-        { "zool", "\"zoology\"" },
+        { "agric", "agriculture" },
+        { "anat", "anatomy" },
+        { "archeol", "archeology" },
+        { "archit", "architecture" },
+        { "art", "art, aesthetics" },
+        { "astron", "astronomy" },
+        { "audvid", "audiovisual" },
+        { "aviat", "aviation" },
+        { "baseb", "baseball" },
+        { "biochem", "biochemistry" },
+        { "biol", "biology" },
+        { "bot", "botany" },
+        { "Buddh", "Buddhism" },
+        { "bus", "business" },
+        { "cards", "card games" },
+        { "chem", "chemistry" },
+        { "Christn", "Christianity" },
+        { "cloth", "clothing" },
+        { "comp", "computing" },
+        { "cryst", "crystallography" },
+        { "dent", "dentistry" },
+        { "ecol", "ecology" },
+        { "econ", "economics" },
+        { "elec", "electricity, elec. eng." },
+        { "electr", "electronics" },
+        { "embryo", "embryology" },
+        { "engr", "engineering" },
+        { "ent", "entomology" },
+        { "film", "film" },
+        { "finc", "finance" },
+        { "fish", "fishing" },
+        { "food", "food, cooking" },
+        { "gardn", "gardening, horticulture" },
+        { "genet", "genetics" },
+        { "geogr", "geography" },
+        { "geol", "geology" },
+        { "geom", "geometry" },
+        { "go", "go (game)" },
+        { "golf", "golf" },
+        { "gramm", "grammar" },
+        { "grmyth", "Greek mythology" },
+        { "hanaf", "hanafuda" },
+        { "horse", "horse racing" },
+        { "kabuki", "kabuki" },
+        { "law", "law" },
+        { "ling", "linguistics" },
+        { "logic", "logic" },
+        { "MA", "martial arts" },
+        { "mahj", "mahjong" },
+        { "manga", "manga" },
+        { "math", "mathematics" },
+        { "mech", "mechanical engineering" },
+        { "med", "medicine" },
+        { "met", "meteorology" },
+        { "mil", "military" },
+        { "mining", "mining" },
+        { "music", "music" },
+        { "noh", "noh" },
+        { "ornith", "ornithology" },
+        { "paleo", "paleontology" },
+        { "pathol", "pathology" },
+        { "pharm", "pharmacology" },
+        { "phil", "philosophy" },
+        { "photo", "photography" },
+        { "physics", "physics" },
+        { "physiol", "physiology" },
+        { "politics", "politics" },
+        { "print", "printing" },
+        { "psy", "psychiatry" },
+        { "psyanal", "psychoanalysis" },
+        { "psych", "psychology" },
+        { "rail", "railway" },
+        { "rommyth", "Roman mythology" },
+        { "Shinto", "Shinto" },
+        { "shogi", "shogi" },
+        { "ski", "skiing" },
+        { "sports", "sports" },
+        { "stat", "statistics" },
+        { "stockm", "stock market" },
+        { "sumo", "sumo" },
+        { "telec", "telecommunications" },
+        { "tradem", "trademark" },
+        { "tv", "television" },
+        { "vidg", "video games" },
+        { "zool", "zoology" },
 
-        { "ateji", "\"ateji (phonetic) reading\"" },
-        { "ik", "\"word containing irregular kana usage\"" },
-        { "iK", "\"word containing irregular kanji usage\"" },
-        { "io", "\"irregular okurigana usage\"" },
-        { "oK", "\"word containing out-dated kanji or kanji usage\"" },
-        { "rK", "\"rarely-used kanji form\"" },
-        { "sK", "\"search-only kanji form\"" },
+        { "ateji", "ateji (phonetic) reading" },
+        { "ik", "word containing irregular kana usage" },
+        { "iK", "word containing irregular kanji usage" },
+        { "io", "irregular okurigana usage" },
+        { "oK", "word containing out-dated kanji or kanji usage" },
+        { "rK", "rarely-used kanji form" },
+        { "sK", "search-only kanji form" },
 
-        { "abbr", "\"abbreviation\"" },
-        { "arch", "\"archaic\"" },
-        { "char", "\"character\"" },
-        { "chn", "\"children's language\"" },
-        { "col", "\"colloquial\"" },
-        { "company", "\"company name\"" },
-        { "creat", "\"creature\"" },
-        { "dated", "\"dated term\"" },
-        { "dei", "\"deity\"" },
-        { "derog", "\"derogatory\"" },
-        { "doc", "\"document\"" },
-        { "euph", "\"euphemistic\"" },
-        { "ev", "\"event\"" },
-        { "fam", "\"familiar language\"" },
-        { "fem", "\"female term or language\"" },
-        { "fict", "\"fiction\"" },
-        { "form", "\"formal or literary term\"" },
-        { "given", "\"given name or forename, gender not specified\"" },
-        { "group", "\"group\"" },
-        { "hist", "\"historical term\"" },
-        { "hon", "\"honorific or respectful (sonkeigo) language\"" },
-        { "hum", "\"humble (kenjougo) language\"" },
-        { "id", "\"idiomatic expression\"" },
-        { "joc", "\"jocular, humorous term\"" },
-        { "leg", "\"legend\"" },
-        { "m-sl", "\"manga slang\"" },
-        { "male", "\"male term or language\"" },
-        { "myth", "\"mythology\"" },
-        { "net-sl", "\"Internet slang\"" },
-        { "obj", "\"object\"" },
-        { "obs", "\"obsolete term\"" },
-        { "on-mim", "\"onomatopoeic or mimetic word\"" },
-        { "organization", "\"organization name\"" },
-        { "oth", "\"other\"" },
-        { "person", "\"full name of a particular person\"" },
-        { "place", "\"place name\"" },
-        { "poet", "\"poetical term\"" },
-        { "pol", "\"polite (teineigo) language\"" },
-        { "product", "\"product name\"" },
-        { "proverb", "\"proverb\"" },
-        { "quote", "\"quotation\"" },
-        { "rare", "\"rare term\"" },
-        { "relig", "\"religion\"" },
-        { "sens", "\"sensitive\"" },
-        { "serv", "\"service\"" },
-        { "ship", "\"ship name\"" },
-        { "sl", "\"slang\"" },
-        { "station", "\"railway station\"" },
-        { "surname", "\"family or surname\"" },
-        { "uk", "\"word usually written using kana alone\"" },
-        { "unclass", "\"unclassified name\"" },
-        { "vulg", "\"vulgar expression or word\"" },
-        { "work", "\"work of art, literature, music, etc. name\"" },
-        { "X", "\"rude or X-rated term (not displayed in educational software)\"" },
-        { "yoji", "\"yojijukugo\"" },
+        { "abbr", "abbreviation" },
+        { "arch", "archaic" },
+        { "char", "character" },
+        { "chn", "children's language" },
+        { "col", "colloquial" },
+        { "company", "company name" },
+        { "creat", "creature" },
+        { "dated", "dated term" },
+        { "dei", "deity" },
+        { "derog", "derogatory" },
+        { "doc", "document" },
+        { "euph", "euphemistic" },
+        { "ev", "event" },
+        { "fam", "familiar language" },
+        { "fem", "female term or language" },
+        { "fict", "fiction" },
+        { "form", "formal or literary term" },
+        { "given", "given name or forename, gender not specified" },
+        { "group", "group" },
+        { "hist", "historical term" },
+        { "hon", "honorific or respectful (sonkeigo) language" },
+        { "hum", "humble (kenjougo) language" },
+        { "id", "idiomatic expression" },
+        { "joc", "jocular, humorous term" },
+        { "leg", "legend" },
+        { "m-sl", "manga slang" },
+        { "male", "male term or language" },
+        { "myth", "mythology" },
+        { "net-sl", "Internet slang" },
+        { "obj", "object" },
+        { "obs", "obsolete term" },
+        { "on-mim", "onomatopoeic or mimetic word" },
+        { "organization", "organization name" },
+        { "oth", "other" },
+        { "person", "full name of a particular person" },
+        { "place", "place name" },
+        { "poet", "poetical term" },
+        { "pol", "polite (teineigo) language" },
+        { "product", "product name" },
+        { "proverb", "proverb" },
+        { "quote", "quotation" },
+        { "rare", "rare term" },
+        { "relig", "religion" },
+        { "sens", "sensitive" },
+        { "serv", "service" },
+        { "ship", "ship name" },
+        { "sl", "slang" },
+        { "station", "railway station" },
+        { "surname", "family or surname" },
+        { "uk", "word usually written using kana alone" },
+        { "unclass", "unclassified name" },
+        { "vulg", "vulgar expression or word" },
+        { "work", "work of art, literature, music, etc. name" },
+        { "X", "rude or X-rated term (not displayed in educational software)" },
+        { "yoji", "yojijukugo" },
 
-        { "adj-f", "\"noun or verb acting prenominally\"" },
-        { "adj-i", "\"adjective (keiyoushi)\"" },
-        { "adj-ix", "\"adjective (keiyoushi) - yoi/ii class\"" },
-        { "adj-kari", "\"'kari' adjective (archaic)\"" },
-        { "adj-ku", "\"'ku' adjective (archaic)\"" },
-        { "adj-na", "\"adjectival nouns or quasi-adjectives (keiyodoshi)\"" },
-        { "adj-nari", "\"archaic/formal form of na-adjective\"" },
-        { "adj-no", "\"nouns which may take the genitive case particle 'no'\"" },
-        { "adj-pn", "\"pre-noun adjectival (rentaishi)\"" },
-        { "adj-shiku", "\"'shiku' adjective (archaic)\"" },
-        { "adj-t", "\"'taru' adjective\"" },
-        { "adv", "\"adverb (fukushi)\"" },
-        { "adv-to", "\"adverb taking the 'to' particle\"" },
-        { "aux", "\"auxiliary\"" },
-        { "aux-adj", "\"auxiliary adjective\"" },
-        { "aux-v", "\"auxiliary verb\"" },
-        { "conj", "\"conjunction\"" },
-        { "cop", "\"copula\"" },
-        { "ctr", "\"counter\"" },
-        { "exp", "\"expressions (phrases, clauses, etc.)\"" },
-        { "int", "\"interjection (kandoushi)\"" },
-        { "n", "\"noun (common) (futsuumeishi)\"" },
-        { "n-adv", "\"adverbial noun (fukushitekimeishi)\"" },
-        { "n-pr", "\"proper noun\"" },
-        { "n-pref", "\"noun, used as a prefix\"" },
-        { "n-suf", "\"noun, used as a suffix\"" },
-        { "n-t", "\"noun (temporal) (jisoumeishi)\"" },
-        { "num", "\"numeric\"" },
-        { "pn", "\"pronoun\"" },
-        { "pref", "\"prefix\"" },
-        { "prt", "\"particle\"" },
-        { "suf", "\"suffix\"" },
-        { "unc", "\"unclassified\"" },
-        { "v-unspec", "\"verb unspecified\"" },
-        { "v1", "\"Ichidan verb\"" },
-        { "v1-s", "\"Ichidan verb - kureru special class\"" },
-        { "v2a-s", "\"Nidan verb with 'u' ending (archaic)\"" },
-        { "v2b-k", "\"Nidan verb (upper class) with 'bu' ending (archaic)\"" },
-        { "v2b-s", "\"Nidan verb (lower class) with 'bu' ending (archaic)\"" },
-        { "v2d-k", "\"Nidan verb (upper class) with 'dzu' ending (archaic)\"" },
-        { "v2d-s", "\"Nidan verb (lower class) with 'dzu' ending (archaic)\"" },
-        { "v2g-k", "\"Nidan verb (upper class) with 'gu' ending (archaic)\"" },
-        { "v2g-s", "\"Nidan verb (lower class) with 'gu' ending (archaic)\"" },
-        { "v2h-k", "\"Nidan verb (upper class) with 'hu/fu' ending (archaic)\"" },
-        { "v2h-s", "\"Nidan verb (lower class) with 'hu/fu' ending (archaic)\"" },
-        { "v2k-k", "\"Nidan verb (upper class) with 'ku' ending (archaic)\"" },
-        { "v2k-s", "\"Nidan verb (lower class) with 'ku' ending (archaic)\"" },
-        { "v2m-k", "\"Nidan verb (upper class) with 'mu' ending (archaic)\"" },
-        { "v2m-s", "\"Nidan verb (lower class) with 'mu' ending (archaic)\"" },
-        { "v2n-s", "\"Nidan verb (lower class) with 'nu' ending (archaic)\"" },
-        { "v2r-k", "\"Nidan verb (upper class) with 'ru' ending (archaic)\"" },
-        { "v2r-s", "\"Nidan verb (lower class) with 'ru' ending (archaic)\"" },
-        { "v2s-s", "\"Nidan verb (lower class) with 'su' ending (archaic)\"" },
-        { "v2t-k", "\"Nidan verb (upper class) with 'tsu' ending (archaic)\"" },
-        { "v2t-s", "\"Nidan verb (lower class) with 'tsu' ending (archaic)\"" },
-        { "v2w-s", "\"Nidan verb (lower class) with 'u' ending and 'we' conjugation (archaic)\"" },
-        { "v2y-k", "\"Nidan verb (upper class) with 'yu' ending (archaic)\"" },
-        { "v2y-s", "\"Nidan verb (lower class) with 'yu' ending (archaic)\"" },
-        { "v2z-s", "\"Nidan verb (lower class) with 'zu' ending (archaic)\"" },
-        { "v4b", "\"Yodan verb with 'bu' ending (archaic)\"" },
-        { "v4g", "\"Yodan verb with 'gu' ending (archaic)\"" },
-        { "v4h", "\"Yodan verb with 'hu/fu' ending (archaic)\"" },
-        { "v4k", "\"Yodan verb with 'ku' ending (archaic)\"" },
-        { "v4m", "\"Yodan verb with 'mu' ending (archaic)\"" },
-        { "v4n", "\"Yodan verb with 'nu' ending (archaic)\"" },
-        { "v4r", "\"Yodan verb with 'ru' ending (archaic)\"" },
-        { "v4s", "\"Yodan verb with 'su' ending (archaic)\"" },
-        { "v4t", "\"Yodan verb with 'tsu' ending (archaic)\"" },
-        { "v5aru", "\"Godan verb - -aru special class\"" },
-        { "v5b", "\"Godan verb with 'bu' ending\"" },
-        { "v5g", "\"Godan verb with 'gu' ending\"" },
-        { "v5k", "\"Godan verb with 'ku' ending\"" },
-        { "v5k-s", "\"Godan verb - Iku/Yuku special class\"" },
-        { "v5m", "\"Godan verb with 'mu' ending\"" },
-        { "v5n", "\"Godan verb with 'nu' ending\"" },
-        { "v5r", "\"Godan verb with 'ru' ending\"" },
-        { "v5r-i", "\"Godan verb with 'ru' ending (irregular verb)\"" },
-        { "v5s", "\"Godan verb with 'su' ending\"" },
-        { "v5t", "\"Godan verb with 'tsu' ending\"" },
-        { "v5u", "\"Godan verb with 'u' ending\"" },
-        { "v5u-s", "\"Godan verb with 'u' ending (special class)\"" },
-        { "v5uru", "\"Godan verb - Uru old class verb (old form of Eru)\"" },
-        { "vi", "\"intransitive verb\"" },
-        { "vk", "\"Kuru verb - special class\"" },
-        { "vn", "\"irregular nu verb\"" },
-        { "vr", "\"irregular ru verb, plain form ends with -ri\"" },
-        { "vs", "\"noun or participle which takes the aux. verb suru\"" },
-        { "vs-c", "\"su verb - precursor to the modern suru\"" },
-        { "vs-i", "\"suru verb - included\"" },
-        { "vs-s", "\"suru verb - special class\"" },
-        { "vt", "\"transitive verb\"" },
-        { "vz", "\"Ichidan verb - zuru verb (alternative form of -jiru verbs)\"" },
+        { "adj-f", "noun or verb acting prenominally" },
+        { "adj-i", "adjective (keiyoushi)" },
+        { "adj-ix", "adjective (keiyoushi) - yoi/ii class" },
+        { "adj-kari", "'kari' adjective (archaic)" },
+        { "adj-ku", "'ku' adjective (archaic)" },
+        { "adj-na", "adjectival nouns or quasi-adjectives (keiyodoshi)" },
+        { "adj-nari", "archaic/formal form of na-adjective" },
+        { "adj-no", "nouns which may take the genitive case particle 'no'" },
+        { "adj-pn", "pre-noun adjectival (rentaishi)" },
+        { "adj-shiku", "'shiku' adjective (archaic)" },
+        { "adj-t", "'taru' adjective" },
+        { "adv", "adverb (fukushi)" },
+        { "adv-to", "adverb taking the 'to' particle" },
+        { "aux", "auxiliary" },
+        { "aux-adj", "auxiliary adjective" },
+        { "aux-v", "auxiliary verb" },
+        { "conj", "conjunction" },
+        { "cop", "copula" },
+        { "ctr", "counter" },
+        { "exp", "expressions (phrases, clauses, etc.)" },
+        { "int", "interjection (kandoushi)" },
+        { "n", "noun (common) (futsuumeishi)" },
+        { "n-adv", "adverbial noun (fukushitekimeishi)" },
+        { "n-pr", "proper noun" },
+        { "n-pref", "noun, used as a prefix" },
+        { "n-suf", "noun, used as a suffix" },
+        { "n-t", "noun (temporal) (jisoumeishi)" },
+        { "num", "numeric" },
+        { "pn", "pronoun" },
+        { "pref", "prefix" },
+        { "prt", "particle" },
+        { "suf", "suffix" },
+        { "unc", "unclassified" },
+        { "v-unspec", "verb unspecified" },
+        { "v1", "Ichidan verb" },
+        { "v1-s", "Ichidan verb - kureru special class" },
+        { "v2a-s", "Nidan verb with 'u' ending (archaic)" },
+        { "v2b-k", "Nidan verb (upper class) with 'bu' ending (archaic)" },
+        { "v2b-s", "Nidan verb (lower class) with 'bu' ending (archaic)" },
+        { "v2d-k", "Nidan verb (upper class) with 'dzu' ending (archaic)" },
+        { "v2d-s", "Nidan verb (lower class) with 'dzu' ending (archaic)" },
+        { "v2g-k", "Nidan verb (upper class) with 'gu' ending (archaic)" },
+        { "v2g-s", "Nidan verb (lower class) with 'gu' ending (archaic)" },
+        { "v2h-k", "Nidan verb (upper class) with 'hu/fu' ending (archaic)" },
+        { "v2h-s", "Nidan verb (lower class) with 'hu/fu' ending (archaic)" },
+        { "v2k-k", "Nidan verb (upper class) with 'ku' ending (archaic)" },
+        { "v2k-s", "Nidan verb (lower class) with 'ku' ending (archaic)" },
+        { "v2m-k", "Nidan verb (upper class) with 'mu' ending (archaic)" },
+        { "v2m-s", "Nidan verb (lower class) with 'mu' ending (archaic)" },
+        { "v2n-s", "Nidan verb (lower class) with 'nu' ending (archaic)" },
+        { "v2r-k", "Nidan verb (upper class) with 'ru' ending (archaic)" },
+        { "v2r-s", "Nidan verb (lower class) with 'ru' ending (archaic)" },
+        { "v2s-s", "Nidan verb (lower class) with 'su' ending (archaic)" },
+        { "v2t-k", "Nidan verb (upper class) with 'tsu' ending (archaic)" },
+        { "v2t-s", "Nidan verb (lower class) with 'tsu' ending (archaic)" },
+        { "v2w-s", "Nidan verb (lower class) with 'u' ending and 'we' conjugation (archaic)" },
+        { "v2y-k", "Nidan verb (upper class) with 'yu' ending (archaic)" },
+        { "v2y-s", "Nidan verb (lower class) with 'yu' ending (archaic)" },
+        { "v2z-s", "Nidan verb (lower class) with 'zu' ending (archaic)" },
+        { "v4b", "Yodan verb with 'bu' ending (archaic)" },
+        { "v4g", "Yodan verb with 'gu' ending (archaic)" },
+        { "v4h", "Yodan verb with 'hu/fu' ending (archaic)" },
+        { "v4k", "Yodan verb with 'ku' ending (archaic)" },
+        { "v4m", "Yodan verb with 'mu' ending (archaic)" },
+        { "v4n", "Yodan verb with 'nu' ending (archaic)" },
+        { "v4r", "Yodan verb with 'ru' ending (archaic)" },
+        { "v4s", "Yodan verb with 'su' ending (archaic)" },
+        { "v4t", "Yodan verb with 'tsu' ending (archaic)" },
+        { "v5aru", "Godan verb - -aru special class" },
+        { "v5b", "Godan verb with 'bu' ending" },
+        { "v5g", "Godan verb with 'gu' ending" },
+        { "v5k", "Godan verb with 'ku' ending" },
+        { "v5k-s", "Godan verb - Iku/Yuku special class" },
+        { "v5m", "Godan verb with 'mu' ending" },
+        { "v5n", "Godan verb with 'nu' ending" },
+        { "v5r", "Godan verb with 'ru' ending" },
+        { "v5r-i", "Godan verb with 'ru' ending (irregular verb)" },
+        { "v5s", "Godan verb with 'su' ending" },
+        { "v5t", "Godan verb with 'tsu' ending" },
+        { "v5u", "Godan verb with 'u' ending" },
+        { "v5u-s", "Godan verb with 'u' ending (special class)" },
+        { "v5uru", "Godan verb - Uru old class verb (old form of Eru)" },
+        { "vi", "intransitive verb" },
+        { "vk", "Kuru verb - special class" },
+        { "vn", "irregular nu verb" },
+        { "vr", "irregular ru verb, plain form ends with -ri" },
+        { "vs", "noun or participle which takes the aux. verb suru" },
+        { "vs-c", "su verb - precursor to the modern suru" },
+        { "vs-i", "suru verb - included" },
+        { "vs-s", "suru verb - special class" },
+        { "vt", "transitive verb" },
+        { "vz", "Ichidan verb - zuru verb (alternative form of -jiru verbs)" },
 
-        { "gikun", "\"gikun (meaning as reading) or jukujikun (special kanji reading)\"" },
-        { "ok", "\"out-dated or obsolete kana usage\"" },
-        { "sk", "\"search-only kana form\"" }
+        { "gikun", "gikun (meaning as reading) or jukujikun (special kanji reading)" },
+        { "ok", "out-dated or obsolete kana usage" },
+        { "sk", "search-only kana form" }
     };
 
     public static readonly Dictionary<string, string> JmnedictEntities = new(25)
@@ -352,7 +373,7 @@ public static class DictUtils
         { "given", "given name or forename, gender not specified" },
         { "group", "group" }, { "leg", "legend" }, { "masc", "male given name or forename" }, { "myth", "mythology" },
         { "obj", "object" }, { "organization", "organization name" }, { "oth", "other" }, { "person", "full name of a particular person" },
-        { "place", "place name" }, { "product", "product name" }, { "relig", "religion" }, { "serv", "service" },
+        { "place", "place name" }, { "product", "product name" }, { "relig", "religion" }, { "serv", "service" }, { "ship", "ship name" },
         { "station", "railway station" }, { "surname", "family or surname" }, { "unclass", "unclassified name" }, { "work", "work of art, literature, music, etc. name" }
         #pragma warning restore format
     };
@@ -414,6 +435,7 @@ public static class DictUtils
 
     internal static readonly DictType[] s_nameDictTypes = {
         DictType.CustomNameDictionary,
+        DictType.ProfileCustomNameDictionary,
         DictType.JMnedict,
         DictType.NonspecificNameYomichan,
         DictType.NonspecificNameNazeka
@@ -421,6 +443,7 @@ public static class DictUtils
 
     internal static readonly DictType[] s_wordDictTypes = {
         DictType.CustomWordDictionary,
+        DictType.ProfileCustomWordDictionary,
         DictType.JMdict,
         DictType.Daijirin,
         DictType.Daijisen,
@@ -450,8 +473,16 @@ public static class DictUtils
     public static async Task LoadDictionaries()
     {
         DictsReady = false;
+        ProfileCustomWordDictReady = false;
+        ProfileCustomNameDictReady = false;
         CustomWordDictReady = false;
         CustomNameDictReady = false;
+
+        ProfileCustomWordsCancellationTokenSource?.Dispose();
+        ProfileCustomWordsCancellationTokenSource = new CancellationTokenSource();
+
+        ProfileCustomNamesCancellationTokenSource?.Dispose();
+        ProfileCustomNamesCancellationTokenSource = new CancellationTokenSource();
 
         bool dictCleared = false;
         bool dictRemoved = false;
@@ -611,13 +642,26 @@ public static class DictUtils
                     break;
 
                 case DictType.CustomWordDictionary:
+                case DictType.ProfileCustomWordDictionary:
                     if (dict is { Active: true, Contents.Count: 0 })
                     {
-                        tasks.Add(Task.Run(async () =>
+                        tasks.Add(Task.Run(() =>
                         {
-                            await CustomWordLoader.Load(dict).ConfigureAwait(false);
+                            CustomWordLoader.Load(dict,
+                                dict.Type is DictType.CustomWordDictionary
+                                ? CancellationToken.None
+                                : ProfileCustomWordsCancellationTokenSource.Token);
+
                             dict.Size = dict.Contents.Count;
-                            CustomWordDictReady = true;
+
+                            if (dict.Type is DictType.CustomWordDictionary)
+                            {
+                                CustomWordDictReady = true;
+                            }
+                            else
+                            {
+                                ProfileCustomWordDictReady = true;
+                            }
                         }));
                     }
 
@@ -626,24 +670,52 @@ public static class DictUtils
                         dict.Contents.Clear();
                         dict.Contents.TrimExcess();
                         dictCleared = true;
-                        CustomWordDictReady = true;
+
+                        if (dict.Type is DictType.CustomWordDictionary)
+                        {
+                            CustomWordDictReady = true;
+                        }
+                        else
+                        {
+                            ProfileCustomWordDictReady = true;
+                        }
                     }
 
                     else
                     {
-                        CustomWordDictReady = true;
+                        if (dict.Type is DictType.CustomWordDictionary)
+                        {
+                            CustomWordDictReady = true;
+                        }
+                        else
+                        {
+                            ProfileCustomWordDictReady = true;
+                        }
                     }
 
                     break;
 
                 case DictType.CustomNameDictionary:
+                case DictType.ProfileCustomNameDictionary:
                     if (dict is { Active: true, Contents.Count: 0 })
                     {
-                        tasks.Add(Task.Run(async () =>
+                        tasks.Add(Task.Run(() =>
                         {
-                            await CustomNameLoader.Load(dict).ConfigureAwait(false);
+                            CustomNameLoader.Load(dict,
+                                dict.Type is DictType.CustomNameDictionary
+                                ? CancellationToken.None
+                                : ProfileCustomNamesCancellationTokenSource.Token);
+
                             dict.Size = dict.Contents.Count;
-                            CustomNameDictReady = true;
+
+                            if (dict.Type is DictType.CustomNameDictionary)
+                            {
+                                CustomNameDictReady = true;
+                            }
+                            else
+                            {
+                                ProfileCustomNameDictReady = true;
+                            }
                         }));
                     }
 
@@ -652,12 +724,27 @@ public static class DictUtils
                         dict.Contents.Clear();
                         dict.Contents.TrimExcess();
                         dictCleared = true;
-                        CustomNameDictReady = true;
+
+                        if (dict.Type is DictType.CustomNameDictionary)
+                        {
+                            CustomNameDictReady = true;
+                        }
+                        else
+                        {
+                            ProfileCustomNameDictReady = true;
+                        }
                     }
 
                     else
                     {
-                        CustomNameDictReady = true;
+                        if (dict.Type is DictType.CustomNameDictionary)
+                        {
+                            CustomNameDictReady = true;
+                        }
+                        else
+                        {
+                            ProfileCustomNameDictReady = true;
+                        }
                     }
 
                     break;
@@ -838,7 +925,16 @@ public static class DictUtils
 
                 if (deserializedDicts is not null)
                 {
-                    IOrderedEnumerable<Dict> orderedDicts = deserializedDicts.Values.OrderBy(static d => d.Priority);
+                    foreach ((string key, Dict dict) in BuiltInDicts)
+                    {
+                        if (deserializedDicts.Values.All(d => d.Type != dict.Type))
+                        {
+                            deserializedDicts.Add(key, dict);
+                        }
+                    }
+
+                    IOrderedEnumerable<Dict> orderedDicts = deserializedDicts.Values.OrderBy(static dict => dict.Priority);
+
                     int priority = 1;
 
                     foreach (Dict dict in orderedDicts)
@@ -849,6 +945,8 @@ public static class DictUtils
                             {
                                 DictType.CustomNameDictionary => new Dictionary<string, IList<IDictRecord>>(1024),
                                 DictType.CustomWordDictionary => new Dictionary<string, IList<IDictRecord>>(1024),
+                                DictType.ProfileCustomNameDictionary => new Dictionary<string, IList<IDictRecord>>(256),
+                                DictType.ProfileCustomWordDictionary => new Dictionary<string, IList<IDictRecord>>(256),
                                 DictType.JMdict => new Dictionary<string, IList<IDictRecord>>(450000), //2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739
                                 DictType.JMnedict => new Dictionary<string, IList<IDictRecord>>(630000), //2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055
                                 DictType.Kanjidic => new Dictionary<string, IList<IDictRecord>>(13108), //2022/05/11: 13108, 2022/08/15: 13108, 2023/04/22: 13108
@@ -889,9 +987,16 @@ public static class DictUtils
                         dict.Priority = priority;
                         ++priority;
 
-                        string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-                        string relativePath = Path.GetRelativePath(Utils.ApplicationPath, fullPath);
-                        dict.Path = relativePath.StartsWith('.') ? fullPath : relativePath;
+                        if (dict.Type is DictType.ProfileCustomNameDictionary)
+                        {
+                            dict.Path = ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfile);
+                        }
+                        else if (dict.Type is DictType.ProfileCustomWordDictionary)
+                        {
+                            dict.Path = ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfile);
+                        }
+
+                        dict.Path = Utils.GetPath(dict.Path);
 
                         Dicts.Add(dict.Name, dict);
                     }

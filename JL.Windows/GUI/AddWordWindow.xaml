@@ -5,11 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Background="{DynamicResource RegionBrush}"
-        Title="Add Word" ResizeMode="NoResize" Width="500" SizeToContent="Height" MaxHeight="1000"
+        Title="Add Word" ResizeMode="NoResize" Width="500" SizeToContent="Height" MaxHeight="1000" PreviewKeyUp="Window_PreviewKeyUp"
         Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False" Closing="Window_Closing" x:ClassModifier="internal">
     <ScrollViewer>
         <Grid>
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,70">
+                <TextBlock HorizontalAlignment="Left" Margin="0,0,0,10" Text="Dictionary" Style="{StaticResource TextBlockDefault}" />
+                <ComboBox Name="ComboBoxDictType" Width="300" Margin="0,0,0,20" SelectedIndex="0" HorizontalAlignment="Left" SelectedValuePath="Tag">
+                    <ComboBoxItem Content="Custom Word Dictionary" Tag="Global" />
+                    <ComboBoxItem Content="Custom Word Dictionary (Profile)" Tag="Profile" />
+                </ComboBox>
                 <TextBlock Text="Spellings" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 <TextBox x:Name="SpellingsTextBox" HorizontalAlignment="Left" TextWrapping="Wrap" Width="300" Margin="0,0,0,20"
                          Cursor="Help" ToolTip="Separated by a semicolon" />
@@ -41,7 +46,7 @@
                 <RadioButton Content="Noun" HorizontalAlignment="Stretch" FontSize="16" Height="40" Checked="OtherRadioButtons_Checked" />
                 <RadioButton Content="Verb" HorizontalAlignment="Stretch" FontSize="16" Height="40" Checked="VerbRadioButton_Checked" />
                 <RadioButton Content="Adjective" HorizontalAlignment="Stretch" FontSize="16" Height="40" Checked="OtherRadioButtons_Checked" />
-                <RadioButton x:Name="OtherRadioButton" Content="Other" HorizontalAlignment="Stretch" FontSize="16" Height="40" Checked="OtherRadioButtons_Checked" />
+                <RadioButton Content="Other" HorizontalAlignment="Stretch" FontSize="16" Height="40" Checked="OtherRadioButtons_Checked" IsChecked="True" />
             </StackPanel>
         </Grid>
     </ScrollViewer>

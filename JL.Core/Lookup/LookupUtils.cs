@@ -79,8 +79,8 @@ public static class LookupUtils
         ConcurrentQueue<Dictionary<string, IntermediaryResult>> epwingNazekaKanjiResultsList = new();
         ConcurrentQueue<Dictionary<string, IntermediaryResult>> epwingNazekaNameResultsList = new();
         Dictionary<string, IntermediaryResult> kanjidicResults = new();
-        Dictionary<string, IntermediaryResult> customWordResults = new();
-        Dictionary<string, IntermediaryResult> customNameResults = new();
+        ConcurrentQueue<Dictionary<string, IntermediaryResult>> customWordResults = new();
+        ConcurrentQueue<Dictionary<string, IntermediaryResult>> customNameResults = new();
 
         List<string> textList = new();
         List<string> textInHiraganaList = new();
@@ -129,12 +129,14 @@ public static class LookupUtils
                         break;
 
                     case DictType.CustomWordDictionary:
-                        customWordResults = GetWordResults(textList, textInHiraganaList,
-                            deconjugationResultsList, dict);
+                    case DictType.ProfileCustomWordDictionary:
+                        customWordResults.Enqueue(GetWordResults(textList, textInHiraganaList,
+                            deconjugationResultsList, dict));
                         break;
 
                     case DictType.CustomNameDictionary:
-                        customNameResults = GetNameResults(textList, textInHiraganaList, dict);
+                    case DictType.ProfileCustomNameDictionary:
+                        customNameResults.Enqueue(GetNameResults(textList, textInHiraganaList, dict));
                         break;
 
                     case DictType.NonspecificKanjiYomichan:
@@ -209,14 +211,14 @@ public static class LookupUtils
             lookupResults.AddRange(BuildKanjidicResult(kanjidicResults));
         }
 
-        if (customWordResults.Count > 0)
+        foreach (Dictionary<string, IntermediaryResult> result in customWordResults)
         {
-            lookupResults.AddRange(BuildCustomWordResult(customWordResults));
+            lookupResults.AddRange(BuildCustomWordResult(result));
         }
 
-        if (customNameResults.Count > 0)
+        foreach (Dictionary<string, IntermediaryResult> result in customNameResults)
         {
-            lookupResults.AddRange(BuildCustomNameResult(customNameResults));
+            lookupResults.AddRange(BuildCustomNameResult(result));
         }
 
         foreach (Dictionary<string, IntermediaryResult> result in epwingYomichanWordResultsList)
@@ -270,12 +272,12 @@ public static class LookupUtils
                 if (lookupResult.ReadingsOrthographyInfoList?.Count > 0)
                 {
                     string? readingOrthography = lookupResult.ReadingsOrthographyInfoList[index];
-                    if (readingOrthography == "uk")
+                    if (readingOrthography is "uk")
                     {
                         return 0;
                     }
 
-                    if (readingOrthography == "ok")
+                    if (readingOrthography is "ok")
                     {
                         return 2;
                     }
@@ -347,6 +349,7 @@ public static class LookupUtils
                             break;
 
                         case DictType.CustomWordDictionary:
+                        case DictType.ProfileCustomWordDictionary:
                             {
                                 int dictResultsCount = dictResults.Count;
                                 for (int i = 0; i < dictResultsCount; i++)
@@ -465,6 +468,7 @@ public static class LookupUtils
                         case DictType.JMnedict:
                         case DictType.Kanjidic:
                         case DictType.CustomNameDictionary:
+                        case DictType.ProfileCustomNameDictionary:
                             break;
 
                         default:

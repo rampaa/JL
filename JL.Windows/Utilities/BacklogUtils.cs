@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Windows.Controls;
+using JL.Core.Profile;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
@@ -133,7 +134,7 @@ internal static class BacklogUtils
                 _ = Directory.CreateDirectory(directory);
             }
 
-            await File.WriteAllLinesAsync(Path.Join(directory, string.Create(CultureInfo.InvariantCulture, $"{Process.GetCurrentProcess().StartTime.ToString("yyyy.MM.dd_HH.mm.ss", CultureInfo.InvariantCulture)}-{DateTime.Now.ToString("yyyy.MM.dd_HH.mm.ss", CultureInfo.InvariantCulture)}.txt")), Backlog).ConfigureAwait(false);
+            await File.WriteAllLinesAsync(Path.Join(directory, string.Create(CultureInfo.InvariantCulture, $"{ProfileUtils.CurrentProfile}_{Process.GetCurrentProcess().StartTime.ToString("yyyy.MM.dd_HH.mm.ss", CultureInfo.InvariantCulture)}-{DateTime.Now.ToString("yyyy.MM.dd_HH.mm.ss", CultureInfo.InvariantCulture)}.txt")), Backlog).ConfigureAwait(false);
         }
     }
 }

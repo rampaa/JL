@@ -214,7 +214,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
             };
             buttonEdit.Click += (_, _) =>
             {
-                _ = new EditFrequencyWindow(freq) { Owner = this }.ShowDialog();
+                _ = new EditFrequencyWindow(freq) { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
                 UpdateFreqsDisplay();
             };
 
@@ -279,7 +279,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
 
     private void ButtonAddFrequency_OnClick(object sender, RoutedEventArgs e)
     {
-        _ = new AddFrequencyWindow { Owner = this }.ShowDialog();
+        _ = new AddFrequencyWindow { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
         UpdateFreqsDisplay();
     }
 

@@ -8,6 +8,8 @@ using JL.Core.Audio;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
+using JL.Core.Frontend;
+using JL.Core.Profile;
 using JL.Core.Statistics;
 using JL.Core.WordClass;
 using Serilog;
@@ -118,6 +120,18 @@ public static class Utils
             await File.Create(customNamesPath).DisposeAsync().ConfigureAwait(false);
         }
 
+        string profileCustomWordsPath = ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfile);
+        if (!File.Exists(profileCustomWordsPath))
+        {
+            await File.Create(profileCustomWordsPath).DisposeAsync().ConfigureAwait(false);
+        }
+
+        string profileCustomNamesPath = ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfile);
+        if (!File.Exists(profileCustomNamesPath))
+        {
+            await File.Create(profileCustomNamesPath).DisposeAsync().ConfigureAwait(false);
+        }
+
         List<Task> tasks = new()
         {
             Task.Run(static async () =>
@@ -159,5 +173,12 @@ public static class Utils
         {
             StringPoolInstance.Reset();
         }
+    }
+
+    public static string GetPath(string path)
+    {
+        string fullPath = Path.GetFullPath(path, ApplicationPath);
+        string relativePath = Path.GetRelativePath(ApplicationPath, fullPath);
+        return relativePath.StartsWith('.') ? fullPath : relativePath;
     }
 }

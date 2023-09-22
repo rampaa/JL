@@ -1,5 +1,7 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using JL.Core.Profile;
 using JL.Core.Utilities;
 
 namespace JL.Core.Statistics;
@@ -19,7 +21,7 @@ public sealed class Stats
     public long Imoutos { get; set; }
 
     [JsonIgnore] public static Stats SessionStats { get; set; } = new();
-
+    [JsonIgnore] public static Stats ProfileLifetimeStats { get; set; } = new();
     [JsonIgnore] public static Stats LifetimeStats { get; set; } = new();
 
     public static void IncrementStat(StatType type, long amount = 1)
@@ -28,26 +30,32 @@ public sealed class Stats
         {
             case StatType.Characters:
                 SessionStats.Characters += amount;
+                ProfileLifetimeStats.Characters += amount;
                 LifetimeStats.Characters += amount;
                 break;
             case StatType.Lines:
                 SessionStats.Lines += amount;
+                ProfileLifetimeStats.Lines += amount;
                 LifetimeStats.Lines += amount;
                 break;
             case StatType.Time:
                 SessionStats.Time = SessionStats.Time.Add(TimeSpan.FromTicks(amount));
+                ProfileLifetimeStats.Time = ProfileLifetimeStats.Time.Add(TimeSpan.FromTicks(amount));
                 LifetimeStats.Time = LifetimeStats.Time.Add(TimeSpan.FromTicks(amount));
                 break;
             case StatType.CardsMined:
                 SessionStats.CardsMined += amount;
+                ProfileLifetimeStats.CardsMined += amount;
                 LifetimeStats.CardsMined += amount;
                 break;
             case StatType.TimesPlayedAudio:
                 SessionStats.TimesPlayedAudio += amount;
+                ProfileLifetimeStats.TimesPlayedAudio += amount;
                 LifetimeStats.TimesPlayedAudio += amount;
                 break;
             case StatType.Imoutos:
                 SessionStats.Imoutos += amount;
+                ProfileLifetimeStats.Imoutos += amount;
                 LifetimeStats.Imoutos += amount;
                 break;
             default:
@@ -66,6 +74,15 @@ public sealed class Stats
                 LifetimeStats.CardsMined = 0;
                 LifetimeStats.TimesPlayedAudio = 0;
                 LifetimeStats.Imoutos = 0;
+                break;
+
+            case StatsMode.Profile:
+                ProfileLifetimeStats.Characters = 0;
+                ProfileLifetimeStats.Lines = 0;
+                ProfileLifetimeStats.Time = TimeSpan.Zero;
+                ProfileLifetimeStats.CardsMined = 0;
+                ProfileLifetimeStats.TimesPlayedAudio = 0;
+                ProfileLifetimeStats.Imoutos = 0;
                 break;
 
             case StatsMode.Session:
@@ -94,6 +111,22 @@ public sealed class Stats
         {
             Utils.Frontend.Alert(AlertLevel.Error, "Couldn't write Stats");
             Utils.Logger.Error(ex, "Couldn't write Stats");
+        }
+    }
+
+    public static async Task SerializeProfileLifetimeStats()
+    {
+        try
+        {
+            _ = Directory.CreateDirectory(ProfileUtils.ProfileFolderPath);
+            await File.WriteAllTextAsync(StatsUtils.GetStatsPath(ProfileUtils.CurrentProfile),
+                    JsonSerializer.Serialize(ProfileLifetimeStats, Utils.s_jsoWithIndentation))
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't write {ProfileUtils.CurrentProfile} Stats"));
+            Utils.Logger.Error(ex, "Couldn't write {CurrentProfile} Stats", ProfileUtils.CurrentProfile);
         }
     }
 }

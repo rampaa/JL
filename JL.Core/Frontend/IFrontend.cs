@@ -1,6 +1,6 @@
 using JL.Core.Utilities;
 
-namespace JL.Core;
+namespace JL.Core.Frontend;
 
 public interface IFrontend
 {

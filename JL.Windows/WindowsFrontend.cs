@@ -1,5 +1,5 @@
 using System.Windows;
-using JL.Core;
+using JL.Core.Frontend;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
 using JL.Windows.SpeechSynthesis;
