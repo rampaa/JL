@@ -19,13 +19,12 @@ internal static class JmdictLoader
             // The downside of using XmlTextReader is that it does not support async methods
             // And we cannot set some settings (e.g. MaxCharactersFromEntities)
 
-            using (XmlTextReader xmlReader = new(fullPath)
+            using (XmlTextReader xmlReader = new(fullPath))
             {
-                DtdProcessing = DtdProcessing.Parse,
-                WhitespaceHandling = WhitespaceHandling.None,
-                EntityHandling = EntityHandling.ExpandCharEntities
-            })
-            {
+                xmlReader.DtdProcessing = DtdProcessing.Parse;
+                xmlReader.WhitespaceHandling = WhitespaceHandling.None;
+                xmlReader.EntityHandling = EntityHandling.ExpandCharEntities;
+
                 while (xmlReader.ReadToFollowing("entry"))
                 {
                     JmdictRecordBuilder.AddToDictionary(ReadEntry(xmlReader), dict.Contents);

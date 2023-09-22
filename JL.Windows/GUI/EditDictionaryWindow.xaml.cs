@@ -97,7 +97,8 @@ internal sealed partial class EditDictionaryWindow : Window
 
     private void BrowseForDictionaryFolder()
     {
-        using System.Windows.Forms.FolderBrowserDialog fbd = new() { SelectedPath = Utils.ApplicationPath };
+        using System.Windows.Forms.FolderBrowserDialog fbd = new();
+        fbd.SelectedPath = Utils.ApplicationPath;
 
         if (fbd.ShowDialog() is System.Windows.Forms.DialogResult.OK &&
             !string.IsNullOrWhiteSpace(fbd.SelectedPath))
