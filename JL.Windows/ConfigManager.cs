@@ -705,7 +705,6 @@ internal static class ConfigManager
             KeyGestureUtils.SetInputGestureText(currentPopupWindow.AddNameMenuItem, ShowAddNameWindowKeyGesture);
             KeyGestureUtils.SetInputGestureText(currentPopupWindow.AddWordMenuItem, ShowAddWordWindowKeyGesture);
             KeyGestureUtils.SetInputGestureText(currentPopupWindow.SearchMenuItem, SearchWithBrowserKeyGesture);
-            KeyGestureUtils.SetInputGestureText(currentPopupWindow.StatsMenuItem, ShowStatsKeyGesture);
 
             currentPopupWindow = currentPopupWindow.ChildPopupWindow;
         }

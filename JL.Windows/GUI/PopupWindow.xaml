@@ -68,10 +68,6 @@
                 Name="SearchMenuItem"
                 Header="Search"
                 Click="SearchWithBrowser" />
-            <MenuItem
-                Name="StatsMenuItem"
-                Header="Stats"
-                Click="ShowStats" />
         </ContextMenu>
     </Window.ContextMenu>
 </Window>
