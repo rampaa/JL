@@ -98,7 +98,6 @@ internal sealed partial class PopupWindow : Window
         KeyGestureUtils.SetInputGestureText(AddNameMenuItem, ConfigManager.ShowAddNameWindowKeyGesture);
         KeyGestureUtils.SetInputGestureText(AddWordMenuItem, ConfigManager.ShowAddWordWindowKeyGesture);
         KeyGestureUtils.SetInputGestureText(SearchMenuItem, ConfigManager.SearchWithBrowserKeyGesture);
-        KeyGestureUtils.SetInputGestureText(StatsMenuItem, ConfigManager.ShowStatsKeyGesture);
 
         if (ConfigManager.ShowMiningModeReminder)
         {
@@ -124,11 +123,6 @@ internal sealed partial class PopupWindow : Window
     private void SearchWithBrowser(object sender, RoutedEventArgs e)
     {
         WindowsUtils.SearchWithBrowser(LastSelectedText);
-    }
-
-    private void ShowStats(object sender, RoutedEventArgs e)
-    {
-        WindowsUtils.ShowStatsWindow();
     }
 
     public async Task LookupOnCharPosition(TextBox tb, int charPosition, bool enableMiningMode)
@@ -1509,12 +1503,6 @@ internal sealed partial class PopupWindow : Window
             await WindowsUtils.Motivate().ConfigureAwait(false);
         }
 
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowStatsKeyGesture))
-        {
-            WindowsUtils.ShowStatsWindow();
-            PopupAutoHideTimer.Start();
-        }
-
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.NextDictKeyGesture))
         {
             bool foundSelectedButton = false;
@@ -1842,8 +1830,7 @@ internal sealed partial class PopupWindow : Window
             {
                 if (PopupContextMenu.IsVisible
                     || AddWordWindow.IsItVisible()
-                    || AddNameWindow.IsItVisible()
-                    || StatsWindow.IsItVisible())
+                    || AddNameWindow.IsItVisible())
                 {
                     PopupAutoHideTimer.Stop();
                 }
@@ -1953,8 +1940,7 @@ internal sealed partial class PopupWindow : Window
         if (!(bool)e.NewValue
             && !IsMouseOver
             && !AddWordWindow.IsItVisible()
-            && !AddNameWindow.IsItVisible()
-            && !StatsWindow.IsItVisible())
+            && !AddNameWindow.IsItVisible())
         {
             PopupAutoHideTimer.Start();
         }
@@ -2023,7 +2009,11 @@ internal sealed partial class PopupWindow : Window
         else
         {
             PopupWindow previousPopup = (PopupWindow)Owner;
-            WinApi.ActivateWindow(previousPopup.WindowHandle);
+            if (previousPopup.IsVisible)
+            {
+                WinApi.ActivateWindow(previousPopup.WindowHandle);
+            }
+
             if (ConfigManager.HighlightLongestMatch && !previousPopup.ContextMenuIsOpening)
             {
                 WindowsUtils.Unselect(_lastTextBox);

@@ -951,7 +951,9 @@ public static class LookupUtils
                         deconjugatedMatchedText: customNameResult.Value.DeconjugatedMatchedText,
                         frequencies: new List<LookupFrequencyResult> { new(customNameResult.Value.Dict.Name, -freq) },
                         dict: customNameResult.Value.Dict,
-                        readings: new List<string> { customNameDictResult.Reading },
+                        readings: customNameDictResult.Reading is not null
+                            ? new List<string> { customNameDictResult.Reading }
+                            : null,
                         formattedDefinitions: customNameDictResult.BuildFormattedDefinition()
                     );
 

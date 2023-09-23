@@ -19,17 +19,27 @@ public static class CustomNameLoader
                     break;
                 }
 
-                string[] lParts = line.Split("\t", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                string[] lParts = line.Split("\t", StringSplitOptions.TrimEntries);
 
                 if (lParts.Length is 3)
                 {
-                    AddToDictionary(lParts[0], lParts[1], lParts[2], customNameDictionary);
+                    string spelling = lParts[0];
+
+                    string? reading = lParts[1];
+                    if (reading.Length is 0 || reading == spelling)
+                    {
+                        reading = null;
+                    }
+
+                    string nameType = lParts[2];
+
+                    AddToDictionary(spelling, reading, nameType, customNameDictionary);
                 }
             }
         }
     }
 
-    public static void AddToDictionary(string spelling, string reading, string nameType, Dictionary<string, IList<IDictRecord>> customNameDictionary)
+    public static void AddToDictionary(string spelling, string? reading, string nameType, Dictionary<string, IList<IDictRecord>> customNameDictionary)
     {
         CustomNameRecord newNameRecord = new(spelling, reading, nameType);
         if (customNameDictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(spelling), out IList<IDictRecord>? entry))

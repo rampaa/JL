@@ -49,23 +49,17 @@ internal sealed partial class AddNameWindow : Window
             SpellingTextBox.ClearValue(BorderBrushProperty);
         }
 
-        string reading = ReadingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
-        if (reading.Length is 0)
-        {
-            ReadingTextBox.BorderBrush = Brushes.Red;
-            isValid = false;
-        }
-        else if (ReadingTextBox.BorderBrush == Brushes.Red)
-        {
-            ReadingTextBox.ClearValue(BorderBrushProperty);
-        }
-
         if (isValid)
         {
             string nameType =
                 NameTypeStackPanel.Children.OfType<RadioButton>()
                     .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
             string spelling = SpellingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
+            string? reading = ReadingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
+            if (reading.Length is 0 || reading == spelling)
+            {
+                reading = null;
+            }
 
             DictType dictType = ComboBoxDictType.SelectedValue.ToString() is "Global"
                 ? DictType.CustomNameDictionary
@@ -88,6 +82,7 @@ internal sealed partial class AddNameWindow : Window
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
+        WindowsUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
         s_instance = null;

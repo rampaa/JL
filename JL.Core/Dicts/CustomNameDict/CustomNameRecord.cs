@@ -5,10 +5,10 @@ namespace JL.Core.Dicts.CustomNameDict;
 internal sealed record class CustomNameRecord : IDictRecord
 {
     public string PrimarySpelling { get; }
-    public string Reading { get; }
+    public string? Reading { get; }
     private string NameType { get; }
 
-    public CustomNameRecord(string primarySpelling, string reading, string nameType)
+    public CustomNameRecord(string primarySpelling, string? reading, string nameType)
     {
         PrimarySpelling = primarySpelling;
         Reading = reading;
@@ -18,7 +18,7 @@ internal sealed record class CustomNameRecord : IDictRecord
 #pragma warning disable CA1308
     public string BuildFormattedDefinition()
     {
-        return string.Create(CultureInfo.InvariantCulture, $"({NameType.ToLowerInvariant()}) {Reading}");
+        return string.Create(CultureInfo.InvariantCulture, $"({NameType.ToLowerInvariant()}) {Reading ?? PrimarySpelling}");
     }
 #pragma warning restore CA1308
 

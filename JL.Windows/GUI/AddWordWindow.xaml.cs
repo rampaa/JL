@@ -108,6 +108,7 @@ internal sealed partial class AddWordWindow : Window
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
+        WindowsUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
         s_instance = null;
