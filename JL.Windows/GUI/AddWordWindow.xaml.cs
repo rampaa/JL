@@ -49,17 +49,9 @@ internal sealed partial class AddWordWindow : Window
             SpellingsTextBox.ClearValue(BorderBrushProperty);
         }
 
-        if (ReadingsTextBox.Text is "")
-        {
-            ReadingsTextBox.BorderBrush = Brushes.Red;
-            isValid = false;
-        }
-        else if (ReadingsTextBox.BorderBrush == Brushes.Red)
-        {
-            ReadingsTextBox.ClearValue(BorderBrushProperty);
-        }
-
-        if (DefinitionsTextBox.Text is "")
+        string rawDefinitions = DefinitionsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
+        string[] definitions = rawDefinitions.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        if (definitions.Length is 0)
         {
             DefinitionsTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -73,17 +65,23 @@ internal sealed partial class AddWordWindow : Window
         {
             string rawSpellings = SpellingsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
             string rawReadings = ReadingsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
-            string rawDefinitions = DefinitionsTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
             string rawPartOfSpeech = PartOfSpeechStackPanel.Children.OfType<RadioButton>()
                 .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
             string rawWordClasses = WordClassTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal);
 
-            string[] spellings = rawSpellings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
-            string[] readings = rawReadings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
-            string[] definitions = rawDefinitions.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
-            string[]? wordClasses = string.IsNullOrWhiteSpace(rawWordClasses)
-                ? null
-                : rawWordClasses.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
+            string[] spellings = rawSpellings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+            string[]? readings = rawReadings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            if (readings.Length is 0)
+            {
+                readings = null;
+            }
+
+            string[]? wordClasses = rawWordClasses.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            if (wordClasses.Length is 0)
+            {
+                wordClasses = null;
+            }
 
             DictType dictType = ComboBoxDictType.SelectedValue.ToString() is "Global"
                 ? DictType.CustomWordDictionary

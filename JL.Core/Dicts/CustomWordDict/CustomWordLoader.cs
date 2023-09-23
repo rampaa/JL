@@ -56,14 +56,13 @@ public static class CustomWordLoader
                     break;
                 }
 
-                string[] lParts = line.Split("\t", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                string[] lParts = line.Split("\t");
 
                 if (lParts.Length > 3)
                 {
                     string[] spellings = lParts[0].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
                     string[]? readings = lParts[1].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
                     if (readings.Length is 0)
                     {
                         readings = null;
@@ -87,6 +86,15 @@ public static class CustomWordLoader
     public static void AddToDictionary(string[] spellings, string[]? readings, string[] definitions,
         string rawPartOfSpeech, string[]? wordClasses, Dictionary<string, IList<IDictRecord>> customWordDictionary)
     {
+        bool hasUserDefinedWordClasses = wordClasses?.Length > 0;
+        string[] wordClassArray = rawPartOfSpeech switch
+        {
+            "Verb" => hasUserDefinedWordClasses ? wordClasses! : s_verbs,
+            "Adjective" => s_adjectives,
+            "Noun" => s_noun,
+            _ => s_other
+        };
+
         for (int i = 0; i < spellings.Length; i++)
         {
             string[]? alternativeSpellings = spellings.RemoveAt(i);
@@ -97,32 +105,43 @@ public static class CustomWordLoader
 
             string spelling = spellings[i];
 
-            bool hasUserDefinedWordClasses = wordClasses?.Length > 0;
-
-            string[] wordClassArray = rawPartOfSpeech switch
-            {
-                "Verb" => hasUserDefinedWordClasses ? wordClasses! : s_verbs,
-                "Adjective" => s_adjectives,
-                "Noun" => s_noun,
-                _ => s_other
-            };
-
             CustomWordRecord newWordRecord = new(spelling, alternativeSpellings, readings, definitions, wordClassArray, hasUserDefinedWordClasses);
 
-            if (customWordDictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(spelling), out IList<IDictRecord>? result))
+            if (!AddRecordToDictionary(spelling, newWordRecord, customWordDictionary))
             {
-                if (result.Contains(newWordRecord))
-                {
-                    break;
-                }
-
-                result.Add(newWordRecord);
+                return;
             }
-            else
+
+            if (i is 0)
             {
-                customWordDictionary.Add(JapaneseUtils.KatakanaToHiragana(spelling),
-                    new List<IDictRecord> { newWordRecord });
+                for (int j = 0; j < readings?.Length; j++)
+                {
+                    if (!AddRecordToDictionary(readings[j], newWordRecord, customWordDictionary))
+                    {
+                        return;
+                    }
+                }
             }
         }
+    }
+
+    private static bool AddRecordToDictionary(string spelling, CustomWordRecord record, Dictionary<string, IList<IDictRecord>> dictionary)
+    {
+        if (dictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(spelling), out IList<IDictRecord>? result))
+        {
+            if (result.Contains(record))
+            {
+                return false;
+            }
+
+            result.Add(record);
+        }
+        else
+        {
+            dictionary.Add(JapaneseUtils.KatakanaToHiragana(spelling),
+                new List<IDictRecord> { record });
+        }
+
+        return true;
     }
 }

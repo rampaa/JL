@@ -48,7 +48,8 @@ internal sealed partial class AddNameWindow : Window
             SpellingTextBox.ClearValue(BorderBrushProperty);
         }
 
-        if (ReadingTextBox.Text is "")
+        string reading = ReadingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
+        if (reading.Length is 0)
         {
             ReadingTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -64,7 +65,6 @@ internal sealed partial class AddNameWindow : Window
                 NameTypeStackPanel.Children.OfType<RadioButton>()
                     .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
             string spelling = SpellingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
-            string reading = ReadingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
 
             DictType dictType = ComboBoxDictType.SelectedValue.ToString() is "Global"
                 ? DictType.CustomNameDictionary
