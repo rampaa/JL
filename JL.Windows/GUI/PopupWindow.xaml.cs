@@ -178,6 +178,10 @@ internal sealed partial class PopupWindow : Window
 
             if (ConfigManager.HighlightLongestMatch)
             {
+                WinApi.ActivateWindow(Owner == MainWindow.Instance
+                    ? MainWindow.Instance.WindowHandle
+                    : ((PopupWindow)Owner).WindowHandle);
+
                 _ = tb.Focus();
                 tb.Select(charPosition, lookupResults[0].MatchedText.Length);
             }

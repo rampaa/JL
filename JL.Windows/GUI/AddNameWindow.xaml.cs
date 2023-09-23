@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomNameDict;
@@ -105,9 +106,9 @@ internal sealed partial class AddNameWindow : Window
         }
     }
 
-    private void Window_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+    private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
     {
-        if (e.Key is System.Windows.Input.Key.Enter)
+        if (e.Key is Key.Enter && InputMethod.Current?.ImeState is not InputMethodState.On)
         {
             e.Handled = true;
             SaveButton_Click(null, null);
