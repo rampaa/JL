@@ -15,12 +15,13 @@ public static class ProfileUtils
     {
         try
         {
+            _ = Directory.CreateDirectory(Utils.ConfigPath);
             await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "Profiles.json"),
                 JsonSerializer.Serialize(new Profile(CurrentProfile, Profiles), Utils.s_jsoWithIndentation)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            Utils.Logger.Fatal(ex, "SerializeAudioSources failed");
+            Utils.Logger.Fatal(ex, "SerializeProfiles failed");
             throw;
         }
     }
@@ -54,7 +55,7 @@ public static class ProfileUtils
 
             else
             {
-                Utils.Logger.Information("Stats.json doesn't exist, creating it");
+                Utils.Logger.Information("Profiles.json doesn't exist, creating it");
                 await SerializeProfiles().ConfigureAwait(false);
             }
         }
