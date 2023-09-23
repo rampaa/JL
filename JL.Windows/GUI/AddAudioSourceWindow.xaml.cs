@@ -135,17 +135,19 @@ internal sealed partial class AddAudioSourceWindow : Window
 
     private void InfoButton_Click(object sender, RoutedEventArgs e)
     {
-        const string audioSourceTypeInfo = @"1) Local files through ""Local Path"" type:
-e.g. C:\Users\User\Desktop\jpod_files\{Reading} - {Term}.mp3
+        const string audioSourceTypeInfo = """
+                                           1) Local files through "Local Path" type:
+                                           e.g. C:\Users\User\Desktop\jpod_files\{Reading} - {Term}.mp3
 
-2) URLs returning an audio directly through ""URL"" type:
-e.g. http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={Term}&kana={Reading}
+                                           2) URLs returning an audio directly through "URL" type:
+                                           e.g. http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={Term}&kana={Reading}
 
-3) URLs returning a JSON response in Custom Audio List format through ""URL (JSON)"" type:
-e.g. http://127.0.0.1:5050/?sources=jpod,jpod_alternate,nhk16,forvo&term={Term}&reading={Reading}
+                                           3) URLs returning a JSON response in Custom Audio List format through "URL (JSON)" type:
+                                           e.g. http://127.0.0.1:5050/?sources=jpod,jpod_alternate,nhk16,forvo&term={Term}&reading={Reading}
 
-4) Windows Text to Speech:
-e.g. Microsoft Haruka";
+                                           4) Windows Text to Speech:
+                                           e.g. Microsoft Haruka
+                                           """;
 
         InfoWindow infoWindow = new()
         {

@@ -411,7 +411,7 @@ internal sealed partial class PopupWindow : Window
 
             if (PopupListBox.Items.Count > 0)
             {
-                PopupListBox.ScrollIntoView(PopupListBox.Items[0]);
+                PopupListBox.ScrollIntoView(PopupListBox.Items[0]!);
             }
         }
 
@@ -441,7 +441,7 @@ internal sealed partial class PopupWindow : Window
 
             if (PopupListBox.Items.Count > 0)
             {
-                PopupListBox.ScrollIntoView(PopupListBox.Items[0]);
+                PopupListBox.ScrollIntoView(PopupListBox.Items[0]!);
             }
 
             // we might cache incomplete results if we don't wait until all dicts are loaded
@@ -1519,7 +1519,7 @@ internal sealed partial class PopupWindow : Window
             int dictCount = ItemsControlButtons.Items.Count;
             for (int i = 0; i < dictCount; i++)
             {
-                Button button = (Button)ItemsControlButtons.Items[i];
+                Button button = (Button)ItemsControlButtons.Items[i]!;
 
                 if (button.Background == Brushes.DodgerBlue)
                 {
@@ -1541,7 +1541,7 @@ internal sealed partial class PopupWindow : Window
 
             if (!movedToNextDict)
             {
-                ((Button)ItemsControlButtons.Items[0]).Background = Brushes.DodgerBlue;
+                ((Button)ItemsControlButtons.Items[0]!).Background = Brushes.DodgerBlue;
                 PopupListBox.Items.Filter = NoAllDictFilter;
             }
         }
@@ -1554,7 +1554,7 @@ internal sealed partial class PopupWindow : Window
             int dictCount = ItemsControlButtons.Items.Count;
             for (int i = dictCount - 1; i > 0; i--)
             {
-                Button button = (Button)ItemsControlButtons.Items[i];
+                Button button = (Button)ItemsControlButtons.Items[i]!;
 
                 if (button.Background == Brushes.DodgerBlue)
                 {
@@ -1576,7 +1576,7 @@ internal sealed partial class PopupWindow : Window
 
             if (foundSelectedButton && !movedToPreviousDict)
             {
-                ((Button)ItemsControlButtons.Items[0]).Background = Brushes.DodgerBlue;
+                ((Button)ItemsControlButtons.Items[0]!).Background = Brushes.DodgerBlue;
                 PopupListBox.Items.Filter = NoAllDictFilter;
             }
 
@@ -1584,12 +1584,12 @@ internal sealed partial class PopupWindow : Window
             {
                 for (int i = dictCount - 1; i > 0; i--)
                 {
-                    Button btn = (Button)ItemsControlButtons.Items[i];
+                    Button btn = (Button)ItemsControlButtons.Items[i]!;
                     if (btn.IsEnabled)
                     {
                         _filteredDict = (Dict)btn.Tag;
                         btn.Background = Brushes.DodgerBlue;
-                        ((Button)ItemsControlButtons.Items[0]).ClearValue(BackgroundProperty);
+                        ((Button)ItemsControlButtons.Items[0]!).ClearValue(BackgroundProperty);
                         PopupListBox.Items.Filter = DictFilter;
                         break;
                     }

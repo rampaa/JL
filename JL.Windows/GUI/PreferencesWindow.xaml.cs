@@ -44,46 +44,52 @@ internal sealed partial class PreferencesWindow : Window
         return s_instance?.IsVisible ?? false;
     }
 
-    private const string WordJLFieldsInfo = @"• Primary Spelling: It's the spelling you click to mine the word, e.g., if you look up ""わかりました"", its primary spelling will be ""分かる"".
-• Readings: Readings of the mined word, e.g., if you look up ""描く"", its ""Readings"" will be ""えがく, かく"".
-• Alternative Spellings: Alternative spellings of the mined word, e.g., if you look up ""わかりました"", its alternative spellings will be ""解る, 判る, 分る"".
-• Definitions: Definitions of the mined word.
-• Dictionary Name: Name of the dictionary, e.g., JMDict.
-• Audio: Audio for the first reading of the mined word.
-• Source Text: Whole text in which the mined word appears in.
-• Sentence: Sentence in which the mined word appears in.
-• Matched Text: Text the mined word found as, e.g., ""わかりました"".
-• Deconjugated Matched Text: Matched Text's deconjugated form, e.g., if the ""Matched Text"" is ""わかりました"", ""Deconjugated Matched Text"" will be ""わかる"".
-• Deconjugation Process: Deconjugation path from the ""Matched Text"" to ""Deconjugated Matched Text"".
-• Frequencies: Frequency info for the mined word, e.g., ""VN: #77, JPDB: #666"".
-• EDICT ID: JMDict entry ID.
-• Local Time: Mining date and time expressed in local timezone.";
+    private const string WordJLFieldsInfo = """
+                                            • Primary Spelling: It's the spelling you click to mine the word, e.g., if you look up "わかりました", its primary spelling will be "分かる".
+                                            • Readings: Readings of the mined word, e.g., if you look up "描く", its "Readings" will be "えがく, かく".
+                                            • Alternative Spellings: Alternative spellings of the mined word, e.g., if you look up "わかりました", its alternative spellings will be "解る, 判る, 分る".
+                                            • Definitions: Definitions of the mined word.
+                                            • Dictionary Name: Name of the dictionary, e.g., JMDict.
+                                            • Audio: Audio for the first reading of the mined word.
+                                            • Source Text: Whole text in which the mined word appears in.
+                                            • Sentence: Sentence in which the mined word appears in.
+                                            • Matched Text: Text the mined word found as, e.g., "わかりました".
+                                            • Deconjugated Matched Text: Matched Text's deconjugated form, e.g., if the "Matched Text" is "わかりました", "Deconjugated Matched Text" will be "わかる".
+                                            • Deconjugation Process: Deconjugation path from the "Matched Text" to "Deconjugated Matched Text".
+                                            • Frequencies: Frequency info for the mined word, e.g., "VN: #77, JPDB: #666".
+                                            • EDICT ID: JMDict entry ID.
+                                            • Local Time: Mining date and time expressed in local timezone.
+                                            """;
 
-    private const string KanjiJLFieldsInfo = @"• Primary Spelling: It's the spelling you click to mine the kanji, e.g., ""妹"".
-• Readings: Kun+On+Nanori readings of the kanji.
-• Kun Readings: Kun readings of the mined kanji.
-• On Readings: On readings of the mined kanji.
-• Nanori Readings: Nanori readings of the mined kanji.
-• Stroke Count: Stroke count of the kanji.
-• Kanji Grade: The kanji grade level.
-• Kanji Composition: Kanji composition info, e.g., ""⿰女未"" for ""妹"".
-• Definitions: Definitions of the mined kanji.
-• Dictionary Name: Name of the dictionary, e.g., ""Kanjidic"".
-• Source Text: Whole text in which the mined kanji appears in.
-• Sentence: Sentence in which the mined kanji appears in.
-• Frequencies: Frequency info for the kanji.
-• EDICT ID: KANJIDIC2 entry ID.
-• Local Time: Mining date and time expressed in local timezone.";
+    private const string KanjiJLFieldsInfo = """
+                                             • Primary Spelling: It's the spelling you click to mine the kanji, e.g., "妹".
+                                             • Readings: Kun+On+Nanori readings of the kanji.
+                                             • Kun Readings: Kun readings of the mined kanji.
+                                             • On Readings: On readings of the mined kanji.
+                                             • Nanori Readings: Nanori readings of the mined kanji.
+                                             • Stroke Count: Stroke count of the kanji.
+                                             • Kanji Grade: The kanji grade level.
+                                             • Kanji Composition: Kanji composition info, e.g., "⿰女未" for "妹".
+                                             • Definitions: Definitions of the mined kanji.
+                                             • Dictionary Name: Name of the dictionary, e.g., "Kanjidic".
+                                             • Source Text: Whole text in which the mined kanji appears in.
+                                             • Sentence: Sentence in which the mined kanji appears in.
+                                             • Frequencies: Frequency info for the kanji.
+                                             • EDICT ID: KANJIDIC2 entry ID.
+                                             • Local Time: Mining date and time expressed in local timezone.
+                                             """;
 
-    private const string NameJLFieldsInfo = @"• Primary Spelling: It's the spelling you click to mine the name.
-• Readings: Readings of the name.
-• Alternative Spellings: Alternative spellings of the mined name.
-• Definitions: Translations of the name.
-• Dictionary Name: Name of the dictionary, e.g., ""JMnedict"".
-• Source Text: Whole text in which the mined name appears in.
-• Sentence: Sentence in which the mined name appears in.
-• EDICT ID: JMnedict entry ID.
-• Local Time: Mining date and time expressed in local timezone.";
+    private const string NameJLFieldsInfo = """
+                                            • Primary Spelling: It's the spelling you click to mine the name.
+                                            • Readings: Readings of the name.
+                                            • Alternative Spellings: Alternative spellings of the mined name.
+                                            • Definitions: Translations of the name.
+                                            • Dictionary Name: Name of the dictionary, e.g., "JMnedict".
+                                            • Source Text: Whole text in which the mined name appears in.
+                                            • Sentence: Sentence in which the mined name appears in.
+                                            • EDICT ID: JMnedict entry ID.
+                                            • Local Time: Mining date and time expressed in local timezone.
+                                            """;
 
     #region EventHandlers
 
