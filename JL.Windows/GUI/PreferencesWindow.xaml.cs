@@ -124,6 +124,8 @@ internal sealed partial class PreferencesWindow : Window
 
             if (_profileNamesDict.Active || _profileWordsDict.Active)
             {
+                Utils.Frontend.InvalidateDisplayCache();
+
                 if (_profileNamesDict.Active)
                 {
                     DictUtils.ProfileCustomNamesCancellationTokenSource?.Cancel();
