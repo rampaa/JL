@@ -35,20 +35,20 @@
             </ItemsControl.ItemsPanel>
         </ItemsControl>
 
-        <ListBox Grid.Row="2" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
+        <ListView Grid.Row="2" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.ScrollUnit="Pixel"
                   BorderThickness="0" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True"
                   ScrollViewer.VerticalScrollBarVisibility="Auto" VirtualizingPanel.IsContainerVirtualizable="True"
                   HorizontalContentAlignment="Stretch"
                   Background="{Binding Path=Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
-                  x:Name="PopupListBox" Opacity="70">
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="{x:Type ListBoxItem}">
+                  x:Name="PopupListView" Opacity="70">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
                     <Setter Property="Focusable" Value="False" />
                 </Style>
-            </ListBox.ItemContainerStyle>
-        </ListBox>
+            </ListView.ItemContainerStyle>
+        </ListView>
     </Grid>
 
     <Window.ContextMenu>
