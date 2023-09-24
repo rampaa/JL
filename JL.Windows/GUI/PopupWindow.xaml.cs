@@ -1962,6 +1962,12 @@ internal sealed partial class PopupWindow : Window
 
     public void HidePopup()
     {
+        if (PopupListView.Items.Count > 0)
+        {
+            PopupListView.ScrollIntoView(PopupListView.Items.GetItemAt(0));
+            PopupListView.UpdateLayout();
+        }
+
         MainWindow mainWindow = MainWindow.Instance;
         bool isFirstPopup = Owner == mainWindow;
 
@@ -1980,12 +1986,6 @@ internal sealed partial class PopupWindow : Window
         TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
         ItemsControlButtons.Visibility = Visibility.Collapsed;
         ItemsControlButtons.ItemsSource = null;
-
-        if (PopupListView.Items.Count > 0)
-        {
-            PopupListView.ScrollIntoView(PopupListView.Items.GetItemAt(0));
-            PopupListView.UpdateLayout();
-        }
 
         PopupListView.ItemsSource = null;
         LastText = "";
