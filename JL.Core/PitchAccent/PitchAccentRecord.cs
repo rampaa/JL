@@ -13,7 +13,7 @@ public sealed class PitchAccentRecord : IDictRecord
 
     private static readonly Regex s_positionRegex = new("@\"(\\[|［)(\\d)(］|\\])", RegexOptions.Compiled);
 
-    internal PitchAccentRecord(IReadOnlyList<JsonElement> jsonObject)
+    internal PitchAccentRecord(List<JsonElement> jsonObject)
     {
         Spelling = jsonObject[0].ToString().GetPooledString();
 

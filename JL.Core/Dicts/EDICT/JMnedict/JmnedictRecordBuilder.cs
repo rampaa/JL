@@ -78,7 +78,7 @@ internal static class JmnedictRecordBuilder
             }
             else
             {
-                jmnedictDictionary.Add(key, new List<IDictRecord> { jmnedictRecord });
+                jmnedictDictionary[key] = new List<IDictRecord> { jmnedictRecord };
             }
         }
     }

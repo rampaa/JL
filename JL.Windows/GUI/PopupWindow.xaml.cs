@@ -61,6 +61,8 @@ internal sealed partial class PopupWindow : Window
     public static LRUCache<string, StackPanel[]> StackPanelCache { get; } = new(
         Utils.CacheSize, Utils.CacheSize / 8);
 
+    private ScrollViewer? _popupListViewScrollViewer;
+
     public PopupWindow()
     {
         InitializeComponent();
@@ -71,6 +73,7 @@ internal sealed partial class PopupWindow : Window
     {
         base.OnSourceInitialized(e);
         WindowHandle = new WindowInteropHelper(this).Handle;
+        _popupListViewScrollViewer = PopupListView.GetChildOfType<ScrollViewer>();
     }
 
     protected override void OnActivated(EventArgs e)
@@ -1312,16 +1315,16 @@ internal sealed partial class PopupWindow : Window
     private void ShowAddNameWindow()
     {
         string text;
-        string readings = "";
+        string reading = "";
         if (ChildPopupWindow?._lastTextBox?.SelectionLength > 0)
         {
             text = ChildPopupWindow._lastTextBox.SelectedText;
 
             if (text == ChildPopupWindow.LastSelectedText)
             {
-                IList<string>? readingList = ChildPopupWindow.LastLookupResults[0].Readings;
-                readings = readingList is { Count: 1 }
-                    ? readingList[0]
+                string[]? readings = ChildPopupWindow.LastLookupResults[0].Readings;
+                reading = readings is { Length: 1 }
+                    ? readings[0]
                     : "";
             }
         }
@@ -1330,18 +1333,18 @@ internal sealed partial class PopupWindow : Window
             int index = MiningMode ? _listBoxIndex : 0;
             text = LastLookupResults[index].PrimarySpelling;
 
-            IList<string>? readingList = LastLookupResults[index].Readings;
-            readings = readingList is { Count: 1 }
-                ? readingList[0]
+            string[]? readings = LastLookupResults[index].Readings;
+            reading = readings is { Length: 1 }
+                ? readings[0]
                 : "";
         }
 
-        if (readings == text)
+        if (reading == text)
         {
-            readings = "";
+            reading = "";
         }
 
-        WindowsUtils.ShowAddNameWindow(text, readings);
+        WindowsUtils.ShowAddNameWindow(text, reading);
     }
 
     private async void Window_KeyDown(object sender, KeyEventArgs e)
@@ -1962,12 +1965,6 @@ internal sealed partial class PopupWindow : Window
 
     public void HidePopup()
     {
-        if (PopupListView.Items.Count > 0)
-        {
-            PopupListView.ScrollIntoView(PopupListView.Items.GetItemAt(0));
-            PopupListView.UpdateLayout();
-        }
-
         MainWindow mainWindow = MainWindow.Instance;
         bool isFirstPopup = Owner == mainWindow;
 
@@ -1986,6 +1983,12 @@ internal sealed partial class PopupWindow : Window
         TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
         ItemsControlButtons.Visibility = Visibility.Collapsed;
         ItemsControlButtons.ItemsSource = null;
+
+        if (_popupListViewScrollViewer is not null)
+        {
+            _popupListViewScrollViewer.ScrollToTop();
+            PopupListView.UpdateLayout();
+        }
 
         PopupListView.ItemsSource = null;
         LastText = "";

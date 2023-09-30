@@ -125,13 +125,14 @@ internal static class EpwingNazekaLoader
 
     private static void AddRecordToDictionary(string key, EpwingNazekaRecord record, Dictionary<string, IList<IDictRecord>> dictionary)
     {
-        if (dictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(key).GetPooledString(), out IList<IDictRecord>? result))
+        string keyInHiragana = JapaneseUtils.KatakanaToHiragana(key).GetPooledString();
+        if (dictionary.TryGetValue(keyInHiragana, out IList<IDictRecord>? result))
         {
             result.Add(record);
         }
         else
         {
-            dictionary.Add(key, new List<IDictRecord> { record });
+            dictionary[keyInHiragana] = new List<IDictRecord> { record };
         }
     }
 }

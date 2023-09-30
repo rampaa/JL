@@ -887,9 +887,9 @@ internal sealed partial class MainWindow : Window
 
         if (text is not null && FirstPopupWindow.LastSelectedText is not null && text == FirstPopupWindow.LastSelectedText)
         {
-            IList<string>? readingList = FirstPopupWindow.LastLookupResults[0].Readings;
-            reading = readingList is { Count: 1 }
-                ? readingList[0]
+            string[]? readings = FirstPopupWindow.LastLookupResults[0].Readings;
+            reading = readings is { Length: 1 }
+                ? readings[0]
                 : "";
         }
 

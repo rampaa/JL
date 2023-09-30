@@ -141,7 +141,7 @@ internal sealed partial class AddDictionaryWindow : Window
         FillDictTypesCombobox(DictUtils.NazekaDictTypes);
     }
 
-    private void FillDictTypesCombobox(IEnumerable<DictType> types)
+    private void FillDictTypesCombobox(DictType[] types)
     {
         IEnumerable<DictType> loadedDictTypes = DictUtils.Dicts.Values.Select(static dict => dict.Type);
         IEnumerable<DictType> validTypes = types.Except(loadedDictTypes.Except(DictUtils.NonspecificDictTypes));

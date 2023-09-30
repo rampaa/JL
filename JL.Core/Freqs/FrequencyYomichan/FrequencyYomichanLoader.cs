@@ -78,7 +78,7 @@ internal static class FrequencyYomichanLoader
 
                         else
                         {
-                            freqDict.Add(spellingInHiragana, new List<FrequencyRecord> { new(spelling, frequency) });
+                            freqDict[spellingInHiragana] = new List<FrequencyRecord> { new(spelling, frequency) };
                         }
                     }
 
@@ -92,7 +92,7 @@ internal static class FrequencyYomichanLoader
 
                         else
                         {
-                            freqDict.Add(readingInHiragana, new List<FrequencyRecord> { new(spelling, frequency) });
+                            freqDict[readingInHiragana] = new List<FrequencyRecord> { new(spelling, frequency) };
                         }
 
                         if (reading != spelling)
@@ -104,7 +104,7 @@ internal static class FrequencyYomichanLoader
 
                             else
                             {
-                                freqDict.Add(spellingInHiragana, new List<FrequencyRecord> { new(reading, frequency) });
+                                freqDict[spellingInHiragana] = new List<FrequencyRecord> { new(reading, frequency) };
                             }
                         }
                     }

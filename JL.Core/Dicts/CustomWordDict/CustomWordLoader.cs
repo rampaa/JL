@@ -126,7 +126,8 @@ public static class CustomWordLoader
 
     private static bool AddRecordToDictionary(string spelling, CustomWordRecord record, Dictionary<string, IList<IDictRecord>> dictionary)
     {
-        if (dictionary.TryGetValue(JapaneseUtils.KatakanaToHiragana(spelling), out IList<IDictRecord>? result))
+        string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(spelling);
+        if (dictionary.TryGetValue(spellingInHiragana, out IList<IDictRecord>? result))
         {
             if (result.Contains(record))
             {
@@ -137,8 +138,7 @@ public static class CustomWordLoader
         }
         else
         {
-            dictionary.Add(JapaneseUtils.KatakanaToHiragana(spelling),
-                new List<IDictRecord> { record });
+            dictionary[spellingInHiragana] = new List<IDictRecord> { record };
         }
 
         return true;

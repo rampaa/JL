@@ -25,11 +25,6 @@ internal static class KanjidicLoader
                 }
             }
 
-            foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
-            {
-                dict.Contents[key] = recordList.ToArray();
-            }
-
             dict.Contents.TrimExcess();
         }
 
@@ -55,7 +50,7 @@ internal static class KanjidicLoader
 
     private static async Task ReadCharacter(XmlReader xmlReader, Dictionary<string, IList<IDictRecord>> kanjidicDictionary)
     {
-        string key = await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+        string key = (await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false)).GetPooledString();
 
         int grade = -1;
         int strokeCount = 0;
@@ -142,6 +137,6 @@ internal static class KanjidicLoader
 
         KanjidicRecord entry = new(definitions, onReadings, kunReadings, nanoriReadings, strokeCount, grade, frequency);
 
-        kanjidicDictionary.Add(key, new List<IDictRecord> { entry });
+        kanjidicDictionary[key] = new IDictRecord[] { entry };
     }
 }

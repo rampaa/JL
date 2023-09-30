@@ -227,9 +227,7 @@ internal static class JmdictRecordBuilder
             recordDictionary.Add(key, record);
             ++index;
 
-            if (i is 0
-                && allSpellingsWithoutSearchOnlyForms.Count is 0
-                && entry.KanjiElements.Count > 0)
+            if (i is 0 && allSpellingsWithoutSearchOnlyForms.Count is 0)
             {
                 for (int j = 0; j < entry.KanjiElements.Count; j++)
                 {
@@ -246,7 +244,7 @@ internal static class JmdictRecordBuilder
             }
             else
             {
-                jmdictDictionary.Add(key, new List<IDictRecord> { jmdictRecord });
+                jmdictDictionary[key] = new List<IDictRecord> { jmdictRecord };
             }
         }
     }

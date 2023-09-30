@@ -18,7 +18,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
     //public int Sequence { get; init; }
     //public string TermTags { get; init; }
 
-    public EpwingYomichanRecord(IReadOnlyList<JsonElement> jsonElement)
+    public EpwingYomichanRecord(List<JsonElement> jsonElement)
     {
         PrimarySpelling = jsonElement[0].ToString().GetPooledString();
         Reading = jsonElement[1].ToString();

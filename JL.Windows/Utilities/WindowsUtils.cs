@@ -48,7 +48,7 @@ internal static class WindowsUtils
     public static double DpiAwareFixedPopupXPosition { get; set; } = ConfigManager.FixedPopupXPosition / Dpi.DpiScaleX;
     public static double DpiAwareFixedPopupYPosition { get; set; } = ConfigManager.FixedPopupYPosition / Dpi.DpiScaleY;
 
-    public static IEnumerable<ComboBoxItem> FindJapaneseFonts()
+    public static List<ComboBoxItem> FindJapaneseFonts()
     {
         List<ComboBoxItem> japaneseFonts = new();
 

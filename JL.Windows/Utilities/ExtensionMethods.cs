@@ -1,4 +1,6 @@
 using System.Configuration;
+using System.Windows;
+using System.Windows.Media;
 
 namespace JL.Windows.Utilities;
 internal static class ExtensionMethods
@@ -8,28 +10,24 @@ internal static class ExtensionMethods
         return configurationCollection[key]?.Value ?? null;
     }
 
-    //public static T? GetChildOfType<T>(this DependencyObject dependencyObject) where T : DependencyObject
-    //{
-    //    for (int i = 0; i < VisualTreeHelper.GetChildrenCount(dependencyObject); i++)
-    //    {
-    //        DependencyObject child = VisualTreeHelper.GetChild(dependencyObject, i);
+    public static T? GetChildOfType<T>(this DependencyObject dependencyObject) where T : DependencyObject
+    {
+        int childrenCount = VisualTreeHelper.GetChildrenCount(dependencyObject);
+        for (int i = 0; i < childrenCount; i++)
+        {
+            DependencyObject child = VisualTreeHelper.GetChild(dependencyObject, i);
+            if (child is T result)
+            {
+                return result;
+            }
 
-    //        if (child is T result)
-    //        {
-    //            return result;
-    //        }
+            T? grandChild = GetChildOfType<T>(child);
+            if (grandChild is not null)
+            {
+                return grandChild;
+            }
+        }
 
-    //        if (child is not null)
-    //        {
-    //            T? grandChild = GetChildOfType<T>(child);
-
-    //            if (grandChild is not null)
-    //            {
-    //                return grandChild;
-    //            }
-    //        }
-    //    }
-
-    //    return null;
-    //}
+        return null;
+    }
 }

@@ -43,7 +43,7 @@ internal static class YomichanKanjiLoader
                 }
                 else
                 {
-                    dict.Contents.Add(kanji, new List<IDictRecord> { yomichanKanjiRecord });
+                    dict.Contents[kanji] = new List<IDictRecord> { yomichanKanjiRecord };
                 }
             }
         }

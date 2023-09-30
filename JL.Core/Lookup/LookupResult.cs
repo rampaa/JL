@@ -11,7 +11,7 @@ public sealed class LookupResult
     public Dict Dict { get; }
     public string PrimarySpelling { get; init; }
 
-    public IList<string>? Readings { get; init; }
+    public string[]? Readings { get; init; }
     public string? FormattedDefinitions { get; init; }
     public int EdictId { get; init; }
     public string[]? AlternativeSpellings { get; init; }
@@ -34,7 +34,7 @@ public sealed class LookupResult
         string matchedText,
         string deconjugatedMatchedText,
         Dict dict,
-        IList<string>? readings,
+        string[]? readings,
         List<LookupFrequencyResult>? frequencies = null,
         string[]? alternativeSpellings = null,
         string[]? primarySpellingOrthographyInfoList = null,

@@ -58,11 +58,11 @@ internal static class PopupWindowUtils
         return null;
     }
 
-    public static string ReadingsToText(IList<string> readings, IReadOnlyList<string?> rOrthographyInfoList)
+    public static string ReadingsToText(string[] readings, List<string?> rOrthographyInfoList)
     {
         StringBuilder sb = new();
 
-        for (int index = 0; index < readings.Count; index++)
+        for (int index = 0; index < readings.Length; index++)
         {
             _ = sb.Append(readings[index]);
 
@@ -74,7 +74,7 @@ internal static class PopupWindowUtils
                 }
             }
 
-            if (index != readings.Count - 1)
+            if (index != readings.Length - 1)
             {
                 _ = sb.Append(", ");
             }
@@ -83,13 +83,13 @@ internal static class PopupWindowUtils
         return sb.ToString();
     }
 
-    public static string AlternativeSpellingsToText(IReadOnlyList<string> alternativeSpellings, IReadOnlyList<string?> aOrthographyInfoList)
+    public static string AlternativeSpellingsToText(string[] alternativeSpellings, List<string?> aOrthographyInfoList)
     {
         StringBuilder sb = new();
 
         _ = sb.Append('(');
 
-        for (int index = 0; index < alternativeSpellings.Count; index++)
+        for (int index = 0; index < alternativeSpellings.Length; index++)
         {
             _ = sb.Append(alternativeSpellings[index]);
 
@@ -101,7 +101,7 @@ internal static class PopupWindowUtils
                 }
             }
 
-            if (index != alternativeSpellings.Count - 1)
+            if (index != alternativeSpellings.Length - 1)
             {
                 _ = sb.Append(", ");
             }
@@ -112,22 +112,22 @@ internal static class PopupWindowUtils
         return sb.ToString();
     }
 
-    public static Grid CreatePitchAccentGrid(string primarySpelling, IReadOnlyList<string>? alternativeSpellings,
-        IList<string>? readings, string[] splitReadingsWithRInfo, double leftMargin, Dict dict)
+    public static Grid CreatePitchAccentGrid(string primarySpelling, string[]? alternativeSpellings,
+        string[]? readings, string[] splitReadingsWithRInfo, double leftMargin, Dict dict)
     {
         Grid pitchAccentGrid = new();
 
-        bool hasReading = readings?.Count > 0;
+        bool hasReading = readings?.Length > 0;
 
         int fontSize = hasReading
             ? ConfigManager.ReadingsFontSize
             : ConfigManager.PrimarySpellingFontSize;
 
-        IList<string> expressions = hasReading ? readings! : new List<string> { primarySpelling };
+        string[] expressions = hasReading ? readings! : new[] { primarySpelling };
 
         double horizontalOffsetForReading = leftMargin;
 
-        for (int i = 0; i < expressions.Count; i++)
+        for (int i = 0; i < expressions.Length; i++)
         {
             string normalizedExpression = JapaneseUtils.KatakanaToHiragana(expressions[i]);
             List<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expressions[i]);

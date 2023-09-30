@@ -14,7 +14,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
     private string[]? Definitions { get; }
     private string[]? Stats { get; }
 
-    public YomichanKanjiRecord(IReadOnlyList<JsonElement> jsonElement)
+    public YomichanKanjiRecord(List<JsonElement> jsonElement)
     {
         OnReadings = jsonElement[1].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (OnReadings.Length is 0)

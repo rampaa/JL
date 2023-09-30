@@ -35,8 +35,8 @@ internal sealed partial class PreferencesWindow : Window
     {
         InitializeComponent();
         _profileName = ProfileUtils.CurrentProfile;
-        _profileNamesDict = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.ProfileCustomNameDictionary);
-        _profileWordsDict = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.ProfileCustomWordDictionary);
+        _profileNamesDict = DictUtils.BuiltInDictTypeToDict[DictType.ProfileCustomNameDictionary];
+        _profileWordsDict = DictUtils.BuiltInDictTypeToDict[DictType.ProfileCustomWordDictionary];
     }
 
     public static bool IsItVisible()
@@ -203,15 +203,15 @@ internal sealed partial class PreferencesWindow : Window
         if (otherAnkiConfig is not null)
         {
             SetPreviousMiningConfig(OtherMiningSetupComboBoxDeckNames, OtherMiningSetupComboBoxModelNames, OtherTagsTextBox, otherAnkiConfig);
-            CreateFieldElements(otherAnkiConfig.Fields, Enum.GetValues<JLField>().ToList(), OtherMiningSetupStackPanelFields);
+            CreateFieldElements(otherAnkiConfig.Fields, Enum.GetValues<JLField>(), OtherMiningSetupStackPanelFields);
         }
     }
 
     private static void SetPreviousMiningConfig(Selector deckNamesSelector, Selector modelNamesComboBox, TextBox tagTextBox, AnkiConfig ankiConfig)
     {
-        deckNamesSelector.ItemsSource = new List<string> { ankiConfig.DeckName };
+        deckNamesSelector.ItemsSource = new[] { ankiConfig.DeckName };
         deckNamesSelector.SelectedItem = ankiConfig.DeckName;
-        modelNamesComboBox.ItemsSource = new List<string> { ankiConfig.ModelName };
+        modelNamesComboBox.ItemsSource = new[] { ankiConfig.ModelName };
         modelNamesComboBox.SelectedItem = ankiConfig.ModelName;
         tagTextBox.Text = string.Join(", ", ankiConfig.Tags);
     }
@@ -256,7 +256,7 @@ internal sealed partial class PreferencesWindow : Window
         await PopulateDeckAndModelNames().ConfigureAwait(false);
     }
 
-    private static async Task GetFields(ComboBox modelNamesComboBox, Panel miningPanel, IEnumerable<JLField> fieldList)
+    private static async Task GetFields(ComboBox modelNamesComboBox, Panel miningPanel, JLField[] fieldList)
     {
         string modelName = modelNamesComboBox.SelectionBoxItem.ToString()!;
 
@@ -297,7 +297,7 @@ internal sealed partial class PreferencesWindow : Window
         await GetFields(OtherMiningSetupComboBoxModelNames, OtherMiningSetupStackPanelFields, JLFieldUtils.JLFieldsForWordDicts).ConfigureAwait(false);
     }
 
-    private static void CreateFieldElements(Dictionary<string, JLField> fields, IEnumerable<JLField> fieldList, Panel fieldPanel)
+    private static void CreateFieldElements(Dictionary<string, JLField> fields, JLField[] fieldList, Panel fieldPanel)
     {
         fieldPanel.Children.Clear();
 
@@ -320,7 +320,7 @@ internal sealed partial class PreferencesWindow : Window
         }
     }
 
-    private static AnkiConfig? GetAnkiConfigFromPreferences(Selector deckNamesSelector, Selector modelNamesSelector, Panel miningPanel, TextBox tagsTextBox, IReadOnlyCollection<JLField> jlFieldList, MineType mineType)
+    private static AnkiConfig? GetAnkiConfigFromPreferences(Selector deckNamesSelector, Selector modelNamesSelector, Panel miningPanel, TextBox tagsTextBox, JLField[] jlFieldList, MineType mineType)
     {
         if (deckNamesSelector.SelectedItem is null ||
             modelNamesSelector.SelectedItem is null)

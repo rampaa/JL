@@ -39,7 +39,10 @@ public class LookupTests
                     antonym: new AntonymOption(false)
                 )));
 
-        JmdictLoader.Load(DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict)).Wait();
+        Dict dict = DictUtils.Dicts["JMdict"];
+        DictUtils.BuiltInDictTypeToDict[DictType.JMdict] = dict;
+        JmdictLoader.Load(dict).Wait();
+
         FreqUtils.FreqDicts = FreqUtils.s_builtInFreqs;
         FreqUtils.LoadFrequencies().Wait();
         DeconjugatorUtils.DeserializeRules().Wait();
@@ -59,7 +62,7 @@ public class LookupTests
                     frequencies: new List<LookupFrequencyResult> { new("VN (Nazeka)", 759) },
                     primarySpelling: "始まる",
                     deconjugatedMatchedText: "始まる",
-                    readings: new List<string> { "はじまる" },
+                    readings: new[] { "はじまる" },
                     formattedDefinitions: "(v5r, vi) (1) to begin; to start; to commence (v5r, vi) (2) to happen (again); to begin (anew) (v5r, vi) (3) to date (from); to originate (in)",
                     edictId: 1307500,
                     alternativeSpellingsOrthographyInfoList: new List<string?>(),

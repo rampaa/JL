@@ -181,4 +181,37 @@ public static class Utils
         string relativePath = Path.GetRelativePath(ApplicationPath, fullPath);
         return relativePath.StartsWith('.') ? fullPath : relativePath;
     }
+
+    internal static T[]? ConcatNullableArrays<T>(params T[]?[] arrays)
+    {
+        int position = 0;
+        int length = 0;
+
+        for (int i = 0; i < arrays.Length; i++)
+        {
+            T[]? array = arrays[i];
+            if (array is not null)
+            {
+                length += array.Length;
+            }
+        }
+
+        if (length is 0)
+        {
+            return null;
+        }
+
+        T[] concatArray = new T[length];
+        for (int i = 0; i < arrays.Length; i++)
+        {
+            T[]? array = arrays[i];
+            if (array is not null)
+            {
+                Array.Copy(array, 0, concatArray, position, array.Length);
+                position += array.Length;
+            }
+        }
+
+        return concatArray;
+    }
 }

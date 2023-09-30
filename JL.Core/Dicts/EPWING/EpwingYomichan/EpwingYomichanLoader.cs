@@ -63,7 +63,7 @@ internal static class EpwingYomichanLoader
         }
         else
         {
-            dict.Contents.Add(hiraganaExpression, new List<IDictRecord> { yomichanRecord });
+            dict.Contents[hiraganaExpression] = new List<IDictRecord> { yomichanRecord };
         }
 
         if (dict.Type is not DictType.NonspecificNameYomichan && !string.IsNullOrEmpty(yomichanRecord.Reading))
@@ -76,7 +76,7 @@ internal static class EpwingYomichanLoader
             }
             else
             {
-                dict.Contents.Add(hiraganaReading, new List<IDictRecord> { yomichanRecord });
+                dict.Contents[hiraganaReading] = new List<IDictRecord> { yomichanRecord };
             }
         }
     }

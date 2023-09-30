@@ -12,11 +12,10 @@ internal static class DictOptionManager
 
     public static void ApplyDictOptions()
     {
-        Dict? jmdict = DictUtils.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.JMdict);
-        if (jmdict is not null)
+        if (DictUtils.BuiltInDictTypeToDict.TryGetValue(DictType.JMdict, out Dict? jmdict))
         {
-            POrthographyInfoColor = WindowsUtils.FrozenBrushFromHex(jmdict.Options?.POrthographyInfoColor?.Value
-                                                                    ?? ConfigManager.PrimarySpellingColor.ToString(CultureInfo.InvariantCulture))!;
+            POrthographyInfoColor = WindowsUtils.FrozenBrushFromHex(
+                jmdict.Options?.POrthographyInfoColor?.Value ?? ConfigManager.PrimarySpellingColor.ToString(CultureInfo.InvariantCulture))!;
         }
 
         else

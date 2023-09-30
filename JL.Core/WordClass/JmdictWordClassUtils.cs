@@ -32,15 +32,13 @@ internal static class JmdictWordClassUtils
                     for (int j = 0; j < jmdictWordClass.Readings.Length; j++)
                     {
                         string readingInHiragana = JapaneseUtils.KatakanaToHiragana(jmdictWordClass.Readings[j]).GetPooledString();
-
                         if (DictUtils.WordClassDictionary.TryGetValue(readingInHiragana, out IList<JmdictWordClass>? result))
                         {
                             result.Add(jmdictWordClass);
                         }
-
                         else
                         {
-                            DictUtils.WordClassDictionary.Add(readingInHiragana, new List<JmdictWordClass> { jmdictWordClass });
+                            DictUtils.WordClassDictionary[readingInHiragana] = new List<JmdictWordClass> { jmdictWordClass };
                         }
                     }
                 }
@@ -65,7 +63,8 @@ internal static class JmdictWordClassUtils
             "v5n", "v5r", "v5r-i", "v5s", "v5t", "v5u", "v5u-s", "vk", "vs-c", "vs-i", "vs-s", "vz"
         };
 
-        foreach (IList<IDictRecord> jmdictRecordList in DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict).Contents.Values.ToList())
+        Dict dict = DictUtils.BuiltInDictTypeToDict[DictType.JMdict];
+        foreach (IList<IDictRecord> jmdictRecordList in dict.Contents.Values.ToList())
         {
             int jmdictRecordListCount = jmdictRecordList.Count;
             for (int i = 0; i < jmdictRecordListCount; i++)
@@ -82,7 +81,7 @@ internal static class JmdictWordClassUtils
                 if (jmdictWordClassDictionary.TryGetValue(value.PrimarySpelling, out List<JmdictWordClass>? psr))
                 {
                     if (!psr.Any(r =>
-                            r.Readings?.SequenceEqual(value.Readings ?? Enumerable.Empty<string>()) ??
+                            r.Readings?.SequenceEqual(value.Readings ?? Array.Empty<string>()) ??
                             (value.Readings is null && r.Spelling == value.PrimarySpelling)))
                     {
                         psr.Add(new JmdictWordClass(value.PrimarySpelling, value.Readings, wordClasses));
@@ -91,8 +90,7 @@ internal static class JmdictWordClassUtils
 
                 else
                 {
-                    jmdictWordClassDictionary.Add(value.PrimarySpelling,
-                        new List<JmdictWordClass> { new(value.PrimarySpelling, value.Readings, wordClasses) });
+                    jmdictWordClassDictionary[value.PrimarySpelling] = new List<JmdictWordClass> { new(value.PrimarySpelling, value.Readings, wordClasses) };
                 }
 
                 if (value.AlternativeSpellings is not null)
@@ -104,7 +102,7 @@ internal static class JmdictWordClassUtils
                         if (jmdictWordClassDictionary.TryGetValue(spelling, out List<JmdictWordClass>? asr))
                         {
                             if (!asr.Any(r =>
-                                    r.Readings?.SequenceEqual(value.Readings ?? Enumerable.Empty<string>()) ??
+                                    r.Readings?.SequenceEqual(value.Readings ?? Array.Empty<string>()) ??
                                     (value.Readings is null && r.Spelling == spelling)))
                             {
                                 asr.Add(new JmdictWordClass(spelling, value.Readings, wordClasses));
@@ -113,8 +111,7 @@ internal static class JmdictWordClassUtils
 
                         else
                         {
-                            jmdictWordClassDictionary.Add(spelling,
-                                new List<JmdictWordClass> { new(spelling, value.Readings, wordClasses) });
+                            jmdictWordClassDictionary[spelling] = new List<JmdictWordClass> { new(spelling, value.Readings, wordClasses) };
                         }
                     }
                 }
@@ -127,9 +124,9 @@ internal static class JmdictWordClassUtils
 
     internal static async Task Initialize()
     {
-        Dict dict = DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict);
         if (!File.Exists(Path.Join(Utils.ResourcesPath, "PoS.json")))
         {
+            Dict dict = DictUtils.BuiltInDictTypeToDict[DictType.JMdict];
             if (dict.Active)
             {
                 await Serialize().ConfigureAwait(false);

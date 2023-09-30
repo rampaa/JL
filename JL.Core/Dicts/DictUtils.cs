@@ -102,6 +102,8 @@ public static class DictUtils
         }
     };
 
+    public static readonly Dictionary<DictType, Dict> BuiltInDictTypeToDict = new(7);
+
     public static readonly Dictionary<string, string> JmdictEntities = new(254)
     {
         { "bra", "Brazilian" },
@@ -987,13 +989,37 @@ public static class DictUtils
                         dict.Priority = priority;
                         ++priority;
 
-                        if (dict.Type is DictType.ProfileCustomNameDictionary)
+                        switch (dict.Type)
                         {
-                            dict.Path = ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfile);
-                        }
-                        else if (dict.Type is DictType.ProfileCustomWordDictionary)
-                        {
-                            dict.Path = ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfile);
+                            case DictType.ProfileCustomNameDictionary:
+                                dict.Path = ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfile);
+                                BuiltInDictTypeToDict.Add(dict.Type, dict);
+                                break;
+
+                            case DictType.ProfileCustomWordDictionary:
+                                dict.Path = ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfile);
+                                BuiltInDictTypeToDict.Add(dict.Type, dict);
+                                break;
+
+                            case DictType.CustomNameDictionary:
+                                BuiltInDictTypeToDict.Add(dict.Type, dict);
+                                break;
+
+                            case DictType.CustomWordDictionary:
+                                BuiltInDictTypeToDict.Add(dict.Type, dict);
+                                break;
+
+                            case DictType.JMdict:
+                                BuiltInDictTypeToDict.Add(dict.Type, dict);
+                                break;
+
+                            case DictType.Kanjidic:
+                                BuiltInDictTypeToDict.Add(dict.Type, dict);
+                                break;
+
+                            case DictType.JMnedict:
+                                BuiltInDictTypeToDict.Add(dict.Type, dict);
+                                break;
                         }
 
                         dict.Path = Utils.GetPath(dict.Path);
