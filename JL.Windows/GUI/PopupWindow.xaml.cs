@@ -444,8 +444,7 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    public StackPanel MakeResultStackPanel(LookupResult result,
-        int index, int resultsCount)
+    public StackPanel MakeResultStackPanel(LookupResult result, int index, int resultsCount)
     {
         // top
         WrapPanel top = new() { Tag = index };
