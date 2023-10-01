@@ -213,7 +213,8 @@ internal sealed partial class PopupWindow : Window
                 UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
             }
 
-            if (ConfigManager.Focusable && ConfigManager.PopupFocusOnLookup)
+            if (ConfigManager.Focusable
+                && (enableMiningMode || ConfigManager.PopupFocusOnLookup))
             {
                 _ = Activate();
             }
@@ -1847,6 +1848,13 @@ internal sealed partial class PopupWindow : Window
         popupWindow.EnableMiningMode();
         WinApi.BringToFront(popupWindow.WindowHandle);
         popupWindow.DisplayResults(true);
+
+        if (ConfigManager.Focusable)
+        {
+            _ = popupWindow.Activate();
+        }
+
+        _ = popupWindow.Focus();
 
         if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
         {
