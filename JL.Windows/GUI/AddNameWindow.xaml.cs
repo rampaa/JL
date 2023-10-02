@@ -54,9 +54,17 @@ internal sealed partial class AddNameWindow : Window
             string nameType =
                 NameTypeStackPanel.Children.OfType<RadioButton>()
                     .FirstOrDefault(static r => r.IsChecked.HasValue && r.IsChecked.Value)!.Content.ToString()!;
+
             string spelling = SpellingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
+
             string? reading = ReadingTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
             if (reading.Length is 0 || reading == spelling)
+            {
+                reading = null;
+            }
+
+            string? extraInfo = ExtraInfoTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
+            if (extraInfo.Length is 0)
             {
                 reading = null;
             }
@@ -68,14 +76,14 @@ internal sealed partial class AddNameWindow : Window
             Dict dict = DictUtils.Dicts.Values.First(dict => dict.Type == dictType);
             if (dict.Active)
             {
-                CustomNameLoader.AddToDictionary(spelling, reading, nameType, dict.Contents);
+                CustomNameLoader.AddToDictionary(spelling, reading, nameType, extraInfo, dict.Contents);
                 Utils.Frontend.InvalidateDisplayCache();
             }
 
             Close();
 
             string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
-            string line = string.Create(CultureInfo.InvariantCulture, $"{spelling}\t{reading}\t{nameType}\n");
+            string line = string.Create(CultureInfo.InvariantCulture, $"{spelling}\t{reading}\t{nameType}\t{extraInfo}\n");
             await File.AppendAllTextAsync(path, line, Encoding.UTF8).ConfigureAwait(false);
         }
     }

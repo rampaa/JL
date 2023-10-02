@@ -21,7 +21,7 @@ public static class CustomNameLoader
 
                 string[] lParts = line.Split("\t", StringSplitOptions.TrimEntries);
 
-                if (lParts.Length is 3)
+                if (lParts.Length >= 3)
                 {
                     string spelling = lParts[0];
 
@@ -33,15 +33,25 @@ public static class CustomNameLoader
 
                     string nameType = lParts[2];
 
-                    AddToDictionary(spelling, reading, nameType, customNameDictionary);
+                    string? extraInfo = null;
+                    if (lParts.Length is 4)
+                    {
+                        extraInfo = lParts[3];
+                        if (extraInfo.Length is 0)
+                        {
+                            extraInfo = null;
+                        }
+                    }
+
+                    AddToDictionary(spelling, reading, nameType, extraInfo, customNameDictionary);
                 }
             }
         }
     }
 
-    public static void AddToDictionary(string spelling, string? reading, string nameType, Dictionary<string, IList<IDictRecord>> customNameDictionary)
+    public static void AddToDictionary(string spelling, string? reading, string nameType, string? extraInfo, Dictionary<string, IList<IDictRecord>> customNameDictionary)
     {
-        CustomNameRecord newNameRecord = new(spelling, reading, nameType);
+        CustomNameRecord newNameRecord = new(spelling, reading, nameType, extraInfo);
 
         string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(spelling);
         if (customNameDictionary.TryGetValue(spellingInHiragana, out IList<IDictRecord>? entry))

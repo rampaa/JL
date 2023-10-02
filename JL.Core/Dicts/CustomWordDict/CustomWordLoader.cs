@@ -57,7 +57,7 @@ public static class CustomWordLoader
                 }
 
                 string[] lParts = line.Split("\t", StringSplitOptions.TrimEntries);
-                if (lParts.Length > 3)
+                if (lParts.Length >= 4)
                 {
                     string[] spellings = lParts[0].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
