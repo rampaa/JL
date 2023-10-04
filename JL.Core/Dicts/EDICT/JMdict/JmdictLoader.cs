@@ -287,7 +287,7 @@ internal static class JmdictLoader
                                         lang = langCode;
                                     }
 
-                                    lang = new CultureInfo(lang).EnglishName;
+                                    lang = CultureInfo.GetCultureInfo(lang).EnglishName;
                                 }
                             }
 
