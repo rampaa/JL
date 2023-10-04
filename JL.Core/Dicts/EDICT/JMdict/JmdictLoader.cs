@@ -278,23 +278,22 @@ internal static class JmdictLoader
 
                         if (lang is not null)
                         {
-                            try
+                            if (s_canHandleCulture)
                             {
-                                if (s_canHandleCulture)
+                                if (Utils.s_iso6392BTo2T.TryGetValue(lang, out string? langCode))
                                 {
-                                    if (Utils.s_iso6392BTo2T.TryGetValue(lang, out string? langCode))
-                                    {
-                                        lang = langCode;
-                                    }
+                                    lang = langCode;
+                                }
 
+                                try
+                                {
                                     lang = CultureInfo.GetCultureInfo(lang).EnglishName;
                                 }
-                            }
-
-                            catch (Exception ex)
-                            {
-                                Utils.Logger.Error(ex, "Underlying OS cannot process the culture info");
-                                s_canHandleCulture = false;
+                                catch (Exception ex)
+                                {
+                                    Utils.Logger.Error(ex, "Underlying OS cannot process the culture info");
+                                    s_canHandleCulture = false;
+                                }
                             }
                         }
 
