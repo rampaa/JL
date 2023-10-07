@@ -46,8 +46,11 @@ internal sealed partial class PreferencesWindow : Window
 
     private const string WordJLFieldsInfo = """
                                             • Primary Spelling: It's the spelling you click to mine the word, e.g., if you look up "わかりました", its primary spelling will be "分かる".
-                                            • Readings: Readings of the mined word, e.g., if you look up "描く", its "Readings" will be "えがく, かく".
+                                            • Primary Spelling with Orthography Info: It's the spelling you click to mine the word with its orthography Info, e.g., if you look up "珈琲", its "Primary Spelling with Orthography Info" will be "珈琲 (ateji)".
+                                            • Readings: Readings of the mined word, e.g., if you look up "従妹", its "Readings" will be "じゅうまい, いとこ".
+                                            • Readings with Orthography Info: Readings of the mined word with their orthography info, e.g. if you look up "従妹", its "Readings with Orthography Info" will be "じゅうまい, いとこ (gikun)". 
                                             • Alternative Spellings: Alternative spellings of the mined word, e.g., if you look up "わかりました", its alternative spellings will be "解る, 判る, 分る".
+                                            • Alternative Spellings with Orthography Info: Alternative spellings of the mined word with their orthography info, e.g., if you look up "嫁" its "Alternative Spellings with Orthography Info" will be "娵 (rK), 婦 (rK), 媳 (rK)".
                                             • Definitions: Definitions of the mined word.
                                             • Dictionary Name: Name of the dictionary, e.g., JMDict.
                                             • Audio: Audio for the first reading of the mined word.
@@ -57,6 +60,7 @@ internal sealed partial class PreferencesWindow : Window
                                             • Deconjugated Matched Text: Matched Text's deconjugated form, e.g., if the "Matched Text" is "わかりました", "Deconjugated Matched Text" will be "わかる".
                                             • Deconjugation Process: Deconjugation path from the "Matched Text" to "Deconjugated Matched Text".
                                             • Frequencies: Frequency info for the mined word, e.g., "VN: #77, JPDB: #666".
+                                            • Raw Frequencies: Raw frequency info for the mined word, e.g., "77, 666".
                                             • EDICT ID: JMDict entry ID.
                                             • Local Time: Mining date and time expressed in local timezone.
                                             """;
@@ -74,7 +78,8 @@ internal sealed partial class PreferencesWindow : Window
                                              • Dictionary Name: Name of the dictionary, e.g., "Kanjidic".
                                              • Source Text: Whole text in which the mined kanji appears in.
                                              • Sentence: Sentence in which the mined kanji appears in.
-                                             • Frequencies: Frequency info for the kanji.
+                                             • Frequencies: Frequency info for the kanji, e.g., "Kanjidic Freq: #77, jpdb: #666".
+                                             • Raw Frequencies: Raw frequency info for the mined word, e.g., "77, 666".
                                              • EDICT ID: KANJIDIC2 entry ID.
                                              • Local Time: Mining date and time expressed in local timezone.
                                              """;
