@@ -147,10 +147,13 @@ internal sealed partial class PreferencesWindow : Window
 
     private async void AnkiTabItem_MouseUp(object sender, MouseButtonEventArgs e)
     {
-        if (ConfigManager.AnkiIntegration && !SetAnkiConfig)
+        if (!SetAnkiConfig)
         {
-            await SetPreviousMiningConfig().ConfigureAwait(true);
-            await PopulateDeckAndModelNames().ConfigureAwait(true);
+            if (CoreConfig.AnkiIntegration)
+            {
+                await SetPreviousMiningConfig().ConfigureAwait(true);
+                await PopulateDeckAndModelNames().ConfigureAwait(true);
+            }
 
             SetAnkiConfig = true;
         }
@@ -311,7 +314,8 @@ internal sealed partial class PreferencesWindow : Window
             ComboBox comboBoxJLFields = new()
             {
                 ItemsSource = descriptions,
-                SelectedItem = jlField.GetDescription() ?? jlField.ToString()
+                SelectedItem = jlField.GetDescription() ?? jlField.ToString(),
+                Margin = new Thickness(0, 10, 0, 15)
             };
 
             _ = stackPanel.Children.Add(textBlockFieldName);
@@ -357,7 +361,7 @@ internal sealed partial class PreferencesWindow : Window
 
     public async Task SaveMiningSetup()
     {
-        if (!ConfigManager.AnkiIntegration)
+        if (!CoreConfig.AnkiIntegration)
         {
             return;
         }
@@ -397,7 +401,7 @@ internal sealed partial class PreferencesWindow : Window
         {
             Utils.Frontend.Alert(AlertLevel.Error, "Error saving AnkiConfig");
             Utils.Logger.Error("Error saving AnkiConfig");
-            ConfigManager.AnkiIntegration = false;
+            CoreConfig.AnkiIntegration = false;
         }
     }
 

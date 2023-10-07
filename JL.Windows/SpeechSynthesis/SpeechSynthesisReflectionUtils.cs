@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Reflection;
 using System.Speech.Synthesis;
 using JL.Core.Utilities;
@@ -9,17 +8,7 @@ internal static class SpeechSynthesisReflectionUtils
 {
     private const string VoiceSynthesizerProperty = "VoiceSynthesizer";
     private const string InstalledVoicesField = "_installedVoices";
-
     private const string OneCoreVoicesRegistry = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech_OneCore\Voices";
-
-    private static readonly Type s_objectTokenCategoryType = typeof(SpeechSynthesizer).Assembly
-        .GetType("System.Speech.Internal.ObjectTokens.ObjectTokenCategory")!;
-
-    private static readonly Type s_voiceInfoType = typeof(SpeechSynthesizer).Assembly
-        .GetType("System.Speech.Synthesis.VoiceInfo")!;
-
-    private static readonly Type s_installedVoiceType = typeof(SpeechSynthesizer).Assembly
-        .GetType("System.Speech.Synthesis.InstalledVoice")!;
 
     private static object? GetProperty(object target, string propName)
     {
@@ -35,18 +24,25 @@ internal static class SpeechSynthesisReflectionUtils
     {
         try
         {
-            object voiceSynthesizer = GetProperty(synthesizer, VoiceSynthesizerProperty) ?? throw new NotSupportedException(string.Create(CultureInfo.InvariantCulture, $"Property not found: {VoiceSynthesizerProperty}"));
+            Type objectTokenCategoryType = typeof(SpeechSynthesizer).Assembly
+                .GetType("System.Speech.Internal.ObjectTokens.ObjectTokenCategory")!;
 
-            List<InstalledVoice> installedVoices = GetField(voiceSynthesizer, InstalledVoicesField) as List<InstalledVoice> ?? throw new NotSupportedException($"Field not found or null: {InstalledVoicesField}");
+            Type voiceInfoType = typeof(SpeechSynthesizer).Assembly
+                .GetType("System.Speech.Synthesis.VoiceInfo")!;
 
-            using IDisposable objectTokenCategory = s_objectTokenCategoryType
+            Type installedVoiceType = typeof(SpeechSynthesizer).Assembly
+                .GetType("System.Speech.Synthesis.InstalledVoice")!;
+
+            object voiceSynthesizer = GetProperty(synthesizer, VoiceSynthesizerProperty)!;
+            List<InstalledVoice> installedVoices = (List<InstalledVoice>?)GetField(voiceSynthesizer, InstalledVoicesField)!;
+
+            using IDisposable objectTokenCategory = (IDisposable?)objectTokenCategoryType
                     .GetMethod("Create", BindingFlags.Static | BindingFlags.NonPublic)?
-                    .Invoke(null, new object?[] { OneCoreVoicesRegistry }) as IDisposable
-                    ?? throw new NotSupportedException(string.Create(CultureInfo.InvariantCulture, $"Failed to call Create on {s_objectTokenCategoryType} instance"));
+                    .Invoke(null, new object[] { OneCoreVoicesRegistry })!;
 
-            IEnumerable<object?> tokens = s_objectTokenCategoryType
+            IEnumerable<object?> tokens = (IEnumerable<object?>?)objectTokenCategoryType
                 .GetMethod("FindMatchingTokens", BindingFlags.Instance | BindingFlags.NonPublic)?
-                .Invoke(objectTokenCategory, new object?[] { null, null }) as IEnumerable<object?> ?? throw new NotSupportedException("Failed to list matching tokens");
+                .Invoke(objectTokenCategory, new object?[] { null, null })!;
 
             foreach (object? token in tokens)
             {
@@ -56,11 +52,10 @@ internal static class SpeechSynthesisReflectionUtils
                 }
 
                 object voiceInfo = typeof(SpeechSynthesizer).Assembly
-                    .CreateInstance(s_voiceInfoType.FullName!, true, BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { token }, null, null)
-                    ?? throw new NotSupportedException($"Failed to instantiate {s_voiceInfoType}");
+                    .CreateInstance(voiceInfoType.FullName!, true, BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { token }, null, null)!;
 
                 InstalledVoice installedVoice = (InstalledVoice)typeof(SpeechSynthesizer).Assembly
-                    .CreateInstance(s_installedVoiceType.FullName!, true, BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { voiceSynthesizer, voiceInfo }, null, null)!;
+                    .CreateInstance(installedVoiceType.FullName!, true, BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { voiceSynthesizer, voiceInfo }, null, null)!;
 
                 installedVoices.Add(installedVoice);
             }

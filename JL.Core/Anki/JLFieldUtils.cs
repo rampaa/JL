@@ -5,8 +5,11 @@ public static class JLFieldUtils
     public static readonly JLField[] JLFieldsForWordDicts = {
         JLField.Nothing,
         JLField.PrimarySpelling,
+        JLField.PrimarySpellingWithOrthographyInfo,
         JLField.AlternativeSpellings,
+        JLField.AlternativeSpellingsWithOrthographyInfo,
         JLField.Readings,
+        JLField.ReadingsWithOrthographyInfo,
         JLField.Definitions,
         JLField.DictionaryName,
         JLField.Audio,
@@ -17,6 +20,7 @@ public static class JLFieldUtils
         JLField.DeconjugatedMatchedText,
         JLField.DeconjugationProcess,
         JLField.Frequencies,
+        JLField.RawFrequencies,
         JLField.EdictId,
         JLField.LocalTime
     };
@@ -38,6 +42,7 @@ public static class JLFieldUtils
         JLField.SourceText,
         JLField.Sentence,
         JLField.Frequencies,
+        JLField.RawFrequencies,
         JLField.EdictId,
         JLField.LocalTime
     };

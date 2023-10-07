@@ -66,7 +66,7 @@ internal sealed partial class AddNameWindow : Window
             string? extraInfo = ExtraInfoTextBox.Text.Replace("\t", "  ", StringComparison.Ordinal).Trim();
             if (extraInfo.Length is 0)
             {
-                reading = null;
+                extraInfo = null;
             }
 
             DictType dictType = ComboBoxDictType.SelectedValue.ToString() is "Global"
@@ -80,6 +80,7 @@ internal sealed partial class AddNameWindow : Window
                 Utils.Frontend.InvalidateDisplayCache();
             }
 
+            PopupWindowUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);
             Close();
 
             string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
@@ -90,7 +91,6 @@ internal sealed partial class AddNameWindow : Window
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        WindowsUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
         s_instance = null;
@@ -103,9 +103,13 @@ internal sealed partial class AddNameWindow : Window
         {
             _ = SpellingTextBox.Focus();
         }
-        else // if (string.IsNullOrEmpty(ReadingTextBox.Text))
+        else if (string.IsNullOrEmpty(ReadingTextBox.Text))
         {
             _ = ReadingTextBox.Focus();
+        }
+        else // if (string.IsNullOrEmpty(ExtraInfoTextBox.Text))
+        {
+            _ = ExtraInfoTextBox.Focus();
         }
     }
 

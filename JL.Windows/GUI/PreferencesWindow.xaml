@@ -25,7 +25,7 @@
                         </StackPanel.Resources>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Theme"
+                            <TextBlock HorizontalAlignment="Left" Text="Theme" Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <ComboBox x:Name="ThemeComboBox" HorizontalAlignment="Right"
                                       SelectedValuePath="Tag" Width="250">
@@ -35,7 +35,7 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Lookup mode"
+                            <TextBlock HorizontalAlignment="Left" Text="Lookup mode" Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <ComboBox x:Name="LookupModeComboBox" HorizontalAlignment="Right"
                                       SelectedValuePath="Tag" Width="250">
@@ -48,6 +48,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Mining mode button"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help"
                                        ToolTip="Used only if the selected lookup mode is mouse move"/>
                             <ComboBox x:Name="MiningModeMouseButtonComboBox" HorizontalAlignment="Right"
@@ -61,6 +62,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Lookup button"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help"
                                        ToolTip="Used only if the selected lookup mode is mouse click/touch"/>
                             <ComboBox x:Name="LookupOnClickMouseButtonComboBox" HorizontalAlignment="Right"
@@ -74,12 +76,14 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Lookup requires Lookup Key press"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="RequireLookupKeyPressCheckBox" HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock Text="Lookup Key" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <TextBox x:Name="LookupKeyKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
@@ -88,6 +92,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Highlight color"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="HighlightColorButton"  HorizontalAlignment="Right"
                                     Width="60" Click="ShowColorPicker"
@@ -96,6 +101,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Audio volume"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <hc:NumericUpDown x:Name="AudioVolumeNumericUpDown" Maximum="100"
                                               Minimum="0"
@@ -104,12 +110,14 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Auto play audio"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <CheckBox x:Name="AutoPlayAudioCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Focusable"
+                                       Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"
                                        ToolTip="If unchecked, JL will not steal the focus away from other windows, even in case of a mouse click."/>
                             <CheckBox x:Name="FocusableCheckBox"  HorizontalAlignment="Right" />
@@ -117,12 +125,14 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Automatically adjust font sizes on resolution change"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="AutoAdjustFontSizesOnResolutionChange"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Highlight the longest match"
+                                       Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"
                                        ToolTip="Ignored if lookup mode is set to text select" />
                             <CheckBox x:Name="HighlightLongestMatchCheckBox"  HorizontalAlignment="Right" />
@@ -130,18 +140,21 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Kanji mode"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="KanjiModeCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Disable hotkeys"
+                                       Style="{StaticResource TextBlockDefault}"
                                        ToolTip="Disables hotkeys except for Toggle Hotkeys hotkey" Cursor="Help" TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <CheckBox x:Name="DisableHotkeysCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Check for updates on start up"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="CheckForJLUpdatesOnStartUpCheckBox"
                                       HorizontalAlignment="Right" />
@@ -152,6 +165,7 @@
                                     Click="CheckForJLUpdatesButton_Click" />
 
                         <TextBlock x:Name="JLVersionTextBlock" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                   Style="{StaticResource TextBlockDefault}"
                                    VerticalAlignment="Bottom" />
 
                     </StackPanel>
@@ -168,6 +182,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Font"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <ComboBox x:Name="MainWindowFontComboBox" HorizontalAlignment="Right"
                                       Width="210" SelectedValuePath="Content"
@@ -177,6 +192,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Width"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="MainWindowWidthNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -184,6 +200,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Height"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="MainWindowHeightNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -191,12 +208,14 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Dynamic width"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="MainWindowDynamicWidthCheckBox" HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Dynamic height"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="MainWindowDynamicHeightCheckBox"
                                               HorizontalAlignment="Right" />
@@ -204,6 +223,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max dynamic width"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="MainWindowMaxDynamicWidthNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -211,6 +231,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max dynamic height"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="MainWindowMaxDynamicHeightNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -218,6 +239,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Background color"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="MainWindowBackgroundColorButton"  HorizontalAlignment="Right"
                                     Width="60" Click="ShowColorPicker"
@@ -226,6 +248,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Text color"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="TextBoxTextColorButton"  HorizontalAlignment="Right"
                                     Width="60" Height="32" BorderThickness="5,5,5,5"
@@ -234,6 +257,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Backlog text color"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="TextBoxBacklogTextColorButton"  HorizontalAlignment="Right"
                                     Width="60" Height="32" BorderThickness="5,5,5,5"
@@ -242,6 +266,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Font size"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="TextBoxFontSizeNumericUpDown" Maximum="500" Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -249,6 +274,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Opacity"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="MainWindowOpacityNumericUpDown" Maximum="100" Minimum="0.2" DecimalPlaces="1"
                                               HorizontalAlignment="Right" />
@@ -256,6 +282,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Hide all buttons when mouse is not over the title bar"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox"
                                               HorizontalAlignment="Right" />
@@ -263,6 +290,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Center text horizontally"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="HorizontallyCenterMainWindowTextCheckBox"
                                               HorizontalAlignment="Right" />
@@ -270,47 +298,54 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Always on top"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="AlwaysOnTopCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Enable WebSocket text capture"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="CaptureTextFromWebSocketCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="WebSocket server address" VerticalAlignment="Center" TextWrapping="Wrap" />
+                            <TextBlock HorizontalAlignment="Left" Text="WebSocket server address" VerticalAlignment="Center" TextWrapping="Wrap" Style="{StaticResource TextBlockDefault}" />
                             <TextBox x:Name="WebSocketUriTextBox" HorizontalAlignment="Right" Width="200" MaxHeight="60" TextWrapping="Wrap" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Enable clipboard text capture"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="CaptureTextFromClipboardCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Capture text from clipboard/WebSocket only if it has Japanese characters"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="OnlyCaptureTextWithJapaneseCharsCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Disable lookups for non-Japanese characters"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="DisableLookupsForNonJapaneseCharsInMainWindowCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Add shadow to text"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="TextBoxApplyDropShadowEffectCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Focus on hover"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
                                        Cursor="Help"
                                        ToolTip="If Focusable is set to false, this option will have no effect."/>
@@ -319,18 +354,21 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Text only visible on hover"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="TextOnlyVisibleOnHoverCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Change opacity on unhover"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Opacity on unhover"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="MainWindowBackgroundOpacityOnUnhoverNumericUpDown" Maximum="100" Minimum="0.2" DecimalPlaces="1"
                                               HorizontalAlignment="Right" />
@@ -338,18 +376,21 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Trim white-space characters"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="TextBoxTrimWhiteSpaceCharactersCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Remove newlines"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="TextBoxRemoveNewlinesCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Text to speech on text change"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="TextToSpeechOnTextChangeCheckBox"
                                               HorizontalAlignment="Right" />
@@ -357,18 +398,21 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Read only"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="TextBoxIsReadOnlyCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Always show caret"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="AlwaysShowMainTextBoxCaretCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Enable backlog"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="EnableBacklogCheckBox"
                                               HorizontalAlignment="Right" />
@@ -377,6 +421,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Auto save backlog before closing JL"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help"
                                        ToolTip="Automatically saves the backlog to Backlogs folder before closing JL"/>
                             <CheckBox x:Name="AutoSaveBacklogBeforeClosingCheckBox"
@@ -386,6 +431,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Show backlog items one by one (Mouse Wheel)"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help"
                                        ToolTip="If enabled, scrolling up/down with mouse wheel show the items in backlog one by one.
                                        &#10;If disabled, scrolling up will show all the backlog at once."/>
@@ -406,6 +452,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Font"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <ComboBox x:Name="PopupFontComboBox" HorizontalAlignment="Right"
                                       Width="210" SelectedValuePath="Content" />
@@ -413,6 +460,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max width"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupMaxWidthNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -420,6 +468,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max height"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupMaxHeightNumericUpDown" Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -427,24 +476,28 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Dynamic width"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="PopupDynamicWidthCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Dynamic height"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="PopupDynamicHeightCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Fixed positioning"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="FixedPopupPositioningCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Fixed X position"
+                                       Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help" ToolTip="Only takes effect if fixed positioning is enabled."
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="FixedPopupXPositionNumericUpDown"
@@ -453,6 +506,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Fixed Y position"
+                                       Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help" ToolTip="Only takes effect if fixed positioning is enabled."
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="FixedPopupYPositionNumericUpDown"
@@ -462,6 +516,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Focus on lookup"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help"
                                        ToolTip="Attempt to set focus on the popup window when you mouse over text.
                                        &#10;Required if you want to be able to use popup hotkeys without clicking on the popup window first.
@@ -471,6 +526,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Hide dictionary tabs with no results"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="HideDictTabsWithNoResultsCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
@@ -478,6 +534,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Auto hide popup if cursor is not over it"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help"
                                        ToolTip="Auto hides the popup after the specified delay if mining mode is enabled and the cursor is not over the popup" />
                             <CheckBox x:Name="AutoHidePopupIfMouseIsNotOverItCheckBox"  HorizontalAlignment="Right" />
@@ -485,6 +542,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Auto hide popup delay (in milliseconds)"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown" Maximum="999999" Minimum="1" DecimalPlaces="0"
                                               HorizontalAlignment="Right" />
@@ -492,18 +550,21 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Show mining mode reminder"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="ShowMiningModeReminderCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Disable lookups for non-Japanese characters"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="DisableLookupsForNonJapaneseCharsInPopupsCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Background color"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="PopupBackgroundColorButton"  HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
@@ -512,6 +573,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Opacity"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupOpacityNumericUpDown" Maximum="100" Minimum="0.2" DecimalPlaces="1"
                                               HorizontalAlignment="Right" />
@@ -519,6 +581,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="X Offset"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupXOffsetNumericUpDown" Maximum="100" Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -526,6 +589,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Y Offset"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PopupYOffsetNumericUpDown" Maximum="100" Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -533,6 +597,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Flip"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <ComboBox x:Name="PopupFlipComboBox" HorizontalAlignment="Right"
                                       SelectedValuePath="Content">
@@ -544,6 +609,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Mine button"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <ComboBox x:Name="MineMouseButtonComboBox" HorizontalAlignment="Right"
                                       SelectedValuePath="Tag" Width="250">
@@ -556,6 +622,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Copy primary spelling button"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center"/>
                             <ComboBox x:Name="CopyPrimarySpellingToClipboardMouseButtonComboBox" HorizontalAlignment="Right"
                                       SelectedValuePath="Tag" Width="250">
@@ -568,6 +635,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Primary spelling color"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="PrimarySpellingColorButton"  HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
@@ -576,6 +644,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Primary spelling font size"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="PrimarySpellingFontSizeNumericUpDown" Maximum="500"
                                               Minimum="1"
@@ -584,6 +653,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Reading color"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="ReadingsColorButton"  HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
@@ -592,6 +662,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Reading font size"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="ReadingsFontSizeNumericUpDown" Maximum="100" Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -599,6 +670,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Alternative spelling color"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="AlternativeSpellingsColorButton"
                                     HorizontalAlignment="Right"
@@ -609,6 +681,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left"
                                        Text="Alternative spelling font size"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="AlternativeSpellingsFontSizeNumericUpDown" Maximum="500"
                                               Minimum="1"
@@ -616,7 +689,7 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Definition color"
+                            <TextBlock HorizontalAlignment="Left" Text="Definition color" Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="DefinitionsColorButton"  HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
@@ -625,7 +698,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Definition font size"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                       Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="DefinitionsFontSizeNumericUpDown" Maximum="100"
                                               Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -633,7 +706,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Frequency color"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                       Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="FrequencyColorButton"  HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
@@ -641,14 +714,14 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Frequency font size"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                       Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="FrequencyFontSizeNumericUpDown" Maximum="100" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Deconjugation info color"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                       Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="DeconjugationInfoColorButton"
                                     HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
@@ -657,7 +730,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Deconjugation info font size"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                       Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="DeconjugationInfoFontSizeNumericUpDown" Maximum="100"
                                               Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -665,7 +738,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Dictionary name color"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                       Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="DictTypeColorButton"  HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
@@ -673,7 +746,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Dictionary name font size"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                       Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="DictTypeFontSizeNumericUpDown" Maximum="100"
                                               Minimum="1"
                                               HorizontalAlignment="Right" />
@@ -681,7 +754,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Separator Color"
-                                       TextWrapping="Wrap" VerticalAlignment="Center" />
+                                       Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
                             <Button x:Name="SeparatorColorButton"  HorizontalAlignment="Right"
                                     Width="60" BorderThickness="5,5,5,5"
                                     Height="32" BorderBrush="#FF707070" Click="ShowColorPicker" />
@@ -699,7 +772,7 @@
                         </StackPanel.Resources>
 
                         <DockPanel Margin="0,10,0,0">
-                            <TextBlock HorizontalAlignment="Left" Text="Enable Anki integration"
+                            <TextBlock HorizontalAlignment="Left" Text="Enable Anki integration" Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" TextWrapping="Wrap" />
                             <CheckBox x:Name="AnkiIntegrationCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
@@ -707,7 +780,7 @@
                         <StackPanel IsEnabled="{Binding ElementName=AnkiIntegrationCheckBox,Path=IsChecked}">
 
                             <DockPanel Margin="0,10,0,0">
-                                <TextBlock HorizontalAlignment="Left" Text="AnkiConnect server address"
+                                <TextBlock HorizontalAlignment="Left" Text="AnkiConnect server address" Style="{StaticResource TextBlockDefault}"
                                            VerticalAlignment="Center" TextWrapping="Wrap" DockPanel.Dock="Left" />
                                 <Button Content="Apply" Width="Auto" VerticalAlignment="Center" FontSize="9" Height="26"
                                     Click="ApplyAnkiConnectUrlButton_Click" DockPanel.Dock="Right" />
@@ -717,13 +790,13 @@
 
                             <DockPanel Margin="0,10,0,0">
                                 <TextBlock HorizontalAlignment="Left" Text="Force sync after mining"
-                                           VerticalAlignment="Center" TextWrapping="Wrap" />
+                                           Style="{StaticResource TextBlockDefault}" VerticalAlignment="Center" TextWrapping="Wrap" />
                                 <CheckBox x:Name="ForceSyncAnkiCheckBox"  HorizontalAlignment="Right" />
                             </DockPanel>
 
                             <DockPanel Margin="0,10,0,0">
                                 <TextBlock HorizontalAlignment="Left" Text="Allow duplicate cards"
-                                           VerticalAlignment="Center" TextWrapping="Wrap" />
+                                           Style="{StaticResource TextBlockDefault}" VerticalAlignment="Center" TextWrapping="Wrap" />
                                 <CheckBox x:Name="AllowDuplicateCardsCheckBox"  HorizontalAlignment="Right" />
                             </DockPanel>
 
@@ -738,7 +811,7 @@
                                         <Grid Margin="10,10,10,10">
                                             <StackPanel Margin="10">
                                                 <TextBlock HorizontalAlignment="Center" Text="Deck:"
-                                               TextWrapping="Wrap" />
+                                                           Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <ComboBox x:Name="WordMiningSetupComboBoxDeckNames" Width="300" Margin="0,10,0,0" />
                                                 <Button Click="MiningSetupButtonRefresh_Click"
                                                         Width="100"
@@ -746,7 +819,7 @@
                                                     Refresh
                                                 </Button>
                                                 <TextBlock HorizontalAlignment="Center" Text="Model:"
-                                               TextWrapping="Wrap" />
+                                                           Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <ComboBox x:Name="WordMiningSetupComboBoxModelNames" Width="300" Margin="0,10,0,0" />
 
                                                 <Separator Height="15" />
@@ -764,7 +837,7 @@
                                                 <Separator Height="15" />
 
                                                 <TextBlock HorizontalAlignment="Center" Text="Tags:"
-                                               TextWrapping="Wrap" />
+                                                           Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <TextBox x:Name="WordTagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
                                              Cursor="Help" ToolTip="Separated by a comma" />
                                             </StackPanel>
@@ -776,7 +849,7 @@
                                         <Grid Margin="10,10,10,10">
                                             <StackPanel Margin="10">
                                                 <TextBlock HorizontalAlignment="Center" Text="Deck:"
-                                               TextWrapping="Wrap" />
+                                                           Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <ComboBox x:Name="KanjiMiningSetupComboBoxDeckNames" Width="300" Margin="0,10,0,0" />
                                                 <Button Click="MiningSetupButtonRefresh_Click"
                                                         Width="100"
@@ -784,7 +857,7 @@
                                                     Refresh
                                                 </Button>
                                                 <TextBlock HorizontalAlignment="Center" Text="Model:"
-                                               TextWrapping="Wrap" />
+                                                           Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <ComboBox x:Name="KanjiMiningSetupComboBoxModelNames" Width="300" Margin="0,10,0,0" />
 
                                                 <Separator Height="15" />
@@ -802,7 +875,7 @@
                                                 <Separator Height="15" />
 
                                                 <TextBlock HorizontalAlignment="Center" Text="Tags:"
-                                               TextWrapping="Wrap" />
+                                                           Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <TextBox x:Name="KanjiTagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
                                              Cursor="Help" ToolTip="Separated by a comma" />
                                             </StackPanel>
@@ -814,7 +887,7 @@
                                         <Grid Margin="10,10,10,10">
                                             <StackPanel Margin="10">
                                                 <TextBlock HorizontalAlignment="Center" Text="Deck:"
-                                               TextWrapping="Wrap" />
+                                                           Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <ComboBox x:Name="NameMiningSetupComboBoxDeckNames" Width="300" Margin="0,10,0,0" />
                                                 <Button Click="MiningSetupButtonRefresh_Click"
                                                         Width="100"
@@ -822,7 +895,7 @@
                                                     Refresh
                                                 </Button>
                                                 <TextBlock HorizontalAlignment="Center" Text="Model:"
-                                               TextWrapping="Wrap" />
+                                                           Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <ComboBox x:Name="NameMiningSetupComboBoxModelNames" Width="300" Margin="0,10,0,0" />
 
                                                 <Separator Height="15" />
@@ -840,7 +913,7 @@
                                                 <Separator Height="15" />
 
                                                 <TextBlock HorizontalAlignment="Center" Text="Tags:"
-                                               TextWrapping="Wrap" />
+                                                           Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <TextBox x:Name="NameTagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
                                              Cursor="Help" ToolTip="Separated by a comma" />
                                             </StackPanel>
@@ -852,7 +925,7 @@
                                         <Grid Margin="10,10,10,10">
                                             <StackPanel Margin="10">
                                                 <TextBlock HorizontalAlignment="Center" Text="Deck:"
-                                               TextWrapping="Wrap" />
+                                                           Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <ComboBox x:Name="OtherMiningSetupComboBoxDeckNames" Width="300" Margin="0,10,0,0" />
                                                 <Button Click="MiningSetupButtonRefresh_Click"
                                                         Width="100"
@@ -860,7 +933,7 @@
                                                     Refresh
                                                 </Button>
                                                 <TextBlock HorizontalAlignment="Center" Text="Model:"
-                                               TextWrapping="Wrap" />
+                                                           Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <ComboBox x:Name="OtherMiningSetupComboBoxModelNames" Width="300" Margin="0,10,0,0" />
 
                                                 <Separator Height="15" />
@@ -878,7 +951,7 @@
                                                 <Separator Height="15" />
 
                                                 <TextBlock HorizontalAlignment="Center" Text="Tags:"
-                                               TextWrapping="Wrap" />
+                                                           Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <TextBox x:Name="OtherTagsTextBox" TextWrapping="Wrap" Width="200" Margin="0,10,0,20"
                                              Cursor="Help" ToolTip="Separated by a comma" />
                                             </StackPanel>
@@ -906,6 +979,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Hotkey toggle" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help" ToolTip="Toggle disable hotkeys option" VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -916,6 +990,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Close popup" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -926,6 +1001,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Minimize/Restore the main window" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -936,6 +1012,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Mining mode" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -946,6 +1023,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Reconnect to WebSocket" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -956,6 +1034,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Play audio" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -966,6 +1045,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Selected text to speech" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -986,6 +1066,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Add word" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -996,6 +1077,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Search" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1006,6 +1088,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Move backwards (Backlog)" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1016,6 +1099,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Move forward (Backlog)" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1026,6 +1110,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Kanji mode" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1036,6 +1121,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle lookup" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1046,7 +1132,8 @@
                                       PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                       HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle mouse pass-through mode" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                        VerticalAlignment="Center" />
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
@@ -1056,6 +1143,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Previous dictionary" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1066,6 +1154,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Next dictionary" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1076,6 +1165,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle always on top" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1086,6 +1176,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle capture text from clipboard option" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1096,6 +1187,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle capture text from WebSocket option" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1106,6 +1198,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Delete the currently shown line" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" Cursor="Help"
                                        ToolTip="Delete the currently shown line from the main window.
                                        &#10;Line and character count stats will be updated accordingly."/>
@@ -1118,6 +1211,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle always show caret option" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1128,6 +1222,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Move caret left" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1138,6 +1233,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Move caret right" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1148,6 +1244,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Move caret up" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1158,6 +1255,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Move caret down" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1168,6 +1266,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Lookup term at caret index" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1178,6 +1277,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Select next lookup result" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1188,6 +1288,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Select previous lookup result" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1198,6 +1299,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Mine selected lookup result" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1209,7 +1311,8 @@
                                       PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                       HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Manage dictionaries" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                        VerticalAlignment="Center" />
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
@@ -1220,7 +1323,8 @@
                                       PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                       HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Manage frequencies" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                        VerticalAlignment="Center" />
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
@@ -1231,7 +1335,8 @@
                                       PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                       HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Manage audio sources" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                        VerticalAlignment="Center" />
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
@@ -1241,7 +1346,8 @@
                                       PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                       HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Preferences" TextWrapping="Wrap" HorizontalAlignment="Left"
-                                        VerticalAlignment="Center" />
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
                         </DockPanel>
 
                         <DockPanel>
@@ -1251,6 +1357,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Show stats" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1261,6 +1368,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="Toggle read only option" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1271,6 +1379,7 @@
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
                             <TextBlock Text="???" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
 
@@ -1288,6 +1397,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Profile"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <DockPanel HorizontalAlignment="Right">
                                 <ComboBox x:Name="ProfileComboBox" HorizontalAlignment="Left" VerticalAlignment="Center"
@@ -1298,6 +1408,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Maximum Search Length"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap"
                                        Height="26" Width="175" />
                             <hc:NumericUpDown x:Name="MaxSearchLengthNumericUpDown" Maximum="100" Minimum="1"
@@ -1306,6 +1417,7 @@
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Lookup throttle (ms)"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="LookupRateNumericUpDown" Maximum="100" Minimum="0"
                                               HorizontalAlignment="Right" />
@@ -1314,6 +1426,7 @@
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Max number of results when not in mining mode"
                                        TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}"
                                        ToolTip="Improves performance when using a lot of dictionaries at the same time"
                                        Cursor="Help"/>
                             <hc:NumericUpDown x:Name="MaxNumResultsNotInMiningModeNumericUpDown" Maximum="100"
@@ -1324,6 +1437,7 @@
                         <DockPanel Margin="0,10,0,0">
                             <TextBlock HorizontalAlignment="Left" Text="Precache results on text change"
                                        TextWrapping="Wrap"
+                                       Style="{StaticResource TextBlockDefault}"
                                        ToolTip="Generate all possible results for the text in the main window before you mouse over anything.
                                        &#10;Improves performance when using a lot of dictionaries at the same time, as long as you don't try to
                                        &#10;look up something immediately after the text changes.
@@ -1335,6 +1449,7 @@
                         <DockPanel Margin="0,10,0,0">
                             <TextBlock HorizontalAlignment="Left" Text="Global hotkeys"
                                        TextWrapping="Wrap"
+                                       Style="{StaticResource TextBlockDefault}"
                                        ToolTip="Enable global hotkeys. This allows hotkeys to be used even when JL doesn't have the focus.
                                        &#10;Only hotkeys with modifiers (e.g. Alt+T), function keys (except for F12) and numpad keys can be used as global hotkeys."
                                        Cursor="Help"/>
@@ -1343,18 +1458,21 @@
 
                         <DockPanel Margin="0,10,0,0">
                             <TextBlock HorizontalAlignment="Left" Text="Stop increasing time stat when minimized"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" />
                             <CheckBox x:Name="StopIncreasingTimeStatWhenMinimizedCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel Margin="0,10,0,0">
                             <TextBlock HorizontalAlignment="Left" Text="Strip punctuation before calculating character count"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" />
                             <CheckBox x:Name="StripPunctuationBeforeCalculatingCharacterCountCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Browser path" VerticalAlignment="Center" TextWrapping="Wrap"
+                                       Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help"
                                        ToolTip="The path of the browser that will be used by the search functionality, without quotes.
                                        &#10;Leave blank to use the default browser."/>
@@ -1363,12 +1481,13 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Search URL" VerticalAlignment="Center" TextWrapping="Wrap" />
+                            <TextBlock HorizontalAlignment="Left" Text="Search URL" VerticalAlignment="Center" TextWrapping="Wrap" Style="{StaticResource TextBlockDefault}" />
                             <TextBox x:Name="SearchUrlTextBox" HorizontalAlignment="Right" Width="300" MaxHeight="60" TextWrapping="Wrap" />
                         </DockPanel>
 
                         <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Minimum Log Level"
+                                       Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <ComboBox x:Name="MinimumLogLevelComboBox" HorizontalAlignment="Right"
                                       Width="250" SelectedValuePath="Content">

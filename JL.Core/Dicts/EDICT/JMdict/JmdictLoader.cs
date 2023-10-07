@@ -289,7 +289,7 @@ internal static class JmdictLoader
                                 {
                                     lang = CultureInfo.GetCultureInfo(lang).EnglishName;
                                 }
-                                catch (Exception ex)
+                                catch (CultureNotFoundException ex)
                                 {
                                     Utils.Logger.Error(ex, "Underlying OS cannot process the culture info");
                                     s_canHandleCulture = false;

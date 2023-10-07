@@ -19,6 +19,12 @@ public enum JLField
     [Description("EDICT ID")] EdictId,
     [Description("Local Time")] LocalTime,
     Frequencies,
+    [Description("Raw Frequencies")] RawFrequencies,
+
+    // JMdict
+    [Description("Primary Spelling with Orthography Info")] PrimarySpellingWithOrthographyInfo,
+    [Description("Readings with Orthography Info")] ReadingsWithOrthographyInfo,
+    [Description("Alternative Spellings with Orthography Info")] AlternativeSpellingsWithOrthographyInfo,
 
     // Word dictionaries
     [Description("Deconjugated Matched Text")] DeconjugatedMatchedText,

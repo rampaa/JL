@@ -1,6 +1,7 @@
 using System.Globalization;
 using JL.Core.Audio;
 using JL.Core.Dicts;
+using JL.Core.Lookup;
 using JL.Core.Network;
 using JL.Core.Utilities;
 
@@ -8,9 +9,13 @@ namespace JL.Core.Anki;
 
 public static class Mining
 {
-    public static async Task<bool> Mine(Dictionary<JLField, string> miningParams)
+    public static async Task<bool> Mine(Dictionary<JLField, string> miningParams, LookupResult lookupResult)
     {
-        string primarySpelling = miningParams[JLField.PrimarySpelling];
+        if (!CoreConfig.AnkiIntegration)
+        {
+            Utils.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
+            return false;
+        }
 
         Dictionary<MineType, AnkiConfig>? ankiConfigDict = await AnkiConfig.ReadAnkiConfig().ConfigureAwait(false);
 
@@ -21,36 +26,17 @@ public static class Mining
         }
 
         AnkiConfig? ankiConfig;
-
-        DictType? dictType = null;
-
-        if (miningParams.TryGetValue(JLField.DictionaryName, out string? dictionaryName))
-        {
-            if (DictUtils.Dicts.TryGetValue(dictionaryName, out Dict? dict))
-            {
-                dictType = dict.Type;
-            }
-        }
-
-        if (dictType is null)
-        {
-            Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Mining failed for {primarySpelling}. Cannot find the type of {JLField.DictionaryName.GetDescription()}"));
-            Utils.Logger.Error("Mining failed for {FoundSpelling}. Cannot find the type of {DictionaryName}", primarySpelling, JLField.DictionaryName.GetDescription());
-            return false;
-        }
-
-
-        if (DictUtils.s_wordDictTypes.Contains(dictType.Value))
+        if (DictUtils.s_wordDictTypes.Contains(lookupResult.Dict.Type))
         {
             _ = ankiConfigDict.TryGetValue(MineType.Word, out ankiConfig);
         }
 
-        else if (DictUtils.s_kanjiDictTypes.Contains(dictType.Value))
+        else if (DictUtils.s_kanjiDictTypes.Contains(lookupResult.Dict.Type))
         {
             _ = ankiConfigDict.TryGetValue(MineType.Kanji, out ankiConfig);
         }
 
-        else if (DictUtils.s_nameDictTypes.Contains(dictType.Value))
+        else if (DictUtils.s_nameDictTypes.Contains(lookupResult.Dict.Type))
         {
             _ = ankiConfigDict.TryGetValue(MineType.Name, out ankiConfig);
         }
@@ -66,20 +52,13 @@ public static class Mining
             return false;
         }
 
-        // idk if this gets the right audio for every word
-        string? reading = miningParams.GetValueOrDefault(JLField.Readings)?.Split(',')[0];
-        if (string.IsNullOrEmpty(reading))
-        {
-            reading = primarySpelling;
-        }
-
         Dictionary<string, JLField> userFields = ankiConfig.Fields;
-        Dictionary<string, object> fields = ConvertFields(userFields, miningParams);
-
         List<string> audioFields = FindFields(JLField.Audio, userFields);
         bool needsAudio = audioFields.Count > 0;
+        string reading = lookupResult.Readings?[0] ?? lookupResult.PrimarySpelling;
+
         AudioResponse? audioResponse = needsAudio
-            ? await AudioUtils.GetPrioritizedAudio(primarySpelling, reading).ConfigureAwait(false)
+            ? await AudioUtils.GetPrioritizedAudio(lookupResult.PrimarySpelling, reading).ConfigureAwait(false)
             : null;
 
         byte[]? audioData = audioResponse?.AudioData;
@@ -98,7 +77,7 @@ public static class Mining
             : new Dictionary<string, object>(4)
             {
                 { "data", audioData },
-                { "filename", string.Create(CultureInfo.InvariantCulture, $"JL_audio_{reading}_{primarySpelling}.{audioResponse!.AudioFormat}") },
+                { "filename", string.Create(CultureInfo.InvariantCulture, $"JL_audio_{reading}_{lookupResult.PrimarySpelling}.{audioResponse!.AudioFormat}") },
                 { "skipHash", Networking.Jpod101NoAudioMd5Hash },
                 { "fields", audioFields }
             };
@@ -114,7 +93,7 @@ public static class Mining
             : new Dictionary<string, object>(3)
             {
                 { "data", imageBytes },
-                { "filename", string.Create(CultureInfo.InvariantCulture, $"JL_image_{reading}_{primarySpelling}.png") },
+                { "filename", string.Create(CultureInfo.InvariantCulture, $"JL_image_{reading}_{lookupResult.PrimarySpelling}.png") },
                 { "fields", imageFields }
             };
 
@@ -123,26 +102,28 @@ public static class Mining
             { "allowDuplicate", CoreConfig.AllowDuplicateCards }
         };
 
+        Dictionary<string, object> fields = ConvertFields(userFields, miningParams);
+
         Note note = new(ankiConfig.DeckName, ankiConfig.ModelName, fields, options, ankiConfig.Tags, audio, null, image);
         Response? response = await AnkiConnect.AddNoteToDeck(note).ConfigureAwait(false);
 
         if (response is null)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Mining failed for {primarySpelling}"));
-            Utils.Logger.Error("Mining failed for {FoundSpelling}", primarySpelling);
+            Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Mining failed for {lookupResult.PrimarySpelling}"));
+            Utils.Logger.Error("Mining failed for {FoundSpelling}", lookupResult.PrimarySpelling);
             return false;
         }
 
         if (needsAudio && (audioData is null || Utils.GetMd5String(audioData) is Networking.Jpod101NoAudioMd5Hash))
         {
-            Utils.Frontend.Alert(AlertLevel.Warning, string.Create(CultureInfo.InvariantCulture, $"Mined {primarySpelling} (no audio)"));
-            Utils.Logger.Information("Mined {FoundSpelling} (no audio)", primarySpelling);
+            Utils.Frontend.Alert(AlertLevel.Warning, string.Create(CultureInfo.InvariantCulture, $"Mined {lookupResult.PrimarySpelling} (no audio)"));
+            Utils.Logger.Information("Mined {FoundSpelling} (no audio)", lookupResult.PrimarySpelling);
         }
 
         else
         {
-            Utils.Frontend.Alert(AlertLevel.Success, string.Create(CultureInfo.InvariantCulture, $"Mined {primarySpelling}"));
-            Utils.Logger.Information("Mined {FoundSpelling}", primarySpelling);
+            Utils.Frontend.Alert(AlertLevel.Success, string.Create(CultureInfo.InvariantCulture, $"Mined {lookupResult.PrimarySpelling}"));
+            Utils.Logger.Information("Mined {FoundSpelling}", lookupResult.PrimarySpelling);
         }
 
         if (CoreConfig.ForceSyncAnki)

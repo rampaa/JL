@@ -95,6 +95,7 @@ internal sealed partial class AddWordWindow : Window
                 Utils.Frontend.InvalidateDisplayCache();
             }
 
+            PopupWindowUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);
             Close();
 
             string line = string.IsNullOrWhiteSpace(rawWordClasses)
@@ -108,7 +109,6 @@ internal sealed partial class AddWordWindow : Window
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        WindowsUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
         s_instance = null;

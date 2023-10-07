@@ -40,7 +40,7 @@
                   VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.ScrollUnit="Pixel"
                   BorderThickness="0" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True"
                   ScrollViewer.VerticalScrollBarVisibility="Auto" VirtualizingPanel.IsContainerVirtualizable="True"
-                  HorizontalContentAlignment="Stretch"
+                  HorizontalContentAlignment="Stretch" MouseLeave="PopupListView_MouseLeave"
                   Background="{Binding Path=Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
                   x:Name="PopupListView" Opacity="70">
             <ListView.ItemContainerStyle>

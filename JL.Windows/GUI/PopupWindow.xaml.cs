@@ -6,11 +6,9 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using Caching;
 using JL.Core;
-using JL.Core.Anki;
 using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
-using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
 using JL.Windows.SpeechSynthesis;
@@ -28,13 +26,17 @@ internal sealed partial class PopupWindow : Window
     public PopupWindow? ChildPopupWindow { get; private set; }
     private bool ContextMenuIsOpening { get; set; } = false;
 
-    private TextBox? _lastTextBox;
+    private TextBox? _previousTextBox;
 
-    private int _listBoxIndex;
+    private TextBox? _lastInteractedTextBox;
+
+    private int _listBoxIndex = 0;
+
+    private int _firstVisibleListBoxIndex = 0;
 
     private int _currentCharPosition;
 
-    private string? _currentText;
+    private string _currentText = "";
 
     public string? LastSelectedText { get; private set; }
 
@@ -116,16 +118,30 @@ internal sealed partial class PopupWindow : Window
 
     private void AddWord(object sender, RoutedEventArgs e)
     {
-        string text = ChildPopupWindow?._lastTextBox?.SelectionLength > 0
-            ? ChildPopupWindow._lastTextBox.SelectedText
-            : LastLookupResults[MiningMode ? _listBoxIndex : 0].PrimarySpelling;
+        ShowAddWordWindow();
+    }
+
+    private void ShowAddWordWindow()
+    {
+        string text = _lastInteractedTextBox?.SelectionLength > 0
+            ? _lastInteractedTextBox.SelectedText
+            : LastLookupResults[_listBoxIndex].PrimarySpelling;
 
         WindowsUtils.ShowAddWordWindow(text);
     }
 
     private void SearchWithBrowser(object sender, RoutedEventArgs e)
     {
-        WindowsUtils.SearchWithBrowser(LastSelectedText);
+        SearchWithBrowser();
+    }
+
+    private void SearchWithBrowser()
+    {
+        string text = _lastInteractedTextBox?.SelectionLength > 0
+            ? _lastInteractedTextBox.SelectedText
+            : LastLookupResults[_listBoxIndex].PrimarySpelling;
+
+        WindowsUtils.SearchWithBrowser(text);
     }
 
     public async Task LookupOnCharPosition(TextBox tb, int charPosition, bool enableMiningMode)
@@ -170,7 +186,7 @@ internal sealed partial class PopupWindow : Window
 
         if (lookupResults?.Count > 0)
         {
-            _lastTextBox = tb;
+            _previousTextBox = tb;
             LastSelectedText = lookupResults[0].MatchedText;
 
             if (ConfigManager.HighlightLongestMatch)
@@ -202,6 +218,9 @@ internal sealed partial class PopupWindow : Window
             }
 
             Show();
+
+            _firstVisibleListBoxIndex = GetFirstVisibleListBoxItemIndex();
+            _listBoxIndex = _firstVisibleListBoxIndex;
 
             if (ConfigManager.FixedPopupPositioning && Owner == MainWindow.Instance)
             {
@@ -263,13 +282,14 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        _lastTextBox = tb;
+        _previousTextBox = tb;
         LastText = tb.SelectedText;
         LastSelectedText = tb.SelectedText;
+        _currentCharPosition = tb.SelectionStart;
 
         List<LookupResult>? lookupResults = LookupUtils.LookupText(tb.SelectedText);
 
-        if (lookupResults is { Count: > 0 })
+        if (lookupResults?.Count > 0)
         {
             LastLookupResults = lookupResults;
             EnableMiningMode();
@@ -281,6 +301,9 @@ internal sealed partial class PopupWindow : Window
             }
 
             Show();
+
+            _firstVisibleListBoxIndex = GetFirstVisibleListBoxItemIndex();
+            _listBoxIndex = _firstVisibleListBoxIndex;
 
             if (ConfigManager.FixedPopupPositioning && Owner == MainWindow.Instance)
             {
@@ -383,7 +406,7 @@ internal sealed partial class PopupWindow : Window
         Top = y;
     }
 
-    private void DisplayResults(bool generateAllResults, string? text = null)
+    public void DisplayResults(bool generateAllResults, string? text = null)
     {
         DictsWithResults.Clear();
 
@@ -607,11 +630,12 @@ internal sealed partial class PopupWindow : Window
                     _ = top.Children.Add(readingTextBox);
                 }
 
-                readingTextBox.PreviewMouseUp += UiElement_PreviewMouseUp;
-                readingTextBox.MouseMove += UiElement_MouseMove;
+                readingTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
+                readingTextBox.MouseMove += TextBox_MouseMove;
                 readingTextBox.LostFocus += Unselect;
-                readingTextBox.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
+                readingTextBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
                 readingTextBox.MouseLeave += OnMouseLeave;
+                readingTextBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
             }
 
             else
@@ -689,11 +713,12 @@ internal sealed partial class PopupWindow : Window
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                alternativeSpellingsTexBox.PreviewMouseUp += UiElement_PreviewMouseUp;
-                alternativeSpellingsTexBox.MouseMove += UiElement_MouseMove;
+                alternativeSpellingsTexBox.PreviewMouseUp += TextBox_PreviewMouseUp;
+                alternativeSpellingsTexBox.MouseMove += TextBox_MouseMove;
                 alternativeSpellingsTexBox.LostFocus += Unselect;
-                alternativeSpellingsTexBox.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
+                alternativeSpellingsTexBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
                 alternativeSpellingsTexBox.MouseLeave += OnMouseLeave;
+                alternativeSpellingsTexBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
                 _ = top.Children.Add(alternativeSpellingsTexBox);
             }
             else
@@ -792,11 +817,12 @@ internal sealed partial class PopupWindow : Window
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                definitionsTextBox.PreviewMouseUp += UiElement_PreviewMouseUp;
-                definitionsTextBox.MouseMove += UiElement_MouseMove;
+                definitionsTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
+                definitionsTextBox.MouseMove += TextBox_MouseMove;
                 definitionsTextBox.LostFocus += Unselect;
-                definitionsTextBox.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
+                definitionsTextBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
                 definitionsTextBox.MouseLeave += OnMouseLeave;
+                definitionsTextBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
                 _ = bottom.Children.Add(definitionsTextBox);
             }
 
@@ -844,11 +870,12 @@ internal sealed partial class PopupWindow : Window
                     ContextMenu = PopupContextMenu
                 };
 
-                onReadingsTextBox.PreviewMouseUp += UiElement_PreviewMouseUp;
-                onReadingsTextBox.MouseMove += UiElement_MouseMove;
+                onReadingsTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
+                onReadingsTextBox.MouseMove += TextBox_MouseMove;
                 onReadingsTextBox.LostFocus += Unselect;
-                onReadingsTextBox.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
+                onReadingsTextBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
                 onReadingsTextBox.MouseLeave += OnMouseLeave;
+                onReadingsTextBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
                 _ = bottom.Children.Add(onReadingsTextBox);
             }
 
@@ -895,11 +922,12 @@ internal sealed partial class PopupWindow : Window
                     ContextMenu = PopupContextMenu
                 };
 
-                kunReadingsTextBox.PreviewMouseUp += UiElement_PreviewMouseUp;
-                kunReadingsTextBox.MouseMove += UiElement_MouseMove;
+                kunReadingsTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
+                kunReadingsTextBox.MouseMove += TextBox_MouseMove;
                 kunReadingsTextBox.LostFocus += Unselect;
-                kunReadingsTextBox.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
+                kunReadingsTextBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
                 kunReadingsTextBox.MouseLeave += OnMouseLeave;
+                kunReadingsTextBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
                 _ = bottom.Children.Add(kunReadingsTextBox);
             }
 
@@ -946,11 +974,12 @@ internal sealed partial class PopupWindow : Window
                     ContextMenu = PopupContextMenu
                 };
 
-                nanoriReadingsTextBox.PreviewMouseUp += UiElement_PreviewMouseUp;
-                nanoriReadingsTextBox.MouseMove += UiElement_MouseMove;
+                nanoriReadingsTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
+                nanoriReadingsTextBox.MouseMove += TextBox_MouseMove;
                 nanoriReadingsTextBox.LostFocus += Unselect;
-                nanoriReadingsTextBox.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
+                nanoriReadingsTextBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
                 nanoriReadingsTextBox.MouseLeave += OnMouseLeave;
+                nanoriReadingsTextBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
                 _ = bottom.Children.Add(nanoriReadingsTextBox);
             }
 
@@ -1030,11 +1059,12 @@ internal sealed partial class PopupWindow : Window
                     ContextMenu = PopupContextMenu
                 };
 
-                compositionTextBox.PreviewMouseUp += UiElement_PreviewMouseUp;
-                compositionTextBox.MouseMove += UiElement_MouseMove;
+                compositionTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
+                compositionTextBox.MouseMove += TextBox_MouseMove;
                 compositionTextBox.LostFocus += Unselect;
-                compositionTextBox.PreviewMouseRightButtonUp += TextBoxPreviewMouseRightButtonUp;
+                compositionTextBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
                 compositionTextBox.MouseLeave += OnMouseLeave;
+                compositionTextBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
                 _ = bottom.Children.Add(compositionTextBox);
             }
 
@@ -1096,9 +1126,24 @@ internal sealed partial class PopupWindow : Window
         return stackPanel;
     }
 
+    private static int GetIndexOfListBoxItemFromStackPanel(StackPanel stackPanel)
+    {
+        return (int)((WrapPanel)stackPanel.Children[0]).Tag;
+    }
+
+    private int GetFirstVisibleListBoxItemIndex()
+    {
+        StackPanel? firstVisibleStackPanel = PopupListView.Items.Cast<StackPanel>()
+            .FirstOrDefault(static stackPanel => stackPanel.Visibility is Visibility.Visible);
+
+        return firstVisibleStackPanel is not null
+            ? GetIndexOfListBoxItemFromStackPanel(firstVisibleStackPanel)
+            : 0;
+    }
+
     private void ListBoxItem_MouseEnter(object sender, MouseEventArgs e)
     {
-        _listBoxIndex = (int)((WrapPanel)((StackPanel)sender).Children[0]).Tag;
+        _listBoxIndex = GetIndexOfListBoxItemFromStackPanel((StackPanel)sender);
         LastSelectedText = LastLookupResults[_listBoxIndex].PrimarySpelling;
     }
 
@@ -1107,14 +1152,20 @@ internal sealed partial class PopupWindow : Window
         WindowsUtils.Unselect((TextBox)sender);
     }
 
-    private void TextBoxPreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+    private void TextBox_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
         AddNameMenuItem.IsEnabled = DictUtils.CustomNameDictReady && DictUtils.ProfileCustomNameDictReady;
         AddWordMenuItem.IsEnabled = DictUtils.CustomWordDictReady && DictUtils.ProfileCustomWordDictReady;
-        LastSelectedText = ((TextBox)sender).SelectedText;
+        _lastInteractedTextBox = (TextBox)sender;
+        LastSelectedText = _lastInteractedTextBox.SelectedText;
     }
 
-    private async void UiElement_MouseMove(object sender, MouseEventArgs? e)
+    private void TextBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        _lastInteractedTextBox = (TextBox)sender;
+    }
+
+    private async void TextBox_MouseMove(object sender, MouseEventArgs? e)
     {
         if (ConfigManager.InactiveLookupMode
             || ConfigManager.LookupOnSelectOnly
@@ -1137,6 +1188,7 @@ internal sealed partial class PopupWindow : Window
         if (MiningMode)
         {
             TextBox tb = (TextBox)sender;
+            _lastInteractedTextBox = tb;
             if (JapaneseUtils.JapaneseRegex.IsMatch(tb.Text))
             {
                 await ChildPopupWindow.LookupOnMouseMoveOrClick(tb).ConfigureAwait(false);
@@ -1144,150 +1196,8 @@ internal sealed partial class PopupWindow : Window
 
             else if (ConfigManager.HighlightLongestMatch)
             {
-                WindowsUtils.Unselect(ChildPopupWindow._lastTextBox);
+                WindowsUtils.Unselect(ChildPopupWindow._previousTextBox);
             }
-        }
-    }
-
-    private async Task Mine(Panel top)
-    {
-        Dictionary<JLField, string> miningParams = new();
-
-        if (_currentText is not null)
-        {
-            miningParams[JLField.SourceText] = _currentText;
-            miningParams[JLField.Sentence] = JapaneseUtils.FindSentence(_currentText, _currentCharPosition);
-        }
-
-        HidePopup();
-
-        foreach (UIElement child in top.Children)
-        {
-            switch (child)
-            {
-                case TextBox chi:
-                    switch (chi.Name)
-                    {
-                        case nameof(LookupResult.Readings):
-                            miningParams[JLField.Readings] = chi.Text;
-                            break;
-                        case nameof(LookupResult.AlternativeSpellings):
-                            miningParams[JLField.AlternativeSpellings] = chi.Text;
-                            break;
-                    }
-
-                    break;
-                case TextBlock ch:
-                    switch (ch.Name)
-                    {
-                        case nameof(LookupResult.PrimarySpelling):
-                            miningParams[JLField.PrimarySpelling] = ch.Text;
-                            break;
-                        case nameof(LookupResult.MatchedText):
-                            miningParams[JLField.MatchedText] = ch.Text;
-                            break;
-                        case nameof(LookupResult.DeconjugatedMatchedText):
-                            miningParams[JLField.DeconjugatedMatchedText] = ch.Text;
-                            break;
-                        case nameof(LookupResult.EdictId):
-                            miningParams[JLField.EdictId] = ch.Text;
-                            break;
-                        case nameof(LookupResult.Frequencies):
-                            miningParams[JLField.Frequencies] = ch.Text;
-                            break;
-                        case nameof(LookupResult.Dict.Name):
-                            miningParams[JLField.DictionaryName] = ch.Text;
-                            break;
-                        case nameof(LookupResult.Process):
-                            miningParams[JLField.DeconjugationProcess] = ch.Text;
-                            break;
-                    }
-
-                    break;
-                case Grid grid:
-                    {
-                        foreach (UIElement uiElement in grid.Children)
-                        {
-                            if (uiElement is TextBlock textBlockCg)
-                            {
-                                switch (textBlockCg.Name)
-                                {
-                                    case nameof(LookupResult.PrimarySpelling):
-                                        miningParams[JLField.PrimarySpelling] = textBlockCg.Text;
-                                        break;
-                                }
-                            }
-                            else if (uiElement is TextBox textBoxCg)
-                            {
-                                switch (textBoxCg.Name)
-                                {
-                                    case nameof(LookupResult.Readings):
-                                        miningParams[JLField.Readings] = textBoxCg.Text;
-                                        break;
-                                }
-                            }
-                        }
-
-                        break;
-                    }
-            }
-        }
-
-        StackPanel innerStackPanel = (StackPanel)top.Parent;
-        StackPanel bottom = (StackPanel)innerStackPanel.Children[1];
-        foreach (object child in bottom.Children)
-        {
-            if (child is TextBox textBox)
-            {
-                switch (textBox.Name)
-                {
-                    case nameof(LookupResult.FormattedDefinitions):
-                        miningParams[JLField.Definitions] = textBox.Text.Replace("\n", "<br/>", StringComparison.Ordinal);
-                        break;
-                    case nameof(LookupResult.OnReadings):
-                        miningParams[JLField.OnReadings] = textBox.Text[4..];
-                        break;
-                    case nameof(LookupResult.KunReadings):
-                        miningParams[JLField.KunReadings] = textBox.Text[5..];
-                        break;
-                    case nameof(LookupResult.NanoriReadings):
-                        miningParams[JLField.NanoriReadings] = textBox.Text[8..];
-                        break;
-                    case nameof(LookupResult.KanjiComposition):
-                        miningParams[JLField.KanjiComposition] = textBox.Text[13..];
-                        break;
-                }
-                continue;
-            }
-
-            if (child is not TextBlock tb)
-            {
-                continue;
-            }
-
-            switch (tb.Name)
-            {
-                case nameof(LookupResult.StrokeCount):
-                    miningParams[JLField.StrokeCount] = tb.Text;
-                    break;
-                case nameof(LookupResult.KanjiGrade):
-                    miningParams[JLField.KanjiGrade] = tb.Text;
-                    break;
-                case nameof(LookupResult.KanjiStats):
-                    miningParams[JLField.KanjiStats] = tb.Text;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(null, "Invalid LookupResult type");
-            }
-        }
-
-        miningParams[JLField.LocalTime] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
-
-        bool mined = await Mining.Mine(miningParams).ConfigureAwait(false);
-
-        if (mined)
-        {
-            Stats.IncrementStat(StatType.CardsMined);
         }
     }
 
@@ -1303,38 +1213,32 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        TextBlock textBlock = (TextBlock)sender;
+        HidePopup();
 
-        WrapPanel top = textBlock.Parent is Grid primarySpellingGrid
-            ? (WrapPanel)primarySpellingGrid.Parent
-            : (WrapPanel)textBlock.Parent;
-
-        await Mine(top).ConfigureAwait(false);
+        await PopupWindowUtils.Mine(LastLookupResults[_listBoxIndex], _currentText, _currentCharPosition).ConfigureAwait(false);
     }
 
     private void ShowAddNameWindow()
     {
         string text;
         string reading = "";
-        if (ChildPopupWindow?._lastTextBox?.SelectionLength > 0)
+        if (_lastInteractedTextBox?.SelectionLength > 0)
         {
-            text = ChildPopupWindow._lastTextBox.SelectedText;
-
-            if (text == ChildPopupWindow.LastSelectedText)
+            text = _lastInteractedTextBox.SelectedText;
+            if (text == ChildPopupWindow?.LastSelectedText)
             {
                 string[]? readings = ChildPopupWindow.LastLookupResults[0].Readings;
-                reading = readings is { Length: 1 }
+                reading = readings?.Length is 1
                     ? readings[0]
                     : "";
             }
         }
         else
         {
-            int index = MiningMode ? _listBoxIndex : 0;
-            text = LastLookupResults[index].PrimarySpelling;
+            text = LastLookupResults[_listBoxIndex].PrimarySpelling;
 
-            string[]? readings = LastLookupResults[index].Readings;
-            reading = readings is { Length: 1 }
+            string[]? readings = LastLookupResults[_listBoxIndex].Readings;
+            reading = readings?.Length is 1
                 ? readings[0]
                 : "";
         }
@@ -1444,7 +1348,7 @@ internal sealed partial class PopupWindow : Window
 
             if (Owner != MainWindow.Instance)
             {
-                UiElement_MouseMove(_lastTextBox!, null);
+                TextBox_MouseMove(_previousTextBox!, null);
             }
 
             else
@@ -1459,10 +1363,24 @@ internal sealed partial class PopupWindow : Window
             {
                 if (!MiningMode)
                 {
+                    if (Owner is PopupWindow previousPopupWindow)
+                    {
+                        previousPopupWindow.ShowAddNameWindow();
+                    }
+
+                    else
+                    {
+                        MainWindow.Instance.ShowAddNameWindow();
+                    }
+
                     HidePopup();
                 }
 
-                ShowAddNameWindow();
+                else
+                {
+                    ShowAddNameWindow();
+                }
+
                 PopupAutoHideTimer.Start();
             }
         }
@@ -1473,17 +1391,49 @@ internal sealed partial class PopupWindow : Window
             {
                 if (!MiningMode)
                 {
+                    if (Owner is PopupWindow previousPopupWindow)
+                    {
+                        previousPopupWindow.ShowAddWordWindow();
+                    }
+
+                    else
+                    {
+                        MainWindow.Instance.ShowAddWordWindow();
+                    }
+
                     HidePopup();
                 }
 
-                WindowsUtils.ShowAddWordWindow(LastSelectedText);
+                else
+                {
+                    ShowAddWordWindow();
+                }
+
                 PopupAutoHideTimer.Start();
             }
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SearchWithBrowserKeyGesture))
         {
-            WindowsUtils.SearchWithBrowser(LastSelectedText);
+            if (!MiningMode)
+            {
+                if (Owner is PopupWindow previousPopupWindow)
+                {
+                    previousPopupWindow.SearchWithBrowser();
+                }
+
+                else
+                {
+                    MainWindow.Instance.SearchWithBrowser();
+                }
+
+                HidePopup();
+            }
+
+            else
+            {
+                SearchWithBrowser();
+            }
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.InactiveLookupModeKeyGesture))
@@ -1585,7 +1535,7 @@ internal sealed partial class PopupWindow : Window
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ToggleMinimizedStateKeyGesture))
         {
             MainWindow mainWindow = MainWindow.Instance;
-            WindowsUtils.HidePopups(mainWindow.FirstPopupWindow);
+            PopupWindowUtils.HidePopups(mainWindow.FirstPopupWindow);
 
             if (ConfigManager.Focusable)
             {
@@ -1611,10 +1561,13 @@ internal sealed partial class PopupWindow : Window
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SelectedTextToSpeechKeyGesture))
         {
             if (MiningMode
-                && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null
-                && LastSelectedText is not null)
+                && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
             {
-                await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, LastSelectedText, CoreConfig.AudioVolume).ConfigureAwait(false);
+                string text = _lastInteractedTextBox?.SelectionLength > 0
+                    ? _lastInteractedTextBox.SelectedText
+                    : LastLookupResults[_listBoxIndex].PrimarySpelling;
+
+                await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text, CoreConfig.AudioVolume).ConfigureAwait(false);
             }
         }
 
@@ -1638,17 +1591,15 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode && PopupListView.SelectedItem is not null)
             {
-                WrapPanel? top = ((StackPanel)PopupListView.SelectedItem).Children.OfType<WrapPanel>().FirstOrDefault();
+                HidePopup();
 
-                if (top is not null)
-                {
-                    await Mine(top).ConfigureAwait(false);
-                }
+                int index = GetIndexOfListBoxItemFromStackPanel((StackPanel)PopupListView.SelectedItem);
+                await PopupWindowUtils.Mine(LastLookupResults[index], _currentText, _currentCharPosition).ConfigureAwait(false);
             }
         }
     }
 
-    private void EnableMiningMode()
+    public void EnableMiningMode()
     {
         MiningMode = true;
 
@@ -1662,88 +1613,26 @@ internal sealed partial class PopupWindow : Window
 
     private async Task PlayAudio()
     {
-        string? primarySpelling = null;
-        string? reading = null;
-
-        List<StackPanel> visibleStackPanels = PopupListView.Items.Cast<StackPanel>()
-            .Where(static stackPanel => stackPanel.Visibility is Visibility.Visible).ToList();
-
-        if (visibleStackPanels.Count is 0)
+        if (LastLookupResults.Count is 0)
         {
             return;
         }
 
-        StackPanel innerStackPanel = visibleStackPanels[MiningMode ? _listBoxIndex : 0];
-        WrapPanel top = (WrapPanel)innerStackPanel.Children[0];
+        LookupResult lastLookupResult = LastLookupResults[_listBoxIndex];
+        string primarySpelling = lastLookupResult.PrimarySpelling;
+        string? reading = lastLookupResult.Readings?[0];
 
-        foreach (UIElement child in top.Children)
+        if (WindowsUtils.AudioPlayer?.PlaybackState is PlaybackState.Playing
+            && s_primarySpellingOfLastPlayedAudio == primarySpelling
+            && s_readingOfLastPlayedAudio == reading)
         {
-            if (child is TextBox chi)
-            {
-                switch (chi.Name)
-                {
-                    case nameof(LookupResult.Readings):
-                        reading = chi.Text.Split(',')[0];
-                        break;
-                }
-            }
-
-            else if (child is TextBlock ch)
-            {
-                switch (ch.Name)
-                {
-                    case nameof(LookupResult.PrimarySpelling):
-                        primarySpelling = ch.Text;
-                        break;
-                    case nameof(LookupResult.Readings):
-                        reading = ch.Text.Split(',')[0];
-                        break;
-                }
-            }
-
-            else if (child is Grid grid)
-            {
-                foreach (UIElement uiElement in grid.Children)
-                {
-                    if (uiElement is TextBlock textBlockCg)
-                    {
-                        switch (textBlockCg.Name)
-                        {
-                            case nameof(LookupResult.PrimarySpelling):
-                                primarySpelling = textBlockCg.Text;
-                                break;
-                            case nameof(LookupResult.Readings):
-                                reading = textBlockCg.Text.Split(',')[0];
-                                break;
-                        }
-                    }
-                    else if (uiElement is TextBox textBoxCg)
-                    {
-                        switch (textBoxCg.Name)
-                        {
-                            case nameof(LookupResult.Readings):
-                                reading = textBoxCg.Text.Split(',')[0];
-                                break;
-                        }
-                    }
-                }
-            }
+            return;
         }
 
-        if (primarySpelling is not null)
-        {
-            if (WindowsUtils.AudioPlayer?.PlaybackState is PlaybackState.Playing
-                && s_primarySpellingOfLastPlayedAudio == primarySpelling
-                && s_readingOfLastPlayedAudio == reading)
-            {
-                return;
-            }
+        s_primarySpellingOfLastPlayedAudio = primarySpelling;
+        s_readingOfLastPlayedAudio = reading;
 
-            s_primarySpellingOfLastPlayedAudio = primarySpelling;
-            s_readingOfLastPlayedAudio = reading;
-
-            await AudioUtils.GetAndPlayAudio(primarySpelling, reading).ConfigureAwait(false);
-        }
+        await AudioUtils.GetAndPlayAudio(primarySpelling, reading).ConfigureAwait(false);
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -1780,9 +1669,10 @@ internal sealed partial class PopupWindow : Window
         HidePopup();
     }
 
-    private async void UiElement_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    private async void TextBox_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        LastSelectedText = ((TextBox)sender).SelectedText;
+        _lastInteractedTextBox = (TextBox)sender;
+        LastSelectedText = _lastInteractedTextBox.SelectedText;
 
         if (ConfigManager.InactiveLookupMode
             || (ConfigManager.RequireLookupKeyPress && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture))
@@ -1842,25 +1732,6 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    public static void ShowMiningModeResults(PopupWindow popupWindow)
-    {
-        popupWindow.EnableMiningMode();
-        WinApi.BringToFront(popupWindow.WindowHandle);
-        popupWindow.DisplayResults(true);
-
-        if (ConfigManager.Focusable)
-        {
-            _ = popupWindow.Activate();
-        }
-
-        _ = popupWindow.Focus();
-
-        if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
-        {
-            PopupWindowUtils.SetPopupAutoHideTimer();
-        }
-    }
-
     private void GenerateDictTypeButtons()
     {
         List<Button> buttons = new(DictUtils.Dicts.Values.Count);
@@ -1900,6 +1771,12 @@ internal sealed partial class PopupWindow : Window
         button.Background = Brushes.DodgerBlue;
 
         PopupListView.Items.Filter = NoAllDictFilter;
+        _firstVisibleListBoxIndex = GetFirstVisibleListBoxItemIndex();
+        _listBoxIndex = _firstVisibleListBoxIndex;
+        LastSelectedText = LastLookupResults[_listBoxIndex].PrimarySpelling;
+
+        WindowsUtils.Unselect(_lastInteractedTextBox);
+        _lastInteractedTextBox = null;
     }
 
     private void DictTypeButtonOnClick(object sender, RoutedEventArgs e)
@@ -1916,6 +1793,12 @@ internal sealed partial class PopupWindow : Window
         _filteredDict = (Dict)button.Tag;
 
         PopupListView.Items.Filter = DictFilter;
+        _firstVisibleListBoxIndex = GetFirstVisibleListBoxItemIndex();
+        _listBoxIndex = _firstVisibleListBoxIndex;
+        LastSelectedText = LastLookupResults[_listBoxIndex].PrimarySpelling;
+
+        WindowsUtils.Unselect(_lastInteractedTextBox);
+        _lastInteractedTextBox = null;
     }
 
     private bool DictFilter(object item)
@@ -1952,7 +1835,7 @@ internal sealed partial class PopupWindow : Window
         {
             if (e.ChangedButton is not MouseButton.Right)
             {
-                WindowsUtils.HidePopups(ChildPopupWindow);
+                PopupWindowUtils.HidePopups(ChildPopupWindow);
             }
         }
 
@@ -1960,12 +1843,12 @@ internal sealed partial class PopupWindow : Window
         {
             if (!MiningMode)
             {
-                ShowMiningModeResults(this);
+                PopupWindowUtils.ShowMiningModeResults(this);
             }
 
             else if (ChildPopupWindow is { IsVisible: true, MiningMode: false })
             {
-                ShowMiningModeResults(ChildPopupWindow);
+                PopupWindowUtils.ShowMiningModeResults(ChildPopupWindow);
             }
         }
     }
@@ -1976,7 +1859,9 @@ internal sealed partial class PopupWindow : Window
         bool isFirstPopup = Owner == mainWindow;
 
         if (isFirstPopup
-            && (ConfigManager.TextOnlyVisibleOnHover || ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover))
+            && (ConfigManager.TextOnlyVisibleOnHover || ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
+            && !AddNameWindow.IsItVisible()
+            && !AddWordWindow.IsItVisible())
         {
             _ = mainWindow.ChangeVisibility().ConfigureAwait(true);
         }
@@ -1999,9 +1884,20 @@ internal sealed partial class PopupWindow : Window
 
         PopupListView.ItemsSource = null;
         LastText = "";
+        _currentText = "";
+        _listBoxIndex = 0;
+        _firstVisibleListBoxIndex = 0;
+        _lastInteractedTextBox = null;
+
         PopupAutoHideTimer.Stop();
 
+        UpdateLayout();
         Hide();
+
+        if (AddNameWindow.IsItVisible() || AddWordWindow.IsItVisible())
+        {
+            return;
+        }
 
         if (isFirstPopup)
         {
@@ -2009,7 +1905,7 @@ internal sealed partial class PopupWindow : Window
 
             if (ConfigManager.HighlightLongestMatch && !mainWindow.ContextMenuIsOpening)
             {
-                WindowsUtils.Unselect(_lastTextBox);
+                WindowsUtils.Unselect(_previousTextBox);
             }
         }
 
@@ -2023,7 +1919,7 @@ internal sealed partial class PopupWindow : Window
 
             if (ConfigManager.HighlightLongestMatch && !previousPopup.ContextMenuIsOpening)
             {
-                WindowsUtils.Unselect(_lastTextBox);
+                WindowsUtils.Unselect(_previousTextBox);
             }
         }
     }
@@ -2031,7 +1927,13 @@ internal sealed partial class PopupWindow : Window
     private void Window_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
         ContextMenuIsOpening = true;
-        WindowsUtils.HidePopups(ChildPopupWindow);
+        PopupWindowUtils.HidePopups(ChildPopupWindow);
         ContextMenuIsOpening = false;
+    }
+
+    private void PopupListView_MouseLeave(object sender, MouseEventArgs e)
+    {
+        _listBoxIndex = _firstVisibleListBoxIndex;
+        LastSelectedText = LastLookupResults[_listBoxIndex].PrimarySpelling;
     }
 }

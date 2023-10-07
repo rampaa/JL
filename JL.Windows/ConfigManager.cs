@@ -23,7 +23,7 @@ internal static class ConfigManager
     #region General
 
     private static readonly ComboBoxItem[] s_japaneseFonts =
-        WindowsUtils.FindJapaneseFonts().OrderByDescending(static f => f.Foreground.ToString(CultureInfo.InvariantCulture)).ThenBy(static font => font.Content)
+        WindowsUtils.FindJapaneseFonts().OrderBy(static f => f.Foreground == Brushes.DimGray).ThenBy(static font => font.Content)
             .ToArray();
 
     private static readonly ComboBoxItem[] s_popupJapaneseFonts =
@@ -122,12 +122,6 @@ internal static class ConfigManager
     public static int AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 2000;
     public static MouseButton MineMouseButton { get; private set; } = MouseButton.Left;
     public static MouseButton CopyPrimarySpellingToClipboardMouseButton { get; private set; } = MouseButton.Middle;
-
-    #endregion
-
-    #region Anki
-
-    public static bool AnkiIntegration { get; set; } = false;
 
     #endregion
 
@@ -281,7 +275,7 @@ internal static class ConfigManager
             WinApi.PreventActivation(mainWindow.WindowHandle);
         }
 
-        AnkiIntegration = GetValueFromConfig(config, AnkiIntegration, nameof(AnkiIntegration), bool.TryParse);
+        CoreConfig.AnkiIntegration = GetValueFromConfig(config, CoreConfig.AnkiIntegration, nameof(CoreConfig.AnkiIntegration), bool.TryParse);
         CoreConfig.KanjiMode = GetValueFromConfig(config, CoreConfig.KanjiMode, nameof(CoreConfig.KanjiMode), bool.TryParse);
         CoreConfig.ForceSyncAnki = GetValueFromConfig(config, CoreConfig.ForceSyncAnki, nameof(CoreConfig.ForceSyncAnki), bool.TryParse);
         CoreConfig.AllowDuplicateCards = GetValueFromConfig(config, CoreConfig.AllowDuplicateCards, nameof(CoreConfig.AllowDuplicateCards), bool.TryParse);
@@ -833,7 +827,7 @@ internal static class ConfigManager
         preferenceWindow.DisableHotkeysCheckBox.IsChecked = DisableHotkeys;
         preferenceWindow.FocusableCheckBox.IsChecked = Focusable;
         preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked = TextOnlyVisibleOnHover;
-        preferenceWindow.AnkiIntegrationCheckBox.IsChecked = AnkiIntegration;
+        preferenceWindow.AnkiIntegrationCheckBox.IsChecked = CoreConfig.AnkiIntegration;
         preferenceWindow.LookupRateNumericUpDown.Value = CoreConfig.LookupRate;
 
         preferenceWindow.MainWindowDynamicWidthCheckBox.IsChecked = MainWindowDynamicWidth;
@@ -1140,7 +1134,7 @@ internal static class ConfigManager
         settings[nameof(TextOnlyVisibleOnHover)].Value =
             preferenceWindow.TextOnlyVisibleOnHoverCheckBox.IsChecked.ToString();
 
-        settings[nameof(AnkiIntegration)].Value =
+        settings[nameof(CoreConfig.AnkiIntegration)].Value =
             preferenceWindow.AnkiIntegrationCheckBox.IsChecked.ToString();
         settings[nameof(HighlightColor)].Value =
             preferenceWindow.HighlightColorButton.Tag.ToString();

@@ -194,7 +194,7 @@ internal sealed partial class MainWindow : Window
             TitleBarContextMenu.IsOpen = false;
             MainTextBoxContextMenu.IsOpen = false;
 
-            WindowsUtils.HidePopups(FirstPopupWindow);
+            PopupWindowUtils.HidePopups(FirstPopupWindow);
         }, DispatcherPriority.Send);
 
         if (ConfigManager.AlwaysOnTop
@@ -414,7 +414,7 @@ internal sealed partial class MainWindow : Window
         }
         else if (e.ChangedButton is MouseButton.Right)
         {
-            WindowsUtils.HidePopups(FirstPopupWindow);
+            PopupWindowUtils.HidePopups(FirstPopupWindow);
         }
     }
 
@@ -437,7 +437,7 @@ internal sealed partial class MainWindow : Window
         }
         else if (e.ChangedButton is MouseButton.Right)
         {
-            WindowsUtils.HidePopups(FirstPopupWindow);
+            PopupWindowUtils.HidePopups(FirstPopupWindow);
         }
     }
 
@@ -712,7 +712,7 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            WindowsUtils.HidePopups(FirstPopupWindow);
+            PopupWindowUtils.HidePopups(FirstPopupWindow);
 
             if (ConfigManager.Focusable)
             {
@@ -875,7 +875,7 @@ internal sealed partial class MainWindow : Window
         ShowAddNameWindow();
     }
 
-    private void ShowAddNameWindow()
+    public void ShowAddNameWindow()
     {
         string? text = MainTextBox.SelectionLength > 0
             ? MainTextBox.SelectedText
@@ -888,7 +888,7 @@ internal sealed partial class MainWindow : Window
         if (text is not null && FirstPopupWindow.LastSelectedText is not null && text == FirstPopupWindow.LastSelectedText)
         {
             string[]? readings = FirstPopupWindow.LastLookupResults[0].Readings;
-            reading = readings is { Length: 1 }
+            reading = readings?.Length is 1
                 ? readings[0]
                 : "";
         }
@@ -906,7 +906,7 @@ internal sealed partial class MainWindow : Window
         ShowAddWordWindow();
     }
 
-    private void ShowAddWordWindow()
+    public void ShowAddWordWindow()
     {
         string? text = MainTextBox.SelectionLength > 0
             ? MainTextBox.SelectedText
@@ -923,6 +923,11 @@ internal sealed partial class MainWindow : Window
     }
 
     private void SearchWithBrowser(object sender, RoutedEventArgs e)
+    {
+        SearchWithBrowser();
+    }
+
+    public void SearchWithBrowser()
     {
         WindowsUtils.SearchWithBrowser(MainTextBox.SelectedText);
         WindowsUtils.UpdateMainWindowVisibility();
@@ -1032,11 +1037,11 @@ internal sealed partial class MainWindow : Window
         if (e.ChangedButton == ConfigManager.MiningModeMouseButton && FirstPopupWindow is { IsVisible: true, MiningMode: false })
         {
             e.Handled = true;
-            PopupWindow.ShowMiningModeResults(FirstPopupWindow);
+            PopupWindowUtils.ShowMiningModeResults(FirstPopupWindow);
         }
         else if (e.ChangedButton is not MouseButton.Right)
         {
-            WindowsUtils.HidePopups(FirstPopupWindow);
+            PopupWindowUtils.HidePopups(FirstPopupWindow);
         }
     }
 
@@ -1222,7 +1227,7 @@ internal sealed partial class MainWindow : Window
         }
         else if (e.ChangedButton is MouseButton.Right)
         {
-            WindowsUtils.HidePopups(FirstPopupWindow);
+            PopupWindowUtils.HidePopups(FirstPopupWindow);
         }
     }
 
@@ -1262,7 +1267,7 @@ internal sealed partial class MainWindow : Window
         int charIndex = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), ConfigManager.HorizontallyCenterMainWindowText);
         ContextMenuIsOpening = charIndex >= MainTextBox.SelectionStart && charIndex <= MainTextBox.SelectionStart + MainTextBox.SelectionLength;
 
-        WindowsUtils.HidePopups(FirstPopupWindow);
+        PopupWindowUtils.HidePopups(FirstPopupWindow);
 
         if (!ContextMenuIsOpening && MainTextBox.SelectionLength > 0)
         {
@@ -1496,6 +1501,6 @@ internal sealed partial class MainWindow : Window
 
     private void TitleBar_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        WindowsUtils.HidePopups(FirstPopupWindow);
+        PopupWindowUtils.HidePopups(FirstPopupWindow);
     }
 }

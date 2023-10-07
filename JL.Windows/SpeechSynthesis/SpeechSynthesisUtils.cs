@@ -18,7 +18,7 @@ internal static class SpeechSynthesisUtils
     {
         Synthesizer.InjectOneCoreVoices();
 
-        return Synthesizer.GetInstalledVoices(new CultureInfo("ja-JP"))
+        return Synthesizer.GetInstalledVoices(CultureInfo.GetCultureInfo("ja-JP"))
             .Where(static iv => iv.Enabled)
             .Select(static iv => iv.VoiceInfo.Name)
             .OrderBy(static name => name)

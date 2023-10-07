@@ -5,9 +5,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using JL.Core.Anki;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
 using JL.Core.PitchAccent;
+using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
 
@@ -248,5 +250,142 @@ internal static class PopupWindowUtils
                 lastPopupWindow = parentPopupWindow;
             }
         });
+    }
+
+    public static void HidePopups(PopupWindow? rootPopup)
+    {
+        PopupWindow? currentPopupWindow = rootPopup;
+
+        while (currentPopupWindow?.IsVisible ?? false)
+        {
+            currentPopupWindow.HidePopup();
+            currentPopupWindow = currentPopupWindow.ChildPopupWindow;
+        }
+    }
+
+    public static void ShowMiningModeResults(PopupWindow popupWindow)
+    {
+        popupWindow.EnableMiningMode();
+        WinApi.BringToFront(popupWindow.WindowHandle);
+        popupWindow.DisplayResults(true);
+
+        if (ConfigManager.Focusable)
+        {
+            _ = popupWindow.Activate();
+        }
+
+        _ = popupWindow.Focus();
+
+        if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
+        {
+            SetPopupAutoHideTimer();
+        }
+    }
+
+    public static async Task Mine(LookupResult lookupResult, string currentText, int currentCharPosition)
+    {
+        Dictionary<JLField, string> miningParams = new()
+        {
+            [JLField.LocalTime] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture),
+            [JLField.SourceText] = currentText,
+            [JLField.Sentence] = JapaneseUtils.FindSentence(currentText, currentCharPosition),
+            [JLField.DictionaryName] = lookupResult.Dict.Name,
+            [JLField.MatchedText] = lookupResult.MatchedText,
+            [JLField.DeconjugatedMatchedText] = lookupResult.DeconjugatedMatchedText,
+            [JLField.PrimarySpelling] = lookupResult.PrimarySpelling,
+            [JLField.PrimarySpellingWithOrthographyInfo] = lookupResult.PrimarySpellingOrthographyInfoList is not null
+                ? string.Create(CultureInfo.InvariantCulture, $"{lookupResult.PrimarySpelling} ({string.Join(", ", lookupResult.PrimarySpellingOrthographyInfoList)})")
+                : lookupResult.PrimarySpelling
+        };
+
+        if (lookupResult.Readings is not null)
+        {
+            string readings = string.Join(", ", lookupResult.Readings);
+            miningParams[JLField.Readings] = readings;
+
+            miningParams[JLField.ReadingsWithOrthographyInfo] = lookupResult.ReadingsOrthographyInfoList is not null
+                ? ReadingsToText(lookupResult.Readings, lookupResult.ReadingsOrthographyInfoList)
+                : readings;
+        }
+
+        if (lookupResult.AlternativeSpellings is not null)
+        {
+            string alternativeSpellings = string.Join(", ", lookupResult.AlternativeSpellings);
+            miningParams[JLField.AlternativeSpellings] = alternativeSpellings;
+
+            miningParams[JLField.AlternativeSpellingsWithOrthographyInfo] = lookupResult.AlternativeSpellingsOrthographyInfoList is not null
+                ? ReadingsToText(lookupResult.AlternativeSpellings, lookupResult.AlternativeSpellingsOrthographyInfoList)
+                : alternativeSpellings;
+        }
+
+        if (lookupResult.Frequencies is not null)
+        {
+            string? formattedFreq = FrequenciesToText(lookupResult.Frequencies);
+            if (formattedFreq is not null)
+            {
+                miningParams[JLField.Frequencies] = formattedFreq;
+                miningParams[JLField.RawFrequencies] = string.Join(", ", lookupResult.Frequencies
+                    .Where(static f => f.Freq is > 0 and < int.MaxValue)
+                    .Select(static f => f.Freq));
+            }
+        }
+
+        if (lookupResult.FormattedDefinitions is not null)
+        {
+            miningParams[JLField.Definitions] = lookupResult.FormattedDefinitions
+                .Replace("\n", "<br/>", StringComparison.Ordinal);
+        }
+
+        if (lookupResult.EdictId > 0)
+        {
+            miningParams[JLField.EdictId] = lookupResult.EdictId.ToString(CultureInfo.InvariantCulture);
+        }
+
+        if (lookupResult.Process is not null)
+        {
+            miningParams[JLField.DeconjugationProcess] = lookupResult.Process;
+        }
+
+        if (lookupResult.KanjiComposition is not null)
+        {
+            miningParams[JLField.KanjiComposition] = lookupResult.KanjiComposition;
+        }
+
+        if (lookupResult.KanjiStats is not null)
+        {
+            miningParams[JLField.KanjiStats] = lookupResult.KanjiStats;
+        }
+
+        if (lookupResult.StrokeCount > 0)
+        {
+            miningParams[JLField.StrokeCount] = lookupResult.StrokeCount.ToString(CultureInfo.InvariantCulture);
+        }
+
+        if (lookupResult.KanjiGrade > -1)
+        {
+            miningParams[JLField.KanjiGrade] = lookupResult.KanjiGrade.ToString(CultureInfo.InvariantCulture);
+        }
+
+        if (lookupResult.OnReadings is not null)
+        {
+            miningParams[JLField.OnReadings] = string.Join(", ", lookupResult.OnReadings);
+        }
+
+        if (lookupResult.KunReadings is not null)
+        {
+            miningParams[JLField.KunReadings] = string.Join(", ", lookupResult.KunReadings);
+        }
+
+        if (lookupResult.NanoriReadings is not null)
+        {
+            miningParams[JLField.NanoriReadings] = string.Join(", ", lookupResult.NanoriReadings);
+        }
+
+        bool mined = await Mining.Mine(miningParams, lookupResult).ConfigureAwait(false);
+
+        if (mined)
+        {
+            Stats.IncrementStat(StatType.CardsMined);
+        }
     }
 }
