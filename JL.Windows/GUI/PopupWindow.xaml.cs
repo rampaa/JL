@@ -1884,7 +1884,6 @@ internal sealed partial class PopupWindow : Window
 
         PopupListView.ItemsSource = null;
         LastText = "";
-        _currentText = "";
         _listBoxIndex = 0;
         _firstVisibleListBoxIndex = 0;
         _lastInteractedTextBox = null;
