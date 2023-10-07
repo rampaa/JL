@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <RollForward>LatestMajor</RollForward>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Caching" Version="3.0.0" />
+    <PackageReference Include="Caching" Version="3.0.1" />
     <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
   </ItemGroup>

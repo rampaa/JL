@@ -31,14 +31,14 @@ internal static class PopupWindowUtils
         return gradeText;
     }
 
-    public static string? FrequenciesToText(List<LookupFrequencyResult> frequencies)
+    public static string? FrequenciesToText(List<LookupFrequencyResult> frequencies, bool forMining)
     {
-        if (frequencies.Count is 1 && frequencies[0].Freq is > 0 and < int.MaxValue)
+        if (!forMining && frequencies.Count is 1 && frequencies[0].Freq is > 0 and < int.MaxValue)
         {
             return string.Create(CultureInfo.InvariantCulture, $"#{frequencies[0].Freq}");
         }
 
-        if (frequencies.Count > 1)
+        if (frequencies.Count > 0)
         {
             int freqResultCount = 0;
             StringBuilder sb = new();
@@ -320,7 +320,7 @@ internal static class PopupWindowUtils
 
         if (lookupResult.Frequencies is not null)
         {
-            string? formattedFreq = FrequenciesToText(lookupResult.Frequencies);
+            string? formattedFreq = FrequenciesToText(lookupResult.Frequencies, true);
             if (formattedFreq is not null)
             {
                 miningParams[JLField.Frequencies] = formattedFreq;

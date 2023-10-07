@@ -756,7 +756,7 @@ internal sealed partial class PopupWindow : Window
 
         if (result.Frequencies is not null)
         {
-            string? freqText = PopupWindowUtils.FrequenciesToText(result.Frequencies);
+            string? freqText = PopupWindowUtils.FrequenciesToText(result.Frequencies, false);
 
             if (freqText is not null)
             {
