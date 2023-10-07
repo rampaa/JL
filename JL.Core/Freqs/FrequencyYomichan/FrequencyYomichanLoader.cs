@@ -110,13 +110,13 @@ internal static class FrequencyYomichanLoader
                     }
                 }
             }
-
-            foreach ((string key, IList<FrequencyRecord> recordList) in freq.Contents)
-            {
-                freq.Contents[key] = recordList.ToArray();
-            }
-
-            freqDict.TrimExcess();
         }
+
+        foreach ((string key, IList<FrequencyRecord> recordList) in freq.Contents)
+        {
+            freq.Contents[key] = recordList.ToArray();
+        }
+
+        freqDict.TrimExcess();
     }
 }
