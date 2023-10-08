@@ -65,8 +65,8 @@ public class LookupTests
                     readings: new[] { "はじまる" },
                     formattedDefinitions: "(v5r, vi) (1) to begin; to start; to commence (v5r, vi) (2) to happen (again); to begin (anew) (v5r, vi) (3) to date (from); to originate (in)",
                     edictId: 1307500,
-                    alternativeSpellingsOrthographyInfoList: new List<string?>(),
-                    readingsOrthographyInfoList: new List<string?>()
+                    alternativeSpellingsOrthographyInfoList: null,
+                    readingsOrthographyInfoList: null
                 )
             };
 
