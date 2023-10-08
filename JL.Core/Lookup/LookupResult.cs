@@ -5,30 +5,35 @@ namespace JL.Core.Lookup;
 public sealed class LookupResult
 {
     // common (required for sorting)
-    public string MatchedText { get; }
-    public string DeconjugatedMatchedText { get; init; }
-    public List<LookupFrequencyResult>? Frequencies { get; init; }
+    public string PrimarySpelling { get; }
+    public string[]? Readings { get; }
+    public string? FormattedDefinitions { get; }
     public Dict Dict { get; }
-    public string PrimarySpelling { get; init; }
+    public string MatchedText { get; }
+    public List<LookupFrequencyResult>? Frequencies { get; }
 
-    public string[]? Readings { get; init; }
-    public string? FormattedDefinitions { get; init; }
-    public int EdictId { get; init; }
-    public string[]? AlternativeSpellings { get; init; }
-    public string? Process { get; init; }
-    public string[]? PrimarySpellingOrthographyInfoList { get; init; }
+    // JMdict, JMnedict, KANJIDIC2
+    public int EdictId { get; }
+
+    // Word dictionaries
+    public string DeconjugatedMatchedText { get; }
+    public string? DeconjugationProcess { get; }
+    // JMdict, Nazeka EPWING
+    public string[]? AlternativeSpellings { get; }
+    public string[]? PrimarySpellingOrthographyInfoList { get; }
     public List<string?>? ReadingsOrthographyInfoList { get; }
     public List<string?>? AlternativeSpellingsOrthographyInfoList { get; }
 
     // Kanji
-    public string[]? OnReadings { get; init; }
-    public string[]? KunReadings { get; init; }
-    public string[]? NanoriReadings { get; init; }
+    public string[]? OnReadings { get; }
+    public string[]? KunReadings { get; }
+    public string? KanjiComposition { get; }
+    public string? KanjiStats { get; }
+    // KANJIDIC2
+    public string[]? NanoriReadings { get; }
     public string[]? RadicalNames { get; }
-    public int StrokeCount { get; init; }
-    public string? KanjiComposition { get; init; }
-    public int KanjiGrade { get; init; }
-    public string? KanjiStats { get; init; }
+    public int StrokeCount { get; }
+    public int KanjiGrade { get; }
 
     internal LookupResult(
         string primarySpelling,
@@ -46,7 +51,7 @@ public sealed class LookupResult
         string[]? nanoriReadings = null,
         string[]? radicalNames = null,
         string? formattedDefinitions = null,
-        string? process = null,
+        string? deconjugationProcess = null,
         string? kanjiComposition = null,
         string? kanjiStats = null,
         int edictId = 0,
@@ -63,7 +68,7 @@ public sealed class LookupResult
         FormattedDefinitions = formattedDefinitions;
         EdictId = edictId;
         AlternativeSpellings = alternativeSpellings;
-        Process = process;
+        DeconjugationProcess = deconjugationProcess;
         PrimarySpellingOrthographyInfoList = primarySpellingOrthographyInfoList;
         ReadingsOrthographyInfoList = readingsOrthographyInfoList;
         AlternativeSpellingsOrthographyInfoList = alternativeSpellingsOrthographyInfoList;

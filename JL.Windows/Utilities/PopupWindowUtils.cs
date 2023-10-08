@@ -340,9 +340,9 @@ internal static class PopupWindowUtils
             miningParams[JLField.EdictId] = lookupResult.EdictId.ToString(CultureInfo.InvariantCulture);
         }
 
-        if (lookupResult.Process is not null)
+        if (lookupResult.DeconjugationProcess is not null)
         {
-            miningParams[JLField.DeconjugationProcess] = lookupResult.Process;
+            miningParams[JLField.DeconjugationProcess] = lookupResult.DeconjugationProcess;
         }
 
         if (lookupResult.KanjiComposition is not null)

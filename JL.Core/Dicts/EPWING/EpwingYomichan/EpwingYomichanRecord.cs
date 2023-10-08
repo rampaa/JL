@@ -14,9 +14,9 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
     public string[] Definitions { get; set; }
     public string[]? WordClasses { get; }
     private string[]? DefinitionTags { get; }
-    //public int Score { get; init; }
-    //public int Sequence { get; init; }
-    //public string TermTags { get; init; }
+    //public int Score { get; }
+    //public int Sequence { get; }
+    //public string TermTags { get; }
 
     public EpwingYomichanRecord(List<JsonElement> jsonElement)
     {

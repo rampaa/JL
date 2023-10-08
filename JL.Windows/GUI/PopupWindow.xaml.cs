@@ -698,12 +698,12 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        if (result.Process is not null)
+        if (result.DeconjugationProcess is not null)
         {
-            TextBlock processTextBlock = new()
+            TextBlock deconjugationProcessTextBlock = new()
             {
-                Name = nameof(result.Process),
-                Text = result.Process,
+                Name = nameof(result.DeconjugationProcess),
+                Text = result.DeconjugationProcess,
                 Foreground = ConfigManager.DeconjugationInfoColor,
                 FontSize = ConfigManager.DeconjugationInfoFontSize,
                 Margin = new Thickness(5, 0, 0, 0),
@@ -711,7 +711,7 @@ internal sealed partial class PopupWindow : Window
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Top
             };
-            _ = top.Children.Add(processTextBlock);
+            _ = top.Children.Add(deconjugationProcessTextBlock);
         }
 
         if (result.Frequencies is not null)

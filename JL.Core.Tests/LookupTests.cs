@@ -43,7 +43,11 @@ public class LookupTests
         DictUtils.SingleDictTypeDicts[DictType.JMdict] = dict;
         JmdictLoader.Load(dict).Wait();
 
-        FreqUtils.FreqDicts = FreqUtils.s_builtInFreqs;
+        foreach ((string key, Freq freq) in FreqUtils.s_builtInFreqs)
+        {
+            FreqUtils.FreqDicts[key] = freq;
+        }
+
         FreqUtils.LoadFrequencies().Wait();
         DeconjugatorUtils.DeserializeRules().Wait();
     }

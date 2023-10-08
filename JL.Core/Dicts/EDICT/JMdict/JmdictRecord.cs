@@ -26,7 +26,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
     private LoanwordSource[]?[]? LoanwordEtymology { get; }
     private string[]?[]? RelatedTerms { get; }
     private string[]?[]? Antonyms { get; }
-    //public string[] Priorities { get; set; } // e.g. gai1
+    //public string[] Priorities { get; } // e.g. gai1
 
     public JmdictRecord(int id,
         string primarySpelling,

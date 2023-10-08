@@ -666,7 +666,7 @@ public static class LookupUtils
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         edictId: jMDictResult.Id,
                         alternativeSpellings: jMDictResult.AlternativeSpellings,
-                        process: ProcessProcess(wordResult.Processes?[i]),
+                        deconjugationProcess: ProcessDeconjugationProcess(wordResult.Processes?[i]),
                         frequencies: GetWordFrequencies(jMDictResult),
                         primarySpellingOrthographyInfoList: jMDictResult.PrimarySpellingOrthographyInfo,
                         readingsOrthographyInfoList: rOrthographyInfoList,
@@ -819,7 +819,7 @@ public static class LookupUtils
                         primarySpelling: epwingResult.PrimarySpelling,
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        process: ProcessProcess(wordResult.Processes?[i]),
+                        deconjugationProcess: ProcessDeconjugationProcess(wordResult.Processes?[i]),
                         frequencies: GetWordFrequencies(epwingResult),
                         dict: wordResult.Dict,
                         readings: epwingResult.Reading is not null
@@ -857,7 +857,7 @@ public static class LookupUtils
                         alternativeSpellings: epwingResult.AlternativeSpellings,
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        process: ProcessProcess(wordResult.Processes?[i]),
+                        deconjugationProcess: ProcessDeconjugationProcess(wordResult.Processes?[i]),
                         frequencies: GetWordFrequencies(epwingResult),
                         dict: wordResult.Dict,
                         readings: epwingResult.Reading is not null
@@ -907,8 +907,8 @@ public static class LookupUtils
                         primarySpelling: customWordDictResult.PrimarySpelling,
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        process: customWordDictResult.HasUserDefinedWordClass
-                            ? ProcessProcess(wordResult.Processes?[i])
+                        deconjugationProcess: customWordDictResult.HasUserDefinedWordClass
+                            ? ProcessDeconjugationProcess(wordResult.Processes?[i])
                             : null,
                         dict: wordResult.Dict,
                         readings: customWordDictResult.Readings,
@@ -1012,7 +1012,7 @@ public static class LookupUtils
         return freqsList;
     }
 
-    private static string? ProcessProcess(List<List<string>>? processList)
+    private static string? ProcessDeconjugationProcess(List<List<string>>? processList)
     {
         StringBuilder deconjugation = new();
         bool first = true;

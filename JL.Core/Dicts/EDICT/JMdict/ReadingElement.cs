@@ -7,7 +7,7 @@ internal sealed class ReadingElement
     public List<string> ReInfList { get; } // e.g. gikun
 
     // public bool ReNokanji { get; set; } // Is kana insufficient to notate the right spelling?
-    // public List<string> RePriList { get; set; } // e.g. ichi1
+    // public List<string> RePriList { get; } // e.g. ichi1
     public ReadingElement()
     {
         ReRestrList = new List<string>();

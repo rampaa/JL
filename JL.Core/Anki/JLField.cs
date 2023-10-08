@@ -32,12 +32,12 @@ public enum JLField
     [Description("Readings with Orthography Info")] ReadingsWithOrthographyInfo,
     [Description("Alternative Spellings with Orthography Info")] AlternativeSpellingsWithOrthographyInfo,
 
-    //Kanji dictionaries
-    [Description("Kun Readings")] KunReadings,
+    // Kanji dictionaries
     [Description("On Readings")] OnReadings,
+    [Description("Kun Readings")] KunReadings,
     [Description("Kanji Composition")] KanjiComposition,
     [Description("Kanji Statistics")] KanjiStats,
-    //KANJIDIC2
+    // KANJIDIC2
     [Description("Nanori Readings")] NanoriReadings,
     [Description("Stroke Count")] StrokeCount,
     [Description("Kanji Grade")] KanjiGrade,
