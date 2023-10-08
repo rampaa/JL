@@ -584,7 +584,7 @@ public static class LookupUtils
     private static ConcurrentQueue<LookupResult> BuildJmdictResult(
         Dictionary<string, IntermediaryResult> jmdictResults)
     {
-        Dict dict = DictUtils.BuiltInDictTypeToDict[DictType.JMdict];
+        Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
         bool showROrthographyInfo = dict.Options?.ROrthographyInfo?.Value ?? true;
         bool showAOrthographyInfo = dict.Options?.AOrthographyInfo?.Value ?? true;
 

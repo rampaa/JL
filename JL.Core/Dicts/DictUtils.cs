@@ -102,7 +102,7 @@ public static class DictUtils
         }
     };
 
-    public static readonly Dictionary<DictType, Dict> BuiltInDictTypeToDict = new(7);
+    public static readonly Dictionary<DictType, Dict> SingleDictTypeDicts = new(8);
 
     public static readonly Dictionary<string, string> JmdictEntities = new(254)
     {
@@ -803,6 +803,7 @@ public static class DictUtils
                                 Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't import {dict.Name}"));
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
+                                _ = SingleDictTypeDicts.Remove(DictType.PitchAccentYomichan);
                                 dictRemoved = true;
                             }
                         }));
@@ -993,32 +994,36 @@ public static class DictUtils
                         {
                             case DictType.ProfileCustomNameDictionary:
                                 dict.Path = ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfile);
-                                BuiltInDictTypeToDict.Add(dict.Type, dict);
+                                SingleDictTypeDicts[dict.Type] = dict;
                                 break;
 
                             case DictType.ProfileCustomWordDictionary:
                                 dict.Path = ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfile);
-                                BuiltInDictTypeToDict.Add(dict.Type, dict);
+                                SingleDictTypeDicts[dict.Type] = dict;
                                 break;
 
                             case DictType.CustomNameDictionary:
-                                BuiltInDictTypeToDict.Add(dict.Type, dict);
+                                SingleDictTypeDicts[dict.Type] = dict;
                                 break;
 
                             case DictType.CustomWordDictionary:
-                                BuiltInDictTypeToDict.Add(dict.Type, dict);
+                                SingleDictTypeDicts[dict.Type] = dict;
                                 break;
 
                             case DictType.JMdict:
-                                BuiltInDictTypeToDict.Add(dict.Type, dict);
+                                SingleDictTypeDicts[dict.Type] = dict;
                                 break;
 
                             case DictType.Kanjidic:
-                                BuiltInDictTypeToDict.Add(dict.Type, dict);
+                                SingleDictTypeDicts[dict.Type] = dict;
                                 break;
 
                             case DictType.JMnedict:
-                                BuiltInDictTypeToDict.Add(dict.Type, dict);
+                                SingleDictTypeDicts[dict.Type] = dict;
+                                break;
+
+                            case DictType.PitchAccentYomichan:
+                                SingleDictTypeDicts[dict.Type] = dict;
                                 break;
                         }
 

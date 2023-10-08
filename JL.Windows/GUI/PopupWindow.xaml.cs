@@ -521,7 +521,7 @@ internal sealed partial class PopupWindow : Window
         };
         primarySpellingTextBlock.PreviewMouseUp += PrimarySpelling_PreviewMouseUp; // for mining
 
-        Dict? pitchDict = DictUtils.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.PitchAccentYomichan);
+        _ = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict);
         bool pitchDictIsActive = pitchDict?.Active ?? false;
 
         if (result.Readings is null && pitchDictIsActive)

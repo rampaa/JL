@@ -96,8 +96,13 @@ internal sealed partial class AddDictionaryWindow : Window
 
             DictOptions options = new(newlineOption, examplesOption, noAllOption, pitchAccentMarkerColorOption);
 
-            DictUtils.Dicts.Add(name,
-                new Dict(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options));
+            Dict dict = new(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options);
+            DictUtils.Dicts.Add(name, dict);
+
+            if (dict.Type is DictType.PitchAccentYomichan)
+            {
+                DictUtils.SingleDictTypeDicts[DictType.PitchAccentYomichan] = dict;
+            }
 
             Close();
         }

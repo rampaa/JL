@@ -291,6 +291,11 @@ internal sealed partial class ManageDictionariesWindow : Window
                     dict.Contents.TrimExcess();
                     _ = DictUtils.Dicts.Remove(dict.Name);
 
+                    if (dict.Type is DictType.PitchAccentYomichan)
+                    {
+                        _ = DictUtils.SingleDictTypeDicts.Remove(DictType.PitchAccentYomichan);
+                    }
+
                     int priorityOfDeletedDict = dict.Priority;
 
                     foreach (Dict d in DictUtils.Dicts.Values)

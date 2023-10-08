@@ -63,7 +63,7 @@ internal static class JmdictWordClassUtils
             "v5n", "v5r", "v5r-i", "v5s", "v5t", "v5u", "v5u-s", "vk", "vs-c", "vs-i", "vs-s", "vz"
         };
 
-        Dict dict = DictUtils.BuiltInDictTypeToDict[DictType.JMdict];
+        Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
         foreach (IList<IDictRecord> jmdictRecordList in dict.Contents.Values.ToList())
         {
             int jmdictRecordListCount = jmdictRecordList.Count;
@@ -126,7 +126,7 @@ internal static class JmdictWordClassUtils
     {
         if (!File.Exists(Path.Join(Utils.ResourcesPath, "PoS.json")))
         {
-            Dict dict = DictUtils.BuiltInDictTypeToDict[DictType.JMdict];
+            Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
             if (dict.Active)
             {
                 await Serialize().ConfigureAwait(false);

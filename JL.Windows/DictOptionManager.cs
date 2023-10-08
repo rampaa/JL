@@ -12,10 +12,10 @@ internal static class DictOptionManager
 
     public static void ApplyDictOptions()
     {
-        if (DictUtils.BuiltInDictTypeToDict.TryGetValue(DictType.JMdict, out Dict? jmdict))
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.JMdict, out Dict? jmdict))
         {
-            POrthographyInfoColor = WindowsUtils.FrozenBrushFromHex(
-                jmdict.Options?.POrthographyInfoColor?.Value ?? ConfigManager.PrimarySpellingColor.ToString(CultureInfo.InvariantCulture))!;
+            POrthographyInfoColor = WindowsUtils.FrozenBrushFromHex(jmdict.Options?.POrthographyInfoColor?.Value
+                    ?? ConfigManager.PrimarySpellingColor.ToString(CultureInfo.InvariantCulture))!;
         }
 
         else
@@ -24,13 +24,10 @@ internal static class DictOptionManager
             POrthographyInfoColor.Freeze();
         }
 
-        Dict? pitchAccentDict = DictUtils.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.PitchAccentYomichan);
-        if (pitchAccentDict is not null)
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchAccentDict))
         {
-            if (pitchAccentDict.Options?.PitchAccentMarkerColor is not null)
-            {
-                PitchAccentMarkerColor = WindowsUtils.FrozenBrushFromHex(pitchAccentDict.Options.PitchAccentMarkerColor.Value.Value)!;
-            }
+            PitchAccentMarkerColor = WindowsUtils.FrozenBrushFromHex(pitchAccentDict.Options?.PitchAccentMarkerColor?.Value
+                ?? Brushes.DeepSkyBlue.ToString(CultureInfo.InvariantCulture))!;
         }
 
         else

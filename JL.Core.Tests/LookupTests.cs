@@ -40,7 +40,7 @@ public class LookupTests
                 )));
 
         Dict dict = DictUtils.Dicts["JMdict"];
-        DictUtils.BuiltInDictTypeToDict[DictType.JMdict] = dict;
+        DictUtils.SingleDictTypeDicts[DictType.JMdict] = dict;
         JmdictLoader.Load(dict).Wait();
 
         FreqUtils.FreqDicts = FreqUtils.s_builtInFreqs;

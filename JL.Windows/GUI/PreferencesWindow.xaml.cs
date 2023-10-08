@@ -35,8 +35,8 @@ internal sealed partial class PreferencesWindow : Window
     {
         InitializeComponent();
         _profileName = ProfileUtils.CurrentProfile;
-        _profileNamesDict = DictUtils.BuiltInDictTypeToDict[DictType.ProfileCustomNameDictionary];
-        _profileWordsDict = DictUtils.BuiltInDictTypeToDict[DictType.ProfileCustomWordDictionary];
+        _profileNamesDict = DictUtils.SingleDictTypeDicts[DictType.ProfileCustomNameDictionary];
+        _profileWordsDict = DictUtils.SingleDictTypeDicts[DictType.ProfileCustomWordDictionary];
     }
 
     public static bool IsItVisible()

@@ -106,7 +106,7 @@ public static class ResourceUpdater
     {
         DictUtils.UpdatingJmdict = true;
 
-        Dict dict = DictUtils.BuiltInDictTypeToDict[DictType.JMdict];
+        Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
         bool downloaded = await UpdateResource(dict.Path,
                 DictUtils.s_jmdictUrl,
                 DictType.JMdict.ToString(), true, false)
@@ -141,7 +141,7 @@ public static class ResourceUpdater
     {
         DictUtils.UpdatingJmnedict = true;
 
-        Dict dict = DictUtils.BuiltInDictTypeToDict[DictType.JMnedict];
+        Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMnedict];
         bool downloaded = await UpdateResource(dict.Path,
                 DictUtils.s_jmnedictUrl,
                 DictType.JMnedict.ToString(), true, false)
@@ -170,7 +170,7 @@ public static class ResourceUpdater
     {
         DictUtils.UpdatingKanjidic = true;
 
-        Dict dict = DictUtils.BuiltInDictTypeToDict[DictType.Kanjidic];
+        Dict dict = DictUtils.SingleDictTypeDicts[DictType.Kanjidic];
         bool downloaded = await UpdateResource(dict.Path,
                 DictUtils.s_kanjidicUrl,
                 DictType.Kanjidic.ToString(), true, false)
