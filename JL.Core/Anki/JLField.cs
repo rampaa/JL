@@ -9,33 +9,37 @@ public enum JLField
     [Description("Primary Spelling")] PrimarySpelling,
     Readings,
     Definitions,
-    [Description("Alternative Spellings")] AlternativeSpellings,
     [Description("Dictionary Name")] DictionaryName,
     Audio,
     Image,
     Sentence,
     [Description("Source Text")] SourceText,
     [Description("Matched Text")] MatchedText,
-    [Description("EDICT ID")] EdictId,
     [Description("Local Time")] LocalTime,
     Frequencies,
     [Description("Raw Frequencies")] RawFrequencies,
 
+    // JMdict, JMnedict, KANJIDIC2
+    [Description("EDICT ID")] EdictId,
+
+    // Word dictionaries
+    [Description("Deconjugated Matched Text")] DeconjugatedMatchedText,
+    [Description("Deconjugation Process")] DeconjugationProcess,
+    // JMdict, Nazeka EPWING
+    [Description("Alternative Spellings")] AlternativeSpellings,
     // JMdict
     [Description("Primary Spelling with Orthography Info")] PrimarySpellingWithOrthographyInfo,
     [Description("Readings with Orthography Info")] ReadingsWithOrthographyInfo,
     [Description("Alternative Spellings with Orthography Info")] AlternativeSpellingsWithOrthographyInfo,
 
-    // Word dictionaries
-    [Description("Deconjugated Matched Text")] DeconjugatedMatchedText,
-    [Description("Deconjugation Process")] DeconjugationProcess,
-
     //Kanji dictionaries
     [Description("Kun Readings")] KunReadings,
     [Description("On Readings")] OnReadings,
+    [Description("Kanji Composition")] KanjiComposition,
+    [Description("Kanji Statistics")] KanjiStats,
+    //KANJIDIC2
     [Description("Nanori Readings")] NanoriReadings,
     [Description("Stroke Count")] StrokeCount,
     [Description("Kanji Grade")] KanjiGrade,
-    [Description("Kanji Composition")] KanjiComposition,
-    [Description("Kanji Statistics")] KanjiStats
+    [Description("Radical Names")] RadicalNames
 }

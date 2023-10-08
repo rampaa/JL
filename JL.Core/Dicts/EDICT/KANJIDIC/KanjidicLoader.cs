@@ -59,6 +59,7 @@ internal static class KanjidicLoader
         List<string> nanoriReadingList = new();
         List<string> onReadingList = new();
         List<string> kunReadingList = new();
+        List<string> radicalNameList = new();
 
         while (!xmlReader.EOF)
         {
@@ -118,6 +119,15 @@ internal static class KanjidicLoader
 
                         break;
 
+                    case "rad_name":
+                        radicalNameList.Add((await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false)).GetPooledString());
+                        break;
+
+                    // Old JLPT, has 4 levels instead of 5
+                    //case "jlpt":
+                    //    jlpt = xmlReader.ReadElementContentAsInt();
+                    //    break;
+
                     default:
                         _ = await xmlReader.ReadAsync().ConfigureAwait(false);
                         break;
@@ -134,8 +144,9 @@ internal static class KanjidicLoader
         string[]? onReadings = onReadingList.TrimStringListToStringArray();
         string[]? kunReadings = kunReadingList.TrimStringListToStringArray();
         string[]? nanoriReadings = nanoriReadingList.TrimStringListToStringArray();
+        string[]? radicalNames = radicalNameList.TrimStringListToStringArray();
 
-        KanjidicRecord entry = new(definitions, onReadings, kunReadings, nanoriReadings, strokeCount, grade, frequency);
+        KanjidicRecord entry = new(definitions, onReadings, kunReadings, nanoriReadings, radicalNames, strokeCount, grade, frequency);
 
         kanjidicDictionary[key] = new IDictRecord[] { entry };
     }

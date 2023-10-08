@@ -24,6 +24,7 @@ public sealed class LookupResult
     public string[]? OnReadings { get; init; }
     public string[]? KunReadings { get; init; }
     public string[]? NanoriReadings { get; init; }
+    public string[]? RadicalNames { get; }
     public int StrokeCount { get; init; }
     public string? KanjiComposition { get; init; }
     public int KanjiGrade { get; init; }
@@ -43,6 +44,7 @@ public sealed class LookupResult
         string[]? onReadings = null,
         string[]? kunReadings = null,
         string[]? nanoriReadings = null,
+        string[]? radicalNames = null,
         string? formattedDefinitions = null,
         string? process = null,
         string? kanjiComposition = null,
@@ -72,5 +74,6 @@ public sealed class LookupResult
         KanjiComposition = kanjiComposition;
         KanjiStats = kanjiStats;
         KanjiGrade = kanjiGrade;
+        RadicalNames = radicalNames;
     }
 }

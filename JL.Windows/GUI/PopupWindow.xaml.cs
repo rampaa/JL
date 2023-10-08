@@ -1000,13 +1000,65 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
+        if (result.RadicalNames is not null)
+        {
+            if (MiningMode)
+            {
+                TouchScreenTextBox radicalNameTextBox = new()
+                {
+                    Name = nameof(result.RadicalNames),
+                    Text = string.Create(CultureInfo.InvariantCulture, $"Radical names: {string.Join(", ", result.RadicalNames)}"),
+                    Foreground = ConfigManager.ReadingsColor,
+                    FontSize = ConfigManager.ReadingsFontSize,
+                    Margin = new Thickness(2, 0, 0, 0),
+                    TextWrapping = TextWrapping.Wrap,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Background = Brushes.Transparent,
+                    BorderThickness = new Thickness(0, 0, 0, 0),
+                    Padding = new Thickness(0),
+                    IsReadOnly = true,
+                    IsUndoEnabled = false,
+                    UndoLimit = 0,
+                    Cursor = Cursors.Arrow,
+                    SelectionBrush = ConfigManager.HighlightColor,
+                    IsInactiveSelectionHighlightEnabled = true,
+                    ContextMenu = PopupContextMenu
+                };
+
+                radicalNameTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
+                radicalNameTextBox.MouseMove += TextBox_MouseMove;
+                radicalNameTextBox.LostFocus += Unselect;
+                radicalNameTextBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
+                radicalNameTextBox.MouseLeave += OnMouseLeave;
+                radicalNameTextBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
+                _ = bottom.Children.Add(radicalNameTextBox);
+            }
+
+            else
+            {
+                TextBlock radicalNameTextBlock = new()
+                {
+                    Name = nameof(result.NanoriReadings),
+                    Text = string.Create(CultureInfo.InvariantCulture, $"Radical names: {string.Join(", ", result.RadicalNames)}"),
+                    Foreground = ConfigManager.ReadingsColor,
+                    FontSize = ConfigManager.ReadingsFontSize,
+                    Margin = new Thickness(2, 0, 0, 0),
+                    TextWrapping = TextWrapping.Wrap,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                _ = bottom.Children.Add(radicalNameTextBlock);
+            }
+        }
+
         if (result.KanjiGrade > -1)
         {
             string gradeText = PopupWindowUtils.GradeToText(result.KanjiGrade);
             TextBlock gradeTextBlock = new()
             {
                 Name = nameof(result.KanjiGrade),
-                Text = string.Create(CultureInfo.InvariantCulture, $"{nameof(result.KanjiGrade)}: {gradeText}"),
+                Text = string.Create(CultureInfo.InvariantCulture, $"Grade: {gradeText}"),
                 Foreground = ConfigManager.DefinitionsColor,
                 FontSize = ConfigManager.DefinitionsFontSize,
                 Margin = new Thickness(2, 2, 2, 2),
@@ -1022,7 +1074,7 @@ internal sealed partial class PopupWindow : Window
             TextBlock strokeCountTextBlock = new()
             {
                 Name = nameof(result.StrokeCount),
-                Text = string.Create(CultureInfo.InvariantCulture, $"Strokes: {result.StrokeCount}"),
+                Text = string.Create(CultureInfo.InvariantCulture, $"Stroke count: {result.StrokeCount}"),
                 Foreground = ConfigManager.DefinitionsColor,
                 FontSize = ConfigManager.DefinitionsFontSize,
                 Margin = new Thickness(2, 2, 2, 2),

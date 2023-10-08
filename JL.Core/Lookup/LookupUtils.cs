@@ -742,6 +742,7 @@ public static class LookupUtils
             onReadings: kanjiRecord.OnReadings,
             kunReadings: kanjiRecord.KunReadings,
             nanoriReadings: kanjiRecord.NanoriReadings,
+            radicalNames: kanjiRecord.RadicalNames,
             strokeCount: kanjiRecord.StrokeCount,
             kanjiGrade: kanjiRecord.Grade,
             kanjiComposition: DictUtils.s_kanjiCompositionDict.GetValueOrDefault(dictResult.Key),

@@ -6,6 +6,7 @@ internal sealed class KanjidicRecord : IDictRecord
     public string[]? OnReadings { get; }
     public string[]? KunReadings { get; }
     public string[]? NanoriReadings { get; }
+    public string[]? RadicalNames { get; }
     public int StrokeCount { get; }
     public int Grade { get; }
     public int Frequency { get; }
@@ -14,6 +15,7 @@ internal sealed class KanjidicRecord : IDictRecord
         string[]? onReadings,
         string[]? kunReadings,
         string[]? nanoriReadings,
+        string[]? radicalNames,
         int strokeCount,
         int grade,
         int frequency)
@@ -25,6 +27,7 @@ internal sealed class KanjidicRecord : IDictRecord
         StrokeCount = strokeCount;
         Grade = grade;
         Frequency = frequency;
+        RadicalNames = radicalNames;
     }
 
     public string? BuildFormattedDefinition()

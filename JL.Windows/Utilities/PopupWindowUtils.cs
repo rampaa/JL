@@ -21,11 +21,10 @@ internal static class PopupWindowUtils
     {
         string gradeText = grade switch
         {
-            0 => "Hyougai",
-            <= 6 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Kyouiku)"),
+            >= 1 and <= 6 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Kyouiku)"),
             8 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Jouyou)"),
             <= 10 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Jinmeiyou)"),
-            _ => ""
+            _ => "Hyougai"
         };
 
         return gradeText;
@@ -379,6 +378,11 @@ internal static class PopupWindowUtils
         if (lookupResult.NanoriReadings is not null)
         {
             miningParams[JLField.NanoriReadings] = string.Join(", ", lookupResult.NanoriReadings);
+        }
+
+        if (lookupResult.RadicalNames is not null)
+        {
+            miningParams[JLField.RadicalNames] = string.Join(", ", lookupResult.RadicalNames);
         }
 
         bool mined = await Mining.Mine(miningParams, lookupResult).ConfigureAwait(false);

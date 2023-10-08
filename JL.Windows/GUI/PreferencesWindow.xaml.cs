@@ -71,6 +71,7 @@ internal sealed partial class PreferencesWindow : Window
                                              • Kun Readings: Kun readings of the mined kanji.
                                              • On Readings: On readings of the mined kanji.
                                              • Nanori Readings: Nanori readings of the mined kanji.
+                                             • Radical Names: Radical names of the kanji.
                                              • Stroke Count: Stroke count of the kanji.
                                              • Kanji Grade: The kanji grade level.
                                              • Kanji Composition: Kanji composition info, e.g., "⿰女未" for "妹".

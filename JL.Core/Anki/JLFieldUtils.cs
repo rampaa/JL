@@ -32,6 +32,7 @@ public static class JLFieldUtils
         JLField.KunReadings,
         JLField.OnReadings,
         JLField.NanoriReadings,
+        JLField.RadicalNames,
         JLField.StrokeCount,
         JLField.KanjiGrade,
         JLField.KanjiComposition,
