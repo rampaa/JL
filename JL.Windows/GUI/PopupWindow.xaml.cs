@@ -437,6 +437,13 @@ internal sealed partial class PopupWindow : Window
 
         else
         {
+            _ = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict);
+            bool pitchDictIsActive = pitchDict?.Active ?? false;
+            Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
+            bool showPOrthographyInfo = jmdict.Options?.POrthographyInfo?.Value ?? true;
+            bool showROrthographyInfo = jmdict.Options?.ROrthographyInfo?.Value ?? true;
+            bool showAOrthographyInfo = jmdict.Options?.AOrthographyInfo?.Value ?? true;
+
             int resultCount = generateAllResults
                 ? LastLookupResults.Count
                 : Math.Min(LastLookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
@@ -452,7 +459,7 @@ internal sealed partial class PopupWindow : Window
                     DictsWithResults.Add(lookupResult.Dict);
                 }
 
-                popupItemSource[i] = MakeResultStackPanel(lookupResult, i, resultCount);
+                popupItemSource[i] = MakeResultStackPanel(lookupResult, i, resultCount, pitchDict, pitchDictIsActive, showPOrthographyInfo, showROrthographyInfo, showAOrthographyInfo);
             }
 
             PopupListView.ItemsSource = popupItemSource;
@@ -467,7 +474,7 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    public StackPanel MakeResultStackPanel(LookupResult result, int index, int resultsCount)
+    public StackPanel MakeResultStackPanel(LookupResult result, int index, int resultsCount, Dict? pitchDict, bool pitchDictIsActive, bool showPOrthographyInfo, bool showROrthographyInfo, bool showAOrthographyInfo)
     {
         // top
         WrapPanel top = new() { Tag = index };
@@ -488,9 +495,6 @@ internal sealed partial class PopupWindow : Window
             ContextMenu = PopupContextMenu
         };
         primarySpellingTextBlock.PreviewMouseUp += PrimarySpelling_PreviewMouseUp; // for mining
-
-        _ = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict);
-        bool pitchDictIsActive = pitchDict?.Active ?? false;
 
         if (result.Readings is null && pitchDictIsActive)
         {
@@ -517,8 +521,7 @@ internal sealed partial class PopupWindow : Window
             _ = top.Children.Add(primarySpellingTextBlock);
         }
 
-        if (result.PrimarySpellingOrthographyInfoList is not null
-            && (result.Dict.Options?.POrthographyInfo?.Value ?? true))
+        if (showPOrthographyInfo && result.PrimarySpellingOrthographyInfoList is not null)
         {
             TextBlock textBlockPOrthographyInfo = new()
             {
@@ -537,7 +540,7 @@ internal sealed partial class PopupWindow : Window
         if (result.Readings is not null
             && (pitchDictIsActive || (result.KunReadings is null && result.OnReadings is null)))
         {
-            string readingsText = result.ReadingsOrthographyInfoList?.Count > 0 && (result.Dict.Options?.ROrthographyInfo?.Value ?? true)
+            string readingsText = showROrthographyInfo && result.ReadingsOrthographyInfoList is not null
                 ? PopupWindowUtils.ReadingsToText(result.Readings, result.ReadingsOrthographyInfoList)
                 : string.Join(", ", result.Readings);
 
@@ -562,10 +565,7 @@ internal sealed partial class PopupWindow : Window
                     IsInactiveSelectionHighlightEnabled = true,
                     ContextMenu = PopupContextMenu,
                     HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Visibility = pitchDictIsActive || (result.KunReadings is null && result.OnReadings is null)
-                    ? Visibility.Visible
-                    : Visibility.Collapsed
+                    VerticalAlignment = VerticalAlignment.Center
                 };
 
                 if (pitchDictIsActive)
@@ -612,18 +612,17 @@ internal sealed partial class PopupWindow : Window
                     FontSize = ConfigManager.ReadingsFontSize,
                     Margin = new Thickness(5, 0, 0, 0),
                     HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Visibility = Visibility.Visible
+                    VerticalAlignment = VerticalAlignment.Center
                 };
 
-                if (pitchDict?.Active ?? false)
+                if (pitchDictIsActive)
                 {
                     Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
                         result.AlternativeSpellings,
                         result.Readings,
                         readingTextBlock.Text.Split(", "),
                         readingTextBlock.Margin.Left,
-                        pitchDict);
+                        pitchDict!);
 
                     if (pitchAccentGrid.Children.Count is 0)
                     {
@@ -646,7 +645,7 @@ internal sealed partial class PopupWindow : Window
 
         if (result.AlternativeSpellings is not null)
         {
-            string alternativeSpellingsText = result.AlternativeSpellingsOrthographyInfoList?.Count > 0 && (result.Dict.Options?.AOrthographyInfo?.Value ?? true)
+            string alternativeSpellingsText = showAOrthographyInfo && result.AlternativeSpellingsOrthographyInfoList is not null
                 ? PopupWindowUtils.AlternativeSpellingsToText(result.AlternativeSpellings, result.AlternativeSpellingsOrthographyInfoList)
                 : string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", result.AlternativeSpellings)})");
 
@@ -1015,11 +1014,10 @@ internal sealed partial class PopupWindow : Window
 
         if (result.KanjiGrade > -1)
         {
-            string gradeText = PopupWindowUtils.GradeToText(result.KanjiGrade);
             TextBlock gradeTextBlock = new()
             {
                 Name = nameof(result.KanjiGrade),
-                Text = string.Create(CultureInfo.InvariantCulture, $"Grade: {gradeText}"),
+                Text = string.Create(CultureInfo.InvariantCulture, $"Grade: {PopupWindowUtils.GradeToText(result.KanjiGrade)}"),
                 Foreground = ConfigManager.DefinitionsColor,
                 FontSize = ConfigManager.DefinitionsFontSize,
                 Margin = new Thickness(2, 2, 2, 2),

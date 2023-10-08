@@ -602,11 +602,11 @@ public static class LookupUtils
                 {
                     JmdictRecord jMDictResult = (JmdictRecord)wordResult.Results[i][j];
 
-                    string[]?[]? rLists = jMDictResult.ReadingsOrthographyInfo;
                     if (showROrthographyInfo)
                     {
                         rOrthographyInfoList = new List<string?>();
 
+                        string[]?[]? rLists = jMDictResult.ReadingsOrthographyInfo;
                         for (int k = 0; k < rLists?.Length; k++)
                         {
                             StringBuilder formattedROrthographyInfo = new();
@@ -627,13 +627,14 @@ public static class LookupUtils
                             }
                         }
                     }
+                    rOrthographyInfoList = rOrthographyInfoList?.Count > 0 ? rOrthographyInfoList : null;
 
-                    string[]?[]? aLists = jMDictResult.AlternativeSpellingsOrthographyInfo;
                     List<string?>? aOrthographyInfoList = null;
                     if (showAOrthographyInfo)
                     {
                         aOrthographyInfoList = new List<string?>();
 
+                        string[]?[]? aLists = jMDictResult.AlternativeSpellingsOrthographyInfo;
                         for (int k = 0; k < aLists?.Length; k++)
                         {
                             StringBuilder formattedAOrthographyInfo = new();
@@ -655,6 +656,7 @@ public static class LookupUtils
                             }
                         }
                     }
+                    aOrthographyInfoList = aOrthographyInfoList?.Count > 0 ? aOrthographyInfoList : null;
 
                     LookupResult result = new
                     (

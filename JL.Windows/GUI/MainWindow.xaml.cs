@@ -273,6 +273,13 @@ internal sealed partial class MainWindow : Window
                 List<LookupResult>? lookupResults = LookupUtils.LookupText(text);
                 if (lookupResults?.Count > 0)
                 {
+                    _ = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict);
+                    bool pitchDictIsActive = pitchDict?.Active ?? false;
+                    Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
+                    bool pOrthographyInfo = jmdict.Options?.POrthographyInfo?.Value ?? true;
+                    bool rOrthographyInfo = jmdict.Options?.ROrthographyInfo?.Value ?? true;
+                    bool aOrthographyInfo = jmdict.Options?.AOrthographyInfo?.Value ?? true;
+
                     int resultCount = Math.Min(lookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
                     StackPanel[] popupItemSource = new StackPanel[resultCount];
                     for (int i = 0; i < resultCount; i++)
@@ -284,7 +291,7 @@ internal sealed partial class MainWindow : Window
                             FirstPopupWindow.DictsWithResults.Add(lookupResult.Dict);
                         }
 
-                        popupItemSource[i] = FirstPopupWindow.MakeResultStackPanel(lookupResult, i, lookupResults.Count);
+                        popupItemSource[i] = FirstPopupWindow.MakeResultStackPanel(lookupResult, i, lookupResults.Count, pitchDict, pitchDictIsActive, pOrthographyInfo, rOrthographyInfo, aOrthographyInfo);
                     }
 
                     PopupWindow.StackPanelCache.AddReplace(text, popupItemSource);
