@@ -472,42 +472,10 @@ internal sealed partial class PopupWindow : Window
         // top
         WrapPanel top = new() { Tag = index };
 
-        TextBlock textBlockMatchedText = new()
-        {
-            Name = nameof(result.MatchedText),
-            Text = result.MatchedText,
-            Visibility = Visibility.Collapsed,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            VerticalAlignment = VerticalAlignment.Center
-        };
-        _ = top.Children.Add(textBlockMatchedText);
-
-        TextBlock textBlockDeconjugatedMatchedText = new()
-        {
-            Name = nameof(result.DeconjugatedMatchedText),
-            Text = result.DeconjugatedMatchedText,
-            Visibility = Visibility.Collapsed,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            VerticalAlignment = VerticalAlignment.Center
-        };
-        _ = top.Children.Add(textBlockDeconjugatedMatchedText);
-
-        if (result.EdictId is not 0)
-        {
-            TextBlock edictIdTextBlock = new()
-            {
-                Name = nameof(result.EdictId),
-                Text = result.EdictId.ToString(CultureInfo.InvariantCulture),
-                Visibility = Visibility.Collapsed
-            };
-            _ = top.Children.Add(edictIdTextBlock);
-        }
-
         TextBlock primarySpellingTextBlock = new()
         {
             Name = nameof(result.PrimarySpelling),
             Text = result.PrimarySpelling,
-            Tag = index, // for audio
             Foreground = ConfigManager.PrimarySpellingColor,
             Background = Brushes.Transparent,
             FontSize = ConfigManager.PrimarySpellingFontSize,
@@ -566,7 +534,8 @@ internal sealed partial class PopupWindow : Window
             _ = top.Children.Add(textBlockPOrthographyInfo);
         }
 
-        if (result.Readings is not null)
+        if (result.Readings is not null
+            && (pitchDictIsActive || (result.KunReadings is null && result.OnReadings is null)))
         {
             string readingsText = result.ReadingsOrthographyInfoList?.Count > 0 && (result.Dict.Options?.ROrthographyInfo?.Value ?? true)
                 ? PopupWindowUtils.ReadingsToText(result.Readings, result.ReadingsOrthographyInfoList)
@@ -644,9 +613,7 @@ internal sealed partial class PopupWindow : Window
                     Margin = new Thickness(5, 0, 0, 0),
                     HorizontalAlignment = HorizontalAlignment.Left,
                     VerticalAlignment = VerticalAlignment.Center,
-                    Visibility = pitchDictIsActive || (result.KunReadings is null && result.OnReadings is null)
-                    ? Visibility.Visible
-                    : Visibility.Collapsed
+                    Visibility = Visibility.Visible
                 };
 
                 if (pitchDict?.Active ?? false)
