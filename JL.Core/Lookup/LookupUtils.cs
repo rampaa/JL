@@ -1002,7 +1002,7 @@ public static class LookupUtils
 
         if (frequency is not 0)
         {
-            freqsList.Add(new LookupFrequencyResult("Kanjidic Freq", frequency));
+            freqsList.Add(new LookupFrequencyResult("KANJIDIC2", frequency));
         }
 
         freqsList.AddRange(GetYomichanKanjiFrequencies(kanji));

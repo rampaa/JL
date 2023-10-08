@@ -59,7 +59,7 @@ internal sealed partial class PreferencesWindow : Window
                                             • Matched Text: Text the mined word found as, e.g., "わかりました".
                                             • Deconjugated Matched Text: Matched Text's deconjugated form, e.g., if the "Matched Text" is "わかりました", "Deconjugated Matched Text" will be "わかる".
                                             • Deconjugation Process: Deconjugation path from the "Matched Text" to "Deconjugated Matched Text".
-                                            • Frequencies: Frequency info for the mined word, e.g., "VN: #77, JPDB: #666".
+                                            • Frequencies: Frequency info for the mined word, e.g., "VN: 77, jpdb: 666".
                                             • Raw Frequencies: Raw frequency info for the mined word, e.g., "77, 666".
                                             • EDICT ID: JMDict entry ID.
                                             • Local Time: Mining date and time expressed in local timezone.
@@ -78,7 +78,7 @@ internal sealed partial class PreferencesWindow : Window
                                              • Dictionary Name: Name of the dictionary, e.g., "Kanjidic".
                                              • Source Text: Whole text in which the mined kanji appears in.
                                              • Sentence: Sentence in which the mined kanji appears in.
-                                             • Frequencies: Frequency info for the kanji, e.g., "Kanjidic Freq: #77, jpdb: #666".
+                                             • Frequencies: Frequency info for the kanji, e.g., "KANJIDIC2: 77, jpdb: 666".
                                              • Raw Frequencies: Raw frequency info for the mined word, e.g., "77, 666".
                                              • EDICT ID: KANJIDIC2 entry ID.
                                              • Local Time: Mining date and time expressed in local timezone.

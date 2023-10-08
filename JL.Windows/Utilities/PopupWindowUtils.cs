@@ -46,7 +46,7 @@ internal static class PopupWindowUtils
             {
                 if (lookupFreqResult.Freq is > 0 and < int.MaxValue)
                 {
-                    _ = sb.Append(CultureInfo.InvariantCulture, $"{lookupFreqResult.Name}: #{lookupFreqResult.Freq}, ");
+                    _ = sb.Append(CultureInfo.InvariantCulture, $"{lookupFreqResult.Name}: {lookupFreqResult.Freq}, ");
                     ++freqResultCount;
                 }
             }
