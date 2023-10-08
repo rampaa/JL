@@ -522,32 +522,26 @@ internal sealed partial class PopupWindow : Window
         primarySpellingTextBlock.PreviewMouseUp += PrimarySpelling_PreviewMouseUp; // for mining
 
         Dict? pitchDict = DictUtils.Dicts.Values.FirstOrDefault(static dict => dict.Type is DictType.PitchAccentYomichan);
-        if (pitchDict?.Active ?? false)
+        bool pitchDictIsActive = pitchDict?.Active ?? false;
+
+        if (result.Readings is null && pitchDictIsActive)
         {
-            if (result.Readings is not null)
+            Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
+                result.AlternativeSpellings,
+                null,
+                primarySpellingTextBlock.Text.Split(", "),
+                primarySpellingTextBlock.Margin.Left,
+                pitchDict!);
+
+            if (pitchAccentGrid.Children.Count is 0)
             {
                 _ = top.Children.Add(primarySpellingTextBlock);
             }
 
             else
             {
-                Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
-                    result.AlternativeSpellings,
-                    null,
-                    primarySpellingTextBlock.Text.Split(", "),
-                    primarySpellingTextBlock.Margin.Left,
-                    pitchDict);
-
-                if (pitchAccentGrid.Children.Count is 0)
-                {
-                    _ = top.Children.Add(primarySpellingTextBlock);
-                }
-
-                else
-                {
-                    _ = pitchAccentGrid.Children.Add(primarySpellingTextBlock);
-                    _ = top.Children.Add(pitchAccentGrid);
-                }
+                _ = pitchAccentGrid.Children.Add(primarySpellingTextBlock);
+                _ = top.Children.Add(pitchAccentGrid);
             }
         }
         else
@@ -600,19 +594,19 @@ internal sealed partial class PopupWindow : Window
                     ContextMenu = PopupContextMenu,
                     HorizontalAlignment = HorizontalAlignment.Left,
                     VerticalAlignment = VerticalAlignment.Center,
-                    Visibility = result.KunReadings is null && result.OnReadings is null
+                    Visibility = pitchDictIsActive || (result.KunReadings is null && result.OnReadings is null)
                     ? Visibility.Visible
                     : Visibility.Collapsed
                 };
 
-                if (pitchDict?.Active ?? false)
+                if (pitchDictIsActive)
                 {
                     Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
                         result.AlternativeSpellings,
                         result.Readings,
                         readingTextBox.Text.Split(", "),
                         readingTextBox.Margin.Left,
-                        pitchDict);
+                        pitchDict!);
 
                     if (pitchAccentGrid.Children.Count is 0)
                     {
@@ -650,7 +644,7 @@ internal sealed partial class PopupWindow : Window
                     Margin = new Thickness(5, 0, 0, 0),
                     HorizontalAlignment = HorizontalAlignment.Left,
                     VerticalAlignment = VerticalAlignment.Center,
-                    Visibility = result.KunReadings is null && result.OnReadings is null
+                    Visibility = pitchDictIsActive || (result.KunReadings is null && result.OnReadings is null)
                     ? Visibility.Visible
                     : Visibility.Collapsed
                 };
