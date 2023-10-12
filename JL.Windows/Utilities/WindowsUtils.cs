@@ -47,7 +47,7 @@ internal static class WindowsUtils
     public static double DpiAwareFixedPopupXPosition { get; set; } = ConfigManager.FixedPopupXPosition / Dpi.DpiScaleX;
     public static double DpiAwareFixedPopupYPosition { get; set; } = ConfigManager.FixedPopupYPosition / Dpi.DpiScaleY;
 
-    public static List<ComboBoxItem> FindJapaneseFonts()
+    public static ComboBoxItem[] FindJapaneseFonts()
     {
         List<ComboBoxItem> japaneseFonts = new();
 
@@ -88,18 +88,43 @@ internal static class WindowsUtils
 
                 if (!foundGlyph)
                 {
-                    comboBoxItem.Foreground = Brushes.DimGray;
+                    comboBoxItem.Foreground = Brushes.LightSlateGray;
                     japaneseFonts.Add(comboBoxItem);
                 }
             }
             else
             {
-                comboBoxItem.Foreground = Brushes.DimGray;
+                comboBoxItem.Foreground = Brushes.LightSlateGray;
                 japaneseFonts.Add(comboBoxItem);
             }
         }
 
-        return japaneseFonts;
+        return japaneseFonts
+            .OrderBy(static f => f.Foreground == Brushes.LightSlateGray)
+            .ThenBy(static font => font.Content)
+            .ToArray();
+    }
+
+    public static ComboBoxItem[] CloneJapaneseFontComboBoxItems(ComboBoxItem[] japaneseFontsComboBoxItems)
+    {
+        ComboBoxItem[] clone = new ComboBoxItem[japaneseFontsComboBoxItems.Length];
+        for (int i = 0; i < japaneseFontsComboBoxItems.Length; i++)
+        {
+            ComboBoxItem comboBoxItem = japaneseFontsComboBoxItems[i];
+
+            clone[i] = new ComboBoxItem()
+            {
+                Content = comboBoxItem.FontFamily.Source,
+                FontFamily = comboBoxItem.FontFamily
+            };
+
+            if (comboBoxItem.Foreground == Brushes.LightSlateGray)
+            {
+                clone[i].Foreground = Brushes.LightSlateGray;
+            }
+        }
+
+        return clone;
     }
 
     public static void ShowAddNameWindow(string? selectedText, string reading = "")

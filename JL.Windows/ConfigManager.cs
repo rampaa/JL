@@ -21,19 +21,6 @@ namespace JL.Windows;
 internal static class ConfigManager
 {
     #region General
-
-    private static readonly ComboBoxItem[] s_japaneseFonts =
-        WindowsUtils.FindJapaneseFonts().OrderBy(static f => f.Foreground == Brushes.DimGray).ThenBy(static font => font.Content)
-            .ToArray();
-
-    private static readonly ComboBoxItem[] s_popupJapaneseFonts =
-        Array.ConvertAll(s_japaneseFonts, static f => new ComboBoxItem
-        {
-            Content = f.Content,
-            FontFamily = f.FontFamily,
-            Foreground = f.Foreground
-        });
-
     public static bool InactiveLookupMode { get; set; } = false;
     public static Brush HighlightColor { get; private set; } = Brushes.AliceBlue;
     public static bool RequireLookupKeyPress { get; private set; } = false;
@@ -186,8 +173,9 @@ internal static class ConfigManager
     #endregion
 
     public static ExeConfigurationFileMap MappedExeConfiguration { get; set; } = new();
+    private static readonly ComboBoxItem[] s_japaneseFonts = WindowsUtils.FindJapaneseFonts();
+    private static readonly ComboBoxItem[] s_popupJapaneseFonts = WindowsUtils.CloneJapaneseFontComboBoxItems(s_japaneseFonts);
     private static SkinType s_theme = SkinType.Dark;
-
 
     public static void ApplyPreferences()
     {
