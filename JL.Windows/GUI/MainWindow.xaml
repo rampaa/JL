@@ -16,7 +16,7 @@
     </Window.Background>
 
     <Grid x:Name="MainGrid">
-
+        
         <Border Name="TopBorder" MouseDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="5" Background="Transparent"/>
         <Border Name="RightBorder" MouseDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="5" Background="Transparent"/>
         <Border Name="LeftBorder" MouseDown="ResizeWindow" MouseEnter="Border_OnMouseEnter" MouseLeave="Border_OnMouseLeave"  VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="5" Background="Transparent"/>
@@ -42,8 +42,8 @@
             </Rectangle.ContextMenu>
         </Rectangle>
 
-        <uc:TouchScreenTextBox x:Name="MainTextBox" Margin="5,20,5,5" TextWrapping="Wrap" VerticalContentAlignment="Top"
-                 Background="Transparent" FontSize="{Binding Value, ElementName=FontSizeSlider}"
+        <uc:TouchScreenTextBox x:Name="MainTextBox" Margin="5,20,5,5" TextWrapping="Wrap" VerticalContentAlignment="Top" HorizontalContentAlignment="Left" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                 Background="Transparent" FontSize="{Binding Value, ElementName=FontSizeSlider}" 
                  IsReadOnly="True" BorderThickness="0,0,0,0" MouseMove="MainTextBox_MouseMove"
                  VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" AutoWordSelection="False"
                  MouseWheel="MainTextBox_MouseWheel" Cursor="Arrow" PreviewTouchDown="MainTextBox_PreviewTouchDown" PreviewTouchUp="MainTextBox_PreviewTouchUp"
@@ -91,82 +91,71 @@
             </uc:TouchScreenTextBox.ContextMenu>
         </uc:TouchScreenTextBox>
 
-        <Slider x:Name="OpacitySlider" HorizontalAlignment="Left" Margin="-42,70,0,0" VerticalAlignment="Top"
-                Width="120" RenderTransformOrigin="0.5,0.5" Maximum="100" Value="30" Visibility="Collapsed"
-                Minimum="0.2" ToolTip="{Binding Value, ElementName=OpacitySlider}"
-                ValueChanged="OpacitySlider_ValueChanged" LostMouseCapture="OpacitySlider_LostMouseCapture"
-                IsMoveToPointEnabled="True" IsSnapToTickEnabled="True"
-                ScrollViewer.VerticalScrollBarVisibility="Disabled" LostFocus="OpacitySlider_LostFocus">
-            <Slider.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform />
-                    <SkewTransform />
-                    <RotateTransform Angle="-90" />
-                    <TranslateTransform />
-                </TransformGroup>
-            </Slider.RenderTransform>
-        </Slider>
-        <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="-17,70,0,0" VerticalAlignment="Top"
-                Width="120" RenderTransformOrigin="0.5,0.5" Value="50" Maximum="300" Minimum="1"
-                ToolTip="{Binding Value, ElementName=FontSizeSlider}" Visibility="Collapsed"
-                ValueChanged="FontSizeSlider_ValueChanged" LostMouseCapture="FontSizeSlider_LostMouseCapture"
-                IsMoveToPointEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                IsSnapToTickEnabled="True" LostFocus="FontSizeSlider_LostFocus">
-            <Slider.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform />
-                    <SkewTransform />
-                    <RotateTransform Angle="-90" />
-                    <TranslateTransform />
-                </TransformGroup>
-            </Slider.RenderTransform>
-        </Slider>
-
-        <TextBlock x:Name="CloseButton" HorizontalAlignment="Right"
-                   Margin="10,0,10,0" Text="x" TextWrapping="NoWrap" VerticalAlignment="Top" Foreground="White" ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                   MouseLeftButtonUp="CloseWindow" MouseEnter="Button_MouseEnter"
-                   MouseLeave="Button_MouseLeave" ToolTip="Close" FontFamily="Meiryo UI" FontSize="18">
-            <TextBlock.Effect>
-                <DropShadowEffect ShadowDepth="0.5" BlurRadius="3" Direction="320" Opacity="0.8" RenderingBias="Quality" />
-            </TextBlock.Effect>
-        </TextBlock>
-
-        <TextBlock x:Name="MinimizeButton" HorizontalAlignment="Right"
-                   Margin="10,0,30,0" Text="−" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" MouseLeftButtonUp="MinimizeWindow" FontFamily="Meiryo UI"
-                   MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" ToolTip="Minimize" FontSize="18">
-            <TextBlock.Effect>
-                <DropShadowEffect ShadowDepth="0.5" BlurRadius="3" Direction="320" Opacity="0.8" RenderingBias="Quality" />
-            </TextBlock.Effect>
-        </TextBlock>
-
         <!--<TextBlock x:Name="PrecacheProgress" Margin="1,1,15,15" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                    Visibility="Collapsed" Width="120" Height="17" Foreground="White">
             <TextBlock.Background>
                 <SolidColorBrush Color="Black" Opacity="0.002"/>
             </TextBlock.Background>
         </TextBlock>-->
-
-        <TextBlock x:Name="FontSizeButton" HorizontalAlignment="Left" MouseLeave="TitleBarButtonMouseLeave"
-                   Margin="37,0,10,0" Text="T" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" RenderTransformOrigin="-0.222,0.567" FontFamily="Meiryo UI"
-                   MouseDown="FontSizeButton_MouseDown" ToolTip="Font Size" FontSize="18">
-            <TextBlock.Background>
-                <SolidColorBrush Color="Black" Opacity="0.002"/>
-            </TextBlock.Background>
-            <TextBlock.Effect>
-                <DropShadowEffect ShadowDepth="0.5" BlurRadius="3" Direction="320" Opacity="0.8" RenderingBias="Quality" />
-            </TextBlock.Effect>
-        </TextBlock>
-
-        <TextBlock x:Name="OpacityButton" HorizontalAlignment="Left" MouseLeave="TitleBarButtonMouseLeave"
-                   Margin="10,0,10,0" Text="☯" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" FontFamily="Meiryo UI" Padding="0,0,0,0"
+        
+        <DockPanel Margin="10,0,0,0" HorizontalAlignment="Left">
+            <StackPanel Width="20">
+                <TextBlock x:Name="OpacityButton" HorizontalAlignment="Center" MouseLeave="TitleBarButtonMouseLeave"
+                   Text="☯" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" FontFamily="Meiryo UI"
                    MouseDown="OpacityButton_MouseDown" ToolTip="Opacity" FontWeight="Normal" FontSize="18">
-            <TextBlock.Background>
-                <SolidColorBrush Color="Black" Opacity="0.002"/>
-            </TextBlock.Background>
-            <TextBlock.Effect>
-                <DropShadowEffect ShadowDepth="0.5" BlurRadius="3" Direction="320" Opacity="0.8" RenderingBias="Quality" />
-            </TextBlock.Effect>
-        </TextBlock>
+                    <TextBlock.Background>
+                        <SolidColorBrush Color="Black" Opacity="0.002"/>
+                    </TextBlock.Background>
+                    <TextBlock.Effect>
+                        <DropShadowEffect ShadowDepth="0.5" BlurRadius="3" Direction="320" Opacity="0.8" RenderingBias="Quality" />
+                    </TextBlock.Effect>
+                </TextBlock>
+                <Slider x:Name="OpacitySlider" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top"
+                Height="100" Maximum="100" Value="30" Visibility="Collapsed"
+                Minimum="0.2" ToolTip="{Binding Value, ElementName=OpacitySlider}"
+                ValueChanged="OpacitySlider_ValueChanged" LostMouseCapture="OpacitySlider_LostMouseCapture"
+                IsMoveToPointEnabled="True" IsSnapToTickEnabled="True"
+                ScrollViewer.VerticalScrollBarVisibility="Disabled" LostFocus="OpacitySlider_LostFocus">
+                </Slider>
+            </StackPanel>
+            <StackPanel Margin="5,0,0,0" Width="20">
+                <TextBlock x:Name="FontSizeButton" HorizontalAlignment="Center" MouseLeave="TitleBarButtonMouseLeave"
+                   Text="T" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" FontFamily="Meiryo UI"
+                   MouseDown="FontSizeButton_MouseDown" ToolTip="Font Size" FontSize="18">
+                    <TextBlock.Background>
+                        <SolidColorBrush Color="Black" Opacity="0.002"/>
+                    </TextBlock.Background>
+                    <TextBlock.Effect>
+                        <DropShadowEffect ShadowDepth="0.5" BlurRadius="3" Direction="320" Opacity="0.8" RenderingBias="Quality" />
+                    </TextBlock.Effect>
+                </TextBlock>
+                <Slider x:Name="FontSizeSlider" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top"
+                Height="100" Value="50" Maximum="300" Minimum="1" Visibility="Collapsed"
+                ToolTip="{Binding Value, ElementName=FontSizeSlider}"
+                ValueChanged="FontSizeSlider_ValueChanged" LostMouseCapture="FontSizeSlider_LostMouseCapture"
+                IsMoveToPointEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                IsSnapToTickEnabled="True" LostFocus="FontSizeSlider_LostFocus">
+                </Slider>
+            </StackPanel>
+        </DockPanel>
 
+        <DockPanel Margin="0,0,10,0" HorizontalAlignment="Right">
+            <TextBlock x:Name="MinimizeButton"
+                   Text="−" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="White" MouseLeftButtonUp="MinimizeWindow" FontFamily="Meiryo UI"
+                   MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" ToolTip="Minimize" FontSize="18" Margin="0,0,10,0" HorizontalAlignment="Center">
+                <TextBlock.Effect>
+                    <DropShadowEffect ShadowDepth="0.5" BlurRadius="3" Direction="320" Opacity="0.8" RenderingBias="Quality" />
+                </TextBlock.Effect>
+            </TextBlock>
+            <TextBlock x:Name="CloseButton" HorizontalAlignment="Center"
+                   Text="x" TextWrapping="NoWrap" VerticalAlignment="Top" Foreground="White"
+                   MouseLeftButtonUp="CloseWindow" MouseEnter="Button_MouseEnter"
+                   MouseLeave="Button_MouseLeave" ToolTip="Close" FontFamily="Meiryo UI" FontSize="18">
+                <TextBlock.Effect>
+                    <DropShadowEffect ShadowDepth="0.5" BlurRadius="3" Direction="320" Opacity="0.8" RenderingBias="Quality" />
+                </TextBlock.Effect>
+            </TextBlock>
+        </DockPanel>
+        
     </Grid>
 </Window>
