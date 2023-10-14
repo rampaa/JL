@@ -50,7 +50,8 @@ internal static class EpwingYomichanLoader
 
     private static void AddToDictionary(IEpwingRecord yomichanRecord, Dict dict)
     {
-        if (!EpwingUtils.IsValidEpwingResultForDictType(yomichanRecord, dict))
+        if (yomichanRecord.Definitions.Length is 0
+            || !EpwingUtils.IsValidEpwingResultForDictType(yomichanRecord, dict))
         {
             return;
         }

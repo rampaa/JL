@@ -27,11 +27,6 @@ internal static class EpwingUtils
 
     public static bool IsValidEpwingResultForDictType(IEpwingRecord epwingRecord, Dict dict)
     {
-        if (epwingRecord.Definitions.Length is 0)
-        {
-            return false;
-        }
-
         foreach (char c in epwingRecord.PrimarySpelling)
         {
             if (s_invalidCharacters.Contains(c) || char.IsWhiteSpace(c))

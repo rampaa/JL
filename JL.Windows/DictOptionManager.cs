@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Windows.Utilities;
