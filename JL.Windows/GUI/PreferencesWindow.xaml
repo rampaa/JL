@@ -519,7 +519,6 @@
                                        Style="{StaticResource TextBlockDefault}"
                                        Cursor="Help"
                                        ToolTip="Attempt to set focus on the popup window when you mouse over text.
-                                       &#10;Required if you want to be able to use popup hotkeys without clicking on the popup window first.
                                        &#10;If Focusable is set to false, this option will have no effect." />
                             <CheckBox x:Name="PopupFocusOnLookupCheckBox"  HorizontalAlignment="Right" />
                         </DockPanel>
