@@ -31,7 +31,7 @@ public static class Utils
 
     public static readonly ILogger Logger = new LoggerConfiguration()
         .MinimumLevel.ControlledBy(LoggingLevelSwitch)
-        .WriteTo.File(Path.Join(ApplicationPath, "Logs/log.txt"),
+        .WriteTo.File(Path.Join(ApplicationPath, "Logs", "log.txt"),
             formatProvider: CultureInfo.InvariantCulture,
             rollingInterval: RollingInterval.Day,
             retainedFileTimeLimit: TimeSpan.FromDays(90),
