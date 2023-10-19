@@ -83,39 +83,9 @@ internal static class EpwingUtils
 
                 break;
 
-            case DictType.Daijirin:
-                // English definitions
-                if (epwingRecord.Definitions.Any(static def => def.Contains("→英和", StringComparison.Ordinal) || def.Contains(@"\u003", StringComparison.Ordinal)))
-                {
-                    return false;
-                }
-
-                // English definitions
-                if (!epwingRecord.Definitions.Any(JapaneseUtils.JapaneseRegex.IsMatch))
-                {
-                    return false;
-                }
-
-                break;
-
             case DictType.Daijisen:
-                // English words
-                if (!JapaneseUtils.JapaneseRegex.IsMatch(epwingRecord.PrimarySpelling))
-                {
-                    return false;
-                }
-
                 // Kanji definitions
                 if (epwingRecord.Definitions.Any(static def => def.Contains("［音］", StringComparison.Ordinal)))
-                {
-                    return false;
-                }
-
-                break;
-
-            case DictType.Koujien:
-                // English words
-                if (!JapaneseUtils.JapaneseRegex.IsMatch(epwingRecord.PrimarySpelling))
                 {
                     return false;
                 }
