@@ -1224,9 +1224,11 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
+        string? selectedDefinitions = GetSelectedDefinitions(_listViewItemIndex);
+
         HidePopup();
 
-        await PopupWindowUtils.Mine(LastLookupResults[_listViewItemIndex], _currentText, GetSelectedDefinitions(_listViewItemIndex), _currentCharPosition).ConfigureAwait(false);
+        await PopupWindowUtils.Mine(LastLookupResults[_listViewItemIndex], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
     }
 
     private void ShowAddNameWindow()
@@ -1602,10 +1604,12 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode && PopupListView.SelectedItem is not null)
             {
+                int index = GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem);
+                string? selectedDefinitions = GetSelectedDefinitions(index);
+
                 HidePopup();
 
-                int index = GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem);
-                await PopupWindowUtils.Mine(LastLookupResults[index], _currentText, GetSelectedDefinitions(index), _currentCharPosition).ConfigureAwait(false);
+                await PopupWindowUtils.Mine(LastLookupResults[index], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
             }
         }
     }
