@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using JL.Core.Utilities;
 
 namespace JL.Core.Freqs.FrequencyYomichan;
@@ -31,45 +32,57 @@ internal static class FrequencyYomichanLoader
 
             foreach (List<JsonElement> value in frequencyJson!)
             {
-                string spelling = value[0].ToString().GetPooledString();
+                string spelling = value[0].GetString()!.GetPooledString();
                 string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(spelling).GetPooledString();
-                string reading = "";
+                string? reading = null;
                 int frequency = int.MaxValue;
                 JsonElement thirdElement = value[2];
 
-                if (int.TryParse(value[2].ToString().Split('/')[0], out int parsedFreq))
-                {
-                    frequency = parsedFreq;
-                }
-
-                else if (thirdElement.TryGetProperty("reading", out JsonElement readingValue))
-                {
-                    reading = readingValue.ToString().GetPooledString();
-                    JsonElement freqElement = thirdElement.GetProperty("frequency");
-                    frequency = freqElement.ValueKind is JsonValueKind.Number
-                        ? freqElement.GetInt32()
-                        : thirdElement.GetProperty("frequency").GetProperty("value").GetInt32();
-                }
-
-                else if (thirdElement.TryGetProperty("value", out JsonElement freqValue))
-                {
-                    frequency = freqValue.GetInt32();
-                }
-
-                else if (thirdElement.ValueKind is JsonValueKind.Array)
-                {
-                    reading = thirdElement[0].ToString().GetPooledString();
-                    frequency = thirdElement[1].GetInt32();
-                }
-
-                else if (thirdElement.ValueKind is JsonValueKind.Number)
+                if (thirdElement.ValueKind is JsonValueKind.Number)
                 {
                     frequency = thirdElement.GetInt32();
                 }
 
+                else if (thirdElement.ValueKind is JsonValueKind.Object)
+                {
+                    if (thirdElement.TryGetProperty("value", out JsonElement freqValue))
+                    {
+                        frequency = freqValue.GetInt32();
+                    }
+
+                    else if (thirdElement.TryGetProperty("reading", out JsonElement readingValue))
+                    {
+                        reading = readingValue.GetString()!.GetPooledString();
+                        JsonElement frequencyElement = thirdElement.GetProperty("frequency");
+                        frequency = frequencyElement.ValueKind is JsonValueKind.Number
+                            ? frequencyElement.GetInt32()
+                            : frequencyElement.GetProperty("value").GetInt32();
+                    }
+                }
+
+                else if (thirdElement.ValueKind is JsonValueKind.String)
+                {
+                    string freqStr = thirdElement.GetString()!;
+                    Match match = Utils.s_numberRegex.Match(freqStr);
+                    if (match.Success)
+                    {
+                        if (int.TryParse(match.ValueSpan, out int parsedFreq))
+                        {
+                            frequency = parsedFreq;
+                        }
+                    }
+                }
+
+                // Check if there is any frequency dictionary with this format
+                else if (thirdElement.ValueKind is JsonValueKind.Array)
+                {
+                    reading = thirdElement[0].GetString()!.GetPooledString();
+                    frequency = thirdElement[1].GetInt32();
+                }
+
                 if (frequency is not int.MaxValue)
                 {
-                    if (reading is "")
+                    if (reading is null)
                     {
                         if (freqDict.TryGetValue(spellingInHiragana, out IList<FrequencyRecord>? spellingFreqResult))
                         {

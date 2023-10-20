@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using CommunityToolkit.HighPerformance.Buffers;
 using JL.Core.Audio;
 using JL.Core.Deconjugation;
@@ -24,6 +25,7 @@ public static class Utils
     public static readonly string ResourcesPath = Path.Join(AppContext.BaseDirectory, "Resources");
     public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
     internal static StringPool StringPoolInstance => StringPool.Shared;
+    internal static readonly Regex s_numberRegex = new(@"\d+", RegexOptions.Compiled);
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
     public const int CacheSize = 1000;
 
