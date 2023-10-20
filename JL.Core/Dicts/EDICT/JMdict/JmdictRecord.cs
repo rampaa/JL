@@ -15,17 +15,17 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
     public string[]?[]? AlternativeSpellingsOrthographyInfo { get; }
     public string[]? Readings { get; }
     public string[]?[]? ReadingsOrthographyInfo { get; }
-    private string[][] Definitions { get; }
+    private string[] Definitions { get; }
     public string[][] WordClasses { get; } //e.g. noun +
     private string[]?[]? SpellingRestrictions { get; }
     private string[]?[]? ReadingRestrictions { get; }
-    private string[]?[]? Fields { get; } // e.g. "martial arts"
-    private string[]?[]? Misc { get; } // e.g. "abbr" +
+    private string?[]? Fields { get; } // e.g. "martial arts"
+    private string?[]? Misc { get; } // e.g. "abbr" +
     private string?[]? DefinitionInfo { get; } // e.g. "often derog" +
-    private string[]?[]? Dialects { get; } // e.g. ksb
+    private string?[]? Dialects { get; } // e.g. ksb
     private LoanwordSource[]?[]? LoanwordEtymology { get; }
-    private string[]?[]? RelatedTerms { get; }
-    private string[]?[]? Antonyms { get; }
+    private string?[]? RelatedTerms { get; }
+    private string?[]? Antonyms { get; }
     //public string[] Priorities { get; } // e.g. gai1
 
     public JmdictRecord(int id,
@@ -35,17 +35,17 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
         string[]?[]? alternativeSpellingsOrthographyInfo,
         string[]? readings,
         string[]?[]? readingsOrthographyInfo,
-        string[][] definitions,
+        string[] definitions,
         string[][] wordClasses,
         string[]?[]? spellingRestrictions,
         string[]?[]? readingRestrictions,
-        string[]?[]? fields,
-        string[]?[]? misc,
+        string?[]? fields,
+        string?[]? misc,
         string?[]? definitionInfo,
-        string[]?[]? dialects,
+        string?[]? dialects,
         LoanwordSource[]?[]? loanwordEtymology,
-        string[]?[]? relatedTerms,
-        string[]?[]? antonyms)
+        string?[]? relatedTerms,
+        string?[]? antonyms)
     {
         Id = id;
         PrimarySpelling = primarySpelling;
@@ -110,10 +110,10 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
             if (showDialectInfo)
             {
-                string[]? dialects = Dialects?[i];
-                if (dialects?.Length > 0)
+                string? dialects = Dialects?[i];
+                if (dialects is not null)
                 {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", dialects)}) ");
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({dialects}) ");
                 }
             }
 
@@ -128,23 +128,23 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
             if (showMiscInfo)
             {
-                string[]? misc = Misc?[i];
-                if (misc?.Length > 0)
+                string? misc = Misc?[i];
+                if (misc is not null)
                 {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", misc)}) ");
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({misc}) ");
                 }
             }
 
             if (showWordTypeInfo)
             {
-                string[]? fields = Fields?[i];
+                string? fields = Fields?[i];
                 if (fields?.Length > 0)
                 {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", fields)}) ");
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({fields}) ");
                 }
             }
 
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", Definitions[i])} ");
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"{Definitions[i]} ");
 
             if (showSpellingRestrictionInfo)
             {
@@ -208,19 +208,19 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
             if (showRelatedTerms)
             {
-                string[]? relatedTerms = RelatedTerms?[i];
-                if (relatedTerms?.Length > 0)
+                string? relatedTerms = RelatedTerms?[i];
+                if (relatedTerms is not null)
                 {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"(related terms: {string.Join(", ", relatedTerms)}) ");
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"(related terms: {relatedTerms}) ");
                 }
             }
 
             if (showAntonyms)
             {
-                string[]? antonyms = Antonyms?[i];
-                if (antonyms?.Length > 0)
+                string? antonyms = Antonyms?[i];
+                if (antonyms is not null)
                 {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"(antonyms: {string.Join(", ", antonyms)}) ");
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"(antonyms: {antonyms}) ");
                 }
             }
 

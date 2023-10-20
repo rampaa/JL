@@ -10,11 +10,11 @@ internal sealed class JmnedictRecord : IDictRecord
     public string PrimarySpelling { get; }
     public string[]? AlternativeSpellings { get; }
     public string[]? Readings { get; }
-    private string[][] Definitions { get; }
-    private string[][] NameTypes { get; }
+    private string[] Definitions { get; }
+    private string[] NameTypes { get; }
     //public string[]?[]? RelatedTerms { get; }
 
-    public JmnedictRecord(int id, string primarySpelling, string[]? alternativeSpellings, string[]? readings, string[][] definitions, string[][] nameTypes)
+    public JmnedictRecord(int id, string primarySpelling, string[]? alternativeSpellings, string[]? readings, string[] definitions, string[] nameTypes)
     {
         Id = id;
         PrimarySpelling = primarySpelling;
@@ -38,8 +38,6 @@ internal sealed class JmnedictRecord : IDictRecord
 
         for (int i = 0; i < Definitions.Length; i++)
         {
-            string[] definitions = Definitions[i];
-
             if (multipleDefinitions)
             {
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
@@ -47,11 +45,10 @@ internal sealed class JmnedictRecord : IDictRecord
 
             if (NameTypes?.Length >= i)
             {
-                string[] nameTypes = NameTypes[i];
-
-                if (nameTypes.Length > 1 || !nameTypes.Contains("unclass"))
+                string nameType = NameTypes[i];
+                if (nameType is not "unclass")
                 {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", nameTypes)}) ");
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({nameType}) ");
                 }
             }
 
@@ -64,7 +61,7 @@ internal sealed class JmnedictRecord : IDictRecord
             //    }
             //}
 
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", definitions)} {separator}");
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"{Definitions[i]} {separator}");
         }
 
         return defResult.Remove(defResult.Length - separator.Length - 1, separator.Length + 1).ToString();

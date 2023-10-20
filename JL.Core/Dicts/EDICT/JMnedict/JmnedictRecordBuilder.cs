@@ -19,16 +19,16 @@ internal static class JmnedictRecordBuilder
                     continue;
                 }
 
-                List<string[]> definitionList = new();
-                List<string[]> nameTypeList = new();
+                List<string> definitionList = new();
+                List<string> nameTypeList = new();
                 // List<string[]?> relatedTermList = new();
 
                 for (int j = 0; j < entry.TranslationList.Count; j++)
                 {
                     Translation translation = entry.TranslationList[j];
 
-                    definitionList.Add(translation.TransDetList.ToArray());
-                    nameTypeList.Add(translation.NameTypeList.ToArray());
+                    definitionList.Add(string.Join("; ", translation.TransDetList));
+                    nameTypeList.Add(string.Join(", ", translation.NameTypeList));
                     //relatedTermList.Add(translation.XRefList > 0 ? translation.XRefList.ToArray() : null);
                 }
 
@@ -50,16 +50,16 @@ internal static class JmnedictRecordBuilder
                     continue;
                 }
 
-                List<string[]> definitionList = new();
-                List<string[]> nameTypeList = new();
+                List<string> definitionList = new();
+                List<string> nameTypeList = new();
                 // List<string[]?> relatedTermList = new();
 
                 for (int j = 0; j < entry.TranslationList.Count; j++)
                 {
                     Translation translation = entry.TranslationList[j];
 
-                    definitionList.Add(translation.TransDetList.ToArray());
-                    nameTypeList.Add(translation.NameTypeList.ToArray());
+                    definitionList.Add(string.Join("; ", translation.TransDetList));
+                    nameTypeList.Add(string.Join(", ", translation.NameTypeList));
                     // relatedTermList.Add(translation.XRefList > 0 ? translation.XRefList.ToArray() : null);
                 }
 

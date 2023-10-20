@@ -47,16 +47,16 @@ internal static class JmdictRecordBuilder
                 }
             }
 
-            List<string[]> definitionList = new();
+            List<string> definitionList = new();
             List<string[]> wordClassList = new();
             List<string[]?> readingRestrictionList = new();
             List<string[]?> spellingRestrictionList = new();
-            List<string[]?> fieldList = new();
-            List<string[]?> miscList = new();
-            List<string[]?> dialectList = new();
+            List<string?> fieldList = new();
+            List<string?> miscList = new();
+            List<string?> dialectList = new();
             List<string?> definitionInfoList = new();
-            List<string[]?> relatedTermList = new();
-            List<string[]?> antonymList = new();
+            List<string?> relatedTermList = new();
+            List<string?> antonymList = new();
             List<LoanwordSource[]?> loanwordSourceList = new();
             for (int j = 0; j < entry.SenseList.Count; j++)
             {
@@ -66,16 +66,16 @@ internal static class JmdictRecordBuilder
                     || sense.StagKList.Contains(kanjiElement.Keb)
                     || sense.StagRList.Intersect(readingList).Any())
                 {
-                    definitionList.Add(sense.GlossList.ToArray());
+                    definitionList.Add(string.Join("; ", sense.GlossList));
                     wordClassList.Add(sense.PosList.ToArray());
                     readingRestrictionList.Add(sense.StagRList.TrimStringListToStringArray());
                     spellingRestrictionList.Add(sense.StagKList.TrimStringListToStringArray());
-                    fieldList.Add(sense.FieldList.TrimStringListToStringArray());
-                    miscList.Add(sense.MiscList.TrimStringListToStringArray());
-                    dialectList.Add(sense.DialList.TrimStringListToStringArray());
+                    fieldList.Add(sense.FieldList.Count > 0 ? string.Join(", ", sense.FieldList) : null);
+                    miscList.Add(sense.MiscList.Count > 0 ? string.Join(", ", sense.MiscList) : null);
+                    dialectList.Add(sense.DialList.Count > 0 ? string.Join(", ", sense.DialList) : null);
                     definitionInfoList.Add(sense.SInf);
-                    relatedTermList.Add(sense.XRefList.TrimStringListToStringArray());
-                    antonymList.Add(sense.AntList.TrimStringListToStringArray());
+                    relatedTermList.Add(sense.XRefList.Count > 0 ? string.Join(", ", sense.XRefList) : null);
+                    antonymList.Add(sense.AntList.Count > 0 ? string.Join(", ", sense.AntList) : null);
                     loanwordSourceList.Add(sense.LSourceList.TrimListWithNullableElementsToArray());
                 }
             }
@@ -91,13 +91,13 @@ internal static class JmdictRecordBuilder
                 wordClassList.ToArray(),
                 spellingRestrictionList.TrimListOfNullableArraysToArrayOfArrays(),
                 readingRestrictionList.TrimListOfNullableArraysToArrayOfArrays(),
-                fieldList.TrimListOfNullableArraysToArrayOfArrays(),
-                miscList.TrimListOfNullableArraysToArrayOfArrays(),
+                fieldList.TrimListWithNullableElementsToArray(),
+                miscList.TrimListWithNullableElementsToArray(),
                 definitionInfoList.TrimListWithNullableElementsToArray(),
-                dialectList.TrimListOfNullableArraysToArrayOfArrays(),
+                dialectList.TrimListWithNullableElementsToArray(),
                 loanwordSourceList.TrimListOfNullableArraysToArrayOfArrays(),
-                relatedTermList.TrimListOfNullableArraysToArrayOfArrays(),
-                antonymList.TrimListOfNullableArraysToArrayOfArrays());
+                relatedTermList.TrimListWithNullableElementsToArray(),
+                antonymList.TrimListWithNullableElementsToArray());
 
             recordDictionary.Add(key, record);
 
@@ -169,16 +169,16 @@ internal static class JmdictRecordBuilder
                 alternativeSpellingsOrthographyInfo = allROrthographyInfoWithoutSearchOnlyForms.RemoveAtToArray(index);
             }
 
-            List<string[]> definitionList = new();
+            List<string> definitionList = new();
             List<string[]> wordClassList = new();
             List<string[]?> readingRestrictionList = new();
             List<string[]?> spellingRestrictionList = new();
-            List<string[]?> fieldList = new();
-            List<string[]?> miscList = new();
-            List<string[]?> dialectList = new();
+            List<string?> fieldList = new();
+            List<string?> miscList = new();
+            List<string?> dialectList = new();
             List<string?> definitionInfoList = new();
-            List<string[]?> relatedTermList = new();
-            List<string[]?> antonymList = new();
+            List<string?> relatedTermList = new();
+            List<string?> antonymList = new();
             List<LoanwordSource[]?> loanwordSourceList = new();
             for (int j = 0; j < entry.SenseList.Count; j++)
             {
@@ -189,16 +189,16 @@ internal static class JmdictRecordBuilder
                     || sense.StagKList.Contains(primarySpelling)
                     || (alternativeSpellings is not null && sense.StagKList.Intersect(alternativeSpellings).Any()))
                 {
-                    definitionList.Add(sense.GlossList.ToArray());
+                    definitionList.Add(string.Join("; ", sense.GlossList));
                     wordClassList.Add(sense.PosList.ToArray());
                     readingRestrictionList.Add(sense.StagRList.TrimStringListToStringArray());
                     spellingRestrictionList.Add(sense.StagKList.TrimStringListToStringArray());
-                    fieldList.Add(sense.FieldList.TrimStringListToStringArray());
-                    miscList.Add(sense.MiscList.TrimStringListToStringArray());
-                    dialectList.Add(sense.DialList.TrimStringListToStringArray());
+                    fieldList.Add(sense.FieldList.Count > 0 ? string.Join(", ", sense.FieldList) : null);
+                    miscList.Add(sense.MiscList.Count > 0 ? string.Join(", ", sense.MiscList) : null);
+                    dialectList.Add(sense.DialList.Count > 0 ? string.Join(", ", sense.DialList) : null);
                     definitionInfoList.Add(sense.SInf);
-                    relatedTermList.Add(sense.XRefList.TrimStringListToStringArray());
-                    antonymList.Add(sense.AntList.TrimStringListToStringArray());
+                    relatedTermList.Add(sense.XRefList.Count > 0 ? string.Join(", ", sense.XRefList) : null);
+                    antonymList.Add(sense.AntList.Count > 0 ? string.Join(", ", sense.AntList) : null);
                     loanwordSourceList.Add(sense.LSourceList.TrimListWithNullableElementsToArray());
                 }
             }
@@ -214,13 +214,13 @@ internal static class JmdictRecordBuilder
                 wordClassList.ToArray(),
                 spellingRestrictionList.TrimListOfNullableArraysToArrayOfArrays(),
                 readingRestrictionList.TrimListOfNullableArraysToArrayOfArrays(),
-                fieldList.TrimListOfNullableArraysToArrayOfArrays(),
-                miscList.TrimListOfNullableArraysToArrayOfArrays(),
+                fieldList.TrimListWithNullableElementsToArray(),
+                miscList.TrimListWithNullableElementsToArray(),
                 definitionInfoList.TrimListWithNullableElementsToArray(),
-                dialectList.TrimListOfNullableArraysToArrayOfArrays(),
+                dialectList.TrimListWithNullableElementsToArray(),
                 loanwordSourceList.TrimListOfNullableArraysToArrayOfArrays(),
-                relatedTermList.TrimListOfNullableArraysToArrayOfArrays(),
-                antonymList.TrimListOfNullableArraysToArrayOfArrays());
+                relatedTermList.TrimListWithNullableElementsToArray(),
+                antonymList.TrimListWithNullableElementsToArray());
 
             // record.Priorities = kanjiElement.KePriList
 
