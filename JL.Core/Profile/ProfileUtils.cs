@@ -47,8 +47,8 @@ public static class ProfileUtils
                     }
                     else
                     {
-                        Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/Profiles.json");
-                        Utils.Logger.Fatal("Couldn't load Config/Profiles.json");
+                        Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't load Config{Path.DirectorySeparatorChar}Profiles.json"));
+                        Utils.Logger.Fatal("Couldn't load Config{DirectorySeparatorChar}Profiles.json", Path.DirectorySeparatorChar);
                     }
                 }
             }

@@ -209,8 +209,8 @@ public static class FreqUtils
                 }
                 else
                 {
-                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/freqs.json");
-                    Utils.Logger.Fatal("Couldn't load Config/freqs.json");
+                    Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't load Config{Path.DirectorySeparatorChar}freqs.json"));
+                    Utils.Logger.Fatal("Couldn't load Config{DirectorySeparatorChar}freqs.json", Path.DirectorySeparatorChar);
                 }
             }
         }

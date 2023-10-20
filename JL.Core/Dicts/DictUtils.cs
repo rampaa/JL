@@ -950,9 +950,9 @@ public static class DictUtils
                                 DictType.CustomWordDictionary => new Dictionary<string, IList<IDictRecord>>(1024),
                                 DictType.ProfileCustomNameDictionary => new Dictionary<string, IList<IDictRecord>>(256),
                                 DictType.ProfileCustomWordDictionary => new Dictionary<string, IList<IDictRecord>>(256),
-                                DictType.JMdict => new Dictionary<string, IList<IDictRecord>>(450000), //2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739
-                                DictType.JMnedict => new Dictionary<string, IList<IDictRecord>>(630000), //2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055
-                                DictType.Kanjidic => new Dictionary<string, IList<IDictRecord>>(13108), //2022/05/11: 13108, 2022/08/15: 13108, 2023/04/22: 13108
+                                DictType.JMdict => new Dictionary<string, IList<IDictRecord>>(450000), // 2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739
+                                DictType.JMnedict => new Dictionary<string, IList<IDictRecord>>(630000), // 2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055
+                                DictType.Kanjidic => new Dictionary<string, IList<IDictRecord>>(13108), // 2022/05/11: 13108, 2022/08/15: 13108, 2023/04/22: 13108
                                 DictType.Daijirin => new Dictionary<string, IList<IDictRecord>>(420429),
                                 DictType.DaijirinNazeka => new Dictionary<string, IList<IDictRecord>>(420429),
                                 DictType.Daijisen => new Dictionary<string, IList<IDictRecord>>(679115),
@@ -1034,8 +1034,8 @@ public static class DictUtils
                 }
                 else
                 {
-                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/dicts.json");
-                    Utils.Logger.Fatal("Couldn't load Config/dicts.json");
+                    Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't load Config{Path.DirectorySeparatorChar}dicts.json"));
+                    Utils.Logger.Fatal("Couldn't load Config{DirectorySeparatorChar}dicts.json", Path.DirectorySeparatorChar);
                 }
             }
         }

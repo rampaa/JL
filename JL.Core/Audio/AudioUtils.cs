@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -244,8 +245,8 @@ public static class AudioUtils
                 }
                 else
                 {
-                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/AudioSourceConfig.json");
-                    Utils.Logger.Fatal("Couldn't load Config/AudioSourceConfig.json");
+                    Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't load Config{Path.DirectorySeparatorChar}AudioSourceConfig.json"));
+                    Utils.Logger.Fatal("Couldn't load Config{DirectorySeparatorChar}AudioSourceConfig.json", Path.DirectorySeparatorChar);
                 }
             }
         }
