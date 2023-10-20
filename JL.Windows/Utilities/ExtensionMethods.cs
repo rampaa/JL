@@ -30,4 +30,33 @@ internal static class ExtensionMethods
 
         return null;
     }
+
+    public static T? GetChildByName<T>(this DependencyObject parent, string childName) where T : DependencyObject
+    {
+        int childrenCount = VisualTreeHelper.GetChildrenCount(parent);
+        for (int i = 0; i < childrenCount; i++)
+        {
+            DependencyObject child = VisualTreeHelper.GetChild(parent, i);
+            if (child is T t)
+            {
+                if (child is FrameworkElement frameworkElement)
+                {
+                    if (frameworkElement.Name == childName)
+                    {
+                        return t;
+                    }
+                }
+            }
+            else
+            {
+                T? tChild = GetChildByName<T>(child, childName);
+                if (tChild is not null)
+                {
+                    return tChild;
+                }
+            }
+        }
+
+        return null;
+    }
 }

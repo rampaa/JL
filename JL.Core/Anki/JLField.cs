@@ -9,6 +9,7 @@ public enum JLField
     [Description("Primary Spelling")] PrimarySpelling,
     Readings,
     Definitions,
+    [Description("Selected Definitions")] SelectedDefinitions,
     [Description("Dictionary Name")] DictionaryName,
     Audio,
     Image,

@@ -281,7 +281,7 @@ internal static class PopupWindowUtils
         }
     }
 
-    public static async Task Mine(LookupResult lookupResult, string currentText, int currentCharPosition)
+    public static async Task Mine(LookupResult lookupResult, string currentText, string? selectedDefinitions, int currentCharPosition)
     {
         Dictionary<JLField, string> miningParams = new()
         {
@@ -331,8 +331,18 @@ internal static class PopupWindowUtils
 
         if (lookupResult.FormattedDefinitions is not null)
         {
-            miningParams[JLField.Definitions] = lookupResult.FormattedDefinitions
-                .Replace("\n", "<br/>", StringComparison.Ordinal);
+            string formattedDefinitions = lookupResult.FormattedDefinitions.Replace("\n", "<br/>", StringComparison.Ordinal);
+            miningParams[JLField.Definitions] = formattedDefinitions;
+
+            if (selectedDefinitions is null)
+            {
+                miningParams[JLField.SelectedDefinitions] = formattedDefinitions;
+            }
+        }
+
+        if (selectedDefinitions is not null)
+        {
+            miningParams[JLField.SelectedDefinitions] = selectedDefinitions.Replace("\n", "<br/>", StringComparison.Ordinal);
         }
 
         if (lookupResult.EdictId > 0)

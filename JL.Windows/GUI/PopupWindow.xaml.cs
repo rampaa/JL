@@ -30,9 +30,9 @@ internal sealed partial class PopupWindow : Window
 
     private TextBox? _lastInteractedTextBox;
 
-    private int _listBoxIndex = 0;
+    private int _listViewItemIndex = 0;
 
-    private int _firstVisibleListBoxIndex = 0;
+    private int _firstVisibleListViewItemIndex = 0;
 
     private int _currentCharPosition;
 
@@ -125,7 +125,7 @@ internal sealed partial class PopupWindow : Window
     {
         string text = _lastInteractedTextBox?.SelectionLength > 0
             ? _lastInteractedTextBox.SelectedText
-            : LastLookupResults[_listBoxIndex].PrimarySpelling;
+            : LastLookupResults[_listViewItemIndex].PrimarySpelling;
 
         WindowsUtils.ShowAddWordWindow(text);
     }
@@ -139,7 +139,7 @@ internal sealed partial class PopupWindow : Window
     {
         string text = _lastInteractedTextBox?.SelectionLength > 0
             ? _lastInteractedTextBox.SelectedText
-            : LastLookupResults[_listBoxIndex].PrimarySpelling;
+            : LastLookupResults[_listViewItemIndex].PrimarySpelling;
 
         WindowsUtils.SearchWithBrowser(text);
     }
@@ -219,8 +219,8 @@ internal sealed partial class PopupWindow : Window
 
             Show();
 
-            _firstVisibleListBoxIndex = GetFirstVisibleListBoxItemIndex();
-            _listBoxIndex = _firstVisibleListBoxIndex;
+            _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
+            _listViewItemIndex = _firstVisibleListViewItemIndex;
 
             if (ConfigManager.FixedPopupPositioning && Owner == MainWindow.Instance)
             {
@@ -302,8 +302,8 @@ internal sealed partial class PopupWindow : Window
 
             Show();
 
-            _firstVisibleListBoxIndex = GetFirstVisibleListBoxItemIndex();
-            _listBoxIndex = _firstVisibleListBoxIndex;
+            _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
+            _listViewItemIndex = _firstVisibleListViewItemIndex;
 
             if (ConfigManager.FixedPopupPositioning && Owner == MainWindow.Instance)
             {
@@ -1132,30 +1132,30 @@ internal sealed partial class PopupWindow : Window
             Children = { top, bottom }
         };
 
-        stackPanel.MouseEnter += ListBoxItem_MouseEnter;
+        stackPanel.MouseEnter += ListViewItem_MouseEnter;
 
         return stackPanel;
     }
 
-    private static int GetIndexOfListBoxItemFromStackPanel(StackPanel stackPanel)
+    private static int GetIndexOfListViewItemFromStackPanel(StackPanel stackPanel)
     {
         return (int)((WrapPanel)stackPanel.Children[0]).Tag;
     }
 
-    private int GetFirstVisibleListBoxItemIndex()
+    private int GetFirstVisibleListViewItemIndex()
     {
         StackPanel? firstVisibleStackPanel = PopupListView.Items.Cast<StackPanel>()
             .FirstOrDefault(static stackPanel => stackPanel.Visibility is Visibility.Visible);
 
         return firstVisibleStackPanel is not null
-            ? GetIndexOfListBoxItemFromStackPanel(firstVisibleStackPanel)
+            ? GetIndexOfListViewItemFromStackPanel(firstVisibleStackPanel)
             : 0;
     }
 
-    private void ListBoxItem_MouseEnter(object sender, MouseEventArgs e)
+    private void ListViewItem_MouseEnter(object sender, MouseEventArgs e)
     {
-        _listBoxIndex = GetIndexOfListBoxItemFromStackPanel((StackPanel)sender);
-        LastSelectedText = LastLookupResults[_listBoxIndex].PrimarySpelling;
+        _listViewItemIndex = GetIndexOfListViewItemFromStackPanel((StackPanel)sender);
+        LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
     }
 
     private static void Unselect(object sender, RoutedEventArgs e)
@@ -1226,7 +1226,7 @@ internal sealed partial class PopupWindow : Window
 
         HidePopup();
 
-        await PopupWindowUtils.Mine(LastLookupResults[_listBoxIndex], _currentText, _currentCharPosition).ConfigureAwait(false);
+        await PopupWindowUtils.Mine(LastLookupResults[_listViewItemIndex], _currentText, GetSelectedDefinitions(_listViewItemIndex), _currentCharPosition).ConfigureAwait(false);
     }
 
     private void ShowAddNameWindow()
@@ -1246,9 +1246,9 @@ internal sealed partial class PopupWindow : Window
         }
         else
         {
-            text = LastLookupResults[_listBoxIndex].PrimarySpelling;
+            text = LastLookupResults[_listViewItemIndex].PrimarySpelling;
 
-            string[]? readings = LastLookupResults[_listBoxIndex].Readings;
+            string[]? readings = LastLookupResults[_listViewItemIndex].Readings;
             reading = readings?.Length is 1
                 ? readings[0]
                 : "";
@@ -1576,7 +1576,7 @@ internal sealed partial class PopupWindow : Window
             {
                 string text = _lastInteractedTextBox?.SelectionLength > 0
                     ? _lastInteractedTextBox.SelectedText
-                    : LastLookupResults[_listBoxIndex].PrimarySpelling;
+                    : LastLookupResults[_listViewItemIndex].PrimarySpelling;
 
                 await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text, CoreConfig.AudioVolume).ConfigureAwait(false);
             }
@@ -1604,8 +1604,8 @@ internal sealed partial class PopupWindow : Window
             {
                 HidePopup();
 
-                int index = GetIndexOfListBoxItemFromStackPanel((StackPanel)PopupListView.SelectedItem);
-                await PopupWindowUtils.Mine(LastLookupResults[index], _currentText, _currentCharPosition).ConfigureAwait(false);
+                int index = GetIndexOfListViewItemFromStackPanel((StackPanel)PopupListView.SelectedItem);
+                await PopupWindowUtils.Mine(LastLookupResults[index], _currentText, GetSelectedDefinitions(index), _currentCharPosition).ConfigureAwait(false);
             }
         }
     }
@@ -1629,7 +1629,7 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        LookupResult lastLookupResult = LastLookupResults[_listBoxIndex];
+        LookupResult lastLookupResult = LastLookupResults[_listViewItemIndex];
         string primarySpelling = lastLookupResult.PrimarySpelling;
         string? reading = lastLookupResult.Readings?[0];
 
@@ -1782,9 +1782,9 @@ internal sealed partial class PopupWindow : Window
         button.Background = Brushes.DodgerBlue;
 
         PopupListView.Items.Filter = NoAllDictFilter;
-        _firstVisibleListBoxIndex = GetFirstVisibleListBoxItemIndex();
-        _listBoxIndex = _firstVisibleListBoxIndex;
-        LastSelectedText = LastLookupResults[_listBoxIndex].PrimarySpelling;
+        _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
+        _listViewItemIndex = _firstVisibleListViewItemIndex;
+        LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
 
         WindowsUtils.Unselect(_lastInteractedTextBox);
         _lastInteractedTextBox = null;
@@ -1804,9 +1804,9 @@ internal sealed partial class PopupWindow : Window
         _filteredDict = (Dict)button.Tag;
 
         PopupListView.Items.Filter = DictFilter;
-        _firstVisibleListBoxIndex = GetFirstVisibleListBoxItemIndex();
-        _listBoxIndex = _firstVisibleListBoxIndex;
-        LastSelectedText = LastLookupResults[_listBoxIndex].PrimarySpelling;
+        _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
+        _listViewItemIndex = _firstVisibleListViewItemIndex;
+        LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
 
         WindowsUtils.Unselect(_lastInteractedTextBox);
         _lastInteractedTextBox = null;
@@ -1895,8 +1895,8 @@ internal sealed partial class PopupWindow : Window
 
         PopupListView.ItemsSource = null;
         LastText = "";
-        _listBoxIndex = 0;
-        _firstVisibleListBoxIndex = 0;
+        _listViewItemIndex = 0;
+        _firstVisibleListViewItemIndex = 0;
         _lastInteractedTextBox = null;
 
         PopupAutoHideTimer.Stop();
@@ -1943,7 +1943,24 @@ internal sealed partial class PopupWindow : Window
 
     private void PopupListView_MouseLeave(object sender, MouseEventArgs e)
     {
-        _listBoxIndex = _firstVisibleListBoxIndex;
-        LastSelectedText = LastLookupResults[_listBoxIndex].PrimarySpelling;
+        _listViewItemIndex = _firstVisibleListViewItemIndex;
+        LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
+    }
+
+    private TextBox? GetDefinitionTextBox(int listViewIndex)
+    {
+        return ((StackPanel)((StackPanel)PopupListView.Items[listViewIndex]).Children[1]).GetChildByName<TextBox>(nameof(LookupResult.FormattedDefinitions));
+    }
+
+    private string? GetSelectedDefinitions(int listViewIndex)
+    {
+        TextBox? definitionTextBox = GetDefinitionTextBox(listViewIndex);
+        string? selectedDefinitions = null;
+        if (definitionTextBox?.SelectionLength > 0)
+        {
+            selectedDefinitions = definitionTextBox.SelectedText;
+        }
+
+        return selectedDefinitions;
     }
 }
