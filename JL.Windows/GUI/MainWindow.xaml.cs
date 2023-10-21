@@ -803,6 +803,14 @@ internal sealed partial class MainWindow : Window
             }
         }
 
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ToggleAlwaysShowMainTextBoxCaretKeyGesture))
+        {
+            handled = true;
+
+            ConfigManager.AlwaysShowMainTextBoxCaret = !ConfigManager.AlwaysShowMainTextBoxCaret;
+            MainTextBox.IsReadOnlyCaretVisible = ConfigManager.AlwaysShowMainTextBoxCaret;
+        }
+
         if (handled && e is not null)
         {
             e.Handled = true;

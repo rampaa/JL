@@ -1612,6 +1612,12 @@ internal sealed partial class PopupWindow : Window
                 await PopupWindowUtils.Mine(LastLookupResults[index], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
             }
         }
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ToggleAlwaysShowMainTextBoxCaretKeyGesture))
+        {
+            ConfigManager.AlwaysShowMainTextBoxCaret = !ConfigManager.AlwaysShowMainTextBoxCaret;
+            MainWindow.Instance.MainTextBox.IsReadOnlyCaretVisible = ConfigManager.AlwaysShowMainTextBoxCaret;
+        }
     }
 
     public void EnableMiningMode()

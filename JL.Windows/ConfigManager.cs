@@ -67,7 +67,7 @@ internal static class ConfigManager
     public static bool EnableBacklog { get; private set; } = true;
     public static bool AutoSaveBacklogBeforeClosing { get; private set; } = false;
     public static bool TextToSpeechOnTextChange { get; private set; } = false;
-    public static bool AlwaysShowMainTextBoxCaret { get; private set; } = false;
+    public static bool AlwaysShowMainTextBoxCaret { get; set; } = false;
 
     #endregion
 
