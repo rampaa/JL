@@ -36,20 +36,28 @@ internal static class KeyGestureUtils
 
     public static async Task HandleKeyDown(KeyEventArgs e)
     {
+        Key key = e.Key is Key.System
+            ? e.SystemKey
+            : e.Key;
+
+        if (key is Key.LWin or Key.RWin)
+        {
+            return;
+        }
+
         ModifierKeys modifierKeys = Keyboard.Modifiers;
         if (modifierKeys is ModifierKeys.None)
         {
             modifierKeys = ModifierKeys.Windows;
         }
-
-        Key key = e.Key is Key.System
-            ? e.SystemKey
-            : e.Key;
-
-        if (key is Key.LeftCtrl or Key.RightCtrl or Key.LeftAlt or Key.RightAlt or Key.LWin or Key.RWin
-            || modifierKeys is ModifierKeys.Shift)
+        else if (key is Key.LeftCtrl or Key.RightCtrl or Key.LeftAlt or Key.RightAlt or Key.LeftShift or Key.RightShift)
         {
             modifierKeys = ModifierKeys.None;
+        }
+
+        if (modifierKeys is ModifierKeys.Shift)
+        {
+            return;
         }
 
         KeyGesture pressedKeyGesture = new(key, modifierKeys);
