@@ -130,7 +130,7 @@ public static class ExtensionMethods
         return list.ToArray();
     }
 
-    internal static T?[]? TrimListWithNullableElementsToArray<T>(this List<T?> list)
+    internal static T?[]? TrimListWithNullableElementsToArray<T>(this List<T?> list) where T : class
     {
         if (list.Count is 0 || list.All(static element => element is null))
         {

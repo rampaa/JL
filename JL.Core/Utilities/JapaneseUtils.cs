@@ -27,6 +27,7 @@ public static class JapaneseUtils
     // CJK Unified Ideographs Extension D (2B740–2B81F)
     // CJK Unified Ideographs Extension E (2B820–2CEAF)
     // CJK Unified Ideographs Extension F (2CEB0–2EBEF)
+    // CJK Unified Ideographs Extension I (2EBF0–2EE5F) is a Chinese-only range, so it's not included in the regex
     // CJK Compatibility Ideographs Supplement (2F800–2FA1F)
     // CJK Unified Ideographs Extension G (30000–3134F)
     // CJK Unified Ideographs Extension H (31350–323AF)
