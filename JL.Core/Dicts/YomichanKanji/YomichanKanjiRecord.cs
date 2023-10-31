@@ -16,7 +16,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
 
     public YomichanKanjiRecord(List<JsonElement> jsonElement)
     {
-        OnReadings = jsonElement[1].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        OnReadings = jsonElement[1].GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (OnReadings.Length is 0)
         {
             OnReadings = null;
@@ -27,7 +27,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
             OnReadings.DeduplicateStringsInArray();
         }
 
-        KunReadings = jsonElement[2].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        KunReadings = jsonElement[2].GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (KunReadings.Length is 0)
         {
             KunReadings = null;
@@ -38,7 +38,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
             KunReadings.DeduplicateStringsInArray();
         }
 
-        //Tags = jsonElement[3].ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        //Tags = jsonElement[3].GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         //if (Tags.Length is 0)
         //{
         //    Tags = null;
@@ -48,7 +48,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
         JsonElement definitionsArray = jsonElement[4];
         foreach (JsonElement definition in definitionsArray.EnumerateArray())
         {
-            definitionList.Add(definition.ToString());
+            definitionList.Add(definition.GetString()!);
         }
 
         Definitions = definitionList.TrimStringListToStringArray();
