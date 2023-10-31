@@ -20,10 +20,10 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
 
     public EpwingYomichanRecord(List<JsonElement> jsonElement)
     {
-        PrimarySpelling = jsonElement[0].ToString().GetPooledString();
-        Reading = jsonElement[1].ToString();
+        PrimarySpelling = jsonElement[0].GetString()!.GetPooledString();
+        Reading = jsonElement[1].GetString();
 
-        if (Reading is "" || Reading == PrimarySpelling)
+        if (string.IsNullOrEmpty(Reading) || Reading == PrimarySpelling)
         {
             Reading = null;
         }
@@ -36,7 +36,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         JsonElement definitionTagsElement = jsonElement[2];
         if (definitionTagsElement.ValueKind is JsonValueKind.String)
         {
-            DefinitionTags = definitionTagsElement.ToString().Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            DefinitionTags = definitionTagsElement.GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
             if (DefinitionTags.Length is 0)
             {
@@ -53,7 +53,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
             DefinitionTags = null;
         }
 
-        WordClasses = jsonElement[3].ToString().Split(' ');
+        WordClasses = jsonElement[3].GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (WordClasses.Length is 0)
         {
             WordClasses = null;
