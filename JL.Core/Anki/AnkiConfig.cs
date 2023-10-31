@@ -24,29 +24,6 @@ public sealed class AnkiConfig
         Tags = tags;
     }
 
-    //public static async Task CreateDefaultAnkiConfig()
-    //{
-    //    Dictionary<string, AnkiConfig> defaultAnkiConfigDict = new();
-    //    AnkiConfig wordAnkiConfig = new(
-    //            "JLDeck",
-    //            "Japanese JL-Basic",
-    //            new Dictionary<string, JLField>
-    //            {
-    //                { "Edict ID", JLField.EdictId },
-    //                { "Expression", JLField.FoundSpelling },
-    //                { "Reading", JLField.Readings },
-    //                { "Gloss", JLField.Definitions },
-    //                { "Sentence", JLField.Context },
-    //                { "Audio", JLField.Audio },
-    //                { "Time", JLField.TimeLocal },
-    //            },
-    //            new[] { "JL", "Word" }
-    //        );
-
-    //    await WriteAnkiConfig(defaultAnkiConfigDict
-    //    ).ConfigureAwait(false);
-    //}
-
     public static async Task<bool> WriteAnkiConfig(Dictionary<MineType, AnkiConfig> ankiConfig)
     {
         try

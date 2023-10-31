@@ -35,7 +35,7 @@ internal static class YomichanKanjiLoader
             foreach (List<JsonElement> jsonObj in jsonObjects)
             {
                 YomichanKanjiRecord yomichanKanjiRecord = new(jsonObj);
-                string kanji = jsonObj[0].ToString().GetPooledString();
+                string kanji = jsonObj[0].GetString()!.GetPooledString();
 
                 if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? kanjiResult))
                 {

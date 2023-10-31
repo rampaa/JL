@@ -27,12 +27,12 @@ internal static class EpwingNazekaLoader
 
         foreach (JsonElement jsonObj in jsonObjects!.Skip(1))
         {
-            string reading = jsonObj.GetProperty("r").ToString().GetPooledString();
+            string reading = jsonObj.GetProperty("r").GetString()!.GetPooledString();
 
             List<string>? spellingList = new();
             foreach (JsonElement spellingJsonElement in jsonObj.GetProperty("s").EnumerateArray())
             {
-                string spelling = spellingJsonElement.ToString();
+                string? spelling = spellingJsonElement.GetString();
 
                 if (!string.IsNullOrWhiteSpace(spelling))
                 {
@@ -48,15 +48,14 @@ internal static class EpwingNazekaLoader
             List<string> definitionList = new();
             foreach (JsonElement definitionJsonElement in jsonObj.GetProperty("l").EnumerateArray())
             {
-                string definition = definitionJsonElement.ToString();
-
-                if (dict.Type is DictType.Kenkyuusha)
-                {
-                    definition = definition.Replace("┏", "", StringComparison.Ordinal);
-                }
-
+                string? definition = definitionJsonElement.GetString();
                 if (!string.IsNullOrWhiteSpace(definition))
                 {
+                    if (dict.Type is DictType.Kenkyuusha)
+                    {
+                        definition = definition.Replace("┏", "", StringComparison.Ordinal);
+                    }
+
                     definitionList.Add(definition.GetPooledString());
                 }
             }

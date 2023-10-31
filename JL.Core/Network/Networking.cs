@@ -26,7 +26,7 @@ public static class Networking
                 {
                     JsonDocument jsonDocument = await JsonDocument.ParseAsync(githubApiResultStream).ConfigureAwait(false);
                     JsonElement rootElement = jsonDocument.RootElement;
-                    Version latestJLVersion = new(rootElement.GetProperty("tag_name").ToString());
+                    Version latestJLVersion = new(rootElement.GetProperty("tag_name").GetString()!);
 
                     if (latestJLVersion > Utils.JLVersion)
                     {
@@ -41,7 +41,7 @@ public static class Networking
 
                         foreach (JsonElement asset in assets.EnumerateArray())
                         {
-                            string latestReleaseUrl = asset.GetProperty("browser_download_url").ToString();
+                            string latestReleaseUrl = asset.GetProperty("browser_download_url").GetString()!;
 
                             // Add OS check?
                             if (latestReleaseUrl.Contains(architecture, StringComparison.Ordinal))
