@@ -22,7 +22,6 @@ internal sealed class JmnedictRecord : IDictRecord
         Readings = readings;
         Definitions = definitions;
         NameTypes = nameTypes;
-        Id = 0;
         //RelatedTerms = new List<List<string>?>();
     }
 
@@ -68,5 +67,24 @@ internal sealed class JmnedictRecord : IDictRecord
         }
 
         return defResult.Remove(defResult.Length - separator.Length - 1, separator.Length + 1).ToString();
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null)
+        {
+            return false;
+        }
+
+        JmnedictRecord jmnedictObj = (JmnedictRecord)obj;
+        return Id == jmnedictObj.Id && PrimarySpelling == jmnedictObj.PrimarySpelling;
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            return Id * PrimarySpelling.GetHashCode(StringComparison.Ordinal);
+        }
     }
 }

@@ -149,7 +149,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
             string? definition = null;
             if (definitionElement.ValueKind is JsonValueKind.String)
             {
-                definition = definitionElement.GetString();
+                definition = definitionElement.GetString()!.Trim();
             }
 
             else if (definitionElement.ValueKind is JsonValueKind.Array)
@@ -218,7 +218,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         }
 
         return stringBuilder.Length > 0
-            ? stringBuilder.ToString()
+            ? stringBuilder.ToString().Trim()
             : null;
     }
 
