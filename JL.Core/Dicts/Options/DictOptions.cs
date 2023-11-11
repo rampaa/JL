@@ -20,6 +20,7 @@ public sealed class DictOptions
     public RelatedTermOption? RelatedTerm { get; }
     public AntonymOption? Antonym { get; }
     public LoanwordEtymologyOption? LoanwordEtymology { get; }
+    public UseDBOption? UseDB { get; }
 
     public DictOptions
     (
@@ -40,7 +41,8 @@ public sealed class DictOptions
         MiscInfoOption? miscInfo = null,
         LoanwordEtymologyOption? loanwordEtymology = null,
         RelatedTermOption? relatedTerm = null,
-        AntonymOption? antonym = null
+        AntonymOption? antonym = null,
+        UseDBOption? useDB = null
     )
     {
         NewlineBetweenDefinitions = newlineBetweenDefinitions;
@@ -61,5 +63,6 @@ public sealed class DictOptions
         LoanwordEtymology = loanwordEtymology;
         RelatedTerm = relatedTerm;
         Antonym = antonym;
+        UseDB = useDB;
     }
 }

@@ -171,6 +171,7 @@ internal sealed partial class EditDictionaryWindow : Window
             case DictType.KireiCakeYomichan:
             case DictType.NonspecificWordYomichan:
             case DictType.NonspecificKanjiYomichan:
+            case DictType.NonspecificKanjiWithWordSchemaYomichan:
             case DictType.NonspecificNameYomichan:
             case DictType.NonspecificYomichan:
                 BrowseForDictionaryFolder();

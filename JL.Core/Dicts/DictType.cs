@@ -36,6 +36,7 @@ public enum DictType
     [Description("Kanjigen (Yomichan)")] KanjigenYomichan,
     [Description("Nonspecific Word Dictionary (Yomichan)")] NonspecificWordYomichan,
     [Description("Nonspecific Kanji Dictionary (Yomichan)")] NonspecificKanjiYomichan,
+    [Description("Nonspecific Kanji Dictionary with Word Schema (Yomichan)")] NonspecificKanjiWithWordSchemaYomichan,
     [Description("Nonspecific Name Dictionary (Yomichan)")] NonspecificNameYomichan,
     [Description("Nonspecific (Yomichan)")] NonspecificYomichan,
 

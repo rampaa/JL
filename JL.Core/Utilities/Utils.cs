@@ -60,6 +60,12 @@ public static class Utils
         WriteIndented = true
     };
 
+    internal static readonly JsonSerializerOptions s_jsoWithIndentationNotIgnoringNull = new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        WriteIndented = true
+    };
+
     internal static readonly JsonSerializerOptions s_jsoWithEnumConverterAndIndentation = new()
     {
         Converters = { new JsonStringEnumConverter() },
@@ -77,7 +83,6 @@ public static class Utils
         { "dut", "nld" }, { "rum", "ron" }, { "slo", "slk" }, { "alb", "sqi" }, { "chi", "zho" }
         #pragma warning restore format
     };
-
 
 #pragma warning disable CA5351
     internal static string GetMd5String(byte[] bytes)

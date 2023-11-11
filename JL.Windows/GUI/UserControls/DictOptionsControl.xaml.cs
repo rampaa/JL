@@ -139,6 +139,12 @@ internal sealed partial class DictOptionsControl : UserControl
             antonymOption = new AntonymOption(AntonymCheckBox.IsChecked!.Value);
         }
 
+        UseDBOption? useDBOption = null;
+        if (UseDBOption.ValidDictTypes.Contains(type))
+        {
+            useDBOption = new UseDBOption(UseDBCheckBox.IsChecked!.Value);
+        }
+
         DictOptions options = new(
             newlineOption,
             examplesOption,
@@ -157,7 +163,8 @@ internal sealed partial class DictOptionsControl : UserControl
             miscInfoOption,
             loanwordEtymology,
             relatedTermOption,
-            antonymOption);
+            antonymOption,
+            useDBOption);
 
         return options;
     }
@@ -271,6 +278,12 @@ internal sealed partial class DictOptionsControl : UserControl
         {
             AntonymCheckBox.IsChecked = dict.Options?.Antonym?.Value ?? false;
             AntonymCheckBox.Visibility = Visibility.Visible;
+        }
+
+        if (UseDBOption.ValidDictTypes.Contains(dict.Type))
+        {
+            UseDBCheckBox.IsChecked = dict.Options?.UseDB?.Value ?? false;
+            UseDBCheckBox.Visibility = Visibility.Visible;
         }
 
         if (NoAllCheckBox.Visibility is Visibility.Visible

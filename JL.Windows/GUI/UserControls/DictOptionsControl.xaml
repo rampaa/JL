@@ -108,7 +108,16 @@
                 <CheckBox Name="AntonymCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Show antonyms" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
-                
+
+                <CheckBox Name="UseDBCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Store dictionary in a DB instead of memory"
+                               ToolTip="Not recommended unless you are short on RAM. Enabling this will make lookups slower."
+                               Cursor="Help"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Left"
+                               Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
             </StackPanel>
         </ScrollViewer>
     </StackPanel>

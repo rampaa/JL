@@ -13,10 +13,19 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
     public string? Reading { get; }
     public string[] Definitions { get; set; }
     public string[]? WordClasses { get; }
-    private string[]? DefinitionTags { get; }
+    public string[]? DefinitionTags { get; }
     //public int Score { get; }
     //public int Sequence { get; }
     //public string TermTags { get; }
+
+    public EpwingYomichanRecord(string primarySpelling, string? reading, string[] definitions, string[]? wordClasses, string[]? definitionTags)
+    {
+        PrimarySpelling = primarySpelling;
+        Reading = reading;
+        Definitions = definitions;
+        WordClasses = wordClasses;
+        DefinitionTags = definitionTags;
+    }
 
     public EpwingYomichanRecord(List<JsonElement> jsonElement)
     {
@@ -249,5 +258,42 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         }
 
         return default;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null)
+        {
+            return false;
+        }
+
+        EpwingYomichanRecord epwingYomichanRecordObj = (EpwingYomichanRecord)obj;
+        return PrimarySpelling == epwingYomichanRecordObj.PrimarySpelling
+               && Reading == epwingYomichanRecordObj.Reading
+               && (epwingYomichanRecordObj.Definitions?.SequenceEqual(Definitions ?? Array.Empty<string>()) ?? Definitions is null);
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hash = 17;
+            hash = (hash * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
+            hash = (hash * 37) + Reading?.GetHashCode(StringComparison.Ordinal) ?? 37;
+
+            if (Definitions is not null)
+            {
+                foreach (string definition in Definitions)
+                {
+                    hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
+                }
+            }
+            else
+            {
+                hash *= 37;
+            }
+
+            return hash;
+        }
     }
 }

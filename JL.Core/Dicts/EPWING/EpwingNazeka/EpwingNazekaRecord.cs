@@ -108,4 +108,41 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
 
         return frequency;
     }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null)
+        {
+            return false;
+        }
+
+        EpwingNazekaRecord epwingNazekaRecordObj = (EpwingNazekaRecord)obj;
+        return PrimarySpelling == epwingNazekaRecordObj.PrimarySpelling
+               && Reading == epwingNazekaRecordObj.Reading
+               && (epwingNazekaRecordObj.Definitions?.SequenceEqual(Definitions ?? Array.Empty<string>()) ?? Definitions is null);
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hash = 17;
+            hash = (hash * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
+            hash = (hash * 37) + Reading?.GetHashCode(StringComparison.Ordinal) ?? 37;
+
+            if (Definitions is not null)
+            {
+                foreach (string definition in Definitions)
+                {
+                    hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
+                }
+            }
+            else
+            {
+                hash *= 37;
+            }
+
+            return hash;
+        }
+    }
 }

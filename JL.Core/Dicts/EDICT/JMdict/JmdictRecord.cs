@@ -15,17 +15,17 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
     public string[]?[]? AlternativeSpellingsOrthographyInfo { get; }
     public string[]? Readings { get; }
     public string[]?[]? ReadingsOrthographyInfo { get; }
-    private string[][] Definitions { get; }
+    public string[][] Definitions { get; }
     public string[][] WordClasses { get; } //e.g. noun +
-    private string[]?[]? SpellingRestrictions { get; }
-    private string[]?[]? ReadingRestrictions { get; }
-    private string[]?[]? Fields { get; } // e.g. "martial arts"
-    private string[]?[]? Misc { get; } // e.g. "abbr" +
-    private string?[]? DefinitionInfo { get; } // e.g. "often derog" +
-    private string[]?[]? Dialects { get; } // e.g. ksb
-    private LoanwordSource[]?[]? LoanwordEtymology { get; }
-    private string[]?[]? RelatedTerms { get; }
-    private string[]?[]? Antonyms { get; }
+    public string[]?[]? SpellingRestrictions { get; }
+    public string[]?[]? ReadingRestrictions { get; }
+    public string[]?[]? Fields { get; } // e.g. "martial arts"
+    public string[]?[]? Misc { get; } // e.g. "abbr" +
+    public string?[]? DefinitionInfo { get; } // e.g. "often derog" +
+    public string[]?[]? Dialects { get; } // e.g. ksb
+    public LoanwordSource[]?[]? LoanwordEtymology { get; }
+    public string[]?[]? RelatedTerms { get; }
+    public string[]?[]? Antonyms { get; }
     //public string[] Priorities { get; } // e.g. gai1
 
     public JmdictRecord(int id,
@@ -303,5 +303,24 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
         }
 
         return frequency;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null)
+        {
+            return false;
+        }
+
+        JmdictRecord jmdictObj = (JmdictRecord)obj;
+        return Id == jmdictObj.Id && PrimarySpelling == jmdictObj.PrimarySpelling;
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            return Id * PrimarySpelling.GetHashCode(StringComparison.Ordinal);
+        }
     }
 }

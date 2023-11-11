@@ -5,11 +5,18 @@ using JL.Core.Utilities;
 
 namespace JL.Core.PitchAccent;
 
-public sealed class PitchAccentRecord : IDictRecord
+public sealed record class PitchAccentRecord : IDictRecord
 {
     public string Spelling { get; }
     public string? Reading { get; }
     public int Position { get; }
+
+    public PitchAccentRecord(string spelling, string? reading, int position)
+    {
+        Spelling = spelling;
+        Reading = reading;
+        Position = position;
+    }
 
     internal PitchAccentRecord(List<JsonElement> jsonObject)
     {

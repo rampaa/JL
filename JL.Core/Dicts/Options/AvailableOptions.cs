@@ -103,3 +103,8 @@ public readonly record struct AntonymOption(bool Value)
 {
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.JMdict };
 }
+
+public readonly record struct UseDBOption(bool Value)
+{
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = DictUtils.s_dictTypesWithDBSupport;
+}

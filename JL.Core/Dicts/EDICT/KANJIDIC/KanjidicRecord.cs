@@ -2,7 +2,7 @@ namespace JL.Core.Dicts.EDICT.KANJIDIC;
 
 internal sealed class KanjidicRecord : IDictRecord
 {
-    private string[]? Definitions { get; }
+    public string[]? Definitions { get; }
     public string[]? OnReadings { get; }
     public string[]? KunReadings { get; }
     public string[]? NanoriReadings { get; }

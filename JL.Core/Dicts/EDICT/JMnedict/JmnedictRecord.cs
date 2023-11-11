@@ -10,8 +10,8 @@ internal sealed class JmnedictRecord : IDictRecord
     public string PrimarySpelling { get; }
     public string[]? AlternativeSpellings { get; }
     public string[]? Readings { get; }
-    private string[][] Definitions { get; }
-    private string[][] NameTypes { get; }
+    public string[][] Definitions { get; }
+    public string[][] NameTypes { get; }
     //public string[]?[]? RelatedTerms { get; }
 
     public JmnedictRecord(int id, string primarySpelling, string[]? alternativeSpellings, string[]? readings, string[][] definitions, string[][] nameTypes)

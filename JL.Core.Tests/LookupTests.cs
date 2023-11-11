@@ -22,7 +22,7 @@ public class LookupTests
         string jmdictPath = Path.Join(Utils.ResourcesPath, "MockJMdict.xml");
 
         DictUtils.Dicts.Add("JMdict",
-            new Dict(DictType.JMdict, "JMdict", jmdictPath, true, 0, 500000,
+            new Dict(DictType.JMdict, "JMdict", jmdictPath, true, 0, 500000, false,
                 new DictOptions(
                     new NewlineBetweenDefinitionsOption(false),
                     wordClassInfo: new WordClassInfoOption(true),

@@ -11,8 +11,16 @@ internal sealed class YomichanKanjiRecord : IDictRecord
     public string[]? OnReadings { get; }
     public string[]? KunReadings { get; }
     //public string[]? Tags { get; }
-    private string[]? Definitions { get; }
-    private string[]? Stats { get; }
+    public string[]? Definitions { get; }
+    public string[]? Stats { get; }
+
+    public YomichanKanjiRecord(string[]? onReadings, string[]? kunReadings, string[]? definitions, string[]? stats)
+    {
+        OnReadings = onReadings;
+        KunReadings = kunReadings;
+        Definitions = definitions;
+        Stats = stats;
+    }
 
     public YomichanKanjiRecord(List<JsonElement> jsonElement)
     {

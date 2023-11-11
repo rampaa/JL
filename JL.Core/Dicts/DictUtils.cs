@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text.Json;
 using JL.Core.Dicts.CustomNameDict;
 using JL.Core.Dicts.CustomWordDict;
+using JL.Core.Dicts.EDICT.Jmdict;
 using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Dicts.EDICT.JMnedict;
 using JL.Core.Dicts.EDICT.KANJIDIC;
@@ -44,34 +45,34 @@ public static class DictUtils
             "ProfileCustomWordDictionary", new Dict(DictType.ProfileCustomWordDictionary,
                 "Custom Word Dictionary (Profile)",
                 Path.Join(ProfileUtils.ProfileFolderPath, "Default_Custom_Words.txt"),
-                true, -1, 128,
+                true, -1, 128, false,
                 new DictOptions(new NewlineBetweenDefinitionsOption(true)))
         },
         {
             "ProfileCustomNameDictionary", new Dict(DictType.ProfileCustomNameDictionary,
                 "Custom Name Dictionary (Profile)",
                 Path.Join(ProfileUtils.ProfileFolderPath, "Default_Custom_Names.txt"),
-                true, 0, 128,
+                true, 0, 128, false,
                 new DictOptions())
         },
         {
             "CustomWordDictionary", new Dict(DictType.CustomWordDictionary,
                 "Custom Word Dictionary",
                 Path.Join(Utils.ResourcesPath, "custom_words.txt"),
-                true, 1, 128,
+                true, 1, 128, false,
                 new DictOptions(new NewlineBetweenDefinitionsOption(true)))
         },
         {
             "CustomNameDictionary", new Dict(DictType.CustomNameDictionary,
                 "Custom Name Dictionary",
                 Path.Join(Utils.ResourcesPath, "custom_names.txt"),
-                true, 2, 128,
+                true, 2, 128, false,
                 new DictOptions())
         },
         {
             "JMdict", new Dict(DictType.JMdict, "JMdict",
                 Path.Join(Utils.ResourcesPath, "JMdict.xml"),
-                true, 3, 500000,
+                true, 3, 500000, false,
                 new DictOptions(
                     new NewlineBetweenDefinitionsOption(true),
                     wordClassInfo: new WordClassInfoOption(true),
@@ -91,13 +92,13 @@ public static class DictUtils
         {
             "Kanjidic", new Dict(DictType.Kanjidic, "Kanjidic",
                 Path.Join(Utils.ResourcesPath, "kanjidic2.xml"),
-                true, 4, 13108,
+                true, 4, 13108, false,
                 new DictOptions(noAll: new NoAllOption(false)))
         },
         {
             "JMnedict", new Dict(DictType.JMnedict, "JMnedict",
                 Path.Join(Utils.ResourcesPath, "JMnedict.xml"),
-                true, 5, 700000,
+                true, 5, 700000, false,
                 new DictOptions(new NewlineBetweenDefinitionsOption(true)))
         }
     };
@@ -403,6 +404,7 @@ public static class DictUtils
         DictType.PitchAccentYomichan,
         DictType.NonspecificWordYomichan,
         DictType.NonspecificKanjiYomichan,
+        DictType.NonspecificKanjiWithWordSchemaYomichan,
         DictType.NonspecificNameYomichan,
         DictType.NonspecificYomichan
     };
@@ -420,6 +422,7 @@ public static class DictUtils
     public static readonly DictType[] NonspecificDictTypes = {
         DictType.NonspecificWordYomichan,
         DictType.NonspecificKanjiYomichan,
+        DictType.NonspecificKanjiWithWordSchemaYomichan,
         DictType.NonspecificNameYomichan,
         DictType.NonspecificYomichan,
         DictType.NonspecificWordNazeka,
@@ -432,6 +435,7 @@ public static class DictUtils
         DictType.Kanjidic,
         DictType.KanjigenYomichan,
         DictType.NonspecificKanjiYomichan,
+        DictType.NonspecificKanjiWithWordSchemaYomichan,
         DictType.NonspecificKanjiNazeka
     };
 
@@ -472,6 +476,46 @@ public static class DictUtils
         DictType.NonspecificWordNazeka
     };
 
+    internal static readonly DictType[] s_dictTypesWithDBSupport = {
+        DictType.JMdict,
+        DictType.JMnedict,
+        DictType.Daijirin,
+        DictType.Daijisen,
+        DictType.Gakken,
+        DictType.GakkenYojijukugoYomichan,
+        DictType.IwanamiYomichan,
+        DictType.JitsuyouYomichan,
+        DictType.Kenkyuusha,
+        DictType.KireiCakeYomichan,
+        DictType.Kotowaza,
+        DictType.Koujien,
+        DictType.Meikyou,
+        DictType.NikkokuYomichan,
+        DictType.OubunshaYomichan,
+        DictType.ShinjirinYomichan,
+        DictType.ShinmeikaiYomichan,
+        DictType.ShinmeikaiYojijukugoYomichan,
+        DictType.WeblioKogoYomichan,
+        DictType.ZokugoYomichan,
+        DictType.NonspecificWordYomichan,
+        DictType.NonspecificKanjiWithWordSchemaYomichan,
+        DictType.NonspecificNameYomichan,
+        DictType.NonspecificKanjiYomichan,
+        DictType.NonspecificYomichan,
+        DictType.KanjigenYomichan,
+        DictType.DaijirinNazeka,
+        DictType.KenkyuushaNazeka,
+        DictType.ShinmeikaiNazeka,
+        DictType.NonspecificWordNazeka,
+        DictType.NonspecificNameNazeka,
+        DictType.NonspecificNazeka
+    };
+
+    public static string GetDBPath(string dbName)
+    {
+        return string.Create(CultureInfo.InvariantCulture, $"{Path.Join(Utils.ResourcesPath, dbName)} Dictionary.sqlite");
+    }
+
     public static async Task LoadDictionaries()
     {
         DictsReady = false;
@@ -493,27 +537,42 @@ public static class DictUtils
 
         foreach (Dict dict in Dicts.Values.ToList())
         {
+            bool useDB = dict.Options?.UseDB?.Value ?? false;
+            bool dbExists = File.Exists(GetDBPath(dict.Name));
+
             switch (dict.Type)
             {
                 case DictType.JMdict:
                     if (!UpdatingJmdict)
                     {
-                        if (dict is { Active: true, Contents.Count: 0 })
+                        if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                         {
                             Task jmdictTask = Task.Run(async () =>
                             {
                                 await JmdictLoader.Load(dict).ConfigureAwait(false);
                                 dict.Size = dict.Contents.Count;
+
+                                if (useDB && !dbExists)
+                                {
+                                    await JmdictDBManager.CreateJmdictDB(dict.Name).ConfigureAwait(false);
+                                    await JmdictDBManager.InsertToJmdictDB(dict).ConfigureAwait(false);
+                                    dict.Contents.Clear();
+                                    dict.Contents.TrimExcess();
+                                }
                             });
 
                             tasks.Add(jmdictTask);
                         }
 
-                        else if (dict is { Active: false, Contents.Count: > 0 })
+                        else
                         {
-                            dict.Contents.Clear();
-                            dict.Contents.TrimExcess();
-                            dictCleared = true;
+                            if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                            {
+                                dict.Contents.Clear();
+                                dict.Contents.TrimExcess();
+                                dictCleared = true;
+                            }
+                            dict.Ready = true;
                         }
                     }
 
@@ -522,20 +581,34 @@ public static class DictUtils
                 case DictType.JMnedict:
                     if (!UpdatingJmnedict)
                     {
-                        if (dict is { Active: true, Contents.Count: 0 })
+                        if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                         {
                             tasks.Add(Task.Run(async () =>
                             {
                                 await JmnedictLoader.Load(dict).ConfigureAwait(false);
                                 dict.Size = dict.Contents.Count;
+
+                                if (useDB && !dbExists)
+                                {
+                                    await JmnedictDBManager.CreateJmnedictDB(dict.Name).ConfigureAwait(false);
+                                    await JmnedictDBManager.InsertToJmnedictDB(dict).ConfigureAwait(false);
+                                    dict.Contents.Clear();
+                                    dict.Contents.TrimExcess();
+                                    dict.Ready = true;
+                                }
                             }));
                         }
 
-                        else if (dict is { Active: false, Contents.Count: > 0 })
+                        else
                         {
-                            dict.Contents.Clear();
-                            dict.Contents.TrimExcess();
-                            dictCleared = true;
+                            if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                            {
+                                dict.Contents.Clear();
+                                dict.Contents.TrimExcess();
+                                dictCleared = true;
+                            }
+
+                            dict.Ready = true;
                         }
                     }
 
@@ -582,9 +655,10 @@ public static class DictUtils
                 case DictType.KanjigenYomichan:
                 case DictType.KireiCakeYomichan:
                 case DictType.NonspecificWordYomichan:
+                case DictType.NonspecificKanjiWithWordSchemaYomichan:
                 case DictType.NonspecificNameYomichan:
                 case DictType.NonspecificYomichan:
-                    if (dict is { Active: true, Contents.Count: 0 })
+                    if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
                         {
@@ -592,6 +666,15 @@ public static class DictUtils
                             {
                                 await EpwingYomichanLoader.Load(dict).ConfigureAwait(false);
                                 dict.Size = dict.Contents.Count;
+
+                                if (useDB && !dbExists)
+                                {
+                                    await EpwingYomichanDBManager.CreateYomichanWordDB(dict.Name).ConfigureAwait(false);
+                                    await EpwingYomichanDBManager.InsertToYomichanWordDB(dict).ConfigureAwait(false);
+                                    dict.Contents.Clear();
+                                    dict.Contents.TrimExcess();
+                                    dict.Ready = true;
+                                }
                             }
 
                             catch (Exception ex)
@@ -604,17 +687,21 @@ public static class DictUtils
                         }));
                     }
 
-                    else if (dict is { Active: false, Contents.Count: > 0 })
+                    else
                     {
-                        dict.Contents.Clear();
-                        dict.Contents.TrimExcess();
-                        dictCleared = true;
+                        if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                        {
+                            dict.Contents.Clear();
+                            dict.Contents.TrimExcess();
+                            dictCleared = true;
+                        }
+                        dict.Ready = true;
                     }
 
                     break;
 
                 case DictType.NonspecificKanjiYomichan:
-                    if (dict is { Active: true, Contents.Count: 0 })
+                    if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
                         {
@@ -622,6 +709,15 @@ public static class DictUtils
                             {
                                 await YomichanKanjiLoader.Load(dict).ConfigureAwait(false);
                                 dict.Size = dict.Contents.Count;
+
+                                if (useDB && !dbExists)
+                                {
+                                    await YomichanKanjiDBManager.CreateYomichanKanjiDB(dict.Name).ConfigureAwait(false);
+                                    await YomichanKanjiDBManager.InsertToYomichanKanjiDB(dict).ConfigureAwait(false);
+                                    dict.Contents.Clear();
+                                    dict.Contents.TrimExcess();
+                                    dict.Ready = true;
+                                }
                             }
 
                             catch (Exception ex)
@@ -634,11 +730,15 @@ public static class DictUtils
                         }));
                     }
 
-                    else if (dict is { Active: false, Contents.Count: > 0 })
+                    else
                     {
-                        dict.Contents.Clear();
-                        dict.Contents.TrimExcess();
-                        dictCleared = true;
+                        if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                        {
+                            dict.Contents.Clear();
+                            dict.Contents.TrimExcess();
+                            dictCleared = true;
+                        }
+                        dict.Ready = true;
                     }
 
                     break;
@@ -758,7 +858,7 @@ public static class DictUtils
                 case DictType.NonspecificKanjiNazeka:
                 case DictType.NonspecificNameNazeka:
                 case DictType.NonspecificNazeka:
-                    if (dict is { Active: true, Contents.Count: 0 })
+                    if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
                         {
@@ -766,6 +866,15 @@ public static class DictUtils
                             {
                                 await EpwingNazekaLoader.Load(dict).ConfigureAwait(false);
                                 dict.Size = dict.Contents.Count;
+
+                                if (useDB && !dbExists)
+                                {
+                                    await EpwingNazekaDBManager.CreateNazekaWordDB(dict.Name).ConfigureAwait(false);
+                                    await EpwingNazekaDBManager.InsertToNazekaWordDB(dict).ConfigureAwait(false);
+                                    dict.Contents.Clear();
+                                    dict.Contents.TrimExcess();
+                                    dict.Ready = true;
+                                }
                             }
 
                             catch (Exception ex)
@@ -778,17 +887,21 @@ public static class DictUtils
                         }));
                     }
 
-                    else if (dict is { Active: false, Contents.Count: > 0 })
+                    else
                     {
-                        dict.Contents.Clear();
-                        dict.Contents.TrimExcess();
-                        dictCleared = true;
+                        if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                        {
+                            dict.Contents.Clear();
+                            dict.Contents.TrimExcess();
+                            dictCleared = true;
+                        }
+                        dict.Ready = true;
                     }
 
                     break;
 
                 case DictType.PitchAccentYomichan:
-                    if (dict is { Active: true, Contents.Count: 0 })
+                    if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
                         {
@@ -796,6 +909,15 @@ public static class DictUtils
                             {
                                 await PitchAccentLoader.Load(dict).ConfigureAwait(false);
                                 dict.Size = dict.Contents.Count;
+
+                                if (useDB && !dbExists)
+                                {
+                                    await YomichanPitchAccentDBManager.CreateYomichanPitchAccentDB(dict.Name).ConfigureAwait(false);
+                                    await YomichanPitchAccentDBManager.InsertToYomichanPitchAccentDB(dict).ConfigureAwait(false);
+                                    dict.Contents.Clear();
+                                    dict.Contents.TrimExcess();
+                                    dict.Ready = true;
+                                }
                             }
 
                             catch (Exception ex)
@@ -809,12 +931,17 @@ public static class DictUtils
                         }));
                     }
 
-                    else if (dict is { Active: false, Contents.Count: > 0 })
+                    else
                     {
-                        dict.Contents.Clear();
-                        dict.Contents.TrimExcess();
-                        dictCleared = true;
+                        if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                        {
+                            dict.Contents.Clear();
+                            dict.Contents.TrimExcess();
+                            dictCleared = true;
+                        }
+                        dict.Ready = true;
                     }
+
 
                     break;
 
@@ -942,50 +1069,54 @@ public static class DictUtils
 
                     foreach (Dict dict in orderedDicts)
                     {
-                        dict.Contents = dict.Size is not 0
-                            ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
-                            : dict.Type switch
-                            {
-                                DictType.CustomNameDictionary => new Dictionary<string, IList<IDictRecord>>(1024),
-                                DictType.CustomWordDictionary => new Dictionary<string, IList<IDictRecord>>(1024),
-                                DictType.ProfileCustomNameDictionary => new Dictionary<string, IList<IDictRecord>>(256),
-                                DictType.ProfileCustomWordDictionary => new Dictionary<string, IList<IDictRecord>>(256),
-                                DictType.JMdict => new Dictionary<string, IList<IDictRecord>>(450000), //2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739
-                                DictType.JMnedict => new Dictionary<string, IList<IDictRecord>>(630000), //2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055
-                                DictType.Kanjidic => new Dictionary<string, IList<IDictRecord>>(13108), //2022/05/11: 13108, 2022/08/15: 13108, 2023/04/22: 13108
-                                DictType.Daijirin => new Dictionary<string, IList<IDictRecord>>(420429),
-                                DictType.DaijirinNazeka => new Dictionary<string, IList<IDictRecord>>(420429),
-                                DictType.Daijisen => new Dictionary<string, IList<IDictRecord>>(679115),
-                                DictType.Gakken => new Dictionary<string, IList<IDictRecord>>(254558),
-                                DictType.GakkenYojijukugoYomichan => new Dictionary<string, IList<IDictRecord>>(7989),
-                                DictType.IwanamiYomichan => new Dictionary<string, IList<IDictRecord>>(101929),
-                                DictType.JitsuyouYomichan => new Dictionary<string, IList<IDictRecord>>(69746),
-                                DictType.KanjigenYomichan => new Dictionary<string, IList<IDictRecord>>(64730),
-                                DictType.Kenkyuusha => new Dictionary<string, IList<IDictRecord>>(303677),
-                                DictType.KenkyuushaNazeka => new Dictionary<string, IList<IDictRecord>>(191804),
-                                DictType.KireiCakeYomichan => new Dictionary<string, IList<IDictRecord>>(332628),
-                                DictType.Kotowaza => new Dictionary<string, IList<IDictRecord>>(30846),
-                                DictType.Koujien => new Dictionary<string, IList<IDictRecord>>(402571),
-                                DictType.Meikyou => new Dictionary<string, IList<IDictRecord>>(107367),
-                                DictType.NikkokuYomichan => new Dictionary<string, IList<IDictRecord>>(451455),
-                                DictType.OubunshaYomichan => new Dictionary<string, IList<IDictRecord>>(138935),
-                                DictType.PitchAccentYomichan => new Dictionary<string, IList<IDictRecord>>(434991),
-                                DictType.ShinjirinYomichan => new Dictionary<string, IList<IDictRecord>>(229758),
-                                DictType.ShinmeikaiYomichan => new Dictionary<string, IList<IDictRecord>>(126049),
-                                DictType.ShinmeikaiNazeka => new Dictionary<string, IList<IDictRecord>>(126049),
-                                DictType.ShinmeikaiYojijukugoYomichan => new Dictionary<string, IList<IDictRecord>>(6088),
-                                DictType.WeblioKogoYomichan => new Dictionary<string, IList<IDictRecord>>(30838),
-                                DictType.ZokugoYomichan => new Dictionary<string, IList<IDictRecord>>(2392),
-                                DictType.NonspecificWordYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
-                                DictType.NonspecificKanjiYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
-                                DictType.NonspecificNameYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
-                                DictType.NonspecificYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
-                                DictType.NonspecificWordNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
-                                DictType.NonspecificKanjiNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
-                                DictType.NonspecificNameNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
-                                DictType.NonspecificNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
-                                _ => new Dictionary<string, IList<IDictRecord>>(250000)
-                            };
+                        if (((!dict.Options?.UseDB?.Value) ?? true) || !File.Exists(GetDBPath(dict.Name)))
+                        {
+                            dict.Contents = dict.Size is not 0
+                                ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
+                                : dict.Type switch
+                                {
+                                    DictType.CustomNameDictionary => new Dictionary<string, IList<IDictRecord>>(1024),
+                                    DictType.CustomWordDictionary => new Dictionary<string, IList<IDictRecord>>(1024),
+                                    DictType.ProfileCustomNameDictionary => new Dictionary<string, IList<IDictRecord>>(256),
+                                    DictType.ProfileCustomWordDictionary => new Dictionary<string, IList<IDictRecord>>(256),
+                                    DictType.JMdict => new Dictionary<string, IList<IDictRecord>>(450000), //2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739
+                                    DictType.JMnedict => new Dictionary<string, IList<IDictRecord>>(630000), //2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055
+                                    DictType.Kanjidic => new Dictionary<string, IList<IDictRecord>>(13108), //2022/05/11: 13108, 2022/08/15: 13108, 2023/04/22: 13108
+                                    DictType.Daijirin => new Dictionary<string, IList<IDictRecord>>(420429),
+                                    DictType.DaijirinNazeka => new Dictionary<string, IList<IDictRecord>>(420429),
+                                    DictType.Daijisen => new Dictionary<string, IList<IDictRecord>>(679115),
+                                    DictType.Gakken => new Dictionary<string, IList<IDictRecord>>(254558),
+                                    DictType.GakkenYojijukugoYomichan => new Dictionary<string, IList<IDictRecord>>(7989),
+                                    DictType.IwanamiYomichan => new Dictionary<string, IList<IDictRecord>>(101929),
+                                    DictType.JitsuyouYomichan => new Dictionary<string, IList<IDictRecord>>(69746),
+                                    DictType.KanjigenYomichan => new Dictionary<string, IList<IDictRecord>>(64730),
+                                    DictType.Kenkyuusha => new Dictionary<string, IList<IDictRecord>>(303677),
+                                    DictType.KenkyuushaNazeka => new Dictionary<string, IList<IDictRecord>>(191804),
+                                    DictType.KireiCakeYomichan => new Dictionary<string, IList<IDictRecord>>(332628),
+                                    DictType.Kotowaza => new Dictionary<string, IList<IDictRecord>>(30846),
+                                    DictType.Koujien => new Dictionary<string, IList<IDictRecord>>(402571),
+                                    DictType.Meikyou => new Dictionary<string, IList<IDictRecord>>(107367),
+                                    DictType.NikkokuYomichan => new Dictionary<string, IList<IDictRecord>>(451455),
+                                    DictType.OubunshaYomichan => new Dictionary<string, IList<IDictRecord>>(138935),
+                                    DictType.PitchAccentYomichan => new Dictionary<string, IList<IDictRecord>>(434991),
+                                    DictType.ShinjirinYomichan => new Dictionary<string, IList<IDictRecord>>(229758),
+                                    DictType.ShinmeikaiYomichan => new Dictionary<string, IList<IDictRecord>>(126049),
+                                    DictType.ShinmeikaiNazeka => new Dictionary<string, IList<IDictRecord>>(126049),
+                                    DictType.ShinmeikaiYojijukugoYomichan => new Dictionary<string, IList<IDictRecord>>(6088),
+                                    DictType.WeblioKogoYomichan => new Dictionary<string, IList<IDictRecord>>(30838),
+                                    DictType.ZokugoYomichan => new Dictionary<string, IList<IDictRecord>>(2392),
+                                    DictType.NonspecificWordYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
+                                    DictType.NonspecificKanjiYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
+                                    DictType.NonspecificKanjiWithWordSchemaYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
+                                    DictType.NonspecificNameYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
+                                    DictType.NonspecificYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
+                                    DictType.NonspecificWordNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
+                                    DictType.NonspecificKanjiNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
+                                    DictType.NonspecificNameNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
+                                    DictType.NonspecificNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
+                                    _ => new Dictionary<string, IList<IDictRecord>>(250000)
+                                };
+                        }
 
                         dict.Priority = priority;
                         ++priority;

@@ -96,7 +96,7 @@ internal sealed partial class AddDictionaryWindow : Window
 
             DictOptions options = new(newlineOption, examplesOption, noAllOption, pitchAccentMarkerColorOption);
 
-            Dict dict = new(type, name, path, true, DictUtils.Dicts.Count + 1, 0, options);
+            Dict dict = new(type, name, path, true, DictUtils.Dicts.Count + 1, 0, false, options);
             DictUtils.Dicts.Add(name, dict);
 
             if (dict.Type is DictType.PitchAccentYomichan)
@@ -183,6 +183,7 @@ internal sealed partial class AddDictionaryWindow : Window
             case DictType.KireiCakeYomichan:
             case DictType.NonspecificWordYomichan:
             case DictType.NonspecificKanjiYomichan:
+            case DictType.NonspecificKanjiWithWordSchemaYomichan:
             case DictType.NonspecificNameYomichan:
             case DictType.NonspecificYomichan:
                 BrowseForDictionaryFolder();

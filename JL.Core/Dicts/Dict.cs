@@ -11,12 +11,13 @@ public sealed class Dict
     public bool Active { get; set; }
     public int Priority { get; set; }
     public int Size { get; set; }
+    [JsonIgnore] public bool Ready { get; set; }
 
     [JsonIgnore] public Dictionary<string, IList<IDictRecord>> Contents { get; set; } = new();
 
     public DictOptions? Options { get; set; } // can be null for dicts.json files generated before version 1.10
 
-    public Dict(DictType type, string name, string path, bool active, int priority, int size, DictOptions options)
+    public Dict(DictType type, string name, string path, bool active, int priority, int size, bool ready, DictOptions options)
     {
         Type = type;
         Name = name;
@@ -25,5 +26,6 @@ public sealed class Dict
         Priority = priority;
         Size = size;
         Options = options;
+        Ready = ready;
     }
 }
