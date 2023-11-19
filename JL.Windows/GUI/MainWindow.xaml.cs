@@ -13,6 +13,7 @@ using JL.Core.Dicts;
 using JL.Core.Freqs;
 using JL.Core.Lookup;
 using JL.Core.Network;
+using JL.Core.PitchAccent;
 using JL.Core.Profile;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -275,6 +276,7 @@ internal sealed partial class MainWindow : Window
                 {
                     _ = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict);
                     bool pitchDictIsActive = pitchDict?.Active ?? false;
+                    bool useDBForPitchDict = pitchDictIsActive && (pitchDict!.Options?.UseDB?.Value ?? false) && pitchDict.Ready;
                     Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
                     bool pOrthographyInfo = jmdict.Options?.POrthographyInfo?.Value ?? true;
                     bool rOrthographyInfo = jmdict.Options?.ROrthographyInfo?.Value ?? true;
@@ -291,7 +293,7 @@ internal sealed partial class MainWindow : Window
                             FirstPopupWindow.DictsWithResults.Add(lookupResult.Dict);
                         }
 
-                        popupItemSource[i] = FirstPopupWindow.MakeResultStackPanel(lookupResult, i, lookupResults.Count, pitchDict, pitchDictIsActive, pOrthographyInfo, rOrthographyInfo, aOrthographyInfo);
+                        popupItemSource[i] = FirstPopupWindow.MakeResultStackPanel(lookupResult, i, lookupResults.Count, pitchDict, pitchDictIsActive, useDBForPitchDict, YomichanPitchAccentDBManager.GetRecordsFromYomichanPitchAccentDB, pOrthographyInfo, rOrthographyInfo, aOrthographyInfo);
                     }
 
                     PopupWindow.StackPanelCache.AddReplace(text, popupItemSource);

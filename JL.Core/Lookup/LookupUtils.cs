@@ -22,7 +22,7 @@ public static class LookupUtils
 {
     private static DateTime s_lastLookupTime;
 
-    private delegate Dictionary<string, List<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms);
+    public delegate Dictionary<string, List<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms);
     private delegate List<IDictRecord> GetKanjiRecordsFromDB(string dbName, string term);
 
     public static List<LookupResult>? LookupText(string text)

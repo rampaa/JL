@@ -6,7 +6,7 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.PitchAccent;
-internal class YomichanPitchAccentDBManager
+public class YomichanPitchAccentDBManager
 {
     public static void CreateYomichanPitchAccentDB(string dbName)
     {
@@ -21,9 +21,9 @@ internal class YomichanPitchAccentDBManager
                 id INTEGER NOT NULL PRIMARY KEY,
                 spelling TEXT NOT NULL,
                 reading TEXT,
-                position INTEGER NOT NULL,
+                position INTEGER NOT NULL
             ) STRICT;
-
+            
             CREATE TABLE IF NOT EXISTS record_search_key
             (
                 record_id INTEGER NOT NULL,
@@ -150,7 +150,7 @@ internal class YomichanPitchAccentDBManager
                 ? (string)readingFromDB
                 : null;
 
-            int position = (int)dataReader["spelling"];
+            int position = (int)(long)dataReader["position"];
 
             if (results.TryGetValue(searchKey, out List<IDictRecord>? result))
             {
