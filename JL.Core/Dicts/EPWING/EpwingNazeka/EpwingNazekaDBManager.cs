@@ -1,6 +1,6 @@
 using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
@@ -8,10 +8,10 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Dicts.EPWING.EpwingNazeka;
 internal class EpwingNazekaDBManager
 {
-    public static async Task CreateNazekaWordDB(string dbName)
+    public static void CreateNazekaWordDB(string dbName)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
-        await connection.OpenAsync().ConfigureAwait(false);
+        connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -20,22 +20,28 @@ internal class EpwingNazekaDBManager
             (
                 id INTEGER NOT NULL PRIMARY KEY,
                 primary_spelling TEXT NOT NULL,
-                primary_spelling_in_hiragana TEXT NOT NULL,
                 reading TEXT,
-                reading_in_hiragana TEXT,
                 alternative_spellings TEXT,
                 glossary TEXT NOT NULL
             ) STRICT;
+
+            CREATE TABLE IF NOT EXISTS record_search_key
+            (
+                record_id INTEGER NOT NULL,
+                search_key TEXT NOT NULL,
+                PRIMARY KEY (record_id, search_key),
+                FOREIGN KEY (record_id) REFERENCES record (id) ON DELETE CASCADE
+            ) STRICT;
             """;
 
-        _ = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = command.ExecuteNonQuery();
     }
 
-    public static async Task InsertToNazekaWordDB(Dict dict)
+    public static void InsertToNazekaWordDB(Dict dict)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
-        await connection.OpenAsync().ConfigureAwait(false);
-        using DbTransaction transaction = await connection.BeginTransactionAsync().ConfigureAwait(false);
+        connection.Open();
+        using DbTransaction transaction = connection.BeginTransaction();
 
         int id = 1;
         HashSet<EpwingNazekaRecord> nazekaWordRecords = dict.Contents.Values.SelectMany(v => v).Select(v => (EpwingNazekaRecord)v).ToHashSet();
@@ -44,66 +50,102 @@ internal class EpwingNazekaDBManager
             using SqliteCommand insertRecordCommand = connection.CreateCommand();
             insertRecordCommand.CommandText =
                 """
-                INSERT INTO record (id, primary_spelling, primary_spelling_in_hiragana, reading, reading_in_hiragana, alternative_spellings, glossary)
-                VALUES (@id, @primary_spelling, @primary_spelling_in_hiragana, @reading, @reading_in_hiragana, @alternative_spellings, @glossary)
+                INSERT INTO record (id, primary_spelling, reading, alternative_spellings, glossary)
+                VALUES (@id, @primary_spelling, @reading, @alternative_spellings, @glossary)
                 """;
 
             _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
             _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling", record.PrimarySpelling);
-            _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling_in_hiragana", JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling));
             _ = insertRecordCommand.Parameters.AddWithValue("@reading", record.Reading is not null ? record.Reading : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@reading_in_hiragana", record.Reading is not null ? JapaneseUtils.KatakanaToHiragana(record.Reading) : DBNull.Value);
             _ = insertRecordCommand.Parameters.AddWithValue("@alternative_spellings", record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jsoWithIndentation) : DBNull.Value);
             _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_jsoWithIndentation));
 
-            _ = await insertRecordCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+            _ = insertRecordCommand.ExecuteNonQuery();
+
+            using SqliteCommand insertPrimarySpellingCommand = connection.CreateCommand();
+
+            insertPrimarySpellingCommand.CommandText =
+                """
+                INSERT INTO record_search_key(record_id, search_key)
+                VALUES (@record_id, @search_key)
+                """;
+
+            _ = insertPrimarySpellingCommand.Parameters.AddWithValue("@record_id", id);
+            string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
+            _ = insertPrimarySpellingCommand.Parameters.AddWithValue("@search_key", primarySpellingInHiragana);
+            _ = insertPrimarySpellingCommand.ExecuteNonQuery();
+
+            if (record.Reading is not null)
+            {
+                string readingInHiragana = JapaneseUtils.KatakanaToHiragana(record.Reading);
+                if (readingInHiragana != primarySpellingInHiragana)
+                {
+                    using SqliteCommand insertReadingCommand = connection.CreateCommand();
+                    insertReadingCommand.CommandText =
+                        """
+                        INSERT INTO record_search_key(record_id, search_key)
+                        VALUES (@record_id, @search_key)
+                        """;
+
+                    _ = insertReadingCommand.Parameters.AddWithValue("@record_id", id);
+                    _ = insertReadingCommand.Parameters.AddWithValue("@search_key", readingInHiragana);
+
+                    _ = insertReadingCommand.ExecuteNonQuery();
+                }
+            }
 
             ++id;
         }
 
         using SqliteCommand createIndexCommand = connection.CreateCommand();
+        createIndexCommand.CommandText = "CREATE INDEX IF NOT EXISTS ix_record_search_key_search_key ON record_search_key(search_key);";
+        _ = createIndexCommand.ExecuteNonQuery();
 
-        createIndexCommand.CommandText =
-            """
-            CREATE INDEX IF NOT EXISTS ix_record_primary_spelling_in_hiragana ON record(primary_spelling_in_hiragana);
-            CREATE INDEX IF NOT EXISTS ix_record_reading_in_hiragana ON record(reading_in_hiragana);
-            """;
-
-        _ = await createIndexCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
-
-        await transaction.CommitAsync().ConfigureAwait(false);
+        transaction.Commit();
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
         analyzeCommand.CommandText = "ANALYZE;";
-        _ = await analyzeCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = analyzeCommand.ExecuteNonQuery();
 
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
-        _ = await vacuumCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = vacuumCommand.ExecuteNonQuery();
 
         dict.Ready = true;
     }
 
-    public static bool GetRecordsFromNazekaWordDB(string dbName, string term, [MaybeNullWhen(false)] out IList<IDictRecord> value)
+    public static Dictionary<string, List<IDictRecord>> GetRecordsFromNazekaWordDB(string dbName, List<string> terms)
     {
-        List<IDictRecord> records = new();
+        Dictionary<string, List<IDictRecord>> results = new();
 
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
-        command.CommandText =
+        StringBuilder queryBuilder = new(
             """
-            SELECT r.primary_spelling AS primarySpelling, r.reading AS reading, r.alternative_spellings AS alternativeSpellings, r.glossary AS definitions
+            SELECT rsk.search_key AS searchKey, r.primary_spelling AS primarySpelling, r.reading AS reading, r.alternative_spellings AS alternativeSpellings, r.glossary AS definitions
             FROM record r
-            WHERE r.primary_spelling_in_hiragana = @term OR r.reading_in_hiragana = @term
-            """;
+            JOIN record_search_key rsk ON r.id = rsk.record_id
+            WHERE rsk.search_key = @term1
+            """);
 
-        _ = command.Parameters.AddWithValue("@term", term);
+        for (int i = 1; i < terms.Count; i++)
+        {
+            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $"\nOR rsk.search_key = @term{i + 1}");
+        }
+
+        command.CommandText = queryBuilder.ToString();
+
+        for (int i = 0; i < terms.Count; i++)
+        {
+            _ = command.Parameters.AddWithValue($"@term{i + 1}", terms[i]);
+        }
 
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
+            string searchKey = (string)dataReader["searchKey"];
             string primarySpelling = (string)dataReader["primarySpelling"];
 
             object readingFromDB = dataReader["reading"];
@@ -118,16 +160,59 @@ internal class EpwingNazekaDBManager
 
             string[] definitions = JsonSerializer.Deserialize<string[]>((string)dataReader["definitions"])!;
 
-            records.Add(new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions));
+            if (results.TryGetValue(searchKey, out List<IDictRecord>? result))
+            {
+                result.Add(new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions));
+            }
+
+            else
+            {
+                results[searchKey] = new List<IDictRecord> { new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions) };
+            }
         }
 
-        if (records.Count > 0)
+        return results;
+    }
+
+    public static List<IDictRecord> GetRecordsFromNazekaWordDB(string dbName, string term)
+    {
+        List<IDictRecord> results = new();
+
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
+        connection.Open();
+        using SqliteCommand command = connection.CreateCommand();
+
+        command.CommandText =
+            """
+            SELECT rsk.search_key AS searchKey, r.primary_spelling AS primarySpelling, r.reading AS reading, r.alternative_spellings AS alternativeSpellings, r.glossary AS definitions
+            FROM record r
+            JOIN record_search_key rsk ON r.id = rsk.record_id
+            WHERE rsk.search_key = @term
+            """;
+
+        _ = command.Parameters.AddWithValue($"@term", term);
+
+        using SqliteDataReader dataReader = command.ExecuteReader();
+        while (dataReader.Read())
         {
-            value = records;
-            return true;
+            string searchKey = (string)dataReader["searchKey"];
+            string primarySpelling = (string)dataReader["primarySpelling"];
+
+            object readingFromDB = dataReader["reading"];
+            string? reading = readingFromDB is not DBNull
+                ? (string)readingFromDB
+                : null;
+
+            object alternativeSpellingsFromDB = dataReader["alternativeSpellings"];
+            string[]? alternativeSpellings = alternativeSpellingsFromDB is not DBNull
+                ? JsonSerializer.Deserialize<string[]>((string)alternativeSpellingsFromDB, Utils.s_jsoWithIndentation)
+                : null;
+
+            string[] definitions = JsonSerializer.Deserialize<string[]>((string)dataReader["definitions"])!;
+
+            results.Add(new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions));
         }
 
-        value = null;
-        return false;
+        return results;
     }
 }

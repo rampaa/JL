@@ -8,10 +8,10 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Dicts.EPWING.EpwingYomichan;
 internal static class EpwingYomichanDBManager
 {
-    public static async Task CreateYomichanWordDB(string dbName)
+    public static void CreateYomichanWordDB(string dbName)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
-        await connection.OpenAsync().ConfigureAwait(false);
+        connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -38,14 +38,14 @@ internal static class EpwingYomichanDBManager
             ) STRICT;
             """;
 
-        _ = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = command.ExecuteNonQuery();
     }
 
-    public static async Task InsertToYomichanWordDB(Dict dict)
+    public static void InsertToYomichanWordDB(Dict dict)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
-        await connection.OpenAsync().ConfigureAwait(false);
-        using DbTransaction transaction = await connection.BeginTransactionAsync().ConfigureAwait(false);
+        connection.Open();
+        using DbTransaction transaction = connection.BeginTransaction();
 
         int id = 1;
         HashSet<EpwingYomichanRecord> yomichanWordRecords = dict.Contents.Values.SelectMany(v => v).Select(v => (EpwingYomichanRecord)v).ToHashSet();
@@ -65,18 +65,18 @@ internal static class EpwingYomichanDBManager
             _ = insertRecordCommand.Parameters.AddWithValue("@part_of_speech", record.WordClasses is not null ? JsonSerializer.Serialize(record.WordClasses, Utils.s_jsoWithIndentation) : DBNull.Value);
             _ = insertRecordCommand.Parameters.AddWithValue("@glossary_tags", record.DefinitionTags is not null ? JsonSerializer.Serialize(record.Definitions, Utils.s_jsoWithIndentation) : DBNull.Value);
 
-            _ = await insertRecordCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+            _ = insertRecordCommand.ExecuteNonQuery();
 
             using SqliteCommand insertPrimarySpellingCommand = connection.CreateCommand();
             insertPrimarySpellingCommand.CommandText =
-                    """
-                        INSERT INTO record_search_key(record_id, search_key)
-                        VALUES (@record_id, @search_key)
-                        """;
+                """
+                INSERT INTO record_search_key(record_id, search_key)
+                VALUES (@record_id, @search_key)
+                """;
             _ = insertPrimarySpellingCommand.Parameters.AddWithValue("@record_id", id);
             string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
             _ = insertPrimarySpellingCommand.Parameters.AddWithValue("@search_key", primarySpellingInHiragana);
-            _ = await insertPrimarySpellingCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+            _ = insertPrimarySpellingCommand.ExecuteNonQuery();
 
             if (record.Reading is not null)
             {
@@ -93,7 +93,7 @@ internal static class EpwingYomichanDBManager
                     _ = insertReadingCommand.Parameters.AddWithValue("@record_id", id);
                     _ = insertReadingCommand.Parameters.AddWithValue("@search_key", readingInHiragana);
 
-                    _ = await insertReadingCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+                    _ = insertReadingCommand.ExecuteNonQuery();
                 }
             }
 
@@ -107,29 +107,27 @@ internal static class EpwingYomichanDBManager
             CREATE INDEX IF NOT EXISTS ix_record_search_key_search_key ON record_search_key(search_key);
             """;
 
-        _ = await createIndexCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = createIndexCommand.ExecuteNonQuery();
 
-        await transaction.CommitAsync().ConfigureAwait(false);
+        transaction.Commit();
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
         analyzeCommand.CommandText = "ANALYZE;";
-        _ = await analyzeCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = analyzeCommand.ExecuteNonQuery();
 
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
-        _ = await vacuumCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = vacuumCommand.ExecuteNonQuery();
 
         dict.Ready = true;
     }
 
-    public static async Task<Dictionary<string, List<IDictRecord>>> GetRecordsFromYomichanWordDB(string dbName, List<string> terms)
+    public static Dictionary<string, List<IDictRecord>> GetRecordsFromYomichanWordDB(string dbName, List<string> terms)
     {
-        Dictionary<string, List<IDictRecord>> resultDict = new();
+        Dictionary<string, List<IDictRecord>> results = new();
 
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
-
-        await connection.OpenAsync().ConfigureAwait(false);
-
+        connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
         StringBuilder queryBuilder = new(
@@ -153,8 +151,8 @@ internal static class EpwingYomichanDBManager
             _ = command.Parameters.AddWithValue($"@term{i + 1}", terms[i]);
         }
 
-        using SqliteDataReader dataReader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-        while (await dataReader.ReadAsync().ConfigureAwait(false))
+        using SqliteDataReader dataReader = command.ExecuteReader();
+        while (dataReader.Read())
         {
             string searchKey = (string)dataReader["searchKey"];
             string primarySpelling = (string)dataReader["primarySpelling"];
@@ -176,17 +174,63 @@ internal static class EpwingYomichanDBManager
                 ? JsonSerializer.Deserialize<string[]>((string)definitionTagsFromDB, Utils.s_jsoWithIndentation)
                 : null;
 
-            if (resultDict.TryGetValue(searchKey, out List<IDictRecord>? result))
+            if (results.TryGetValue(searchKey, out List<IDictRecord>? result))
             {
                 result.Add(new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags));
             }
 
             else
             {
-                resultDict[searchKey] = new List<IDictRecord> { new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags) };
+                results[searchKey] = new List<IDictRecord> { new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags) };
             }
         }
 
-        return resultDict;
+        return results;
+    }
+
+    public static List<IDictRecord> GetRecordsFromYomichanWordDB(string dbName, string term)
+    {
+        List<IDictRecord> results = new();
+
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
+        connection.Open();
+        using SqliteCommand command = connection.CreateCommand();
+
+        command.CommandText =
+            """
+            SELECT r.primary_spelling AS primarySpelling, r.reading AS reading, r.glossary AS definitions, r.part_of_speech AS wordClasses, r.glossary_tags AS definitionTags
+            FROM record r
+            JOIN record_search_key rsk ON r.id = rsk.record_id
+            WHERE rsk.search_key = @term
+            """;
+
+        _ = command.Parameters.AddWithValue($"@term", term);
+
+        using SqliteDataReader dataReader = command.ExecuteReader();
+        while (dataReader.Read())
+        {
+            string primarySpelling = (string)dataReader["primarySpelling"];
+
+            object readingFromDB = dataReader["reading"];
+            string? reading = readingFromDB is not DBNull
+                ? (string)readingFromDB
+                : null;
+
+            string[] definitions = JsonSerializer.Deserialize<string[]>((string)dataReader["definitions"])!;
+
+            object wordClassFromDB = dataReader["wordClasses"];
+            string[]? wordClasses = wordClassFromDB is not DBNull
+                ? JsonSerializer.Deserialize<string[]>((string)wordClassFromDB, Utils.s_jsoWithIndentation)
+                : null;
+
+            object definitionTagsFromDB = dataReader["definitionTags"];
+            string[]? definitionTags = definitionTagsFromDB is not DBNull
+                ? JsonSerializer.Deserialize<string[]>((string)definitionTagsFromDB, Utils.s_jsoWithIndentation)
+                : null;
+
+            results.Add(new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags));
+        }
+
+        return results;
     }
 }

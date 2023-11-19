@@ -22,7 +22,8 @@ public static class LookupUtils
 {
     private static DateTime s_lastLookupTime;
 
-    private delegate Task<Dictionary<string, List<IDictRecord>>> GetRecordsFromDB(string dbName, List<string> terms);
+    private delegate Dictionary<string, List<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms);
+    private delegate List<IDictRecord> GetKanjiRecordsFromDB(string dbName, string term);
 
     public static List<LookupResult>? LookupText(string text)
     {
@@ -40,28 +41,45 @@ public static class LookupUtils
         {
             _ = Parallel.ForEach(DictUtils.Dicts.Values.ToList(), dict =>
             {
+                bool useDB = (dict.Options?.UseDB?.Value ?? false) && dict.Ready;
+
                 if (dict.Active)
                 {
                     if (dict.Type is DictType.Kanjidic)
                     {
-                        lookupResults.AddRange(BuildKanjidicResult(GetKanjiResults(text, dict, null)));
+                        lookupResults.AddRange(BuildKanjidicResult(
+                            useDB
+                            ? GetKanjiResultsFromDB(text, dict, KanjidicDBManager.GetRecordsFromKanjidicDB)
+                            : GetKanjiResults(text, dict)
+                            ));
                     }
 
                     else if (dict.Type is DictType.KanjigenYomichan or DictType.NonspecificKanjiWithWordSchemaYomichan)
                     {
-                        lookupResults.AddRange(BuildEpwingYomichanResult(GetKanjiResults(text, dict, null)));
+                        lookupResults.AddRange(BuildEpwingYomichanResult(
+                            useDB
+                            ? GetKanjiResultsFromDB(text, dict, EpwingYomichanDBManager.GetRecordsFromYomichanWordDB)
+                            : GetKanjiResults(text, dict)
+                            ));
                     }
 
                     else if (DictUtils.s_kanjiDictTypes.Contains(dict.Type))
                     {
                         if (DictUtils.YomichanDictTypes.Contains(dict.Type))
                         {
-                            lookupResults.AddRange(BuildYomichanKanjiResult(GetKanjiResults(text, dict, null)));
+                            lookupResults.AddRange(BuildYomichanKanjiResult(
+                                useDB
+                                ? GetKanjiResultsFromDB(text, dict, EpwingYomichanDBManager.GetRecordsFromYomichanWordDB)
+                                : GetKanjiResults(text, dict)
+                                ));
                         }
 
                         else //if (DictUtils.NazekaDictTypes.Contains(dict.Type))
                         {
-                            lookupResults.AddRange(BuildEpwingNazekaResult(GetKanjiResults(text, dict, null)));
+                            lookupResults.AddRange(BuildEpwingNazekaResult(
+                                useDB
+                                ? GetKanjiResultsFromDB(text, dict, EpwingNazekaDBManager.GetRecordsFromNazekaWordDB)
+                                : GetKanjiResults(text, dict)));
                         }
                     }
                 }
@@ -105,7 +123,7 @@ public static class LookupUtils
             deconjugationResultsList.Add(Deconjugator.Deconjugate(textInHiragana));
         }
 
-        _ = Parallel.ForEach(DictUtils.Dicts.Values.ToList(), async dict =>
+        _ = Parallel.ForEach(DictUtils.Dicts.Values.ToList(), dict =>
         {
             if (dict.Active)
             {
@@ -114,43 +132,64 @@ public static class LookupUtils
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
-                        jmdictResults = useDB
-                        ? await GetWordResultsFromDB(textList, textInHiraganaList, deconjugationResultsList, dict, null).ConfigureAwait(false)
+                        jmdictResults =
+                        useDB
+                        ? GetWordResultsFromDB(textList, textInHiraganaList, deconjugationResultsList, dict, JmdictDBManager.GetRecordsFromJmdictDB)
                         : GetWordResults(textList, textInHiraganaList, deconjugationResultsList, dict);
                         break;
 
                     case DictType.JMnedict:
-                        jmnedictResults = GetNameResults(textList, textInHiraganaList, dict, null);
+                        jmnedictResults =
+                        useDB
+                        ? GetNameResultsFromDB(textList, textInHiraganaList, dict, JmnedictDBManager.GetRecordsFromJmnedictDB)
+                        : GetNameResults(textList, textInHiraganaList, dict);
                         break;
 
                     case DictType.Kanjidic:
-                        kanjidicResults = GetKanjiResults(text, dict, null);
+                        kanjidicResults =
+                        useDB
+                        ? GetKanjiResultsFromDB(text, dict, KanjidicDBManager.GetRecordsFromKanjidicDB)
+                        : GetKanjiResults(text, dict);
                         break;
 
                     case DictType.NonspecificKanjiWithWordSchemaYomichan:
                     case DictType.KanjigenYomichan:
                         // Template-wise, Kanjigen is a word dictionary that's why its results are put into Yomichan Word Results
                         // Content-wise though it's a kanji dictionary, that's why GetKanjiResults is being used for the lookup
-                        epwingYomichanWordResultsList.Enqueue(GetKanjiResults(text, dict, null));
+                        epwingYomichanWordResultsList.Enqueue
+                        (
+                            useDB
+                            ? GetKanjiResultsFromDB(text, dict, EpwingYomichanDBManager.GetRecordsFromYomichanWordDB)
+                            : GetKanjiResults(text, dict)
+                        );
                         break;
 
                     case DictType.CustomWordDictionary:
                     case DictType.ProfileCustomWordDictionary:
-                        customWordResults.Enqueue(GetWordResults(textList, textInHiraganaList,
-                            deconjugationResultsList, dict));
+                        customWordResults.Enqueue(GetWordResults(textList, textInHiraganaList, deconjugationResultsList, dict));
                         break;
 
                     case DictType.CustomNameDictionary:
                     case DictType.ProfileCustomNameDictionary:
-                        customNameResults.Enqueue(GetNameResults(textList, textInHiraganaList, dict, null));
+                        customNameResults.Enqueue(GetNameResults(textList, textInHiraganaList, dict));
                         break;
 
                     case DictType.NonspecificKanjiYomichan:
-                        epwingYomichanKanjiResultsList.Enqueue(GetKanjiResults(text, dict, null));
+                        epwingYomichanKanjiResultsList.Enqueue
+                        (
+                            useDB
+                            ? GetKanjiResultsFromDB(text, dict, YomichanKanjiDBManager.GetRecordsFromYomichanKanjiDB)
+                            : GetKanjiResults(text, dict)
+                        );
                         break;
 
                     case DictType.NonspecificNameYomichan:
-                        epwingYomichanNameResultsList.Enqueue(GetNameResults(textList, textInHiraganaList, dict, null));
+                        epwingYomichanNameResultsList.Enqueue
+                        (
+                            useDB
+                            ? GetNameResultsFromDB(textList, textInHiraganaList, dict, EpwingYomichanDBManager.GetRecordsFromYomichanWordDB)
+                            : GetNameResults(textList, textInHiraganaList, dict)
+                        );
                         break;
 
                     case DictType.Kenkyuusha:
@@ -176,17 +215,27 @@ public static class LookupUtils
                         epwingYomichanWordResultsList.Enqueue
                         (
                             useDB
-                            ? await GetWordResultsFromDB(textList, textInHiraganaList, deconjugationResultsList, dict, EpwingYomichanDBManager.GetRecordsFromYomichanWordDB).ConfigureAwait(false)
+                            ? GetWordResultsFromDB(textList, textInHiraganaList, deconjugationResultsList, dict, EpwingYomichanDBManager.GetRecordsFromYomichanWordDB)
                             : GetWordResults(textList, textInHiraganaList, deconjugationResultsList, dict)
                         );
                         break;
 
                     case DictType.NonspecificKanjiNazeka:
-                        epwingNazekaKanjiResultsList.Enqueue(GetKanjiResults(text, dict, null));
+                        epwingNazekaKanjiResultsList.Enqueue
+                        (
+                            useDB
+                            ? GetKanjiResultsFromDB(text, dict, EpwingNazekaDBManager.GetRecordsFromNazekaWordDB)
+                            : GetKanjiResults(text, dict)
+                        );
                         break;
 
                     case DictType.NonspecificNameNazeka:
-                        epwingNazekaNameResultsList.Enqueue(GetNameResults(textList, textInHiraganaList, dict, null));
+                        epwingNazekaNameResultsList.Enqueue
+                        (
+                            useDB
+                            ? GetNameResultsFromDB(textList, textInHiraganaList, dict, EpwingNazekaDBManager.GetRecordsFromNazekaWordDB)
+                            : GetNameResults(textList, textInHiraganaList, dict)
+                        );
                         break;
 
                     case DictType.DaijirinNazeka:
@@ -194,7 +243,12 @@ public static class LookupUtils
                     case DictType.ShinmeikaiNazeka:
                     case DictType.NonspecificWordNazeka:
                     case DictType.NonspecificNazeka:
-                        epwingNazekaWordResultsList.Enqueue(GetWordResults(textList, textInHiraganaList, deconjugationResultsList, dict));
+                        epwingNazekaWordResultsList.Enqueue
+                        (
+                            useDB
+                            ? GetWordResultsFromDB(textList, textInHiraganaList, deconjugationResultsList, dict, EpwingNazekaDBManager.GetRecordsFromNazekaWordDB)
+                            : GetWordResults(textList, textInHiraganaList, deconjugationResultsList, dict)
+                        );
                         break;
 
                     case DictType.PitchAccentYomichan:
@@ -338,7 +392,7 @@ public static class LookupUtils
             {
                 if (dictionary.TryGetValue(deconjugationResult.Text, out IList<IDictRecord>? dictResults))
                 {
-                    List<IDictRecord> resultsList = GetValidDeconjugatedResults(dict, deconjugationResult, dictResults, results);
+                    List<IDictRecord> resultsList = GetValidDeconjugatedResults(dict, deconjugationResult, dictResults);
 
                     if (resultsList.Count > 0)
                     {
@@ -391,15 +445,26 @@ public static class LookupUtils
             (bool tryLongVowelConversion, succAttempt) = GetWordResultsHelper(dict, results,
                 deconjugationResultsList[i], textList[i], textInHiraganaList[i], succAttempt);
 
-            if (tryLongVowelConversion && textInHiraganaList[i].Contains('ー', StringComparison.Ordinal) &&
-                textInHiraganaList[i][0] is not 'ー')
+            if (tryLongVowelConversion && textInHiraganaList[i][0] is not 'ー')
             {
-                List<string> textWithoutLongVowelMarkList = JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i]);
-
-                for (int j = 0; j < textWithoutLongVowelMarkList.Count; j++)
+                int count = 0;
+                foreach (char c in textInHiraganaList[i])
                 {
-                    succAttempt = GetWordResultsHelper(dict, results, deconjugationResultsList[i],
-                        textList[i], textWithoutLongVowelMarkList[j], succAttempt).succAttempt;
+                    if (c is 'ー')
+                    {
+                        ++count;
+                    }
+                }
+
+                if (count < 4)
+                {
+                    List<string> textWithoutLongVowelMarkList = JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i]);
+
+                    for (int j = 0; j < textWithoutLongVowelMarkList.Count; j++)
+                    {
+                        succAttempt = GetWordResultsHelper(dict, results, deconjugationResultsList[i],
+                            textList[i], textWithoutLongVowelMarkList[j], succAttempt).succAttempt;
+                    }
                 }
             }
         }
@@ -407,7 +472,7 @@ public static class LookupUtils
         return results;
     }
 
-    private static List<IDictRecord> GetValidDeconjugatedResults(Dict dict, Form deconjugationResult, IList<IDictRecord> dictResults, Dictionary<string, IntermediaryResult> results)
+    private static List<IDictRecord> GetValidDeconjugatedResults(Dict dict, Form deconjugationResult, IList<IDictRecord> dictResults)
     {
         List<IDictRecord> resultsList = new();
 
@@ -566,7 +631,7 @@ public static class LookupUtils
         return resultsList;
     }
 
-    private static async Task<Dictionary<string, IntermediaryResult>> GetWordResultsFromDB(
+    private static Dictionary<string, IntermediaryResult> GetWordResultsFromDB(
         List<string> textList,
         List<string> textInHiraganaList,
         List<HashSet<Form>> deconjugationResultsList,
@@ -575,27 +640,39 @@ public static class LookupUtils
     {
         Dictionary<string, IntermediaryResult> results = new();
 
-        bool[] foundResultArray = await GetWordResultsFromDBHelper(textList,
+        bool[] foundResultArray = GetWordResultsFromDBHelper(textList,
             textInHiraganaList,
             deconjugationResultsList,
             dict,
             getRecordsFromDB,
-            results).ConfigureAwait(false);
+            results);
 
         for (int i = 0; i < textInHiraganaList.Count; i++)
         {
-            if (!foundResultArray[i] && textInHiraganaList[i].Contains('ー', StringComparison.Ordinal) &&
-                textInHiraganaList[i][0] is not 'ー')
+            string textInHiragana = textInHiraganaList[i];
+            if (!foundResultArray[i] && textInHiragana[0] is not 'ー')
             {
-                List<string> textWithoutLongVowelMarkList = JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i]);
-                _ = await GetWordResultsFromDBHelper(new List<string> { textList[i] }, textWithoutLongVowelMarkList, new List<HashSet<Form>> { deconjugationResultsList[i] }, dict, getRecordsFromDB, results).ConfigureAwait(false);
+                int count = 0;
+                foreach (char c in textInHiragana)
+                {
+                    if (c is 'ー')
+                    {
+                        ++count;
+                    }
+                }
+
+                if (count < 4)
+                {
+                    List<string> textWithoutLongVowelMarkList = JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i]);
+                    GetWordResultsFromDBHelper(textList[i], textWithoutLongVowelMarkList, deconjugationResultsList[i].ToList(), dict, getRecordsFromDB, results);
+                }
             }
         }
 
         return results;
     }
 
-    private static async Task<bool[]> GetWordResultsFromDBHelper(
+    private static bool[] GetWordResultsFromDBHelper(
         List<string> textList,
         List<string> textInHiraganaList,
         List<HashSet<Form>> deconjugationResultsList,
@@ -605,7 +682,7 @@ public static class LookupUtils
     {
         bool[] foundResultArray = new bool[textInHiraganaList.Count];
 
-        Dictionary<string, List<IDictRecord>> dbLookupResults = await getRecordsFromDB(dict.Name, textInHiraganaList).ConfigureAwait(false);
+        Dictionary<string, List<IDictRecord>> dbLookupResults = getRecordsFromDB(dict.Name, textInHiraganaList);
         foreach ((string textInHiragana, List<IDictRecord> lookupResults) in dbLookupResults)
         {
             int index = textInHiraganaList.IndexOf(textInHiragana);
@@ -622,14 +699,14 @@ public static class LookupUtils
         {
             List<Form> deconjugationResults = deconjugationResultsList[i].ToList();
 
-            Dictionary<string, List<IDictRecord>> dbLookupResultsForVerbs = await getRecordsFromDB(dict.Name, deconjugationResults.Select(f => f.Text).ToList()).ConfigureAwait(false);
+            Dictionary<string, List<IDictRecord>> dbLookupResultsForVerbs = getRecordsFromDB(dict.Name, deconjugationResults.Select(f => f.Text).ToList());
             foreach ((string textInHiragana, List<IDictRecord> dictResults) in dbLookupResultsForVerbs)
             {
                 int deconjugationResultIndex = deconjugationResults.FindIndex(f => f.Text == textInHiragana);
                 Form deconjugationResult = deconjugationResults[deconjugationResultIndex];
                 string matchedText = textList[i];
 
-                List<IDictRecord> resultsList = GetValidDeconjugatedResults(dict, deconjugationResult, dictResults, results);
+                List<IDictRecord> resultsList = GetValidDeconjugatedResults(dict, deconjugationResult, dictResults);
                 if (resultsList.Count > 0)
                 {
                     if (results.TryGetValue(deconjugationResult.Text, out IntermediaryResult? r))
@@ -673,37 +750,130 @@ public static class LookupUtils
         return foundResultArray;
     }
 
-    private static Dictionary<string, IntermediaryResult> GetNameResults(List<string> textList, List<string> textInHiraganaList, Dict dict, GetRecordsFromDB? getRecordsFromDB)
+    private static void GetWordResultsFromDBHelper(
+    string matchedText,
+    List<string> textInHiraganaList,
+    List<Form> deconjugationResults,
+    Dict dict,
+    GetRecordsFromDB getRecordsFromDB,
+    Dictionary<string, IntermediaryResult> results)
+    {
+        Dictionary<string, List<IDictRecord>> dbLookupResults = getRecordsFromDB(dict.Name, textInHiraganaList);
+        foreach ((string textInHiragana, List<IDictRecord> lookupResults) in dbLookupResults)
+        {
+            int index = textInHiraganaList.IndexOf(textInHiragana);
+
+            _ = results.TryAdd(textInHiragana,
+                    new IntermediaryResult(new List<IList<IDictRecord>> { lookupResults }, null, matchedText, matchedText,
+                        dict));
+        }
+
+        int succAttempt = 0;
+
+        Dictionary<string, List<IDictRecord>> dbLookupResultsForVerbs = getRecordsFromDB(dict.Name, deconjugationResults.Select(f => f.Text).ToList());
+        foreach ((string textInHiragana, List<IDictRecord> dictResults) in dbLookupResultsForVerbs)
+        {
+            int deconjugationResultIndex = deconjugationResults.FindIndex(f => f.Text == textInHiragana);
+            Form deconjugationResult = deconjugationResults[deconjugationResultIndex];
+
+            List<IDictRecord> resultsList = GetValidDeconjugatedResults(dict, deconjugationResult, dictResults);
+            if (resultsList.Count > 0)
+            {
+                if (results.TryGetValue(deconjugationResult.Text, out IntermediaryResult? r))
+                {
+                    if (r.MatchedText == deconjugationResult.OriginalText)
+                    {
+                        int index = r.Results.FindIndex(rs => rs.SequenceEqual(resultsList));
+                        if (index is not -1)
+                        {
+                            //if (!r.Processes?[index].Any(p => p.SequenceEqual(deconjugationResult.Process)) ?? false)
+                            r.Processes?[index].Add(deconjugationResult.Process);
+                        }
+                        else
+                        {
+                            r.Results.Add(resultsList);
+                            r.Processes?.Add(new List<List<string>> { deconjugationResult.Process });
+                        }
+                    }
+                }
+                else
+                {
+                    results.Add(deconjugationResult.Text,
+                        new IntermediaryResult(new List<IList<IDictRecord>> { resultsList },
+                            new List<List<List<string>>> { new() { deconjugationResult.Process } },
+                            matchedText,
+                            deconjugationResult.Text,
+                            dict)
+                    );
+                }
+
+                ++succAttempt;
+            }
+
+            if (succAttempt > 2)
+            {
+                break;
+            }
+        }
+    }
+
+    private static Dictionary<string, IntermediaryResult> GetNameResults(List<string> textList, List<string> textInHiraganaList, Dict dict)
     {
         Dictionary<string, IntermediaryResult> nameResults = new();
-        bool useDB = (dict.Options?.UseDB?.Value ?? false) && dict.Ready;
 
         for (int i = 0; i < textList.Count; i++)
         {
-            if ((dict.Contents.Count > 0 && dict.Contents.TryGetValue(textInHiraganaList[i], out IList<IDictRecord>? result))
-                //|| (useDB && getRecordsFromDB!(dict.Name, textInHiraganaList[i], out result))
-                )
+            if (dict.Contents
+                .TryGetValue(textInHiraganaList[i], out IList<IDictRecord>? result))
             {
                 nameResults.Add(textInHiraganaList[i],
                     new IntermediaryResult(new List<IList<IDictRecord>> { result }, null, textList[i], textList[i], dict));
             }
         }
+
         return nameResults;
     }
 
-    private static Dictionary<string, IntermediaryResult> GetKanjiResults(string text, Dict dict, GetRecordsFromDB? getRecordsFromDB)
+    private static Dictionary<string, IntermediaryResult> GetNameResultsFromDB(List<string> textList, List<string> textInHiraganaList, Dict dict, GetRecordsFromDB getRecordsFromDB)
+    {
+        Dictionary<string, IntermediaryResult> nameResults = new();
+
+        Dictionary<string, List<IDictRecord>> dbLookupResults = getRecordsFromDB(dict.Name, textInHiraganaList);
+        foreach ((string textInHiragana, List<IDictRecord> lookupResults) in dbLookupResults)
+        {
+            string matchedText = textList[textInHiraganaList.IndexOf(textInHiragana)];
+            nameResults.Add(textInHiragana, new IntermediaryResult(new List<IList<IDictRecord>> { lookupResults }, null, matchedText, matchedText, dict));
+        }
+
+        return nameResults;
+    }
+
+    private static Dictionary<string, IntermediaryResult> GetKanjiResults(string text, Dict dict)
     {
         Dictionary<string, IntermediaryResult> kanjiResults = new();
 
-        bool useDB = (dict.Options?.UseDB?.Value ?? false) && dict.Ready;
         string kanji = text.EnumerateRunes().FirstOrDefault().ToString();
 
-        if ((dict.Contents.Count > 0 && dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? result))
-            //|| (useDB && getRecordsFromDB!(dict.Name, kanji, out result))
-            )
+        if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? result))
         {
             kanjiResults.Add(kanji,
                 new IntermediaryResult(new List<IList<IDictRecord>> { result }, null, kanji, kanji, dict));
+        }
+
+        return kanjiResults;
+    }
+
+    private static Dictionary<string, IntermediaryResult> GetKanjiResultsFromDB(string text, Dict dict, GetKanjiRecordsFromDB getKanjiRecordsFromDB)
+    {
+        Dictionary<string, IntermediaryResult> kanjiResults = new();
+
+        string kanji = text.EnumerateRunes().FirstOrDefault().ToString();
+
+        List<IDictRecord> results = getKanjiRecordsFromDB(dict.Name, kanji);
+
+        if (results.Count > 0)
+        {
+            kanjiResults.Add(kanji, new IntermediaryResult(new List<IList<IDictRecord>> { results }, null, kanji, kanji, dict));
         }
 
         return kanjiResults;

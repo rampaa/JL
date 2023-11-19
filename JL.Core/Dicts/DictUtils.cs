@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Text.Json;
 using JL.Core.Dicts.CustomNameDict;
 using JL.Core.Dicts.CustomWordDict;
-using JL.Core.Dicts.EDICT.Jmdict;
 using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Dicts.EDICT.JMnedict;
 using JL.Core.Dicts.EDICT.KANJIDIC;
@@ -554,8 +553,8 @@ public static class DictUtils
 
                                 if (useDB && !dbExists)
                                 {
-                                    await JmdictDBManager.CreateJmdictDB(dict.Name).ConfigureAwait(false);
-                                    await JmdictDBManager.InsertToJmdictDB(dict).ConfigureAwait(false);
+                                    JmdictDBManager.CreateJmdictDB(dict.Name);
+                                    JmdictDBManager.InsertToJmdictDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
                                 }
@@ -590,8 +589,8 @@ public static class DictUtils
 
                                 if (useDB && !dbExists)
                                 {
-                                    await JmnedictDBManager.CreateJmnedictDB(dict.Name).ConfigureAwait(false);
-                                    await JmnedictDBManager.InsertToJmnedictDB(dict).ConfigureAwait(false);
+                                    JmnedictDBManager.CreateJmnedictDB(dict.Name);
+                                    JmnedictDBManager.InsertToJmnedictDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
                                     dict.Ready = true;
@@ -669,8 +668,8 @@ public static class DictUtils
 
                                 if (useDB && !dbExists)
                                 {
-                                    await EpwingYomichanDBManager.CreateYomichanWordDB(dict.Name).ConfigureAwait(false);
-                                    await EpwingYomichanDBManager.InsertToYomichanWordDB(dict).ConfigureAwait(false);
+                                    EpwingYomichanDBManager.CreateYomichanWordDB(dict.Name);
+                                    EpwingYomichanDBManager.InsertToYomichanWordDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
                                     dict.Ready = true;
@@ -712,8 +711,8 @@ public static class DictUtils
 
                                 if (useDB && !dbExists)
                                 {
-                                    await YomichanKanjiDBManager.CreateYomichanKanjiDB(dict.Name).ConfigureAwait(false);
-                                    await YomichanKanjiDBManager.InsertToYomichanKanjiDB(dict).ConfigureAwait(false);
+                                    YomichanKanjiDBManager.CreateYomichanKanjiDB(dict.Name);
+                                    YomichanKanjiDBManager.InsertToYomichanKanjiDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
                                     dict.Ready = true;
@@ -869,8 +868,8 @@ public static class DictUtils
 
                                 if (useDB && !dbExists)
                                 {
-                                    await EpwingNazekaDBManager.CreateNazekaWordDB(dict.Name).ConfigureAwait(false);
-                                    await EpwingNazekaDBManager.InsertToNazekaWordDB(dict).ConfigureAwait(false);
+                                    EpwingNazekaDBManager.CreateNazekaWordDB(dict.Name);
+                                    EpwingNazekaDBManager.InsertToNazekaWordDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
                                     dict.Ready = true;
@@ -912,8 +911,8 @@ public static class DictUtils
 
                                 if (useDB && !dbExists)
                                 {
-                                    await YomichanPitchAccentDBManager.CreateYomichanPitchAccentDB(dict.Name).ConfigureAwait(false);
-                                    await YomichanPitchAccentDBManager.InsertToYomichanPitchAccentDB(dict).ConfigureAwait(false);
+                                    YomichanPitchAccentDBManager.CreateYomichanPitchAccentDB(dict.Name);
+                                    YomichanPitchAccentDBManager.InsertToYomichanPitchAccentDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
                                     dict.Ready = true;

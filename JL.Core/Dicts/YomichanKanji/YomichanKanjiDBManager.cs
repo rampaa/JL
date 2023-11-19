@@ -1,5 +1,4 @@
 using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
 using JL.Core.Utilities;
@@ -8,10 +7,10 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Dicts.YomichanKanji;
 internal class YomichanKanjiDBManager
 {
-    public static async Task CreateYomichanKanjiDB(string dbName)
+    public static void CreateYomichanKanjiDB(string dbName)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
-        await connection.OpenAsync().ConfigureAwait(false);
+        connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -28,14 +27,14 @@ internal class YomichanKanjiDBManager
             ) STRICT;
             """;
 
-        _ = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = command.ExecuteNonQuery();
     }
 
-    public static async Task InsertToYomichanKanjiDB(Dict dict)
+    public static void InsertToYomichanKanjiDB(Dict dict)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
-        await connection.OpenAsync().ConfigureAwait(false);
-        using DbTransaction transaction = await connection.BeginTransactionAsync().ConfigureAwait(false);
+        connection.Open();
+        using DbTransaction transaction = connection.BeginTransaction();
 
         int id = 1;
         foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)
@@ -58,7 +57,7 @@ internal class YomichanKanjiDBManager
                 _ = insertRecordCommand.Parameters.AddWithValue("@glossary", yomichanKanjiRecord.Definitions is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.Definitions, Utils.s_jsoWithIndentation) : DBNull.Value);
                 _ = insertRecordCommand.Parameters.AddWithValue("@stats", yomichanKanjiRecord.Stats is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.Stats, Utils.s_jsoWithIndentation) : DBNull.Value);
 
-                _ = await insertRecordCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+                _ = insertRecordCommand.ExecuteNonQuery();
 
                 ++id;
             }
@@ -71,24 +70,24 @@ internal class YomichanKanjiDBManager
             CREATE INDEX IF NOT EXISTS ix_record_kanji ON record(kanji);
             """;
 
-        _ = await createIndexCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = createIndexCommand.ExecuteNonQuery();
 
-        await transaction.CommitAsync().ConfigureAwait(false);
+        transaction.Commit();
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
         analyzeCommand.CommandText = "ANALYZE;";
-        _ = await analyzeCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = analyzeCommand.ExecuteNonQuery();
 
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
-        _ = await vacuumCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = vacuumCommand.ExecuteNonQuery();
 
         dict.Ready = true;
     }
 
-    public static bool GetRecordsFromYomichanKanjiDB(string dbName, string term, [MaybeNullWhen(false)] out IList<IDictRecord> value)
+    public static List<IDictRecord> GetRecordsFromYomichanKanjiDB(string dbName, string term)
     {
-        List<IDictRecord> records = new();
+        List<IDictRecord> results = new();
 
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
@@ -126,16 +125,9 @@ internal class YomichanKanjiDBManager
                 ? JsonSerializer.Deserialize<string[]>((string)statsFromDB, Utils.s_jsoWithIndentation)
                 : null;
 
-            records.Add(new YomichanKanjiRecord(onReadings, kunReadings, definitions, stats));
+            results.Add(new YomichanKanjiRecord(onReadings, kunReadings, definitions, stats));
         }
 
-        if (records.Count > 0)
-        {
-            value = records;
-            return true;
-        }
-
-        value = null;
-        return false;
+        return results;
     }
 }

@@ -1,5 +1,4 @@
 using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
 using JL.Core.Utilities;
@@ -8,10 +7,10 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Dicts.EDICT.KANJIDIC;
 internal class KanjidicDBManager
 {
-    public static async Task CreateKanjidicDB(string dbName)
+    public static void CreateKanjidicDB(string dbName)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
-        await connection.OpenAsync().ConfigureAwait(false);
+        connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -32,14 +31,14 @@ internal class KanjidicDBManager
             ) STRICT;
             """;
 
-        _ = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = command.ExecuteNonQuery();
     }
 
-    public static async Task InsertToKanjidicDB(Dict dict)
+    public static void InsertToKanjidicDB(Dict dict)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
-        await connection.OpenAsync().ConfigureAwait(false);
-        using DbTransaction transaction = await connection.BeginTransactionAsync().ConfigureAwait(false);
+        connection.Open();
+        using DbTransaction transaction = connection.BeginTransaction();
 
         int id = 1;
         foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)
@@ -67,37 +66,32 @@ internal class KanjidicDBManager
                 _ = insertRecordCommand.Parameters.AddWithValue("@grade", kanjidicRecord.Grade);
                 _ = insertRecordCommand.Parameters.AddWithValue("@frequency", kanjidicRecord.Frequency);
 
-                _ = await insertRecordCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+                _ = insertRecordCommand.ExecuteNonQuery();
 
                 ++id;
             }
         }
 
         using SqliteCommand createIndexCommand = connection.CreateCommand();
+        createIndexCommand.CommandText = "CREATE INDEX IF NOT EXISTS ix_record_kanji ON record(kanji);";
+        _ = createIndexCommand.ExecuteNonQuery();
 
-        createIndexCommand.CommandText =
-            """
-            CREATE INDEX IF NOT EXISTS ix_record_kanji ON record(kanji);
-            """;
-
-        _ = await createIndexCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
-
-        await transaction.CommitAsync().ConfigureAwait(false);
+        transaction.Commit();
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
         analyzeCommand.CommandText = "ANALYZE;";
-        _ = await analyzeCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = analyzeCommand.ExecuteNonQuery();
 
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
-        _ = await vacuumCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = vacuumCommand.ExecuteNonQuery();
 
         dict.Ready = true;
     }
 
-    public static bool GetRecordsFromKanjidicDB(string dbName, string term, [MaybeNullWhen(false)] out IList<IDictRecord> value)
+    public static List<IDictRecord> GetRecordsFromKanjidicDB(string dbName, string term)
     {
-        List<IDictRecord> records = new();
+        List<IDictRecord> results = new();
 
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
@@ -144,16 +138,9 @@ internal class KanjidicDBManager
             int grade = (int)dataReader["grade"];
             int frequency = (int)dataReader["frequency"];
 
-            records.Add(new KanjidicRecord(definitions, onReadings, kunReadings, nanoriReadings, radicalNames, strokeCount, grade, frequency));
+            results.Add(new KanjidicRecord(definitions, onReadings, kunReadings, nanoriReadings, radicalNames, strokeCount, grade, frequency));
         }
 
-        if (records.Count > 0)
-        {
-            value = records;
-            return true;
-        }
-
-        value = null;
-        return false;
+        return results;
     }
 }

@@ -1,18 +1,17 @@
 using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text;
 using System.Text.Json;
-using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
-namespace JL.Core.Dicts.EDICT.Jmdict;
+namespace JL.Core.Dicts.EDICT.JMdict;
 internal class JmdictDBManager
 {
-    public static async Task CreateJmdictDB(string dbName)
+    public static void CreateJmdictDB(string dbName)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
-        await connection.OpenAsync().ConfigureAwait(false);
+        connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -50,14 +49,14 @@ internal class JmdictDBManager
             ) STRICT;
             """;
 
-        _ = await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = command.ExecuteNonQuery();
     }
 
-    public static async Task InsertToJmdictDB(Dict dict)
+    public static void InsertToJmdictDB(Dict dict)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
-        await connection.OpenAsync().ConfigureAwait(false);
-        using DbTransaction transaction = await connection.BeginTransactionAsync().ConfigureAwait(false);
+        connection.Open();
+        using DbTransaction transaction = connection.BeginTransaction();
 
         Dictionary<JmdictRecord, List<string>> recordToKeysDict = new();
         foreach ((string key, IList<IDictRecord> records) in dict.Contents)
@@ -108,7 +107,7 @@ internal class JmdictDBManager
             _ = insertRecordCommand.Parameters.AddWithValue("@loanword_etymology", record.LoanwordEtymology is not null ? JsonSerializer.Serialize(record.LoanwordEtymology, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
             _ = insertRecordCommand.Parameters.AddWithValue("@cross_references", record.RelatedTerms is not null ? JsonSerializer.Serialize(record.RelatedTerms, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
             _ = insertRecordCommand.Parameters.AddWithValue("@antonyms", record.Antonyms is not null ? JsonSerializer.Serialize(record.Antonyms, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
-            _ = await insertRecordCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+            _ = insertRecordCommand.ExecuteNonQuery();
 
             for (int i = 0; i < keys.Count; i++)
             {
@@ -122,7 +121,7 @@ internal class JmdictDBManager
                 _ = insertSearchKeyCommand.Parameters.AddWithValue("@record_id", id);
                 _ = insertSearchKeyCommand.Parameters.AddWithValue("@search_key", keys[i]);
 
-                _ = await insertSearchKeyCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+                _ = insertSearchKeyCommand.ExecuteNonQuery();
             }
 
             ++id;
@@ -130,42 +129,54 @@ internal class JmdictDBManager
 
         using SqliteCommand createIndexCommand = connection.CreateCommand();
         createIndexCommand.CommandText = "CREATE INDEX IF NOT EXISTS ix_record_search_key_search_key ON record_search_key(search_key);";
-        _ = await createIndexCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = createIndexCommand.ExecuteNonQuery();
 
-        await transaction.CommitAsync().ConfigureAwait(false);
+        transaction.Commit();
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
         analyzeCommand.CommandText = "ANALYZE;";
-        _ = await analyzeCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = analyzeCommand.ExecuteNonQuery();
 
         using SqliteCommand vacuumCommand = connection.CreateCommand();
         vacuumCommand.CommandText = "VACUUM;";
-        _ = await vacuumCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+        _ = vacuumCommand.ExecuteNonQuery();
 
         dict.Ready = true;
     }
 
-    public static bool GetRecordsFromJmdictDB(string dbName, string term, [MaybeNullWhen(false)] out IList<IDictRecord> value)
+    public static Dictionary<string, List<IDictRecord>> GetRecordsFromJmdictDB(string dbName, List<string> terms)
     {
-        List<IDictRecord> records = new();
+        Dictionary<string, List<IDictRecord>> results = new();
 
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
-        command.CommandText =
+        StringBuilder queryBuilder = new(
             """
-            SELECT r.edict_id as id, r.primary_spelling AS primarySpelling, r.primary_spelling_orthography_info AS primarySpellingOrthographyInfo, r.spelling_restrictions AS spellingRestrictions, r.alternative_spellings as alternativeSpellings, r.alternative_spellings_orthography_info AS alternativeSpellingsOrthographyInfo, r.readings AS readings, r.readings_orthography_info AS readingsOrthographyInfo, r.reading_restrictions AS readingRestrictions, r.glossary AS definitions, r.glossary_info AS definitionInfo, r.part_of_speech AS wordClasses, r.fields AS fields, r.misc AS misc, r.dialects AS dialects, r.loanword_etymology AS loanwordEtymology, r.cross_references AS relatedTerms, r.antonyms AS antonyms
+            SELECT rsk.search_key AS searchKey, r.edict_id as id, r.primary_spelling AS primarySpelling, r.primary_spelling_orthography_info AS primarySpellingOrthographyInfo, r.spelling_restrictions AS spellingRestrictions, r.alternative_spellings as alternativeSpellings, r.alternative_spellings_orthography_info AS alternativeSpellingsOrthographyInfo, r.readings AS readings, r.readings_orthography_info AS readingsOrthographyInfo, r.reading_restrictions AS readingRestrictions, r.glossary AS definitions, r.glossary_info AS definitionInfo, r.part_of_speech AS wordClasses, r.fields AS fields, r.misc AS misc, r.dialects AS dialects, r.loanword_etymology AS loanwordEtymology, r.cross_references AS relatedTerms, r.antonyms AS antonyms
             FROM record r
             INNER JOIN record_search_key rsk ON r.id = rsk.record_id
-            WHERE rsk.search_key = @term
-            """;
+            WHERE rsk.search_key = @term1
+            """);
 
-        _ = command.Parameters.AddWithValue("@term", term);
+        for (int i = 1; i < terms.Count; i++)
+        {
+            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $"\nOR rsk.search_key = @term{i + 1}");
+        }
+
+        command.CommandText = queryBuilder.ToString();
+
+        for (int i = 0; i < terms.Count; i++)
+        {
+            _ = command.Parameters.AddWithValue($"@term{i + 1}", terms[i]);
+        }
 
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
+            string searchKey = (string)dataReader["searchKey"];
+
             int id = (int)(long)dataReader["id"];
             string primarySpelling = (string)dataReader["primarySpelling"];
 
@@ -242,16 +253,17 @@ internal class JmdictDBManager
                 ? JsonSerializer.Deserialize<string[]?[]>((string)antonymsFromDB, Utils.s_jsoWithIndentation)
                 : null;
 
-            records.Add(new JmdictRecord(id, primarySpelling, primarySpellingOrthographyInfo, alternativeSpellings, alternativeSpellingsOrthographyInfo, readings, readingsOrthographyInfo, definitions, wordClasses, spellingRestrictions, readingRestrictions, fields, misc, definitionInfo, dialects, loanwordEtymology, relatedTerms, antonyms));
+            if (results.TryGetValue(searchKey, out List<IDictRecord>? result))
+            {
+                result.Add(new JmdictRecord(id, primarySpelling, primarySpellingOrthographyInfo, alternativeSpellings, alternativeSpellingsOrthographyInfo, readings, readingsOrthographyInfo, definitions, wordClasses, spellingRestrictions, readingRestrictions, fields, misc, definitionInfo, dialects, loanwordEtymology, relatedTerms, antonyms));
+            }
+
+            else
+            {
+                results[searchKey] = new List<IDictRecord> { new JmdictRecord(id, primarySpelling, primarySpellingOrthographyInfo, alternativeSpellings, alternativeSpellingsOrthographyInfo, readings, readingsOrthographyInfo, definitions, wordClasses, spellingRestrictions, readingRestrictions, fields, misc, definitionInfo, dialects, loanwordEtymology, relatedTerms, antonyms) };
+            }
         }
 
-        if (records.Count > 0)
-        {
-            value = records;
-            return true;
-        }
-
-        value = null;
-        return false;
+        return results;
     }
 }
