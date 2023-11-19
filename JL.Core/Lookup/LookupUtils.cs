@@ -456,7 +456,7 @@ public static class LookupUtils
                     }
                 }
 
-                if (count < 4)
+                if (count is > 0 and < 4)
                 {
                     List<string> textWithoutLongVowelMarkList = JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i]);
 
@@ -661,7 +661,7 @@ public static class LookupUtils
                     }
                 }
 
-                if (count < 4)
+                if (count is > 0 and < 4)
                 {
                     List<string> textWithoutLongVowelMarkList = JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i]);
                     GetWordResultsFromDBHelper(textList[i], textWithoutLongVowelMarkList, deconjugationResultsList[i].ToList(), dict, getRecordsFromDB, results);
