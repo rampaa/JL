@@ -6,7 +6,7 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.EPWING.EpwingNazeka;
-internal class EpwingNazekaDBManager
+internal static class EpwingNazekaDBManager
 {
     public static void CreateNazekaWordDB(string dbName)
     {
@@ -44,7 +44,7 @@ internal class EpwingNazekaDBManager
         using DbTransaction transaction = connection.BeginTransaction();
 
         int id = 1;
-        HashSet<EpwingNazekaRecord> nazekaWordRecords = dict.Contents.Values.SelectMany(v => v).Select(v => (EpwingNazekaRecord)v).ToHashSet();
+        HashSet<EpwingNazekaRecord> nazekaWordRecords = dict.Contents.Values.SelectMany(static v => v).Select(static v => (EpwingNazekaRecord)v).ToHashSet();
         foreach (EpwingNazekaRecord record in nazekaWordRecords)
         {
             using SqliteCommand insertRecordCommand = connection.CreateCommand();
@@ -184,18 +184,17 @@ internal class EpwingNazekaDBManager
 
         command.CommandText =
             """
-            SELECT rsk.search_key AS searchKey, r.primary_spelling AS primarySpelling, r.reading AS reading, r.alternative_spellings AS alternativeSpellings, r.glossary AS definitions
+            SELECT r.primary_spelling AS primarySpelling, r.reading AS reading, r.alternative_spellings AS alternativeSpellings, r.glossary AS definitions
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key = @term
             """;
 
-        _ = command.Parameters.AddWithValue($"@term", term);
+        _ = command.Parameters.AddWithValue("@term", term);
 
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            string searchKey = (string)dataReader["searchKey"];
             string primarySpelling = (string)dataReader["primarySpelling"];
 
             object readingFromDB = dataReader["reading"];

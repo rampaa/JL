@@ -112,7 +112,7 @@ internal static class WindowsUtils
         {
             ComboBoxItem comboBoxItem = japaneseFontsComboBoxItems[i];
 
-            clone[i] = new ComboBoxItem()
+            clone[i] = new ComboBoxItem
             {
                 Content = comboBoxItem.FontFamily.Source,
                 FontFamily = comboBoxItem.FontFamily

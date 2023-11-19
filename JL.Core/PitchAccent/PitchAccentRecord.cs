@@ -11,7 +11,7 @@ public sealed record class PitchAccentRecord : IDictRecord
     public string? Reading { get; }
     public int Position { get; }
 
-    public PitchAccentRecord(string spelling, string? reading, int position)
+    internal PitchAccentRecord(string spelling, string? reading, int position)
     {
         Spelling = spelling;
         Reading = reading;

@@ -48,7 +48,7 @@ internal static class EpwingYomichanDBManager
         using DbTransaction transaction = connection.BeginTransaction();
 
         int id = 1;
-        HashSet<EpwingYomichanRecord> yomichanWordRecords = dict.Contents.Values.SelectMany(v => v).Select(v => (EpwingYomichanRecord)v).ToHashSet();
+        HashSet<EpwingYomichanRecord> yomichanWordRecords = dict.Contents.Values.SelectMany(static v => v).Select(static v => (EpwingYomichanRecord)v).ToHashSet();
         foreach (EpwingYomichanRecord record in yomichanWordRecords)
         {
             using SqliteCommand insertRecordCommand = connection.CreateCommand();
@@ -102,10 +102,7 @@ internal static class EpwingYomichanDBManager
 
         using SqliteCommand createIndexCommand = connection.CreateCommand();
 
-        createIndexCommand.CommandText =
-            """
-            CREATE INDEX IF NOT EXISTS ix_record_search_key_search_key ON record_search_key(search_key);
-            """;
+        createIndexCommand.CommandText = "CREATE INDEX IF NOT EXISTS ix_record_search_key_search_key ON record_search_key(search_key);";
 
         _ = createIndexCommand.ExecuteNonQuery();
 
@@ -204,7 +201,7 @@ internal static class EpwingYomichanDBManager
             WHERE rsk.search_key = @term
             """;
 
-        _ = command.Parameters.AddWithValue($"@term", term);
+        _ = command.Parameters.AddWithValue("@term", term);
 
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())

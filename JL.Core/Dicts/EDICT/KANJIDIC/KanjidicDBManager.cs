@@ -5,7 +5,7 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.EDICT.KANJIDIC;
-internal class KanjidicDBManager
+internal static class KanjidicDBManager
 {
     public static void CreateKanjidicDB(string dbName)
     {

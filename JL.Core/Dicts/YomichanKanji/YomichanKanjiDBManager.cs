@@ -5,7 +5,7 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.YomichanKanji;
-internal class YomichanKanjiDBManager
+internal static class YomichanKanjiDBManager
 {
     public static void CreateYomichanKanjiDB(string dbName)
     {
@@ -65,10 +65,7 @@ internal class YomichanKanjiDBManager
 
         using SqliteCommand createIndexCommand = connection.CreateCommand();
 
-        createIndexCommand.CommandText =
-            """
-            CREATE INDEX IF NOT EXISTS ix_record_kanji ON record(kanji);
-            """;
+        createIndexCommand.CommandText = "CREATE INDEX IF NOT EXISTS ix_record_kanji ON record(kanji);";
 
         _ = createIndexCommand.ExecuteNonQuery();
 
@@ -95,7 +92,7 @@ internal class YomichanKanjiDBManager
 
         command.CommandText =
             """
-            SELECT r.on_readings AS onReadings, r.kun_readings AS kunReadings, r.glossary AS definitions, r.stats AS stats,
+            SELECT r.on_readings AS onReadings, r.kun_readings AS kunReadings, r.glossary AS definitions, r.stats AS stats
             FROM record r
             WHERE r.kanji = @term
             """;

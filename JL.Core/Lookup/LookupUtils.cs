@@ -699,7 +699,7 @@ public static class LookupUtils
         {
             List<Form> deconjugationResults = deconjugationResultsList[i].ToList();
 
-            Dictionary<string, List<IDictRecord>> dbLookupResultsForVerbs = getRecordsFromDB(dict.Name, deconjugationResults.Select(f => f.Text).ToList());
+            Dictionary<string, List<IDictRecord>> dbLookupResultsForVerbs = getRecordsFromDB(dict.Name, deconjugationResults.Select(static f => f.Text).ToList());
             foreach ((string textInHiragana, List<IDictRecord> dictResults) in dbLookupResultsForVerbs)
             {
                 int deconjugationResultIndex = deconjugationResults.FindIndex(f => f.Text == textInHiragana);
@@ -761,8 +761,6 @@ public static class LookupUtils
         Dictionary<string, List<IDictRecord>> dbLookupResults = getRecordsFromDB(dict.Name, textInHiraganaList);
         foreach ((string textInHiragana, List<IDictRecord> lookupResults) in dbLookupResults)
         {
-            int index = textInHiraganaList.IndexOf(textInHiragana);
-
             _ = results.TryAdd(textInHiragana,
                     new IntermediaryResult(new List<IList<IDictRecord>> { lookupResults }, null, matchedText, matchedText,
                         dict));
@@ -770,7 +768,7 @@ public static class LookupUtils
 
         int succAttempt = 0;
 
-        Dictionary<string, List<IDictRecord>> dbLookupResultsForVerbs = getRecordsFromDB(dict.Name, deconjugationResults.Select(f => f.Text).ToList());
+        Dictionary<string, List<IDictRecord>> dbLookupResultsForVerbs = getRecordsFromDB(dict.Name, deconjugationResults.Select(static f => f.Text).ToList());
         foreach ((string textInHiragana, List<IDictRecord> dictResults) in dbLookupResultsForVerbs)
         {
             int deconjugationResultIndex = deconjugationResults.FindIndex(f => f.Text == textInHiragana);
@@ -1263,13 +1261,12 @@ public static class LookupUtils
     private static List<LookupFrequencyResult> GetWordFrequencies(IGetFrequency record)
     {
         List<LookupFrequencyResult> freqsList = new();
+        List<Freq> freqs = FreqUtils.FreqDicts.Values.Where(static f => f is { Active: true, Type: not FreqType.YomichanKanji }).OrderBy(static f => f.Priority).ToList();
 
-        foreach (Freq freq in FreqUtils.FreqDicts.Values.OrderBy(static f => f.Priority).ToList())
+        for(int i = 0; i < freqs.Count; i++)
         {
-            if (freq is { Active: true, Type: not FreqType.YomichanKanji })
-            {
-                freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequency(freq)));
-            }
+            Freq freq = freqs[i];
+            freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequency(freq)));
         }
 
         return freqsList;
@@ -1279,14 +1276,13 @@ public static class LookupUtils
     {
         List<LookupFrequencyResult> freqsList = new();
 
-        Freq? kanjiFreq = FreqUtils.FreqDicts.Values.FirstOrDefault(static f => f.Type is FreqType.YomichanKanji);
-
-        if (kanjiFreq?.Active ?? false)
+        List<Freq> kanjiFreqs = FreqUtils.FreqDicts.Values.Where(static f => f is { Type: FreqType.YomichanKanji, Active: true }).OrderBy(static f => f.Priority).ToList();
+        for (int i = 0; i < kanjiFreqs.Count; i++)
         {
+            Freq kanjiFreq = kanjiFreqs[i];
             if (kanjiFreq.Contents.TryGetValue(kanji, out IList<FrequencyRecord>? freqResultList))
             {
                 int frequency = freqResultList.FirstOrDefault().Frequency;
-
                 if (frequency is not 0)
                 {
                     freqsList.Add(new LookupFrequencyResult(kanjiFreq.Name, frequency));

@@ -119,7 +119,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
         EpwingNazekaRecord epwingNazekaRecordObj = (EpwingNazekaRecord)obj;
         return PrimarySpelling == epwingNazekaRecordObj.PrimarySpelling
                && Reading == epwingNazekaRecordObj.Reading
-               && (epwingNazekaRecordObj.Definitions?.SequenceEqual(Definitions ?? Array.Empty<string>()) ?? Definitions is null);
+               && epwingNazekaRecordObj.Definitions.SequenceEqual(Definitions);
     }
 
     public override int GetHashCode()
@@ -130,16 +130,9 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
             hash = (hash * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + Reading?.GetHashCode(StringComparison.Ordinal) ?? 37;
 
-            if (Definitions is not null)
+            foreach (string definition in Definitions)
             {
-                foreach (string definition in Definitions)
-                {
-                    hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
-                }
-            }
-            else
-            {
-                hash *= 37;
+                hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
             }
 
             return hash;

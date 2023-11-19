@@ -6,9 +6,9 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.PitchAccent;
-public class YomichanPitchAccentDBManager
+public static class YomichanPitchAccentDBManager
 {
-    public static void CreateYomichanPitchAccentDB(string dbName)
+    internal static void CreateYomichanPitchAccentDB(string dbName)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
         connection.Open();
@@ -23,7 +23,7 @@ public class YomichanPitchAccentDBManager
                 reading TEXT,
                 position INTEGER NOT NULL
             ) STRICT;
-            
+
             CREATE TABLE IF NOT EXISTS record_search_key
             (
                 record_id INTEGER NOT NULL,
@@ -36,14 +36,14 @@ public class YomichanPitchAccentDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void InsertToYomichanPitchAccentDB(Dict dict)
+    internal static void InsertToYomichanPitchAccentDB(Dict dict)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
         int id = 1;
-        HashSet<PitchAccentRecord> yomichanPitchAccentRecord = dict.Contents.Values.SelectMany(v => v).Select(v => (PitchAccentRecord)v).ToHashSet();
+        HashSet<PitchAccentRecord> yomichanPitchAccentRecord = dict.Contents.Values.SelectMany(static v => v).Select(static v => (PitchAccentRecord)v).ToHashSet();
         foreach (PitchAccentRecord record in yomichanPitchAccentRecord)
         {
             using SqliteCommand insertRecordCommand = connection.CreateCommand();

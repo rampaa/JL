@@ -246,12 +246,12 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
                 return new YomichanContent(parentTag ?? tag, contentElement.GetString()!.Trim());
             }
 
-            else if (contentElement.ValueKind is JsonValueKind.Array)
+            if (contentElement.ValueKind is JsonValueKind.Array)
             {
                 return new YomichanContent(parentTag ?? tag, GetDefinitionsFromJsonArray(contentElement, tag));
             }
 
-            else if (contentElement.ValueKind is JsonValueKind.Object)
+            if (contentElement.ValueKind is JsonValueKind.Object)
             {
                 return GetDefinitionsFromJsonObject(contentElement, parentTag ?? tag);
             }
@@ -270,7 +270,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         EpwingYomichanRecord epwingYomichanRecordObj = (EpwingYomichanRecord)obj;
         return PrimarySpelling == epwingYomichanRecordObj.PrimarySpelling
                && Reading == epwingYomichanRecordObj.Reading
-               && (epwingYomichanRecordObj.Definitions?.SequenceEqual(Definitions ?? Array.Empty<string>()) ?? Definitions is null);
+               && epwingYomichanRecordObj.Definitions.SequenceEqual(Definitions);
     }
 
     public override int GetHashCode()
@@ -281,16 +281,9 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
             hash = (hash * 37) + PrimarySpelling.GetHashCode(StringComparison.Ordinal);
             hash = (hash * 37) + Reading?.GetHashCode(StringComparison.Ordinal) ?? 37;
 
-            if (Definitions is not null)
+            foreach (string definition in Definitions)
             {
-                foreach (string definition in Definitions)
-                {
-                    hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
-                }
-            }
-            else
-            {
-                hash *= 37;
+                hash = (hash * 37) + definition.GetHashCode(StringComparison.Ordinal);
             }
 
             return hash;

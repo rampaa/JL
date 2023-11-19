@@ -11,7 +11,7 @@ public sealed class Dict
     public bool Active { get; set; }
     public int Priority { get; set; }
     public int Size { get; set; }
-    [JsonIgnore] public bool Ready { get; set; }
+    [JsonIgnore] public bool Ready { get; internal set; }
 
     [JsonIgnore] public Dictionary<string, IList<IDictRecord>> Contents { get; set; } = new();
 

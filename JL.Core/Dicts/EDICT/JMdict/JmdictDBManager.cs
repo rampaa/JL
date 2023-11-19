@@ -6,7 +6,7 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.EDICT.JMdict;
-internal class JmdictDBManager
+internal static class JmdictDBManager
 {
     public static void CreateJmdictDB(string dbName)
     {
@@ -70,7 +70,7 @@ internal class JmdictDBManager
                 }
                 else
                 {
-                    recordToKeysDict[record] = new List<string>() { key };
+                    recordToKeysDict[record] = new List<string> { key };
                 }
             }
         }
@@ -224,8 +224,8 @@ internal class JmdictDBManager
                 : null;
 
             object miscFromDB = dataReader["misc"];
-            string[]?[]? misc = fieldsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]?[]>((string)fieldsFromDB, Utils.s_jsoWithIndentation)
+            string[]?[]? misc = miscFromDB is not DBNull
+                ? JsonSerializer.Deserialize<string[]?[]>((string)miscFromDB, Utils.s_jsoWithIndentation)
                 : null;
 
             object definitionInfoFromDB = dataReader["definitionInfo"];

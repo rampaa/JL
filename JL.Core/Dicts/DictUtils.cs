@@ -513,7 +513,7 @@ public static class DictUtils
         DictType.NonspecificNazeka
     };
 
-    public static string GetDBPath(string dbName)
+    internal static string GetDBPath(string dbName)
     {
         return string.Create(CultureInfo.InvariantCulture, $"{Path.Join(Utils.ResourcesPath, dbName)} Dictionary.sqlite");
     }
@@ -547,6 +547,7 @@ public static class DictUtils
                 case DictType.JMdict:
                     if (!UpdatingJmdict)
                     {
+                        dict.Ready = false;
                         if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                         {
                             Task jmdictTask = Task.Run(async () =>
@@ -561,6 +562,7 @@ public static class DictUtils
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
                                 }
+                                dict.Ready = true;
                             });
 
                             tasks.Add(jmdictTask);
@@ -585,6 +587,7 @@ public static class DictUtils
                     {
                         if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                         {
+                            dict.Ready = false;
                             tasks.Add(Task.Run(async () =>
                             {
                                 await JmnedictLoader.Load(dict).ConfigureAwait(false);
@@ -596,8 +599,8 @@ public static class DictUtils
                                     JmnedictDBManager.InsertToJmnedictDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
-                                    dict.Ready = true;
                                 }
+                                dict.Ready = true;
                             }));
                         }
 
@@ -662,6 +665,7 @@ public static class DictUtils
                 case DictType.NonspecificYomichan:
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
+                        dict.Ready = false;
                         tasks.Add(Task.Run(async () =>
                         {
                             try
@@ -675,8 +679,8 @@ public static class DictUtils
                                     EpwingYomichanDBManager.InsertToYomichanWordDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
-                                    dict.Ready = true;
                                 }
+                                dict.Ready = true;
                             }
 
                             catch (Exception ex)
@@ -705,6 +709,7 @@ public static class DictUtils
                 case DictType.NonspecificKanjiYomichan:
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
+                        dict.Ready = false;
                         tasks.Add(Task.Run(async () =>
                         {
                             try
@@ -718,8 +723,8 @@ public static class DictUtils
                                     YomichanKanjiDBManager.InsertToYomichanKanjiDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
-                                    dict.Ready = true;
                                 }
+                                dict.Ready = true;
                             }
 
                             catch (Exception ex)
@@ -862,6 +867,7 @@ public static class DictUtils
                 case DictType.NonspecificNazeka:
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
+                        dict.Ready = false;
                         tasks.Add(Task.Run(async () =>
                         {
                             try
@@ -875,8 +881,8 @@ public static class DictUtils
                                     EpwingNazekaDBManager.InsertToNazekaWordDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
-                                    dict.Ready = true;
                                 }
+                                dict.Ready = true;
                             }
 
                             catch (Exception ex)
@@ -905,6 +911,7 @@ public static class DictUtils
                 case DictType.PitchAccentYomichan:
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
+                        dict.Ready = false;
                         tasks.Add(Task.Run(async () =>
                         {
                             try
@@ -920,6 +927,7 @@ public static class DictUtils
                                     dict.Contents.TrimExcess();
                                     dict.Ready = true;
                                 }
+                                dict.Ready = true;
                             }
 
                             catch (Exception ex)
@@ -1071,7 +1079,7 @@ public static class DictUtils
 
                     foreach (Dict dict in orderedDicts)
                     {
-                        if (((!dict.Options?.UseDB?.Value) ?? true) || !File.Exists(GetDBPath(dict.Name)))
+                        if ((!dict.Options?.UseDB?.Value ?? true) || !File.Exists(GetDBPath(dict.Name)))
                         {
                             dict.Contents = dict.Size is not 0
                                 ? new Dictionary<string, IList<IDictRecord>>(dict.Size)

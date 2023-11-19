@@ -6,7 +6,7 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.EDICT.JMnedict;
-internal class JmnedictDBManager
+internal static class JmnedictDBManager
 {
     public static void CreateJmnedictDB(string dbName)
     {
@@ -40,7 +40,7 @@ internal class JmnedictDBManager
         using DbTransaction transaction = connection.BeginTransaction();
 
         int id = 1;
-        HashSet<JmnedictRecord> jmnedictRecords = dict.Contents.Values.SelectMany(v => v).Select(v => (JmnedictRecord)v).ToHashSet();
+        HashSet<JmnedictRecord> jmnedictRecords = dict.Contents.Values.SelectMany(static v => v).Select(static v => (JmnedictRecord)v).ToHashSet();
         foreach (JmnedictRecord record in jmnedictRecords)
         {
             using SqliteCommand insertRecordCommand = connection.CreateCommand();
