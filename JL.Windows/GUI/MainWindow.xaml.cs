@@ -1,5 +1,4 @@
 using System.Configuration;
-using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,7 +28,6 @@ namespace JL.Windows.GUI;
 /// </summary>
 internal sealed partial class MainWindow : Window
 {
-    private DateTime _lastClipboardChangeTime;
     private WinApi? _winApi;
     public nint WindowHandle { get; private set; }
 
@@ -97,7 +95,6 @@ internal sealed partial class MainWindow : Window
         if (ConfigManager.CaptureTextFromClipboard)
         {
             CopyFromClipboard();
-            _lastClipboardChangeTime = new DateTime(Stopwatch.GetTimestamp());
         }
 
         FirstPopupWindow.Owner = this;
@@ -143,6 +140,11 @@ internal sealed partial class MainWindow : Window
                 Utils.Logger.Warning(ex, "CopyFromClipboard failed");
             }
         }
+    }
+
+    private void CopyTextToClipboard(object sender, RoutedEventArgs e)
+    {
+        WindowsUtils.CopyTextToClipboard(MainTextBox.SelectedText);
     }
 
     public void CopyFromWebSocket(string text)
@@ -269,6 +271,11 @@ internal sealed partial class MainWindow : Window
 
             string text = input[charPosition..endPosition];
 
+            if (string.IsNullOrEmpty(text))
+            {
+                continue;
+            }
+
             if (!PopupWindow.StackPanelCache.Contains(text))
             {
                 List<LookupResult>? lookupResults = LookupUtils.LookupText(text);
@@ -304,16 +311,8 @@ internal sealed partial class MainWindow : Window
 
     private void ClipboardChanged(object? sender, EventArgs? e)
     {
-        if (!ConfigManager.CaptureTextFromClipboard)
+        if (ConfigManager.CaptureTextFromClipboard)
         {
-            return;
-        }
-
-        DateTime currentTime = new(Stopwatch.GetTimestamp());
-
-        if ((currentTime - _lastClipboardChangeTime).TotalMilliseconds > 5)
-        {
-            _lastClipboardChangeTime = currentTime;
             CopyFromClipboard();
         }
     }
@@ -476,12 +475,28 @@ internal sealed partial class MainWindow : Window
 
     public async Task HandleHotKey(KeyGesture keyGesture, KeyEventArgs? e)
     {
-        if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.DisableHotkeysKeyGesture))
+        bool handled = false;
+
+        if (keyGesture is { Modifiers: ModifierKeys.Control, Key: Key.C })
         {
             if (e is not null)
             {
                 e.Handled = true;
             }
+
+            handled = true;
+
+            WindowsUtils.CopyTextToClipboard(MainTextBox.SelectedText);
+        }
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.DisableHotkeysKeyGesture))
+        {
+            if (e is not null)
+            {
+                e.Handled = true;
+            }
+
+            handled = true;
 
             ConfigManager.DisableHotkeys = !ConfigManager.DisableHotkeys;
 
@@ -498,12 +513,10 @@ internal sealed partial class MainWindow : Window
             }
         }
 
-        if (ConfigManager.DisableHotkeys)
+        if (ConfigManager.DisableHotkeys || handled)
         {
             return;
         }
-
-        bool handled = false;
 
         if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.SteppedBacklogBackwardsKeyGesture))
         {

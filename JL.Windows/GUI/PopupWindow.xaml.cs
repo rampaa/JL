@@ -131,6 +131,11 @@ internal sealed partial class PopupWindow : Window
         WindowsUtils.ShowAddWordWindow(text);
     }
 
+    private void CopyTextToClipboard(object sender, RoutedEventArgs e)
+    {
+        WindowsUtils.CopyTextToClipboard(_lastInteractedTextBox?.SelectedText);
+    }
+
     private void SearchWithBrowser(object sender, RoutedEventArgs e)
     {
         SearchWithBrowser();
@@ -165,6 +170,12 @@ internal sealed partial class PopupWindow : Window
             : JapaneseUtils.FindExpressionBoundary(tb.Text, charPosition);
 
         string text = tb.Text[charPosition..endPosition];
+
+        if (string.IsNullOrEmpty(text))
+        {
+            HidePopup();
+            return;
+        }
 
         if (text == LastText && IsVisible)
         {
@@ -1290,10 +1301,9 @@ internal sealed partial class PopupWindow : Window
         WindowsUtils.ShowAddNameWindow(text, reading);
     }
 
-    private async void Window_KeyDown(object sender, KeyEventArgs e)
+    private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
         e.Handled = true;
-
         await KeyGestureUtils.HandleKeyDown(e).ConfigureAwait(false);
     }
 
@@ -1321,8 +1331,16 @@ internal sealed partial class PopupWindow : Window
 
     public async Task HandleHotKey(KeyGesture keyGesture)
     {
-        if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.DisableHotkeysKeyGesture))
+        bool handled = false;
+        if (keyGesture is { Modifiers: ModifierKeys.Control, Key: Key.C })
         {
+            handled = true;
+            WindowsUtils.CopyTextToClipboard(_lastInteractedTextBox?.SelectedText);
+        }
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.DisableHotkeysKeyGesture))
+        {
+            handled = true;
             ConfigManager.DisableHotkeys = !ConfigManager.DisableHotkeys;
 
             if (ConfigManager.GlobalHotKeys)
@@ -1338,7 +1356,7 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        if (ConfigManager.DisableHotkeys)
+        if (ConfigManager.DisableHotkeys || handled)
         {
             return;
         }
