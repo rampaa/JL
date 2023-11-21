@@ -131,11 +131,6 @@ internal sealed partial class PopupWindow : Window
         WindowsUtils.ShowAddWordWindow(text);
     }
 
-    private void CopyTextToClipboard(object sender, RoutedEventArgs e)
-    {
-        WindowsUtils.CopyTextToClipboard(_lastInteractedTextBox?.SelectedText);
-    }
-
     private void SearchWithBrowser(object sender, RoutedEventArgs e)
     {
         SearchWithBrowser();
@@ -1332,13 +1327,7 @@ internal sealed partial class PopupWindow : Window
     public async Task HandleHotKey(KeyGesture keyGesture)
     {
         bool handled = false;
-        if (keyGesture is { Modifiers: ModifierKeys.Control, Key: Key.C })
-        {
-            handled = true;
-            WindowsUtils.CopyTextToClipboard(_lastInteractedTextBox?.SelectedText);
-        }
-
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.DisableHotkeysKeyGesture))
+        if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.DisableHotkeysKeyGesture))
         {
             handled = true;
             ConfigManager.DisableHotkeys = !ConfigManager.DisableHotkeys;

@@ -219,7 +219,18 @@ internal static class ConfigManager
             }
         }
 
+        MainWindow mainWindow = MainWindow.Instance;
+
         CaptureTextFromClipboard = GetValueFromConfig(config, CaptureTextFromClipboard, nameof(CaptureTextFromClipboard), bool.TryParse);
+        if (CaptureTextFromClipboard)
+        {
+            WinApi.SubscribeToClipboardChanged(mainWindow.WindowHandle);
+        }
+        else
+        {
+            WinApi.UnsubscribeFromClipboardChanged(mainWindow.WindowHandle);
+        }
+
         CoreConfig.CaptureTextFromWebSocket = GetValueFromConfig(config, CoreConfig.CaptureTextFromWebSocket, nameof(CoreConfig.CaptureTextFromWebSocket), bool.TryParse);
         if (!CoreConfig.CaptureTextFromWebSocket && !CaptureTextFromClipboard)
         {
@@ -236,8 +247,6 @@ internal static class ConfigManager
         MiningModeMouseButton = GetValueFromConfig(config, MiningModeMouseButton, nameof(MiningModeMouseButton), Enum.TryParse);
         MineMouseButton = GetValueFromConfig(config, MineMouseButton, nameof(MineMouseButton), Enum.TryParse);
         CopyPrimarySpellingToClipboardMouseButton = GetValueFromConfig(config, CopyPrimarySpellingToClipboardMouseButton, nameof(CopyPrimarySpellingToClipboardMouseButton), Enum.TryParse);
-
-        MainWindow mainWindow = MainWindow.Instance;
 
         AutoAdjustFontSizesOnResolutionChange = GetValueFromConfig(config, AutoAdjustFontSizesOnResolutionChange, nameof(AutoAdjustFontSizesOnResolutionChange), bool.TryParse);
         HighlightLongestMatch = GetValueFromConfig(config, HighlightLongestMatch, nameof(HighlightLongestMatch), bool.TryParse);

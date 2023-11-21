@@ -41,6 +41,7 @@ internal sealed partial class MainWindow : Window
     public double HeightBeforeResolutionChange { get; set; }
     public double WidthBeforeResolutionChange { get; set; }
 
+    private static ulong s_clipboardSequenceNo;
     public bool ContextMenuIsOpening { get; private set; } = false;
 
     private static CancellationTokenSource s_precacheCancellationTokenSource = new();
@@ -74,9 +75,8 @@ internal sealed partial class MainWindow : Window
 
         WindowHandle = new WindowInteropHelper(this).Handle;
         _winApi = new WinApi();
-        _winApi.SubscribeToWndProc(this);
-        WinApi.SubscribeToClipboardChanged(WindowHandle);
         _winApi.ClipboardChanged += ClipboardChanged;
+        _winApi.SubscribeToWndProc(this);
 
         await ProfileUtils.DeserializeProfiles().ConfigureAwait(true);
 
@@ -94,6 +94,7 @@ internal sealed partial class MainWindow : Window
 
         if (ConfigManager.CaptureTextFromClipboard)
         {
+            s_clipboardSequenceNo = WinApi.GetClipboardSequenceNo();
             CopyFromClipboard();
         }
 
@@ -140,11 +141,6 @@ internal sealed partial class MainWindow : Window
                 Utils.Logger.Warning(ex, "CopyFromClipboard failed");
             }
         }
-    }
-
-    private void CopyTextToClipboard(object sender, RoutedEventArgs e)
-    {
-        WindowsUtils.CopyTextToClipboard(MainTextBox.SelectedText);
     }
 
     public void CopyFromWebSocket(string text)
@@ -311,9 +307,11 @@ internal sealed partial class MainWindow : Window
 
     private void ClipboardChanged(object? sender, EventArgs? e)
     {
-        if (ConfigManager.CaptureTextFromClipboard)
+        ulong currentClipboardSequenceNo = WinApi.GetClipboardSequenceNo();
+        if (s_clipboardSequenceNo != currentClipboardSequenceNo)
         {
             CopyFromClipboard();
+            s_clipboardSequenceNo = currentClipboardSequenceNo;
         }
     }
 
@@ -476,20 +474,7 @@ internal sealed partial class MainWindow : Window
     public async Task HandleHotKey(KeyGesture keyGesture, KeyEventArgs? e)
     {
         bool handled = false;
-
-        if (keyGesture is { Modifiers: ModifierKeys.Control, Key: Key.C })
-        {
-            if (e is not null)
-            {
-                e.Handled = true;
-            }
-
-            handled = true;
-
-            WindowsUtils.CopyTextToClipboard(MainTextBox.SelectedText);
-        }
-
-        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.DisableHotkeysKeyGesture))
+        if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.DisableHotkeysKeyGesture))
         {
             if (e is not null)
             {
@@ -674,6 +659,15 @@ internal sealed partial class MainWindow : Window
             handled = true;
 
             ConfigManager.CaptureTextFromClipboard = !ConfigManager.CaptureTextFromClipboard;
+            if (ConfigManager.CaptureTextFromClipboard)
+            {
+                WinApi.SubscribeToClipboardChanged(WindowHandle);
+            }
+            else
+            {
+                WinApi.UnsubscribeFromClipboardChanged(WindowHandle);
+            }
+
             if (!CoreConfig.CaptureTextFromWebSocket && !ConfigManager.CaptureTextFromClipboard)
             {
                 StatsUtils.StatsStopWatch.Stop();

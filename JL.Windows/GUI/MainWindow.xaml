@@ -61,10 +61,8 @@
                         Header="Add word"
                         Click="AddWord" />
                     <MenuItem
-                        Name="CopyMenuItem"
                         Header="Copy"
-                        InputGestureText="Ctrl+C"
-                        Click="CopyTextToClipboard" />
+                        Command="Copy"/>
                     <MenuItem
                         Name="SearchMenuItem"
                         Header="Search"

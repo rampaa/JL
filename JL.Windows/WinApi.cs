@@ -62,6 +62,15 @@ internal sealed class WinApi
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool AddClipboardFormatListener(nint hwnd);
 
+        [DllImport("user32.dll", EntryPoint = "RemoveClipboardFormatListener", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool RemoveClipboardFormatListener(nint hwnd);
+
+        [DllImport("user32.dll", EntryPoint = "GetClipboardSequenceNumber")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static extern ulong GetClipboardSequenceNumber();
+
         [DllImport("user32.dll", EntryPoint = "SendMessageW")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         internal static extern nint SendMessage(nint hWnd, uint msg, nint wParam, nint lParam);
@@ -145,6 +154,16 @@ internal sealed class WinApi
         _ = AddClipboardFormatListener(windowHandle);
     }
 
+    public static void UnsubscribeFromClipboardChanged(nint windowHandle)
+    {
+        _ = RemoveClipboardFormatListener(windowHandle);
+    }
+
+    public static ulong GetClipboardSequenceNo()
+    {
+        return GetClipboardSequenceNumber();
+    }
+
     public static void AddHotKeyToKeyGestureDict(string hotkeyName, KeyGesture keyGesture)
     {
         int id = KeyGestureUtils.KeyGestureDict.Count;
@@ -198,7 +217,7 @@ internal sealed class WinApi
 
     private void OnClipboardChanged()
     {
-        ClipboardChanged?.Invoke(this, EventArgs.Empty);
+        ClipboardChanged!.Invoke(this, EventArgs.Empty);
     }
 
     public static void ResizeWindow(nint windowHandle, nint wParam)
