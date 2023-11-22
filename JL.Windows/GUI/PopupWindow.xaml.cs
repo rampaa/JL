@@ -1257,10 +1257,11 @@ internal sealed partial class PopupWindow : Window
         }
 
         string? selectedDefinitions = GetSelectedDefinitions(_listViewItemIndex);
+        int listViewItemIndex = _listViewItemIndex;
 
         HidePopup();
 
-        await PopupWindowUtils.Mine(LastLookupResults[_listViewItemIndex], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
+        await PopupWindowUtils.Mine(LastLookupResults[listViewItemIndex], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
     }
 
     private void ShowAddNameWindow()
