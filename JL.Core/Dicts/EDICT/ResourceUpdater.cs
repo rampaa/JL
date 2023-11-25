@@ -125,7 +125,25 @@ public static class ResourceUpdater
 
             await JmdictWordClassUtils.Load().ConfigureAwait(false);
 
-            if (!dict.Active)
+            string dbPath = DictUtils.GetDBPath(dict.Name);
+            bool useDB = dict.Options?.UseDB?.Value ?? false;
+            bool dbExists = File.Exists(dbPath);
+
+            if (dbExists || useDB)
+            {
+                if (dbExists)
+                {
+                    File.Delete(dbPath);
+                }
+
+                await Task.Run(() =>
+                {
+                    JmdictDBManager.CreateJmdictDB(dbPath);
+                    JmdictDBManager.InsertToJmdictDB(dict);
+                }).ConfigureAwait(false);
+            }
+
+            if (!dict.Active || useDB)
             {
                 dict.Contents.Clear();
                 dict.Contents.TrimExcess();
@@ -154,7 +172,24 @@ public static class ResourceUpdater
             await Task.Run(async () => await JmnedictLoader
                 .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
 
-            if (!dict.Active)
+            string dbPath = DictUtils.GetDBPath(dict.Name);
+            bool useDB = dict.Options?.UseDB?.Value ?? false;
+            bool dbExists = File.Exists(dbPath);
+            if (dbExists || useDB)
+            {
+                if (dbExists)
+                {
+                    File.Delete(dbPath);
+                }
+
+                await Task.Run(() =>
+                {
+                    JmnedictDBManager.CreateJmnedictDB(dbPath);
+                    JmnedictDBManager.InsertToJmnedictDB(dict);
+                }).ConfigureAwait(false);
+            }
+
+            if (!dict.Active || useDB)
             {
                 dict.Contents.Clear();
                 dict.Contents.TrimExcess();
@@ -183,7 +218,25 @@ public static class ResourceUpdater
             await Task.Run(async () => await KanjidicLoader
                 .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
 
-            if (!dict.Active)
+            string dbPath = DictUtils.GetDBPath(dict.Name);
+            bool useDB = dict.Options?.UseDB?.Value ?? false;
+            bool dbExists = File.Exists(dbPath);
+
+            if (dbExists || useDB)
+            {
+                if (dbExists)
+                {
+                    File.Delete(dbPath);
+                }
+
+                await Task.Run(() =>
+                {
+                    KanjidicDBManager.CreateKanjidicDB(dbPath);
+                    KanjidicDBManager.InsertToKanjidicDB(dict);
+                }).ConfigureAwait(false);
+            }
+
+            if (!dict.Active || useDB)
             {
                 dict.Contents.Clear();
                 dict.Contents.TrimExcess();
