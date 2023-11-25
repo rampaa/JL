@@ -35,6 +35,11 @@ public static class FreqUtils
         }
     };
 
+    internal static string GetDBPath(string dbName)
+    {
+        return string.Create(CultureInfo.InvariantCulture, $"{Path.Join(Utils.ResourcesPath, dbName)} Frequency Dictionary.sqlite");
+    }
+
     public static async Task LoadFrequencies()
     {
         FreqsReady = false;
