@@ -1,10 +1,9 @@
 using System.Text.Json;
-using JL.Core.Dicts;
 using JL.Core.Utilities;
 
-namespace JL.Core.PitchAccent;
+namespace JL.Core.Dicts.PitchAccent;
 
-internal static class PitchAccentLoader
+internal static class YomichanPitchAccentLoader
 {
     public static async Task Load(Dict dict)
     {

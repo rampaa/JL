@@ -1,4 +1,4 @@
-namespace JL.Core.Dicts.EPWING.EpwingYomichan;
+namespace JL.Core.Dicts.EPWING.Yomichan;
 internal readonly struct YomichanContent
 {
     public string? Tag { get; }

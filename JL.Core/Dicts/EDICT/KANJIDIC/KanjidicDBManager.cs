@@ -7,7 +7,7 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Dicts.EDICT.KANJIDIC;
 internal static class KanjidicDBManager
 {
-    public static void CreateKanjidicDB(string dbName)
+    public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
         connection.Open();
@@ -34,7 +34,7 @@ internal static class KanjidicDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void InsertToKanjidicDB(Dict dict)
+    public static void InsertRecordsToDB(Dict dict)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
         connection.Open();
@@ -89,7 +89,7 @@ internal static class KanjidicDBManager
         dict.Ready = true;
     }
 
-    public static List<IDictRecord> GetRecordsFromKanjidicDB(string dbName, string term)
+    public static List<IDictRecord> GetRecordsFromDB(string dbName, string term)
     {
         List<IDictRecord> results = new();
 

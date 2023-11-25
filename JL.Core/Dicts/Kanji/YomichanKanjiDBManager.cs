@@ -4,10 +4,10 @@ using System.Text.Json;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
-namespace JL.Core.Dicts.YomichanKanji;
+namespace JL.Core.Dicts.Kanji;
 internal static class YomichanKanjiDBManager
 {
-    public static void CreateYomichanKanjiDB(string dbName)
+    public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
         connection.Open();
@@ -30,7 +30,7 @@ internal static class YomichanKanjiDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void InsertToYomichanKanjiDB(Dict dict)
+    public static void InsertRecordsToDB(Dict dict)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
         connection.Open();
@@ -82,7 +82,7 @@ internal static class YomichanKanjiDBManager
         dict.Ready = true;
     }
 
-    public static List<IDictRecord> GetRecordsFromYomichanKanjiDB(string dbName, string term)
+    public static List<IDictRecord> GetRecordsFromDB(string dbName, string term)
     {
         List<IDictRecord> results = new();
 

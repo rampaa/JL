@@ -5,10 +5,10 @@ using System.Text.Json;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
-namespace JL.Core.Dicts.EPWING.EpwingNazeka;
-internal static class EpwingNazekaDBManager
+namespace JL.Core.Dicts.EPWING.Yomichan;
+internal static class EpwingYomichanDBManager
 {
-    public static void CreateNazekaWordDB(string dbName)
+    public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
         connection.Open();
@@ -21,8 +21,12 @@ internal static class EpwingNazekaDBManager
                 id INTEGER NOT NULL PRIMARY KEY,
                 primary_spelling TEXT NOT NULL,
                 reading TEXT,
-                alternative_spellings TEXT,
-                glossary TEXT NOT NULL
+                glossary TEXT NOT NULL,
+                part_of_speech TEXT,
+                glossary_tags TEXT,
+                term_tag TEXT,
+                score INTEGER,
+                sequence INTEGER
             ) STRICT;
 
             CREATE TABLE IF NOT EXISTS record_search_key
@@ -37,39 +41,38 @@ internal static class EpwingNazekaDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void InsertToNazekaWordDB(Dict dict)
+    public static void InsertRecordsToDB(Dict dict)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
         int id = 1;
-        HashSet<EpwingNazekaRecord> nazekaWordRecords = dict.Contents.Values.SelectMany(static v => v).Select(static v => (EpwingNazekaRecord)v).ToHashSet();
-        foreach (EpwingNazekaRecord record in nazekaWordRecords)
+        HashSet<EpwingYomichanRecord> yomichanWordRecords = dict.Contents.Values.SelectMany(static v => v).Select(static v => (EpwingYomichanRecord)v).ToHashSet();
+        foreach (EpwingYomichanRecord record in yomichanWordRecords)
         {
             using SqliteCommand insertRecordCommand = connection.CreateCommand();
             insertRecordCommand.CommandText =
                 """
-                INSERT INTO record (id, primary_spelling, reading, alternative_spellings, glossary)
-                VALUES (@id, @primary_spelling, @reading, @alternative_spellings, @glossary)
+                INSERT INTO record (id, primary_spelling, reading, glossary, part_of_speech, glossary_tags)
+                VALUES (@id, @primary_spelling, @reading, @glossary, @part_of_speech, @glossary_tags)
                 """;
 
             _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
             _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling", record.PrimarySpelling);
             _ = insertRecordCommand.Parameters.AddWithValue("@reading", record.Reading is not null ? record.Reading : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@alternative_spellings", record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jsoWithIndentation) : DBNull.Value);
             _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_jsoWithIndentation));
+            _ = insertRecordCommand.Parameters.AddWithValue("@part_of_speech", record.WordClasses is not null ? JsonSerializer.Serialize(record.WordClasses, Utils.s_jsoWithIndentation) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@glossary_tags", record.DefinitionTags is not null ? JsonSerializer.Serialize(record.Definitions, Utils.s_jsoWithIndentation) : DBNull.Value);
 
             _ = insertRecordCommand.ExecuteNonQuery();
 
             using SqliteCommand insertPrimarySpellingCommand = connection.CreateCommand();
-
             insertPrimarySpellingCommand.CommandText =
                 """
                 INSERT INTO record_search_key(record_id, search_key)
                 VALUES (@record_id, @search_key)
                 """;
-
             _ = insertPrimarySpellingCommand.Parameters.AddWithValue("@record_id", id);
             string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling);
             _ = insertPrimarySpellingCommand.Parameters.AddWithValue("@search_key", primarySpellingInHiragana);
@@ -83,9 +86,9 @@ internal static class EpwingNazekaDBManager
                     using SqliteCommand insertReadingCommand = connection.CreateCommand();
                     insertReadingCommand.CommandText =
                         """
-                        INSERT INTO record_search_key(record_id, search_key)
-                        VALUES (@record_id, @search_key)
-                        """;
+                    INSERT INTO record_search_key(record_id, search_key)
+                    VALUES (@record_id, @search_key)
+                    """;
 
                     _ = insertReadingCommand.Parameters.AddWithValue("@record_id", id);
                     _ = insertReadingCommand.Parameters.AddWithValue("@search_key", readingInHiragana);
@@ -98,7 +101,9 @@ internal static class EpwingNazekaDBManager
         }
 
         using SqliteCommand createIndexCommand = connection.CreateCommand();
+
         createIndexCommand.CommandText = "CREATE INDEX IF NOT EXISTS ix_record_search_key_search_key ON record_search_key(search_key);";
+
         _ = createIndexCommand.ExecuteNonQuery();
 
         transaction.Commit();
@@ -114,7 +119,7 @@ internal static class EpwingNazekaDBManager
         dict.Ready = true;
     }
 
-    public static Dictionary<string, List<IDictRecord>> GetRecordsFromNazekaWordDB(string dbName, List<string> terms)
+    public static Dictionary<string, List<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
         Dictionary<string, List<IDictRecord>> results = new();
 
@@ -124,11 +129,12 @@ internal static class EpwingNazekaDBManager
 
         StringBuilder queryBuilder = new(
             """
-            SELECT rsk.search_key AS searchKey, r.primary_spelling AS primarySpelling, r.reading AS reading, r.alternative_spellings AS alternativeSpellings, r.glossary AS definitions
+            SELECT rsk.search_key AS searchKey, r.primary_spelling AS primarySpelling, r.reading AS reading, r.glossary AS definitions, r.part_of_speech AS wordClasses, r.glossary_tags AS definitionTags
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key = @term1
-            """);
+            """
+            );
 
         for (int i = 1; i < terms.Count; i++)
         {
@@ -153,28 +159,33 @@ internal static class EpwingNazekaDBManager
                 ? (string)readingFromDB
                 : null;
 
-            object alternativeSpellingsFromDB = dataReader["alternativeSpellings"];
-            string[]? alternativeSpellings = alternativeSpellingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)alternativeSpellingsFromDB, Utils.s_jsoWithIndentation)
+            string[] definitions = JsonSerializer.Deserialize<string[]>((string)dataReader["definitions"])!;
+
+            object wordClassFromDB = dataReader["wordClasses"];
+            string[]? wordClasses = wordClassFromDB is not DBNull
+                ? JsonSerializer.Deserialize<string[]>((string)wordClassFromDB, Utils.s_jsoWithIndentation)
                 : null;
 
-            string[] definitions = JsonSerializer.Deserialize<string[]>((string)dataReader["definitions"])!;
+            object definitionTagsFromDB = dataReader["definitionTags"];
+            string[]? definitionTags = definitionTagsFromDB is not DBNull
+                ? JsonSerializer.Deserialize<string[]>((string)definitionTagsFromDB, Utils.s_jsoWithIndentation)
+                : null;
 
             if (results.TryGetValue(searchKey, out List<IDictRecord>? result))
             {
-                result.Add(new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions));
+                result.Add(new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags));
             }
 
             else
             {
-                results[searchKey] = new List<IDictRecord> { new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions) };
+                results[searchKey] = new List<IDictRecord> { new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags) };
             }
         }
 
         return results;
     }
 
-    public static List<IDictRecord> GetRecordsFromNazekaWordDB(string dbName, string term)
+    public static List<IDictRecord> GetRecordsFromDB(string dbName, string term)
     {
         List<IDictRecord> results = new();
 
@@ -184,7 +195,7 @@ internal static class EpwingNazekaDBManager
 
         command.CommandText =
             """
-            SELECT r.primary_spelling AS primarySpelling, r.reading AS reading, r.alternative_spellings AS alternativeSpellings, r.glossary AS definitions
+            SELECT r.primary_spelling AS primarySpelling, r.reading AS reading, r.glossary AS definitions, r.part_of_speech AS wordClasses, r.glossary_tags AS definitionTags
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key = @term
@@ -202,14 +213,19 @@ internal static class EpwingNazekaDBManager
                 ? (string)readingFromDB
                 : null;
 
-            object alternativeSpellingsFromDB = dataReader["alternativeSpellings"];
-            string[]? alternativeSpellings = alternativeSpellingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)alternativeSpellingsFromDB, Utils.s_jsoWithIndentation)
-                : null;
-
             string[] definitions = JsonSerializer.Deserialize<string[]>((string)dataReader["definitions"])!;
 
-            results.Add(new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions));
+            object wordClassFromDB = dataReader["wordClasses"];
+            string[]? wordClasses = wordClassFromDB is not DBNull
+                ? JsonSerializer.Deserialize<string[]>((string)wordClassFromDB, Utils.s_jsoWithIndentation)
+                : null;
+
+            object definitionTagsFromDB = dataReader["definitionTags"];
+            string[]? definitionTags = definitionTagsFromDB is not DBNull
+                ? JsonSerializer.Deserialize<string[]>((string)definitionTagsFromDB, Utils.s_jsoWithIndentation)
+                : null;
+
+            results.Add(new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags));
         }
 
         return results;

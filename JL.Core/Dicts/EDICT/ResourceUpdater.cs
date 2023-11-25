@@ -138,8 +138,8 @@ public static class ResourceUpdater
 
                 await Task.Run(() =>
                 {
-                    JmdictDBManager.CreateJmdictDB(dbPath);
-                    JmdictDBManager.InsertToJmdictDB(dict);
+                    JmdictDBManager.CreateDB(dbPath);
+                    JmdictDBManager.InsertRecordsToDB(dict);
                 }).ConfigureAwait(false);
             }
 
@@ -184,8 +184,8 @@ public static class ResourceUpdater
 
                 await Task.Run(() =>
                 {
-                    JmnedictDBManager.CreateJmnedictDB(dbPath);
-                    JmnedictDBManager.InsertToJmnedictDB(dict);
+                    JmnedictDBManager.CreateDB(dbPath);
+                    JmnedictDBManager.InsertRecordsToDB(dict);
                 }).ConfigureAwait(false);
             }
 
@@ -231,8 +231,8 @@ public static class ResourceUpdater
 
                 await Task.Run(() =>
                 {
-                    KanjidicDBManager.CreateKanjidicDB(dbPath);
-                    KanjidicDBManager.InsertToKanjidicDB(dict);
+                    KanjidicDBManager.CreateDB(dbPath);
+                    KanjidicDBManager.InsertRecordsToDB(dict);
                 }).ConfigureAwait(false);
             }
 

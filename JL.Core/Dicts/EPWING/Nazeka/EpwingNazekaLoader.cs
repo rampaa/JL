@@ -1,7 +1,7 @@
 using System.Text.Json;
 using JL.Core.Utilities;
 
-namespace JL.Core.Dicts.EPWING.EpwingNazeka;
+namespace JL.Core.Dicts.EPWING.Nazeka;
 
 internal static class EpwingNazekaLoader
 {

@@ -4,7 +4,7 @@ using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
 
-namespace JL.Core.Dicts.EPWING.EpwingNazeka;
+namespace JL.Core.Dicts.EPWING.Nazeka;
 
 internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
 {

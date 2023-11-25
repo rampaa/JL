@@ -1,14 +1,13 @@
 using System.Data.Common;
 using System.Globalization;
 using System.Text;
-using JL.Core.Dicts;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
-namespace JL.Core.PitchAccent;
+namespace JL.Core.Dicts.PitchAccent;
 public static class YomichanPitchAccentDBManager
 {
-    internal static void CreateYomichanPitchAccentDB(string dbName)
+    internal static void CreateDB(string dbName)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
         connection.Open();
@@ -36,7 +35,7 @@ public static class YomichanPitchAccentDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    internal static void InsertToYomichanPitchAccentDB(Dict dict)
+    internal static void InsertRecordsToDB(Dict dict)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
         connection.Open();
@@ -111,7 +110,7 @@ public static class YomichanPitchAccentDBManager
         dict.Ready = true;
     }
 
-    public static Dictionary<string, List<IDictRecord>> GetRecordsFromYomichanPitchAccentDB(string dbName, List<string> terms)
+    public static Dictionary<string, List<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
         Dictionary<string, List<IDictRecord>> results = new();
 

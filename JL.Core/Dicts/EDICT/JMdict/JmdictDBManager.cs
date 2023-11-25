@@ -8,7 +8,7 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Dicts.EDICT.JMdict;
 internal static class JmdictDBManager
 {
-    public static void CreateJmdictDB(string dbName)
+    public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
         connection.Open();
@@ -52,7 +52,7 @@ internal static class JmdictDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void InsertToJmdictDB(Dict dict)
+    public static void InsertRecordsToDB(Dict dict)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
         connection.Open();
@@ -144,7 +144,7 @@ internal static class JmdictDBManager
         dict.Ready = true;
     }
 
-    public static Dictionary<string, List<IDictRecord>> GetRecordsFromJmdictDB(string dbName, List<string> terms)
+    public static Dictionary<string, List<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
         Dictionary<string, List<IDictRecord>> results = new();
 

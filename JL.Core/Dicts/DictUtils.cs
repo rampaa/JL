@@ -5,11 +5,11 @@ using JL.Core.Dicts.CustomWordDict;
 using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Dicts.EDICT.JMnedict;
 using JL.Core.Dicts.EDICT.KANJIDIC;
-using JL.Core.Dicts.EPWING.EpwingNazeka;
-using JL.Core.Dicts.EPWING.EpwingYomichan;
+using JL.Core.Dicts.EPWING.Nazeka;
+using JL.Core.Dicts.EPWING.Yomichan;
 using JL.Core.Dicts.Options;
-using JL.Core.Dicts.YomichanKanji;
-using JL.Core.PitchAccent;
+using JL.Core.Dicts.PitchAccent;
+using JL.Core.Dicts.Kanji;
 using JL.Core.Profile;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
@@ -557,8 +557,8 @@ public static class DictUtils
 
                                 if (useDB && !dbExists)
                                 {
-                                    JmdictDBManager.CreateJmdictDB(dict.Name);
-                                    JmdictDBManager.InsertToJmdictDB(dict);
+                                    JmdictDBManager.CreateDB(dict.Name);
+                                    JmdictDBManager.InsertRecordsToDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
                                 }
@@ -595,8 +595,8 @@ public static class DictUtils
 
                                 if (useDB && !dbExists)
                                 {
-                                    JmnedictDBManager.CreateJmnedictDB(dict.Name);
-                                    JmnedictDBManager.InsertToJmnedictDB(dict);
+                                    JmnedictDBManager.CreateDB(dict.Name);
+                                    JmnedictDBManager.InsertRecordsToDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
                                 }
@@ -675,8 +675,8 @@ public static class DictUtils
 
                                 if (useDB && !dbExists)
                                 {
-                                    EpwingYomichanDBManager.CreateYomichanWordDB(dict.Name);
-                                    EpwingYomichanDBManager.InsertToYomichanWordDB(dict);
+                                    EpwingYomichanDBManager.CreateDB(dict.Name);
+                                    EpwingYomichanDBManager.InsertRecordsToDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
                                 }
@@ -719,8 +719,8 @@ public static class DictUtils
 
                                 if (useDB && !dbExists)
                                 {
-                                    YomichanKanjiDBManager.CreateYomichanKanjiDB(dict.Name);
-                                    YomichanKanjiDBManager.InsertToYomichanKanjiDB(dict);
+                                    YomichanKanjiDBManager.CreateDB(dict.Name);
+                                    YomichanKanjiDBManager.InsertRecordsToDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
                                 }
@@ -877,8 +877,8 @@ public static class DictUtils
 
                                 if (useDB && !dbExists)
                                 {
-                                    EpwingNazekaDBManager.CreateNazekaWordDB(dict.Name);
-                                    EpwingNazekaDBManager.InsertToNazekaWordDB(dict);
+                                    EpwingNazekaDBManager.CreateDB(dict.Name);
+                                    EpwingNazekaDBManager.InsertRecordsToDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
                                 }
@@ -916,13 +916,13 @@ public static class DictUtils
                         {
                             try
                             {
-                                await PitchAccentLoader.Load(dict).ConfigureAwait(false);
+                                await YomichanPitchAccentLoader.Load(dict).ConfigureAwait(false);
                                 dict.Size = dict.Contents.Count;
 
                                 if (useDB && !dbExists)
                                 {
-                                    YomichanPitchAccentDBManager.CreateYomichanPitchAccentDB(dict.Name);
-                                    YomichanPitchAccentDBManager.InsertToYomichanPitchAccentDB(dict);
+                                    YomichanPitchAccentDBManager.CreateDB(dict.Name);
+                                    YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
                                     dict.Ready = true;

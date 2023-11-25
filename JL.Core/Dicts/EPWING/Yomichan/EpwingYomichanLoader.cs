@@ -1,7 +1,7 @@
 using System.Text.Json;
 using JL.Core.Utilities;
 
-namespace JL.Core.Dicts.EPWING.EpwingYomichan;
+namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal static class EpwingYomichanLoader
 {

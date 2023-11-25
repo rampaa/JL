@@ -1,7 +1,7 @@
 using System.Text.Json;
 using JL.Core.Utilities;
 
-namespace JL.Core.Dicts.YomichanKanji;
+namespace JL.Core.Dicts.Kanji;
 
 internal static class YomichanKanjiLoader
 {

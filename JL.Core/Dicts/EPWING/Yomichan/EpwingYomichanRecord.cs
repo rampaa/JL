@@ -5,7 +5,7 @@ using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
 
-namespace JL.Core.Dicts.EPWING.EpwingYomichan;
+namespace JL.Core.Dicts.EPWING.Yomichan;
 
 internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
 {

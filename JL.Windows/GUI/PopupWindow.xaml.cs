@@ -8,8 +8,8 @@ using Caching;
 using JL.Core;
 using JL.Core.Audio;
 using JL.Core.Dicts;
+using JL.Core.Dicts.PitchAccent;
 using JL.Core.Lookup;
-using JL.Core.PitchAccent;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
 using JL.Windows.SpeechSynthesis;
@@ -461,7 +461,7 @@ internal sealed partial class PopupWindow : Window
                     DictsWithResults.Add(lookupResult.Dict);
                 }
 
-                popupItemSource[i] = MakeResultStackPanel(lookupResult, i, resultCount, pitchDict, pitchDictIsActive, useDBForPitchDict, YomichanPitchAccentDBManager.GetRecordsFromYomichanPitchAccentDB, showPOrthographyInfo, showROrthographyInfo, showAOrthographyInfo);
+                popupItemSource[i] = MakeResultStackPanel(lookupResult, i, resultCount, pitchDict, pitchDictIsActive, useDBForPitchDict, YomichanPitchAccentDBManager.GetRecordsFromDB, showPOrthographyInfo, showROrthographyInfo, showAOrthographyInfo);
             }
 
             PopupListView.ItemsSource = popupItemSource;

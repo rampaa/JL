@@ -9,9 +9,9 @@ using JL.Core.Dicts.CustomWordDict;
 using JL.Core.Dicts.EDICT.JMdict;
 using JL.Core.Dicts.EDICT.JMnedict;
 using JL.Core.Dicts.EDICT.KANJIDIC;
-using JL.Core.Dicts.EPWING.EpwingNazeka;
-using JL.Core.Dicts.EPWING.EpwingYomichan;
-using JL.Core.Dicts.YomichanKanji;
+using JL.Core.Dicts.EPWING.Nazeka;
+using JL.Core.Dicts.EPWING.Yomichan;
+using JL.Core.Dicts.Kanji;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
@@ -49,7 +49,7 @@ public static class LookupUtils
                     {
                         lookupResults.AddRange(BuildKanjidicResult(
                             useDB
-                            ? GetKanjiResultsFromDB(text, dict, KanjidicDBManager.GetRecordsFromKanjidicDB)
+                            ? GetKanjiResultsFromDB(text, dict, KanjidicDBManager.GetRecordsFromDB)
                             : GetKanjiResults(text, dict)
                             ));
                     }
@@ -58,7 +58,7 @@ public static class LookupUtils
                     {
                         lookupResults.AddRange(BuildEpwingYomichanResult(
                             useDB
-                            ? GetKanjiResultsFromDB(text, dict, EpwingYomichanDBManager.GetRecordsFromYomichanWordDB)
+                            ? GetKanjiResultsFromDB(text, dict, EpwingYomichanDBManager.GetRecordsFromDB)
                             : GetKanjiResults(text, dict)
                             ));
                     }
@@ -69,7 +69,7 @@ public static class LookupUtils
                         {
                             lookupResults.AddRange(BuildYomichanKanjiResult(
                                 useDB
-                                ? GetKanjiResultsFromDB(text, dict, EpwingYomichanDBManager.GetRecordsFromYomichanWordDB)
+                                ? GetKanjiResultsFromDB(text, dict, EpwingYomichanDBManager.GetRecordsFromDB)
                                 : GetKanjiResults(text, dict)
                                 ));
                         }
@@ -78,7 +78,7 @@ public static class LookupUtils
                         {
                             lookupResults.AddRange(BuildEpwingNazekaResult(
                                 useDB
-                                ? GetKanjiResultsFromDB(text, dict, EpwingNazekaDBManager.GetRecordsFromNazekaWordDB)
+                                ? GetKanjiResultsFromDB(text, dict, EpwingNazekaDBManager.GetRecordsFromDB)
                                 : GetKanjiResults(text, dict)));
                         }
                     }
@@ -134,21 +134,21 @@ public static class LookupUtils
                     case DictType.JMdict:
                         jmdictResults =
                         useDB
-                        ? GetWordResultsFromDB(textList, textInHiraganaList, deconjugationResultsList, dict, JmdictDBManager.GetRecordsFromJmdictDB)
+                        ? GetWordResultsFromDB(textList, textInHiraganaList, deconjugationResultsList, dict, JmdictDBManager.GetRecordsFromDB)
                         : GetWordResults(textList, textInHiraganaList, deconjugationResultsList, dict);
                         break;
 
                     case DictType.JMnedict:
                         jmnedictResults =
                         useDB
-                        ? GetNameResultsFromDB(textList, textInHiraganaList, dict, JmnedictDBManager.GetRecordsFromJmnedictDB)
+                        ? GetNameResultsFromDB(textList, textInHiraganaList, dict, JmnedictDBManager.GetRecordsFromDB)
                         : GetNameResults(textList, textInHiraganaList, dict);
                         break;
 
                     case DictType.Kanjidic:
                         kanjidicResults =
                         useDB
-                        ? GetKanjiResultsFromDB(text, dict, KanjidicDBManager.GetRecordsFromKanjidicDB)
+                        ? GetKanjiResultsFromDB(text, dict, KanjidicDBManager.GetRecordsFromDB)
                         : GetKanjiResults(text, dict);
                         break;
 
@@ -159,7 +159,7 @@ public static class LookupUtils
                         epwingYomichanWordResultsList.Enqueue
                         (
                             useDB
-                            ? GetKanjiResultsFromDB(text, dict, EpwingYomichanDBManager.GetRecordsFromYomichanWordDB)
+                            ? GetKanjiResultsFromDB(text, dict, EpwingYomichanDBManager.GetRecordsFromDB)
                             : GetKanjiResults(text, dict)
                         );
                         break;
@@ -178,7 +178,7 @@ public static class LookupUtils
                         epwingYomichanKanjiResultsList.Enqueue
                         (
                             useDB
-                            ? GetKanjiResultsFromDB(text, dict, YomichanKanjiDBManager.GetRecordsFromYomichanKanjiDB)
+                            ? GetKanjiResultsFromDB(text, dict, YomichanKanjiDBManager.GetRecordsFromDB)
                             : GetKanjiResults(text, dict)
                         );
                         break;
@@ -187,7 +187,7 @@ public static class LookupUtils
                         epwingYomichanNameResultsList.Enqueue
                         (
                             useDB
-                            ? GetNameResultsFromDB(textList, textInHiraganaList, dict, EpwingYomichanDBManager.GetRecordsFromYomichanWordDB)
+                            ? GetNameResultsFromDB(textList, textInHiraganaList, dict, EpwingYomichanDBManager.GetRecordsFromDB)
                             : GetNameResults(textList, textInHiraganaList, dict)
                         );
                         break;
@@ -215,7 +215,7 @@ public static class LookupUtils
                         epwingYomichanWordResultsList.Enqueue
                         (
                             useDB
-                            ? GetWordResultsFromDB(textList, textInHiraganaList, deconjugationResultsList, dict, EpwingYomichanDBManager.GetRecordsFromYomichanWordDB)
+                            ? GetWordResultsFromDB(textList, textInHiraganaList, deconjugationResultsList, dict, EpwingYomichanDBManager.GetRecordsFromDB)
                             : GetWordResults(textList, textInHiraganaList, deconjugationResultsList, dict)
                         );
                         break;
@@ -224,7 +224,7 @@ public static class LookupUtils
                         epwingNazekaKanjiResultsList.Enqueue
                         (
                             useDB
-                            ? GetKanjiResultsFromDB(text, dict, EpwingNazekaDBManager.GetRecordsFromNazekaWordDB)
+                            ? GetKanjiResultsFromDB(text, dict, EpwingNazekaDBManager.GetRecordsFromDB)
                             : GetKanjiResults(text, dict)
                         );
                         break;
@@ -233,7 +233,7 @@ public static class LookupUtils
                         epwingNazekaNameResultsList.Enqueue
                         (
                             useDB
-                            ? GetNameResultsFromDB(textList, textInHiraganaList, dict, EpwingNazekaDBManager.GetRecordsFromNazekaWordDB)
+                            ? GetNameResultsFromDB(textList, textInHiraganaList, dict, EpwingNazekaDBManager.GetRecordsFromDB)
                             : GetNameResults(textList, textInHiraganaList, dict)
                         );
                         break;
@@ -246,7 +246,7 @@ public static class LookupUtils
                         epwingNazekaWordResultsList.Enqueue
                         (
                             useDB
-                            ? GetWordResultsFromDB(textList, textInHiraganaList, deconjugationResultsList, dict, EpwingNazekaDBManager.GetRecordsFromNazekaWordDB)
+                            ? GetWordResultsFromDB(textList, textInHiraganaList, deconjugationResultsList, dict, EpwingNazekaDBManager.GetRecordsFromDB)
                             : GetWordResults(textList, textInHiraganaList, deconjugationResultsList, dict)
                         );
                         break;
@@ -1263,7 +1263,7 @@ public static class LookupUtils
         List<LookupFrequencyResult> freqsList = new();
         List<Freq> freqs = FreqUtils.FreqDicts.Values.Where(static f => f is { Active: true, Type: not FreqType.YomichanKanji }).OrderBy(static f => f.Priority).ToList();
 
-        for(int i = 0; i < freqs.Count; i++)
+        for (int i = 0; i < freqs.Count; i++)
         {
             Freq freq = freqs[i];
             freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequency(freq)));

@@ -10,10 +10,10 @@ using System.Windows.Threading;
 using HandyControl.Tools;
 using JL.Core;
 using JL.Core.Dicts;
+using JL.Core.Dicts.PitchAccent;
 using JL.Core.Freqs;
 using JL.Core.Lookup;
 using JL.Core.Network;
-using JL.Core.PitchAccent;
 using JL.Core.Profile;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -293,7 +293,7 @@ internal sealed partial class MainWindow : Window
                             FirstPopupWindow.DictsWithResults.Add(lookupResult.Dict);
                         }
 
-                        popupItemSource[i] = FirstPopupWindow.MakeResultStackPanel(lookupResult, i, lookupResults.Count, pitchDict, pitchDictIsActive, useDBForPitchDict, YomichanPitchAccentDBManager.GetRecordsFromYomichanPitchAccentDB, pOrthographyInfo, rOrthographyInfo, aOrthographyInfo);
+                        popupItemSource[i] = FirstPopupWindow.MakeResultStackPanel(lookupResult, i, lookupResults.Count, pitchDict, pitchDictIsActive, useDBForPitchDict, YomichanPitchAccentDBManager.GetRecordsFromDB, pOrthographyInfo, rOrthographyInfo, aOrthographyInfo);
                     }
 
                     PopupWindow.StackPanelCache.AddReplace(text, popupItemSource);

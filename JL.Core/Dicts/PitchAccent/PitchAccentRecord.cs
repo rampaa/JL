@@ -1,9 +1,8 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using JL.Core.Dicts;
 using JL.Core.Utilities;
 
-namespace JL.Core.PitchAccent;
+namespace JL.Core.Dicts.PitchAccent;
 
 public sealed record class PitchAccentRecord : IDictRecord
 {
