@@ -1256,8 +1256,8 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        string? selectedDefinitions = GetSelectedDefinitions(_listViewItemIndex);
         int listViewItemIndex = _listViewItemIndex;
+        string? selectedDefinitions = GetSelectedDefinitions(listViewItemIndex);
 
         HidePopup();
 

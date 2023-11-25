@@ -56,6 +56,7 @@
             <maxversiontested Id="10.0.20348.0"/>
             <maxversiontested Id="10.0.22000.0"/>
             <maxversiontested Id="10.0.22621.0"/>
+            <maxversiontested Id="10.0.22631.0"/>
 
         </application>
     </compatibility>

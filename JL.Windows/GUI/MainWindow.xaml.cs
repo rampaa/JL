@@ -310,8 +310,8 @@ internal sealed partial class MainWindow : Window
         ulong currentClipboardSequenceNo = WinApi.GetClipboardSequenceNo();
         if (s_clipboardSequenceNo != currentClipboardSequenceNo)
         {
-            CopyFromClipboard();
             s_clipboardSequenceNo = currentClipboardSequenceNo;
+            CopyFromClipboard();
         }
     }
 
