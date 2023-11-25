@@ -2,7 +2,7 @@ using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
-using JL.Core.Dicts.YomichanKanji;
+using JL.Core.Dicts.Kanji;
 using JL.Core.Dicts;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
