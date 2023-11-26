@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
+using JL.Windows.GUI.UserControls;
 using Microsoft.Win32;
 using Path = System.IO.Path;
 
@@ -14,11 +15,14 @@ namespace JL.Windows.GUI;
 internal sealed partial class EditFrequencyWindow : Window
 {
     private readonly Freq _freq;
+    private readonly FreqOptionsControl _freqOptionsControl;
 
     public EditFrequencyWindow(Freq freq)
     {
         _freq = freq;
+        _freqOptionsControl = new FreqOptionsControl();
         InitializeComponent();
+        _ = FreqStackPanel.Children.Add(_freqOptionsControl);
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -67,6 +71,10 @@ internal sealed partial class EditFrequencyWindow : Window
 
             _freq.Name = name;
 
+            Core.Freqs.Options.FreqOptions options = _freqOptionsControl.GetFreqOptions(_freq.Type);
+
+            _freq.Options = options;
+
             Utils.Frontend.InvalidateDisplayCache();
 
             Close();
@@ -101,6 +109,8 @@ internal sealed partial class EditFrequencyWindow : Window
         FreqTypeComboBox.SelectedValue = type;
         TextBlockPath.Text = _freq.Path;
         NameTextBox.Text = _freq.Name;
+
+        _freqOptionsControl.GenerateFreqOptionsElements(_freq);
     }
 
     private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)

@@ -44,11 +44,9 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
         if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling),
                 out IList<FrequencyRecord>? freqResults))
         {
-            int freqResultsCount = freqResults.Count;
-            for (int i = 0; i < freqResultsCount; i++)
+            for (int i = 0; i < freqResults.Count; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
-
                 if (Reading == freqResult.Spelling || PrimarySpelling == freqResult.Spelling)
                 {
                     if (frequency > freqResult.Frequency)
@@ -66,11 +64,9 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
                             JapaneseUtils.KatakanaToHiragana(AlternativeSpellings[i]),
                             out IList<FrequencyRecord>? alternativeSpellingFreqResults))
                     {
-                        int alternativeSpellingFreqResultsCount = alternativeSpellingFreqResults.Count;
-                        for (int j = 0; j < alternativeSpellingFreqResultsCount; j++)
+                        for (int j = 0; j < alternativeSpellingFreqResults.Count; j++)
                         {
                             FrequencyRecord alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
-
                             if (Reading == alternativeSpellingFreqResult.Spelling)
                             {
                                 if (frequency > alternativeSpellingFreqResult.Frequency)
@@ -89,10 +85,76 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
             if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading),
                     out IList<FrequencyRecord>? readingFreqResults))
             {
-                int readingFreqResultsCount = readingFreqResults.Count;
-                for (int j = 0; j < readingFreqResultsCount; j++)
+                for (int i = 0; i < readingFreqResults.Count; i++)
                 {
-                    FrequencyRecord readingFreqResult = readingFreqResults[j];
+                    FrequencyRecord readingFreqResult = readingFreqResults[i];
+                    if ((Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading))
+                        || (AlternativeSpellings?.Contains(readingFreqResult.Spelling) ?? false))
+                    {
+                        if (frequency > readingFreqResult.Frequency)
+                        {
+                            frequency = readingFreqResult.Frequency;
+                        }
+                    }
+                }
+            }
+        }
+
+        return frequency;
+    }
+
+    public int GetFrequencyFromDB(Freq freq)
+    {
+        int frequency = int.MaxValue;
+        List<FrequencyRecord>? freqResults = FreqDBManager.GetRecordsFromDB(freq.Name, JapaneseUtils.KatakanaToHiragana(PrimarySpelling));
+        if (freqResults.Count > 0)
+        {
+            for (int i = 0; i < freqResults.Count; i++)
+            {
+                FrequencyRecord freqResult = freqResults[i];
+
+                if (Reading == freqResult.Spelling || PrimarySpelling == freqResult.Spelling)
+                {
+                    if (frequency > freqResult.Frequency)
+                    {
+                        frequency = freqResult.Frequency;
+                    }
+                }
+            }
+
+            if (frequency is int.MaxValue && AlternativeSpellings is not null)
+            {
+                List<string> alternativeSpellingsInHiragana = AlternativeSpellings.Select(JapaneseUtils.KatakanaToHiragana).ToList();
+                Dictionary<string, List<FrequencyRecord>> alternativeSpellingFreqResultDict = FreqDBManager.GetRecordsFromDB(freq.Name, alternativeSpellingsInHiragana);
+                for (int i = 0; i < alternativeSpellingsInHiragana.Count; i++)
+                {
+                    if (alternativeSpellingFreqResultDict.TryGetValue(alternativeSpellingsInHiragana[i], out List<FrequencyRecord>? alternativeSpellingFreqResults))
+                    {
+                        for (int j = 0; j < alternativeSpellingFreqResults.Count; j++)
+                        {
+                            FrequencyRecord alternativeSpellingFreqResult = alternativeSpellingFreqResults[j];
+
+                            if (Reading == alternativeSpellingFreqResult.Spelling)
+                            {
+                                if (frequency > alternativeSpellingFreqResult.Frequency)
+                                {
+                                    frequency = alternativeSpellingFreqResult.Frequency;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        else if (Reading is not null)
+        {
+            List<FrequencyRecord> readingFreqResults = FreqDBManager.GetRecordsFromDB(freq.Name, JapaneseUtils.KatakanaToHiragana(Reading));
+            if (readingFreqResults.Count > 0)
+            {
+                for (int i = 0; i < readingFreqResults.Count; i++)
+                {
+                    FrequencyRecord readingFreqResult = readingFreqResults[i];
 
                     if ((Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading))
                         || (AlternativeSpellings?.Contains(readingFreqResult.Spelling) ?? false))

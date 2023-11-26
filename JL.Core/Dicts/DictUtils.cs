@@ -621,20 +621,36 @@ public static class DictUtils
                 case DictType.Kanjidic:
                     if (!UpdatingKanjidic)
                     {
-                        if (dict is { Active: true, Contents.Count: 0 })
+                        if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                         {
+                            dict.Ready = false;
                             tasks.Add(Task.Run(async () =>
                             {
                                 await KanjidicLoader.Load(dict).ConfigureAwait(false);
                                 dict.Size = dict.Contents.Count;
+
+                                if (useDB && !dbExists)
+                                {
+                                    KanjidicDBManager.CreateDB(dict.Name);
+                                    KanjidicDBManager.InsertRecordsToDB(dict);
+                                    dict.Contents.Clear();
+                                    dict.Contents.TrimExcess();
+                                }
+
+                                dict.Ready = true;
                             }));
                         }
 
-                        else if (dict is { Active: false, Contents.Count: > 0 })
+                        else
                         {
-                            dict.Contents.Clear();
-                            dict.Contents.TrimExcess();
-                            dictCleared = true;
+                            if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                            {
+                                dict.Contents.Clear();
+                                dict.Contents.TrimExcess();
+                                dictCleared = true;
+                            }
+
+                            dict.Ready = true;
                         }
                     }
 

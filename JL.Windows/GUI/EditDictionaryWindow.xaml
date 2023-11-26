@@ -8,7 +8,7 @@
         Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False" Background="{DynamicResource RegionBrush}"
         x:ClassModifier="internal">
     <Grid>
-        <StackPanel Name="StackPanel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,60">
+        <StackPanel Name="DictStackPanel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,60">
             <TextBlock Text="Dictionary Type" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
             <ComboBox Name="ComboBoxDictType" Width="340" Margin="10" HorizontalAlignment="Left" IsEnabled="False" />
 

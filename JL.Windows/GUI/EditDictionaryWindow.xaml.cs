@@ -23,7 +23,7 @@ internal sealed partial class EditDictionaryWindow : Window
         _dict = dict;
         _dictOptionsControl = new DictOptionsControl();
         InitializeComponent();
-        _ = StackPanel.Children.Add(_dictOptionsControl);
+        _ = DictStackPanel.Children.Add(_dictOptionsControl);
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)

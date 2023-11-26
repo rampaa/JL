@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using JL.Core.Freqs;
+using JL.Core.Freqs.Options;
 using JL.Core.Utilities;
 using Microsoft.Win32;
 
@@ -68,7 +69,7 @@ internal sealed partial class AddFrequencyWindow : Window
             FreqType type = typeString!.GetEnum<FreqType>();
 
             FreqUtils.FreqDicts.Add(name,
-                new Freq(type, name, path, true, FreqUtils.FreqDicts.Count + 1, 0));
+                new Freq(type, name, path, true, FreqUtils.FreqDicts.Count + 1, 0, false, new FreqOptions(new UseDBOption(false))));
 
             Close();
         }

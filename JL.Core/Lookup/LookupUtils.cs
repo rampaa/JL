@@ -1266,7 +1266,10 @@ public static class LookupUtils
         for (int i = 0; i < freqs.Count; i++)
         {
             Freq freq = freqs[i];
-            freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequency(freq)));
+            bool useDB = (freq.Options?.UseDB?.Value ?? false) && freq.Ready;
+            freqsList.Add(new LookupFrequencyResult(freq.Name, useDB
+                ? record.GetFrequencyFromDB(freq)
+                : record.GetFrequency(freq)));
         }
 
         return freqsList;
@@ -1275,12 +1278,23 @@ public static class LookupUtils
     private static List<LookupFrequencyResult> GetYomichanKanjiFrequencies(string kanji)
     {
         List<LookupFrequencyResult> freqsList = new();
-
         List<Freq> kanjiFreqs = FreqUtils.FreqDicts.Values.Where(static f => f is { Type: FreqType.YomichanKanji, Active: true }).OrderBy(static f => f.Priority).ToList();
         for (int i = 0; i < kanjiFreqs.Count; i++)
         {
             Freq kanjiFreq = kanjiFreqs[i];
-            if (kanjiFreq.Contents.TryGetValue(kanji, out IList<FrequencyRecord>? freqResultList))
+            bool useDB = (kanjiFreq.Options?.UseDB?.Value ?? false) && kanjiFreq.Ready;
+            IList<FrequencyRecord>? freqResultList;
+
+            if (useDB)
+            {
+                freqResultList = FreqDBManager.GetRecordsFromDB(kanjiFreq.Name, kanji);
+            }
+            else
+            {
+                _ = kanjiFreq.Contents.TryGetValue(kanji, out freqResultList);
+            }
+
+            if (freqResultList is not null)
             {
                 int frequency = freqResultList.FirstOrDefault().Frequency;
                 if (frequency is not 0)

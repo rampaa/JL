@@ -113,8 +113,46 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling),
                 out IList<FrequencyRecord>? freqResults))
         {
-            int freqResultsCount = freqResults.Count;
-            for (int i = 0; i < freqResultsCount; i++)
+            for (int i = 0; i < freqResults.Count; i++)
+            {
+                FrequencyRecord freqResult = freqResults[i];
+                if (Reading == freqResult.Spelling || PrimarySpelling == freqResult.Spelling)
+                {
+                    if (frequency > freqResult.Frequency)
+                    {
+                        frequency = freqResult.Frequency;
+                    }
+                }
+            }
+        }
+
+        else if (Reading is not null
+                 && freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading),
+                     out IList<FrequencyRecord>? readingFreqResults))
+        {
+            for (int i = 0; i < readingFreqResults.Count; i++)
+            {
+                FrequencyRecord readingFreqResult = readingFreqResults[i];
+                if (Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading))
+                {
+                    if (frequency > readingFreqResult.Frequency)
+                    {
+                        frequency = readingFreqResult.Frequency;
+                    }
+                }
+            }
+        }
+
+        return frequency;
+    }
+
+    public int GetFrequencyFromDB(Freq freq)
+    {
+        int frequency = int.MaxValue;
+        List<FrequencyRecord>? freqResults = FreqDBManager.GetRecordsFromDB(freq.Name, JapaneseUtils.KatakanaToHiragana(PrimarySpelling));
+        if (freqResults.Count > 0)
+        {
+            for (int i = 0; i < freqResults.Count; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
 
@@ -128,20 +166,20 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
             }
         }
 
-        else if (!string.IsNullOrEmpty(Reading)
-                 && freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading),
-                     out IList<FrequencyRecord>? readingFreqResults))
+        else if (Reading is not null)
         {
-            int readingFreqResultsCount = readingFreqResults.Count;
-            for (int i = 0; i < readingFreqResultsCount; i++)
+            List<FrequencyRecord> readingFreqResults = FreqDBManager.GetRecordsFromDB(freq.Name, JapaneseUtils.KatakanaToHiragana(Reading));
+            if (readingFreqResults.Count > 0)
             {
-                FrequencyRecord readingFreqResult = readingFreqResults[i];
-
-                if (Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading))
+                for (int i = 0; i < readingFreqResults.Count; i++)
                 {
-                    if (frequency > readingFreqResult.Frequency)
+                    FrequencyRecord readingFreqResult = readingFreqResults[i];
+                    if (Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading))
                     {
-                        frequency = readingFreqResult.Frequency;
+                        if (frequency > readingFreqResult.Frequency)
+                        {
+                            frequency = readingFreqResult.Frequency;
+                        }
                     }
                 }
             }
