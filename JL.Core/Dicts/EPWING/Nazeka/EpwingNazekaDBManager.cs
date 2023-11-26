@@ -57,8 +57,8 @@ internal static class EpwingNazekaDBManager
             _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
             _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling", record.PrimarySpelling);
             _ = insertRecordCommand.Parameters.AddWithValue("@reading", record.Reading is not null ? record.Reading : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@alternative_spellings", record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jsoWithIndentation) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_jsoWithIndentation));
+            _ = insertRecordCommand.Parameters.AddWithValue("@alternative_spellings", record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_defaultJso) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_defaultJso));
 
             _ = insertRecordCommand.ExecuteNonQuery();
 
@@ -155,7 +155,7 @@ internal static class EpwingNazekaDBManager
 
             object alternativeSpellingsFromDB = dataReader["alternativeSpellings"];
             string[]? alternativeSpellings = alternativeSpellingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)alternativeSpellingsFromDB, Utils.s_jsoWithIndentation)
+                ? JsonSerializer.Deserialize<string[]>((string)alternativeSpellingsFromDB, Utils.s_defaultJso)
                 : null;
 
             string[] definitions = JsonSerializer.Deserialize<string[]>((string)dataReader["definitions"])!;
@@ -204,7 +204,7 @@ internal static class EpwingNazekaDBManager
 
             object alternativeSpellingsFromDB = dataReader["alternativeSpellings"];
             string[]? alternativeSpellings = alternativeSpellingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)alternativeSpellingsFromDB, Utils.s_jsoWithIndentation)
+                ? JsonSerializer.Deserialize<string[]>((string)alternativeSpellingsFromDB, Utils.s_defaultJso)
                 : null;
 
             string[] definitions = JsonSerializer.Deserialize<string[]>((string)dataReader["definitions"])!;

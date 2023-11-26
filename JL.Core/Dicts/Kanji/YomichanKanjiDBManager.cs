@@ -52,10 +52,10 @@ internal static class YomichanKanjiDBManager
 
                 _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
                 _ = insertRecordCommand.Parameters.AddWithValue("@kanji", kanji);
-                _ = insertRecordCommand.Parameters.AddWithValue("@on_readings", yomichanKanjiRecord.OnReadings is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.OnReadings, Utils.s_jsoWithIndentation) : DBNull.Value);
-                _ = insertRecordCommand.Parameters.AddWithValue("@kun_readings", yomichanKanjiRecord.KunReadings is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.KunReadings, Utils.s_jsoWithIndentation) : DBNull.Value);
-                _ = insertRecordCommand.Parameters.AddWithValue("@glossary", yomichanKanjiRecord.Definitions is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.Definitions, Utils.s_jsoWithIndentation) : DBNull.Value);
-                _ = insertRecordCommand.Parameters.AddWithValue("@stats", yomichanKanjiRecord.Stats is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.Stats, Utils.s_jsoWithIndentation) : DBNull.Value);
+                _ = insertRecordCommand.Parameters.AddWithValue("@on_readings", yomichanKanjiRecord.OnReadings is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.OnReadings, Utils.s_defaultJso) : DBNull.Value);
+                _ = insertRecordCommand.Parameters.AddWithValue("@kun_readings", yomichanKanjiRecord.KunReadings is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.KunReadings, Utils.s_defaultJso) : DBNull.Value);
+                _ = insertRecordCommand.Parameters.AddWithValue("@glossary", yomichanKanjiRecord.Definitions is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.Definitions, Utils.s_defaultJso) : DBNull.Value);
+                _ = insertRecordCommand.Parameters.AddWithValue("@stats", yomichanKanjiRecord.Stats is not null ? JsonSerializer.Serialize(yomichanKanjiRecord.Stats, Utils.s_defaultJso) : DBNull.Value);
 
                 _ = insertRecordCommand.ExecuteNonQuery();
 
@@ -104,22 +104,22 @@ internal static class YomichanKanjiDBManager
         {
             object onReadingsFromDB = dataReader["onReadings"];
             string[]? onReadings = onReadingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)onReadingsFromDB, Utils.s_jsoWithIndentation)
+                ? JsonSerializer.Deserialize<string[]>((string)onReadingsFromDB, Utils.s_defaultJso)
                 : null;
 
             object kunReadingsFromDB = dataReader["kunReadings"];
             string[]? kunReadings = kunReadingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)kunReadingsFromDB, Utils.s_jsoWithIndentation)
+                ? JsonSerializer.Deserialize<string[]>((string)kunReadingsFromDB, Utils.s_defaultJso)
                 : null;
 
             object definitionsFromDB = dataReader["definitions"];
             string[]? definitions = definitionsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)definitionsFromDB, Utils.s_jsoWithIndentation)
+                ? JsonSerializer.Deserialize<string[]>((string)definitionsFromDB, Utils.s_defaultJso)
                 : null;
 
             object statsFromDB = dataReader["stats"];
             string[]? stats = statsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)statsFromDB, Utils.s_jsoWithIndentation)
+                ? JsonSerializer.Deserialize<string[]>((string)statsFromDB, Utils.s_defaultJso)
                 : null;
 
             results.Add(new YomichanKanjiRecord(onReadings, kunReadings, definitions, stats));
