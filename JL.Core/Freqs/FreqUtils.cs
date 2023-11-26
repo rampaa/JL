@@ -36,8 +36,7 @@ public static class FreqUtils
         }
     };
 
-    internal static FreqType[] s_freqTypesWithDBSupport =
-    {
+    internal static readonly FreqType[] s_freqTypesWithDBSupport = {
         FreqType.Nazeka,
         FreqType.Yomichan,
         FreqType.YomichanKanji

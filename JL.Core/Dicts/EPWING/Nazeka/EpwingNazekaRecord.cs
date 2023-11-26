@@ -106,7 +106,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
     public int GetFrequencyFromDB(Freq freq)
     {
         int frequency = int.MaxValue;
-        List<FrequencyRecord>? freqResults = FreqDBManager.GetRecordsFromDB(freq.Name, JapaneseUtils.KatakanaToHiragana(PrimarySpelling));
+        List<FrequencyRecord> freqResults = FreqDBManager.GetRecordsFromDB(freq.Name, JapaneseUtils.KatakanaToHiragana(PrimarySpelling));
         if (freqResults.Count > 0)
         {
             for (int i = 0; i < freqResults.Count; i++)
