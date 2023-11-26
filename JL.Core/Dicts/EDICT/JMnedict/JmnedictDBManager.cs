@@ -55,10 +55,10 @@ internal static class JmnedictDBManager
             _ = insertRecordCommand.Parameters.AddWithValue("@jmnedict_id", record.Id);
             _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling", record.PrimarySpelling);
             _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling_in_hiragana", JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling));
-            _ = insertRecordCommand.Parameters.AddWithValue("@readings", record.Readings is not null ? JsonSerializer.Serialize(record.Readings, Utils.s_defaultJso) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@alternative_spellings", record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_defaultJso) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_defaultJso));
-            _ = insertRecordCommand.Parameters.AddWithValue("@name_types", JsonSerializer.Serialize(record.NameTypes, Utils.s_defaultJso));
+            _ = insertRecordCommand.Parameters.AddWithValue("@readings", record.Readings is not null ? JsonSerializer.Serialize(record.Readings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@alternative_spellings", record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull));
+            _ = insertRecordCommand.Parameters.AddWithValue("@name_types", JsonSerializer.Serialize(record.NameTypes, Utils.s_jsoNotIgnoringNull));
 
             _ = insertRecordCommand.ExecuteNonQuery();
 
@@ -119,16 +119,16 @@ internal static class JmnedictDBManager
 
             object readingsFromDB = dataReader["readings"];
             string[]? readings = readingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)readingsFromDB, Utils.s_defaultJso)
+                ? JsonSerializer.Deserialize<string[]>((string)readingsFromDB, Utils.s_jsoNotIgnoringNull)
                 : null;
 
             object alternativeSpellingsFromDB = dataReader["alternativeSpellings"];
             string[]? alternativeSpellings = alternativeSpellingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)alternativeSpellingsFromDB, Utils.s_defaultJso)
+                ? JsonSerializer.Deserialize<string[]>((string)alternativeSpellingsFromDB, Utils.s_jsoNotIgnoringNull)
                 : null;
 
-            string[][] definitions = JsonSerializer.Deserialize<string[][]>((string)dataReader["definitions"])!;
-            string[][] nameTypes = JsonSerializer.Deserialize<string[][]>((string)dataReader["nameTypes"])!;
+            string[][] definitions = JsonSerializer.Deserialize<string[][]>((string)dataReader["definitions"], Utils.s_jsoNotIgnoringNull)!;
+            string[][] nameTypes = JsonSerializer.Deserialize<string[][]>((string)dataReader["nameTypes"], Utils.s_jsoNotIgnoringNull)!;
 
             if (results.TryGetValue(searchKey, out List<IDictRecord>? result))
             {

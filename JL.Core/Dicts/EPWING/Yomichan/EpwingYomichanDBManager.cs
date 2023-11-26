@@ -61,9 +61,9 @@ internal static class EpwingYomichanDBManager
             _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
             _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling", record.PrimarySpelling);
             _ = insertRecordCommand.Parameters.AddWithValue("@reading", record.Reading is not null ? record.Reading : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_defaultJso));
-            _ = insertRecordCommand.Parameters.AddWithValue("@part_of_speech", record.WordClasses is not null ? JsonSerializer.Serialize(record.WordClasses, Utils.s_defaultJso) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@glossary_tags", record.DefinitionTags is not null ? JsonSerializer.Serialize(record.Definitions, Utils.s_defaultJso) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull));
+            _ = insertRecordCommand.Parameters.AddWithValue("@part_of_speech", record.WordClasses is not null ? JsonSerializer.Serialize(record.WordClasses, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@glossary_tags", record.DefinitionTags is not null ? JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
 
             _ = insertRecordCommand.ExecuteNonQuery();
 
@@ -159,16 +159,16 @@ internal static class EpwingYomichanDBManager
                 ? (string)readingFromDB
                 : null;
 
-            string[] definitions = JsonSerializer.Deserialize<string[]>((string)dataReader["definitions"])!;
+            string[] definitions = JsonSerializer.Deserialize<string[]>((string)dataReader["definitions"], Utils.s_jsoNotIgnoringNull)!;
 
             object wordClassFromDB = dataReader["wordClasses"];
             string[]? wordClasses = wordClassFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)wordClassFromDB, Utils.s_defaultJso)
+                ? JsonSerializer.Deserialize<string[]>((string)wordClassFromDB, Utils.s_jsoNotIgnoringNull)
                 : null;
 
             object definitionTagsFromDB = dataReader["definitionTags"];
             string[]? definitionTags = definitionTagsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)definitionTagsFromDB, Utils.s_defaultJso)
+                ? JsonSerializer.Deserialize<string[]>((string)definitionTagsFromDB, Utils.s_jsoNotIgnoringNull)
                 : null;
 
             if (results.TryGetValue(searchKey, out List<IDictRecord>? result))
@@ -213,16 +213,16 @@ internal static class EpwingYomichanDBManager
                 ? (string)readingFromDB
                 : null;
 
-            string[] definitions = JsonSerializer.Deserialize<string[]>((string)dataReader["definitions"])!;
+            string[] definitions = JsonSerializer.Deserialize<string[]>((string)dataReader["definitions"], Utils.s_jsoNotIgnoringNull)!;
 
             object wordClassFromDB = dataReader["wordClasses"];
             string[]? wordClasses = wordClassFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)wordClassFromDB, Utils.s_defaultJso)
+                ? JsonSerializer.Deserialize<string[]>((string)wordClassFromDB, Utils.s_jsoNotIgnoringNull)
                 : null;
 
             object definitionTagsFromDB = dataReader["definitionTags"];
             string[]? definitionTags = definitionTagsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)definitionTagsFromDB, Utils.s_defaultJso)
+                ? JsonSerializer.Deserialize<string[]>((string)definitionTagsFromDB, Utils.s_jsoNotIgnoringNull)
                 : null;
 
             results.Add(new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags));

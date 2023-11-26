@@ -56,12 +56,12 @@ internal static class KanjidicDBManager
 
                 _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
                 _ = insertRecordCommand.Parameters.AddWithValue("@kanji", kanji);
-                _ = insertRecordCommand.Parameters.AddWithValue("@on_readings", kanjidicRecord.OnReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.OnReadings, Utils.s_defaultJso) : DBNull.Value);
-                _ = insertRecordCommand.Parameters.AddWithValue("@kun_readings", kanjidicRecord.KunReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.KunReadings, Utils.s_defaultJso) : DBNull.Value);
-                _ = insertRecordCommand.Parameters.AddWithValue("@on_readings", kanjidicRecord.OnReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.OnReadings, Utils.s_defaultJso) : DBNull.Value);
-                _ = insertRecordCommand.Parameters.AddWithValue("@nanori_readings", kanjidicRecord.NanoriReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.NanoriReadings, Utils.s_defaultJso) : DBNull.Value);
-                _ = insertRecordCommand.Parameters.AddWithValue("@radical_names", kanjidicRecord.RadicalNames is not null ? JsonSerializer.Serialize(kanjidicRecord.RadicalNames, Utils.s_defaultJso) : DBNull.Value);
-                _ = insertRecordCommand.Parameters.AddWithValue("@glossary", kanjidicRecord.Definitions is not null ? JsonSerializer.Serialize(kanjidicRecord.Definitions, Utils.s_defaultJso) : DBNull.Value);
+                _ = insertRecordCommand.Parameters.AddWithValue("@on_readings", kanjidicRecord.OnReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.OnReadings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+                _ = insertRecordCommand.Parameters.AddWithValue("@kun_readings", kanjidicRecord.KunReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.KunReadings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+                _ = insertRecordCommand.Parameters.AddWithValue("@on_readings", kanjidicRecord.OnReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.OnReadings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+                _ = insertRecordCommand.Parameters.AddWithValue("@nanori_readings", kanjidicRecord.NanoriReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.NanoriReadings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+                _ = insertRecordCommand.Parameters.AddWithValue("@radical_names", kanjidicRecord.RadicalNames is not null ? JsonSerializer.Serialize(kanjidicRecord.RadicalNames, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+                _ = insertRecordCommand.Parameters.AddWithValue("@glossary", kanjidicRecord.Definitions is not null ? JsonSerializer.Serialize(kanjidicRecord.Definitions, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
                 _ = insertRecordCommand.Parameters.AddWithValue("@stroke_count", kanjidicRecord.StrokeCount);
                 _ = insertRecordCommand.Parameters.AddWithValue("@grade", kanjidicRecord.Grade);
                 _ = insertRecordCommand.Parameters.AddWithValue("@frequency", kanjidicRecord.Frequency);
@@ -111,27 +111,27 @@ internal static class KanjidicDBManager
         {
             object onReadingsFromDB = dataReader["onReadings"];
             string[]? onReadings = onReadingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)onReadingsFromDB, Utils.s_defaultJso)
+                ? JsonSerializer.Deserialize<string[]>((string)onReadingsFromDB, Utils.s_jsoNotIgnoringNull)
                 : null;
 
             object kunReadingsFromDB = dataReader["kunReadings"];
             string[]? kunReadings = kunReadingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)kunReadingsFromDB, Utils.s_defaultJso)
+                ? JsonSerializer.Deserialize<string[]>((string)kunReadingsFromDB, Utils.s_jsoNotIgnoringNull)
                 : null;
 
             object nanoriReadingsFromDB = dataReader["nanoriReadings"];
             string[]? nanoriReadings = nanoriReadingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)nanoriReadingsFromDB, Utils.s_defaultJso)
+                ? JsonSerializer.Deserialize<string[]>((string)nanoriReadingsFromDB, Utils.s_jsoNotIgnoringNull)
                 : null;
 
             object radicalNamesFromDB = dataReader["radicalNames"];
             string[]? radicalNames = radicalNamesFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)radicalNamesFromDB, Utils.s_defaultJso)
+                ? JsonSerializer.Deserialize<string[]>((string)radicalNamesFromDB, Utils.s_jsoNotIgnoringNull)
                 : null;
 
             object definitionsFromDB = dataReader["definitions"];
             string[]? definitions = definitionsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)definitionsFromDB, Utils.s_defaultJso)
+                ? JsonSerializer.Deserialize<string[]>((string)definitionsFromDB, Utils.s_jsoNotIgnoringNull)
                 : null;
 
             int strokeCount = (int)dataReader["strokeCount"];
