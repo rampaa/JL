@@ -199,6 +199,12 @@ internal sealed partial class ManageFrequenciesWindow : Window
                     freq.Contents.TrimExcess();
                     _ = FreqUtils.FreqDicts.Remove(freq.Name);
 
+                    string dbPath = FreqUtils.GetDBPath(freq.Path);
+                    if (File.Exists(dbPath))
+                    {
+                        File.Delete(dbPath);
+                    }
+
                     int priorityOfDeletedFreq = freq.Priority;
 
                     foreach (Freq f in FreqUtils.FreqDicts.Values)

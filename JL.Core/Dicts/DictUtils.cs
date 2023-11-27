@@ -513,7 +513,7 @@ public static class DictUtils
         DictType.NonspecificNazeka
     };
 
-    internal static string GetDBPath(string dbName)
+    public static string GetDBPath(string dbName)
     {
         return string.Create(CultureInfo.InvariantCulture, $"{Path.Join(Utils.ResourcesPath, dbName)} Dictionary.sqlite");
     }
@@ -540,7 +540,8 @@ public static class DictUtils
         foreach (Dict dict in Dicts.Values.ToList())
         {
             bool useDB = dict.Options?.UseDB?.Value ?? false;
-            bool dbExists = File.Exists(GetDBPath(dict.Name));
+            string dbPath = GetDBPath(dict.Name);
+            bool dbExists = File.Exists(dbPath);
 
             switch (dict.Type)
             {
@@ -705,6 +706,11 @@ public static class DictUtils
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
+
+                                if (dbExists)
+                                {
+                                    File.Delete(dbPath);
+                                }
                             }
                         }));
                     }
@@ -749,6 +755,11 @@ public static class DictUtils
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
+
+                                if (dbExists)
+                                {
+                                    File.Delete(dbPath);
+                                }
                             }
                         }));
                     }
@@ -907,6 +918,11 @@ public static class DictUtils
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
+
+                                if (dbExists)
+                                {
+                                    File.Delete(dbPath);
+                                }
                             }
                         }));
                     }
@@ -953,6 +969,11 @@ public static class DictUtils
                                 _ = Dicts.Remove(dict.Name);
                                 _ = SingleDictTypeDicts.Remove(DictType.PitchAccentYomichan);
                                 dictRemoved = true;
+
+                                if (dbExists)
+                                {
+                                    File.Delete(dbPath);
+                                }
                             }
                         }));
                     }
@@ -967,7 +988,6 @@ public static class DictUtils
                         }
                         dict.Ready = true;
                     }
-
 
                     break;
 

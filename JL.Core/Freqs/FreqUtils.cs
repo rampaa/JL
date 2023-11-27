@@ -42,7 +42,7 @@ public static class FreqUtils
         FreqType.YomichanKanji
     };
 
-    internal static string GetDBPath(string dbName)
+    public static string GetDBPath(string dbName)
     {
         return string.Create(CultureInfo.InvariantCulture, $"{Path.Join(Utils.ResourcesPath, dbName)} Frequency Dictionary.sqlite");
     }
@@ -59,7 +59,8 @@ public static class FreqUtils
         foreach (Freq freq in FreqDicts.Values.ToList())
         {
             bool useDB = freq.Options?.UseDB?.Value ?? false;
-            bool dbExists = File.Exists(GetDBPath(freq.Name));
+            string dbPath = GetDBPath(freq.Name);
+            bool dbExists = File.Exists(dbPath);
 
             switch (freq.Type)
             {
@@ -90,6 +91,11 @@ public static class FreqUtils
                                 Utils.Logger.Error(ex, "Couldn't import {FreqName}", freq.Type);
                                 _ = FreqDicts.Remove(freq.Name);
                                 freqRemoved = true;
+
+                                if (dbExists)
+                                {
+                                    File.Delete(dbPath);
+                                }
                             }
                         });
 
@@ -138,6 +144,11 @@ public static class FreqUtils
                                 Utils.Logger.Error(ex, "Couldn't import {FreqName}", freq.Type);
                                 _ = FreqDicts.Remove(freq.Name);
                                 freqRemoved = true;
+
+                                if (dbExists)
+                                {
+                                    File.Delete(dbPath);
+                                }
                             }
                         });
 

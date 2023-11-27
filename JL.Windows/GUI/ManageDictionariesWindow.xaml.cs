@@ -291,6 +291,12 @@ internal sealed partial class ManageDictionariesWindow : Window
                     dict.Contents.TrimExcess();
                     _ = DictUtils.Dicts.Remove(dict.Name);
 
+                    string dbPath = DictUtils.GetDBPath(dict.Path);
+                    if (File.Exists(dbPath))
+                    {
+                        File.Delete(dbPath);
+                    }
+
                     if (dict.Type is DictType.PitchAccentYomichan)
                     {
                         _ = DictUtils.SingleDictTypeDicts.Remove(DictType.PitchAccentYomichan);
