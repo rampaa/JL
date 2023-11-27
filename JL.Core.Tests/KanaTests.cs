@@ -6,21 +6,6 @@ namespace JL.Core.Tests;
 [TestFixture]
 public class KanaTests
 {
-    //[Test]
-    //public void HiraganaToKatakanaConverter_あToア()
-    //{
-    //    // Arrange
-    //    string expected = "ア";
-
-    //    string text = "あ";
-
-    //    // Act
-    //    string result = JapaneseUtils.HiraganaToKatakana(text);
-
-    //    // Assert
-    //    StringAssert.AreEqualIgnoringCase(expected, result);
-    //}
-
     [Test]
     public void KatakanaToHiraganaConverter_アToあ()
     {
@@ -30,11 +15,10 @@ public class KanaTests
         const string text = "ア";
 
         // Act
-        string result = JapaneseUtils.KatakanaToHiragana(
-            text);
+        string result = JapaneseUtils.KatakanaToHiragana(text);
 
         // Assert
-        StringAssert.AreEqualIgnoringCase(expected, result);
+        Assert.That(expected == result);
     }
 
     [Test]
@@ -45,26 +29,24 @@ public class KanaTests
         const string text1 = "㋕";
 
         // Act
-        string result1 = JapaneseUtils.KatakanaToHiragana(
-            text1);
+        string result1 = JapaneseUtils.KatakanaToHiragana(text1);
 
         // Assert
-        StringAssert.AreEqualIgnoringCase(expected1, result1);
+        Assert.That(expected1 == result1);
     }
 
     [Test]
     public void KatakanaToHiraganaConverter_NormalizesText2()
     {
         // Arrange
-        const string expected2 = "あぱーと";
-        const string text2 = "㌀";
+        const string expected = "あぱーと";
+        const string text = "㌀";
 
         // Act
-        string result2 = JapaneseUtils.KatakanaToHiragana(
-            text2);
+        string result = JapaneseUtils.KatakanaToHiragana(text);
 
         // Assert
-        StringAssert.AreEqualIgnoringCase(expected2, result2);
+        Assert.That(expected == result);
     }
 
     // this one seems to be inconsistent between platforms
@@ -73,15 +55,14 @@ public class KanaTests
     public void KatakanaToHiraganaConverter_NormalizesText3()
     {
         // Arrange
-        const string expected3 = "令和";
-        const string text3 = "㋿";
+        const string expected = "令和";
+        const string text = "㋿";
 
         // Act
-        string result3 = JapaneseUtils.KatakanaToHiragana(
-            text3);
+        string result3 = JapaneseUtils.KatakanaToHiragana(text);
 
         // Assert
-        StringAssert.AreEqualIgnoringCase(expected3, result3);
+        Assert.That(expected == result3);
     }
 
     [Test]
@@ -96,6 +77,6 @@ public class KanaTests
         List<string> result = JapaneseUtils.LongVowelMarkToKana(JapaneseUtils.KatakanaToHiragana(text));
 
         // Assert
-        Assert.AreEqual(expected, result);
+        Assert.That(expected.SequenceEqual(result));
     }
 }

@@ -21,7 +21,7 @@ public class UtilsTests
             position);
 
         // Assert
-        Assert.AreEqual(expected, result);
+        Assert.That(expected == result);
     }
 
     [Test]
@@ -39,7 +39,7 @@ public class UtilsTests
             position);
 
         // Assert
-        Assert.AreEqual(expected, result);
+        Assert.That(expected == result);
     }
 
     [Test]
@@ -57,7 +57,7 @@ public class UtilsTests
             position);
 
         // Assert
-        Assert.AreEqual(expected, result);
+        Assert.That(expected == result);
     }
 
     [Test]
@@ -75,7 +75,7 @@ public class UtilsTests
             position);
 
         // Assert
-        Assert.AreEqual(expected, result);
+        Assert.That(expected == result);
     }
 
     [Test]
@@ -93,7 +93,7 @@ public class UtilsTests
             position);
 
         // Assert
-        Assert.AreEqual(expected, result);
+        Assert.That(expected == result);
     }
 
     [Test]
@@ -111,7 +111,7 @@ public class UtilsTests
             position);
 
         // Assert
-        Assert.AreEqual(expected, result);
+        Assert.That(expected == result);
     }
 
     [Test]
@@ -129,7 +129,7 @@ public class UtilsTests
             position);
 
         // Assert
-        Assert.AreEqual(expected, result);
+        Assert.That(expected == result);
     }
 
     [Test]
@@ -147,7 +147,7 @@ public class UtilsTests
             position);
 
         // Assert
-        Assert.AreEqual(expected, result);
+        Assert.That(expected == result);
     }
 
     [Test]
@@ -165,7 +165,7 @@ public class UtilsTests
             position);
 
         // Assert
-        Assert.AreEqual(expected, result);
+        Assert.That(expected == result);
     }
 
     [Test]
@@ -183,7 +183,7 @@ public class UtilsTests
             position);
 
         // Assert
-        Assert.AreEqual(expected, result);
+        Assert.That(expected == result);
     }
 
     [Test]
@@ -201,7 +201,7 @@ public class UtilsTests
             position);
 
         // Assert
-        Assert.AreEqual(expected, result);
+        Assert.That(expected == result);
     }
 
     [Test]
@@ -219,6 +219,6 @@ public class UtilsTests
             position);
 
         // Assert
-        Assert.AreEqual(expected, result);
+        Assert.That(expected == result);
     }
 }

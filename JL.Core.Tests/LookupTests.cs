@@ -78,7 +78,7 @@ public class LookupTests
         List<LookupResult>? result = LookupUtils.LookupText(text);
 
         // Assert
-        StringAssert.AreEqualIgnoringCase(JsonSerializer.Serialize(expected), JsonSerializer.Serialize(result));
+        Assert.That(JsonSerializer.Serialize(expected) == JsonSerializer.Serialize(result));
     }
 
     [Test]
@@ -96,7 +96,7 @@ public class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.AreEqual(expected, actual);
+        Assert.That(expected == actual);
     }
 
     [Test]
@@ -114,7 +114,7 @@ public class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.AreEqual(expected, actual);
+        Assert.That(expected == actual);
     }
 
     [Test]
@@ -132,7 +132,7 @@ public class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.AreEqual(expected, actual);
+        Assert.That(expected == actual);
     }
 
     [Test]
@@ -150,7 +150,7 @@ public class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.AreEqual(expected, actual);
+        Assert.That(expected == actual);
     }
 
     [Test]
@@ -168,7 +168,7 @@ public class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.AreEqual(expected, actual);
+        Assert.That(expected == actual);
     }
 
     [Test]
@@ -187,7 +187,7 @@ public class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.AreEqual(expected, actual);
+        Assert.That(expected == actual);
     }
 
     [Test]
@@ -206,7 +206,7 @@ public class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.AreEqual(expected, actual);
+        Assert.That(expected == actual);
     }
 
     [Test]
@@ -225,7 +225,7 @@ public class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.AreEqual(expected, actual);
+        Assert.That(expected == actual);
     }
 
     [Test]
@@ -244,7 +244,7 @@ public class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.AreEqual(expected, actual);
+        Assert.That(expected == actual);
     }
 
     [Test]
@@ -263,6 +263,6 @@ public class LookupTests
             : int.MaxValue;
 
         // Assert
-        Assert.AreEqual(expected, actual);
+        Assert.That(expected == actual);
     }
 }
