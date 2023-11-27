@@ -300,12 +300,10 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
         return frequency;
     }
 
-    public int GetFrequencyFromDB(Freq freq)
+    public int GetFrequencyFromDB(Freq freq, Dictionary<string, List<FrequencyRecord>> freqDict)
     {
         int frequency = int.MaxValue;
-
-        List<FrequencyRecord> freqResults = FreqDBManager.GetRecordsFromDB(freq.Name, JapaneseUtils.KatakanaToHiragana(PrimarySpelling));
-        if (freqResults.Count > 0)
+        if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out List<FrequencyRecord>? freqResults))
         {
             for (int i = 0; i < freqResults.Count; i++)
             {
@@ -322,11 +320,9 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
             if (frequency is int.MaxValue && AlternativeSpellings is not null)
             {
-                List<string> alternativeSpellingsInHiragana = AlternativeSpellings.Select(JapaneseUtils.KatakanaToHiragana).ToList();
-                Dictionary<string, List<FrequencyRecord>> alternativeSpellingFreqResultDict = FreqDBManager.GetRecordsFromDB(freq.Name, alternativeSpellingsInHiragana);
-                for (int i = 0; i < alternativeSpellingsInHiragana.Count; i++)
+                for (int i = 0; i < AlternativeSpellings.Length; i++)
                 {
-                    if (alternativeSpellingFreqResultDict.TryGetValue(alternativeSpellingsInHiragana[i], out List<FrequencyRecord>? alternativeSpellingFreqResults))
+                    if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(AlternativeSpellings[i]), out List<FrequencyRecord>? alternativeSpellingFreqResults))
                     {
                         for (int j = 0; j < alternativeSpellingFreqResults.Count; j++)
                         {
@@ -346,13 +342,11 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 
         else if (Readings is not null)
         {
-            List<string> readingsInHiragana = Readings.Select(JapaneseUtils.KatakanaToHiragana).ToList();
-            Dictionary<string, List<FrequencyRecord>> readingFreqResultDict = FreqDBManager.GetRecordsFromDB(freq.Name, readingsInHiragana);
-            for (int i = 0; i < readingsInHiragana.Count; i++)
+            for (int i = 0; i < Readings.Length; i++)
             {
-                if (readingFreqResultDict.TryGetValue(readingsInHiragana[i], out List<FrequencyRecord>? readingFreqResults))
+                string reading = Readings[i];
+                if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(reading), out List<FrequencyRecord>? readingFreqResults))
                 {
-                    string reading = Readings[i];
                     for (int j = 0; j < readingFreqResults.Count; j++)
                     {
                         FrequencyRecord readingFreqResult = readingFreqResults[j];
