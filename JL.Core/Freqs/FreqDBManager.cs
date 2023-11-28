@@ -2,6 +2,7 @@ using System.Data.Common;
 using System.Globalization;
 using Microsoft.Data.Sqlite;
 using System.Text;
+using System.Data;
 
 namespace JL.Core.Freqs;
 internal static class FreqDBManager
@@ -92,7 +93,9 @@ internal static class FreqDBManager
 
         StringBuilder queryBuilder = new(
             """
-            SELECT rsk.search_key AS searchKey, r.spelling as spelling, r.frequency AS frequency
+            SELECT rsk.search_key AS searchKey,
+                   r.spelling as spelling,
+                   r.frequency AS frequency
             FROM record r
             INNER JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key = @term1
@@ -113,9 +116,9 @@ internal static class FreqDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            string searchKey = (string)dataReader["searchKey"];
-            string spelling = (string)dataReader["spelling"];
-            int frequency = (int)(long)dataReader["frequency"];
+            string searchKey = dataReader.GetString(nameof(searchKey));
+            string spelling = dataReader.GetString(nameof(spelling));
+            int frequency = dataReader.GetInt32(nameof(frequency));
 
             if (results.TryGetValue(searchKey, out List<FrequencyRecord>? result))
             {
@@ -152,8 +155,8 @@ internal static class FreqDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            string spelling = (string)dataReader["spelling"];
-            int frequency = (int)(long)dataReader["frequency"];
+            string spelling = dataReader.GetString(nameof(spelling));
+            int frequency = dataReader.GetInt32(nameof(frequency));
             records.Add(new FrequencyRecord(spelling, frequency));
         }
 

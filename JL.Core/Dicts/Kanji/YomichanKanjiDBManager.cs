@@ -92,7 +92,10 @@ internal static class YomichanKanjiDBManager
 
         command.CommandText =
             """
-            SELECT r.on_readings AS onReadings, r.kun_readings AS kunReadings, r.glossary AS definitions, r.stats AS stats
+            SELECT r.on_readings AS onReadings,
+                   r.kun_readings AS kunReadings,
+                   r.glossary AS definitions,
+                   r.stats AS stats
             FROM record r
             WHERE r.kanji = @term
             """;
@@ -102,25 +105,29 @@ internal static class YomichanKanjiDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            object onReadingsFromDB = dataReader["onReadings"];
-            string[]? onReadings = onReadingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)onReadingsFromDB, Utils.s_jsoNotIgnoringNull)
-                : null;
+            string[]? onReadings = null;
+            if (dataReader[nameof(onReadings)] is string onReadingsFromDB)
+            {
+                onReadings = JsonSerializer.Deserialize<string[]>(onReadingsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object kunReadingsFromDB = dataReader["kunReadings"];
-            string[]? kunReadings = kunReadingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)kunReadingsFromDB, Utils.s_jsoNotIgnoringNull)
-                : null;
+            string[]? kunReadings = null;
+            if (dataReader[nameof(kunReadings)] is string kunReadingsFromDB)
+            {
+                kunReadings = JsonSerializer.Deserialize<string[]>(kunReadingsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object definitionsFromDB = dataReader["definitions"];
-            string[]? definitions = definitionsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)definitionsFromDB, Utils.s_jsoNotIgnoringNull)
-                : null;
+            string[]? definitions = null;
+            if (dataReader[nameof(definitions)] is string definitionsFromDB)
+            {
+                definitions = JsonSerializer.Deserialize<string[]>(definitionsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object statsFromDB = dataReader["stats"];
-            string[]? stats = statsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)statsFromDB, Utils.s_jsoNotIgnoringNull)
-                : null;
+            string[]? stats = null;
+            if (dataReader[nameof(stats)] is string statsFromDB)
+            {
+                stats = JsonSerializer.Deserialize<string[]>(statsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
             results.Add(new YomichanKanjiRecord(onReadings, kunReadings, definitions, stats));
         }

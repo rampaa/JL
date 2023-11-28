@@ -1,3 +1,4 @@
+using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Text;
@@ -120,7 +121,10 @@ public static class YomichanPitchAccentDBManager
 
         StringBuilder queryBuilder = new(
             """
-            SELECT rsk.search_key AS searchKey, r.spelling AS spelling, r.reading AS reading, r.position AS position
+            SELECT rsk.search_key AS searchKey,
+                   r.spelling AS spelling,
+                   r.reading AS reading,
+                   r.position AS position
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key = @term1
@@ -141,15 +145,16 @@ public static class YomichanPitchAccentDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            string searchKey = (string)dataReader["searchKey"];
-            string spelling = (string)dataReader["spelling"];
+            string searchKey = dataReader.GetString(nameof(searchKey));
+            string spelling = dataReader.GetString(nameof(spelling));
 
-            object readingFromDB = dataReader["reading"];
-            string? reading = readingFromDB is not DBNull
-                ? (string)readingFromDB
-                : null;
+            string? reading = null;
+            if (dataReader[nameof(reading)] is string readingFromDB)
+            {
+                reading = readingFromDB;
+            }
 
-            int position = (int)(long)dataReader["position"];
+            int position = dataReader.GetInt32(nameof(position));
 
             if (results.TryGetValue(searchKey, out List<IDictRecord>? result))
             {

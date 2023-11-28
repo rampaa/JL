@@ -1,3 +1,4 @@
+using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Text;
@@ -92,7 +93,13 @@ internal static class JmnedictDBManager
 
         StringBuilder queryBuilder = new(
             """
-            SELECT r.primary_spelling_in_hiragana AS searchKey, r.jmnedict_id as id, r.primary_spelling AS primarySpelling, r.readings AS readings, r.alternative_spellings as alternativeSpellings, r.glossary AS definitions, r.name_types AS nameTypes
+            SELECT r.primary_spelling_in_hiragana AS searchKey,
+                   r.jmnedict_id AS id,
+                   r.primary_spelling AS primarySpelling,
+                   r.readings AS readings,
+                   r.alternative_spellings AS alternativeSpellings,
+                   r.glossary AS definitions,
+                   r.name_types AS nameTypes
             FROM record r
             WHERE r.primary_spelling_in_hiragana = @term1
             """);
@@ -112,23 +119,24 @@ internal static class JmnedictDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            string searchKey = (string)dataReader["searchKey"];
+            string searchKey = dataReader.GetString(nameof(searchKey));
+            int id = dataReader.GetInt32(nameof(id));
+            string primarySpelling = dataReader.GetString(nameof(primarySpelling));
 
-            int id = (int)(long)dataReader["id"];
-            string primarySpelling = (string)dataReader["primarySpelling"];
+            string[]? readings = null;
+            if (dataReader[nameof(readings)] is string readingsFromDB)
+            {
+                readings = JsonSerializer.Deserialize<string[]>(readingsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object readingsFromDB = dataReader["readings"];
-            string[]? readings = readingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)readingsFromDB, Utils.s_jsoNotIgnoringNull)
-                : null;
+            string[]? alternativeSpellings = null;
+            if (dataReader[nameof(alternativeSpellings)] is string alternativeSpellingsFromDB)
+            {
+                alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object alternativeSpellingsFromDB = dataReader["alternativeSpellings"];
-            string[]? alternativeSpellings = alternativeSpellingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)alternativeSpellingsFromDB, Utils.s_jsoNotIgnoringNull)
-                : null;
-
-            string[][] definitions = JsonSerializer.Deserialize<string[][]>((string)dataReader["definitions"], Utils.s_jsoNotIgnoringNull)!;
-            string[][] nameTypes = JsonSerializer.Deserialize<string[][]>((string)dataReader["nameTypes"], Utils.s_jsoNotIgnoringNull)!;
+            string[][] definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(nameof(definitions)), Utils.s_jsoNotIgnoringNull)!;
+            string[][] nameTypes = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(nameof(nameTypes)), Utils.s_jsoNotIgnoringNull)!;
 
             if (results.TryGetValue(searchKey, out List<IDictRecord>? result))
             {
