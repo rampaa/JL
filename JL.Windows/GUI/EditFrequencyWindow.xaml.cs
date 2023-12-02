@@ -4,6 +4,7 @@ using System.Windows.Media;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
+using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
 using Path = System.IO.Path;
 
@@ -74,6 +75,7 @@ internal sealed partial class EditFrequencyWindow : Window
 
                 if (dbExists)
                 {
+                    SqliteConnection.ClearAllPools();
                     File.Delete(dbPath);
                     dbExists = false;
                 }
@@ -86,6 +88,7 @@ internal sealed partial class EditFrequencyWindow : Window
                 _freq.Ready = false;
                 if (dbExists && !(options.UseDB?.Value ?? false))
                 {
+                    SqliteConnection.ClearAllPools();
                     File.Delete(dbPath);
                     dbExists = false;
                 }
@@ -95,6 +98,7 @@ internal sealed partial class EditFrequencyWindow : Window
             {
                 if (dbExists)
                 {
+                    SqliteConnection.ClearAllPools();
                     File.Move(dbPath, FreqUtils.GetDBPath(name));
                 }
 

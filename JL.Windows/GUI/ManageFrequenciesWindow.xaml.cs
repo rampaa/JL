@@ -9,6 +9,7 @@ using System.Windows.Media;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
+using Microsoft.Data.Sqlite;
 
 namespace JL.Windows.GUI;
 
@@ -202,6 +203,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
                     string dbPath = FreqUtils.GetDBPath(freq.Path);
                     if (File.Exists(dbPath))
                     {
+                        SqliteConnection.ClearAllPools();
                         File.Delete(dbPath);
                     }
 

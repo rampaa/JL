@@ -4,6 +4,7 @@ using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
+using Microsoft.Data.Sqlite;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Path = System.IO.Path;
 
@@ -75,6 +76,7 @@ internal sealed partial class EditDictionaryWindow : Window
 
                 if (dbExists)
                 {
+                    SqliteConnection.ClearAllPools();
                     File.Delete(dbPath);
                     dbExists = false;
                 }
@@ -88,6 +90,7 @@ internal sealed partial class EditDictionaryWindow : Window
 
                 if (dbExists)
                 {
+                    SqliteConnection.ClearAllPools();
                     File.Delete(dbPath);
                     dbExists = false;
                 }
@@ -98,6 +101,7 @@ internal sealed partial class EditDictionaryWindow : Window
                 _dict.Ready = false;
                 if (dbExists && !(options.UseDB?.Value ?? false))
                 {
+                    SqliteConnection.ClearAllPools();
                     File.Delete(dbPath);
                     dbExists = false;
                 }
@@ -107,6 +111,7 @@ internal sealed partial class EditDictionaryWindow : Window
             {
                 if (dbExists)
                 {
+                    SqliteConnection.ClearAllPools();
                     File.Move(dbPath, DictUtils.GetDBPath(name));
                 }
 

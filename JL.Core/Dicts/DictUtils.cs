@@ -585,6 +585,12 @@ public static class DictUtils
                         {
                             if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                             {
+                                if (useDB && !dbExists)
+                                {
+                                    JmdictDBManager.CreateDB(dict.Name);
+                                    JmdictDBManager.InsertRecordsToDB(dict);
+                                }
+
                                 dict.Contents.Clear();
                                 dict.Contents.TrimExcess();
                                 dictCleared = true;
@@ -621,6 +627,12 @@ public static class DictUtils
                         {
                             if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                             {
+                                if (useDB && !dbExists)
+                                {
+                                    JmnedictDBManager.CreateDB(dict.Name);
+                                    JmnedictDBManager.InsertRecordsToDB(dict);
+                                }
+
                                 dict.Contents.Clear();
                                 dict.Contents.TrimExcess();
                                 dictCleared = true;
@@ -658,6 +670,12 @@ public static class DictUtils
                         {
                             if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                             {
+                                if (useDB && !dbExists)
+                                {
+                                    KanjidicDBManager.CreateDB(dict.Name);
+                                    KanjidicDBManager.InsertRecordsToDB(dict);
+                                }
+
                                 dict.Contents.Clear();
                                 dict.Contents.TrimExcess();
                                 dictCleared = true;
@@ -731,6 +749,12 @@ public static class DictUtils
                     {
                         if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                         {
+                            if (useDB && !dbExists)
+                            {
+                                EpwingYomichanDBManager.CreateDB(dict.Name);
+                                EpwingYomichanDBManager.InsertRecordsToDB(dict);
+                            }
+
                             dict.Contents.Clear();
                             dict.Contents.TrimExcess();
                             dictCleared = true;
@@ -780,6 +804,12 @@ public static class DictUtils
                     {
                         if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                         {
+                            if (useDB && !dbExists)
+                            {
+                                YomichanKanjiDBManager.CreateDB(dict.Name);
+                                YomichanKanjiDBManager.InsertRecordsToDB(dict);
+                            }
+
                             dict.Contents.Clear();
                             dict.Contents.TrimExcess();
                             dictCleared = true;
@@ -943,6 +973,12 @@ public static class DictUtils
                     {
                         if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                         {
+                            if (useDB && !dbExists)
+                            {
+                                EpwingNazekaDBManager.CreateDB(dict.Name);
+                                EpwingNazekaDBManager.InsertRecordsToDB(dict);
+                            }
+
                             dict.Contents.Clear();
                             dict.Contents.TrimExcess();
                             dictCleared = true;
@@ -969,7 +1005,6 @@ public static class DictUtils
                                     YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
-                                    dict.Ready = true;
                                 }
                                 dict.Ready = true;
                             }
@@ -994,6 +1029,12 @@ public static class DictUtils
                     {
                         if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                         {
+                            if (useDB && !dbExists)
+                            {
+                                YomichanPitchAccentDBManager.CreateDB(dict.Name);
+                                YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
+                            }
+
                             dict.Contents.Clear();
                             dict.Contents.TrimExcess();
                             dictCleared = true;

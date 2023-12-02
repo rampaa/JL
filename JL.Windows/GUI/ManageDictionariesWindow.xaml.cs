@@ -11,6 +11,7 @@ using JL.Core.Dicts;
 using JL.Core.Dicts.EDICT;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
+using Microsoft.Data.Sqlite;
 using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
 using Cursors = System.Windows.Input.Cursors;
@@ -294,6 +295,7 @@ internal sealed partial class ManageDictionariesWindow : Window
                     string dbPath = DictUtils.GetDBPath(dict.Path);
                     if (File.Exists(dbPath))
                     {
+                        SqliteConnection.ClearAllPools();
                         File.Delete(dbPath);
                     }
 

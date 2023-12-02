@@ -118,6 +118,12 @@ public static class FreqUtils
                     {
                         if (freq.Contents.Count > 0 && (!freq.Active || useDB))
                         {
+                            if (useDB && !dbExists)
+                            {
+                                FreqDBManager.CreateDB(freq.Name);
+                                FreqDBManager.InsertRecordsToDB(freq);
+                            }
+
                             freq.Contents.Clear();
                             freq.Contents.TrimExcess();
                             freqCleared = true;
@@ -171,6 +177,12 @@ public static class FreqUtils
                     {
                         if (freq.Contents.Count > 0 && (!freq.Active || useDB))
                         {
+                            if (useDB && !dbExists)
+                            {
+                                FreqDBManager.CreateDB(freq.Name);
+                                FreqDBManager.InsertRecordsToDB(freq);
+                            }
+
                             freq.Contents.Clear();
                             freq.Contents.TrimExcess();
                             freqCleared = true;
