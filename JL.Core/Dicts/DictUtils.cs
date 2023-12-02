@@ -541,7 +541,19 @@ public static class DictUtils
         {
             bool useDB = dict.Options?.UseDB?.Value ?? false;
             string dbPath = GetDBPath(dict.Name);
+            string dbJournalPath = dbPath + "-journal";
             bool dbExists = File.Exists(dbPath);
+            bool dbJournalExists = File.Exists(dbJournalPath);
+
+            if (dbJournalExists)
+            {
+                File.Delete(dbJournalPath);
+                if (dbExists)
+                {
+                    File.Delete(dbPath);
+                    dbExists = false;
+                }
+            }
 
             switch (dict.Type)
             {
