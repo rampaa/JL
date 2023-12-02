@@ -61,6 +61,18 @@ public static class FreqUtils
             bool useDB = freq.Options?.UseDB?.Value ?? false;
             string dbPath = GetDBPath(freq.Name);
             bool dbExists = File.Exists(dbPath);
+            string dbJournalPath = dbPath + "-journal";
+            bool dbJournalExists = File.Exists(dbJournalPath);
+
+            if (dbJournalExists)
+            {
+                File.Delete(dbJournalPath);
+                if (dbExists)
+                {
+                    File.Delete(dbPath);
+                    dbExists = false;
+                }
+            }
 
             switch (freq.Type)
             {
