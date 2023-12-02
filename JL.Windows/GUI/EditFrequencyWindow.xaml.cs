@@ -67,13 +67,34 @@ internal sealed partial class EditFrequencyWindow : Window
             {
                 _freq.Path = path;
                 _freq.Contents.Clear();
+                _freq.Ready = false;
             }
 
-            _freq.Name = name;
+            string dbPath = FreqUtils.GetDBPath(_freq.Name);
+            bool dbExists = File.Exists(dbPath);
+
+            if (_freq.Name != name)
+            {
+                if (dbExists)
+                {
+                    File.Move(dbPath, FreqUtils.GetDBPath(name));
+                }
+
+                _freq.Name = name;
+            }
 
             Core.Freqs.Options.FreqOptions options = _freqOptionsControl.GetFreqOptions(_freq.Type);
 
-            _freq.Options = options;
+            if (_freq.Options?.UseDB != options.UseDB)
+            {
+                _freq.Options = options;
+                _freq.Ready = false;
+
+                if (dbExists && !(options.UseDB?.Value ?? false))
+                {
+                    File.Delete(dbPath);
+                }
+            }
 
             Utils.Frontend.InvalidateDisplayCache();
 

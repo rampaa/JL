@@ -60,8 +60,8 @@ public static class FreqUtils
         {
             bool useDB = freq.Options?.UseDB?.Value ?? false;
             string dbPath = GetDBPath(freq.Name);
-            bool dbExists = File.Exists(dbPath);
             string dbJournalPath = dbPath + "-journal";
+            bool dbExists = File.Exists(dbPath);
             bool dbJournalExists = File.Exists(dbJournalPath);
 
             if (dbJournalExists)

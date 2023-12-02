@@ -68,15 +68,43 @@ internal sealed partial class EditDictionaryWindow : Window
             {
                 _dict.Path = path;
                 _dict.Contents.Clear();
+                _dict.Ready = false;
             }
 
-            _dict.Name = name;
+            string dbPath = DictUtils.GetDBPath(_dict.Name);
+            bool dbExists = File.Exists(dbPath);
+
+            if (_dict.Name != name)
+            {
+                if (dbExists)
+                {
+                    File.Move(dbPath, DictUtils.GetDBPath(name));
+                }
+
+                _dict.Name = name;
+            }
 
             Core.Dicts.Options.DictOptions options = _dictOptionsControl.GetDictOptions(_dict.Type);
 
             if (_dict.Options?.Examples?.Value != options.Examples?.Value)
             {
                 _dict.Contents.Clear();
+
+                if (dbExists)
+                {
+                    File.Delete(dbPath);
+                }
+            }
+
+            if (_dict.Options?.UseDB != options.UseDB)
+            {
+                _dict.Options = options;
+                _dict.Ready = false;
+
+                if (dbExists && !(options.UseDB?.Value ?? false))
+                {
+                    File.Delete(dbPath);
+                }
             }
 
             _dict.Options = options;
