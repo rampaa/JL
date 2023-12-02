@@ -111,9 +111,9 @@ public static class YomichanPitchAccentDBManager
         dict.Ready = true;
     }
 
-    public static Dictionary<string, List<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
+    public static Dictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
-        Dictionary<string, List<IDictRecord>> results = new();
+        Dictionary<string, IList<IDictRecord>> results = new();
 
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
@@ -156,7 +156,56 @@ public static class YomichanPitchAccentDBManager
 
             int position = dataReader.GetInt32(nameof(position));
 
-            if (results.TryGetValue(searchKey, out List<IDictRecord>? result))
+            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
+            {
+                result.Add(new PitchAccentRecord(spelling, reading, position));
+            }
+
+            else
+            {
+                results[searchKey] = new List<IDictRecord> { new PitchAccentRecord(spelling, reading, position) };
+            }
+        }
+
+        return results;
+    }
+
+    public static Dictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, string term)
+    {
+        Dictionary<string, IList<IDictRecord>> results = new();
+
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
+        connection.Open();
+        using SqliteCommand command = connection.CreateCommand();
+
+        command.CommandText =
+            """
+            SELECT rsk.search_key AS searchKey,
+                   r.spelling AS spelling,
+                   r.reading AS reading,
+                   r.position AS position
+            FROM record r
+            JOIN record_search_key rsk ON r.id = rsk.record_id
+            WHERE rsk.search_key = @term
+            """;
+
+        _ = command.Parameters.AddWithValue($"@term", term);
+
+        using SqliteDataReader dataReader = command.ExecuteReader();
+        while (dataReader.Read())
+        {
+            string searchKey = dataReader.GetString(nameof(searchKey));
+            string spelling = dataReader.GetString(nameof(spelling));
+
+            string? reading = null;
+            if (dataReader[nameof(reading)] is string readingFromDB)
+            {
+                reading = readingFromDB;
+            }
+
+            int position = dataReader.GetInt32(nameof(position));
+
+            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
                 result.Add(new PitchAccentRecord(spelling, reading, position));
             }

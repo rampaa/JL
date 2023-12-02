@@ -114,7 +114,7 @@ internal static class PopupWindowUtils
     }
 
     public static Grid CreatePitchAccentGrid(string primarySpelling, string[]? alternativeSpellings,
-        string[]? readings, string[] splitReadingsWithRInfo, double leftMargin, Dict dict)
+        string[]? readings, string[] splitReadingsWithRInfo, double leftMargin, Dict dict, Dictionary<string, IList<IDictRecord>>? pitchRecordDict)
     {
         Grid pitchAccentGrid = new();
 
@@ -127,121 +127,16 @@ internal static class PopupWindowUtils
         string[] expressions = hasReading ? readings! : new[] { primarySpelling };
 
         double horizontalOffsetForReading = leftMargin;
+
+        Dictionary<string, IList<IDictRecord>> lookupDict = pitchRecordDict is not null
+            ? pitchRecordDict
+            : dict.Contents;
 
         for (int i = 0; i < expressions.Length; i++)
         {
             string normalizedExpression = JapaneseUtils.KatakanaToHiragana(expressions[i]);
 
-            if (dict.Contents.TryGetValue(normalizedExpression, out IList<IDictRecord>? pitchAccentDictResultList))
-            {
-                List<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expressions[i]);
-
-                if (i > 0)
-                {
-                    horizontalOffsetForReading +=
-                        WindowsUtils.MeasureTextSize(string.Create(CultureInfo.InvariantCulture, $"{splitReadingsWithRInfo[i - 1]}, "), fontSize).Width;
-                }
-
-                PitchAccentRecord? chosenPitchAccentDictResult = null;
-
-                for (int j = 0; j < pitchAccentDictResultList.Count; j++)
-                {
-                    PitchAccentRecord pitchAccentDictResult = (PitchAccentRecord)pitchAccentDictResultList[j];
-
-                    if ((!hasReading && pitchAccentDictResult.Reading is null)
-                        || (pitchAccentDictResult.Reading is not null
-                            && normalizedExpression == JapaneseUtils.KatakanaToHiragana(pitchAccentDictResult.Reading)))
-                    {
-                        if (primarySpelling == pitchAccentDictResult.Spelling)
-                        {
-                            chosenPitchAccentDictResult = pitchAccentDictResult;
-                            break;
-                        }
-
-                        if (alternativeSpellings?.Contains(pitchAccentDictResult.Spelling) ?? false)
-                        {
-                            chosenPitchAccentDictResult ??= pitchAccentDictResult;
-                        }
-                    }
-                }
-
-                if (chosenPitchAccentDictResult is not null)
-                {
-                    Polyline polyline = new()
-                    {
-                        StrokeThickness = 2,
-                        Stroke = DictOptionManager.PitchAccentMarkerColor,
-                        StrokeDashArray = new DoubleCollection { 1, 1 }
-                    };
-
-                    bool lowPitch = false;
-                    double horizontalOffsetForChar = horizontalOffsetForReading;
-                    for (int j = 0; j < combinedFormList.Count; j++)
-                    {
-                        Size charSize = WindowsUtils.MeasureTextSize(combinedFormList[j], fontSize);
-
-                        if (chosenPitchAccentDictResult.Position - 1 == j)
-                        {
-                            polyline.Points.Add(new Point(horizontalOffsetForChar, 0));
-                            polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
-                            polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width,
-                                charSize.Height));
-
-                            lowPitch = true;
-                        }
-
-                        else if (j is 0)
-                        {
-                            polyline.Points.Add(new Point(horizontalOffsetForChar, charSize.Height));
-                            polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width,
-                                charSize.Height));
-                            polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
-                        }
-
-                        else
-                        {
-                            double charHeight = lowPitch ? charSize.Height : 0;
-                            polyline.Points.Add(new Point(horizontalOffsetForChar, charHeight));
-                            polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width,
-                                charHeight));
-                        }
-
-                        horizontalOffsetForChar += charSize.Width;
-                    }
-
-                    _ = pitchAccentGrid.Children.Add(polyline);
-                }
-            }
-        }
-
-        pitchAccentGrid.VerticalAlignment = VerticalAlignment.Center;
-        pitchAccentGrid.HorizontalAlignment = HorizontalAlignment.Left;
-
-        return pitchAccentGrid;
-    }
-
-    public static Grid CreatePitchAccentGridFromDB(string primarySpelling, string[]? alternativeSpellings,
-        string[]? readings, string[] splitReadingsWithRInfo, double leftMargin, Dict dict, LookupUtils.GetRecordsFromDB getRecordsFromPitchDB)
-    {
-        Grid pitchAccentGrid = new();
-
-        bool hasReading = readings?.Length > 0;
-
-        int fontSize = hasReading
-            ? ConfigManager.ReadingsFontSize
-            : ConfigManager.PrimarySpellingFontSize;
-
-        string[] expressions = hasReading ? readings! : new[] { primarySpelling };
-
-        double horizontalOffsetForReading = leftMargin;
-
-        List<string> normalizedExpressions = expressions.Select(JapaneseUtils.KatakanaToHiragana).ToList();
-        Dictionary<string, List<IDictRecord>> lookupResultsFromDB = getRecordsFromPitchDB(dict.Name, normalizedExpressions);
-
-        for (int i = 0; i < expressions.Length; i++)
-        {
-            string normalizedExpression = normalizedExpressions[i];
-            if (lookupResultsFromDB.TryGetValue(normalizedExpression, out List<IDictRecord>? pitchAccentDictResultList))
+            if (lookupDict.TryGetValue(normalizedExpression, out IList<IDictRecord>? pitchAccentDictResultList))
             {
                 List<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expressions[i]);
 

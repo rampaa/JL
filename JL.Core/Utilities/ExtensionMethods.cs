@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Reflection;
 
@@ -58,6 +59,11 @@ public static class ExtensionMethods
         }
 
         return textBlocks;
+    }
+
+    internal static void AddRange<T>(this ConcurrentBag<T> source, IEnumerable<T> items)
+    {
+        _ = Parallel.ForEach(items, source.Add);
     }
 
     internal static T[] RemoveAt<T>(this T[] source, int index)
