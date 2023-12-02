@@ -64,24 +64,20 @@ internal sealed partial class EditDictionaryWindow : Window
 
         if (isValid)
         {
+            string dbPath = DictUtils.GetDBPath(_dict.Name);
+            bool dbExists = File.Exists(dbPath);
+
             if (_dict.Path != path)
             {
                 _dict.Path = path;
                 _dict.Contents.Clear();
                 _dict.Ready = false;
-            }
 
-            string dbPath = DictUtils.GetDBPath(_dict.Name);
-            bool dbExists = File.Exists(dbPath);
-
-            if (_dict.Name != name)
-            {
                 if (dbExists)
                 {
-                    File.Move(dbPath, DictUtils.GetDBPath(name));
+                    File.Delete(dbPath);
+                    dbExists = false;
                 }
-
-                _dict.Name = name;
             }
 
             Core.Dicts.Options.DictOptions options = _dictOptionsControl.GetDictOptions(_dict.Type);
@@ -93,18 +89,28 @@ internal sealed partial class EditDictionaryWindow : Window
                 if (dbExists)
                 {
                     File.Delete(dbPath);
+                    dbExists = false;
                 }
             }
 
-            if (_dict.Options?.UseDB != options.UseDB)
+            if (_dict.Options?.UseDB?.Value != options.UseDB?.Value)
             {
-                _dict.Options = options;
                 _dict.Ready = false;
-
                 if (dbExists && !(options.UseDB?.Value ?? false))
                 {
                     File.Delete(dbPath);
+                    dbExists = false;
                 }
+            }
+
+            if (_dict.Name != name)
+            {
+                if (dbExists)
+                {
+                    File.Move(dbPath, DictUtils.GetDBPath(name));
+                }
+
+                _dict.Name = name;
             }
 
             _dict.Options = options;

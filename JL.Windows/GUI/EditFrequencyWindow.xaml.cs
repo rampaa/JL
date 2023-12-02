@@ -63,15 +63,33 @@ internal sealed partial class EditFrequencyWindow : Window
 
         if (isValid)
         {
+            string dbPath = FreqUtils.GetDBPath(_freq.Name);
+            bool dbExists = File.Exists(dbPath);
+
             if (_freq.Path != path)
             {
                 _freq.Path = path;
                 _freq.Contents.Clear();
                 _freq.Ready = false;
+
+                if (dbExists)
+                {
+                    File.Delete(dbPath);
+                    dbExists = false;
+                }
             }
 
-            string dbPath = FreqUtils.GetDBPath(_freq.Name);
-            bool dbExists = File.Exists(dbPath);
+            Core.Freqs.Options.FreqOptions options = _freqOptionsControl.GetFreqOptions(_freq.Type);
+
+            if (_freq.Options?.UseDB?.Value != options.UseDB?.Value)
+            {
+                _freq.Ready = false;
+                if (dbExists && !(options.UseDB?.Value ?? false))
+                {
+                    File.Delete(dbPath);
+                    dbExists = false;
+                }
+            }
 
             if (_freq.Name != name)
             {
@@ -83,19 +101,7 @@ internal sealed partial class EditFrequencyWindow : Window
                 _freq.Name = name;
             }
 
-            Core.Freqs.Options.FreqOptions options = _freqOptionsControl.GetFreqOptions(_freq.Type);
-
-            if (_freq.Options?.UseDB != options.UseDB)
-            {
-                _freq.Options = options;
-                _freq.Ready = false;
-
-                if (dbExists && !(options.UseDB?.Value ?? false))
-                {
-                    File.Delete(dbPath);
-                }
-            }
-
+            _freq.Options = options;
             Utils.Frontend.InvalidateDisplayCache();
 
             Close();
