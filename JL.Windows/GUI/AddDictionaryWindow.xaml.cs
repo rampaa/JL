@@ -1,10 +1,10 @@
-using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
 using JL.Core.Utilities;
+using JL.Windows.GUI.UserControls;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Path = System.IO.Path;
 
@@ -15,9 +15,13 @@ namespace JL.Windows.GUI;
 /// </summary>
 internal sealed partial class AddDictionaryWindow : Window
 {
+    private readonly DictOptionsControl _dictOptionsControl;
+
     public AddDictionaryWindow()
     {
         InitializeComponent();
+        _dictOptionsControl = new DictOptionsControl();
+        _ = DictStackPanel.Children.Add(_dictOptionsControl);
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -70,32 +74,7 @@ internal sealed partial class AddDictionaryWindow : Window
         {
             DictType type = typeString!.GetEnum<DictType>();
 
-            NewlineBetweenDefinitionsOption? newlineOption = null;
-            if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(type))
-            {
-                newlineOption = new NewlineBetweenDefinitionsOption(true);
-            }
-
-            ExamplesOption? examplesOption = null;
-            if (ExamplesOption.ValidDictTypes.Contains(type))
-            {
-                examplesOption = new ExamplesOption(ExamplesOptionValue.None);
-            }
-
-            NoAllOption? noAllOption = null;
-            if (NoAllOption.ValidDictTypes.Contains(type))
-            {
-                noAllOption = new NoAllOption(false);
-            }
-
-            PitchAccentMarkerColorOption? pitchAccentMarkerColorOption = null;
-            if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(type))
-            {
-                pitchAccentMarkerColorOption = new PitchAccentMarkerColorOption(DictOptionManager.PitchAccentMarkerColor.ToString(CultureInfo.InvariantCulture));
-            }
-
-            DictOptions options = new(newlineOption, examplesOption, noAllOption, pitchAccentMarkerColorOption);
-
+            DictOptions options = _dictOptionsControl.GetDictOptions(type);
             Dict dict = new(type, name, path, true, DictUtils.Dicts.Count + 1, 0, false, options);
             DictUtils.Dicts.Add(name, dict);
 
@@ -139,11 +118,13 @@ internal sealed partial class AddDictionaryWindow : Window
     private void RadioButtonYomichanImport_OnClick(object sender, RoutedEventArgs e)
     {
         FillDictTypesCombobox(DictUtils.YomichanDictTypes);
+        HideDictOptions();
     }
 
     private void RadioButtonNazekaEpwingConverter_OnClick(object sender, RoutedEventArgs e)
     {
         FillDictTypesCombobox(DictUtils.NazekaDictTypes);
+        HideDictOptions();
     }
 
     private void FillDictTypesCombobox(DictType[] types)
@@ -221,5 +202,31 @@ internal sealed partial class AddDictionaryWindow : Window
             default:
                 throw new ArgumentOutOfRangeException(null, "Invalid DictType (Add)");
         }
+    }
+
+    private void ComboBoxDictType_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        GenerateDictOptions();
+    }
+
+    private void GenerateDictOptions()
+    {
+        string? typeString = ComboBoxDictType.SelectedItem?.ToString();
+        if (!string.IsNullOrEmpty(typeString))
+        {
+            DictType type = typeString!.GetEnum<DictType>();
+            _dictOptionsControl.GenerateDictOptionsElements(type);
+        }
+
+        else
+        {
+            HideDictOptions();
+        }
+    }
+
+    private void HideDictOptions()
+    {
+        _dictOptionsControl.OptionsStackPanel.Visibility = Visibility.Collapsed;
+        _dictOptionsControl.OptionsTextBlock.Visibility = Visibility.Collapsed;
     }
 }

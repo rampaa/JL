@@ -31,15 +31,34 @@ internal sealed partial class FreqOptionsControl : UserControl
         return options;
     }
 
+    public void GenerateFreqOptionsElements(FreqType freqType)
+    {
+        bool showFreqOptions = false;
+        if (UseDBOption.ValidFreqTypes.Contains(freqType))
+        {
+            UseDBCheckBox.IsChecked = false;
+            UseDBCheckBox.Visibility = Visibility.Visible;
+            showFreqOptions = true;
+        }
+
+        if (showFreqOptions)
+        {
+            OptionsTextBlock.Visibility = Visibility.Visible;
+            OptionsStackPanel.Visibility = Visibility.Visible;
+        }
+    }
+
     public void GenerateFreqOptionsElements(Freq freq)
     {
+        bool showFreqOptions = false;
         if (UseDBOption.ValidFreqTypes.Contains(freq.Type))
         {
             UseDBCheckBox.IsChecked = freq.Options?.UseDB?.Value ?? false;
             UseDBCheckBox.Visibility = Visibility.Visible;
+            showFreqOptions = true;
         }
 
-        if (UseDBCheckBox.Visibility is Visibility.Visible)
+        if (showFreqOptions)
         {
             OptionsTextBlock.Visibility = Visibility.Visible;
             OptionsStackPanel.Visibility = Visibility.Visible;
