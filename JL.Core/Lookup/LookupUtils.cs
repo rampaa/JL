@@ -657,7 +657,7 @@ public static class LookupUtils
                 if (count is > 0 and < 4)
                 {
                     List<string> textWithoutLongVowelMarkList = JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i]);
-                    GetWordResultsFromDBHelper(textList[i], textWithoutLongVowelMarkList, deconjugationResultsList[i].ToList(), dict, getRecordsFromDB, results);
+                    GetWordResultsFromDBHelper(textList[i], textWithoutLongVowelMarkList, deconjugationResultsList[i], dict, getRecordsFromDB, results);
                 }
             }
         }
@@ -688,17 +688,83 @@ public static class LookupUtils
         }
 
         int succAttempt = 0;
+        Dictionary<string, List<IDictRecord>> dbLookupResultsForVerbs = getRecordsFromDB(dict.Name, deconjugationResultsList.SelectMany(static lf => lf.Select(f => f.Text)).Distinct().ToList());
         for (int i = 0; i < deconjugationResultsList.Count; i++)
         {
-            List<Form> deconjugationResults = deconjugationResultsList[i].ToList();
-
-            Dictionary<string, List<IDictRecord>> dbLookupResultsForVerbs = getRecordsFromDB(dict.Name, deconjugationResults.Select(static f => f.Text).ToList());
-            foreach ((string textInHiragana, List<IDictRecord> dictResults) in dbLookupResultsForVerbs)
+            string matchedText = textList[i];
+            HashSet<Form> deconjugationResults = deconjugationResultsList[i];
+            foreach (Form deconjugationResult in deconjugationResults)
             {
-                int deconjugationResultIndex = deconjugationResults.FindIndex(f => f.Text == textInHiragana);
-                Form deconjugationResult = deconjugationResults[deconjugationResultIndex];
-                string matchedText = textList[i];
+                if (dbLookupResultsForVerbs.TryGetValue(deconjugationResult.Text, out List<IDictRecord>? dictResults))
+                {
+                    List<IDictRecord> resultsList = GetValidDeconjugatedResults(dict, deconjugationResult, dictResults);
+                    if (resultsList.Count > 0)
+                    {
+                        if (results.TryGetValue(deconjugationResult.Text, out IntermediaryResult? r))
+                        {
+                            if (r.MatchedText == deconjugationResult.OriginalText)
+                            {
+                                int index = r.Results.FindIndex(rs => rs.SequenceEqual(resultsList));
+                                if (index is not -1)
+                                {
+                                    //if (!r.Processes?[index].Any(p => p.SequenceEqual(deconjugationResult.Process)) ?? false)
+                                    r.Processes?[index].Add(deconjugationResult.Process);
+                                }
+                                else
+                                {
+                                    r.Results.Add(resultsList);
+                                    r.Processes?.Add(new List<List<string>> { deconjugationResult.Process });
+                                }
+                            }
+                        }
+                        else
+                        {
+                            results.Add(deconjugationResult.Text,
+                                new IntermediaryResult(new List<IList<IDictRecord>> { resultsList },
+                                    new List<List<List<string>>> { new() { deconjugationResult.Process } },
+                                    matchedText,
+                                    deconjugationResult.Text,
+                                    dict)
+                            );
+                        }
 
+                        foundResultArray[i] = true;
+                        ++succAttempt;
+                    }
+                }
+
+                if (succAttempt > 2)
+                {
+                    break;
+                }
+            }
+        }
+        return foundResultArray;
+    }
+
+    private static void GetWordResultsFromDBHelper(
+    string matchedText,
+    List<string> textInHiraganaList,
+    HashSet<Form> deconjugationResults,
+    Dict dict,
+    GetRecordsFromDB getRecordsFromDB,
+    Dictionary<string, IntermediaryResult> results)
+    {
+        Dictionary<string, List<IDictRecord>> dbLookupResults = getRecordsFromDB(dict.Name, textInHiraganaList);
+        foreach ((string textInHiragana, List<IDictRecord> lookupResults) in dbLookupResults)
+        {
+            _ = results.TryAdd(textInHiragana,
+                    new IntermediaryResult(new List<IList<IDictRecord>> { lookupResults }, null, matchedText, matchedText,
+                        dict));
+        }
+
+        int succAttempt = 0;
+
+        Dictionary<string, List<IDictRecord>> dbLookupResultsForVerbs = getRecordsFromDB(dict.Name, deconjugationResults.Select(static f => f.Text).Distinct().ToList());
+        foreach (Form deconjugationResult in deconjugationResults)
+        {
+            if (dbLookupResultsForVerbs.TryGetValue(deconjugationResult.Text, out List<IDictRecord>? dictResults))
+            {
                 List<IDictRecord> resultsList = GetValidDeconjugatedResults(dict, deconjugationResult, dictResults);
                 if (resultsList.Count > 0)
                 {
@@ -730,80 +796,13 @@ public static class LookupUtils
                         );
                     }
 
-                    foundResultArray[i] = true;
                     ++succAttempt;
                 }
-            }
 
-            if (succAttempt > 2)
-            {
-                break;
-            }
-        }
-        return foundResultArray;
-    }
-
-    private static void GetWordResultsFromDBHelper(
-    string matchedText,
-    List<string> textInHiraganaList,
-    List<Form> deconjugationResults,
-    Dict dict,
-    GetRecordsFromDB getRecordsFromDB,
-    Dictionary<string, IntermediaryResult> results)
-    {
-        Dictionary<string, List<IDictRecord>> dbLookupResults = getRecordsFromDB(dict.Name, textInHiraganaList);
-        foreach ((string textInHiragana, List<IDictRecord> lookupResults) in dbLookupResults)
-        {
-            _ = results.TryAdd(textInHiragana,
-                    new IntermediaryResult(new List<IList<IDictRecord>> { lookupResults }, null, matchedText, matchedText,
-                        dict));
-        }
-
-        int succAttempt = 0;
-
-        Dictionary<string, List<IDictRecord>> dbLookupResultsForVerbs = getRecordsFromDB(dict.Name, deconjugationResults.Select(static f => f.Text).ToList());
-        foreach ((string textInHiragana, List<IDictRecord> dictResults) in dbLookupResultsForVerbs)
-        {
-            int deconjugationResultIndex = deconjugationResults.FindIndex(f => f.Text == textInHiragana);
-            Form deconjugationResult = deconjugationResults[deconjugationResultIndex];
-
-            List<IDictRecord> resultsList = GetValidDeconjugatedResults(dict, deconjugationResult, dictResults);
-            if (resultsList.Count > 0)
-            {
-                if (results.TryGetValue(deconjugationResult.Text, out IntermediaryResult? r))
+                if (succAttempt > 2)
                 {
-                    if (r.MatchedText == deconjugationResult.OriginalText)
-                    {
-                        int index = r.Results.FindIndex(rs => rs.SequenceEqual(resultsList));
-                        if (index is not -1)
-                        {
-                            //if (!r.Processes?[index].Any(p => p.SequenceEqual(deconjugationResult.Process)) ?? false)
-                            r.Processes?[index].Add(deconjugationResult.Process);
-                        }
-                        else
-                        {
-                            r.Results.Add(resultsList);
-                            r.Processes?.Add(new List<List<string>> { deconjugationResult.Process });
-                        }
-                    }
+                    break;
                 }
-                else
-                {
-                    results.Add(deconjugationResult.Text,
-                        new IntermediaryResult(new List<IList<IDictRecord>> { resultsList },
-                            new List<List<List<string>>> { new() { deconjugationResult.Process } },
-                            matchedText,
-                            deconjugationResult.Text,
-                            dict)
-                    );
-                }
-
-                ++succAttempt;
-            }
-
-            if (succAttempt > 2)
-            {
-                break;
             }
         }
     }
