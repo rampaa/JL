@@ -23,7 +23,7 @@ namespace JL.Windows.GUI;
 /// </summary>
 internal sealed partial class PopupWindow : Window
 {
-    public PopupWindow? ChildPopupWindow { get; private set; }
+    public PopupWindow? ChildPopupWindow { get; set; }
     private bool ContextMenuIsOpening { get; set; } = false;
 
     private TextBox? _previousTextBox;
@@ -60,8 +60,7 @@ internal sealed partial class PopupWindow : Window
 
     public static Timer PopupAutoHideTimer { get; } = new();
 
-    public static LRUCache<string, StackPanel[]> StackPanelCache { get; } = new(
-        Utils.CacheSize, Utils.CacheSize / 8);
+    public static LRUCache<string, StackPanel[]> StackPanelCache { get; } = new(Utils.CacheSize, Utils.CacheSize / 10);
 
     private ScrollViewer? _popupListViewScrollViewer;
 
@@ -445,7 +444,6 @@ internal sealed partial class PopupWindow : Window
         {
             _ = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict);
             bool pitchDictIsActive = pitchDict?.Active ?? false;
-            bool useDBForPitchDict = pitchDictIsActive && (pitchDict!.Options?.UseDB?.Value ?? false) && pitchDict.Ready;
             Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
             bool showPOrthographyInfo = jmdict.Options?.POrthographyInfo?.Value ?? true;
             bool showROrthographyInfo = jmdict.Options?.ROrthographyInfo?.Value ?? true;

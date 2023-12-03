@@ -2,7 +2,6 @@ using System.Windows;
 using System.Windows.Controls;
 using JL.Core.Freqs;
 using JL.Core.Freqs.Options;
-using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI.UserControls;
 
@@ -11,11 +10,6 @@ internal sealed partial class FreqOptionsControl : UserControl
     public FreqOptionsControl()
     {
         InitializeComponent();
-    }
-
-    private void ShowColorPicker(object sender, RoutedEventArgs e)
-    {
-        WindowsUtils.ShowColorPicker((Button)sender);
     }
 
     public FreqOptions GetFreqOptions(FreqType type)

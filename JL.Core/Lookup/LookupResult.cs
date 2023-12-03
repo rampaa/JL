@@ -34,7 +34,7 @@ public sealed class LookupResult
     public string[]? RadicalNames { get; }
     public int StrokeCount { get; }
     public int KanjiGrade { get; }
-    public Dictionary<string, IList<IDictRecord>>? PitchAccentDict { get; internal set; }
+    public Dictionary<string, IList<IDictRecord>>? PitchAccentDict { get; }
 
     internal LookupResult(
         string primarySpelling,

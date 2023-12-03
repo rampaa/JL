@@ -6,9 +6,10 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.PitchAccent;
-public static class YomichanPitchAccentDBManager
+
+internal static class YomichanPitchAccentDBManager
 {
-    internal static void CreateDB(string dbName)
+    public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
         connection.Open();
@@ -36,7 +37,7 @@ public static class YomichanPitchAccentDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    internal static void InsertRecordsToDB(Dict dict)
+    public static void InsertRecordsToDB(Dict dict)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
         connection.Open();
@@ -189,7 +190,7 @@ public static class YomichanPitchAccentDBManager
             WHERE rsk.search_key = @term
             """;
 
-        _ = command.Parameters.AddWithValue($"@term", term);
+        _ = command.Parameters.AddWithValue("@term", term);
 
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())

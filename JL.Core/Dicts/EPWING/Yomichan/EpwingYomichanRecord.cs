@@ -146,7 +146,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         return frequency;
     }
 
-    public int GetFrequencyFromDB(Freq freq, Dictionary<string, List<FrequencyRecord>> freqDict)
+    public int GetFrequencyFromDB(Dictionary<string, List<FrequencyRecord>> freqDict)
     {
         int frequency = int.MaxValue;
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out List<FrequencyRecord>? freqResults))

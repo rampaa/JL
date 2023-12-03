@@ -128,9 +128,7 @@ internal static class PopupWindowUtils
 
         double horizontalOffsetForReading = leftMargin;
 
-        Dictionary<string, IList<IDictRecord>> lookupDict = pitchRecordDict is not null
-            ? pitchRecordDict
-            : dict.Contents;
+        Dictionary<string, IList<IDictRecord>> lookupDict = pitchRecordDict ?? dict.Contents;
 
         for (int i = 0; i < expressions.Length; i++)
         {
@@ -260,10 +258,28 @@ internal static class PopupWindowUtils
     {
         PopupWindow? currentPopupWindow = rootPopup;
 
-        while (currentPopupWindow?.IsVisible ?? false)
+        int depth = 0;
+        while (currentPopupWindow is not null)
         {
             currentPopupWindow.HidePopup();
-            currentPopupWindow = currentPopupWindow.ChildPopupWindow;
+
+            PopupWindow? nextPopupWindow = currentPopupWindow.ChildPopupWindow;
+
+            if (depth is 1)
+            {
+                currentPopupWindow.ChildPopupWindow = null;
+            }
+
+            if (depth > 1)
+            {
+                currentPopupWindow.Owner = null;
+                currentPopupWindow.ChildPopupWindow = null;
+                currentPopupWindow.Close();
+            }
+
+            currentPopupWindow = nextPopupWindow;
+
+            ++depth;
         }
     }
 

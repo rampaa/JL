@@ -214,7 +214,7 @@ internal sealed partial class AddDictionaryWindow : Window
         string? typeString = ComboBoxDictType.SelectedItem?.ToString();
         if (!string.IsNullOrEmpty(typeString))
         {
-            DictType type = typeString!.GetEnum<DictType>();
+            DictType type = typeString.GetEnum<DictType>();
             _dictOptionsControl.GenerateDictOptionsElements(type);
         }
 

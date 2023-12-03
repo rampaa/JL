@@ -135,7 +135,7 @@ internal sealed partial class AddFrequencyWindow : Window
         string? typeString = FreqTypeComboBox.SelectedItem?.ToString();
         if (!string.IsNullOrEmpty(typeString))
         {
-            FreqType type = typeString!.GetEnum<FreqType>();
+            FreqType type = typeString.GetEnum<FreqType>();
             _freqOptionsControl.GenerateFreqOptionsElements(type);
         }
 
