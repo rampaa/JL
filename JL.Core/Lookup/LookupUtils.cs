@@ -149,10 +149,7 @@ public static class LookupUtils
                         break;
 
                     case DictType.JMnedict:
-                        Dictionary<string, IntermediaryResult> jmnedictResults = useDB
-                            ? GetNameResultsFromDB(textList, textInHiraganaList, dict, JmnedictDBManager.GetRecordsFromDB)
-                            : GetNameResults(textList, textInHiraganaList, dict);
-
+                        Dictionary<string, IntermediaryResult> jmnedictResults = GetNameResults(textList, textInHiraganaList, dict, useDB, JmnedictDBManager.GetRecordsFromDB);
                         if (jmnedictResults.Count > 0)
                         {
                             lookupResults.AddRange(BuildJmnedictResult(jmnedictResults, useDBForPitchDict, pitchDict));
@@ -195,7 +192,7 @@ public static class LookupUtils
 
                     case DictType.CustomNameDictionary:
                     case DictType.ProfileCustomNameDictionary:
-                        Dictionary<string, IntermediaryResult> customNameResults = GetNameResults(textList, textInHiraganaList, dict);
+                        Dictionary<string, IntermediaryResult> customNameResults = GetNameResults(textList, textInHiraganaList, dict, false, null);
                         if (customNameResults.Count > 0)
                         {
                             lookupResults.AddRange(BuildCustomNameResult(customNameResults, useDBForPitchDict, pitchDict));
@@ -214,9 +211,7 @@ public static class LookupUtils
                         break;
 
                     case DictType.NonspecificNameYomichan:
-                        Dictionary<string, IntermediaryResult> epwingYomichanNameResults = useDB
-                            ? GetNameResultsFromDB(textList, textInHiraganaList, dict, EpwingYomichanDBManager.GetRecordsFromDB)
-                            : GetNameResults(textList, textInHiraganaList, dict);
+                        Dictionary<string, IntermediaryResult> epwingYomichanNameResults = GetNameResults(textList, textInHiraganaList, dict, useDB, EpwingYomichanDBManager.GetRecordsFromDB);
 
                         if (epwingYomichanNameResults.Count > 0)
                         {
@@ -266,10 +261,7 @@ public static class LookupUtils
                         break;
 
                     case DictType.NonspecificNameNazeka:
-                        Dictionary<string, IntermediaryResult> epwingNazekaNameResults = useDB
-                            ? GetNameResultsFromDB(textList, textInHiraganaList, dict, EpwingNazekaDBManager.GetRecordsFromDB)
-                            : GetNameResults(textList, textInHiraganaList, dict);
-
+                        Dictionary<string, IntermediaryResult> epwingNazekaNameResults = GetNameResults(textList, textInHiraganaList, dict, useDB, EpwingNazekaDBManager.GetRecordsFromDB);
                         if (epwingNazekaNameResults.Count > 0)
                         {
                             lookupResults.AddRange(BuildEpwingNazekaResult(epwingNazekaNameResults, dbFreqs, useDBForPitchDict, pitchDict));
@@ -627,32 +619,21 @@ public static class LookupUtils
         return resultsList;
     }
 
-    private static Dictionary<string, IntermediaryResult> GetNameResults(List<string> textList, List<string> textInHiraganaList, Dict dict)
+    private static Dictionary<string, IntermediaryResult> GetNameResults(List<string> textList, List<string> textInHiraganaList, Dict dict, bool useDB, GetRecordsFromDB? getRecordsFromDB)
     {
+        Dictionary<string, IList<IDictRecord>> nameDict = useDB
+            ? getRecordsFromDB!(dict.Name, textInHiraganaList)
+            : dict.Contents;
+
         Dictionary<string, IntermediaryResult> nameResults = new();
 
         for (int i = 0; i < textList.Count; i++)
         {
-            if (dict.Contents
-                .TryGetValue(textInHiraganaList[i], out IList<IDictRecord>? result))
+            if (nameDict.TryGetValue(textInHiraganaList[i], out IList<IDictRecord>? result))
             {
                 nameResults.Add(textInHiraganaList[i],
                     new IntermediaryResult(new List<IList<IDictRecord>> { result }, null, textList[i], textList[i], dict));
             }
-        }
-
-        return nameResults;
-    }
-
-    private static Dictionary<string, IntermediaryResult> GetNameResultsFromDB(List<string> textList, List<string> textInHiraganaList, Dict dict, GetRecordsFromDB getRecordsFromDB)
-    {
-        Dictionary<string, IntermediaryResult> nameResults = new();
-
-        Dictionary<string, IList<IDictRecord>> dbLookupResults = getRecordsFromDB(dict.Name, textInHiraganaList);
-        foreach ((string textInHiragana, IList<IDictRecord> lookupResults) in dbLookupResults)
-        {
-            string matchedText = textList[textInHiraganaList.IndexOf(textInHiragana)];
-            nameResults.Add(textInHiragana, new IntermediaryResult(new List<IList<IDictRecord>> { lookupResults }, null, matchedText, matchedText, dict));
         }
 
         return nameResults;
