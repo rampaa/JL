@@ -145,9 +145,9 @@ internal static class JmdictDBManager
         dict.Ready = true;
     }
 
-    public static Dictionary<string, List<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
+    public static Dictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
-        Dictionary<string, List<IDictRecord>> results = new();
+        Dictionary<string, IList<IDictRecord>> results = new();
 
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
@@ -285,7 +285,7 @@ internal static class JmdictDBManager
                 antonyms = JsonSerializer.Deserialize<string[]?[]>(antonymsFromDB, Utils.s_jsoNotIgnoringNull);
             }
 
-            if (results.TryGetValue(searchKey, out List<IDictRecord>? result))
+            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
                 result.Add(new JmdictRecord(id, primarySpelling, primarySpellingOrthographyInfo, alternativeSpellings, alternativeSpellingsOrthographyInfo, readings, readingsOrthographyInfo, definitions, wordClasses, spellingRestrictions, readingRestrictions, fields, misc, definitionInfo, dialects, loanwordEtymology, relatedTerms, antonyms));
             }

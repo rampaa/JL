@@ -120,9 +120,9 @@ internal static class EpwingYomichanDBManager
         dict.Ready = true;
     }
 
-    public static Dictionary<string, List<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
+    public static Dictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
-        Dictionary<string, List<IDictRecord>> results = new();
+        Dictionary<string, IList<IDictRecord>> results = new();
 
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
@@ -180,7 +180,7 @@ internal static class EpwingYomichanDBManager
                 definitionTags = JsonSerializer.Deserialize<string[]>(definitionTagsFromDB, Utils.s_jsoNotIgnoringNull);
             }
 
-            if (results.TryGetValue(searchKey, out List<IDictRecord>? result))
+            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
                 result.Add(new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags));
             }
