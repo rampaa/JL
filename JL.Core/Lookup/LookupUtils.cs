@@ -643,7 +643,7 @@ public static class LookupUtils
     {
         Dictionary<string, IntermediaryResult> kanjiResults = new();
 
-        string kanji = text.EnumerateRunes().FirstOrDefault().ToString();
+        string kanji = text.EnumerateRunes().First().ToString();
 
         if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? result))
         {
@@ -658,7 +658,7 @@ public static class LookupUtils
     {
         Dictionary<string, IntermediaryResult> kanjiResults = new();
 
-        string kanji = text.EnumerateRunes().FirstOrDefault().ToString();
+        string kanji = text.EnumerateRunes().First().ToString();
 
         List<IDictRecord> results = getKanjiRecordsFromDB(dict.Name, kanji);
 
