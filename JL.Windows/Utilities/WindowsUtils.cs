@@ -71,25 +71,36 @@ internal static class WindowsUtils
                 && fontFamily.FamilyNames.ContainsKey(englishXmlLanguage))
             {
                 bool foundGlyph = false;
-                foreach (Typeface typeFace in fontFamily.GetTypefaces())
+
+                // If the Cascadia Code font is installed calling GetTypefaces might throw UnauthorizedAccessException
+                // See: https://github.com/microsoft/cascadia-code/issues/691
+                try
                 {
-                    if (typeFace.TryGetGlyphTypeface(out GlyphTypeface glyphTypeFace))
+                    foreach (Typeface typeFace in fontFamily.GetTypefaces())
                     {
-                        // 0x30F8 -> ヸ
-                        // 0x67A0 -> 枠, kokuji
-                        if (glyphTypeFace.CharacterToGlyphMap.ContainsKey(0x30F8))
+                        if (typeFace.TryGetGlyphTypeface(out GlyphTypeface glyphTypeFace))
                         {
-                            japaneseFonts.Add(comboBoxItem);
-                            foundGlyph = true;
-                            break;
+                            // 0x30F8 -> ヸ
+                            // 0x67A0 -> 枠, kokuji
+                            if (glyphTypeFace.CharacterToGlyphMap.ContainsKey(0x30F8))
+                            {
+                                japaneseFonts.Add(comboBoxItem);
+                                foundGlyph = true;
+                                break;
+                            }
                         }
+                    }
+
+                    if (!foundGlyph)
+                    {
+                        comboBoxItem.Foreground = Brushes.LightSlateGray;
+                        japaneseFonts.Add(comboBoxItem);
                     }
                 }
 
-                if (!foundGlyph)
+                catch (UnauthorizedAccessException ex)
                 {
-                    comboBoxItem.Foreground = Brushes.LightSlateGray;
-                    japaneseFonts.Add(comboBoxItem);
+                    Utils.Logger.Error(ex, "GetTypefaces failed for {FontFamily}", fontFamily);
                 }
             }
             else

@@ -1,3 +1,4 @@
+using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Text;
@@ -55,10 +56,10 @@ internal static class JmnedictDBManager
             _ = insertRecordCommand.Parameters.AddWithValue("@jmnedict_id", record.Id);
             _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling", record.PrimarySpelling);
             _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling_in_hiragana", JapaneseUtils.KatakanaToHiragana(record.PrimarySpelling));
-            _ = insertRecordCommand.Parameters.AddWithValue("@readings", record.Readings is not null ? JsonSerializer.Serialize(record.Readings, Utils.s_jsoWithIndentation) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@alternative_spellings", record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jsoWithIndentation) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_jsoWithIndentation));
-            _ = insertRecordCommand.Parameters.AddWithValue("@name_types", JsonSerializer.Serialize(record.NameTypes, Utils.s_jsoWithIndentation));
+            _ = insertRecordCommand.Parameters.AddWithValue("@readings", record.Readings is not null ? JsonSerializer.Serialize(record.Readings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@alternative_spellings", record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull));
+            _ = insertRecordCommand.Parameters.AddWithValue("@name_types", JsonSerializer.Serialize(record.NameTypes, Utils.s_jsoNotIgnoringNull));
 
             _ = insertRecordCommand.ExecuteNonQuery();
 
@@ -82,9 +83,9 @@ internal static class JmnedictDBManager
         dict.Ready = true;
     }
 
-    public static Dictionary<string, List<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
+    public static Dictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
-        Dictionary<string, List<IDictRecord>> results = new();
+        Dictionary<string, IList<IDictRecord>> results = new();
 
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
@@ -92,7 +93,13 @@ internal static class JmnedictDBManager
 
         StringBuilder queryBuilder = new(
             """
-            SELECT r.primary_spelling_in_hiragana AS searchKey, r.jmnedict_id as id, r.primary_spelling AS primarySpelling, r.readings AS readings, r.alternative_spellings as alternativeSpellings, r.glossary AS definitions, r.name_types AS nameTypes
+            SELECT r.primary_spelling_in_hiragana AS searchKey,
+                   r.jmnedict_id AS id,
+                   r.primary_spelling AS primarySpelling,
+                   r.readings AS readings,
+                   r.alternative_spellings AS alternativeSpellings,
+                   r.glossary AS definitions,
+                   r.name_types AS nameTypes
             FROM record r
             WHERE r.primary_spelling_in_hiragana = @term1
             """);
@@ -112,25 +119,26 @@ internal static class JmnedictDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            string searchKey = (string)dataReader["searchKey"];
+            string searchKey = dataReader.GetString(nameof(searchKey));
+            int id = dataReader.GetInt32(nameof(id));
+            string primarySpelling = dataReader.GetString(nameof(primarySpelling));
 
-            int id = (int)(long)dataReader["id"];
-            string primarySpelling = (string)dataReader["primarySpelling"];
+            string[]? readings = null;
+            if (dataReader[nameof(readings)] is string readingsFromDB)
+            {
+                readings = JsonSerializer.Deserialize<string[]>(readingsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object readingsFromDB = dataReader["readings"];
-            string[]? readings = readingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)readingsFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[]? alternativeSpellings = null;
+            if (dataReader[nameof(alternativeSpellings)] is string alternativeSpellingsFromDB)
+            {
+                alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object alternativeSpellingsFromDB = dataReader["alternativeSpellings"];
-            string[]? alternativeSpellings = alternativeSpellingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)alternativeSpellingsFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[][] definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(nameof(definitions)), Utils.s_jsoNotIgnoringNull)!;
+            string[][] nameTypes = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(nameof(nameTypes)), Utils.s_jsoNotIgnoringNull)!;
 
-            string[][] definitions = JsonSerializer.Deserialize<string[][]>((string)dataReader["definitions"])!;
-            string[][] nameTypes = JsonSerializer.Deserialize<string[][]>((string)dataReader["nameTypes"])!;
-
-            if (results.TryGetValue(searchKey, out List<IDictRecord>? result))
+            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
                 result.Add(new JmnedictRecord(id, primarySpelling, alternativeSpellings, readings, definitions, nameTypes));
             }

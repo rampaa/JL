@@ -33,7 +33,7 @@ public class DeconjugatorTests
         }
 
         // Assert
-        Assert.IsTrue(success);
+        Assert.That(success);
     }
 
     [Test]
@@ -59,6 +59,6 @@ public class DeconjugatorTests
         }
 
         // Assert
-        Assert.IsTrue(success);
+        Assert.That(success);
     }
 }

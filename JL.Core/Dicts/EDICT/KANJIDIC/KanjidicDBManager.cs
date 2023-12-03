@@ -1,3 +1,4 @@
+using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Text.Json;
@@ -56,12 +57,11 @@ internal static class KanjidicDBManager
 
                 _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
                 _ = insertRecordCommand.Parameters.AddWithValue("@kanji", kanji);
-                _ = insertRecordCommand.Parameters.AddWithValue("@on_readings", kanjidicRecord.OnReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.OnReadings, Utils.s_jsoWithIndentation) : DBNull.Value);
-                _ = insertRecordCommand.Parameters.AddWithValue("@kun_readings", kanjidicRecord.KunReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.KunReadings, Utils.s_jsoWithIndentation) : DBNull.Value);
-                _ = insertRecordCommand.Parameters.AddWithValue("@on_readings", kanjidicRecord.OnReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.OnReadings, Utils.s_jsoWithIndentation) : DBNull.Value);
-                _ = insertRecordCommand.Parameters.AddWithValue("@nanori_readings", kanjidicRecord.NanoriReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.NanoriReadings, Utils.s_jsoWithIndentation) : DBNull.Value);
-                _ = insertRecordCommand.Parameters.AddWithValue("@radical_names", kanjidicRecord.RadicalNames is not null ? JsonSerializer.Serialize(kanjidicRecord.RadicalNames, Utils.s_jsoWithIndentation) : DBNull.Value);
-                _ = insertRecordCommand.Parameters.AddWithValue("@glossary", kanjidicRecord.Definitions is not null ? JsonSerializer.Serialize(kanjidicRecord.Definitions, Utils.s_jsoWithIndentation) : DBNull.Value);
+                _ = insertRecordCommand.Parameters.AddWithValue("@on_readings", kanjidicRecord.OnReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.OnReadings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+                _ = insertRecordCommand.Parameters.AddWithValue("@kun_readings", kanjidicRecord.KunReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.KunReadings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+                _ = insertRecordCommand.Parameters.AddWithValue("@nanori_readings", kanjidicRecord.NanoriReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.NanoriReadings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+                _ = insertRecordCommand.Parameters.AddWithValue("@radical_names", kanjidicRecord.RadicalNames is not null ? JsonSerializer.Serialize(kanjidicRecord.RadicalNames, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+                _ = insertRecordCommand.Parameters.AddWithValue("@glossary", kanjidicRecord.Definitions is not null ? JsonSerializer.Serialize(kanjidicRecord.Definitions, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
                 _ = insertRecordCommand.Parameters.AddWithValue("@stroke_count", kanjidicRecord.StrokeCount);
                 _ = insertRecordCommand.Parameters.AddWithValue("@grade", kanjidicRecord.Grade);
                 _ = insertRecordCommand.Parameters.AddWithValue("@frequency", kanjidicRecord.Frequency);
@@ -99,7 +99,14 @@ internal static class KanjidicDBManager
 
         command.CommandText =
             """
-            SELECT r.on_readings AS onReadings, r.kun_readings AS kunReadings, r.nanori_readings AS nanoriReadings, r.radical_names AS radicalNames, r.glossary AS definitions, r.stroke_count AS strokeCount, r.grade AS grade, r.frequency
+            SELECT r.on_readings AS onReadings,
+                   r.kun_readings AS kunReadings,
+                   r.nanori_readings AS nanoriReadings,
+                   r.radical_names AS radicalNames,
+                   r.glossary AS definitions,
+                   r.stroke_count AS strokeCount,
+                   r.grade AS grade,
+                   r.frequency AS frequency
             FROM record r
             WHERE r.kanji = @term
             """;
@@ -109,34 +116,39 @@ internal static class KanjidicDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            object onReadingsFromDB = dataReader["onReadings"];
-            string[]? onReadings = onReadingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)onReadingsFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[]? onReadings = null;
+            if (dataReader[nameof(onReadings)] is string onReadingsFromDB)
+            {
+                onReadings = JsonSerializer.Deserialize<string[]>(onReadingsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object kunReadingsFromDB = dataReader["kunReadings"];
-            string[]? kunReadings = kunReadingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)kunReadingsFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[]? kunReadings = null;
+            if (dataReader[nameof(kunReadings)] is string kunReadingsFromDB)
+            {
+                kunReadings = JsonSerializer.Deserialize<string[]>(kunReadingsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object nanoriReadingsFromDB = dataReader["nanoriReadings"];
-            string[]? nanoriReadings = nanoriReadingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)nanoriReadingsFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[]? nanoriReadings = null;
+            if (dataReader[nameof(nanoriReadings)] is string nanoriReadingsFromDB)
+            {
+                nanoriReadings = JsonSerializer.Deserialize<string[]>(nanoriReadingsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object radicalNamesFromDB = dataReader["radicalNames"];
-            string[]? radicalNames = radicalNamesFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)radicalNamesFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[]? radicalNames = null;
+            if (dataReader[nameof(radicalNames)] is string radicalNamesFromDB)
+            {
+                radicalNames = JsonSerializer.Deserialize<string[]>(radicalNamesFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object definitionsFromDB = dataReader["definitions"];
-            string[]? definitions = definitionsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)definitionsFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[]? definitions = null;
+            if (dataReader[nameof(definitions)] is string definitionsFromDB)
+            {
+                definitions = JsonSerializer.Deserialize<string[]>(definitionsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            int strokeCount = (int)dataReader["strokeCount"];
-            int grade = (int)dataReader["grade"];
-            int frequency = (int)dataReader["frequency"];
+            int strokeCount = dataReader.GetInt32(nameof(strokeCount));
+            int grade = dataReader.GetInt32(nameof(grade));
+            int frequency = dataReader.GetInt32(nameof(frequency));
 
             results.Add(new KanjidicRecord(definitions, onReadings, kunReadings, nanoriReadings, radicalNames, strokeCount, grade, frequency));
         }

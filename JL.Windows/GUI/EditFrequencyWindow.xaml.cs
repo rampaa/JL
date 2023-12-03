@@ -3,6 +3,8 @@ using System.Windows;
 using System.Windows.Media;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
+using JL.Windows.GUI.UserControls;
+using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
 using Path = System.IO.Path;
 
@@ -14,11 +16,14 @@ namespace JL.Windows.GUI;
 internal sealed partial class EditFrequencyWindow : Window
 {
     private readonly Freq _freq;
+    private readonly FreqOptionsControl _freqOptionsControl;
 
     public EditFrequencyWindow(Freq freq)
     {
         _freq = freq;
+        _freqOptionsControl = new FreqOptionsControl();
         InitializeComponent();
+        _ = FreqStackPanel.Children.Add(_freqOptionsControl);
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -59,14 +64,48 @@ internal sealed partial class EditFrequencyWindow : Window
 
         if (isValid)
         {
+            string dbPath = FreqUtils.GetDBPath(_freq.Name);
+            bool dbExists = File.Exists(dbPath);
+
             if (_freq.Path != path)
             {
                 _freq.Path = path;
                 _freq.Contents.Clear();
+                _freq.Ready = false;
+
+                if (dbExists)
+                {
+                    SqliteConnection.ClearAllPools();
+                    File.Delete(dbPath);
+                    dbExists = false;
+                }
             }
 
-            _freq.Name = name;
+            Core.Freqs.Options.FreqOptions options = _freqOptionsControl.GetFreqOptions(_freq.Type);
 
+            if (_freq.Options?.UseDB?.Value != options.UseDB?.Value)
+            {
+                _freq.Ready = false;
+                if (dbExists && !(options.UseDB?.Value ?? false))
+                {
+                    SqliteConnection.ClearAllPools();
+                    File.Delete(dbPath);
+                    dbExists = false;
+                }
+            }
+
+            if (_freq.Name != name)
+            {
+                if (dbExists)
+                {
+                    SqliteConnection.ClearAllPools();
+                    File.Move(dbPath, FreqUtils.GetDBPath(name));
+                }
+
+                _freq.Name = name;
+            }
+
+            _freq.Options = options;
             Utils.Frontend.InvalidateDisplayCache();
 
             Close();
@@ -101,6 +140,8 @@ internal sealed partial class EditFrequencyWindow : Window
         FreqTypeComboBox.SelectedValue = type;
         TextBlockPath.Text = _freq.Path;
         NameTextBox.Text = _freq.Name;
+
+        _freqOptionsControl.GenerateFreqOptionsElements(_freq);
     }
 
     private void BrowsePathButton_OnClick(object sender, RoutedEventArgs e)

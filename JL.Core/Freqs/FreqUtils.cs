@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text.Json;
 using JL.Core.Freqs.FrequencyNazeka;
 using JL.Core.Freqs.FrequencyYomichan;
+using JL.Core.Freqs.Options;
 using JL.Core.Utilities;
 
 namespace JL.Core.Freqs;
@@ -17,23 +18,34 @@ public static class FreqUtils
             "VN (Nazeka)",
             new Freq(FreqType.Nazeka, "VN (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_vns.json"),
-                true, 1, 57273)
+                true, 1, 57273, false, new FreqOptions(new UseDBOption(false)))
         },
 
         {
             "Narou (Nazeka)",
             new Freq(FreqType.Nazeka, "Narou (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_narou.json"),
-                false, 2, 75588)
+                false, 2, 75588, false, new FreqOptions(new UseDBOption(false)))
         },
 
         {
             "Novel (Nazeka)",
             new Freq(FreqType.Nazeka, "Novel (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_novels.json"),
-                false, 3, 114348)
+                false, 3, 114348, false, new FreqOptions(new UseDBOption(false)))
         }
     };
+
+    internal static readonly FreqType[] s_freqTypesWithDBSupport = {
+        FreqType.Nazeka,
+        FreqType.Yomichan,
+        FreqType.YomichanKanji
+    };
+
+    public static string GetDBPath(string dbName)
+    {
+        return string.Create(CultureInfo.InvariantCulture, $"{Path.Join(Utils.ResourcesPath, dbName)} Frequency Dictionary.sqlite");
+    }
 
     public static async Task LoadFrequencies()
     {
@@ -46,17 +58,43 @@ public static class FreqUtils
 
         foreach (Freq freq in FreqDicts.Values.ToList())
         {
+            bool useDB = freq.Options?.UseDB?.Value ?? false;
+            string dbPath = GetDBPath(freq.Name);
+            string dbJournalPath = dbPath + "-journal";
+            bool dbExists = File.Exists(dbPath);
+            bool dbJournalExists = File.Exists(dbJournalPath);
+
+            if (dbJournalExists)
+            {
+                File.Delete(dbJournalPath);
+                if (dbExists)
+                {
+                    File.Delete(dbPath);
+                    dbExists = false;
+                }
+            }
+
             switch (freq.Type)
             {
                 case FreqType.Nazeka:
-                    if (freq is { Active: true, Contents.Count: 0 })
+                    if (freq is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
+                        freq.Ready = false;
                         Task nazekaFreqTask = Task.Run(async () =>
                         {
                             try
                             {
                                 await FrequencyNazekaLoader.Load(freq).ConfigureAwait(false);
                                 freq.Size = freq.Contents.Count;
+
+                                if (useDB && !dbExists)
+                                {
+                                    FreqDBManager.CreateDB(freq.Name);
+                                    FreqDBManager.InsertRecordsToDB(freq);
+                                    freq.Contents.Clear();
+                                    freq.Contents.TrimExcess();
+                                }
+                                freq.Ready = true;
                             }
 
                             catch (Exception ex)
@@ -65,31 +103,57 @@ public static class FreqUtils
                                 Utils.Logger.Error(ex, "Couldn't import {FreqName}", freq.Type);
                                 _ = FreqDicts.Remove(freq.Name);
                                 freqRemoved = true;
+
+                                if (dbExists)
+                                {
+                                    File.Delete(dbPath);
+                                }
                             }
                         });
 
                         tasks.Add(nazekaFreqTask);
                     }
 
-                    else if (freq is { Active: false, Contents.Count: > 0 })
+                    else
                     {
-                        freq.Contents.Clear();
-                        freq.Contents.TrimExcess();
-                        freqCleared = true;
+                        if (freq.Contents.Count > 0 && (!freq.Active || useDB))
+                        {
+                            if (useDB && !dbExists)
+                            {
+                                FreqDBManager.CreateDB(freq.Name);
+                                FreqDBManager.InsertRecordsToDB(freq);
+                            }
+
+                            freq.Contents.Clear();
+                            freq.Contents.TrimExcess();
+                            freqCleared = true;
+                        }
+
+                        freq.Ready = true;
                     }
 
                     break;
 
                 case FreqType.Yomichan:
                 case FreqType.YomichanKanji:
-                    if (freq is { Active: true, Contents.Count: 0 })
+                    if (freq is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
+                        freq.Ready = false;
                         Task yomichanFreqTask = Task.Run(async () =>
                         {
                             try
                             {
                                 await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false);
                                 freq.Size = freq.Contents.Count;
+
+                                if (useDB && !dbExists)
+                                {
+                                    FreqDBManager.CreateDB(freq.Name);
+                                    FreqDBManager.InsertRecordsToDB(freq);
+                                    freq.Contents.Clear();
+                                    freq.Contents.TrimExcess();
+                                }
+                                freq.Ready = true;
                             }
 
                             catch (Exception ex)
@@ -98,17 +162,33 @@ public static class FreqUtils
                                 Utils.Logger.Error(ex, "Couldn't import {FreqName}", freq.Type);
                                 _ = FreqDicts.Remove(freq.Name);
                                 freqRemoved = true;
+
+                                if (dbExists)
+                                {
+                                    File.Delete(dbPath);
+                                }
                             }
                         });
 
                         tasks.Add(yomichanFreqTask);
                     }
 
-                    else if (freq is { Active: false, Contents.Count: > 0 })
+                    else
                     {
-                        freq.Contents.Clear();
-                        freq.Contents.TrimExcess();
-                        freqCleared = true;
+                        if (freq.Contents.Count > 0 && (!freq.Active || useDB))
+                        {
+                            if (useDB && !dbExists)
+                            {
+                                FreqDBManager.CreateDB(freq.Name);
+                                FreqDBManager.InsertRecordsToDB(freq);
+                            }
+
+                            freq.Contents.Clear();
+                            freq.Contents.TrimExcess();
+                            freqCleared = true;
+                        }
+
+                        freq.Ready = true;
                     }
 
                     break;

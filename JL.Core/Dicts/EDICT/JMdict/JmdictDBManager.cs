@@ -1,3 +1,4 @@
+using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Text;
@@ -91,22 +92,22 @@ internal static class JmdictDBManager
             _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
             _ = insertRecordCommand.Parameters.AddWithValue("@edict_id", record.Id);
             _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling", record.PrimarySpelling);
-            _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling_orthography_info", record.PrimarySpellingOrthographyInfo is not null ? JsonSerializer.Serialize(record.PrimarySpellingOrthographyInfo, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@alternative_spellings", record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@alternative_spellings_orthography_info", record.AlternativeSpellingsOrthographyInfo is not null ? JsonSerializer.Serialize(record.AlternativeSpellingsOrthographyInfo, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@readings", record.Readings is not null ? JsonSerializer.Serialize(record.Readings, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@readings_orthography_info", record.ReadingsOrthographyInfo is not null ? JsonSerializer.Serialize(record.ReadingsOrthographyInfo, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@reading_restrictions", record.ReadingRestrictions is not null ? JsonSerializer.Serialize(record.ReadingRestrictions, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_jsoWithIndentationNotIgnoringNull));
-            _ = insertRecordCommand.Parameters.AddWithValue("@glossary_info", record.DefinitionInfo is not null ? JsonSerializer.Serialize(record.DefinitionInfo, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@part_of_speech", JsonSerializer.Serialize(record.WordClasses, Utils.s_jsoWithIndentationNotIgnoringNull));
-            _ = insertRecordCommand.Parameters.AddWithValue("@spelling_restrictions", record.SpellingRestrictions is not null ? JsonSerializer.Serialize(record.SpellingRestrictions, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@fields", record.Fields is not null ? JsonSerializer.Serialize(record.Fields, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@misc", record.Misc is not null ? JsonSerializer.Serialize(record.Misc, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@dialects", record.Dialects is not null ? JsonSerializer.Serialize(record.Dialects, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@loanword_etymology", record.LoanwordEtymology is not null ? JsonSerializer.Serialize(record.LoanwordEtymology, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@cross_references", record.RelatedTerms is not null ? JsonSerializer.Serialize(record.RelatedTerms, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@antonyms", record.Antonyms is not null ? JsonSerializer.Serialize(record.Antonyms, Utils.s_jsoWithIndentationNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@primary_spelling_orthography_info", record.PrimarySpellingOrthographyInfo is not null ? JsonSerializer.Serialize(record.PrimarySpellingOrthographyInfo, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@alternative_spellings", record.AlternativeSpellings is not null ? JsonSerializer.Serialize(record.AlternativeSpellings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@alternative_spellings_orthography_info", record.AlternativeSpellingsOrthographyInfo is not null ? JsonSerializer.Serialize(record.AlternativeSpellingsOrthographyInfo, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@readings", record.Readings is not null ? JsonSerializer.Serialize(record.Readings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@readings_orthography_info", record.ReadingsOrthographyInfo is not null ? JsonSerializer.Serialize(record.ReadingsOrthographyInfo, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@reading_restrictions", record.ReadingRestrictions is not null ? JsonSerializer.Serialize(record.ReadingRestrictions, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull));
+            _ = insertRecordCommand.Parameters.AddWithValue("@glossary_info", record.DefinitionInfo is not null ? JsonSerializer.Serialize(record.DefinitionInfo, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@part_of_speech", JsonSerializer.Serialize(record.WordClasses, Utils.s_jsoNotIgnoringNull));
+            _ = insertRecordCommand.Parameters.AddWithValue("@spelling_restrictions", record.SpellingRestrictions is not null ? JsonSerializer.Serialize(record.SpellingRestrictions, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@fields", record.Fields is not null ? JsonSerializer.Serialize(record.Fields, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@misc", record.Misc is not null ? JsonSerializer.Serialize(record.Misc, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@dialects", record.Dialects is not null ? JsonSerializer.Serialize(record.Dialects, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@loanword_etymology", record.LoanwordEtymology is not null ? JsonSerializer.Serialize(record.LoanwordEtymology, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@cross_references", record.RelatedTerms is not null ? JsonSerializer.Serialize(record.RelatedTerms, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@antonyms", record.Antonyms is not null ? JsonSerializer.Serialize(record.Antonyms, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
             _ = insertRecordCommand.ExecuteNonQuery();
 
             for (int i = 0; i < keys.Count; i++)
@@ -144,9 +145,9 @@ internal static class JmdictDBManager
         dict.Ready = true;
     }
 
-    public static Dictionary<string, List<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
+    public static Dictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
-        Dictionary<string, List<IDictRecord>> results = new();
+        Dictionary<string, IList<IDictRecord>> results = new();
 
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
@@ -154,7 +155,25 @@ internal static class JmdictDBManager
 
         StringBuilder queryBuilder = new(
             """
-            SELECT rsk.search_key AS searchKey, r.edict_id as id, r.primary_spelling AS primarySpelling, r.primary_spelling_orthography_info AS primarySpellingOrthographyInfo, r.spelling_restrictions AS spellingRestrictions, r.alternative_spellings as alternativeSpellings, r.alternative_spellings_orthography_info AS alternativeSpellingsOrthographyInfo, r.readings AS readings, r.readings_orthography_info AS readingsOrthographyInfo, r.reading_restrictions AS readingRestrictions, r.glossary AS definitions, r.glossary_info AS definitionInfo, r.part_of_speech AS wordClasses, r.fields AS fields, r.misc AS misc, r.dialects AS dialects, r.loanword_etymology AS loanwordEtymology, r.cross_references AS relatedTerms, r.antonyms AS antonyms
+            SELECT rsk.search_key AS searchKey,
+                   r.edict_id AS id,
+                   r.primary_spelling AS primarySpelling,
+                   r.primary_spelling_orthography_info AS primarySpellingOrthographyInfo,
+                   r.spelling_restrictions AS spellingRestrictions,
+                   r.alternative_spellings AS alternativeSpellings,
+                   r.alternative_spellings_orthography_info AS alternativeSpellingsOrthographyInfo,
+                   r.readings AS readings,
+                   r.readings_orthography_info AS readingsOrthographyInfo,
+                   r.reading_restrictions AS readingRestrictions,
+                   r.glossary AS definitions,
+                   r.glossary_info AS definitionInfo,
+                   r.part_of_speech AS wordClasses,
+                   r.fields AS fields,
+                   r.misc AS misc,
+                   r.dialects AS dialects,
+                   r.loanword_etymology AS loanwordEtymology,
+                   r.cross_references AS relatedTerms,
+                   r.antonyms AS antonyms
             FROM record r
             INNER JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key = @term1
@@ -175,85 +194,98 @@ internal static class JmdictDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            string searchKey = (string)dataReader["searchKey"];
+            string searchKey = dataReader.GetString(nameof(searchKey));
+            int id = dataReader.GetInt32(nameof(id));
+            string primarySpelling = dataReader.GetString(nameof(primarySpelling));
 
-            int id = (int)(long)dataReader["id"];
-            string primarySpelling = (string)dataReader["primarySpelling"];
+            string[]? primarySpellingOrthographyInfo = null;
+            if (dataReader[nameof(primarySpellingOrthographyInfo)] is string primarySpellingOrthographyInfoFromDB)
+            {
+                primarySpellingOrthographyInfo = JsonSerializer.Deserialize<string[]>(primarySpellingOrthographyInfoFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object primarySpellingOrthographyInfoFromDB = dataReader["primarySpellingOrthographyInfo"];
-            string[]? primarySpellingOrthographyInfo = primarySpellingOrthographyInfoFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)primarySpellingOrthographyInfoFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[]?[]? spellingRestrictions = null;
+            if (dataReader[nameof(spellingRestrictions)] is string spellingRestrictionsFromDB)
+            {
+                spellingRestrictions = JsonSerializer.Deserialize<string[]?[]>(spellingRestrictionsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object spellingRestrictionsFromDB = dataReader["spellingRestrictions"];
-            string[]?[]? spellingRestrictions = spellingRestrictionsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]?[]>((string)spellingRestrictionsFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[]? alternativeSpellings = null;
+            if (dataReader[nameof(alternativeSpellings)] is string alternativeSpellingsFromDB)
+            {
+                alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object alternativeSpellingsFromDB = dataReader["alternativeSpellings"];
-            string[]? alternativeSpellings = alternativeSpellingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)alternativeSpellingsFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[]?[]? alternativeSpellingsOrthographyInfo = null;
+            if (dataReader[nameof(alternativeSpellingsOrthographyInfo)] is string alternativeSpellingsOrthographyInfoFromDB)
+            {
+                alternativeSpellingsOrthographyInfo = JsonSerializer.Deserialize<string[]?[]>(alternativeSpellingsOrthographyInfoFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object alternativeSpellingsOrthographyInfoFromDB = dataReader["alternativeSpellingsOrthographyInfo"];
-            string[]?[]? alternativeSpellingsOrthographyInfo = alternativeSpellingsOrthographyInfoFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]?[]>((string)alternativeSpellingsOrthographyInfoFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[]? readings = null;
+            if (dataReader[nameof(readings)] is string readingsFromDB)
+            {
+                readings = JsonSerializer.Deserialize<string[]>(readingsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object readingsFromDB = dataReader["readings"];
-            string[]? readings = readingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)readingsFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[]?[]? readingRestrictions = null;
+            if (dataReader[nameof(readingRestrictions)] is string readingRestrictionsFromDB)
+            {
+                readingRestrictions = JsonSerializer.Deserialize<string[]?[]>(readingRestrictionsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object readingRestrictionsFromDB = dataReader["readingRestrictions"];
-            string[]?[]? readingRestrictions = readingRestrictionsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]?[]>((string)readingRestrictionsFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[]?[]? readingsOrthographyInfo = null;
+            if (dataReader[nameof(readingsOrthographyInfo)] is string readingsOrthographyInfoFromDB)
+            {
+                readingsOrthographyInfo = JsonSerializer.Deserialize<string[]?[]>(readingsOrthographyInfoFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object readingsOrthographyInfoFromDB = dataReader["readingsOrthographyInfo"];
-            string[]?[]? readingsOrthographyInfo = readingsOrthographyInfoFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]?[]>((string)readingsOrthographyInfoFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[][] definitions = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(nameof(definitions)), Utils.s_jsoNotIgnoringNull)!;
+            string[][] wordClasses = JsonSerializer.Deserialize<string[][]>(dataReader.GetString(nameof(wordClasses)), Utils.s_jsoNotIgnoringNull)!;
 
-            string[][] definitions = JsonSerializer.Deserialize<string[][]>((string)dataReader["definitions"])!;
-            string[][] wordClasses = JsonSerializer.Deserialize<string[][]>((string)dataReader["wordClasses"])!;
+            string[]?[]? fields = null;
+            if (dataReader[nameof(fields)] is string fieldsFromDB)
+            {
+                fields = JsonSerializer.Deserialize<string[]?[]>(fieldsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object fieldsFromDB = dataReader["fields"];
-            string[]?[]? fields = fieldsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]?[]>((string)fieldsFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[]?[]? misc = null;
+            if (dataReader[nameof(misc)] is string miscFromDB)
+            {
+                misc = JsonSerializer.Deserialize<string[]?[]>(miscFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object miscFromDB = dataReader["misc"];
-            string[]?[]? misc = miscFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]?[]>((string)miscFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string?[]? definitionInfo = null;
+            if (dataReader[nameof(definitionInfo)] is string definitionInfoFromDB)
+            {
+                definitionInfo = JsonSerializer.Deserialize<string?[]>(definitionInfoFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object definitionInfoFromDB = dataReader["definitionInfo"];
-            string?[]? definitionInfo = definitionInfoFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string?[]>((string)definitionInfoFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[]?[]? dialects = null;
+            if (dataReader[nameof(dialects)] is string dialectsFromDB)
+            {
+                dialects = JsonSerializer.Deserialize<string[]?[]>(dialectsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object dialectsFromDB = dataReader["dialects"];
-            string[]?[]? dialects = dialectsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]?[]>((string)dialectsFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            LoanwordSource[]?[]? loanwordEtymology = null;
+            if (dataReader[nameof(loanwordEtymology)] is string loanwordEtymologyFromDB)
+            {
+                loanwordEtymology = JsonSerializer.Deserialize<LoanwordSource[]?[]>(loanwordEtymologyFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object loanwordEtymologyFromDB = dataReader["loanwordEtymology"];
-            LoanwordSource[]?[]? loanwordEtymology = loanwordEtymologyFromDB is not DBNull
-                ? JsonSerializer.Deserialize<LoanwordSource[]?[]>((string)loanwordEtymologyFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[]?[]? relatedTerms = null;
+            if (dataReader[nameof(relatedTerms)] is string relatedTermsFromDB)
+            {
+                relatedTerms = JsonSerializer.Deserialize<string[]?[]>(relatedTermsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object relatedTermsFromDB = dataReader["relatedTerms"];
-            string[]?[]? relatedTerms = relatedTermsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]?[]>((string)relatedTermsFromDB, Utils.s_jsoWithIndentation)
-                : null;
+            string[]?[]? antonyms = null;
+            if (dataReader[nameof(antonyms)] is string antonymsFromDB)
+            {
+                antonyms = JsonSerializer.Deserialize<string[]?[]>(antonymsFromDB, Utils.s_jsoNotIgnoringNull);
+            }
 
-            object antonymsFromDB = dataReader["antonyms"];
-            string[]?[]? antonyms = antonymsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]?[]>((string)antonymsFromDB, Utils.s_jsoWithIndentation)
-                : null;
-
-            if (results.TryGetValue(searchKey, out List<IDictRecord>? result))
+            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
                 result.Add(new JmdictRecord(id, primarySpelling, primarySpellingOrthographyInfo, alternativeSpellings, alternativeSpellingsOrthographyInfo, readings, readingsOrthographyInfo, definitions, wordClasses, spellingRestrictions, readingRestrictions, fields, misc, definitionInfo, dialects, loanwordEtymology, relatedTerms, antonyms));
             }

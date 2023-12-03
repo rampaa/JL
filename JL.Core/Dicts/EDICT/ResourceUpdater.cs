@@ -7,6 +7,7 @@ using JL.Core.Dicts.EDICT.KANJIDIC;
 using JL.Core.Network;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
+using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.EDICT;
 
@@ -133,6 +134,7 @@ public static class ResourceUpdater
             {
                 if (dbExists)
                 {
+                    SqliteConnection.ClearAllPools();
                     File.Delete(dbPath);
                 }
 
@@ -179,6 +181,7 @@ public static class ResourceUpdater
             {
                 if (dbExists)
                 {
+                    SqliteConnection.ClearAllPools();
                     File.Delete(dbPath);
                 }
 
@@ -226,6 +229,7 @@ public static class ResourceUpdater
             {
                 if (dbExists)
                 {
+                    SqliteConnection.ClearAllPools();
                     File.Delete(dbPath);
                 }
 

@@ -13,6 +13,7 @@
   <ItemGroup>
     <PackageReference Include="Caching" Version="3.0.1" />
     <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.2" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
   </ItemGroup>
 

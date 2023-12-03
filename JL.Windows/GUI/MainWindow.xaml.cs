@@ -9,7 +9,6 @@ using System.Windows.Threading;
 using HandyControl.Tools;
 using JL.Core;
 using JL.Core.Dicts;
-using JL.Core.Dicts.PitchAccent;
 using JL.Core.Freqs;
 using JL.Core.Lookup;
 using JL.Core.Network;
@@ -62,14 +61,6 @@ internal sealed partial class MainWindow : Window
     protected override async void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
-
-        AppDomain.CurrentDomain.UnhandledException += static (_, eventArgs) =>
-        {
-            Exception ex = (Exception)eventArgs.ExceptionObject;
-            Utils.Logger.Fatal(ex, "Unhandled exception");
-        };
-
-        TaskScheduler.UnobservedTaskException += static (_, eventArgs) => Utils.Logger.Fatal(eventArgs.Exception, "Unobserved task exception");
 
         SystemEvents.DisplaySettingsChanged += DisplaySettingsChanged;
 
@@ -279,7 +270,6 @@ internal sealed partial class MainWindow : Window
                 {
                     _ = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict);
                     bool pitchDictIsActive = pitchDict?.Active ?? false;
-                    bool useDBForPitchDict = pitchDictIsActive && (pitchDict!.Options?.UseDB?.Value ?? false) && pitchDict.Ready;
                     Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
                     bool pOrthographyInfo = jmdict.Options?.POrthographyInfo?.Value ?? true;
                     bool rOrthographyInfo = jmdict.Options?.ROrthographyInfo?.Value ?? true;
@@ -296,7 +286,7 @@ internal sealed partial class MainWindow : Window
                             FirstPopupWindow.DictsWithResults.Add(lookupResult.Dict);
                         }
 
-                        popupItemSource[i] = FirstPopupWindow.MakeResultStackPanel(lookupResult, i, lookupResults.Count, pitchDict, pitchDictIsActive, useDBForPitchDict, YomichanPitchAccentDBManager.GetRecordsFromDB, pOrthographyInfo, rOrthographyInfo, aOrthographyInfo);
+                        popupItemSource[i] = FirstPopupWindow.PrepareResultStackPanel(lookupResult, i, lookupResults.Count, pitchDict, pitchDictIsActive, pOrthographyInfo, rOrthographyInfo, aOrthographyInfo);
                     }
 
                     PopupWindow.StackPanelCache.AddReplace(text, popupItemSource);

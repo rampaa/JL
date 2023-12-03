@@ -1,16 +1,13 @@
 using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Text.Json;
-using JL.Core.Dicts.YomichanKanji;
-using JL.Core.Dicts;
-using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
+using System.Text;
+using System.Data;
 
 namespace JL.Core.Freqs;
 internal static class FreqDBManager
 {
-    public static void CreateFrequencyDB(string dbName)
+    public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={FreqUtils.GetDBPath(dbName)};"));
         connection.Open();
@@ -37,7 +34,7 @@ internal static class FreqDBManager
         _ = command.ExecuteNonQuery();
     }
 
-    public static void InsertToYomichanKanjiDB(Freq freq)
+    public static void InsertRecordsToDB(Freq freq)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={FreqUtils.GetDBPath(freq.Name)};Mode=ReadWrite"));
         connection.Open();
@@ -46,34 +43,35 @@ internal static class FreqDBManager
         int id = 1;
         foreach ((string key, IList<FrequencyRecord> records) in freq.Contents)
         {
-            using SqliteCommand insertRecordCommand = connection.CreateCommand();
-            insertRecordCommand.CommandText =
-                """
-                INSERT INTO record (id, spelling, frequency)
-                VALUES (@id, @spelling, @frequency)
-                """;
-
             for (int i = 0; i < records.Count; i++)
             {
+                using SqliteCommand insertRecordCommand = connection.CreateCommand();
+
+                insertRecordCommand.CommandText =
+                    """
+                    INSERT INTO record (id, spelling, frequency)
+                    VALUES (@id, @spelling, @frequency)
+                    """;
+
                 FrequencyRecord record = records[i];
                 _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
                 _ = insertRecordCommand.Parameters.AddWithValue("@spelling", record.Spelling);
                 _ = insertRecordCommand.Parameters.AddWithValue("@frequency", record.Frequency);
                 _ = insertRecordCommand.ExecuteNonQuery();
+
+                using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
+                insertSearchKeyCommand.CommandText =
+                    """
+                    INSERT INTO record_search_key (record_id, search_key)
+                    VALUES (@record_id, @search_key)
+                    """;
+
+                _ = insertSearchKeyCommand.Parameters.AddWithValue("@record_id", id);
+                _ = insertSearchKeyCommand.Parameters.AddWithValue("@search_key", key);
+                _ = insertSearchKeyCommand.ExecuteNonQuery();
+
+                ++id;
             }
-
-            using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
-            insertSearchKeyCommand.CommandText =
-                """
-                INSERT INTO record_search_key (record_id, search_key)
-                VALUES (@record_id, @search_key)
-                """;
-
-            _ = insertSearchKeyCommand.Parameters.AddWithValue("@record_id", id);
-            _ = insertSearchKeyCommand.Parameters.AddWithValue("@search_key", key);
-            _ = insertSearchKeyCommand.ExecuteNonQuery();
-
-            ++id;
         }
 
         using SqliteCommand createIndexCommand = connection.CreateCommand();
@@ -85,9 +83,60 @@ internal static class FreqDBManager
         transaction.Commit();
     }
 
-    public static bool GetRecordsFromYomichanKanjiDB(string dbName, string term, [MaybeNullWhen(false)] out IList<IDictRecord> value)
+    public static Dictionary<string, List<FrequencyRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
-        List<IDictRecord> records = new();
+        Dictionary<string, List<FrequencyRecord>> results = new();
+
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={FreqUtils.GetDBPath(dbName)};Mode=ReadOnly"));
+        connection.Open();
+        using SqliteCommand command = connection.CreateCommand();
+
+        StringBuilder queryBuilder = new(
+            """
+            SELECT rsk.search_key AS searchKey,
+                   r.spelling as spelling,
+                   r.frequency AS frequency
+            FROM record r
+            INNER JOIN record_search_key rsk ON r.id = rsk.record_id
+            WHERE rsk.search_key = @term1
+            """);
+
+        for (int i = 1; i < terms.Count; i++)
+        {
+            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $"\nOR rsk.search_key = @term{i + 1}");
+        }
+
+        command.CommandText = queryBuilder.ToString();
+
+        for (int i = 0; i < terms.Count; i++)
+        {
+            _ = command.Parameters.AddWithValue($"@term{i + 1}", terms[i]);
+        }
+
+        using SqliteDataReader dataReader = command.ExecuteReader();
+        while (dataReader.Read())
+        {
+            string searchKey = dataReader.GetString(nameof(searchKey));
+            string spelling = dataReader.GetString(nameof(spelling));
+            int frequency = dataReader.GetInt32(nameof(frequency));
+
+            if (results.TryGetValue(searchKey, out List<FrequencyRecord>? result))
+            {
+                result.Add(new FrequencyRecord(spelling, frequency));
+            }
+
+            else
+            {
+                results[searchKey] = new List<FrequencyRecord> { new(spelling, frequency) };
+            }
+        }
+
+        return results;
+    }
+
+    public static List<FrequencyRecord> GetRecordsFromDB(string dbName, string term)
+    {
+        List<FrequencyRecord> records = new();
 
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={FreqUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
@@ -95,9 +144,10 @@ internal static class FreqDBManager
 
         command.CommandText =
             """
-            SELECT r.on_readings AS onReadings, r.kun_readings AS kunReadings, r.glossary AS definitions, r.stats AS stats,
+            SELECT r.spelling as spelling, r.frequency AS frequency
             FROM record r
-            WHERE r.kanji = @term
+            INNER JOIN record_search_key rsk ON r.id = rsk.record_id
+            WHERE rsk.search_key = @term
             """;
 
         _ = command.Parameters.AddWithValue("@term", term);
@@ -105,36 +155,11 @@ internal static class FreqDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            object onReadingsFromDB = dataReader["onReadings"];
-            string[]? onReadings = onReadingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)onReadingsFromDB, Utils.s_jsoWithIndentation)
-                : null;
-
-            object kunReadingsFromDB = dataReader["kunReadings"];
-            string[]? kunReadings = kunReadingsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)kunReadingsFromDB, Utils.s_jsoWithIndentation)
-                : null;
-
-            object definitionsFromDB = dataReader["definitions"];
-            string[]? definitions = definitionsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)definitionsFromDB, Utils.s_jsoWithIndentation)
-                : null;
-
-            object statsFromDB = dataReader["stats"];
-            string[]? stats = statsFromDB is not DBNull
-                ? JsonSerializer.Deserialize<string[]>((string)statsFromDB, Utils.s_jsoWithIndentation)
-                : null;
-
-            records.Add(new YomichanKanjiRecord(onReadings, kunReadings, definitions, stats));
+            string spelling = dataReader.GetString(nameof(spelling));
+            int frequency = dataReader.GetInt32(nameof(frequency));
+            records.Add(new FrequencyRecord(spelling, frequency));
         }
 
-        if (records.Count > 0)
-        {
-            value = records;
-            return true;
-        }
-
-        value = null;
-        return false;
+        return records;
     }
 }

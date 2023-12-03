@@ -60,10 +60,9 @@ public static class Utils
         WriteIndented = true
     };
 
-    internal static readonly JsonSerializerOptions s_jsoWithIndentationNotIgnoringNull = new()
+    internal static readonly JsonSerializerOptions s_jsoNotIgnoringNull = new()
     {
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        WriteIndented = true
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
     internal static readonly JsonSerializerOptions s_jsoWithEnumConverterAndIndentation = new()

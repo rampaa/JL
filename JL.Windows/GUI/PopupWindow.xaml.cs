@@ -8,7 +8,6 @@ using Caching;
 using JL.Core;
 using JL.Core.Audio;
 using JL.Core.Dicts;
-using JL.Core.Dicts.PitchAccent;
 using JL.Core.Lookup;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
@@ -24,7 +23,7 @@ namespace JL.Windows.GUI;
 /// </summary>
 internal sealed partial class PopupWindow : Window
 {
-    public PopupWindow? ChildPopupWindow { get; private set; }
+    public PopupWindow? ChildPopupWindow { get; set; }
     private bool ContextMenuIsOpening { get; set; } = false;
 
     private TextBox? _previousTextBox;
@@ -61,8 +60,7 @@ internal sealed partial class PopupWindow : Window
 
     public static Timer PopupAutoHideTimer { get; } = new();
 
-    public static LRUCache<string, StackPanel[]> StackPanelCache { get; } = new(
-        Utils.CacheSize, Utils.CacheSize / 8);
+    public static LRUCache<string, StackPanel[]> StackPanelCache { get; } = new(Utils.CacheSize, Utils.CacheSize / 10);
 
     private ScrollViewer? _popupListViewScrollViewer;
 
@@ -446,7 +444,6 @@ internal sealed partial class PopupWindow : Window
         {
             _ = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict);
             bool pitchDictIsActive = pitchDict?.Active ?? false;
-            bool useDBForPitchDict = pitchDictIsActive && (pitchDict!.Options?.UseDB?.Value ?? false) && pitchDict.Ready;
             Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
             bool showPOrthographyInfo = jmdict.Options?.POrthographyInfo?.Value ?? true;
             bool showROrthographyInfo = jmdict.Options?.ROrthographyInfo?.Value ?? true;
@@ -467,7 +464,7 @@ internal sealed partial class PopupWindow : Window
                     DictsWithResults.Add(lookupResult.Dict);
                 }
 
-                popupItemSource[i] = MakeResultStackPanel(lookupResult, i, resultCount, pitchDict, pitchDictIsActive, useDBForPitchDict, YomichanPitchAccentDBManager.GetRecordsFromDB, showPOrthographyInfo, showROrthographyInfo, showAOrthographyInfo);
+                popupItemSource[i] = PrepareResultStackPanel(lookupResult, i, resultCount, pitchDict, pitchDictIsActive, showPOrthographyInfo, showROrthographyInfo, showAOrthographyInfo);
             }
 
             PopupListView.ItemsSource = popupItemSource;
@@ -482,7 +479,7 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    public StackPanel MakeResultStackPanel(LookupResult result, int index, int resultsCount, Dict? pitchDict, bool pitchDictIsActive, bool useDBForPitchDict, LookupUtils.GetRecordsFromDB getRecordsFromPitchDB, bool showPOrthographyInfo, bool showROrthographyInfo, bool showAOrthographyInfo)
+    public StackPanel PrepareResultStackPanel(LookupResult result, int index, int resultsCount, Dict? pitchDict, bool pitchDictIsActive, bool showPOrthographyInfo, bool showROrthographyInfo, bool showAOrthographyInfo)
     {
         // top
         WrapPanel top = new() { Tag = index };
@@ -506,20 +503,13 @@ internal sealed partial class PopupWindow : Window
 
         if (result.Readings is null && pitchDictIsActive)
         {
-            Grid pitchAccentGrid = useDBForPitchDict
-                ? PopupWindowUtils.CreatePitchAccentGridFromDB(result.PrimarySpelling,
+            Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
                 result.AlternativeSpellings,
                 null,
                 primarySpellingTextBlock.Text.Split(", "),
                 primarySpellingTextBlock.Margin.Left,
                 pitchDict!,
-                getRecordsFromPitchDB)
-                : PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
-                result.AlternativeSpellings,
-                null,
-                primarySpellingTextBlock.Text.Split(", "),
-                primarySpellingTextBlock.Margin.Left,
-                pitchDict!);
+                result.PitchAccentDict);
 
             if (pitchAccentGrid.Children.Count is 0)
             {
@@ -586,20 +576,13 @@ internal sealed partial class PopupWindow : Window
 
                 if (pitchDictIsActive)
                 {
-                    Grid pitchAccentGrid = useDBForPitchDict
-                        ? PopupWindowUtils.CreatePitchAccentGridFromDB(result.PrimarySpelling,
+                    Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
                         result.AlternativeSpellings,
                         result.Readings,
                         readingTextBox.Text.Split(", "),
                         readingTextBox.Margin.Left,
                         pitchDict!,
-                        getRecordsFromPitchDB)
-                        : PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
-                        result.AlternativeSpellings,
-                        result.Readings,
-                        readingTextBox.Text.Split(", "),
-                        readingTextBox.Margin.Left,
-                        pitchDict!);
+                        result.PitchAccentDict);
 
                     if (pitchAccentGrid.Children.Count is 0)
                     {
@@ -641,20 +624,13 @@ internal sealed partial class PopupWindow : Window
 
                 if (pitchDictIsActive)
                 {
-                    Grid pitchAccentGrid = useDBForPitchDict
-                        ? PopupWindowUtils.CreatePitchAccentGridFromDB(result.PrimarySpelling,
+                    Grid pitchAccentGrid = PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
                         result.AlternativeSpellings,
                         result.Readings,
                         readingTextBlock.Text.Split(", "),
                         readingTextBlock.Margin.Left,
                         pitchDict!,
-                        getRecordsFromPitchDB)
-                        : PopupWindowUtils.CreatePitchAccentGrid(result.PrimarySpelling,
-                        result.AlternativeSpellings,
-                        result.Readings,
-                        readingTextBlock.Text.Split(", "),
-                        readingTextBlock.Margin.Left,
-                        pitchDict!);
+                        result.PitchAccentDict);
 
                     if (pitchAccentGrid.Children.Count is 0)
                     {

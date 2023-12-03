@@ -2,7 +2,9 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using JL.Core.Freqs;
+using JL.Core.Freqs.Options;
 using JL.Core.Utilities;
+using JL.Windows.GUI.UserControls;
 using Microsoft.Win32;
 
 namespace JL.Windows.GUI;
@@ -12,9 +14,12 @@ namespace JL.Windows.GUI;
 /// </summary>
 internal sealed partial class AddFrequencyWindow : Window
 {
+    private readonly FreqOptionsControl _freqOptionsControl;
     public AddFrequencyWindow()
     {
         InitializeComponent();
+        _freqOptionsControl = new FreqOptionsControl();
+        _ = FreqStackPanel.Children.Add(_freqOptionsControl);
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -67,8 +72,10 @@ internal sealed partial class AddFrequencyWindow : Window
         {
             FreqType type = typeString!.GetEnum<FreqType>();
 
+            FreqOptions options = _freqOptionsControl.GetFreqOptions(type);
+
             FreqUtils.FreqDicts.Add(name,
-                new Freq(type, name, path, true, FreqUtils.FreqDicts.Count + 1, 0));
+                new Freq(type, name, path, true, FreqUtils.FreqDicts.Count + 1, 0, false, options));
 
             Close();
         }
@@ -121,5 +128,26 @@ internal sealed partial class AddFrequencyWindow : Window
             default:
                 throw new ArgumentOutOfRangeException(null, "Invalid FreqType (Add)");
         }
+    }
+
+    private void GenerateDictOptions()
+    {
+        string? typeString = FreqTypeComboBox.SelectedItem?.ToString();
+        if (!string.IsNullOrEmpty(typeString))
+        {
+            FreqType type = typeString.GetEnum<FreqType>();
+            _freqOptionsControl.GenerateFreqOptionsElements(type);
+        }
+
+        else
+        {
+            _freqOptionsControl.OptionsStackPanel.Visibility = Visibility.Collapsed;
+            _freqOptionsControl.OptionsTextBlock.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    private void FreqTypeComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        GenerateDictOptions();
     }
 }
