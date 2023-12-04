@@ -11,6 +11,7 @@ public static class FreqUtils
 {
     public static bool FreqsReady { get; private set; } = false;
     public static Dictionary<string, Freq> FreqDicts { get; } = new();
+    private static readonly string s_dbFolderPath = Path.Join(Utils.ResourcesPath, "Frequency Databases");
 
     internal static readonly Dictionary<string, Freq> s_builtInFreqs = new(3)
     {
@@ -44,7 +45,7 @@ public static class FreqUtils
 
     public static string GetDBPath(string dbName)
     {
-        return string.Create(CultureInfo.InvariantCulture, $"{Path.Join(Utils.ResourcesPath, dbName)} Frequency Dictionary.sqlite");
+        return string.Create(CultureInfo.InvariantCulture, $"{Path.Join(s_dbFolderPath, dbName)}.sqlite");
     }
 
     public static async Task LoadFrequencies()
