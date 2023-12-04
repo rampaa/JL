@@ -67,6 +67,7 @@ internal static class ConfigManager
     public static bool EnableBacklog { get; private set; } = true;
     public static bool AutoSaveBacklogBeforeClosing { get; private set; } = false;
     public static bool TextToSpeechOnTextChange { get; private set; } = false;
+    public static bool HidePopupsOnTextChange { get; private set; } = true;
     public static bool AlwaysShowMainTextBoxCaret { get; set; } = false;
 
     #endregion
@@ -321,6 +322,8 @@ internal static class ConfigManager
         AutoSaveBacklogBeforeClosing = GetValueFromConfig(config, AutoSaveBacklogBeforeClosing, nameof(AutoSaveBacklogBeforeClosing), bool.TryParse);
 
         TextToSpeechOnTextChange = GetValueFromConfig(config, TextToSpeechOnTextChange, nameof(TextToSpeechOnTextChange), bool.TryParse);
+
+        HidePopupsOnTextChange = GetValueFromConfig(config, HidePopupsOnTextChange, nameof(HidePopupsOnTextChange), bool.TryParse);
 
         HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar = GetValueFromConfig(config, HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), bool.TryParse);
         mainWindow.ChangeVisibilityOfTitleBarButtons();
@@ -855,7 +858,7 @@ internal static class ConfigManager
         preferenceWindow.EnableBacklogCheckBox.IsChecked = EnableBacklog;
         preferenceWindow.AutoSaveBacklogBeforeClosingCheckBox.IsChecked = AutoSaveBacklogBeforeClosing;
         preferenceWindow.TextToSpeechOnTextChangeCheckBox.IsChecked = TextToSpeechOnTextChange;
-
+        preferenceWindow.HidePopupsOnTextChangeCheckBox.IsChecked = HidePopupsOnTextChange;
         preferenceWindow.ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox.IsChecked = HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar;
         preferenceWindow.HorizontallyCenterMainWindowTextCheckBox.IsChecked = HorizontallyCenterMainWindowText;
 
@@ -1069,6 +1072,8 @@ internal static class ConfigManager
             preferenceWindow.AutoSaveBacklogBeforeClosingCheckBox.IsChecked.ToString();
         settings[nameof(TextToSpeechOnTextChange)].Value =
             preferenceWindow.TextToSpeechOnTextChangeCheckBox.IsChecked.ToString();
+        settings[nameof(HidePopupsOnTextChange)].Value =
+            preferenceWindow.HidePopupsOnTextChangeCheckBox.IsChecked.ToString();
         settings[nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar)].Value =
             preferenceWindow.ToggleHideAllTitleBarButtonsWhenMouseIsNotOverTitleBarCheckBox.IsChecked.ToString();
         settings[nameof(HorizontallyCenterMainWindowText)].Value =

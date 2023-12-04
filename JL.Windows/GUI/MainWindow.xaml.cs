@@ -184,7 +184,10 @@ internal sealed partial class MainWindow : Window
             TitleBarContextMenu.IsOpen = false;
             MainTextBoxContextMenu.IsOpen = false;
 
-            PopupWindowUtils.HidePopups(FirstPopupWindow);
+            if (ConfigManager.HidePopupsOnTextChange)
+            {
+                PopupWindowUtils.HidePopups(FirstPopupWindow);
+            }
         }, DispatcherPriority.Send);
 
         if (ConfigManager.AlwaysOnTop
