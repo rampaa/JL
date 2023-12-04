@@ -99,6 +99,9 @@ public static class Utils
 
         StatsUtils.StatsStopWatch.Start();
 
+        _ = Directory.CreateDirectory(DictUtils.s_dbFolderPath);
+        _ = Directory.CreateDirectory(FreqUtils.s_dbFolderPath);
+
         if (!File.Exists(Path.Join(ConfigPath, "dicts.json")))
         {
             await DictUtils.CreateDefaultDictsConfig().ConfigureAwait(false);

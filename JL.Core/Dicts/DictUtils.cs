@@ -34,7 +34,7 @@ public static class DictUtils
     internal static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
     internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     internal static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
-    private static readonly string s_dbFolderPath = Path.Join(Utils.ResourcesPath, "Dictionary Databases");
+    internal static readonly string s_dbFolderPath = Path.Join(Utils.ResourcesPath, "Dictionary Databases");
 
     public static CancellationTokenSource? ProfileCustomWordsCancellationTokenSource { get; private set; }
     public static CancellationTokenSource? ProfileCustomNamesCancellationTokenSource { get; private set; }

@@ -63,7 +63,10 @@ public static class ExtensionMethods
 
     internal static void AddRange<T>(this ConcurrentBag<T> source, IEnumerable<T> items)
     {
-        _ = Parallel.ForEach(items, source.Add);
+        foreach (T item in items)
+        {
+            source.Add(item);
+        }
     }
 
     internal static T[] RemoveAt<T>(this T[] source, int index)

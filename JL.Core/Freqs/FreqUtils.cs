@@ -11,7 +11,7 @@ public static class FreqUtils
 {
     public static bool FreqsReady { get; private set; } = false;
     public static Dictionary<string, Freq> FreqDicts { get; } = new();
-    private static readonly string s_dbFolderPath = Path.Join(Utils.ResourcesPath, "Frequency Databases");
+    internal static readonly string s_dbFolderPath = Path.Join(Utils.ResourcesPath, "Frequency Databases");
 
     internal static readonly Dictionary<string, Freq> s_builtInFreqs = new(3)
     {
