@@ -22,8 +22,7 @@ internal static class YomichanKanjiDBManager
                 on_readings TEXT,
                 kun_readings TEXT,
                 glossary TEXT,
-                stats TEXT,
-                tags TEXT
+                stats TEXT
             ) STRICT;
             """;
 

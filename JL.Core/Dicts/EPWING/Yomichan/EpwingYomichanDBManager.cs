@@ -24,10 +24,7 @@ internal static class EpwingYomichanDBManager
                 reading TEXT,
                 glossary TEXT NOT NULL,
                 part_of_speech TEXT,
-                glossary_tags TEXT,
-                term_tag TEXT,
-                score INTEGER,
-                sequence INTEGER
+                glossary_tags TEXT
             ) STRICT;
 
             CREATE TABLE IF NOT EXISTS record_search_key

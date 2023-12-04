@@ -26,8 +26,7 @@ internal static class JmnedictDBManager
                 readings TEXT,
                 alternative_spellings TEXT,
                 glossary TEXT NOT NULL,
-                name_types TEXT NOT NULL,
-                cross_references TEXT
+                name_types TEXT NOT NULL
             ) STRICT;
             """;
 

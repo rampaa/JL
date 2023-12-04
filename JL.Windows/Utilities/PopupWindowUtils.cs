@@ -258,19 +258,19 @@ internal static class PopupWindowUtils
     {
         PopupWindow? currentPopupWindow = rootPopup;
 
-        int depth = 0;
+        int popupNo = 1;
         while (currentPopupWindow is not null)
         {
             currentPopupWindow.HidePopup();
 
             PopupWindow? nextPopupWindow = currentPopupWindow.ChildPopupWindow;
 
-            if (depth is 1)
+            if (popupNo is 2)
             {
                 currentPopupWindow.ChildPopupWindow = null;
             }
 
-            if (depth > 1)
+            if (popupNo > 2)
             {
                 currentPopupWindow.Owner = null;
                 currentPopupWindow.ChildPopupWindow = null;
@@ -279,7 +279,7 @@ internal static class PopupWindowUtils
 
             currentPopupWindow = nextPopupWindow;
 
-            ++depth;
+            ++popupNo;
         }
     }
 

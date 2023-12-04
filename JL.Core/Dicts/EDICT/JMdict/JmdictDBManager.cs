@@ -37,8 +37,7 @@ internal static class JmdictDBManager
                 dialects TEXT,
                 loanword_etymology TEXT,
                 cross_references TEXT,
-                antonyms TEXT,
-                gloss_types TEXT
+                antonyms TEXT
             ) STRICT;
 
             CREATE TABLE IF NOT EXISTS record_search_key

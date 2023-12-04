@@ -27,8 +27,7 @@ internal static class KanjidicDBManager
                 glossary TEXT,
                 stroke_count INTEGER NOT NULL,
                 grade INTEGER NOT NULL,
-                frequency INTEGER NOT NULL,
-                jlpt INTEGER
+                frequency INTEGER NOT NULL
             ) STRICT;
             """;
 
