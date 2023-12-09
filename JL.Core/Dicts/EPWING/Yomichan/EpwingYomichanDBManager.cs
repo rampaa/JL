@@ -154,37 +154,16 @@ internal static class EpwingYomichanDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
+            EpwingYomichanRecord record = GetRecord(dataReader);
+
             string searchKey = dataReader.GetString(nameof(searchKey));
-            string primarySpelling = dataReader.GetString(nameof(primarySpelling));
-
-            string? reading = null;
-            if (dataReader[nameof(reading)] is string readingFromDB)
-            {
-                reading = readingFromDB;
-            }
-
-            string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(definitions)), Utils.s_jsoNotIgnoringNull)!;
-
-            string[]? wordClasses = null;
-            if (dataReader[nameof(wordClasses)] is string wordClassFromDB)
-            {
-                wordClasses = JsonSerializer.Deserialize<string[]>(wordClassFromDB, Utils.s_jsoNotIgnoringNull);
-            }
-
-            string[]? definitionTags = null;
-            if (dataReader[nameof(definitionTags)] is string definitionTagsFromDB)
-            {
-                definitionTags = JsonSerializer.Deserialize<string[]>(definitionTagsFromDB, Utils.s_jsoNotIgnoringNull);
-            }
-
             if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
-                result.Add(new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags));
+                result.Add(record);
             }
-
             else
             {
-                results[searchKey] = new List<IDictRecord> { new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags) };
+                results[searchKey] = new List<IDictRecord> { record };
             }
         }
 
@@ -201,7 +180,11 @@ internal static class EpwingYomichanDBManager
 
         command.CommandText =
             """
-            SELECT r.primary_spelling AS primarySpelling, r.reading AS reading, r.glossary AS definitions, r.part_of_speech AS wordClasses, r.glossary_tags AS definitionTags
+            SELECT r.primary_spelling AS primarySpelling,
+                   r.reading AS reading,
+                   r.glossary AS definitions,
+                   r.part_of_speech AS wordClasses,
+                   r.glossary_tags AS definitionTags
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key = @term
@@ -212,31 +195,83 @@ internal static class EpwingYomichanDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            string primarySpelling = dataReader.GetString(nameof(primarySpelling));
-
-            string? reading = null;
-            if (dataReader[nameof(reading)] is string readingFromDB)
-            {
-                reading = readingFromDB;
-            }
-
-            string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(definitions)), Utils.s_jsoNotIgnoringNull)!;
-
-            string[]? wordClasses = null;
-            if (dataReader[nameof(wordClasses)] is string wordClassesFromDB)
-            {
-                wordClasses = JsonSerializer.Deserialize<string[]>(wordClassesFromDB, Utils.s_jsoNotIgnoringNull);
-            }
-
-            string[]? definitionTags = null;
-            if (dataReader[nameof(definitionTags)] is string definitionTagsFromDB)
-            {
-                definitionTags = JsonSerializer.Deserialize<string[]>(definitionTagsFromDB, Utils.s_jsoNotIgnoringNull);
-            }
-
-            results.Add(new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags));
+            results.Add(GetRecord(dataReader));
         }
 
         return results;
+    }
+
+    public static void LoadFromDB(Dict dict)
+    {
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadOnly"));
+        connection.Open();
+        using SqliteCommand command = connection.CreateCommand();
+
+        command.CommandText =
+            """
+            SELECT json_array(rsk.search_key) AS searchKeys,
+                   r.primary_spelling AS primarySpelling,
+                   r.reading AS reading,
+                   r.glossary AS definitions,
+                   r.part_of_speech AS wordClasses,
+                   r.glossary_tags AS definitionTags
+            FROM record r
+            JOIN record_search_key rsk ON r.id = rsk.record_id
+            GROUP BY r.id
+            """;
+
+        using SqliteDataReader dataReader = command.ExecuteReader();
+        while (dataReader.Read())
+        {
+            EpwingYomichanRecord record = GetRecord(dataReader);
+            string[] searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(searchKeys)), Utils.s_jsoNotIgnoringNull)!;
+            for (int i = 0; i < searchKeys.Length; i++)
+            {
+                string searchKey = searchKeys[i];
+                if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
+                {
+                    result.Add(record);
+                }
+
+                else
+                {
+                    dict.Contents[searchKey] = new List<IDictRecord> { record };
+                }
+            }
+        }
+
+        foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+        {
+            dict.Contents[key] = recordList.ToArray();
+        }
+
+        dict.Contents.TrimExcess();
+    }
+
+    private static EpwingYomichanRecord GetRecord(SqliteDataReader dataReader)
+    {
+        string primarySpelling = dataReader.GetString(nameof(primarySpelling));
+
+        string? reading = null;
+        if (dataReader[nameof(reading)] is string readingFromDB)
+        {
+            reading = readingFromDB;
+        }
+
+        string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(definitions)), Utils.s_jsoNotIgnoringNull)!;
+
+        string[]? wordClasses = null;
+        if (dataReader[nameof(wordClasses)] is string wordClassesFromDB)
+        {
+            wordClasses = JsonSerializer.Deserialize<string[]>(wordClassesFromDB, Utils.s_jsoNotIgnoringNull);
+        }
+
+        string[]? definitionTags = null;
+        if (dataReader[nameof(definitionTags)] is string definitionTagsFromDB)
+        {
+            definitionTags = JsonSerializer.Deserialize<string[]>(definitionTagsFromDB, Utils.s_jsoNotIgnoringNull);
+        }
+
+        return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags);
     }
 }

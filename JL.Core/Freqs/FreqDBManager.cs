@@ -3,6 +3,8 @@ using System.Globalization;
 using Microsoft.Data.Sqlite;
 using System.Text;
 using System.Data;
+using JL.Core.Utilities;
+using System.Text.Json;
 
 namespace JL.Core.Freqs;
 internal static class FreqDBManager
@@ -116,18 +118,16 @@ internal static class FreqDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            string searchKey = dataReader.GetString(nameof(searchKey));
-            string spelling = dataReader.GetString(nameof(spelling));
-            int frequency = dataReader.GetInt32(nameof(frequency));
+            FrequencyRecord record = GetRecord(dataReader);
 
+            string searchKey = dataReader.GetString(nameof(searchKey));
             if (results.TryGetValue(searchKey, out List<FrequencyRecord>? result))
             {
-                result.Add(new FrequencyRecord(spelling, frequency));
+                result.Add(record);
             }
-
             else
             {
-                results[searchKey] = new List<FrequencyRecord> { new(spelling, frequency) };
+                results[searchKey] = new List<FrequencyRecord> { record };
             }
         }
 
@@ -155,11 +155,59 @@ internal static class FreqDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            string spelling = dataReader.GetString(nameof(spelling));
-            int frequency = dataReader.GetInt32(nameof(frequency));
-            records.Add(new FrequencyRecord(spelling, frequency));
+            records.Add(GetRecord(dataReader));
         }
 
         return records;
+    }
+
+    public static void LoadFromDB(Freq freq)
+    {
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={FreqUtils.GetDBPath(freq.Name)};Mode=ReadOnly"));
+        connection.Open();
+        using SqliteCommand command = connection.CreateCommand();
+
+        command.CommandText =
+            """
+            SELECT json_array(rsk.search_key) AS searchKeys, r.spelling as spelling, r.frequency AS frequency
+            FROM record r
+            INNER JOIN record_search_key rsk ON r.id = rsk.record_id
+            GROUP BY r.id
+            """;
+
+        using SqliteDataReader dataReader = command.ExecuteReader();
+        while (dataReader.Read())
+        {
+            FrequencyRecord record = GetRecord(dataReader);
+
+            string[] searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(searchKeys)), Utils.s_jsoNotIgnoringNull)!;
+            for (int i = 0; i < searchKeys.Length; i++)
+            {
+                string searchKey = searchKeys[i];
+                if (freq.Contents.TryGetValue(searchKey, out IList<FrequencyRecord>? result))
+                {
+                    result.Add(record);
+                }
+                else
+                {
+                    freq.Contents[searchKey] = new List<FrequencyRecord> { record };
+                }
+            }
+        }
+
+        foreach ((string key, IList<FrequencyRecord> recordList) in freq.Contents)
+        {
+            freq.Contents[key] = recordList.ToArray();
+        }
+
+        freq.Contents.TrimExcess();
+    }
+
+    private static FrequencyRecord GetRecord(SqliteDataReader dataReader)
+    {
+        string spelling = dataReader.GetString(nameof(spelling));
+        int frequency = dataReader.GetInt32(nameof(frequency));
+
+        return new FrequencyRecord(spelling, frequency);
     }
 }

@@ -191,7 +191,10 @@ internal static class EpwingNazekaDBManager
 
         command.CommandText =
             """
-            SELECT r.primary_spelling AS primarySpelling, r.reading AS reading, r.alternative_spellings AS alternativeSpellings, r.glossary AS definitions
+            SELECT r.primary_spelling AS primarySpelling,
+                   r.reading AS reading,
+                   r.alternative_spellings AS alternativeSpellings,
+                   r.glossary AS definitions
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             WHERE rsk.search_key = @term
@@ -202,25 +205,75 @@ internal static class EpwingNazekaDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            string primarySpelling = dataReader.GetString(nameof(primarySpelling));
-
-            string? reading = null;
-            if (dataReader[nameof(reading)] is string readingFromDB)
-            {
-                reading = readingFromDB;
-            }
-
-            string[]? alternativeSpellings = null;
-            if (dataReader[nameof(alternativeSpellings)] is string alternativeSpellingsFromDB)
-            {
-                alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jsoNotIgnoringNull);
-            }
-
-            string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(definitions)), Utils.s_jsoNotIgnoringNull)!;
-
-            results.Add(new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions));
+            results.Add(GetRecord(dataReader));
         }
 
         return results;
+    }
+
+    public static void LoadFromDB(Dict dict)
+    {
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadOnly"));
+        connection.Open();
+        using SqliteCommand command = connection.CreateCommand();
+
+        command.CommandText =
+            """
+            SELECT json_array(rsk.search_key) AS searchKeys,
+                   r.primary_spelling AS primarySpelling,
+                   r.reading AS reading,
+                   r.alternative_spellings AS alternativeSpellings,
+                   r.glossary AS definitions
+            FROM record r
+            JOIN record_search_key rsk ON r.id = rsk.record_id
+            GROUP BY r.id
+            """;
+
+        using SqliteDataReader dataReader = command.ExecuteReader();
+        while (dataReader.Read())
+        {
+            EpwingNazekaRecord record = GetRecord(dataReader);
+            string[] searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(searchKeys)), Utils.s_jsoNotIgnoringNull)!;
+            for (int i = 0; i < searchKeys.Length; i++)
+            {
+                string searchKey = searchKeys[i];
+                if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
+                {
+                    result.Add(record);
+                }
+                else
+                {
+                    dict.Contents[searchKey] = new List<IDictRecord> { record };
+                }
+            }
+        }
+
+        foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+        {
+            dict.Contents[key] = recordList.ToArray();
+        }
+
+        dict.Contents.TrimExcess();
+    }
+
+    private static EpwingNazekaRecord GetRecord(SqliteDataReader dataReader)
+    {
+        string primarySpelling = dataReader.GetString(nameof(primarySpelling));
+
+        string? reading = null;
+        if (dataReader[nameof(reading)] is string readingFromDB)
+        {
+            reading = readingFromDB;
+        }
+
+        string[]? alternativeSpellings = null;
+        if (dataReader[nameof(alternativeSpellings)] is string alternativeSpellingsFromDB)
+        {
+            alternativeSpellings = JsonSerializer.Deserialize<string[]>(alternativeSpellingsFromDB, Utils.s_jsoNotIgnoringNull);
+        }
+
+        string[] definitions = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(definitions)), Utils.s_jsoNotIgnoringNull)!;
+
+        return new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions);
     }
 }

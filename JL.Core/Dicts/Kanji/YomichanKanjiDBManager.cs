@@ -1,3 +1,4 @@
+using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Text.Json;
@@ -104,33 +105,77 @@ internal static class YomichanKanjiDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            string[]? onReadings = null;
-            if (dataReader[nameof(onReadings)] is string onReadingsFromDB)
-            {
-                onReadings = JsonSerializer.Deserialize<string[]>(onReadingsFromDB, Utils.s_jsoNotIgnoringNull);
-            }
-
-            string[]? kunReadings = null;
-            if (dataReader[nameof(kunReadings)] is string kunReadingsFromDB)
-            {
-                kunReadings = JsonSerializer.Deserialize<string[]>(kunReadingsFromDB, Utils.s_jsoNotIgnoringNull);
-            }
-
-            string[]? definitions = null;
-            if (dataReader[nameof(definitions)] is string definitionsFromDB)
-            {
-                definitions = JsonSerializer.Deserialize<string[]>(definitionsFromDB, Utils.s_jsoNotIgnoringNull);
-            }
-
-            string[]? stats = null;
-            if (dataReader[nameof(stats)] is string statsFromDB)
-            {
-                stats = JsonSerializer.Deserialize<string[]>(statsFromDB, Utils.s_jsoNotIgnoringNull);
-            }
-
-            results.Add(new YomichanKanjiRecord(onReadings, kunReadings, definitions, stats));
+            results.Add(GetRecord(dataReader));
         }
 
         return results;
+    }
+
+    public static void LoadFromDB(Dict dict)
+    {
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadOnly"));
+        connection.Open();
+        using SqliteCommand command = connection.CreateCommand();
+
+        command.CommandText =
+            """
+            SELECT r.kanji AS kanji
+                   r.on_readings AS onReadings,
+                   r.kun_readings AS kunReadings,
+                   r.glossary AS definitions,
+                   r.stats AS stats
+            FROM record r
+            """;
+
+        using SqliteDataReader dataReader = command.ExecuteReader();
+        while (dataReader.Read())
+        {
+            YomichanKanjiRecord record = GetRecord(dataReader);
+            string kanji = dataReader.GetString(nameof(kanji));
+            if (dict.Contents.TryGetValue(kanji, out IList<IDictRecord>? result))
+            {
+                result.Add(record);
+            }
+            else
+            {
+                dict.Contents[kanji] = new List<IDictRecord> { record };
+            }
+        }
+
+        foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+        {
+            dict.Contents[key] = recordList.ToArray();
+        }
+
+        dict.Contents.TrimExcess();
+    }
+
+    private static YomichanKanjiRecord GetRecord(SqliteDataReader dataReader)
+    {
+        string[]? onReadings = null;
+        if (dataReader[nameof(onReadings)] is string onReadingsFromDB)
+        {
+            onReadings = JsonSerializer.Deserialize<string[]>(onReadingsFromDB, Utils.s_jsoNotIgnoringNull);
+        }
+
+        string[]? kunReadings = null;
+        if (dataReader[nameof(kunReadings)] is string kunReadingsFromDB)
+        {
+            kunReadings = JsonSerializer.Deserialize<string[]>(kunReadingsFromDB, Utils.s_jsoNotIgnoringNull);
+        }
+
+        string[]? definitions = null;
+        if (dataReader[nameof(definitions)] is string definitionsFromDB)
+        {
+            definitions = JsonSerializer.Deserialize<string[]>(definitionsFromDB, Utils.s_jsoNotIgnoringNull);
+        }
+
+        string[]? stats = null;
+        if (dataReader[nameof(stats)] is string statsFromDB)
+        {
+            stats = JsonSerializer.Deserialize<string[]>(statsFromDB, Utils.s_jsoNotIgnoringNull);
+        }
+
+        return new YomichanKanjiRecord(onReadings, kunReadings, definitions, stats);
     }
 }

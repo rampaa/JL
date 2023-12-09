@@ -2,6 +2,7 @@ using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Text;
+using System.Text.Json;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
@@ -146,25 +147,16 @@ internal static class YomichanPitchAccentDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
+            PitchAccentRecord record = GetRecord(dataReader);
+
             string searchKey = dataReader.GetString(nameof(searchKey));
-            string spelling = dataReader.GetString(nameof(spelling));
-
-            string? reading = null;
-            if (dataReader[nameof(reading)] is string readingFromDB)
-            {
-                reading = readingFromDB;
-            }
-
-            int position = dataReader.GetInt32(nameof(position));
-
             if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
-                result.Add(new PitchAccentRecord(spelling, reading, position));
+                result.Add(record);
             }
-
             else
             {
-                results[searchKey] = new List<IDictRecord> { new PitchAccentRecord(spelling, reading, position) };
+                results[searchKey] = new List<IDictRecord> { record };
             }
         }
 
@@ -195,28 +187,78 @@ internal static class YomichanPitchAccentDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
+            PitchAccentRecord record = GetRecord(dataReader);
+
             string searchKey = dataReader.GetString(nameof(searchKey));
-            string spelling = dataReader.GetString(nameof(spelling));
-
-            string? reading = null;
-            if (dataReader[nameof(reading)] is string readingFromDB)
-            {
-                reading = readingFromDB;
-            }
-
-            int position = dataReader.GetInt32(nameof(position));
-
             if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
             {
-                result.Add(new PitchAccentRecord(spelling, reading, position));
+                result.Add(record);
             }
-
             else
             {
-                results[searchKey] = new List<IDictRecord> { new PitchAccentRecord(spelling, reading, position) };
+                results[searchKey] = new List<IDictRecord> { record };
             }
         }
 
         return results;
+    }
+
+    public static void LoadFromDB(Dict dict)
+    {
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadOnly"));
+        connection.Open();
+        using SqliteCommand command = connection.CreateCommand();
+
+        command.CommandText =
+            """
+            SELECT json_array(rsk.search_key) AS searchKeys,
+                   r.spelling AS spelling,
+                   r.reading AS reading,
+                   r.position AS position
+            FROM record r
+            JOIN record_search_key rsk ON r.id = rsk.record_id
+            GROUP BY r.id
+            """;
+
+        using SqliteDataReader dataReader = command.ExecuteReader();
+        while (dataReader.Read())
+        {
+            PitchAccentRecord record = GetRecord(dataReader);
+            string[] searchKeys = JsonSerializer.Deserialize<string[]>(dataReader.GetString(nameof(searchKeys)), Utils.s_jsoNotIgnoringNull)!;
+            for (int i = 0; i < searchKeys.Length; i++)
+            {
+                string searchKey = searchKeys[i];
+                if (dict.Contents.TryGetValue(searchKey, out IList<IDictRecord>? result))
+                {
+                    result.Add(record);
+                }
+                else
+                {
+                    dict.Contents[searchKey] = new List<IDictRecord> { record };
+                }
+            }
+        }
+
+        foreach ((string key, IList<IDictRecord> recordList) in dict.Contents)
+        {
+            dict.Contents[key] = recordList.ToArray();
+        }
+
+        dict.Contents.TrimExcess();
+    }
+
+    private static PitchAccentRecord GetRecord(SqliteDataReader dataReader)
+    {
+        string spelling = dataReader.GetString(nameof(spelling));
+
+        string? reading = null;
+        if (dataReader[nameof(reading)] is string readingFromDB)
+        {
+            reading = readingFromDB;
+        }
+
+        int position = dataReader.GetInt32(nameof(position));
+
+        return new PitchAccentRecord(spelling, reading, position);
     }
 }

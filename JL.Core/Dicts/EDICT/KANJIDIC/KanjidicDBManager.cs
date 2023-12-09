@@ -115,43 +115,77 @@ internal static class KanjidicDBManager
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
         {
-            string[]? onReadings = null;
-            if (dataReader[nameof(onReadings)] is string onReadingsFromDB)
-            {
-                onReadings = JsonSerializer.Deserialize<string[]>(onReadingsFromDB, Utils.s_jsoNotIgnoringNull);
-            }
-
-            string[]? kunReadings = null;
-            if (dataReader[nameof(kunReadings)] is string kunReadingsFromDB)
-            {
-                kunReadings = JsonSerializer.Deserialize<string[]>(kunReadingsFromDB, Utils.s_jsoNotIgnoringNull);
-            }
-
-            string[]? nanoriReadings = null;
-            if (dataReader[nameof(nanoriReadings)] is string nanoriReadingsFromDB)
-            {
-                nanoriReadings = JsonSerializer.Deserialize<string[]>(nanoriReadingsFromDB, Utils.s_jsoNotIgnoringNull);
-            }
-
-            string[]? radicalNames = null;
-            if (dataReader[nameof(radicalNames)] is string radicalNamesFromDB)
-            {
-                radicalNames = JsonSerializer.Deserialize<string[]>(radicalNamesFromDB, Utils.s_jsoNotIgnoringNull);
-            }
-
-            string[]? definitions = null;
-            if (dataReader[nameof(definitions)] is string definitionsFromDB)
-            {
-                definitions = JsonSerializer.Deserialize<string[]>(definitionsFromDB, Utils.s_jsoNotIgnoringNull);
-            }
-
-            int strokeCount = dataReader.GetInt32(nameof(strokeCount));
-            int grade = dataReader.GetInt32(nameof(grade));
-            int frequency = dataReader.GetInt32(nameof(frequency));
-
-            results.Add(new KanjidicRecord(definitions, onReadings, kunReadings, nanoriReadings, radicalNames, strokeCount, grade, frequency));
+            results.Add(GetRecord(dataReader));
         }
 
         return results;
+    }
+
+    public static void LoadFromDB(Dict dict)
+    {
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadOnly"));
+        connection.Open();
+        using SqliteCommand command = connection.CreateCommand();
+
+        command.CommandText =
+            """
+            SELECT r.kanji AS kanji,
+                   r.on_readings AS onReadings,
+                   r.kun_readings AS kunReadings,
+                   r.nanori_readings AS nanoriReadings,
+                   r.radical_names AS radicalNames,
+                   r.glossary AS definitions,
+                   r.stroke_count AS strokeCount,
+                   r.grade AS grade,
+                   r.frequency AS frequency
+            FROM record r
+            """;
+
+        using SqliteDataReader dataReader = command.ExecuteReader();
+        while (dataReader.Read())
+        {
+            string kanji = dataReader.GetString(nameof(kanji));
+            dict.Contents[kanji] = new IDictRecord[] { GetRecord(dataReader) };
+        }
+
+        dict.Contents.TrimExcess();
+    }
+
+    private static KanjidicRecord GetRecord(SqliteDataReader dataReader)
+    {
+        string[]? onReadings = null;
+        if (dataReader[nameof(onReadings)] is string onReadingsFromDB)
+        {
+            onReadings = JsonSerializer.Deserialize<string[]>(onReadingsFromDB, Utils.s_jsoNotIgnoringNull);
+        }
+
+        string[]? kunReadings = null;
+        if (dataReader[nameof(kunReadings)] is string kunReadingsFromDB)
+        {
+            kunReadings = JsonSerializer.Deserialize<string[]>(kunReadingsFromDB, Utils.s_jsoNotIgnoringNull);
+        }
+
+        string[]? nanoriReadings = null;
+        if (dataReader[nameof(nanoriReadings)] is string nanoriReadingsFromDB)
+        {
+            nanoriReadings = JsonSerializer.Deserialize<string[]>(nanoriReadingsFromDB, Utils.s_jsoNotIgnoringNull);
+        }
+
+        string[]? radicalNames = null;
+        if (dataReader[nameof(radicalNames)] is string radicalNamesFromDB)
+        {
+            radicalNames = JsonSerializer.Deserialize<string[]>(radicalNamesFromDB, Utils.s_jsoNotIgnoringNull);
+        }
+
+        string[]? definitions = null;
+        if (dataReader[nameof(definitions)] is string definitionsFromDB)
+        {
+            definitions = JsonSerializer.Deserialize<string[]>(definitionsFromDB, Utils.s_jsoNotIgnoringNull);
+        }
+
+        int strokeCount = dataReader.GetInt32(nameof(strokeCount));
+        int grade = dataReader.GetInt32(nameof(grade));
+        int frequency = dataReader.GetInt32(nameof(frequency));
+        return new KanjidicRecord(definitions, onReadings, kunReadings, nanoriReadings, radicalNames, strokeCount, grade, frequency);
     }
 }
