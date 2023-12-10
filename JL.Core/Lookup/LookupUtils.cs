@@ -318,7 +318,7 @@ public static class LookupUtils
                         return 0;
                     }
 
-                    if (readingOrthography is "ok")
+                    if (readingOrthography is "ok" or "ik" or "rk")
                     {
                         return 2;
                     }
