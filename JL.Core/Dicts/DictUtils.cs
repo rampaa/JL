@@ -567,10 +567,12 @@ public static class DictUtils
                                 if (loadFromDB)
                                 {
                                     JmdictDBManager.LoadFromDB(dict);
+                                    dict.Size = dict.Contents.Count;
                                 }
                                 else
                                 {
                                     await JmdictLoader.Load(dict).ConfigureAwait(false);
+                                    dict.Size = dict.Contents.Count;
 
                                     if (useDB && !dbExists)
                                     {
@@ -581,7 +583,6 @@ public static class DictUtils
                                     }
                                 }
 
-                                dict.Size = dict.Contents.Count;
                                 dict.Ready = true;
                             });
 
@@ -672,10 +673,12 @@ public static class DictUtils
                                 if (loadFromDB)
                                 {
                                     KanjidicDBManager.LoadFromDB(dict);
+                                    dict.Size = dict.Contents.Count;
                                 }
                                 else
                                 {
                                     await KanjidicLoader.Load(dict).ConfigureAwait(false);
+                                    dict.Size = dict.Contents.Count;
 
                                     if (useDB && !dbExists)
                                     {
@@ -686,7 +689,6 @@ public static class DictUtils
                                     }
                                 }
 
-                                dict.Size = dict.Contents.Count;
                                 dict.Ready = true;
                             }));
                         }
@@ -774,10 +776,12 @@ public static class DictUtils
                                 if (loadFromDB)
                                 {
                                     EpwingYomichanDBManager.LoadFromDB(dict);
+                                    dict.Size = dict.Contents.Count;
                                 }
                                 else
                                 {
                                     await EpwingYomichanLoader.Load(dict).ConfigureAwait(false);
+                                    dict.Size = dict.Contents.Count;
 
                                     if (useDB && !dbExists)
                                     {
@@ -788,7 +792,6 @@ public static class DictUtils
                                     }
                                 }
 
-                                dict.Size = dict.Contents.Count;
                                 dict.Ready = true;
                             }
 
@@ -841,10 +844,12 @@ public static class DictUtils
                                 if (loadFromDB)
                                 {
                                     YomichanKanjiDBManager.LoadFromDB(dict);
+                                    dict.Size = dict.Contents.Count;
                                 }
                                 else
                                 {
                                     await YomichanKanjiLoader.Load(dict).ConfigureAwait(false);
+                                    dict.Size = dict.Contents.Count;
 
                                     if (useDB && !dbExists)
                                     {
@@ -855,7 +860,6 @@ public static class DictUtils
                                     }
                                 }
 
-                                dict.Size = dict.Contents.Count;
                                 dict.Ready = true;
                             }
 
@@ -999,10 +1003,12 @@ public static class DictUtils
                                 if (loadFromDB)
                                 {
                                     EpwingNazekaDBManager.LoadFromDB(dict);
+                                    dict.Size = dict.Contents.Count;
                                 }
                                 else
                                 {
                                     await EpwingNazekaLoader.Load(dict).ConfigureAwait(false);
+                                    dict.Size = dict.Contents.Count;
 
                                     if (useDB && !dbExists)
                                     {
@@ -1013,7 +1019,6 @@ public static class DictUtils
                                     }
                                 }
 
-                                dict.Size = dict.Contents.Count;
                                 dict.Ready = true;
                             }
 
@@ -1066,10 +1071,13 @@ public static class DictUtils
                                 if (loadFromDB)
                                 {
                                     EpwingYomichanDBManager.LoadFromDB(dict);
+                                    dict.Size = dict.Contents.Count;
                                 }
                                 else
                                 {
                                     await YomichanPitchAccentLoader.Load(dict).ConfigureAwait(false);
+                                    dict.Size = dict.Contents.Count;
+
                                     if (useDB && !dbExists)
                                     {
                                         YomichanPitchAccentDBManager.CreateDB(dict.Name);
@@ -1079,7 +1087,6 @@ public static class DictUtils
                                     }
                                 }
 
-                                dict.Size = dict.Contents.Count;
                                 dict.Ready = true;
                             }
 

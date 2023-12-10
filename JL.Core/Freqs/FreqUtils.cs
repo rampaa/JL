@@ -94,10 +94,12 @@ public static class FreqUtils
                                 if (loadFromDB)
                                 {
                                     FreqDBManager.LoadFromDB(freq);
+                                    freq.Size = freq.Contents.Count;
                                 }
                                 else
                                 {
                                     await FrequencyNazekaLoader.Load(freq).ConfigureAwait(false);
+                                    freq.Size = freq.Contents.Count;
 
                                     if (useDB && !dbExists)
                                     {
@@ -108,7 +110,6 @@ public static class FreqUtils
                                     }
                                 }
 
-                                freq.Size = freq.Contents.Count;
                                 freq.Ready = true;
                             }
 
@@ -167,10 +168,12 @@ public static class FreqUtils
                                 if (loadFromDB)
                                 {
                                     FreqDBManager.LoadFromDB(freq);
+                                    freq.Size = freq.Contents.Count;
                                 }
                                 else
                                 {
                                     await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false);
+                                    freq.Size = freq.Contents.Count;
 
                                     if (useDB && !dbExists)
                                     {
@@ -181,7 +184,6 @@ public static class FreqUtils
                                     }
                                 }
 
-                                freq.Size = freq.Contents.Count;
                                 freq.Ready = true;
                             }
 
