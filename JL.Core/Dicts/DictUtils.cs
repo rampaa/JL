@@ -1070,7 +1070,7 @@ public static class DictUtils
 
                                 if (loadFromDB)
                                 {
-                                    EpwingYomichanDBManager.LoadFromDB(dict);
+                                    YomichanPitchAccentDBManager.LoadFromDB(dict);
                                     dict.Size = dict.Contents.Count;
                                 }
                                 else
