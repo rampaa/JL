@@ -159,6 +159,23 @@ internal sealed partial class ManageDictionariesWindow : Window
 
             dictPathDisplay.MouseLeave += (_, _) => dictPathDisplay.TextDecorations = null;
 
+            Button buttonEdit = new()
+            {
+                Width = 45,
+                Height = 30,
+                Content = "Edit",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+                Foreground = Brushes.White,
+                Background = Brushes.DodgerBlue,
+                BorderThickness = new Thickness(1),
+                Margin = new Thickness(0, 0, 5, 0)
+                // Visibility = DictUtils.BuiltInDicts.Values
+                //     .Select(t => t.Type).ToList().Contains(dict.Type)
+                //     ? Visibility.Collapsed
+                //     : Visibility.Visible,
+            };
+
             Button buttonUpdate = new()
             {
                 Width = 75,
@@ -180,20 +197,24 @@ internal sealed partial class ManageDictionariesWindow : Window
             {
                 case DictType.JMdict:
                     buttonUpdate.IsEnabled = !DictUtils.UpdatingJmdict;
+                    buttonEdit.IsEnabled = !DictUtils.UpdatingJmdict;
                     break;
 
                 case DictType.JMnedict:
                     buttonUpdate.IsEnabled = !DictUtils.UpdatingJmnedict;
+                    buttonEdit.IsEnabled = !DictUtils.UpdatingJmnedict;
                     break;
 
                 case DictType.Kanjidic:
                     buttonUpdate.IsEnabled = !DictUtils.UpdatingKanjidic;
+                    buttonEdit.IsEnabled = !DictUtils.UpdatingKanjidic;
                     break;
             }
 
             buttonUpdate.Click += async (_, _) =>
             {
                 buttonUpdate.IsEnabled = false;
+                buttonEdit.IsEnabled = false;
 
                 switch (dict.Type)
                 {
@@ -225,23 +246,6 @@ internal sealed partial class ManageDictionariesWindow : Window
                     .Select(static d => d.Type).Contains(dict.Type)
                     ? Visibility.Collapsed
                     : Visibility.Visible
-            };
-
-            Button buttonEdit = new()
-            {
-                Width = 45,
-                Height = 30,
-                Content = "Edit",
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
-                Foreground = Brushes.White,
-                Background = Brushes.DodgerBlue,
-                BorderThickness = new Thickness(1),
-                Margin = new Thickness(0, 0, 5, 0)
-                // Visibility = DictUtils.BuiltInDicts.Values
-                //     .Select(t => t.Type).ToList().Contains(dict.Type)
-                //     ? Visibility.Collapsed
-                //     : Visibility.Visible,
             };
 
             Button buttonInfo = new()

@@ -119,7 +119,7 @@ internal static class YomichanKanjiDBManager
 
         command.CommandText =
             """
-            SELECT r.kanji AS kanji
+            SELECT r.kanji AS kanji,
                    r.on_readings AS onReadings,
                    r.kun_readings AS kunReadings,
                    r.glossary AS definitions,

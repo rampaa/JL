@@ -130,17 +130,17 @@ public static class ResourceUpdater
             bool useDB = dict.Options?.UseDB?.Value ?? false;
             bool dbExists = File.Exists(dbPath);
 
-            if (dbExists || useDB)
+            if (dbExists)
             {
-                if (dbExists)
-                {
-                    SqliteConnection.ClearAllPools();
-                    File.Delete(dbPath);
-                }
+                SqliteConnection.ClearAllPools();
+                File.Delete(dbPath);
+            }
 
+            if (useDB)
+            {
                 await Task.Run(() =>
                 {
-                    JmdictDBManager.CreateDB(dbPath);
+                    JmdictDBManager.CreateDB(dict.Name);
                     JmdictDBManager.InsertRecordsToDB(dict);
                 }).ConfigureAwait(false);
             }
@@ -177,17 +177,18 @@ public static class ResourceUpdater
             string dbPath = DictUtils.GetDBPath(dict.Name);
             bool useDB = dict.Options?.UseDB?.Value ?? false;
             bool dbExists = File.Exists(dbPath);
-            if (dbExists || useDB)
-            {
-                if (dbExists)
-                {
-                    SqliteConnection.ClearAllPools();
-                    File.Delete(dbPath);
-                }
 
+            if (dbExists)
+            {
+                SqliteConnection.ClearAllPools();
+                File.Delete(dbPath);
+            }
+
+            if (useDB)
+            {
                 await Task.Run(() =>
                 {
-                    JmnedictDBManager.CreateDB(dbPath);
+                    JmnedictDBManager.CreateDB(dict.Name);
                     JmnedictDBManager.InsertRecordsToDB(dict);
                 }).ConfigureAwait(false);
             }
@@ -225,17 +226,17 @@ public static class ResourceUpdater
             bool useDB = dict.Options?.UseDB?.Value ?? false;
             bool dbExists = File.Exists(dbPath);
 
-            if (dbExists || useDB)
+            if (dbExists)
             {
-                if (dbExists)
-                {
-                    SqliteConnection.ClearAllPools();
-                    File.Delete(dbPath);
-                }
+                SqliteConnection.ClearAllPools();
+                File.Delete(dbPath);
+            }
 
+            if (useDB)
+            {
                 await Task.Run(() =>
                 {
-                    KanjidicDBManager.CreateDB(dbPath);
+                    KanjidicDBManager.CreateDB(dict.Name);
                     KanjidicDBManager.InsertRecordsToDB(dict);
                 }).ConfigureAwait(false);
             }
