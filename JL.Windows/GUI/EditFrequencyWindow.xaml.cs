@@ -86,12 +86,12 @@ internal sealed partial class EditFrequencyWindow : Window
             if (_freq.Options?.UseDB?.Value != options.UseDB?.Value)
             {
                 _freq.Ready = false;
-                if (dbExists && !(options.UseDB?.Value ?? false))
-                {
-                    SqliteConnection.ClearAllPools();
-                    File.Delete(dbPath);
-                    dbExists = false;
-                }
+                //if (dbExists && !(options.UseDB?.Value ?? false))
+                //{
+                //    SqliteConnection.ClearAllPools();
+                //    File.Delete(dbPath);
+                //    dbExists = false;
+                //}
             }
 
             if (_freq.Name != name)

@@ -100,12 +100,12 @@ internal sealed partial class EditDictionaryWindow : Window
             if (_dict.Options?.UseDB?.Value != options.UseDB?.Value)
             {
                 _dict.Ready = false;
-                if (dbExists && !(options.UseDB?.Value ?? false))
-                {
-                    SqliteConnection.ClearAllPools();
-                    File.Delete(dbPath);
-                    dbExists = false;
-                }
+                //if (dbExists && !(options.UseDB?.Value ?? false))
+                //{
+                //    SqliteConnection.ClearAllPools();
+                //    File.Delete(dbPath);
+                //    dbExists = false;
+                //}
             }
 
             if (_dict.Name != name)
