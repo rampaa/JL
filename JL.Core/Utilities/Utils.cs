@@ -141,34 +141,29 @@ public static class Utils
             await File.Create(profileCustomNamesPath).DisposeAsync().ConfigureAwait(false);
         }
 
-        List<Task> tasks = new()
-        {
-            Task.Run(static async () =>
+        Parallel.Invoke(
+            async () =>
             {
                 await DictUtils.DeserializeDicts().ConfigureAwait(false);
                 Frontend.ApplyDictOptions();
                 await DictUtils.LoadDictionaries().ConfigureAwait(false);
                 await DictUtils.SerializeDicts().ConfigureAwait(false);
                 await JmdictWordClassUtils.Initialize().ConfigureAwait(false);
-            }),
-
-            Task.Run(static async () =>
+            },
+            async () =>
             {
                 await FreqUtils.DeserializeFreqs().ConfigureAwait(false);
                 await FreqUtils.LoadFrequencies().ConfigureAwait(false);
-            }),
-
-            Task.Run(static async() =>
+                await FreqUtils.SerializeFreqs().ConfigureAwait(false);
+            },
+            async () =>
             {
                 await AudioUtils.DeserializeAudioSources().ConfigureAwait(false);
                 Frontend.SetInstalledVoiceWithHighestPriority();
-            }),
+            },
+            async () => await DeconjugatorUtils.DeserializeRules().ConfigureAwait(false),
+            async () => await DictUtils.InitializeKanjiCompositionDict().ConfigureAwait(false));
 
-            Task.Run(static async() => await DeconjugatorUtils.DeserializeRules().ConfigureAwait(false))
-        };
-
-        await DictUtils.InitializeKanjiCompositionDict().ConfigureAwait(false);
-        await Task.WhenAll(tasks).ConfigureAwait(false);
         StringPoolInstance.Reset();
     }
 
