@@ -556,7 +556,7 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            if (DictUtils.CustomNameDictReady && DictUtils.ProfileCustomNameDictReady)
+            if (DictUtils.SingleDictTypeDicts[DictType.CustomNameDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomNameDictionary].Ready)
             {
                 ShowAddNameWindow();
             }
@@ -566,7 +566,7 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            if (DictUtils.CustomWordDictReady && DictUtils.ProfileCustomWordDictReady)
+            if (DictUtils.SingleDictTypeDicts[DictType.CustomWordDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomWordDictionary].Ready)
             {
                 ShowAddWordWindow();
             }
@@ -1278,8 +1278,8 @@ internal sealed partial class MainWindow : Window
 
         ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady;
 
-        AddNameMenuItem.IsEnabled = DictUtils.CustomNameDictReady && DictUtils.ProfileCustomNameDictReady;
-        AddWordMenuItem.IsEnabled = DictUtils.CustomWordDictReady && DictUtils.ProfileCustomWordDictReady;
+        AddNameMenuItem.IsEnabled = DictUtils.SingleDictTypeDicts[DictType.CustomNameDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomNameDictionary].Ready;
+        AddWordMenuItem.IsEnabled = DictUtils.SingleDictTypeDicts[DictType.CustomWordDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomWordDictionary].Ready;
 
         int charIndex = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), ConfigManager.HorizontallyCenterMainWindowText);
         ContextMenuIsOpening = charIndex >= MainTextBox.SelectionStart && charIndex <= MainTextBox.SelectionStart + MainTextBox.SelectionLength;

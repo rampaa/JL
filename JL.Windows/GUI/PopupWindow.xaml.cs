@@ -1173,8 +1173,8 @@ internal sealed partial class PopupWindow : Window
 
     private void TextBox_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
-        AddNameMenuItem.IsEnabled = DictUtils.CustomNameDictReady && DictUtils.ProfileCustomNameDictReady;
-        AddWordMenuItem.IsEnabled = DictUtils.CustomWordDictReady && DictUtils.ProfileCustomWordDictReady;
+        AddNameMenuItem.IsEnabled = DictUtils.SingleDictTypeDicts[DictType.CustomNameDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomNameDictionary].Ready;
+        AddWordMenuItem.IsEnabled = DictUtils.SingleDictTypeDicts[DictType.CustomWordDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomWordDictionary].Ready;
         _lastInteractedTextBox = (TextBox)sender;
         LastSelectedText = _lastInteractedTextBox.SelectedText;
     }
@@ -1382,7 +1382,7 @@ internal sealed partial class PopupWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowAddNameWindowKeyGesture))
         {
-            if (DictUtils.CustomNameDictReady && DictUtils.ProfileCustomNameDictReady)
+            if (DictUtils.SingleDictTypeDicts[DictType.CustomNameDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomNameDictionary].Ready)
             {
                 if (!MiningMode)
                 {
@@ -1410,7 +1410,7 @@ internal sealed partial class PopupWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ShowAddWordWindowKeyGesture))
         {
-            if (DictUtils.CustomWordDictReady && DictUtils.ProfileCustomWordDictReady)
+            if (DictUtils.SingleDictTypeDicts[DictType.CustomWordDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomWordDictionary].Ready)
             {
                 if (!MiningMode)
                 {

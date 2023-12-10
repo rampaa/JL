@@ -75,6 +75,8 @@ public static class FreqUtils
                 }
             }
 
+            bool loadFromDB = dbExists && !useDB;
+
             switch (freq.Type)
             {
                 case FreqType.Nazeka:
@@ -85,16 +87,28 @@ public static class FreqUtils
                         {
                             try
                             {
-                                await FrequencyNazekaLoader.Load(freq).ConfigureAwait(false);
-                                freq.Size = freq.Contents.Count;
+                                freq.Contents = freq.Size > 0
+                                    ? new Dictionary<string, IList<FrequencyRecord>>(freq.Size)
+                                    : new Dictionary<string, IList<FrequencyRecord>>(114348);
 
-                                if (useDB && !dbExists)
+                                if (loadFromDB)
                                 {
-                                    FreqDBManager.CreateDB(freq.Name);
-                                    FreqDBManager.InsertRecordsToDB(freq);
-                                    freq.Contents.Clear();
-                                    freq.Contents.TrimExcess();
+                                    FreqDBManager.LoadFromDB(freq);
                                 }
+                                else
+                                {
+                                    await FrequencyNazekaLoader.Load(freq).ConfigureAwait(false);
+
+                                    if (useDB && !dbExists)
+                                    {
+                                        FreqDBManager.CreateDB(freq.Name);
+                                        FreqDBManager.InsertRecordsToDB(freq);
+                                        freq.Contents.Clear();
+                                        freq.Contents.TrimExcess();
+                                    }
+                                }
+
+                                freq.Size = freq.Contents.Count;
                                 freq.Ready = true;
                             }
 
@@ -144,16 +158,30 @@ public static class FreqUtils
                         {
                             try
                             {
-                                await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false);
-                                freq.Size = freq.Contents.Count;
+                                freq.Contents = freq.Size > 0
+                                    ? new Dictionary<string, IList<FrequencyRecord>>(freq.Size)
+                                    : freq.Type is FreqType.Yomichan
+                                        ? new Dictionary<string, IList<FrequencyRecord>>(1504512)
+                                        : new Dictionary<string, IList<FrequencyRecord>>(169623);
 
-                                if (useDB && !dbExists)
+                                if (loadFromDB)
                                 {
-                                    FreqDBManager.CreateDB(freq.Name);
-                                    FreqDBManager.InsertRecordsToDB(freq);
-                                    freq.Contents.Clear();
-                                    freq.Contents.TrimExcess();
+                                    FreqDBManager.LoadFromDB(freq);
                                 }
+                                else
+                                {
+                                    await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false);
+
+                                    if (useDB && !dbExists)
+                                    {
+                                        FreqDBManager.CreateDB(freq.Name);
+                                        FreqDBManager.InsertRecordsToDB(freq);
+                                        freq.Contents.Clear();
+                                        freq.Contents.TrimExcess();
+                                    }
+                                }
+
+                                freq.Size = freq.Contents.Count;
                                 freq.Ready = true;
                             }
 
@@ -219,6 +247,7 @@ public static class FreqUtils
             }
 
             Utils.Frontend.InvalidateDisplayCache();
+            Utils.Frontend.Alert(AlertLevel.Success, "Finished loading frequency dictionaries");
         }
 
         FreqsReady = true;
@@ -270,16 +299,6 @@ public static class FreqUtils
 
                     foreach (Freq freq in orderedFreqs)
                     {
-                        freq.Contents = freq.Size is not 0
-                            ? new Dictionary<string, IList<FrequencyRecord>>(freq.Size)
-                            : freq.Type switch
-                            {
-                                FreqType.Yomichan => new Dictionary<string, IList<FrequencyRecord>>(1504512),
-                                FreqType.YomichanKanji => new Dictionary<string, IList<FrequencyRecord>>(169623),
-                                FreqType.Nazeka => new Dictionary<string, IList<FrequencyRecord>>(114348),
-                                _ => new Dictionary<string, IList<FrequencyRecord>>(500000)
-                            };
-
                         freq.Priority = priority;
                         ++priority;
 
