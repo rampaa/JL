@@ -151,14 +151,6 @@ public static class Utils
         }),
         Task.Run(static async () =>
         {
-            await DictUtils.DeserializeDicts().ConfigureAwait(false);
-            Frontend.ApplyDictOptions();
-            await DictUtils.LoadDictionaries().ConfigureAwait(false);
-            await DictUtils.SerializeDicts().ConfigureAwait(false);
-            await JmdictWordClassUtils.Initialize().ConfigureAwait(false);
-        }),
-        Task.Run(static async () =>
-        {
             await FreqUtils.DeserializeFreqs().ConfigureAwait(false);
             await FreqUtils.LoadFrequencies().ConfigureAwait(false);
             await FreqUtils.SerializeFreqs().ConfigureAwait(false);
