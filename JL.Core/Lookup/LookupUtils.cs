@@ -343,7 +343,7 @@ public static class LookupUtils
 
     private static (bool tryLongVowelConversion, int succAttempt) GetWordResultsHelper(Dict dict,
             Dictionary<string, IntermediaryResult> results,
-            HashSet<Form>? deconjugationList,
+            HashSet<Form>? deconjugationResults,
             string matchedText,
             string textInHiragana,
             int succAttempt,
@@ -363,9 +363,9 @@ public static class LookupUtils
             tryLongVowelConversion = false;
         }
 
-        if (deconjugationList is not null && succAttempt < 3)
+        if (deconjugationResults is not null && succAttempt < 3)
         {
-            foreach (Form deconjugationResult in deconjugationList)
+            foreach (Form deconjugationResult in deconjugationResults)
             {
                 if (verbDict.TryGetValue(deconjugationResult.Text, out IList<IDictRecord>? dictResults))
                 {
