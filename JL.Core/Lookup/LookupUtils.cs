@@ -865,8 +865,8 @@ public static class LookupUtils
         return searchKeys.ToList();
     }
 
-    private static ConcurrentBag<LookupResult> BuildJmdictResult(
-         Dictionary<string, IntermediaryResult> jmdictResults, List<Freq> dbFreqs, bool useDBForPitchDict, Dict? pitchDict)
+    private static List<LookupResult> BuildJmdictResult(
+     Dictionary<string, IntermediaryResult> jmdictResults, List<Freq> dbFreqs, bool useDBForPitchDict, Dict? pitchDict)
     {
         IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts = null;
         Dictionary<string, IList<IDictRecord>>? pitchAccentDict = null;
@@ -892,8 +892,8 @@ public static class LookupUtils
         bool showROrthographyInfo = dict.Options?.ROrthographyInfo?.Value ?? true;
         bool showAOrthographyInfo = dict.Options?.AOrthographyInfo?.Value ?? true;
 
-        ConcurrentBag<LookupResult> results = new();
-        _ = Parallel.ForEach(jmdictResults.Values.ToList(), wordResult =>
+        List<LookupResult> results = new();
+        foreach (IntermediaryResult wordResult in jmdictResults.Values.ToList())
         {
             int resultsListCount = wordResult.Results.Count;
             for (int i = 0; i < resultsListCount; i++)
@@ -982,13 +982,13 @@ public static class LookupUtils
                     results.Add(result);
                 }
             }
-        });
+        }
 
         return results;
     }
 
-    private static ConcurrentBag<LookupResult> BuildJmnedictResult(
-        Dictionary<string, IntermediaryResult> jmnedictResults, bool useDBForPitchDict, Dict? pitchDict)
+    private static List<LookupResult> BuildJmnedictResult(
+    Dictionary<string, IntermediaryResult> jmnedictResults, bool useDBForPitchDict, Dict? pitchDict)
     {
         Dictionary<string, IList<IDictRecord>>? pitchAccentDict = null;
         if (useDBForPitchDict)
@@ -997,8 +997,8 @@ public static class LookupUtils
             pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys);
         }
 
-        ConcurrentBag<LookupResult> results = new();
-        _ = Parallel.ForEach(jmnedictResults.Values.ToList(), nameResult =>
+        List<LookupResult> results = new();
+        foreach (IntermediaryResult nameResult in jmnedictResults.Values.ToList())
         {
             int resultsListCount = nameResult.Results.Count;
             for (int i = 0; i < resultsListCount; i++)
@@ -1025,7 +1025,7 @@ public static class LookupUtils
                     results.Add(result);
                 }
             }
-        });
+        }
 
         return results;
     }
@@ -1118,8 +1118,8 @@ public static class LookupUtils
         return results;
     }
 
-    private static ConcurrentBag<LookupResult> BuildEpwingYomichanResult(
-        Dictionary<string, IntermediaryResult> epwingResults, List<Freq> dbFreqs, bool useDBForPitchDict, Dict? pitchDict)
+    private static List<LookupResult> BuildEpwingYomichanResult(
+    Dictionary<string, IntermediaryResult> epwingResults, List<Freq> dbFreqs, bool useDBForPitchDict, Dict? pitchDict)
     {
         IDictionary<string, Dictionary<string, List<FrequencyRecord>>>? frequencyDicts = null;
         Dictionary<string, IList<IDictRecord>>? pitchAccentDict = null;
@@ -1141,8 +1141,8 @@ public static class LookupUtils
             }
         });
 
-        ConcurrentBag<LookupResult> results = new();
-        _ = Parallel.ForEach(epwingResults.Values.ToList(), wordResult =>
+        List<LookupResult> results = new();
+        foreach (IntermediaryResult wordResult in epwingResults.Values.ToList())
         {
             int resultsListCount = wordResult.Results.Count;
             for (int i = 0; i < resultsListCount; i++)
@@ -1170,7 +1170,7 @@ public static class LookupUtils
                     results.Add(result);
                 }
             }
-        });
+        }
 
         return results;
     }
