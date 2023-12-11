@@ -343,7 +343,7 @@ public static class LookupUtils
 
     private static (bool tryLongVowelConversion, int succAttempt) GetWordResultsHelper(Dict dict,
             Dictionary<string, IntermediaryResult> results,
-            HashSet<Form> deconjugationList,
+            HashSet<Form>? deconjugationList,
             string matchedText,
             string textInHiragana,
             int succAttempt,
@@ -363,7 +363,7 @@ public static class LookupUtils
             tryLongVowelConversion = false;
         }
 
-        if (succAttempt < 3)
+        if (deconjugationList is not null && succAttempt < 3)
         {
             foreach (Form deconjugationResult in deconjugationList)
             {
@@ -421,8 +421,10 @@ public static class LookupUtils
 
         if (useDB)
         {
-            dbWordDict = getRecordsFromDB!(dict.Name, textInHiraganaList);
-            dbVerbDict = getRecordsFromDB(dict.Name, deconjugationResultsList.SelectMany(static lf => lf.Select(static f => f.Text)).Distinct().ToList());
+            Parallel.Invoke(() => dbWordDict = getRecordsFromDB!(dict.Name, textInHiraganaList),
+                () => dbVerbDict = getRecordsFromDB!(dict.Name, deconjugationResultsList
+                    .SelectMany(static lf => lf.Select(static f => f.Text))
+                    .Distinct().ToList()));
         }
 
         int succAttempt = 0;
@@ -446,10 +448,14 @@ public static class LookupUtils
                 {
                     List<string> textWithoutLongVowelMarkList = JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i]);
 
+                    if (useDB)
+                    {
+                        dbWordDict = getRecordsFromDB!(dict.Name, textWithoutLongVowelMarkList);
+                    }
+
                     for (int j = 0; j < textWithoutLongVowelMarkList.Count; j++)
                     {
-                        succAttempt = GetWordResultsHelper(dict, results, deconjugationResultsList[i],
-                            textList[i], textWithoutLongVowelMarkList[j], succAttempt, dbWordDict, dbVerbDict).succAttempt;
+                        _ = GetWordResultsHelper(dict, results, null, textList[i], textWithoutLongVowelMarkList[j], succAttempt, dbWordDict, null);
                     }
                 }
             }
