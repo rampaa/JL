@@ -100,19 +100,21 @@ internal static class JmnedictDBManager
                    r.glossary AS definitions,
                    r.name_types AS nameTypes
             FROM record r
-            WHERE r.primary_spelling_in_hiragana = @term1
+            WHERE r.primary_spelling_in_hiragana IN (@1
             """);
 
         for (int i = 1; i < terms.Count; i++)
         {
-            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $"\nOR r.primary_spelling_in_hiragana = @term{i + 1}");
+            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
+
+        _ = queryBuilder.Append(')');
 
         command.CommandText = queryBuilder.ToString();
 
         for (int i = 0; i < terms.Count; i++)
         {
-            _ = command.Parameters.AddWithValue($"@term{i + 1}", terms[i]);
+            _ = command.Parameters.AddWithValue($"@{i + 1}", terms[i]);
         }
 
         using SqliteDataReader dataReader = command.ExecuteReader();

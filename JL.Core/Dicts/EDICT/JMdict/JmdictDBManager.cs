@@ -174,20 +174,22 @@ internal static class JmdictDBManager
                    r.cross_references AS relatedTerms,
                    r.antonyms AS antonyms
             FROM record r
-            INNER JOIN record_search_key rsk ON r.id = rsk.record_id
-            WHERE rsk.search_key = @term1
+            JOIN record_search_key rsk ON r.id = rsk.record_id
+            WHERE rsk.search_key IN (@1
             """);
 
         for (int i = 1; i < terms.Count; i++)
         {
-            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $"\nOR rsk.search_key = @term{i + 1}");
+            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
+
+        _ = queryBuilder.Append(')');
 
         command.CommandText = queryBuilder.ToString();
 
         for (int i = 0; i < terms.Count; i++)
         {
-            _ = command.Parameters.AddWithValue($"@term{i + 1}", terms[i]);
+            _ = command.Parameters.AddWithValue($"@{i + 1}", terms[i]);
         }
 
         using SqliteDataReader dataReader = command.ExecuteReader();
@@ -238,7 +240,7 @@ internal static class JmdictDBManager
                    r.cross_references AS relatedTerms,
                    r.antonyms AS antonyms
             FROM record r
-            INNER JOIN record_search_key rsk ON r.id = rsk.record_id
+            JOIN record_search_key rsk ON r.id = rsk.record_id
             GROUP BY r.id
             """;
 

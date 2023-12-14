@@ -1135,10 +1135,7 @@ public static class LookupUtils
             if (dbFreqs.Count > 0)
             {
                 List<string> searchKeys = GetSearchKeyForEpwingYomichanRecord(epwingResults);
-                if (searchKeys.Count < 950)
-                {
-                    frequencyDicts = GetFrequencyDictsFromDB(dbFreqs, searchKeys);
-                }
+                frequencyDicts = GetFrequencyDictsFromDB(dbFreqs, searchKeys);
             }
         },
         () =>
@@ -1146,10 +1143,7 @@ public static class LookupUtils
             if (useDBForPitchDict)
             {
                 List<string> searchKeys = GetSearchKeyForEpwingYomichanRecord(epwingResults);
-                if (searchKeys.Count < 950)
-                {
-                    pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys);
-                }
+                pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys);
             }
         });
 
@@ -1198,10 +1192,7 @@ public static class LookupUtils
             if (dbFreqs.Count > 0)
             {
                 List<string> searchKeys = GetSearchKeysFromEpwingNazekaRecord(epwingNazekaResults, true);
-                if (searchKeys.Count < 950)
-                {
-                    frequencyDicts = GetFrequencyDictsFromDB(dbFreqs, searchKeys);
-                }
+                frequencyDicts = GetFrequencyDictsFromDB(dbFreqs, searchKeys);
             }
         },
         () =>
@@ -1209,10 +1200,7 @@ public static class LookupUtils
             if (useDBForPitchDict)
             {
                 List<string> searchKeys = GetSearchKeysFromEpwingNazekaRecord(epwingNazekaResults, false);
-                if (searchKeys.Count < 950)
-                {
-                    pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys);
-                }
+                pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys);
             }
         });
 
@@ -1262,10 +1250,7 @@ public static class LookupUtils
             if (dbFreqs.Count > 0)
             {
                 List<string> searchKeys = GetSearchKeysFromEpwingNazekaRecord(customWordResults, true);
-                if (searchKeys.Count < 950)
-                {
-                    frequencyDicts = GetFrequencyDictsFromDB(dbFreqs, searchKeys);
-                }
+                frequencyDicts = GetFrequencyDictsFromDB(dbFreqs, searchKeys);
             }
         },
         () =>
@@ -1273,10 +1258,7 @@ public static class LookupUtils
             if (useDBForPitchDict)
             {
                 List<string> searchKeys = GetSearchKeysFromEpwingNazekaRecord(customWordResults, false);
-                if (searchKeys.Count < 950)
-                {
-                    pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys);
-                }
+                pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys);
             }
         });
 
