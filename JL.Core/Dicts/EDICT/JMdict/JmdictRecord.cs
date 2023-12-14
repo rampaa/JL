@@ -108,30 +108,21 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
-            if (showDialectInfo)
-            {
-                string[]? dialects = Dialects?[i];
-                if (dialects?.Length > 0)
-                {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", dialects)}) ");
-                }
-            }
-
-            if (showExtraDefinitionInfo && definitionInfoExists)
-            {
-                string? definitionInfo = DefinitionInfo![i];
-                if (definitionInfo is not null)
-                {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({definitionInfo}) ");
-                }
-            }
-
             if (showMiscInfo)
             {
                 string[]? misc = Misc?[i];
                 if (misc?.Length > 0)
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", misc)}) ");
+                }
+            }
+
+            if (showDialectInfo)
+            {
+                string[]? dialects = Dialects?[i];
+                if (dialects?.Length > 0)
+                {
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", dialects)}) ");
                 }
             }
 
@@ -145,6 +136,15 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
             }
 
             _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", Definitions[i])} ");
+
+            if (showExtraDefinitionInfo && definitionInfoExists)
+            {
+                string? definitionInfo = DefinitionInfo![i];
+                if (definitionInfo is not null)
+                {
+                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({definitionInfo}) ");
+                }
+            }
 
             if (showSpellingRestrictionInfo)
             {
@@ -186,7 +186,11 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                         LoanwordSource lSource = lSources[j];
                         if (lSource.IsWasei)
                         {
-                            _ = defResult.Append("Wasei ");
+                            _ = defResult.Append("wasei ");
+                        }
+                        else if (j is 0)
+                        {
+                            _ = defResult.Append("from ");
                         }
 
                         _ = defResult.Append(lSource.Language);
