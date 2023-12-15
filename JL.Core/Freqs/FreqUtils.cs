@@ -4,6 +4,7 @@ using JL.Core.Freqs.FrequencyNazeka;
 using JL.Core.Freqs.FrequencyYomichan;
 using JL.Core.Freqs.Options;
 using JL.Core.Utilities;
+using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Freqs;
 
@@ -83,7 +84,7 @@ public static class FreqUtils
                     if (freq is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         freq.Ready = false;
-                        Task nazekaFreqTask = Task.Run(async () =>
+                        tasks.Add(Task.Run(async () =>
                         {
                             try
                             {
@@ -125,9 +126,7 @@ public static class FreqUtils
                                     File.Delete(dbPath);
                                 }
                             }
-                        });
-
-                        tasks.Add(nazekaFreqTask);
+                        }));
                     }
 
                     else
@@ -138,10 +137,15 @@ public static class FreqUtils
                             {
                                 FreqDBManager.CreateDB(freq.Name);
                                 FreqDBManager.InsertRecordsToDB(freq);
+                                freq.Contents.Clear();
+                                freq.Contents.TrimExcess();
+                            }
+                            else
+                            {
+                                freq.Contents.Clear();
+                                freq.Contents.TrimExcess();
                             }
 
-                            freq.Contents.Clear();
-                            freq.Contents.TrimExcess();
                             freqCleared = true;
                         }
 
@@ -155,7 +159,7 @@ public static class FreqUtils
                     if (freq is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         freq.Ready = false;
-                        Task yomichanFreqTask = Task.Run(async () =>
+                        tasks.Add(Task.Run(async () =>
                         {
                             try
                             {
@@ -199,9 +203,7 @@ public static class FreqUtils
                                     File.Delete(dbPath);
                                 }
                             }
-                        });
-
-                        tasks.Add(yomichanFreqTask);
+                        }));
                     }
 
                     else
@@ -212,10 +214,15 @@ public static class FreqUtils
                             {
                                 FreqDBManager.CreateDB(freq.Name);
                                 FreqDBManager.InsertRecordsToDB(freq);
+                                freq.Contents.Clear();
+                                freq.Contents.TrimExcess();
+                            }
+                            else
+                            {
+                                freq.Contents.Clear();
+                                freq.Contents.TrimExcess();
                             }
 
-                            freq.Contents.Clear();
-                            freq.Contents.TrimExcess();
                             freqCleared = true;
                         }
 
@@ -231,6 +238,9 @@ public static class FreqUtils
 
         if (tasks.Count > 0 || freqCleared)
         {
+            Utils.Frontend.InvalidateDisplayCache();
+            SqliteConnection.ClearAllPools();
+
             if (tasks.Count > 0)
             {
                 await Task.WhenAll(tasks).ConfigureAwait(false);
@@ -248,7 +258,6 @@ public static class FreqUtils
                 }
             }
 
-            Utils.Frontend.InvalidateDisplayCache();
             Utils.Frontend.Alert(AlertLevel.Success, "Finished loading frequency dictionaries");
         }
 
