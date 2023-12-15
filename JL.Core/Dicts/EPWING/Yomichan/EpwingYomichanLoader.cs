@@ -47,7 +47,7 @@ internal static class EpwingYomichanLoader
                     reading = reading.GetPooledString();
                 }
 
-                string[]? definitions = EpwingYomichanRecord.GetDefinitions(jsonElements[5]);
+                string[]? definitions = EpwingYomichanUtils.GetDefinitions(jsonElements[5]);
                 definitions?.DeduplicateStringsInArray();
 
                 if (definitions is null
