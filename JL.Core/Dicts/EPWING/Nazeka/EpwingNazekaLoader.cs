@@ -73,17 +73,16 @@ internal static class EpwingNazekaLoader
                 string primarySpelling = spellingList[0];
                 string[]? alternativeSpellings = spellingList.RemoveAtToArray(0);
 
-                EpwingNazekaRecord tempRecord = new(primarySpelling, reading, alternativeSpellings, definitions);
-                if (!EpwingUtils.IsValidEpwingResultForDictType(tempRecord, dict))
+                if (!EpwingUtils.IsValidEpwingResultForDictType(primarySpelling, reading, definitions, dict))
                 {
                     continue;
                 }
 
-                AddRecordToDictionary(primarySpelling, tempRecord, nazekaEpwingDict);
-
-                if (dict.Type is not DictType.NonspecificNameNazeka)
+                EpwingNazekaRecord record = new(primarySpelling, reading, alternativeSpellings, definitions);
+                AddRecordToDictionary(primarySpelling, record, nazekaEpwingDict);
+                if (dict.Type is not DictType.NonspecificNameNazeka and not DictType.NonspecificKanjiNazeka)
                 {
-                    AddRecordToDictionary(reading, tempRecord, nazekaEpwingDict);
+                    AddRecordToDictionary(reading, record, nazekaEpwingDict);
                 }
 
                 for (int i = 1; i < spellingList.Count; i++)
@@ -91,26 +90,24 @@ internal static class EpwingNazekaLoader
                     primarySpelling = spellingList[i];
                     alternativeSpellings = spellingList.RemoveAtToArray(i);
 
-                    tempRecord = new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions);
-                    if (!EpwingUtils.IsValidEpwingResultForDictType(tempRecord, dict))
+                    if (!EpwingUtils.IsValidEpwingResultForDictType(primarySpelling, reading, definitions, dict))
                     {
                         continue;
                     }
 
-                    AddRecordToDictionary(primarySpelling, tempRecord, nazekaEpwingDict);
+                    AddRecordToDictionary(primarySpelling, new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions), nazekaEpwingDict);
                 }
             }
 
             else
             {
-                EpwingNazekaRecord tempRecord = new(reading, null, null, definitions);
-
-                if (!EpwingUtils.IsValidEpwingResultForDictType(tempRecord, dict))
+                if (!EpwingUtils.IsValidEpwingResultForDictType(reading, null, definitions, dict))
                 {
                     continue;
                 }
 
-                AddRecordToDictionary(reading, tempRecord, nazekaEpwingDict);
+                EpwingNazekaRecord record = new(reading, null, null, definitions);
+                AddRecordToDictionary(reading, record, nazekaEpwingDict);
             }
         }
 
@@ -122,7 +119,7 @@ internal static class EpwingNazekaLoader
         dict.Contents.TrimExcess();
     }
 
-    private static void AddRecordToDictionary(string key, EpwingNazekaRecord record, Dictionary<string, IList<IDictRecord>> dictionary)
+    private static void AddRecordToDictionary(string key, IDictRecord record, Dictionary<string, IList<IDictRecord>> dictionary)
     {
         string keyInHiragana = JapaneseUtils.KatakanaToHiragana(key).GetPooledString();
         if (dictionary.TryGetValue(keyInHiragana, out IList<IDictRecord>? result))

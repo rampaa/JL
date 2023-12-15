@@ -25,9 +25,9 @@ internal static class EpwingUtils
         '→', '━'
     };
 
-    public static bool IsValidEpwingResultForDictType(IEpwingRecord epwingRecord, Dict dict)
+    public static bool IsValidEpwingResultForDictType(string primarySpelling, string? reading, string[] definitions, Dict dict)
     {
-        foreach (char c in epwingRecord.PrimarySpelling)
+        foreach (char c in primarySpelling)
         {
             if (s_invalidCharacters.Contains(c) || char.IsWhiteSpace(c))
             {
@@ -40,13 +40,13 @@ internal static class EpwingUtils
             case DictType.Kenkyuusha:
                 if ((dict.Options?.Examples?.Value ?? ExamplesOptionValue.None) is ExamplesOptionValue.None)
                 {
-                    if (epwingRecord.Definitions.Length > 2)
+                    if (definitions.Length > 2)
                     {
-                        for (int i = 2; i < epwingRecord.Definitions.Length; i++)
+                        for (int i = 2; i < definitions.Length; i++)
                         {
-                            if (!char.IsDigit(epwingRecord.Definitions[i][0]))
+                            if (!char.IsDigit(definitions[i][0]))
                             {
-                                epwingRecord.Definitions = epwingRecord.Definitions.RemoveAt(i);
+                                definitions = definitions.RemoveAt(i);
                                 --i;
                             }
                         }
@@ -54,13 +54,13 @@ internal static class EpwingUtils
                 }
                 else if (dict.Options is { Examples.Value: ExamplesOptionValue.One })
                 {
-                    if (epwingRecord.Definitions.Length > 2)
+                    if (definitions.Length > 2)
                     {
                         bool isMainExample = true;
 
-                        for (int i = 2; i < epwingRecord.Definitions.Length; i++)
+                        for (int i = 2; i < definitions.Length; i++)
                         {
-                            if (char.IsDigit(epwingRecord.Definitions[i][0]))
+                            if (char.IsDigit(definitions[i][0]))
                             {
                                 isMainExample = true;
                             }
@@ -69,7 +69,7 @@ internal static class EpwingUtils
                             {
                                 if (!isMainExample)
                                 {
-                                    epwingRecord.Definitions = epwingRecord.Definitions.RemoveAt(i);
+                                    definitions = definitions.RemoveAt(i);
                                     --i;
                                 }
 
@@ -79,13 +79,13 @@ internal static class EpwingUtils
                     }
                 }
 
-                epwingRecord.Definitions = epwingRecord.Definitions.Select(static def => def.Replace("┏", "", StringComparison.Ordinal)).ToArray();
+                definitions = definitions.Select(static def => def.Replace("┏", "", StringComparison.Ordinal)).ToArray();
 
                 break;
 
             case DictType.Daijisen:
                 // Kanji definitions
-                if (epwingRecord.Definitions.Any(static def => def.Contains("［音］", StringComparison.Ordinal)))
+                if (definitions.Any(static def => def.Contains("［音］", StringComparison.Ordinal)))
                 {
                     return false;
                 }
@@ -93,30 +93,30 @@ internal static class EpwingUtils
                 break;
         }
 
-        return FilterDuplicateEntries(epwingRecord, dict);
+        return FilterDuplicateEntries(primarySpelling, reading, definitions, dict);
     }
 
-    private static bool FilterDuplicateEntries(IEpwingRecord epwingRecord, Dict dict)
+    private static bool FilterDuplicateEntries(string primarySpelling, string? reading, string[] definitions, Dict dict)
     {
         if (dict.Contents.TryGetValue(
-                JapaneseUtils.KatakanaToHiragana(epwingRecord.PrimarySpelling),
+                JapaneseUtils.KatakanaToHiragana(primarySpelling),
                 out IList<IDictRecord>? previousResults))
         {
             for (int i = 0; i < previousResults.Count; i++)
             {
                 IEpwingRecord previousResult = (IEpwingRecord)previousResults[i];
 
-                if (previousResult.Definitions.SequenceEqual(epwingRecord.Definitions))
+                if (previousResult.Definitions.SequenceEqual(definitions))
                 {
                     // If an entry has reading info while others don't, keep the one with the reading info.
                     if (string.IsNullOrEmpty(previousResult.Reading) &&
-                        !string.IsNullOrEmpty(epwingRecord.Reading))
+                        !string.IsNullOrEmpty(reading))
                     {
                         previousResults.RemoveAt(i);
                         break;
                     }
 
-                    if (epwingRecord.Reading == previousResult.Reading)
+                    if (reading == previousResult.Reading)
                     {
                         return false;
                     }
@@ -124,15 +124,15 @@ internal static class EpwingUtils
             }
         }
 
-        else if (epwingRecord.Reading is not null && dict.Contents.TryGetValue(
-                     JapaneseUtils.KatakanaToHiragana(epwingRecord.Reading),
+        else if (reading is not null && dict.Contents.TryGetValue(
+                     JapaneseUtils.KatakanaToHiragana(reading),
                      out previousResults))
         {
             for (int i = 0; i < previousResults.Count; i++)
             {
                 IEpwingRecord previousResult = (IEpwingRecord)previousResults[i];
 
-                if (previousResult.Definitions.SequenceEqual(epwingRecord.Definitions))
+                if (previousResult.Definitions.SequenceEqual(definitions))
                 {
                     if (string.IsNullOrEmpty(previousResult.Reading))
                     {

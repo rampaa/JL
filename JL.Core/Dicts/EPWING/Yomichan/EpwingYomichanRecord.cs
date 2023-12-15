@@ -11,7 +11,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
 {
     public string PrimarySpelling { get; }
     public string? Reading { get; }
-    public string[] Definitions { get; set; }
+    public string[] Definitions { get; }
     public string[]? WordClasses { get; }
     public string[]? DefinitionTags { get; }
     //public int Score { get; }
@@ -25,64 +25,6 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         Definitions = definitions;
         WordClasses = wordClasses;
         DefinitionTags = definitionTags;
-    }
-
-    public EpwingYomichanRecord(List<JsonElement> jsonElement)
-    {
-        PrimarySpelling = jsonElement[0].GetString()!.GetPooledString();
-        Reading = jsonElement[1].GetString();
-
-        if (string.IsNullOrEmpty(Reading) || Reading == PrimarySpelling)
-        {
-            Reading = null;
-        }
-
-        else
-        {
-            Reading = Reading.GetPooledString();
-        }
-
-        JsonElement definitionTagsElement = jsonElement[2];
-        if (definitionTagsElement.ValueKind is JsonValueKind.String)
-        {
-            DefinitionTags = definitionTagsElement.GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-            if (DefinitionTags.Length is 0)
-            {
-                DefinitionTags = null;
-            }
-
-            else
-            {
-                DefinitionTags.DeduplicateStringsInArray();
-            }
-        }
-        else
-        {
-            DefinitionTags = null;
-        }
-
-        WordClasses = jsonElement[3].GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-        if (WordClasses.Length is 0)
-        {
-            WordClasses = null;
-        }
-
-        else
-        {
-            WordClasses.DeduplicateStringsInArray();
-        }
-
-        //jsonElement[4].TryGetInt32(out int score);
-        //Score = score;
-
-        Definitions = GetDefinitions(jsonElement[5]) ?? Array.Empty<string>();
-        Definitions.DeduplicateStringsInArray();
-
-        //jsonElement[6].TryGetInt32(out int sequence);
-        //Sequence = sequence;
-
-        //TermTags = jsonElement[7].ToString();
     }
 
     public string BuildFormattedDefinition(DictOptions? options)
@@ -185,7 +127,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         return frequency;
     }
 
-    private static string[]? GetDefinitions(JsonElement jsonElement)
+    public static string[]? GetDefinitions(JsonElement jsonElement)
     {
         List<string> definitions = new();
         foreach (JsonElement definitionElement in jsonElement.EnumerateArray())
@@ -268,31 +210,38 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
 
     private static YomichanContent GetDefinitionsFromJsonObject(JsonElement jsonElement, string? parentTag = null)
     {
-        if (jsonElement.TryGetProperty("content", out JsonElement contentElement))
+        JsonElement currentJsonElement = jsonElement;
+        string? currentParentTag = parentTag;
+        while (true)
         {
-            string? tag = null;
-            if (jsonElement.TryGetProperty("tag", out JsonElement tagElement))
+            if (currentJsonElement.TryGetProperty("content", out JsonElement contentElement))
             {
-                tag = tagElement.GetString();
+                string? tag = null;
+                if (currentJsonElement.TryGetProperty("tag", out JsonElement tagElement))
+                {
+                    tag = tagElement.GetString();
+                }
+
+                if (contentElement.ValueKind is JsonValueKind.String)
+                {
+                    return new YomichanContent(currentParentTag ?? tag, contentElement.GetString()!.Trim());
+                }
+
+                if (contentElement.ValueKind is JsonValueKind.Array)
+                {
+                    return new YomichanContent(currentParentTag ?? tag, GetDefinitionsFromJsonArray(contentElement, tag));
+                }
+
+                if (contentElement.ValueKind is JsonValueKind.Object)
+                {
+                    currentJsonElement = contentElement;
+                    currentParentTag ??= tag;
+                    continue;
+                }
             }
 
-            if (contentElement.ValueKind is JsonValueKind.String)
-            {
-                return new YomichanContent(parentTag ?? tag, contentElement.GetString()!.Trim());
-            }
-
-            if (contentElement.ValueKind is JsonValueKind.Array)
-            {
-                return new YomichanContent(parentTag ?? tag, GetDefinitionsFromJsonArray(contentElement, tag));
-            }
-
-            if (contentElement.ValueKind is JsonValueKind.Object)
-            {
-                return GetDefinitionsFromJsonObject(contentElement, parentTag ?? tag);
-            }
+            return default;
         }
-
-        return default;
     }
 
     public override bool Equals(object? obj)

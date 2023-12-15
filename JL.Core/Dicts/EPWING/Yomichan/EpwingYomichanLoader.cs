@@ -19,24 +19,73 @@ internal static class EpwingYomichanLoader
 
         foreach (string jsonFile in jsonFiles)
         {
-            List<List<JsonElement>>? jsonObjects;
+            List<List<JsonElement>>? jsonElementLists;
 
             FileStream fileStream = File.OpenRead(jsonFile);
             await using (fileStream.ConfigureAwait(false))
             {
-                jsonObjects = await JsonSerializer
+                jsonElementLists = await JsonSerializer
                     .DeserializeAsync<List<List<JsonElement>>>(fileStream)
                     .ConfigureAwait(false);
             }
 
-            if (jsonObjects is null)
+            if (jsonElementLists is null)
             {
                 continue;
             }
 
-            foreach (List<JsonElement> jsonObj in jsonObjects)
+            foreach (List<JsonElement> jsonElements in jsonElementLists)
             {
-                AddToDictionary(new EpwingYomichanRecord(jsonObj), dict);
+                string primarySpelling = jsonElements[0].GetString()!.GetPooledString();
+                string? reading = jsonElements[1].GetString();
+                if (string.IsNullOrEmpty(reading) || reading == primarySpelling)
+                {
+                    reading = null;
+                }
+                else
+                {
+                    reading = reading.GetPooledString();
+                }
+
+                string[]? definitions = EpwingYomichanRecord.GetDefinitions(jsonElements[5]);
+                definitions?.DeduplicateStringsInArray();
+
+                if (definitions is null
+                    || !EpwingUtils.IsValidEpwingResultForDictType(primarySpelling, reading, definitions, dict))
+                {
+                    continue;
+                }
+
+                string[]? definitionTags = null;
+                JsonElement definitionTagsElement = jsonElements[2];
+                if (definitionTagsElement.ValueKind is JsonValueKind.String)
+                {
+                    definitionTags = definitionTagsElement.GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                    if (definitionTags.Length is 0)
+                    {
+                        definitionTags = null;
+                    }
+                    else
+                    {
+                        definitionTags.DeduplicateStringsInArray();
+                    }
+                }
+
+                string[]? wordClasses = jsonElements[3].GetString()!.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                if (wordClasses.Length is 0)
+                {
+                    wordClasses = null;
+                }
+                else
+                {
+                    wordClasses.DeduplicateStringsInArray();
+                }
+
+                //jsonElements[4].TryGetInt32(out int score);
+                //jsonElements[6].TryGetInt32(out int sequence);
+                //string[] termTags = jsonElements[7].ToString();
+
+                AddToDictionary(new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags), dict);
             }
         }
 
@@ -50,14 +99,7 @@ internal static class EpwingYomichanLoader
 
     private static void AddToDictionary(IEpwingRecord yomichanRecord, Dict dict)
     {
-        if (yomichanRecord.Definitions.Length is 0
-            || !EpwingUtils.IsValidEpwingResultForDictType(yomichanRecord, dict))
-        {
-            return;
-        }
-
         string hiraganaExpression = JapaneseUtils.KatakanaToHiragana(yomichanRecord.PrimarySpelling);
-
         if (dict.Contents.TryGetValue(hiraganaExpression, out IList<IDictRecord>? records))
         {
             records.Add(yomichanRecord);
@@ -67,7 +109,8 @@ internal static class EpwingYomichanLoader
             dict.Contents[hiraganaExpression] = new List<IDictRecord> { yomichanRecord };
         }
 
-        if (dict.Type is not DictType.NonspecificNameYomichan && !string.IsNullOrEmpty(yomichanRecord.Reading))
+        if (dict.Type is not DictType.NonspecificNameYomichan and not DictType.NonspecificKanjiWithWordSchemaYomichan and not DictType.KanjigenYomichan
+            && !string.IsNullOrEmpty(yomichanRecord.Reading))
         {
             string hiraganaReading = JapaneseUtils.KatakanaToHiragana(yomichanRecord.Reading);
 
