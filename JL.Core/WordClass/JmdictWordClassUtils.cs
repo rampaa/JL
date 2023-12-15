@@ -127,7 +127,9 @@ internal static class JmdictWordClassUtils
         if (!File.Exists(Path.Join(Utils.ResourcesPath, "PoS.json")))
         {
             Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-            if (dict.Active)
+            bool useDB = dict.Options?.UseDB?.Value ?? false;
+
+            if (dict.Active && !useDB)
             {
                 await Serialize().ConfigureAwait(false);
             }

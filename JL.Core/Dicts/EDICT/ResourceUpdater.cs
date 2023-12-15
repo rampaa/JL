@@ -136,7 +136,7 @@ public static class ResourceUpdater
                 File.Delete(dbPath);
             }
 
-            if (useDB)
+            if (useDB || dbExists)
             {
                 await Task.Run(() =>
                 {
@@ -184,7 +184,7 @@ public static class ResourceUpdater
                 File.Delete(dbPath);
             }
 
-            if (useDB)
+            if (useDB || dbExists)
             {
                 await Task.Run(() =>
                 {
@@ -232,7 +232,7 @@ public static class ResourceUpdater
                 File.Delete(dbPath);
             }
 
-            if (useDB)
+            if (useDB || dbExists)
             {
                 await Task.Run(() =>
                 {
