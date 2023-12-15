@@ -89,32 +89,30 @@ internal static class EpwingYomichanUtils
 
     private static YomichanContent GetDefinitionsFromJsonObject(JsonElement jsonElement, string? parentTag = null)
     {
-        JsonElement currentJsonElement = jsonElement;
-        string? currentParentTag = parentTag;
         while (true)
         {
-            if (currentJsonElement.TryGetProperty("content", out JsonElement contentElement))
+            if (jsonElement.TryGetProperty("content", out JsonElement contentElement))
             {
                 string? tag = null;
-                if (currentJsonElement.TryGetProperty("tag", out JsonElement tagElement))
+                if (jsonElement.TryGetProperty("tag", out JsonElement tagElement))
                 {
                     tag = tagElement.GetString();
                 }
 
                 if (contentElement.ValueKind is JsonValueKind.String)
                 {
-                    return new YomichanContent(currentParentTag ?? tag, contentElement.GetString()!.Trim());
+                    return new YomichanContent(parentTag ?? tag, contentElement.GetString()!.Trim());
                 }
 
                 if (contentElement.ValueKind is JsonValueKind.Array)
                 {
-                    return new YomichanContent(currentParentTag ?? tag, GetDefinitionsFromJsonArray(contentElement, tag));
+                    return new YomichanContent(parentTag ?? tag, GetDefinitionsFromJsonArray(contentElement, tag));
                 }
 
                 if (contentElement.ValueKind is JsonValueKind.Object)
                 {
-                    currentJsonElement = contentElement;
-                    currentParentTag ??= tag;
+                    jsonElement = contentElement;
+                    parentTag ??= tag;
                     continue;
                 }
             }

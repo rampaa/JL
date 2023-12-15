@@ -515,6 +515,7 @@ public static class DictUtils
         return string.Create(CultureInfo.InvariantCulture, $"{Path.Join(s_dbFolderPath, dbName)}.sqlite");
     }
 
+#pragma warning disable IDE0072
     public static async Task LoadDictionaries()
     {
         DictsReady = false;
@@ -795,7 +796,8 @@ public static class DictUtils
                                         DictType.NonspecificWordYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
                                         DictType.NonspecificKanjiWithWordSchemaYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
                                         DictType.NonspecificNameYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
-                                        DictType.NonspecificYomichan => new Dictionary<string, IList<IDictRecord>>(250000)
+                                        DictType.NonspecificYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
+                                        _ => throw new ArgumentOutOfRangeException(null, "Invalid DictType")
                                     };
 
                                 if (loadFromDB)
@@ -1038,7 +1040,8 @@ public static class DictUtils
                                     DictType.NonspecificWordNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
                                     DictType.NonspecificKanjiNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
                                     DictType.NonspecificNameNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
-                                    DictType.NonspecificNazeka => new Dictionary<string, IList<IDictRecord>>(250000)
+                                    DictType.NonspecificNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
+                                    _ => throw new ArgumentOutOfRangeException(null, "Invalid DictType")
                                 };
 
                                 if (loadFromDB)
@@ -1214,6 +1217,7 @@ public static class DictUtils
 
         DictsReady = true;
     }
+#pragma warning restore IDE0072
 
     internal static async Task InitializeKanjiCompositionDict()
     {
