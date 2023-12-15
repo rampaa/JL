@@ -141,7 +141,7 @@ internal static class WindowsUtils
     public static void ShowAddNameWindow(string? selectedText, string reading = "")
     {
         AddNameWindow addNameWindowInstance = AddNameWindow.Instance;
-        addNameWindowInstance.SpellingTextBox.Text = selectedText;
+        addNameWindowInstance.SpellingTextBox.Text = selectedText ?? "";
         addNameWindowInstance.ReadingTextBox.Text = reading;
         MainWindow mainWindow = MainWindow.Instance;
         addNameWindowInstance.Owner = mainWindow;
@@ -159,7 +159,7 @@ internal static class WindowsUtils
     public static void ShowAddWordWindow(string? selectedText)
     {
         AddWordWindow addWordWindowInstance = AddWordWindow.Instance;
-        addWordWindowInstance.SpellingsTextBox.Text = selectedText;
+        addWordWindowInstance.SpellingsTextBox.Text = selectedText ?? "";
         MainWindow mainWindow = MainWindow.Instance;
         addWordWindowInstance.Owner = mainWindow;
         addWordWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;

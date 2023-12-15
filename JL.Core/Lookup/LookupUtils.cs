@@ -756,42 +756,6 @@ public static class LookupUtils
         return searchKeys.ToList();
     }
 
-    private static List<string> GetSearchKeysFromCustomWordRecord(Dictionary<string, IntermediaryResult> dictResults, bool includeAlternativeSpellings)
-    {
-        HashSet<string> searchKeys = new();
-        foreach ((string key, IntermediaryResult intermediaryResult) in dictResults)
-        {
-            _ = searchKeys.Add(key);
-
-            List<IList<IDictRecord>> dictRecordsList = intermediaryResult.Results;
-            for (int i = 0; i < dictRecordsList.Count; i++)
-            {
-                IList<IDictRecord> dictRecords = dictRecordsList[i];
-                for (int j = 0; j < dictRecords.Count; j++)
-                {
-                    CustomWordRecord customWordRecord = (CustomWordRecord)dictRecords[j];
-                    _ = searchKeys.Add(JapaneseUtils.KatakanaToHiragana(customWordRecord.PrimarySpelling));
-                    if (customWordRecord.Readings is not null)
-                    {
-                        foreach (string reading in customWordRecord.Readings.Select(JapaneseUtils.KatakanaToHiragana))
-                        {
-                            _ = searchKeys.Add(reading);
-                        }
-                    }
-                    if (includeAlternativeSpellings && customWordRecord.AlternativeSpellings is not null)
-                    {
-                        foreach (string alternativeSpelling in customWordRecord.AlternativeSpellings.Select(JapaneseUtils.KatakanaToHiragana))
-                        {
-                            _ = searchKeys.Add(alternativeSpelling);
-                        }
-                    }
-                }
-            }
-        }
-
-        return searchKeys.ToList();
-    }
-
     private static List<string> GetSearchKeysFromCustomNameRecord(Dictionary<string, IntermediaryResult> dictResults)
     {
         HashSet<string> searchKeys = new();
