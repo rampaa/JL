@@ -13,6 +13,7 @@ using JL.Core.Dicts.Kanji;
 using JL.Core.Profile;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
+using Microsoft.Data.Sqlite;
 
 
 namespace JL.Core.Dicts;
@@ -557,7 +558,7 @@ public static class DictUtils
                         dict.Ready = false;
                         if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                         {
-                            Task jmdictTask = Task.Run(async () =>
+                            tasks.Add(Task.Run(async () =>
                             {
                                 // 2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739
                                 dict.Contents = dict.Size > 0
@@ -584,9 +585,7 @@ public static class DictUtils
                                 }
 
                                 dict.Ready = true;
-                            });
-
-                            tasks.Add(jmdictTask);
+                            }));
                         }
 
                         else
@@ -595,12 +594,20 @@ public static class DictUtils
                             {
                                 if (useDB && !dbExists)
                                 {
-                                    JmdictDBManager.CreateDB(dict.Name);
-                                    JmdictDBManager.InsertRecordsToDB(dict);
+                                    tasks.Add(Task.Run(() =>
+                                    {
+                                        JmdictDBManager.CreateDB(dict.Name);
+                                        JmdictDBManager.InsertRecordsToDB(dict);
+                                        dict.Contents.Clear();
+                                        dict.Contents.TrimExcess();
+                                    }));
+                                }
+                                else
+                                {
+                                    dict.Contents.Clear();
+                                    dict.Contents.TrimExcess();
                                 }
 
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
                                 dictCleared = true;
                             }
                             dict.Ready = true;
@@ -633,6 +640,7 @@ public static class DictUtils
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
                                 }
+
                                 dict.Ready = true;
                             }));
                         }
@@ -643,12 +651,20 @@ public static class DictUtils
                             {
                                 if (useDB && !dbExists)
                                 {
-                                    JmnedictDBManager.CreateDB(dict.Name);
-                                    JmnedictDBManager.InsertRecordsToDB(dict);
+                                    tasks.Add(Task.Run(() =>
+                                    {
+                                        JmnedictDBManager.CreateDB(dict.Name);
+                                        JmnedictDBManager.InsertRecordsToDB(dict);
+                                        dict.Contents.Clear();
+                                        dict.Contents.TrimExcess();
+                                    }));
+                                }
+                                else
+                                {
+                                    dict.Contents.Clear();
+                                    dict.Contents.TrimExcess();
                                 }
 
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
                                 dictCleared = true;
                             }
 
@@ -657,6 +673,7 @@ public static class DictUtils
                     }
 
                     break;
+
                 case DictType.Kanjidic:
                     if (!UpdatingKanjidic)
                     {
@@ -699,12 +716,20 @@ public static class DictUtils
                             {
                                 if (useDB && !dbExists)
                                 {
-                                    KanjidicDBManager.CreateDB(dict.Name);
-                                    KanjidicDBManager.InsertRecordsToDB(dict);
+                                    tasks.Add(Task.Run(() =>
+                                    {
+                                        KanjidicDBManager.CreateDB(dict.Name);
+                                        KanjidicDBManager.InsertRecordsToDB(dict);
+                                        dict.Contents.Clear();
+                                        dict.Contents.TrimExcess();
+                                    }));
+                                }
+                                else
+                                {
+                                    dict.Contents.Clear();
+                                    dict.Contents.TrimExcess();
                                 }
 
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
                                 dictCleared = true;
                             }
 
@@ -816,12 +841,20 @@ public static class DictUtils
                         {
                             if (useDB && !dbExists)
                             {
-                                EpwingYomichanDBManager.CreateDB(dict.Name);
-                                EpwingYomichanDBManager.InsertRecordsToDB(dict);
+                                tasks.Add(Task.Run(() =>
+                                {
+                                    EpwingYomichanDBManager.CreateDB(dict.Name);
+                                    EpwingYomichanDBManager.InsertRecordsToDB(dict);
+                                    dict.Contents.Clear();
+                                    dict.Contents.TrimExcess();
+                                }));
+                            }
+                            else
+                            {
+                                dict.Contents.Clear();
+                                dict.Contents.TrimExcess();
                             }
 
-                            dict.Contents.Clear();
-                            dict.Contents.TrimExcess();
                             dictCleared = true;
                         }
                         dict.Ready = true;
@@ -884,12 +917,20 @@ public static class DictUtils
                         {
                             if (useDB && !dbExists)
                             {
-                                YomichanKanjiDBManager.CreateDB(dict.Name);
-                                YomichanKanjiDBManager.InsertRecordsToDB(dict);
+                                tasks.Add(Task.Run(() =>
+                                {
+                                    YomichanKanjiDBManager.CreateDB(dict.Name);
+                                    YomichanKanjiDBManager.InsertRecordsToDB(dict);
+                                    dict.Contents.Clear();
+                                    dict.Contents.TrimExcess();
+                                }));
+                            }
+                            else
+                            {
+                                dict.Contents.Clear();
+                                dict.Contents.TrimExcess();
                             }
 
-                            dict.Contents.Clear();
-                            dict.Contents.TrimExcess();
                             dictCleared = true;
                         }
                         dict.Ready = true;
@@ -1043,12 +1084,20 @@ public static class DictUtils
                         {
                             if (useDB && !dbExists)
                             {
-                                EpwingNazekaDBManager.CreateDB(dict.Name);
-                                EpwingNazekaDBManager.InsertRecordsToDB(dict);
+                                tasks.Add(Task.Run(() =>
+                                {
+                                    EpwingNazekaDBManager.CreateDB(dict.Name);
+                                    EpwingNazekaDBManager.InsertRecordsToDB(dict);
+                                    dict.Contents.Clear();
+                                    dict.Contents.TrimExcess();
+                                }));
+                            }
+                            else
+                            {
+                                dict.Contents.Clear();
+                                dict.Contents.TrimExcess();
                             }
 
-                            dict.Contents.Clear();
-                            dict.Contents.TrimExcess();
                             dictCleared = true;
                         }
                         dict.Ready = true;
@@ -1112,12 +1161,20 @@ public static class DictUtils
                         {
                             if (useDB && !dbExists)
                             {
-                                YomichanPitchAccentDBManager.CreateDB(dict.Name);
-                                YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
+                                tasks.Add(Task.Run(() =>
+                                {
+                                    YomichanPitchAccentDBManager.CreateDB(dict.Name);
+                                    YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
+                                    dict.Contents.Clear();
+                                    dict.Contents.TrimExcess();
+                                }));
+                            }
+                            else
+                            {
+                                dict.Contents.Clear();
+                                dict.Contents.TrimExcess();
                             }
 
-                            dict.Contents.Clear();
-                            dict.Contents.TrimExcess();
                             dictCleared = true;
                         }
                         dict.Ready = true;
@@ -1132,6 +1189,9 @@ public static class DictUtils
 
         if (tasks.Count > 0 || dictCleared)
         {
+            Utils.Frontend.InvalidateDisplayCache();
+            SqliteConnection.ClearAllPools();
+
             if (tasks.Count > 0)
             {
                 await Task.WhenAll(tasks).ConfigureAwait(false);
@@ -1149,7 +1209,6 @@ public static class DictUtils
                 }
             }
 
-            Utils.Frontend.InvalidateDisplayCache();
             Utils.Frontend.Alert(AlertLevel.Success, "Finished loading dictionaries");
         }
 
