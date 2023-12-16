@@ -68,6 +68,7 @@ public static class FreqUtils
 
             if (dbJournalExists)
             {
+                SqliteConnection.ClearAllPools();
                 File.Delete(dbJournalPath);
                 if (dbExists)
                 {
@@ -123,6 +124,7 @@ public static class FreqUtils
 
                                 if (dbExists)
                                 {
+                                    SqliteConnection.ClearAllPools();
                                     File.Delete(dbPath);
                                 }
                             }
@@ -198,6 +200,7 @@ public static class FreqUtils
 
                                 if (dbExists)
                                 {
+                                    SqliteConnection.ClearAllPools();
                                     File.Delete(dbPath);
                                 }
                             }

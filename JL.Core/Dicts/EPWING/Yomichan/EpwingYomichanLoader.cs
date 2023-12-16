@@ -109,7 +109,9 @@ internal static class EpwingYomichanLoader
             dict.Contents[hiraganaExpression] = new List<IDictRecord> { yomichanRecord };
         }
 
-        if (dict.Type is not DictType.NonspecificNameYomichan and not DictType.NonspecificKanjiWithWordSchemaYomichan and not DictType.KanjigenYomichan
+        if (dict.Type is not DictType.NonspecificNameYomichan
+            and not DictType.NonspecificKanjiWithWordSchemaYomichan
+            and not DictType.KanjigenYomichan
             && !string.IsNullOrEmpty(yomichanRecord.Reading))
         {
             string hiraganaReading = JapaneseUtils.KatakanaToHiragana(yomichanRecord.Reading);

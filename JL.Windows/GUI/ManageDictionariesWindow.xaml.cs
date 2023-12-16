@@ -296,7 +296,7 @@ internal sealed partial class ManageDictionariesWindow : Window
                     dict.Contents.TrimExcess();
                     _ = DictUtils.Dicts.Remove(dict.Name);
 
-                    string dbPath = DictUtils.GetDBPath(dict.Path);
+                    string dbPath = DictUtils.GetDBPath(dict.Name);
                     if (File.Exists(dbPath))
                     {
                         SqliteConnection.ClearAllPools();

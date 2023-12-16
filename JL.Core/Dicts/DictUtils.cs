@@ -542,6 +542,7 @@ public static class DictUtils
 
             if (dbJournalExists)
             {
+                SqliteConnection.ClearAllPools();
                 File.Delete(dbJournalPath);
                 if (dbExists)
                 {
@@ -861,6 +862,7 @@ public static class DictUtils
 
                                 if (dbExists)
                                 {
+                                    SqliteConnection.ClearAllPools();
                                     File.Delete(dbPath);
                                 }
                             }
@@ -939,6 +941,7 @@ public static class DictUtils
 
                                 if (dbExists)
                                 {
+                                    SqliteConnection.ClearAllPools();
                                     File.Delete(dbPath);
                                 }
                             }
@@ -1107,6 +1110,7 @@ public static class DictUtils
 
                                 if (dbExists)
                                 {
+                                    SqliteConnection.ClearAllPools();
                                     File.Delete(dbPath);
                                 }
                             }
@@ -1186,6 +1190,7 @@ public static class DictUtils
 
                                 if (dbExists)
                                 {
+                                    SqliteConnection.ClearAllPools();
                                     File.Delete(dbPath);
                                 }
                             }

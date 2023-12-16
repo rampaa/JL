@@ -200,7 +200,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
                     freq.Contents.TrimExcess();
                     _ = FreqUtils.FreqDicts.Remove(freq.Name);
 
-                    string dbPath = FreqUtils.GetDBPath(freq.Path);
+                    string dbPath = FreqUtils.GetDBPath(freq.Name);
                     if (File.Exists(dbPath))
                     {
                         SqliteConnection.ClearAllPools();

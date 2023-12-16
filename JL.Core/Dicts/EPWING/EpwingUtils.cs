@@ -79,8 +79,6 @@ internal static class EpwingUtils
                     }
                 }
 
-                definitions = definitions.Select(static def => def.Replace("┏", "", StringComparison.Ordinal)).ToArray();
-
                 break;
 
             case DictType.Daijisen:
