@@ -129,27 +129,25 @@ public static class FreqUtils
                         }));
                     }
 
-                    else
+                    else if (freq.Contents.Count > 0 && (!freq.Active || useDB))
                     {
-                        if (freq.Contents.Count > 0 && (!freq.Active || useDB))
+                        freq.Ready = false;
+                        if (useDB && !dbExists)
                         {
-                            if (useDB && !dbExists)
-                            {
-                                FreqDBManager.CreateDB(freq.Name);
-                                FreqDBManager.InsertRecordsToDB(freq);
-                                freq.Contents.Clear();
-                                freq.Contents.TrimExcess();
-                            }
-                            else
-                            {
-                                freq.Contents.Clear();
-                                freq.Contents.TrimExcess();
-                            }
-
-                            freqCleared = true;
+                            FreqDBManager.CreateDB(freq.Name);
+                            FreqDBManager.InsertRecordsToDB(freq);
+                            freq.Contents.Clear();
+                            freq.Contents.TrimExcess();
+                            freq.Ready = true;
+                        }
+                        else
+                        {
+                            freq.Contents.Clear();
+                            freq.Contents.TrimExcess();
+                            freq.Ready = true;
                         }
 
-                        freq.Ready = true;
+                        freqCleared = true;
                     }
 
                     break;
@@ -206,27 +204,25 @@ public static class FreqUtils
                         }));
                     }
 
-                    else
+                    else if (freq.Contents.Count > 0 && (!freq.Active || useDB))
                     {
-                        if (freq.Contents.Count > 0 && (!freq.Active || useDB))
+                        freq.Ready = false;
+                        if (useDB && !dbExists)
                         {
-                            if (useDB && !dbExists)
-                            {
-                                FreqDBManager.CreateDB(freq.Name);
-                                FreqDBManager.InsertRecordsToDB(freq);
-                                freq.Contents.Clear();
-                                freq.Contents.TrimExcess();
-                            }
-                            else
-                            {
-                                freq.Contents.Clear();
-                                freq.Contents.TrimExcess();
-                            }
-
-                            freqCleared = true;
+                            FreqDBManager.CreateDB(freq.Name);
+                            FreqDBManager.InsertRecordsToDB(freq);
+                            freq.Contents.Clear();
+                            freq.Contents.TrimExcess();
+                            freq.Ready = true;
+                        }
+                        else
+                        {
+                            freq.Contents.Clear();
+                            freq.Contents.TrimExcess();
+                            freq.Ready = true;
                         }
 
-                        freq.Ready = true;
+                        freqCleared = true;
                     }
 
                     break;

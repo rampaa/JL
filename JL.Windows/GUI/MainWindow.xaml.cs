@@ -556,7 +556,19 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            if (DictUtils.SingleDictTypeDicts[DictType.CustomNameDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomNameDictionary].Ready)
+            bool customNameDictReady = false;
+            if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomNameDictionary, out Dict? customNameDict))
+            {
+                customNameDictReady = customNameDict.Ready;
+            }
+
+            bool profileCustomNameDictReady = false;
+            if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomNameDictionary, out Dict? profileCustomNameDict))
+            {
+                profileCustomNameDictReady = profileCustomNameDict.Ready;
+            }
+
+            if (customNameDictReady && profileCustomNameDictReady)
             {
                 ShowAddNameWindow();
             }
@@ -566,7 +578,19 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            if (DictUtils.SingleDictTypeDicts[DictType.CustomWordDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomWordDictionary].Ready)
+            bool customWordDictReady = false;
+            if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomWordDictionary, out Dict? customWordDict))
+            {
+                customWordDictReady = customWordDict.Ready;
+            }
+
+            bool profileCustomWordDictReady = false;
+            if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomWordDictionary, out Dict? profileCustomWordDict))
+            {
+                profileCustomWordDictReady = profileCustomWordDict.Ready;
+            }
+
+            if (customWordDictReady && profileCustomWordDictReady)
             {
                 ShowAddWordWindow();
             }
@@ -1278,8 +1302,33 @@ internal sealed partial class MainWindow : Window
 
         ManageFrequenciesMenuItem.IsEnabled = FreqUtils.FreqsReady;
 
-        AddNameMenuItem.IsEnabled = DictUtils.SingleDictTypeDicts[DictType.CustomNameDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomNameDictionary].Ready;
-        AddWordMenuItem.IsEnabled = DictUtils.SingleDictTypeDicts[DictType.CustomWordDictionary].Ready && DictUtils.SingleDictTypeDicts[DictType.ProfileCustomWordDictionary].Ready;
+        bool customNameDictReady = false;
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomNameDictionary, out Dict? customNameDict))
+        {
+            customNameDictReady = customNameDict.Ready;
+        }
+
+        bool profileCustomNameDictReady = false;
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomNameDictionary, out Dict? profileCustomNameDict))
+        {
+            profileCustomNameDictReady = profileCustomNameDict.Ready;
+        }
+
+        AddNameMenuItem.IsEnabled = customNameDictReady && profileCustomNameDictReady;
+
+        bool customWordDictReady = false;
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.CustomWordDictionary, out Dict? customWordDict))
+        {
+            customWordDictReady = customWordDict.Ready;
+        }
+
+        bool profileCustomWordDictReady = false;
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.ProfileCustomWordDictionary, out Dict? profileCustomWordDict))
+        {
+            profileCustomWordDictReady = profileCustomWordDict.Ready;
+        }
+
+        AddWordMenuItem.IsEnabled = customWordDictReady && profileCustomWordDictReady;
 
         int charIndex = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), ConfigManager.HorizontallyCenterMainWindowText);
         ContextMenuIsOpening = charIndex >= MainTextBox.SelectionStart && charIndex <= MainTextBox.SelectionStart + MainTextBox.SelectionLength;

@@ -589,29 +589,28 @@ public static class DictUtils
                             }));
                         }
 
-                        else
+                        else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                         {
-                            if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                            dict.Ready = false;
+                            if (useDB && !dbExists)
                             {
-                                if (useDB && !dbExists)
+                                tasks.Add(Task.Run(() =>
                                 {
-                                    tasks.Add(Task.Run(() =>
-                                    {
-                                        JmdictDBManager.CreateDB(dict.Name);
-                                        JmdictDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents.Clear();
-                                        dict.Contents.TrimExcess();
-                                    }));
-                                }
-                                else
-                                {
+                                    JmdictDBManager.CreateDB(dict.Name);
+                                    JmdictDBManager.InsertRecordsToDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
-                                }
-
-                                dictCleared = true;
+                                    dict.Ready = true;
+                                }));
                             }
-                            dict.Ready = true;
+                            else
+                            {
+                                dict.Contents.Clear();
+                                dict.Contents.TrimExcess();
+                                dict.Ready = true;
+                            }
+
+                            dictCleared = true;
                         }
                     }
 
@@ -646,30 +645,28 @@ public static class DictUtils
                             }));
                         }
 
-                        else
+                        else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                         {
-                            if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                            dict.Ready = false;
+                            if (useDB && !dbExists)
                             {
-                                if (useDB && !dbExists)
+                                tasks.Add(Task.Run(() =>
                                 {
-                                    tasks.Add(Task.Run(() =>
-                                    {
-                                        JmnedictDBManager.CreateDB(dict.Name);
-                                        JmnedictDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents.Clear();
-                                        dict.Contents.TrimExcess();
-                                    }));
-                                }
-                                else
-                                {
+                                    JmnedictDBManager.CreateDB(dict.Name);
+                                    JmnedictDBManager.InsertRecordsToDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
-                                }
-
-                                dictCleared = true;
+                                    dict.Ready = true;
+                                }));
+                            }
+                            else
+                            {
+                                dict.Contents.Clear();
+                                dict.Contents.TrimExcess();
+                                dict.Ready = true;
                             }
 
-                            dict.Ready = true;
+                            dictCleared = true;
                         }
                     }
 
@@ -711,30 +708,26 @@ public static class DictUtils
                             }));
                         }
 
-                        else
+                        else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                         {
-                            if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                            dict.Ready = false;
+                            if (useDB && !dbExists)
                             {
-                                if (useDB && !dbExists)
+                                tasks.Add(Task.Run(() =>
                                 {
-                                    tasks.Add(Task.Run(() =>
-                                    {
-                                        KanjidicDBManager.CreateDB(dict.Name);
-                                        KanjidicDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents.Clear();
-                                        dict.Contents.TrimExcess();
-                                    }));
-                                }
-                                else
-                                {
+                                    KanjidicDBManager.CreateDB(dict.Name);
+                                    KanjidicDBManager.InsertRecordsToDB(dict);
                                     dict.Contents.Clear();
                                     dict.Contents.TrimExcess();
-                                }
-
-                                dictCleared = true;
+                                    dict.Ready = true;
+                                }));
                             }
-
-                            dict.Ready = true;
+                            else
+                            {
+                                dict.Contents.Clear();
+                                dict.Contents.TrimExcess();
+                                dict.Ready = true;
+                            }
                         }
                     }
 
@@ -837,29 +830,28 @@ public static class DictUtils
                         }));
                     }
 
-                    else
+                    else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                     {
-                        if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                        dict.Ready = false;
+                        if (useDB && !dbExists)
                         {
-                            if (useDB && !dbExists)
+                            tasks.Add(Task.Run(() =>
                             {
-                                tasks.Add(Task.Run(() =>
-                                {
-                                    EpwingYomichanDBManager.CreateDB(dict.Name);
-                                    EpwingYomichanDBManager.InsertRecordsToDB(dict);
-                                    dict.Contents.Clear();
-                                    dict.Contents.TrimExcess();
-                                }));
-                            }
-                            else
-                            {
+                                EpwingYomichanDBManager.CreateDB(dict.Name);
+                                EpwingYomichanDBManager.InsertRecordsToDB(dict);
                                 dict.Contents.Clear();
                                 dict.Contents.TrimExcess();
-                            }
-
-                            dictCleared = true;
+                                dict.Ready = true;
+                            }));
                         }
-                        dict.Ready = true;
+                        else
+                        {
+                            dict.Contents.Clear();
+                            dict.Contents.TrimExcess();
+                            dict.Ready = true;
+                        }
+
+                        dictCleared = true;
                     }
 
                     break;
@@ -913,29 +905,28 @@ public static class DictUtils
                         }));
                     }
 
-                    else
+                    else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                     {
-                        if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                        dict.Ready = false;
+                        if (useDB && !dbExists)
                         {
-                            if (useDB && !dbExists)
+                            tasks.Add(Task.Run(() =>
                             {
-                                tasks.Add(Task.Run(() =>
-                                {
-                                    YomichanKanjiDBManager.CreateDB(dict.Name);
-                                    YomichanKanjiDBManager.InsertRecordsToDB(dict);
-                                    dict.Contents.Clear();
-                                    dict.Contents.TrimExcess();
-                                }));
-                            }
-                            else
-                            {
+                                YomichanKanjiDBManager.CreateDB(dict.Name);
+                                YomichanKanjiDBManager.InsertRecordsToDB(dict);
                                 dict.Contents.Clear();
                                 dict.Contents.TrimExcess();
-                            }
-
-                            dictCleared = true;
+                                dict.Ready = true;
+                            }));
                         }
-                        dict.Ready = true;
+                        else
+                        {
+                            dict.Contents.Clear();
+                            dict.Contents.TrimExcess();
+                            dict.Ready = true;
+                        }
+
+                        dictCleared = true;
                     }
 
                     break;
@@ -1081,29 +1072,28 @@ public static class DictUtils
                         }));
                     }
 
-                    else
+                    else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                     {
-                        if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                        dict.Ready = false;
+                        if (useDB && !dbExists)
                         {
-                            if (useDB && !dbExists)
+                            tasks.Add(Task.Run(() =>
                             {
-                                tasks.Add(Task.Run(() =>
-                                {
-                                    EpwingNazekaDBManager.CreateDB(dict.Name);
-                                    EpwingNazekaDBManager.InsertRecordsToDB(dict);
-                                    dict.Contents.Clear();
-                                    dict.Contents.TrimExcess();
-                                }));
-                            }
-                            else
-                            {
+                                EpwingNazekaDBManager.CreateDB(dict.Name);
+                                EpwingNazekaDBManager.InsertRecordsToDB(dict);
                                 dict.Contents.Clear();
                                 dict.Contents.TrimExcess();
-                            }
-
-                            dictCleared = true;
+                                dict.Ready = true;
+                            }));
                         }
-                        dict.Ready = true;
+                        else
+                        {
+                            dict.Contents.Clear();
+                            dict.Contents.TrimExcess();
+                            dict.Ready = true;
+                        }
+
+                        dictCleared = true;
                     }
 
                     break;
@@ -1158,29 +1148,28 @@ public static class DictUtils
                         }));
                     }
 
-                    else
+                    else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                     {
-                        if (dict.Contents.Count > 0 && (!dict.Active || useDB))
+                        dict.Ready = false;
+                        if (useDB && !dbExists)
                         {
-                            if (useDB && !dbExists)
+                            tasks.Add(Task.Run(() =>
                             {
-                                tasks.Add(Task.Run(() =>
-                                {
-                                    YomichanPitchAccentDBManager.CreateDB(dict.Name);
-                                    YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
-                                    dict.Contents.Clear();
-                                    dict.Contents.TrimExcess();
-                                }));
-                            }
-                            else
-                            {
+                                YomichanPitchAccentDBManager.CreateDB(dict.Name);
+                                YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
                                 dict.Contents.Clear();
                                 dict.Contents.TrimExcess();
-                            }
-
-                            dictCleared = true;
+                                dict.Ready = true;
+                            }));
                         }
-                        dict.Ready = true;
+                        else
+                        {
+                            dict.Contents.Clear();
+                            dict.Contents.TrimExcess();
+                            dict.Ready = true;
+                        }
+
+                        dictCleared = true;
                     }
 
                     break;
