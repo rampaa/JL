@@ -78,13 +78,13 @@ public static class FreqUtils
             }
 
             bool loadFromDB = dbExists && !useDB;
+            freq.Ready = false;
 
             switch (freq.Type)
             {
                 case FreqType.Nazeka:
                     if (freq is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
-                        freq.Ready = false;
                         tasks.Add(Task.Run(async () =>
                         {
                             try
@@ -133,7 +133,6 @@ public static class FreqUtils
 
                     else if (freq.Contents.Count > 0 && (!freq.Active || useDB))
                     {
-                        freq.Ready = false;
                         if (useDB && !dbExists)
                         {
                             FreqDBManager.CreateDB(freq.Name);
@@ -152,13 +151,16 @@ public static class FreqUtils
                         freqCleared = true;
                     }
 
+                    else
+                    {
+                        freq.Ready = true;
+                    }
                     break;
 
                 case FreqType.Yomichan:
                 case FreqType.YomichanKanji:
                     if (freq is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
-                        freq.Ready = false;
                         tasks.Add(Task.Run(async () =>
                         {
                             try
@@ -209,7 +211,6 @@ public static class FreqUtils
 
                     else if (freq.Contents.Count > 0 && (!freq.Active || useDB))
                     {
-                        freq.Ready = false;
                         if (useDB && !dbExists)
                         {
                             FreqDBManager.CreateDB(freq.Name);
@@ -226,6 +227,11 @@ public static class FreqUtils
                         }
 
                         freqCleared = true;
+                    }
+
+                    else
+                    {
+                        freq.Ready = true;
                     }
 
                     break;
