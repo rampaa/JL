@@ -1,11 +1,12 @@
 using Caching;
+using JL.Core.Utilities;
 
 namespace JL.Core.Deconjugation;
 
 // translated from https://github.com/wareya/nazeka/blob/master/background-script.js
 internal static class Deconjugator
 {
-    private static readonly LRUCache<string, HashSet<Form>> s_cache = new(777, 88);
+    private static readonly LRUCache<string, HashSet<Form>> s_cache = new(Utils.CacheSize, Utils.CacheSize / 10);
     public static Rule[] Rules { get; set; } = Array.Empty<Rule>();
 
     private static Form? StdruleDeconjugateInner(Form myForm, VirtualRule myRule)

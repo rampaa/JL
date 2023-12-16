@@ -14,6 +14,7 @@ using JL.Core.Profile;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
 using Microsoft.Data.Sqlite;
+using JL.Core.Dicts.EDICT;
 
 
 namespace JL.Core.Dicts;
@@ -550,48 +551,56 @@ public static class DictUtils
             }
 
             bool loadFromDB = dbExists && !useDB;
+            dict.Ready = false;
 
             switch (dict.Type)
             {
                 case DictType.JMdict:
                     if (!UpdatingJmdict)
                     {
-                        dict.Ready = false;
                         if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                         {
                             tasks.Add(Task.Run(async () =>
                             {
-                                // 2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739
-                                dict.Contents = dict.Size > 0
-                                    ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
-                                    : new Dictionary<string, IList<IDictRecord>>(450000);
-
-                                if (loadFromDB)
+                                try
                                 {
-                                    JmdictDBManager.LoadFromDB(dict);
-                                    dict.Size = dict.Contents.Count;
-                                }
-                                else
-                                {
-                                    await JmdictLoader.Load(dict).ConfigureAwait(false);
-                                    dict.Size = dict.Contents.Count;
+                                    // 2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739
+                                    dict.Contents = dict.Size > 0
+                                        ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
+                                        : new Dictionary<string, IList<IDictRecord>>(450000);
 
-                                    if (useDB && !dbExists)
+                                    if (loadFromDB)
                                     {
-                                        JmdictDBManager.CreateDB(dict.Name);
-                                        JmdictDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents.Clear();
-                                        dict.Contents.TrimExcess();
+                                        JmdictDBManager.LoadFromDB(dict);
+                                        dict.Size = dict.Contents.Count;
                                     }
-                                }
+                                    else
+                                    {
+                                        await JmdictLoader.Load(dict).ConfigureAwait(false);
+                                        dict.Size = dict.Contents.Count;
 
-                                dict.Ready = true;
+                                        if (useDB && !dbExists)
+                                        {
+                                            JmdictDBManager.CreateDB(dict.Name);
+                                            JmdictDBManager.InsertRecordsToDB(dict);
+                                            dict.Contents.Clear();
+                                            dict.Contents.TrimExcess();
+                                        }
+                                    }
+
+                                    dict.Ready = true;
+                                }
+                                catch (Exception ex)
+                                {
+                                    Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
+                                    File.Delete(Path.GetFullPath(dict.Path, Utils.ApplicationPath));
+                                    await ResourceUpdater.UpdateJmdict().ConfigureAwait(false);
+                                }
                             }));
                         }
 
                         else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                         {
-                            dict.Ready = false;
                             if (useDB && !dbExists)
                             {
                                 tasks.Add(Task.Run(() =>
@@ -612,6 +621,11 @@ public static class DictUtils
 
                             dictCleared = true;
                         }
+
+                        else
+                        {
+                            dict.Ready = true;
+                        }
                     }
 
                     break;
@@ -621,33 +635,40 @@ public static class DictUtils
                     {
                         if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                         {
-                            dict.Ready = false;
                             tasks.Add(Task.Run(async () =>
                             {
-                                // 2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055
-                                dict.Contents = dict.Size > 0
-                                    ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
-                                    : new Dictionary<string, IList<IDictRecord>>(630000);
-
-                                // We don't load JMnedict from DB because it is slower and allocates more memory for JMnedict for some reason
-                                await JmnedictLoader.Load(dict).ConfigureAwait(false);
-                                dict.Size = dict.Contents.Count;
-
-                                if (useDB && !dbExists)
+                                try
                                 {
-                                    JmnedictDBManager.CreateDB(dict.Name);
-                                    JmnedictDBManager.InsertRecordsToDB(dict);
-                                    dict.Contents.Clear();
-                                    dict.Contents.TrimExcess();
-                                }
+                                    // 2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055
+                                    dict.Contents = dict.Size > 0
+                                        ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
+                                        : new Dictionary<string, IList<IDictRecord>>(630000);
 
-                                dict.Ready = true;
+                                    // We don't load JMnedict from DB because it is slower and allocates more memory for JMnedict for some reason
+                                    await JmnedictLoader.Load(dict).ConfigureAwait(false);
+                                    dict.Size = dict.Contents.Count;
+
+                                    if (useDB && !dbExists)
+                                    {
+                                        JmnedictDBManager.CreateDB(dict.Name);
+                                        JmnedictDBManager.InsertRecordsToDB(dict);
+                                        dict.Contents.Clear();
+                                        dict.Contents.TrimExcess();
+                                    }
+
+                                    dict.Ready = true;
+                                }
+                                catch (Exception ex)
+                                {
+                                    Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
+                                    File.Delete(Path.GetFullPath(dict.Path, Utils.ApplicationPath));
+                                    await ResourceUpdater.UpdateJmnedict().ConfigureAwait(false);
+                                }
                             }));
                         }
 
                         else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                         {
-                            dict.Ready = false;
                             if (useDB && !dbExists)
                             {
                                 tasks.Add(Task.Run(() =>
@@ -668,6 +689,11 @@ public static class DictUtils
 
                             dictCleared = true;
                         }
+
+                        else
+                        {
+                            dict.Ready = true;
+                        }
                     }
 
                     break;
@@ -677,40 +703,47 @@ public static class DictUtils
                     {
                         if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                         {
-                            dict.Ready = false;
                             tasks.Add(Task.Run(async () =>
                             {
-                                // 2022/05/11: 13108, 2022/08/15: 13108, 2023/04/22: 13108
-                                dict.Contents = dict.Size > 0
-                                    ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
-                                    : new Dictionary<string, IList<IDictRecord>>(13108);
-
-                                if (loadFromDB)
+                                try
                                 {
-                                    KanjidicDBManager.LoadFromDB(dict);
-                                    dict.Size = dict.Contents.Count;
-                                }
-                                else
-                                {
-                                    await KanjidicLoader.Load(dict).ConfigureAwait(false);
-                                    dict.Size = dict.Contents.Count;
+                                    // 2022/05/11: 13108, 2022/08/15: 13108, 2023/04/22: 13108
+                                    dict.Contents = dict.Size > 0
+                                        ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
+                                        : new Dictionary<string, IList<IDictRecord>>(13108);
 
-                                    if (useDB && !dbExists)
+                                    if (loadFromDB)
                                     {
-                                        KanjidicDBManager.CreateDB(dict.Name);
-                                        KanjidicDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents.Clear();
-                                        dict.Contents.TrimExcess();
+                                        KanjidicDBManager.LoadFromDB(dict);
+                                        dict.Size = dict.Contents.Count;
                                     }
-                                }
+                                    else
+                                    {
+                                        await KanjidicLoader.Load(dict).ConfigureAwait(false);
+                                        dict.Size = dict.Contents.Count;
 
-                                dict.Ready = true;
+                                        if (useDB && !dbExists)
+                                        {
+                                            KanjidicDBManager.CreateDB(dict.Name);
+                                            KanjidicDBManager.InsertRecordsToDB(dict);
+                                            dict.Contents.Clear();
+                                            dict.Contents.TrimExcess();
+                                        }
+                                    }
+
+                                    dict.Ready = true;
+                                }
+                                catch (Exception ex)
+                                {
+                                    Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
+                                    File.Delete(Path.GetFullPath(dict.Path, Utils.ApplicationPath));
+                                    await ResourceUpdater.UpdateKanjidic().ConfigureAwait(false);
+                                }
                             }));
                         }
 
                         else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                         {
-                            dict.Ready = false;
                             if (useDB && !dbExists)
                             {
                                 tasks.Add(Task.Run(() =>
@@ -728,6 +761,11 @@ public static class DictUtils
                                 dict.Contents.TrimExcess();
                                 dict.Ready = true;
                             }
+                        }
+
+                        else
+                        {
+                            dict.Ready = true;
                         }
                     }
 
@@ -758,7 +796,6 @@ public static class DictUtils
                 case DictType.NonspecificYomichan:
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
-                        dict.Ready = false;
                         tasks.Add(Task.Run(async () =>
                         {
                             try
@@ -832,7 +869,6 @@ public static class DictUtils
 
                     else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                     {
-                        dict.Ready = false;
                         if (useDB && !dbExists)
                         {
                             tasks.Add(Task.Run(() =>
@@ -854,12 +890,16 @@ public static class DictUtils
                         dictCleared = true;
                     }
 
+                    else
+                    {
+                        dict.Ready = true;
+                    }
+
                     break;
 
                 case DictType.NonspecificKanjiYomichan:
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
-                        dict.Ready = false;
                         tasks.Add(Task.Run(async () =>
                         {
                             dict.Contents = dict.Size > 0
@@ -907,7 +947,6 @@ public static class DictUtils
 
                     else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                     {
-                        dict.Ready = false;
                         if (useDB && !dbExists)
                         {
                             tasks.Add(Task.Run(() =>
@@ -929,13 +968,17 @@ public static class DictUtils
                         dictCleared = true;
                     }
 
+                    else
+                    {
+                        dict.Ready = true;
+                    }
+
                     break;
 
                 case DictType.CustomWordDictionary:
                 case DictType.ProfileCustomWordDictionary:
                     if (dict is { Active: true, Contents.Count: 0 })
                     {
-                        dict.Ready = false;
                         tasks.Add(Task.Run(() =>
                         {
                             dict.Contents = dict.Size is not 0
@@ -973,7 +1016,6 @@ public static class DictUtils
                 case DictType.ProfileCustomNameDictionary:
                     if (dict is { Active: true, Contents.Count: 0 })
                     {
-                        dict.Ready = false;
                         tasks.Add(Task.Run(() =>
                         {
                             dict.Contents = dict.Size is not 0
@@ -1016,7 +1058,6 @@ public static class DictUtils
                 case DictType.NonspecificNazeka:
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
-                        dict.Ready = false;
                         tasks.Add(Task.Run(async () =>
                         {
                             try
@@ -1074,7 +1115,6 @@ public static class DictUtils
 
                     else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                     {
-                        dict.Ready = false;
                         if (useDB && !dbExists)
                         {
                             tasks.Add(Task.Run(() =>
@@ -1096,12 +1136,16 @@ public static class DictUtils
                         dictCleared = true;
                     }
 
+                    else
+                    {
+                        dict.Ready = true;
+                    }
+
                     break;
 
                 case DictType.PitchAccentYomichan:
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
-                        dict.Ready = false;
                         tasks.Add(Task.Run(async () =>
                         {
                             try
@@ -1150,7 +1194,6 @@ public static class DictUtils
 
                     else if (dict.Contents.Count > 0 && (!dict.Active || useDB))
                     {
-                        dict.Ready = false;
                         if (useDB && !dbExists)
                         {
                             tasks.Add(Task.Run(() =>
@@ -1170,6 +1213,11 @@ public static class DictUtils
                         }
 
                         dictCleared = true;
+                    }
+
+                    else
+                    {
+                        dict.Ready = true;
                     }
 
                     break;
@@ -1201,7 +1249,10 @@ public static class DictUtils
                 }
             }
 
-            Utils.Frontend.Alert(AlertLevel.Success, "Finished loading dictionaries");
+            if (!UpdatingJmdict && !UpdatingJmnedict && !UpdatingKanjidic)
+            {
+                Utils.Frontend.Alert(AlertLevel.Success, "Finished loading dictionaries");
+            }
         }
 
         DictsReady = true;

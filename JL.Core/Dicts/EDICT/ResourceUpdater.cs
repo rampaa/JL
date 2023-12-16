@@ -115,6 +115,7 @@ public static class ResourceUpdater
 
         if (downloaded)
         {
+            dict.Ready = false;
             dict.Contents.Clear();
 
             await Task.Run(async () => await JmdictLoader
@@ -152,9 +153,12 @@ public static class ResourceUpdater
             }
         }
 
-        DictUtils.UpdatingJmdict = false;
-
         Utils.ClearStringPoolIfDictsAreReady();
+
+        DictUtils.UpdatingJmdict = false;
+        dict.Ready = true;
+
+        Utils.Frontend.Alert(AlertLevel.Success, "Finished updating JMdict");
     }
 
     public static async Task UpdateJmnedict()
@@ -169,6 +173,7 @@ public static class ResourceUpdater
 
         if (downloaded)
         {
+            dict.Ready = false;
             dict.Contents.Clear();
 
             await Task.Run(async () => await JmnedictLoader
@@ -200,9 +205,12 @@ public static class ResourceUpdater
             }
         }
 
-        DictUtils.UpdatingJmnedict = false;
-
         Utils.ClearStringPoolIfDictsAreReady();
+
+        DictUtils.UpdatingJmnedict = false;
+        dict.Ready = true;
+
+        Utils.Frontend.Alert(AlertLevel.Success, "Finished updating JMnedict");
     }
 
     public static async Task UpdateKanjidic()
@@ -217,6 +225,7 @@ public static class ResourceUpdater
 
         if (downloaded)
         {
+            dict.Ready = false;
             dict.Contents.Clear();
 
             await Task.Run(async () => await KanjidicLoader
@@ -248,8 +257,11 @@ public static class ResourceUpdater
             }
         }
 
-        DictUtils.UpdatingKanjidic = false;
-
         Utils.ClearStringPoolIfDictsAreReady();
+
+        DictUtils.UpdatingKanjidic = false;
+        dict.Ready = true;
+
+        Utils.Frontend.Alert(AlertLevel.Success, "Finished updating KANJIDIC2");
     }
 }
