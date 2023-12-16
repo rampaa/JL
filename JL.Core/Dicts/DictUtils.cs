@@ -133,7 +133,9 @@ public static class DictUtils
         { "bus", "business" },
         { "cards", "card games" },
         { "chem", "chemistry" },
+        { "chmyth", "Chinese mythology" },
         { "Christn", "Christianity" },
+        { "civeng", "civil engineering" },
         { "cloth", "clothing" },
         { "comp", "computing" },
         { "cryst", "crystallography" },
@@ -145,6 +147,7 @@ public static class DictUtils
         { "embryo", "embryology" },
         { "engr", "engineering" },
         { "ent", "entomology" },
+        { "figskt", "figure skating" },
         { "film", "film" },
         { "finc", "finance" },
         { "fish", "fishing" },
@@ -160,6 +163,8 @@ public static class DictUtils
         { "grmyth", "Greek mythology" },
         { "hanaf", "hanafuda" },
         { "horse", "horse racing" },
+        { "internet", "networking, WWW" },
+        { "jpmyth", "Japanese mythology" },
         { "kabuki", "kabuki" },
         { "law", "law" },
         { "ling", "linguistics" },
@@ -172,7 +177,9 @@ public static class DictUtils
         { "med", "medicine" },
         { "met", "meteorology" },
         { "mil", "military" },
+        { "min", "mineralogy" },
         { "mining", "mining" },
+        { "motor", "motorsport" },
         { "music", "music" },
         { "noh", "noh" },
         { "ornith", "ornithology" },
@@ -185,6 +192,7 @@ public static class DictUtils
         { "physiol", "physiology" },
         { "politics", "politics" },
         { "print", "printing" },
+        { "prowres", "professional wrestling" },
         { "psy", "psychiatry" },
         { "psyanal", "psychoanalysis" },
         { "psych", "psychology" },
@@ -200,6 +208,7 @@ public static class DictUtils
         { "telec", "telecommunications" },
         { "tradem", "trademark" },
         { "tv", "television" },
+        { "vet", "veterinary terms" },
         { "vidg", "video games" },
         { "zool", "zoology" },
 
@@ -362,6 +371,7 @@ public static class DictUtils
 
         { "gikun", "gikun (meaning as reading) or jukujikun (special kanji reading)" },
         { "ok", "out-dated or obsolete kana usage" },
+        { "rk", "rarely used kana form" },
         { "sk", "search-only kana form" }
     };
 
