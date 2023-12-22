@@ -20,6 +20,7 @@ internal static class JmdictRecordBuilder
             string key = JapaneseUtils.KatakanaToHiragana(kanjiElement.Keb).GetPooledString();
             if (recordDictionary.ContainsKey(key))
             {
+                ++index;
                 continue;
             }
 
