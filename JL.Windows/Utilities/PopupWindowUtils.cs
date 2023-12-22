@@ -85,7 +85,7 @@ internal static class PopupWindowUtils
         return sb.ToString();
     }
 
-    public static string AlternativeSpellingsToText(string[] alternativeSpellings, string[]?[]? aOrthographyInfoList)
+    public static string AlternativeSpellingsToText(string[] alternativeSpellings, string[]?[] aOrthographyInfoList)
     {
         StringBuilder sb = new();
 
@@ -95,7 +95,7 @@ internal static class PopupWindowUtils
         {
             _ = sb.Append(alternativeSpellings[index]);
 
-            if (index < aOrthographyInfoList?.Length)
+            if (index < aOrthographyInfoList.Length)
             {
                 string[]? aOrthographyInfo = aOrthographyInfoList[index];
                 if (aOrthographyInfo is not null)

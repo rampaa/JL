@@ -320,7 +320,7 @@ public static class LookupUtils
                         {
                             return 0;
                         }
-                        else if (roi is "ok" or "ik" or "rk")
+                        if (roi is "ok" or "ik" or "rk")
                         {
                             return 2;
                         }
