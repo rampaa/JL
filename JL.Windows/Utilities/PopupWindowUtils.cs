@@ -67,7 +67,7 @@ internal static class PopupWindowUtils
         {
             _ = sb.Append(readings[index]);
 
-            if (index < rOrthographyInfoList?.Length)
+            if (index < rOrthographyInfoList.Length)
             {
                 string[]? rOrthographyInfo = rOrthographyInfoList[index];
                 if (rOrthographyInfo is not null)
