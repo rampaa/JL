@@ -118,6 +118,7 @@ internal static class JmdictRecordBuilder
 
             if (recordDictionary.ContainsKey(key))
             {
+                ++index;
                 continue;
             }
 
@@ -226,6 +227,7 @@ internal static class JmdictRecordBuilder
             // record.Priorities = kanjiElement.KePriList
 
             recordDictionary.Add(key, record);
+
             ++index;
 
             if (i is 0 && allSpellingsWithoutSearchOnlyForms.Count is 0)
