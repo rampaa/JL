@@ -310,17 +310,20 @@ public static class LookupUtils
                     return 3;
                 }
 
-                if (lookupResult.ReadingsOrthographyInfoList?.Count > 0)
+                if (lookupResult.ReadingsOrthographyInfoList is not null)
                 {
-                    string? readingOrthography = lookupResult.ReadingsOrthographyInfoList[index];
-                    if (readingOrthography is "uk")
+                    string[]? readingsOrthographyInfo = lookupResult.ReadingsOrthographyInfoList[index];
+                    for (int i = 0; i < readingsOrthographyInfo?.Length; i++)
                     {
-                        return 0;
-                    }
-
-                    if (readingOrthography is "ok" or "ik" or "rk")
-                    {
-                        return 2;
+                        string roi = readingsOrthographyInfo[i];
+                        if (roi is "uk")
+                        {
+                            return 0;
+                        }
+                        else if (roi is "ok" or "ik" or "rk")
+                        {
+                            return 2;
+                        }
                     }
                 }
 
@@ -858,79 +861,16 @@ public static class LookupUtils
             }
         });
 
-        Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-        bool showROrthographyInfo = dict.Options?.ROrthographyInfo?.Value ?? true;
-        bool showAOrthographyInfo = dict.Options?.AOrthographyInfo?.Value ?? true;
-
         List<LookupResult> results = new();
         foreach (IntermediaryResult wordResult in jmdictResults.Values.ToList())
         {
             int resultsListCount = wordResult.Results.Count;
             for (int i = 0; i < resultsListCount; i++)
             {
-                List<string?>? rOrthographyInfoList = null;
-
                 int resultCount = wordResult.Results[i].Count;
                 for (int j = 0; j < resultCount; j++)
                 {
                     JmdictRecord jmdictResult = (JmdictRecord)wordResult.Results[i][j];
-
-                    if (showROrthographyInfo)
-                    {
-                        rOrthographyInfoList = new List<string?>();
-
-                        string[]?[]? rLists = jmdictResult.ReadingsOrthographyInfo;
-                        for (int k = 0; k < rLists?.Length; k++)
-                        {
-                            StringBuilder formattedROrthographyInfo = new();
-
-                            string[]? rList = rLists[k];
-                            if (rList?.Length > 0)
-                            {
-                                for (int l = 0; l < rList.Length; l++)
-                                {
-                                    _ = formattedROrthographyInfo.Append(CultureInfo.InvariantCulture, $"{rList[l]}, ");
-                                }
-
-                                rOrthographyInfoList.Add(formattedROrthographyInfo.Remove(formattedROrthographyInfo.Length - 2, 2).ToString());
-                            }
-                            else
-                            {
-                                rOrthographyInfoList.Add(null);
-                            }
-                        }
-                    }
-                    rOrthographyInfoList = rOrthographyInfoList?.Count > 0 ? rOrthographyInfoList : null;
-
-                    List<string?>? aOrthographyInfoList = null;
-                    if (showAOrthographyInfo)
-                    {
-                        aOrthographyInfoList = new List<string?>();
-
-                        string[]?[]? aLists = jmdictResult.AlternativeSpellingsOrthographyInfo;
-                        for (int k = 0; k < aLists?.Length; k++)
-                        {
-                            StringBuilder formattedAOrthographyInfo = new();
-
-                            string[]? aList = aLists[k];
-                            if (aList?.Length > 0)
-                            {
-                                for (int l = 0; l < aList.Length; l++)
-                                {
-                                    _ = formattedAOrthographyInfo.Append(CultureInfo.InvariantCulture, $"{aList[l]}, ");
-                                }
-
-                                aOrthographyInfoList.Add(formattedAOrthographyInfo.Remove(formattedAOrthographyInfo.Length - 2, 2).ToString());
-                            }
-
-                            else
-                            {
-                                aOrthographyInfoList.Add(null);
-                            }
-                        }
-                    }
-                    aOrthographyInfoList = aOrthographyInfoList?.Count > 0 ? aOrthographyInfoList : null;
-
                     LookupResult result = new
                     (
                         primarySpelling: jmdictResult.PrimarySpelling,
@@ -942,8 +882,8 @@ public static class LookupUtils
                         deconjugationProcess: ProcessDeconjugationProcess(wordResult.Processes?[i]),
                         frequencies: GetWordFrequencies(jmdictResult, frequencyDicts),
                         primarySpellingOrthographyInfoList: jmdictResult.PrimarySpellingOrthographyInfo,
-                        readingsOrthographyInfoList: rOrthographyInfoList,
-                        alternativeSpellingsOrthographyInfoList: aOrthographyInfoList,
+                        readingsOrthographyInfoList: jmdictResult.ReadingsOrthographyInfo,
+                        alternativeSpellingsOrthographyInfoList: jmdictResult.AlternativeSpellingsOrthographyInfo,
                         dict: wordResult.Dict,
                         formattedDefinitions: jmdictResult.BuildFormattedDefinition(wordResult.Dict.Options),
                         pitchAccentDict: pitchAccentDict

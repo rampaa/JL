@@ -59,7 +59,7 @@ internal static class PopupWindowUtils
         return null;
     }
 
-    public static string ReadingsToText(string[] readings, List<string?> rOrthographyInfoList)
+    public static string ReadingsToText(string[] readings, string[]?[] rOrthographyInfoList)
     {
         StringBuilder sb = new();
 
@@ -67,11 +67,12 @@ internal static class PopupWindowUtils
         {
             _ = sb.Append(readings[index]);
 
-            if (index < rOrthographyInfoList?.Count)
+            if (index < rOrthographyInfoList?.Length)
             {
-                if (!string.IsNullOrEmpty(rOrthographyInfoList[index]))
+                string[]? rOrthographyInfo = rOrthographyInfoList[index];
+                if (rOrthographyInfo is not null)
                 {
-                    _ = sb.Append(CultureInfo.InvariantCulture, $" ({rOrthographyInfoList[index]})");
+                    _ = sb.Append(CultureInfo.InvariantCulture, $" ({string.Join(", ", rOrthographyInfo)})");
                 }
             }
 
@@ -84,7 +85,7 @@ internal static class PopupWindowUtils
         return sb.ToString();
     }
 
-    public static string AlternativeSpellingsToText(string[] alternativeSpellings, List<string?> aOrthographyInfoList)
+    public static string AlternativeSpellingsToText(string[] alternativeSpellings, string[]?[]? aOrthographyInfoList)
     {
         StringBuilder sb = new();
 
@@ -94,11 +95,12 @@ internal static class PopupWindowUtils
         {
             _ = sb.Append(alternativeSpellings[index]);
 
-            if (index < aOrthographyInfoList?.Count)
+            if (index < aOrthographyInfoList?.Length)
             {
-                if (!string.IsNullOrEmpty(aOrthographyInfoList[index]))
+                string[]? aOrthographyInfo = aOrthographyInfoList[index];
+                if (aOrthographyInfo is not null)
                 {
-                    _ = sb.Append(CultureInfo.InvariantCulture, $" ({aOrthographyInfoList[index]})");
+                    _ = sb.Append(CultureInfo.InvariantCulture, $" ({string.Join(", ", aOrthographyInfo)})");
                 }
             }
 

@@ -21,8 +21,8 @@ public sealed class LookupResult
     // JMdict, Nazeka EPWING
     public string[]? AlternativeSpellings { get; }
     public string[]? PrimarySpellingOrthographyInfoList { get; }
-    public List<string?>? ReadingsOrthographyInfoList { get; }
-    public List<string?>? AlternativeSpellingsOrthographyInfoList { get; }
+    public string[]?[]? ReadingsOrthographyInfoList { get; }
+    public string[]?[]? AlternativeSpellingsOrthographyInfoList { get; }
 
     // Kanji
     public string[]? OnReadings { get; }
@@ -45,8 +45,8 @@ public sealed class LookupResult
         List<LookupFrequencyResult>? frequencies = null,
         string[]? alternativeSpellings = null,
         string[]? primarySpellingOrthographyInfoList = null,
-        List<string?>? readingsOrthographyInfoList = null,
-        List<string?>? alternativeSpellingsOrthographyInfoList = null,
+        string[]?[]? readingsOrthographyInfoList = null,
+        string[]?[]? alternativeSpellingsOrthographyInfoList = null,
         string[]? onReadings = null,
         string[]? kunReadings = null,
         string[]? nanoriReadings = null,
