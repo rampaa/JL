@@ -23,6 +23,7 @@ public sealed class LookupResult
     public string[]? PrimarySpellingOrthographyInfoList { get; }
     public string[]?[]? ReadingsOrthographyInfoList { get; }
     public string[]?[]? AlternativeSpellingsOrthographyInfoList { get; }
+    public string[]?[]? MiscList { get; }
 
     // Kanji
     public string[]? OnReadings { get; }
@@ -47,6 +48,7 @@ public sealed class LookupResult
         string[]? primarySpellingOrthographyInfoList = null,
         string[]?[]? readingsOrthographyInfoList = null,
         string[]?[]? alternativeSpellingsOrthographyInfoList = null,
+        string[]?[]? miscList = null,
         string[]? onReadings = null,
         string[]? kunReadings = null,
         string[]? nanoriReadings = null,
@@ -74,6 +76,7 @@ public sealed class LookupResult
         PrimarySpellingOrthographyInfoList = primarySpellingOrthographyInfoList;
         ReadingsOrthographyInfoList = readingsOrthographyInfoList;
         AlternativeSpellingsOrthographyInfoList = alternativeSpellingsOrthographyInfoList;
+        MiscList = miscList;
         OnReadings = onReadings;
         KunReadings = kunReadings;
         NanoriReadings = nanoriReadings;

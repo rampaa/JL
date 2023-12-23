@@ -161,4 +161,17 @@ public static class ExtensionMethods
             strings[i] = strings[i].GetPooledString();
         }
     }
+
+    internal static bool Contains<T>(this T[] source, T item) where T : class
+    {
+        for (int i = 0; i < source.Length; i++)
+        {
+            if (source[i] == item)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

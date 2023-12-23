@@ -299,6 +299,23 @@ public static class LookupUtils
         return lookupResults
             .OrderByDescending(static lookupResult => lookupResult.MatchedText.Length)
             .ThenByDescending(static lookupResult => lookupResult.PrimarySpelling == lookupResult.MatchedText)
+            .ThenByDescending(static lookupResult => lookupResult.Readings?.Contains(lookupResult.MatchedText) ?? false)
+            .ThenBy(static lookupResult => lookupResult.Dict.Priority)
+            .ThenBy(static lookupResult =>
+            {
+                if (lookupResult.PrimarySpellingOrthographyInfoList is not null)
+                {
+                    for (int i = 0; i < lookupResult.PrimarySpellingOrthographyInfoList.Length; i++)
+                    {
+                        if (lookupResult.PrimarySpellingOrthographyInfoList[i] is "oK" or "iK" or "rK")
+                        {
+                            return 1;
+                        }
+                    }
+                }
+
+                return 0;
+            })
             .ThenBy(static lookupResult =>
             {
                 int index = lookupResult.Readings is not null
@@ -310,37 +327,46 @@ public static class LookupUtils
                     return 3;
                 }
 
-                if (lookupResult.ReadingsOrthographyInfoList is not null)
+                if (lookupResult.MiscList is not null)
                 {
-                    string[]? readingsOrthographyInfo = lookupResult.ReadingsOrthographyInfoList[index];
-                    for (int i = 0; i < readingsOrthographyInfo?.Length; i++)
+                    for (int i = 0; i < lookupResult.MiscList.Length; i++)
                     {
-                        string roi = readingsOrthographyInfo[i];
-                        if (roi is "uk")
+                        if (lookupResult.MiscList[i]?.Contains("uk") ?? false)
                         {
                             return 0;
                         }
-                        if (roi is "ok" or "ik" or "rk")
+                    }
+                }
+
+                if (lookupResult.ReadingsOrthographyInfoList is not null)
+                {
+                    string[]? readingsOrthographyInfo = lookupResult.ReadingsOrthographyInfoList[index];
+                    if (readingsOrthographyInfo is not null)
+                    {
+                        for (int i = 0; i < readingsOrthographyInfo.Length; i++)
                         {
-                            return 2;
+                            if (readingsOrthographyInfo[i] is "ok" or "ik" or "rk")
+                            {
+                                return 2;
+                            }
                         }
                     }
                 }
 
                 return 1;
             })
-            .ThenBy(static lookupResult => lookupResult.Dict.Priority)
             .ThenBy(static lookupResult => lookupResult.Frequencies?.Count > 0 ? lookupResult.Frequencies[0].Freq : int.MaxValue)
-            .ThenBy(static lookupResult =>
-            {
-                int index = lookupResult.Readings is not null
-                    ? Array.IndexOf(lookupResult.Readings, lookupResult.MatchedText)
-                    : -1;
+            //.ThenBy(static lookupResult =>
+            //{
+            //    int index = lookupResult.Readings is not null
+            //        ? Array.IndexOf(lookupResult.Readings, lookupResult.MatchedText)
+            //        : -1;
 
-                return index is not -1
-                    ? index
-                    : int.MaxValue;
-            })
+            //    return index is not -1
+            //        ? index
+            //        : int.MaxValue;
+            //})
+            //.ThenByDescending(static lookupResult => lookupResult.PrimarySpelling.Length)
             .ToList();
     }
 
@@ -884,6 +910,7 @@ public static class LookupUtils
                         primarySpellingOrthographyInfoList: jmdictResult.PrimarySpellingOrthographyInfo,
                         readingsOrthographyInfoList: jmdictResult.ReadingsOrthographyInfo,
                         alternativeSpellingsOrthographyInfoList: jmdictResult.AlternativeSpellingsOrthographyInfo,
+                        miscList: jmdictResult.Misc,
                         dict: wordResult.Dict,
                         formattedDefinitions: jmdictResult.BuildFormattedDefinition(wordResult.Dict.Options),
                         pitchAccentDict: pitchAccentDict
@@ -1321,10 +1348,15 @@ public static class LookupUtils
 
     private static string? ProcessDeconjugationProcess(List<List<string>>? processList)
     {
+        if (processList is null)
+        {
+            return null;
+        }
+
         StringBuilder deconjugation = new();
         bool first = true;
 
-        for (int i = 0; i < processList?.Count; i++)
+        for (int i = 0; i < processList.Count; i++)
         {
             List<string> form = processList[i];
 

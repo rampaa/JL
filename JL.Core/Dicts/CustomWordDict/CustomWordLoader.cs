@@ -111,9 +111,9 @@ public static class CustomWordLoader
                 return;
             }
 
-            if (i is 0)
+            if (i is 0 && readings is not null)
             {
-                for (int j = 0; j < readings?.Length; j++)
+                for (int j = 0; j < readings.Length; j++)
                 {
                     if (!AddRecordToDictionary(readings[j], newWordRecord, customWordDictionary))
                     {
