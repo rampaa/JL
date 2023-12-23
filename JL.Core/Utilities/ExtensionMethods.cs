@@ -162,7 +162,7 @@ public static class ExtensionMethods
         }
     }
 
-    internal static bool Contains<T>(this T[] source, T item) where T : class
+    internal static bool Contains(this string[] source, string item)
     {
         for (int i = 0; i < source.Length; i++)
         {
