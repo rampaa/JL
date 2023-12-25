@@ -18,6 +18,7 @@ public static class JapaneseUtils
     // Katakana Phonetic Extensions (31F0–31FF)
     // Enclosed CJK Letters and Months (3200–32FF)
     // CJK Compatibility (3300–33FF)
+    // Halfwidth and Fullwidth Forms (FF00–FFEF)
     // CJK Unified Ideographs Extension A (3400–4DBF)
     // CJK Unified Ideographs (4E00–9FFF)
     // CJK Compatibility Ideographs (F900–FAFF)
@@ -32,7 +33,7 @@ public static class JapaneseUtils
     // CJK Unified Ideographs Extension G (30000–3134F)
     // CJK Unified Ideographs Extension H (31350–323AF)
     public static readonly Regex JapaneseRegex = new(
-        @"[\u2e80-\u30ff\u3190–\u319f\u31c0-\u4dbf\u4e00-\u9fff\uf900-\ufaff\ufe30-\ufe4f\uff00-\uffef]|\ud82c[\udc00-\udcff]|\ud83c[\ude00-\udeff]|\ud840[\udc00-\udfff]|[\ud841-\ud868][\udc00-\udfff]|\ud869[\udc00-\udedf]|\ud869[\udf00-\udfff]|[\ud86a-\ud879][\udc00-\udfff]|\ud87a[\udc00-\udfef]|\ud87e[\udc00-\ude1f]|\ud880[\udc00-\udfff]|[\ud881-\ud883][\udc00-\udfff]|\ud884[\udc00-\udfff]|[\ud885-\ud887][\udc00-\udfff]|\ud888[\udc00-\udfaf]",
+        @"[\u2E80-\u319F\u31C0-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD879][\uDC00-\uDFFF]|\uD87A[\uDC00-\uDFEF]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD887][\uDC00-\uDFFF]|\uD888[\uDC00-\uDFAF]",
         RegexOptions.Compiled);
 
     private static readonly Dictionary<char, string> s_katakanaToHiraganaDict = new(87)
