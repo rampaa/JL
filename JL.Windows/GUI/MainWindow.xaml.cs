@@ -250,9 +250,9 @@ internal sealed partial class MainWindow : Window
                 return;
             }
 
-            if (charPosition > 0 && char.IsHighSurrogate(input[charPosition - 1]))
+            if (char.IsLowSurrogate(input[charPosition]))
             {
-                --charPosition;
+                continue;
             }
 
             int endPosition = input.Length - charPosition > ConfigManager.MaxSearchLength
