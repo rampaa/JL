@@ -58,7 +58,7 @@ internal static class JmdictDBManager
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
-        Dictionary<JmdictRecord, List<string>> recordToKeysDict = new();
+        Dictionary<JmdictRecord, List<string>> recordToKeysDict = new(dict.Contents.Count);
         foreach ((string key, IList<IDictRecord> records) in dict.Contents)
         {
             for (int i = 0; i < records.Count; i++)
@@ -146,8 +146,6 @@ internal static class JmdictDBManager
 
     public static Dictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
-        Dictionary<string, IList<IDictRecord>> results = new();
-
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
@@ -191,6 +189,8 @@ internal static class JmdictDBManager
         {
             _ = command.Parameters.AddWithValue($"@{i + 1}", terms[i]);
         }
+
+        Dictionary<string, IList<IDictRecord>> results = new();
 
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())

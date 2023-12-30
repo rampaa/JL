@@ -347,7 +347,7 @@ internal sealed partial class PreferencesWindow : Window
         string deckName = deckNamesSelector.SelectedItem.ToString()!;
         string modelName = modelNamesSelector.SelectedItem.ToString()!;
 
-        Dictionary<string, JLField> dict = new();
+        Dictionary<string, JLField> dict = new(miningPanel.Children.Count);
         foreach (StackPanel stackPanel in miningPanel.Children)
         {
             TextBlock textBlock = (TextBlock)stackPanel.Children[0];

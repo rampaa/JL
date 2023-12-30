@@ -38,6 +38,8 @@ internal sealed partial class PopupWindow : Window
 
     private string _currentText = "";
 
+    private readonly Button _buttonAll = new() { Content = "All", Margin = new Thickness(1), Background = Brushes.DodgerBlue };
+
     public string? LastSelectedText { get; private set; }
 
     public nint WindowHandle { get; private set; }
@@ -1122,13 +1124,7 @@ internal sealed partial class PopupWindow : Window
 
         if (index != resultsCount - 1)
         {
-            _ = bottom.Children.Add(new Separator
-            {
-                Height = 2,
-                Background = ConfigManager.SeparatorColor,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Center
-            });
+            _ = bottom.Children.Add(PopupWindowUtils.EntrySeparator);
         }
 
         StackPanel stackPanel = new()
@@ -1765,10 +1761,10 @@ internal sealed partial class PopupWindow : Window
 
     private void GenerateDictTypeButtons()
     {
-        List<Button> buttons = new(DictUtils.Dicts.Values.Count);
-        Button buttonAll = new() { Content = "All", Margin = new Thickness(1), Background = Brushes.DodgerBlue };
-        buttonAll.Click += ButtonAllOnClick;
-        buttons.Add(buttonAll);
+        List<Button> buttons = new(DictUtils.Dicts.Values.Count + 1);
+        _buttonAll.Background = Brushes.DodgerBlue;
+        _buttonAll.Click += ButtonAllOnClick;
+        buttons.Add(_buttonAll);
 
         foreach (Dict dict in DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority).ToList())
         {
@@ -1906,6 +1902,7 @@ internal sealed partial class PopupWindow : Window
         TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
         ItemsControlButtons.Visibility = Visibility.Collapsed;
         ItemsControlButtons.ItemsSource = null;
+        _buttonAll.Click -= ButtonAllOnClick;
 
         if (_popupListViewScrollViewer is not null)
         {

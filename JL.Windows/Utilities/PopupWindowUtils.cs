@@ -17,6 +17,15 @@ namespace JL.Windows.Utilities;
 
 internal static class PopupWindowUtils
 {
+    private static readonly DoubleCollection s_strokeDashArray = new() { 1, 1 };
+    public static readonly Separator EntrySeparator = new()
+    {
+        Height = 2,
+        Background = ConfigManager.SeparatorColor,
+        HorizontalAlignment = HorizontalAlignment.Stretch,
+        VerticalAlignment = VerticalAlignment.Center
+    };
+
     public static string GradeToText(int grade)
     {
         string gradeText = grade switch
@@ -175,7 +184,7 @@ internal static class PopupWindowUtils
                     {
                         StrokeThickness = 2,
                         Stroke = DictOptionManager.PitchAccentMarkerColor,
-                        StrokeDashArray = new DoubleCollection { 1, 1 }
+                        StrokeDashArray = s_strokeDashArray
                     };
 
                     bool lowPitch = false;

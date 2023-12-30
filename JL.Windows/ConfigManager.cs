@@ -412,7 +412,10 @@ internal static class ConfigManager
         DefinitionsColor = GetFrozenBrushFromConfig(config, DefinitionsColor, nameof(DefinitionsColor));
         FrequencyColor = GetFrozenBrushFromConfig(config, FrequencyColor, nameof(FrequencyColor));
         DeconjugationInfoColor = GetFrozenBrushFromConfig(config, DeconjugationInfoColor, nameof(DeconjugationInfoColor));
+
         SeparatorColor = GetFrozenBrushFromConfig(config, SeparatorColor, nameof(SeparatorColor));
+        PopupWindowUtils.EntrySeparator.Background = SeparatorColor;
+
         DictTypeColor = GetFrozenBrushFromConfig(config, DictTypeColor, nameof(DictTypeColor));
 
         HighlightColor = GetFrozenBrushFromConfig(config, HighlightColor, nameof(HighlightColor));
@@ -684,6 +687,7 @@ internal static class ConfigManager
             else
             {
                 PopupFont = new FontFamily(popupFontStr);
+                WindowsUtils.PopupFontTypeFace = new Typeface(popupFontStr);
             }
         }
 

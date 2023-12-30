@@ -31,6 +31,7 @@ namespace JL.Windows.Utilities;
 internal static class WindowsUtils
 {
     private static readonly Random s_random = new();
+    public static Typeface PopupFontTypeFace { get; set; } = new Typeface(ConfigManager.PopupFont.Source);
     private static DateTime s_lastAudioPlayTime = new();
     public static WaveOut? AudioPlayer { get; private set; }
 
@@ -49,11 +50,10 @@ internal static class WindowsUtils
 
     public static ComboBoxItem[] FindJapaneseFonts()
     {
-        List<ComboBoxItem> japaneseFonts = new();
-
         XmlLanguage japaneseXmlLanguage = XmlLanguage.GetLanguage("ja-JP");
         XmlLanguage englishXmlLanguage = XmlLanguage.GetLanguage("en-US");
 
+        List<ComboBoxItem> japaneseFonts = new(Fonts.SystemFontFamilies.Count);
         foreach (FontFamily fontFamily in Fonts.SystemFontFamilies)
         {
             ComboBoxItem comboBoxItem = new()
@@ -466,10 +466,9 @@ internal static class WindowsUtils
             text,
             CultureInfo.CurrentCulture,
             FlowDirection.LeftToRight,
-            new Typeface(ConfigManager.PopupFont.Source),
+            PopupFontTypeFace,
             fontSize,
             Brushes.Transparent,
-            new NumberSubstitution(),
             Dpi.PixelsPerDip);
 
         return new Size(formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
