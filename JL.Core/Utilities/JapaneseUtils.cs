@@ -317,7 +317,7 @@ public static class JapaneseUtils
 
             if (s_bracketsDict.TryGetValue(sentence.FirstOrDefault(), out char rightBracket))
             {
-                if (sentence.Last() == rightBracket)
+                if (sentence[^1] == rightBracket)
                 {
                     sentence = sentence[1..^1];
                 }
@@ -339,7 +339,7 @@ public static class JapaneseUtils
 
             else if (s_bracketsDict.ContainsValue(sentence.LastOrDefault()))
             {
-                char leftBracket = s_bracketsDict.First(p => p.Value == sentence.Last()).Key;
+                char leftBracket = s_bracketsDict.First(p => p.Value == sentence[^1]).Key;
 
                 if (!sentence.Contains(leftBracket, StringComparison.Ordinal))
                 {
@@ -348,7 +348,7 @@ public static class JapaneseUtils
                 else
                 {
                     int numberOfLeftBrackets = sentence.Count(p => p == leftBracket);
-                    int numberOfRightBrackets = sentence.Count(p => p == sentence.Last());
+                    int numberOfRightBrackets = sentence.Count(p => p == sentence[^1]);
 
                     if (numberOfRightBrackets == numberOfLeftBrackets + 1)
                     {

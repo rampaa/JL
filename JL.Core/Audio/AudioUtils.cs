@@ -9,7 +9,7 @@ namespace JL.Core.Audio;
 
 public static class AudioUtils
 {
-    private static readonly AudioResponse s_audioResponse = new(AudioSourceType.TextToSpeech, "wav", null);
+    private static readonly AudioResponse s_textToSpeechAudioResponse = new(AudioSourceType.TextToSpeech, "wav", null);
 
     public static readonly Dictionary<string, AudioSource> AudioSources = new();
 
@@ -161,7 +161,7 @@ public static class AudioUtils
 
                     case AudioSourceType.TextToSpeech:
                         await Utils.Frontend.TextToSpeech(uri, reading, CoreConfig.AudioVolume).ConfigureAwait(false);
-                        return s_audioResponse;
+                        return s_textToSpeechAudioResponse;
 
                     default:
                         throw new ArgumentOutOfRangeException(null, "Invalid AudioSourceType");

@@ -58,7 +58,7 @@ internal static class JmdictDBManager
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
-        Dictionary<JmdictRecord, List<string>> recordToKeysDict = new(dict.Contents.Count);
+        Dictionary<JmdictRecord, List<string>> recordToKeysDict = new();
         foreach ((string key, IList<IDictRecord> records) in dict.Contents)
         {
             for (int i = 0; i < records.Count; i++)
