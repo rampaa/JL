@@ -1124,7 +1124,13 @@ internal sealed partial class PopupWindow : Window
 
         if (index != resultsCount - 1)
         {
-            _ = bottom.Children.Add(PopupWindowUtils.EntrySeparator);
+            _ = bottom.Children.Add(new Separator()
+            {
+                Height = 2,
+                Background = ConfigManager.SeparatorColor,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Center
+            });
         }
 
         StackPanel stackPanel = new()

@@ -414,7 +414,6 @@ internal static class ConfigManager
         DeconjugationInfoColor = GetFrozenBrushFromConfig(config, DeconjugationInfoColor, nameof(DeconjugationInfoColor));
 
         SeparatorColor = GetFrozenBrushFromConfig(config, SeparatorColor, nameof(SeparatorColor));
-        PopupWindowUtils.EntrySeparator.Background = SeparatorColor;
 
         DictTypeColor = GetFrozenBrushFromConfig(config, DictTypeColor, nameof(DictTypeColor));
 
