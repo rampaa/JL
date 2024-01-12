@@ -255,7 +255,7 @@ internal sealed partial class MainWindow : Window
                 continue;
             }
 
-            int endPosition = input.Length - charPosition > ConfigManager.MaxSearchLength
+            int endPosition = (input.Length - charPosition) > ConfigManager.MaxSearchLength
                 ? JapaneseUtils.FindExpressionBoundary(input[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
                 : JapaneseUtils.FindExpressionBoundary(input, charPosition);
 
@@ -1099,7 +1099,7 @@ internal sealed partial class MainWindow : Window
             double ratioX = oldResolution.Width / WindowsUtils.DpiAwareWorkAreaWidth;
             double ratioY = oldResolution.Height / WindowsUtils.DpiAwareWorkAreaHeight;
 
-            double fontScale = ratioX * ratioY > 1
+            double fontScale = (ratioX * ratioY) > 1
                 ? Math.Min(ratioX, ratioY) * 0.75
                 : Math.Max(ratioX, ratioY) / 0.75;
 
@@ -1331,7 +1331,7 @@ internal sealed partial class MainWindow : Window
         AddWordMenuItem.IsEnabled = customWordDictReady && profileCustomWordDictReady;
 
         int charIndex = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), ConfigManager.HorizontallyCenterMainWindowText);
-        ContextMenuIsOpening = charIndex >= MainTextBox.SelectionStart && charIndex <= MainTextBox.SelectionStart + MainTextBox.SelectionLength;
+        ContextMenuIsOpening = charIndex >= MainTextBox.SelectionStart && charIndex <= (MainTextBox.SelectionStart + MainTextBox.SelectionLength);
 
         PopupWindowUtils.HidePopups(FirstPopupWindow);
 
@@ -1539,14 +1539,14 @@ internal sealed partial class MainWindow : Window
     {
         //Swipe down
         if (MainTextBox.VerticalOffset is 0
-            && currentPosition.Y > _swipeStartPoint.Y + 50)
+            && currentPosition.Y > (_swipeStartPoint.Y + 50))
         {
             BacklogUtils.ShowPreviousBacklogItem();
         }
 
         //Swipe up
-        else if (MainTextBox.GetLastVisibleLineIndex() == MainTextBox.LineCount - 1
-            && currentPosition.Y < _swipeStartPoint.Y - 50)
+        else if (MainTextBox.GetLastVisibleLineIndex() == (MainTextBox.LineCount - 1)
+            && currentPosition.Y < (_swipeStartPoint.Y - 50))
         {
             BacklogUtils.ShowNextBacklogItem();
         }

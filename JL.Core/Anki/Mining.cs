@@ -173,7 +173,7 @@ public static class Mining
             {
                 _ = lineToMine.Append(CultureInfo.InvariantCulture, $"{jlField.GetDescription()}: ")
                     .Append(jlFieldContent)
-                    .Append(i < jlFields.Length - 1 ? '\t' : '\n');
+                    .Append(i < (jlFields.Length - 1) ? '\t' : '\n');
             }
         }
 

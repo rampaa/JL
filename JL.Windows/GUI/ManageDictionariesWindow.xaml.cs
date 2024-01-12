@@ -370,7 +370,7 @@ internal sealed partial class ManageDictionariesWindow : Window
             return;
         }
 
-        DictUtils.Dicts.First(d => d.Value.Priority == dict.Priority - 1).Value.Priority += 1;
+        DictUtils.Dicts.First(d => d.Value.Priority == (dict.Priority - 1)).Value.Priority += 1;
         dict.Priority -= 1;
     }
 
@@ -381,7 +381,7 @@ internal sealed partial class ManageDictionariesWindow : Window
             return;
         }
 
-        DictUtils.Dicts.First(d => d.Value.Priority == dict.Priority + 1).Value.Priority -= 1;
+        DictUtils.Dicts.First(d => d.Value.Priority == (dict.Priority + 1)).Value.Priority -= 1;
         dict.Priority += 1;
     }
 

@@ -270,7 +270,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
             return;
         }
 
-        FreqUtils.FreqDicts.First(f => f.Value.Priority == freq.Priority - 1).Value.Priority += 1;
+        FreqUtils.FreqDicts.First(f => f.Value.Priority == (freq.Priority - 1)).Value.Priority += 1;
         freq.Priority -= 1;
     }
 
@@ -281,7 +281,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
             return;
         }
 
-        FreqUtils.FreqDicts.First(f => f.Value.Priority == freq.Priority + 1).Value.Priority -= 1;
+        FreqUtils.FreqDicts.First(f => f.Value.Priority == (freq.Priority + 1)).Value.Priority -= 1;
         freq.Priority += 1;
     }
 

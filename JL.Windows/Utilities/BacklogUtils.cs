@@ -49,13 +49,13 @@ internal static class BacklogUtils
             return;
         }
 
-        if (s_currentTextIndex < Backlog.Count - 1)
+        if (s_currentTextIndex < (Backlog.Count - 1))
         {
             ++s_currentTextIndex;
             mainWindow.MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
         }
 
-        if (s_currentTextIndex == Backlog.Count - 1)
+        if (s_currentTextIndex == (Backlog.Count - 1))
         {
             mainWindow.MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
         }
@@ -84,7 +84,7 @@ internal static class BacklogUtils
             --s_currentTextIndex;
         }
 
-        mainTextBox.Foreground = s_currentTextIndex < Backlog.Count - 1
+        mainTextBox.Foreground = s_currentTextIndex < (Backlog.Count - 1)
             ? ConfigManager.MainWindowBacklogTextColor
             : ConfigManager.MainWindowTextColor;
 

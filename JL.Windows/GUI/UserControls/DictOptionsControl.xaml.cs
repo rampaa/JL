@@ -313,7 +313,6 @@ internal sealed partial class DictOptionsControl : UserControl
             showDictOptions = true;
         }
 
-        ShowPitchAccentWithDottedLines? showPitchAccentWithDottedLines = null;
         if (ShowPitchAccentWithDottedLines.ValidDictTypes.Contains(dictType))
         {
             ShowPitchAccentWithDottedLinesCheckBox.IsChecked = true;

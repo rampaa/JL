@@ -336,17 +336,14 @@ public static class LookupUtils
                     }
                 }
 
-                if (lookupResult.ReadingsOrthographyInfoList is not null)
+                string[]? readingsOrthographyInfo = lookupResult.ReadingsOrthographyInfoList?[index];
+                if (readingsOrthographyInfo is not null)
                 {
-                    string[]? readingsOrthographyInfo = lookupResult.ReadingsOrthographyInfoList[index];
-                    if (readingsOrthographyInfo is not null)
+                    for (int i = 0; i < readingsOrthographyInfo.Length; i++)
                     {
-                        for (int i = 0; i < readingsOrthographyInfo.Length; i++)
+                        if (readingsOrthographyInfo[i] is "ok" or "ik" or "rk")
                         {
-                            if (readingsOrthographyInfo[i] is "ok" or "ik" or "rk")
-                            {
-                                return 2;
-                            }
+                            return 2;
                         }
                     }
                 }

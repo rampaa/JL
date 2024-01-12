@@ -208,7 +208,7 @@ public static class JapaneseUtils
                     listSize = stringBuilders.Count;
                     for (int j = 0; j < listSize; j++)
                     {
-                        _ = stringBuilders[j].Append(j < listSize / 2 ? vowel : alternativeVowel);
+                        _ = stringBuilders[j].Append(j < (listSize / 2) ? vowel : alternativeVowel);
                     }
                 }
             }
@@ -231,7 +231,7 @@ public static class JapaneseUtils
 
         for (int i = 0; i < text.Length; i++)
         {
-            if (i + 1 < text.Length
+            if ((i + 1) < text.Length
                 && s_smallCombiningKanaSet.Contains(text[i + 1]))
             {
                 combinedForm.Add(string.Create(CultureInfo.InvariantCulture, $"{text[i]}{text[i + 1]}"));
@@ -268,7 +268,7 @@ public static class JapaneseUtils
         return endPosition;
     }
 
-    public static string FindSentence(string text, int position)
+    internal static string FindSentence(string text, int position)
     {
         int startPosition = -1;
         int endPosition = -1;
@@ -330,7 +330,7 @@ public static class JapaneseUtils
                     int numberOfLeftBrackets = sentence.Count(p => p == sentence[0]);
                     int numberOfRightBrackets = sentence.Count(p => p == rightBracket);
 
-                    if (numberOfLeftBrackets == numberOfRightBrackets + 1)
+                    if (numberOfLeftBrackets == (numberOfRightBrackets + 1))
                     {
                         sentence = sentence[1..];
                     }
@@ -350,7 +350,7 @@ public static class JapaneseUtils
                     int numberOfLeftBrackets = sentence.Count(p => p == leftBracket);
                     int numberOfRightBrackets = sentence.Count(p => p == sentence[^1]);
 
-                    if (numberOfRightBrackets == numberOfLeftBrackets + 1)
+                    if (numberOfRightBrackets == (numberOfLeftBrackets + 1))
                     {
                         sentence = sentence[..^1];
                     }

@@ -223,7 +223,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
             return;
         }
 
-        AudioUtils.AudioSources.First(f => f.Value.Priority == audioSource.Priority - 1).Value.Priority += 1;
+        AudioUtils.AudioSources.First(f => f.Value.Priority == (audioSource.Priority - 1)).Value.Priority += 1;
         audioSource.Priority -= 1;
     }
 
@@ -234,7 +234,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
             return;
         }
 
-        AudioUtils.AudioSources.First(a => a.Value.Priority == audioSource.Priority + 1).Value.Priority -= 1;
+        AudioUtils.AudioSources.First(a => a.Value.Priority == (audioSource.Priority + 1)).Value.Priority -= 1;
         audioSource.Priority += 1;
     }
 

@@ -84,7 +84,7 @@ internal static class PopupWindowUtils
                     {
                         Size charSize = WindowsUtils.MeasureTextSize(combinedFormList[j], fontSize);
 
-                        if (chosenPitchAccentDictResult.Position - 1 == j)
+                        if ((chosenPitchAccentDictResult.Position - 1) == j)
                         {
                             polyline.Points.Add(new Point(horizontalOffsetForChar, 0));
                             polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));

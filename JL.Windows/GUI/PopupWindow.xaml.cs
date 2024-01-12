@@ -161,7 +161,7 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        int endPosition = tb.Text.Length - charPosition > ConfigManager.MaxSearchLength
+        int endPosition = (tb.Text.Length - charPosition) > ConfigManager.MaxSearchLength
             ? JapaneseUtils.FindExpressionBoundary(tb.Text[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
             : JapaneseUtils.FindExpressionBoundary(tb.Text, charPosition);
 
@@ -350,8 +350,8 @@ internal sealed partial class PopupWindow : Window
         double mouseX = cursorPosition.X / WindowsUtils.Dpi.DpiScaleX;
         double mouseY = cursorPosition.Y / WindowsUtils.Dpi.DpiScaleY;
 
-        bool needsFlipX = ConfigManager.PopupFlipX && mouseX + ActualWidth > WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth;
-        bool needsFlipY = ConfigManager.PopupFlipY && mouseY + ActualHeight > WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight;
+        bool needsFlipX = ConfigManager.PopupFlipX && (mouseX + ActualWidth) > (WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth);
+        bool needsFlipY = ConfigManager.PopupFlipY && (mouseY + ActualHeight) > (WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight);
 
         double newLeft;
         double newTop;
@@ -389,17 +389,17 @@ internal sealed partial class PopupWindow : Window
         }
 
         // stick to edges if +OOB
-        if (newLeft + ActualWidth > WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth)
+        if ((newLeft + ActualWidth) > (WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth))
         {
             newLeft = WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth - ActualWidth;
         }
 
-        if (newTop + ActualHeight > WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight)
+        if ((newTop + ActualHeight) > (WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight))
         {
             newTop = WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight - ActualHeight;
         }
 
-        if (mouseX >= newLeft && mouseX <= newLeft + ActualWidth && mouseY >= newTop && mouseY <= newTop + ActualHeight)
+        if (mouseX >= newLeft && mouseX <= (newLeft + ActualWidth) && mouseY >= newTop && mouseY <= (newTop + ActualHeight))
         {
             UnavoidableMouseEnter = true;
         }
@@ -1123,9 +1123,9 @@ internal sealed partial class PopupWindow : Window
             _ = bottom.Children.Add(kanjiStatsTextBlock);
         }
 
-        if (index != resultsCount - 1)
+        if (index != (resultsCount - 1))
         {
-            _ = bottom.Children.Add(new Separator()
+            _ = bottom.Children.Add(new Separator
             {
                 Height = 2,
                 Background = ConfigManager.SeparatorColor,
@@ -1291,7 +1291,7 @@ internal sealed partial class PopupWindow : Window
 
     private void SelectNextLookupResult()
     {
-        int nextItemIndex = PopupListView.SelectedIndex + 1 < PopupListView.Items.Count
+        int nextItemIndex = (PopupListView.SelectedIndex + 1) < PopupListView.Items.Count
             ? PopupListView.SelectedIndex + 1
             : 0;
 
@@ -1302,7 +1302,7 @@ internal sealed partial class PopupWindow : Window
 
     private void SelectPreviousLookupResult()
     {
-        int nextItemIndex = PopupListView.SelectedIndex - 1 > -1
+        int nextItemIndex = (PopupListView.SelectedIndex - 1) > -1
             ? PopupListView.SelectedIndex - 1
             : PopupListView.Items.Count - 1;
 

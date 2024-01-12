@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Text;
 
 namespace JL.Core.Lookup;
-public class LookupResultUtils
+public static class LookupResultUtils
 {
     internal static string? ProcessDeconjugationProcess(List<List<string>>? processList)
     {
@@ -116,7 +116,7 @@ public class LookupResultUtils
                 }
             }
 
-            if (index != readings.Length - 1)
+            if (index != (readings.Length - 1))
             {
                 _ = sb.Append(", ");
             }
@@ -144,7 +144,7 @@ public class LookupResultUtils
                 }
             }
 
-            if (index != alternativeSpellings.Length - 1)
+            if (index != (alternativeSpellings.Length - 1))
             {
                 _ = sb.Append(", ");
             }

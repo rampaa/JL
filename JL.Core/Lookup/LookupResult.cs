@@ -13,17 +13,17 @@ public sealed class LookupResult
     public List<LookupFrequencyResult>? Frequencies { get; }
 
     // JMdict, JMnedict, KANJIDIC2
-    public int EdictId { get; }
+    internal int EdictId { get; }
 
     // Word dictionaries
-    public string DeconjugatedMatchedText { get; }
+    internal string DeconjugatedMatchedText { get; }
     public string? DeconjugationProcess { get; }
     // JMdict, Nazeka EPWING
     public string[]? AlternativeSpellings { get; }
     public string[]? PrimarySpellingOrthographyInfoList { get; }
     public string[]?[]? ReadingsOrthographyInfoList { get; }
     public string[]?[]? AlternativeSpellingsOrthographyInfoList { get; }
-    public string[]?[]? MiscList { get; }
+    internal string[]?[]? MiscList { get; }
 
     // Kanji
     public string[]? OnReadings { get; }

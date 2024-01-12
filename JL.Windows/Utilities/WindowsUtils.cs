@@ -31,7 +31,7 @@ namespace JL.Windows.Utilities;
 internal static class WindowsUtils
 {
     private static readonly Random s_random = new();
-    public static Typeface PopupFontTypeFace { get; set; } = new Typeface(ConfigManager.PopupFont.Source);
+    public static Typeface PopupFontTypeFace { get; set; } = new(ConfigManager.PopupFont.Source);
     private static DateTime s_lastAudioPlayTime = new();
     public static WaveOut? AudioPlayer { get; private set; }
 
