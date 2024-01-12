@@ -20,25 +20,25 @@ public static class FreqUtils
             "VN (Nazeka)",
             new Freq(FreqType.Nazeka, "VN (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_vns.json"),
-                true, 1, 57273, false, new FreqOptions(new UseDBOption(false)))
+                true, 1, 57273, false, new FreqOptions(new UseDBOption(false), new HigherValueMeansHigherFrequencyOption(false)))
         },
 
         {
             "Narou (Nazeka)",
             new Freq(FreqType.Nazeka, "Narou (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_narou.json"),
-                false, 2, 75588, false, new FreqOptions(new UseDBOption(false)))
+                false, 2, 75588, false, new FreqOptions(new UseDBOption(false), new HigherValueMeansHigherFrequencyOption(false)))
         },
 
         {
             "Novel (Nazeka)",
             new Freq(FreqType.Nazeka, "Novel (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_novels.json"),
-                false, 3, 114348, false, new FreqOptions(new UseDBOption(false)))
+                false, 3, 114348, false, new FreqOptions(new UseDBOption(false), new HigherValueMeansHigherFrequencyOption(false)))
         }
     };
 
-    internal static readonly FreqType[] s_freqTypesWithDBSupport = {
+    internal static readonly FreqType[] s_allFreqDicts = {
         FreqType.Nazeka,
         FreqType.Yomichan,
         FreqType.YomichanKanji

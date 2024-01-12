@@ -6,6 +6,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using Caching;
 using JL.Core;
+using JL.Core.Anki;
 using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
@@ -549,7 +550,7 @@ internal sealed partial class PopupWindow : Window
             && (pitchDictIsActive || (result.KunReadings is null && result.OnReadings is null)))
         {
             string readingsText = showROrthographyInfo && result.ReadingsOrthographyInfoList is not null
-                ? PopupWindowUtils.ReadingsToText(result.Readings, result.ReadingsOrthographyInfoList)
+                ? LookupResultUtils.ReadingsToText(result.Readings, result.ReadingsOrthographyInfoList)
                 : string.Join(", ", result.Readings);
 
             if (MiningMode)
@@ -656,7 +657,7 @@ internal sealed partial class PopupWindow : Window
         if (result.AlternativeSpellings is not null)
         {
             string alternativeSpellingsText = showAOrthographyInfo && result.AlternativeSpellingsOrthographyInfoList is not null
-                ? PopupWindowUtils.AlternativeSpellingsToText(result.AlternativeSpellings, result.AlternativeSpellingsOrthographyInfoList)
+                ? LookupResultUtils.AlternativeSpellingsToText(result.AlternativeSpellings, result.AlternativeSpellingsOrthographyInfoList)
                 : string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", result.AlternativeSpellings)})");
 
             if (MiningMode)
@@ -726,7 +727,7 @@ internal sealed partial class PopupWindow : Window
 
         if (result.Frequencies is not null)
         {
-            string? freqText = PopupWindowUtils.FrequenciesToText(result.Frequencies, false);
+            string? freqText = LookupResultUtils.FrequenciesToText(result.Frequencies, false);
 
             if (freqText is not null)
             {
@@ -1027,7 +1028,7 @@ internal sealed partial class PopupWindow : Window
             TextBlock gradeTextBlock = new()
             {
                 Name = nameof(result.KanjiGrade),
-                Text = string.Create(CultureInfo.InvariantCulture, $"Grade: {PopupWindowUtils.GradeToText(result.KanjiGrade)}"),
+                Text = string.Create(CultureInfo.InvariantCulture, $"Grade: {LookupResultUtils.GradeToText(result.KanjiGrade)}"),
                 Foreground = ConfigManager.DefinitionsColor,
                 FontSize = ConfigManager.DefinitionsFontSize,
                 Margin = new Thickness(2, 2, 2, 2),
@@ -1239,7 +1240,14 @@ internal sealed partial class PopupWindow : Window
 
         HidePopup();
 
-        await PopupWindowUtils.Mine(LastLookupResults[listViewItemIndex], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
+        if (ConfigManager.MineToFileInsteadOfAnki)
+        {
+            await Mining.MineToFile(LastLookupResults[listViewItemIndex], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
+        }
+        else
+        {
+            await Mining.Mine(LastLookupResults[listViewItemIndex], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
+        }
     }
 
     private void ShowAddNameWindow()
@@ -1621,7 +1629,14 @@ internal sealed partial class PopupWindow : Window
 
                 HidePopup();
 
-                await PopupWindowUtils.Mine(LastLookupResults[index], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
+                if (ConfigManager.MineToFileInsteadOfAnki)
+                {
+                    await Mining.MineToFile(LastLookupResults[index], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
+                }
+                else
+                {
+                    await Mining.Mine(LastLookupResults[index], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
+                }
             }
         }
 

@@ -145,6 +145,12 @@ internal sealed partial class DictOptionsControl : UserControl
             useDBOption = new UseDBOption(UseDBCheckBox.IsChecked!.Value);
         }
 
+        ShowPitchAccentWithDottedLines? showPitchAccentWithDottedLines = null;
+        if (ShowPitchAccentWithDottedLines.ValidDictTypes.Contains(type))
+        {
+            showPitchAccentWithDottedLines = new ShowPitchAccentWithDottedLines(ShowPitchAccentWithDottedLinesCheckBox.IsChecked!.Value);
+        }
+
         DictOptions options = new(
             newlineOption,
             examplesOption,
@@ -164,7 +170,8 @@ internal sealed partial class DictOptionsControl : UserControl
             loanwordEtymology,
             relatedTermOption,
             antonymOption,
-            useDBOption);
+            useDBOption,
+            showPitchAccentWithDottedLines);
 
         return options;
     }
@@ -303,6 +310,14 @@ internal sealed partial class DictOptionsControl : UserControl
         {
             UseDBCheckBox.IsChecked = false;
             UseDBCheckBox.Visibility = Visibility.Visible;
+            showDictOptions = true;
+        }
+
+        ShowPitchAccentWithDottedLines? showPitchAccentWithDottedLines = null;
+        if (ShowPitchAccentWithDottedLines.ValidDictTypes.Contains(dictType))
+        {
+            ShowPitchAccentWithDottedLinesCheckBox.IsChecked = true;
+            ShowPitchAccentWithDottedLinesCheckBox.Visibility = Visibility.Visible;
             showDictOptions = true;
         }
 
@@ -447,6 +462,13 @@ internal sealed partial class DictOptionsControl : UserControl
         {
             UseDBCheckBox.IsChecked = dict.Options?.UseDB?.Value ?? false;
             UseDBCheckBox.Visibility = Visibility.Visible;
+            showDictOptions = true;
+        }
+
+        if (ShowPitchAccentWithDottedLines.ValidDictTypes.Contains(dict.Type))
+        {
+            ShowPitchAccentWithDottedLinesCheckBox.IsChecked = dict.Options?.ShowPitchAccentWithDottedLines?.Value ?? true;
+            ShowPitchAccentWithDottedLinesCheckBox.Visibility = Visibility.Visible;
             showDictOptions = true;
         }
 

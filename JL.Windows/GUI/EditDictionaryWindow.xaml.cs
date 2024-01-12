@@ -5,6 +5,7 @@ using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
+using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Path = System.IO.Path;
@@ -84,6 +85,19 @@ internal sealed partial class EditDictionaryWindow : Window
             }
 
             DictOptions options = _dictOptionsControl.GetDictOptions(_dict.Type);
+
+            if (_dict.Type is DictType.PitchAccentYomichan)
+            {
+                bool oldDottedLinesOption = _dict.Options?.ShowPitchAccentWithDottedLines?.Value ?? true;
+                bool newDottedLinesOption = options.ShowPitchAccentWithDottedLines?.Value ?? true;
+
+                if (oldDottedLinesOption != newDottedLinesOption)
+                {
+                    PopupWindowUtils.StrokeDashArray = newDottedLinesOption
+                        ? new DoubleCollection() { 1, 1 }
+                        : new DoubleCollection() { 1, 0 };
+                }
+            }
 
             if (_dict.Options?.Examples?.Value != options.Examples?.Value)
             {

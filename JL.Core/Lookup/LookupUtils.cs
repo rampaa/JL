@@ -1,7 +1,5 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Globalization;
-using System.Text;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomNameDict;
@@ -36,13 +34,13 @@ public static class LookupUtils
 
         s_lastLookupTime = preciseTimeNow;
 
-        ConcurrentBag<LookupResult> lookupResults = new();
-
         List<Freq> dbFreqs = FreqUtils.FreqDicts.Values.Where(static f => f is { Active: true, Type: not FreqType.YomichanKanji } && (f.Options?.UseDB?.Value ?? false) && f.Ready).ToList();
 
         _ = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict);
         bool pitchDictIsActive = pitchDict?.Active ?? false;
         bool useDBForPitchDict = pitchDictIsActive && (pitchDict!.Options?.UseDB?.Value ?? false) && pitchDict.Ready;
+
+        ConcurrentBag<LookupResult> lookupResults = new();
 
         if (CoreConfig.KanjiMode)
         {
@@ -355,7 +353,20 @@ public static class LookupUtils
 
                 return 1;
             })
-            .ThenBy(static lookupResult => lookupResult.Frequencies?.Count > 0 ? lookupResult.Frequencies[0].Freq : int.MaxValue)
+            .ThenBy(static lookupResult =>
+            {
+                if (lookupResult.Frequencies?.Count > 0)
+                {
+                    LookupFrequencyResult freqResult = lookupResult.Frequencies[0];
+                    return !freqResult.HigherValueMeansHigherFrequency
+                        ? freqResult.Freq
+                        : freqResult.Freq is int.MaxValue
+                            ? int.MaxValue
+                            : int.MaxValue - freqResult.Freq;
+                }
+
+                return int.MaxValue;
+            })
             //.ThenBy(static lookupResult =>
             //{
             //    int index = lookupResult.Readings is not null
@@ -443,8 +454,6 @@ public static class LookupUtils
     private static Dictionary<string, IntermediaryResult> GetWordResults(List<string> textList,
         List<string> textInHiraganaList, List<HashSet<Form>> deconjugationResultsList, Dict dict, bool useDB, GetRecordsFromDB? getRecordsFromDB)
     {
-        Dictionary<string, IntermediaryResult> results = new();
-
         Dictionary<string, IList<IDictRecord>>? dbWordDict = null;
         Dictionary<string, IList<IDictRecord>>? dbVerbDict = null;
 
@@ -456,6 +465,7 @@ public static class LookupUtils
                     .Distinct().ToList()));
         }
 
+        Dictionary<string, IntermediaryResult> results = new();
         int succAttempt = 0;
         for (int i = 0; i < textList.Count; i++)
         {
@@ -495,13 +505,11 @@ public static class LookupUtils
 
     private static List<IDictRecord> GetValidDeconjugatedResults(Dict dict, Form deconjugationResult, IList<IDictRecord> dictResults)
     {
-        List<IDictRecord> resultsList = new();
+        string? lastTag = deconjugationResult.Tags.Count > 0
+            ? deconjugationResult.Tags[^1]
+            : null;
 
-        string lastTag = "";
-        if (deconjugationResult.Tags.Count > 0)
-        {
-            lastTag = deconjugationResult.Tags.Last();
-        }
+        List<IDictRecord> resultsList = new();
 
         switch (dict.Type)
         {
@@ -512,8 +520,7 @@ public static class LookupUtils
                     {
                         JmdictRecord dictResult = (JmdictRecord)dictResults[i];
 
-                        if (deconjugationResult.Tags.Count is 0
-                            || dictResult.WordClasses.SelectMany(static pos => pos).Contains(lastTag))
+                        if (lastTag is null || dictResult.WordClasses.SelectMany(static pos => pos).Contains(lastTag))
                         {
                             resultsList.Add(dictResult);
                         }
@@ -529,8 +536,7 @@ public static class LookupUtils
                     {
                         CustomWordRecord dictResult = (CustomWordRecord)dictResults[i];
 
-                        if (deconjugationResult.Tags.Count is 0
-                            || dictResult.WordClasses.Contains(lastTag))
+                        if (lastTag is null || dictResult.WordClasses.Contains(lastTag))
                         {
                             resultsList.Add(dictResult);
                         }
@@ -568,8 +574,7 @@ public static class LookupUtils
                     {
                         EpwingYomichanRecord dictResult = (EpwingYomichanRecord)dictResults[i];
 
-                        if (deconjugationResult.Tags.Count is 0 ||
-                            (dictResult.WordClasses?.Contains(lastTag) ?? false))
+                        if (lastTag is null || (dictResult.WordClasses?.Contains(lastTag) ?? false))
                         {
                             resultsList.Add(dictResult);
                         }
@@ -585,7 +590,7 @@ public static class LookupUtils
                                     && (jmdictWordClassResult.Readings?.Contains(dictResult.Reading ?? string.Empty)
                                         ?? string.IsNullOrEmpty(dictResult.Reading)))
                                 {
-                                    if (jmdictWordClassResult.WordClasses.Contains(lastTag))
+                                    if (lastTag is not null && jmdictWordClassResult.WordClasses.Contains(lastTag))
                                     {
                                         resultsList.Add(dictResult);
                                         break;
@@ -626,7 +631,7 @@ public static class LookupUtils
                                     && (jmdictWordClassResult.Readings?.Contains(dictResult.Reading ?? "")
                                         ?? string.IsNullOrEmpty(dictResult.Reading)))
                                 {
-                                    if (jmdictWordClassResult.WordClasses.Contains(lastTag))
+                                    if (lastTag is not null && jmdictWordClassResult.WordClasses.Contains(lastTag))
                                     {
                                         resultsList.Add(dictResult);
                                         break;
@@ -905,7 +910,7 @@ public static class LookupUtils
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         edictId: jmdictResult.Id,
                         alternativeSpellings: jmdictResult.AlternativeSpellings,
-                        deconjugationProcess: ProcessDeconjugationProcess(wordResult.Processes?[i]),
+                        deconjugationProcess: LookupResultUtils.ProcessDeconjugationProcess(wordResult.Processes?[i]),
                         frequencies: GetWordFrequencies(jmdictResult, frequencyDicts),
                         primarySpellingOrthographyInfoList: jmdictResult.PrimarySpellingOrthographyInfo,
                         readingsOrthographyInfoList: jmdictResult.ReadingsOrthographyInfo,
@@ -1094,7 +1099,7 @@ public static class LookupUtils
                         primarySpelling: epwingResult.PrimarySpelling,
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: ProcessDeconjugationProcess(wordResult.Processes?[i]),
+                        deconjugationProcess: LookupResultUtils.ProcessDeconjugationProcess(wordResult.Processes?[i]),
                         frequencies: GetWordFrequencies(epwingResult, frequencyDicts),
                         dict: wordResult.Dict,
                         readings: epwingResult.Reading is not null
@@ -1152,7 +1157,7 @@ public static class LookupUtils
                         alternativeSpellings: epwingResult.AlternativeSpellings,
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: ProcessDeconjugationProcess(wordResult.Processes?[i]),
+                        deconjugationProcess: LookupResultUtils.ProcessDeconjugationProcess(wordResult.Processes?[i]),
                         frequencies: GetWordFrequencies(epwingResult, frequencyDicts),
                         dict: wordResult.Dict,
                         readings: epwingResult.Reading is not null
@@ -1211,7 +1216,7 @@ public static class LookupUtils
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: customWordDictResult.HasUserDefinedWordClass
-                            ? ProcessDeconjugationProcess(wordResult.Processes?[i])
+                            ? LookupResultUtils.ProcessDeconjugationProcess(wordResult.Processes?[i])
                             : null,
                         dict: wordResult.Dict,
                         readings: customWordDictResult.Readings,
@@ -1256,7 +1261,7 @@ public static class LookupUtils
                         primarySpelling: customNameDictResult.PrimarySpelling,
                         matchedText: customNameResult.Value.MatchedText,
                         deconjugatedMatchedText: customNameResult.Value.DeconjugatedMatchedText,
-                        frequencies: new List<LookupFrequencyResult> { new(customNameResult.Value.Dict.Name, -freq) },
+                        frequencies: new List<LookupFrequencyResult> { new(customNameResult.Value.Dict.Name, -freq, false) },
                         dict: customNameResult.Value.Dict,
                         readings: customNameDictResult.Reading is not null
                             ? new[] { customNameDictResult.Reading }
@@ -1288,13 +1293,13 @@ public static class LookupUtils
             {
                 if (freqDictsFromDB?.TryGetValue(freq.Name, out Dictionary<string, List<FrequencyRecord>>? freqDict) ?? false)
                 {
-                    freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequencyFromDB(freqDict)));
+                    freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequencyFromDB(freqDict), freq.Options?.HigherValueMeansHigherFrequency?.Value ?? false));
                 }
             }
 
             else
             {
-                freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequency(freq)));
+                freqsList.Add(new LookupFrequencyResult(freq.Name, record.GetFrequency(freq), freq.Options?.HigherValueMeansHigherFrequency?.Value ?? false));
             }
         }
 
@@ -1325,7 +1330,7 @@ public static class LookupUtils
                 int frequency = freqResultList.FirstOrDefault().Frequency;
                 if (frequency is not 0)
                 {
-                    freqsList.Add(new LookupFrequencyResult(kanjiFreq.Name, frequency));
+                    freqsList.Add(new LookupFrequencyResult(kanjiFreq.Name, frequency, false));
                 }
             }
         }
@@ -1339,63 +1344,10 @@ public static class LookupUtils
 
         if (frequency is not 0)
         {
-            freqsList.Add(new LookupFrequencyResult("KANJIDIC2", frequency));
+            freqsList.Add(new LookupFrequencyResult("KANJIDIC2", frequency, false));
         }
 
         freqsList.AddRange(GetYomichanKanjiFrequencies(kanji));
         return freqsList;
-    }
-
-    private static string? ProcessDeconjugationProcess(List<List<string>>? processList)
-    {
-        if (processList is null)
-        {
-            return null;
-        }
-
-        StringBuilder deconjugation = new();
-        bool first = true;
-
-        for (int i = 0; i < processList.Count; i++)
-        {
-            List<string> form = processList[i];
-
-            StringBuilder formText = new();
-            int added = 0;
-
-            for (int j = form.Count - 1; j >= 0; j--)
-            {
-                string info = form[j];
-
-                if (info is "")
-                {
-                    continue;
-                }
-
-                if (info.StartsWith('(') && info.EndsWith(')') && j is not 0)
-                {
-                    continue;
-                }
-
-                if (added > 0)
-                {
-                    _ = formText.Append('→');
-                }
-
-                ++added;
-                _ = formText.Append(info);
-            }
-
-            if (formText.Length is not 0)
-            {
-                _ = first
-                    ? deconjugation.Append(CultureInfo.InvariantCulture, $"～{formText}")
-                    : deconjugation.Append(CultureInfo.InvariantCulture, $"; {formText}");
-            }
-
-            first = false;
-        }
-
-        return deconjugation.Length is 0 ? null : deconjugation.ToString();
     }
 }

@@ -20,7 +20,13 @@ internal sealed partial class FreqOptionsControl : UserControl
             useDBOption = new UseDBOption(UseDBCheckBox.IsChecked!.Value);
         }
 
-        FreqOptions options = new(useDBOption);
+        HigherValueMeansHigherFrequencyOption? higherValueMeansHigherFrequencyOption = null;
+        if (HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(type))
+        {
+            higherValueMeansHigherFrequencyOption = new HigherValueMeansHigherFrequencyOption(HigherValueMeansHigherFrequencyCheckBox.IsChecked!.Value);
+        }
+
+        FreqOptions options = new(useDBOption, higherValueMeansHigherFrequencyOption);
 
         return options;
     }
@@ -32,6 +38,13 @@ internal sealed partial class FreqOptionsControl : UserControl
         {
             UseDBCheckBox.IsChecked = false;
             UseDBCheckBox.Visibility = Visibility.Visible;
+            showFreqOptions = true;
+        }
+
+        if (HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(freqType))
+        {
+            HigherValueMeansHigherFrequencyCheckBox.IsChecked = false;
+            HigherValueMeansHigherFrequencyCheckBox.Visibility = Visibility.Visible;
             showFreqOptions = true;
         }
 
@@ -49,6 +62,13 @@ internal sealed partial class FreqOptionsControl : UserControl
         {
             UseDBCheckBox.IsChecked = freq.Options?.UseDB?.Value ?? false;
             UseDBCheckBox.Visibility = Visibility.Visible;
+            showFreqOptions = true;
+        }
+
+        if (HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(freq.Type))
+        {
+            HigherValueMeansHigherFrequencyCheckBox.IsChecked = freq.Options?.HigherValueMeansHigherFrequency?.Value ?? false;
+            HigherValueMeansHigherFrequencyCheckBox.Visibility = Visibility.Visible;
             showFreqOptions = true;
         }
 

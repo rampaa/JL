@@ -170,6 +170,7 @@ internal static class ConfigManager
     public static bool GlobalHotKeys { get; private set; } = false;
     public static bool StopIncreasingTimeStatWhenMinimized { get; private set; } = true;
     public static bool StripPunctuationBeforeCalculatingCharacterCount { get; private set; } = true;
+    public static bool MineToFileInsteadOfAnki { get; private set; } = true;
 
     #endregion
 
@@ -256,6 +257,7 @@ internal static class ConfigManager
         GlobalHotKeys = GetValueFromConfig(config, GlobalHotKeys, nameof(GlobalHotKeys), bool.TryParse);
         StopIncreasingTimeStatWhenMinimized = GetValueFromConfig(config, StopIncreasingTimeStatWhenMinimized, nameof(StopIncreasingTimeStatWhenMinimized), bool.TryParse);
         StripPunctuationBeforeCalculatingCharacterCount = GetValueFromConfig(config, StripPunctuationBeforeCalculatingCharacterCount, nameof(StripPunctuationBeforeCalculatingCharacterCount), bool.TryParse);
+        MineToFileInsteadOfAnki = GetValueFromConfig(config, MineToFileInsteadOfAnki, nameof(MineToFileInsteadOfAnki), bool.TryParse);
         CheckForJLUpdatesOnStartUp = GetValueFromConfig(config, CheckForJLUpdatesOnStartUp, nameof(CheckForJLUpdatesOnStartUp), bool.TryParse);
         AlwaysOnTop = GetValueFromConfig(config, AlwaysOnTop, nameof(AlwaysOnTop), bool.TryParse);
         mainWindow.Topmost = AlwaysOnTop;
@@ -825,6 +827,7 @@ internal static class ConfigManager
         preferenceWindow.GlobalHotKeysCheckBox.IsChecked = GlobalHotKeys;
         preferenceWindow.StopIncreasingTimeStatWhenMinimizedCheckBox.IsChecked = StopIncreasingTimeStatWhenMinimized;
         preferenceWindow.StripPunctuationBeforeCalculatingCharacterCountCheckBox.IsChecked = StripPunctuationBeforeCalculatingCharacterCount;
+        preferenceWindow.MineToFileInsteadOfAnkiCheckBox.IsChecked = MineToFileInsteadOfAnki;
         preferenceWindow.AlwaysOnTopCheckBox.IsChecked = AlwaysOnTop;
         preferenceWindow.RequireLookupKeyPressCheckBox.IsChecked = RequireLookupKeyPress;
         preferenceWindow.DisableHotkeysCheckBox.IsChecked = DisableHotkeys;
@@ -1121,6 +1124,8 @@ internal static class ConfigManager
             preferenceWindow.StopIncreasingTimeStatWhenMinimizedCheckBox.IsChecked.ToString();
         settings[nameof(StripPunctuationBeforeCalculatingCharacterCount)].Value =
             preferenceWindow.StripPunctuationBeforeCalculatingCharacterCountCheckBox.IsChecked.ToString();
+        settings[nameof(MineToFileInsteadOfAnki)].Value =
+            preferenceWindow.MineToFileInsteadOfAnkiCheckBox.IsChecked.ToString();
         settings[nameof(CheckForJLUpdatesOnStartUp)].Value =
             preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked.ToString();
 

@@ -63,7 +63,7 @@ public class LookupTests
                 (
                     matchedText: "始まる",
                     dict: DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict),
-                    frequencies: new List<LookupFrequencyResult> { new("VN (Nazeka)", 759) },
+                    frequencies: new List<LookupFrequencyResult> { new("VN (Nazeka)", 759, false) },
                     primarySpelling: "始まる",
                     deconjugatedMatchedText: "始まる",
                     readings: new[] { "はじまる" },

@@ -118,6 +118,15 @@
                                Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
+                <CheckBox Name="ShowPitchAccentWithDottedLinesCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show pitch accent with dotted lines"
+                               ToolTip="If unchecked, pitch accent will be shown with solid lines"
+                               Cursor="Help"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Left"
+                               Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
             </StackPanel>
         </ScrollViewer>
     </StackPanel>
