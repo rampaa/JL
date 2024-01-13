@@ -364,17 +364,16 @@ public static class LookupUtils
 
                 return int.MaxValue;
             })
-            //.ThenBy(static lookupResult =>
-            //{
-            //    int index = lookupResult.Readings is not null
-            //        ? Array.IndexOf(lookupResult.Readings, lookupResult.MatchedText)
-            //        : -1;
+            .ThenBy(static lookupResult =>
+            {
+                int index = lookupResult.Readings is not null
+                    ? Array.IndexOf(lookupResult.Readings, lookupResult.MatchedText)
+                    : -1;
 
-            //    return index is not -1
-            //        ? index
-            //        : int.MaxValue;
-            //})
-            //.ThenByDescending(static lookupResult => lookupResult.PrimarySpelling.Length)
+                return index is not -1
+                    ? index
+                    : int.MaxValue;
+            })
             .ToList();
     }
 

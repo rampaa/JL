@@ -109,18 +109,18 @@
                     <TextBlock Text="Show antonyms" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
-                <CheckBox Name="UseDBCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Text="Store dictionary in a DB instead of memory"
-                               ToolTip="Not recommended unless you are short on RAM. Enabling this will make lookups slower."
+                <CheckBox Name="ShowPitchAccentWithDottedLinesCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Show pitch accent with dotted lines"
+                               ToolTip="If unchecked, pitch accent will be shown with solid lines"
                                Cursor="Help"
                                TextWrapping="Wrap"
                                HorizontalAlignment="Left"
                                Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
-                <CheckBox Name="ShowPitchAccentWithDottedLinesCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Text="Show pitch accent with dotted lines"
-                               ToolTip="If unchecked, pitch accent will be shown with solid lines"
+                <CheckBox Name="UseDBCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Store dictionary in a DB instead of memory"
+                               ToolTip="Not recommended unless you are short on RAM. Enabling this will make lookups slower."
                                Cursor="Help"
                                TextWrapping="Wrap"
                                HorizontalAlignment="Left"
