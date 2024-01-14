@@ -170,7 +170,7 @@ internal static class ConfigManager
     public static bool GlobalHotKeys { get; private set; } = false;
     public static bool StopIncreasingTimeStatWhenMinimized { get; private set; } = true;
     public static bool StripPunctuationBeforeCalculatingCharacterCount { get; private set; } = true;
-    public static bool MineToFileInsteadOfAnki { get; private set; } = true;
+    public static bool MineToFileInsteadOfAnki { get; private set; } = false;
 
     #endregion
 
