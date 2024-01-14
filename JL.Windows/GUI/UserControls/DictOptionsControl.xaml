@@ -120,7 +120,8 @@
 
                 <CheckBox Name="UseDBCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Store dictionary in a DB instead of memory"
-                               ToolTip="Not recommended unless you are short on RAM. Enabling this will make lookups slower."
+                               ToolTip="Not recommended for pitch accent dictionaries, unless you are short on RAM.
+                               &#10;Enabling this will make lookups slower but will also considerably reduce the memory usage of JL"
                                Cursor="Help"
                                TextWrapping="Wrap"
                                HorizontalAlignment="Left"
