@@ -20,14 +20,14 @@ namespace JL.Core.Utilities;
 
 public static class Utils
 {
-    public static readonly Version JLVersion = new(1, 25, 0);
+    public static readonly Version JLVersion = new(1, 26, 0);
     public static readonly string ApplicationPath = AppContext.BaseDirectory;
     public static readonly string ResourcesPath = Path.Join(AppContext.BaseDirectory, "Resources");
     public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
     internal static StringPool StringPoolInstance => StringPool.Shared;
     internal static readonly Regex s_numberRegex = new(@"\d+", RegexOptions.Compiled);
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
-    public const int CacheSize = 500;
+    public const int CacheSize = 100;
 
     public static readonly LoggingLevelSwitch LoggingLevelSwitch = new() { MinimumLevel = Serilog.Events.LogEventLevel.Error };
 
