@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using JL.Core.Freqs.Options;
 
 namespace JL.Core.Freqs;
 
+[SuppressMessage("ReSharper", "MemberCanBeInternal")]
 public sealed class Freq
 {
     public FreqType Type { get; }

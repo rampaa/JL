@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
@@ -12,6 +13,7 @@ using NUnit.Framework;
 namespace JL.Core.Tests;
 
 [TestFixture]
+[SuppressMessage("Performance", "CA1861:Avoid constant arrays as arguments")]
 public class LookupTests
 {
     [OneTimeSetUp]

@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using JL.Core.Dicts.Options;
 
 namespace JL.Core.Dicts;
 
+[SuppressMessage("ReSharper", "MemberCanBeInternal")]
 public sealed class Dict
 {
     public DictType Type { get; }
