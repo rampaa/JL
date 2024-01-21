@@ -1,5 +1,6 @@
 using System.Net.WebSockets;
 using System.Text;
+using JL.Core.Statistics;
 using JL.Core.Utilities;
 
 namespace JL.Core.Network;
@@ -70,8 +71,15 @@ public static class WebSocketUtils
                     }
                     catch (WebSocketException webSocketException)
                     {
+                        if (!CoreConfig.CaptureTextFromClipboard)
+                        {
+                            StatsUtils.StatsStopWatch.Stop();
+                            StatsUtils.StopStatsTimer();
+                        }
+
                         Utils.Logger.Warning(webSocketException, "WebSocket server is closed unexpectedly");
                         Utils.Frontend.Alert(AlertLevel.Error, "WebSocket server is closed");
+
                         break;
                     }
                 }
@@ -79,6 +87,12 @@ public static class WebSocketUtils
 
             catch (WebSocketException webSocketException)
             {
+                if (!CoreConfig.CaptureTextFromClipboard)
+                {
+                    StatsUtils.StatsStopWatch.Stop();
+                    StatsUtils.StopStatsTimer();
+                }
+
                 Utils.Logger.Warning(webSocketException, "Couldn't connect to the WebSocket server, probably because it is not running");
                 Utils.Frontend.Alert(AlertLevel.Error, "Couldn't connect to the WebSocket server, probably because it is not running");
             }

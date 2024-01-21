@@ -57,7 +57,6 @@ internal static class ConfigManager
     public static bool TextBoxRemoveNewlines { get; private set; } = false;
     public static bool TextBoxIsReadOnly { get; set; } = true;
     private static bool TextBoxApplyDropShadowEffect { get; set; } = true;
-    public static bool CaptureTextFromClipboard { get; set; } = true;
     public static bool OnlyCaptureTextWithJapaneseChars { get; private set; } = true;
     public static bool DisableLookupsForNonJapaneseCharsInMainWindow { get; private set; } = false;
     public static bool MainWindowFocusOnHover { get; private set; } = false;
@@ -223,8 +222,8 @@ internal static class ConfigManager
 
         MainWindow mainWindow = MainWindow.Instance;
 
-        CaptureTextFromClipboard = GetValueFromConfig(config, CaptureTextFromClipboard, nameof(CaptureTextFromClipboard), bool.TryParse);
-        if (CaptureTextFromClipboard)
+        CoreConfig.CaptureTextFromClipboard = GetValueFromConfig(config, CoreConfig.CaptureTextFromClipboard, nameof(CoreConfig.CaptureTextFromClipboard), bool.TryParse);
+        if (CoreConfig.CaptureTextFromClipboard)
         {
             WinApi.SubscribeToClipboardChanged(mainWindow.WindowHandle);
         }
@@ -234,7 +233,7 @@ internal static class ConfigManager
         }
 
         CoreConfig.CaptureTextFromWebSocket = GetValueFromConfig(config, CoreConfig.CaptureTextFromWebSocket, nameof(CoreConfig.CaptureTextFromWebSocket), bool.TryParse);
-        if (!CoreConfig.CaptureTextFromWebSocket && !CaptureTextFromClipboard)
+        if (!CoreConfig.CaptureTextFromWebSocket && !CoreConfig.CaptureTextFromClipboard)
         {
             StatsUtils.StatsStopWatch.Stop();
             StatsUtils.StopStatsTimer();
@@ -855,7 +854,7 @@ internal static class ConfigManager
         preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked = TextBoxTrimWhiteSpaceCharacters;
         preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked = TextBoxRemoveNewlines;
         preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked = TextBoxApplyDropShadowEffect;
-        preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked = CaptureTextFromClipboard;
+        preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked = CoreConfig.CaptureTextFromClipboard;
         preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked = CoreConfig.CaptureTextFromWebSocket;
         preferenceWindow.OnlyCaptureTextWithJapaneseCharsCheckBox.IsChecked = OnlyCaptureTextWithJapaneseChars;
         preferenceWindow.DisableLookupsForNonJapaneseCharsInMainWindowCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInMainWindow;
@@ -1059,7 +1058,7 @@ internal static class ConfigManager
             preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked.ToString();
 
 
-        settings[nameof(CaptureTextFromClipboard)].Value =
+        settings[nameof(CoreConfig.CaptureTextFromClipboard)].Value =
             preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked.ToString();
         settings[nameof(CoreConfig.CaptureTextFromWebSocket)].Value =
             preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked.ToString();

@@ -83,7 +83,7 @@ internal sealed partial class MainWindow : Window
         await StatsUtils.DeserializeLifetimeStats().ConfigureAwait(true);
         await StatsUtils.DeserializeProfileLifetimeStats().ConfigureAwait(true);
 
-        if (ConfigManager.CaptureTextFromClipboard)
+        if (CoreConfig.CaptureTextFromClipboard)
         {
             s_clipboardSequenceNo = WinApi.GetClipboardSequenceNo();
             CopyFromClipboard();
@@ -675,8 +675,8 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            ConfigManager.CaptureTextFromClipboard = !ConfigManager.CaptureTextFromClipboard;
-            if (ConfigManager.CaptureTextFromClipboard)
+            CoreConfig.CaptureTextFromClipboard = !CoreConfig.CaptureTextFromClipboard;
+            if (CoreConfig.CaptureTextFromClipboard)
             {
                 WinApi.SubscribeToClipboardChanged(WindowHandle);
             }
@@ -685,12 +685,12 @@ internal sealed partial class MainWindow : Window
                 WinApi.UnsubscribeFromClipboardChanged(WindowHandle);
             }
 
-            if (!CoreConfig.CaptureTextFromWebSocket && !ConfigManager.CaptureTextFromClipboard)
+            if (!CoreConfig.CaptureTextFromWebSocket && !CoreConfig.CaptureTextFromClipboard)
             {
                 StatsUtils.StatsStopWatch.Stop();
                 StatsUtils.StopStatsTimer();
             }
-            else
+            else if (!ConfigManager.StopIncreasingTimeStatWhenMinimized || WindowState is not WindowState.Minimized)
             {
                 StatsUtils.StatsStopWatch.Start();
                 StatsUtils.StartStatsTimer();
@@ -704,12 +704,12 @@ internal sealed partial class MainWindow : Window
             CoreConfig.CaptureTextFromWebSocket = !CoreConfig.CaptureTextFromWebSocket;
             WebSocketUtils.HandleWebSocket();
 
-            if (!CoreConfig.CaptureTextFromWebSocket && !ConfigManager.CaptureTextFromClipboard)
+            if (!CoreConfig.CaptureTextFromWebSocket && !CoreConfig.CaptureTextFromClipboard)
             {
                 StatsUtils.StatsStopWatch.Stop();
                 StatsUtils.StopStatsTimer();
             }
-            else
+            else if (!ConfigManager.StopIncreasingTimeStatWhenMinimized || WindowState is not WindowState.Minimized)
             {
                 StatsUtils.StatsStopWatch.Start();
                 StatsUtils.StartStatsTimer();
@@ -721,6 +721,13 @@ internal sealed partial class MainWindow : Window
             handled = true;
 
             CoreConfig.CaptureTextFromWebSocket = true;
+
+            if (!StatsUtils.StatsStopWatch.IsRunning)
+            {
+                StatsUtils.StatsStopWatch.Start();
+                StatsUtils.StartStatsTimer();
+            }
+
             WebSocketUtils.HandleWebSocket();
         }
 
