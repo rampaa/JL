@@ -9,6 +9,7 @@ public static class WebSocketUtils
 {
     private static Task? s_webSocketTask = null;
     private static CancellationTokenSource? s_webSocketCancellationTokenSource = null;
+    public static bool Connected => !s_webSocketTask?.IsCompleted ?? false;
 
     public static void HandleWebSocket()
     {

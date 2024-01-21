@@ -720,15 +720,18 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            CoreConfig.CaptureTextFromWebSocket = true;
-
-            if (!StatsUtils.StatsStopWatch.IsRunning)
+            if (!WebSocketUtils.Connected)
             {
-                StatsUtils.StatsStopWatch.Start();
-                StatsUtils.StartStatsTimer();
-            }
+                CoreConfig.CaptureTextFromWebSocket = true;
 
-            WebSocketUtils.HandleWebSocket();
+                if (!StatsUtils.StatsStopWatch.IsRunning)
+                {
+                    StatsUtils.StatsStopWatch.Start();
+                    StatsUtils.StartStatsTimer();
+                }
+
+                WebSocketUtils.HandleWebSocket();
+            }
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.TextBoxIsReadOnlyKeyGesture))
@@ -1452,7 +1455,8 @@ internal sealed partial class MainWindow : Window
                 MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
             }
 
-            if (ConfigManager.StopIncreasingTimeStatWhenMinimized)
+            if (ConfigManager.StopIncreasingTimeStatWhenMinimized
+                && (CoreConfig.CaptureTextFromClipboard || (CoreConfig.CaptureTextFromWebSocket && WebSocketUtils.Connected)))
             {
                 StatsUtils.StatsStopWatch.Start();
             }
