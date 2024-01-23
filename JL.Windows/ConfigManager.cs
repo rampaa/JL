@@ -93,13 +93,13 @@ internal static class ConfigManager
     public static int PrimarySpellingFontSize { get; set; } = 21;
     public static Brush ReadingsColor { get; private set; } = Brushes.Goldenrod;
     public static int ReadingsFontSize { get; set; } = 19;
-    public static Brush AlternativeSpellingsColor { get; private set; } = Brushes.White;
+    public static Brush AlternativeSpellingsColor { get; private set; } = Brushes.LightYellow;
     public static int AlternativeSpellingsFontSize { get; set; } = 17;
     public static Brush DefinitionsColor { get; private set; } = Brushes.White;
     public static int DefinitionsFontSize { get; set; } = 17;
-    public static Brush FrequencyColor { get; private set; } = Brushes.White;
+    public static Brush FrequencyColor { get; private set; } = Brushes.Yellow;
     public static int FrequencyFontSize { get; set; } = 17;
-    public static Brush DeconjugationInfoColor { get; private set; } = Brushes.White;
+    public static Brush DeconjugationInfoColor { get; private set; } = Brushes.LightSteelBlue;
     public static int DeconjugationInfoFontSize { get; set; } = 17;
     public static Brush DictTypeColor { get; private set; } = Brushes.LightBlue;
     public static int DictTypeFontSize { get; set; } = 15;
