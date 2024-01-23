@@ -711,18 +711,53 @@ internal sealed partial class PopupWindow : Window
 
         if (result.DeconjugationProcess is not null)
         {
-            TextBlock deconjugationProcessTextBlock = new()
+            if (MiningMode)
             {
-                Name = nameof(result.DeconjugationProcess),
-                Text = result.DeconjugationProcess,
-                Foreground = ConfigManager.DeconjugationInfoColor,
-                FontSize = ConfigManager.DeconjugationInfoFontSize,
-                Margin = new Thickness(5, 0, 0, 0),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Top
-            };
-            _ = top.Children.Add(deconjugationProcessTextBlock);
+                TouchScreenTextBox deconjugationProcessTextBox = new()
+                {
+                    Name = nameof(result.DeconjugationProcess),
+                    Text = string.Create(CultureInfo.InvariantCulture, $"{result.MatchedText} {result.DeconjugationProcess}"),
+                    TextWrapping = TextWrapping.Wrap,
+                    Background = Brushes.Transparent,
+                    Foreground = ConfigManager.DeconjugationInfoColor,
+                    FontSize = ConfigManager.DeconjugationInfoFontSize,
+                    BorderThickness = new Thickness(0, 0, 0, 0),
+                    Margin = new Thickness(5, 0, 0, 0),
+                    Padding = new Thickness(0),
+                    IsReadOnly = true,
+                    IsUndoEnabled = false,
+                    UndoLimit = 0,
+                    Cursor = Cursors.Arrow,
+                    SelectionBrush = ConfigManager.HighlightColor,
+                    IsInactiveSelectionHighlightEnabled = true,
+                    ContextMenu = PopupContextMenu,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Top
+                };
+
+                deconjugationProcessTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
+                deconjugationProcessTextBox.MouseMove += TextBox_MouseMove;
+                deconjugationProcessTextBox.LostFocus += Unselect;
+                deconjugationProcessTextBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
+                deconjugationProcessTextBox.MouseLeave += OnMouseLeave;
+                deconjugationProcessTextBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
+                _ = top.Children.Add(deconjugationProcessTextBox);
+            }
+            else
+            {
+                TextBlock deconjugationProcessTextBlock = new()
+                {
+                    Name = nameof(result.DeconjugationProcess),
+                    Text = string.Create(CultureInfo.InvariantCulture, $"{result.MatchedText} {result.DeconjugationProcess}"),
+                    Foreground = ConfigManager.DeconjugationInfoColor,
+                    FontSize = ConfigManager.DeconjugationInfoFontSize,
+                    Margin = new Thickness(5, 0, 0, 0),
+                    TextWrapping = TextWrapping.Wrap,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Top
+                };
+                _ = top.Children.Add(deconjugationProcessTextBlock);
+            }
         }
 
         if (result.Frequencies is not null)
