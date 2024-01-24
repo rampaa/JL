@@ -483,6 +483,16 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
+    private void AddEventHandlersToTextBox(TextBox textBox)
+    {
+        textBox.PreviewMouseUp += TextBox_PreviewMouseUp;
+        textBox.MouseMove += TextBox_MouseMove;
+        textBox.LostFocus += Unselect;
+        textBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
+        textBox.MouseLeave += OnMouseLeave;
+        textBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
+    }
+
     public StackPanel PrepareResultStackPanel(LookupResult result, int index, int resultsCount, Dict? pitchDict, bool pitchDictIsActive, bool showPOrthographyInfo, bool showROrthographyInfo, bool showAOrthographyInfo, double pOrthographyInfoFontSize)
     {
         // top
@@ -579,12 +589,7 @@ internal sealed partial class PopupWindow : Window
                     _ = top.Children.Add(readingTextBox);
                 }
 
-                readingTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
-                readingTextBox.MouseMove += TextBox_MouseMove;
-                readingTextBox.LostFocus += Unselect;
-                readingTextBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
-                readingTextBox.MouseLeave += OnMouseLeave;
-                readingTextBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
+                AddEventHandlersToTextBox(readingTextBox);
             }
 
             else
@@ -642,12 +647,8 @@ internal sealed partial class PopupWindow : Window
                     VerticalAlignment.Center,
                     new Thickness(5, 0, 0, 0));
 
-                alternativeSpellingsTexBox.PreviewMouseUp += TextBox_PreviewMouseUp;
-                alternativeSpellingsTexBox.MouseMove += TextBox_MouseMove;
-                alternativeSpellingsTexBox.LostFocus += Unselect;
-                alternativeSpellingsTexBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
-                alternativeSpellingsTexBox.MouseLeave += OnMouseLeave;
-                alternativeSpellingsTexBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
+                AddEventHandlersToTextBox(alternativeSpellingsTexBox);
+
                 _ = top.Children.Add(alternativeSpellingsTexBox);
             }
             else
@@ -676,12 +677,8 @@ internal sealed partial class PopupWindow : Window
                     VerticalAlignment.Top,
                     new Thickness(5, 0, 0, 0));
 
-                deconjugationProcessTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
-                deconjugationProcessTextBox.MouseMove += TextBox_MouseMove;
-                deconjugationProcessTextBox.LostFocus += Unselect;
-                deconjugationProcessTextBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
-                deconjugationProcessTextBox.MouseLeave += OnMouseLeave;
-                deconjugationProcessTextBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
+                AddEventHandlersToTextBox(deconjugationProcessTextBox);
+
                 _ = top.Children.Add(deconjugationProcessTextBox);
             }
             else
@@ -740,12 +737,8 @@ internal sealed partial class PopupWindow : Window
                     VerticalAlignment.Center,
                     new Thickness(2));
 
-                definitionsTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
-                definitionsTextBox.MouseMove += TextBox_MouseMove;
-                definitionsTextBox.LostFocus += Unselect;
-                definitionsTextBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
-                definitionsTextBox.MouseLeave += OnMouseLeave;
-                definitionsTextBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
+                AddEventHandlersToTextBox(definitionsTextBox);
+
                 _ = bottom.Children.Add(definitionsTextBox);
             }
 
@@ -776,12 +769,8 @@ internal sealed partial class PopupWindow : Window
                     VerticalAlignment.Center,
                     new Thickness(2));
 
-                onReadingsTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
-                onReadingsTextBox.MouseMove += TextBox_MouseMove;
-                onReadingsTextBox.LostFocus += Unselect;
-                onReadingsTextBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
-                onReadingsTextBox.MouseLeave += OnMouseLeave;
-                onReadingsTextBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
+                AddEventHandlersToTextBox(onReadingsTextBox);
+
                 _ = bottom.Children.Add(onReadingsTextBox);
             }
 
@@ -811,12 +800,8 @@ internal sealed partial class PopupWindow : Window
                     VerticalAlignment.Center,
                     new Thickness(2));
 
-                kunReadingsTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
-                kunReadingsTextBox.MouseMove += TextBox_MouseMove;
-                kunReadingsTextBox.LostFocus += Unselect;
-                kunReadingsTextBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
-                kunReadingsTextBox.MouseLeave += OnMouseLeave;
-                kunReadingsTextBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
+                AddEventHandlersToTextBox(kunReadingsTextBox);
+
                 _ = bottom.Children.Add(kunReadingsTextBox);
             }
 
@@ -846,12 +831,8 @@ internal sealed partial class PopupWindow : Window
                     VerticalAlignment.Center,
                     new Thickness(2));
 
-                nanoriReadingsTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
-                nanoriReadingsTextBox.MouseMove += TextBox_MouseMove;
-                nanoriReadingsTextBox.LostFocus += Unselect;
-                nanoriReadingsTextBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
-                nanoriReadingsTextBox.MouseLeave += OnMouseLeave;
-                nanoriReadingsTextBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
+                AddEventHandlersToTextBox(nanoriReadingsTextBox);
+
                 _ = bottom.Children.Add(nanoriReadingsTextBox);
             }
 
@@ -881,12 +862,8 @@ internal sealed partial class PopupWindow : Window
                     VerticalAlignment.Center,
                     new Thickness(2));
 
-                radicalNameTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
-                radicalNameTextBox.MouseMove += TextBox_MouseMove;
-                radicalNameTextBox.LostFocus += Unselect;
-                radicalNameTextBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
-                radicalNameTextBox.MouseLeave += OnMouseLeave;
-                radicalNameTextBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
+                AddEventHandlersToTextBox(radicalNameTextBox);
+
                 _ = bottom.Children.Add(radicalNameTextBox);
             }
 
@@ -940,12 +917,8 @@ internal sealed partial class PopupWindow : Window
                     VerticalAlignment.Center,
                     new Thickness(2));
 
-                compositionTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
-                compositionTextBox.MouseMove += TextBox_MouseMove;
-                compositionTextBox.LostFocus += Unselect;
-                compositionTextBox.PreviewMouseRightButtonUp += TextBox_PreviewMouseRightButtonUp;
-                compositionTextBox.MouseLeave += OnMouseLeave;
-                compositionTextBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
+                AddEventHandlersToTextBox(compositionTextBox);
+
                 _ = bottom.Children.Add(compositionTextBox);
             }
 
