@@ -774,7 +774,7 @@ internal sealed partial class PopupWindow : Window
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(2, 0, 0, 0));
+                    new Thickness(2));
 
                 onReadingsTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
                 onReadingsTextBox.MouseMove += TextBox_MouseMove;
@@ -793,7 +793,7 @@ internal sealed partial class PopupWindow : Window
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(2, 0, 0, 0));
+                    new Thickness(2));
 
                 _ = bottom.Children.Add(onReadingsTextBlock);
             }
@@ -809,7 +809,7 @@ internal sealed partial class PopupWindow : Window
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(2, 0, 0, 0));
+                    new Thickness(2));
 
                 kunReadingsTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
                 kunReadingsTextBox.MouseMove += TextBox_MouseMove;
@@ -828,7 +828,7 @@ internal sealed partial class PopupWindow : Window
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(2, 0, 0, 0));
+                    new Thickness(2));
 
                 _ = bottom.Children.Add(kunReadingsTextBlock);
             }
@@ -844,7 +844,7 @@ internal sealed partial class PopupWindow : Window
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(2, 0, 0, 0));
+                    new Thickness(2));
 
                 nanoriReadingsTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
                 nanoriReadingsTextBox.MouseMove += TextBox_MouseMove;
@@ -863,7 +863,7 @@ internal sealed partial class PopupWindow : Window
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(2, 0, 0, 0));
+                    new Thickness(2));
 
                 _ = bottom.Children.Add(nanoriReadingsTextBlock);
             }
@@ -879,7 +879,7 @@ internal sealed partial class PopupWindow : Window
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(2, 0, 0, 0));
+                    new Thickness(2));
 
                 radicalNameTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
                 radicalNameTextBox.MouseMove += TextBox_MouseMove;
@@ -898,7 +898,7 @@ internal sealed partial class PopupWindow : Window
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(2, 0, 0, 0));
+                    new Thickness(2));
 
                 _ = bottom.Children.Add(radicalNameTextBlock);
             }
