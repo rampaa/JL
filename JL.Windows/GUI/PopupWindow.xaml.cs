@@ -487,21 +487,14 @@ internal sealed partial class PopupWindow : Window
         // top
         WrapPanel top = new() { Tag = index };
 
-        TextBlock primarySpellingTextBlock = new()
-        {
-            Name = nameof(result.PrimarySpelling),
-            Text = result.PrimarySpelling,
-            Foreground = ConfigManager.PrimarySpellingColor,
-            Background = Brushes.Transparent,
-            FontSize = ConfigManager.PrimarySpellingFontSize,
-            TextWrapping = TextWrapping.Wrap,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            VerticalAlignment = VerticalAlignment.Center,
-            Margin = new Thickness(5, 0, 0, 0),
-            Padding = new Thickness(0),
-            Cursor = Cursors.Arrow,
-            ContextMenu = PopupContextMenu
-        };
+        TextBlock primarySpellingTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.PrimarySpelling),
+            result.PrimarySpelling,
+            ConfigManager.PrimarySpellingColor,
+            ConfigManager.PrimarySpellingFontSize,
+            PopupContextMenu,
+            VerticalAlignment.Center,
+            new Thickness(5, 0, 0, 0));
+
         primarySpellingTextBlock.PreviewMouseUp += PrimarySpelling_PreviewMouseUp; // for mining
 
         if (result.Readings is null && pitchDictIsActive)
@@ -532,17 +525,14 @@ internal sealed partial class PopupWindow : Window
 
         if (showPOrthographyInfo && result.PrimarySpellingOrthographyInfoList is not null)
         {
-            TextBlock textBlockPOrthographyInfo = new()
-            {
-                Name = nameof(result.PrimarySpellingOrthographyInfoList),
-                Text = string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", result.PrimarySpellingOrthographyInfoList)})"),
-                Foreground = DictOptionManager.POrthographyInfoColor,
-                FontSize = result.Dict.Options?.POrthographyInfoFontSize?.Value ?? 15,
-                Margin = new Thickness(5, 0, 0, 0),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
-            };
+            TextBlock textBlockPOrthographyInfo = PopupWindowUtils.CreateTextBlock(nameof(result.PrimarySpellingOrthographyInfoList),
+                string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", result.PrimarySpellingOrthographyInfoList)})"),
+                DictOptionManager.POrthographyInfoColor,
+                result.Dict.Options?.POrthographyInfoFontSize?.Value ?? 15,
+                PopupContextMenu,
+                VerticalAlignment.Center,
+                new Thickness(5, 0, 0, 0));
+
             _ = top.Children.Add(textBlockPOrthographyInfo);
         }
 
@@ -555,27 +545,12 @@ internal sealed partial class PopupWindow : Window
 
             if (MiningMode)
             {
-                TouchScreenTextBox readingTextBox = new()
-                {
-                    Name = nameof(result.Readings),
-                    Text = readingsText,
-                    TextWrapping = TextWrapping.Wrap,
-                    Background = Brushes.Transparent,
-                    Foreground = ConfigManager.ReadingsColor,
-                    FontSize = ConfigManager.ReadingsFontSize,
-                    BorderThickness = new Thickness(0, 0, 0, 0),
-                    Margin = new Thickness(5, 0, 0, 0),
-                    Padding = new Thickness(0),
-                    IsReadOnly = true,
-                    IsUndoEnabled = false,
-                    UndoLimit = 0,
-                    Cursor = Cursors.Arrow,
-                    SelectionBrush = ConfigManager.HighlightColor,
-                    IsInactiveSelectionHighlightEnabled = true,
-                    ContextMenu = PopupContextMenu,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                TouchScreenTextBox readingTextBox = PopupWindowUtils.CreateTextBox(nameof(result.Readings),
+                    readingsText, ConfigManager.ReadingsColor,
+                    ConfigManager.ReadingsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(5, 0, 0, 0));
 
                 if (pitchDictIsActive)
                 {
@@ -613,17 +588,13 @@ internal sealed partial class PopupWindow : Window
 
             else
             {
-                TextBlock readingTextBlock = new()
-                {
-                    Name = nameof(result.Readings),
-                    Text = readingsText,
-                    TextWrapping = TextWrapping.Wrap,
-                    Foreground = ConfigManager.ReadingsColor,
-                    FontSize = ConfigManager.ReadingsFontSize,
-                    Margin = new Thickness(5, 0, 0, 0),
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                TextBlock readingTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.Readings),
+                    readingsText,
+                    ConfigManager.ReadingsColor,
+                    ConfigManager.ReadingsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(5, 0, 0, 0));
 
                 if (pitchDictIsActive)
                 {
@@ -662,27 +633,13 @@ internal sealed partial class PopupWindow : Window
 
             if (MiningMode)
             {
-                TouchScreenTextBox alternativeSpellingsTexBox = new()
-                {
-                    Name = nameof(result.AlternativeSpellings),
-                    Text = alternativeSpellingsText,
-                    TextWrapping = TextWrapping.Wrap,
-                    Background = Brushes.Transparent,
-                    Foreground = ConfigManager.AlternativeSpellingsColor,
-                    FontSize = ConfigManager.AlternativeSpellingsFontSize,
-                    BorderThickness = new Thickness(0, 0, 0, 0),
-                    Margin = new Thickness(5, 0, 0, 0),
-                    Padding = new Thickness(0),
-                    IsReadOnly = true,
-                    IsUndoEnabled = false,
-                    UndoLimit = 0,
-                    Cursor = Cursors.Arrow,
-                    SelectionBrush = ConfigManager.HighlightColor,
-                    IsInactiveSelectionHighlightEnabled = true,
-                    ContextMenu = PopupContextMenu,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                TouchScreenTextBox alternativeSpellingsTexBox = PopupWindowUtils.CreateTextBox(nameof(result.AlternativeSpellings),
+                    alternativeSpellingsText,
+                    ConfigManager.AlternativeSpellingsColor,
+                    ConfigManager.AlternativeSpellingsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(5, 0, 0, 0));
 
                 alternativeSpellingsTexBox.PreviewMouseUp += TextBox_PreviewMouseUp;
                 alternativeSpellingsTexBox.MouseMove += TextBox_MouseMove;
@@ -694,17 +651,14 @@ internal sealed partial class PopupWindow : Window
             }
             else
             {
-                TextBlock alternativeSpellingsTexBlock = new()
-                {
-                    Name = nameof(result.AlternativeSpellings),
-                    Text = alternativeSpellingsText,
-                    TextWrapping = TextWrapping.Wrap,
-                    Foreground = ConfigManager.AlternativeSpellingsColor,
-                    FontSize = ConfigManager.AlternativeSpellingsFontSize,
-                    Margin = new Thickness(5, 0, 0, 0),
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                TextBlock alternativeSpellingsTexBlock = PopupWindowUtils.CreateTextBlock(nameof(result.AlternativeSpellings),
+                    alternativeSpellingsText,
+                    ConfigManager.AlternativeSpellingsColor,
+                    ConfigManager.AlternativeSpellingsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(5, 0, 0, 0));
+
                 _ = top.Children.Add(alternativeSpellingsTexBlock);
             }
         }
@@ -713,27 +667,13 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TouchScreenTextBox deconjugationProcessTextBox = new()
-                {
-                    Name = nameof(result.DeconjugationProcess),
-                    Text = string.Create(CultureInfo.InvariantCulture, $"{result.MatchedText} {result.DeconjugationProcess}"),
-                    TextWrapping = TextWrapping.Wrap,
-                    Background = Brushes.Transparent,
-                    Foreground = ConfigManager.DeconjugationInfoColor,
-                    FontSize = ConfigManager.DeconjugationInfoFontSize,
-                    BorderThickness = new Thickness(0, 0, 0, 0),
-                    Margin = new Thickness(5, 0, 0, 0),
-                    Padding = new Thickness(0),
-                    IsReadOnly = true,
-                    IsUndoEnabled = false,
-                    UndoLimit = 0,
-                    Cursor = Cursors.Arrow,
-                    SelectionBrush = ConfigManager.HighlightColor,
-                    IsInactiveSelectionHighlightEnabled = true,
-                    ContextMenu = PopupContextMenu,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Top
-                };
+                TouchScreenTextBox deconjugationProcessTextBox = PopupWindowUtils.CreateTextBox(nameof(result.DeconjugationProcess),
+                    string.Create(CultureInfo.InvariantCulture, $"{result.MatchedText} {result.DeconjugationProcess}"),
+                    ConfigManager.DeconjugationInfoColor,
+                    ConfigManager.DeconjugationInfoFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Top,
+                    new Thickness(5, 0, 0, 0));
 
                 deconjugationProcessTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
                 deconjugationProcessTextBox.MouseMove += TextBox_MouseMove;
@@ -745,17 +685,14 @@ internal sealed partial class PopupWindow : Window
             }
             else
             {
-                TextBlock deconjugationProcessTextBlock = new()
-                {
-                    Name = nameof(result.DeconjugationProcess),
-                    Text = string.Create(CultureInfo.InvariantCulture, $"{result.MatchedText} {result.DeconjugationProcess}"),
-                    Foreground = ConfigManager.DeconjugationInfoColor,
-                    FontSize = ConfigManager.DeconjugationInfoFontSize,
-                    Margin = new Thickness(5, 0, 0, 0),
-                    TextWrapping = TextWrapping.Wrap,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Top
-                };
+                TextBlock deconjugationProcessTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.DeconjugationProcess),
+                    string.Create(CultureInfo.InvariantCulture, $"{result.MatchedText} {result.DeconjugationProcess}"),
+                    ConfigManager.DeconjugationInfoColor,
+                    ConfigManager.DeconjugationInfoFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Top,
+                    new Thickness(5, 0, 0, 0));
+
                 _ = top.Children.Add(deconjugationProcessTextBlock);
             }
         }
@@ -763,35 +700,28 @@ internal sealed partial class PopupWindow : Window
         if (result.Frequencies is not null)
         {
             string? freqText = LookupResultUtils.FrequenciesToText(result.Frequencies, false);
-
             if (freqText is not null)
             {
-                TextBlock frequencyTextBlock = new()
-                {
-                    Name = nameof(result.Frequencies),
-                    Text = freqText,
-                    Foreground = ConfigManager.FrequencyColor,
-                    FontSize = ConfigManager.FrequencyFontSize,
-                    Margin = new Thickness(5, 0, 0, 0),
-                    TextWrapping = TextWrapping.Wrap,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Top
-                };
+                TextBlock frequencyTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.Frequencies),
+                    freqText,
+                    ConfigManager.FrequencyColor,
+                    ConfigManager.FrequencyFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Top,
+                    new Thickness(5, 0, 0, 0));
+
                 _ = top.Children.Add(frequencyTextBlock);
             }
         }
 
-        TextBlock dictTypeTextBlock = new()
-        {
-            Name = nameof(result.Dict.Name),
-            Text = result.Dict.Name,
-            Foreground = ConfigManager.DictTypeColor,
-            FontSize = ConfigManager.DictTypeFontSize,
-            Margin = new Thickness(5, 0, 0, 0),
-            TextWrapping = TextWrapping.Wrap,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            VerticalAlignment = VerticalAlignment.Top
-        };
+        TextBlock dictTypeTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.Dict.Name),
+            result.Dict.Name,
+            ConfigManager.DictTypeColor,
+            ConfigManager.DictTypeFontSize,
+            PopupContextMenu,
+            VerticalAlignment.Top,
+            new Thickness(5, 0, 0, 0));
+
         _ = top.Children.Add(dictTypeTextBlock);
 
         // bottom
@@ -801,27 +731,13 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TouchScreenTextBox definitionsTextBox = new()
-                {
-                    Name = nameof(result.FormattedDefinitions),
-                    Text = result.FormattedDefinitions,
-                    TextWrapping = TextWrapping.Wrap,
-                    Background = Brushes.Transparent,
-                    Foreground = ConfigManager.DefinitionsColor,
-                    FontSize = ConfigManager.DefinitionsFontSize,
-                    BorderThickness = new Thickness(0, 0, 0, 0),
-                    Margin = new Thickness(2, 2, 2, 2),
-                    Padding = new Thickness(0),
-                    IsReadOnly = true,
-                    IsUndoEnabled = false,
-                    UndoLimit = 0,
-                    Cursor = Cursors.Arrow,
-                    SelectionBrush = ConfigManager.HighlightColor,
-                    IsInactiveSelectionHighlightEnabled = true,
-                    ContextMenu = PopupContextMenu,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                TouchScreenTextBox definitionsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.FormattedDefinitions),
+                    result.FormattedDefinitions,
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2));
 
                 definitionsTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
                 definitionsTextBox.MouseMove += TextBox_MouseMove;
@@ -834,17 +750,14 @@ internal sealed partial class PopupWindow : Window
 
             else
             {
-                TextBlock definitionsTextBlock = new()
-                {
-                    Name = nameof(result.FormattedDefinitions),
-                    Text = result.FormattedDefinitions,
-                    TextWrapping = TextWrapping.Wrap,
-                    Foreground = ConfigManager.DefinitionsColor,
-                    FontSize = ConfigManager.DefinitionsFontSize,
-                    Margin = new Thickness(2, 2, 2, 2),
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                TextBlock definitionsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.FormattedDefinitions),
+                    result.FormattedDefinitions,
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2));
+
                 _ = bottom.Children.Add(definitionsTextBlock);
             }
         }
@@ -854,27 +767,13 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TouchScreenTextBox onReadingsTextBox = new()
-                {
-                    Name = nameof(result.OnReadings),
-                    Text = string.Create(CultureInfo.InvariantCulture, $"On: {string.Join(", ", result.OnReadings)}"),
-                    Foreground = ConfigManager.ReadingsColor,
-                    FontSize = ConfigManager.ReadingsFontSize,
-                    Margin = new Thickness(2, 0, 0, 0),
-                    TextWrapping = TextWrapping.Wrap,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Background = Brushes.Transparent,
-                    BorderThickness = new Thickness(0, 0, 0, 0),
-                    Padding = new Thickness(0),
-                    IsReadOnly = true,
-                    IsUndoEnabled = false,
-                    UndoLimit = 0,
-                    Cursor = Cursors.Arrow,
-                    SelectionBrush = ConfigManager.HighlightColor,
-                    IsInactiveSelectionHighlightEnabled = true,
-                    ContextMenu = PopupContextMenu
-                };
+                TouchScreenTextBox onReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.OnReadings),
+                    string.Create(CultureInfo.InvariantCulture, $"On: {string.Join(", ", result.OnReadings)}"),
+                    ConfigManager.ReadingsColor,
+                    ConfigManager.ReadingsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2, 0, 0, 0));
 
                 onReadingsTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
                 onReadingsTextBox.MouseMove += TextBox_MouseMove;
@@ -887,17 +786,14 @@ internal sealed partial class PopupWindow : Window
 
             else
             {
-                TextBlock onReadingsTextBlock = new()
-                {
-                    Name = nameof(result.OnReadings),
-                    Text = string.Create(CultureInfo.InvariantCulture, $"On: {string.Join(", ", result.OnReadings)}"),
-                    Foreground = ConfigManager.ReadingsColor,
-                    FontSize = ConfigManager.ReadingsFontSize,
-                    Margin = new Thickness(2, 0, 0, 0),
-                    TextWrapping = TextWrapping.Wrap,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                TextBlock onReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.OnReadings),
+                    string.Create(CultureInfo.InvariantCulture, $"On: {string.Join(", ", result.OnReadings)}"),
+                    ConfigManager.ReadingsColor,
+                    ConfigManager.ReadingsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2, 0, 0, 0));
+
                 _ = bottom.Children.Add(onReadingsTextBlock);
             }
         }
@@ -906,27 +802,13 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TouchScreenTextBox kunReadingsTextBox = new()
-                {
-                    Name = nameof(result.KunReadings),
-                    Text = string.Create(CultureInfo.InvariantCulture, $"Kun: {string.Join(", ", result.KunReadings)}"),
-                    Foreground = ConfigManager.ReadingsColor,
-                    FontSize = ConfigManager.ReadingsFontSize,
-                    Margin = new Thickness(2, 0, 0, 0),
-                    TextWrapping = TextWrapping.Wrap,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Background = Brushes.Transparent,
-                    BorderThickness = new Thickness(0, 0, 0, 0),
-                    Padding = new Thickness(0),
-                    IsReadOnly = true,
-                    IsUndoEnabled = false,
-                    UndoLimit = 0,
-                    Cursor = Cursors.Arrow,
-                    SelectionBrush = ConfigManager.HighlightColor,
-                    IsInactiveSelectionHighlightEnabled = true,
-                    ContextMenu = PopupContextMenu
-                };
+                TouchScreenTextBox kunReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.KunReadings),
+                    string.Create(CultureInfo.InvariantCulture, $"Kun: {string.Join(", ", result.KunReadings)}"),
+                    ConfigManager.ReadingsColor,
+                    ConfigManager.ReadingsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2, 0, 0, 0));
 
                 kunReadingsTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
                 kunReadingsTextBox.MouseMove += TextBox_MouseMove;
@@ -939,17 +821,14 @@ internal sealed partial class PopupWindow : Window
 
             else
             {
-                TextBlock kunReadingsTextBlock = new()
-                {
-                    Name = nameof(result.KunReadings),
-                    Text = string.Create(CultureInfo.InvariantCulture, $"Kun: {string.Join(", ", result.KunReadings)}"),
-                    Foreground = ConfigManager.ReadingsColor,
-                    FontSize = ConfigManager.ReadingsFontSize,
-                    Margin = new Thickness(2, 0, 0, 0),
-                    TextWrapping = TextWrapping.Wrap,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                TextBlock kunReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KunReadings),
+                    string.Create(CultureInfo.InvariantCulture, $"Kun: {string.Join(", ", result.KunReadings)}"),
+                    ConfigManager.ReadingsColor,
+                    ConfigManager.ReadingsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2, 0, 0, 0));
+
                 _ = bottom.Children.Add(kunReadingsTextBlock);
             }
         }
@@ -958,27 +837,13 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TouchScreenTextBox nanoriReadingsTextBox = new()
-                {
-                    Name = nameof(result.NanoriReadings),
-                    Text = string.Create(CultureInfo.InvariantCulture, $"Nanori: {string.Join(", ", result.NanoriReadings)}"),
-                    Foreground = ConfigManager.ReadingsColor,
-                    FontSize = ConfigManager.ReadingsFontSize,
-                    Margin = new Thickness(2, 0, 0, 0),
-                    TextWrapping = TextWrapping.Wrap,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Background = Brushes.Transparent,
-                    BorderThickness = new Thickness(0, 0, 0, 0),
-                    Padding = new Thickness(0),
-                    IsReadOnly = true,
-                    IsUndoEnabled = false,
-                    UndoLimit = 0,
-                    Cursor = Cursors.Arrow,
-                    SelectionBrush = ConfigManager.HighlightColor,
-                    IsInactiveSelectionHighlightEnabled = true,
-                    ContextMenu = PopupContextMenu
-                };
+                TouchScreenTextBox nanoriReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.NanoriReadings),
+                    string.Create(CultureInfo.InvariantCulture, $"Nanori: {string.Join(", ", result.NanoriReadings)}"),
+                    ConfigManager.ReadingsColor,
+                    ConfigManager.ReadingsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2, 0, 0, 0));
 
                 nanoriReadingsTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
                 nanoriReadingsTextBox.MouseMove += TextBox_MouseMove;
@@ -991,17 +856,14 @@ internal sealed partial class PopupWindow : Window
 
             else
             {
-                TextBlock nanoriReadingsTextBlock = new()
-                {
-                    Name = nameof(result.NanoriReadings),
-                    Text = string.Create(CultureInfo.InvariantCulture, $"Nanori: {string.Join(", ", result.NanoriReadings)}"),
-                    Foreground = ConfigManager.ReadingsColor,
-                    FontSize = ConfigManager.ReadingsFontSize,
-                    Margin = new Thickness(2, 0, 0, 0),
-                    TextWrapping = TextWrapping.Wrap,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                TextBlock nanoriReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.NanoriReadings),
+                    string.Create(CultureInfo.InvariantCulture, $"Nanori: {string.Join(", ", result.NanoriReadings)}"),
+                    ConfigManager.ReadingsColor,
+                    ConfigManager.ReadingsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2, 0, 0, 0));
+
                 _ = bottom.Children.Add(nanoriReadingsTextBlock);
             }
         }
@@ -1010,27 +872,13 @@ internal sealed partial class PopupWindow : Window
         {
             if (MiningMode)
             {
-                TouchScreenTextBox radicalNameTextBox = new()
-                {
-                    Name = nameof(result.RadicalNames),
-                    Text = string.Create(CultureInfo.InvariantCulture, $"Radical names: {string.Join(", ", result.RadicalNames)}"),
-                    Foreground = ConfigManager.ReadingsColor,
-                    FontSize = ConfigManager.ReadingsFontSize,
-                    Margin = new Thickness(2, 0, 0, 0),
-                    TextWrapping = TextWrapping.Wrap,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Background = Brushes.Transparent,
-                    BorderThickness = new Thickness(0, 0, 0, 0),
-                    Padding = new Thickness(0),
-                    IsReadOnly = true,
-                    IsUndoEnabled = false,
-                    UndoLimit = 0,
-                    Cursor = Cursors.Arrow,
-                    SelectionBrush = ConfigManager.HighlightColor,
-                    IsInactiveSelectionHighlightEnabled = true,
-                    ContextMenu = PopupContextMenu
-                };
+                TouchScreenTextBox radicalNameTextBox = PopupWindowUtils.CreateTextBox(nameof(result.RadicalNames),
+                    string.Create(CultureInfo.InvariantCulture, $"Radical names: {string.Join(", ", result.RadicalNames)}"),
+                    ConfigManager.ReadingsColor,
+                    ConfigManager.ReadingsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2, 0, 0, 0));
 
                 radicalNameTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
                 radicalNameTextBox.MouseMove += TextBox_MouseMove;
@@ -1043,78 +891,53 @@ internal sealed partial class PopupWindow : Window
 
             else
             {
-                TextBlock radicalNameTextBlock = new()
-                {
-                    Name = nameof(result.NanoriReadings),
-                    Text = string.Create(CultureInfo.InvariantCulture, $"Radical names: {string.Join(", ", result.RadicalNames)}"),
-                    Foreground = ConfigManager.ReadingsColor,
-                    FontSize = ConfigManager.ReadingsFontSize,
-                    Margin = new Thickness(2, 0, 0, 0),
-                    TextWrapping = TextWrapping.Wrap,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                TextBlock radicalNameTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.RadicalNames),
+                    string.Create(CultureInfo.InvariantCulture, $"Radical names: {string.Join(", ", result.RadicalNames)}"),
+                    ConfigManager.ReadingsColor,
+                    ConfigManager.ReadingsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2, 0, 0, 0));
+
                 _ = bottom.Children.Add(radicalNameTextBlock);
             }
         }
 
         if (result.KanjiGrade > -1)
         {
-            TextBlock gradeTextBlock = new()
-            {
-                Name = nameof(result.KanjiGrade),
-                Text = string.Create(CultureInfo.InvariantCulture, $"Grade: {LookupResultUtils.GradeToText(result.KanjiGrade)}"),
-                Foreground = ConfigManager.DefinitionsColor,
-                FontSize = ConfigManager.DefinitionsFontSize,
-                Margin = new Thickness(2, 2, 2, 2),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
-            };
+            TextBlock gradeTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiGrade),
+                    string.Create(CultureInfo.InvariantCulture, $"Grade: {LookupResultUtils.GradeToText(result.KanjiGrade)}"),
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2));
+
             _ = bottom.Children.Add(gradeTextBlock);
         }
 
         if (result.StrokeCount > 0)
         {
-            TextBlock strokeCountTextBlock = new()
-            {
-                Name = nameof(result.StrokeCount),
-                Text = string.Create(CultureInfo.InvariantCulture, $"Stroke count: {result.StrokeCount}"),
-                Foreground = ConfigManager.DefinitionsColor,
-                FontSize = ConfigManager.DefinitionsFontSize,
-                Margin = new Thickness(2, 2, 2, 2),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            _ = bottom.Children.Add(strokeCountTextBlock);
+            TextBlock strokeCountTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.StrokeCount),
+                    string.Create(CultureInfo.InvariantCulture, $"Stroke count: {result.StrokeCount}"),
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2));
         }
 
         if (result.KanjiComposition is not null)
         {
             if (MiningMode)
             {
-                TouchScreenTextBox compositionTextBox = new()
-                {
-                    Name = nameof(result.KanjiComposition),
-                    Text = string.Create(CultureInfo.InvariantCulture, $"Composition: {result.KanjiComposition}"),
-                    Foreground = ConfigManager.DefinitionsColor,
-                    FontSize = ConfigManager.DefinitionsFontSize,
-                    Margin = new Thickness(2, 2, 2, 2),
-                    TextWrapping = TextWrapping.Wrap,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Background = Brushes.Transparent,
-                    BorderThickness = new Thickness(0, 0, 0, 0),
-                    Padding = new Thickness(0),
-                    IsReadOnly = true,
-                    IsUndoEnabled = false,
-                    UndoLimit = 0,
-                    Cursor = Cursors.Arrow,
-                    SelectionBrush = ConfigManager.HighlightColor,
-                    IsInactiveSelectionHighlightEnabled = true,
-                    ContextMenu = PopupContextMenu
-                };
+                TouchScreenTextBox compositionTextBox = PopupWindowUtils.CreateTextBox(nameof(result.KanjiComposition),
+                    string.Create(CultureInfo.InvariantCulture, $"Composition: {result.KanjiComposition}"),
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2));
 
                 compositionTextBox.PreviewMouseUp += TextBox_PreviewMouseUp;
                 compositionTextBox.MouseMove += TextBox_MouseMove;
@@ -1127,34 +950,28 @@ internal sealed partial class PopupWindow : Window
 
             else
             {
-                TextBlock compositionTextBlock = new()
-                {
-                    Name = nameof(result.KanjiComposition),
-                    Text = string.Create(CultureInfo.InvariantCulture, $"Composition: {result.KanjiComposition}"),
-                    Foreground = ConfigManager.DefinitionsColor,
-                    FontSize = ConfigManager.DefinitionsFontSize,
-                    Margin = new Thickness(2, 2, 2, 2),
-                    TextWrapping = TextWrapping.Wrap,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                TextBlock compositionTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiComposition),
+                    string.Create(CultureInfo.InvariantCulture, $"Composition: {result.KanjiComposition}"),
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2));
+
                 _ = bottom.Children.Add(compositionTextBlock);
             }
         }
 
         if (result.KanjiStats is not null)
         {
-            TextBlock kanjiStatsTextBlock = new()
-            {
-                Name = nameof(result.KanjiStats),
-                Text = string.Create(CultureInfo.InvariantCulture, $"Statistics:\n{result.KanjiStats}"),
-                Foreground = ConfigManager.DefinitionsColor,
-                FontSize = ConfigManager.DefinitionsFontSize,
-                Margin = new Thickness(2, 2, 2, 2),
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
-            };
+            TextBlock kanjiStatsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiStats),
+                    string.Create(CultureInfo.InvariantCulture, $"Statistics:\n{result.KanjiStats}"),
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2));
+
             _ = bottom.Children.Add(kanjiStatsTextBlock);
         }
 

@@ -2,18 +2,64 @@ using System.Globalization;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using JL.Core.Dicts;
 using JL.Core.Dicts.PitchAccent;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
+using JL.Windows.GUI.UserControls;
 
 namespace JL.Windows.Utilities;
 
 internal static class PopupWindowUtils
 {
     public static DoubleCollection StrokeDashArray { get; set; } = new() { 1, 1 };
+
+    public static TextBlock CreateTextBlock(string name, string text, Brush foregroundBrush, double fontSize, ContextMenu contextMenu, VerticalAlignment verticalAlignment, Thickness margin)
+    {
+        return new TextBlock()
+        {
+            Name = name,
+            Text = text,
+            Foreground = foregroundBrush,
+            FontSize = fontSize,
+            ContextMenu = contextMenu,
+            VerticalAlignment = verticalAlignment,
+            Margin = margin,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            Background = Brushes.Transparent,
+            Cursor = Cursors.Arrow,
+            TextWrapping = TextWrapping.Wrap,
+            Padding = new Thickness(0)
+        };
+    }
+
+    public static TouchScreenTextBox CreateTextBox(string name, string text, Brush foregroundBrush, double fontSize, ContextMenu contextMenu, VerticalAlignment verticalAlignment, Thickness margin)
+    {
+        return new TouchScreenTextBox()
+        {
+            Name = name,
+            Text = text,
+            Foreground = foregroundBrush,
+            FontSize = fontSize,
+            ContextMenu = contextMenu,
+            VerticalAlignment = verticalAlignment,
+            Margin = margin,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            Background = Brushes.Transparent,
+            Cursor = Cursors.Arrow,
+            SelectionBrush = ConfigManager.HighlightColor,
+            IsInactiveSelectionHighlightEnabled = true,
+            TextWrapping = TextWrapping.Wrap,
+            IsReadOnly = true,
+            IsUndoEnabled = false,
+            UndoLimit = 0,
+            BorderThickness = new Thickness(0),
+            Padding = new Thickness(0)
+        };
+    }
 
     public static Grid CreatePitchAccentGrid(string primarySpelling, string[]? alternativeSpellings,
         string[]? readings, string[] splitReadingsWithRInfo, double leftMargin, Dict dict, Dictionary<string, IList<IDictRecord>>? pitchRecordDict)
