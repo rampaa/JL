@@ -451,6 +451,7 @@ internal sealed partial class PopupWindow : Window
             bool showPOrthographyInfo = jmdict.Options?.POrthographyInfo?.Value ?? true;
             bool showROrthographyInfo = jmdict.Options?.ROrthographyInfo?.Value ?? true;
             bool showAOrthographyInfo = jmdict.Options?.AOrthographyInfo?.Value ?? true;
+            double pOrthographyInfoFontSize = jmdict.Options?.POrthographyInfoFontSize?.Value ?? 15;
 
             int resultCount = generateAllResults
                 ? LastLookupResults.Count
@@ -467,7 +468,7 @@ internal sealed partial class PopupWindow : Window
                     DictsWithResults.Add(lookupResult.Dict);
                 }
 
-                popupItemSource[i] = PrepareResultStackPanel(lookupResult, i, resultCount, pitchDict, pitchDictIsActive, showPOrthographyInfo, showROrthographyInfo, showAOrthographyInfo);
+                popupItemSource[i] = PrepareResultStackPanel(lookupResult, i, resultCount, pitchDict, pitchDictIsActive, showPOrthographyInfo, showROrthographyInfo, showAOrthographyInfo, pOrthographyInfoFontSize);
             }
 
             PopupListView.ItemsSource = popupItemSource;
@@ -482,7 +483,7 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
-    public StackPanel PrepareResultStackPanel(LookupResult result, int index, int resultsCount, Dict? pitchDict, bool pitchDictIsActive, bool showPOrthographyInfo, bool showROrthographyInfo, bool showAOrthographyInfo)
+    public StackPanel PrepareResultStackPanel(LookupResult result, int index, int resultsCount, Dict? pitchDict, bool pitchDictIsActive, bool showPOrthographyInfo, bool showROrthographyInfo, bool showAOrthographyInfo, double pOrthographyInfoFontSize)
     {
         // top
         WrapPanel top = new() { Tag = index };
@@ -528,7 +529,7 @@ internal sealed partial class PopupWindow : Window
             TextBlock textBlockPOrthographyInfo = PopupWindowUtils.CreateTextBlock(nameof(result.PrimarySpellingOrthographyInfoList),
                 string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", result.PrimarySpellingOrthographyInfoList)})"),
                 DictOptionManager.POrthographyInfoColor,
-                result.Dict.Options?.POrthographyInfoFontSize?.Value ?? 15,
+                pOrthographyInfoFontSize,
                 PopupContextMenu,
                 VerticalAlignment.Center,
                 new Thickness(5, 0, 0, 0));

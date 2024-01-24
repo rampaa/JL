@@ -277,6 +277,7 @@ internal sealed partial class MainWindow : Window
                     bool pOrthographyInfo = jmdict.Options?.POrthographyInfo?.Value ?? true;
                     bool rOrthographyInfo = jmdict.Options?.ROrthographyInfo?.Value ?? true;
                     bool aOrthographyInfo = jmdict.Options?.AOrthographyInfo?.Value ?? true;
+                    double pOrthographyInfoFontSize = jmdict.Options?.POrthographyInfoFontSize?.Value ?? 15;
 
                     int resultCount = Math.Min(lookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
                     StackPanel[] popupItemSource = new StackPanel[resultCount];
@@ -289,7 +290,7 @@ internal sealed partial class MainWindow : Window
                             FirstPopupWindow.DictsWithResults.Add(lookupResult.Dict);
                         }
 
-                        popupItemSource[i] = FirstPopupWindow.PrepareResultStackPanel(lookupResult, i, lookupResults.Count, pitchDict, pitchDictIsActive, pOrthographyInfo, rOrthographyInfo, aOrthographyInfo);
+                        popupItemSource[i] = FirstPopupWindow.PrepareResultStackPanel(lookupResult, i, lookupResults.Count, pitchDict, pitchDictIsActive, pOrthographyInfo, rOrthographyInfo, aOrthographyInfo, pOrthographyInfoFontSize);
                     }
 
                     PopupWindow.StackPanelCache.AddReplace(text, popupItemSource);
