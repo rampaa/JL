@@ -53,8 +53,6 @@ internal static class ConfigManager
     public static bool TextOnlyVisibleOnHover { get; set; } = false;
     public static bool ChangeMainWindowBackgroundOpacityOnUnhover { get; private set; } = false;
     public static double MainWindowBackgroundOpacityOnUnhover { get; private set; } = 0.2; // 0.2-100
-    public static bool TextBoxTrimWhiteSpaceCharacters { get; private set; } = true;
-    public static bool TextBoxRemoveNewlines { get; private set; } = false;
     public static bool TextBoxIsReadOnly { get; set; } = true;
     private static bool TextBoxApplyDropShadowEffect { get; set; } = true;
     public static bool OnlyCaptureTextWithJapaneseChars { get; private set; } = true;
@@ -284,8 +282,8 @@ internal static class ConfigManager
         FixedPopupPositioning = GetValueFromConfig(config, FixedPopupPositioning, nameof(FixedPopupPositioning), bool.TryParse);
         ChangeMainWindowBackgroundOpacityOnUnhover = GetValueFromConfig(config, ChangeMainWindowBackgroundOpacityOnUnhover, nameof(ChangeMainWindowBackgroundOpacityOnUnhover), bool.TryParse);
         TextOnlyVisibleOnHover = GetValueFromConfig(config, TextOnlyVisibleOnHover, nameof(TextOnlyVisibleOnHover), bool.TryParse);
-        TextBoxTrimWhiteSpaceCharacters = GetValueFromConfig(config, TextBoxTrimWhiteSpaceCharacters, nameof(TextBoxTrimWhiteSpaceCharacters), bool.TryParse);
-        TextBoxRemoveNewlines = GetValueFromConfig(config, TextBoxRemoveNewlines, nameof(TextBoxRemoveNewlines), bool.TryParse);
+        CoreConfig.TextBoxTrimWhiteSpaceCharacters = GetValueFromConfig(config, CoreConfig.TextBoxTrimWhiteSpaceCharacters, nameof(CoreConfig.TextBoxTrimWhiteSpaceCharacters), bool.TryParse);
+        CoreConfig.TextBoxRemoveNewlines = GetValueFromConfig(config, CoreConfig.TextBoxRemoveNewlines, nameof(CoreConfig.TextBoxRemoveNewlines), bool.TryParse);
         OnlyCaptureTextWithJapaneseChars = GetValueFromConfig(config, OnlyCaptureTextWithJapaneseChars, nameof(OnlyCaptureTextWithJapaneseChars), bool.TryParse);
         DisableLookupsForNonJapaneseCharsInMainWindow = GetValueFromConfig(config, DisableLookupsForNonJapaneseCharsInMainWindow, nameof(DisableLookupsForNonJapaneseCharsInMainWindow), bool.TryParse);
         MainWindowFocusOnHover = GetValueFromConfig(config, MainWindowFocusOnHover, nameof(MainWindowFocusOnHover), bool.TryParse);
@@ -851,8 +849,8 @@ internal static class ConfigManager
 
         preferenceWindow.TextBoxIsReadOnlyCheckBox.IsChecked = TextBoxIsReadOnly;
         preferenceWindow.AlwaysShowMainTextBoxCaretCheckBox.IsChecked = AlwaysShowMainTextBoxCaret;
-        preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked = TextBoxTrimWhiteSpaceCharacters;
-        preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked = TextBoxRemoveNewlines;
+        preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked = CoreConfig.TextBoxTrimWhiteSpaceCharacters;
+        preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked = CoreConfig.TextBoxRemoveNewlines;
         preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked = TextBoxApplyDropShadowEffect;
         preferenceWindow.CaptureTextFromClipboardCheckBox.IsChecked = CoreConfig.CaptureTextFromClipboard;
         preferenceWindow.CaptureTextFromWebSocketCheckBox.IsChecked = CoreConfig.CaptureTextFromWebSocket;
@@ -1050,9 +1048,9 @@ internal static class ConfigManager
             preferenceWindow.TextBoxIsReadOnlyCheckBox.IsChecked.ToString();
         settings[nameof(AlwaysShowMainTextBoxCaret)].Value =
             preferenceWindow.AlwaysShowMainTextBoxCaretCheckBox.IsChecked.ToString();
-        settings[nameof(TextBoxTrimWhiteSpaceCharacters)].Value =
+        settings[nameof(CoreConfig.TextBoxTrimWhiteSpaceCharacters)].Value =
             preferenceWindow.TextBoxTrimWhiteSpaceCharactersCheckBox.IsChecked.ToString();
-        settings[nameof(TextBoxRemoveNewlines)].Value =
+        settings[nameof(CoreConfig.TextBoxRemoveNewlines)].Value =
             preferenceWindow.TextBoxRemoveNewlinesCheckBox.IsChecked.ToString();
         settings[nameof(TextBoxApplyDropShadowEffect)].Value =
             preferenceWindow.TextBoxApplyDropShadowEffectCheckBox.IsChecked.ToString();

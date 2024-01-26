@@ -113,7 +113,7 @@ internal sealed partial class MainWindow : Window
                 gotTextFromClipboard = true;
                 if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || JapaneseUtils.JapaneseRegex.IsMatch(text))
                 {
-                    text = SanitizeText(text);
+                    text = TextUtils.SanitizeText(text);
 
                     if (WindowState is not WindowState.Minimized)
                     {
@@ -138,7 +138,7 @@ internal sealed partial class MainWindow : Window
     {
         if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || JapaneseUtils.JapaneseRegex.IsMatch(text))
         {
-            text = SanitizeText(text);
+            text = TextUtils.SanitizeText(text);
 
             Dispatcher.Invoke(() =>
             {
@@ -151,21 +151,6 @@ internal sealed partial class MainWindow : Window
 
             HandlePostCopy(text);
         }
-    }
-
-    private static string SanitizeText(string text)
-    {
-        if (ConfigManager.TextBoxTrimWhiteSpaceCharacters)
-        {
-            text = text.Trim();
-        }
-
-        if (ConfigManager.TextBoxRemoveNewlines)
-        {
-            text = text.ReplaceLineEndings("");
-        }
-
-        return text;
     }
 
     private void HandlePostCopy(string text)

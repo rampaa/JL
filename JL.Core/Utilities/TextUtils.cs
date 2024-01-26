@@ -1,0 +1,93 @@
+using System.Text;
+
+namespace JL.Core.Utilities;
+public class TextUtils
+{
+    private static int FirstInvalidUnicodeSequenceIndex(string text)
+    {
+        for (int i = 0; i < text.Length; i++)
+        {
+            char c = text[i];
+
+            if (c < '\ud800')
+            {
+                continue;
+            }
+            else if (c is '\uFFFE' || char.IsLowSurrogate(c))
+            {
+                return i;
+            }
+            else if (char.IsHighSurrogate(c))
+            {
+                if (i + 1 >= text.Length || !char.IsLowSurrogate(text[i + 1]))
+                {
+                    return i;
+                }
+                else
+                {
+                    ++i;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    private static string RemoveInvalidUnicodeSequences(string text, int index)
+    {
+        StringBuilder sb = new(text[..index], text.Length - 1);
+
+        for (int i = index + 1; i < text.Length; i++)
+        {
+            char c = text[i];
+
+            if (c < '\ud800')
+            {
+                _ = sb.Append(c);
+            }
+            else if (c is '\uFFFE' || char.IsLowSurrogate(c))
+            {
+                continue;
+            }
+            else if (char.IsHighSurrogate(c))
+            {
+                if (i + 1 >= text.Length || !char.IsLowSurrogate(text[i + 1]))
+                {
+                    continue;
+                }
+                else
+                {
+                    _ = sb.Append(c).Append(text[i + 1]);
+                    ++i;
+                }
+            }
+            else
+            {
+                _ = sb.Append(c);
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    public static string SanitizeText(string text)
+    {
+        int firstInvalidUnicodeCharIndex = FirstInvalidUnicodeSequenceIndex(text);
+        if (firstInvalidUnicodeCharIndex is not -1)
+        {
+            text = RemoveInvalidUnicodeSequences(text, firstInvalidUnicodeCharIndex);
+        }
+
+        if (CoreConfig.TextBoxTrimWhiteSpaceCharacters)
+        {
+            text = text.Trim();
+        }
+
+        if (CoreConfig.TextBoxRemoveNewlines)
+        {
+            text = text.ReplaceLineEndings("");
+        }
+
+        return text;
+    }
+}
