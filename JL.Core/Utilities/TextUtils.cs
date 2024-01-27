@@ -1,7 +1,7 @@
 using System.Text;
 
 namespace JL.Core.Utilities;
-public class TextUtils
+public static class TextUtils
 {
     private static int FirstInvalidUnicodeSequenceIndex(string text)
     {
@@ -9,22 +9,20 @@ public class TextUtils
         {
             char c = text[i];
 
-            if (c < '\ud800')
+            if (c >= '\ud800')
             {
-                continue;
-            }
-            else if (c is '\uFFFE' || char.IsLowSurrogate(c))
-            {
-                return i;
-            }
-            else if (char.IsHighSurrogate(c))
-            {
-                if (i + 1 >= text.Length || !char.IsLowSurrogate(text[i + 1]))
+                if (c is '\uFFFE' || char.IsLowSurrogate(c))
                 {
                     return i;
                 }
-                else
+
+                if (char.IsHighSurrogate(c))
                 {
+                    if ((i + 1) >= text.Length || !char.IsLowSurrogate(text[i + 1]))
+                    {
+                        return i;
+                    }
+
                     ++i;
                 }
             }
@@ -45,25 +43,22 @@ public class TextUtils
             {
                 _ = sb.Append(c);
             }
-            else if (c is '\uFFFE' || char.IsLowSurrogate(c))
+
+            else if (c is not '\uFFFE' && !char.IsLowSurrogate(c))
             {
-                continue;
-            }
-            else if (char.IsHighSurrogate(c))
-            {
-                if (i + 1 >= text.Length || !char.IsLowSurrogate(text[i + 1]))
+                if (char.IsHighSurrogate(c))
                 {
-                    continue;
+                    if ((i + 1) < text.Length && char.IsLowSurrogate(text[i + 1]))
+                    {
+                        _ = sb.Append(c).Append(text[i + 1]);
+                        ++i;
+                    }
                 }
+
                 else
                 {
-                    _ = sb.Append(c).Append(text[i + 1]);
-                    ++i;
+                    _ = sb.Append(c);
                 }
-            }
-            else
-            {
-                _ = sb.Append(c);
             }
         }
 

@@ -19,7 +19,7 @@ internal static class PopupWindowUtils
 
     public static TextBlock CreateTextBlock(string name, string text, Brush foregroundBrush, double fontSize, ContextMenu contextMenu, VerticalAlignment verticalAlignment, Thickness margin)
     {
-        return new TextBlock()
+        return new TextBlock
         {
             Name = name,
             Text = text,
@@ -38,7 +38,7 @@ internal static class PopupWindowUtils
 
     public static TouchScreenTextBox CreateTextBox(string name, string text, Brush foregroundBrush, double fontSize, ContextMenu contextMenu, VerticalAlignment verticalAlignment, Thickness margin)
     {
-        return new TouchScreenTextBox()
+        return new TouchScreenTextBox
         {
             Name = name,
             Text = text,

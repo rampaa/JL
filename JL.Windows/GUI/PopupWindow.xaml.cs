@@ -903,6 +903,8 @@ internal sealed partial class PopupWindow : Window
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
+
+            _ = bottom.Children.Add(strokeCountTextBlock);
         }
 
         if (result.KanjiComposition is not null)

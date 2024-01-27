@@ -164,6 +164,9 @@ internal static class JmdictWordClassUtils
             }
         }
 
-        await Load().ConfigureAwait(false);
+        if (DictUtils.WordClassDictionary.Count is 0)
+        {
+            await Load().ConfigureAwait(false);
+        }
     }
 }
