@@ -44,7 +44,7 @@ public static class TextUtils
                 _ = sb.Append(c);
             }
 
-            else if (c is '\uFFFD' or '\uFFFE' or '\uFFFF' && !char.IsLowSurrogate(c))
+            else if (c is not '\uFFFD' and not '\uFFFE' and not '\uFFFF' && !char.IsLowSurrogate(c))
             {
                 if (char.IsHighSurrogate(c))
                 {
