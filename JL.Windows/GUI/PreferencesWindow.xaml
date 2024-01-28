@@ -825,7 +825,7 @@
                                                         Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
                                                     Refresh
                                                 </Button>
-                                                <TextBlock HorizontalAlignment="Center" Text="Model:"
+                                                <TextBlock HorizontalAlignment="Center" Text="Note Type:"
                                                            Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <ComboBox x:Name="WordMiningSetupComboBoxModelNames" Width="300" Margin="0,10,0,0" />
 
@@ -863,7 +863,7 @@
                                                         Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
                                                     Refresh
                                                 </Button>
-                                                <TextBlock HorizontalAlignment="Center" Text="Model:"
+                                                <TextBlock HorizontalAlignment="Center" Text="Note Type:"
                                                            Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <ComboBox x:Name="KanjiMiningSetupComboBoxModelNames" Width="300" Margin="0,10,0,0" />
 
@@ -901,7 +901,7 @@
                                                         Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
                                                     Refresh
                                                 </Button>
-                                                <TextBlock HorizontalAlignment="Center" Text="Model:"
+                                                <TextBlock HorizontalAlignment="Center" Text="Note Type:"
                                                            Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <ComboBox x:Name="NameMiningSetupComboBoxModelNames" Width="300" Margin="0,10,0,0" />
 
@@ -939,7 +939,7 @@
                                                         Margin="0,10,25,0" HorizontalAlignment="Right" FontSize="16" Height="35">
                                                     Refresh
                                                 </Button>
-                                                <TextBlock HorizontalAlignment="Center" Text="Model:"
+                                                <TextBlock HorizontalAlignment="Center" Text="Note Type:"
                                                            Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" />
                                                 <ComboBox x:Name="OtherMiningSetupComboBoxModelNames" Width="300" Margin="0,10,0,0" />
 
