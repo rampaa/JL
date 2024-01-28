@@ -85,7 +85,7 @@ internal sealed partial class AddNameWindow : Window
 
             string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
             string line = string.Create(CultureInfo.InvariantCulture, $"{spelling}\t{reading}\t{nameType}\t{extraInfo}\n");
-            await File.AppendAllTextAsync(path, line, Encoding.UTF8).ConfigureAwait(false);
+            await File.AppendAllTextAsync(path, line).ConfigureAwait(false);
         }
     }
 

@@ -9,7 +9,7 @@ public static class TextUtils
         {
             char c = text[i];
 
-            if (c >= '\ud800')
+            if (c >= '\uD800')
             {
                 if (c is '\uFFFE' || char.IsLowSurrogate(c))
                 {
@@ -39,7 +39,7 @@ public static class TextUtils
         {
             char c = text[i];
 
-            if (c < '\ud800')
+            if (c < '\uD800')
             {
                 _ = sb.Append(c);
             }
