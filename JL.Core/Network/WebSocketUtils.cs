@@ -10,11 +10,7 @@ public static class WebSocketUtils
     private static Task? s_webSocketTask = null;
     private static CancellationTokenSource? s_webSocketCancellationTokenSource = null;
 
-    private static readonly Encoding s_utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: false)
-    {
-        EncoderFallback = new EncoderReplacementFallback("\uFFFE"),
-        DecoderFallback = new DecoderReplacementFallback("\uFFFE")
-    };
+    private static readonly Encoding s_utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: false);
 
     public static bool Connected => !s_webSocketTask?.IsCompleted ?? false;
 

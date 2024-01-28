@@ -11,7 +11,7 @@ public static class TextUtils
 
             if (c >= '\uD800')
             {
-                if (c is '\uFFFE' || char.IsLowSurrogate(c))
+                if (c is '\uFFFD' or '\uFFFE' or '\uFFFF' || char.IsLowSurrogate(c))
                 {
                     return i;
                 }
@@ -44,7 +44,7 @@ public static class TextUtils
                 _ = sb.Append(c);
             }
 
-            else if (c is not '\uFFFE' && !char.IsLowSurrogate(c))
+            else if (c is '\uFFFD' or '\uFFFE' or '\uFFFF' && !char.IsLowSurrogate(c))
             {
                 if (char.IsHighSurrogate(c))
                 {
