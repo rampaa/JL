@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace JL.Core.Anki;
+namespace JL.Core.Mining.Anki;
 
 public static class AnkiUtils
 {

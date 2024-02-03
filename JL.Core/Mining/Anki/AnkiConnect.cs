@@ -3,7 +3,7 @@ using System.Text.Json;
 using JL.Core.Network;
 using JL.Core.Utilities;
 
-namespace JL.Core.Anki;
+namespace JL.Core.Mining.Anki;
 
 internal static class AnkiConnect
 {

@@ -6,10 +6,10 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using Caching;
 using JL.Core;
-using JL.Core.Anki;
 using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
+using JL.Core.Mining;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
 using JL.Windows.SpeechSynthesis;
@@ -1070,11 +1070,11 @@ internal sealed partial class PopupWindow : Window
 
         if (ConfigManager.MineToFileInsteadOfAnki)
         {
-            await Mining.MineToFile(LastLookupResults[listViewItemIndex], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
+            await MiningUtils.MineToFile(LastLookupResults[listViewItemIndex], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
         }
         else
         {
-            await Mining.Mine(LastLookupResults[listViewItemIndex], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
+            await MiningUtils.Mine(LastLookupResults[listViewItemIndex], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
         }
     }
 
@@ -1459,11 +1459,11 @@ internal sealed partial class PopupWindow : Window
 
                 if (ConfigManager.MineToFileInsteadOfAnki)
                 {
-                    await Mining.MineToFile(LastLookupResults[index], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
+                    await MiningUtils.MineToFile(LastLookupResults[index], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
                 }
                 else
                 {
-                    await Mining.Mine(LastLookupResults[index], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
+                    await MiningUtils.Mine(LastLookupResults[index], _currentText, selectedDefinitions, _currentCharPosition).ConfigureAwait(false);
                 }
             }
         }

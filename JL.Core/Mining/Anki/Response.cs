@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace JL.Core.Anki;
+namespace JL.Core.Mining.Anki;
 
 internal sealed class Response
 {

@@ -1,4 +1,4 @@
-namespace JL.Core.Anki;
+namespace JL.Core.Mining;
 
 public static class JLFieldUtils
 {

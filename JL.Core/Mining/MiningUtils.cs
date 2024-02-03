@@ -3,13 +3,14 @@ using System.Text;
 using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
+using JL.Core.Mining.Anki;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 
-namespace JL.Core.Anki;
+namespace JL.Core.Mining;
 
-public static class Mining
+public static class MiningUtils
 {
     private static Dictionary<JLField, string> GetMiningParameters(LookupResult lookupResult, string currentText, string? selectedDefinitions, int currentCharPosition, bool replaceLineBreakWithBrTag)
     {
@@ -177,7 +178,7 @@ public static class Mining
             }
         }
 
-        await File.AppendAllTextAsync(filePath, lineToMine.ToString(), Encoding.UTF8).ConfigureAwait(false);
+        await File.AppendAllTextAsync(filePath, lineToMine.ToString()).ConfigureAwait(false);
 
         Stats.IncrementStat(StatType.CardsMined);
 

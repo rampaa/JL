@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using JL.Core.Utilities;
 
-namespace JL.Core.Anki;
+namespace JL.Core.Mining.Anki;
 
 public sealed class AnkiConfig
 {

@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace JL.Core.Anki;
+namespace JL.Core.Mining;
 
 public enum JLField
 {
