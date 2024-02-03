@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using JL.Core.Audio;
 using JL.Core.Dicts;
+using JL.Core.Dicts.PitchAccent;
 using JL.Core.Lookup;
 using JL.Core.Mining.Anki;
 using JL.Core.Network;
@@ -131,7 +132,94 @@ public static class MiningUtils
             miningParams[JLField.RadicalNames] = string.Join(", ", lookupResult.RadicalNames);
         }
 
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict))
+        {
+            if (pitchDict.Active)
+            {
+                List<KeyValuePair<string, int>>? pitchAccents = GetPitchAccents(lookupResult.PitchAccentDict ?? pitchDict.Contents, lookupResult);
+                if (pitchAccents is not null)
+                {
+                    StringBuilder numericPitchAccentBuilder = new();
+                    for (int i = 0; i < pitchAccents.Count; i++)
+                    {
+                        KeyValuePair<string, int> pitchAccent = pitchAccents[i];
+                        _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{pitchAccent.Key}: {pitchAccent.Value}, ");
+                    }
+
+                    _ = numericPitchAccentBuilder.Remove(numericPitchAccentBuilder.Length - 2, 2);
+                    miningParams[JLField.NumericPitchAccents] = numericPitchAccentBuilder.ToString();
+                }
+            }
+        }
+
         return miningParams;
+    }
+
+    private static List<KeyValuePair<string, int>>? GetPitchAccents(Dictionary<string, IList<IDictRecord>> pitchDict, LookupResult lookupResult)
+    {
+        List<KeyValuePair<string, int>> pitchAccents = new();
+
+        if (lookupResult.Readings is not null)
+        {
+            for (int i = 0; i < lookupResult.Readings.Length; i++)
+            {
+                string reading = lookupResult.Readings[i];
+                string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading);
+
+                if (pitchDict.TryGetValue(readingInHiragana, out IList<IDictRecord>? pitchResult))
+                {
+                    foreach (IDictRecord dictRecord in pitchResult)
+                    {
+                        PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)dictRecord;
+                        if (lookupResult.PrimarySpelling == pitchAccentRecord.Spelling
+                            || (lookupResult.AlternativeSpellings?.Contains(pitchAccentRecord.Spelling) ?? false))
+                        {
+                            pitchAccents.Add(KeyValuePair.Create(reading, pitchAccentRecord.Position));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        else
+        {
+            string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(lookupResult.PrimarySpelling);
+            if (pitchDict.TryGetValue(primarySpellingInHiragana, out IList<IDictRecord>? pitchResult))
+            {
+                foreach (IDictRecord dictRecord in pitchResult)
+                {
+                    PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)dictRecord;
+                    if (pitchAccentRecord.Reading is null)
+                    {
+                        pitchAccents.Add(KeyValuePair.Create(lookupResult.PrimarySpelling, pitchAccentRecord.Position));
+                        break;
+                    }
+                }
+            }
+
+            else if (lookupResult.AlternativeSpellings is not null)
+            {
+                for (int i = 0; i < lookupResult.AlternativeSpellings.Length; i++)
+                {
+                    string alternativeSpellingInHiragana = JapaneseUtils.KatakanaToHiragana(lookupResult.AlternativeSpellings[i]);
+                    if (pitchDict.TryGetValue(alternativeSpellingInHiragana, out pitchResult))
+                    {
+                        foreach (IDictRecord dictRecord in pitchResult)
+                        {
+                            PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)dictRecord;
+                            if (pitchAccentRecord.Reading is null)
+                            {
+                                pitchAccents.Add(KeyValuePair.Create(lookupResult.PrimarySpelling, pitchAccentRecord.Position));
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return pitchAccents.Count > 0 ? pitchAccents : null;
     }
 
     public static async Task MineToFile(LookupResult lookupResult, string currentText, string? selectedDefinitions, int currentCharPosition)
