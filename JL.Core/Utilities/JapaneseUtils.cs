@@ -118,7 +118,7 @@ public static class JapaneseUtils
         '\n'
     };
 
-    private static readonly Dictionary<char, char> s_bracketsDict = new(18)
+    private static readonly Dictionary<char, char> s_leftToRightBracketDict = new(18)
     {
         { '「', '」' },
         { '『', '』' },
@@ -140,17 +140,9 @@ public static class JapaneseUtils
         { '{', '}' }
     };
 
-    private static readonly HashSet<char> s_brackets = new(36)
-    {
-        #pragma warning disable format
-        '「', '」' , '『', '』' , '【', '】',
-        '《', '》', '〔', '〕', '（', '）',
-        '［', '］', '〈', '〉', '｛', '｝',
-        '＜', '＞', '〝', '〟', '＂', '＂',
-        '＇', '＇', '｢', '｣', '⟨', '⟩',
-        '(', ')', '[', ']', '{', '}'
-        #pragma warning restore format
-    };
+    private static readonly Dictionary<char, char> s_rightToLeftBracketDict = s_leftToRightBracketDict.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
+
+    private static readonly HashSet<char> s_brackets = s_leftToRightBracketDict.Keys.Union(s_leftToRightBracketDict.Values).ToHashSet();
 
     public static string KatakanaToHiragana(string text)
     {
@@ -300,22 +292,22 @@ public static class JapaneseUtils
         }
 
         string sentence = startPosition < endPosition
-            ? text[startPosition..(endPosition + 1)].Trim('\n', '\t', '\r', ' ', '　')
+            ? text[startPosition..(endPosition + 1)].Trim()
             : "";
 
         if (sentence.Length > 1)
         {
-            if (s_bracketsDict.ContainsValue(sentence[0]))
+            if (s_rightToLeftBracketDict.ContainsKey(sentence[0]))
             {
                 sentence = sentence[1..];
             }
 
-            if (s_bracketsDict.ContainsKey(sentence.LastOrDefault()))
+            if (s_leftToRightBracketDict.ContainsKey(sentence.LastOrDefault()))
             {
                 sentence = sentence[..^1];
             }
 
-            if (s_bracketsDict.TryGetValue(sentence.FirstOrDefault(), out char rightBracket))
+            if (s_leftToRightBracketDict.TryGetValue(sentence.FirstOrDefault(), out char rightBracket))
             {
                 if (sentence[^1] == rightBracket)
                 {
@@ -337,10 +329,8 @@ public static class JapaneseUtils
                 }
             }
 
-            else if (s_bracketsDict.ContainsValue(sentence.LastOrDefault()))
+            else if (s_rightToLeftBracketDict.TryGetValue(sentence.LastOrDefault(), out char leftBracket))
             {
-                char leftBracket = s_bracketsDict.First(p => p.Value == sentence[^1]).Key;
-
                 if (!sentence.Contains(leftBracket, StringComparison.Ordinal))
                 {
                     sentence = sentence[..^1];
