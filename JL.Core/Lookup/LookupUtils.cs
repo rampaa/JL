@@ -301,7 +301,7 @@ public static class LookupUtils
             .ThenBy(static lookupResult => lookupResult.Dict.Priority)
             .ThenBy(static lookupResult =>
             {
-                if (lookupResult.PrimarySpellingOrthographyInfoList is not null)
+                if (lookupResult.PrimarySpellingOrthographyInfoList is not null && lookupResult.PrimarySpelling == lookupResult.MatchedText)
                 {
                     for (int i = 0; i < lookupResult.PrimarySpellingOrthographyInfoList.Length; i++)
                     {
