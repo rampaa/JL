@@ -1310,83 +1310,71 @@ internal sealed partial class PopupWindow : Window
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.NextDictKeyGesture))
         {
             bool foundSelectedButton = false;
-            bool movedToNextDict = false;
 
-            int dictCount = ItemsControlButtons.Items.Count;
-            for (int i = 0; i < dictCount; i++)
+            Button? nextButton = null;
+            for (int i = 0; i < ItemsControlButtons.Items.Count; i++)
             {
                 Button button = (Button)ItemsControlButtons.Items[i]!;
 
                 if (button.Background == Brushes.DodgerBlue)
                 {
-                    button.ClearValue(BackgroundProperty);
-
                     foundSelectedButton = true;
                     continue;
                 }
 
                 if (foundSelectedButton && button.IsEnabled)
                 {
-                    _filteredDict = (Dict)button.Tag;
-                    movedToNextDict = true;
-                    button.Background = Brushes.DodgerBlue;
-                    PopupListView.Items.Filter = DictFilter;
+                    nextButton = button;
                     break;
                 }
             }
 
-            if (!movedToNextDict)
+            if (nextButton is not null)
             {
-                ((Button)ItemsControlButtons.Items[0]!).Background = Brushes.DodgerBlue;
-                PopupListView.Items.Filter = NoAllDictFilter;
+                ClickDictTypeButton(nextButton);
+            }
+            else
+            {
+                ClickDictTypeButton(_buttonAll);
             }
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.PreviousDictKeyGesture))
         {
             bool foundSelectedButton = false;
-            bool movedToPreviousDict = false;
+            Button? previousButton = null;
 
             int dictCount = ItemsControlButtons.Items.Count;
-            for (int i = dictCount - 1; i > 0; i--)
+            for (int i = dictCount - 1; i >= 0; i--)
             {
                 Button button = (Button)ItemsControlButtons.Items[i]!;
 
                 if (button.Background == Brushes.DodgerBlue)
                 {
-                    button.ClearValue(BackgroundProperty);
-
                     foundSelectedButton = true;
                     continue;
                 }
 
                 if (foundSelectedButton && button.IsEnabled)
                 {
-                    _filteredDict = (Dict)button.Tag;
-                    button.Background = Brushes.DodgerBlue;
-                    movedToPreviousDict = true;
-                    PopupListView.Items.Filter = DictFilter;
+                    previousButton = button;
                     break;
                 }
             }
 
-            if (foundSelectedButton && !movedToPreviousDict)
+            if (previousButton is not null)
             {
-                ((Button)ItemsControlButtons.Items[0]!).Background = Brushes.DodgerBlue;
-                PopupListView.Items.Filter = NoAllDictFilter;
+                ClickDictTypeButton(previousButton);
             }
 
-            else if (!foundSelectedButton)
+            else
             {
                 for (int i = dictCount - 1; i > 0; i--)
                 {
                     Button btn = (Button)ItemsControlButtons.Items[i]!;
                     if (btn.IsEnabled)
                     {
-                        _filteredDict = (Dict)btn.Tag;
-                        btn.Background = Brushes.DodgerBlue;
-                        ((Button)ItemsControlButtons.Items[0]!).ClearValue(BackgroundProperty);
-                        PopupListView.Items.Filter = DictFilter;
+                        ClickDictTypeButton(btn);
                         break;
                     }
                 }
@@ -1612,7 +1600,7 @@ internal sealed partial class PopupWindow : Window
     {
         List<Button> buttons = new(DictUtils.Dicts.Values.Count + 1);
         _buttonAll.Background = Brushes.DodgerBlue;
-        _buttonAll.Click += ButtonAllOnClick;
+        _buttonAll.Click += DictTypeButtonOnClick;
         buttons.Add(_buttonAll);
 
         foreach (Dict dict in DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority).ToList())
@@ -1636,39 +1624,33 @@ internal sealed partial class PopupWindow : Window
         ItemsControlButtons.ItemsSource = buttons;
     }
 
-    private void ButtonAllOnClick(object sender, RoutedEventArgs e)
-    {
-        foreach (Button btn in ItemsControlButtons.Items)
-        {
-            btn.ClearValue(BackgroundProperty);
-        }
-
-        Button button = (Button)sender;
-        button.Background = Brushes.DodgerBlue;
-
-        PopupListView.Items.Filter = NoAllDictFilter;
-        _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
-        _listViewItemIndex = _firstVisibleListViewItemIndex;
-        LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
-
-        WindowsUtils.Unselect(_lastInteractedTextBox);
-        _lastInteractedTextBox = null;
-    }
-
     private void DictTypeButtonOnClick(object sender, RoutedEventArgs e)
     {
+        ClickDictTypeButton((Button)sender);
+    }
+
+    private void ClickDictTypeButton(Button button)
+    {
         foreach (Button btn in ItemsControlButtons.Items)
         {
             btn.ClearValue(BackgroundProperty);
         }
 
-        Button button = (Button)sender;
-
         button.Background = Brushes.DodgerBlue;
 
-        _filteredDict = (Dict)button.Tag;
+        bool isAllButton = button == _buttonAll;
+        if (isAllButton)
+        {
+            PopupListView.Items.Filter = NoAllDictFilter;
+        }
 
-        PopupListView.Items.Filter = DictFilter;
+        else
+        {
+            _filteredDict = (Dict)button.Tag;
+            PopupListView.Items.Filter = DictFilter;
+        }
+
+        _popupListViewScrollViewer!.ScrollToTop();
         _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
         _listViewItemIndex = _firstVisibleListViewItemIndex;
         LastSelectedText = LastLookupResults[_listViewItemIndex].PrimarySpelling;
@@ -1751,7 +1733,7 @@ internal sealed partial class PopupWindow : Window
         TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
         ItemsControlButtons.Visibility = Visibility.Collapsed;
         ItemsControlButtons.ItemsSource = null;
-        _buttonAll.Click -= ButtonAllOnClick;
+        _buttonAll.Click -= DictTypeButtonOnClick;
 
         if (_popupListViewScrollViewer is not null)
         {
