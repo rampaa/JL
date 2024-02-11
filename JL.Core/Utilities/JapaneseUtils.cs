@@ -140,7 +140,7 @@ public static class JapaneseUtils
         { '{', '}' }
     };
 
-    private static readonly Dictionary<char, char> s_rightToLeftBracketDict = s_leftToRightBracketDict.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
+    private static readonly Dictionary<char, char> s_rightToLeftBracketDict = s_leftToRightBracketDict.ToDictionary(static kvp => kvp.Value, static kvp => kvp.Key);
 
     private static readonly HashSet<char> s_brackets = s_leftToRightBracketDict.Keys.Union(s_leftToRightBracketDict.Values).ToHashSet();
 

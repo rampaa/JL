@@ -6,7 +6,6 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using Caching;
 using JL.Core;
-using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
 using JL.Core.Mining;
@@ -14,7 +13,6 @@ using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
 using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
-using NAudio.Wave;
 using Timer = System.Timers.Timer;
 
 namespace JL.Windows.GUI;
@@ -56,10 +54,6 @@ internal sealed partial class PopupWindow : Window
     public string? LastText { get; set; }
 
     public bool MiningMode { get; private set; }
-
-    private static string? s_primarySpellingOfLastPlayedAudio = null;
-
-    private static string? s_readingOfLastPlayedAudio = null;
 
     public static Timer PopupAutoHideTimer { get; } = new();
 
@@ -631,6 +625,26 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
+        if (MiningMode)
+        {
+            Button audioButton = new()
+            {
+                Content = "🔊",
+                Foreground = ConfigManager.DefinitionsColor,
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(5, 0, 0, 0),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Background = Brushes.Transparent,
+                Cursor = Cursors.Arrow,
+                BorderThickness = new Thickness(0),
+                Padding = new Thickness(0)
+            };
+
+            audioButton.Click += AudioButton_Click;
+
+            _ = top.Children.Add(audioButton);
+        }
+
         if (result.AlternativeSpellings is not null)
         {
             string alternativeSpellingsText = showAOrthographyInfo && result.AlternativeSpellingsOrthographyInfoList is not null
@@ -1022,6 +1036,7 @@ internal sealed partial class PopupWindow : Window
             || ConfigManager.LookupOnMouseClickOnly
             || e?.LeftButton is MouseButtonState.Pressed
             || PopupContextMenu.IsVisible
+            || ReadingsAudioWindow.IsItVisible()
             || (ConfigManager.RequireLookupKeyPress
                 && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
         {
@@ -1048,6 +1063,19 @@ internal sealed partial class PopupWindow : Window
             {
                 WindowsUtils.Unselect(ChildPopupWindow._previousTextBox);
             }
+        }
+    }
+
+    private async void AudioButton_Click(object sender, RoutedEventArgs e)
+    {
+        LookupResult lookupResult = LastLookupResults[_listViewItemIndex];
+        if (lookupResult.Readings is null || lookupResult.Readings.Length is 1)
+        {
+            await PopupWindowUtils.PlayAudio(lookupResult.PrimarySpelling, lookupResult.Readings?[0]).ConfigureAwait(false);
+        }
+        else
+        {
+            ReadingsAudioWindow.Show(lookupResult.PrimarySpelling, lookupResult.Readings, this);
         }
     }
 
@@ -1329,14 +1357,7 @@ internal sealed partial class PopupWindow : Window
                 }
             }
 
-            if (nextButton is not null)
-            {
-                ClickDictTypeButton(nextButton);
-            }
-            else
-            {
-                ClickDictTypeButton(_buttonAll);
-            }
+            ClickDictTypeButton(nextButton ?? _buttonAll);
         }
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.PreviousDictKeyGesture))
@@ -1486,17 +1507,7 @@ internal sealed partial class PopupWindow : Window
         string primarySpelling = lastLookupResult.PrimarySpelling;
         string? reading = lastLookupResult.Readings?[0];
 
-        if (WindowsUtils.AudioPlayer?.PlaybackState is PlaybackState.Playing
-            && s_primarySpellingOfLastPlayedAudio == primarySpelling
-            && s_readingOfLastPlayedAudio == reading)
-        {
-            return;
-        }
-
-        s_primarySpellingOfLastPlayedAudio = primarySpelling;
-        s_readingOfLastPlayedAudio = reading;
-
-        await AudioUtils.GetAndPlayAudio(primarySpelling, reading).ConfigureAwait(false);
+        await PopupWindowUtils.PlayAudio(primarySpelling, reading).ConfigureAwait(false);
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -1576,6 +1587,7 @@ internal sealed partial class PopupWindow : Window
             if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
             {
                 if (PopupContextMenu.IsVisible
+                    || ReadingsAudioWindow.IsItVisible()
                     || AddWordWindow.IsItVisible()
                     || AddNameWindow.IsItVisible())
                 {
@@ -1689,6 +1701,8 @@ internal sealed partial class PopupWindow : Window
 
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
+        ReadingsAudioWindow.HideWindow();
+
         if (ChildPopupWindow is { MiningMode: true })
         {
             if (e.ChangedButton is not MouseButton.Right)
@@ -1723,6 +1737,8 @@ internal sealed partial class PopupWindow : Window
         {
             _ = mainWindow.ChangeVisibility().ConfigureAwait(true);
         }
+
+        ReadingsAudioWindow.HideWindow();
 
         if (!IsVisible)
         {

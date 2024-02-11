@@ -5,16 +5,21 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Dicts.PitchAccent;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
 using JL.Windows.GUI.UserControls;
+using NAudio.Wave;
 
 namespace JL.Windows.Utilities;
 
 internal static class PopupWindowUtils
 {
+    private static string? s_primarySpellingOfLastPlayedAudio = null;
+
+    private static string? s_readingOfLastPlayedAudio = null;
     public static DoubleCollection StrokeDashArray { get; set; } = new() { 1, 1 };
 
     public static TextBlock CreateTextBlock(string name, string text, Brush foregroundBrush, double fontSize, ContextMenu contextMenu, VerticalAlignment verticalAlignment, Thickness margin)
@@ -248,5 +253,20 @@ internal static class PopupWindowUtils
         {
             SetPopupAutoHideTimer();
         }
+    }
+
+    public static async Task PlayAudio(string primarySpelling, string? reading)
+    {
+        if (WindowsUtils.AudioPlayer?.PlaybackState is PlaybackState.Playing
+            && s_primarySpellingOfLastPlayedAudio == primarySpelling
+            && s_readingOfLastPlayedAudio == reading)
+        {
+            return;
+        }
+
+        s_primarySpellingOfLastPlayedAudio = primarySpelling;
+        s_readingOfLastPlayedAudio = reading;
+
+        await AudioUtils.GetAndPlayAudio(primarySpelling, reading).ConfigureAwait(false);
     }
 }
