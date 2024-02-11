@@ -18,7 +18,7 @@
             <ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type ListViewItem}">
                     <Setter Property="Focusable" Value="False" />
-                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ReadingsListView_PreviewMouseLeftButtonDown" />
+                    <EventSetter Event="PreviewMouseLeftButtonUp" Handler="ReadingsListView_PreviewMouseLeftButtonUp" />
                 </Style>
             </ListView.ItemContainerStyle>
         </ListView>

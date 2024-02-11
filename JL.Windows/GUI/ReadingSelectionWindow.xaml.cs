@@ -61,7 +61,7 @@ internal sealed partial class ReadingSelectionWindow : Window
         }
     }
 
-    private async void ReadingsListView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private async void ReadingsListView_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         string selectedReading = (string)((ListViewItem)sender).Content;
         Hide();
