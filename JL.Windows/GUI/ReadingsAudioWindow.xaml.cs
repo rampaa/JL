@@ -10,7 +10,7 @@ namespace JL.Windows.GUI;
 /// </summary>
 internal sealed partial class ReadingsAudioWindow : Window
 {
-    private static string? s_primarySpelling;
+    private string? _primarySpelling;
     private nint _windowHandle;
 
     private static ReadingsAudioWindow? s_instance;
@@ -27,9 +27,11 @@ internal sealed partial class ReadingsAudioWindow : Window
 
     public static void Show(string primarySpelling, string[] readings, Window window)
     {
-        s_primarySpelling = primarySpelling;
         ReadingsAudioWindow currentInstance = s_instance ??= new ReadingsAudioWindow();
+        currentInstance._primarySpelling = primarySpelling;
         currentInstance.ReadingsListView.ItemsSource = readings;
+        currentInstance.ReadingsListView.Background = ConfigManager.PopupBackgroundColor;
+        currentInstance.ReadingsListView.Foreground = ConfigManager.ReadingsColor;
         currentInstance.Background = ConfigManager.PopupBackgroundColor;
         currentInstance.Foreground = ConfigManager.DefinitionsColor;
         currentInstance.FontFamily = ConfigManager.PopupFont;
@@ -63,7 +65,7 @@ internal sealed partial class ReadingsAudioWindow : Window
     {
         string selectedReading = (string)((ListViewItem)sender).Content;
         Hide();
-        await PopupWindowUtils.PlayAudio(s_primarySpelling!, selectedReading).ConfigureAwait(false);
+        await PopupWindowUtils.PlayAudio(_primarySpelling!, selectedReading).ConfigureAwait(false);
     }
 
     private void UpdatePosition(Point cursorPosition)
