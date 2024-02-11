@@ -6,16 +6,16 @@ using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
 /// <summary>
-/// Interaction logic for ReadingsAudioWindow.xaml
+/// Interaction logic for ReadingSelectionWindow.xaml
 /// </summary>
-internal sealed partial class ReadingsAudioWindow : Window
+internal sealed partial class ReadingSelectionWindow : Window
 {
     private string? _primarySpelling;
     private nint _windowHandle;
 
-    private static ReadingsAudioWindow? s_instance;
+    private static ReadingSelectionWindow? s_instance;
 
-    private ReadingsAudioWindow()
+    private ReadingSelectionWindow()
     {
         InitializeComponent();
     }
@@ -27,7 +27,7 @@ internal sealed partial class ReadingsAudioWindow : Window
 
     public static void Show(string primarySpelling, string[] readings, Window window)
     {
-        ReadingsAudioWindow currentInstance = s_instance ??= new ReadingsAudioWindow();
+        ReadingSelectionWindow currentInstance = s_instance ??= new ReadingSelectionWindow();
         currentInstance._primarySpelling = primarySpelling;
         currentInstance.ReadingsListView.ItemsSource = readings;
         currentInstance.ReadingsListView.Background = ConfigManager.PopupBackgroundColor;

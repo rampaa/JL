@@ -1,10 +1,10 @@
-<Window x:Class="JL.Windows.GUI.ReadingsAudioWindow"
+<Window x:Class="JL.Windows.GUI.ReadingSelectionWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="ReadingsAudioWindow" SizeToContent="WidthAndHeight" WindowStyle="None" Topmost="True"
+        SizeToContent="WidthAndHeight" WindowStyle="None" Topmost="True"
         ShowInTaskbar="False" AllowsTransparency="True" Focusable="False" x:ClassModifier="internal">
     <Grid>
         <ListView x:Name="ReadingsListView" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"

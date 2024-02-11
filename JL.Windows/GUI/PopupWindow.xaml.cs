@@ -1013,7 +1013,7 @@ internal sealed partial class PopupWindow : Window
             || ConfigManager.LookupOnMouseClickOnly
             || e?.LeftButton is MouseButtonState.Pressed
             || PopupContextMenu.IsVisible
-            || ReadingsAudioWindow.IsItVisible()
+            || ReadingSelectionWindow.IsItVisible()
             || (ConfigManager.RequireLookupKeyPress
                 && !KeyGestureUtils.CompareKeyGesture(ConfigManager.LookupKeyKeyGesture)))
         {
@@ -1052,7 +1052,7 @@ internal sealed partial class PopupWindow : Window
         }
         else
         {
-            ReadingsAudioWindow.Show(lookupResult.PrimarySpelling, lookupResult.Readings, this);
+            ReadingSelectionWindow.Show(lookupResult.PrimarySpelling, lookupResult.Readings, this);
         }
     }
 
@@ -1564,7 +1564,7 @@ internal sealed partial class PopupWindow : Window
             if (ConfigManager.AutoHidePopupIfMouseIsNotOverIt)
             {
                 if (PopupContextMenu.IsVisible
-                    || ReadingsAudioWindow.IsItVisible()
+                    || ReadingSelectionWindow.IsItVisible()
                     || AddWordWindow.IsItVisible()
                     || AddNameWindow.IsItVisible())
                 {
@@ -1678,7 +1678,7 @@ internal sealed partial class PopupWindow : Window
 
     private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        ReadingsAudioWindow.HideWindow();
+        ReadingSelectionWindow.HideWindow();
 
         if (ChildPopupWindow is { MiningMode: true })
         {
@@ -1715,7 +1715,7 @@ internal sealed partial class PopupWindow : Window
             _ = mainWindow.ChangeVisibility().ConfigureAwait(true);
         }
 
-        ReadingsAudioWindow.HideWindow();
+        ReadingSelectionWindow.HideWindow();
 
         if (!IsVisible)
         {
