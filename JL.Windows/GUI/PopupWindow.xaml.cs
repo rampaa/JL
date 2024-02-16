@@ -57,7 +57,7 @@ internal sealed partial class PopupWindow : Window
 
     public static Timer PopupAutoHideTimer { get; } = new();
 
-    public static LRUCache<string, StackPanel[]> StackPanelCache { get; } = new(Utils.CacheSize, Utils.CacheSize / 10);
+    public static LRUCache<string, StackPanel[]> StackPanelCache { get; } = new(Utils.CacheSize, Utils.CacheSize / 5);
 
     private ScrollViewer? _popupListViewScrollViewer;
 
