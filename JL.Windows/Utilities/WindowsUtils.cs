@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools;
+using JL.Core;
 using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
@@ -347,7 +348,7 @@ internal static class WindowsUtils
 
         await Utils.CoreInitialize().ConfigureAwait(true);
 
-        if (ConfigManager.CheckForJLUpdatesOnStartUp)
+        if (CoreConfig.CheckForJLUpdatesOnStartUp)
         {
             PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
             preferencesWindow.CheckForJLUpdatesButton.IsEnabled = false;

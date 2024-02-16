@@ -1,6 +1,9 @@
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using System.Timers;
+using JL.Core.Dicts.EDICT;
 using JL.Core.Utilities;
+using Timer = System.Timers.Timer;
 
 namespace JL.Core.Network;
 
@@ -9,6 +12,7 @@ public static class Networking
     public static readonly HttpClient Client = new(new HttpClientHandler { UseProxy = false, CheckCertificateRevocationList = true });
     internal const string Jpod101NoAudioMd5Hash = "7E-2C-2F-95-4E-F6-05-13-73-BA-91-6F-00-01-68-DC";
     private static readonly Uri s_gitHubApiUrlForLatestJLRelease = new("https://api.github.com/repos/rampaa/JL/releases/latest");
+    private static readonly Timer s_updaterTimer = new();
 
     public static async Task CheckForJLUpdates(bool isAutoCheck)
     {
@@ -84,6 +88,27 @@ public static class Networking
         {
             Utils.Logger.Error(ex, "Couldn't check for JL updates");
             Utils.Frontend.Alert(AlertLevel.Warning, "Couldn't check for JL updates");
+        }
+    }
+
+    internal static void StartUpdaterTimer()
+    {
+        if (!s_updaterTimer.Enabled)
+        {
+            s_updaterTimer.Interval = TimeSpan.FromHours(12).TotalMilliseconds;
+            s_updaterTimer.Elapsed += CheckForUpdates;
+            s_updaterTimer.AutoReset = true;
+            s_updaterTimer.Enabled = true;
+        }
+    }
+
+    private static async void CheckForUpdates(object? sender, ElapsedEventArgs e)
+    {
+        await ResourceUpdater.AutoUpdateBuiltInDicts().ConfigureAwait(false);
+
+        if (CoreConfig.CheckForJLUpdatesOnStartUp)
+        {
+            await CheckForJLUpdates(true).ConfigureAwait(false);
         }
     }
 }

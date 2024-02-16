@@ -83,20 +83,23 @@ public static class DictUtils
                     miscInfo: new MiscInfoOption(true),
                     loanwordEtymology: new LoanwordEtymologyOption(true),
                     relatedTerm: new RelatedTermOption(false),
-                    antonym: new AntonymOption(false)
+                    antonym: new AntonymOption(false),
+                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)
                 ))
         },
         {
             "Kanjidic", new Dict(DictType.Kanjidic, "Kanjidic",
                 Path.Join(Utils.ResourcesPath, "kanjidic2.xml"),
                 true, 4, 13108, false,
-                new DictOptions(noAll: new NoAllOption(false)))
+                new DictOptions(noAll: new NoAllOption(false),
+                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)))
         },
         {
             "JMnedict", new Dict(DictType.JMnedict, "JMnedict",
                 Path.Join(Utils.ResourcesPath, "JMnedict.xml"),
                 true, 5, 700000, false,
-                new DictOptions(new NewlineBetweenDefinitionsOption(true)))
+                new DictOptions(new NewlineBetweenDefinitionsOption(true),
+                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)))
         }
     };
 
@@ -605,7 +608,7 @@ public static class DictUtils
                                 {
                                     Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                     File.Delete(Path.GetFullPath(dict.Path, Utils.ApplicationPath));
-                                    await ResourceUpdater.UpdateJmdict().ConfigureAwait(false);
+                                    await ResourceUpdater.UpdateJmdict(true, false).ConfigureAwait(false);
                                 }
                             }));
                         }
@@ -673,7 +676,7 @@ public static class DictUtils
                                 {
                                     Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                     File.Delete(Path.GetFullPath(dict.Path, Utils.ApplicationPath));
-                                    await ResourceUpdater.UpdateJmnedict().ConfigureAwait(false);
+                                    await ResourceUpdater.UpdateJmnedict(true, false).ConfigureAwait(false);
                                 }
                             }));
                         }
@@ -748,7 +751,7 @@ public static class DictUtils
                                 {
                                     Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                     File.Delete(Path.GetFullPath(dict.Path, Utils.ApplicationPath));
-                                    await ResourceUpdater.UpdateKanjidic().ConfigureAwait(false);
+                                    await ResourceUpdater.UpdateKanjidic(true, false).ConfigureAwait(false);
                                 }
                             }));
                         }

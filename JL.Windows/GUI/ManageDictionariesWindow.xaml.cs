@@ -219,13 +219,13 @@ internal sealed partial class ManageDictionariesWindow : Window
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
-                        await ResourceUpdater.UpdateJmdict().ConfigureAwait(true);
+                        await ResourceUpdater.UpdateJmdict(true, false).ConfigureAwait(true);
                         break;
                     case DictType.JMnedict:
-                        await ResourceUpdater.UpdateJmnedict().ConfigureAwait(true);
+                        await ResourceUpdater.UpdateJmnedict(true, false).ConfigureAwait(true);
                         break;
                     case DictType.Kanjidic:
-                        await ResourceUpdater.UpdateKanjidic().ConfigureAwait(true);
+                        await ResourceUpdater.UpdateKanjidic(true, false).ConfigureAwait(true);
                         break;
                 }
 

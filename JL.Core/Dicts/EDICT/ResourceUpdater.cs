@@ -18,9 +18,9 @@ public static class ResourceUpdater
     {
         try
         {
-            if (!isUpdate || Utils.Frontend.ShowYesNoDialog(string.Create(CultureInfo.InvariantCulture,
+            if (!isUpdate || noPrompt || Utils.Frontend.ShowYesNoDialog(string.Create(CultureInfo.InvariantCulture,
                         $"Do you want to download the latest version of {resourceName}?"),
-                    "Update dictionary?"))
+                    isUpdate ? "Update dictionary?" : "Download dictionary?"))
             {
                 using HttpRequestMessage request = new(HttpMethod.Get, resourceDownloadUri);
 
@@ -103,14 +103,14 @@ public static class ResourceUpdater
         }
     }
 
-    public static async Task UpdateJmdict()
+    public static async Task UpdateJmdict(bool isUpdate, bool noPrompt)
     {
         DictUtils.UpdatingJmdict = true;
 
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
         bool downloaded = await UpdateResource(dict.Path,
                 DictUtils.s_jmdictUrl,
-                DictType.JMdict.ToString(), true, false)
+                DictType.JMdict.ToString(), isUpdate, noPrompt)
             .ConfigureAwait(false);
 
         if (downloaded)
@@ -161,14 +161,14 @@ public static class ResourceUpdater
         Utils.Frontend.Alert(AlertLevel.Success, "Finished updating JMdict");
     }
 
-    public static async Task UpdateJmnedict()
+    public static async Task UpdateJmnedict(bool isUpdate, bool noPrompt)
     {
         DictUtils.UpdatingJmnedict = true;
 
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMnedict];
         bool downloaded = await UpdateResource(dict.Path,
                 DictUtils.s_jmnedictUrl,
-                DictType.JMnedict.ToString(), true, false)
+                DictType.JMnedict.ToString(), isUpdate, noPrompt)
             .ConfigureAwait(false);
 
         if (downloaded)
@@ -213,14 +213,14 @@ public static class ResourceUpdater
         Utils.Frontend.Alert(AlertLevel.Success, "Finished updating JMnedict");
     }
 
-    public static async Task UpdateKanjidic()
+    public static async Task UpdateKanjidic(bool isUpdate, bool noPrompt)
     {
         DictUtils.UpdatingKanjidic = true;
 
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.Kanjidic];
         bool downloaded = await UpdateResource(dict.Path,
                 DictUtils.s_kanjidicUrl,
-                DictType.Kanjidic.ToString(), true, false)
+                DictType.Kanjidic.ToString(), isUpdate, noPrompt)
             .ConfigureAwait(false);
 
         if (downloaded)
@@ -264,4 +264,44 @@ public static class ResourceUpdater
 
         Utils.Frontend.Alert(AlertLevel.Success, "Finished updating KANJIDIC2");
     }
+
+    public static async Task AutoUpdateBuiltInDicts()
+    {
+        DictType[] dicts = {
+            DictType.JMdict,
+            DictType.JMnedict,
+            DictType.Kanjidic
+        };
+
+        for (int i = 0; i < dicts.Length; i++)
+        {
+            Dict dict = DictUtils.SingleDictTypeDicts[dicts[i]];
+            if (dict.Active)
+            {
+                int dueDate = dict.Options?.AutoUpdateAfterNDays?.Value ?? 0;
+                if (dueDate > 0)
+                {
+                    string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
+                    bool pathExists = File.Exists(fullPath);
+                    if (!pathExists
+                        || (DateTime.Now - File.GetLastWriteTime(fullPath)).Days >= dueDate)
+                    {
+                        if (dict.Type is DictType.JMdict)
+                        {
+                            await UpdateJmdict(pathExists, true).ConfigureAwait(false);
+                        }
+                        else if (dict.Type is DictType.JMnedict)
+                        {
+                            await UpdateJmnedict(pathExists, true).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            await UpdateKanjidic(pathExists, true).ConfigureAwait(false);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

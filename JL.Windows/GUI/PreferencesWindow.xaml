@@ -153,7 +153,7 @@
                         </DockPanel>
 
                         <DockPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="Check for updates on start up"
+                            <TextBlock HorizontalAlignment="Left" Text="Auto check for updates"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <CheckBox x:Name="CheckForJLUpdatesOnStartUpCheckBox"

@@ -31,7 +31,6 @@ internal static class ConfigManager
     public static KeyGesture LookupKeyKeyGesture { get; private set; } = new(Key.LeftShift, ModifierKeys.None);
     public static bool HighlightLongestMatch { get; private set; } = false;
     public static bool AutoPlayAudio { get; private set; } = false;
-    public static bool CheckForJLUpdatesOnStartUp { get; private set; } = true;
     public static bool DisableHotkeys { get; set; } = false;
     public static bool Focusable { get; private set; } = true;
     public static MouseButton MiningModeMouseButton { get; private set; } = MouseButton.Middle;
@@ -255,7 +254,7 @@ internal static class ConfigManager
         StopIncreasingTimeStatWhenMinimized = GetValueFromConfig(config, StopIncreasingTimeStatWhenMinimized, nameof(StopIncreasingTimeStatWhenMinimized), bool.TryParse);
         StripPunctuationBeforeCalculatingCharacterCount = GetValueFromConfig(config, StripPunctuationBeforeCalculatingCharacterCount, nameof(StripPunctuationBeforeCalculatingCharacterCount), bool.TryParse);
         MineToFileInsteadOfAnki = GetValueFromConfig(config, MineToFileInsteadOfAnki, nameof(MineToFileInsteadOfAnki), bool.TryParse);
-        CheckForJLUpdatesOnStartUp = GetValueFromConfig(config, CheckForJLUpdatesOnStartUp, nameof(CheckForJLUpdatesOnStartUp), bool.TryParse);
+        CoreConfig.CheckForJLUpdatesOnStartUp = GetValueFromConfig(config, CoreConfig.CheckForJLUpdatesOnStartUp, nameof(CoreConfig.CheckForJLUpdatesOnStartUp), bool.TryParse);
         AlwaysOnTop = GetValueFromConfig(config, AlwaysOnTop, nameof(AlwaysOnTop), bool.TryParse);
         mainWindow.Topmost = AlwaysOnTop;
 
@@ -819,7 +818,7 @@ internal static class ConfigManager
         preferenceWindow.AutoAdjustFontSizesOnResolutionChange.IsChecked = AutoAdjustFontSizesOnResolutionChange;
         preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
         preferenceWindow.AutoPlayAudioCheckBox.IsChecked = AutoPlayAudio;
-        preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = CheckForJLUpdatesOnStartUp;
+        preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = CoreConfig.CheckForJLUpdatesOnStartUp;
         preferenceWindow.PrecachingCheckBox.IsChecked = Precaching;
         preferenceWindow.GlobalHotKeysCheckBox.IsChecked = GlobalHotKeys;
         preferenceWindow.StopIncreasingTimeStatWhenMinimizedCheckBox.IsChecked = StopIncreasingTimeStatWhenMinimized;
@@ -1123,7 +1122,7 @@ internal static class ConfigManager
             preferenceWindow.StripPunctuationBeforeCalculatingCharacterCountCheckBox.IsChecked.ToString();
         settings[nameof(MineToFileInsteadOfAnki)].Value =
             preferenceWindow.MineToFileInsteadOfAnkiCheckBox.IsChecked.ToString();
-        settings[nameof(CheckForJLUpdatesOnStartUp)].Value =
+        settings[nameof(CoreConfig.CheckForJLUpdatesOnStartUp)].Value =
             preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked.ToString();
 
         settings[nameof(AlwaysOnTop)].Value =

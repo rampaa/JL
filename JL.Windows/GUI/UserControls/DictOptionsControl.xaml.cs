@@ -145,10 +145,16 @@ internal sealed partial class DictOptionsControl : UserControl
             useDBOption = new UseDBOption(UseDBCheckBox.IsChecked!.Value);
         }
 
-        ShowPitchAccentWithDottedLines? showPitchAccentWithDottedLines = null;
-        if (ShowPitchAccentWithDottedLines.ValidDictTypes.Contains(type))
+        ShowPitchAccentWithDottedLinesOption? showPitchAccentWithDottedLines = null;
+        if (ShowPitchAccentWithDottedLinesOption.ValidDictTypes.Contains(type))
         {
-            showPitchAccentWithDottedLines = new ShowPitchAccentWithDottedLines(ShowPitchAccentWithDottedLinesCheckBox.IsChecked!.Value);
+            showPitchAccentWithDottedLines = new ShowPitchAccentWithDottedLinesOption(ShowPitchAccentWithDottedLinesCheckBox.IsChecked!.Value);
+        }
+
+        AutoUpdateAfterNDaysOption? autoUpdateAfterNDaysOption = null;
+        if (AutoUpdateAfterNDaysOption.ValidDictTypes.Contains(type))
+        {
+            autoUpdateAfterNDaysOption = new AutoUpdateAfterNDaysOption((int)AutoUpdateAfterNDaysNumericUpDown.Value);
         }
 
         DictOptions options = new(
@@ -171,7 +177,8 @@ internal sealed partial class DictOptionsControl : UserControl
             relatedTermOption,
             antonymOption,
             useDBOption,
-            showPitchAccentWithDottedLines);
+            showPitchAccentWithDottedLines,
+            autoUpdateAfterNDaysOption);
 
         return options;
     }
@@ -313,10 +320,17 @@ internal sealed partial class DictOptionsControl : UserControl
             showDictOptions = true;
         }
 
-        if (ShowPitchAccentWithDottedLines.ValidDictTypes.Contains(dictType))
+        if (ShowPitchAccentWithDottedLinesOption.ValidDictTypes.Contains(dictType))
         {
             ShowPitchAccentWithDottedLinesCheckBox.IsChecked = true;
             ShowPitchAccentWithDottedLinesCheckBox.Visibility = Visibility.Visible;
+            showDictOptions = true;
+        }
+
+        if (AutoUpdateAfterNDaysOption.ValidDictTypes.Contains(dictType))
+        {
+            AutoUpdateAfterNDaysNumericUpDown.Value = 0;
+            AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Visible;
             showDictOptions = true;
         }
 
@@ -464,10 +478,17 @@ internal sealed partial class DictOptionsControl : UserControl
             showDictOptions = true;
         }
 
-        if (ShowPitchAccentWithDottedLines.ValidDictTypes.Contains(dict.Type))
+        if (ShowPitchAccentWithDottedLinesOption.ValidDictTypes.Contains(dict.Type))
         {
             ShowPitchAccentWithDottedLinesCheckBox.IsChecked = dict.Options?.ShowPitchAccentWithDottedLines?.Value ?? true;
             ShowPitchAccentWithDottedLinesCheckBox.Visibility = Visibility.Visible;
+            showDictOptions = true;
+        }
+
+        if (AutoUpdateAfterNDaysOption.ValidDictTypes.Contains(dict.Type))
+        {
+            AutoUpdateAfterNDaysNumericUpDown.Value = dict.Options?.AutoUpdateAfterNDays?.Value ?? 0;
+            AutoUpdateAfterNDaysDockPanel.Visibility = Visibility.Visible;
             showDictOptions = true;
         }
 

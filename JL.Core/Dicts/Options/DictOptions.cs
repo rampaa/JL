@@ -21,7 +21,8 @@ public sealed class DictOptions
     public AntonymOption? Antonym { get; }
     public LoanwordEtymologyOption? LoanwordEtymology { get; }
     public UseDBOption? UseDB { get; }
-    public ShowPitchAccentWithDottedLines? ShowPitchAccentWithDottedLines { get; }
+    public ShowPitchAccentWithDottedLinesOption? ShowPitchAccentWithDottedLines { get; }
+    public AutoUpdateAfterNDaysOption? AutoUpdateAfterNDays { get; }
 
     public DictOptions
     (
@@ -44,7 +45,8 @@ public sealed class DictOptions
         RelatedTermOption? relatedTerm = null,
         AntonymOption? antonym = null,
         UseDBOption? useDB = null,
-        ShowPitchAccentWithDottedLines? showPitchAccentWithDottedLines = null
+        ShowPitchAccentWithDottedLinesOption? showPitchAccentWithDottedLines = null,
+        AutoUpdateAfterNDaysOption? autoUpdateAfterNDays = null
     )
     {
         NewlineBetweenDefinitions = newlineBetweenDefinitions;
@@ -67,5 +69,6 @@ public sealed class DictOptions
         Antonym = antonym;
         UseDB = useDB;
         ShowPitchAccentWithDottedLines = showPitchAccentWithDottedLines;
+        AutoUpdateAfterNDays = autoUpdateAfterNDays;
     }
 }

@@ -109,7 +109,12 @@ public readonly record struct UseDBOption(bool Value)
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = DictUtils.s_dictTypesWithDBSupport;
 }
 
-public readonly record struct ShowPitchAccentWithDottedLines(bool Value)
+public readonly record struct ShowPitchAccentWithDottedLinesOption(bool Value)
 {
     [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.PitchAccentYomichan };
+}
+
+public readonly record struct AutoUpdateAfterNDaysOption(int Value)
+{
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = { DictType.JMdict, DictType.JMnedict, DictType.Kanjidic };
 }

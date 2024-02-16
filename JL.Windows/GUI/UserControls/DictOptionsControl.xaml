@@ -26,6 +26,16 @@
                     <TextBlock Text="Don't show results under All" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
+                <DockPanel x:Name="AutoUpdateAfterNDaysDockPanel" Visibility="Collapsed">
+                    <hc:NumericUpDown x:Name="AutoUpdateAfterNDaysNumericUpDown" Minimum="0" Maximum="365"
+                                      HorizontalAlignment="Left" VerticalAlignment="Center"
+                                      Margin="10, 0, 0, 0" FontSize="12" Width="70" Height="30" />
+                    <TextBlock Text="Auto update the dictionary after the specified number of days"
+                               ToolTip="Setting it to 0 will disable it" Cursor="Help"
+                               Margin="10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}"
+                               TextWrapping="Wrap" VerticalAlignment="Center" FontSize="12" />
+                </DockPanel>
+
                 <DockPanel x:Name="PitchAccentMarkerColorDockPanel" Visibility="Collapsed">
                     <Button x:Name="PitchAccentMarkerColorButton" Content="" HorizontalAlignment="Left"
                             Width="50" Height="25" Click="ShowColorPicker" Margin="10, 0, 0, 0"

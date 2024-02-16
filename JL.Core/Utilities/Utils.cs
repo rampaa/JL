@@ -8,8 +8,10 @@ using CommunityToolkit.HighPerformance.Buffers;
 using JL.Core.Audio;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
+using JL.Core.Dicts.EDICT;
 using JL.Core.Freqs;
 using JL.Core.Frontend;
+using JL.Core.Network;
 using JL.Core.Profile;
 using JL.Core.Statistics;
 using JL.Core.WordClass;
@@ -95,8 +97,9 @@ public static class Utils
 
     public static async Task CoreInitialize()
     {
-        StatsUtils.StartStatsTimer();
+        Networking.StartUpdaterTimer();
 
+        StatsUtils.StartStatsTimer();
         StatsUtils.StatsStopWatch.Start();
 
         _ = Directory.CreateDirectory(DictUtils.s_dbFolderPath);
@@ -140,28 +143,29 @@ public static class Utils
         {
             await File.Create(profileCustomNamesPath).DisposeAsync().ConfigureAwait(false);
         }
-
-        await Task.WhenAll(Task.Run(static async () =>
-        {
-            await DictUtils.DeserializeDicts().ConfigureAwait(false);
-            Frontend.ApplyDictOptions();
-            await DictUtils.LoadDictionaries().ConfigureAwait(false);
-            await DictUtils.SerializeDicts().ConfigureAwait(false);
-            await JmdictWordClassUtils.Initialize().ConfigureAwait(false);
-        }),
-        Task.Run(static async () =>
-        {
-            await FreqUtils.DeserializeFreqs().ConfigureAwait(false);
-            await FreqUtils.LoadFrequencies().ConfigureAwait(false);
-            await FreqUtils.SerializeFreqs().ConfigureAwait(false);
-        }),
-        Task.Run(static async () =>
-        {
-            await AudioUtils.DeserializeAudioSources().ConfigureAwait(false);
-            Frontend.SetInstalledVoiceWithHighestPriority();
-        }),
-        Task.Run(static async () => await DeconjugatorUtils.DeserializeRules().ConfigureAwait(false)),
-        Task.Run(static async () => await DictUtils.InitializeKanjiCompositionDict().ConfigureAwait(false))).ConfigureAwait(false);
+        await Task.WhenAll(
+            Task.Run(static async () =>
+            {
+                await DictUtils.DeserializeDicts().ConfigureAwait(false);
+                Frontend.ApplyDictOptions();
+                await DictUtils.LoadDictionaries().ConfigureAwait(false);
+                await DictUtils.SerializeDicts().ConfigureAwait(false);
+                await JmdictWordClassUtils.Initialize().ConfigureAwait(false);
+                await ResourceUpdater.AutoUpdateBuiltInDicts().ConfigureAwait(false);
+            }),
+            Task.Run(static async () =>
+            {
+                await FreqUtils.DeserializeFreqs().ConfigureAwait(false);
+                await FreqUtils.LoadFrequencies().ConfigureAwait(false);
+                await FreqUtils.SerializeFreqs().ConfigureAwait(false);
+            }),
+            Task.Run(static async () =>
+            {
+                await AudioUtils.DeserializeAudioSources().ConfigureAwait(false);
+                Frontend.SetInstalledVoiceWithHighestPriority();
+            }),
+            Task.Run(static async () => await DeconjugatorUtils.DeserializeRules().ConfigureAwait(false)),
+            Task.Run(static async () => await DictUtils.InitializeKanjiCompositionDict().ConfigureAwait(false))).ConfigureAwait(false);
 
         StringPoolInstance.Reset();
     }
