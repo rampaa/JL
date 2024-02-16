@@ -128,4 +128,9 @@ internal sealed partial class ReadingSelectionWindow : Window
     {
         s_instance?.Hide();
     }
+
+    private void Window_LostFocus(object sender, RoutedEventArgs e)
+    {
+        Hide();
+    }
 }

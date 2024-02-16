@@ -4,8 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        SizeToContent="WidthAndHeight" WindowStyle="None" Topmost="True"
-        ShowInTaskbar="False" AllowsTransparency="True" Focusable="False" x:ClassModifier="internal">
+        SizeToContent="WidthAndHeight" WindowStyle="None" Topmost="True" LostFocus="Window_LostFocus"
+        ShowInTaskbar="False" AllowsTransparency="True" x:ClassModifier="internal">
     <Grid>
         <ListView x:Name="ReadingsListView" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
