@@ -22,7 +22,7 @@ internal static class PopupWindowUtils
     private static string? s_readingOfLastPlayedAudio = null;
     public static DoubleCollection StrokeDashArray { get; set; } = new() { 1, 1 };
 
-    public static TextBlock CreateTextBlock(string name, string text, Brush foregroundBrush, double fontSize, VerticalAlignment verticalAlignment, Thickness margin)
+    public static TextBlock CreateTextBlock(string name, string text, Brush foregroundBrush, double fontSize, ContextMenu contextMenu, VerticalAlignment verticalAlignment, Thickness margin)
     {
         return new TextBlock
         {
@@ -30,6 +30,7 @@ internal static class PopupWindowUtils
             Text = text,
             Foreground = foregroundBrush,
             FontSize = fontSize,
+            ContextMenu = contextMenu,
             VerticalAlignment = verticalAlignment,
             Margin = margin,
             HorizontalAlignment = HorizontalAlignment.Left,
@@ -40,7 +41,7 @@ internal static class PopupWindowUtils
         };
     }
 
-    public static TouchScreenTextBox CreateTextBox(string name, string text, Brush foregroundBrush, double fontSize, VerticalAlignment verticalAlignment, Thickness margin)
+    public static TouchScreenTextBox CreateTextBox(string name, string text, Brush foregroundBrush, double fontSize, ContextMenu contextMenu, VerticalAlignment verticalAlignment, Thickness margin)
     {
         return new TouchScreenTextBox
         {
@@ -48,6 +49,7 @@ internal static class PopupWindowUtils
             Text = text,
             Foreground = foregroundBrush,
             FontSize = fontSize,
+            ContextMenu = contextMenu,
             VerticalAlignment = verticalAlignment,
             Margin = margin,
             HorizontalAlignment = HorizontalAlignment.Left,
