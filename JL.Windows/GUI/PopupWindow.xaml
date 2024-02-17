@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="PopupWindow" PreviewMouseDown="Window_PreviewMouseDown"
-        Width="Auto" Height="Auto" SizeToContent="Height" MaxWidth="700" MaxHeight="520"
+        Width="Auto" Height="Auto" SizeToContent="Height" MaxWidth="700" MaxHeight="520" ResizeMode="NoResize"
         Topmost="True" WindowStyle="None" AllowsTransparency="true" ShowInTaskbar="False" ContextMenuOpening="Window_ContextMenuOpening"
         PreviewKeyDown="Window_PreviewKeyDown" Closing="Window_Closing" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave"
         x:ClassModifier="internal">
@@ -14,10 +14,28 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Name="TextBlockMiningModeReminder" FontSize="13" Padding="5,1,0,1"
+        <Grid Grid.Row="0" Name="TitleBarGrid" Visibility="Collapsed">
+            <Rectangle Name="TitleBar" VerticalAlignment="Top" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
+                   HorizontalAlignment="Stretch" Height="15" Opacity="1" Margin="0"
+                   Fill="{Binding Path=Background,
+                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
+            </Rectangle>
+
+            <Button x:Name="CloseButton" HorizontalAlignment="Right" Margin="0,0,10,0" Click="CloseButton_Click"
+                Content="x" VerticalAlignment="Top" Padding="0" BorderThickness="0" VerticalContentAlignment="Top"
+                Background="{Binding Path=Background,
+                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
+                Foreground="{Binding Path=Foreground,
+                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
+                ToolTip="Close" FontFamily="Meiryo UI" FontSize="14"  Height="15">
+            </Button>
+        </Grid>
+
+        <TextBlock Grid.Row="1" Name="TextBlockMiningModeReminder" FontSize="13" Padding="5,0,0,0"
                        Visibility="Collapsed" TextWrapping="Wrap"
                        Background="{Binding Path=Background,
                             RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
@@ -25,7 +43,7 @@
                             RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
         </TextBlock>
 
-        <ItemsControl Grid.Row="1" Name="ItemsControlButtons" Visibility="Collapsed"
+        <ItemsControl Grid.Row="2" Name="ItemsControlButtons" Visibility="Collapsed"
                           Background="{Binding Path=Background,
                   RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
             <ItemsControl.ItemsPanel>
@@ -35,7 +53,7 @@
             </ItemsControl.ItemsPanel>
         </ItemsControl>
 
-        <ListView Grid.Row="2" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
+        <ListView Grid.Row="3" VirtualizingStackPanel.VirtualizationMode="Recycling" Focusable="False"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.ScrollUnit="Pixel"
                   BorderThickness="0" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True"

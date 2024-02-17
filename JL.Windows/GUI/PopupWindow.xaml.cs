@@ -1465,6 +1465,8 @@ internal sealed partial class PopupWindow : Window
     {
         MiningMode = true;
 
+        TitleBarGrid.Visibility = Visibility.Visible;
+
         if (ConfigManager.ShowMiningModeReminder && Owner == MainWindow.Instance)
         {
             TextBlockMiningModeReminder.Visibility = Visibility.Visible;
@@ -1723,6 +1725,7 @@ internal sealed partial class PopupWindow : Window
         }
 
         MiningMode = false;
+        TitleBarGrid.Visibility = Visibility.Collapsed;
         TextBlockMiningModeReminder.Visibility = Visibility.Collapsed;
         ItemsControlButtons.Visibility = Visibility.Collapsed;
         ItemsControlButtons.ItemsSource = null;
@@ -1803,5 +1806,18 @@ internal sealed partial class PopupWindow : Window
         }
 
         return selectedDefinitions;
+    }
+
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+        HidePopup();
+    }
+
+    private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.LeftButton is MouseButtonState.Pressed)
+        {
+            DragMove();
+        }
     }
 }
