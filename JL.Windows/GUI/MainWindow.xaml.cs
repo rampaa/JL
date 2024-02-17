@@ -227,13 +227,13 @@ internal sealed partial class MainWindow : Window
         if (ConfigManager.Precaching && DictUtils.DictsReady
                                      && !DictUtils.UpdatingJmdict && !DictUtils.UpdatingJmnedict && !DictUtils.UpdatingKanjidic
                                      && FreqUtils.FreqsReady
-                                     && MainTextBox.Text.Length < Utils.CacheSize)
+                                     && text.Length < Utils.CacheSize)
         {
             s_precacheCancellationTokenSource.Cancel();
             s_precacheCancellationTokenSource.Dispose();
             s_precacheCancellationTokenSource = new CancellationTokenSource();
 
-            _ = Dispatcher.InvokeAsync(async () => await Precache(MainTextBox.Text, s_precacheCancellationTokenSource.Token).ConfigureAwait(false), DispatcherPriority.Background);
+            _ = Dispatcher.InvokeAsync(async () => await Precache(text, s_precacheCancellationTokenSource.Token).ConfigureAwait(false), DispatcherPriority.Background);
         }
     }
 
@@ -800,11 +800,18 @@ internal sealed partial class MainWindow : Window
 
             if (SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
             {
-                string selectedText = MainTextBox.SelectionLength > 0
-                    ? MainTextBox.SelectedText
-                    : MainTextBox.Text;
+                string selectedText = WindowState is not WindowState.Minimized
+                    ? MainTextBox.SelectionLength > 0
+                        ? MainTextBox.SelectedText
+                        : MainTextBox.Text
+                    : s_lastTextCopiedWhileMinimized is not null
+                        ? s_lastTextCopiedWhileMinimized
+                        : MainTextBox.Text;
 
-                await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, selectedText, CoreConfig.AudioVolume).ConfigureAwait(false);
+                if (selectedText.Length > 0)
+                {
+                    await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, selectedText, CoreConfig.AudioVolume).ConfigureAwait(false);
+                }
             }
         }
 
