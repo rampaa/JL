@@ -81,7 +81,7 @@ internal static class ConfigManager
     public static bool PopupFocusOnLookup { get; private set; } = false;
     public static bool ShowMiningModeReminder { get; private set; } = true;
     public static bool DisableLookupsForNonJapaneseCharsInPopups { get; private set; } = true;
-    public static Brush PopupBackgroundColor { get; private set; } = new SolidColorBrush(Color.FromRgb(0, 0, 0)) { Opacity = 0.7 };
+    public static Brush PopupBackgroundColor { get; private set; } = new SolidColorBrush(Color.FromRgb(0, 0, 0)) { Opacity = 0.8 };
     public static int PopupXOffset { get; set; } = 10;
     public static int PopupYOffset { get; set; } = 20;
     public static bool PopupFlipX { get; private set; } = true;
@@ -426,7 +426,7 @@ internal static class ConfigManager
         mainWindow.MainTextBox.SelectionBrush = HighlightColor;
 
         PopupBackgroundColor = GetBrushFromConfig(config, PopupBackgroundColor, nameof(PopupBackgroundColor));
-        PopupBackgroundColor.Opacity = GetNumberWithDecimalPointFromConfig(config, 70.0, "PopupOpacity", double.TryParse) / 100;
+        PopupBackgroundColor.Opacity = GetNumberWithDecimalPointFromConfig(config, 80.0, "PopupOpacity", double.TryParse) / 100;
         PopupBackgroundColor.Freeze();
 
         mainWindow.Background = GetBrushFromConfig(config, mainWindow.Background, "MainWindowBackgroundColor");

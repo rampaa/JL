@@ -21,8 +21,7 @@
         <Grid Grid.Row="0" Name="TitleBarGrid" Visibility="Collapsed">
             <Rectangle Name="TitleBar" VerticalAlignment="Top" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
                    HorizontalAlignment="Stretch" Height="20" Opacity="1" Margin="0"
-                   Fill="{Binding Path=Background,
-                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
+                   Fill="Transparent">
             </Rectangle>
 
             <Button x:Name="CloseButton" HorizontalAlignment="Right" Margin="0,0,10,0" Click="CloseButton_Click"
@@ -36,15 +35,13 @@
 
         <TextBlock Grid.Row="1" Name="TextBlockMiningModeReminder" FontSize="13" Padding="5,0,0,0"
                        Visibility="Collapsed" TextWrapping="Wrap"
-                       Background="{Binding Path=Background,
-                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
+                       Background="Transparent"
                        Foreground="{Binding Path=Foreground,
                             RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
         </TextBlock>
 
         <ItemsControl Grid.Row="2" Name="ItemsControlButtons" Visibility="Collapsed"
-                          Background="{Binding Path=Background,
-                  RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
+                          Background="Transparent">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel Orientation="Horizontal" />
@@ -58,8 +55,8 @@
                   BorderThickness="0" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True"
                   ScrollViewer.VerticalScrollBarVisibility="Auto" VirtualizingPanel.IsContainerVirtualizable="True"
                   HorizontalContentAlignment="Stretch" MouseLeave="PopupListView_MouseLeave"
-                  Background="{Binding Path=Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
-                  x:Name="PopupListView" Opacity="70">
+                  Background="Transparent"
+                  x:Name="PopupListView">
             <ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type ListViewItem}">
                     <Setter Property="Focusable" Value="False" />
