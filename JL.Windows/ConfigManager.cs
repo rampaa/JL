@@ -104,6 +104,9 @@ internal static class ConfigManager
     public static bool HideDictTabsWithNoResults { get; private set; } = true;
     public static bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } = false;
     public static int AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 2000;
+    public static bool AutoLookupFirstTermWhenTextIsCopiedFromClipboard { get; private set; } = false;
+    public static bool AutoLookupFirstTermWhenTextIsCopiedFromWebSocket { get; private set; } = false;
+    public static bool AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized { get; private set; } = true;
     public static MouseButton MineMouseButton { get; private set; } = MouseButton.Left;
     public static MouseButton CopyPrimarySpellingToClipboardMouseButton { get; private set; } = MouseButton.Middle;
 
@@ -150,6 +153,7 @@ internal static class ConfigManager
     public static KeyGesture MoveCaretUpKeyGesture { get; private set; } = new(Key.NumPad8, ModifierKeys.Control);
     public static KeyGesture MoveCaretDownKeyGesture { get; private set; } = new(Key.NumPad2, ModifierKeys.Control);
     public static KeyGesture LookupTermAtCaretIndexKeyGesture { get; private set; } = new(Key.NumPad5, ModifierKeys.Control);
+    public static KeyGesture LookupFirstTermKeyGesture { get; private set; } = new(Key.L, ModifierKeys.Alt);
     public static KeyGesture SelectNextLookupResultKeyGesture { get; private set; } = new(Key.Down, ModifierKeys.Control);
     public static KeyGesture SelectPreviousLookupResultKeyGesture { get; private set; } = new(Key.Up, ModifierKeys.Control);
     public static KeyGesture MineSelectedLookupResultKeyGesture { get; private set; } = new(Key.Enter, ModifierKeys.Control);
@@ -293,6 +297,9 @@ internal static class ConfigManager
         PopupDynamicWidth = GetValueFromConfig(config, PopupDynamicWidth, nameof(PopupDynamicWidth), bool.TryParse);
         HideDictTabsWithNoResults = GetValueFromConfig(config, HideDictTabsWithNoResults, nameof(HideDictTabsWithNoResults), bool.TryParse);
         AutoHidePopupIfMouseIsNotOverIt = GetValueFromConfig(config, AutoHidePopupIfMouseIsNotOverIt, nameof(AutoHidePopupIfMouseIsNotOverIt), bool.TryParse);
+        AutoLookupFirstTermWhenTextIsCopiedFromClipboard = GetValueFromConfig(config, AutoLookupFirstTermWhenTextIsCopiedFromClipboard, nameof(AutoLookupFirstTermWhenTextIsCopiedFromClipboard), bool.TryParse);
+        AutoLookupFirstTermWhenTextIsCopiedFromWebSocket = GetValueFromConfig(config, AutoLookupFirstTermWhenTextIsCopiedFromWebSocket, nameof(AutoLookupFirstTermWhenTextIsCopiedFromWebSocket), bool.TryParse);
+        AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized = GetValueFromConfig(config, AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized, nameof(AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized), bool.TryParse);
 
         TextBoxIsReadOnly = GetValueFromConfig(config, TextBoxIsReadOnly, nameof(TextBoxIsReadOnly), bool.TryParse);
         if (mainWindow.MainTextBox.IsReadOnly != TextBoxIsReadOnly)
@@ -449,6 +456,7 @@ internal static class ConfigManager
         MoveCaretUpKeyGesture = KeyGestureUtils.SetKeyGesture(config, nameof(MoveCaretUpKeyGesture), MoveCaretUpKeyGesture);
         MoveCaretDownKeyGesture = KeyGestureUtils.SetKeyGesture(config, nameof(MoveCaretDownKeyGesture), MoveCaretDownKeyGesture);
         LookupTermAtCaretIndexKeyGesture = KeyGestureUtils.SetKeyGesture(config, nameof(LookupTermAtCaretIndexKeyGesture), LookupTermAtCaretIndexKeyGesture);
+        LookupFirstTermKeyGesture = KeyGestureUtils.SetKeyGesture(config, nameof(LookupFirstTermKeyGesture), LookupFirstTermKeyGesture);
         SelectNextLookupResultKeyGesture = KeyGestureUtils.SetKeyGesture(config, nameof(SelectNextLookupResultKeyGesture), SelectNextLookupResultKeyGesture);
         SelectPreviousLookupResultKeyGesture = KeyGestureUtils.SetKeyGesture(config, nameof(SelectPreviousLookupResultKeyGesture), SelectPreviousLookupResultKeyGesture);
         MineSelectedLookupResultKeyGesture = KeyGestureUtils.SetKeyGesture(config, nameof(MineSelectedLookupResultKeyGesture), MineSelectedLookupResultKeyGesture);
@@ -773,6 +781,8 @@ internal static class ConfigManager
             KeyGestureUtils.KeyGestureToString(MoveCaretDownKeyGesture);
         preferenceWindow.LookupTermAtCaretIndexKeyGestureTextBox.Text =
             KeyGestureUtils.KeyGestureToString(LookupTermAtCaretIndexKeyGesture);
+        preferenceWindow.LookupFirstTermKeyGestureTextBox.Text =
+            KeyGestureUtils.KeyGestureToString(LookupFirstTermKeyGesture);
         preferenceWindow.SelectNextLookupResultKeyGestureTextBox.Text =
             KeyGestureUtils.KeyGestureToString(SelectNextLookupResultKeyGesture);
         preferenceWindow.SelectPreviousLookupResultKeyGestureTextBox.Text =
@@ -928,6 +938,10 @@ internal static class ConfigManager
         preferenceWindow.DisableLookupsForNonJapaneseCharsInPopupsCheckBox.IsChecked = DisableLookupsForNonJapaneseCharsInPopups;
         preferenceWindow.HideDictTabsWithNoResultsCheckBox.IsChecked = HideDictTabsWithNoResults;
         preferenceWindow.AutoHidePopupIfMouseIsNotOverItCheckBox.IsChecked = AutoHidePopupIfMouseIsNotOverIt;
+
+        preferenceWindow.AutoLookupFirstTermWhenTextIsCopiedFromClipboardCheckBox.IsChecked = AutoLookupFirstTermWhenTextIsCopiedFromClipboard;
+        preferenceWindow.AutoLookupFirstTermWhenTextIsCopiedFromWebSocketCheckBox.IsChecked = AutoLookupFirstTermWhenTextIsCopiedFromWebSocket;
+        preferenceWindow.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimizedCheckBox.IsChecked = AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized;
     }
 
     public static async Task SavePreferences(PreferencesWindow preferenceWindow)
@@ -989,6 +1003,8 @@ internal static class ConfigManager
             preferenceWindow.MoveCaretDownKeyGestureTextBox.Text);
         SaveKeyGesture(config, nameof(LookupTermAtCaretIndexKeyGesture),
             preferenceWindow.LookupTermAtCaretIndexKeyGestureTextBox.Text);
+        SaveKeyGesture(config, nameof(LookupFirstTermKeyGesture),
+            preferenceWindow.LookupFirstTermKeyGestureTextBox.Text);
         SaveKeyGesture(config, nameof(SelectNextLookupResultKeyGesture),
             preferenceWindow.SelectNextLookupResultKeyGestureTextBox.Text);
         SaveKeyGesture(config, nameof(SelectPreviousLookupResultKeyGesture),
@@ -1228,6 +1244,15 @@ internal static class ConfigManager
 
         settings[nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds)].Value =
             preferenceWindow.AutoHidePopupIfMouseIsNotOverItDelayInMillisecondsNumericUpDown.Value.ToString(CultureInfo.InvariantCulture);
+
+        settings[nameof(AutoLookupFirstTermWhenTextIsCopiedFromClipboard)].Value =
+            preferenceWindow.AutoLookupFirstTermWhenTextIsCopiedFromClipboardCheckBox.IsChecked.ToString();
+
+        settings[nameof(AutoLookupFirstTermWhenTextIsCopiedFromWebSocket)].Value =
+            preferenceWindow.AutoLookupFirstTermWhenTextIsCopiedFromWebSocketCheckBox.IsChecked.ToString();
+
+        settings[nameof(AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized)].Value =
+            preferenceWindow.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimizedCheckBox.IsChecked.ToString();
 
         settings["LookupMode"].Value =
             preferenceWindow.LookupModeComboBox.SelectedValue.ToString();

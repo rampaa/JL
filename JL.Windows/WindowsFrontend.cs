@@ -27,7 +27,7 @@ internal sealed class WindowsFrontend : IFrontend
 
     public void ApplyDictOptions() => DictOptionManager.ApplyDictOptions();
 
-    public void CopyFromWebSocket(string text) => MainWindow.Instance.CopyFromWebSocket(text);
+    public async Task CopyFromWebSocket(string text) => await MainWindow.Instance.CopyFromWebSocket(text).ConfigureAwait(false);
 
     public byte[]? GetImageFromClipboardAsByteArray() => WindowsUtils.GetImageFromClipboardAsByteArray();
 

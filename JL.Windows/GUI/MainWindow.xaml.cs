@@ -86,7 +86,7 @@ internal sealed partial class MainWindow : Window
         if (CoreConfig.CaptureTextFromClipboard)
         {
             s_clipboardSequenceNo = WinApi.GetClipboardSequenceNo();
-            CopyFromClipboard();
+            _ = CopyFromClipboard();
         }
 
         FirstPopupWindow.Owner = this;
@@ -102,7 +102,7 @@ internal sealed partial class MainWindow : Window
         await WindowsUtils.InitializeMainWindow().ConfigureAwait(false);
     }
 
-    private void CopyFromClipboard()
+    private bool CopyFromClipboard()
     {
         bool gotTextFromClipboard = false;
         while (Clipboard.ContainsText() && !gotTextFromClipboard)
@@ -114,17 +114,21 @@ internal sealed partial class MainWindow : Window
                 if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || JapaneseUtils.JapaneseRegex.IsMatch(text))
                 {
                     text = TextUtils.SanitizeText(text);
-
-                    if (WindowState is not WindowState.Minimized)
+                    if (text.Length > 0)
                     {
-                        Dispatcher.Invoke(() =>
+                        if (WindowState is not WindowState.Minimized)
                         {
-                            MainTextBox.Text = text;
-                            MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
-                        }, DispatcherPriority.Send);
-                    }
+                            Dispatcher.Invoke(() =>
+                            {
+                                MainTextBox.Text = text;
+                                MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+                            }, DispatcherPriority.Send);
+                        }
 
-                    HandlePostCopy(text);
+                        HandlePostCopy(text);
+
+                        return true;
+                    }
                 }
             }
             catch (Exception ex)
@@ -132,24 +136,35 @@ internal sealed partial class MainWindow : Window
                 Utils.Logger.Warning(ex, "CopyFromClipboard failed");
             }
         }
+
+        return false;
     }
 
-    public void CopyFromWebSocket(string text)
+    public async Task CopyFromWebSocket(string text)
     {
         if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || JapaneseUtils.JapaneseRegex.IsMatch(text))
         {
             text = TextUtils.SanitizeText(text);
-
-            Dispatcher.Invoke(() =>
+            if (text.Length > 0)
             {
-                if (WindowState is not WindowState.Minimized)
+                Dispatcher.Invoke(() =>
                 {
-                    MainTextBox.Text = text;
-                    MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
-                }
-            }, DispatcherPriority.Send);
+                    if (WindowState is not WindowState.Minimized)
+                    {
+                        MainTextBox.Text = text;
+                        MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
+                    }
+                }, DispatcherPriority.Send);
 
-            HandlePostCopy(text);
+                HandlePostCopy(text);
+
+                if (ConfigManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
+                    && (!ConfigManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
+                        || WindowState is WindowState.Minimized))
+                {
+                    await FirstPopupWindow.LookupOnCharPosition(MainTextBox, text, 0, true).ConfigureAwait(false);
+                }
+            }
         }
     }
 
@@ -284,13 +299,21 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    private void ClipboardChanged(object? sender, EventArgs? e)
+    private async void ClipboardChanged(object? sender, EventArgs? e)
     {
         ulong currentClipboardSequenceNo = WinApi.GetClipboardSequenceNo();
         if (s_clipboardSequenceNo != currentClipboardSequenceNo)
         {
             s_clipboardSequenceNo = currentClipboardSequenceNo;
-            CopyFromClipboard();
+            bool gotTextFromClipboard = CopyFromClipboard();
+
+            if (gotTextFromClipboard
+                && ConfigManager.AutoLookupFirstTermWhenTextIsCopiedFromClipboard
+                && (!ConfigManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
+                    || WindowState is WindowState.Minimized))
+            {
+                await FirstPopupWindow.LookupOnCharPosition(MainTextBox, s_lastTextCopiedWhileMinimized ?? MainTextBox.Text, 0, true).ConfigureAwait(false);
+            }
         }
     }
 
@@ -814,14 +837,32 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            if (ConfigManager.LookupOnSelectOnly && MainTextBox.SelectionLength > 0 && MainTextBox.SelectionStart == MainTextBox.CaretIndex)
+            if (MainTextBox.Text.Length > 0)
             {
-                await FirstPopupWindow.LookupOnSelect(MainTextBox).ConfigureAwait(false);
-            }
+                if (ConfigManager.LookupOnSelectOnly && MainTextBox.SelectionLength > 0 && MainTextBox.SelectionStart == MainTextBox.CaretIndex)
+                {
+                    await FirstPopupWindow.LookupOnSelect(MainTextBox).ConfigureAwait(false);
+                }
 
-            else
+                else
+                {
+                    await FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.Text, MainTextBox.CaretIndex, true).ConfigureAwait(false);
+                }
+            }
+        }
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.LookupFirstTermKeyGesture))
+        {
+            handled = true;
+
+            string text = s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
+            if (text.Length > 0)
             {
-                await FirstPopupWindow.LookupOnCharPosition(MainTextBox, MainTextBox.CaretIndex, true).ConfigureAwait(false);
+                int index = WindowState is WindowState.Minimized
+                    ? 0
+                    : MainTextBox.CaretIndex;
+
+                await FirstPopupWindow.LookupOnCharPosition(MainTextBox, text, index, true).ConfigureAwait(false);
             }
         }
 
@@ -1421,11 +1462,25 @@ internal sealed partial class MainWindow : Window
 
             if (ConfigManager.GlobalHotKeys)
             {
+                List<int> keyGestureIdsToIgnore = new();
+                // TODO: Find out which hotkeys are useful even when main window is minimized
                 if (KeyGestureUtils.KeyGestureNameToIntDict.TryGetValue(nameof(ConfigManager.ToggleMinimizedStateKeyGesture), out int id))
                 {
-                    WinApi.UnregisterAllHotKeys(WindowHandle, id);
+                    keyGestureIdsToIgnore.Add(id);
+                }
+                if (KeyGestureUtils.KeyGestureNameToIntDict.TryGetValue(nameof(ConfigManager.LookupFirstTermKeyGesture), out id))
+                {
+                    keyGestureIdsToIgnore.Add(id);
+                }
+                if (KeyGestureUtils.KeyGestureNameToIntDict.TryGetValue(nameof(ConfigManager.ClosePopupKeyGesture), out id))
+                {
+                    keyGestureIdsToIgnore.Add(id);
                 }
 
+                if (keyGestureIdsToIgnore.Count > 0)
+                {
+                    WinApi.UnregisterAllHotKeys(WindowHandle, keyGestureIdsToIgnore);
+                }
                 else
                 {
                     WinApi.UnregisterAllHotKeys(WindowHandle);

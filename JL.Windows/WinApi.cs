@@ -57,6 +57,13 @@ internal sealed class WinApi
             public int flags;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct LPPOINT
+        {
+            public int X;
+            public int Y;
+        }
+
         [DllImport("user32.dll", EntryPoint = "AddClipboardFormatListener", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -132,6 +139,11 @@ internal sealed class WinApi
         [DllImport("user32.dll", EntryPoint = "SetActiveWindow")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static extern nint SetActiveWindow(nint hWnd);
+
+        [DllImport("user32.dll", EntryPoint = "GetCursorPos")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetCursorPos(ref LPPOINT pt);
     }
 #pragma warning restore IDE1006
 
@@ -202,11 +214,11 @@ internal sealed class WinApi
         }
     }
 
-    public static void UnregisterAllHotKeys(nint windowHandle, int idToIgnore)
+    public static void UnregisterAllHotKeys(nint windowHandle, List<int> keyGestureIdsToIgnore)
     {
         foreach (int id in KeyGestureUtils.KeyGestureDict.Keys)
         {
-            if (id == idToIgnore)
+            if (keyGestureIdsToIgnore.Contains(id))
             {
                 continue;
             }
@@ -253,6 +265,14 @@ internal sealed class WinApi
     public static void ActivateWindow(nint windowHandle)
     {
         _ = SetActiveWindow(windowHandle);
+    }
+
+    public static Point GetMousePosition()
+    {
+        LPPOINT lpPoint = new();
+        _ = GetCursorPos(ref lpPoint);
+
+        return new Point(lpPoint.X, lpPoint.Y);
     }
 
     private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)

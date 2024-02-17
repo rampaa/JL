@@ -140,26 +140,26 @@ internal sealed partial class PopupWindow : Window
         WindowsUtils.SearchWithBrowser(text);
     }
 
-    public async Task LookupOnCharPosition(TextBox tb, int charPosition, bool enableMiningMode)
+    public async Task LookupOnCharPosition(TextBox tb, string textBoxText, int charPosition, bool enableMiningMode)
     {
-        _currentText = tb.Text;
+        _currentText = textBoxText;
         _currentCharPosition = charPosition;
 
         if (Owner != MainWindow.Instance
                 ? ConfigManager.DisableLookupsForNonJapaneseCharsInPopups
-                  && !JapaneseUtils.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString())
+                  && !JapaneseUtils.JapaneseRegex.IsMatch(textBoxText[charPosition].ToString())
                 : ConfigManager.DisableLookupsForNonJapaneseCharsInMainWindow
-                  && !JapaneseUtils.JapaneseRegex.IsMatch(tb.Text[charPosition].ToString()))
+                  && !JapaneseUtils.JapaneseRegex.IsMatch(textBoxText[charPosition].ToString()))
         {
             HidePopup();
             return;
         }
 
-        int endPosition = (tb.Text.Length - charPosition) > ConfigManager.MaxSearchLength
-            ? JapaneseUtils.FindExpressionBoundary(tb.Text[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
-            : JapaneseUtils.FindExpressionBoundary(tb.Text, charPosition);
+        int endPosition = (textBoxText.Length - charPosition) > ConfigManager.MaxSearchLength
+            ? JapaneseUtils.FindExpressionBoundary(textBoxText[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
+            : JapaneseUtils.FindExpressionBoundary(textBoxText, charPosition);
 
-        string text = tb.Text[charPosition..endPosition];
+        string text = textBoxText[charPosition..endPosition];
 
         if (string.IsNullOrEmpty(text))
         {
@@ -176,7 +176,7 @@ internal sealed partial class PopupWindow : Window
 
             else
             {
-                UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+                UpdatePosition(WinApi.GetMousePosition());
             }
 
             return;
@@ -231,7 +231,7 @@ internal sealed partial class PopupWindow : Window
 
             else
             {
-                UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+                UpdatePosition(WinApi.GetMousePosition());
             }
 
             if (ConfigManager.Focusable
@@ -269,7 +269,7 @@ internal sealed partial class PopupWindow : Window
                 --charPosition;
             }
 
-            await LookupOnCharPosition(tb, charPosition, ConfigManager.LookupOnMouseClickOnly).ConfigureAwait(false);
+            await LookupOnCharPosition(tb, tb.Text, charPosition, ConfigManager.LookupOnMouseClickOnly).ConfigureAwait(false);
         }
         else
         {
@@ -314,7 +314,7 @@ internal sealed partial class PopupWindow : Window
 
             else
             {
-                UpdatePosition(PointToScreen(Mouse.GetPosition(this)));
+                UpdatePosition(WinApi.GetMousePosition());
             }
 
             _ = tb.Focus();
@@ -635,7 +635,7 @@ internal sealed partial class PopupWindow : Window
                 Cursor = Cursors.Arrow,
                 BorderThickness = new Thickness(0),
                 Padding = new Thickness(0),
-                FontSize = 12,
+                FontSize = 12
             };
 
             audioButton.Click += AudioButton_Click;
@@ -1052,7 +1052,7 @@ internal sealed partial class PopupWindow : Window
         }
         else
         {
-            ReadingSelectionWindow.Show(lookupResult.PrimarySpelling, lookupResult.Readings, this);
+            ReadingSelectionWindow.Show(lookupResult.PrimarySpelling, lookupResult.Readings);
         }
     }
 

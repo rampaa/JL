@@ -570,6 +570,27 @@
                         </DockPanel>
 
                         <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Auto look up the first term when it's copied from the clipboard"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}" />
+                            <CheckBox x:Name="AutoLookupFirstTermWhenTextIsCopiedFromClipboardCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Auto look up the first term when it's copied from a WebSocket"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}" />
+                            <CheckBox x:Name="AutoLookupFirstTermWhenTextIsCopiedFromWebSocketCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="Don't auto look up the first term on text change if Main Window is not minimized"
+                                       TextWrapping="Wrap" VerticalAlignment="Center"
+                                       Style="{StaticResource TextBlockDefault}" />
+                            <CheckBox x:Name="AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimizedCheckBox"  HorizontalAlignment="Right" />
+                        </DockPanel>
+
+                        <DockPanel>
                             <TextBlock HorizontalAlignment="Left" Text="Background color"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
@@ -1272,7 +1293,18 @@
                             <TextBox x:Name="LookupTermAtCaretIndexKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Lookup term at caret index" TextWrapping="Wrap" HorizontalAlignment="Left"
+                            <TextBlock Text="Look up the term at the caret index" TextWrapping="Wrap" HorizontalAlignment="Left"
+                                       Style="{StaticResource TextBlockDefault}"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Button Content="Clear" Width="Auto" DockPanel.Dock="Right" FontSize="9" Height="24"
+                                    Click="ClearKeyGestureButton_Click" />
+                            <TextBox x:Name="LookupFirstTermKeyGestureTextBox"
+                                     PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
+                                     HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
+                            <TextBlock Text="Look up the first term" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
@@ -1283,7 +1315,7 @@
                             <TextBox x:Name="SelectNextLookupResultKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Select next lookup result" TextWrapping="Wrap" HorizontalAlignment="Left"
+                            <TextBlock Text="Select the next lookup result" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>
@@ -1294,7 +1326,7 @@
                             <TextBox x:Name="SelectPreviousLookupResultKeyGestureTextBox"
                                      PreviewKeyDown="KeyGestureToText" CaretBrush="#00000000" Width="250"
                                      HorizontalAlignment="Right" DockPanel.Dock="Right" Margin="0,0,5,0" />
-                            <TextBlock Text="Select previous lookup result" TextWrapping="Wrap" HorizontalAlignment="Left"
+                            <TextBlock Text="Select the previous lookup result" TextWrapping="Wrap" HorizontalAlignment="Left"
                                        Style="{StaticResource TextBlockDefault}"
                                        VerticalAlignment="Center" />
                         </DockPanel>

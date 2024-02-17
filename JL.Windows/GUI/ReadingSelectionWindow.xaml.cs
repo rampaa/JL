@@ -25,7 +25,7 @@ internal sealed partial class ReadingSelectionWindow : Window
         return s_instance?.IsVisible ?? false;
     }
 
-    public static void Show(string primarySpelling, string[] readings, Window window)
+    public static void Show(string primarySpelling, string[] readings)
     {
         ReadingSelectionWindow currentInstance = s_instance ??= new ReadingSelectionWindow();
         currentInstance._primarySpelling = primarySpelling;
@@ -36,7 +36,7 @@ internal sealed partial class ReadingSelectionWindow : Window
         currentInstance.Foreground = ConfigManager.DefinitionsColor;
         currentInstance.FontFamily = ConfigManager.PopupFont;
         currentInstance.Show();
-        currentInstance.UpdatePosition(window.PointToScreen(Mouse.GetPosition(window)));
+        currentInstance.UpdatePosition(WinApi.GetMousePosition());
         WinApi.BringToFront(currentInstance._windowHandle);
         _ = currentInstance.Focus();
     }

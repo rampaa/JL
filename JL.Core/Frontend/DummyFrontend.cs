@@ -27,9 +27,8 @@ internal sealed class DummyFrontend : IFrontend
     public void ApplyDictOptions()
     {
     }
-    public void CopyFromWebSocket(string text)
-    {
-    }
+
+    public Task CopyFromWebSocket(string text) => Task.CompletedTask;
 
     public byte[]? GetImageFromClipboardAsByteArray() => null;
 
