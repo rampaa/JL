@@ -158,12 +158,15 @@ internal sealed partial class MainWindow : Window
 
                 HandlePostCopy(text);
 
-                if (ConfigManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
-                    && (!ConfigManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
-                        || WindowState is WindowState.Minimized))
+                await Dispatcher.Invoke(async () =>
                 {
-                    await FirstPopupWindow.LookupOnCharPosition(MainTextBox, text, 0, true).ConfigureAwait(false);
-                }
+                    if (ConfigManager.AutoLookupFirstTermWhenTextIsCopiedFromWebSocket
+                        && (!ConfigManager.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized
+                            || WindowState is WindowState.Minimized))
+                    {
+                        await FirstPopupWindow.LookupOnCharPosition(MainTextBox, text, 0, true).ConfigureAwait(false);
+                    }
+                }).ConfigureAwait(false);
             }
         }
     }
