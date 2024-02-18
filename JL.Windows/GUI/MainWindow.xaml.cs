@@ -868,11 +868,7 @@ internal sealed partial class MainWindow : Window
             string text = s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
             if (text.Length > 0)
             {
-                int index = WindowState is WindowState.Minimized
-                    ? 0
-                    : MainTextBox.CaretIndex;
-
-                await FirstPopupWindow.LookupOnCharPosition(MainTextBox, text, index, true).ConfigureAwait(false);
+                await FirstPopupWindow.LookupOnCharPosition(MainTextBox, text, 0, true).ConfigureAwait(false);
             }
         }
 
