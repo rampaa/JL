@@ -8,7 +8,6 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Core.Dicts;
-using JL.Core.Dicts.EDICT;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
@@ -219,13 +218,13 @@ internal sealed partial class ManageDictionariesWindow : Window
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
-                        await ResourceUpdater.UpdateJmdict(true, false).ConfigureAwait(true);
+                        await DictUpdater.UpdateJmdict(true, false).ConfigureAwait(true);
                         break;
                     case DictType.JMnedict:
-                        await ResourceUpdater.UpdateJmnedict(true, false).ConfigureAwait(true);
+                        await DictUpdater.UpdateJmnedict(true, false).ConfigureAwait(true);
                         break;
                     case DictType.Kanjidic:
-                        await ResourceUpdater.UpdateKanjidic(true, false).ConfigureAwait(true);
+                        await DictUpdater.UpdateKanjidic(true, false).ConfigureAwait(true);
                         break;
                 }
 

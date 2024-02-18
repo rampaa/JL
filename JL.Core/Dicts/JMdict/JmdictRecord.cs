@@ -4,7 +4,7 @@ using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
 
-namespace JL.Core.Dicts.EDICT.JMdict;
+namespace JL.Core.Dicts.JMdict;
 
 internal sealed class JmdictRecord : IDictRecord, IGetFrequency
 {

@@ -6,7 +6,7 @@ using System.Text.Json;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
-namespace JL.Core.Dicts.EDICT.JMdict;
+namespace JL.Core.Dicts.JMdict;
 internal static class JmdictDBManager
 {
     public static void CreateDB(string dbName)

@@ -1,4 +1,4 @@
-namespace JL.Core.Dicts.EDICT.JMdict;
+namespace JL.Core.Dicts.JMdict;
 
 internal ref struct JmdictEntry
 {

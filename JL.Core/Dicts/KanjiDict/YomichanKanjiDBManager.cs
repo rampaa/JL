@@ -5,7 +5,7 @@ using System.Text.Json;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
-namespace JL.Core.Dicts.Kanji;
+namespace JL.Core.Dicts.KanjiDict;
 internal static class YomichanKanjiDBManager
 {
     public static void CreateDB(string dbName)

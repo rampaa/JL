@@ -811,9 +811,7 @@ internal sealed partial class MainWindow : Window
                     ? MainTextBox.SelectionLength > 0
                         ? MainTextBox.SelectedText
                         : MainTextBox.Text
-                    : s_lastTextCopiedWhileMinimized is not null
-                        ? s_lastTextCopiedWhileMinimized
-                        : MainTextBox.Text;
+                    : s_lastTextCopiedWhileMinimized ?? MainTextBox.Text;
 
                 if (selectedText.Length > 0)
                 {

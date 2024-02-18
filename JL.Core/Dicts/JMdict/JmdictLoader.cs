@@ -3,7 +3,7 @@ using System.Xml;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
 
-namespace JL.Core.Dicts.EDICT.JMdict;
+namespace JL.Core.Dicts.JMdict;
 
 internal static class JmdictLoader
 {
@@ -43,7 +43,7 @@ internal static class JmdictLoader
                      "Couldn't find JMdict.xml. Would you like to download it now?",
                      "Download JMdict?"))
         {
-            bool downloaded = await ResourceUpdater.UpdateResource(fullPath,
+            bool downloaded = await DictUpdater.UpdateDict(fullPath,
                 DictUtils.s_jmdictUrl,
                 DictType.JMdict.ToString(), false, false).ConfigureAwait(false);
 

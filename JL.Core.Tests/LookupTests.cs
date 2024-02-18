@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
-using JL.Core.Dicts.EDICT.JMdict;
+using JL.Core.Dicts.JMdict;
 using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
 using JL.Core.Frontend;

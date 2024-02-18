@@ -1,7 +1,6 @@
 using System.Text.Json;
 using JL.Core.Dicts;
-using JL.Core.Dicts.EDICT;
-using JL.Core.Dicts.EDICT.JMdict;
+using JL.Core.Dicts.JMdict;
 using JL.Core.Utilities;
 
 namespace JL.Core.WordClass;
@@ -141,7 +140,7 @@ internal static class JmdictWordClassUtils
                 if (!File.Exists(fullPath))
                 {
                     deleteJmdictFile = true;
-                    bool downloaded = await ResourceUpdater.UpdateResource(fullPath,
+                    bool downloaded = await DictUpdater.UpdateDict(fullPath,
                         DictUtils.s_jmdictUrl,
                         dict.Type.ToString(), false, true).ConfigureAwait(false);
 

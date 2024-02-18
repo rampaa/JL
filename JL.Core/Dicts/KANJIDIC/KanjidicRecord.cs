@@ -1,4 +1,4 @@
-namespace JL.Core.Dicts.EDICT.KANJIDIC;
+namespace JL.Core.Dicts.KANJIDIC;
 
 internal sealed class KanjidicRecord : IDictRecord
 {

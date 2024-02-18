@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Text;
 using JL.Core.Dicts.Options;
 
-namespace JL.Core.Dicts.EDICT.JMnedict;
+namespace JL.Core.Dicts.JMnedict;
 
 internal sealed class JmnedictRecord : IDictRecord
 {

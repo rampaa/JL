@@ -22,7 +22,7 @@ public enum JLField
     [Description("Pitch Accents (Numeric)")] NumericPitchAccents,
 
     // JMdict, JMnedict, KANJIDIC2
-    [Description("EDICT ID")] EdictId,
+    [Description("Entry ID")] EdictId,
 
     // Word dictionaries
     [Description("Deconjugated Matched Text")] DeconjugatedMatchedText,

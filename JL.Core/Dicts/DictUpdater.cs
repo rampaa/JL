@@ -1,30 +1,30 @@
 using System.Globalization;
 using System.IO.Compression;
 using System.Net;
-using JL.Core.Dicts.EDICT.JMdict;
-using JL.Core.Dicts.EDICT.JMnedict;
-using JL.Core.Dicts.EDICT.KANJIDIC;
+using JL.Core.Dicts.JMdict;
+using JL.Core.Dicts.JMnedict;
+using JL.Core.Dicts.KANJIDIC;
 using JL.Core.Network;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
 using Microsoft.Data.Sqlite;
 
-namespace JL.Core.Dicts.EDICT;
+namespace JL.Core.Dicts;
 
-public static class ResourceUpdater
+public static class DictUpdater
 {
-    internal static async Task<bool> UpdateResource(string resourcePath, Uri resourceDownloadUri, string resourceName,
+    internal static async Task<bool> UpdateDict(string dictPath, Uri dictDownloadUri, string dictName,
         bool isUpdate, bool noPrompt)
     {
         try
         {
             if (!isUpdate || noPrompt || Utils.Frontend.ShowYesNoDialog(string.Create(CultureInfo.InvariantCulture,
-                        $"Do you want to download the latest version of {resourceName}?"),
+                        $"Do you want to download the latest version of {dictName}?"),
                     isUpdate ? "Update dictionary?" : "Download dictionary?"))
             {
-                using HttpRequestMessage request = new(HttpMethod.Get, resourceDownloadUri);
+                using HttpRequestMessage request = new(HttpMethod.Get, dictDownloadUri);
 
-                string fullPath = Path.GetFullPath(resourcePath, Utils.ApplicationPath);
+                string fullPath = Path.GetFullPath(dictPath, Utils.ApplicationPath);
                 if (File.Exists(fullPath))
                 {
                     request.Headers.IfModifiedSince = File.GetLastWriteTime(fullPath);
@@ -33,7 +33,7 @@ public static class ResourceUpdater
                 if (!noPrompt)
                 {
                     Utils.Frontend.ShowOkDialog(string.Create(CultureInfo.InvariantCulture,
-                            $"This may take a while. Please don't shut down the program until {resourceName} is downloaded."),
+                            $"This may take a while. Please don't shut down the program until {dictName} is downloaded."),
                         "Info");
                 }
 
@@ -49,7 +49,7 @@ public static class ResourceUpdater
                     if (!noPrompt)
                     {
                         Utils.Frontend.ShowOkDialog(string.Create(CultureInfo.InvariantCulture,
-                                $"{resourceName} has been downloaded successfully."),
+                                $"{dictName} has been downloaded successfully."),
                             "Info");
                     }
 
@@ -59,19 +59,19 @@ public static class ResourceUpdater
                 if (response.StatusCode is HttpStatusCode.NotModified && !noPrompt)
                 {
                     Utils.Frontend.ShowOkDialog(string.Create(CultureInfo.InvariantCulture,
-                            $"{resourceName} is up to date."),
+                            $"{dictName} is up to date."),
                         "Info");
                 }
 
                 else
                 {
-                    Utils.Logger.Error("Unexpected error while downloading {ResourceName}. Status code: {StatusCode}",
-                        resourceName, response.StatusCode);
+                    Utils.Logger.Error("Unexpected error while downloading {DictName}. Status code: {StatusCode}",
+                        dictName, response.StatusCode);
 
                     if (!noPrompt)
                     {
                         Utils.Frontend.ShowOkDialog(string.Create(CultureInfo.InvariantCulture,
-                                $"Unexpected error while downloading {resourceName}."),
+                                $"Unexpected error while downloading {dictName}."),
                             "Info");
                     }
                 }
@@ -81,10 +81,10 @@ public static class ResourceUpdater
         catch (Exception ex)
         {
             Utils.Frontend.ShowOkDialog(string.Create(CultureInfo.InvariantCulture,
-                    $"Unexpected error while downloading {resourceName}."),
+                    $"Unexpected error while downloading {dictName}."),
                 "Info");
 
-            Utils.Logger.Error(ex, "Unexpected error while downloading {ResourceName}", resourceName);
+            Utils.Logger.Error(ex, "Unexpected error while downloading {DictName}", dictName);
         }
 
         return false;
@@ -108,7 +108,7 @@ public static class ResourceUpdater
         DictUtils.UpdatingJmdict = true;
 
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-        bool downloaded = await UpdateResource(dict.Path,
+        bool downloaded = await UpdateDict(dict.Path,
                 DictUtils.s_jmdictUrl,
                 DictType.JMdict.ToString(), isUpdate, noPrompt)
             .ConfigureAwait(false);
@@ -166,7 +166,7 @@ public static class ResourceUpdater
         DictUtils.UpdatingJmnedict = true;
 
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMnedict];
-        bool downloaded = await UpdateResource(dict.Path,
+        bool downloaded = await UpdateDict(dict.Path,
                 DictUtils.s_jmnedictUrl,
                 DictType.JMnedict.ToString(), isUpdate, noPrompt)
             .ConfigureAwait(false);
@@ -218,7 +218,7 @@ public static class ResourceUpdater
         DictUtils.UpdatingKanjidic = true;
 
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.Kanjidic];
-        bool downloaded = await UpdateResource(dict.Path,
+        bool downloaded = await UpdateDict(dict.Path,
                 DictUtils.s_kanjidicUrl,
                 DictType.Kanjidic.ToString(), isUpdate, noPrompt)
             .ConfigureAwait(false);
@@ -265,7 +265,7 @@ public static class ResourceUpdater
         Utils.Frontend.Alert(AlertLevel.Success, "Finished updating KANJIDIC2");
     }
 
-    public static async Task AutoUpdateBuiltInDicts()
+    internal static async Task AutoUpdateBuiltInDicts()
     {
         DictType[] dicts = {
             DictType.JMdict,

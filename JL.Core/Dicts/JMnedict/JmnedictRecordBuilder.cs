@@ -1,6 +1,6 @@
 using JL.Core.Utilities;
 
-namespace JL.Core.Dicts.EDICT.JMnedict;
+namespace JL.Core.Dicts.JMnedict;
 
 internal static class JmnedictRecordBuilder
 {

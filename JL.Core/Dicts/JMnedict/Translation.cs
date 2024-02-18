@@ -1,4 +1,4 @@
-namespace JL.Core.Dicts.EDICT.JMnedict;
+namespace JL.Core.Dicts.JMnedict;
 
 internal sealed class Translation
 {

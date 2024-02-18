@@ -4,7 +4,7 @@ using System.Text.Json;
 using JL.Core.Dicts.Options;
 using JL.Core.Utilities;
 
-namespace JL.Core.Dicts.Kanji;
+namespace JL.Core.Dicts.KanjiDict;
 
 internal sealed class YomichanKanjiRecord : IDictRecord
 {

@@ -1,7 +1,7 @@
 using System.Xml;
 using JL.Core.Utilities;
 
-namespace JL.Core.Dicts.EDICT.JMnedict;
+namespace JL.Core.Dicts.JMnedict;
 
 internal static class JmnedictLoader
 {
@@ -38,7 +38,7 @@ internal static class JmnedictLoader
         else if (Utils.Frontend.ShowYesNoDialog("Couldn't find JMnedict.xml. Would you like to download it now?",
                      "Download JMnedict?"))
         {
-            bool downloaded = await ResourceUpdater.UpdateResource(fullPath,
+            bool downloaded = await DictUpdater.UpdateDict(fullPath,
                 DictUtils.s_jmnedictUrl,
                 DictType.JMnedict.ToString(), false, false).ConfigureAwait(false);
 

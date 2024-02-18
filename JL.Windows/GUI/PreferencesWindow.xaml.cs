@@ -64,7 +64,7 @@ internal sealed partial class PreferencesWindow : Window
                                             • Frequencies: Frequency info for the mined word, e.g., "VN: 77, jpdb: 666".
                                             • Raw Frequencies: Raw frequency info for the mined word, e.g., "77, 666".
                                             • Pitch Accents (Numeric): Pitch accents for the mined word in numeric form, e.g., おんな: 3, おみな: 0, おうな: 1
-                                            • EDICT ID: JMDict entry ID.
+                                            • Entry ID: JMDict entry ID.
                                             • Local Time: Mining date and time expressed in local timezone.
                                             """;
 
@@ -86,7 +86,7 @@ internal sealed partial class PreferencesWindow : Window
                                              • Frequencies: Frequency info for the kanji, e.g., "KANJIDIC2: 77, jpdb: 666".
                                              • Raw Frequencies: Raw frequency info for the mined word, e.g., "77, 666".
                                              • Pitch Accents (Numeric): Pitch accents for the mined word in numeric form, e.g., おんな: 3, おみな: 0, おうな: 1
-                                             • EDICT ID: KANJIDIC2 entry ID.
+                                             • Entry ID: KANJIDIC2 entry ID.
                                              • Local Time: Mining date and time expressed in local timezone.
                                              """;
 
@@ -100,7 +100,7 @@ internal sealed partial class PreferencesWindow : Window
                                             • Source Text: Whole text in which the mined name appears in.
                                             • Sentence: Sentence in which the mined name appears in.
                                             • Pitch Accents (Numeric): Pitch accents for the mined word in numeric form, e.g., おんな: 3, おみな: 0, おうな: 1
-                                            • EDICT ID: JMnedict entry ID.
+                                            • Entry ID: JMnedict entry ID.
                                             • Local Time: Mining date and time expressed in local timezone.
                                             """;
 

@@ -8,7 +8,6 @@ using CommunityToolkit.HighPerformance.Buffers;
 using JL.Core.Audio;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
-using JL.Core.Dicts.EDICT;
 using JL.Core.Freqs;
 using JL.Core.Frontend;
 using JL.Core.Network;
@@ -151,7 +150,7 @@ public static class Utils
                 await DictUtils.LoadDictionaries().ConfigureAwait(false);
                 await DictUtils.SerializeDicts().ConfigureAwait(false);
                 await JmdictWordClassUtils.Initialize().ConfigureAwait(false);
-                await ResourceUpdater.AutoUpdateBuiltInDicts().ConfigureAwait(false);
+                await DictUpdater.AutoUpdateBuiltInDicts().ConfigureAwait(false);
             }),
             Task.Run(static async () =>
             {

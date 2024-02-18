@@ -1,7 +1,7 @@
 using System.Xml;
 using JL.Core.Utilities;
 
-namespace JL.Core.Dicts.EDICT.KANJIDIC;
+namespace JL.Core.Dicts.KANJIDIC;
 
 internal static class KanjidicLoader
 {
@@ -32,7 +32,7 @@ internal static class KanjidicLoader
                      "Couldn't find kanjidic2.xml. Would you like to download it now?",
                      "Download KANJIDIC2?"))
         {
-            bool downloaded = await ResourceUpdater.UpdateResource(fullPath,
+            bool downloaded = await DictUpdater.UpdateDict(fullPath,
                 DictUtils.s_kanjidicUrl,
                 DictType.Kanjidic.ToString(), false, false).ConfigureAwait(false);
 
