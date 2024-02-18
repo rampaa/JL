@@ -58,6 +58,8 @@ internal sealed partial class PreferencesWindow : Window
                                             • Audio: Audio for the first reading of the mined word.
                                             • Source Text: Whole text in which the mined word appears in.
                                             • Sentence: Sentence in which the mined word appears in.
+                                            • Leading Sentence Part: Part of the sentence that appears before the matched text. e.g., if the mined word is "大好き" while the sentence is "妹が大好きです", "Leading Sentence Part" will be "妹が".
+                                            • Trailing Sentence Part: Part of the sentence that appears after the matched text. e.g., if the mined word is "大好き" while the sentence is "妹が大好きです", "Trailing Sentence Part" will be "です".
                                             • Matched Text: Text the mined word found as, e.g., "わかりました".
                                             • Deconjugated Matched Text: Matched Text's deconjugated form, e.g., if the "Matched Text" is "わかりました", "Deconjugated Matched Text" will be "わかる".
                                             • Deconjugation Process: Deconjugation path from the "Matched Text" to "Deconjugated Matched Text".
@@ -83,6 +85,8 @@ internal sealed partial class PreferencesWindow : Window
                                              • Dictionary Name: Name of the dictionary, e.g., "Kanjidic".
                                              • Source Text: Whole text in which the mined kanji appears in.
                                              • Sentence: Sentence in which the mined kanji appears in.
+                                             • Leading Sentence Part: Part of the sentence that appears before the mined kanji. e.g., if the mined kanji is "大" while the sentence is "妹が大好きです", "Leading Sentence Part" will be "妹が".
+                                             • Trailing Sentence Part: Part of the sentence that appears after the mined kanji. e.g., if the mined kanji is "大" while the sentence is "妹が大好きです", "Trailing Sentence Part" will be "好きです".
                                              • Frequencies: Frequency info for the kanji, e.g., "KANJIDIC2: 77, jpdb: 666".
                                              • Raw Frequencies: Raw frequency info for the mined word, e.g., "77, 666".
                                              • Pitch Accents (Numeric): Pitch accents for the mined word in numeric form, e.g., おんな: 3, おみな: 0, おうな: 1
@@ -99,6 +103,8 @@ internal sealed partial class PreferencesWindow : Window
                                             • Dictionary Name: Name of the dictionary, e.g., "JMnedict".
                                             • Source Text: Whole text in which the mined name appears in.
                                             • Sentence: Sentence in which the mined name appears in.
+                                            • Leading Sentence Part: Part of the sentence that appears before the mined name. e.g., if the mined name is "エスト" while the sentence is "俺はエストのことが大好き", "Leading Sentence Part" will be "俺は".
+                                            • Trailing Sentence Part: Part of the sentence that appears after the mined name. e.g., if the mined name is "エスト" while the sentence is "俺はエストのことが大好き", "Trailing Sentence Part" will be "のことが大好き".
                                             • Pitch Accents (Numeric): Pitch accents for the mined word in numeric form, e.g., おんな: 3, おみな: 0, おうな: 1
                                             • Entry ID: JMnedict entry ID.
                                             • Local Time: Mining date and time expressed in local timezone.

@@ -19,7 +19,6 @@ public static class MiningUtils
         {
             [JLField.LocalTime] = DateTime.Now.ToString("s", CultureInfo.InvariantCulture),
             [JLField.SourceText] = replaceLineBreakWithBrTag ? currentText.ReplaceLineEndings("<br/>") : currentText,
-            [JLField.Sentence] = JapaneseUtils.FindSentence(currentText, currentCharPosition),
             [JLField.DictionaryName] = lookupResult.Dict.Name,
             [JLField.MatchedText] = lookupResult.MatchedText,
             [JLField.DeconjugatedMatchedText] = lookupResult.DeconjugatedMatchedText,
@@ -28,6 +27,11 @@ public static class MiningUtils
         ? string.Create(CultureInfo.InvariantCulture, $"{lookupResult.PrimarySpelling} ({string.Join(", ", lookupResult.PrimarySpellingOrthographyInfoList)})")
         : lookupResult.PrimarySpelling
         };
+
+        string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
+        miningParams[JLField.Sentence] = sentence;
+        miningParams[JLField.LeadingSentencePart] = sentence[..currentCharPosition];
+        miningParams[JLField.TrailingSentencePart] = sentence[(lookupResult.MatchedText.Length + currentCharPosition)..];
 
         if (lookupResult.Readings is not null)
         {

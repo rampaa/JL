@@ -14,6 +14,8 @@ public enum JLField
     Audio,
     Image,
     Sentence,
+    [Description("Leading Sentence Part")] LeadingSentencePart,
+    [Description("Trailing Sentence Part")] TrailingSentencePart,
     [Description("Source Text")] SourceText,
     [Description("Matched Text")] MatchedText,
     [Description("Local Time")] LocalTime,
