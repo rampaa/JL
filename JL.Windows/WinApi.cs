@@ -214,6 +214,19 @@ internal sealed class WinApi
         }
     }
 
+    public static void UnregisterAllHotKeys(nint windowHandle, int keyGestureIdToIgnore)
+    {
+        foreach (int id in KeyGestureUtils.KeyGestureDict.Keys)
+        {
+            if (keyGestureIdToIgnore == id)
+            {
+                continue;
+            }
+
+            _ = UnregisterHotKey(windowHandle, id);
+        }
+    }
+
     public static void UnregisterAllHotKeys(nint windowHandle, List<int> keyGestureIdsToIgnore)
     {
         foreach (int id in KeyGestureUtils.KeyGestureDict.Keys)
