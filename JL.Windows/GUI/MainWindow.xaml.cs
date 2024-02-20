@@ -50,7 +50,7 @@ internal sealed partial class MainWindow : Window
     private static readonly Point s_origin = new(0, 0);
     private Point _swipeStartPoint;
 
-    public MainWindow()
+    private MainWindow()
     {
         InitializeComponent();
         s_instance = this;
