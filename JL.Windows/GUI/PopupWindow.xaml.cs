@@ -1824,13 +1824,9 @@ internal sealed partial class PopupWindow : Window
     private string? GetSelectedDefinitions(int listViewIndex)
     {
         TextBox? definitionTextBox = GetDefinitionTextBox(listViewIndex);
-        string? selectedDefinitions = null;
-        if (definitionTextBox?.SelectionLength > 0)
-        {
-            selectedDefinitions = definitionTextBox.SelectedText;
-        }
-
-        return selectedDefinitions;
+        return definitionTextBox?.SelectionLength > 0
+            ? definitionTextBox.SelectedText
+            : null;
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
