@@ -64,34 +64,34 @@ internal sealed class WinApi
             public int Y;
         }
 
-        [DllImport("user32.dll", EntryPoint = "AddClipboardFormatListener", SetLastError = true)]
+        [DllImport("user32.dll", EntryPoint = "AddClipboardFormatListener", ExactSpelling = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool AddClipboardFormatListener(nint hwnd);
 
-        [DllImport("user32.dll", EntryPoint = "RemoveClipboardFormatListener", SetLastError = true)]
+        [DllImport("user32.dll", EntryPoint = "RemoveClipboardFormatListener", ExactSpelling = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool RemoveClipboardFormatListener(nint hwnd);
 
-        [DllImport("user32.dll", EntryPoint = "GetClipboardSequenceNumber")]
+        [DllImport("user32.dll", EntryPoint = "GetClipboardSequenceNumber", ExactSpelling = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         internal static extern ulong GetClipboardSequenceNumber();
 
-        [DllImport("user32.dll", EntryPoint = "SendMessageW")]
+        [DllImport("user32.dll", EntryPoint = "SendMessageW", ExactSpelling = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         internal static extern nint SendMessage(nint hWnd, uint msg, nint wParam, nint lParam);
 
-        [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
+        [DllImport("user32.dll", EntryPoint = "SetWindowPos", ExactSpelling = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
-        [DllImport("user32.dll", EntryPoint = "SetWindowLongW")]
+        [DllImport("user32.dll", EntryPoint = "SetWindowLongW", ExactSpelling = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern int SetWindowLong32(nint hWnd, int nIndex, int dwNewLong);
 
-        [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW")]
+        [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW", ExactSpelling = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern nint SetWindowLongPtr64(nint hWnd, int nIndex, nint dwNewLong);
 
@@ -102,11 +102,11 @@ internal sealed class WinApi
                 : SetWindowLong32(hWnd, nIndex, (int)dwNewLong);
         }
 
-        [DllImport("user32.dll", EntryPoint = "GetWindowLongW")]
+        [DllImport("user32.dll", EntryPoint = "GetWindowLongW", ExactSpelling = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern int GetWindowLongPtr32(nint hWnd, int nIndex);
 
-        [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")]
+        [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW", ExactSpelling = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern nint GetWindowLongPtr64(nint hWnd, int nIndex);
 
@@ -117,30 +117,30 @@ internal sealed class WinApi
                 : GetWindowLongPtr32(hWnd, nIndex);
         }
 
-        [DllImport("user32.dll", EntryPoint = "DefWindowProcW")]
+        [DllImport("user32.dll", EntryPoint = "DefWindowProcW", ExactSpelling = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         internal static extern nint DefWindowProc(nint hWnd, int msg, nint wParam, nint lParam);
 
-        [DllImport("user32.dll", EntryPoint = "RegisterHotKey")]
+        [DllImport("user32.dll", EntryPoint = "RegisterHotKey", ExactSpelling = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool RegisterHotKey(nint hWnd, int id, uint fsModifiers, uint vk);
 
-        [DllImport("user32.dll", EntryPoint = "UnregisterHotKey")]
+        [DllImport("user32.dll", EntryPoint = "UnregisterHotKey", ExactSpelling = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool UnregisterHotKey(nint hWnd, int id);
 
-        [DllImport("user32.dll", EntryPoint = "ShowWindow")]
+        [DllImport("user32.dll", EntryPoint = "ShowWindow", ExactSpelling = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool ShowWindow(nint hWnd, int nCmdShow);
 
-        [DllImport("user32.dll", EntryPoint = "SetActiveWindow")]
+        [DllImport("user32.dll", EntryPoint = "SetActiveWindow", ExactSpelling = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static extern nint SetActiveWindow(nint hWnd);
 
-        [DllImport("user32.dll", EntryPoint = "GetCursorPos")]
+        [DllImport("user32.dll", EntryPoint = "GetCursorPos", ExactSpelling = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GetCursorPos(ref LPPOINT pt);
