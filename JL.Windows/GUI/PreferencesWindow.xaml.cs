@@ -32,7 +32,7 @@ internal sealed partial class PreferencesWindow : Window
     private readonly Dict _profileNamesDict;
     private readonly Dict _profileWordsDict;
 
-    public PreferencesWindow()
+    private PreferencesWindow()
     {
         InitializeComponent();
         _profileName = ProfileUtils.CurrentProfile;
@@ -129,11 +129,12 @@ internal sealed partial class PreferencesWindow : Window
         Close();
     }
 
-    private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private async void Window_Closed(object sender, EventArgs e)
     {
+        s_instance = null;
+
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
-        s_instance = null;
 
         if (_profileName != ProfileUtils.CurrentProfile)
         {

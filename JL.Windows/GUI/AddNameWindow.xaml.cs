@@ -19,7 +19,7 @@ internal sealed partial class AddNameWindow : Window
     private static AddNameWindow? s_instance;
     public static AddNameWindow Instance => s_instance ??= new AddNameWindow();
 
-    public AddNameWindow()
+    private AddNameWindow()
     {
         InitializeComponent();
     }
@@ -88,11 +88,11 @@ internal sealed partial class AddNameWindow : Window
         }
     }
 
-    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private void Window_Closed(object sender, EventArgs e)
     {
+        s_instance = null;
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
-        s_instance = null;
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e)

@@ -24,7 +24,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
 
     public static ManageFrequenciesWindow Instance => s_instance ??= new ManageFrequenciesWindow();
 
-    public ManageFrequenciesWindow()
+    private ManageFrequenciesWindow()
     {
         InitializeComponent();
         UpdateFreqsDisplay();
@@ -56,12 +56,14 @@ internal sealed partial class ManageFrequenciesWindow : Window
         return s_instance?.IsVisible ?? false;
     }
 
-    private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private async void Window_Closed(object sender, EventArgs e)
     {
+        s_instance = null;
+
         Utils.Frontend.InvalidateDisplayCache();
+
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
-        s_instance = null;
         await FreqUtils.LoadFrequencies().ConfigureAwait(false);
         await FreqUtils.SerializeFreqs().ConfigureAwait(false);
 

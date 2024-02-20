@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Manage Frequencies" Height="700" Width="900" Closing="Window_Closing" ResizeMode="NoResize" Background="{DynamicResource RegionBrush}"
+        Title="Manage Frequencies" Height="700" Width="900" Closed="Window_Closed" ResizeMode="NoResize" Background="{DynamicResource RegionBrush}"
         SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Topmost="True" ShowInTaskbar="False"
         x:ClassModifier="internal">
     <Grid>

@@ -21,7 +21,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
     private nint _windowHandle;
     public static ManageAudioSourcesWindow Instance => s_instance ??= new ManageAudioSourcesWindow();
 
-    public ManageAudioSourcesWindow()
+    private ManageAudioSourcesWindow()
     {
         InitializeComponent();
         UpdateAudioSourcesDisplay();
@@ -53,14 +53,14 @@ internal sealed partial class ManageAudioSourcesWindow : Window
         return s_instance?.IsVisible ?? false;
     }
 
-    private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private async void Window_Closed(object sender, EventArgs e)
     {
-        Utils.Frontend.InvalidateDisplayCache();
+        s_instance = null;
+
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
-        s_instance = null;
-        await AudioUtils.SerializeAudioSources().ConfigureAwait(false);
 
+        await AudioUtils.SerializeAudioSources().ConfigureAwait(false);
         SpeechSynthesisUtils.SetInstalledVoiceWithHighestPriority();
     }
 

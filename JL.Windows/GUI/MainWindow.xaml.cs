@@ -343,7 +343,6 @@ internal sealed partial class MainWindow : Window
 
     private void MainWindow_Closed(object sender, EventArgs e)
     {
-        SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
         Application.Current.Shutdown();
     }
 
@@ -454,6 +453,7 @@ internal sealed partial class MainWindow : Window
 
     private async void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
+        SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
         ConfigManager.SaveBeforeClosing();
         Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
         await Stats.SerializeLifetimeStats().ConfigureAwait(false);

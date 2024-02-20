@@ -18,7 +18,7 @@ internal sealed partial class StatsWindow : Window
 
     public static StatsWindow Instance => s_instance ??= new StatsWindow();
 
-    public StatsWindow()
+    private StatsWindow()
     {
         InitializeComponent();
     }
@@ -138,10 +138,10 @@ internal sealed partial class StatsWindow : Window
     }
 #pragma warning restore CA1308
 
-    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private void Window_Closed(object sender, EventArgs e)
     {
+        s_instance = null;
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
-        s_instance = null;
     }
 }

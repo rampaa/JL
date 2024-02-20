@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         Background="{DynamicResource RegionBrush}"
         Title="Add Word" ResizeMode="NoResize" Width="500" SizeToContent="Height" MaxHeight="1000" PreviewKeyUp="Window_PreviewKeyUp"
-        Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False" Closing="Window_Closing" x:ClassModifier="internal">
+        Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False" Closed="Window_Closed" x:ClassModifier="internal">
     <ScrollViewer>
         <Grid>
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,70">

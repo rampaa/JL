@@ -20,7 +20,7 @@ internal sealed partial class AddWordWindow : Window
 
     public static AddWordWindow Instance => s_instance ??= new AddWordWindow();
 
-    public AddWordWindow()
+    private AddWordWindow()
     {
         InitializeComponent();
     }
@@ -106,11 +106,11 @@ internal sealed partial class AddWordWindow : Window
         }
     }
 
-    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private void Window_Closed(object sender, EventArgs e)
     {
+        s_instance = null;
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
-        s_instance = null;
     }
 
     private void VerbRadioButton_Checked(object sender, RoutedEventArgs e)

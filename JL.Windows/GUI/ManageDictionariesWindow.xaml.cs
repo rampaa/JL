@@ -28,7 +28,7 @@ internal sealed partial class ManageDictionariesWindow : Window
 
     public static ManageDictionariesWindow Instance => s_instance ??= new ManageDictionariesWindow();
 
-    public ManageDictionariesWindow()
+    private ManageDictionariesWindow()
     {
         InitializeComponent();
         UpdateDictionariesDisplay();
@@ -60,12 +60,15 @@ internal sealed partial class ManageDictionariesWindow : Window
         return s_instance?.IsVisible ?? false;
     }
 
-    private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private async void Window_Closed(object sender, EventArgs e)
     {
+        s_instance = null;
+
         Utils.Frontend.InvalidateDisplayCache();
+
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
-        s_instance = null;
+
         await DictUtils.LoadDictionaries().ConfigureAwait(false);
         await DictUtils.SerializeDicts().ConfigureAwait(false);
 

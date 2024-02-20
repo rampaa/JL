@@ -43,7 +43,7 @@ internal sealed partial class ManageProfilesWindow : Window
         }
     }
 
-    private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private async void Window_Closed(object sender, EventArgs e)
     {
         await ProfileUtils.SerializeProfiles().ConfigureAwait(false);
     }
