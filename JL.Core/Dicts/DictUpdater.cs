@@ -151,14 +151,13 @@ public static class DictUpdater
                 dict.Contents.Clear();
                 dict.Contents.TrimExcess();
             }
+
+            Utils.ClearStringPoolIfDictsAreReady();
+            dict.Ready = true;
+            Utils.Frontend.Alert(AlertLevel.Success, "Finished updating JMdict");
         }
 
-        Utils.ClearStringPoolIfDictsAreReady();
-
         DictUtils.UpdatingJmdict = false;
-        dict.Ready = true;
-
-        Utils.Frontend.Alert(AlertLevel.Success, "Finished updating JMdict");
     }
 
     public static async Task UpdateJmnedict(bool isUpdate, bool noPrompt)
@@ -203,14 +202,13 @@ public static class DictUpdater
                 dict.Contents.Clear();
                 dict.Contents.TrimExcess();
             }
+
+            Utils.ClearStringPoolIfDictsAreReady();
+            dict.Ready = true;
+            Utils.Frontend.Alert(AlertLevel.Success, "Finished updating JMnedict");
         }
 
-        Utils.ClearStringPoolIfDictsAreReady();
-
         DictUtils.UpdatingJmnedict = false;
-        dict.Ready = true;
-
-        Utils.Frontend.Alert(AlertLevel.Success, "Finished updating JMnedict");
     }
 
     public static async Task UpdateKanjidic(bool isUpdate, bool noPrompt)
@@ -255,14 +253,13 @@ public static class DictUpdater
                 dict.Contents.Clear();
                 dict.Contents.TrimExcess();
             }
+
+            Utils.ClearStringPoolIfDictsAreReady();
+            dict.Ready = true;
+            Utils.Frontend.Alert(AlertLevel.Success, "Finished updating KANJIDIC2");
         }
 
-        Utils.ClearStringPoolIfDictsAreReady();
-
         DictUtils.UpdatingKanjidic = false;
-        dict.Ready = true;
-
-        Utils.Frontend.Alert(AlertLevel.Success, "Finished updating KANJIDIC2");
     }
 
     internal static async Task AutoUpdateBuiltInDicts()
