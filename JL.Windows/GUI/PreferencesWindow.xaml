@@ -268,7 +268,7 @@
                             <TextBlock HorizontalAlignment="Left" Text="Font size"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="TextBoxFontSizeNumericUpDown" Maximum="500" Minimum="1"
+                            <hc:NumericUpDown x:Name="TextBoxFontSizeNumericUpDown" Maximum="300" Minimum="1"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
