@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -86,38 +85,35 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 IsChecked = freq.Active,
                 Margin = new Thickness(10),
                 HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                Tag = freq
             };
+            checkBox.Checked += CheckBox_Checked;
+            checkBox.Unchecked += CheckBox_Unchecked;
 
-            Button buttonIncreasePriority = new()
+            Button increasePriorityButton = new()
             {
                 Width = 25,
                 Content = '↑',
                 Margin = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                Tag = freq
             };
+            increasePriorityButton.Click += IncreasePriorityButton_Click;
 
-            Button buttonDecreasePriority = new()
+            Button decreasePriorityButton = new()
             {
                 Width = 25,
                 Content = '↓',
                 Margin = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                Tag = freq
             };
+            decreasePriorityButton.Click += DecreasePriorityButton_Click;
 
-            TextBlock priority = new()
-            {
-                Name = "priority",
-                // Width = 20,
-                Width = 0,
-                Text = freq.Priority.ToString(CultureInfo.InvariantCulture),
-                Visibility = Visibility.Collapsed
-                // Margin = new Thickness(10),
-            };
-
-            TextBlock freqTypeDisplay = new()
+            TextBlock freqTypeTextBlock = new()
             {
                 Width = 177,
                 Text = freq.Name,
@@ -129,7 +125,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
 
             string fullPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
             bool invalidPath = !Directory.Exists(fullPath) && !File.Exists(fullPath);
-            TextBlock freqPathValidityDisplay = new()
+            TextBlock freqPathValidityTextBlock = new()
             {
                 Width = 13,
                 Text = invalidPath ? "❌" : "",
@@ -140,7 +136,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 HorizontalAlignment = HorizontalAlignment.Center
             };
 
-            TextBlock freqPathDisplay = new()
+            TextBlock freqPathTextBlock = new()
             {
                 Width = 300,
                 Text = freq.Path,
@@ -150,24 +146,11 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 Margin = new Thickness(10),
                 Cursor = Cursors.Hand
             };
+            freqPathTextBlock.PreviewMouseLeftButtonUp += PathTextBlock_PreviewMouseLeftButtonUp;
+            freqPathTextBlock.MouseEnter += PathTextBlock_MouseEnter;
+            freqPathTextBlock.MouseLeave += PathTextBlock_MouseLeave;
 
-            freqPathDisplay.PreviewMouseLeftButtonUp += PathTextBox_PreviewMouseLeftButtonUp;
-            freqPathDisplay.MouseEnter += (_, _) => freqPathDisplay.TextDecorations = TextDecorations.Underline;
-            freqPathDisplay.MouseLeave += (_, _) => freqPathDisplay.TextDecorations = null;
-
-            Button buttonRemove = new()
-            {
-                Width = 75,
-                Height = 30,
-                Content = "Remove",
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                Foreground = Brushes.White,
-                Background = Brushes.Red,
-                BorderThickness = new Thickness(1)
-            };
-
-            Button buttonEdit = new()
+            Button editButton = new()
             {
                 Width = 45,
                 Height = 30,
@@ -177,79 +160,42 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 Foreground = Brushes.White,
                 Background = Brushes.DodgerBlue,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(0, 0, 5, 0)
+                Margin = new Thickness(0, 0, 5, 0),
+                Tag = freq
             };
+            editButton.Click += EditButton_Click;
 
-            checkBox.Unchecked += (_, _) => freq.Active = false;
-            checkBox.Checked += (_, _) => freq.Active = true;
-
-            buttonIncreasePriority.Click += (_, _) =>
+            Button removeButton = new()
             {
-                PrioritizeFreq(freq);
-                UpdateFreqsDisplay();
+                Width = 75,
+                Height = 30,
+                Content = "Remove",
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Foreground = Brushes.White,
+                Background = Brushes.Red,
+                BorderThickness = new Thickness(1),
+                Tag = freq
             };
-
-            buttonDecreasePriority.Click += (_, _) =>
-            {
-                DeprioritizeFreq(freq);
-                UpdateFreqsDisplay();
-            };
-
-            buttonRemove.Click += (_, _) =>
-            {
-                if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this frequency dictionary?", "Confirmation"))
-                {
-                    freq.Contents.Clear();
-                    freq.Contents.TrimExcess();
-                    _ = FreqUtils.FreqDicts.Remove(freq.Name);
-
-                    string dbPath = FreqUtils.GetDBPath(freq.Name);
-                    if (File.Exists(dbPath))
-                    {
-                        SqliteConnection.ClearAllPools();
-                        File.Delete(dbPath);
-                    }
-
-                    int priorityOfDeletedFreq = freq.Priority;
-
-                    foreach (Freq f in FreqUtils.FreqDicts.Values)
-                    {
-                        if (f.Priority > priorityOfDeletedFreq)
-                        {
-                            f.Priority -= 1;
-                        }
-                    }
-
-                    UpdateFreqsDisplay();
-                }
-            };
-            buttonEdit.Click += (_, _) =>
-            {
-                _ = new EditFrequencyWindow(freq) { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
-                UpdateFreqsDisplay();
-            };
-
-            resultDockPanels.Add(dockPanel);
+            removeButton.Click += RemoveButton_Click;
 
             _ = dockPanel.Children.Add(checkBox);
-            _ = dockPanel.Children.Add(buttonIncreasePriority);
-            _ = dockPanel.Children.Add(buttonDecreasePriority);
-            _ = dockPanel.Children.Add(priority);
-            _ = dockPanel.Children.Add(freqTypeDisplay);
-            _ = dockPanel.Children.Add(freqPathValidityDisplay);
-            _ = dockPanel.Children.Add(freqPathDisplay);
-            _ = dockPanel.Children.Add(buttonEdit);
-            _ = dockPanel.Children.Add(buttonRemove);
+            _ = dockPanel.Children.Add(increasePriorityButton);
+            _ = dockPanel.Children.Add(decreasePriorityButton);
+            _ = dockPanel.Children.Add(freqTypeTextBlock);
+            _ = dockPanel.Children.Add(freqPathValidityTextBlock);
+            _ = dockPanel.Children.Add(freqPathTextBlock);
+            _ = dockPanel.Children.Add(editButton);
+            _ = dockPanel.Children.Add(removeButton);
+
+            resultDockPanels.Add(dockPanel);
         }
 
-        FrequenciesDisplay.ItemsSource = resultDockPanels.OrderBy(static dockPanel =>
-            dockPanel.Children
-                .OfType<TextBlock>()
-                .Where(static textBlock => textBlock.Name is "priority")
-                .Select(static textBlockPriority => Convert.ToInt32(textBlockPriority.Text, CultureInfo.InvariantCulture)).First());
+        FrequenciesDisplay.ItemsSource = resultDockPanels
+            .OrderBy(static dockPanel => ((Freq)((CheckBox)dockPanel.Children[0]).Tag).Priority);
     }
 
-    private void PathTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    private void PathTextBlock_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         string? fullPath = Path.GetFullPath(((TextBlock)sender).Text, Utils.ApplicationPath);
         if (File.Exists(fullPath) || Directory.Exists(fullPath))
@@ -264,6 +210,79 @@ internal sealed partial class ManageFrequenciesWindow : Window
                 _ = Process.Start("explorer.exe", fullPath);
             }
         }
+    }
+
+    private void PathTextBlock_MouseEnter(object sender, MouseEventArgs e)
+    {
+        ((TextBlock)sender).TextDecorations = TextDecorations.Underline;
+    }
+
+    private void PathTextBlock_MouseLeave(object sender, MouseEventArgs e)
+    {
+        ((TextBlock)sender).TextDecorations = null;
+    }
+
+    private void CheckBox_Checked(object sender, RoutedEventArgs e)
+    {
+        Freq freq = (Freq)((CheckBox)sender).Tag;
+        freq.Active = true;
+    }
+
+    private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+    {
+        Freq freq = (Freq)((CheckBox)sender).Tag;
+        freq.Active = false;
+    }
+
+    private void IncreasePriorityButton_Click(object sender, RoutedEventArgs e)
+    {
+        Freq freq = (Freq)((Button)sender).Tag;
+        PrioritizeFreq(freq);
+        UpdateFreqsDisplay();
+    }
+
+    private void DecreasePriorityButton_Click(object sender, RoutedEventArgs e)
+    {
+        Freq freq = (Freq)((Button)sender).Tag;
+        DeprioritizeFreq(freq);
+        UpdateFreqsDisplay();
+    }
+
+    private void RemoveButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this frequency dictionary?", "Confirmation"))
+        {
+            Freq freq = (Freq)((Button)sender).Tag;
+            freq.Contents.Clear();
+            freq.Contents.TrimExcess();
+            _ = FreqUtils.FreqDicts.Remove(freq.Name);
+
+            string dbPath = FreqUtils.GetDBPath(freq.Name);
+            if (File.Exists(dbPath))
+            {
+                SqliteConnection.ClearAllPools();
+                File.Delete(dbPath);
+            }
+
+            int priorityOfDeletedFreq = freq.Priority;
+
+            foreach (Freq f in FreqUtils.FreqDicts.Values)
+            {
+                if (f.Priority > priorityOfDeletedFreq)
+                {
+                    f.Priority -= 1;
+                }
+            }
+
+            UpdateFreqsDisplay();
+        }
+    }
+
+    private void EditButton_Click(object sender, RoutedEventArgs e)
+    {
+        Freq freq = (Freq)((Button)sender).Tag;
+        _ = new EditFrequencyWindow(freq) { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
+        UpdateFreqsDisplay();
     }
 
     private static void PrioritizeFreq(Freq freq)

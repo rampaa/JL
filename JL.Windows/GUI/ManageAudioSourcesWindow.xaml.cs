@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -79,38 +78,35 @@ internal sealed partial class ManageAudioSourcesWindow : Window
                 IsChecked = audioSource.Active,
                 Margin = new Thickness(10),
                 HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                Tag = audioSource
             };
+            checkBox.Checked += CheckBox_Checked;
+            checkBox.Unchecked += CheckBox_Unchecked;
 
-            Button buttonIncreasePriority = new()
+            Button increasePriorityButton = new()
             {
                 Width = 25,
                 Content = '↑',
                 Margin = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                Tag = audioSource
             };
+            increasePriorityButton.Click += IncreasePriorityButton_Click;
 
-            Button buttonDecreasePriority = new()
+            Button decreasePriorityButton = new()
             {
                 Width = 25,
                 Content = '↓',
                 Margin = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                Tag = audioSource
             };
+            decreasePriorityButton.Click += DecreasePriorityButton_Click;
 
-            TextBlock priority = new()
-            {
-                Name = "priority",
-                // Width = 20,
-                Width = 0,
-                Text = audioSource.Priority.ToString(CultureInfo.InvariantCulture),
-                Visibility = Visibility.Collapsed
-                // Margin = new Thickness(10),
-            };
-
-            TextBlock audioSourceTypeDisplay = new()
+            TextBlock audioSourceTypeTextBlock = new()
             {
                 Width = 80,
                 Text = audioSource.Type.GetDescription(),
@@ -118,8 +114,10 @@ internal sealed partial class ManageAudioSourcesWindow : Window
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(10)
             };
-            TextBlock audioSourceUriDisplay = new()
+
+            TextBlock audioSourceUriTextBlock = new()
             {
+                Name = nameof(audioSourceUriTextBlock),
                 Width = 470,
                 Text = uri,
                 TextWrapping = TextWrapping.Wrap,
@@ -128,23 +126,10 @@ internal sealed partial class ManageAudioSourcesWindow : Window
                 Margin = new Thickness(10),
                 Cursor = Cursors.Hand
             };
+            audioSourceUriTextBlock.MouseEnter += AudioSourceUriTextBlock_MouseEnter;
+            audioSourceUriTextBlock.MouseLeave += AudioSourceUriTextBlock_MouseLeave;
 
-            audioSourceUriDisplay.MouseEnter += (_, _) => audioSourceUriDisplay.TextDecorations = TextDecorations.Underline;
-            audioSourceUriDisplay.MouseLeave += (_, _) => audioSourceUriDisplay.TextDecorations = null;
-
-            Button buttonRemove = new()
-            {
-                Width = 75,
-                Height = 30,
-                Content = "Remove",
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
-                Foreground = Brushes.White,
-                Background = Brushes.Red,
-                BorderThickness = new Thickness(1)
-            };
-
-            Button buttonEdit = new()
+            Button editButton = new()
             {
                 Width = 45,
                 Height = 30,
@@ -154,66 +139,108 @@ internal sealed partial class ManageAudioSourcesWindow : Window
                 Foreground = Brushes.White,
                 Background = Brushes.DodgerBlue,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(0, 0, 5, 0)
+                Margin = new Thickness(0, 0, 5, 0),
+                Tag = audioSource
             };
+            editButton.Click += EditButton_Click;
 
-            checkBox.Unchecked += (_, _) => audioSource.Active = false;
-            checkBox.Checked += (_, _) => audioSource.Active = true;
-
-            buttonIncreasePriority.Click += (_, _) =>
+            Button removeButton = new()
             {
-                PrioritizeAudioSource(audioSource);
-                UpdateAudioSourcesDisplay();
+                Width = 75,
+                Height = 30,
+                Content = "Remove",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+                Foreground = Brushes.White,
+                Background = Brushes.Red,
+                BorderThickness = new Thickness(1),
+                Tag = audioSource
             };
-
-            buttonDecreasePriority.Click += (_, _) =>
-            {
-                DeprioritizeAudioSource(audioSource);
-                UpdateAudioSourcesDisplay();
-            };
-
-            buttonRemove.Click += (_, _) =>
-            {
-                if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this audio source?", "Confirmation"))
-                {
-                    _ = AudioUtils.AudioSources.Remove(uri);
-
-                    int priorityOfDeletedAudioSource = audioSource.Priority;
-
-                    foreach (AudioSource a in AudioUtils.AudioSources.Values)
-                    {
-                        if (a.Priority > priorityOfDeletedAudioSource)
-                        {
-                            a.Priority -= 1;
-                        }
-                    }
-
-                    UpdateAudioSourcesDisplay();
-                }
-            };
-            buttonEdit.Click += (_, _) =>
-            {
-                _ = new EditAudioSourceWindow(uri, audioSource) { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
-                UpdateAudioSourcesDisplay();
-            };
-
-            resultDockPanels.Add(dockPanel);
+            removeButton.Click += RemoveButton_Click;
 
             _ = dockPanel.Children.Add(checkBox);
-            _ = dockPanel.Children.Add(buttonIncreasePriority);
-            _ = dockPanel.Children.Add(buttonDecreasePriority);
-            _ = dockPanel.Children.Add(priority);
-            _ = dockPanel.Children.Add(audioSourceTypeDisplay);
-            _ = dockPanel.Children.Add(audioSourceUriDisplay);
-            _ = dockPanel.Children.Add(buttonEdit);
-            _ = dockPanel.Children.Add(buttonRemove);
+            _ = dockPanel.Children.Add(increasePriorityButton);
+            _ = dockPanel.Children.Add(decreasePriorityButton);
+            _ = dockPanel.Children.Add(audioSourceTypeTextBlock);
+            _ = dockPanel.Children.Add(audioSourceUriTextBlock);
+            _ = dockPanel.Children.Add(editButton);
+            _ = dockPanel.Children.Add(removeButton);
+
+            resultDockPanels.Add(dockPanel);
         }
 
-        AudioSourceListBox.ItemsSource = resultDockPanels.OrderBy(static dockPanel =>
-            dockPanel.Children
-                .OfType<TextBlock>()
-                .Where(static textBlock => textBlock.Name is "priority")
-                .Select(static textBlockPriority => Convert.ToInt32(textBlockPriority.Text, CultureInfo.InvariantCulture)).First());
+        AudioSourceListBox.ItemsSource = resultDockPanels
+            .OrderBy(static dockPanel => ((AudioSource)((CheckBox)dockPanel.Children[0]).Tag).Priority);
+    }
+
+    private void AudioSourceUriTextBlock_MouseEnter(object sender, MouseEventArgs e)
+    {
+        ((TextBlock)sender).TextDecorations = TextDecorations.Underline;
+    }
+
+    private void AudioSourceUriTextBlock_MouseLeave(object sender, MouseEventArgs e)
+    {
+        ((TextBlock)sender).TextDecorations = null;
+    }
+
+    private void CheckBox_Checked(object sender, RoutedEventArgs e)
+    {
+        AudioSource audioSource = (AudioSource)((CheckBox)sender).Tag;
+        audioSource.Active = true;
+    }
+
+    private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+    {
+        AudioSource audioSource = (AudioSource)((CheckBox)sender).Tag;
+        audioSource.Active = false;
+    }
+
+    private void IncreasePriorityButton_Click(object sender, RoutedEventArgs e)
+    {
+        AudioSource audioSource = (AudioSource)((Button)sender).Tag;
+        PrioritizeAudioSource(audioSource);
+        UpdateAudioSourcesDisplay();
+    }
+
+    private void DecreasePriorityButton_Click(object sender, RoutedEventArgs e)
+    {
+        AudioSource audioSource = (AudioSource)((Button)sender).Tag;
+        DeprioritizeAudioSource(audioSource);
+        UpdateAudioSourcesDisplay();
+    }
+
+    private void RemoveButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this audio source?", "Confirmation"))
+        {
+            Button removeButton = (Button)sender;
+
+            string uri = removeButton.Parent.GetChildByName<TextBlock>("audioSourceUriTextBlock")!.Text;
+            _ = AudioUtils.AudioSources.Remove(uri);
+
+            AudioSource audioSource = (AudioSource)removeButton.Tag;
+            int priorityOfDeletedAudioSource = audioSource.Priority;
+
+            foreach (AudioSource a in AudioUtils.AudioSources.Values)
+            {
+                if (a.Priority > priorityOfDeletedAudioSource)
+                {
+                    a.Priority -= 1;
+                }
+            }
+
+            UpdateAudioSourcesDisplay();
+        }
+    }
+
+    private void EditButton_Click(object sender, RoutedEventArgs e)
+    {
+        Button editButton = (Button)sender;
+        AudioSource audioSource = (AudioSource)editButton.Tag;
+        string uri = editButton.Parent.GetChildByName<TextBlock>("audioSourceUriTextBlock")!.Text;
+
+        _ = new EditAudioSourceWindow(uri, audioSource) { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
+        UpdateAudioSourcesDisplay();
     }
 
     private static void PrioritizeAudioSource(AudioSource audioSource)

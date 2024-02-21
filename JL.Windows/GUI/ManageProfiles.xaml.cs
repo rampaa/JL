@@ -69,7 +69,7 @@ internal sealed partial class ManageProfilesWindow : Window
 
             bool defaultOrCurrentProfile = ProfileUtils.DefaultProfiles.Contains(profile) || profile == ProfileUtils.CurrentProfile;
 
-            Button buttonRemove = new()
+            Button removeButton = new()
             {
                 Width = 75,
                 Height = 30,
@@ -81,54 +81,58 @@ internal sealed partial class ManageProfilesWindow : Window
                 BorderThickness = new Thickness(1),
                 Visibility = defaultOrCurrentProfile
                     ? Visibility.Collapsed
-                    : Visibility.Visible
+                    : Visibility.Visible,
+                Tag = profile
             };
-
-            buttonRemove.Click += (_, _) =>
-            {
-                if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this profile?", "Confirmation"))
-                {
-                    _ = ProfileUtils.Profiles.Remove(profile);
-                    PreferencesWindow.Instance.ProfileComboBox.ItemsSource = ProfileUtils.Profiles.ToList();
-
-                    string profilePath = ProfileUtils.GetProfilePath(profile);
-                    if (File.Exists(profilePath))
-                    {
-                        File.Delete(profilePath);
-                    }
-
-                    string profileCustomNamesPath = ProfileUtils.GetProfileCustomNameDictPath(profile);
-                    if (File.Exists(profileCustomNamesPath))
-                    {
-                        File.Delete(profileCustomNamesPath);
-                    }
-
-                    string profileCustomWordsPath = ProfileUtils.GetProfileCustomWordDictPath(profile);
-                    if (File.Exists(profileCustomWordsPath))
-                    {
-                        File.Delete(profileCustomWordsPath);
-                    }
-
-                    string statsPath = StatsUtils.GetStatsPath(profile);
-                    if (File.Exists(statsPath))
-                    {
-                        File.Delete(statsPath);
-                    }
-
-                    UpdateProfilesDisplay();
-                }
-            };
+            removeButton.Click += RemoveButton_Click;
 
             resultDockPanels.Add(dockPanel);
 
             _ = dockPanel.Children.Add(profileNameTextBlock);
-            _ = dockPanel.Children.Add(buttonRemove);
+            _ = dockPanel.Children.Add(removeButton);
         }
 
         ProfileListBox.ItemsSource = resultDockPanels;
     }
 
-    private void ButtonAddProfile_OnClick(object sender, RoutedEventArgs e)
+    private void RemoveButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this profile?", "Confirmation"))
+        {
+            string profile = (string)((Button)sender).Tag;
+
+            _ = ProfileUtils.Profiles.Remove(profile);
+            PreferencesWindow.Instance.ProfileComboBox.ItemsSource = ProfileUtils.Profiles.ToList();
+
+            string profilePath = ProfileUtils.GetProfilePath(profile);
+            if (File.Exists(profilePath))
+            {
+                File.Delete(profilePath);
+            }
+
+            string profileCustomNamesPath = ProfileUtils.GetProfileCustomNameDictPath(profile);
+            if (File.Exists(profileCustomNamesPath))
+            {
+                File.Delete(profileCustomNamesPath);
+            }
+
+            string profileCustomWordsPath = ProfileUtils.GetProfileCustomWordDictPath(profile);
+            if (File.Exists(profileCustomWordsPath))
+            {
+                File.Delete(profileCustomWordsPath);
+            }
+
+            string statsPath = StatsUtils.GetStatsPath(profile);
+            if (File.Exists(statsPath))
+            {
+                File.Delete(statsPath);
+            }
+
+            UpdateProfilesDisplay();
+        }
+    }
+
+    private void AddProfileButton_Click(object sender, RoutedEventArgs e)
     {
         _ = new AddProfileWindow { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
         UpdateProfilesDisplay();

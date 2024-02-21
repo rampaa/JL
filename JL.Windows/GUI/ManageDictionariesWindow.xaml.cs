@@ -90,38 +90,35 @@ internal sealed partial class ManageDictionariesWindow : Window
                 IsChecked = dict.Active,
                 Margin = new Thickness(10),
                 HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                Tag = dict
             };
+            checkBox.Checked += CheckBox_Checked;
+            checkBox.Unchecked += CheckBox_Unchecked;
 
-            Button buttonIncreasePriority = new()
+            Button increasePriorityButton = new()
             {
                 Width = 25,
                 Content = '↑',
                 Margin = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                Tag = dict
             };
+            increasePriorityButton.Click += IncreasePriorityButton_Click;
 
-            Button buttonDecreasePriority = new()
+            Button decreasePriorityButton = new()
             {
                 Width = 25,
                 Content = '↓',
                 Margin = new Thickness(1),
                 HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                Tag = dict
             };
+            decreasePriorityButton.Click += DecreasePriorityButton_Click;
 
-            TextBlock priority = new()
-            {
-                Name = "priority",
-                // Width = 20,
-                Width = 0,
-                Text = dict.Priority.ToString(CultureInfo.InvariantCulture),
-                Visibility = Visibility.Collapsed
-                // Margin = new Thickness(10),
-            };
-
-            TextBlock dictTypeDisplay = new()
+            TextBlock dictNameTextBlock = new()
             {
                 Width = 150,
                 Text = dict.Name,
@@ -133,7 +130,7 @@ internal sealed partial class ManageDictionariesWindow : Window
 
             string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
             bool invalidPath = !Directory.Exists(fullPath) && !File.Exists(fullPath);
-            TextBlock dictPathValidityDisplay = new()
+            TextBlock dictPathValidityTextBlock = new()
             {
                 Width = 13,
                 Text = invalidPath ? "❌" : "",
@@ -141,10 +138,11 @@ internal sealed partial class ManageDictionariesWindow : Window
                 Foreground = Brushes.Crimson,
                 Margin = new Thickness(1),
                 VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Center
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Tag = dict
             };
 
-            TextBlock dictPathDisplay = new()
+            TextBlock dictPathTextBlock = new()
             {
                 Width = 300,
                 Text = dict.Path,
@@ -154,15 +152,13 @@ internal sealed partial class ManageDictionariesWindow : Window
                 Margin = new Thickness(10),
                 Cursor = Cursors.Hand
             };
+            dictPathTextBlock.PreviewMouseLeftButtonUp += PathTextBox_PreviewMouseLeftButtonUp;
+            dictPathTextBlock.MouseEnter += PathTextBlock_MouseEnter;
+            dictPathTextBlock.MouseLeave += PathTextBlock_MouseLeave;
 
-            dictPathDisplay.PreviewMouseLeftButtonUp += PathTextBox_PreviewMouseLeftButtonUp;
-
-            dictPathDisplay.MouseEnter += (_, _) => dictPathDisplay.TextDecorations = TextDecorations.Underline;
-
-            dictPathDisplay.MouseLeave += (_, _) => dictPathDisplay.TextDecorations = null;
-
-            Button buttonEdit = new()
+            Button editButton = new()
             {
+                Name = nameof(editButton),
                 Width = 45,
                 Height = 30,
                 Content = "Edit",
@@ -171,14 +167,16 @@ internal sealed partial class ManageDictionariesWindow : Window
                 Foreground = Brushes.White,
                 Background = Brushes.DodgerBlue,
                 BorderThickness = new Thickness(1),
-                Margin = new Thickness(0, 0, 5, 0)
+                Margin = new Thickness(0, 0, 5, 0),
                 // Visibility = DictUtils.BuiltInDicts.Values
                 //     .Select(t => t.Type).ToList().Contains(dict.Type)
                 //     ? Visibility.Collapsed
                 //     : Visibility.Visible,
+                Tag = dict
             };
+            editButton.Click += EditButton_Click;
 
-            Button buttonUpdate = new()
+            Button updateButton = new()
             {
                 Width = 75,
                 Height = 30,
@@ -192,49 +190,12 @@ internal sealed partial class ManageDictionariesWindow : Window
                     and not DictType.JMnedict
                     and not DictType.Kanjidic
                     ? Visibility.Collapsed
-                    : Visibility.Visible
+                    : Visibility.Visible,
+                Tag = dict
             };
+            updateButton.Click += UpdateButton_Click;
 
-            switch (dict.Type)
-            {
-                case DictType.JMdict:
-                    buttonUpdate.IsEnabled = !DictUtils.UpdatingJmdict;
-                    buttonEdit.IsEnabled = !DictUtils.UpdatingJmdict;
-                    break;
-
-                case DictType.JMnedict:
-                    buttonUpdate.IsEnabled = !DictUtils.UpdatingJmnedict;
-                    buttonEdit.IsEnabled = !DictUtils.UpdatingJmnedict;
-                    break;
-
-                case DictType.Kanjidic:
-                    buttonUpdate.IsEnabled = !DictUtils.UpdatingKanjidic;
-                    buttonEdit.IsEnabled = !DictUtils.UpdatingKanjidic;
-                    break;
-            }
-
-            buttonUpdate.Click += async (_, _) =>
-            {
-                buttonUpdate.IsEnabled = false;
-                buttonEdit.IsEnabled = false;
-
-                switch (dict.Type)
-                {
-                    case DictType.JMdict:
-                        await DictUpdater.UpdateJmdict(true, false).ConfigureAwait(true);
-                        break;
-                    case DictType.JMnedict:
-                        await DictUpdater.UpdateJmnedict(true, false).ConfigureAwait(true);
-                        break;
-                    case DictType.Kanjidic:
-                        await DictUpdater.UpdateKanjidic(true, false).ConfigureAwait(true);
-                        break;
-                }
-
-                UpdateDictionariesDisplay();
-            };
-
-            Button buttonRemove = new()
+            Button removeButton = new()
             {
                 Width = 75,
                 Height = 30,
@@ -247,10 +208,12 @@ internal sealed partial class ManageDictionariesWindow : Window
                 Visibility = DictUtils.BuiltInDicts.Values
                     .Select(static d => d.Type).Contains(dict.Type)
                     ? Visibility.Collapsed
-                    : Visibility.Visible
+                    : Visibility.Visible,
+                Tag = dict
             };
+            removeButton.Click += RemoveButton_Click;
 
-            Button buttonInfo = new()
+            Button infoButton = new()
             {
                 Width = 50,
                 Height = 30,
@@ -269,86 +232,39 @@ internal sealed partial class ManageDictionariesWindow : Window
             switch (dict.Type)
             {
                 case DictType.JMdict:
-                    buttonInfo.Click += JmdictInfoButton_Click;
+                    updateButton.IsEnabled = !DictUtils.UpdatingJmdict;
+                    editButton.IsEnabled = !DictUtils.UpdatingJmdict;
+                    infoButton.Click += JmdictInfoButton_Click;
                     break;
+
                 case DictType.JMnedict:
-                    buttonInfo.Click += JmnedictInfoButton_Click;
+                    updateButton.IsEnabled = !DictUtils.UpdatingJmnedict;
+                    editButton.IsEnabled = !DictUtils.UpdatingJmnedict;
+                    infoButton.Click += JmnedictInfoButton_Click;
+                    break;
+
+                case DictType.Kanjidic:
+                    updateButton.IsEnabled = !DictUtils.UpdatingKanjidic;
+                    editButton.IsEnabled = !DictUtils.UpdatingKanjidic;
                     break;
             }
 
-            checkBox.Unchecked += (_, _) => dict.Active = false;
-
-            checkBox.Checked += (_, _) => dict.Active = true;
-
-            buttonIncreasePriority.Click += (_, _) =>
-            {
-                PrioritizeDict(dict);
-                UpdateDictionariesDisplay();
-            };
-            buttonDecreasePriority.Click += (_, _) =>
-            {
-                DeprioritizeDict(dict);
-                UpdateDictionariesDisplay();
-            };
-            buttonRemove.Click += (_, _) =>
-            {
-                if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this dictionary?", "Confirmation"))
-                {
-                    dict.Contents.Clear();
-                    dict.Contents.TrimExcess();
-                    _ = DictUtils.Dicts.Remove(dict.Name);
-
-                    string dbPath = DictUtils.GetDBPath(dict.Name);
-                    if (File.Exists(dbPath))
-                    {
-                        SqliteConnection.ClearAllPools();
-                        File.Delete(dbPath);
-                    }
-
-                    if (dict.Type is DictType.PitchAccentYomichan)
-                    {
-                        _ = DictUtils.SingleDictTypeDicts.Remove(DictType.PitchAccentYomichan);
-                    }
-
-                    int priorityOfDeletedDict = dict.Priority;
-
-                    foreach (Dict d in DictUtils.Dicts.Values)
-                    {
-                        if (d.Priority > priorityOfDeletedDict)
-                        {
-                            d.Priority -= 1;
-                        }
-                    }
-
-                    UpdateDictionariesDisplay();
-                }
-            };
-            buttonEdit.Click += (_, _) =>
-            {
-                _ = new EditDictionaryWindow(dict) { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
-                UpdateDictionariesDisplay();
-            };
+            _ = dockPanel.Children.Add(checkBox);
+            _ = dockPanel.Children.Add(increasePriorityButton);
+            _ = dockPanel.Children.Add(decreasePriorityButton);
+            _ = dockPanel.Children.Add(dictNameTextBlock);
+            _ = dockPanel.Children.Add(dictPathValidityTextBlock);
+            _ = dockPanel.Children.Add(dictPathTextBlock);
+            _ = dockPanel.Children.Add(editButton);
+            _ = dockPanel.Children.Add(updateButton);
+            _ = dockPanel.Children.Add(removeButton);
+            _ = dockPanel.Children.Add(infoButton);
 
             resultDockPanels.Add(dockPanel);
-
-            _ = dockPanel.Children.Add(checkBox);
-            _ = dockPanel.Children.Add(buttonIncreasePriority);
-            _ = dockPanel.Children.Add(buttonDecreasePriority);
-            _ = dockPanel.Children.Add(priority);
-            _ = dockPanel.Children.Add(dictTypeDisplay);
-            _ = dockPanel.Children.Add(dictPathValidityDisplay);
-            _ = dockPanel.Children.Add(dictPathDisplay);
-            _ = dockPanel.Children.Add(buttonEdit);
-            _ = dockPanel.Children.Add(buttonUpdate);
-            _ = dockPanel.Children.Add(buttonRemove);
-            _ = dockPanel.Children.Add(buttonInfo);
         }
 
-        DictionariesDisplay.ItemsSource = resultDockPanels.OrderBy(static dockPanel =>
-            dockPanel.Children
-                .OfType<TextBlock>()
-                .Where(static textBlock => textBlock.Name is "priority")
-                .Select(static textBlockPriority => Convert.ToInt32(textBlockPriority.Text, CultureInfo.InvariantCulture)).First());
+        DictionariesDisplay.ItemsSource = resultDockPanels
+            .OrderBy(static dockPanel => ((Dict)((CheckBox)dockPanel.Children[0]).Tag).Priority);
     }
 
     private void PathTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -363,6 +279,108 @@ internal sealed partial class ManageDictionariesWindow : Window
 
             _ = Process.Start("explorer.exe", fullPath);
         }
+    }
+
+    private void PathTextBlock_MouseEnter(object sender, MouseEventArgs e)
+    {
+        ((TextBlock)sender).TextDecorations = TextDecorations.Underline;
+    }
+
+    private void PathTextBlock_MouseLeave(object sender, MouseEventArgs e)
+    {
+        ((TextBlock)sender).TextDecorations = null;
+    }
+    private void CheckBox_Checked(object sender, RoutedEventArgs e)
+    {
+        Dict dict = (Dict)((CheckBox)sender).Tag;
+        dict.Active = true;
+    }
+
+    private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+    {
+        Dict dict = (Dict)((CheckBox)sender).Tag;
+        dict.Active = false;
+    }
+
+    private void IncreasePriorityButton_Click(object sender, RoutedEventArgs e)
+    {
+        Dict dict = (Dict)((Button)sender).Tag;
+        PrioritizeDict(dict);
+        UpdateDictionariesDisplay();
+    }
+
+    private void DecreasePriorityButton_Click(object sender, RoutedEventArgs e)
+    {
+        Dict dict = (Dict)((Button)sender).Tag;
+        DeprioritizeDict(dict);
+        UpdateDictionariesDisplay();
+    }
+
+    private void RemoveButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this dictionary?", "Confirmation"))
+        {
+            Dict dict = (Dict)((Button)sender).Tag;
+            dict.Contents.Clear();
+            dict.Contents.TrimExcess();
+            _ = DictUtils.Dicts.Remove(dict.Name);
+
+            string dbPath = DictUtils.GetDBPath(dict.Name);
+            if (File.Exists(dbPath))
+            {
+                SqliteConnection.ClearAllPools();
+                File.Delete(dbPath);
+            }
+
+            if (dict.Type is DictType.PitchAccentYomichan)
+            {
+                _ = DictUtils.SingleDictTypeDicts.Remove(DictType.PitchAccentYomichan);
+            }
+
+            int priorityOfDeletedDict = dict.Priority;
+
+            foreach (Dict d in DictUtils.Dicts.Values)
+            {
+                if (d.Priority > priorityOfDeletedDict)
+                {
+                    d.Priority -= 1;
+                }
+            }
+
+            UpdateDictionariesDisplay();
+        }
+    }
+
+    private void EditButton_Click(object sender, RoutedEventArgs e)
+    {
+        Dict dict = (Dict)((Button)sender).Tag;
+        _ = new EditDictionaryWindow(dict) { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
+        UpdateDictionariesDisplay();
+    }
+
+    private async void UpdateButton_Click(object sender, RoutedEventArgs e)
+    {
+        Button updateButton = (Button)sender;
+        updateButton.IsEnabled = false;
+
+        Button editButton = ((DockPanel)updateButton.Parent).GetChildByName<Button>("editButton")!;
+        editButton.IsEnabled = false;
+
+        Dict dict = (Dict)updateButton.Tag;
+        switch (dict.Type)
+        {
+            case DictType.JMdict:
+                await DictUpdater.UpdateJmdict(true, false).ConfigureAwait(true);
+                break;
+            case DictType.JMnedict:
+                await DictUpdater.UpdateJmnedict(true, false).ConfigureAwait(true);
+                break;
+            case DictType.Kanjidic:
+                await DictUpdater.UpdateKanjidic(true, false).ConfigureAwait(true);
+                break;
+        }
+
+        UpdateDictionariesDisplay();
     }
 
     private static void PrioritizeDict(Dict dict)
@@ -434,13 +452,5 @@ internal sealed partial class ManageDictionariesWindow : Window
     private void JmnedictInfoButton_Click(object sender, RoutedEventArgs e)
     {
         ShowInfoWindow(DictUtils.JmnedictEntities, "JMnedict Abbreviations");
-    }
-
-    private void Window_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-    {
-        if (IsVisible)
-        {
-            UpdateDictionariesDisplay();
-        }
     }
 }
