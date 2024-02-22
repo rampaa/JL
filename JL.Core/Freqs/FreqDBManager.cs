@@ -22,7 +22,7 @@ internal static class FreqDBManager
                 id INTEGER NOT NULL PRIMARY KEY,
                 spelling TEXT NOT NULL,
                 frequency INTEGER NOT NULL
-            );
+            ) STRICT;
 
             CREATE TABLE IF NOT EXISTS record_search_key
             (
@@ -30,7 +30,7 @@ internal static class FreqDBManager
                 search_key TEXT NOT NULL,
                 PRIMARY KEY (record_id, search_key),
                 FOREIGN KEY (record_id) REFERENCES record (id) ON DELETE CASCADE
-            ) STRICT;
+            ) WITHOUT ROWID, STRICT;
             """;
 
         _ = command.ExecuteNonQuery();

@@ -46,7 +46,7 @@ internal static class JmdictDBManager
                 search_key TEXT NOT NULL,
                 PRIMARY KEY (record_id, search_key),
                 FOREIGN KEY (record_id) REFERENCES record (id) ON DELETE CASCADE
-            ) STRICT;
+            ) WITHOUT ROWID, STRICT;
             """;
 
         _ = command.ExecuteNonQuery();
