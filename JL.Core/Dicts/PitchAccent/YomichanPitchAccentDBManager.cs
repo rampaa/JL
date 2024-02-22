@@ -213,7 +213,7 @@ internal static class YomichanPitchAccentDBManager
 
         command.CommandText =
             """
-            SELECT json_array(rsk.search_key) AS searchKeys,
+            SELECT json_group_array(rsk.search_key) AS searchKeys,
                    r.spelling AS spelling,
                    r.reading AS reading,
                    r.position AS position

@@ -221,7 +221,7 @@ internal static class EpwingNazekaDBManager
 
         command.CommandText =
             """
-            SELECT json_array(rsk.search_key) AS searchKeys,
+            SELECT json_group_array(rsk.search_key) AS searchKeys,
                    r.primary_spelling AS primarySpelling,
                    r.reading AS reading,
                    r.alternative_spellings AS alternativeSpellings,

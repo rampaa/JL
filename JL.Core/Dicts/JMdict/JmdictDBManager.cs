@@ -220,7 +220,7 @@ internal static class JmdictDBManager
 
         command.CommandText =
             """
-            SELECT json_array(rsk.search_key) AS searchKeys,
+            SELECT json_group_array(rsk.search_key) AS searchKeys,
                    r.edict_id AS id,
                    r.primary_spelling AS primarySpelling,
                    r.primary_spelling_orthography_info AS primarySpellingOrthographyInfo,

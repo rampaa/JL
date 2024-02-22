@@ -171,7 +171,7 @@ internal static class FreqDBManager
 
         command.CommandText =
             """
-            SELECT json_array(rsk.search_key) AS searchKeys, r.spelling as spelling, r.frequency AS frequency
+            SELECT json_group_array(rsk.search_key) AS searchKeys, r.spelling as spelling, r.frequency AS frequency
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
             GROUP BY r.id
