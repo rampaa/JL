@@ -586,7 +586,7 @@ public static class LookupUtils
                                     && (jmdictWordClassResult.Readings?.Contains(dictResult.Reading ?? string.Empty)
                                         ?? string.IsNullOrEmpty(dictResult.Reading)))
                                 {
-                                    if (lastTag is not null && jmdictWordClassResult.WordClasses.Contains(lastTag))
+                                    if (jmdictWordClassResult.WordClasses.Contains(lastTag))
                                     {
                                         resultsList.Add(dictResult);
                                         break;

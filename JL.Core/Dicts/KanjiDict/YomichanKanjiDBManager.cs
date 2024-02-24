@@ -30,7 +30,10 @@ internal static class YomichanKanjiDBManager
             """;
         _ = command.ExecuteNonQuery();
 
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText = string.Create(CultureInfo.InvariantCulture, $"PRAGMA user_version = {Version};");
+#pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
+
         _ = command.ExecuteNonQuery();
     }
 

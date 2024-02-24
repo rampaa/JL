@@ -416,9 +416,9 @@ internal static class WindowsUtils
                 return;
             }
 
-#pragma warning disable CA5394
+#pragma warning disable CA5394 // Do not use insecure randomness
             string randomFilePath = filePaths[s_random.Next(numFiles)];
-#pragma warning restore CA5394
+#pragma warning restore CA5394 // Do not use insecure randomness
 
             byte[] audioData = await File.ReadAllBytesAsync(randomFilePath).ConfigureAwait(false);
             PlayAudio(audioData, "mp3", 1);

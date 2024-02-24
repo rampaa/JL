@@ -17,15 +17,14 @@ internal sealed record class CustomNameRecord : IDictRecord
         ExtraInfo = extraInfo;
     }
 
-#pragma warning disable CA1308
     public string BuildFormattedDefinition()
     {
         string extraInfo = ExtraInfo is not null
             ? string.Create(CultureInfo.InvariantCulture, $"\n{ExtraInfo}")
             : "";
 
+#pragma warning disable CA1308 // Normalize strings to uppercase
         return string.Create(CultureInfo.InvariantCulture, $"({NameType.ToLowerInvariant()}) {Reading ?? PrimarySpelling}{extraInfo}");
+#pragma warning restore CA1308 // Normalize strings to uppercase
     }
-#pragma warning restore CA1308
-
 }

@@ -39,7 +39,10 @@ internal static class EpwingYomichanDBManager
             """;
         _ = command.ExecuteNonQuery();
 
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText = string.Create(CultureInfo.InvariantCulture, $"PRAGMA user_version = {Version};");
+#pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
+
         _ = command.ExecuteNonQuery();
     }
 
@@ -149,7 +152,9 @@ internal static class EpwingYomichanDBManager
 
         _ = queryBuilder.Append(')');
 
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText = queryBuilder.ToString();
+#pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
         for (int i = 0; i < terms.Count; i++)
         {

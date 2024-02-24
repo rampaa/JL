@@ -4,16 +4,16 @@ using JL.Core.Dicts.CustomNameDict;
 using JL.Core.Dicts.CustomWordDict;
 using JL.Core.Dicts.EPWING.Nazeka;
 using JL.Core.Dicts.EPWING.Yomichan;
+using JL.Core.Dicts.JMdict;
+using JL.Core.Dicts.JMnedict;
+using JL.Core.Dicts.KANJIDIC;
+using JL.Core.Dicts.KanjiDict;
 using JL.Core.Dicts.Options;
 using JL.Core.Dicts.PitchAccent;
 using JL.Core.Profile;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
 using Microsoft.Data.Sqlite;
-using JL.Core.Dicts.JMdict;
-using JL.Core.Dicts.JMnedict;
-using JL.Core.Dicts.KANJIDIC;
-using JL.Core.Dicts.KanjiDict;
 
 
 namespace JL.Core.Dicts;

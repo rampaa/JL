@@ -106,9 +106,9 @@ internal sealed partial class StatsWindow : Window
         }
     }
 
-#pragma warning disable CA1308
     private async void ButtonResetStats_OnClick(object sender, RoutedEventArgs e)
     {
+#pragma warning disable CA1308 // Normalize strings to uppercase
         if (Utils.Frontend.ShowYesNoDialog(
                 string.Create(CultureInfo.InvariantCulture, $"Are you really sure that you want to reset the {ButtonSwapStats.Content.ToString()!.ToLowerInvariant()} stats?"),
                 string.Create(CultureInfo.InvariantCulture, $"Reset {ButtonSwapStats.Content} Stats?")))
@@ -135,8 +135,8 @@ internal sealed partial class StatsWindow : Window
                 Utils.Logger.Error("Cannot parse {SwapButtonText} into a StatsMode enum", ButtonSwapStats.Content.ToString());
             }
         }
+#pragma warning restore CA1308 // Normalize strings to uppercase
     }
-#pragma warning restore CA1308
 
     private void Window_Closed(object sender, EventArgs e)
     {
