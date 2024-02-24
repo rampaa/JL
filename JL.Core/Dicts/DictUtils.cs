@@ -569,6 +569,8 @@ public static class DictUtils
             switch (dict.Type)
             {
                 case DictType.JMdict:
+                    dbExists = DeleteOldDB(dbExists, JmdictDBManager.Version, dict.Name, dbPath);
+
                     if (!UpdatingJmdict)
                     {
                         if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
@@ -577,7 +579,7 @@ public static class DictUtils
                             {
                                 try
                                 {
-                                    // 2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739, 2023/12/16: 419334
+                                    // 2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739, 2023/12/16: 419334, 2024/02/22: 421519
                                     dict.Contents = dict.Size > 0
                                         ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
                                         : new Dictionary<string, IList<IDictRecord>>(450000);
@@ -644,6 +646,8 @@ public static class DictUtils
                     break;
 
                 case DictType.JMnedict:
+                    dbExists = DeleteOldDB(dbExists, JmnedictDBManager.Version, dict.Name, dbPath);
+
                     if (!UpdatingJmnedict)
                     {
                         if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
@@ -652,10 +656,10 @@ public static class DictUtils
                             {
                                 try
                                 {
-                                    // 2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055, 2023/12/16: 609238
+                                    // 2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055, 2023/12/16: 609238, 2024/02/22: 609265
                                     dict.Contents = dict.Size > 0
                                         ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
-                                        : new Dictionary<string, IList<IDictRecord>>(630000);
+                                        : new Dictionary<string, IList<IDictRecord>>(620000);
 
                                     // We don't load JMnedict from DB because it is slower and allocates more memory for JMnedict for some reason
                                     await JmnedictLoader.Load(dict).ConfigureAwait(false);
@@ -712,6 +716,8 @@ public static class DictUtils
                     break;
 
                 case DictType.Kanjidic:
+                    dbExists = DeleteOldDB(dbExists, KanjidicDBManager.Version, dict.Name, dbPath);
+
                     if (!UpdatingKanjidic)
                     {
                         if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
@@ -720,7 +726,7 @@ public static class DictUtils
                             {
                                 try
                                 {
-                                    // 2022/05/11: 13108, 2023/12/16: 13108
+                                    // 2022/05/11: 13108, 2023/12/16: 13108, 2024/02/02 13108
                                     dict.Contents = dict.Size > 0
                                         ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
                                         : new Dictionary<string, IList<IDictRecord>>(13108);
@@ -807,6 +813,8 @@ public static class DictUtils
                 case DictType.NonspecificKanjiWithWordSchemaYomichan:
                 case DictType.NonspecificNameYomichan:
                 case DictType.NonspecificYomichan:
+                    dbExists = DeleteOldDB(dbExists, EpwingYomichanDBManager.Version, dict.Name, dbPath);
+
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
@@ -912,6 +920,8 @@ public static class DictUtils
                     break;
 
                 case DictType.NonspecificKanjiYomichan:
+                    dbExists = DeleteOldDB(dbExists, YomichanKanjiDBManager.Version, dict.Name, dbPath);
+
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
@@ -1071,6 +1081,8 @@ public static class DictUtils
                 case DictType.NonspecificKanjiNazeka:
                 case DictType.NonspecificNameNazeka:
                 case DictType.NonspecificNazeka:
+                    dbExists = DeleteOldDB(dbExists, EpwingNazekaDBManager.Version, dict.Name, dbPath);
+
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
@@ -1160,6 +1172,8 @@ public static class DictUtils
                     break;
 
                 case DictType.PitchAccentYomichan:
+                    dbExists = DeleteOldDB(dbExists, YomichanPitchAccentDBManager.Version, dict.Name, dbPath);
+
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
@@ -1426,5 +1440,29 @@ public static class DictUtils
             Utils.Logger.Fatal(ex, "DeserializeDicts failed");
             throw;
         }
+    }
+
+    private static uint GetVersionFromDB(string dbName)
+    {
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={GetDBPath(dbName)};Mode=ReadOnly"));
+        connection.Open();
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = "PRAGMA user_version";
+        return Convert.ToUInt32(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
+    }
+
+    private static bool DeleteOldDB(bool dbExists, uint version, string dictName, string dbPath)
+    {
+        if (dbExists)
+        {
+            if (version > GetVersionFromDB(dictName))
+            {
+                SqliteConnection.ClearAllPools();
+                File.Delete(dbPath);
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 }

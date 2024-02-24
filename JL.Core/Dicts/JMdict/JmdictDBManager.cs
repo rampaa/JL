@@ -9,6 +9,8 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Dicts.JMdict;
 internal static class JmdictDBManager
 {
+    public const uint Version = 1;
+
     public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
@@ -48,7 +50,9 @@ internal static class JmdictDBManager
                 FOREIGN KEY (record_id) REFERENCES record (id) ON DELETE CASCADE
             ) WITHOUT ROWID, STRICT;
             """;
+        _ = command.ExecuteNonQuery();
 
+        command.CommandText = string.Create(CultureInfo.InvariantCulture, $"PRAGMA user_version = {Version};");
         _ = command.ExecuteNonQuery();
     }
 

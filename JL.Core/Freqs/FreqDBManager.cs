@@ -9,6 +9,8 @@ using System.Text.Json;
 namespace JL.Core.Freqs;
 internal static class FreqDBManager
 {
+    public const uint Version = 1;
+
     public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={FreqUtils.GetDBPath(dbName)};"));
@@ -32,7 +34,9 @@ internal static class FreqDBManager
                 FOREIGN KEY (record_id) REFERENCES record (id) ON DELETE CASCADE
             ) WITHOUT ROWID, STRICT;
             """;
+        _ = command.ExecuteNonQuery();
 
+        command.CommandText = string.Create(CultureInfo.InvariantCulture, $"PRAGMA user_version = {Version};");
         _ = command.ExecuteNonQuery();
     }
 

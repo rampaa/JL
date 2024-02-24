@@ -83,6 +83,8 @@ public static class FreqUtils
             switch (freq.Type)
             {
                 case FreqType.Nazeka:
+                    dbExists = DeleteOldDB(dbExists, FreqDBManager.Version, freq.Name, dbPath);
+
                     if (freq is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
@@ -159,6 +161,8 @@ public static class FreqUtils
 
                 case FreqType.Yomichan:
                 case FreqType.YomichanKanji:
+                    dbExists = DeleteOldDB(dbExists, FreqDBManager.Version, freq.Name, dbPath);
+
                     if (freq is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
                         tasks.Add(Task.Run(async () =>
@@ -335,5 +339,29 @@ public static class FreqUtils
             Utils.Logger.Fatal(ex, "DeserializeFreqs failed");
             throw;
         }
+    }
+
+    private static uint GetVersionFromDB(string dbName)
+    {
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={GetDBPath(dbName)};Mode=ReadOnly"));
+        connection.Open();
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = "PRAGMA user_version";
+        return Convert.ToUInt32(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
+    }
+
+    private static bool DeleteOldDB(bool dbExists, uint version, string dictName, string dbPath)
+    {
+        if (dbExists)
+        {
+            if (version > GetVersionFromDB(dictName))
+            {
+                SqliteConnection.ClearAllPools();
+                File.Delete(dbPath);
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 }

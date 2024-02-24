@@ -8,6 +8,8 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Dicts.KanjiDict;
 internal static class YomichanKanjiDBManager
 {
+    public const uint Version = 0;
+
     public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
@@ -26,7 +28,9 @@ internal static class YomichanKanjiDBManager
                 stats TEXT
             ) STRICT;
             """;
+        _ = command.ExecuteNonQuery();
 
+        command.CommandText = string.Create(CultureInfo.InvariantCulture, $"PRAGMA user_version = {Version};");
         _ = command.ExecuteNonQuery();
     }
 
