@@ -563,13 +563,14 @@ public static class DictUtils
                 }
             }
 
-            bool loadFromDB = dbExists && !useDB;
+            bool loadFromDB;
             dict.Ready = false;
 
             switch (dict.Type)
             {
                 case DictType.JMdict:
                     dbExists = DeleteOldDB(dbExists, JmdictDBManager.Version, dict.Name, dbPath);
+                    loadFromDB = dbExists && !useDB;
 
                     if (!UpdatingJmdict)
                     {
@@ -647,6 +648,7 @@ public static class DictUtils
 
                 case DictType.JMnedict:
                     dbExists = DeleteOldDB(dbExists, JmnedictDBManager.Version, dict.Name, dbPath);
+                    loadFromDB = dbExists && !useDB;
 
                     if (!UpdatingJmnedict)
                     {
@@ -717,6 +719,7 @@ public static class DictUtils
 
                 case DictType.Kanjidic:
                     dbExists = DeleteOldDB(dbExists, KanjidicDBManager.Version, dict.Name, dbPath);
+                    loadFromDB = dbExists && !useDB;
 
                     if (!UpdatingKanjidic)
                     {
@@ -814,6 +817,7 @@ public static class DictUtils
                 case DictType.NonspecificNameYomichan:
                 case DictType.NonspecificYomichan:
                     dbExists = DeleteOldDB(dbExists, EpwingYomichanDBManager.Version, dict.Name, dbPath);
+                    loadFromDB = dbExists && !useDB;
 
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
@@ -921,6 +925,7 @@ public static class DictUtils
 
                 case DictType.NonspecificKanjiYomichan:
                     dbExists = DeleteOldDB(dbExists, YomichanKanjiDBManager.Version, dict.Name, dbPath);
+                    loadFromDB = dbExists && !useDB;
 
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
@@ -1082,6 +1087,7 @@ public static class DictUtils
                 case DictType.NonspecificNameNazeka:
                 case DictType.NonspecificNazeka:
                     dbExists = DeleteOldDB(dbExists, EpwingNazekaDBManager.Version, dict.Name, dbPath);
+                    loadFromDB = dbExists && !useDB;
 
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
@@ -1173,6 +1179,7 @@ public static class DictUtils
 
                 case DictType.PitchAccentYomichan:
                     dbExists = DeleteOldDB(dbExists, YomichanPitchAccentDBManager.Version, dict.Name, dbPath);
+                    loadFromDB = dbExists && !useDB;
 
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {

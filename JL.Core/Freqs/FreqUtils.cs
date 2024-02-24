@@ -77,13 +77,14 @@ public static class FreqUtils
                 }
             }
 
-            bool loadFromDB = dbExists && !useDB;
+            bool loadFromDB;
             freq.Ready = false;
 
             switch (freq.Type)
             {
                 case FreqType.Nazeka:
                     dbExists = DeleteOldDB(dbExists, FreqDBManager.Version, freq.Name, dbPath);
+                    loadFromDB = dbExists && !useDB;
 
                     if (freq is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
@@ -162,6 +163,7 @@ public static class FreqUtils
                 case FreqType.Yomichan:
                 case FreqType.YomichanKanji:
                     dbExists = DeleteOldDB(dbExists, FreqDBManager.Version, freq.Name, dbPath);
+                    loadFromDB = dbExists && !useDB;
 
                     if (freq is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
                     {
