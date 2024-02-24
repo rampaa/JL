@@ -173,23 +173,23 @@ internal sealed partial class ManageAudioSourcesWindow : Window
             .OrderBy(static dockPanel => ((AudioSource)((CheckBox)dockPanel.Children[0]).Tag).Priority);
     }
 
-    private void AudioSourceUriTextBlock_MouseEnter(object sender, MouseEventArgs e)
+    private static void AudioSourceUriTextBlock_MouseEnter(object sender, MouseEventArgs e)
     {
         ((TextBlock)sender).TextDecorations = TextDecorations.Underline;
     }
 
-    private void AudioSourceUriTextBlock_MouseLeave(object sender, MouseEventArgs e)
+    private static void AudioSourceUriTextBlock_MouseLeave(object sender, MouseEventArgs e)
     {
         ((TextBlock)sender).TextDecorations = null;
     }
 
-    private void CheckBox_Checked(object sender, RoutedEventArgs e)
+    private static void CheckBox_Checked(object sender, RoutedEventArgs e)
     {
         AudioSource audioSource = (AudioSource)((CheckBox)sender).Tag;
         audioSource.Active = true;
     }
 
-    private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private static void CheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         AudioSource audioSource = (AudioSource)((CheckBox)sender).Tag;
         audioSource.Active = false;

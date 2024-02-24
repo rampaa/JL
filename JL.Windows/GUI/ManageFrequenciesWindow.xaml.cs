@@ -212,23 +212,23 @@ internal sealed partial class ManageFrequenciesWindow : Window
         }
     }
 
-    private void PathTextBlock_MouseEnter(object sender, MouseEventArgs e)
+    private static void PathTextBlock_MouseEnter(object sender, MouseEventArgs e)
     {
         ((TextBlock)sender).TextDecorations = TextDecorations.Underline;
     }
 
-    private void PathTextBlock_MouseLeave(object sender, MouseEventArgs e)
+    private static void PathTextBlock_MouseLeave(object sender, MouseEventArgs e)
     {
         ((TextBlock)sender).TextDecorations = null;
     }
 
-    private void CheckBox_Checked(object sender, RoutedEventArgs e)
+    private static void CheckBox_Checked(object sender, RoutedEventArgs e)
     {
         Freq freq = (Freq)((CheckBox)sender).Tag;
         freq.Active = true;
     }
 
-    private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private static void CheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         Freq freq = (Freq)((CheckBox)sender).Tag;
         freq.Active = false;
