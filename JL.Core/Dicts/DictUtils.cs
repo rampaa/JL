@@ -649,7 +649,7 @@ public static class DictUtils
 
                 case DictType.JMnedict:
                     dbExists = DeleteOldDB(dbExists, JmnedictDBManager.Version, dict.Name, dbPath);
-                    loadFromDB = dbExists && !useDB;
+                    // loadFromDB = dbExists && !useDB;
 
                     if (!UpdatingJmnedict)
                     {
