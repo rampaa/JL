@@ -64,6 +64,7 @@ public static class FreqUtils
             string dbPath = GetDBPath(freq.Name);
             string dbJournalPath = dbPath + "-journal";
             bool dbExists = File.Exists(dbPath);
+            bool dbExisted = dbExists;
             bool dbJournalExists = File.Exists(dbJournalPath);
 
             if (dbJournalExists)
@@ -106,7 +107,7 @@ public static class FreqUtils
                                     await FrequencyNazekaLoader.Load(freq).ConfigureAwait(false);
                                     freq.Size = freq.Contents.Count;
 
-                                    if (useDB && !dbExists)
+                                    if (!dbExists && (useDB || dbExisted))
                                     {
                                         FreqDBManager.CreateDB(freq.Name);
                                         FreqDBManager.InsertRecordsToDB(freq);
@@ -187,7 +188,7 @@ public static class FreqUtils
                                     await FrequencyYomichanLoader.Load(freq).ConfigureAwait(false);
                                     freq.Size = freq.Contents.Count;
 
-                                    if (useDB && !dbExists)
+                                    if (!dbExists && (useDB || dbExisted))
                                     {
                                         FreqDBManager.CreateDB(freq.Name);
                                         FreqDBManager.InsertRecordsToDB(freq);

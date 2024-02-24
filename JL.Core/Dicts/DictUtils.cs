@@ -550,6 +550,7 @@ public static class DictUtils
             string dbPath = GetDBPath(dict.Name);
             string dbJournalPath = dbPath + "-journal";
             bool dbExists = File.Exists(dbPath);
+            bool dbExisted = dbExists;
             bool dbJournalExists = File.Exists(dbJournalPath);
 
             if (dbJournalExists)
@@ -595,7 +596,7 @@ public static class DictUtils
                                         await JmdictLoader.Load(dict).ConfigureAwait(false);
                                         dict.Size = dict.Contents.Count;
 
-                                        if (useDB && !dbExists)
+                                        if (!dbExists && (useDB || dbExisted))
                                         {
                                             JmdictDBManager.CreateDB(dict.Name);
                                             JmdictDBManager.InsertRecordsToDB(dict);
@@ -667,7 +668,7 @@ public static class DictUtils
                                     await JmnedictLoader.Load(dict).ConfigureAwait(false);
                                     dict.Size = dict.Contents.Count;
 
-                                    if (useDB && !dbExists)
+                                    if (!dbExists && (useDB || dbExisted))
                                     {
                                         JmnedictDBManager.CreateDB(dict.Name);
                                         JmnedictDBManager.InsertRecordsToDB(dict);
@@ -744,7 +745,7 @@ public static class DictUtils
                                         await KanjidicLoader.Load(dict).ConfigureAwait(false);
                                         dict.Size = dict.Contents.Count;
 
-                                        if (useDB && !dbExists)
+                                        if (!dbExists && (useDB || dbExisted))
                                         {
                                             KanjidicDBManager.CreateDB(dict.Name);
                                             KanjidicDBManager.InsertRecordsToDB(dict);
@@ -865,7 +866,7 @@ public static class DictUtils
                                     await EpwingYomichanLoader.Load(dict).ConfigureAwait(false);
                                     dict.Size = dict.Contents.Count;
 
-                                    if (useDB && !dbExists)
+                                    if (!dbExists && (useDB || dbExisted))
                                     {
                                         EpwingYomichanDBManager.CreateDB(dict.Name);
                                         EpwingYomichanDBManager.InsertRecordsToDB(dict);
@@ -947,7 +948,7 @@ public static class DictUtils
                                     await YomichanKanjiLoader.Load(dict).ConfigureAwait(false);
                                     dict.Size = dict.Contents.Count;
 
-                                    if (useDB && !dbExists)
+                                    if (!dbExists && (useDB || dbExisted))
                                     {
                                         YomichanKanjiDBManager.CreateDB(dict.Name);
                                         YomichanKanjiDBManager.InsertRecordsToDB(dict);
@@ -1119,7 +1120,7 @@ public static class DictUtils
                                     await EpwingNazekaLoader.Load(dict).ConfigureAwait(false);
                                     dict.Size = dict.Contents.Count;
 
-                                    if (useDB && !dbExists)
+                                    if (!dbExists && (useDB || dbExisted))
                                     {
                                         EpwingNazekaDBManager.CreateDB(dict.Name);
                                         EpwingNazekaDBManager.InsertRecordsToDB(dict);
@@ -1201,7 +1202,7 @@ public static class DictUtils
                                     await YomichanPitchAccentLoader.Load(dict).ConfigureAwait(false);
                                     dict.Size = dict.Contents.Count;
 
-                                    if (useDB && !dbExists)
+                                    if (!dbExists && (useDB || dbExisted))
                                     {
                                         YomichanPitchAccentDBManager.CreateDB(dict.Name);
                                         YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
