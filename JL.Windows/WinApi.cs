@@ -15,6 +15,8 @@ internal sealed class WinApi
         internal const int GWL_EXSTYLE = -20;
         // public const nint HTCAPTION = 2;
         internal const nint HWND_TOPMOST = -1;
+        // internal const nint HWND_TOP = 0;
+        // internal const nint HWND_NOTOPMOST = -2;
         internal const int SWP_NOACTIVATE = 0x0010;
         internal const int SWP_NOCOPYBITS = 0x0100;
         internal const int SWP_NOMOVE = 0x0002;

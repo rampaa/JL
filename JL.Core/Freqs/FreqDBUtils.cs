@@ -22,7 +22,7 @@ public static class FreqDBUtils
         return Convert.ToInt32(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
     }
 
-    public static bool DeleteOldDB(bool dbExists, int version, string dictName, string dbPath)
+    internal static bool DeleteOldDB(bool dbExists, int version, string dictName, string dbPath)
     {
         if (dbExists)
         {
@@ -50,9 +50,9 @@ public static class FreqDBUtils
 
     public static void SendOptimizePragmaToAllFreqDicts()
     {
-        foreach (Freq dict in FreqUtils.FreqDicts.Values.Where(freq => freq is { Active: true, Ready: true, Options.UseDB.Value: true }))
+        foreach (Freq freq in FreqUtils.FreqDicts.Values.Where(static freq => freq is { Active: true, Ready: true, Options.UseDB.Value: true }))
         {
-            SendOptimizePragma(dict.Name);
+            SendOptimizePragma(freq.Name);
         }
     }
 }

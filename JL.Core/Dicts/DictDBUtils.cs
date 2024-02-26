@@ -60,7 +60,7 @@ public static class DictDBUtils
         return Convert.ToInt32(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
     }
 
-    public static bool DeleteOldDB(bool dbExists, int version, string dictName, string dbPath)
+    internal static bool DeleteOldDB(bool dbExists, int version, string dictName, string dbPath)
     {
         if (dbExists)
         {
@@ -88,7 +88,7 @@ public static class DictDBUtils
 
     public static void SendOptimizePragmaToAllDicts()
     {
-        foreach (Dict dict in DictUtils.Dicts.Values.Where(dict => dict is { Active: true, Ready: true, Options.UseDB.Value: true }))
+        foreach (Dict dict in DictUtils.Dicts.Values.Where(static dict => dict is { Active: true, Ready: true, Options.UseDB.Value: true }))
         {
             SendOptimizePragma(dict.Name);
         }
