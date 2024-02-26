@@ -63,7 +63,7 @@ public static class LookupResultUtils
         {
             >= 1 and <= 6 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Kyouiku)"),
             8 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Jouyou)"),
-            <= 10 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Jinmeiyou)"),
+            >= 9 and <= 10 => string.Create(CultureInfo.InvariantCulture, $"{grade} (Jinmeiyou)"),
             _ => "Hyougai"
         };
 

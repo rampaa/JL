@@ -52,7 +52,7 @@ internal static class KanjidicLoader
     {
         string key = (await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false)).GetPooledString();
 
-        byte grade = byte.MaxValue;
+        byte grade = 0;
         byte strokeCount = 0;
         int frequency = 0;
         List<string> definitionList = new();
