@@ -73,7 +73,7 @@ internal static class KanjidicLoader
                 switch (xmlReader.Name)
                 {
                     case "grade":
-                        grade = (byte)xmlReader.ReadContentAsInt();
+                        grade = (byte)xmlReader.ReadElementContentAsInt();
                         break;
 
                     case "stroke_count":
