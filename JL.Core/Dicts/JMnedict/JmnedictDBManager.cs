@@ -9,11 +9,11 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Dicts.JMnedict;
 internal static class JmnedictDBManager
 {
-    public const uint Version = 0;
+    public const int Version = 0;
 
     public static void CreateDB(string dbName)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dbName)};"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -42,11 +42,11 @@ internal static class JmnedictDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
-        int id = 1;
+        ulong id = 1;
         HashSet<JmnedictRecord> jmnedictRecords = dict.Contents.Values.SelectMany(static v => v).Select(static v => (JmnedictRecord)v).ToHashSet();
         foreach (JmnedictRecord record in jmnedictRecords)
         {
@@ -93,7 +93,7 @@ internal static class JmnedictDBManager
     {
         Dictionary<string, IList<IDictRecord>> results = new();
 
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 

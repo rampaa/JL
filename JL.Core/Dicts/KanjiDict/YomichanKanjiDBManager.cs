@@ -8,11 +8,11 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Dicts.KanjiDict;
 internal static class YomichanKanjiDBManager
 {
-    public const uint Version = 0;
+    public const int Version = 0;
 
     public static void CreateDB(string dbName)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dbName)};"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -39,11 +39,11 @@ internal static class YomichanKanjiDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
-        int id = 1;
+        ulong id = 1;
         foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)
         {
             foreach (IDictRecord record in records)
@@ -93,7 +93,7 @@ internal static class YomichanKanjiDBManager
     {
         List<IDictRecord> results = new();
 
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -120,7 +120,7 @@ internal static class YomichanKanjiDBManager
 
     public static void LoadFromDB(Dict dict)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadOnly"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dict.Name)};Mode=ReadOnly"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 

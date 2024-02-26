@@ -8,11 +8,11 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Dicts.KANJIDIC;
 internal static class KanjidicDBManager
 {
-    public const uint Version = 0;
+    public const int Version = 0;
 
     public static void CreateDB(string dbName)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dbName)};"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -43,11 +43,11 @@ internal static class KanjidicDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
-        int id = 1;
+        ulong id = 1;
         foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)
         {
             foreach (IDictRecord record in records)
@@ -99,7 +99,7 @@ internal static class KanjidicDBManager
     {
         List<IDictRecord> results = new();
 
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -130,7 +130,7 @@ internal static class KanjidicDBManager
 
     public static void LoadFromDB(Dict dict)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadOnly"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dict.Name)};Mode=ReadOnly"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -190,8 +190,8 @@ internal static class KanjidicDBManager
             definitions = JsonSerializer.Deserialize<string[]>(definitionsFromDB, Utils.s_jsoNotIgnoringNull);
         }
 
-        int strokeCount = dataReader.GetInt32(nameof(strokeCount));
-        int grade = dataReader.GetInt32(nameof(grade));
+        byte strokeCount = dataReader.GetByte(nameof(strokeCount));
+        byte grade = dataReader.GetByte(nameof(grade));
         int frequency = dataReader.GetInt32(nameof(frequency));
         return new KanjidicRecord(definitions, onReadings, kunReadings, nanoriReadings, radicalNames, strokeCount, grade, frequency);
     }

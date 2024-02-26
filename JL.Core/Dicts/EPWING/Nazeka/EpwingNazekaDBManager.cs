@@ -9,11 +9,11 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Dicts.EPWING.Nazeka;
 internal static class EpwingNazekaDBManager
 {
-    public const uint Version = 1;
+    public const int Version = 1;
 
     public static void CreateDB(string dbName)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dbName)};"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -47,11 +47,11 @@ internal static class EpwingNazekaDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
-        int id = 1;
+        ulong id = 1;
         HashSet<EpwingNazekaRecord> nazekaWordRecords = dict.Contents.Values.SelectMany(static v => v).Select(static v => (EpwingNazekaRecord)v).ToHashSet();
         foreach (EpwingNazekaRecord record in nazekaWordRecords)
         {
@@ -126,7 +126,7 @@ internal static class EpwingNazekaDBManager
     {
         Dictionary<string, IList<IDictRecord>> results = new();
 
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -196,7 +196,7 @@ internal static class EpwingNazekaDBManager
     {
         List<IDictRecord> results = new();
 
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -224,7 +224,7 @@ internal static class EpwingNazekaDBManager
 
     public static void LoadFromDB(Dict dict)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadOnly"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dict.Name)};Mode=ReadOnly"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 

@@ -897,7 +897,7 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        if (result.KanjiGrade > -1)
+        if (result.KanjiGrade is not byte.MaxValue)
         {
             TextBlock gradeTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiGrade),
                     string.Create(CultureInfo.InvariantCulture, $"Grade: {LookupResultUtils.GradeToText(result.KanjiGrade)}"),

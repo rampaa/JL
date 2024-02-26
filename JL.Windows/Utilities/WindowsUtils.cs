@@ -461,7 +461,7 @@ internal static class WindowsUtils
         });
     }
 
-    public static Size MeasureTextSize(string text, int fontSize)
+    public static Size MeasureTextSize(string text, double fontSize)
     {
         FormattedText formattedText = new(
             text,

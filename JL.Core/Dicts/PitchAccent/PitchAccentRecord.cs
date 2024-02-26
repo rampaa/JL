@@ -8,9 +8,9 @@ public sealed record class PitchAccentRecord : IDictRecord
 {
     public string Spelling { get; }
     public string? Reading { get; }
-    public int Position { get; }
+    public byte Position { get; }
 
-    internal PitchAccentRecord(string spelling, string? reading, int position)
+    internal PitchAccentRecord(string spelling, string? reading, byte position)
     {
         Spelling = spelling;
         Reading = reading;
@@ -24,7 +24,7 @@ public sealed record class PitchAccentRecord : IDictRecord
         if (jsonObject[2].ValueKind is JsonValueKind.Object)
         {
             Reading = jsonObject[2].GetProperty("reading").GetString();
-            Position = jsonObject[2].GetProperty("pitches")[0].GetProperty("position").GetInt32();
+            Position = jsonObject[2].GetProperty("pitches")[0].GetProperty("position").GetByte();
         }
 
         else
@@ -37,9 +37,9 @@ public sealed record class PitchAccentRecord : IDictRecord
                 Match match = Utils.s_numberRegex.Match(positionStr);
                 if (match.Success)
                 {
-                    Position = int.TryParse(match.ValueSpan, out int position)
+                    Position = byte.TryParse(match.ValueSpan, out byte position)
                         ? position
-                        : -1;
+                        : byte.MaxValue;
                 }
             }
         }

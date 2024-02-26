@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Core.Dicts;
+using JL.Core.Freqs;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
@@ -325,9 +326,11 @@ internal sealed partial class ManageDictionariesWindow : Window
             dict.Contents.TrimExcess();
             _ = DictUtils.Dicts.Remove(dict.Name);
 
-            string dbPath = DictUtils.GetDBPath(dict.Name);
+            string dbPath = DictDBUtils.GetDBPath(dict.Name);
             if (File.Exists(dbPath))
             {
+                DictDBUtils.SendOptimizePragmaToAllDicts();
+                FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
                 SqliteConnection.ClearAllPools();
                 File.Delete(dbPath);
             }

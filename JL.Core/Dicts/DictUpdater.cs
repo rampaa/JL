@@ -4,6 +4,7 @@ using System.Net;
 using JL.Core.Dicts.JMdict;
 using JL.Core.Dicts.JMnedict;
 using JL.Core.Dicts.KANJIDIC;
+using JL.Core.Freqs;
 using JL.Core.Network;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
@@ -127,12 +128,14 @@ public static class DictUpdater
 
             await JmdictWordClassUtils.Load().ConfigureAwait(false);
 
-            string dbPath = DictUtils.GetDBPath(dict.Name);
+            string dbPath = DictDBUtils.GetDBPath(dict.Name);
             bool useDB = dict.Options?.UseDB?.Value ?? false;
             bool dbExists = File.Exists(dbPath);
 
             if (dbExists)
             {
+                DictDBUtils.SendOptimizePragmaToAllDicts();
+                FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
                 SqliteConnection.ClearAllPools();
                 File.Delete(dbPath);
             }
@@ -178,12 +181,14 @@ public static class DictUpdater
             await Task.Run(async () => await JmnedictLoader
                 .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
 
-            string dbPath = DictUtils.GetDBPath(dict.Name);
+            string dbPath = DictDBUtils.GetDBPath(dict.Name);
             bool useDB = dict.Options?.UseDB?.Value ?? false;
             bool dbExists = File.Exists(dbPath);
 
             if (dbExists)
             {
+                DictDBUtils.SendOptimizePragmaToAllDicts();
+                FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
                 SqliteConnection.ClearAllPools();
                 File.Delete(dbPath);
             }
@@ -229,12 +234,14 @@ public static class DictUpdater
             await Task.Run(async () => await KanjidicLoader
                 .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
 
-            string dbPath = DictUtils.GetDBPath(dict.Name);
+            string dbPath = DictDBUtils.GetDBPath(dict.Name);
             bool useDB = dict.Options?.UseDB?.Value ?? false;
             bool dbExists = File.Exists(dbPath);
 
             if (dbExists)
             {
+                DictDBUtils.SendOptimizePragmaToAllDicts();
+                FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
                 SqliteConnection.ClearAllPools();
                 File.Delete(dbPath);
             }

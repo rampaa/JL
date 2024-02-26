@@ -17,6 +17,7 @@ using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.SpeechSynthesis;
 using JL.Windows.Utilities;
+using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
 using Window = System.Windows.Window;
 
@@ -459,6 +460,9 @@ internal sealed partial class MainWindow : Window
         await Stats.SerializeLifetimeStats().ConfigureAwait(false);
         await Stats.SerializeProfileLifetimeStats().ConfigureAwait(false);
         await BacklogUtils.WriteBacklog().ConfigureAwait(false);
+        DictDBUtils.SendOptimizePragmaToAllDicts();
+        FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
+        SqliteConnection.ClearAllPools();
     }
 
     private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -1151,7 +1155,7 @@ internal sealed partial class MainWindow : Window
                 ? Math.Min(ratioX, ratioY) * 0.75
                 : Math.Max(ratioX, ratioY) / 0.75;
 
-            FontSizeSlider.Value = (int)Math.Round(FontSizeSlider.Value / fontScale);
+            FontSizeSlider.Value = Math.Round(FontSizeSlider.Value / fontScale);
 
             Left = LeftPositionBeforeResolutionChange / ratioX;
             LeftPositionBeforeResolutionChange = Left;
@@ -1159,24 +1163,24 @@ internal sealed partial class MainWindow : Window
             Top = TopPositionBeforeResolutionChange / ratioY;
             TopPositionBeforeResolutionChange = Top;
 
-            Width = (int)Math.Round(WidthBeforeResolutionChange / ratioX);
+            Width = Math.Round(WidthBeforeResolutionChange / ratioX);
             WidthBeforeResolutionChange = Width;
 
-            Height = (int)Math.Round(HeightBeforeResolutionChange / ratioY);
+            Height = Math.Round(HeightBeforeResolutionChange / ratioY);
             HeightBeforeResolutionChange = Height;
 
-            ConfigManager.PopupMaxHeight = (int)Math.Round(ConfigManager.PopupMaxHeight / ratioY);
-            ConfigManager.PopupMaxWidth = (int)Math.Round(ConfigManager.PopupMaxWidth / ratioX);
+            ConfigManager.PopupMaxHeight = Math.Round(ConfigManager.PopupMaxHeight / ratioY);
+            ConfigManager.PopupMaxWidth = Math.Round(ConfigManager.PopupMaxWidth / ratioX);
             WindowsUtils.DpiAwarePopupMaxHeight = ConfigManager.PopupMaxHeight / WindowsUtils.Dpi.DpiScaleY;
             WindowsUtils.DpiAwarePopupMaxWidth = ConfigManager.PopupMaxWidth / WindowsUtils.Dpi.DpiScaleX;
 
-            ConfigManager.PopupYOffset = (int)Math.Round(ConfigManager.PopupYOffset / ratioY);
-            ConfigManager.PopupXOffset = (int)Math.Round(ConfigManager.PopupXOffset / ratioX);
+            ConfigManager.PopupYOffset = Math.Round(ConfigManager.PopupYOffset / ratioY);
+            ConfigManager.PopupXOffset = Math.Round(ConfigManager.PopupXOffset / ratioX);
             WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
             WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
 
-            ConfigManager.FixedPopupYPosition = (int)Math.Round(ConfigManager.FixedPopupYPosition / ratioY);
-            ConfigManager.FixedPopupXPosition = (int)Math.Round(ConfigManager.FixedPopupXPosition / ratioX);
+            ConfigManager.FixedPopupYPosition = Math.Round(ConfigManager.FixedPopupYPosition / ratioY);
+            ConfigManager.FixedPopupXPosition = Math.Round(ConfigManager.FixedPopupXPosition / ratioX);
             WindowsUtils.DpiAwareXOffset = ConfigManager.PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
             WindowsUtils.DpiAwareYOffset = ConfigManager.PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
 
@@ -1189,13 +1193,13 @@ internal sealed partial class MainWindow : Window
 
             if (ConfigManager.AutoAdjustFontSizesOnResolutionChange)
             {
-                ConfigManager.AlternativeSpellingsFontSize = (int)Math.Round(ConfigManager.AlternativeSpellingsFontSize / fontScale);
-                ConfigManager.DeconjugationInfoFontSize = (int)Math.Round(ConfigManager.DeconjugationInfoFontSize / fontScale);
-                ConfigManager.DefinitionsFontSize = (int)Math.Round(ConfigManager.DefinitionsFontSize / fontScale);
-                ConfigManager.DictTypeFontSize = (int)Math.Round(ConfigManager.DictTypeFontSize / fontScale);
-                ConfigManager.FrequencyFontSize = (int)Math.Round(ConfigManager.FrequencyFontSize / fontScale);
-                ConfigManager.PrimarySpellingFontSize = (int)Math.Round(ConfigManager.PrimarySpellingFontSize / fontScale);
-                ConfigManager.ReadingsFontSize = (int)Math.Round(ConfigManager.ReadingsFontSize / fontScale);
+                ConfigManager.AlternativeSpellingsFontSize = Math.Round(ConfigManager.AlternativeSpellingsFontSize / fontScale);
+                ConfigManager.DeconjugationInfoFontSize = Math.Round(ConfigManager.DeconjugationInfoFontSize / fontScale);
+                ConfigManager.DefinitionsFontSize = Math.Round(ConfigManager.DefinitionsFontSize / fontScale);
+                ConfigManager.DictTypeFontSize = Math.Round(ConfigManager.DictTypeFontSize / fontScale);
+                ConfigManager.FrequencyFontSize = Math.Round(ConfigManager.FrequencyFontSize / fontScale);
+                ConfigManager.PrimarySpellingFontSize = Math.Round(ConfigManager.PrimarySpellingFontSize / fontScale);
+                ConfigManager.ReadingsFontSize = Math.Round(ConfigManager.ReadingsFontSize / fontScale);
             }
         }
     }
@@ -1473,34 +1477,10 @@ internal sealed partial class MainWindow : Window
 
             if (ConfigManager.GlobalHotKeys)
             {
-                string[] namesOfHotkeysThatCanBeUsedWhileJLIsMinimized =
+                List<int> keyGestureIdsToIgnore = new(KeyGestureUtils.NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized.Length);
+                for (int i = 0; i < KeyGestureUtils.NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized.Length; i++)
                 {
-                    nameof(ConfigManager.ToggleMinimizedStateKeyGesture),
-                    nameof(ConfigManager.ClosePopupKeyGesture),
-                    nameof(ConfigManager.DisableHotkeysKeyGesture),
-                    nameof(ConfigManager.PlayAudioKeyGesture),
-                    nameof(ConfigManager.SelectedTextToSpeechKeyGesture),
-                    nameof(ConfigManager.SearchWithBrowserKeyGesture),
-                    nameof(ConfigManager.LookupFirstTermKeyGesture),
-                    nameof(ConfigManager.MineSelectedLookupResultKeyGesture),
-                    nameof(ConfigManager.MotivationKeyGesture),
-                    nameof(ConfigManager.NextDictKeyGesture),
-                    nameof(ConfigManager.PreviousDictKeyGesture),
-                    nameof(ConfigManager.SelectedTextToSpeechKeyGesture),
-                    nameof(ConfigManager.SelectNextLookupResultKeyGesture),
-                    nameof(ConfigManager.SelectPreviousLookupResultKeyGesture),
-                    nameof(ConfigManager.CaptureTextFromClipboardKeyGesture),
-                    nameof(ConfigManager.CaptureTextFromWebSocketKeyGesture),
-                    nameof(ConfigManager.ReconnectToWebSocketServerKeyGesture),
-                    nameof(ConfigManager.KanjiModeKeyGesture),
-                    nameof(ConfigManager.ShowAddNameWindowKeyGesture),
-                    nameof(ConfigManager.ShowAddWordWindowKeyGesture)
-                };
-
-                List<int> keyGestureIdsToIgnore = new(namesOfHotkeysThatCanBeUsedWhileJLIsMinimized.Length);
-                for (int i = 0; i < namesOfHotkeysThatCanBeUsedWhileJLIsMinimized.Length; i++)
-                {
-                    if (KeyGestureUtils.KeyGestureNameToIntDict.TryGetValue(namesOfHotkeysThatCanBeUsedWhileJLIsMinimized[i], out int id))
+                    if (KeyGestureUtils.KeyGestureNameToIntDict.TryGetValue(KeyGestureUtils.NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized[i], out int id))
                     {
                         keyGestureIdsToIgnore.Add(id);
                     }

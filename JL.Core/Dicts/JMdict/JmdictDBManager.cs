@@ -9,11 +9,11 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Dicts.JMdict;
 internal static class JmdictDBManager
 {
-    public const uint Version = 1;
+    public const int Version = 1;
 
     public static void CreateDB(string dbName)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dbName)};"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -61,7 +61,7 @@ internal static class JmdictDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dict.Name)};Mode=ReadWrite"));
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
@@ -82,7 +82,7 @@ internal static class JmdictDBManager
             }
         }
 
-        int id = 1;
+        ulong id = 1;
         foreach ((JmdictRecord record, List<string> keys) in recordToKeysDict)
         {
             using SqliteCommand insertRecordCommand = connection.CreateCommand();
@@ -153,7 +153,7 @@ internal static class JmdictDBManager
 
     public static Dictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dbName)};Mode=ReadOnly"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dbName)};Mode=ReadOnly"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -223,7 +223,7 @@ internal static class JmdictDBManager
 
     public static void LoadFromDB(Dict dict)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictUtils.GetDBPath(dict.Name)};Mode=ReadOnly"));
+        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DictDBUtils.GetDBPath(dict.Name)};Mode=ReadOnly"));
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 

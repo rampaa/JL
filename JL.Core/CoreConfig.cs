@@ -7,7 +7,7 @@ public static class CoreConfig
     public static bool AnkiIntegration { get; set; } = false;
     public static bool ForceSyncAnki { get; set; } = false;
     public static bool AllowDuplicateCards { get; set; } = false;
-    public static int LookupRate { get; set; } = 0;
+    public static double LookupRate { get; set; } = 0;
     public static bool CaptureTextFromClipboard { get; set; } = true;
     public static bool CaptureTextFromWebSocket { get; set; } = false;
     public static bool TextBoxTrimWhiteSpaceCharacters { get; set; } = true;

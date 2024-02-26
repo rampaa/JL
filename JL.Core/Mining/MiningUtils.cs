@@ -111,7 +111,7 @@ public static class MiningUtils
             miningParams[JLField.StrokeCount] = lookupResult.StrokeCount.ToString(CultureInfo.InvariantCulture);
         }
 
-        if (lookupResult.KanjiGrade > -1)
+        if (lookupResult.KanjiGrade is not byte.MaxValue)
         {
             miningParams[JLField.KanjiGrade] = lookupResult.KanjiGrade.ToString(CultureInfo.InvariantCulture);
         }
@@ -140,13 +140,13 @@ public static class MiningUtils
         {
             if (pitchDict.Active)
             {
-                List<KeyValuePair<string, int>>? pitchAccents = GetPitchAccents(lookupResult.PitchAccentDict ?? pitchDict.Contents, lookupResult);
+                List<KeyValuePair<string, byte>>? pitchAccents = GetPitchAccents(lookupResult.PitchAccentDict ?? pitchDict.Contents, lookupResult);
                 if (pitchAccents is not null)
                 {
                     StringBuilder numericPitchAccentBuilder = new();
                     for (int i = 0; i < pitchAccents.Count; i++)
                     {
-                        KeyValuePair<string, int> pitchAccent = pitchAccents[i];
+                        KeyValuePair<string, byte> pitchAccent = pitchAccents[i];
                         _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{pitchAccent.Key}: {pitchAccent.Value}, ");
                     }
 
@@ -159,9 +159,9 @@ public static class MiningUtils
         return miningParams;
     }
 
-    private static List<KeyValuePair<string, int>>? GetPitchAccents(Dictionary<string, IList<IDictRecord>> pitchDict, LookupResult lookupResult)
+    private static List<KeyValuePair<string, byte>>? GetPitchAccents(Dictionary<string, IList<IDictRecord>> pitchDict, LookupResult lookupResult)
     {
-        List<KeyValuePair<string, int>> pitchAccents = new();
+        List<KeyValuePair<string, byte>> pitchAccents = new();
 
         if (lookupResult.Readings is not null)
         {

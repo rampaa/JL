@@ -52,8 +52,8 @@ internal static class KanjidicLoader
     {
         string key = (await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false)).GetPooledString();
 
-        int grade = -1;
-        int strokeCount = 0;
+        byte grade = byte.MaxValue;
+        byte strokeCount = 0;
         int frequency = 0;
         List<string> definitionList = new();
         List<string> nanoriReadingList = new();
@@ -73,11 +73,11 @@ internal static class KanjidicLoader
                 switch (xmlReader.Name)
                 {
                     case "grade":
-                        grade = xmlReader.ReadElementContentAsInt();
+                        grade = (byte)xmlReader.ReadContentAsInt();
                         break;
 
                     case "stroke_count":
-                        strokeCount = xmlReader.ReadElementContentAsInt();
+                        strokeCount = (byte)xmlReader.ReadElementContentAsInt();
                         break;
 
                     case "freq":

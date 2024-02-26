@@ -106,7 +106,7 @@ public readonly record struct AntonymOption(bool Value)
 
 public readonly record struct UseDBOption(bool Value)
 {
-    [JsonIgnore] public static readonly DictType[] ValidDictTypes = DictUtils.s_dictTypesWithDBSupport;
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = DictDBUtils.s_dictTypesWithDBSupport;
 }
 
 public readonly record struct ShowPitchAccentWithDottedLinesOption(bool Value)

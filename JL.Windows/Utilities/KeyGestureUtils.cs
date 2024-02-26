@@ -34,6 +34,29 @@ internal static class KeyGestureUtils
         #pragma warning restore format
     };
 
+    public static readonly string[] NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized = {
+        nameof(ConfigManager.ToggleMinimizedStateKeyGesture),
+        nameof(ConfigManager.ClosePopupKeyGesture),
+        nameof(ConfigManager.DisableHotkeysKeyGesture),
+        nameof(ConfigManager.PlayAudioKeyGesture),
+        nameof(ConfigManager.SelectedTextToSpeechKeyGesture),
+        nameof(ConfigManager.SearchWithBrowserKeyGesture),
+        nameof(ConfigManager.LookupFirstTermKeyGesture),
+        nameof(ConfigManager.MineSelectedLookupResultKeyGesture),
+        nameof(ConfigManager.MotivationKeyGesture),
+        nameof(ConfigManager.NextDictKeyGesture),
+        nameof(ConfigManager.PreviousDictKeyGesture),
+        nameof(ConfigManager.SelectedTextToSpeechKeyGesture),
+        nameof(ConfigManager.SelectNextLookupResultKeyGesture),
+        nameof(ConfigManager.SelectPreviousLookupResultKeyGesture),
+        nameof(ConfigManager.CaptureTextFromClipboardKeyGesture),
+        nameof(ConfigManager.CaptureTextFromWebSocketKeyGesture),
+        nameof(ConfigManager.ReconnectToWebSocketServerKeyGesture),
+        nameof(ConfigManager.KanjiModeKeyGesture),
+        nameof(ConfigManager.ShowAddNameWindowKeyGesture),
+        nameof(ConfigManager.ShowAddWordWindowKeyGesture)
+    };
+
     public static async Task HandleKeyDown(KeyEventArgs e)
     {
         Key key = e.Key is Key.System

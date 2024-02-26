@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
+using JL.Core.Dicts;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
@@ -65,7 +66,7 @@ internal sealed partial class EditFrequencyWindow : Window
 
         if (isValid)
         {
-            string dbPath = FreqUtils.GetDBPath(_freq.Name);
+            string dbPath = FreqDBUtils.GetDBPath(_freq.Name);
             bool dbExists = File.Exists(dbPath);
 
             if (_freq.Path != path)
@@ -76,6 +77,8 @@ internal sealed partial class EditFrequencyWindow : Window
 
                 if (dbExists)
                 {
+                    DictDBUtils.SendOptimizePragmaToAllDicts();
+                    FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
                     SqliteConnection.ClearAllPools();
                     File.Delete(dbPath);
                     dbExists = false;
@@ -89,6 +92,8 @@ internal sealed partial class EditFrequencyWindow : Window
                 _freq.Ready = false;
                 //if (dbExists && !(options.UseDB?.Value ?? false))
                 //{
+                //    DictDBUtils.SendOptimizePragmaToAllDicts();
+                //    FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
                 //    SqliteConnection.ClearAllPools();
                 //    File.Delete(dbPath);
                 //    dbExists = false;
@@ -99,8 +104,10 @@ internal sealed partial class EditFrequencyWindow : Window
             {
                 if (dbExists)
                 {
+                    DictDBUtils.SendOptimizePragmaToAllDicts();
+                    FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
                     SqliteConnection.ClearAllPools();
-                    File.Move(dbPath, FreqUtils.GetDBPath(name));
+                    File.Move(dbPath, FreqDBUtils.GetDBPath(name));
                 }
 
                 _freq.Name = name;

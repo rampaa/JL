@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
+using JL.Core.Freqs;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
 using JL.Windows.Utilities;
@@ -68,7 +69,7 @@ internal sealed partial class EditDictionaryWindow : Window
 
         if (isValid)
         {
-            string dbPath = DictUtils.GetDBPath(_dict.Name);
+            string dbPath = DictDBUtils.GetDBPath(_dict.Name);
             bool dbExists = File.Exists(dbPath);
 
             if (_dict.Path != path)
@@ -79,6 +80,8 @@ internal sealed partial class EditDictionaryWindow : Window
 
                 if (dbExists)
                 {
+                    DictDBUtils.SendOptimizePragmaToAllDicts();
+                    FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
                     SqliteConnection.ClearAllPools();
                     File.Delete(dbPath);
                     dbExists = false;
@@ -106,6 +109,8 @@ internal sealed partial class EditDictionaryWindow : Window
 
                 if (dbExists)
                 {
+                    DictDBUtils.SendOptimizePragmaToAllDicts();
+                    FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
                     SqliteConnection.ClearAllPools();
                     File.Delete(dbPath);
                     dbExists = false;
@@ -117,6 +122,8 @@ internal sealed partial class EditDictionaryWindow : Window
                 _dict.Ready = false;
                 //if (dbExists && !(options.UseDB?.Value ?? false))
                 //{
+                //    DictDBUtils.SendOptimizePragmaToAllDicts();
+                //    FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
                 //    SqliteConnection.ClearAllPools();
                 //    File.Delete(dbPath);
                 //    dbExists = false;
@@ -127,8 +134,10 @@ internal sealed partial class EditDictionaryWindow : Window
             {
                 if (dbExists)
                 {
+                    DictDBUtils.SendOptimizePragmaToAllDicts();
+                    FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
                     SqliteConnection.ClearAllPools();
-                    File.Move(dbPath, DictUtils.GetDBPath(name));
+                    File.Move(dbPath, DictDBUtils.GetDBPath(name));
                 }
 
                 _dict.Name = name;

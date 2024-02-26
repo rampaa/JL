@@ -71,39 +71,39 @@ internal static class ConfigManager
     #region Popup
 
     public static FontFamily PopupFont { get; private set; } = new("Meiryo");
-    public static int PopupMaxWidth { get; set; } = 700;
-    public static int PopupMaxHeight { get; set; } = 520;
+    public static double PopupMaxWidth { get; set; } = 700;
+    public static double PopupMaxHeight { get; set; } = 520;
     public static bool PopupDynamicHeight { get; private set; } = true;
     public static bool PopupDynamicWidth { get; private set; } = true;
     public static bool FixedPopupPositioning { get; private set; } = false;
-    public static int FixedPopupXPosition { get; set; } = 0;
-    public static int FixedPopupYPosition { get; set; } = 0;
+    public static double FixedPopupXPosition { get; set; } = 0;
+    public static double FixedPopupYPosition { get; set; } = 0;
     public static bool PopupFocusOnLookup { get; private set; } = false;
     public static bool ShowMiningModeReminder { get; private set; } = true;
     public static bool DisableLookupsForNonJapaneseCharsInPopups { get; private set; } = true;
     public static Brush PopupBackgroundColor { get; private set; } = new SolidColorBrush(Color.FromRgb(0, 0, 0)) { Opacity = 0.8 };
-    public static int PopupXOffset { get; set; } = 10;
-    public static int PopupYOffset { get; set; } = 20;
+    public static double PopupXOffset { get; set; } = 10;
+    public static double PopupYOffset { get; set; } = 20;
     public static bool PopupFlipX { get; private set; } = true;
     public static bool PopupFlipY { get; private set; } = true;
     public static Brush PrimarySpellingColor { get; private set; } = Brushes.Chocolate;
-    public static int PrimarySpellingFontSize { get; set; } = 21;
+    public static double PrimarySpellingFontSize { get; set; } = 21;
     public static Brush ReadingsColor { get; private set; } = Brushes.Goldenrod;
-    public static int ReadingsFontSize { get; set; } = 19;
+    public static double ReadingsFontSize { get; set; } = 19;
     public static Brush AlternativeSpellingsColor { get; private set; } = Brushes.LightYellow;
-    public static int AlternativeSpellingsFontSize { get; set; } = 17;
+    public static double AlternativeSpellingsFontSize { get; set; } = 17;
     public static Brush DefinitionsColor { get; private set; } = Brushes.White;
-    public static int DefinitionsFontSize { get; set; } = 17;
+    public static double DefinitionsFontSize { get; set; } = 17;
     public static Brush FrequencyColor { get; private set; } = Brushes.Yellow;
-    public static int FrequencyFontSize { get; set; } = 17;
+    public static double FrequencyFontSize { get; set; } = 17;
     public static Brush DeconjugationInfoColor { get; private set; } = Brushes.LightSteelBlue;
-    public static int DeconjugationInfoFontSize { get; set; } = 17;
+    public static double DeconjugationInfoFontSize { get; set; } = 17;
     public static Brush DictTypeColor { get; private set; } = Brushes.LightBlue;
-    public static int DictTypeFontSize { get; set; } = 15;
+    public static double DictTypeFontSize { get; set; } = 15;
     public static Brush SeparatorColor { get; private set; } = Brushes.White;
     public static bool HideDictTabsWithNoResults { get; private set; } = true;
     public static bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } = false;
-    public static int AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 2000;
+    public static double AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 2000;
     public static bool AutoLookupFirstTermWhenTextIsCopiedFromClipboard { get; private set; } = false;
     public static bool AutoLookupFirstTermWhenTextIsCopiedFromWebSocket { get; private set; } = false;
     public static bool AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized { get; private set; } = true;
@@ -347,37 +347,37 @@ internal static class ConfigManager
         }
 
         MaxSearchLength = GetValueFromConfig(config, MaxSearchLength, nameof(MaxSearchLength), int.TryParse);
-        CoreConfig.LookupRate = GetValueFromConfig(config, CoreConfig.LookupRate, nameof(CoreConfig.LookupRate), int.TryParse);
-        PrimarySpellingFontSize = GetValueFromConfig(config, PrimarySpellingFontSize, nameof(PrimarySpellingFontSize), int.TryParse);
-        ReadingsFontSize = GetValueFromConfig(config, ReadingsFontSize, nameof(ReadingsFontSize), int.TryParse);
-        AlternativeSpellingsFontSize = GetValueFromConfig(config, AlternativeSpellingsFontSize, nameof(AlternativeSpellingsFontSize), int.TryParse);
-        DefinitionsFontSize = GetValueFromConfig(config, DefinitionsFontSize, nameof(DefinitionsFontSize), int.TryParse);
-        FrequencyFontSize = GetValueFromConfig(config, FrequencyFontSize, nameof(FrequencyFontSize), int.TryParse);
-        DeconjugationInfoFontSize = GetValueFromConfig(config, DeconjugationInfoFontSize, nameof(DeconjugationInfoFontSize), int.TryParse);
-        DictTypeFontSize = GetValueFromConfig(config, DictTypeFontSize, nameof(DictTypeFontSize), int.TryParse);
+        CoreConfig.LookupRate = GetNumberWithDecimalPointFromConfig(config, CoreConfig.LookupRate, nameof(CoreConfig.LookupRate), double.TryParse);
+        PrimarySpellingFontSize = GetNumberWithDecimalPointFromConfig(config, PrimarySpellingFontSize, nameof(PrimarySpellingFontSize), double.TryParse);
+        ReadingsFontSize = GetNumberWithDecimalPointFromConfig(config, ReadingsFontSize, nameof(ReadingsFontSize), double.TryParse);
+        AlternativeSpellingsFontSize = GetNumberWithDecimalPointFromConfig(config, AlternativeSpellingsFontSize, nameof(AlternativeSpellingsFontSize), double.TryParse);
+        DefinitionsFontSize = GetNumberWithDecimalPointFromConfig(config, DefinitionsFontSize, nameof(DefinitionsFontSize), double.TryParse);
+        FrequencyFontSize = GetNumberWithDecimalPointFromConfig(config, FrequencyFontSize, nameof(FrequencyFontSize), double.TryParse);
+        DeconjugationInfoFontSize = GetNumberWithDecimalPointFromConfig(config, DeconjugationInfoFontSize, nameof(DeconjugationInfoFontSize), double.TryParse);
+        DictTypeFontSize = GetNumberWithDecimalPointFromConfig(config, DictTypeFontSize, nameof(DictTypeFontSize), double.TryParse);
         MaxNumResultsNotInMiningMode = GetValueFromConfig(config, MaxNumResultsNotInMiningMode, nameof(MaxNumResultsNotInMiningMode), int.TryParse);
         CoreConfig.AudioVolume = GetValueFromConfig(config, CoreConfig.AudioVolume, nameof(CoreConfig.AudioVolume), int.TryParse);
 
-        AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = GetValueFromConfig(config, AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds), int.TryParse);
+        AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds = GetNumberWithDecimalPointFromConfig(config, AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds, nameof(AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds), double.TryParse);
         PopupWindow.PopupAutoHideTimer.Enabled = false;
         PopupWindow.PopupAutoHideTimer.Interval = AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds;
 
-        PopupXOffset = GetValueFromConfig(config, PopupXOffset, nameof(PopupXOffset), int.TryParse);
+        PopupXOffset = GetNumberWithDecimalPointFromConfig(config, PopupXOffset, nameof(PopupXOffset), double.TryParse);
         WindowsUtils.DpiAwareXOffset = PopupXOffset / WindowsUtils.Dpi.DpiScaleX;
 
-        PopupYOffset = GetValueFromConfig(config, PopupYOffset, nameof(PopupYOffset), int.TryParse);
+        PopupYOffset = GetNumberWithDecimalPointFromConfig(config, PopupYOffset, nameof(PopupYOffset), double.TryParse);
         WindowsUtils.DpiAwareYOffset = PopupYOffset / WindowsUtils.Dpi.DpiScaleY;
 
-        PopupMaxWidth = GetValueFromConfig(config, PopupMaxWidth, nameof(PopupMaxWidth), int.TryParse);
+        PopupMaxWidth = GetNumberWithDecimalPointFromConfig(config, PopupMaxWidth, nameof(PopupMaxWidth), double.TryParse);
         WindowsUtils.DpiAwarePopupMaxWidth = PopupMaxWidth / WindowsUtils.Dpi.DpiScaleX;
 
-        PopupMaxHeight = GetValueFromConfig(config, PopupMaxHeight, nameof(PopupMaxHeight), int.TryParse);
+        PopupMaxHeight = GetNumberWithDecimalPointFromConfig(config, PopupMaxHeight, nameof(PopupMaxHeight), double.TryParse);
         WindowsUtils.DpiAwarePopupMaxHeight = PopupMaxHeight / WindowsUtils.Dpi.DpiScaleY;
 
-        FixedPopupXPosition = GetValueFromConfig(config, FixedPopupXPosition, nameof(FixedPopupXPosition), int.TryParse);
+        FixedPopupXPosition = GetNumberWithDecimalPointFromConfig(config, FixedPopupXPosition, nameof(FixedPopupXPosition), double.TryParse);
         WindowsUtils.DpiAwareFixedPopupXPosition = FixedPopupXPosition / WindowsUtils.Dpi.DpiScaleX;
 
-        FixedPopupYPosition = GetValueFromConfig(config, FixedPopupYPosition, nameof(FixedPopupYPosition), int.TryParse);
+        FixedPopupYPosition = GetNumberWithDecimalPointFromConfig(config, FixedPopupYPosition, nameof(FixedPopupYPosition), double.TryParse);
         WindowsUtils.DpiAwareFixedPopupYPosition = FixedPopupYPosition / WindowsUtils.Dpi.DpiScaleY;
 
         mainWindow.OpacitySlider.Value = GetNumberWithDecimalPointFromConfig(config, mainWindow.OpacitySlider.Value, "MainWindowOpacity", double.TryParse);

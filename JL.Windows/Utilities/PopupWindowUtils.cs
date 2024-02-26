@@ -73,7 +73,7 @@ internal static class PopupWindowUtils
 
         bool hasReading = readings?.Length > 0;
 
-        int fontSize = hasReading
+        double fontSize = hasReading
             ? ConfigManager.ReadingsFontSize
             : ConfigManager.PrimarySpellingFontSize;
 
@@ -211,7 +211,7 @@ internal static class PopupWindowUtils
     {
         PopupWindow? currentPopupWindow = rootPopup;
 
-        int popupNo = 1;
+        ulong popupNo = 1;
         while (currentPopupWindow is not null)
         {
             currentPopupWindow.HidePopup();

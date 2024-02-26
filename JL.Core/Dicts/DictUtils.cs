@@ -10,6 +10,7 @@ using JL.Core.Dicts.KANJIDIC;
 using JL.Core.Dicts.KanjiDict;
 using JL.Core.Dicts.Options;
 using JL.Core.Dicts.PitchAccent;
+using JL.Core.Freqs;
 using JL.Core.Profile;
 using JL.Core.Utilities;
 using JL.Core.WordClass;
@@ -30,7 +31,6 @@ public static class DictUtils
     internal static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
     internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     internal static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
-    internal static readonly string s_dbFolderPath = Path.Join(Utils.ResourcesPath, "Dictionary Databases");
 
     public static CancellationTokenSource? ProfileCustomWordsCancellationTokenSource { get; private set; }
     public static CancellationTokenSource? ProfileCustomNamesCancellationTokenSource { get; private set; }
@@ -485,49 +485,6 @@ public static class DictUtils
         DictType.NonspecificWordNazeka
     };
 
-    internal static readonly DictType[] s_dictTypesWithDBSupport = {
-        DictType.JMdict,
-        DictType.JMnedict,
-        DictType.Kanjidic,
-        DictType.Daijirin,
-        DictType.Daijisen,
-        DictType.Gakken,
-        DictType.GakkenYojijukugoYomichan,
-        DictType.IwanamiYomichan,
-        DictType.JitsuyouYomichan,
-        DictType.KanjigenYomichan,
-        DictType.Kenkyuusha,
-        DictType.KireiCakeYomichan,
-        DictType.Kotowaza,
-        DictType.Koujien,
-        DictType.Meikyou,
-        DictType.NikkokuYomichan,
-        DictType.OubunshaYomichan,
-        DictType.ShinjirinYomichan,
-        DictType.ShinmeikaiYomichan,
-        DictType.ShinmeikaiYojijukugoYomichan,
-        DictType.WeblioKogoYomichan,
-        DictType.ZokugoYomichan,
-        DictType.PitchAccentYomichan,
-        DictType.NonspecificWordYomichan,
-        DictType.NonspecificKanjiYomichan,
-        DictType.NonspecificKanjiWithWordSchemaYomichan,
-        DictType.NonspecificNameYomichan,
-        DictType.NonspecificYomichan,
-        DictType.DaijirinNazeka,
-        DictType.KenkyuushaNazeka,
-        DictType.ShinmeikaiNazeka,
-        DictType.NonspecificWordNazeka,
-        DictType.NonspecificKanjiNazeka,
-        DictType.NonspecificNameNazeka,
-        DictType.NonspecificNazeka
-    };
-
-    public static string GetDBPath(string dbName)
-    {
-        return string.Create(CultureInfo.InvariantCulture, $"{Path.Join(s_dbFolderPath, dbName)}.sqlite");
-    }
-
 #pragma warning disable IDE0072
     public static async Task LoadDictionaries()
     {
@@ -547,7 +504,7 @@ public static class DictUtils
         foreach (Dict dict in Dicts.Values.ToList())
         {
             bool useDB = dict.Options?.UseDB?.Value ?? false;
-            string dbPath = GetDBPath(dict.Name);
+            string dbPath = DictDBUtils.GetDBPath(dict.Name);
             string dbJournalPath = dbPath + "-journal";
             bool dbExists = File.Exists(dbPath);
             bool dbExisted = dbExists;
@@ -555,6 +512,8 @@ public static class DictUtils
 
             if (dbJournalExists)
             {
+                DictDBUtils.SendOptimizePragmaToAllDicts();
+                FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
                 SqliteConnection.ClearAllPools();
                 File.Delete(dbJournalPath);
                 if (dbExists)
@@ -570,7 +529,7 @@ public static class DictUtils
             switch (dict.Type)
             {
                 case DictType.JMdict:
-                    dbExists = DeleteOldDB(dbExists, JmdictDBManager.Version, dict.Name, dbPath);
+                    dbExists = DictDBUtils.DeleteOldDB(dbExists, JmdictDBManager.Version, dict.Name, dbPath);
                     loadFromDB = dbExists && !useDB;
 
                     if (!UpdatingJmdict)
@@ -648,7 +607,7 @@ public static class DictUtils
                     break;
 
                 case DictType.JMnedict:
-                    dbExists = DeleteOldDB(dbExists, JmnedictDBManager.Version, dict.Name, dbPath);
+                    dbExists = DictDBUtils.DeleteOldDB(dbExists, JmnedictDBManager.Version, dict.Name, dbPath);
                     // loadFromDB = dbExists && !useDB;
 
                     if (!UpdatingJmnedict)
@@ -719,7 +678,7 @@ public static class DictUtils
                     break;
 
                 case DictType.Kanjidic:
-                    dbExists = DeleteOldDB(dbExists, KanjidicDBManager.Version, dict.Name, dbPath);
+                    dbExists = DictDBUtils.DeleteOldDB(dbExists, KanjidicDBManager.Version, dict.Name, dbPath);
                     loadFromDB = dbExists && !useDB;
 
                     if (!UpdatingKanjidic)
@@ -817,7 +776,7 @@ public static class DictUtils
                 case DictType.NonspecificKanjiWithWordSchemaYomichan:
                 case DictType.NonspecificNameYomichan:
                 case DictType.NonspecificYomichan:
-                    dbExists = DeleteOldDB(dbExists, EpwingYomichanDBManager.Version, dict.Name, dbPath);
+                    dbExists = DictDBUtils.DeleteOldDB(dbExists, EpwingYomichanDBManager.Version, dict.Name, dbPath);
                     loadFromDB = dbExists && !useDB;
 
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
@@ -887,6 +846,8 @@ public static class DictUtils
 
                                 if (dbExists)
                                 {
+                                    DictDBUtils.SendOptimizePragmaToAllDicts();
+                                    FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
                                     SqliteConnection.ClearAllPools();
                                     File.Delete(dbPath);
                                 }
@@ -925,7 +886,7 @@ public static class DictUtils
                     break;
 
                 case DictType.NonspecificKanjiYomichan:
-                    dbExists = DeleteOldDB(dbExists, YomichanKanjiDBManager.Version, dict.Name, dbPath);
+                    dbExists = DictDBUtils.DeleteOldDB(dbExists, YomichanKanjiDBManager.Version, dict.Name, dbPath);
                     loadFromDB = dbExists && !useDB;
 
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
@@ -969,6 +930,8 @@ public static class DictUtils
 
                                 if (dbExists)
                                 {
+                                    DictDBUtils.SendOptimizePragmaToAllDicts();
+                                    FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
                                     SqliteConnection.ClearAllPools();
                                     File.Delete(dbPath);
                                 }
@@ -1087,7 +1050,7 @@ public static class DictUtils
                 case DictType.NonspecificKanjiNazeka:
                 case DictType.NonspecificNameNazeka:
                 case DictType.NonspecificNazeka:
-                    dbExists = DeleteOldDB(dbExists, EpwingNazekaDBManager.Version, dict.Name, dbPath);
+                    dbExists = DictDBUtils.DeleteOldDB(dbExists, EpwingNazekaDBManager.Version, dict.Name, dbPath);
                     loadFromDB = dbExists && !useDB;
 
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
@@ -1141,6 +1104,8 @@ public static class DictUtils
 
                                 if (dbExists)
                                 {
+                                    DictDBUtils.SendOptimizePragmaToAllDicts();
+                                    FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
                                     SqliteConnection.ClearAllPools();
                                     File.Delete(dbPath);
                                 }
@@ -1179,7 +1144,7 @@ public static class DictUtils
                     break;
 
                 case DictType.PitchAccentYomichan:
-                    dbExists = DeleteOldDB(dbExists, YomichanPitchAccentDBManager.Version, dict.Name, dbPath);
+                    dbExists = DictDBUtils.DeleteOldDB(dbExists, YomichanPitchAccentDBManager.Version, dict.Name, dbPath);
                     loadFromDB = dbExists && !useDB;
 
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
@@ -1224,6 +1189,8 @@ public static class DictUtils
 
                                 if (dbExists)
                                 {
+                                    DictDBUtils.SendOptimizePragmaToAllDicts();
+                                    FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
                                     SqliteConnection.ClearAllPools();
                                     File.Delete(dbPath);
                                 }
@@ -1269,6 +1236,8 @@ public static class DictUtils
         if (tasks.Count > 0 || dictCleared)
         {
             Utils.Frontend.InvalidateDisplayCache();
+            DictDBUtils.SendOptimizePragmaToAllDicts();
+            FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
             SqliteConnection.ClearAllPools();
 
             if (tasks.Count > 0)
@@ -1388,7 +1357,6 @@ public static class DictUtils
                     IOrderedEnumerable<Dict> orderedDicts = deserializedDicts.Values.OrderBy(static dict => dict.Priority);
 
                     int priority = 1;
-
                     foreach (Dict dict in orderedDicts)
                     {
                         dict.Priority = priority;
@@ -1448,29 +1416,5 @@ public static class DictUtils
             Utils.Logger.Fatal(ex, "DeserializeDicts failed");
             throw;
         }
-    }
-
-    private static uint GetVersionFromDB(string dbName)
-    {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={GetDBPath(dbName)};Mode=ReadOnly"));
-        connection.Open();
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "PRAGMA user_version";
-        return Convert.ToUInt32(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
-    }
-
-    private static bool DeleteOldDB(bool dbExists, uint version, string dictName, string dbPath)
-    {
-        if (dbExists)
-        {
-            if (version > GetVersionFromDB(dictName))
-            {
-                SqliteConnection.ClearAllPools();
-                File.Delete(dbPath);
-                return false;
-            }
-            return true;
-        }
-        return false;
     }
 }

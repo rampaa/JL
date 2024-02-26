@@ -33,8 +33,8 @@ public sealed class LookupResult
     // KANJIDIC2
     public string[]? NanoriReadings { get; }
     public string[]? RadicalNames { get; }
-    public int StrokeCount { get; }
-    public int KanjiGrade { get; }
+    public byte StrokeCount { get; }
+    public byte KanjiGrade { get; }
     public Dictionary<string, IList<IDictRecord>>? PitchAccentDict { get; }
 
     internal LookupResult(
@@ -58,8 +58,8 @@ public sealed class LookupResult
         string? kanjiComposition = null,
         string? kanjiStats = null,
         int edictId = 0,
-        int strokeCount = 0,
-        int kanjiGrade = -1,
+        byte strokeCount = 0,
+        byte kanjiGrade = byte.MaxValue,
         Dictionary<string, IList<IDictRecord>>? pitchAccentDict = null
     )
     {
