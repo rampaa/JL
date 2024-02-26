@@ -24,14 +24,22 @@ public static class MiningUtils
             [JLField.DeconjugatedMatchedText] = lookupResult.DeconjugatedMatchedText,
             [JLField.PrimarySpelling] = lookupResult.PrimarySpelling,
             [JLField.PrimarySpellingWithOrthographyInfo] = lookupResult.PrimarySpellingOrthographyInfoList is not null
-        ? string.Create(CultureInfo.InvariantCulture, $"{lookupResult.PrimarySpelling} ({string.Join(", ", lookupResult.PrimarySpellingOrthographyInfoList)})")
-        : lookupResult.PrimarySpelling
+                ? string.Create(CultureInfo.InvariantCulture, $"{lookupResult.PrimarySpelling} ({string.Join(", ", lookupResult.PrimarySpellingOrthographyInfoList)})")
+                : lookupResult.PrimarySpelling
         };
 
         string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
         miningParams[JLField.Sentence] = sentence;
-        miningParams[JLField.LeadingSentencePart] = sentence[..currentCharPosition];
-        miningParams[JLField.TrailingSentencePart] = sentence[(lookupResult.MatchedText.Length + currentCharPosition)..];
+
+        int searchStartIndex = currentCharPosition - sentence.Length + 1;
+        if (searchStartIndex < 0 || searchStartIndex >= currentText.Length)
+        {
+            searchStartIndex = 0;
+        }
+
+        int sentenceStartIndex = currentText.IndexOf(sentence, searchStartIndex, StringComparison.Ordinal);
+        miningParams[JLField.LeadingSentencePart] = currentText[sentenceStartIndex..currentCharPosition];
+        miningParams[JLField.TrailingSentencePart] = currentText[(lookupResult.MatchedText.Length + currentCharPosition)..(sentenceStartIndex + sentence.Length)];
 
         if (lookupResult.Readings is not null)
         {
