@@ -101,8 +101,8 @@ public static class Utils
         StatsUtils.StartStatsTimer();
         StatsUtils.StatsStopWatch.Start();
 
-        _ = Directory.CreateDirectory(DictDBUtils.s_dbFolderPath);
-        _ = Directory.CreateDirectory(FreqDBUtils.s_dbFolderPath);
+        _ = Directory.CreateDirectory(DBUtils.s_dictDBFolderPath);
+        _ = Directory.CreateDirectory(DBUtils.s_freqDBFolderPath);
 
         if (!File.Exists(Path.Join(ConfigPath, "dicts.json")))
         {

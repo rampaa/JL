@@ -1,7 +1,6 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
-using JL.Core.Dicts;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
@@ -66,7 +65,7 @@ internal sealed partial class EditFrequencyWindow : Window
 
         if (isValid)
         {
-            string dbPath = FreqDBUtils.GetDBPath(_freq.Name);
+            string dbPath = DBUtils.GetFreqDBPath(_freq.Name);
             bool dbExists = File.Exists(dbPath);
 
             if (_freq.Path != path)
@@ -77,8 +76,7 @@ internal sealed partial class EditFrequencyWindow : Window
 
                 if (dbExists)
                 {
-                    DictDBUtils.SendOptimizePragmaToAllDicts();
-                    FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
+                    DBUtils.SendOptimizePragmaToAllDBs();
                     SqliteConnection.ClearAllPools();
                     File.Delete(dbPath);
                     dbExists = false;
@@ -92,8 +90,7 @@ internal sealed partial class EditFrequencyWindow : Window
                 _freq.Ready = false;
                 //if (dbExists && !(options.UseDB?.Value ?? false))
                 //{
-                //    DictDBUtils.SendOptimizePragmaToAllDicts();
-                //    FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
+                //    DBUtils.SendOptimizePragmaToAllDBs();
                 //    SqliteConnection.ClearAllPools();
                 //    File.Delete(dbPath);
                 //    dbExists = false;
@@ -104,10 +101,9 @@ internal sealed partial class EditFrequencyWindow : Window
             {
                 if (dbExists)
                 {
-                    DictDBUtils.SendOptimizePragmaToAllDicts();
-                    FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
+                    DBUtils.SendOptimizePragmaToAllDBs();
                     SqliteConnection.ClearAllPools();
-                    File.Move(dbPath, FreqDBUtils.GetDBPath(name));
+                    File.Move(dbPath, DBUtils.GetFreqDBPath(name));
                 }
 
                 _freq.Name = name;

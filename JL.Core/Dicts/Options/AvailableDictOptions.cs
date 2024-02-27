@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.Options;
 
@@ -106,7 +107,7 @@ public readonly record struct AntonymOption(bool Value)
 
 public readonly record struct UseDBOption(bool Value)
 {
-    [JsonIgnore] public static readonly DictType[] ValidDictTypes = DictDBUtils.s_dictTypesWithDBSupport;
+    [JsonIgnore] public static readonly DictType[] ValidDictTypes = DBUtils.s_dictTypesWithDBSupport;
 }
 
 public readonly record struct ShowPitchAccentWithDottedLinesOption(bool Value)

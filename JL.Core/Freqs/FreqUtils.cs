@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Text.Json;
-using JL.Core.Dicts;
 using JL.Core.Freqs.FrequencyNazeka;
 using JL.Core.Freqs.FrequencyYomichan;
 using JL.Core.Freqs.Options;
@@ -56,7 +55,7 @@ public static class FreqUtils
         foreach (Freq freq in FreqDicts.Values.ToList())
         {
             bool useDB = freq.Options?.UseDB?.Value ?? false;
-            string dbPath = FreqDBUtils.GetDBPath(freq.Name);
+            string dbPath = DBUtils.GetFreqDBPath(freq.Name);
             string dbJournalPath = dbPath + "-journal";
             bool dbExists = File.Exists(dbPath);
             bool dbExisted = dbExists;
@@ -64,8 +63,7 @@ public static class FreqUtils
 
             if (dbJournalExists)
             {
-                DictDBUtils.SendOptimizePragmaToAllDicts();
-                FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
+                DBUtils.SendOptimizePragmaToAllDBs();
                 SqliteConnection.ClearAllPools();
                 File.Delete(dbJournalPath);
                 if (dbExists)
@@ -81,7 +79,7 @@ public static class FreqUtils
             switch (freq.Type)
             {
                 case FreqType.Nazeka:
-                    dbExists = FreqDBUtils.DeleteOldDB(dbExists, FreqDBManager.Version, freq.Name, dbPath);
+                    dbExists = DBUtils.DeleteOldDB(dbExists, FreqDBManager.Version, dbPath);
                     loadFromDB = dbExists && !useDB;
 
                     if (freq is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
@@ -125,8 +123,7 @@ public static class FreqUtils
 
                                 if (dbExists)
                                 {
-                                    DictDBUtils.SendOptimizePragmaToAllDicts();
-                                    FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
+                                    DBUtils.SendOptimizePragmaToAllDBs();
                                     SqliteConnection.ClearAllPools();
                                     File.Delete(dbPath);
                                 }
@@ -162,7 +159,7 @@ public static class FreqUtils
 
                 case FreqType.Yomichan:
                 case FreqType.YomichanKanji:
-                    dbExists = FreqDBUtils.DeleteOldDB(dbExists, FreqDBManager.Version, freq.Name, dbPath);
+                    dbExists = DBUtils.DeleteOldDB(dbExists, FreqDBManager.Version, dbPath);
                     loadFromDB = dbExists && !useDB;
 
                     if (freq is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
@@ -208,8 +205,7 @@ public static class FreqUtils
 
                                 if (dbExists)
                                 {
-                                    DictDBUtils.SendOptimizePragmaToAllDicts();
-                                    FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
+                                    DBUtils.SendOptimizePragmaToAllDBs();
                                     SqliteConnection.ClearAllPools();
                                     File.Delete(dbPath);
                                 }
@@ -252,8 +248,7 @@ public static class FreqUtils
         if (tasks.Count > 0 || freqCleared)
         {
             Utils.Frontend.InvalidateDisplayCache();
-            DictDBUtils.SendOptimizePragmaToAllDicts();
-            FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
+            DBUtils.SendOptimizePragmaToAllDBs();
             SqliteConnection.ClearAllPools();
 
             if (tasks.Count > 0)

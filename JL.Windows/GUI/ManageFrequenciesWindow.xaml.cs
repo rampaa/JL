@@ -5,7 +5,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using JL.Core.Dicts;
 using JL.Core.Freqs;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
@@ -258,11 +257,10 @@ internal sealed partial class ManageFrequenciesWindow : Window
             freq.Contents.TrimExcess();
             _ = FreqUtils.FreqDicts.Remove(freq.Name);
 
-            string dbPath = FreqDBUtils.GetDBPath(freq.Name);
+            string dbPath = DBUtils.GetFreqDBPath(freq.Name);
             if (File.Exists(dbPath))
             {
-                DictDBUtils.SendOptimizePragmaToAllDicts();
-                FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
+                DBUtils.SendOptimizePragmaToAllDBs();
                 SqliteConnection.ClearAllPools();
                 File.Delete(dbPath);
             }

@@ -460,8 +460,7 @@ internal sealed partial class MainWindow : Window
         await Stats.SerializeLifetimeStats().ConfigureAwait(false);
         await Stats.SerializeProfileLifetimeStats().ConfigureAwait(false);
         await BacklogUtils.WriteBacklog().ConfigureAwait(false);
-        DictDBUtils.SendOptimizePragmaToAllDicts();
-        FreqDBUtils.SendOptimizePragmaToAllFreqDicts();
+        DBUtils.SendOptimizePragmaToAllDBs();
         SqliteConnection.ClearAllPools();
     }
 
