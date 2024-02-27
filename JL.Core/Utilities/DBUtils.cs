@@ -2,10 +2,14 @@ using JL.Core.Dicts;
 using JL.Core.Freqs;
 using Microsoft.Data.Sqlite;
 using System.Globalization;
+using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace JL.Core.Utilities;
-public class DBUtils
+public static class DBUtils
 {
+    private static readonly Timer s_optimizePragmaTimer = new();
+
     internal static readonly string s_freqDBFolderPath = Path.Join(Utils.ResourcesPath, "Frequency Databases");
     internal static readonly string s_dictDBFolderPath = Path.Join(Utils.ResourcesPath, "Dictionary Databases");
 
@@ -55,6 +59,22 @@ public class DBUtils
     public static string GetFreqDBPath(string dbName)
     {
         return string.Create(CultureInfo.InvariantCulture, $"{Path.Join(s_freqDBFolderPath, dbName)}.sqlite");
+    }
+
+    internal static void StartOptimizePragmaTimer()
+    {
+        if (!s_optimizePragmaTimer.Enabled)
+        {
+            s_optimizePragmaTimer.Interval = TimeSpan.FromHours(1).TotalMilliseconds;
+            s_optimizePragmaTimer.Elapsed += SendOptimizePragmaToAllDBs;
+            s_optimizePragmaTimer.AutoReset = true;
+            s_optimizePragmaTimer.Enabled = true;
+        }
+    }
+
+    private static void SendOptimizePragmaToAllDBs(object? sender, ElapsedEventArgs e)
+    {
+        SendOptimizePragmaToAllDBs();
     }
 
     public static void SendOptimizePragmaToAllDBs()

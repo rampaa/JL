@@ -1230,7 +1230,6 @@ public static class DictUtils
         if (tasks.Count > 0 || dictCleared)
         {
             Utils.Frontend.InvalidateDisplayCache();
-            DBUtils.SendOptimizePragmaToAllDBs();
             SqliteConnection.ClearAllPools();
 
             if (tasks.Count > 0)

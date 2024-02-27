@@ -101,6 +101,8 @@ public static class Utils
         StatsUtils.StartStatsTimer();
         StatsUtils.StatsStopWatch.Start();
 
+        DBUtils.StartOptimizePragmaTimer();
+
         _ = Directory.CreateDirectory(DBUtils.s_dictDBFolderPath);
         _ = Directory.CreateDirectory(DBUtils.s_freqDBFolderPath);
 
