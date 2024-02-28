@@ -31,7 +31,7 @@ public static class MiningUtils
         string sentence = JapaneseUtils.FindSentence(currentText, currentCharPosition);
         miningParams[JLField.Sentence] = sentence;
 
-        int searchStartIndex = currentCharPosition - sentence.Length + 1;
+        int searchStartIndex = currentCharPosition + lookupResult.MatchedText.Length - sentence.Length;
         if (searchStartIndex < 0 || searchStartIndex >= currentText.Length)
         {
             searchStartIndex = 0;
