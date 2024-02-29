@@ -15,6 +15,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <NoWin32Manifest>true</NoWin32Manifest>
     <PublishReadyToRun>true</PublishReadyToRun>
+    <AnalysisLevel>6-all</AnalysisLevel>
   </PropertyGroup>
 
   <ItemGroup>

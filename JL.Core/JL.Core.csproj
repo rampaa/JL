@@ -8,6 +8,7 @@
     <Nullable>enable</Nullable>
     <PublishReadyToRun>true</PublishReadyToRun>
     <Platforms>AnyCPU;x86;x64;ARM64</Platforms>
+    <AnalysisLevel>6-all</AnalysisLevel>
   </PropertyGroup>
 
   <ItemGroup>
