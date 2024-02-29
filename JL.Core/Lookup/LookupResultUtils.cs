@@ -4,7 +4,7 @@ using System.Text;
 namespace JL.Core.Lookup;
 public static class LookupResultUtils
 {
-    internal static string? ProcessDeconjugationProcess(List<List<string>>? processList)
+    internal static string? DeconjugationProcessesToText(List<List<string>>? processList)
     {
         if (processList is null)
         {

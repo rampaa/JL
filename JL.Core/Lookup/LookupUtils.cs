@@ -906,7 +906,7 @@ public static class LookupUtils
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         edictId: jmdictResult.Id,
                         alternativeSpellings: jmdictResult.AlternativeSpellings,
-                        deconjugationProcess: LookupResultUtils.ProcessDeconjugationProcess(wordResult.Processes?[i]),
+                        deconjugationProcess: LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes?[i]),
                         frequencies: GetWordFrequencies(jmdictResult, frequencyDicts),
                         primarySpellingOrthographyInfoList: jmdictResult.PrimarySpellingOrthographyInfo,
                         readingsOrthographyInfoList: jmdictResult.ReadingsOrthographyInfo,
@@ -1095,7 +1095,7 @@ public static class LookupUtils
                         primarySpelling: epwingResult.PrimarySpelling,
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: LookupResultUtils.ProcessDeconjugationProcess(wordResult.Processes?[i]),
+                        deconjugationProcess: LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes?[i]),
                         frequencies: GetWordFrequencies(epwingResult, frequencyDicts),
                         dict: wordResult.Dict,
                         readings: epwingResult.Reading is not null
@@ -1153,7 +1153,7 @@ public static class LookupUtils
                         alternativeSpellings: epwingResult.AlternativeSpellings,
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
-                        deconjugationProcess: LookupResultUtils.ProcessDeconjugationProcess(wordResult.Processes?[i]),
+                        deconjugationProcess: LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes?[i]),
                         frequencies: GetWordFrequencies(epwingResult, frequencyDicts),
                         dict: wordResult.Dict,
                         readings: epwingResult.Reading is not null
@@ -1212,7 +1212,7 @@ public static class LookupUtils
                         matchedText: wordResult.MatchedText,
                         deconjugatedMatchedText: wordResult.DeconjugatedMatchedText,
                         deconjugationProcess: customWordDictResult.HasUserDefinedWordClass
-                            ? LookupResultUtils.ProcessDeconjugationProcess(wordResult.Processes?[i])
+                            ? LookupResultUtils.DeconjugationProcessesToText(wordResult.Processes?[i])
                             : null,
                         dict: wordResult.Dict,
                         readings: customWordDictResult.Readings,
