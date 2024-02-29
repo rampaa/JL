@@ -467,6 +467,3 @@ dotnet_naming_symbols.parameters_group.applicable_kinds = parameter
 dotnet_naming_rule.parameters_rule.symbols              = parameters_group
 dotnet_naming_rule.parameters_rule.style                = camel_case_style
 dotnet_naming_rule.parameters_rule.severity             = warning
-
-# IDE0045: Convert to conditional expression
-dotnet_diagnostic.IDE0045.severity = silent
