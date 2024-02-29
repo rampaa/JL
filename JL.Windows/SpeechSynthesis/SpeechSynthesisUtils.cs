@@ -8,7 +8,7 @@ using NAudio.Wave;
 namespace JL.Windows.SpeechSynthesis;
 internal static class SpeechSynthesisUtils
 {
-    private static DateTime s_lastAudioPlayTime = new();
+    private static DateTime s_lastAudioPlayTime;
     public static string? InstalledVoiceWithHighestPriority { get; private set; }
     private static SpeechSynthesizer Synthesizer { get; } = new();
 
