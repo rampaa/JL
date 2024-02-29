@@ -17,9 +17,9 @@ namespace JL.Windows.Utilities;
 
 internal static class PopupWindowUtils
 {
-    private static string? s_primarySpellingOfLastPlayedAudio = null;
+    private static string? s_primarySpellingOfLastPlayedAudio;
 
-    private static string? s_readingOfLastPlayedAudio = null;
+    private static string? s_readingOfLastPlayedAudio;
     public static DoubleCollection StrokeDashArray { get; set; } = new() { 1, 1 };
 
     public static TextBlock CreateTextBlock(string name, string text, Brush foregroundBrush, double fontSize, ContextMenu contextMenu, VerticalAlignment verticalAlignment, Thickness margin)

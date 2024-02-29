@@ -23,15 +23,15 @@ namespace JL.Windows.GUI;
 internal sealed partial class PopupWindow : Window
 {
     public PopupWindow? ChildPopupWindow { get; set; }
-    private bool ContextMenuIsOpening { get; set; } = false;
+    private bool ContextMenuIsOpening { get; set; } // = false;
 
     private TextBox? _previousTextBox;
 
     private TextBox? _lastInteractedTextBox;
 
-    private int _listViewItemIndex = 0;
+    private int _listViewItemIndex; // 0
 
-    private int _firstVisibleListViewItemIndex = 0;
+    private int _firstVisibleListViewItemIndex; // 0
 
     private int _currentCharPosition;
 
@@ -47,9 +47,9 @@ internal sealed partial class PopupWindow : Window
 
     public List<Dict> DictsWithResults { get; } = new();
 
-    private Dict? _filteredDict = null;
+    private Dict? _filteredDict;
 
-    public bool UnavoidableMouseEnter { get; private set; } = false;
+    public bool UnavoidableMouseEnter { get; private set; } // = false;
 
     public string? LastText { get; set; }
 

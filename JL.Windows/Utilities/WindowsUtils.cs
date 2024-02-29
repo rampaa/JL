@@ -33,7 +33,7 @@ internal static class WindowsUtils
 {
     private static readonly Random s_random = new();
     public static Typeface PopupFontTypeFace { get; set; } = new(ConfigManager.PopupFont.Source);
-    private static DateTime s_lastAudioPlayTime = new();
+    private static DateTime s_lastAudioPlayTime;
     public static WaveOut? AudioPlayer { get; private set; }
 
     public static System.Windows.Forms.Screen ActiveScreen { get; set; } =
