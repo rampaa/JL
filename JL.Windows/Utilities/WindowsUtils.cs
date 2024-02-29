@@ -438,7 +438,7 @@ internal static class WindowsUtils
 
     public static Brush? FrozenBrushFromHex(string hexColorString)
     {
-        var brush = (Brush?)new BrushConverter().ConvertFrom(hexColorString);
+        Brush? brush = (Brush?)new BrushConverter().ConvertFrom(hexColorString);
         brush?.Freeze();
         return brush;
     }

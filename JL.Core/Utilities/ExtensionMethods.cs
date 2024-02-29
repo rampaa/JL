@@ -121,32 +121,23 @@ public static class ExtensionMethods
 
     internal static string[]? TrimStringListToStringArray(this List<string> list)
     {
-        if (list.Count is 0 || list.All(string.IsNullOrEmpty))
-        {
-            return null;
-        }
-
-        return list.ToArray();
+        return list.Count is 0 || list.All(string.IsNullOrEmpty)
+            ? null
+            : list.ToArray();
     }
 
     internal static T[]?[]? TrimListOfNullableArraysToArrayOfArrays<T>(this List<T[]?> list)
     {
-        if (list.Count is 0 || list.All(static array => array is null))
-        {
-            return null;
-        }
-
-        return list.ToArray();
+        return list.Count is 0 || list.All(static array => array is null)
+            ? null
+            : list.ToArray();
     }
 
     internal static T?[]? TrimListWithNullableElementsToArray<T>(this List<T?> list) where T : class
     {
-        if (list.Count is 0 || list.All(static element => element is null))
-        {
-            return null;
-        }
-
-        return list.ToArray();
+        return list.Count is 0 || list.All(static element => element is null)
+            ? null
+            : list.ToArray();
     }
 
     internal static string GetPooledString(this string str)

@@ -1647,7 +1647,7 @@ internal sealed partial class PopupWindow : Window
 
     private void ClickDictTypeButton(Button button)
     {
-        foreach (Button btn in ItemsControlButtons.Items)
+        foreach (Button btn in ItemsControlButtons.Items.Cast<Button>())
         {
             btn.ClearValue(BackgroundProperty);
         }

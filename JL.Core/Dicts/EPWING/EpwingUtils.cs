@@ -35,60 +35,56 @@ internal static class EpwingUtils
             }
         }
 
-        switch (dict.Type)
+        if (dict.Type is DictType.Kenkyuusha)
         {
-            case DictType.Kenkyuusha:
-                if ((dict.Options?.Examples?.Value ?? ExamplesOptionValue.None) is ExamplesOptionValue.None)
+            if ((dict.Options?.Examples?.Value ?? ExamplesOptionValue.None) is ExamplesOptionValue.None)
+            {
+                if (definitions.Length > 2)
                 {
-                    if (definitions.Length > 2)
+                    for (int i = 2; i < definitions.Length; i++)
                     {
-                        for (int i = 2; i < definitions.Length; i++)
+                        if (!char.IsDigit(definitions[i][0]))
                         {
-                            if (!char.IsDigit(definitions[i][0]))
+                            definitions = definitions.RemoveAt(i);
+                            --i;
+                        }
+                    }
+                }
+            }
+            else if (dict.Options is { Examples.Value: ExamplesOptionValue.One })
+            {
+                if (definitions.Length > 2)
+                {
+                    bool isMainExample = true;
+
+                    for (int i = 2; i < definitions.Length; i++)
+                    {
+                        if (char.IsDigit(definitions[i][0]))
+                        {
+                            isMainExample = true;
+                        }
+
+                        else
+                        {
+                            if (!isMainExample)
                             {
                                 definitions = definitions.RemoveAt(i);
                                 --i;
                             }
+
+                            isMainExample = false;
                         }
                     }
                 }
-                else if (dict.Options is { Examples.Value: ExamplesOptionValue.One })
-                {
-                    if (definitions.Length > 2)
-                    {
-                        bool isMainExample = true;
-
-                        for (int i = 2; i < definitions.Length; i++)
-                        {
-                            if (char.IsDigit(definitions[i][0]))
-                            {
-                                isMainExample = true;
-                            }
-
-                            else
-                            {
-                                if (!isMainExample)
-                                {
-                                    definitions = definitions.RemoveAt(i);
-                                    --i;
-                                }
-
-                                isMainExample = false;
-                            }
-                        }
-                    }
-                }
-
-                break;
-
-            case DictType.Daijisen:
-                // Kanji definitions
-                if (definitions.Any(static def => def.Contains("［音］", StringComparison.Ordinal)))
-                {
-                    return false;
-                }
-
-                break;
+            }
+        }
+        else if (dict.Type is DictType.Daijisen)
+        {
+            // Kanji definitions
+            if (definitions.Any(static def => def.Contains("［音］", StringComparison.Ordinal)))
+            {
+                return false;
+            }
         }
 
         return FilterDuplicateEntries(primarySpelling, reading, definitions, dict);

@@ -359,7 +359,7 @@ internal sealed partial class PreferencesWindow : Window
         string modelName = modelNamesSelector.SelectedItem.ToString()!;
 
         Dictionary<string, JLField> dict = new(miningPanel.Children.Count);
-        foreach (StackPanel stackPanel in miningPanel.Children)
+        foreach (StackPanel stackPanel in miningPanel.Children.Cast<StackPanel>())
         {
             TextBlock textBlock = (TextBlock)stackPanel.Children[0];
             ComboBox comboBox = (ComboBox)stackPanel.Children[1];

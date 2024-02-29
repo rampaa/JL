@@ -112,22 +112,16 @@ internal static class KeyGestureUtils
 
     public static bool CompareKeyGestures(KeyGesture keyGesture1, KeyGesture keyGesture2)
     {
-        if (keyGesture2.Modifiers is ModifierKeys.Windows)
-        {
-            return keyGesture1.Key == keyGesture2.Key && Keyboard.Modifiers is ModifierKeys.None;
-        }
-
-        return keyGesture1.Key == keyGesture2.Key && keyGesture1.Modifiers == keyGesture2.Modifiers;
+        return keyGesture2.Modifiers is ModifierKeys.Windows
+            ? keyGesture1.Key == keyGesture2.Key && Keyboard.Modifiers is ModifierKeys.None
+            : keyGesture1.Key == keyGesture2.Key && keyGesture1.Modifiers == keyGesture2.Modifiers;
     }
 
     public static bool CompareKeyGesture(KeyGesture keyGesture)
     {
-        if (keyGesture.Modifiers is ModifierKeys.Windows)
-        {
-            return Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers is ModifierKeys.None;
-        }
-
-        return Keyboard.IsKeyDown(keyGesture.Key)
+        return keyGesture.Modifiers is ModifierKeys.Windows
+            ? Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers is ModifierKeys.None
+            : Keyboard.IsKeyDown(keyGesture.Key)
                && (ModifierAsKeyPress(keyGesture.Key)
                    ? keyGesture.Modifiers is ModifierKeys.None
                    : Keyboard.Modifiers == keyGesture.Modifiers);

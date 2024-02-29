@@ -1354,45 +1354,26 @@ public static class DictUtils
                         dict.Priority = priority;
                         ++priority;
 
-                        switch (dict.Type)
+                        if (dict.Type is DictType.ProfileCustomNameDictionary)
                         {
-                            case DictType.ProfileCustomNameDictionary:
-                                dict.Path = ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfile);
-                                SingleDictTypeDicts[dict.Type] = dict;
-                                break;
-
-                            case DictType.ProfileCustomWordDictionary:
-                                dict.Path = ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfile);
-                                SingleDictTypeDicts[dict.Type] = dict;
-                                break;
-
-                            case DictType.CustomNameDictionary:
-                                SingleDictTypeDicts[dict.Type] = dict;
-                                break;
-
-                            case DictType.CustomWordDictionary:
-                                SingleDictTypeDicts[dict.Type] = dict;
-                                break;
-
-                            case DictType.JMdict:
-                                SingleDictTypeDicts[dict.Type] = dict;
-                                break;
-
-                            case DictType.Kanjidic:
-                                SingleDictTypeDicts[dict.Type] = dict;
-                                break;
-
-                            case DictType.JMnedict:
-                                SingleDictTypeDicts[dict.Type] = dict;
-                                break;
-
-                            case DictType.PitchAccentYomichan:
-                                SingleDictTypeDicts[dict.Type] = dict;
-                                break;
+                            dict.Path = ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfile);
+                            SingleDictTypeDicts[dict.Type] = dict;
+                        }
+                        else if (dict.Type is DictType.ProfileCustomWordDictionary)
+                        {
+                            dict.Path = ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfile);
+                            SingleDictTypeDicts[dict.Type] = dict;
+                        }
+                        else if (dict.Type is DictType.CustomNameDictionary
+                            or DictType.CustomWordDictionary
+                            or DictType.JMdict
+                            or DictType.Kanjidic
+                            or DictType.JMnedict)
+                        {
+                            SingleDictTypeDicts[dict.Type] = dict;
                         }
 
                         dict.Path = Utils.GetPath(dict.Path);
-
                         Dicts.Add(dict.Name, dict);
                     }
                 }

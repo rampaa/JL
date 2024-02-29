@@ -229,24 +229,22 @@ internal sealed partial class ManageDictionariesWindow : Window
                     : Visibility.Collapsed
             };
 
-            switch (dict.Type)
+            if (dict.Type is DictType.JMdict)
             {
-                case DictType.JMdict:
-                    updateButton.IsEnabled = !DictUtils.UpdatingJmdict;
-                    editButton.IsEnabled = !DictUtils.UpdatingJmdict;
-                    infoButton.Click += JmdictInfoButton_Click;
-                    break;
-
-                case DictType.JMnedict:
-                    updateButton.IsEnabled = !DictUtils.UpdatingJmnedict;
-                    editButton.IsEnabled = !DictUtils.UpdatingJmnedict;
-                    infoButton.Click += JmnedictInfoButton_Click;
-                    break;
-
-                case DictType.Kanjidic:
-                    updateButton.IsEnabled = !DictUtils.UpdatingKanjidic;
-                    editButton.IsEnabled = !DictUtils.UpdatingKanjidic;
-                    break;
+                updateButton.IsEnabled = !DictUtils.UpdatingJmdict;
+                editButton.IsEnabled = !DictUtils.UpdatingJmdict;
+                infoButton.Click += JmdictInfoButton_Click;
+            }
+            else if (dict.Type is DictType.JMnedict)
+            {
+                updateButton.IsEnabled = !DictUtils.UpdatingJmnedict;
+                editButton.IsEnabled = !DictUtils.UpdatingJmnedict;
+                infoButton.Click += JmnedictInfoButton_Click;
+            }
+            else if (dict.Type is DictType.Kanjidic)
+            {
+                updateButton.IsEnabled = !DictUtils.UpdatingKanjidic;
+                editButton.IsEnabled = !DictUtils.UpdatingKanjidic;
             }
 
             _ = dockPanel.Children.Add(checkBox);
@@ -368,17 +366,17 @@ internal sealed partial class ManageDictionariesWindow : Window
         editButton.IsEnabled = false;
 
         Dict dict = (Dict)updateButton.Tag;
-        switch (dict.Type)
+        if (dict.Type is DictType.JMdict)
         {
-            case DictType.JMdict:
-                await DictUpdater.UpdateJmdict(true, false).ConfigureAwait(true);
-                break;
-            case DictType.JMnedict:
-                await DictUpdater.UpdateJmnedict(true, false).ConfigureAwait(true);
-                break;
-            case DictType.Kanjidic:
-                await DictUpdater.UpdateKanjidic(true, false).ConfigureAwait(true);
-                break;
+            await DictUpdater.UpdateJmdict(true, false).ConfigureAwait(true);
+        }
+        else if (dict.Type is DictType.JMnedict)
+        {
+            await DictUpdater.UpdateJmnedict(true, false).ConfigureAwait(true);
+        }
+        else if (dict.Type is DictType.Kanjidic)
+        {
+            await DictUpdater.UpdateKanjidic(true, false).ConfigureAwait(true);
         }
 
         UpdateDictionariesDisplay();
