@@ -307,17 +307,14 @@ public static class MiningUtils
         {
             _ = ankiConfigDict.TryGetValue(MineType.Word, out ankiConfig);
         }
-
         else if (DictUtils.s_kanjiDictTypes.Contains(lookupResult.Dict.Type))
         {
             _ = ankiConfigDict.TryGetValue(MineType.Kanji, out ankiConfig);
         }
-
         else if (DictUtils.s_nameDictTypes.Contains(lookupResult.Dict.Type))
         {
             _ = ankiConfigDict.TryGetValue(MineType.Name, out ankiConfig);
         }
-
         else
         {
             _ = ankiConfigDict.TryGetValue(MineType.Other, out ankiConfig);

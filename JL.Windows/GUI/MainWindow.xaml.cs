@@ -42,11 +42,11 @@ internal sealed partial class MainWindow : Window
     public double WidthBeforeResolutionChange { get; set; }
 
     private static ulong s_clipboardSequenceNo;
-    public bool ContextMenuIsOpening { get; private set; } = false;
+    public bool ContextMenuIsOpening { get; private set; } // = false;
 
     private static CancellationTokenSource s_precacheCancellationTokenSource = new();
 
-    private static string? s_lastTextCopiedWhileMinimized = null;
+    private static string? s_lastTextCopiedWhileMinimized;
 
     private static readonly Point s_origin = new(0, 0);
     private Point _swipeStartPoint;

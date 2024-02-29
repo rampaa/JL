@@ -21,17 +21,17 @@ namespace JL.Windows;
 internal static class ConfigManager
 {
     #region General
-    public static bool InactiveLookupMode { get; set; } = false;
+    public static bool InactiveLookupMode { get; set; } // = false;
     public static Brush HighlightColor { get; private set; } = Brushes.AliceBlue;
-    public static bool RequireLookupKeyPress { get; private set; } = false;
-    public static bool LookupOnSelectOnly { get; private set; } = false;
-    public static bool LookupOnMouseClickOnly { get; private set; } = false;
+    public static bool RequireLookupKeyPress { get; private set; } // = false;
+    public static bool LookupOnSelectOnly { get; private set; } // = false;
+    public static bool LookupOnMouseClickOnly { get; private set; } // = false;
     public static bool AutoAdjustFontSizesOnResolutionChange { get; private set; } = true;
 
     public static KeyGesture LookupKeyKeyGesture { get; private set; } = new(Key.LeftShift, ModifierKeys.None);
-    public static bool HighlightLongestMatch { get; private set; } = false;
-    public static bool AutoPlayAudio { get; private set; } = false;
-    public static bool DisableHotkeys { get; set; } = false;
+    public static bool HighlightLongestMatch { get; private set; } // = false;
+    public static bool AutoPlayAudio { get; private set; } // = false;
+    public static bool DisableHotkeys { get; set; } // = false;
     public static bool Focusable { get; private set; } = true;
     public static MouseButton MiningModeMouseButton { get; private set; } = MouseButton.Middle;
     public static MouseButton LookupOnClickMouseButton { get; private set; } = MouseButton.Left;
@@ -43,28 +43,28 @@ internal static class ConfigManager
     public static double MainWindowWidth { get; set; } = 800;
     public static double MainWindowHeight { get; set; } = 200;
     public static bool MainWindowDynamicHeight { get; private set; } = true;
-    public static bool MainWindowDynamicWidth { get; private set; } = false;
+    public static bool MainWindowDynamicWidth { get; private set; } // = false;
     public static double MainWindowMaxDynamicWidth { get; private set; } = 800;
     public static double MainWindowMaxDynamicHeight { get; private set; } = 269;
     public static Brush MainWindowTextColor { get; private set; } = Brushes.White;
     public static Brush MainWindowBacklogTextColor { get; private set; } = Brushes.Bisque;
     public static bool AlwaysOnTop { get; set; } = true;
-    public static bool TextOnlyVisibleOnHover { get; set; } = false;
-    public static bool ChangeMainWindowBackgroundOpacityOnUnhover { get; private set; } = false;
+    public static bool TextOnlyVisibleOnHover { get; set; } // = false;
+    public static bool ChangeMainWindowBackgroundOpacityOnUnhover { get; private set; } // = false;
     public static double MainWindowBackgroundOpacityOnUnhover { get; private set; } = 0.2; // 0.2-100
     public static bool TextBoxIsReadOnly { get; set; } = true;
     private static bool TextBoxApplyDropShadowEffect { get; set; } = true;
     public static bool OnlyCaptureTextWithJapaneseChars { get; private set; } = true;
-    public static bool DisableLookupsForNonJapaneseCharsInMainWindow { get; private set; } = false;
-    public static bool MainWindowFocusOnHover { get; private set; } = false;
+    public static bool DisableLookupsForNonJapaneseCharsInMainWindow { get; private set; } // = false;
+    public static bool MainWindowFocusOnHover { get; private set; } // = false;
     public static bool SteppedBacklogWithMouseWheel { get; private set; } = true;
-    public static bool HorizontallyCenterMainWindowText { get; private set; } = false;
-    public static bool HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar { get; set; } = false;
+    public static bool HorizontallyCenterMainWindowText { get; private set; } // = false;
+    public static bool HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar { get; set; } // = false;
     public static bool EnableBacklog { get; private set; } = true;
-    public static bool AutoSaveBacklogBeforeClosing { get; private set; } = false;
-    public static bool TextToSpeechOnTextChange { get; private set; } = false;
+    public static bool AutoSaveBacklogBeforeClosing { get; private set; } // = false;
+    public static bool TextToSpeechOnTextChange { get; private set; } // = false;
     public static bool HidePopupsOnTextChange { get; private set; } = true;
-    public static bool AlwaysShowMainTextBoxCaret { get; set; } = false;
+    public static bool AlwaysShowMainTextBoxCaret { get; set; } // = false;
 
     #endregion
 
@@ -75,10 +75,10 @@ internal static class ConfigManager
     public static double PopupMaxHeight { get; set; } = 520;
     public static bool PopupDynamicHeight { get; private set; } = true;
     public static bool PopupDynamicWidth { get; private set; } = true;
-    public static bool FixedPopupPositioning { get; private set; } = false;
-    public static double FixedPopupXPosition { get; set; } = 0;
-    public static double FixedPopupYPosition { get; set; } = 0;
-    public static bool PopupFocusOnLookup { get; private set; } = false;
+    public static bool FixedPopupPositioning { get; private set; } // = false;
+    public static double FixedPopupXPosition { get; set; } // = 0;
+    public static double FixedPopupYPosition { get; set; } // = 0;
+    public static bool PopupFocusOnLookup { get; private set; } // = false;
     public static bool ShowMiningModeReminder { get; private set; } = true;
     public static bool DisableLookupsForNonJapaneseCharsInPopups { get; private set; } = true;
     public static Brush PopupBackgroundColor { get; private set; } = new SolidColorBrush(Color.FromRgb(0, 0, 0)) { Opacity = 0.8 };
@@ -102,10 +102,10 @@ internal static class ConfigManager
     public static double DictTypeFontSize { get; set; } = 15;
     public static Brush SeparatorColor { get; private set; } = Brushes.White;
     public static bool HideDictTabsWithNoResults { get; private set; } = true;
-    public static bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } = false;
+    public static bool AutoHidePopupIfMouseIsNotOverIt { get; private set; } // = false;
     public static double AutoHidePopupIfMouseIsNotOverItDelayInMilliseconds { get; private set; } = 2000;
-    public static bool AutoLookupFirstTermWhenTextIsCopiedFromClipboard { get; private set; } = false;
-    public static bool AutoLookupFirstTermWhenTextIsCopiedFromWebSocket { get; private set; } = false;
+    public static bool AutoLookupFirstTermWhenTextIsCopiedFromClipboard { get; private set; } // = false;
+    public static bool AutoLookupFirstTermWhenTextIsCopiedFromWebSocket { get; private set; } // = false;
     public static bool AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized { get; private set; } = true;
     public static MouseButton MineMouseButton { get; private set; } = MouseButton.Left;
     public static MouseButton CopyPrimarySpellingToClipboardMouseButton { get; private set; } = MouseButton.Middle;
@@ -164,13 +164,13 @@ internal static class ConfigManager
 
     public static int MaxSearchLength { get; private set; } = 37;
     public static int MaxNumResultsNotInMiningMode { get; private set; } = 7;
-    public static bool Precaching { get; private set; } = false;
+    public static bool Precaching { get; private set; } // = false;
     public static string SearchUrl { get; private set; } = "https://www.google.com/search?q={SearchTerm}&hl=ja";
     public static string BrowserPath { get; private set; } = "";
-    public static bool GlobalHotKeys { get; private set; } = false;
+    public static bool GlobalHotKeys { get; private set; } // = false;
     public static bool StopIncreasingTimeStatWhenMinimized { get; private set; } = true;
     public static bool StripPunctuationBeforeCalculatingCharacterCount { get; private set; } = true;
-    public static bool MineToFileInsteadOfAnki { get; private set; } = false;
+    public static bool MineToFileInsteadOfAnki { get; private set; } // = false;
 
     #endregion
 

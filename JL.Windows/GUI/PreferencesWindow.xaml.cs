@@ -27,7 +27,7 @@ internal sealed partial class PreferencesWindow : Window
 {
     private static PreferencesWindow? s_instance;
     public static PreferencesWindow Instance => s_instance ??= new PreferencesWindow();
-    public bool SetAnkiConfig { get; private set; } = false;
+    public bool SetAnkiConfig { get; private set; } // = false;
     private string _profileName;
     private readonly Dict _profileNamesDict;
     private readonly Dict _profileWordsDict;

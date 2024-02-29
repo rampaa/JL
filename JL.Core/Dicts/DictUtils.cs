@@ -20,10 +20,10 @@ namespace JL.Core.Dicts;
 
 public static class DictUtils
 {
-    public static bool DictsReady { get; private set; } = false;
-    public static bool UpdatingJmdict { get; internal set; } = false;
-    public static bool UpdatingJmnedict { get; internal set; } = false;
-    public static bool UpdatingKanjidic { get; internal set; } = false;
+    public static bool DictsReady { get; private set; } // = false;
+    public static bool UpdatingJmdict { get; internal set; } // = false;
+    public static bool UpdatingJmnedict { get; internal set; } // = false;
+    public static bool UpdatingKanjidic { get; internal set; } // = false;
     public static readonly Dictionary<string, Dict> Dicts = new();
     internal static Dictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new(55000); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272
     internal static readonly Dictionary<string, string> s_kanjiCompositionDict = new(86934);

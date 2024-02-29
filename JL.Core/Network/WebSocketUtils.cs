@@ -7,8 +7,8 @@ namespace JL.Core.Network;
 
 public static class WebSocketUtils
 {
-    private static Task? s_webSocketTask = null;
-    private static CancellationTokenSource? s_webSocketCancellationTokenSource = null;
+    private static Task? s_webSocketTask;
+    private static CancellationTokenSource? s_webSocketCancellationTokenSource;
 
     private static readonly Encoding s_utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: false);
 

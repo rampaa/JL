@@ -38,14 +38,9 @@ internal static class EpwingYomichanLoader
             {
                 string primarySpelling = jsonElements[0].GetString()!.GetPooledString();
                 string? reading = jsonElements[1].GetString();
-                if (string.IsNullOrEmpty(reading) || reading == primarySpelling)
-                {
-                    reading = null;
-                }
-                else
-                {
-                    reading = reading.GetPooledString();
-                }
+                reading = string.IsNullOrEmpty(reading) || reading == primarySpelling
+                    ? null
+                    : reading.GetPooledString();
 
                 string[]? definitions = EpwingYomichanUtils.GetDefinitions(jsonElements[5]);
                 definitions?.DeduplicateStringsInArray();
