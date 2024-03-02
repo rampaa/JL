@@ -414,7 +414,7 @@ internal sealed partial class PreferencesWindow : Window
 
         if (ankiConfigDict.Count > 0)
         {
-            _ = await AnkiConfig.WriteAnkiConfig(ankiConfigDict).ConfigureAwait(false);
+            await AnkiConfig.WriteAnkiConfig(ankiConfigDict).ConfigureAwait(false);
         }
 
         else

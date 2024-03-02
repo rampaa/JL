@@ -31,7 +31,7 @@ internal static class FrequencyNazekaLoader
                 List<JsonElement> elementList = value[i];
 
                 string exactSpelling = elementList[0].GetString()!.GetPooledString();
-                _ = elementList[1].TryGetInt32(out int frequencyRank);
+                int frequencyRank = elementList[1].GetInt32();
 
                 if (freqDict.TryGetValue(reading, out IList<FrequencyRecord>? readingFreqResult))
                 {

@@ -10,6 +10,14 @@
                    Visibility="Collapsed" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
         <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300" PanningMode="Both">
             <StackPanel x:Name="OptionsStackPanel" VerticalAlignment="Center" HorizontalAlignment="Left">
+                
+                <CheckBox Name="HigherValueMeansHigherFrequencyCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Higher value means higher frequency"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Left"
+                               Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+                
                 <CheckBox Name="UseDBCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Store frequency dictionary in a DB instead of memory"
                                ToolTip="Not recommended unless you are short on RAM. Enabling this will make lookups slower."
@@ -18,13 +26,7 @@
                                HorizontalAlignment="Left"
                                Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
-
-                <CheckBox Name="HigherValueMeansHigherFrequencyCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Text="Higher value means higher frequency"
-                               TextWrapping="Wrap"
-                               HorizontalAlignment="Left"
-                               Style="{StaticResource TextBlockDefault}" />
-                </CheckBox>
+                
             </StackPanel>
         </ScrollViewer>
     </StackPanel>

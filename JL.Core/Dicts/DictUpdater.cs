@@ -33,8 +33,7 @@ public static class DictUpdater
                 if (!noPrompt)
                 {
                     Utils.Frontend.ShowOkDialog(string.Create(CultureInfo.InvariantCulture,
-                            $"This may take a while. Please don't shut down the program until {dictName} is downloaded."),
-                        "Info");
+                            $"This may take a while. Please don't shut down the program until {dictName} is downloaded."), "Info");
                 }
 
                 using HttpResponseMessage response = await Networking.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
@@ -49,8 +48,7 @@ public static class DictUpdater
                     if (!noPrompt)
                     {
                         Utils.Frontend.ShowOkDialog(string.Create(CultureInfo.InvariantCulture,
-                                $"{dictName} has been downloaded successfully."),
-                            "Info");
+                                $"{dictName} has been downloaded successfully."), "Info");
                     }
 
                     return true;
@@ -59,8 +57,7 @@ public static class DictUpdater
                 if (response.StatusCode is HttpStatusCode.NotModified && !noPrompt)
                 {
                     Utils.Frontend.ShowOkDialog(string.Create(CultureInfo.InvariantCulture,
-                            $"{dictName} is up to date."),
-                        "Info");
+                            $"{dictName} is up to date."), "Info");
                 }
 
                 else
@@ -71,8 +68,7 @@ public static class DictUpdater
                     if (!noPrompt)
                     {
                         Utils.Frontend.ShowOkDialog(string.Create(CultureInfo.InvariantCulture,
-                                $"Unexpected error while downloading {dictName}."),
-                            "Info");
+                                $"Unexpected error while downloading {dictName}."), "Info");
                     }
                 }
             }
@@ -81,8 +77,7 @@ public static class DictUpdater
         catch (Exception ex)
         {
             Utils.Frontend.ShowOkDialog(string.Create(CultureInfo.InvariantCulture,
-                    $"Unexpected error while downloading {dictName}."),
-                "Info");
+                    $"Unexpected error while downloading {dictName}."), "Info");
 
             Utils.Logger.Error(ex, "Unexpected error while downloading {DictName}", dictName);
         }

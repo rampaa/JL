@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
@@ -629,7 +630,7 @@ internal static class WindowsUtils
                 Clipboard.SetDataObject(text, false);
                 retry = false;
             }
-            catch (Exception ex)
+            catch (ExternalException ex)
             {
                 Utils.Logger.Warning(ex, "CopyTextToClipboard failed");
             }

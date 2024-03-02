@@ -1,5 +1,6 @@
 using System.Configuration;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -132,7 +133,7 @@ internal sealed partial class MainWindow : Window
                     }
                 }
             }
-            catch (Exception ex)
+            catch (ExternalException ex)
             {
                 Utils.Logger.Warning(ex, "CopyFromClipboard failed");
             }
