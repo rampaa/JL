@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using JL.Core.Network;
@@ -195,67 +196,43 @@ public static class AudioUtils
 
     public static async Task SerializeAudioSources()
     {
-        try
-        {
-            await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
-                JsonSerializer.Serialize(AudioSources, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            Utils.Logger.Fatal(ex, "SerializeAudioSources failed");
-            throw;
-        }
+        await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
+            JsonSerializer.Serialize(AudioSources, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
     }
 
     public static async Task CreateDefaultAudioSourceConfig()
     {
-        try
-        {
-            _ = Directory.CreateDirectory(Utils.ConfigPath);
-            await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
-                JsonSerializer.Serialize(s_builtInAudioSources, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't write default audio source config");
-            Utils.Logger.Error(ex, "Couldn't write default audio source config");
-        }
+        _ = Directory.CreateDirectory(Utils.ConfigPath);
+        await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"),
+            JsonSerializer.Serialize(s_builtInAudioSources, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
     }
 
     internal static async Task DeserializeAudioSources()
     {
-        try
+        FileStream fileStream = File.OpenRead(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"));
+        await using (fileStream.ConfigureAwait(false))
         {
-            FileStream fileStream = File.OpenRead(Path.Join(Utils.ConfigPath, "AudioSourceConfig.json"));
-            await using (fileStream.ConfigureAwait(false))
+            Dictionary<string, AudioSource>? deserializedAudioSources = await JsonSerializer
+                .DeserializeAsync<Dictionary<string, AudioSource>>(fileStream, Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
+
+            if (deserializedAudioSources is not null)
             {
-                Dictionary<string, AudioSource>? deserializedAudioSources = await JsonSerializer
-                    .DeserializeAsync<Dictionary<string, AudioSource>>(fileStream, Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
+                IOrderedEnumerable<KeyValuePair<string, AudioSource>> audioSources = deserializedAudioSources.OrderBy(static d => d.Value.Priority);
+                int priority = 1;
 
-                if (deserializedAudioSources is not null)
+                foreach ((string key, AudioSource audioSource) in audioSources)
                 {
-                    IOrderedEnumerable<KeyValuePair<string, AudioSource>> audioSources = deserializedAudioSources.OrderBy(static d => d.Value.Priority);
-                    int priority = 1;
+                    audioSource.Priority = priority;
+                    AudioSources.Add(key, audioSource);
 
-                    foreach ((string key, AudioSource audioSource) in audioSources)
-                    {
-                        audioSource.Priority = priority;
-                        AudioSources.Add(key, audioSource);
-
-                        ++priority;
-                    }
-                }
-                else
-                {
-                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/AudioSourceConfig.json");
-                    Utils.Logger.Fatal("Couldn't load Config/AudioSourceConfig.json");
+                    ++priority;
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Utils.Logger.Fatal(ex, "DeserializeAudioSources failed");
-            throw;
+            else
+            {
+                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/AudioSourceConfig.json");
+                throw new SerializationException("Couldn't load Config/AudioSourceConfig.json");
+            }
         }
     }
 }

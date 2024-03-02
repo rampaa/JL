@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.Serialization;
 using System.Text.Json;
 using JL.Core.Freqs.FrequencyNazeka;
 using JL.Core.Freqs.FrequencyYomichan;
@@ -275,69 +276,45 @@ public static class FreqUtils
 
     public static async Task CreateDefaultFreqsConfig()
     {
-        try
-        {
-            _ = Directory.CreateDirectory(Utils.ConfigPath);
-            await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
-                JsonSerializer.Serialize(s_builtInFreqs, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't write default Freqs config");
-            Utils.Logger.Error(ex, "Couldn't write default Freqs config");
-        }
+        _ = Directory.CreateDirectory(Utils.ConfigPath);
+        await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
+            JsonSerializer.Serialize(s_builtInFreqs, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
     }
 
     public static async Task SerializeFreqs()
     {
-        try
-        {
-            await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
-                JsonSerializer.Serialize(FreqDicts, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            Utils.Logger.Fatal(ex, "SerializeFreqs failed");
-            throw;
-        }
+        await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "freqs.json"),
+            JsonSerializer.Serialize(FreqDicts, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
     }
 
     internal static async Task DeserializeFreqs()
     {
-        try
+        FileStream fileStream = File.OpenRead(Path.Join(Utils.ConfigPath, "freqs.json"));
+        await using (fileStream.ConfigureAwait(false))
         {
-            FileStream fileStream = File.OpenRead(Path.Join(Utils.ConfigPath, "freqs.json"));
-            await using (fileStream.ConfigureAwait(false))
+            Dictionary<string, Freq>? deserializedFreqs = await JsonSerializer
+                .DeserializeAsync<Dictionary<string, Freq>>(fileStream, Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
+
+            if (deserializedFreqs is not null)
             {
-                Dictionary<string, Freq>? deserializedFreqs = await JsonSerializer
-                    .DeserializeAsync<Dictionary<string, Freq>>(fileStream, Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
+                IOrderedEnumerable<Freq> orderedFreqs = deserializedFreqs.Values.OrderBy(static f => f.Priority);
+                int priority = 1;
 
-                if (deserializedFreqs is not null)
+                foreach (Freq freq in orderedFreqs)
                 {
-                    IOrderedEnumerable<Freq> orderedFreqs = deserializedFreqs.Values.OrderBy(static f => f.Priority);
-                    int priority = 1;
+                    freq.Priority = priority;
+                    ++priority;
 
-                    foreach (Freq freq in orderedFreqs)
-                    {
-                        freq.Priority = priority;
-                        ++priority;
+                    freq.Path = Utils.GetPath(freq.Path);
 
-                        freq.Path = Utils.GetPath(freq.Path);
-
-                        FreqDicts.Add(freq.Name, freq);
-                    }
-                }
-                else
-                {
-                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/freqs.json");
-                    Utils.Logger.Fatal("Couldn't load Config/freqs.json");
+                    FreqDicts.Add(freq.Name, freq);
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Utils.Logger.Fatal(ex, "DeserializeFreqs failed");
-            throw;
+            else
+            {
+                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/freqs.json");
+                throw new SerializationException("Couldn't load Config/freqs.json");
+            }
         }
     }
 }

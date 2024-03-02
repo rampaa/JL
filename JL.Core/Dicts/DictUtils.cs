@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.Serialization;
 using System.Text.Json;
 using JL.Core.Dicts.CustomNameDict;
 using JL.Core.Dicts.CustomWordDict;
@@ -1299,95 +1300,71 @@ public static class DictUtils
 
     public static async Task CreateDefaultDictsConfig()
     {
-        try
-        {
-            _ = Directory.CreateDirectory(Utils.ConfigPath);
-            await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
-                JsonSerializer.Serialize(BuiltInDicts, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't write default Dicts config");
-            Utils.Logger.Error(ex, "Couldn't write default Dicts config");
-        }
+        _ = Directory.CreateDirectory(Utils.ConfigPath);
+        await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
+            JsonSerializer.Serialize(BuiltInDicts, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
     }
 
     public static async Task SerializeDicts()
     {
-        try
-        {
-            await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
-                JsonSerializer.Serialize(Dicts, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            Utils.Logger.Fatal(ex, "SerializeDicts failed");
-            throw;
-        }
+        await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "dicts.json"),
+            JsonSerializer.Serialize(Dicts, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
     }
 
     internal static async Task DeserializeDicts()
     {
-        try
+        FileStream dictStream = File.OpenRead(Path.Join(Utils.ConfigPath, "dicts.json"));
+        await using (dictStream.ConfigureAwait(false))
         {
-            FileStream dictStream = File.OpenRead(Path.Join(Utils.ConfigPath, "dicts.json"));
-            await using (dictStream.ConfigureAwait(false))
+            Dictionary<string, Dict>? deserializedDicts = await JsonSerializer
+                .DeserializeAsync<Dictionary<string, Dict>>(dictStream, Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
+
+            if (deserializedDicts is not null)
             {
-                Dictionary<string, Dict>? deserializedDicts = await JsonSerializer
-                    .DeserializeAsync<Dictionary<string, Dict>>(dictStream, Utils.s_jsoWithEnumConverter).ConfigureAwait(false);
-
-                if (deserializedDicts is not null)
+                foreach ((string key, Dict dict) in BuiltInDicts)
                 {
-                    foreach ((string key, Dict dict) in BuiltInDicts)
+                    if (deserializedDicts.Values.All(d => d.Type != dict.Type))
                     {
-                        if (deserializedDicts.Values.All(d => d.Type != dict.Type))
-                        {
-                            deserializedDicts.Add(key, dict);
-                        }
-                    }
-
-                    IOrderedEnumerable<Dict> orderedDicts = deserializedDicts.Values.OrderBy(static dict => dict.Priority);
-
-                    int priority = 1;
-                    foreach (Dict dict in orderedDicts)
-                    {
-                        dict.Priority = priority;
-                        ++priority;
-
-                        if (dict.Type is DictType.ProfileCustomNameDictionary)
-                        {
-                            dict.Path = ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfile);
-                            SingleDictTypeDicts[dict.Type] = dict;
-                        }
-                        else if (dict.Type is DictType.ProfileCustomWordDictionary)
-                        {
-                            dict.Path = ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfile);
-                            SingleDictTypeDicts[dict.Type] = dict;
-                        }
-                        else if (dict.Type is DictType.CustomNameDictionary
-                            or DictType.CustomWordDictionary
-                            or DictType.JMdict
-                            or DictType.Kanjidic
-                            or DictType.JMnedict)
-                        {
-                            SingleDictTypeDicts[dict.Type] = dict;
-                        }
-
-                        dict.Path = Utils.GetPath(dict.Path);
-                        Dicts.Add(dict.Name, dict);
+                        deserializedDicts.Add(key, dict);
                     }
                 }
-                else
+
+                IOrderedEnumerable<Dict> orderedDicts = deserializedDicts.Values.OrderBy(static dict => dict.Priority);
+
+                int priority = 1;
+                foreach (Dict dict in orderedDicts)
                 {
-                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/dicts.json");
-                    Utils.Logger.Fatal("Couldn't load Config/dicts.json");
+                    dict.Priority = priority;
+                    ++priority;
+
+                    if (dict.Type is DictType.ProfileCustomNameDictionary)
+                    {
+                        dict.Path = ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfile);
+                        SingleDictTypeDicts[dict.Type] = dict;
+                    }
+                    else if (dict.Type is DictType.ProfileCustomWordDictionary)
+                    {
+                        dict.Path = ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfile);
+                        SingleDictTypeDicts[dict.Type] = dict;
+                    }
+                    else if (dict.Type is DictType.CustomNameDictionary
+                        or DictType.CustomWordDictionary
+                        or DictType.JMdict
+                        or DictType.Kanjidic
+                        or DictType.JMnedict)
+                    {
+                        SingleDictTypeDicts[dict.Type] = dict;
+                    }
+
+                    dict.Path = Utils.GetPath(dict.Path);
+                    Dicts.Add(dict.Name, dict);
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Utils.Logger.Fatal(ex, "DeserializeDicts failed");
-            throw;
+            else
+            {
+                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/dicts.json");
+                throw new SerializationException("Couldn't load Config/dicts.json");
+            }
         }
     }
 }

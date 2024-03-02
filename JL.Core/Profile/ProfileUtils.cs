@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.Serialization;
 using System.Text.Json;
 using JL.Core.Utilities;
 
@@ -13,56 +14,39 @@ public static class ProfileUtils
 
     public static async Task SerializeProfiles()
     {
-        try
-        {
-            _ = Directory.CreateDirectory(Utils.ConfigPath);
-            await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "Profiles.json"),
-                JsonSerializer.Serialize(new Profile(CurrentProfile, Profiles), Utils.s_jsoWithIndentation)).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            Utils.Logger.Fatal(ex, "SerializeProfiles failed");
-            throw;
-        }
+        _ = Directory.CreateDirectory(Utils.ConfigPath);
+        await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "Profiles.json"),
+            JsonSerializer.Serialize(new Profile(CurrentProfile, Profiles), Utils.s_jsoWithIndentation)).ConfigureAwait(false);
     }
-
 
     public static async Task DeserializeProfiles()
     {
-        try
+        string profileConfigPath = Path.Join(Utils.ConfigPath, "Profiles.json");
+        if (File.Exists(profileConfigPath))
         {
-            string profileConfigPath = Path.Join(Utils.ConfigPath, "Profiles.json");
-            if (File.Exists(profileConfigPath))
+            FileStream fileStream = File.OpenRead(profileConfigPath);
+            await using (fileStream.ConfigureAwait(false))
             {
-                FileStream fileStream = File.OpenRead(profileConfigPath);
-                await using (fileStream.ConfigureAwait(false))
-                {
-                    Profile? profileRecord = await JsonSerializer
-                        .DeserializeAsync<Profile>(fileStream, Utils.s_jsoWithIndentation).ConfigureAwait(false);
+                Profile? profileRecord = await JsonSerializer
+                    .DeserializeAsync<Profile>(fileStream, Utils.s_jsoWithIndentation).ConfigureAwait(false);
 
-                    if (profileRecord is not null)
-                    {
-                        CurrentProfile = profileRecord.CurrentProfile;
-                        Profiles = profileRecord.Profiles;
-                    }
-                    else
-                    {
-                        Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/Profiles.json");
-                        Utils.Logger.Fatal("Couldn't load Config/Profiles.json");
-                    }
+                if (profileRecord is not null)
+                {
+                    CurrentProfile = profileRecord.CurrentProfile;
+                    Profiles = profileRecord.Profiles;
+                }
+                else
+                {
+                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't load Config/Profiles.json");
+                    throw new SerializationException("Couldn't load Config/Profiles.json");
                 }
             }
-
-            else
-            {
-                Utils.Logger.Information("Profiles.json doesn't exist, creating it");
-                await SerializeProfiles().ConfigureAwait(false);
-            }
         }
-        catch (Exception ex)
+
+        else
         {
-            Utils.Logger.Fatal(ex, "DeserializeProfiles failed");
-            throw;
+            Utils.Logger.Information("Profiles.json doesn't exist, creating it");
+            await SerializeProfiles().ConfigureAwait(false);
         }
     }
 
