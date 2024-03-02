@@ -142,7 +142,7 @@ public static class JapaneseUtils
 
     private static readonly Dictionary<char, char> s_rightToLeftBracketDict = s_leftToRightBracketDict.ToDictionary(static kvp => kvp.Value, static kvp => kvp.Key);
 
-    private static readonly HashSet<char> s_brackets = s_leftToRightBracketDict.Keys.Union(s_leftToRightBracketDict.Values).ToHashSet();
+    private static readonly HashSet<char> s_expressionTerminatingCharacters = s_leftToRightBracketDict.Keys.Union(s_leftToRightBracketDict.Values).Union(s_sentenceTerminatingCharacters).ToHashSet();
 
     public static string KatakanaToHiragana(string text)
     {
@@ -250,7 +250,7 @@ public static class JapaneseUtils
         for (int i = position; i < text.Length; i++)
         {
             char c = text[i];
-            if (s_brackets.Contains(c) || char.IsWhiteSpace(c))
+            if (s_expressionTerminatingCharacters.Contains(c) || char.IsWhiteSpace(c))
             {
                 endPosition = i;
                 break;
