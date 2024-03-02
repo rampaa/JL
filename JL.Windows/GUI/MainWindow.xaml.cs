@@ -35,7 +35,7 @@ internal sealed partial class MainWindow : Window
     public PopupWindow FirstPopupWindow { get; }
 
     private static MainWindow? s_instance;
-    public static MainWindow Instance => s_instance ??= new MainWindow();
+    public static MainWindow Instance => s_instance!;
 
     public double LeftPositionBeforeResolutionChange { get; set; }
     public double TopPositionBeforeResolutionChange { get; set; }
