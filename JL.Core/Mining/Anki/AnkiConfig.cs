@@ -24,7 +24,7 @@ public sealed class AnkiConfig
         Tags = tags;
     }
 
-    public static async Task<bool> WriteAnkiConfig(Dictionary<MineType, AnkiConfig> ankiConfig)
+    public static async Task WriteAnkiConfig(Dictionary<MineType, AnkiConfig> ankiConfig)
     {
         try
         {
@@ -33,15 +33,12 @@ public sealed class AnkiConfig
                 JsonSerializer.Serialize(ankiConfig, Utils.s_jsoWithEnumConverterAndIndentation)).ConfigureAwait(false);
 
             s_ankiConfigDict = ankiConfig;
-
-            return true;
         }
 
         catch (Exception ex)
         {
             Utils.Frontend.Alert(AlertLevel.Error, "Couldn't write AnkiConfig");
             Utils.Logger.Error(ex, "Couldn't write AnkiConfig");
-            return false;
         }
     }
 
