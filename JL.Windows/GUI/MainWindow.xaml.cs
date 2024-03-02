@@ -49,7 +49,6 @@ internal sealed partial class MainWindow : Window
 
     private static string? s_lastTextCopiedWhileMinimized;
 
-    private static readonly Point s_origin = new(0, 0);
     private Point _swipeStartPoint;
 
     private MainWindow()
@@ -1225,8 +1224,8 @@ internal sealed partial class MainWindow : Window
             FirstPopupWindow.HidePopup();
         }
 
-        // For some reason, when DragMove() is used Mouse.GetPosition() returns Point(0, 0)
-        if (e.GetPosition(this) == s_origin)
+        // For some reason, when DragMove() is used Mouse.GetPosition() returns Point(0, 0)/default(Point)
+        if (e.GetPosition(this) == default)
         {
             return;
         }
