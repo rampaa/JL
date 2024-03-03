@@ -112,13 +112,17 @@ public static class JapaneseUtils
         '！',
         '？',
         '…',
+        '‥',
+        '︒',
         '.',
         '!',
         '?',
+        '︙',
+        '︰',
         '\n'
     };
 
-    private static readonly Dictionary<char, char> s_leftToRightBracketDict = new(18)
+    private static readonly Dictionary<char, char> s_leftToRightBracketDict = new(28)
     {
         { '「', '」' },
         { '『', '』' },
@@ -137,7 +141,17 @@ public static class JapaneseUtils
         { '⟨', '⟩' },
         { '(', ')' },
         { '[', ']' },
-        { '{', '}' }
+        { '{', '}' },
+        { '︗', '︘' },
+        { '﹁', '﹂' },
+        { '﹃', '﹄' },
+        { '︵', '︶' },
+        { '﹇', '﹈' },
+        { '︷', '︸' },
+        { '︹', '︺' },
+        { '︻', '︼' },
+        { '︽', '︾' },
+        { '︿', '﹀' },
     };
 
     private static readonly Dictionary<char, char> s_rightToLeftBracketDict = s_leftToRightBracketDict.ToDictionary(static kvp => kvp.Value, static kvp => kvp.Key);
@@ -252,7 +266,7 @@ public static class JapaneseUtils
             char c = text[i];
             if (s_expressionTerminatingCharacters.Contains(c) || char.IsWhiteSpace(c))
             {
-                endPosition = i;
+                endPosition = i + 1;
                 break;
             }
         }
