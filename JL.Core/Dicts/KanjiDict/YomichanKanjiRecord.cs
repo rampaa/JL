@@ -86,7 +86,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
 
         for (int i = 0; i < Definitions.Length; i++)
         {
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"{Definitions[i]}{separator}");
+            _ = defResult.Append(Definitions[i]).Append(separator);
         }
 
         return defResult.Remove(defResult.Length - separator.Length, separator.Length).ToString();

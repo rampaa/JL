@@ -211,7 +211,7 @@ public static class MiningUtils
                 if (pitchAccents is not null)
                 {
                     string[] expressions = lookupResult.Readings ?? new[] { lookupResult.PrimarySpelling };
-                    StringBuilder expressionsWithPitchAccentBuilder = new($"{PitchAccentStyle}\n\n");
+                    StringBuilder expressionsWithPitchAccentBuilder = new(string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n"));
 
                     StringBuilder numericPitchAccentBuilder = new();
                     for (int i = 0; i < pitchAccents.Count; i++)

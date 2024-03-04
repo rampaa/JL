@@ -41,7 +41,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({DefinitionTags[i]}) ");
             }
 
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"{Definitions[i]}{separator}");
+            _ = defResult.Append(Definitions[i]).Append(separator);
         }
 
         return defResult.Remove(defResult.Length - separator.Length, separator.Length).ToString();
