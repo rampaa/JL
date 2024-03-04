@@ -27,7 +27,11 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
+
+#pragma warning disable CA1812 // Internal class that is apparently never instantiated
 internal sealed partial class MainWindow : Window
+#pragma warning restore CA1812 // Internal class that is apparently never instantiated
+
 {
     private WinApi? _winApi;
     public nint WindowHandle { get; private set; }
