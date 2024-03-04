@@ -305,7 +305,7 @@ public static class JapaneseUtils
             endPosition = text.Length - 1;
         }
 
-        string sentence = startPosition < endPosition
+        string sentence = startPosition <= endPosition
             ? text[startPosition..(endPosition + 1)].Trim()
             : "";
 
