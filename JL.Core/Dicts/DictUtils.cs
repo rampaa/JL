@@ -1351,7 +1351,8 @@ public static class DictUtils
                         or DictType.CustomWordDictionary
                         or DictType.JMdict
                         or DictType.Kanjidic
-                        or DictType.JMnedict)
+                        or DictType.JMnedict
+                        or DictType.PitchAccentYomichan)
                     {
                         SingleDictTypeDicts[dict.Type] = dict;
                     }

@@ -17,30 +17,34 @@ public sealed record class PitchAccentRecord : IDictRecord
         Position = position;
     }
 
-    internal PitchAccentRecord(List<JsonElement> jsonObject)
+    internal PitchAccentRecord(List<JsonElement> jsonElements)
     {
-        Spelling = jsonObject[0].GetString()!.GetPooledString();
+        Spelling = jsonElements[0].GetString()!.GetPooledString();
 
-        if (jsonObject[2].ValueKind is JsonValueKind.Object)
+        JsonElement thirdJsonElement = jsonElements[2];
+        if (thirdJsonElement.ValueKind is JsonValueKind.Object)
         {
-            Reading = jsonObject[2].GetProperty("reading").GetString();
-            Position = jsonObject[2].GetProperty("pitches")[0].GetProperty("position").GetByte();
+            Reading = thirdJsonElement.GetProperty("reading").GetString();
+            Position = thirdJsonElement.GetProperty("pitches")[0].GetProperty("position").TryGetByte(out byte position)
+                ? position
+                : byte.MaxValue;
         }
 
         else
         {
-            Reading = jsonObject[1].GetString();
+            Reading = jsonElements[1].GetString();
 
-            string? positionStr = jsonObject[5][0].GetString();
+            string? positionStr = jsonElements[5][0].GetString();
             if (positionStr is not null)
             {
                 Match match = Utils.s_numberRegex.Match(positionStr);
-                if (match.Success)
-                {
-                    Position = byte.TryParse(match.ValueSpan, out byte position)
-                        ? position
-                        : byte.MaxValue;
-                }
+                Position = match.Success && byte.TryParse(match.ValueSpan, out byte position)
+                    ? position
+                    : byte.MaxValue;
+            }
+            else
+            {
+                Position = byte.MaxValue;
             }
         }
 
