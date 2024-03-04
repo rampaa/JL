@@ -139,8 +139,7 @@ internal static class PopupWindowUtils
                         {
                             polyline.Points.Add(new Point(horizontalOffsetForChar, 0));
                             polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
-                            polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width,
-                                charSize.Height));
+                            polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charSize.Height));
 
                             lowPitch = true;
                         }
@@ -148,8 +147,7 @@ internal static class PopupWindowUtils
                         else if (j is 0)
                         {
                             polyline.Points.Add(new Point(horizontalOffsetForChar, charSize.Height));
-                            polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width,
-                                charSize.Height));
+                            polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charSize.Height));
                             polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));
                         }
 
@@ -157,8 +155,7 @@ internal static class PopupWindowUtils
                         {
                             double charHeight = lowPitch ? charSize.Height : 0;
                             polyline.Points.Add(new Point(horizontalOffsetForChar, charHeight));
-                            polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width,
-                                charHeight));
+                            polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, charHeight));
                         }
 
                         horizontalOffsetForChar += charSize.Width;

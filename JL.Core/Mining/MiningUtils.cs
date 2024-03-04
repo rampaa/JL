@@ -13,6 +13,65 @@ namespace JL.Core.Mining;
 
 public static class MiningUtils
 {
+    private const string PitchAccentStyle =
+        """
+        <style>
+          .dotted-line-on-bottom,
+          .dotted-line-on-top,
+          .dotted-line-on-bottom-right,
+          .dotted-line-on-top-right {
+            position: relative;
+            display: inline-block;
+          }
+
+          .dotted-line-on-bottom:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-bottom: 1px dotted currentColor;
+            pointer-events: none;
+          }
+
+          .dotted-line-on-top:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-top: 1px dotted currentColor;
+            pointer-events: none;
+          }
+
+          .dotted-line-on-bottom-right:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-bottom: 1px dotted currentColor;
+            border-right: 1px dotted currentColor;
+            pointer-events: none;
+          }
+
+          .dotted-line-on-top-right:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-top: 1px dotted currentColor;
+            border-right: 1px dotted currentColor;
+            pointer-events: none;
+          }
+        </style>
+        """;
+
     private static Dictionary<JLField, string> GetMiningParameters(LookupResult lookupResult, string currentText, string? selectedDefinitions, int currentCharPosition, bool replaceLineBreakWithBrTag)
     {
         Dictionary<JLField, string> miningParams = new()
@@ -151,15 +210,22 @@ public static class MiningUtils
                 List<KeyValuePair<string, byte>>? pitchAccents = GetPitchAccents(lookupResult.PitchAccentDict ?? pitchDict.Contents, lookupResult);
                 if (pitchAccents is not null)
                 {
+                    string[] expressions = lookupResult.Readings ?? new[] { lookupResult.PrimarySpelling };
+                    StringBuilder expressionsWithPitchAccentBuilder = new($"{PitchAccentStyle}\n\n");
+
                     StringBuilder numericPitchAccentBuilder = new();
                     for (int i = 0; i < pitchAccents.Count; i++)
                     {
                         KeyValuePair<string, byte> pitchAccent = pitchAccents[i];
                         _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{pitchAccent.Key}: {pitchAccent.Value}, ");
+                        _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(pitchAccent.Key, pitchAccent.Value)).Append(", ");
                     }
 
                     _ = numericPitchAccentBuilder.Remove(numericPitchAccentBuilder.Length - 2, 2);
                     miningParams[JLField.NumericPitchAccents] = numericPitchAccentBuilder.ToString();
+
+                    _ = expressionsWithPitchAccentBuilder.Remove(expressionsWithPitchAccentBuilder.Length - 2, 2);
+                    miningParams[JLField.PitchAccents] = expressionsWithPitchAccentBuilder.ToString();
                 }
             }
         }
@@ -234,6 +300,31 @@ public static class MiningUtils
         return pitchAccents.Count > 0 ? pitchAccents : null;
     }
 
+    private static StringBuilder GetExpressionWithPitchAccent(string expression, byte position)
+    {
+        bool lowPitch = false;
+        StringBuilder expressionWithPitchAccentStringBuilder = new();
+        List<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expression);
+        for (int i = 0; i < combinedFormList.Count; i++)
+        {
+            if (i == (position - 1))
+            {
+                _ = expressionWithPitchAccentStringBuilder.Append(CultureInfo.InvariantCulture, $"<span class=\"dotted-line-on-top-right\">{combinedFormList[i]}</span>");
+                lowPitch = true;
+            }
+            else if (i is 0)
+            {
+                _ = expressionWithPitchAccentStringBuilder.Append(CultureInfo.InvariantCulture, $"<span class=\"dotted-line-on-bottom-right\">{combinedFormList[i]}</span>");
+            }
+            else
+            {
+                _ = expressionWithPitchAccentStringBuilder.Append(CultureInfo.InvariantCulture, $"<span class=\"dotted-line-on-{(lowPitch ? "bottom" : "top")}\">{combinedFormList[i]}</span>");
+            }
+        }
+
+        return expressionWithPitchAccentStringBuilder;
+    }
+
     public static async Task MineToFile(LookupResult lookupResult, string currentText, string? selectedDefinitions, int currentCharPosition)
     {
         string filePath;
@@ -264,7 +355,7 @@ public static class MiningUtils
         for (int i = 1; i < jlFields.Length; i++)
         {
             JLField jlField = jlFields[i];
-            if (jlField is JLField.Audio or JLField.Image)
+            if (jlField is JLField.Audio or JLField.Image or JLField.PitchAccents)
             {
                 continue;
             }

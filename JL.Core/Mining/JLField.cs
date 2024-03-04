@@ -21,6 +21,7 @@ public enum JLField
     [Description("Local Time")] LocalTime,
     Frequencies,
     [Description("Raw Frequencies")] RawFrequencies,
+    [Description("Pitch Accents")] PitchAccents,
     [Description("Pitch Accents (Numeric)")] NumericPitchAccents,
 
     // JMdict, JMnedict, KANJIDIC2

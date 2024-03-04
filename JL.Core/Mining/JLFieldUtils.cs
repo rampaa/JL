@@ -24,6 +24,7 @@ public static class JLFieldUtils
         JLField.DeconjugationProcess,
         JLField.Frequencies,
         JLField.RawFrequencies,
+        JLField.PitchAccents,
         JLField.NumericPitchAccents,
         JLField.EdictId,
         JLField.LocalTime
@@ -51,6 +52,7 @@ public static class JLFieldUtils
         JLField.TrailingSentencePart,
         JLField.Frequencies,
         JLField.RawFrequencies,
+        JLField.PitchAccents,
         JLField.NumericPitchAccents,
         JLField.EdictId,
         JLField.LocalTime
@@ -70,6 +72,7 @@ public static class JLFieldUtils
         JLField.Sentence,
         JLField.LeadingSentencePart,
         JLField.TrailingSentencePart,
+        JLField.PitchAccents,
         JLField.NumericPitchAccents,
         JLField.EdictId,
         JLField.LocalTime
