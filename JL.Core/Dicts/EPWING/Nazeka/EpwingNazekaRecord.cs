@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text;
 using JL.Core.Dicts.Options;
 using JL.Core.Freqs;

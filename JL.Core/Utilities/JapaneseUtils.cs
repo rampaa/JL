@@ -151,7 +151,7 @@ public static class JapaneseUtils
         { '︹', '︺' },
         { '︻', '︼' },
         { '︽', '︾' },
-        { '︿', '﹀' },
+        { '︿', '﹀' }
     };
 
     private static readonly Dictionary<char, char> s_rightToLeftBracketDict = s_leftToRightBracketDict.ToDictionary(static kvp => kvp.Value, static kvp => kvp.Key);
