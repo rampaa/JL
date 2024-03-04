@@ -29,7 +29,7 @@ public static class MiningUtils
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
+            width: calc(100% - 0.7px);
             height: 100%;
             border-bottom: 1px dotted currentColor;
             pointer-events: none;
@@ -40,7 +40,7 @@ public static class MiningUtils
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
+            width: calc(100% - 0.7px);
             height: 100%;
             border-top: 1px dotted currentColor;
             pointer-events: none;
@@ -51,7 +51,7 @@ public static class MiningUtils
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
+            width: calc(100% - 0.7px);
             height: 100%;
             border-bottom: 1px dotted currentColor;
             border-right: 1px dotted currentColor;
@@ -63,7 +63,7 @@ public static class MiningUtils
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
+            width: calc(100% - 0.7px);
             height: 100%;
             border-top: 1px dotted currentColor;
             border-right: 1px dotted currentColor;
