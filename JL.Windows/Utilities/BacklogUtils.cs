@@ -73,7 +73,7 @@ internal static class BacklogUtils
         }
 
         Stats.IncrementStat(StatType.Characters,
-                new StringInfo(JapaneseUtils.RemovePunctuation(Backlog[s_currentTextIndex])).LengthInTextElements * -1);
+            -new StringInfo(JapaneseUtils.RemovePunctuation(Backlog[s_currentTextIndex])).LengthInTextElements);
 
         Stats.IncrementStat(StatType.Lines, -1);
 
