@@ -94,14 +94,14 @@ internal static class EpwingYomichanLoader
 
     private static void AddToDictionary(IEpwingRecord yomichanRecord, Dict dict)
     {
-        string hiraganaExpression = JapaneseUtils.KatakanaToHiragana(yomichanRecord.PrimarySpelling);
-        if (dict.Contents.TryGetValue(hiraganaExpression, out IList<IDictRecord>? records))
+        string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(yomichanRecord.PrimarySpelling);
+        if (dict.Contents.TryGetValue(primarySpellingInHiragana, out IList<IDictRecord>? records))
         {
             records.Add(yomichanRecord);
         }
         else
         {
-            dict.Contents[hiraganaExpression] = new List<IDictRecord> { yomichanRecord };
+            dict.Contents[primarySpellingInHiragana] = new List<IDictRecord> { yomichanRecord };
         }
 
         if (dict.Type is not DictType.NonspecificNameYomichan
@@ -109,15 +109,17 @@ internal static class EpwingYomichanLoader
             and not DictType.KanjigenYomichan
             && !string.IsNullOrEmpty(yomichanRecord.Reading))
         {
-            string hiraganaReading = JapaneseUtils.KatakanaToHiragana(yomichanRecord.Reading);
-
-            if (dict.Contents.TryGetValue(hiraganaReading, out records))
+            string readingInHiragana = JapaneseUtils.KatakanaToHiragana(yomichanRecord.Reading);
+            if (primarySpellingInHiragana != readingInHiragana)
             {
-                records.Add(yomichanRecord);
-            }
-            else
-            {
-                dict.Contents[hiraganaReading] = new List<IDictRecord> { yomichanRecord };
+                if (dict.Contents.TryGetValue(readingInHiragana, out records))
+                {
+                    records.Add(yomichanRecord);
+                }
+                else
+                {
+                    dict.Contents[readingInHiragana] = new List<IDictRecord> { yomichanRecord };
+                }
             }
         }
     }
