@@ -976,8 +976,10 @@ internal sealed partial class MainWindow : Window
         string? text = MainTextBox.SelectionLength > 0
             ? MainTextBox.SelectedText
             : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), ConfigManager.HorizontallyCenterMainWindowText) is not -1
-                ? FirstPopupWindow.LastSelectedText
-                : null;
+                || (FirstPopupWindow.LastSelectedText is not null
+                    && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
+                        ? FirstPopupWindow.LastSelectedText
+                        : null;
 
         string reading = "";
 
@@ -1007,8 +1009,10 @@ internal sealed partial class MainWindow : Window
         string? text = MainTextBox.SelectionLength > 0
             ? MainTextBox.SelectedText
             : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), ConfigManager.HorizontallyCenterMainWindowText) is not -1
-                ? FirstPopupWindow.LastSelectedText
-                : null;
+                || (FirstPopupWindow.LastSelectedText is not null
+                    && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
+                        ? FirstPopupWindow.LastSelectedText
+                        : null;
 
         WindowsUtils.ShowAddWordWindow(text);
     }
@@ -1025,7 +1029,15 @@ internal sealed partial class MainWindow : Window
 
     public void SearchWithBrowser()
     {
-        WindowsUtils.SearchWithBrowser(MainTextBox.SelectedText);
+        string? text = MainTextBox.SelectionLength > 0
+            ? MainTextBox.SelectedText
+            : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), ConfigManager.HorizontallyCenterMainWindowText) is not -1
+                || (FirstPopupWindow.LastSelectedText is not null
+                    && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
+                        ? FirstPopupWindow.LastSelectedText
+                        : null;
+
+        WindowsUtils.SearchWithBrowser(text);
         WindowsUtils.UpdateMainWindowVisibility();
     }
 
