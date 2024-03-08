@@ -57,15 +57,16 @@ internal static class YomichanPitchAccentLoader
                 if (!string.IsNullOrEmpty(newEntry.Reading))
                 {
                     string readingInHiragana = JapaneseUtils.KatakanaToHiragana(newEntry.Reading).GetPooledString();
-
-                    if (pitchDict.TryGetValue(readingInHiragana, out IList<IDictRecord>? readingResult))
+                    if (spellingInHiragana != readingInHiragana)
                     {
-                        readingResult.Add(newEntry);
-                    }
-
-                    else
-                    {
-                        pitchDict[readingInHiragana] = new List<IDictRecord> { newEntry };
+                        if (pitchDict.TryGetValue(readingInHiragana, out IList<IDictRecord>? readingResult))
+                        {
+                            readingResult.Add(newEntry);
+                        }
+                        else
+                        {
+                            pitchDict[readingInHiragana] = new List<IDictRecord> { newEntry };
+                        }
                     }
                 }
             }
