@@ -117,7 +117,7 @@ public static class FreqUtils
 
                             catch (Exception ex)
                             {
-                                Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't import {freq.Name}"));
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
                                 Utils.Logger.Error(ex, "Couldn't import {FreqName}", freq.Type);
                                 _ = FreqDicts.Remove(freq.Name);
                                 freqRemoved = true;
@@ -199,7 +199,7 @@ public static class FreqUtils
 
                             catch (Exception ex)
                             {
-                                Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't import {freq.Name}"));
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {freq.Name}");
                                 Utils.Logger.Error(ex, "Couldn't import {FreqName}", freq.Type);
                                 _ = FreqDicts.Remove(freq.Name);
                                 freqRemoved = true;

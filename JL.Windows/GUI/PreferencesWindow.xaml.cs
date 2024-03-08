@@ -352,9 +352,8 @@ internal sealed partial class PreferencesWindow : Window
         if (deckNamesSelector.SelectedItem is null ||
             modelNamesSelector.SelectedItem is null)
         {
-            string mineTypeStr = mineType.ToString();
-            Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Save failed: Incomplete Anki config for {mineTypeStr} dictionaries"));
-            Utils.Logger.Error("Save failed: Incomplete Anki config for {MineType} dictionaries", mineTypeStr);
+            Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Save failed: Incomplete Anki config for {mineType} dictionaries"));
+            Utils.Logger.Error("Save failed: Incomplete Anki config for {MineType} dictionaries", mineType);
             return null;
         }
 

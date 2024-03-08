@@ -290,13 +290,13 @@ internal static class WindowsUtils
         string browserPath = "";
         if (!string.IsNullOrWhiteSpace(ConfigManager.BrowserPath))
         {
-            browserPath = string.Create(CultureInfo.InvariantCulture, $"\"{ConfigManager.BrowserPath}\"");
+            browserPath = $"\"{ConfigManager.BrowserPath}\"";
         }
 
         if (selectedText?.Length > 0)
         {
             _ = Process.Start(new ProcessStartInfo("cmd",
-                string.Create(CultureInfo.InvariantCulture, $"/c start \"\" {browserPath} \"{ConfigManager.SearchUrl.Replace("{SearchTerm}", System.Web.HttpUtility.UrlEncode(selectedText), StringComparison.Ordinal)}\""))
+                $"/c start \"\" {browserPath} \"{ConfigManager.SearchUrl.Replace("{SearchTerm}", System.Web.HttpUtility.UrlEncode(selectedText), StringComparison.Ordinal)}\"")
             {
                 CreateNoWindow = true
             });

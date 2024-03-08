@@ -59,7 +59,7 @@ public static class StatsUtils
 
             catch (Exception ex)
             {
-                Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't read {ProfileUtils.CurrentProfile} Stats"));
+                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't read {ProfileUtils.CurrentProfile} Stats");
                 Utils.Logger.Error(ex, "Couldn't read {CurrentProfile} Stats", ProfileUtils.CurrentProfile);
             }
         }
@@ -118,6 +118,6 @@ public static class StatsUtils
 
     public static string GetStatsPath(string profileName)
     {
-        return Path.Join(ProfileUtils.ProfileFolderPath, string.Create(CultureInfo.InvariantCulture, $"{profileName}_Stats.json"));
+        return Path.Join(ProfileUtils.ProfileFolderPath, $"{profileName}_Stats.json");
     }
 }

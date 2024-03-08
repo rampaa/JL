@@ -183,8 +183,8 @@ internal static class KeyGestureUtils
             KeyGesture newKeyGesture = rawKeyGesture.Contains("Ctrl", StringComparison.Ordinal)
                                        || rawKeyGesture.Contains("Alt", StringComparison.Ordinal)
                                        || rawKeyGesture.Contains("Shift", StringComparison.Ordinal)
-                ? (KeyGesture)keyGestureConverter.ConvertFromString(rawKeyGesture)!
-                : (KeyGesture)keyGestureConverter.ConvertFromString(string.Create(CultureInfo.InvariantCulture, $"Win+{rawKeyGesture}"))!;
+                ? (KeyGesture)keyGestureConverter.ConvertFromInvariantString(rawKeyGesture)!
+                : (KeyGesture)keyGestureConverter.ConvertFromInvariantString($"Win+{rawKeyGesture}")!;
 
             if (ConfigManager.GlobalHotKeys && setAsGlobalHotKey)
             {

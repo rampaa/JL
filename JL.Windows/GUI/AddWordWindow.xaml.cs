@@ -98,8 +98,8 @@ internal sealed partial class AddWordWindow : Window
             Close();
 
             string line = string.IsNullOrWhiteSpace(rawWordClasses)
-                ? string.Create(CultureInfo.InvariantCulture, $"{spellings}\t{readings}\t{definitions}\t{rawPartOfSpeech}\n")
-                : string.Create(CultureInfo.InvariantCulture, $"{spellings}\t{readings}\t{definitions}\t{rawPartOfSpeech}\t{wordClasses}\n");
+                ? $"{spellings}\t{readings}\t{definitions}\t{rawPartOfSpeech}\n"
+                : $"{spellings}\t{readings}\t{definitions}\t{rawPartOfSpeech}\t{wordClasses}\n";
 
             string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
             await File.AppendAllTextAsync(path, line).ConfigureAwait(false);

@@ -256,7 +256,7 @@ internal static class JmdictLoader
 
                             if (glossType is not null)
                             {
-                                gloss = string.Create(CultureInfo.InvariantCulture, $"({glossType}.) ");
+                                gloss = $"({glossType}.) ";
                             }
                         }
 

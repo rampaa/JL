@@ -110,7 +110,7 @@ internal sealed partial class StatsWindow : Window
     {
 #pragma warning disable CA1308 // Normalize strings to uppercase
         if (Utils.Frontend.ShowYesNoDialog(
-                string.Create(CultureInfo.InvariantCulture, $"Are you really sure that you want to reset the {ButtonSwapStats.Content.ToString()!.ToLowerInvariant()} stats?"),
+                $"Are you really sure that you want to reset the {ButtonSwapStats.Content.ToString()!.ToLowerInvariant()} stats?",
                 string.Create(CultureInfo.InvariantCulture, $"Reset {ButtonSwapStats.Content} Stats?")))
         {
             if (Enum.TryParse(ButtonSwapStats.Content.ToString(), out StatsMode statsMode))

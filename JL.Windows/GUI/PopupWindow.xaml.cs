@@ -531,7 +531,7 @@ internal sealed partial class PopupWindow : Window
         if (showPOrthographyInfo && result.PrimarySpellingOrthographyInfoList is not null)
         {
             TextBlock textBlockPOrthographyInfo = PopupWindowUtils.CreateTextBlock(nameof(result.PrimarySpellingOrthographyInfoList),
-                string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", result.PrimarySpellingOrthographyInfoList)})"),
+                $"({string.Join(", ", result.PrimarySpellingOrthographyInfoList)})",
                 DictOptionManager.POrthographyInfoColor,
                 pOrthographyInfoFontSize,
                 PopupContextMenu,
@@ -651,7 +651,7 @@ internal sealed partial class PopupWindow : Window
         {
             string alternativeSpellingsText = showAOrthographyInfo && result.AlternativeSpellingsOrthographyInfoList is not null
                 ? LookupResultUtils.AlternativeSpellingsToText(result.AlternativeSpellings, result.AlternativeSpellingsOrthographyInfoList)
-                : string.Create(CultureInfo.InvariantCulture, $"({string.Join(", ", result.AlternativeSpellings)})");
+                : $"({string.Join(", ", result.AlternativeSpellings)})";
 
             if (MiningMode)
             {
@@ -686,7 +686,7 @@ internal sealed partial class PopupWindow : Window
             if (MiningMode)
             {
                 TouchScreenTextBox deconjugationProcessTextBox = PopupWindowUtils.CreateTextBox(nameof(result.DeconjugationProcess),
-                    string.Create(CultureInfo.InvariantCulture, $"{result.MatchedText} {result.DeconjugationProcess}"),
+                    $"{result.MatchedText} {result.DeconjugationProcess}",
                     ConfigManager.DeconjugationInfoColor,
                     ConfigManager.DeconjugationInfoFontSize,
                     PopupContextMenu,
@@ -700,7 +700,7 @@ internal sealed partial class PopupWindow : Window
             else
             {
                 TextBlock deconjugationProcessTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.DeconjugationProcess),
-                    string.Create(CultureInfo.InvariantCulture, $"{result.MatchedText} {result.DeconjugationProcess}"),
+                    $"{result.MatchedText} {result.DeconjugationProcess}",
                     ConfigManager.DeconjugationInfoColor,
                     ConfigManager.DeconjugationInfoFontSize,
                     PopupContextMenu,
@@ -778,7 +778,7 @@ internal sealed partial class PopupWindow : Window
             if (MiningMode)
             {
                 TouchScreenTextBox onReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.OnReadings),
-                    string.Create(CultureInfo.InvariantCulture, $"On: {string.Join(", ", result.OnReadings)}"),
+                    $"On: {string.Join(", ", result.OnReadings)}",
                     ConfigManager.ReadingsColor,
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
@@ -793,7 +793,7 @@ internal sealed partial class PopupWindow : Window
             else
             {
                 TextBlock onReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.OnReadings),
-                    string.Create(CultureInfo.InvariantCulture, $"On: {string.Join(", ", result.OnReadings)}"),
+                    $"On: {string.Join(", ", result.OnReadings)}",
                     ConfigManager.ReadingsColor,
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
@@ -809,7 +809,7 @@ internal sealed partial class PopupWindow : Window
             if (MiningMode)
             {
                 TouchScreenTextBox kunReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.KunReadings),
-                    string.Create(CultureInfo.InvariantCulture, $"Kun: {string.Join(", ", result.KunReadings)}"),
+                    $"Kun: {string.Join(", ", result.KunReadings)}",
                     ConfigManager.ReadingsColor,
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
@@ -824,7 +824,7 @@ internal sealed partial class PopupWindow : Window
             else
             {
                 TextBlock kunReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KunReadings),
-                    string.Create(CultureInfo.InvariantCulture, $"Kun: {string.Join(", ", result.KunReadings)}"),
+                    $"Kun: {string.Join(", ", result.KunReadings)}",
                     ConfigManager.ReadingsColor,
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
@@ -840,7 +840,7 @@ internal sealed partial class PopupWindow : Window
             if (MiningMode)
             {
                 TouchScreenTextBox nanoriReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.NanoriReadings),
-                    string.Create(CultureInfo.InvariantCulture, $"Nanori: {string.Join(", ", result.NanoriReadings)}"),
+                    $"Nanori: {string.Join(", ", result.NanoriReadings)}",
                     ConfigManager.ReadingsColor,
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
@@ -855,7 +855,7 @@ internal sealed partial class PopupWindow : Window
             else
             {
                 TextBlock nanoriReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.NanoriReadings),
-                    string.Create(CultureInfo.InvariantCulture, $"Nanori: {string.Join(", ", result.NanoriReadings)}"),
+                    $"Nanori: {string.Join(", ", result.NanoriReadings)}",
                     ConfigManager.ReadingsColor,
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
@@ -871,7 +871,7 @@ internal sealed partial class PopupWindow : Window
             if (MiningMode)
             {
                 TouchScreenTextBox radicalNameTextBox = PopupWindowUtils.CreateTextBox(nameof(result.RadicalNames),
-                    string.Create(CultureInfo.InvariantCulture, $"Radical names: {string.Join(", ", result.RadicalNames)}"),
+                    $"Radical names: {string.Join(", ", result.RadicalNames)}",
                     ConfigManager.ReadingsColor,
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
@@ -886,7 +886,7 @@ internal sealed partial class PopupWindow : Window
             else
             {
                 TextBlock radicalNameTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.RadicalNames),
-                    string.Create(CultureInfo.InvariantCulture, $"Radical names: {string.Join(", ", result.RadicalNames)}"),
+                    $"Radical names: {string.Join(", ", result.RadicalNames)}",
                     ConfigManager.ReadingsColor,
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
@@ -900,7 +900,7 @@ internal sealed partial class PopupWindow : Window
         if (result.KanjiGrade is not byte.MaxValue)
         {
             TextBlock gradeTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiGrade),
-                    string.Create(CultureInfo.InvariantCulture, $"Grade: {LookupResultUtils.GradeToText(result.KanjiGrade)}"),
+                    $"Grade: {LookupResultUtils.GradeToText(result.KanjiGrade)}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
@@ -928,7 +928,7 @@ internal sealed partial class PopupWindow : Window
             if (MiningMode)
             {
                 TouchScreenTextBox compositionTextBox = PopupWindowUtils.CreateTextBox(nameof(result.KanjiComposition),
-                    string.Create(CultureInfo.InvariantCulture, $"Composition: {result.KanjiComposition}"),
+                    $"Composition: {result.KanjiComposition}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
@@ -943,7 +943,7 @@ internal sealed partial class PopupWindow : Window
             else
             {
                 TextBlock compositionTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiComposition),
-                    string.Create(CultureInfo.InvariantCulture, $"Composition: {result.KanjiComposition}"),
+                    $"Composition: {result.KanjiComposition}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
@@ -957,7 +957,7 @@ internal sealed partial class PopupWindow : Window
         if (result.KanjiStats is not null)
         {
             TextBlock kanjiStatsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiStats),
-                    string.Create(CultureInfo.InvariantCulture, $"Statistics:\n{result.KanjiStats}"),
+                    $"Statistics:\n{result.KanjiStats}",
                     ConfigManager.DefinitionsColor,
                     ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,

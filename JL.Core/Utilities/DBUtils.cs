@@ -53,12 +53,12 @@ public static class DBUtils
 
     public static string GetDictDBPath(string dbName)
     {
-        return string.Create(CultureInfo.InvariantCulture, $"{Path.Join(s_dictDBFolderPath, dbName)}.sqlite");
+        return $"{Path.Join(s_dictDBFolderPath, dbName)}.sqlite";
     }
 
     public static string GetFreqDBPath(string dbName)
     {
-        return string.Create(CultureInfo.InvariantCulture, $"{Path.Join(s_freqDBFolderPath, dbName)}.sqlite");
+        return $"{Path.Join(s_freqDBFolderPath, dbName)}.sqlite";
     }
 
     internal static void StartOptimizePragmaTimer()
@@ -85,7 +85,7 @@ public static class DBUtils
 
     private static void SendOptimizePragma(string dbPath)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={dbPath};Mode=ReadOnly"));
+        using SqliteConnection connection = new($"Data Source={dbPath};Mode=ReadOnly");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA optimize;";
@@ -110,7 +110,7 @@ public static class DBUtils
 
     private static int GetVersionFromDB(string dbPath)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={dbPath};Mode=ReadOnly"));
+        using SqliteConnection connection = new($"Data Source={dbPath};Mode=ReadOnly");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA user_version;";

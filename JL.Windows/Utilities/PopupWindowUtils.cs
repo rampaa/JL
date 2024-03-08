@@ -94,7 +94,7 @@ internal static class PopupWindowUtils
                 if (i > 0)
                 {
                     horizontalOffsetForReading +=
-                        WindowsUtils.MeasureTextSize(string.Create(CultureInfo.InvariantCulture, $"{splitReadingsWithRInfo[i - 1]}, "), fontSize).Width;
+                        WindowsUtils.MeasureTextSize($"{splitReadingsWithRInfo[i - 1]}, ", fontSize).Width;
                 }
 
                 PitchAccentRecord? chosenPitchAccentDictResult = null;

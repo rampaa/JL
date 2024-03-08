@@ -13,7 +13,7 @@ internal static class EpwingNazekaDBManager
 
     public static void CreateDB(string dbName)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DBUtils.GetDictDBPath(dbName)};"));
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -47,7 +47,7 @@ internal static class EpwingNazekaDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadWrite"));
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadWrite");
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
@@ -126,7 +126,7 @@ internal static class EpwingNazekaDBManager
     {
         Dictionary<string, IList<IDictRecord>> results = new();
 
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly"));
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -155,7 +155,7 @@ internal static class EpwingNazekaDBManager
 
         for (int i = 0; i < terms.Count; i++)
         {
-            _ = command.Parameters.AddWithValue($"@{i + 1}", terms[i]);
+            _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
         }
 
         using SqliteDataReader dataReader = command.ExecuteReader();
@@ -196,7 +196,7 @@ internal static class EpwingNazekaDBManager
     {
         List<IDictRecord> results = new();
 
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly"));
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -224,7 +224,7 @@ internal static class EpwingNazekaDBManager
 
     public static void LoadFromDB(Dict dict)
     {
-        using SqliteConnection connection = new(string.Create(CultureInfo.InvariantCulture, $"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadOnly"));
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadOnly");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 

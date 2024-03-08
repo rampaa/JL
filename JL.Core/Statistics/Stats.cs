@@ -174,7 +174,7 @@ public sealed class Stats
         }
         catch (Exception ex)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't write {ProfileUtils.CurrentProfile} Stats"));
+            Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't write {ProfileUtils.CurrentProfile} Stats");
             Utils.Logger.Error(ex, "Couldn't write {CurrentProfile} Stats", ProfileUtils.CurrentProfile);
         }
     }

@@ -54,16 +54,16 @@ public static class ProfileUtils
     {
         return profileName is "Default"
             ? DefaultProfilePath
-            : Path.Join(ProfileFolderPath, string.Create(CultureInfo.InvariantCulture, $"{profileName}.config"));
+            : Path.Join(ProfileFolderPath, $"{profileName}.config");
     }
 
     public static string GetProfileCustomNameDictPath(string profileName)
     {
-        return Path.Join(ProfileFolderPath, string.Create(CultureInfo.InvariantCulture, $"{profileName}_Custom_Names.txt"));
+        return Path.Join(ProfileFolderPath, $"{profileName}_Custom_Names.txt");
     }
 
     public static string GetProfileCustomWordDictPath(string profileName)
     {
-        return Path.Join(ProfileFolderPath, string.Create(CultureInfo.InvariantCulture, $"{profileName}_Custom_Words.txt"));
+        return Path.Join(ProfileFolderPath, $"{profileName}_Custom_Words.txt");
     }
 }

@@ -838,7 +838,7 @@ public static class DictUtils
 
                             catch (Exception ex)
                             {
-                                Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't import {dict.Name}"));
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
@@ -921,7 +921,7 @@ public static class DictUtils
 
                             catch (Exception ex)
                             {
-                                Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't import {dict.Name}"));
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
@@ -1094,7 +1094,7 @@ public static class DictUtils
 
                             catch (Exception ex)
                             {
-                                Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't import {dict.Name}"));
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
                                 dictRemoved = true;
@@ -1177,7 +1177,7 @@ public static class DictUtils
 
                             catch (Exception ex)
                             {
-                                Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Couldn't import {dict.Name}"));
+                                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't import {dict.Name}");
                                 Utils.Logger.Error(ex, "Couldn't import {DictType}", dict.Type);
                                 _ = Dicts.Remove(dict.Name);
                                 _ = SingleDictTypeDicts.Remove(DictType.PitchAccentYomichan);

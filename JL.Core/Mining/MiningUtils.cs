@@ -83,7 +83,7 @@ public static class MiningUtils
             [JLField.DeconjugatedMatchedText] = lookupResult.DeconjugatedMatchedText,
             [JLField.PrimarySpelling] = lookupResult.PrimarySpelling,
             [JLField.PrimarySpellingWithOrthographyInfo] = lookupResult.PrimarySpellingOrthographyInfoList is not null
-                ? string.Create(CultureInfo.InvariantCulture, $"{lookupResult.PrimarySpelling} ({string.Join(", ", lookupResult.PrimarySpellingOrthographyInfoList)})")
+                ? $"{lookupResult.PrimarySpelling} ({string.Join(", ", lookupResult.PrimarySpellingOrthographyInfoList)})"
                 : lookupResult.PrimarySpelling
         };
 
@@ -210,7 +210,7 @@ public static class MiningUtils
                 List<KeyValuePair<string, byte>>? pitchAccents = GetPitchAccents(lookupResult.PitchAccentDict ?? pitchDict.Contents, lookupResult);
                 if (pitchAccents is not null)
                 {
-                    StringBuilder expressionsWithPitchAccentBuilder = new(string.Create(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n"));
+                    StringBuilder expressionsWithPitchAccentBuilder = new($"{PitchAccentStyle}\n\n");
 
                     StringBuilder numericPitchAccentBuilder = new();
                     for (int i = 0; i < pitchAccents.Count; i++)
@@ -372,7 +372,7 @@ public static class MiningUtils
 
         Stats.IncrementStat(StatType.CardsMined);
 
-        Utils.Frontend.Alert(AlertLevel.Success, string.Create(CultureInfo.InvariantCulture, $"Mined {lookupResult.PrimarySpelling}"));
+        Utils.Frontend.Alert(AlertLevel.Success, $"Mined {lookupResult.PrimarySpelling}");
         Utils.Logger.Information("Mined {FoundSpelling}", lookupResult.PrimarySpelling);
     }
 
@@ -441,7 +441,7 @@ public static class MiningUtils
             : new Dictionary<string, object>(4)
             {
                 { "data", audioData },
-                { "filename", string.Create(CultureInfo.InvariantCulture, $"JL_audio_{reading}_{lookupResult.PrimarySpelling}.{audioResponse!.AudioFormat}") },
+                { "filename", $"JL_audio_{reading}_{lookupResult.PrimarySpelling}.{audioResponse!.AudioFormat}" },
                 { "skipHash", Networking.Jpod101NoAudioMd5Hash },
                 { "fields", audioFields }
             };
@@ -457,7 +457,7 @@ public static class MiningUtils
             : new Dictionary<string, object>(3)
             {
                 { "data", imageBytes },
-                { "filename", string.Create(CultureInfo.InvariantCulture, $"JL_image_{reading}_{lookupResult.PrimarySpelling}.png") },
+                { "filename", $"JL_image_{reading}_{lookupResult.PrimarySpelling}.png" },
                 { "fields", imageFields }
             };
 
@@ -475,20 +475,20 @@ public static class MiningUtils
 
         if (response is null)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Mining failed for {lookupResult.PrimarySpelling}"));
+            Utils.Frontend.Alert(AlertLevel.Error, $"Mining failed for {lookupResult.PrimarySpelling}");
             Utils.Logger.Error("Mining failed for {FoundSpelling}", lookupResult.PrimarySpelling);
             return;
         }
 
         if (needsAudio && (audioData is null || Utils.GetMd5String(audioData) is Networking.Jpod101NoAudioMd5Hash))
         {
-            Utils.Frontend.Alert(AlertLevel.Warning, string.Create(CultureInfo.InvariantCulture, $"Mined {lookupResult.PrimarySpelling} (no audio)"));
+            Utils.Frontend.Alert(AlertLevel.Warning, $"Mined {lookupResult.PrimarySpelling} (no audio)");
             Utils.Logger.Information("Mined {FoundSpelling} (no audio)", lookupResult.PrimarySpelling);
         }
 
         else
         {
-            Utils.Frontend.Alert(AlertLevel.Success, string.Create(CultureInfo.InvariantCulture, $"Mined {lookupResult.PrimarySpelling}"));
+            Utils.Frontend.Alert(AlertLevel.Success, $"Mined {lookupResult.PrimarySpelling}");
             Utils.Logger.Information("Mined {FoundSpelling}", lookupResult.PrimarySpelling);
         }
 
