@@ -47,7 +47,7 @@ internal sealed partial class AddFrequencyWindow : Window
 
         if (string.IsNullOrWhiteSpace(path)
             || (!Directory.Exists(fullPath) && !File.Exists(fullPath))
-            || FreqUtils.FreqDicts.Values.Select(static freq => freq.Path).Contains(path))
+            || FreqUtils.FreqDicts.Values.Any(freq => freq.Path == path))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
             isValid = false;
@@ -58,7 +58,7 @@ internal sealed partial class AddFrequencyWindow : Window
         }
 
         string name = NameTextBox.Text;
-        if (string.IsNullOrEmpty(name) || FreqUtils.FreqDicts.Values.Select(static freq => freq.Name).Contains(name))
+        if (string.IsNullOrEmpty(name) || FreqUtils.FreqDicts.ContainsKey(name))
         {
             NameTextBox.BorderBrush = Brushes.Red;
             isValid = false;

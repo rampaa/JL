@@ -49,7 +49,7 @@ internal sealed partial class AddDictionaryWindow : Window
 
         if (string.IsNullOrWhiteSpace(path)
             || (!Directory.Exists(fullPath) && !File.Exists(fullPath))
-            || DictUtils.Dicts.Values.Select(static dict => dict.Path).Contains(path))
+            || DictUtils.Dicts.Values.Any(dict => dict.Path == path))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
             isValid = false;
@@ -60,7 +60,7 @@ internal sealed partial class AddDictionaryWindow : Window
         }
 
         string name = NameTextBox.Text;
-        if (string.IsNullOrEmpty(name) || DictUtils.Dicts.Values.Select(static dict => dict.Name).Contains(name))
+        if (string.IsNullOrEmpty(name) || DictUtils.Dicts.ContainsKey(name))
         {
             NameTextBox.BorderBrush = Brushes.Red;
             isValid = false;
