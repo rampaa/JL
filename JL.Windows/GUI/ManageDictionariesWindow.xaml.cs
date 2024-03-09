@@ -168,10 +168,6 @@ internal sealed partial class ManageDictionariesWindow : Window
                 Background = Brushes.DodgerBlue,
                 BorderThickness = new Thickness(1),
                 Margin = new Thickness(0, 0, 5, 0),
-                // Visibility = DictUtils.BuiltInDicts.Values
-                //     .Select(t => t.Type).ToList().Contains(dict.Type)
-                //     ? Visibility.Collapsed
-                //     : Visibility.Visible,
                 Tag = dict
             };
             editButton.Click += EditButton_Click;
@@ -205,8 +201,7 @@ internal sealed partial class ManageDictionariesWindow : Window
                 Foreground = Brushes.White,
                 Background = Brushes.Red,
                 BorderThickness = new Thickness(1),
-                Visibility = DictUtils.BuiltInDicts.Values
-                    .Select(static d => d.Type).Contains(dict.Type)
+                Visibility = DictUtils.BuiltInDicts.Values.Any(d => d.Type == dict.Type)
                     ? Visibility.Collapsed
                     : Visibility.Visible,
                 Tag = dict

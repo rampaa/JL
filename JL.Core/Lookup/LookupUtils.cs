@@ -516,7 +516,7 @@ public static class LookupUtils
                     {
                         JmdictRecord dictResult = (JmdictRecord)dictResults[i];
 
-                        if (lastTag is null || dictResult.WordClasses.SelectMany(static pos => pos).Contains(lastTag))
+                        if (lastTag is null || dictResult.WordClasses.Any(wordClasses => wordClasses.Contains(lastTag)))
                         {
                             resultsList.Add(dictResult);
                         }
