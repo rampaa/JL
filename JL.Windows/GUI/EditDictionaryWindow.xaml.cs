@@ -135,7 +135,9 @@ internal sealed partial class EditDictionaryWindow : Window
                     File.Move(dbPath, DBUtils.GetDictDBPath(name));
                 }
 
+                _ = DictUtils.Dicts.Remove(_dict.Name);
                 _dict.Name = name;
+                DictUtils.Dicts.Add(name, _dict);
             }
 
             _dict.Options = options;

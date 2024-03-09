@@ -53,7 +53,7 @@ internal sealed partial class EditFrequencyWindow : Window
 
         string name = NameTextBox.Text;
         if (string.IsNullOrEmpty(name)
-            || (_freq.Name != name && FreqUtils.FreqDicts.Values.Any(dict => dict.Name == name)))
+            || (_freq.Name != name && FreqUtils.FreqDicts.ContainsKey(name)))
         {
             NameTextBox.BorderBrush = Brushes.Red;
             isValid = false;
@@ -106,7 +106,9 @@ internal sealed partial class EditFrequencyWindow : Window
                     File.Move(dbPath, DBUtils.GetFreqDBPath(name));
                 }
 
+                _ = FreqUtils.FreqDicts.Remove(_freq.Name);
                 _freq.Name = name;
+                FreqUtils.FreqDicts.Add(name, _freq);
             }
 
             _freq.Options = options;
