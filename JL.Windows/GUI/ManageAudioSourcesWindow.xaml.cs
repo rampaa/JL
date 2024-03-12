@@ -126,8 +126,6 @@ internal sealed partial class ManageAudioSourcesWindow : Window
                 Margin = new Thickness(10),
                 Cursor = Cursors.Hand
             };
-            audioSourceUriTextBlock.MouseEnter += AudioSourceUriTextBlock_MouseEnter;
-            audioSourceUriTextBlock.MouseLeave += AudioSourceUriTextBlock_MouseLeave;
 
             Button editButton = new()
             {
@@ -171,16 +169,6 @@ internal sealed partial class ManageAudioSourcesWindow : Window
 
         AudioSourceListBox.ItemsSource = resultDockPanels
             .OrderBy(static dockPanel => ((AudioSource)((CheckBox)dockPanel.Children[0]).Tag).Priority);
-    }
-
-    private static void AudioSourceUriTextBlock_MouseEnter(object sender, MouseEventArgs e)
-    {
-        ((TextBlock)sender).TextDecorations = TextDecorations.Underline;
-    }
-
-    private static void AudioSourceUriTextBlock_MouseLeave(object sender, MouseEventArgs e)
-    {
-        ((TextBlock)sender).TextDecorations = null;
     }
 
     private static void CheckBox_Checked(object sender, RoutedEventArgs e)
