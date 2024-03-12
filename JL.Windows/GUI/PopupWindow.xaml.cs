@@ -498,7 +498,7 @@ internal sealed partial class PopupWindow : Window
             ConfigManager.PrimarySpellingFontSize,
             PopupContextMenu,
             VerticalAlignment.Center,
-            new Thickness(5, 0, 0, 0));
+            new Thickness(2, 0, 0, 0));
 
         primarySpellingTextBlock.PreviewMouseUp += PrimarySpelling_PreviewMouseUp; // for mining
 
@@ -536,7 +536,7 @@ internal sealed partial class PopupWindow : Window
                 pOrthographyInfoFontSize,
                 PopupContextMenu,
                 VerticalAlignment.Center,
-                new Thickness(5, 0, 0, 0));
+                new Thickness(3, 0, 0, 0));
 
             _ = top.Children.Add(textBlockPOrthographyInfo);
         }
@@ -594,7 +594,7 @@ internal sealed partial class PopupWindow : Window
                     ConfigManager.ReadingsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(5, 0, 0, 0));
+                    new Thickness(7, 0, 0, 0));
 
                 if (pitchDictIsActive)
                 {
@@ -633,7 +633,7 @@ internal sealed partial class PopupWindow : Window
                 Content = "🔊",
                 Foreground = ConfigManager.DefinitionsColor,
                 VerticalAlignment = VerticalAlignment.Top,
-                Margin = new Thickness(5, 0, 0, 0),
+                Margin = new Thickness(3, 0, 0, 0),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 Background = Brushes.Transparent,
                 Cursor = Cursors.Arrow,
@@ -675,7 +675,7 @@ internal sealed partial class PopupWindow : Window
                     ConfigManager.AlternativeSpellingsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(5, 0, 0, 0));
+                    new Thickness(7, 0, 0, 0));
 
                 _ = top.Children.Add(alternativeSpellingsTexBlock);
             }
@@ -705,7 +705,7 @@ internal sealed partial class PopupWindow : Window
                     ConfigManager.DeconjugationInfoFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Top,
-                    new Thickness(5, 0, 0, 0));
+                    new Thickness(7, 0, 0, 0));
 
                 _ = top.Children.Add(deconjugationProcessTextBlock);
             }
@@ -722,7 +722,7 @@ internal sealed partial class PopupWindow : Window
                     ConfigManager.FrequencyFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Top,
-                    new Thickness(5, 0, 0, 0));
+                    new Thickness(7, 0, 0, 0));
 
                 _ = top.Children.Add(frequencyTextBlock);
             }
@@ -734,7 +734,7 @@ internal sealed partial class PopupWindow : Window
             ConfigManager.DictTypeFontSize,
             PopupContextMenu,
             VerticalAlignment.Top,
-            new Thickness(5, 0, 0, 0));
+            new Thickness(7, 0, 0, 0));
 
         _ = top.Children.Add(dictTypeTextBlock);
 
@@ -751,7 +751,7 @@ internal sealed partial class PopupWindow : Window
                     ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(2));
+                    new Thickness(0, 2, 2, 2));
 
                 AddEventHandlersToTextBox(definitionsTextBox);
 
@@ -779,11 +779,11 @@ internal sealed partial class PopupWindow : Window
             {
                 TouchScreenTextBox onReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.OnReadings),
                     $"On: {string.Join(", ", result.OnReadings)}",
-                    ConfigManager.ReadingsColor,
-                    ConfigManager.ReadingsFontSize,
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(2));
+                    new Thickness(0, 2, 2, 2));
 
                 AddEventHandlersToTextBox(onReadingsTextBox);
 
@@ -794,8 +794,8 @@ internal sealed partial class PopupWindow : Window
             {
                 TextBlock onReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.OnReadings),
                     $"On: {string.Join(", ", result.OnReadings)}",
-                    ConfigManager.ReadingsColor,
-                    ConfigManager.ReadingsFontSize,
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
@@ -810,11 +810,11 @@ internal sealed partial class PopupWindow : Window
             {
                 TouchScreenTextBox kunReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.KunReadings),
                     $"Kun: {string.Join(", ", result.KunReadings)}",
-                    ConfigManager.ReadingsColor,
-                    ConfigManager.ReadingsFontSize,
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(2));
+                    new Thickness(0, 2, 2, 2));
 
                 AddEventHandlersToTextBox(kunReadingsTextBox);
 
@@ -825,8 +825,8 @@ internal sealed partial class PopupWindow : Window
             {
                 TextBlock kunReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KunReadings),
                     $"Kun: {string.Join(", ", result.KunReadings)}",
-                    ConfigManager.ReadingsColor,
-                    ConfigManager.ReadingsFontSize,
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
@@ -841,11 +841,11 @@ internal sealed partial class PopupWindow : Window
             {
                 TouchScreenTextBox nanoriReadingsTextBox = PopupWindowUtils.CreateTextBox(nameof(result.NanoriReadings),
                     $"Nanori: {string.Join(", ", result.NanoriReadings)}",
-                    ConfigManager.ReadingsColor,
-                    ConfigManager.ReadingsFontSize,
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(2));
+                    new Thickness(0, 2, 2, 2));
 
                 AddEventHandlersToTextBox(nanoriReadingsTextBox);
 
@@ -856,8 +856,8 @@ internal sealed partial class PopupWindow : Window
             {
                 TextBlock nanoriReadingsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.NanoriReadings),
                     $"Nanori: {string.Join(", ", result.NanoriReadings)}",
-                    ConfigManager.ReadingsColor,
-                    ConfigManager.ReadingsFontSize,
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
@@ -872,11 +872,11 @@ internal sealed partial class PopupWindow : Window
             {
                 TouchScreenTextBox radicalNameTextBox = PopupWindowUtils.CreateTextBox(nameof(result.RadicalNames),
                     $"Radical names: {string.Join(", ", result.RadicalNames)}",
-                    ConfigManager.ReadingsColor,
-                    ConfigManager.ReadingsFontSize,
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(2));
+                    new Thickness(0, 2, 2, 2));
 
                 AddEventHandlersToTextBox(radicalNameTextBox);
 
@@ -887,8 +887,8 @@ internal sealed partial class PopupWindow : Window
             {
                 TextBlock radicalNameTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.RadicalNames),
                     $"Radical names: {string.Join(", ", result.RadicalNames)}",
-                    ConfigManager.ReadingsColor,
-                    ConfigManager.ReadingsFontSize,
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
                     new Thickness(2));
@@ -933,7 +933,7 @@ internal sealed partial class PopupWindow : Window
                     ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(2));
+                    new Thickness(0, 2, 2, 2));
 
                 AddEventHandlersToTextBox(compositionTextBox);
 
@@ -981,7 +981,7 @@ internal sealed partial class PopupWindow : Window
         StackPanel stackPanel = new()
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
-            Margin = new Thickness(4, 2, 4, 2),
+            Margin = new Thickness(2),
             Background = Brushes.Transparent,
             Tag = result.Dict,
             Children = { top, bottom }
