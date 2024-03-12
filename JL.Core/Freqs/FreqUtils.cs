@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using JL.Core.Freqs.FrequencyNazeka;
@@ -76,6 +75,11 @@ public static class FreqUtils
 
             bool loadFromDB;
             freq.Ready = false;
+
+            if (useDB)
+            {
+                _ = DBUtils.s_freqDBPaths.TryAdd(freq.Name, dbPath);
+            }
 
             switch (freq.Type)
             {

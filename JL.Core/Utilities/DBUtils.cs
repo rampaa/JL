@@ -10,6 +10,9 @@ public static class DBUtils
 {
     private static readonly Timer s_optimizePragmaTimer = new();
 
+    internal static readonly Dictionary<string, string> s_dictDBPaths = new();
+    internal static readonly Dictionary<string, string> s_freqDBPaths = new();
+
     internal static readonly string s_freqDBFolderPath = Path.Join(Utils.ResourcesPath, "Frequency Databases");
     internal static readonly string s_dictDBFolderPath = Path.Join(Utils.ResourcesPath, "Dictionary Databases");
 
@@ -53,12 +56,16 @@ public static class DBUtils
 
     public static string GetDictDBPath(string dbName)
     {
-        return $"{Path.Join(s_dictDBFolderPath, dbName)}.sqlite";
+        return s_dictDBPaths.TryGetValue(dbName, out string? dbPath)
+            ? dbPath
+            : $"{Path.Join(s_dictDBFolderPath, dbName)}.sqlite";
     }
 
     public static string GetFreqDBPath(string dbName)
     {
-        return $"{Path.Join(s_freqDBFolderPath, dbName)}.sqlite";
+        return s_freqDBPaths.TryGetValue(dbName, out string? dbPath)
+            ? dbPath
+            : $"{Path.Join(s_freqDBFolderPath, dbName)}.sqlite";
     }
 
     internal static void StartOptimizePragmaTimer()

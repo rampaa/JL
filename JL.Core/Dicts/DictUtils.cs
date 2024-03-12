@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using JL.Core.Dicts.CustomNameDict;
@@ -524,6 +523,11 @@ public static class DictUtils
 
             bool loadFromDB;
             dict.Ready = false;
+
+            if (useDB)
+            {
+                _ = DBUtils.s_dictDBPaths.TryAdd(dict.Name, dbPath);
+            }
 
             switch (dict.Type)
             {
