@@ -139,4 +139,13 @@ public static class DBUtils
         }
         return false;
     }
+
+    //public static string GetSqliteVersion()
+    //{
+    //    using SqliteConnection connection = new();
+    //    connection.Open();
+    //    using SqliteCommand command = connection.CreateCommand();
+    //    command.CommandText = "SELECT SQLITE_VERSION();";
+    //    return (string)command.ExecuteScalar()!;
+    //}
 }
