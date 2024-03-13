@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace JL.Core.Dicts.CustomNameDict;
 
 internal sealed record class CustomNameRecord : IDictRecord
