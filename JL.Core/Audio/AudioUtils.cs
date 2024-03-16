@@ -146,7 +146,6 @@ public static class AudioUtils
                             ? await GetAudioFromUrl(normalizedUri).ConfigureAwait(false)
                             : await GetAudioFromJsonReturningUrl(normalizedUri).ConfigureAwait(false);
                     }
-
                     break;
 
                     case AudioSourceType.LocalPath:
