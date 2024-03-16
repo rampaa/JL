@@ -521,8 +521,9 @@ public static class LookupUtils
                         resultsList.Add(dictResult);
                     }
                 }
+
+                break;
             }
-            break;
 
             case DictType.CustomWordDictionary:
             case DictType.ProfileCustomWordDictionary:
@@ -537,8 +538,9 @@ public static class LookupUtils
                         resultsList.Add(dictResult);
                     }
                 }
+
+                break;
             }
-            break;
 
             case DictType.Daijirin:
             case DictType.Daijisen:
@@ -595,8 +597,9 @@ public static class LookupUtils
                         }
                     }
                 }
+
+                break;
             }
-            break;
 
             case DictType.DaijirinNazeka:
             case DictType.KenkyuushaNazeka:
@@ -636,8 +639,9 @@ public static class LookupUtils
                         }
                     }
                 }
+
+                break;
             }
-            break;
 
             case DictType.PitchAccentYomichan:
             case DictType.JMnedict:

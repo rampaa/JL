@@ -145,8 +145,9 @@ public static class AudioUtils
                         audioResponse = audioSource.Type is AudioSourceType.Url
                             ? await GetAudioFromUrl(normalizedUri).ConfigureAwait(false)
                             : await GetAudioFromJsonReturningUrl(normalizedUri).ConfigureAwait(false);
+
+                        break;
                     }
-                    break;
 
                     case AudioSourceType.LocalPath:
                     {
@@ -156,8 +157,9 @@ public static class AudioUtils
 
                         Uri normalizedUri = new(stringBuilder.ToString());
                         audioResponse = await GetAudioFromPath(normalizedUri).ConfigureAwait(false);
+
+                        break;
                     }
-                    break;
 
                     case AudioSourceType.TextToSpeech:
                         await Utils.Frontend.TextToSpeech(uri, reading, CoreConfig.AudioVolume).ConfigureAwait(false);

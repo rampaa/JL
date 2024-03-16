@@ -46,8 +46,9 @@ public sealed class Stats
                     ProfileLifetimeStats.Characters -= unsignedAmount;
                     LifetimeStats.Characters -= unsignedAmount;
                 }
+
+                break;
             }
-            break;
 
             case StatType.Lines:
             {
@@ -68,16 +69,18 @@ public sealed class Stats
                     ProfileLifetimeStats.Lines -= unsignedAmount;
                     LifetimeStats.Lines -= unsignedAmount;
                 }
+
+                break;
             }
-            break;
 
             case StatType.Time:
             {
                 SessionStats.Time = SessionStats.Time.Add(TimeSpan.FromTicks(amount));
                 ProfileLifetimeStats.Time = ProfileLifetimeStats.Time.Add(TimeSpan.FromTicks(amount));
                 LifetimeStats.Time = LifetimeStats.Time.Add(TimeSpan.FromTicks(amount));
+
+                break;
             }
-            break;
 
             case StatType.CardsMined:
             {
@@ -85,8 +88,9 @@ public sealed class Stats
                 SessionStats.CardsMined += unsignedAmount;
                 ProfileLifetimeStats.CardsMined += unsignedAmount;
                 LifetimeStats.CardsMined += unsignedAmount;
+
+                break;
             }
-            break;
 
             case StatType.TimesPlayedAudio:
             {
@@ -94,8 +98,9 @@ public sealed class Stats
                 SessionStats.TimesPlayedAudio += unsignedAmount;
                 ProfileLifetimeStats.TimesPlayedAudio += unsignedAmount;
                 LifetimeStats.TimesPlayedAudio += unsignedAmount;
+
+                break;
             }
-            break;
 
             case StatType.Imoutos:
             {
@@ -103,8 +108,9 @@ public sealed class Stats
                 SessionStats.Imoutos += unsignedAmount;
                 ProfileLifetimeStats.Imoutos += unsignedAmount;
                 LifetimeStats.Imoutos += unsignedAmount;
+
+                break;
             }
-            break;
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
