@@ -84,7 +84,7 @@ dotnet_diagnostic.CA1062.severity = none
 dotnet_diagnostic.CA1819.severity = none
 
 # IDE0305: Use collection expression for fluent
-dotnet_diagnostic.IDE0305.severity = silent
+dotnet_diagnostic.IDE0305.severity = none
 
 ##########################################
 # Language Rules
@@ -126,7 +126,7 @@ dotnet_style_explicit_tuple_names = true:warning
 dotnet_style_prefer_inferred_tuple_names = true:warning
 dotnet_style_prefer_inferred_anonymous_type_member_names = true:warning
 dotnet_style_prefer_auto_properties = true:warning
-dotnet_style_prefer_conditional_expression_over_assignment = true:silent
+dotnet_style_prefer_conditional_expression_over_assignment = true:none
 dotnet_style_prefer_conditional_expression_over_return = true:warning
 dotnet_style_prefer_compound_assignment = true:warning
 dotnet_style_prefer_simplified_interpolation = true:warning
@@ -188,7 +188,7 @@ csharp_prefer_braces = true:warning
 csharp_prefer_simple_using_statement = true:suggestion
 csharp_style_prefer_method_group_conversion = true:warning
 csharp_style_prefer_top_level_statements = false:warning
-csharp_style_prefer_primary_constructors = true:silent
+csharp_style_prefer_primary_constructors = true:none
 
 # 'using' directive preferences
 csharp_using_directive_placement = outside_namespace:warning
