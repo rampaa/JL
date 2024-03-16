@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!--Do not update HandyControl to 3.5.0, see: https://github.com/HandyOrg/HandyControl/issues/1524-->
+    <!--Do not update HandyControl to 3.5.0 or 3.5.1, see: https://github.com/HandyOrg/HandyControl/issues/1524-->
     <PackageReference Include="HandyControl" Version="3.4.0" />
     <PackageReference Include="HandyControl.Lang.en" Version="3.4.0" />
 
