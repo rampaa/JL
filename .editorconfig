@@ -185,7 +185,7 @@ csharp_prefer_braces = true:warning
 csharp_prefer_simple_using_statement = true:suggestion
 csharp_style_prefer_method_group_conversion = true:warning
 csharp_style_prefer_top_level_statements = false:warning
-# csharp_style_prefer_primary_constructors = true:warning TBD
+csharp_style_prefer_primary_constructors = true:silent
 
 # 'using' directive preferences
 csharp_using_directive_placement = outside_namespace:warning

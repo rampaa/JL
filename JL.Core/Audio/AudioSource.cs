@@ -1,15 +1,8 @@
 namespace JL.Core.Audio;
 
-public sealed class AudioSource
+public sealed class AudioSource(AudioSourceType type, bool active, int priority)
 {
-    public AudioSourceType Type { get; }
-    public bool Active { get; set; }
-    public int Priority { get; set; }
-
-    public AudioSource(AudioSourceType type, bool active, int priority)
-    {
-        Type = type;
-        Active = active;
-        Priority = priority;
-    }
+    public AudioSourceType Type { get; } = type;
+    public bool Active { get; set; } = active;
+    public int Priority { get; set; } = priority;
 }
