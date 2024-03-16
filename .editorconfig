@@ -83,6 +83,9 @@ dotnet_diagnostic.CA1062.severity = none
 # CA1819: Properties should not return arrays
 dotnet_diagnostic.CA1819.severity = none
 
+# IDE0305: Use collection expression for fluent
+dotnet_diagnostic.IDE0305.severity = silent
+
 ##########################################
 # Language Rules
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/language-rules
@@ -118,7 +121,7 @@ dotnet_style_parentheses_in_other_operators = never_if_unnecessary:warning
 # Expression-level preferences
 dotnet_style_object_initializer = true:warning
 dotnet_style_collection_initializer = true:warning
-# dotnet_style_prefer_collection_expression = when_types_loosely_match:warning TBD
+dotnet_style_prefer_collection_expression = when_types_loosely_match
 dotnet_style_explicit_tuple_names = true:warning
 dotnet_style_prefer_inferred_tuple_names = true:warning
 dotnet_style_prefer_inferred_anonymous_type_member_names = true:warning
