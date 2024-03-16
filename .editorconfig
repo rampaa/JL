@@ -248,7 +248,7 @@ csharp_indent_switch_labels = true
 csharp_indent_labels = one_less_than_current
 csharp_indent_block_contents = true
 csharp_indent_braces = false
-csharp_indent_case_contents_when_block = true
+csharp_indent_case_contents_when_block = false
 
 # Spacing options
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/formatting-rules#spacing-options

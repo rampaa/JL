@@ -135,30 +135,30 @@ public static class AudioUtils
                 {
                     case AudioSourceType.Url:
                     case AudioSourceType.UrlJson:
-                        {
-                            StringBuilder stringBuilder = new StringBuilder(uri)
-                                .Replace("://localhost", "://127.0.0.1")
-                                .Replace("{Term}", spelling)
-                                .Replace("{Reading}", reading);
+                    {
+                        StringBuilder stringBuilder = new StringBuilder(uri)
+                            .Replace("://localhost", "://127.0.0.1")
+                            .Replace("{Term}", spelling)
+                            .Replace("{Reading}", reading);
 
-                            Uri normalizedUri = new(stringBuilder.ToString());
-                            audioResponse = audioSource.Type is AudioSourceType.Url
-                                ? await GetAudioFromUrl(normalizedUri).ConfigureAwait(false)
-                                : await GetAudioFromJsonReturningUrl(normalizedUri).ConfigureAwait(false);
-                        }
+                        Uri normalizedUri = new(stringBuilder.ToString());
+                        audioResponse = audioSource.Type is AudioSourceType.Url
+                            ? await GetAudioFromUrl(normalizedUri).ConfigureAwait(false)
+                            : await GetAudioFromJsonReturningUrl(normalizedUri).ConfigureAwait(false);
+                    }
 
-                        break;
+                    break;
 
                     case AudioSourceType.LocalPath:
-                        {
-                            StringBuilder stringBuilder = new StringBuilder(uri)
-                                .Replace("{Term}", spelling)
-                                .Replace("{Reading}", reading);
+                    {
+                        StringBuilder stringBuilder = new StringBuilder(uri)
+                            .Replace("{Term}", spelling)
+                            .Replace("{Reading}", reading);
 
-                            Uri normalizedUri = new(stringBuilder.ToString());
-                            audioResponse = await GetAudioFromPath(normalizedUri).ConfigureAwait(false);
-                        }
-                        break;
+                        Uri normalizedUri = new(stringBuilder.ToString());
+                        audioResponse = await GetAudioFromPath(normalizedUri).ConfigureAwait(false);
+                    }
+                    break;
 
                     case AudioSourceType.TextToSpeech:
                         await Utils.Frontend.TextToSpeech(uri, reading, CoreConfig.AudioVolume).ConfigureAwait(false);

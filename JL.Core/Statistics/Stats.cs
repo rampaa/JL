@@ -28,83 +28,83 @@ public sealed class Stats
         switch (type)
         {
             case StatType.Characters:
-                {
-                    bool positive = amount >= 0;
-                    ulong unsignedAmount = positive
-                        ? (ulong)amount
-                        : (ulong)-amount;
+            {
+                bool positive = amount >= 0;
+                ulong unsignedAmount = positive
+                    ? (ulong)amount
+                    : (ulong)-amount;
 
-                    if (positive)
-                    {
-                        SessionStats.Characters += unsignedAmount;
-                        ProfileLifetimeStats.Characters += unsignedAmount;
-                        LifetimeStats.Characters += unsignedAmount;
-                    }
-                    else
-                    {
-                        SessionStats.Characters -= unsignedAmount;
-                        ProfileLifetimeStats.Characters -= unsignedAmount;
-                        LifetimeStats.Characters -= unsignedAmount;
-                    }
+                if (positive)
+                {
+                    SessionStats.Characters += unsignedAmount;
+                    ProfileLifetimeStats.Characters += unsignedAmount;
+                    LifetimeStats.Characters += unsignedAmount;
                 }
-                break;
+                else
+                {
+                    SessionStats.Characters -= unsignedAmount;
+                    ProfileLifetimeStats.Characters -= unsignedAmount;
+                    LifetimeStats.Characters -= unsignedAmount;
+                }
+            }
+            break;
 
             case StatType.Lines:
-                {
-                    bool positive = amount >= 0;
-                    ulong unsignedAmount = positive
-                        ? (ulong)amount
-                        : (ulong)-amount;
+            {
+                bool positive = amount >= 0;
+                ulong unsignedAmount = positive
+                    ? (ulong)amount
+                    : (ulong)-amount;
 
-                    if (positive)
-                    {
-                        SessionStats.Lines += unsignedAmount;
-                        ProfileLifetimeStats.Lines += unsignedAmount;
-                        LifetimeStats.Lines += unsignedAmount;
-                    }
-                    else
-                    {
-                        SessionStats.Lines -= unsignedAmount;
-                        ProfileLifetimeStats.Lines -= unsignedAmount;
-                        LifetimeStats.Lines -= unsignedAmount;
-                    }
+                if (positive)
+                {
+                    SessionStats.Lines += unsignedAmount;
+                    ProfileLifetimeStats.Lines += unsignedAmount;
+                    LifetimeStats.Lines += unsignedAmount;
                 }
-                break;
+                else
+                {
+                    SessionStats.Lines -= unsignedAmount;
+                    ProfileLifetimeStats.Lines -= unsignedAmount;
+                    LifetimeStats.Lines -= unsignedAmount;
+                }
+            }
+            break;
 
             case StatType.Time:
-                {
-                    SessionStats.Time = SessionStats.Time.Add(TimeSpan.FromTicks(amount));
-                    ProfileLifetimeStats.Time = ProfileLifetimeStats.Time.Add(TimeSpan.FromTicks(amount));
-                    LifetimeStats.Time = LifetimeStats.Time.Add(TimeSpan.FromTicks(amount));
-                }
-                break;
+            {
+                SessionStats.Time = SessionStats.Time.Add(TimeSpan.FromTicks(amount));
+                ProfileLifetimeStats.Time = ProfileLifetimeStats.Time.Add(TimeSpan.FromTicks(amount));
+                LifetimeStats.Time = LifetimeStats.Time.Add(TimeSpan.FromTicks(amount));
+            }
+            break;
 
             case StatType.CardsMined:
-                {
-                    ulong unsignedAmount = (ulong)amount;
-                    SessionStats.CardsMined += unsignedAmount;
-                    ProfileLifetimeStats.CardsMined += unsignedAmount;
-                    LifetimeStats.CardsMined += unsignedAmount;
-                }
-                break;
+            {
+                ulong unsignedAmount = (ulong)amount;
+                SessionStats.CardsMined += unsignedAmount;
+                ProfileLifetimeStats.CardsMined += unsignedAmount;
+                LifetimeStats.CardsMined += unsignedAmount;
+            }
+            break;
 
             case StatType.TimesPlayedAudio:
-                {
-                    ulong unsignedAmount = (ulong)amount;
-                    SessionStats.TimesPlayedAudio += unsignedAmount;
-                    ProfileLifetimeStats.TimesPlayedAudio += unsignedAmount;
-                    LifetimeStats.TimesPlayedAudio += unsignedAmount;
-                }
-                break;
+            {
+                ulong unsignedAmount = (ulong)amount;
+                SessionStats.TimesPlayedAudio += unsignedAmount;
+                ProfileLifetimeStats.TimesPlayedAudio += unsignedAmount;
+                LifetimeStats.TimesPlayedAudio += unsignedAmount;
+            }
+            break;
 
             case StatType.Imoutos:
-                {
-                    ulong unsignedAmount = (ulong)amount;
-                    SessionStats.Imoutos += unsignedAmount;
-                    ProfileLifetimeStats.Imoutos += unsignedAmount;
-                    LifetimeStats.Imoutos += unsignedAmount;
-                }
-                break;
+            {
+                ulong unsignedAmount = (ulong)amount;
+                SessionStats.Imoutos += unsignedAmount;
+                ProfileLifetimeStats.Imoutos += unsignedAmount;
+                LifetimeStats.Imoutos += unsignedAmount;
+            }
+            break;
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);

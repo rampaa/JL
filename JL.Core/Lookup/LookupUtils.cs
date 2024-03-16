@@ -510,35 +510,35 @@ public static class LookupUtils
         switch (dict.Type)
         {
             case DictType.JMdict:
+            {
+                int dictResultsCount = dictResults.Count;
+                for (int i = 0; i < dictResultsCount; i++)
                 {
-                    int dictResultsCount = dictResults.Count;
-                    for (int i = 0; i < dictResultsCount; i++)
-                    {
-                        JmdictRecord dictResult = (JmdictRecord)dictResults[i];
+                    JmdictRecord dictResult = (JmdictRecord)dictResults[i];
 
-                        if (lastTag is null || dictResult.WordClasses.Any(wordClasses => wordClasses.Contains(lastTag)))
-                        {
-                            resultsList.Add(dictResult);
-                        }
+                    if (lastTag is null || dictResult.WordClasses.Any(wordClasses => wordClasses.Contains(lastTag)))
+                    {
+                        resultsList.Add(dictResult);
                     }
                 }
-                break;
+            }
+            break;
 
             case DictType.CustomWordDictionary:
             case DictType.ProfileCustomWordDictionary:
+            {
+                int dictResultsCount = dictResults.Count;
+                for (int i = 0; i < dictResultsCount; i++)
                 {
-                    int dictResultsCount = dictResults.Count;
-                    for (int i = 0; i < dictResultsCount; i++)
-                    {
-                        CustomWordRecord dictResult = (CustomWordRecord)dictResults[i];
+                    CustomWordRecord dictResult = (CustomWordRecord)dictResults[i];
 
-                        if (lastTag is null || dictResult.WordClasses.Contains(lastTag))
-                        {
-                            resultsList.Add(dictResult);
-                        }
+                    if (lastTag is null || dictResult.WordClasses.Contains(lastTag))
+                    {
+                        resultsList.Add(dictResult);
                     }
                 }
-                break;
+            }
+            break;
 
             case DictType.Daijirin:
             case DictType.Daijisen:
@@ -564,39 +564,39 @@ public static class LookupUtils
             case DictType.NonspecificKanjiWithWordSchemaYomichan:
             case DictType.NonspecificNameYomichan:
             case DictType.NonspecificYomichan:
+            {
+                int dictResultsCount = dictResults.Count;
+                for (int i = 0; i < dictResultsCount; i++)
                 {
-                    int dictResultsCount = dictResults.Count;
-                    for (int i = 0; i < dictResultsCount; i++)
+                    EpwingYomichanRecord dictResult = (EpwingYomichanRecord)dictResults[i];
+
+                    if (lastTag is null || (dictResult.WordClasses?.Contains(lastTag) ?? false))
                     {
-                        EpwingYomichanRecord dictResult = (EpwingYomichanRecord)dictResults[i];
+                        resultsList.Add(dictResult);
+                    }
 
-                        if (lastTag is null || (dictResult.WordClasses?.Contains(lastTag) ?? false))
+                    else if (DictUtils.WordClassDictionary.TryGetValue(deconjugationResult.Text,
+                                 out IList<JmdictWordClass>? jmdictWcResults))
+                    {
+                        for (int j = 0; j < jmdictWcResults.Count; j++)
                         {
-                            resultsList.Add(dictResult);
-                        }
+                            JmdictWordClass jmdictWordClassResult = jmdictWcResults[j];
 
-                        else if (DictUtils.WordClassDictionary.TryGetValue(deconjugationResult.Text,
-                                     out IList<JmdictWordClass>? jmdictWcResults))
-                        {
-                            for (int j = 0; j < jmdictWcResults.Count; j++)
+                            if (dictResult.PrimarySpelling == jmdictWordClassResult.Spelling
+                                && (jmdictWordClassResult.Readings?.Contains(dictResult.Reading ?? string.Empty)
+                                    ?? string.IsNullOrEmpty(dictResult.Reading)))
                             {
-                                JmdictWordClass jmdictWordClassResult = jmdictWcResults[j];
-
-                                if (dictResult.PrimarySpelling == jmdictWordClassResult.Spelling
-                                    && (jmdictWordClassResult.Readings?.Contains(dictResult.Reading ?? string.Empty)
-                                        ?? string.IsNullOrEmpty(dictResult.Reading)))
+                                if (jmdictWordClassResult.WordClasses.Contains(lastTag))
                                 {
-                                    if (jmdictWordClassResult.WordClasses.Contains(lastTag))
-                                    {
-                                        resultsList.Add(dictResult);
-                                        break;
-                                    }
+                                    resultsList.Add(dictResult);
+                                    break;
                                 }
                             }
                         }
                     }
                 }
-                break;
+            }
+            break;
 
             case DictType.DaijirinNazeka:
             case DictType.KenkyuushaNazeka:
@@ -605,39 +605,39 @@ public static class LookupUtils
             case DictType.NonspecificKanjiNazeka:
             case DictType.NonspecificNameNazeka:
             case DictType.NonspecificNazeka:
+            {
+                int dictResultsCount = dictResults.Count;
+                for (int i = 0; i < dictResultsCount; i++)
                 {
-                    int dictResultsCount = dictResults.Count;
-                    for (int i = 0; i < dictResultsCount; i++)
+                    EpwingNazekaRecord dictResult = (EpwingNazekaRecord)dictResults[i];
+
+                    if (deconjugationResult.Tags.Count is 0)
                     {
-                        EpwingNazekaRecord dictResult = (EpwingNazekaRecord)dictResults[i];
+                        resultsList.Add(dictResult);
+                    }
 
-                        if (deconjugationResult.Tags.Count is 0)
+                    else if (DictUtils.WordClassDictionary.TryGetValue(deconjugationResult.Text,
+                                 out IList<JmdictWordClass>? jmdictWcResults))
+                    {
+                        for (int j = 0; j < jmdictWcResults.Count; j++)
                         {
-                            resultsList.Add(dictResult);
-                        }
+                            JmdictWordClass jmdictWordClassResult = jmdictWcResults[j];
 
-                        else if (DictUtils.WordClassDictionary.TryGetValue(deconjugationResult.Text,
-                                     out IList<JmdictWordClass>? jmdictWcResults))
-                        {
-                            for (int j = 0; j < jmdictWcResults.Count; j++)
+                            if (dictResult.PrimarySpelling == jmdictWordClassResult.Spelling
+                                && (jmdictWordClassResult.Readings?.Contains(dictResult.Reading ?? "")
+                                    ?? string.IsNullOrEmpty(dictResult.Reading)))
                             {
-                                JmdictWordClass jmdictWordClassResult = jmdictWcResults[j];
-
-                                if (dictResult.PrimarySpelling == jmdictWordClassResult.Spelling
-                                    && (jmdictWordClassResult.Readings?.Contains(dictResult.Reading ?? "")
-                                        ?? string.IsNullOrEmpty(dictResult.Reading)))
+                                if (lastTag is not null && jmdictWordClassResult.WordClasses.Contains(lastTag))
                                 {
-                                    if (lastTag is not null && jmdictWordClassResult.WordClasses.Contains(lastTag))
-                                    {
-                                        resultsList.Add(dictResult);
-                                        break;
-                                    }
+                                    resultsList.Add(dictResult);
+                                    break;
                                 }
                             }
                         }
                     }
                 }
-                break;
+            }
+            break;
 
             case DictType.PitchAccentYomichan:
             case DictType.JMnedict:
