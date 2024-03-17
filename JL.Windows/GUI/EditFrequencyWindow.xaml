@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Edit Frequency" Height="400" Width="800" ResizeMode="NoResize" SizeToContent="WidthAndHeight"
-        Topmost="True" Loaded="Window_Loaded" ShowInTaskbar="False" Background="{DynamicResource RegionBrush}"
+        Loaded="Window_Loaded" ShowInTaskbar="False" Background="{DynamicResource RegionBrush}"
         x:ClassModifier="internal">
     <Grid>
         <StackPanel x:Name="FreqStackPanel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,60">

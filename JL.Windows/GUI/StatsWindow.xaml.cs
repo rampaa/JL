@@ -27,7 +27,12 @@ internal sealed partial class StatsWindow : Window
     {
         base.OnSourceInitialized(e);
         _windowHandle = new WindowInteropHelper(this).Handle;
-        WinApi.BringToFront(_windowHandle);
+
+        if (ConfigManager.AlwaysOnTop)
+        {
+            WinApi.BringToFront(_windowHandle);
+            _ = Focus();
+        }
     }
 
     protected override void OnActivated(EventArgs e)

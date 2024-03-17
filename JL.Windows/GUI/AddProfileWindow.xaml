@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         Background="{DynamicResource RegionBrush}"
         Title="Add Profile" Height="Auto" Width="Auto" ResizeMode="NoResize" SizeToContent="WidthAndHeight"
-        Topmost="True" ShowInTaskbar="False" x:ClassModifier="internal" Loaded="Window_Loaded">
+        ShowInTaskbar="False" x:ClassModifier="internal" Loaded="Window_Loaded">
     <Grid>
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,60">
             <TextBlock Text="Profile name" TextWrapping="Wrap" Margin="0,10,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />

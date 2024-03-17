@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Manage Frequencies" Height="700" Width="900" Closed="Window_Closed" ResizeMode="NoResize" Background="{DynamicResource RegionBrush}"
-        SizeToContent="Manual" ScrollViewer.CanContentScroll="True" Topmost="True" ShowInTaskbar="False"
+        SizeToContent="Manual" ScrollViewer.CanContentScroll="True" ShowInTaskbar="False"
         x:ClassModifier="internal">
     <Grid>
         <StackPanel Margin="20,10,20,10">

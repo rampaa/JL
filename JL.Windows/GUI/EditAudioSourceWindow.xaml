@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         Background="{DynamicResource RegionBrush}"
         Title="Edit Audio Source" Height="Auto" Width="480" ResizeMode="NoResize" SizeToContent="Height"
-        Topmost="True" ShowInTaskbar="False" x:ClassModifier="internal">
+        ShowInTaskbar="False" x:ClassModifier="internal">
     <Grid>
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,20,60">
             <TextBlock Text="Audio Source Type" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
