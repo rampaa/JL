@@ -92,7 +92,7 @@ public static class DBUtils
 
     private static void SendOptimizePragma(string dbPath)
     {
-        using SqliteConnection connection = new($"Data Source={dbPath};Mode=ReadOnly");
+        using SqliteConnection connection = new($"Data Source={dbPath};Mode=ReadWrite");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA optimize;";

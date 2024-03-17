@@ -25,7 +25,7 @@ internal sealed partial class ReadingSelectionWindow : Window
         return s_instance?.IsVisible ?? false;
     }
 
-    public static void Show(string primarySpelling, string[] readings)
+    public static void Show(Window owner, string primarySpelling, string[] readings)
     {
         ReadingSelectionWindow currentInstance = s_instance ??= new ReadingSelectionWindow();
         currentInstance._primarySpelling = primarySpelling;
@@ -35,10 +35,9 @@ internal sealed partial class ReadingSelectionWindow : Window
         currentInstance.Background = ConfigManager.PopupBackgroundColor;
         currentInstance.Foreground = ConfigManager.DefinitionsColor;
         currentInstance.FontFamily = ConfigManager.PopupFont;
+        currentInstance.Owner = owner;
         currentInstance.Show();
         currentInstance.UpdatePosition(WinApi.GetMousePosition());
-        WinApi.BringToFront(currentInstance._windowHandle);
-        _ = currentInstance.Focus();
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -131,6 +130,12 @@ internal sealed partial class ReadingSelectionWindow : Window
 
     private void Window_LostFocus(object sender, RoutedEventArgs e)
     {
+        Hide();
+    }
+
+    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+        e.Cancel = true;
         Hide();
     }
 }

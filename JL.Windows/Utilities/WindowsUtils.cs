@@ -140,13 +140,13 @@ internal static class WindowsUtils
         return clone;
     }
 
-    public static void ShowAddNameWindow(string? selectedText, string reading = "")
+    public static void ShowAddNameWindow(Window owner, string? selectedText, string reading = "")
     {
         AddNameWindow addNameWindowInstance = AddNameWindow.Instance;
         addNameWindowInstance.SpellingTextBox.Text = selectedText ?? "";
         addNameWindowInstance.ReadingTextBox.Text = reading;
-        addNameWindowInstance.Owner = MainWindow.Instance;
-        addNameWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        addNameWindowInstance.Owner = owner;
+        addNameWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StatsStopWatch.Stop();
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
@@ -157,12 +157,12 @@ internal static class WindowsUtils
         _ = addNameWindowInstance.ShowDialog();
     }
 
-    public static void ShowAddWordWindow(string? selectedText)
+    public static void ShowAddWordWindow(Window owner, string? selectedText)
     {
         AddWordWindow addWordWindowInstance = AddWordWindow.Instance;
         addWordWindowInstance.SpellingsTextBox.Text = selectedText ?? "";
-        addWordWindowInstance.Owner = MainWindow.Instance;
-        addWordWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        addWordWindowInstance.Owner = owner;
+        addWordWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StatsStopWatch.Stop();
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)

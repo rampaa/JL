@@ -54,8 +54,8 @@ internal sealed partial class MainWindow : Window
 
     private MainWindow()
     {
-        InitializeComponent();
         s_instance = this;
+        InitializeComponent();
         ConfigHelper.Instance.SetLang("en");
         FirstPopupWindow = new PopupWindow();
     }
@@ -263,11 +263,6 @@ internal sealed partial class MainWindow : Window
         }
 
         await FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox).ConfigureAwait(false);
-    }
-
-    private void MainWindow_Closed(object sender, EventArgs e)
-    {
-        Application.Current.Shutdown();
     }
 
     private void MainTextBox_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -914,7 +909,7 @@ internal sealed partial class MainWindow : Window
             reading = "";
         }
 
-        WindowsUtils.ShowAddNameWindow(text, reading);
+        WindowsUtils.ShowAddNameWindow(this, text, reading);
     }
 
     private void AddWord(object sender, RoutedEventArgs e)
@@ -932,7 +927,7 @@ internal sealed partial class MainWindow : Window
                         ? FirstPopupWindow.LastSelectedText
                         : null;
 
-        WindowsUtils.ShowAddWordWindow(text);
+        WindowsUtils.ShowAddWordWindow(this, text);
     }
 
     private void ShowPreferences(object sender, RoutedEventArgs e)

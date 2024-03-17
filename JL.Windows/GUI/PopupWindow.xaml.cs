@@ -120,7 +120,7 @@ internal sealed partial class PopupWindow : Window
             ? _lastInteractedTextBox.SelectedText
             : LastLookupResults[_listViewItemIndex].PrimarySpelling;
 
-        WindowsUtils.ShowAddWordWindow(text);
+        WindowsUtils.ShowAddWordWindow(this, text);
     }
 
     private void SearchWithBrowser(object sender, RoutedEventArgs e)
@@ -1042,7 +1042,7 @@ internal sealed partial class PopupWindow : Window
         }
         else
         {
-            ReadingSelectionWindow.Show(lookupResult.PrimarySpelling, lookupResult.Readings);
+            ReadingSelectionWindow.Show(this, lookupResult.PrimarySpelling, lookupResult.Readings);
         }
     }
 
@@ -1103,7 +1103,7 @@ internal sealed partial class PopupWindow : Window
             reading = "";
         }
 
-        WindowsUtils.ShowAddNameWindow(text, reading);
+        WindowsUtils.ShowAddNameWindow(this, text, reading);
     }
 
     private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
