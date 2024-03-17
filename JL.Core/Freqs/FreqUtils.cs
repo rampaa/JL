@@ -252,7 +252,6 @@ public static class FreqUtils
 
         if (tasks.Count > 0 || freqCleared)
         {
-            Utils.Frontend.InvalidateDisplayCache();
             SqliteConnection.ClearAllPools();
 
             if (tasks.Count > 0)

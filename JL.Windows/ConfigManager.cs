@@ -164,7 +164,6 @@ internal static class ConfigManager
 
     public static int MaxSearchLength { get; private set; } = 37;
     public static int MaxNumResultsNotInMiningMode { get; private set; } = 7;
-    public static bool Precaching { get; private set; } // = false;
     public static string SearchUrl { get; private set; } = "https://www.google.com/search?q={SearchTerm}&hl=ja";
     public static string BrowserPath { get; private set; } = "";
     public static bool GlobalHotKeys { get; private set; } // = false;
@@ -253,7 +252,6 @@ internal static class ConfigManager
         AutoAdjustFontSizesOnResolutionChange = GetValueFromConfig(config, AutoAdjustFontSizesOnResolutionChange, nameof(AutoAdjustFontSizesOnResolutionChange), bool.TryParse);
         HighlightLongestMatch = GetValueFromConfig(config, HighlightLongestMatch, nameof(HighlightLongestMatch), bool.TryParse);
         AutoPlayAudio = GetValueFromConfig(config, AutoPlayAudio, nameof(AutoPlayAudio), bool.TryParse);
-        Precaching = GetValueFromConfig(config, Precaching, nameof(Precaching), bool.TryParse);
         GlobalHotKeys = GetValueFromConfig(config, GlobalHotKeys, nameof(GlobalHotKeys), bool.TryParse);
         StopIncreasingTimeStatWhenMinimized = GetValueFromConfig(config, StopIncreasingTimeStatWhenMinimized, nameof(StopIncreasingTimeStatWhenMinimized), bool.TryParse);
         StripPunctuationBeforeCalculatingCharacterCount = GetValueFromConfig(config, StripPunctuationBeforeCalculatingCharacterCount, nameof(StripPunctuationBeforeCalculatingCharacterCount), bool.TryParse);
@@ -829,7 +827,6 @@ internal static class ConfigManager
         preferenceWindow.HighlightLongestMatchCheckBox.IsChecked = HighlightLongestMatch;
         preferenceWindow.AutoPlayAudioCheckBox.IsChecked = AutoPlayAudio;
         preferenceWindow.CheckForJLUpdatesOnStartUpCheckBox.IsChecked = CoreConfig.CheckForJLUpdatesOnStartUp;
-        preferenceWindow.PrecachingCheckBox.IsChecked = Precaching;
         preferenceWindow.GlobalHotKeysCheckBox.IsChecked = GlobalHotKeys;
         preferenceWindow.StopIncreasingTimeStatWhenMinimizedCheckBox.IsChecked = StopIncreasingTimeStatWhenMinimized;
         preferenceWindow.StripPunctuationBeforeCalculatingCharacterCountCheckBox.IsChecked = StripPunctuationBeforeCalculatingCharacterCount;
@@ -1128,8 +1125,6 @@ internal static class ConfigManager
             preferenceWindow.HighlightLongestMatchCheckBox.IsChecked.ToString();
         settings[nameof(AutoPlayAudio)].Value =
             preferenceWindow.AutoPlayAudioCheckBox.IsChecked.ToString();
-        settings[nameof(Precaching)].Value =
-            preferenceWindow.PrecachingCheckBox.IsChecked.ToString();
         settings[nameof(GlobalHotKeys)].Value =
             preferenceWindow.GlobalHotKeysCheckBox.IsChecked.ToString();
         settings[nameof(StopIncreasingTimeStatWhenMinimized)].Value =

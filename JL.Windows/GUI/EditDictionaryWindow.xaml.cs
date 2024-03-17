@@ -141,7 +141,6 @@ internal sealed partial class EditDictionaryWindow : Window
             }
 
             _dict.Options = options;
-            Utils.Frontend.InvalidateDisplayCache();
 
             Close();
         }

@@ -11,7 +11,6 @@ using HandyControl.Tools;
 using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
-using JL.Core.Lookup;
 using JL.Core.Network;
 using JL.Core.Profile;
 using JL.Core.Statistics;
@@ -48,8 +47,6 @@ internal sealed partial class MainWindow : Window
 
     private static ulong s_clipboardSequenceNo;
     public bool ContextMenuIsOpening { get; private set; } // = false;
-
-    private static CancellationTokenSource s_precacheCancellationTokenSource = new();
 
     private static string? s_lastTextCopiedWhileMinimized;
 
@@ -228,83 +225,6 @@ internal sealed partial class MainWindow : Window
             : text;
 
         Stats.IncrementStat(StatType.Characters, new StringInfo(strippedText).LengthInTextElements);
-
-        if (ConfigManager.Precaching && DictUtils.DictsReady
-                                     && !DictUtils.UpdatingJmdict && !DictUtils.UpdatingJmnedict && !DictUtils.UpdatingKanjidic
-                                     && FreqUtils.FreqsReady
-                                     && text.Length < Utils.CacheSize)
-        {
-            s_precacheCancellationTokenSource.Cancel();
-            s_precacheCancellationTokenSource.Dispose();
-            s_precacheCancellationTokenSource = new CancellationTokenSource();
-
-            _ = Dispatcher.InvokeAsync(async () => await Precache(text, s_precacheCancellationTokenSource.Token).ConfigureAwait(false), DispatcherPriority.Background);
-        }
-    }
-
-    private async Task Precache(string input, CancellationToken cancellationToken)
-    {
-        FirstPopupWindow.DictsWithResults.Clear();
-
-        for (int charPosition = 0; charPosition < input.Length; charPosition++)
-        {
-            if (charPosition % 10 is 0)
-            {
-                await Task.Delay(1, CancellationToken.None).ConfigureAwait(true); // let user interact with the GUI while this method is running
-            }
-
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
-
-            if (char.IsLowSurrogate(input[charPosition]))
-            {
-                continue;
-            }
-
-            int endPosition = (input.Length - charPosition) > ConfigManager.MaxSearchLength
-                ? JapaneseUtils.FindExpressionBoundary(input[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
-                : JapaneseUtils.FindExpressionBoundary(input, charPosition);
-
-            string text = input[charPosition..endPosition];
-
-            if (string.IsNullOrEmpty(text))
-            {
-                continue;
-            }
-
-            if (!PopupWindow.StackPanelCache.Contains(text))
-            {
-                List<LookupResult>? lookupResults = LookupUtils.LookupText(text);
-                if (lookupResults?.Count > 0)
-                {
-                    _ = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict);
-                    bool pitchDictIsActive = pitchDict?.Active ?? false;
-                    Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-                    bool pOrthographyInfo = jmdict.Options?.POrthographyInfo?.Value ?? true;
-                    bool rOrthographyInfo = jmdict.Options?.ROrthographyInfo?.Value ?? true;
-                    bool aOrthographyInfo = jmdict.Options?.AOrthographyInfo?.Value ?? true;
-                    double pOrthographyInfoFontSize = jmdict.Options?.POrthographyInfoFontSize?.Value ?? 15;
-
-                    int resultCount = Math.Min(lookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
-                    StackPanel[] popupItemSource = new StackPanel[resultCount];
-                    for (int i = 0; i < resultCount; i++)
-                    {
-                        LookupResult lookupResult = lookupResults[i];
-
-                        if (!FirstPopupWindow.DictsWithResults.Contains(lookupResult.Dict))
-                        {
-                            FirstPopupWindow.DictsWithResults.Add(lookupResult.Dict);
-                        }
-
-                        popupItemSource[i] = FirstPopupWindow.PrepareResultStackPanel(lookupResult, i, lookupResults.Count, pitchDict, pitchDictIsActive, pOrthographyInfo, rOrthographyInfo, aOrthographyInfo, pOrthographyInfoFontSize);
-                    }
-
-                    PopupWindow.StackPanelCache.AddReplace(text, popupItemSource);
-                }
-            }
-        }
     }
 
     private async void ClipboardChanged(object? sender, EventArgs? e)
@@ -342,7 +262,6 @@ internal sealed partial class MainWindow : Window
             return;
         }
 
-        s_precacheCancellationTokenSource.Cancel();
         await FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox).ConfigureAwait(false);
     }
 
@@ -574,7 +493,6 @@ internal sealed partial class MainWindow : Window
 
             CoreConfig.KanjiMode = !CoreConfig.KanjiMode;
             FirstPopupWindow.LastText = "";
-            Utils.Frontend.InvalidateDisplayCache();
             MainTextBox_MouseMove(null, null);
         }
 

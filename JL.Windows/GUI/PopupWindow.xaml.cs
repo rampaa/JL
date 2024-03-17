@@ -4,7 +4,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using Caching;
 using JL.Core;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
@@ -56,8 +55,6 @@ internal sealed partial class PopupWindow : Window
     public bool MiningMode { get; private set; }
 
     public static Timer PopupAutoHideTimer { get; } = new();
-
-    public static LRUCache<string, StackPanel[]> StackPanelCache { get; } = new(Utils.CacheSize, Utils.CacheSize / 5);
 
     private ScrollViewer? _popupListViewScrollViewer;
 
@@ -414,67 +411,35 @@ internal sealed partial class PopupWindow : Window
 
         PopupListView.Items.Filter = NoAllDictFilter;
 
-        if (text is not null && !generateAllResults && StackPanelCache.TryGet(text, out StackPanel[] data))
+        _ = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict);
+        bool pitchDictIsActive = pitchDict?.Active ?? false;
+        Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
+        bool showPOrthographyInfo = jmdict.Options?.POrthographyInfo?.Value ?? true;
+        bool showROrthographyInfo = jmdict.Options?.ROrthographyInfo?.Value ?? true;
+        bool showAOrthographyInfo = jmdict.Options?.AOrthographyInfo?.Value ?? true;
+        double pOrthographyInfoFontSize = jmdict.Options?.POrthographyInfoFontSize?.Value ?? 15;
+
+        int resultCount = generateAllResults
+            ? LastLookupResults.Count
+            : Math.Min(LastLookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
+
+        StackPanel[] popupItemSource = new StackPanel[resultCount];
+
+        for (int i = 0; i < resultCount; i++)
         {
-            int resultCount = Math.Min(data.Length, ConfigManager.MaxNumResultsNotInMiningMode);
-            StackPanel[] popupItemSource = new StackPanel[resultCount];
+            LookupResult lookupResult = LastLookupResults[i];
 
-            for (int i = 0; i < resultCount; i++)
+            if (!DictsWithResults.Contains(lookupResult.Dict))
             {
-                StackPanel stackPanel = data[i];
-
-                Dict dict = (Dict)stackPanel.Tag;
-                if (!DictsWithResults.Contains(dict))
-                {
-                    DictsWithResults.Add(dict);
-                }
-
-                popupItemSource[i] = stackPanel;
+                DictsWithResults.Add(lookupResult.Dict);
             }
 
-            PopupListView.ItemsSource = popupItemSource;
-            GenerateDictTypeButtons();
-            UpdateLayout();
+            popupItemSource[i] = PrepareResultStackPanel(lookupResult, i, resultCount, pitchDict, pitchDictIsActive, showPOrthographyInfo, showROrthographyInfo, showAOrthographyInfo, pOrthographyInfoFontSize);
         }
 
-        else
-        {
-            _ = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict);
-            bool pitchDictIsActive = pitchDict?.Active ?? false;
-            Dict jmdict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-            bool showPOrthographyInfo = jmdict.Options?.POrthographyInfo?.Value ?? true;
-            bool showROrthographyInfo = jmdict.Options?.ROrthographyInfo?.Value ?? true;
-            bool showAOrthographyInfo = jmdict.Options?.AOrthographyInfo?.Value ?? true;
-            double pOrthographyInfoFontSize = jmdict.Options?.POrthographyInfoFontSize?.Value ?? 15;
-
-            int resultCount = generateAllResults
-                ? LastLookupResults.Count
-                : Math.Min(LastLookupResults.Count, ConfigManager.MaxNumResultsNotInMiningMode);
-
-            StackPanel[] popupItemSource = new StackPanel[resultCount];
-
-            for (int i = 0; i < resultCount; i++)
-            {
-                LookupResult lookupResult = LastLookupResults[i];
-
-                if (!DictsWithResults.Contains(lookupResult.Dict))
-                {
-                    DictsWithResults.Add(lookupResult.Dict);
-                }
-
-                popupItemSource[i] = PrepareResultStackPanel(lookupResult, i, resultCount, pitchDict, pitchDictIsActive, showPOrthographyInfo, showROrthographyInfo, showAOrthographyInfo, pOrthographyInfoFontSize);
-            }
-
-            PopupListView.ItemsSource = popupItemSource;
-            GenerateDictTypeButtons();
-            UpdateLayout();
-
-            // we might cache incomplete results if we don't wait until all dicts are loaded
-            if (text is not null && !generateAllResults && DictUtils.DictsReady && !DictUtils.UpdatingJmdict && !DictUtils.UpdatingJmnedict && !DictUtils.UpdatingKanjidic)
-            {
-                StackPanelCache.AddReplace(text, popupItemSource);
-            }
-        }
+        PopupListView.ItemsSource = popupItemSource;
+        GenerateDictTypeButtons();
+        UpdateLayout();
     }
 
     private void AddEventHandlersToTextBox(TextBox textBox)
@@ -1235,7 +1200,6 @@ internal sealed partial class PopupWindow : Window
         {
             CoreConfig.KanjiMode = !CoreConfig.KanjiMode;
             LastText = "";
-            Utils.Frontend.InvalidateDisplayCache();
 
             if (Owner != MainWindow.Instance)
             {

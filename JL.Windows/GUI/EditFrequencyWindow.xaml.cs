@@ -112,7 +112,6 @@ internal sealed partial class EditFrequencyWindow : Window
             }
 
             _freq.Options = options;
-            Utils.Frontend.InvalidateDisplayCache();
 
             Close();
         }

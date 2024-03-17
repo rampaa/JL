@@ -64,8 +64,6 @@ internal sealed partial class ManageDictionariesWindow : Window
     {
         s_instance = null;
 
-        Utils.Frontend.InvalidateDisplayCache();
-
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
 

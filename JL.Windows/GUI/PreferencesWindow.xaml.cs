@@ -122,7 +122,6 @@ internal sealed partial class PreferencesWindow : Window
 
     private async void SaveButton_Click(object sender, RoutedEventArgs e)
     {
-        Utils.Frontend.InvalidateDisplayCache();
         await ConfigManager.SavePreferences(this).ConfigureAwait(true);
         Close();
     }
@@ -147,8 +146,6 @@ internal sealed partial class PreferencesWindow : Window
 
             if (_profileNamesDict.Active || _profileWordsDict.Active)
             {
-                Utils.Frontend.InvalidateDisplayCache();
-
                 if (_profileNamesDict.Active)
                 {
                     DictUtils.ProfileCustomNamesCancellationTokenSource?.Cancel();

@@ -91,13 +91,6 @@
             </uc:TouchScreenTextBox.ContextMenu>
         </uc:TouchScreenTextBox>
 
-        <!--<TextBlock x:Name="PrecacheProgress" Margin="1,1,15,15" HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                   Visibility="Collapsed" Width="120" Height="17" Foreground="White">
-            <TextBlock.Background>
-                <SolidColorBrush Color="Black" Opacity="0.002"/>
-            </TextBlock.Background>
-        </TextBlock>-->
-        
         <DockPanel Margin="10,0,0,0" HorizontalAlignment="Left">
             <StackPanel Width="20">
                 <TextBlock x:Name="OpacityButton" HorizontalAlignment="Center" MouseLeave="TitleBarButtonMouseLeave"

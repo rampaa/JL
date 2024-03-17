@@ -1474,18 +1474,6 @@
                         </DockPanel>
 
                         <DockPanel Margin="0,10,0,0">
-                            <TextBlock HorizontalAlignment="Left" Text="Precache results on text change"
-                                       TextWrapping="Wrap"
-                                       Style="{StaticResource TextBlockDefault}"
-                                       ToolTip="Generate all possible results for the text in the main window before you mouse over anything.
-                                       &#10;Improves performance when using a lot of dictionaries at the same time, as long as you don't try to
-                                       &#10;look up something immediately after the text changes.
-                                       &#10;Not recommended unless you feel that lookup is slow."
-                                       Cursor="Help"/>
-                            <CheckBox x:Name="PrecachingCheckBox"  HorizontalAlignment="Right" />
-                        </DockPanel>
-
-                        <DockPanel Margin="0,10,0,0">
                             <TextBlock HorizontalAlignment="Left" Text="Global hotkeys"
                                        TextWrapping="Wrap"
                                        Style="{StaticResource TextBlockDefault}"

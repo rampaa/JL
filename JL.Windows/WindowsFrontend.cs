@@ -23,8 +23,6 @@ internal sealed class WindowsFrontend : IFrontend
 
     public Task UpdateJL(Uri downloadUrlOfLatestJLRelease) => WindowsUtils.UpdateJL(downloadUrlOfLatestJLRelease);
 
-    public void InvalidateDisplayCache() => PopupWindow.StackPanelCache.Clear();
-
     public void ApplyDictOptions() => DictOptionManager.ApplyDictOptions();
 
     public async Task CopyFromWebSocket(string text) => await MainWindow.Instance.CopyFromWebSocket(text).ConfigureAwait(false);

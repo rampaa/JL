@@ -90,7 +90,6 @@ internal sealed partial class AddWordWindow : Window
             if (dict.Active)
             {
                 CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawPartOfSpeech, wordClasses, dict.Contents);
-                Utils.Frontend.InvalidateDisplayCache();
             }
 
             PopupWindowUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);

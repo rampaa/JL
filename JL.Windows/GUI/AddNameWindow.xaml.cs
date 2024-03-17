@@ -75,7 +75,6 @@ internal sealed partial class AddNameWindow : Window
             if (dict.Active)
             {
                 CustomNameLoader.AddToDictionary(spelling, reading, nameType, extraInfo, dict.Contents);
-                Utils.Frontend.InvalidateDisplayCache();
             }
 
             PopupWindowUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);

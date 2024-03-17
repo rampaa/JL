@@ -28,7 +28,6 @@ public static class Utils
     internal static StringPool StringPoolInstance => StringPool.Shared;
     internal static readonly Regex s_numberRegex = new(@"\d+", RegexOptions.Compiled);
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
-    public const int CacheSize = 100;
 
     public static readonly LoggingLevelSwitch LoggingLevelSwitch = new() { MinimumLevel = Serilog.Events.LogEventLevel.Error };
 

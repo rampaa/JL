@@ -20,10 +20,6 @@ internal sealed class DummyFrontend : IFrontend
 
     public Task UpdateJL(Uri downloadUrlOfLatestJLRelease) => Task.CompletedTask;
 
-    public void InvalidateDisplayCache()
-    {
-    }
-
     public void ApplyDictOptions()
     {
     }

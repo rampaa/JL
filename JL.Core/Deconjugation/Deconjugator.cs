@@ -1,12 +1,8 @@
-using Caching;
-using JL.Core.Utilities;
-
 namespace JL.Core.Deconjugation;
 
 // translated from https://github.com/wareya/nazeka/blob/master/background-script.js
 internal static class Deconjugator
 {
-    private static readonly LRUCache<string, HashSet<Form>> s_cache = new(Utils.CacheSize, Utils.CacheSize / 5);
     public static Rule[] Rules { get; set; } = Array.Empty<Rule>();
 
     private static Form? StdruleDeconjugateInner(Form myForm, VirtualRule myRule)
@@ -281,11 +277,6 @@ internal static class Deconjugator
 
     public static HashSet<Form> Deconjugate(string text)
     {
-        if (s_cache.TryGet(text, out HashSet<Form> data))
-        {
-            return data;
-        }
-
         HashSet<Form> processed = new();
         HashSet<Form> novel = new();
 
@@ -337,8 +328,6 @@ internal static class Deconjugator
             processed.UnionWith(novel);
             novel = newNovel;
         }
-
-        s_cache.AddReplace(text, processed);
 
         return processed;
     }
