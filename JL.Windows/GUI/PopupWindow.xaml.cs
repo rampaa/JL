@@ -1370,26 +1370,25 @@ internal sealed partial class PopupWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ToggleMinimizedStateKeyGesture))
         {
-            MainWindow mainWindow = MainWindow.Instance;
-            PopupWindowUtils.HidePopups(mainWindow.FirstPopupWindow);
+            PopupWindowUtils.HidePopups(MainWindow.Instance.FirstPopupWindow);
 
             if (ConfigManager.Focusable)
             {
-                mainWindow.WindowState = mainWindow.WindowState is WindowState.Minimized
+                MainWindow.Instance.WindowState = MainWindow.Instance.WindowState is WindowState.Minimized
                     ? WindowState.Normal
                     : WindowState.Minimized;
             }
 
             else
             {
-                if (mainWindow.WindowState is WindowState.Minimized)
+                if (MainWindow.Instance.WindowState is WindowState.Minimized)
                 {
-                    WinApi.RestoreWindow(mainWindow.WindowHandle);
+                    WinApi.RestoreWindow(MainWindow.Instance.WindowHandle);
                 }
 
                 else
                 {
-                    WinApi.MinimizeWindow(mainWindow.WindowHandle);
+                    WinApi.MinimizeWindow(MainWindow.Instance.WindowHandle);
                 }
             }
         }
@@ -1695,15 +1694,14 @@ internal sealed partial class PopupWindow : Window
 
     public void HidePopup()
     {
-        MainWindow mainWindow = MainWindow.Instance;
-        bool isFirstPopup = Owner == mainWindow;
+        bool isFirstPopup = Owner == MainWindow.Instance;
 
         if (isFirstPopup
             && (ConfigManager.TextOnlyVisibleOnHover || ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
             && !AddNameWindow.IsItVisible()
             && !AddWordWindow.IsItVisible())
         {
-            _ = mainWindow.ChangeVisibility().ConfigureAwait(true);
+            _ = MainWindow.Instance.ChangeVisibility().ConfigureAwait(true);
         }
 
         ReadingSelectionWindow.HideWindow();
@@ -1744,9 +1742,9 @@ internal sealed partial class PopupWindow : Window
 
         if (isFirstPopup)
         {
-            WinApi.ActivateWindow(mainWindow.WindowHandle);
+            WinApi.ActivateWindow(MainWindow.Instance.WindowHandle);
 
-            if (ConfigManager.HighlightLongestMatch && !mainWindow.ContextMenuIsOpening)
+            if (ConfigManager.HighlightLongestMatch && !MainWindow.Instance.ContextMenuIsOpening)
             {
                 WindowsUtils.Unselect(_previousTextBox);
             }

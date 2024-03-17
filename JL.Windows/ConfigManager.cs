@@ -220,16 +220,14 @@ internal static class ConfigManager
             }
         }
 
-        MainWindow mainWindow = MainWindow.Instance;
-
         CoreConfig.CaptureTextFromClipboard = GetValueFromConfig(config, CoreConfig.CaptureTextFromClipboard, nameof(CoreConfig.CaptureTextFromClipboard), bool.TryParse);
         if (CoreConfig.CaptureTextFromClipboard)
         {
-            WinApi.SubscribeToClipboardChanged(mainWindow.WindowHandle);
+            WinApi.SubscribeToClipboardChanged(MainWindow.Instance.WindowHandle);
         }
         else
         {
-            WinApi.UnsubscribeFromClipboardChanged(mainWindow.WindowHandle);
+            WinApi.UnsubscribeFromClipboardChanged(MainWindow.Instance.WindowHandle);
         }
 
         CoreConfig.CaptureTextFromWebSocket = GetValueFromConfig(config, CoreConfig.CaptureTextFromWebSocket, nameof(CoreConfig.CaptureTextFromWebSocket), bool.TryParse);
@@ -258,7 +256,7 @@ internal static class ConfigManager
         MineToFileInsteadOfAnki = GetValueFromConfig(config, MineToFileInsteadOfAnki, nameof(MineToFileInsteadOfAnki), bool.TryParse);
         CoreConfig.CheckForJLUpdatesOnStartUp = GetValueFromConfig(config, CoreConfig.CheckForJLUpdatesOnStartUp, nameof(CoreConfig.CheckForJLUpdatesOnStartUp), bool.TryParse);
         AlwaysOnTop = GetValueFromConfig(config, AlwaysOnTop, nameof(AlwaysOnTop), bool.TryParse);
-        mainWindow.Topmost = AlwaysOnTop;
+        MainWindow.Instance.Topmost = AlwaysOnTop;
 
         RequireLookupKeyPress = GetValueFromConfig(config, RequireLookupKeyPress, nameof(RequireLookupKeyPress), bool.TryParse);
         DisableHotkeys = GetValueFromConfig(config, DisableHotkeys, nameof(DisableHotkeys), bool.TryParse);
@@ -266,11 +264,11 @@ internal static class ConfigManager
         Focusable = GetValueFromConfig(config, Focusable, nameof(Focusable), bool.TryParse);
         if (Focusable)
         {
-            WinApi.AllowActivation(mainWindow.WindowHandle);
+            WinApi.AllowActivation(MainWindow.Instance.WindowHandle);
         }
         else
         {
-            WinApi.PreventActivation(mainWindow.WindowHandle);
+            WinApi.PreventActivation(MainWindow.Instance.WindowHandle);
         }
 
         CoreConfig.AnkiIntegration = GetValueFromConfig(config, CoreConfig.AnkiIntegration, nameof(CoreConfig.AnkiIntegration), bool.TryParse);
@@ -300,18 +298,18 @@ internal static class ConfigManager
         AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized = GetValueFromConfig(config, AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized, nameof(AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized), bool.TryParse);
 
         TextBoxIsReadOnly = GetValueFromConfig(config, TextBoxIsReadOnly, nameof(TextBoxIsReadOnly), bool.TryParse);
-        if (mainWindow.MainTextBox.IsReadOnly != TextBoxIsReadOnly)
+        if (MainWindow.Instance.MainTextBox.IsReadOnly != TextBoxIsReadOnly)
         {
-            mainWindow.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
-            mainWindow.MainTextBox.IsUndoEnabled = !TextBoxIsReadOnly;
-            mainWindow.MainTextBox.UndoLimit = TextBoxIsReadOnly ? 0 : -1;
+            MainWindow.Instance.MainTextBox.IsReadOnly = TextBoxIsReadOnly;
+            MainWindow.Instance.MainTextBox.IsUndoEnabled = !TextBoxIsReadOnly;
+            MainWindow.Instance.MainTextBox.UndoLimit = TextBoxIsReadOnly ? 0 : -1;
         }
 
         AlwaysShowMainTextBoxCaret = GetValueFromConfig(config, AlwaysShowMainTextBoxCaret, nameof(AlwaysShowMainTextBoxCaret), bool.TryParse);
-        mainWindow.MainTextBox.IsReadOnlyCaretVisible = AlwaysShowMainTextBoxCaret;
+        MainWindow.Instance.MainTextBox.IsReadOnlyCaretVisible = AlwaysShowMainTextBoxCaret;
 
         HorizontallyCenterMainWindowText = GetValueFromConfig(config, HorizontallyCenterMainWindowText, nameof(HorizontallyCenterMainWindowText), bool.TryParse);
-        mainWindow.MainTextBox.HorizontalContentAlignment = HorizontallyCenterMainWindowText
+        MainWindow.Instance.MainTextBox.HorizontalContentAlignment = HorizontallyCenterMainWindowText
             ? HorizontalAlignment.Center
             : HorizontalAlignment.Left;
 
@@ -329,19 +327,19 @@ internal static class ConfigManager
         HidePopupsOnTextChange = GetValueFromConfig(config, HidePopupsOnTextChange, nameof(HidePopupsOnTextChange), bool.TryParse);
 
         HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar = GetValueFromConfig(config, HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar, nameof(HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar), bool.TryParse);
-        mainWindow.ChangeVisibilityOfTitleBarButtons();
+        MainWindow.Instance.ChangeVisibilityOfTitleBarButtons();
 
         TextBoxApplyDropShadowEffect = GetValueFromConfig(config, TextBoxApplyDropShadowEffect, nameof(TextBoxApplyDropShadowEffect), bool.TryParse);
         if (TextBoxApplyDropShadowEffect)
         {
             DropShadowEffect dropShadowEffect = new() { Direction = 320, BlurRadius = 4, ShadowDepth = 1.3, Opacity = 0.8, RenderingBias = RenderingBias.Quality };
             dropShadowEffect.Freeze();
-            mainWindow.MainTextBox.Effect = dropShadowEffect;
+            MainWindow.Instance.MainTextBox.Effect = dropShadowEffect;
         }
 
         else
         {
-            mainWindow.MainTextBox.Effect = null;
+            MainWindow.Instance.MainTextBox.Effect = null;
         }
 
         MaxSearchLength = GetValueFromConfig(config, MaxSearchLength, nameof(MaxSearchLength), int.TryParse);
@@ -378,36 +376,36 @@ internal static class ConfigManager
         FixedPopupYPosition = GetNumberWithDecimalPointFromConfig(config, FixedPopupYPosition, nameof(FixedPopupYPosition), double.TryParse);
         WindowsUtils.DpiAwareFixedPopupYPosition = FixedPopupYPosition / WindowsUtils.Dpi.DpiScaleY;
 
-        mainWindow.OpacitySlider.Value = GetNumberWithDecimalPointFromConfig(config, mainWindow.OpacitySlider.Value, "MainWindowOpacity", double.TryParse);
-        mainWindow.FontSizeSlider.Value = GetNumberWithDecimalPointFromConfig(config, mainWindow.FontSizeSlider.Value, "MainWindowFontSize", double.TryParse);
+        MainWindow.Instance.OpacitySlider.Value = GetNumberWithDecimalPointFromConfig(config, MainWindow.Instance.OpacitySlider.Value, "MainWindowOpacity", double.TryParse);
+        MainWindow.Instance.FontSizeSlider.Value = GetNumberWithDecimalPointFromConfig(config, MainWindow.Instance.FontSizeSlider.Value, "MainWindowFontSize", double.TryParse);
         MainWindowBackgroundOpacityOnUnhover = GetNumberWithDecimalPointFromConfig(config, MainWindowBackgroundOpacityOnUnhover, nameof(MainWindowBackgroundOpacityOnUnhover), double.TryParse);
 
         MainWindowHeight = GetNumberWithDecimalPointFromConfig(config, MainWindowHeight, nameof(MainWindowHeight), double.TryParse);
         MainWindowWidth = GetNumberWithDecimalPointFromConfig(config, MainWindowWidth, nameof(MainWindowWidth), double.TryParse);
         MainWindowMaxDynamicWidth = GetNumberWithDecimalPointFromConfig(config, MainWindowMaxDynamicWidth, nameof(MainWindowMaxDynamicWidth), double.TryParse);
         MainWindowMaxDynamicHeight = GetNumberWithDecimalPointFromConfig(config, MainWindowMaxDynamicHeight, nameof(MainWindowMaxDynamicHeight), double.TryParse);
-        WindowsUtils.SetSizeToContentForMainWindow(MainWindowDynamicWidth, MainWindowDynamicHeight, MainWindowMaxDynamicWidth, MainWindowMaxDynamicHeight, MainWindowWidth, MainWindowHeight, mainWindow);
-        mainWindow.WidthBeforeResolutionChange = MainWindowWidth;
-        mainWindow.HeightBeforeResolutionChange = MainWindowHeight;
+        WindowsUtils.SetSizeToContentForMainWindow(MainWindowDynamicWidth, MainWindowDynamicHeight, MainWindowMaxDynamicWidth, MainWindowMaxDynamicHeight, MainWindowWidth, MainWindowHeight, MainWindow.Instance);
+        MainWindow.Instance.WidthBeforeResolutionChange = MainWindowWidth;
+        MainWindow.Instance.HeightBeforeResolutionChange = MainWindowHeight;
 
-        mainWindow.Top = GetNumberWithDecimalPointFromConfig(config, mainWindow.Top, "MainWindowTopPosition", double.TryParse);
-        mainWindow.Left = GetNumberWithDecimalPointFromConfig(config, mainWindow.Left, "MainWindowLeftPosition", double.TryParse);
+        MainWindow.Instance.Top = GetNumberWithDecimalPointFromConfig(config, MainWindow.Instance.Top, "MainWindowTopPosition", double.TryParse);
+        MainWindow.Instance.Left = GetNumberWithDecimalPointFromConfig(config, MainWindow.Instance.Left, "MainWindowLeftPosition", double.TryParse);
 
-        mainWindow.TopPositionBeforeResolutionChange = mainWindow.Top;
-        mainWindow.LeftPositionBeforeResolutionChange = mainWindow.Left;
+        MainWindow.Instance.TopPositionBeforeResolutionChange = MainWindow.Instance.Top;
+        MainWindow.Instance.LeftPositionBeforeResolutionChange = MainWindow.Instance.Left;
 
-        mainWindow.MainGrid.Opacity = TextOnlyVisibleOnHover && !mainWindow.IsMouseOver && !PreferencesWindow.IsItVisible() ? 0 : 1;
+        MainWindow.Instance.MainGrid.Opacity = TextOnlyVisibleOnHover && !MainWindow.Instance.IsMouseOver && !PreferencesWindow.IsItVisible() ? 0 : 1;
 
         // MAKE SURE YOU FREEZE ANY NEW COLOR OBJECTS YOU ADD
         // OR THE PROGRAM WILL CRASH AND BURN
         MainWindowTextColor = GetFrozenBrushFromConfig(config, MainWindowTextColor, nameof(MainWindowTextColor));
         MainWindowBacklogTextColor = GetFrozenBrushFromConfig(config, MainWindowBacklogTextColor, nameof(MainWindowBacklogTextColor));
 
-        mainWindow.MainTextBox.Foreground = !EnableBacklog || mainWindow.MainTextBox.Text == BacklogUtils.Backlog.LastOrDefault("")
+        MainWindow.Instance.MainTextBox.Foreground = !EnableBacklog || MainWindow.Instance.MainTextBox.Text == BacklogUtils.Backlog.LastOrDefault("")
             ? MainWindowTextColor
             : MainWindowBacklogTextColor;
 
-        mainWindow.MainTextBox.CaretBrush = MainWindowTextColor;
+        MainWindow.Instance.MainTextBox.CaretBrush = MainWindowTextColor;
 
         PrimarySpellingColor = GetFrozenBrushFromConfig(config, PrimarySpellingColor, nameof(PrimarySpellingColor));
         ReadingsColor = GetFrozenBrushFromConfig(config, ReadingsColor, nameof(ReadingsColor));
@@ -421,19 +419,19 @@ internal static class ConfigManager
         DictTypeColor = GetFrozenBrushFromConfig(config, DictTypeColor, nameof(DictTypeColor));
 
         HighlightColor = GetFrozenBrushFromConfig(config, HighlightColor, nameof(HighlightColor));
-        mainWindow.MainTextBox.SelectionBrush = HighlightColor;
+        MainWindow.Instance.MainTextBox.SelectionBrush = HighlightColor;
 
         PopupBackgroundColor = GetBrushFromConfig(config, PopupBackgroundColor, nameof(PopupBackgroundColor));
         PopupBackgroundColor.Opacity = GetNumberWithDecimalPointFromConfig(config, 80.0, "PopupOpacity", double.TryParse) / 100;
         PopupBackgroundColor.Freeze();
 
-        mainWindow.Background = GetBrushFromConfig(config, mainWindow.Background, "MainWindowBackgroundColor");
+        MainWindow.Instance.Background = GetBrushFromConfig(config, MainWindow.Instance.Background, "MainWindowBackgroundColor");
 
-        mainWindow.Background.Opacity = ChangeMainWindowBackgroundOpacityOnUnhover && !mainWindow.IsMouseOver && !PreferencesWindow.IsItVisible()
+        MainWindow.Instance.Background.Opacity = ChangeMainWindowBackgroundOpacityOnUnhover && !MainWindow.Instance.IsMouseOver && !PreferencesWindow.IsItVisible()
             ? MainWindowBackgroundOpacityOnUnhover / 100
-            : mainWindow.OpacitySlider.Value / 100;
+            : MainWindow.Instance.OpacitySlider.Value / 100;
 
-        WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+        WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
         KeyGestureUtils.KeyGestureDict.Clear();
         KeyGestureUtils.KeyGestureNameToIntDict.Clear();
 
@@ -502,17 +500,17 @@ internal static class ConfigManager
 
         if (GlobalHotKeys && !DisableHotkeys)
         {
-            WinApi.RegisterAllHotKeys(mainWindow.WindowHandle);
+            WinApi.RegisterAllHotKeys(MainWindow.Instance.WindowHandle);
         }
 
-        KeyGestureUtils.SetInputGestureText(mainWindow.AddNameMenuItem, ShowAddNameWindowKeyGesture);
-        KeyGestureUtils.SetInputGestureText(mainWindow.AddWordMenuItem, ShowAddWordWindowKeyGesture);
-        KeyGestureUtils.SetInputGestureText(mainWindow.SearchMenuItem, SearchWithBrowserKeyGesture);
-        KeyGestureUtils.SetInputGestureText(mainWindow.PreferencesMenuItem, ShowPreferencesWindowKeyGesture);
-        KeyGestureUtils.SetInputGestureText(mainWindow.ManageDictionariesMenuItem, ShowManageDictionariesWindowKeyGesture);
-        KeyGestureUtils.SetInputGestureText(mainWindow.ManageFrequenciesMenuItem, ShowManageFrequenciesWindowKeyGesture);
-        KeyGestureUtils.SetInputGestureText(mainWindow.ManageAudioSourcesMenuItem, ShowManageAudioSourcesWindowKeyGesture);
-        KeyGestureUtils.SetInputGestureText(mainWindow.StatsMenuItem, ShowStatsKeyGesture);
+        KeyGestureUtils.SetInputGestureText(MainWindow.Instance.AddNameMenuItem, ShowAddNameWindowKeyGesture);
+        KeyGestureUtils.SetInputGestureText(MainWindow.Instance.AddWordMenuItem, ShowAddWordWindowKeyGesture);
+        KeyGestureUtils.SetInputGestureText(MainWindow.Instance.SearchMenuItem, SearchWithBrowserKeyGesture);
+        KeyGestureUtils.SetInputGestureText(MainWindow.Instance.PreferencesMenuItem, ShowPreferencesWindowKeyGesture);
+        KeyGestureUtils.SetInputGestureText(MainWindow.Instance.ManageDictionariesMenuItem, ShowManageDictionariesWindowKeyGesture);
+        KeyGestureUtils.SetInputGestureText(MainWindow.Instance.ManageFrequenciesMenuItem, ShowManageFrequenciesWindowKeyGesture);
+        KeyGestureUtils.SetInputGestureText(MainWindow.Instance.ManageAudioSourcesMenuItem, ShowManageAudioSourcesWindowKeyGesture);
+        KeyGestureUtils.SetInputGestureText(MainWindow.Instance.StatsMenuItem, ShowStatsKeyGesture);
 
         {
             string? ankiConnectUriStr = settings.Get(nameof(CoreConfig.AnkiConnectUri));
@@ -614,7 +612,7 @@ internal static class ConfigManager
                 mainWindowFontStr = "Meiryo";
             }
 
-            mainWindow.MainTextBox.FontFamily = new FontFamily(mainWindowFontStr);
+            MainWindow.Instance.MainTextBox.FontFamily = new FontFamily(mainWindowFontStr);
         }
 
         {
@@ -718,8 +716,6 @@ internal static class ConfigManager
         Configuration config = ConfigurationManager.OpenMappedExeConfiguration(MappedExeConfiguration, ConfigurationUserLevel.None);
         KeyValueConfigurationCollection settings = config.AppSettings.Settings;
 
-        MainWindow mainWindow = MainWindow.Instance;
-
         preferenceWindow.ProfileComboBox.ItemsSource = ProfileUtils.Profiles;
         preferenceWindow.ProfileComboBox.SelectedItem = ProfileUtils.CurrentProfile;
 
@@ -801,7 +797,7 @@ internal static class ConfigManager
             KeyGestureUtils.KeyGestureToString(SelectedTextToSpeechKeyGesture);
 
         WindowsUtils.SetButtonColor(preferenceWindow.HighlightColorButton, HighlightColor);
-        WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, mainWindow.Background.CloneCurrentValue());
+        WindowsUtils.SetButtonColor(preferenceWindow.MainWindowBackgroundColorButton, MainWindow.Instance.Background.CloneCurrentValue());
         WindowsUtils.SetButtonColor(preferenceWindow.TextBoxTextColorButton, MainWindowTextColor);
         WindowsUtils.SetButtonColor(preferenceWindow.TextBoxBacklogTextColorButton, MainWindowBacklogTextColor);
         WindowsUtils.SetButtonColor(preferenceWindow.DeconjugationInfoColorButton, DeconjugationInfoColor);
@@ -847,8 +843,8 @@ internal static class ConfigManager
 
         preferenceWindow.MainWindowHeightNumericUpDown.Value = MainWindowHeight;
         preferenceWindow.MainWindowWidthNumericUpDown.Value = MainWindowWidth;
-        preferenceWindow.TextBoxFontSizeNumericUpDown.Value = mainWindow.FontSizeSlider.Value;
-        preferenceWindow.MainWindowOpacityNumericUpDown.Value = mainWindow.OpacitySlider.Value;
+        preferenceWindow.TextBoxFontSizeNumericUpDown.Value = MainWindow.Instance.FontSizeSlider.Value;
+        preferenceWindow.MainWindowOpacityNumericUpDown.Value = MainWindow.Instance.OpacitySlider.Value;
 
         preferenceWindow.ChangeMainWindowBackgroundOpacityOnUnhoverCheckBox.IsChecked = ChangeMainWindowBackgroundOpacityOnUnhover;
         preferenceWindow.MainWindowBackgroundOpacityOnUnhoverNumericUpDown.Value = MainWindowBackgroundOpacityOnUnhover;
@@ -876,7 +872,7 @@ internal static class ConfigManager
 
         preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
         preferenceWindow.MainWindowFontComboBox.SelectedIndex = Array.FindIndex(s_japaneseFonts, f =>
-            f.Content.ToString() == mainWindow.MainTextBox.FontFamily.Source);
+            f.Content.ToString() == MainWindow.Instance.MainTextBox.FontFamily.Source);
 
         if (preferenceWindow.MainWindowFontComboBox.SelectedIndex is -1)
         {
@@ -1264,9 +1260,8 @@ internal static class ConfigManager
         settings[nameof(CopyPrimarySpellingToClipboardMouseButton)].Value =
             preferenceWindow.CopyPrimarySpellingToClipboardMouseButtonComboBox.SelectedValue.ToString();
 
-        MainWindow mainWindow = MainWindow.Instance;
-        settings["MainWindowTopPosition"].Value = mainWindow.Top.ToString(CultureInfo.InvariantCulture);
-        settings["MainWindowLeftPosition"].Value = mainWindow.Left.ToString(CultureInfo.InvariantCulture);
+        settings["MainWindowTopPosition"].Value = MainWindow.Instance.Top.ToString(CultureInfo.InvariantCulture);
+        settings["MainWindowLeftPosition"].Value = MainWindow.Instance.Left.ToString(CultureInfo.InvariantCulture);
 
         config.Save(ConfigurationSaveMode.Modified);
 
@@ -1285,25 +1280,23 @@ internal static class ConfigManager
         Configuration config = ConfigurationManager.OpenMappedExeConfiguration(MappedExeConfiguration, ConfigurationUserLevel.None);
         KeyValueConfigurationCollection settings = config.AppSettings.Settings;
 
-        MainWindow mainWindow = MainWindow.Instance;
+        settings["MainWindowFontSize"].Value = MainWindow.Instance.FontSizeSlider.Value.ToString(CultureInfo.InvariantCulture);
+        settings["MainWindowOpacity"].Value = MainWindow.Instance.OpacitySlider.Value.ToString(CultureInfo.InvariantCulture);
 
-        settings["MainWindowFontSize"].Value = mainWindow.FontSizeSlider.Value.ToString(CultureInfo.InvariantCulture);
-        settings["MainWindowOpacity"].Value = mainWindow.OpacitySlider.Value.ToString(CultureInfo.InvariantCulture);
-
-        settings[nameof(MainWindowHeight)].Value = MainWindowHeight > mainWindow.MinHeight
+        settings[nameof(MainWindowHeight)].Value = MainWindowHeight > MainWindow.Instance.MinHeight
             ? MainWindowHeight.ToString(CultureInfo.InvariantCulture)
-            : mainWindow.MinHeight.ToString(CultureInfo.InvariantCulture);
+            : MainWindow.Instance.MinHeight.ToString(CultureInfo.InvariantCulture);
 
-        settings[nameof(MainWindowWidth)].Value = MainWindowWidth > mainWindow.MinWidth
+        settings[nameof(MainWindowWidth)].Value = MainWindowWidth > MainWindow.Instance.MinWidth
             ? MainWindowWidth.ToString(CultureInfo.InvariantCulture)
-            : mainWindow.MinWidth.ToString(CultureInfo.InvariantCulture);
+            : MainWindow.Instance.MinWidth.ToString(CultureInfo.InvariantCulture);
 
-        settings["MainWindowTopPosition"].Value = mainWindow.Top >= SystemParameters.VirtualScreenTop
-            ? mainWindow.Top.ToString(CultureInfo.InvariantCulture)
+        settings["MainWindowTopPosition"].Value = MainWindow.Instance.Top >= SystemParameters.VirtualScreenTop
+            ? MainWindow.Instance.Top.ToString(CultureInfo.InvariantCulture)
             : "0";
 
-        settings["MainWindowLeftPosition"].Value = mainWindow.Left >= SystemParameters.VirtualScreenLeft
-            ? mainWindow.Left.ToString(CultureInfo.InvariantCulture)
+        settings["MainWindowLeftPosition"].Value = MainWindow.Instance.Left >= SystemParameters.VirtualScreenLeft
+            ? MainWindow.Instance.Left.ToString(CultureInfo.InvariantCulture)
             : "0";
 
         // TODO: properties with public setters should be saved here?

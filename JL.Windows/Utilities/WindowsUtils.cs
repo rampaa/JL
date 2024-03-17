@@ -145,14 +145,13 @@ internal static class WindowsUtils
         AddNameWindow addNameWindowInstance = AddNameWindow.Instance;
         addNameWindowInstance.SpellingTextBox.Text = selectedText ?? "";
         addNameWindowInstance.ReadingTextBox.Text = reading;
-        MainWindow mainWindow = MainWindow.Instance;
-        addNameWindowInstance.Owner = mainWindow;
+        addNameWindowInstance.Owner = MainWindow.Instance;
         addNameWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         StatsUtils.StatsStopWatch.Stop();
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+            WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = addNameWindowInstance.ShowDialog();
@@ -162,14 +161,13 @@ internal static class WindowsUtils
     {
         AddWordWindow addWordWindowInstance = AddWordWindow.Instance;
         addWordWindowInstance.SpellingsTextBox.Text = selectedText ?? "";
-        MainWindow mainWindow = MainWindow.Instance;
-        addWordWindowInstance.Owner = mainWindow;
+        addWordWindowInstance.Owner = MainWindow.Instance;
         addWordWindowInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         StatsUtils.StatsStopWatch.Stop();
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+            WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = addWordWindowInstance.ShowDialog();
@@ -179,14 +177,13 @@ internal static class WindowsUtils
     {
         PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
         ConfigManager.LoadPreferences(preferencesWindow);
-        MainWindow mainWindow = MainWindow.Instance;
-        preferencesWindow.Owner = mainWindow;
+        preferencesWindow.Owner = MainWindow.Instance;
         preferencesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StatsStopWatch.Stop();
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+            WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = preferencesWindow.ShowDialog();
@@ -212,14 +209,13 @@ internal static class WindowsUtils
         }
 
         ManageDictionariesWindow manageDictionariesWindow = ManageDictionariesWindow.Instance;
-        MainWindow mainWindow = MainWindow.Instance;
-        manageDictionariesWindow.Owner = mainWindow;
+        manageDictionariesWindow.Owner = MainWindow.Instance;
         manageDictionariesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StatsStopWatch.Stop();
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+            WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = manageDictionariesWindow.ShowDialog();
@@ -233,14 +229,13 @@ internal static class WindowsUtils
         }
 
         ManageFrequenciesWindow manageFrequenciesWindow = ManageFrequenciesWindow.Instance;
-        MainWindow mainWindow = MainWindow.Instance;
-        manageFrequenciesWindow.Owner = mainWindow;
+        manageFrequenciesWindow.Owner = MainWindow.Instance;
         manageFrequenciesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StatsStopWatch.Stop();
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+            WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = manageFrequenciesWindow.ShowDialog();
@@ -252,13 +247,12 @@ internal static class WindowsUtils
         StatsUtils.StatsStopWatch.Reset();
 
         StatsWindow statsWindow = StatsWindow.Instance;
-        MainWindow mainWindow = MainWindow.Instance;
-        statsWindow.Owner = mainWindow;
+        statsWindow.Owner = MainWindow.Instance;
         statsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+            WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = statsWindow.ShowDialog();
@@ -272,14 +266,13 @@ internal static class WindowsUtils
         }
 
         ManageAudioSourcesWindow manageAudioSourcesWindow = ManageAudioSourcesWindow.Instance;
-        MainWindow mainWindow = MainWindow.Instance;
-        manageAudioSourcesWindow.Owner = mainWindow;
+        manageAudioSourcesWindow.Owner = MainWindow.Instance;
         manageAudioSourcesWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         StatsUtils.StatsStopWatch.Stop();
 
         if (ConfigManager.GlobalHotKeys && !ConfigManager.DisableHotkeys)
         {
-            WinApi.UnregisterAllHotKeys(mainWindow.WindowHandle);
+            WinApi.UnregisterAllHotKeys(MainWindow.Instance.WindowHandle);
         }
 
         _ = manageAudioSourcesWindow.ShowDialog();
@@ -639,20 +632,18 @@ internal static class WindowsUtils
 
     public static void UpdateMainWindowVisibility()
     {
-        MainWindow mainWindow = MainWindow.Instance;
-
-        if (!mainWindow.FirstPopupWindow.IsVisible)
+        if (!MainWindow.Instance.FirstPopupWindow.IsVisible)
         {
-            if (!mainWindow.IsMouseOver)
+            if (!MainWindow.Instance.IsMouseOver)
             {
                 if (ConfigManager.TextOnlyVisibleOnHover)
                 {
-                    mainWindow.MainGrid.Opacity = 0;
+                    MainWindow.Instance.MainGrid.Opacity = 0;
                 }
 
                 if (ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
                 {
-                    mainWindow.Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
+                    MainWindow.Instance.Background.Opacity = ConfigManager.MainWindowBackgroundOpacityOnUnhover / 100;
                 }
             }
         }
