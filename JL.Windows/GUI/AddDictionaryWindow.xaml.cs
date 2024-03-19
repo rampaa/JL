@@ -1,11 +1,10 @@
-using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
-using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using Microsoft.Win32;
 using Path = System.IO.Path;
 
 namespace JL.Windows.GUI;
@@ -90,7 +89,6 @@ internal sealed partial class AddDictionaryWindow : Window
     private void BrowseForDictionaryFile(string filter)
     {
         OpenFileDialog openFileDialog = new() { InitialDirectory = Utils.ApplicationPath, Filter = filter };
-
         if (openFileDialog.ShowDialog() is true)
         {
             TextBlockPath.Text = Utils.GetPath(openFileDialog.FileName);
@@ -99,13 +97,10 @@ internal sealed partial class AddDictionaryWindow : Window
 
     private void BrowseForDictionaryFolder()
     {
-        using System.Windows.Forms.FolderBrowserDialog fbd = new();
-        fbd.SelectedPath = Utils.ApplicationPath;
-
-        if (fbd.ShowDialog() is System.Windows.Forms.DialogResult.OK &&
-            !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+        OpenFolderDialog openFolderDialog = new() { InitialDirectory = Utils.ApplicationPath };
+        if (openFolderDialog.ShowDialog() is true)
         {
-            TextBlockPath.Text = Utils.GetPath(fbd.SelectedPath);
+            TextBlockPath.Text = Utils.GetPath(openFolderDialog.FolderName);
         }
     }
 
