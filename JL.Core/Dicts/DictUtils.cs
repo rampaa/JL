@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using JL.Core.Dicts.CustomNameDict;
@@ -498,6 +499,8 @@ public static class DictUtils
         bool dictCleared = false;
         bool dictRemoved = false;
 
+        Dictionary<string, string> dictDBPaths = [];
+
         List<Task> tasks = [];
 
         foreach (Dict dict in Dicts.Values.ToList())
@@ -524,9 +527,9 @@ public static class DictUtils
             bool loadFromDB;
             dict.Ready = false;
 
-            if (useDB)
+            if (useDB && !DBUtils.DictDBPaths.ContainsKey(dict.Name))
             {
-                _ = DBUtils.s_dictDBPaths.TryAdd(dict.Name, dbPath);
+                dictDBPaths.Add(dict.Name, dbPath);
             }
 
             switch (dict.Type)
@@ -1230,6 +1233,11 @@ public static class DictUtils
                 default:
                     throw new ArgumentOutOfRangeException(null, "Invalid dict type");
             }
+        }
+
+        if (dictDBPaths.Count > 0)
+        {
+            DBUtils.DictDBPaths = FrozenDictionary.ToFrozenDictionary(DBUtils.DictDBPaths.Union(dictDBPaths));
         }
 
         if (tasks.Count > 0 || dictCleared)

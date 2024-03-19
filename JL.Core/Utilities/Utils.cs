@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.Encodings.Web;
@@ -76,7 +77,7 @@ public static partial class Utils
         WriteIndented = true
     };
 
-    internal static readonly Dictionary<string, string> s_iso6392BTo2T = new(20)
+    internal static readonly FrozenDictionary<string, string> s_iso6392BTo2T = FrozenDictionary.ToFrozenDictionary(new Dictionary<string, string>(20)
     {
         #pragma warning disable format
         { "tib", "bod" }, { "cze", "ces" }, { "wel", "cym" }, { "ger", "deu" }, { "gre", "ell" },
@@ -84,7 +85,7 @@ public static partial class Utils
         { "geo", "kat" }, { "mac", "mkd" }, { "mao", "mri" }, { "may", "msa" }, { "bur", "mya" },
         { "dut", "nld" }, { "rum", "ron" }, { "slo", "slk" }, { "alb", "sqi" }, { "chi", "zho" }
         #pragma warning restore format
-    };
+    });
 
 #pragma warning disable CA5351
     internal static string GetMd5String(byte[] bytes)

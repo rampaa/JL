@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Configuration;
 using System.Text;
 using System.Windows.Controls;
@@ -11,7 +12,7 @@ internal static class KeyGestureUtils
     public static readonly Dictionary<int, KeyGesture> KeyGestureDict = [];
     public static readonly Dictionary<string, int> KeyGestureNameToIntDict = [];
 
-    public static readonly HashSet<Key> ValidKeys =
+    public static readonly FrozenSet<Key> ValidKeys = FrozenSet.ToFrozenSet(
     [
         #pragma warning disable format
 
@@ -31,7 +32,7 @@ internal static class KeyGestureUtils
         Key.Decimal, Key.Divide
 
         #pragma warning restore format
-    ];
+    ]);
 
     public static readonly string[] NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized = [
         nameof(ConfigManager.ToggleMinimizedStateKeyGesture),

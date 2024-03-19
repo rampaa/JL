@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using JL.Core.Freqs.FrequencyNazeka;
@@ -51,6 +52,8 @@ public static class FreqUtils
         bool freqCleared = false;
         bool freqRemoved = false;
 
+        Dictionary<string, string> freqDBPathDict = [];
+
         List<Task> tasks = [];
 
         foreach (Freq freq in FreqDicts.Values.ToList())
@@ -77,9 +80,9 @@ public static class FreqUtils
             bool loadFromDB;
             freq.Ready = false;
 
-            if (useDB)
+            if (useDB && !DBUtils.FreqDBPaths.ContainsKey(freq.Name))
             {
-                _ = DBUtils.s_freqDBPaths.TryAdd(freq.Name, dbPath);
+                freqDBPathDict.Add(freq.Name, dbPath);
             }
 
             switch (freq.Type)
@@ -249,6 +252,11 @@ public static class FreqUtils
                 default:
                     throw new ArgumentOutOfRangeException(null, "Invalid freq type");
             }
+        }
+
+        if (freqDBPathDict.Count > 0)
+        {
+            DBUtils.FreqDBPaths = FrozenDictionary.ToFrozenDictionary(DBUtils.FreqDBPaths.Union(freqDBPathDict));
         }
 
         if (tasks.Count > 0 || freqCleared)
