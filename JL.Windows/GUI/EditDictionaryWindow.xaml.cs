@@ -153,7 +153,7 @@ internal sealed partial class EditDictionaryWindow : Window
             initialDirectory = Utils.ApplicationPath;
         }
 
-        OpenFileDialog openFileDialog = new(){ InitialDirectory = initialDirectory, Filter = filter };
+        OpenFileDialog openFileDialog = new() { InitialDirectory = initialDirectory, Filter = filter };
         if (openFileDialog.ShowDialog() is true)
         {
             TextBlockPath.Text = Utils.GetPath(openFileDialog.FileName);
@@ -168,7 +168,7 @@ internal sealed partial class EditDictionaryWindow : Window
             initialDirectory = Utils.ApplicationPath;
         }
 
-        OpenFolderDialog openFolderDialog = new() { InitialDirectory =  };
+        OpenFolderDialog openFolderDialog = new() { InitialDirectory = initialDirectory };
         if (openFolderDialog.ShowDialog() is true)
         {
             TextBlockPath.Text = Utils.GetPath(openFolderDialog.FolderName);
