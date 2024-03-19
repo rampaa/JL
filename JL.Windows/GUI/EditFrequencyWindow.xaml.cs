@@ -133,7 +133,7 @@ internal sealed partial class EditFrequencyWindow : Window
 
     private void BrowseForFrequencyFolder()
     {
-        string? initialDirectory = _freq.Path;
+        string initialDirectory = _freq.Path;
         if (!Directory.Exists(initialDirectory))
         {
             initialDirectory = Utils.ApplicationPath;

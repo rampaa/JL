@@ -162,7 +162,7 @@ internal sealed partial class EditDictionaryWindow : Window
 
     private void BrowseForDictionaryFolder()
     {
-        string? initialDirectory = _dict.Path;
+        string initialDirectory = _dict.Path;
         if (!Directory.Exists(initialDirectory))
         {
             initialDirectory = Utils.ApplicationPath;

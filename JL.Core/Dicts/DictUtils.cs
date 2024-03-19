@@ -1237,7 +1237,7 @@ public static class DictUtils
 
         if (dictDBPaths.Count > 0)
         {
-            DBUtils.DictDBPaths = FrozenDictionary.ToFrozenDictionary(DBUtils.DictDBPaths.Union(dictDBPaths));
+            DBUtils.DictDBPaths = DBUtils.DictDBPaths.Union(dictDBPaths).ToFrozenDictionary();
         }
 
         if (tasks.Count > 0 || dictCleared)

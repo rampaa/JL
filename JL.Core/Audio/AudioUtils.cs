@@ -22,7 +22,7 @@ public static class AudioUtils
         }
     };
 
-    private static readonly FrozenDictionary<string, string> s_mediaTypeToExtensionDict = FrozenDictionary.ToFrozenDictionary(new Dictionary<string, string>(6)
+    private static readonly FrozenDictionary<string, string> s_mediaTypeToExtensionDict = new Dictionary<string, string>(6)
     {
         { "mpeg", "mp3" },
         { "3gpp", "3gp" },
@@ -30,7 +30,7 @@ public static class AudioUtils
         { "vorbis", "ogg" },
         { "vorbis-config", "ogg" },
         { "x-midi", "midi" }
-    });
+    }.ToFrozenDictionary();
 
     private static async Task<AudioResponse?> GetAudioFromUrl(Uri url)
     {

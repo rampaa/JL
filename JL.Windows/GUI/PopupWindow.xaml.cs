@@ -44,7 +44,7 @@ internal sealed partial class PopupWindow : Window
 
     public List<LookupResult> LastLookupResults { get; private set; } = [];
 
-    public List<Dict> DictsWithResults { get; } = [];
+    private readonly List<Dict> _dictsWithResults = [];
 
     private Dict? _filteredDict;
 
@@ -404,7 +404,7 @@ internal sealed partial class PopupWindow : Window
 
     public void DisplayResults(bool generateAllResults)
     {
-        DictsWithResults.Clear();
+        _dictsWithResults.Clear();
 
         PopupListView.Items.Filter = NoAllDictFilter;
 
@@ -426,9 +426,9 @@ internal sealed partial class PopupWindow : Window
         {
             LookupResult lookupResult = LastLookupResults[i];
 
-            if (!DictsWithResults.Contains(lookupResult.Dict))
+            if (!_dictsWithResults.Contains(lookupResult.Dict))
             {
-                DictsWithResults.Add(lookupResult.Dict);
+                _dictsWithResults.Add(lookupResult.Dict);
             }
 
             popupItemSource[i] = PrepareResultStackPanel(lookupResult, i, resultCount, pitchDict, pitchDictIsActive, showPOrthographyInfo, showROrthographyInfo, showAOrthographyInfo, pOrthographyInfoFontSize);
@@ -449,7 +449,7 @@ internal sealed partial class PopupWindow : Window
         textBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
     }
 
-    public StackPanel PrepareResultStackPanel(LookupResult result, int index, int resultsCount, Dict? pitchDict, bool pitchDictIsActive, bool showPOrthographyInfo, bool showROrthographyInfo, bool showAOrthographyInfo, double pOrthographyInfoFontSize)
+    private StackPanel PrepareResultStackPanel(LookupResult result, int index, int resultsCount, Dict? pitchDict, bool pitchDictIsActive, bool showPOrthographyInfo, bool showROrthographyInfo, bool showAOrthographyInfo, double pOrthographyInfoFontSize)
     {
         // top
         WrapPanel top = new() { Tag = index };
@@ -1581,7 +1581,7 @@ internal sealed partial class PopupWindow : Window
 
         foreach (Dict dict in DictUtils.Dicts.Values.OrderBy(static dict => dict.Priority).ToList())
         {
-            if (!dict.Active || dict.Type is DictType.PitchAccentYomichan || (ConfigManager.HideDictTabsWithNoResults && !DictsWithResults.Contains(dict)))
+            if (!dict.Active || dict.Type is DictType.PitchAccentYomichan || (ConfigManager.HideDictTabsWithNoResults && !_dictsWithResults.Contains(dict)))
             {
                 continue;
             }
@@ -1589,7 +1589,7 @@ internal sealed partial class PopupWindow : Window
             Button button = new() { Content = dict.Name, Margin = new Thickness(1), Tag = dict };
             button.Click += DictTypeButtonOnClick;
 
-            if (!DictsWithResults.Contains(dict))
+            if (!_dictsWithResults.Contains(dict))
             {
                 button.IsEnabled = false;
             }

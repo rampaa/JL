@@ -256,7 +256,7 @@ public static class FreqUtils
 
         if (freqDBPathDict.Count > 0)
         {
-            DBUtils.FreqDBPaths = FrozenDictionary.ToFrozenDictionary(DBUtils.FreqDBPaths.Union(freqDBPathDict));
+            DBUtils.FreqDBPaths = DBUtils.FreqDBPaths.Union(freqDBPathDict).ToFrozenDictionary();
         }
 
         if (tasks.Count > 0 || freqCleared)
