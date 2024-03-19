@@ -121,7 +121,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
             };
 
             string fullPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
-            bool invalidPath = !Directory.Exists(fullPath) && !File.Exists(fullPath);
+            bool invalidPath = !Path.Exists(fullPath);
             TextBlock freqPathValidityTextBlock = new()
             {
                 Width = 13,
@@ -195,7 +195,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
     private void PathTextBlock_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         string? fullPath = Path.GetFullPath(((TextBlock)sender).Text, Utils.ApplicationPath);
-        if (File.Exists(fullPath) || Directory.Exists(fullPath))
+        if (Path.Exists(fullPath))
         {
             if (File.Exists(fullPath))
             {

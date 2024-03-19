@@ -46,7 +46,7 @@ internal sealed partial class AddFrequencyWindow : Window
         string fullPath = Path.GetFullPath(path, Utils.ApplicationPath);
 
         if (string.IsNullOrWhiteSpace(path)
-            || (!Directory.Exists(fullPath) && !File.Exists(fullPath))
+            || !Path.Exists(fullPath)
             || FreqUtils.FreqDicts.Values.Any(freq => freq.Path == path))
         {
             TextBlockPath.BorderBrush = Brushes.Red;

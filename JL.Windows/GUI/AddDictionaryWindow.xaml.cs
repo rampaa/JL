@@ -48,7 +48,7 @@ internal sealed partial class AddDictionaryWindow : Window
         string fullPath = Path.GetFullPath(path, Utils.ApplicationPath);
 
         if (string.IsNullOrWhiteSpace(path)
-            || (!Directory.Exists(fullPath) && !File.Exists(fullPath))
+            || !Path.Exists(fullPath)
             || DictUtils.Dicts.Values.Any(dict => dict.Path == path))
         {
             TextBlockPath.BorderBrush = Brushes.Red;

@@ -40,8 +40,7 @@ internal sealed partial class EditFrequencyWindow : Window
 
         if (string.IsNullOrWhiteSpace(path)
             || (_freq.Path != path
-                && ((!Directory.Exists(fullPath) && !File.Exists(fullPath))
-                    || FreqUtils.FreqDicts.Values.Any(dict => dict.Path == path))))
+                && (!Path.Exists(fullPath) || FreqUtils.FreqDicts.Values.Any(dict => dict.Path == path))))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
             isValid = false;
