@@ -42,9 +42,9 @@ internal sealed partial class PopupWindow : Window
 
     public nint WindowHandle { get; private set; }
 
-    public List<LookupResult> LastLookupResults { get; private set; } = new();
+    public List<LookupResult> LastLookupResults { get; private set; } = [];
 
-    public List<Dict> DictsWithResults { get; } = new();
+    public List<Dict> DictsWithResults { get; } = [];
 
     private Dict? _filteredDict;
 
@@ -144,9 +144,9 @@ internal sealed partial class PopupWindow : Window
 
         if (Owner != MainWindow.Instance
                 ? ConfigManager.DisableLookupsForNonJapaneseCharsInPopups
-                  && !JapaneseUtils.JapaneseRegex.IsMatch(textBoxText[charPosition].ToString())
+                  && !JapaneseUtils.JapaneseRegex().IsMatch(textBoxText[charPosition].ToString())
                 : ConfigManager.DisableLookupsForNonJapaneseCharsInMainWindow
-                  && !JapaneseUtils.JapaneseRegex.IsMatch(textBoxText[charPosition].ToString()))
+                  && !JapaneseUtils.JapaneseRegex().IsMatch(textBoxText[charPosition].ToString()))
         {
             HidePopup();
             return;
@@ -213,7 +213,7 @@ internal sealed partial class PopupWindow : Window
 
             else
             {
-                DisplayResults(false, text);
+                DisplayResults(false);
             }
 
             Show();
@@ -405,7 +405,7 @@ internal sealed partial class PopupWindow : Window
         Top = y;
     }
 
-    public void DisplayResults(bool generateAllResults, string? text = null)
+    public void DisplayResults(bool generateAllResults)
     {
         DictsWithResults.Clear();
 
@@ -1021,7 +1021,7 @@ internal sealed partial class PopupWindow : Window
         {
             TextBox tb = (TextBox)sender;
             _lastInteractedTextBox = tb;
-            if (JapaneseUtils.JapaneseRegex.IsMatch(tb.Text))
+            if (JapaneseUtils.JapaneseRegex().IsMatch(tb.Text))
             {
                 await ChildPopupWindow.LookupOnMouseMoveOrClick(tb).ConfigureAwait(false);
             }

@@ -70,7 +70,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
     // probably should be split into several methods
     private void UpdateFreqsDisplay()
     {
-        List<DockPanel> resultDockPanels = new();
+        List<DockPanel> resultDockPanels = [];
 
         foreach (Freq freq in FreqUtils.FreqDicts.Values.ToList())
         {

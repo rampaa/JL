@@ -14,7 +14,7 @@ public sealed class Freq
     public int Priority { get; set; }
     public int Size { get; set; }
     [JsonIgnore] public bool Ready { get; set; }
-    [JsonIgnore] public Dictionary<string, IList<FrequencyRecord>> Contents { get; internal set; } = new();
+    [JsonIgnore] public Dictionary<string, IList<FrequencyRecord>> Contents { get; internal set; } = [];
     public FreqOptions? Options { get; set; } // can be null for dicts.json files generated before version 1.25.0
 
     public Freq(FreqType type, string name, string path, bool active, int priority, int size, bool ready, FreqOptions options)

@@ -37,7 +37,7 @@ internal static class JmdictWordClassUtils
                         }
                         else
                         {
-                            DictUtils.WordClassDictionary[readingInHiragana] = new List<JmdictWordClass> { jmdictWordClass };
+                            DictUtils.WordClassDictionary[readingInHiragana] = [jmdictWordClass];
                         }
                     }
                 }
@@ -54,13 +54,13 @@ internal static class JmdictWordClassUtils
 
     public static async Task Serialize()
     {
-        Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary = new();
+        Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary = [];
 
-        HashSet<string> usedWordClasses = new(23)
-        {
+        HashSet<string> usedWordClasses =
+        [
             "adj-i", "adj-na", "v1", "v1-s", "v4r", "v5aru", "v5b", "v5g", "v5k", "v5k-s", "v5m",
             "v5n", "v5r", "v5r-i", "v5s", "v5t", "v5u", "v5u-s", "vk", "vs-c", "vs-i", "vs-s", "vz"
-        };
+        ];
 
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
         foreach (IList<IDictRecord> jmdictRecordList in dict.Contents.Values.ToList())
@@ -80,7 +80,7 @@ internal static class JmdictWordClassUtils
                 if (jmdictWordClassDictionary.TryGetValue(value.PrimarySpelling, out List<JmdictWordClass>? psr))
                 {
                     if (!psr.Any(r =>
-                            r.Readings?.SequenceEqual(value.Readings ?? Array.Empty<string>()) ??
+                            r.Readings?.SequenceEqual(value.Readings ?? []) ??
                             (value.Readings is null && r.Spelling == value.PrimarySpelling)))
                     {
                         psr.Add(new JmdictWordClass(value.PrimarySpelling, value.Readings, wordClasses));
@@ -89,7 +89,7 @@ internal static class JmdictWordClassUtils
 
                 else
                 {
-                    jmdictWordClassDictionary[value.PrimarySpelling] = new List<JmdictWordClass> { new(value.PrimarySpelling, value.Readings, wordClasses) };
+                    jmdictWordClassDictionary[value.PrimarySpelling] = [new JmdictWordClass(value.PrimarySpelling, value.Readings, wordClasses)];
                 }
 
                 if (value.AlternativeSpellings is not null)
@@ -101,7 +101,7 @@ internal static class JmdictWordClassUtils
                         if (jmdictWordClassDictionary.TryGetValue(spelling, out List<JmdictWordClass>? asr))
                         {
                             if (!asr.Any(r =>
-                                    r.Readings?.SequenceEqual(value.Readings ?? Array.Empty<string>()) ??
+                                    r.Readings?.SequenceEqual(value.Readings ?? []) ??
                                     (value.Readings is null && r.Spelling == spelling)))
                             {
                                 asr.Add(new JmdictWordClass(spelling, value.Readings, wordClasses));
@@ -110,7 +110,7 @@ internal static class JmdictWordClassUtils
 
                         else
                         {
-                            jmdictWordClassDictionary[spelling] = new List<JmdictWordClass> { new(spelling, value.Readings, wordClasses) };
+                            jmdictWordClassDictionary[spelling] = [new JmdictWordClass(spelling, value.Readings, wordClasses)];
                         }
                     }
                 }

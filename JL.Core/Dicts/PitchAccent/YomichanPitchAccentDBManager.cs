@@ -122,7 +122,7 @@ internal static class YomichanPitchAccentDBManager
 
     public static Dictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
-        Dictionary<string, IList<IDictRecord>> results = new();
+        Dictionary<string, IList<IDictRecord>> results = [];
 
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -167,7 +167,7 @@ internal static class YomichanPitchAccentDBManager
             }
             else
             {
-                results[searchKey] = new List<IDictRecord> { record };
+                results[searchKey] = [record];
             }
         }
 
@@ -176,7 +176,7 @@ internal static class YomichanPitchAccentDBManager
 
     public static Dictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, string term)
     {
-        Dictionary<string, IList<IDictRecord>> results = new();
+        Dictionary<string, IList<IDictRecord>> results = [];
 
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -207,7 +207,7 @@ internal static class YomichanPitchAccentDBManager
             }
             else
             {
-                results[searchKey] = new List<IDictRecord> { record };
+                results[searchKey] = [record];
             }
         }
 
@@ -245,7 +245,7 @@ internal static class YomichanPitchAccentDBManager
                 }
                 else
                 {
-                    dict.Contents[searchKey] = new List<IDictRecord> { record };
+                    dict.Contents[searchKey] = [record];
                 }
             }
         }

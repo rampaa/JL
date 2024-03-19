@@ -65,7 +65,7 @@ internal static class JmdictDBManager
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
-        Dictionary<JmdictRecord, List<string>> recordToKeysDict = new();
+        Dictionary<JmdictRecord, List<string>> recordToKeysDict = [];
         foreach ((string key, IList<IDictRecord> records) in dict.Contents)
         {
             for (int i = 0; i < records.Count; i++)
@@ -77,7 +77,7 @@ internal static class JmdictDBManager
                 }
                 else
                 {
-                    recordToKeysDict[record] = new List<string> { key };
+                    recordToKeysDict[record] = [key];
                 }
             }
         }
@@ -199,7 +199,7 @@ internal static class JmdictDBManager
             _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
         }
 
-        Dictionary<string, IList<IDictRecord>> results = new();
+        Dictionary<string, IList<IDictRecord>> results = [];
 
         using SqliteDataReader dataReader = command.ExecuteReader();
         while (dataReader.Read())
@@ -214,7 +214,7 @@ internal static class JmdictDBManager
 
             else
             {
-                results[searchKey] = new List<IDictRecord> { record };
+                results[searchKey] = [record];
             }
         }
 
@@ -268,7 +268,7 @@ internal static class JmdictDBManager
                 }
                 else
                 {
-                    dict.Contents[searchKey] = new List<IDictRecord> { record };
+                    dict.Contents[searchKey] = [record];
                 }
             }
         }

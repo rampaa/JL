@@ -255,11 +255,11 @@ public static class DictUpdater
 
     internal static async Task AutoUpdateBuiltInDicts()
     {
-        DictType[] dicts = {
+        DictType[] dicts = [
             DictType.JMdict,
             DictType.JMnedict,
             DictType.Kanjidic
-        };
+        ];
 
         for (int i = 0; i < dicts.Length; i++)
         {

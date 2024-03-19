@@ -97,7 +97,7 @@ internal static class KanjidicDBManager
 
     public static List<IDictRecord> GetRecordsFromDB(string dbName, string term)
     {
-        List<IDictRecord> results = new();
+        List<IDictRecord> results = [];
 
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -152,7 +152,7 @@ internal static class KanjidicDBManager
         while (dataReader.Read())
         {
             string kanji = dataReader.GetString(nameof(kanji));
-            dict.Contents[kanji] = new IDictRecord[] { GetRecord(dataReader) };
+            dict.Contents[kanji] = [GetRecord(dataReader)];
         }
 
         dict.Contents.TrimExcess();

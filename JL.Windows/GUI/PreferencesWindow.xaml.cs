@@ -149,13 +149,13 @@ internal sealed partial class PreferencesWindow : Window
                 if (_profileNamesDict.Active)
                 {
                     DictUtils.ProfileCustomNamesCancellationTokenSource?.Cancel();
-                    _profileNamesDict.Contents = new Dictionary<string, IList<IDictRecord>>();
+                    _profileNamesDict.Contents = [];
                 }
 
                 if (_profileWordsDict.Active)
                 {
                     DictUtils.ProfileCustomWordsCancellationTokenSource?.Cancel();
-                    _profileWordsDict.Contents = new Dictionary<string, IList<IDictRecord>>();
+                    _profileWordsDict.Contents = [];
                 }
 
                 await DictUtils.LoadDictionaries().ConfigureAwait(false);
@@ -372,7 +372,7 @@ internal sealed partial class PreferencesWindow : Window
 
         string rawTags = tagsTextBox.Text;
         string[] tags = string.IsNullOrEmpty(rawTags)
-            ? Array.Empty<string>()
+            ? []
             : rawTags.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
 
         return new AnkiConfig(deckName, modelName, dict, tags);
@@ -385,7 +385,7 @@ internal sealed partial class PreferencesWindow : Window
             return;
         }
 
-        Dictionary<MineType, AnkiConfig> ankiConfigDict = new();
+        Dictionary<MineType, AnkiConfig> ankiConfigDict = [];
 
         AnkiConfig? ankiConfig = GetAnkiConfigFromPreferences(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordMiningSetupStackPanelFields, WordTagsTextBox, JLFieldUtils.JLFieldsForWordDicts, MineType.Word);
         if (ankiConfig is not null)

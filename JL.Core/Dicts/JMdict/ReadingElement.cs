@@ -10,9 +10,9 @@ internal sealed class ReadingElement
     // public List<string> RePriList { get; } // e.g. ichi1
     public ReadingElement()
     {
-        ReRestrList = new List<string>();
-        ReInfList = new List<string>();
-        Reb = string.Empty;
+        ReRestrList = [];
+        ReInfList = [];
+        Reb = "";
         // ReNokanji = false;
         // RePriList = new List<string>();
     }

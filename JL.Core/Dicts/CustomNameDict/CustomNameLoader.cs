@@ -64,7 +64,7 @@ public static class CustomNameLoader
 
         else
         {
-            customNameDictionary[spellingInHiragana] = new List<IDictRecord> { newNameRecord };
+            customNameDictionary[spellingInHiragana] = [newNameRecord];
         }
     }
 }

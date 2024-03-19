@@ -11,7 +11,7 @@ namespace JL.Core.Freqs;
 public static class FreqUtils
 {
     public static bool FreqsReady { get; private set; } // = false;
-    public static Dictionary<string, Freq> FreqDicts { get; } = new();
+    public static Dictionary<string, Freq> FreqDicts { get; } = [];
 
     internal static readonly Dictionary<string, Freq> s_builtInFreqs = new(3)
     {
@@ -37,11 +37,12 @@ public static class FreqUtils
         }
     };
 
-    internal static readonly FreqType[] s_allFreqDicts = {
+    internal static readonly FreqType[] s_allFreqDicts =
+    [
         FreqType.Nazeka,
         FreqType.Yomichan,
         FreqType.YomichanKanji
-    };
+    ];
 
     public static async Task LoadFrequencies()
     {
@@ -50,7 +51,7 @@ public static class FreqUtils
         bool freqCleared = false;
         bool freqRemoved = false;
 
-        List<Task> tasks = new();
+        List<Task> tasks = [];
 
         foreach (Freq freq in FreqDicts.Values.ToList())
         {

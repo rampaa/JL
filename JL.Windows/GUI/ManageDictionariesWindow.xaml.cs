@@ -75,7 +75,7 @@ internal sealed partial class ManageDictionariesWindow : Window
     // probably should be split into several methods
     private void UpdateDictionariesDisplay()
     {
-        List<DockPanel> resultDockPanels = new();
+        List<DockPanel> resultDockPanels = [];
 
         foreach (Dict dict in DictUtils.Dicts.Values.ToList())
         {

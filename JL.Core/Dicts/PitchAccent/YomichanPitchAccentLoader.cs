@@ -51,7 +51,7 @@ internal static class YomichanPitchAccentLoader
 
                 else
                 {
-                    pitchDict[spellingInHiragana] = new List<IDictRecord> { newEntry };
+                    pitchDict[spellingInHiragana] = [newEntry];
                 }
 
                 if (!string.IsNullOrEmpty(newEntry.Reading))
@@ -65,7 +65,7 @@ internal static class YomichanPitchAccentLoader
                         }
                         else
                         {
-                            pitchDict[readingInHiragana] = new List<IDictRecord> { newEntry };
+                            pitchDict[readingInHiragana] = [newEntry];
                         }
                     }
                 }

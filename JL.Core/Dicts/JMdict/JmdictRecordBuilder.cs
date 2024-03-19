@@ -6,7 +6,7 @@ internal static class JmdictRecordBuilder
 {
     public static void AddToDictionary(JmdictEntry entry, Dictionary<string, IList<IDictRecord>> jmdictDictionary)
     {
-        Dictionary<string, JmdictRecord> recordDictionary = new();
+        Dictionary<string, JmdictRecord> recordDictionary = [];
 
         List<KanjiElement> kanjiElementsWithoutSearchOnlyForms = entry.KanjiElements.Where(static ke => !ke.KeInfList.Contains("sK")).ToList();
         List<string> allSpellingsWithoutSearchOnlyForms = kanjiElementsWithoutSearchOnlyForms.Select(static ke => ke.Keb).ToList();
@@ -34,8 +34,8 @@ internal static class JmdictRecordBuilder
                 continue;
             }
 
-            List<string> readingList = new();
-            List<string[]?> readingsOrthographyInfoList = new();
+            List<string> readingList = [];
+            List<string[]?> readingsOrthographyInfoList = [];
             for (int j = 0; j < entry.ReadingElements.Count; j++)
             {
                 ReadingElement readingElement = entry.ReadingElements[j];
@@ -48,17 +48,17 @@ internal static class JmdictRecordBuilder
                 }
             }
 
-            List<string[]> definitionList = new();
-            List<string[]> wordClassList = new();
-            List<string[]?> readingRestrictionList = new();
-            List<string[]?> spellingRestrictionList = new();
-            List<string[]?> fieldList = new();
-            List<string[]?> miscList = new();
-            List<string[]?> dialectList = new();
-            List<string?> definitionInfoList = new();
-            List<string[]?> relatedTermList = new();
-            List<string[]?> antonymList = new();
-            List<LoanwordSource[]?> loanwordSourceList = new();
+            List<string[]> definitionList = [];
+            List<string[]> wordClassList = [];
+            List<string[]?> readingRestrictionList = [];
+            List<string[]?> spellingRestrictionList = [];
+            List<string[]?> fieldList = [];
+            List<string[]?> miscList = [];
+            List<string[]?> dialectList = [];
+            List<string?> definitionInfoList = [];
+            List<string[]?> relatedTermList = [];
+            List<string[]?> antonymList = [];
+            List<LoanwordSource[]?> loanwordSourceList = [];
             for (int j = 0; j < entry.SenseList.Count; j++)
             {
                 Sense sense = entry.SenseList[j];
@@ -171,17 +171,17 @@ internal static class JmdictRecordBuilder
                 alternativeSpellingsOrthographyInfo = allROrthographyInfoWithoutSearchOnlyForms.RemoveAtToArray(index);
             }
 
-            List<string[]> definitionList = new();
-            List<string[]> wordClassList = new();
-            List<string[]?> readingRestrictionList = new();
-            List<string[]?> spellingRestrictionList = new();
-            List<string[]?> fieldList = new();
-            List<string[]?> miscList = new();
-            List<string[]?> dialectList = new();
-            List<string?> definitionInfoList = new();
-            List<string[]?> relatedTermList = new();
-            List<string[]?> antonymList = new();
-            List<LoanwordSource[]?> loanwordSourceList = new();
+            List<string[]> definitionList = [];
+            List<string[]> wordClassList = [];
+            List<string[]?> readingRestrictionList = [];
+            List<string[]?> spellingRestrictionList = [];
+            List<string[]?> fieldList = [];
+            List<string[]?> miscList = [];
+            List<string[]?> dialectList = [];
+            List<string?> definitionInfoList = [];
+            List<string[]?> relatedTermList = [];
+            List<string[]?> antonymList = [];
+            List<LoanwordSource[]?> loanwordSourceList = [];
             for (int j = 0; j < entry.SenseList.Count; j++)
             {
                 Sense sense = entry.SenseList[j];
@@ -247,7 +247,7 @@ internal static class JmdictRecordBuilder
             }
             else
             {
-                jmdictDictionary[key] = new List<IDictRecord> { jmdictRecord };
+                jmdictDictionary[key] = [jmdictRecord];
             }
         }
     }

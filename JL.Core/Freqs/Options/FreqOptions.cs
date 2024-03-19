@@ -1,12 +1,6 @@
 namespace JL.Core.Freqs.Options;
-public sealed class FreqOptions
+public sealed class FreqOptions(UseDBOption? useDB = null, HigherValueMeansHigherFrequencyOption? higherValueMeansHigherFrequency = null)
 {
-    public UseDBOption? UseDB { get; }
-    public HigherValueMeansHigherFrequencyOption? HigherValueMeansHigherFrequency { get; }
-
-    public FreqOptions(UseDBOption? useDB = null, HigherValueMeansHigherFrequencyOption? higherValueMeansHigherFrequency = null)
-    {
-        UseDB = useDB;
-        HigherValueMeansHigherFrequency = higherValueMeansHigherFrequency;
-    }
+    public UseDBOption? UseDB { get; } = useDB;
+    public HigherValueMeansHigherFrequencyOption? HigherValueMeansHigherFrequency { get; } = higherValueMeansHigherFrequency;
 }

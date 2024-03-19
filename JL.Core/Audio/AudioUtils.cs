@@ -12,7 +12,7 @@ public static class AudioUtils
 {
     private static readonly AudioResponse s_textToSpeechAudioResponse = new(AudioSourceType.TextToSpeech, "wav", null);
 
-    public static readonly Dictionary<string, AudioSource> AudioSources = new();
+    public static readonly Dictionary<string, AudioSource> AudioSources = [];
 
     private static readonly Dictionary<string, AudioSource> s_builtInAudioSources = new(1)
     {

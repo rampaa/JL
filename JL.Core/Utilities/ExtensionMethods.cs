@@ -87,10 +87,7 @@ public static class ExtensionMethods
 
     internal static T[]? RemoveAtToArray<T>(this List<T> list, int index)
     {
-        if (index >= list.Count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, list.Count);
 
         if (list.Count is 1 || list.All(static l => l is null))
         {

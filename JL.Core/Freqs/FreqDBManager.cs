@@ -94,7 +94,7 @@ internal static class FreqDBManager
 
     public static Dictionary<string, List<FrequencyRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
-        Dictionary<string, List<FrequencyRecord>> results = new();
+        Dictionary<string, List<FrequencyRecord>> results = [];
 
         using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -138,7 +138,7 @@ internal static class FreqDBManager
             }
             else
             {
-                results[searchKey] = new List<FrequencyRecord> { record };
+                results[searchKey] = [record];
             }
         }
 
@@ -147,7 +147,7 @@ internal static class FreqDBManager
 
     public static List<FrequencyRecord> GetRecordsFromDB(string dbName, string term)
     {
-        List<FrequencyRecord> records = new();
+        List<FrequencyRecord> records = [];
 
         using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -201,7 +201,7 @@ internal static class FreqDBManager
                 }
                 else
                 {
-                    freq.Contents[searchKey] = new List<FrequencyRecord> { record };
+                    freq.Contents[searchKey] = [record];
                 }
             }
         }

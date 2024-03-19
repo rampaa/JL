@@ -29,7 +29,7 @@ internal static class EpwingNazekaLoader
         {
             string reading = jsonObj.GetProperty("r").GetString()!.GetPooledString();
 
-            List<string>? spellingList = new();
+            List<string>? spellingList = [];
             foreach (JsonElement spellingJsonElement in jsonObj.GetProperty("s").EnumerateArray())
             {
                 string? spelling = spellingJsonElement.GetString();
@@ -45,7 +45,7 @@ internal static class EpwingNazekaLoader
                 spellingList = null;
             }
 
-            List<string> definitionList = new();
+            List<string> definitionList = [];
             foreach (JsonElement definitionJsonElement in jsonObj.GetProperty("l").EnumerateArray())
             {
                 string? definition = definitionJsonElement.GetString();
@@ -132,7 +132,7 @@ internal static class EpwingNazekaLoader
         }
         else
         {
-            dictionary[keyInHiragana] = new List<IDictRecord> { record };
+            dictionary[keyInHiragana] = [record];
         }
     }
 }

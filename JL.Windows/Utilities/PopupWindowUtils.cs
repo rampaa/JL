@@ -19,7 +19,7 @@ internal static class PopupWindowUtils
     private static string? s_primarySpellingOfLastPlayedAudio;
 
     private static string? s_readingOfLastPlayedAudio;
-    public static DoubleCollection StrokeDashArray { get; set; } = new() { 1, 1 };
+    public static DoubleCollection StrokeDashArray { get; set; } = [1, 1];
 
     public static TextBlock CreateTextBlock(string name, string text, Brush foregroundBrush, double fontSize, ContextMenu contextMenu, VerticalAlignment verticalAlignment, Thickness margin)
     {
@@ -76,7 +76,7 @@ internal static class PopupWindowUtils
             ? ConfigManager.ReadingsFontSize
             : ConfigManager.PrimarySpellingFontSize;
 
-        string[] expressions = hasReading ? readings! : new[] { primarySpelling };
+        string[] expressions = hasReading ? readings! : [primarySpelling];
 
         double horizontalOffsetForReading = leftMargin;
 

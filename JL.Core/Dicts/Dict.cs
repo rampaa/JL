@@ -16,7 +16,7 @@ public sealed class Dict
     [JsonIgnore] public bool Ready { get; set; }
 
 #pragma warning disable CA2227
-    [JsonIgnore] public Dictionary<string, IList<IDictRecord>> Contents { get; set; } = new();
+    [JsonIgnore] public Dictionary<string, IList<IDictRecord>> Contents { get; set; } = [];
 #pragma warning restore CA2227
 
     public DictOptions? Options { get; set; } // can be null for dicts.json files generated before version 1.10

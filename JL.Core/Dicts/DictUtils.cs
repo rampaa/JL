@@ -24,7 +24,7 @@ public static class DictUtils
     public static bool UpdatingJmdict { get; internal set; } // = false;
     public static bool UpdatingJmnedict { get; internal set; } // = false;
     public static bool UpdatingKanjidic { get; internal set; } // = false;
-    public static readonly Dictionary<string, Dict> Dicts = new();
+    public static readonly Dictionary<string, Dict> Dicts = [];
     internal static Dictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new(55000); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272
     internal static readonly Dictionary<string, string> s_kanjiCompositionDict = new(86934);
     internal static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
@@ -389,7 +389,7 @@ public static class DictUtils
         #pragma warning restore format
     };
 
-    public static readonly DictType[] YomichanDictTypes = {
+    public static readonly DictType[] YomichanDictTypes = [
         DictType.Daijirin,
         DictType.Daijisen,
         DictType.Gakken,
@@ -415,9 +415,9 @@ public static class DictUtils
         DictType.NonspecificKanjiWithWordSchemaYomichan,
         DictType.NonspecificNameYomichan,
         DictType.NonspecificYomichan
-    };
+    ];
 
-    public static readonly DictType[] NazekaDictTypes = {
+    public static readonly DictType[] NazekaDictTypes = [
         DictType.DaijirinNazeka,
         DictType.KenkyuushaNazeka,
         DictType.ShinmeikaiNazeka,
@@ -425,9 +425,9 @@ public static class DictUtils
         DictType.NonspecificKanjiNazeka,
         DictType.NonspecificNameNazeka,
         DictType.NonspecificNazeka
-    };
+    ];
 
-    public static readonly DictType[] NonspecificDictTypes = {
+    public static readonly DictType[] NonspecificDictTypes = [
         DictType.NonspecificWordYomichan,
         DictType.NonspecificKanjiYomichan,
         DictType.NonspecificKanjiWithWordSchemaYomichan,
@@ -437,25 +437,25 @@ public static class DictUtils
         DictType.NonspecificKanjiNazeka,
         DictType.NonspecificNameNazeka,
         DictType.NonspecificNazeka
-    };
+    ];
 
-    internal static readonly DictType[] s_kanjiDictTypes = {
+    internal static readonly DictType[] s_kanjiDictTypes = [
         DictType.Kanjidic,
         DictType.KanjigenYomichan,
         DictType.NonspecificKanjiYomichan,
         DictType.NonspecificKanjiWithWordSchemaYomichan,
         DictType.NonspecificKanjiNazeka
-    };
+    ];
 
-    internal static readonly DictType[] s_nameDictTypes = {
+    internal static readonly DictType[] s_nameDictTypes = [
         DictType.CustomNameDictionary,
         DictType.ProfileCustomNameDictionary,
         DictType.JMnedict,
         DictType.NonspecificNameYomichan,
         DictType.NonspecificNameNazeka
-    };
+    ];
 
-    internal static readonly DictType[] s_wordDictTypes = {
+    internal static readonly DictType[] s_wordDictTypes = [
         DictType.CustomWordDictionary,
         DictType.ProfileCustomWordDictionary,
         DictType.JMdict,
@@ -482,7 +482,7 @@ public static class DictUtils
         DictType.KenkyuushaNazeka,
         DictType.ShinmeikaiNazeka,
         DictType.NonspecificWordNazeka
-    };
+    ];
 
 #pragma warning disable IDE0072
     public static async Task LoadDictionaries()
@@ -498,7 +498,7 @@ public static class DictUtils
         bool dictCleared = false;
         bool dictRemoved = false;
 
-        List<Task> tasks = new();
+        List<Task> tasks = [];
 
         foreach (Dict dict in Dicts.Values.ToList())
         {

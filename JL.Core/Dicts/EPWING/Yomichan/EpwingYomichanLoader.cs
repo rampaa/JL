@@ -101,7 +101,7 @@ internal static class EpwingYomichanLoader
         }
         else
         {
-            dict.Contents[primarySpellingInHiragana] = new List<IDictRecord> { yomichanRecord };
+            dict.Contents[primarySpellingInHiragana] = [yomichanRecord];
         }
 
         if (dict.Type is not DictType.NonspecificNameYomichan
@@ -118,7 +118,7 @@ internal static class EpwingYomichanLoader
                 }
                 else
                 {
-                    dict.Contents[readingInHiragana] = new List<IDictRecord> { yomichanRecord };
+                    dict.Contents[readingInHiragana] = [yomichanRecord];
                 }
             }
         }

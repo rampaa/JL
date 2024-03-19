@@ -63,7 +63,7 @@ internal static class FrequencyYomichanLoader
                 else if (thirdElement.ValueKind is JsonValueKind.String)
                 {
                     string freqStr = thirdElement.GetString()!;
-                    Match match = Utils.s_numberRegex.Match(freqStr);
+                    Match match = Utils.NumberRegex().Match(freqStr);
                     if (match.Success)
                     {
                         if (int.TryParse(match.ValueSpan, out int parsedFreq))
@@ -91,7 +91,7 @@ internal static class FrequencyYomichanLoader
 
                         else
                         {
-                            freqDict[spellingInHiragana] = new List<FrequencyRecord> { new(spelling, frequency) };
+                            freqDict[spellingInHiragana] = [new FrequencyRecord(spelling, frequency)];
                         }
                     }
 
@@ -105,7 +105,7 @@ internal static class FrequencyYomichanLoader
 
                         else
                         {
-                            freqDict[readingInHiragana] = new List<FrequencyRecord> { new(spelling, frequency) };
+                            freqDict[readingInHiragana] = [new FrequencyRecord(spelling, frequency)];
                         }
 
                         if (reading != spelling)
@@ -117,7 +117,7 @@ internal static class FrequencyYomichanLoader
 
                             else
                             {
-                                freqDict[spellingInHiragana] = new List<FrequencyRecord> { new(reading, frequency) };
+                                freqDict[spellingInHiragana] = [new FrequencyRecord(reading, frequency)];
                             }
                         }
                     }

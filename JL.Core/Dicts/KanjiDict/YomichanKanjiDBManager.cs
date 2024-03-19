@@ -91,7 +91,7 @@ internal static class YomichanKanjiDBManager
 
     public static List<IDictRecord> GetRecordsFromDB(string dbName, string term)
     {
-        List<IDictRecord> results = new();
+        List<IDictRecord> results = [];
 
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -145,7 +145,7 @@ internal static class YomichanKanjiDBManager
             }
             else
             {
-                dict.Contents[kanji] = new List<IDictRecord> { record };
+                dict.Contents[kanji] = [record];
             }
         }
 

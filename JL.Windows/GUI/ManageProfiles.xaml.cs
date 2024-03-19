@@ -49,7 +49,7 @@ internal sealed partial class ManageProfilesWindow : Window
 
     private void UpdateProfilesDisplay()
     {
-        List<DockPanel> resultDockPanels = new();
+        List<DockPanel> resultDockPanels = [];
 
         foreach (string profile in ProfileUtils.Profiles)
         {

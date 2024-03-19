@@ -52,7 +52,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
         //    Tags = null;
         //}
 
-        List<string> definitionList = new();
+        List<string> definitionList = [];
         JsonElement definitionsArray = jsonElement[4];
         foreach (JsonElement definition in definitionsArray.EnumerateArray())
         {
@@ -61,7 +61,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
 
         Definitions = definitionList.TrimStringListToStringArray();
 
-        List<string> statList = new();
+        List<string> statList = [];
         JsonElement statsElement = jsonElement[5];
         foreach (JsonProperty stat in statsElement.EnumerateObject())
         {

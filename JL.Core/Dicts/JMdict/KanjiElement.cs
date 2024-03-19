@@ -9,8 +9,8 @@ internal sealed class KanjiElement
 
     public KanjiElement()
     {
-        KeInfList = new List<string>();
-        Keb = string.Empty;
-        // KePriList = new List<string>();
+        KeInfList = [];
+        Keb = "";
+        // KePriList = [];
     }
 }

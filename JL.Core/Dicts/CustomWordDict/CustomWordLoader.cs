@@ -4,7 +4,7 @@ namespace JL.Core.Dicts.CustomWordDict;
 
 public static class CustomWordLoader
 {
-    private static readonly string[] s_verbs = {
+    private static readonly string[] s_verbs = [
         "v1",
         "v1-s",
         "v4r",
@@ -26,20 +26,20 @@ public static class CustomWordLoader
         "vs-i",
         "vs-s",
         "vz"
-    };
+    ];
 
-    private static readonly string[] s_adjectives = {
+    private static readonly string[] s_adjectives = [
         "adj-i",
         "adj-na"
-    };
+    ];
 
-    private static readonly string[] s_noun = {
+    private static readonly string[] s_noun = [
         "noun"
-    };
+    ];
 
-    private static readonly string[] s_other = {
+    private static readonly string[] s_other = [
         "other"
-    };
+    ];
 
     internal static void Load(Dict dict, CancellationToken cancellationToken)
     {
@@ -138,7 +138,7 @@ public static class CustomWordLoader
         }
         else
         {
-            dictionary[spellingInHiragana] = new List<IDictRecord> { record };
+            dictionary[spellingInHiragana] = [record];
         }
 
         return true;

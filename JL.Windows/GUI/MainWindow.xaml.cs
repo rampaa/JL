@@ -113,7 +113,7 @@ internal sealed partial class MainWindow : Window
             {
                 string text = Clipboard.GetText();
                 gotTextFromClipboard = true;
-                if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || JapaneseUtils.JapaneseRegex.IsMatch(text))
+                if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || JapaneseUtils.JapaneseRegex().IsMatch(text))
                 {
                     text = TextUtils.SanitizeText(text);
                     if (text.Length > 0)
@@ -144,7 +144,7 @@ internal sealed partial class MainWindow : Window
 
     public async Task CopyFromWebSocket(string text)
     {
-        if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || JapaneseUtils.JapaneseRegex.IsMatch(text))
+        if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || JapaneseUtils.JapaneseRegex().IsMatch(text))
         {
             text = TextUtils.SanitizeText(text);
             if (text.Length > 0)

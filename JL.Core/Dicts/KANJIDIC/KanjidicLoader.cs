@@ -55,11 +55,11 @@ internal static class KanjidicLoader
         byte grade = 0;
         byte strokeCount = 0;
         int frequency = 0;
-        List<string> definitionList = new();
-        List<string> nanoriReadingList = new();
-        List<string> onReadingList = new();
-        List<string> kunReadingList = new();
-        List<string> radicalNameList = new();
+        List<string> definitionList = [];
+        List<string> nanoriReadingList = [];
+        List<string> onReadingList = [];
+        List<string> kunReadingList = [];
+        List<string> radicalNameList = [];
 
         while (!xmlReader.EOF)
         {
@@ -148,6 +148,6 @@ internal static class KanjidicLoader
 
         KanjidicRecord entry = new(definitions, onReadings, kunReadings, nanoriReadings, radicalNames, strokeCount, grade, frequency);
 
-        kanjidicDictionary[key] = new IDictRecord[] { entry };
+        kanjidicDictionary[key] = [entry];
     }
 }

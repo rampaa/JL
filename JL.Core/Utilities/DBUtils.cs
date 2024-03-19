@@ -10,13 +10,13 @@ public static class DBUtils
 {
     private static readonly Timer s_optimizePragmaTimer = new();
 
-    internal static readonly Dictionary<string, string> s_dictDBPaths = new();
-    internal static readonly Dictionary<string, string> s_freqDBPaths = new();
+    internal static readonly Dictionary<string, string> s_dictDBPaths = [];
+    internal static readonly Dictionary<string, string> s_freqDBPaths = [];
 
     internal static readonly string s_freqDBFolderPath = Path.Join(Utils.ResourcesPath, "Frequency Databases");
     internal static readonly string s_dictDBFolderPath = Path.Join(Utils.ResourcesPath, "Dictionary Databases");
 
-    internal static readonly DictType[] s_dictTypesWithDBSupport = {
+    internal static readonly DictType[] s_dictTypesWithDBSupport = [
         DictType.JMdict,
         DictType.JMnedict,
         DictType.Kanjidic,
@@ -52,7 +52,7 @@ public static class DBUtils
         DictType.NonspecificKanjiNazeka,
         DictType.NonspecificNameNazeka,
         DictType.NonspecificNazeka
-    };
+    ];
 
     public static string GetDictDBPath(string dbName)
     {

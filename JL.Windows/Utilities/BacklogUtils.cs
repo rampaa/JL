@@ -11,7 +11,7 @@ namespace JL.Windows.Utilities;
 internal static class BacklogUtils
 {
     private static int s_currentTextIndex; // 0
-    public static List<string> Backlog { get; } = new();
+    public static List<string> Backlog { get; } = [];
 
     public static void AddToBacklog(string text)
     {

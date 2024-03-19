@@ -2,7 +2,8 @@ namespace JL.Core.Mining;
 
 public static class JLFieldUtils
 {
-    public static readonly JLField[] JLFieldsForWordDicts = {
+    public static readonly JLField[] JLFieldsForWordDicts =
+    [
         JLField.Nothing,
         JLField.PrimarySpelling,
         JLField.PrimarySpellingWithOrthographyInfo,
@@ -28,9 +29,10 @@ public static class JLFieldUtils
         JLField.NumericPitchAccents,
         JLField.EdictId,
         JLField.LocalTime
-    };
+    ];
 
-    public static readonly JLField[] JLFieldsForKanjiDicts = {
+    public static readonly JLField[] JLFieldsForKanjiDicts =
+    [
         JLField.Nothing,
         JLField.PrimarySpelling,
         JLField.Readings,
@@ -56,9 +58,10 @@ public static class JLFieldUtils
         JLField.NumericPitchAccents,
         JLField.EdictId,
         JLField.LocalTime
-    };
+    ];
 
-    public static readonly JLField[] JLFieldsForNameDicts = {
+    public static readonly JLField[] JLFieldsForNameDicts =
+    [
         JLField.Nothing,
         JLField.PrimarySpelling,
         JLField.Readings,
@@ -76,5 +79,5 @@ public static class JLFieldUtils
         JLField.NumericPitchAccents,
         JLField.EdictId,
         JLField.LocalTime
-    };
+    ];
 }

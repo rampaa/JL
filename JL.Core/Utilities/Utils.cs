@@ -19,14 +19,17 @@ using Serilog.Core;
 
 namespace JL.Core.Utilities;
 
-public static class Utils
+public static partial class Utils
 {
     public static readonly Version JLVersion = new(1, 30, 2);
     public static readonly string ApplicationPath = AppContext.BaseDirectory;
     public static readonly string ResourcesPath = Path.Join(AppContext.BaseDirectory, "Resources");
     public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
     internal static StringPool StringPoolInstance => StringPool.Shared;
-    internal static readonly Regex s_numberRegex = new(@"\d+", RegexOptions.Compiled);
+
+    [GeneratedRegex(@"\d+", RegexOptions.Compiled)]
+    internal static partial Regex NumberRegex();
+
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
 
     public static readonly LoggingLevelSwitch LoggingLevelSwitch = new() { MinimumLevel = Serilog.Events.LogEventLevel.Error };

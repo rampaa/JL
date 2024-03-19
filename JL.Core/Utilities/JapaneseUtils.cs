@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace JL.Core.Utilities;
 
-public static class JapaneseUtils
+public static partial class JapaneseUtils
 {
     // Matches the following Unicode ranges:
     // CJK Radicals Supplement (2E80–2EFF)
@@ -32,9 +32,10 @@ public static class JapaneseUtils
     // CJK Compatibility Ideographs Supplement (2F800–2FA1F)
     // CJK Unified Ideographs Extension G (30000–3134F)
     // CJK Unified Ideographs Extension H (31350–323AF)
-    public static readonly Regex JapaneseRegex = new(
-        @"[\u2E80-\u319F\u31C0-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD879][\uDC00-\uDFFF]|\uD87A[\uDC00-\uDFEF]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD887][\uDC00-\uDFFF]|\uD888[\uDC00-\uDFAF]",
-        RegexOptions.Compiled);
+
+    [GeneratedRegex(@"[\u2E80-\u319F\u31C0-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD879][\uDC00-\uDFFF]|\uD87A[\uDC00-\uDFEF]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD887][\uDC00-\uDFFF]|\uD888[\uDC00-\uDFAF]",
+        RegexOptions.Compiled)]
+    public static partial Regex JapaneseRegex();
 
     private static readonly Dictionary<char, string> s_katakanaToHiraganaDict = new(87)
     {
@@ -96,8 +97,8 @@ public static class JapaneseUtils
         #pragma warning restore format
     };
 
-    private static readonly HashSet<char> s_smallCombiningKanaSet = new(18)
-    {
+    private static readonly HashSet<char> s_smallCombiningKanaSet =
+    [
         #pragma warning disable format
         'ァ', 'ィ', 'ゥ', 'ェ', 'ォ', 'ヮ',
         'ャ', 'ュ', 'ョ',
@@ -105,9 +106,9 @@ public static class JapaneseUtils
         'ぁ', 'ぃ', 'ぅ', 'ぇ', 'ぉ', 'ゎ',
         'ゃ', 'ゅ', 'ょ'
         #pragma warning restore format
-    };
+    ];
 
-    private static readonly char[] s_sentenceTerminatingCharacters = {
+    private static readonly char[] s_sentenceTerminatingCharacters = [
         '。',
         '！',
         '？',
@@ -120,7 +121,7 @@ public static class JapaneseUtils
         '︙',
         '︰',
         '\n'
-    };
+    ];
 
     private static readonly Dictionary<char, char> s_leftToRightBracketDict = new(28)
     {

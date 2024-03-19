@@ -39,7 +39,7 @@ internal static class FrequencyNazekaLoader
                 }
                 else
                 {
-                    freqDict[reading.GetPooledString()] = new List<FrequencyRecord> { new(exactSpelling, frequencyRank) };
+                    freqDict[reading.GetPooledString()] = [new FrequencyRecord(exactSpelling, frequencyRank)];
                 }
 
                 string exactSpellingInHiragana = JapaneseUtils.KatakanaToHiragana(exactSpelling).GetPooledString();
@@ -52,7 +52,7 @@ internal static class FrequencyNazekaLoader
 
                     else
                     {
-                        freqDict[exactSpellingInHiragana] = new List<FrequencyRecord> { new(reading, frequencyRank) };
+                        freqDict[exactSpellingInHiragana] = [new FrequencyRecord(reading, frequencyRank)];
                     }
                 }
             }
