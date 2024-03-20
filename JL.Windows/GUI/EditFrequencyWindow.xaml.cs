@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
@@ -70,7 +71,7 @@ internal sealed partial class EditFrequencyWindow : Window
             if (_freq.Path != path)
             {
                 _freq.Path = path;
-                _freq.Contents.Clear();
+                _freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
                 _freq.Ready = false;
 
                 if (dbExists)

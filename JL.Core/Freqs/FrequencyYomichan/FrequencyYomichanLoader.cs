@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using JL.Core.Utilities;
@@ -13,8 +14,6 @@ internal static class FrequencyYomichanLoader
         {
             return;
         }
-
-        Dictionary<string, IList<FrequencyRecord>> freqDict = freq.Contents;
 
         List<string> jsonFiles = Directory.EnumerateFiles(fullPath, "*_bank_*.json", SearchOption.TopDirectoryOnly)
             .Where(static s => s.Contains("term", StringComparison.Ordinal) || s.Contains("kanji", StringComparison.Ordinal))
@@ -84,40 +83,40 @@ internal static class FrequencyYomichanLoader
                 {
                     if (reading is null)
                     {
-                        if (freqDict.TryGetValue(spellingInHiragana, out IList<FrequencyRecord>? spellingFreqResult))
+                        if (freq.Contents.TryGetValue(spellingInHiragana, out IList<FrequencyRecord>? spellingFreqResult))
                         {
                             spellingFreqResult.Add(new FrequencyRecord(spelling, frequency));
                         }
 
                         else
                         {
-                            freqDict[spellingInHiragana] = [new FrequencyRecord(spelling, frequency)];
+                            freq.Contents[spellingInHiragana] = [new FrequencyRecord(spelling, frequency)];
                         }
                     }
 
                     else
                     {
                         string readingInHiragana = JapaneseUtils.KatakanaToHiragana(reading).GetPooledString();
-                        if (freqDict.TryGetValue(readingInHiragana, out IList<FrequencyRecord>? readingFreqResult))
+                        if (freq.Contents.TryGetValue(readingInHiragana, out IList<FrequencyRecord>? readingFreqResult))
                         {
                             readingFreqResult.Add(new FrequencyRecord(spelling, frequency));
                         }
 
                         else
                         {
-                            freqDict[readingInHiragana] = [new FrequencyRecord(spelling, frequency)];
+                            freq.Contents[readingInHiragana] = [new FrequencyRecord(spelling, frequency)];
                         }
 
                         if (reading != spelling)
                         {
-                            if (freqDict.TryGetValue(spellingInHiragana, out IList<FrequencyRecord>? spellingFreqResult))
+                            if (freq.Contents.TryGetValue(spellingInHiragana, out IList<FrequencyRecord>? spellingFreqResult))
                             {
                                 spellingFreqResult.Add(new FrequencyRecord(reading, frequency));
                             }
 
                             else
                             {
-                                freqDict[spellingInHiragana] = [new FrequencyRecord(reading, frequency)];
+                                freq.Contents[spellingInHiragana] = [new FrequencyRecord(reading, frequency)];
                             }
                         }
                     }
@@ -130,6 +129,6 @@ internal static class FrequencyYomichanLoader
             freq.Contents[key] = recordList.ToArray();
         }
 
-        freqDict.TrimExcess();
+        freq.Contents = freq.Contents.ToFrozenDictionary();
     }
 }

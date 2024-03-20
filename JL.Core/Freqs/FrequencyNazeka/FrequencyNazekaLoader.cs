@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Text.Json;
 using JL.Core.Utilities;
 
@@ -13,7 +14,6 @@ internal static class FrequencyNazekaLoader
             return;
         }
 
-        Dictionary<string, IList<FrequencyRecord>> freqDict = freq.Contents;
         Dictionary<string, List<List<JsonElement>>>? frequencyJson;
 
         FileStream fileStream = File.OpenRead(fullPath);
@@ -33,26 +33,26 @@ internal static class FrequencyNazekaLoader
                 string exactSpelling = elementList[0].GetString()!.GetPooledString();
                 int frequencyRank = elementList[1].GetInt32();
 
-                if (freqDict.TryGetValue(reading, out IList<FrequencyRecord>? readingFreqResult))
+                if (freq.Contents.TryGetValue(reading, out IList<FrequencyRecord>? readingFreqResult))
                 {
                     readingFreqResult.Add(new FrequencyRecord(exactSpelling, frequencyRank));
                 }
                 else
                 {
-                    freqDict[reading.GetPooledString()] = [new FrequencyRecord(exactSpelling, frequencyRank)];
+                    freq.Contents[reading.GetPooledString()] = [new FrequencyRecord(exactSpelling, frequencyRank)];
                 }
 
                 string exactSpellingInHiragana = JapaneseUtils.KatakanaToHiragana(exactSpelling).GetPooledString();
                 if (exactSpellingInHiragana != reading)
                 {
-                    if (freqDict.TryGetValue(exactSpellingInHiragana, out IList<FrequencyRecord>? exactSpellingFreqResult))
+                    if (freq.Contents.TryGetValue(exactSpellingInHiragana, out IList<FrequencyRecord>? exactSpellingFreqResult))
                     {
                         exactSpellingFreqResult.Add(new FrequencyRecord(reading, frequencyRank));
                     }
 
                     else
                     {
-                        freqDict[exactSpellingInHiragana] = [new FrequencyRecord(reading, frequencyRank)];
+                        freq.Contents[exactSpellingInHiragana] = [new FrequencyRecord(reading, frequencyRank)];
                     }
                 }
             }
@@ -63,6 +63,6 @@ internal static class FrequencyNazekaLoader
             freq.Contents[key] = recordList.ToArray();
         }
 
-        freqDict.TrimExcess();
+        freq.Contents = freq.Contents.ToFrozenDictionary();
     }
 }

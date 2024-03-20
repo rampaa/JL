@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
@@ -211,7 +212,7 @@ internal static class FreqDBManager
             freq.Contents[key] = recordList.ToArray();
         }
 
-        freq.Contents.TrimExcess();
+        freq.Contents = freq.Contents.ToFrozenDictionary();
     }
 
     private static FrequencyRecord GetRecord(SqliteDataReader dataReader)

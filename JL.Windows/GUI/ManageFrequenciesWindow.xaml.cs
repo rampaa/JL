@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -250,8 +251,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
         if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this frequency dictionary?", "Confirmation"))
         {
             Freq freq = (Freq)((Button)sender).Tag;
-            freq.Contents.Clear();
-            freq.Contents.TrimExcess();
+            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
             _ = FreqUtils.FreqDicts.Remove(freq.Name);
 
             string dbPath = DBUtils.GetFreqDBPath(freq.Name);

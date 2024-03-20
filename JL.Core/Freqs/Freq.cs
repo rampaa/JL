@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using JL.Core.Freqs.Options;
@@ -14,6 +15,10 @@ public sealed class Freq(FreqType type, string name, string path, bool active, i
     public int Priority { get; set; } = priority;
     public int Size { get; set; } = size;
     [JsonIgnore] public bool Ready { get; set; } = ready;
-    [JsonIgnore] public Dictionary<string, IList<FrequencyRecord>> Contents { get; internal set; } = [];
+
+#pragma warning disable CA2227
+    [JsonIgnore] public IDictionary<string, IList<FrequencyRecord>> Contents { get; set; } = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+#pragma warning restore CA2227
+
     public FreqOptions? Options { get; set; } = options; // can be null for freqs.json files generated before version 1.25.0
 }

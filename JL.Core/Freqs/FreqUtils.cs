@@ -115,8 +115,7 @@ public static class FreqUtils
                                     {
                                         FreqDBManager.CreateDB(freq.Name);
                                         FreqDBManager.InsertRecordsToDB(freq);
-                                        freq.Contents.Clear();
-                                        freq.Contents.TrimExcess();
+                                        freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
                                     }
                                 }
 
@@ -146,14 +145,12 @@ public static class FreqUtils
                         {
                             FreqDBManager.CreateDB(freq.Name);
                             FreqDBManager.InsertRecordsToDB(freq);
-                            freq.Contents.Clear();
-                            freq.Contents.TrimExcess();
+                            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
                             freq.Ready = true;
                         }
                         else
                         {
-                            freq.Contents.Clear();
-                            freq.Contents.TrimExcess();
+                            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
                             freq.Ready = true;
                         }
 
@@ -197,8 +194,7 @@ public static class FreqUtils
                                     {
                                         FreqDBManager.CreateDB(freq.Name);
                                         FreqDBManager.InsertRecordsToDB(freq);
-                                        freq.Contents.Clear();
-                                        freq.Contents.TrimExcess();
+                                        freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
                                     }
                                 }
 
@@ -228,14 +224,12 @@ public static class FreqUtils
                         {
                             FreqDBManager.CreateDB(freq.Name);
                             FreqDBManager.InsertRecordsToDB(freq);
-                            freq.Contents.Clear();
-                            freq.Contents.TrimExcess();
+                            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
                             freq.Ready = true;
                         }
                         else
                         {
-                            freq.Contents.Clear();
-                            freq.Contents.TrimExcess();
+                            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
                             freq.Ready = true;
                         }
 
