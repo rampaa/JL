@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Text.Json;
 using JL.Core.Dicts;
 using JL.Core.Dicts.JMdict;
@@ -49,7 +50,7 @@ internal static class JmdictWordClassUtils
             DictUtils.WordClassDictionary[key] = recordList.ToArray();
         }
 
-        DictUtils.WordClassDictionary.TrimExcess();
+        DictUtils.WordClassDictionary = DictUtils.WordClassDictionary.ToFrozenDictionary();
     }
 
     public static async Task Serialize()
