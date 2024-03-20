@@ -991,6 +991,8 @@ public static class LookupUtils
 
         IntermediaryResult intermediaryResult = kanjiResults.First().Value;
 
+        _ = DictUtils.KanjiCompositionDict.TryGetValue(dictResult.Key, out string? kanjiComposition);
+
         LookupResult result = new
         (
             primarySpelling: dictResult.Key,
@@ -1001,7 +1003,7 @@ public static class LookupUtils
             radicalNames: kanjiRecord.RadicalNames,
             strokeCount: kanjiRecord.StrokeCount,
             kanjiGrade: kanjiRecord.Grade,
-            kanjiComposition: DictUtils.s_kanjiCompositionDict.GetValueOrDefault(dictResult.Key),
+            kanjiComposition: kanjiComposition,
             frequencies: GetKanjidicFrequencies(dictResult.Key, kanjiRecord.Frequency),
             matchedText: intermediaryResult.MatchedText,
             deconjugatedMatchedText: intermediaryResult.DeconjugatedMatchedText,
@@ -1037,13 +1039,15 @@ public static class LookupUtils
 
                     string[]? allReadings = Utils.ConcatNullableArrays(yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings);
 
+                    _ = DictUtils.KanjiCompositionDict.TryGetValue(kanjiResult.Key, out string? kanjiComposition);
+
                     LookupResult result = new
                     (
                         primarySpelling: kanjiResult.Key,
                         readings: allReadings,
                         onReadings: yomichanKanjiDictResult.OnReadings,
                         kunReadings: yomichanKanjiDictResult.KunReadings,
-                        kanjiComposition: DictUtils.s_kanjiCompositionDict.GetValueOrDefault(kanjiResult.Key),
+                        kanjiComposition: kanjiComposition,
                         kanjiStats: yomichanKanjiDictResult.BuildFormattedStats(),
                         frequencies: GetYomichanKanjiFrequencies(kanjiResult.Key),
                         matchedText: kanjiResult.Value.MatchedText,

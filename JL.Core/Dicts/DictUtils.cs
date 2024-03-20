@@ -27,7 +27,7 @@ public static class DictUtils
     public static bool UpdatingKanjidic { get; internal set; } // = false;
     public static readonly Dictionary<string, Dict> Dicts = [];
     internal static IDictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new Dictionary<string, IList<JmdictWordClass>>(55000); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272
-    internal static readonly Dictionary<string, string> s_kanjiCompositionDict = new(86934);
+    internal static IDictionary<string, string> KanjiCompositionDict { get; set; } = new Dictionary<string, string>(86934);
     internal static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
     internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     internal static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
@@ -1263,7 +1263,7 @@ public static class DictUtils
                 {
                     int endIndex = lParts[2].IndexOf('[', StringComparison.Ordinal);
 
-                    s_kanjiCompositionDict.Add(lParts[1].GetPooledString(),
+                    KanjiCompositionDict.Add(lParts[1].GetPooledString(),
                         endIndex is -1 ? lParts[2] : lParts[2][..endIndex]);
                 }
 
@@ -1276,13 +1276,15 @@ public static class DictUtils
                             int endIndex = lParts[j].IndexOf('[', StringComparison.Ordinal);
                             if (endIndex is not -1)
                             {
-                                s_kanjiCompositionDict.Add(lParts[1].GetPooledString(), lParts[j][..endIndex]);
+                                KanjiCompositionDict.Add(lParts[1].GetPooledString(), lParts[j][..endIndex]);
                                 break;
                             }
                         }
                     }
                 }
             }
+
+            KanjiCompositionDict = KanjiCompositionDict.ToFrozenDictionary();
         }
     }
 
