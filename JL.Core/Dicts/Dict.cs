@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using JL.Core.Dicts.Options;
@@ -16,7 +17,7 @@ public sealed class Dict(DictType type, string name, string path, bool active, i
     [JsonIgnore] public bool Ready { get; set; } = ready;
 
 #pragma warning disable CA2227
-    [JsonIgnore] public Dictionary<string, IList<IDictRecord>> Contents { get; set; } = [];
+    [JsonIgnore] public IDictionary<string, IList<IDictRecord>> Contents { get; set; } = FrozenDictionary<string, IList<IDictRecord>>.Empty;
 #pragma warning restore CA2227
 
     public DictOptions? Options { get; set; } = options; // can be null for dicts.json files generated before version 1.10

@@ -386,8 +386,8 @@ public static class LookupUtils
             Dictionary<string, IList<IDictRecord>>? dbWordDict,
             Dictionary<string, IList<IDictRecord>>? dbVerbDict)
     {
-        Dictionary<string, IList<IDictRecord>> wordDict = dbWordDict ?? dict.Contents;
-        Dictionary<string, IList<IDictRecord>> verbDict = dbVerbDict ?? dict.Contents;
+        IDictionary<string, IList<IDictRecord>> wordDict = dbWordDict ?? dict.Contents;
+        IDictionary<string, IList<IDictRecord>> verbDict = dbVerbDict ?? dict.Contents;
 
         bool tryLongVowelConversion = true;
 
@@ -659,7 +659,7 @@ public static class LookupUtils
 
     private static Dictionary<string, IntermediaryResult> GetNameResults(List<string> textList, List<string> textInHiraganaList, Dict dict, bool useDB, GetRecordsFromDB? getRecordsFromDB)
     {
-        Dictionary<string, IList<IDictRecord>> nameDict = useDB
+        IDictionary<string, IList<IDictRecord>> nameDict = useDB
             ? getRecordsFromDB!(dict.Name, textInHiraganaList)
             : dict.Contents;
 

@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Xml;
 using JL.Core.Utilities;
 
@@ -25,7 +26,7 @@ internal static class KanjidicLoader
                 }
             }
 
-            dict.Contents.TrimExcess();
+            dict.Contents = dict.Contents.ToFrozenDictionary();
         }
 
         else if (Utils.Frontend.ShowYesNoDialog(
@@ -48,7 +49,7 @@ internal static class KanjidicLoader
         }
     }
 
-    private static async Task ReadCharacter(XmlReader xmlReader, Dictionary<string, IList<IDictRecord>> kanjidicDictionary)
+    private static async Task ReadCharacter(XmlReader xmlReader, IDictionary<string, IList<IDictRecord>> kanjidicDictionary)
     {
         string key = (await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false)).GetPooledString();
 

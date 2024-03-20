@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Text.Json;
 using JL.Core.Utilities;
 
@@ -89,7 +90,7 @@ internal static class EpwingYomichanLoader
             dict.Contents[key] = recordList.ToArray();
         }
 
-        dict.Contents.TrimExcess();
+        dict.Contents = dict.Contents.ToFrozenDictionary();
     }
 
     private static void AddToDictionary(IEpwingRecord yomichanRecord, Dict dict)

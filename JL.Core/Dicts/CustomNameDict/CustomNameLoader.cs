@@ -9,7 +9,7 @@ public static class CustomNameLoader
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
         if (File.Exists(fullPath))
         {
-            Dictionary<string, IList<IDictRecord>> customNameDictionary = dict.Contents;
+            IDictionary<string, IList<IDictRecord>> customNameDictionary = dict.Contents;
 
             foreach (string line in File.ReadLines(fullPath))
             {
@@ -49,7 +49,7 @@ public static class CustomNameLoader
         }
     }
 
-    public static void AddToDictionary(string spelling, string? reading, string nameType, string? extraInfo, Dictionary<string, IList<IDictRecord>> customNameDictionary)
+    public static void AddToDictionary(string spelling, string? reading, string nameType, string? extraInfo, IDictionary<string, IList<IDictRecord>> customNameDictionary)
     {
         CustomNameRecord newNameRecord = new(spelling, reading, nameType, extraInfo);
 

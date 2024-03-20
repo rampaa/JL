@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -311,8 +312,7 @@ internal sealed partial class ManageDictionariesWindow : Window
         if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this dictionary?", "Confirmation"))
         {
             Dict dict = (Dict)((Button)sender).Tag;
-            dict.Contents.Clear();
-            dict.Contents.TrimExcess();
+            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
             _ = DictUtils.Dicts.Remove(dict.Name);
 
             string dbPath = DBUtils.GetDictDBPath(dict.Name);

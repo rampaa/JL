@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
@@ -255,7 +256,7 @@ internal static class EpwingYomichanDBManager
             dict.Contents[key] = recordList.ToArray();
         }
 
-        dict.Contents.TrimExcess();
+        dict.Contents = dict.Contents.ToFrozenDictionary();
     }
 
     private static EpwingYomichanRecord GetRecord(SqliteDataReader dataReader)

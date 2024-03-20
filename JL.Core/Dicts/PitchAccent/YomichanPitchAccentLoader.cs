@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Text.Json;
 using JL.Core.Utilities;
 
@@ -13,7 +14,7 @@ internal static class YomichanPitchAccentLoader
             return;
         }
 
-        Dictionary<string, IList<IDictRecord>> pitchDict = dict.Contents;
+        IDictionary<string, IList<IDictRecord>> pitchDict = dict.Contents;
 
         string[] jsonFiles = Directory.GetFiles(fullPath, "term*bank_*.json");
 
@@ -77,6 +78,6 @@ internal static class YomichanPitchAccentLoader
             pitchDict[key] = recordList.ToArray();
         }
 
-        pitchDict.TrimExcess();
+        dict.Contents = dict.Contents.ToFrozenDictionary();
     }
 }

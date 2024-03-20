@@ -232,7 +232,7 @@ public static class MiningUtils
         return miningParams;
     }
 
-    private static List<KeyValuePair<string, byte>>? GetPitchAccents(Dictionary<string, IList<IDictRecord>> pitchDict, LookupResult lookupResult)
+    private static List<KeyValuePair<string, byte>>? GetPitchAccents(IDictionary<string, IList<IDictRecord>> pitchDict, LookupResult lookupResult)
     {
         List<KeyValuePair<string, byte>> pitchAccents = [];
 

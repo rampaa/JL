@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
@@ -155,7 +156,7 @@ internal static class KanjidicDBManager
             dict.Contents[kanji] = [GetRecord(dataReader)];
         }
 
-        dict.Contents.TrimExcess();
+        dict.Contents = dict.Contents.ToFrozenDictionary();
     }
 
     private static KanjidicRecord GetRecord(SqliteDataReader dataReader)

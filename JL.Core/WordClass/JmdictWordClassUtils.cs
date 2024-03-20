@@ -154,8 +154,7 @@ internal static class JmdictWordClassUtils
                 await Task.Run(async () =>
                     await JmdictLoader.Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
                 await Serialize().ConfigureAwait(false);
-                dict.Contents.Clear();
-                dict.Contents.TrimExcess();
+                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
 
                 if (deleteJmdictFile)
                 {

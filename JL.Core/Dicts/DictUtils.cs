@@ -565,8 +565,7 @@ public static class DictUtils
                                         {
                                             JmdictDBManager.CreateDB(dict.Name);
                                             JmdictDBManager.InsertRecordsToDB(dict);
-                                            dict.Contents.Clear();
-                                            dict.Contents.TrimExcess();
+                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                         }
                                     }
 
@@ -589,15 +588,13 @@ public static class DictUtils
                                 {
                                     JmdictDBManager.CreateDB(dict.Name);
                                     JmdictDBManager.InsertRecordsToDB(dict);
-                                    dict.Contents.Clear();
-                                    dict.Contents.TrimExcess();
+                                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                     dict.Ready = true;
                                 }));
                             }
                             else
                             {
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
+                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                 dict.Ready = true;
                             }
 
@@ -637,8 +634,7 @@ public static class DictUtils
                                     {
                                         JmnedictDBManager.CreateDB(dict.Name);
                                         JmnedictDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents.Clear();
-                                        dict.Contents.TrimExcess();
+                                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                     }
 
                                     dict.Ready = true;
@@ -660,15 +656,13 @@ public static class DictUtils
                                 {
                                     JmnedictDBManager.CreateDB(dict.Name);
                                     JmnedictDBManager.InsertRecordsToDB(dict);
-                                    dict.Contents.Clear();
-                                    dict.Contents.TrimExcess();
+                                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                     dict.Ready = true;
                                 }));
                             }
                             else
                             {
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
+                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                 dict.Ready = true;
                             }
 
@@ -714,8 +708,7 @@ public static class DictUtils
                                         {
                                             KanjidicDBManager.CreateDB(dict.Name);
                                             KanjidicDBManager.InsertRecordsToDB(dict);
-                                            dict.Contents.Clear();
-                                            dict.Contents.TrimExcess();
+                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                         }
                                     }
 
@@ -738,15 +731,13 @@ public static class DictUtils
                                 {
                                     KanjidicDBManager.CreateDB(dict.Name);
                                     KanjidicDBManager.InsertRecordsToDB(dict);
-                                    dict.Contents.Clear();
-                                    dict.Contents.TrimExcess();
+                                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                     dict.Ready = true;
                                 }));
                             }
                             else
                             {
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
+                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                 dict.Ready = true;
                             }
                         }
@@ -835,8 +826,7 @@ public static class DictUtils
                                     {
                                         EpwingYomichanDBManager.CreateDB(dict.Name);
                                         EpwingYomichanDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents.Clear();
-                                        dict.Contents.TrimExcess();
+                                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                     }
                                 }
 
@@ -868,15 +858,13 @@ public static class DictUtils
                             {
                                 EpwingYomichanDBManager.CreateDB(dict.Name);
                                 EpwingYomichanDBManager.InsertRecordsToDB(dict);
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
+                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                 dict.Ready = true;
                             }));
                         }
                         else
                         {
-                            dict.Contents.Clear();
-                            dict.Contents.TrimExcess();
+                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                             dict.Ready = true;
                         }
 
@@ -918,8 +906,7 @@ public static class DictUtils
                                     {
                                         YomichanKanjiDBManager.CreateDB(dict.Name);
                                         YomichanKanjiDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents.Clear();
-                                        dict.Contents.TrimExcess();
+                                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                     }
                                 }
 
@@ -951,15 +938,13 @@ public static class DictUtils
                             {
                                 YomichanKanjiDBManager.CreateDB(dict.Name);
                                 YomichanKanjiDBManager.InsertRecordsToDB(dict);
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
+                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                 dict.Ready = true;
                             }));
                         }
                         else
                         {
-                            dict.Contents.Clear();
-                            dict.Contents.TrimExcess();
+                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                             dict.Ready = true;
                         }
 
@@ -997,8 +982,7 @@ public static class DictUtils
 
                     else if (dict is { Active: false, Contents.Count: > 0 })
                     {
-                        dict.Contents.Clear();
-                        dict.Contents.TrimExcess();
+                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                         dictCleared = true;
                         dict.Ready = true;
                     }
@@ -1034,8 +1018,7 @@ public static class DictUtils
 
                     else if (dict is { Active: false, Contents.Count: > 0 })
                     {
-                        dict.Contents.Clear();
-                        dict.Contents.TrimExcess();
+                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                         dictCleared = true;
                         dict.Ready = true;
                     }
@@ -1091,8 +1074,7 @@ public static class DictUtils
                                     {
                                         EpwingNazekaDBManager.CreateDB(dict.Name);
                                         EpwingNazekaDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents.Clear();
-                                        dict.Contents.TrimExcess();
+                                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                     }
                                 }
 
@@ -1124,15 +1106,13 @@ public static class DictUtils
                             {
                                 EpwingNazekaDBManager.CreateDB(dict.Name);
                                 EpwingNazekaDBManager.InsertRecordsToDB(dict);
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
+                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                 dict.Ready = true;
                             }));
                         }
                         else
                         {
-                            dict.Contents.Clear();
-                            dict.Contents.TrimExcess();
+                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                             dict.Ready = true;
                         }
 
@@ -1174,8 +1154,7 @@ public static class DictUtils
                                     {
                                         YomichanPitchAccentDBManager.CreateDB(dict.Name);
                                         YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents.Clear();
-                                        dict.Contents.TrimExcess();
+                                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                     }
                                 }
 
@@ -1208,15 +1187,13 @@ public static class DictUtils
                             {
                                 YomichanPitchAccentDBManager.CreateDB(dict.Name);
                                 YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
+                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                 dict.Ready = true;
                             }));
                         }
                         else
                         {
-                            dict.Contents.Clear();
-                            dict.Contents.TrimExcess();
+                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                             dict.Ready = true;
                         }
 

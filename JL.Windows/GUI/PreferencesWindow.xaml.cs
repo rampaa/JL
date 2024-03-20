@@ -153,7 +153,7 @@ internal sealed partial class PreferencesWindow : Window
                         await DictUtils.ProfileCustomNamesCancellationTokenSource.CancelAsync().ConfigureAwait(false);
                     }
 
-                    _profileNamesDict.Contents = [];
+                    _profileNamesDict.Contents = new Dictionary<string, IList<IDictRecord>>(256);
                 }
 
                 if (_profileWordsDict.Active)
@@ -163,7 +163,7 @@ internal sealed partial class PreferencesWindow : Window
                         await DictUtils.ProfileCustomWordsCancellationTokenSource.CancelAsync().ConfigureAwait(false);
                     }
 
-                    _profileWordsDict.Contents = [];
+                    _profileWordsDict.Contents = new Dictionary<string, IList<IDictRecord>>(256);
                 }
 
                 await DictUtils.LoadDictionaries().ConfigureAwait(false);

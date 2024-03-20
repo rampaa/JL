@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Xml;
 using JL.Core.Utilities;
 
@@ -32,7 +33,7 @@ internal static class JmnedictLoader
                 dict.Contents[key] = recordList.ToArray();
             }
 
-            dict.Contents.TrimExcess();
+            dict.Contents = dict.Contents.ToFrozenDictionary();
         }
 
         else if (Utils.Frontend.ShowYesNoDialog("Couldn't find JMnedict.xml. Would you like to download it now?",

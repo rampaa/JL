@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
@@ -73,7 +74,7 @@ internal sealed partial class EditDictionaryWindow : Window
             if (_dict.Path != path)
             {
                 _dict.Path = path;
-                _dict.Contents.Clear();
+                _dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                 _dict.Ready = false;
 
                 if (dbExists)
@@ -102,7 +103,7 @@ internal sealed partial class EditDictionaryWindow : Window
 
             if (_dict.Options?.Examples?.Value != options.Examples?.Value)
             {
-                _dict.Contents.Clear();
+                _dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
 
                 if (dbExists)
                 {

@@ -4,7 +4,7 @@ namespace JL.Core.Dicts.JMdict;
 
 internal static class JmdictRecordBuilder
 {
-    public static void AddToDictionary(JmdictEntry entry, Dictionary<string, IList<IDictRecord>> jmdictDictionary)
+    public static void AddToDictionary(JmdictEntry entry, IDictionary<string, IList<IDictRecord>> jmdictDictionary)
     {
         Dictionary<string, JmdictRecord> recordDictionary = [];
 

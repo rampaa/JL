@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Globalization;
 using System.Xml;
 using JL.Core.Utilities;
@@ -36,7 +37,7 @@ internal static class JmdictLoader
                 dict.Contents[key] = recordList.ToArray();
             }
 
-            dict.Contents.TrimExcess();
+            dict.Contents = dict.Contents.ToFrozenDictionary();
         }
 
         else if (Utils.Frontend.ShowYesNoDialog(

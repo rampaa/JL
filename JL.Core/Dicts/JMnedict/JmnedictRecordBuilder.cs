@@ -4,7 +4,7 @@ namespace JL.Core.Dicts.JMnedict;
 
 internal static class JmnedictRecordBuilder
 {
-    public static void AddToDictionary(JmnedictEntry entry, Dictionary<string, IList<IDictRecord>> jmnedictDictionary)
+    public static void AddToDictionary(JmnedictEntry entry, IDictionary<string, IList<IDictRecord>> jmnedictDictionary)
     {
         Dictionary<string, JmnedictRecord> recordDictionary = [];
 

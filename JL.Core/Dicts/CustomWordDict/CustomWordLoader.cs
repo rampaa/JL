@@ -46,7 +46,7 @@ public static class CustomWordLoader
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
         if (File.Exists(fullPath))
         {
-            Dictionary<string, IList<IDictRecord>> customWordDictionary = dict.Contents;
+            IDictionary<string, IList<IDictRecord>> customWordDictionary = dict.Contents;
 
             foreach (string line in File.ReadLines(fullPath))
             {
@@ -83,7 +83,7 @@ public static class CustomWordLoader
     }
 
     public static void AddToDictionary(string[] spellings, string[]? readings, string[] definitions,
-        string rawPartOfSpeech, string[]? wordClasses, Dictionary<string, IList<IDictRecord>> customWordDictionary)
+        string rawPartOfSpeech, string[]? wordClasses, IDictionary<string, IList<IDictRecord>> customWordDictionary)
     {
         bool hasUserDefinedWordClasses = wordClasses?.Length > 0;
         string[] wordClassArray = rawPartOfSpeech switch
@@ -124,7 +124,7 @@ public static class CustomWordLoader
         }
     }
 
-    private static bool AddRecordToDictionary(string spelling, CustomWordRecord record, Dictionary<string, IList<IDictRecord>> dictionary)
+    private static bool AddRecordToDictionary(string spelling, CustomWordRecord record, IDictionary<string, IList<IDictRecord>> dictionary)
     {
         string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(spelling);
         if (dictionary.TryGetValue(spellingInHiragana, out IList<IDictRecord>? result))

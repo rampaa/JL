@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Text.Json;
 using JL.Core.Utilities;
 
@@ -23,7 +24,7 @@ internal static class EpwingNazekaLoader
                 .ConfigureAwait(false);
         }
 
-        Dictionary<string, IList<IDictRecord>> nazekaEpwingDict = dict.Contents;
+        IDictionary<string, IList<IDictRecord>> nazekaEpwingDict = dict.Contents;
 
         foreach (JsonElement jsonObj in jsonObjects!.Skip(1))
         {
@@ -121,10 +122,10 @@ internal static class EpwingNazekaLoader
             dict.Contents[key] = recordList.ToArray();
         }
 
-        dict.Contents.TrimExcess();
+        dict.Contents = dict.Contents.ToFrozenDictionary();
     }
 
-    private static void AddRecordToDictionary(string keyInHiragana, IDictRecord record, Dictionary<string, IList<IDictRecord>> dictionary)
+    private static void AddRecordToDictionary(string keyInHiragana, IDictRecord record, IDictionary<string, IList<IDictRecord>> dictionary)
     {
         if (dictionary.TryGetValue(keyInHiragana, out IList<IDictRecord>? result))
         {

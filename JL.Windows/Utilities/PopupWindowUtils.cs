@@ -80,7 +80,7 @@ internal static class PopupWindowUtils
 
         double horizontalOffsetForReading = leftMargin;
 
-        Dictionary<string, IList<IDictRecord>> lookupDict = pitchRecordDict ?? dict.Contents;
+        IDictionary<string, IList<IDictRecord>> lookupDict = pitchRecordDict ?? dict.Contents;
 
         for (int i = 0; i < expressions.Length; i++)
         {
