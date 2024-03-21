@@ -1,11 +1,9 @@
 using System.Collections.Frozen;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using JL.Core.Dicts.Options;
 
 namespace JL.Core.Dicts;
 
-[SuppressMessage("ReSharper", "MemberCanBeInternal")]
 public sealed class Dict(DictType type, string name, string path, bool active, int priority, int size, bool ready, DictOptions options)
 {
     public DictType Type { get; } = type;
@@ -13,7 +11,10 @@ public sealed class Dict(DictType type, string name, string path, bool active, i
     public string Path { get; set; } = path;
     public bool Active { get; set; } = active;
     public int Priority { get; set; } = priority;
+
+    // ReSharper disable once MemberCanBeInternal
     public int Size { get; set; } = size;
+
     [JsonIgnore] public bool Ready { get; set; } = ready;
 
 #pragma warning disable CA2227

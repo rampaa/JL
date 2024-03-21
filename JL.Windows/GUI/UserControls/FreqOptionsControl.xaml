@@ -20,7 +20,7 @@
                 
                 <CheckBox Name="UseDBCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Store frequency dictionary in a DB instead of memory"
-                               ToolTip="Not recommended unless you are short on RAM. Enabling this will make lookups slower."
+                               ToolTip="Disabling this will make lookups faster but it will also increase the memory usage of JL."
                                Cursor="Help"
                                TextWrapping="Wrap"
                                HorizontalAlignment="Left"

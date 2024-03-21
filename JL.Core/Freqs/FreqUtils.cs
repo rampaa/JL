@@ -20,21 +20,21 @@ public static class FreqUtils
             "VN (Nazeka)",
             new Freq(FreqType.Nazeka, "VN (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_vns.json"),
-                true, 1, 57273, false, new FreqOptions(new UseDBOption(false), new HigherValueMeansHigherFrequencyOption(false)))
+                true, 1, 57273, false, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
         },
 
         {
             "Narou (Nazeka)",
             new Freq(FreqType.Nazeka, "Narou (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_narou.json"),
-                false, 2, 75588, false, new FreqOptions(new UseDBOption(false), new HigherValueMeansHigherFrequencyOption(false)))
+                false, 2, 75588, false, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
         },
 
         {
             "Novel (Nazeka)",
             new Freq(FreqType.Nazeka, "Novel (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_novels.json"),
-                false, 3, 114348, false, new FreqOptions(new UseDBOption(false), new HigherValueMeansHigherFrequencyOption(false)))
+                false, 3, 114348, false, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
         }
     };
 
@@ -58,7 +58,7 @@ public static class FreqUtils
 
         foreach (Freq freq in FreqDicts.Values.ToList())
         {
-            bool useDB = freq.Options?.UseDB?.Value ?? false;
+            bool useDB = freq.Options?.UseDB?.Value ?? true;
             string dbPath = DBUtils.GetFreqDBPath(freq.Name);
             string dbJournalPath = dbPath + "-journal";
             bool dbExists = File.Exists(dbPath);
@@ -311,6 +311,8 @@ public static class FreqUtils
                     freq.Priority = priority;
                     ++priority;
 
+                    InitFreqOptions(freq);
+
                     freq.Path = Utils.GetPath(freq.Path);
 
                     FreqDicts.Add(freq.Name, freq);
@@ -323,4 +325,18 @@ public static class FreqUtils
             }
         }
     }
+
+    private static void InitFreqOptions(Freq freq)
+    {
+        freq.Options ??= new FreqOptions();
+        if (UseDBOption.ValidFreqTypes.Contains(freq.Type))
+        {
+            freq.Options.UseDB ??= new UseDBOption(false);
+        }
+        if (HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(freq.Type))
+        {
+            freq.Options.HigherValueMeansHigherFrequency ??= new HigherValueMeansHigherFrequencyOption(false);
+        }
+    }
+
 }

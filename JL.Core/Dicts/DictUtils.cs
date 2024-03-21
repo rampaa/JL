@@ -38,39 +38,42 @@ public static class DictUtils
     public static readonly Dictionary<string, Dict> BuiltInDicts = new(7)
     {
         {
-            "ProfileCustomWordDictionary", new Dict(DictType.ProfileCustomWordDictionary,
+            "Custom Word Dictionary (Profile)", new Dict(DictType.ProfileCustomWordDictionary,
                 "Custom Word Dictionary (Profile)",
                 Path.Join(ProfileUtils.ProfileFolderPath, "Default_Custom_Words.txt"),
                 true, -1, 128, false,
-                new DictOptions(new NewlineBetweenDefinitionsOption(true)))
+                new DictOptions(new NewlineBetweenDefinitionsOption(true),
+                    noAll: new NoAllOption(false)))
         },
         {
-            "ProfileCustomNameDictionary", new Dict(DictType.ProfileCustomNameDictionary,
+            "Custom Name Dictionary (Profile)", new Dict(DictType.ProfileCustomNameDictionary,
                 "Custom Name Dictionary (Profile)",
                 Path.Join(ProfileUtils.ProfileFolderPath, "Default_Custom_Names.txt"),
                 true, 0, 128, false,
-                new DictOptions())
+                new DictOptions(noAll: new NoAllOption(false)))
         },
         {
-            "CustomWordDictionary", new Dict(DictType.CustomWordDictionary,
+            "Custom Word Dictionary", new Dict(DictType.CustomWordDictionary,
                 "Custom Word Dictionary",
                 Path.Join(Utils.ResourcesPath, "custom_words.txt"),
                 true, 1, 128, false,
-                new DictOptions(new NewlineBetweenDefinitionsOption(true)))
+                new DictOptions(new NewlineBetweenDefinitionsOption(true),
+                    noAll: new NoAllOption(false)))
         },
         {
-            "CustomNameDictionary", new Dict(DictType.CustomNameDictionary,
+            "Custom Name Dictionary", new Dict(DictType.CustomNameDictionary,
                 "Custom Name Dictionary",
                 Path.Join(Utils.ResourcesPath, "custom_names.txt"),
                 true, 2, 128, false,
-                new DictOptions())
+                new DictOptions(noAll: new NoAllOption(false)))
         },
         {
-            "JMdict", new Dict(DictType.JMdict, "JMdict",
-                Path.Join(Utils.ResourcesPath, "JMdict.xml"),
+            nameof(DictType.JMdict), new Dict(DictType.JMdict, nameof(DictType.JMdict),
+                Path.Join(Utils.ResourcesPath, $"{nameof(DictType.JMdict)}.xml"),
                 true, 3, 500000, false,
                 new DictOptions(
                     new NewlineBetweenDefinitionsOption(true),
+                    noAll: new NoAllOption(false),
                     wordClassInfo: new WordClassInfoOption(true),
                     dialectInfo: new DialectInfoOption(true),
                     pOrthographyInfo: new POrthographyInfoOption(true),
@@ -79,26 +82,33 @@ public static class DictUtils
                     aOrthographyInfo: new AOrthographyInfoOption(true),
                     rOrthographyInfo: new ROrthographyInfoOption(true),
                     wordTypeInfo: new WordTypeInfoOption(true),
+                    extraDefinitionInfo: new ExtraDefinitionInfoOption(true),
+                    spellingRestrictionInfo: new SpellingRestrictionInfoOption(true),
                     miscInfo: new MiscInfoOption(true),
                     loanwordEtymology: new LoanwordEtymologyOption(true),
                     relatedTerm: new RelatedTermOption(false),
                     antonym: new AntonymOption(false),
-                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)
+                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0),
+                    useDB: new UseDBOption(true)
                 ))
         },
         {
-            "Kanjidic", new Dict(DictType.Kanjidic, "Kanjidic",
+            nameof(DictType.Kanjidic), new Dict(DictType.Kanjidic, nameof(DictType.Kanjidic),
                 Path.Join(Utils.ResourcesPath, "kanjidic2.xml"),
                 true, 4, 13108, false,
-                new DictOptions(noAll: new NoAllOption(false),
-                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)))
+                new DictOptions(
+                    noAll: new NoAllOption(false),
+                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0),
+                    useDB: new UseDBOption(true)))
         },
         {
-            "JMnedict", new Dict(DictType.JMnedict, "JMnedict",
-                Path.Join(Utils.ResourcesPath, "JMnedict.xml"),
+            nameof(DictType.JMnedict), new Dict(DictType.JMnedict, nameof(DictType.JMnedict),
+                Path.Join(Utils.ResourcesPath, $"{nameof(DictType.JMnedict)}.xml"),
                 true, 5, 700000, false,
                 new DictOptions(new NewlineBetweenDefinitionsOption(true),
-                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)))
+                    noAll: new NoAllOption(false),
+                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0),
+                    useDB: new UseDBOption(true)))
         }
     };
 
@@ -505,7 +515,7 @@ public static class DictUtils
 
         foreach (Dict dict in Dicts.Values.ToList())
         {
-            bool useDB = dict.Options?.UseDB?.Value ?? false;
+            bool useDB = dict.Options?.UseDB?.Value ?? true;
             string dbPath = DBUtils.GetDictDBPath(dict.Name);
             string dbJournalPath = dbPath + "-journal";
             bool dbExists = File.Exists(dbPath);
@@ -1347,6 +1357,8 @@ public static class DictUtils
                         SingleDictTypeDicts[dict.Type] = dict;
                     }
 
+                    InitDictOptions(dict);
+
                     dict.Path = Utils.GetPath(dict.Path);
                     Dicts.Add(dict.Name, dict);
                 }
@@ -1358,4 +1370,95 @@ public static class DictUtils
             }
         }
     }
+
+    private static void InitDictOptions(Dict dict)
+    {
+        if (dict.Type is DictType.JMdict)
+        {
+            DictOptions builtInJmdictOptions = BuiltInDicts[nameof(DictType.JMdict)].Options!;
+            if (dict.Options is null)
+            {
+                dict.Options = builtInJmdictOptions;
+            }
+            else
+            {
+                dict.Options.NoAll = builtInJmdictOptions.NoAll;
+                dict.Options.NewlineBetweenDefinitions ??= builtInJmdictOptions.NewlineBetweenDefinitions;
+                dict.Options.WordClassInfo ??= builtInJmdictOptions.WordClassInfo;
+                dict.Options.DialectInfo ??= builtInJmdictOptions.DialectInfo;
+                dict.Options.POrthographyInfo ??= builtInJmdictOptions.POrthographyInfo;
+                dict.Options.POrthographyInfoColor ??= builtInJmdictOptions.POrthographyInfoColor;
+                dict.Options.POrthographyInfoFontSize ??= builtInJmdictOptions.POrthographyInfoFontSize;
+                dict.Options.AOrthographyInfo ??= builtInJmdictOptions.AOrthographyInfo;
+                dict.Options.ROrthographyInfo ??= builtInJmdictOptions.ROrthographyInfo;
+                dict.Options.WordTypeInfo ??= builtInJmdictOptions.WordTypeInfo;
+                dict.Options.ExtraDefinitionInfo ??= builtInJmdictOptions.ExtraDefinitionInfo;
+                dict.Options.SpellingRestrictionInfo ??= builtInJmdictOptions.SpellingRestrictionInfo;
+                dict.Options.MiscInfo ??= builtInJmdictOptions.MiscInfo;
+                dict.Options.LoanwordEtymology ??= builtInJmdictOptions.LoanwordEtymology;
+                dict.Options.RelatedTerm ??= builtInJmdictOptions.RelatedTerm;
+                dict.Options.Antonym ??= builtInJmdictOptions.Antonym;
+                dict.Options.AutoUpdateAfterNDays ??= builtInJmdictOptions.AutoUpdateAfterNDays;
+                dict.Options.UseDB ??= builtInJmdictOptions.UseDB;
+            }
+        }
+        else if (dict.Type is DictType.Kanjidic)
+        {
+            DictOptions builtInKanjidicOptions = BuiltInDicts[nameof(DictType.Kanjidic)].Options!;
+            if (dict.Options is null)
+            {
+                dict.Options = builtInKanjidicOptions;
+            }
+            else
+            {
+                dict.Options.NoAll = builtInKanjidicOptions.NoAll;
+                dict.Options.AutoUpdateAfterNDays ??= builtInKanjidicOptions.AutoUpdateAfterNDays;
+                dict.Options.UseDB ??= builtInKanjidicOptions.UseDB;
+            }
+        }
+        else if (dict.Type is DictType.JMnedict)
+        {
+            DictOptions builtInJmnedictOptions = BuiltInDicts[nameof(DictType.Kanjidic)].Options!;
+            if (dict.Options is null)
+            {
+                dict.Options = builtInJmnedictOptions;
+            }
+            else
+            {
+                dict.Options.NewlineBetweenDefinitions ??= builtInJmnedictOptions.NewlineBetweenDefinitions;
+                dict.Options.NoAll = builtInJmnedictOptions.NoAll;
+                dict.Options.AutoUpdateAfterNDays ??= builtInJmnedictOptions.AutoUpdateAfterNDays;
+                dict.Options.UseDB ??= builtInJmnedictOptions.UseDB;
+            }
+        }
+        else
+        {
+            dict.Options ??= new DictOptions();
+            if (NoAllOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.NoAll ??= new NoAllOption(false);
+            }
+            if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.NewlineBetweenDefinitions ??= new NewlineBetweenDefinitionsOption(true);
+            }
+            if (UseDBOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.UseDB ??= new UseDBOption(true);
+            }
+            if (ExamplesOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.Examples ??= new ExamplesOption(ExamplesOptionValue.None);
+            }
+            if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.PitchAccentMarkerColor ??= new PitchAccentMarkerColorOption("#FF00BFFF");
+            }
+            if (ShowPitchAccentWithDottedLinesOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.ShowPitchAccentWithDottedLines ??= new ShowPitchAccentWithDottedLinesOption(true);
+            }
+        }
+    }
+
 }

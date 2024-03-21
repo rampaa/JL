@@ -315,7 +315,7 @@ internal sealed partial class DictOptionsControl : UserControl
 
         if (UseDBOption.ValidDictTypes.Contains(dictType))
         {
-            UseDBCheckBox.IsChecked = false;
+            UseDBCheckBox.IsChecked = true;
             UseDBCheckBox.Visibility = Visibility.Visible;
             showDictOptions = true;
         }
@@ -473,7 +473,7 @@ internal sealed partial class DictOptionsControl : UserControl
 
         if (UseDBOption.ValidDictTypes.Contains(dict.Type))
         {
-            UseDBCheckBox.IsChecked = dict.Options?.UseDB?.Value ?? false;
+            UseDBCheckBox.IsChecked = dict.Options?.UseDB?.Value ?? true;
             UseDBCheckBox.Visibility = Visibility.Visible;
             showDictOptions = true;
         }

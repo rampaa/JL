@@ -34,11 +34,11 @@ public static class LookupUtils
 
         s_lastLookupTime = preciseTimeNow;
 
-        List<Freq> dbFreqs = FreqUtils.FreqDicts.Values.Where(static f => f is { Active: true, Type: not FreqType.YomichanKanji } && (f.Options?.UseDB?.Value ?? false) && f.Ready).ToList();
+        List<Freq> dbFreqs = FreqUtils.FreqDicts.Values.Where(static f => f is { Active: true, Type: not FreqType.YomichanKanji } && (f.Options?.UseDB?.Value ?? true) && f.Ready).ToList();
 
         _ = DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict);
         bool pitchDictIsActive = pitchDict?.Active ?? false;
-        bool useDBForPitchDict = pitchDictIsActive && (pitchDict!.Options?.UseDB?.Value ?? false) && pitchDict.Ready;
+        bool useDBForPitchDict = pitchDictIsActive && (pitchDict!.Options?.UseDB?.Value ?? true) && pitchDict.Ready;
 
         ConcurrentBag<LookupResult> lookupResults = [];
 
@@ -46,7 +46,7 @@ public static class LookupUtils
         {
             _ = Parallel.ForEach(DictUtils.Dicts.Values.ToList(), dict =>
             {
-                bool useDB = (dict.Options?.UseDB?.Value ?? false) && dict.Ready;
+                bool useDB = (dict.Options?.UseDB?.Value ?? true) && dict.Ready;
                 if (dict.Active)
                 {
                     if (dict.Type is DictType.Kanjidic)
@@ -1291,7 +1291,7 @@ public static class LookupUtils
         for (int i = 0; i < freqs.Count; i++)
         {
             Freq freq = freqs[i];
-            bool useDB = (freq.Options?.UseDB?.Value ?? false) && freq.Ready;
+            bool useDB = (freq.Options?.UseDB?.Value ?? true) && freq.Ready;
 
             if (useDB)
             {
@@ -1317,7 +1317,7 @@ public static class LookupUtils
         for (int i = 0; i < kanjiFreqs.Count; i++)
         {
             Freq kanjiFreq = kanjiFreqs[i];
-            bool useDB = (kanjiFreq.Options?.UseDB?.Value ?? false) && kanjiFreq.Ready;
+            bool useDB = (kanjiFreq.Options?.UseDB?.Value ?? true) && kanjiFreq.Ready;
             IList<FrequencyRecord>? freqResultList;
 
             if (useDB)
