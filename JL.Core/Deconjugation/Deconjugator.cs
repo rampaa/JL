@@ -3,7 +3,7 @@ namespace JL.Core.Deconjugation;
 // translated from https://github.com/wareya/nazeka/blob/master/background-script.js
 internal static class Deconjugator
 {
-    public static Rule[] Rules { get; set; } = Array.Empty<Rule>();
+    public static Rule[] Rules { get; set; } = [];
 
     private static Form? StdruleDeconjugateInner(Form myForm, VirtualRule myRule)
     {
@@ -77,7 +77,7 @@ internal static class Deconjugator
             return null;
         }
 
-        HashSet<Form> collection = new();
+        HashSet<Form> collection = [];
 
         string[] array = myRule.DecEnd;
         if (array.Length is 1)
@@ -206,7 +206,7 @@ internal static class Deconjugator
             return null;
         }
 
-        HashSet<Form> collection = new();
+        HashSet<Form> collection = [];
 
         string[] array = myRule.DecEnd;
         if (array.Length is 1)
@@ -231,8 +231,8 @@ internal static class Deconjugator
                 (
                     myRule.Type,
                     null,
-                    new[] { maybeDecEnd },
-                    new[] { maybeConEnd },
+                    [maybeDecEnd],
+                    [maybeConEnd],
                     null,
                     null,
                     myRule.Detail
@@ -277,22 +277,22 @@ internal static class Deconjugator
 
     public static HashSet<Form> Deconjugate(string text)
     {
-        HashSet<Form> processed = new();
-        HashSet<Form> novel = new();
+        HashSet<Form> processed = [];
+        HashSet<Form> novel = [];
 
         Form startForm = new
         (
             text,
             text,
-            new List<string>(),
-            new HashSet<string>(),
-            new List<string>()
+            [],
+            [],
+            []
         );
         _ = novel.Add(startForm);
 
         while (novel.Count > 0)
         {
-            HashSet<Form> newNovel = new();
+            HashSet<Form> newNovel = [];
             foreach (Form form in novel)
             {
                 foreach (Rule rule in Rules)

@@ -46,7 +46,7 @@ internal sealed partial class AddFrequencyWindow : Window
         string fullPath = Path.GetFullPath(path, Utils.ApplicationPath);
 
         if (string.IsNullOrWhiteSpace(path)
-            || (!Directory.Exists(fullPath) && !File.Exists(fullPath))
+            || !Path.Exists(fullPath)
             || FreqUtils.FreqDicts.Values.Any(freq => freq.Path == path))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
@@ -84,7 +84,6 @@ internal sealed partial class AddFrequencyWindow : Window
     private void BrowseForFrequencyFile(string filter)
     {
         OpenFileDialog openFileDialog = new() { InitialDirectory = Utils.ApplicationPath, Filter = filter };
-
         if (openFileDialog.ShowDialog() is true)
         {
             TextBlockPath.Text = Utils.GetPath(openFileDialog.FileName);
@@ -93,13 +92,10 @@ internal sealed partial class AddFrequencyWindow : Window
 
     private void BrowseForFrequencyFolder()
     {
-        using System.Windows.Forms.FolderBrowserDialog fbd = new();
-        fbd.SelectedPath = Utils.ApplicationPath;
-
-        if (fbd.ShowDialog() is System.Windows.Forms.DialogResult.OK &&
-            !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+        OpenFolderDialog openFolderDialog = new() { InitialDirectory = Utils.ApplicationPath };
+        if (openFolderDialog.ShowDialog() is true)
         {
-            TextBlockPath.Text = Utils.GetPath(fbd.SelectedPath);
+            TextBlockPath.Text = Utils.GetPath(openFolderDialog.FolderName);
         }
     }
 

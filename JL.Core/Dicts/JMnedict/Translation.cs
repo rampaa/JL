@@ -8,8 +8,8 @@ internal sealed class Translation
 
     public Translation()
     {
-        NameTypeList = new List<string>();
-        TransDetList = new List<string>();
-        //XRefList = new List<string>();
+        NameTypeList = [];
+        TransDetList = [];
+        //XRefList = [];
     }
 }

@@ -1,10 +1,11 @@
+using System.Collections.Frozen;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace JL.Core.Utilities;
 
-public static class JapaneseUtils
+public static partial class JapaneseUtils
 {
     // Matches the following Unicode ranges:
     // CJK Radicals Supplement (2E80–2EFF)
@@ -32,11 +33,12 @@ public static class JapaneseUtils
     // CJK Compatibility Ideographs Supplement (2F800–2FA1F)
     // CJK Unified Ideographs Extension G (30000–3134F)
     // CJK Unified Ideographs Extension H (31350–323AF)
-    public static readonly Regex JapaneseRegex = new(
-        @"[\u2E80-\u319F\u31C0-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD879][\uDC00-\uDFFF]|\uD87A[\uDC00-\uDFEF]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD887][\uDC00-\uDFFF]|\uD888[\uDC00-\uDFAF]",
-        RegexOptions.Compiled);
 
-    private static readonly Dictionary<char, string> s_katakanaToHiraganaDict = new(87)
+    [GeneratedRegex(@"[\u2E80-\u319F\u31C0-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD879][\uDC00-\uDFFF]|\uD87A[\uDC00-\uDFEF]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD887][\uDC00-\uDFFF]|\uD888[\uDC00-\uDFAF]",
+        RegexOptions.Compiled)]
+    public static partial Regex JapaneseRegex();
+
+    private static readonly FrozenDictionary<char, string> s_katakanaToHiraganaDict = new Dictionary<char, string>(87)
     {
         #pragma warning disable format
         { 'ア', "あ" }, { 'イ', "い" }, { 'ウ', "う" }, { 'エ', "え" }, { 'オ', "お" },
@@ -67,9 +69,9 @@ public static class JapaneseUtils
 
         { 'ヸ', "ゐ゙" }, { 'ヹ', "ゑ゙" }, { 'ヺ', "を゙" }
         #pragma warning restore format
-    };
+    }.ToFrozenDictionary();
 
-    private static readonly Dictionary<string, char> s_kanaFinalVowelDict = new(87)
+    private static readonly FrozenDictionary<string, char> s_kanaFinalVowelDict = new Dictionary<string, char>(87)
     {
         #pragma warning disable format
         //Hiragana
@@ -94,10 +96,10 @@ public static class JapaneseUtils
         { "も", 'お' }, { "ろ", 'お' }, { "ご", 'お' }, { "ぞ", 'お' }, { "ど", 'お' }, { "ぼ", 'お' },
         { "ぽ", 'お' }, { "を", 'お' }, { "よ", 'お' }, { "ぉ", 'お' }, { "ょ", 'お' }, { "を゙", 'お' }
         #pragma warning restore format
-    };
+    }.ToFrozenDictionary();
 
-    private static readonly HashSet<char> s_smallCombiningKanaSet = new(18)
-    {
+    private static readonly FrozenSet<char> s_smallCombiningKanaSet = FrozenSet.ToFrozenSet(
+    [
         #pragma warning disable format
         'ァ', 'ィ', 'ゥ', 'ェ', 'ォ', 'ヮ',
         'ャ', 'ュ', 'ョ',
@@ -105,9 +107,9 @@ public static class JapaneseUtils
         'ぁ', 'ぃ', 'ぅ', 'ぇ', 'ぉ', 'ゎ',
         'ゃ', 'ゅ', 'ょ'
         #pragma warning restore format
-    };
+    ]);
 
-    private static readonly char[] s_sentenceTerminatingCharacters = {
+    private static readonly char[] s_sentenceTerminatingCharacters = [
         '。',
         '！',
         '？',
@@ -120,9 +122,9 @@ public static class JapaneseUtils
         '︙',
         '︰',
         '\n'
-    };
+    ];
 
-    private static readonly Dictionary<char, char> s_leftToRightBracketDict = new(28)
+    private static readonly FrozenDictionary<char, char> s_leftToRightBracketDict = new Dictionary<char, char>(28)
     {
         { '「', '」' },
         { '『', '』' },
@@ -152,11 +154,11 @@ public static class JapaneseUtils
         { '︻', '︼' },
         { '︽', '︾' },
         { '︿', '﹀' }
-    };
+    }.ToFrozenDictionary();
 
-    private static readonly Dictionary<char, char> s_rightToLeftBracketDict = s_leftToRightBracketDict.ToDictionary(static kvp => kvp.Value, static kvp => kvp.Key);
+    private static readonly FrozenDictionary<char, char> s_rightToLeftBracketDict = s_leftToRightBracketDict.ToFrozenDictionary(static kvp => kvp.Value, static kvp => kvp.Key);
 
-    private static readonly HashSet<char> s_expressionTerminatingCharacters = s_leftToRightBracketDict.Keys.Union(s_leftToRightBracketDict.Values).Union(s_sentenceTerminatingCharacters).ToHashSet();
+    private static readonly FrozenSet<char> s_expressionTerminatingCharacters = s_leftToRightBracketDict.Keys.Union(s_leftToRightBracketDict.Values).Union(s_sentenceTerminatingCharacters).ToFrozenSet();
 
     public static string KatakanaToHiragana(string text)
     {

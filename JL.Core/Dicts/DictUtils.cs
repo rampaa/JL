@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using JL.Core.Dicts.CustomNameDict;
@@ -24,9 +25,9 @@ public static class DictUtils
     public static bool UpdatingJmdict { get; internal set; } // = false;
     public static bool UpdatingJmnedict { get; internal set; } // = false;
     public static bool UpdatingKanjidic { get; internal set; } // = false;
-    public static readonly Dictionary<string, Dict> Dicts = new();
-    internal static Dictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new(55000); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272
-    internal static readonly Dictionary<string, string> s_kanjiCompositionDict = new(86934);
+    public static readonly Dictionary<string, Dict> Dicts = [];
+    internal static IDictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new Dictionary<string, IList<JmdictWordClass>>(55000); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272
+    internal static IDictionary<string, string> KanjiCompositionDict { get; set; } = new Dictionary<string, string>(86934);
     internal static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
     internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     internal static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
@@ -37,39 +38,42 @@ public static class DictUtils
     public static readonly Dictionary<string, Dict> BuiltInDicts = new(7)
     {
         {
-            "ProfileCustomWordDictionary", new Dict(DictType.ProfileCustomWordDictionary,
+            "Custom Word Dictionary (Profile)", new Dict(DictType.ProfileCustomWordDictionary,
                 "Custom Word Dictionary (Profile)",
                 Path.Join(ProfileUtils.ProfileFolderPath, "Default_Custom_Words.txt"),
                 true, -1, 128, false,
-                new DictOptions(new NewlineBetweenDefinitionsOption(true)))
+                new DictOptions(new NewlineBetweenDefinitionsOption(true),
+                    noAll: new NoAllOption(false)))
         },
         {
-            "ProfileCustomNameDictionary", new Dict(DictType.ProfileCustomNameDictionary,
+            "Custom Name Dictionary (Profile)", new Dict(DictType.ProfileCustomNameDictionary,
                 "Custom Name Dictionary (Profile)",
                 Path.Join(ProfileUtils.ProfileFolderPath, "Default_Custom_Names.txt"),
                 true, 0, 128, false,
-                new DictOptions())
+                new DictOptions(noAll: new NoAllOption(false)))
         },
         {
-            "CustomWordDictionary", new Dict(DictType.CustomWordDictionary,
+            "Custom Word Dictionary", new Dict(DictType.CustomWordDictionary,
                 "Custom Word Dictionary",
                 Path.Join(Utils.ResourcesPath, "custom_words.txt"),
                 true, 1, 128, false,
-                new DictOptions(new NewlineBetweenDefinitionsOption(true)))
+                new DictOptions(new NewlineBetweenDefinitionsOption(true),
+                    noAll: new NoAllOption(false)))
         },
         {
-            "CustomNameDictionary", new Dict(DictType.CustomNameDictionary,
+            "Custom Name Dictionary", new Dict(DictType.CustomNameDictionary,
                 "Custom Name Dictionary",
                 Path.Join(Utils.ResourcesPath, "custom_names.txt"),
                 true, 2, 128, false,
-                new DictOptions())
+                new DictOptions(noAll: new NoAllOption(false)))
         },
         {
-            "JMdict", new Dict(DictType.JMdict, "JMdict",
-                Path.Join(Utils.ResourcesPath, "JMdict.xml"),
+            nameof(DictType.JMdict), new Dict(DictType.JMdict, nameof(DictType.JMdict),
+                Path.Join(Utils.ResourcesPath, $"{nameof(DictType.JMdict)}.xml"),
                 true, 3, 500000, false,
                 new DictOptions(
                     new NewlineBetweenDefinitionsOption(true),
+                    noAll: new NoAllOption(false),
                     wordClassInfo: new WordClassInfoOption(true),
                     dialectInfo: new DialectInfoOption(true),
                     pOrthographyInfo: new POrthographyInfoOption(true),
@@ -78,26 +82,33 @@ public static class DictUtils
                     aOrthographyInfo: new AOrthographyInfoOption(true),
                     rOrthographyInfo: new ROrthographyInfoOption(true),
                     wordTypeInfo: new WordTypeInfoOption(true),
+                    extraDefinitionInfo: new ExtraDefinitionInfoOption(true),
+                    spellingRestrictionInfo: new SpellingRestrictionInfoOption(true),
                     miscInfo: new MiscInfoOption(true),
                     loanwordEtymology: new LoanwordEtymologyOption(true),
                     relatedTerm: new RelatedTermOption(false),
                     antonym: new AntonymOption(false),
-                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)
+                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0),
+                    useDB: new UseDBOption(true)
                 ))
         },
         {
-            "Kanjidic", new Dict(DictType.Kanjidic, "Kanjidic",
+            nameof(DictType.Kanjidic), new Dict(DictType.Kanjidic, nameof(DictType.Kanjidic),
                 Path.Join(Utils.ResourcesPath, "kanjidic2.xml"),
                 true, 4, 13108, false,
-                new DictOptions(noAll: new NoAllOption(false),
-                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)))
+                new DictOptions(
+                    noAll: new NoAllOption(false),
+                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0),
+                    useDB: new UseDBOption(true)))
         },
         {
-            "JMnedict", new Dict(DictType.JMnedict, "JMnedict",
-                Path.Join(Utils.ResourcesPath, "JMnedict.xml"),
+            nameof(DictType.JMnedict), new Dict(DictType.JMnedict, nameof(DictType.JMnedict),
+                Path.Join(Utils.ResourcesPath, $"{nameof(DictType.JMnedict)}.xml"),
                 true, 5, 700000, false,
                 new DictOptions(new NewlineBetweenDefinitionsOption(true),
-                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0)))
+                    noAll: new NoAllOption(false),
+                    autoUpdateAfterNDays: new AutoUpdateAfterNDaysOption(0),
+                    useDB: new UseDBOption(true)))
         }
     };
 
@@ -389,7 +400,7 @@ public static class DictUtils
         #pragma warning restore format
     };
 
-    public static readonly DictType[] YomichanDictTypes = {
+    public static readonly DictType[] YomichanDictTypes = [
         DictType.Daijirin,
         DictType.Daijisen,
         DictType.Gakken,
@@ -415,9 +426,9 @@ public static class DictUtils
         DictType.NonspecificKanjiWithWordSchemaYomichan,
         DictType.NonspecificNameYomichan,
         DictType.NonspecificYomichan
-    };
+    ];
 
-    public static readonly DictType[] NazekaDictTypes = {
+    public static readonly DictType[] NazekaDictTypes = [
         DictType.DaijirinNazeka,
         DictType.KenkyuushaNazeka,
         DictType.ShinmeikaiNazeka,
@@ -425,9 +436,9 @@ public static class DictUtils
         DictType.NonspecificKanjiNazeka,
         DictType.NonspecificNameNazeka,
         DictType.NonspecificNazeka
-    };
+    ];
 
-    public static readonly DictType[] NonspecificDictTypes = {
+    public static readonly DictType[] NonspecificDictTypes = [
         DictType.NonspecificWordYomichan,
         DictType.NonspecificKanjiYomichan,
         DictType.NonspecificKanjiWithWordSchemaYomichan,
@@ -437,25 +448,25 @@ public static class DictUtils
         DictType.NonspecificKanjiNazeka,
         DictType.NonspecificNameNazeka,
         DictType.NonspecificNazeka
-    };
+    ];
 
-    internal static readonly DictType[] s_kanjiDictTypes = {
+    internal static readonly DictType[] s_kanjiDictTypes = [
         DictType.Kanjidic,
         DictType.KanjigenYomichan,
         DictType.NonspecificKanjiYomichan,
         DictType.NonspecificKanjiWithWordSchemaYomichan,
         DictType.NonspecificKanjiNazeka
-    };
+    ];
 
-    internal static readonly DictType[] s_nameDictTypes = {
+    internal static readonly DictType[] s_nameDictTypes = [
         DictType.CustomNameDictionary,
         DictType.ProfileCustomNameDictionary,
         DictType.JMnedict,
         DictType.NonspecificNameYomichan,
         DictType.NonspecificNameNazeka
-    };
+    ];
 
-    internal static readonly DictType[] s_wordDictTypes = {
+    internal static readonly DictType[] s_wordDictTypes = [
         DictType.CustomWordDictionary,
         DictType.ProfileCustomWordDictionary,
         DictType.JMdict,
@@ -482,7 +493,7 @@ public static class DictUtils
         DictType.KenkyuushaNazeka,
         DictType.ShinmeikaiNazeka,
         DictType.NonspecificWordNazeka
-    };
+    ];
 
 #pragma warning disable IDE0072
     public static async Task LoadDictionaries()
@@ -498,11 +509,13 @@ public static class DictUtils
         bool dictCleared = false;
         bool dictRemoved = false;
 
-        List<Task> tasks = new();
+        Dictionary<string, string> dictDBPaths = [];
+
+        List<Task> tasks = [];
 
         foreach (Dict dict in Dicts.Values.ToList())
         {
-            bool useDB = dict.Options?.UseDB?.Value ?? false;
+            bool useDB = dict.Options?.UseDB?.Value ?? true;
             string dbPath = DBUtils.GetDictDBPath(dict.Name);
             string dbJournalPath = dbPath + "-journal";
             bool dbExists = File.Exists(dbPath);
@@ -524,9 +537,9 @@ public static class DictUtils
             bool loadFromDB;
             dict.Ready = false;
 
-            if (useDB)
+            if (useDB && !DBUtils.DictDBPaths.ContainsKey(dict.Name))
             {
-                _ = DBUtils.s_dictDBPaths.TryAdd(dict.Name, dbPath);
+                dictDBPaths.Add(dict.Name, dbPath);
             }
 
             switch (dict.Type)
@@ -562,8 +575,7 @@ public static class DictUtils
                                         {
                                             JmdictDBManager.CreateDB(dict.Name);
                                             JmdictDBManager.InsertRecordsToDB(dict);
-                                            dict.Contents.Clear();
-                                            dict.Contents.TrimExcess();
+                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                         }
                                     }
 
@@ -586,15 +598,13 @@ public static class DictUtils
                                 {
                                     JmdictDBManager.CreateDB(dict.Name);
                                     JmdictDBManager.InsertRecordsToDB(dict);
-                                    dict.Contents.Clear();
-                                    dict.Contents.TrimExcess();
+                                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                     dict.Ready = true;
                                 }));
                             }
                             else
                             {
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
+                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                 dict.Ready = true;
                             }
 
@@ -634,8 +644,7 @@ public static class DictUtils
                                     {
                                         JmnedictDBManager.CreateDB(dict.Name);
                                         JmnedictDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents.Clear();
-                                        dict.Contents.TrimExcess();
+                                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                     }
 
                                     dict.Ready = true;
@@ -657,15 +666,13 @@ public static class DictUtils
                                 {
                                     JmnedictDBManager.CreateDB(dict.Name);
                                     JmnedictDBManager.InsertRecordsToDB(dict);
-                                    dict.Contents.Clear();
-                                    dict.Contents.TrimExcess();
+                                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                     dict.Ready = true;
                                 }));
                             }
                             else
                             {
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
+                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                 dict.Ready = true;
                             }
 
@@ -711,8 +718,7 @@ public static class DictUtils
                                         {
                                             KanjidicDBManager.CreateDB(dict.Name);
                                             KanjidicDBManager.InsertRecordsToDB(dict);
-                                            dict.Contents.Clear();
-                                            dict.Contents.TrimExcess();
+                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                         }
                                     }
 
@@ -735,15 +741,13 @@ public static class DictUtils
                                 {
                                     KanjidicDBManager.CreateDB(dict.Name);
                                     KanjidicDBManager.InsertRecordsToDB(dict);
-                                    dict.Contents.Clear();
-                                    dict.Contents.TrimExcess();
+                                    dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                     dict.Ready = true;
                                 }));
                             }
                             else
                             {
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
+                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                 dict.Ready = true;
                             }
                         }
@@ -832,8 +836,7 @@ public static class DictUtils
                                     {
                                         EpwingYomichanDBManager.CreateDB(dict.Name);
                                         EpwingYomichanDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents.Clear();
-                                        dict.Contents.TrimExcess();
+                                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                     }
                                 }
 
@@ -865,15 +868,13 @@ public static class DictUtils
                             {
                                 EpwingYomichanDBManager.CreateDB(dict.Name);
                                 EpwingYomichanDBManager.InsertRecordsToDB(dict);
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
+                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                 dict.Ready = true;
                             }));
                         }
                         else
                         {
-                            dict.Contents.Clear();
-                            dict.Contents.TrimExcess();
+                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                             dict.Ready = true;
                         }
 
@@ -915,8 +916,7 @@ public static class DictUtils
                                     {
                                         YomichanKanjiDBManager.CreateDB(dict.Name);
                                         YomichanKanjiDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents.Clear();
-                                        dict.Contents.TrimExcess();
+                                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                     }
                                 }
 
@@ -948,15 +948,13 @@ public static class DictUtils
                             {
                                 YomichanKanjiDBManager.CreateDB(dict.Name);
                                 YomichanKanjiDBManager.InsertRecordsToDB(dict);
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
+                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                 dict.Ready = true;
                             }));
                         }
                         else
                         {
-                            dict.Contents.Clear();
-                            dict.Contents.TrimExcess();
+                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                             dict.Ready = true;
                         }
 
@@ -994,8 +992,7 @@ public static class DictUtils
 
                     else if (dict is { Active: false, Contents.Count: > 0 })
                     {
-                        dict.Contents.Clear();
-                        dict.Contents.TrimExcess();
+                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                         dictCleared = true;
                         dict.Ready = true;
                     }
@@ -1031,8 +1028,7 @@ public static class DictUtils
 
                     else if (dict is { Active: false, Contents.Count: > 0 })
                     {
-                        dict.Contents.Clear();
-                        dict.Contents.TrimExcess();
+                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                         dictCleared = true;
                         dict.Ready = true;
                     }
@@ -1088,8 +1084,7 @@ public static class DictUtils
                                     {
                                         EpwingNazekaDBManager.CreateDB(dict.Name);
                                         EpwingNazekaDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents.Clear();
-                                        dict.Contents.TrimExcess();
+                                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                     }
                                 }
 
@@ -1121,15 +1116,13 @@ public static class DictUtils
                             {
                                 EpwingNazekaDBManager.CreateDB(dict.Name);
                                 EpwingNazekaDBManager.InsertRecordsToDB(dict);
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
+                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                 dict.Ready = true;
                             }));
                         }
                         else
                         {
-                            dict.Contents.Clear();
-                            dict.Contents.TrimExcess();
+                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                             dict.Ready = true;
                         }
 
@@ -1171,8 +1164,7 @@ public static class DictUtils
                                     {
                                         YomichanPitchAccentDBManager.CreateDB(dict.Name);
                                         YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents.Clear();
-                                        dict.Contents.TrimExcess();
+                                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                     }
                                 }
 
@@ -1205,15 +1197,13 @@ public static class DictUtils
                             {
                                 YomichanPitchAccentDBManager.CreateDB(dict.Name);
                                 YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
-                                dict.Contents.Clear();
-                                dict.Contents.TrimExcess();
+                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                                 dict.Ready = true;
                             }));
                         }
                         else
                         {
-                            dict.Contents.Clear();
-                            dict.Contents.TrimExcess();
+                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                             dict.Ready = true;
                         }
 
@@ -1230,6 +1220,11 @@ public static class DictUtils
                 default:
                     throw new ArgumentOutOfRangeException(null, "Invalid dict type");
             }
+        }
+
+        if (dictDBPaths.Count > 0)
+        {
+            DBUtils.DictDBPaths = DBUtils.DictDBPaths.Union(dictDBPaths).ToFrozenDictionary();
         }
 
         if (tasks.Count > 0 || dictCleared)
@@ -1278,7 +1273,7 @@ public static class DictUtils
                 {
                     int endIndex = lParts[2].IndexOf('[', StringComparison.Ordinal);
 
-                    s_kanjiCompositionDict.Add(lParts[1].GetPooledString(),
+                    KanjiCompositionDict.Add(lParts[1].GetPooledString(),
                         endIndex is -1 ? lParts[2] : lParts[2][..endIndex]);
                 }
 
@@ -1291,13 +1286,15 @@ public static class DictUtils
                             int endIndex = lParts[j].IndexOf('[', StringComparison.Ordinal);
                             if (endIndex is not -1)
                             {
-                                s_kanjiCompositionDict.Add(lParts[1].GetPooledString(), lParts[j][..endIndex]);
+                                KanjiCompositionDict.Add(lParts[1].GetPooledString(), lParts[j][..endIndex]);
                                 break;
                             }
                         }
                     }
                 }
             }
+
+            KanjiCompositionDict = KanjiCompositionDict.ToFrozenDictionary();
         }
     }
 
@@ -1360,6 +1357,8 @@ public static class DictUtils
                         SingleDictTypeDicts[dict.Type] = dict;
                     }
 
+                    InitDictOptions(dict);
+
                     dict.Path = Utils.GetPath(dict.Path);
                     Dicts.Add(dict.Name, dict);
                 }
@@ -1371,4 +1370,95 @@ public static class DictUtils
             }
         }
     }
+
+    private static void InitDictOptions(Dict dict)
+    {
+        if (dict.Type is DictType.JMdict)
+        {
+            DictOptions builtInJmdictOptions = BuiltInDicts[nameof(DictType.JMdict)].Options!;
+            if (dict.Options is null)
+            {
+                dict.Options = builtInJmdictOptions;
+            }
+            else
+            {
+                dict.Options.NoAll = builtInJmdictOptions.NoAll;
+                dict.Options.NewlineBetweenDefinitions ??= builtInJmdictOptions.NewlineBetweenDefinitions;
+                dict.Options.WordClassInfo ??= builtInJmdictOptions.WordClassInfo;
+                dict.Options.DialectInfo ??= builtInJmdictOptions.DialectInfo;
+                dict.Options.POrthographyInfo ??= builtInJmdictOptions.POrthographyInfo;
+                dict.Options.POrthographyInfoColor ??= builtInJmdictOptions.POrthographyInfoColor;
+                dict.Options.POrthographyInfoFontSize ??= builtInJmdictOptions.POrthographyInfoFontSize;
+                dict.Options.AOrthographyInfo ??= builtInJmdictOptions.AOrthographyInfo;
+                dict.Options.ROrthographyInfo ??= builtInJmdictOptions.ROrthographyInfo;
+                dict.Options.WordTypeInfo ??= builtInJmdictOptions.WordTypeInfo;
+                dict.Options.ExtraDefinitionInfo ??= builtInJmdictOptions.ExtraDefinitionInfo;
+                dict.Options.SpellingRestrictionInfo ??= builtInJmdictOptions.SpellingRestrictionInfo;
+                dict.Options.MiscInfo ??= builtInJmdictOptions.MiscInfo;
+                dict.Options.LoanwordEtymology ??= builtInJmdictOptions.LoanwordEtymology;
+                dict.Options.RelatedTerm ??= builtInJmdictOptions.RelatedTerm;
+                dict.Options.Antonym ??= builtInJmdictOptions.Antonym;
+                dict.Options.AutoUpdateAfterNDays ??= builtInJmdictOptions.AutoUpdateAfterNDays;
+                dict.Options.UseDB ??= builtInJmdictOptions.UseDB;
+            }
+        }
+        else if (dict.Type is DictType.Kanjidic)
+        {
+            DictOptions builtInKanjidicOptions = BuiltInDicts[nameof(DictType.Kanjidic)].Options!;
+            if (dict.Options is null)
+            {
+                dict.Options = builtInKanjidicOptions;
+            }
+            else
+            {
+                dict.Options.NoAll = builtInKanjidicOptions.NoAll;
+                dict.Options.AutoUpdateAfterNDays ??= builtInKanjidicOptions.AutoUpdateAfterNDays;
+                dict.Options.UseDB ??= builtInKanjidicOptions.UseDB;
+            }
+        }
+        else if (dict.Type is DictType.JMnedict)
+        {
+            DictOptions builtInJmnedictOptions = BuiltInDicts[nameof(DictType.Kanjidic)].Options!;
+            if (dict.Options is null)
+            {
+                dict.Options = builtInJmnedictOptions;
+            }
+            else
+            {
+                dict.Options.NewlineBetweenDefinitions ??= builtInJmnedictOptions.NewlineBetweenDefinitions;
+                dict.Options.NoAll = builtInJmnedictOptions.NoAll;
+                dict.Options.AutoUpdateAfterNDays ??= builtInJmnedictOptions.AutoUpdateAfterNDays;
+                dict.Options.UseDB ??= builtInJmnedictOptions.UseDB;
+            }
+        }
+        else
+        {
+            dict.Options ??= new DictOptions();
+            if (NoAllOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.NoAll ??= new NoAllOption(false);
+            }
+            if (NewlineBetweenDefinitionsOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.NewlineBetweenDefinitions ??= new NewlineBetweenDefinitionsOption(true);
+            }
+            if (UseDBOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.UseDB ??= new UseDBOption(true);
+            }
+            if (ExamplesOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.Examples ??= new ExamplesOption(ExamplesOptionValue.None);
+            }
+            if (PitchAccentMarkerColorOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.PitchAccentMarkerColor ??= new PitchAccentMarkerColorOption("#FF00BFFF");
+            }
+            if (ShowPitchAccentWithDottedLinesOption.ValidDictTypes.Contains(dict.Type))
+            {
+                dict.Options.ShowPitchAccentWithDottedLines ??= new ShowPitchAccentWithDottedLinesOption(true);
+            }
+        }
+    }
+
 }

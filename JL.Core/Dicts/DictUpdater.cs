@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.IO.Compression;
 using System.Net;
 using JL.Core.Dicts.JMdict;
@@ -104,7 +105,7 @@ public static class DictUpdater
         if (downloaded)
         {
             dict.Ready = false;
-            dict.Contents.Clear();
+            dict.Contents = new Dictionary<string, IList<IDictRecord>>(450000);
 
             await Task.Run(async () => await JmdictLoader
                 .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
@@ -116,7 +117,7 @@ public static class DictUpdater
             await JmdictWordClassUtils.Load().ConfigureAwait(false);
 
             string dbPath = DBUtils.GetDictDBPath(dict.Name);
-            bool useDB = dict.Options?.UseDB?.Value ?? false;
+            bool useDB = dict.Options?.UseDB?.Value ?? true;
             bool dbExists = File.Exists(dbPath);
 
             if (dbExists)
@@ -137,8 +138,7 @@ public static class DictUpdater
 
             if (!dict.Active || useDB)
             {
-                dict.Contents.Clear();
-                dict.Contents.TrimExcess();
+                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
             }
 
             Utils.ClearStringPoolIfDictsAreReady();
@@ -162,13 +162,13 @@ public static class DictUpdater
         if (downloaded)
         {
             dict.Ready = false;
-            dict.Contents.Clear();
+            dict.Contents = new Dictionary<string, IList<IDictRecord>>(620000);
 
             await Task.Run(async () => await JmnedictLoader
                 .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
 
             string dbPath = DBUtils.GetDictDBPath(dict.Name);
-            bool useDB = dict.Options?.UseDB?.Value ?? false;
+            bool useDB = dict.Options?.UseDB?.Value ?? true;
             bool dbExists = File.Exists(dbPath);
 
             if (dbExists)
@@ -189,8 +189,7 @@ public static class DictUpdater
 
             if (!dict.Active || useDB)
             {
-                dict.Contents.Clear();
-                dict.Contents.TrimExcess();
+                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
             }
 
             Utils.ClearStringPoolIfDictsAreReady();
@@ -214,13 +213,13 @@ public static class DictUpdater
         if (downloaded)
         {
             dict.Ready = false;
-            dict.Contents.Clear();
+            dict.Contents = new Dictionary<string, IList<IDictRecord>>(13108);
 
             await Task.Run(async () => await KanjidicLoader
                 .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
 
             string dbPath = DBUtils.GetDictDBPath(dict.Name);
-            bool useDB = dict.Options?.UseDB?.Value ?? false;
+            bool useDB = dict.Options?.UseDB?.Value ?? true;
             bool dbExists = File.Exists(dbPath);
 
             if (dbExists)
@@ -241,8 +240,7 @@ public static class DictUpdater
 
             if (!dict.Active || useDB)
             {
-                dict.Contents.Clear();
-                dict.Contents.TrimExcess();
+                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
             }
 
             Utils.ClearStringPoolIfDictsAreReady();
@@ -255,11 +253,11 @@ public static class DictUpdater
 
     internal static async Task AutoUpdateBuiltInDicts()
     {
-        DictType[] dicts = {
+        DictType[] dicts = [
             DictType.JMdict,
             DictType.JMnedict,
             DictType.Kanjidic
-        };
+        ];
 
         for (int i = 0; i < dicts.Length; i++)
         {

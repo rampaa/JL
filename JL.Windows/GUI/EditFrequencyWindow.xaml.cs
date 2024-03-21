@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
@@ -40,8 +41,7 @@ internal sealed partial class EditFrequencyWindow : Window
 
         if (string.IsNullOrWhiteSpace(path)
             || (_freq.Path != path
-                && ((!Directory.Exists(fullPath) && !File.Exists(fullPath))
-                    || FreqUtils.FreqDicts.Values.Any(dict => dict.Path == path))))
+                && (!Path.Exists(fullPath) || FreqUtils.FreqDicts.Values.Any(dict => dict.Path == path))))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
             isValid = false;
@@ -71,7 +71,7 @@ internal sealed partial class EditFrequencyWindow : Window
             if (_freq.Path != path)
             {
                 _freq.Path = path;
-                _freq.Contents.Clear();
+                _freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
                 _freq.Ready = false;
 
                 if (dbExists)
@@ -119,7 +119,13 @@ internal sealed partial class EditFrequencyWindow : Window
 
     private void BrowseForFrequencyFile(string filter)
     {
-        OpenFileDialog openFileDialog = new() { InitialDirectory = Utils.ApplicationPath, Filter = filter };
+        string? initialDirectory = Path.GetDirectoryName(_freq.Path);
+        if (!Directory.Exists(initialDirectory))
+        {
+            initialDirectory = Utils.ApplicationPath;
+        }
+
+        OpenFileDialog openFileDialog = new() { InitialDirectory = initialDirectory, Filter = filter };
         if (openFileDialog.ShowDialog() is true)
         {
             TextBlockPath.Text = Utils.GetPath(openFileDialog.FileName);
@@ -128,13 +134,16 @@ internal sealed partial class EditFrequencyWindow : Window
 
     private void BrowseForFrequencyFolder()
     {
-        using System.Windows.Forms.FolderBrowserDialog fbd = new();
-        fbd.SelectedPath = Utils.ApplicationPath;
-
-        if (fbd.ShowDialog() is System.Windows.Forms.DialogResult.OK &&
-            !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+        string initialDirectory = _freq.Path;
+        if (!Directory.Exists(initialDirectory))
         {
-            TextBlockPath.Text = Utils.GetPath(fbd.SelectedPath);
+            initialDirectory = Utils.ApplicationPath;
+        }
+
+        OpenFolderDialog openFolderDialog = new() { InitialDirectory = initialDirectory };
+        if (openFolderDialog.ShowDialog() is true)
+        {
+            TextBlockPath.Text = Utils.GetPath(openFolderDialog.FolderName);
         }
     }
 

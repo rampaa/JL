@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Net.Http.Json;
 using System.Runtime.Serialization;
 using System.Text;
@@ -12,7 +13,7 @@ public static class AudioUtils
 {
     private static readonly AudioResponse s_textToSpeechAudioResponse = new(AudioSourceType.TextToSpeech, "wav", null);
 
-    public static readonly Dictionary<string, AudioSource> AudioSources = new();
+    public static readonly Dictionary<string, AudioSource> AudioSources = [];
 
     private static readonly Dictionary<string, AudioSource> s_builtInAudioSources = new(1)
     {
@@ -21,7 +22,7 @@ public static class AudioUtils
         }
     };
 
-    private static readonly Dictionary<string, string> s_mediaTypeToExtensionDict = new(6)
+    private static readonly FrozenDictionary<string, string> s_mediaTypeToExtensionDict = new Dictionary<string, string>(6)
     {
         { "mpeg", "mp3" },
         { "3gpp", "3gp" },
@@ -29,7 +30,7 @@ public static class AudioUtils
         { "vorbis", "ogg" },
         { "vorbis-config", "ogg" },
         { "x-midi", "midi" }
-    };
+    }.ToFrozenDictionary();
 
     private static async Task<AudioResponse?> GetAudioFromUrl(Uri url)
     {

@@ -232,9 +232,9 @@ public static class MiningUtils
         return miningParams;
     }
 
-    private static List<KeyValuePair<string, byte>>? GetPitchAccents(Dictionary<string, IList<IDictRecord>> pitchDict, LookupResult lookupResult)
+    private static List<KeyValuePair<string, byte>>? GetPitchAccents(IDictionary<string, IList<IDictRecord>> pitchDict, LookupResult lookupResult)
     {
-        List<KeyValuePair<string, byte>> pitchAccents = new();
+        List<KeyValuePair<string, byte>> pitchAccents = [];
 
         if (lookupResult.Readings is not null)
         {
@@ -508,7 +508,7 @@ public static class MiningUtils
     /// </summary>
     private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> userFields, Dictionary<JLField, string> miningParams)
     {
-        Dictionary<string, object> dict = new();
+        Dictionary<string, object> dict = [];
         foreach ((string key, JLField value) in userFields)
         {
             string? fieldName = miningParams.GetValueOrDefault(value);

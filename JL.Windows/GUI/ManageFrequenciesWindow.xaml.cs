@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -70,7 +71,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
     // probably should be split into several methods
     private void UpdateFreqsDisplay()
     {
-        List<DockPanel> resultDockPanels = new();
+        List<DockPanel> resultDockPanels = [];
 
         foreach (Freq freq in FreqUtils.FreqDicts.Values.ToList())
         {
@@ -121,7 +122,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
             };
 
             string fullPath = Path.GetFullPath(freq.Path, Utils.ApplicationPath);
-            bool invalidPath = !Directory.Exists(fullPath) && !File.Exists(fullPath);
+            bool invalidPath = !Path.Exists(fullPath);
             TextBlock freqPathValidityTextBlock = new()
             {
                 Width = 13,
@@ -195,7 +196,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
     private void PathTextBlock_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         string? fullPath = Path.GetFullPath(((TextBlock)sender).Text, Utils.ApplicationPath);
-        if (File.Exists(fullPath) || Directory.Exists(fullPath))
+        if (Path.Exists(fullPath))
         {
             if (File.Exists(fullPath))
             {
@@ -250,8 +251,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
         if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this frequency dictionary?", "Confirmation"))
         {
             Freq freq = (Freq)((Button)sender).Tag;
-            freq.Contents.Clear();
-            freq.Contents.TrimExcess();
+            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
             _ = FreqUtils.FreqDicts.Remove(freq.Name);
 
             string dbPath = DBUtils.GetFreqDBPath(freq.Name);

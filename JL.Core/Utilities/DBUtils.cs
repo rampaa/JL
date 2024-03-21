@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Globalization;
 using System.Timers;
 using JL.Core.Dicts;
@@ -10,13 +11,13 @@ public static class DBUtils
 {
     private static readonly Timer s_optimizePragmaTimer = new();
 
-    internal static readonly Dictionary<string, string> s_dictDBPaths = new();
-    internal static readonly Dictionary<string, string> s_freqDBPaths = new();
+    internal static FrozenDictionary<string, string> DictDBPaths { get; set; } = FrozenDictionary<string, string>.Empty;
+    internal static FrozenDictionary<string, string> FreqDBPaths { get; set; } = FrozenDictionary<string, string>.Empty;
 
     internal static readonly string s_freqDBFolderPath = Path.Join(Utils.ResourcesPath, "Frequency Databases");
     internal static readonly string s_dictDBFolderPath = Path.Join(Utils.ResourcesPath, "Dictionary Databases");
 
-    internal static readonly DictType[] s_dictTypesWithDBSupport = {
+    internal static readonly DictType[] s_dictTypesWithDBSupport = [
         DictType.JMdict,
         DictType.JMnedict,
         DictType.Kanjidic,
@@ -52,18 +53,18 @@ public static class DBUtils
         DictType.NonspecificKanjiNazeka,
         DictType.NonspecificNameNazeka,
         DictType.NonspecificNazeka
-    };
+    ];
 
     public static string GetDictDBPath(string dbName)
     {
-        return s_dictDBPaths.TryGetValue(dbName, out string? dbPath)
+        return DictDBPaths.TryGetValue(dbName, out string? dbPath)
             ? dbPath
             : $"{Path.Join(s_dictDBFolderPath, dbName)}.sqlite";
     }
 
     public static string GetFreqDBPath(string dbName)
     {
-        return s_freqDBPaths.TryGetValue(dbName, out string? dbPath)
+        return FreqDBPaths.TryGetValue(dbName, out string? dbPath)
             ? dbPath
             : $"{Path.Join(s_freqDBFolderPath, dbName)}.sqlite";
     }

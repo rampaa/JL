@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.Encodings.Web;
@@ -19,14 +20,17 @@ using Serilog.Core;
 
 namespace JL.Core.Utilities;
 
-public static class Utils
+public static partial class Utils
 {
     public static readonly Version JLVersion = new(1, 30, 2);
     public static readonly string ApplicationPath = AppContext.BaseDirectory;
     public static readonly string ResourcesPath = Path.Join(AppContext.BaseDirectory, "Resources");
     public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
     internal static StringPool StringPoolInstance => StringPool.Shared;
-    internal static readonly Regex s_numberRegex = new(@"\d+", RegexOptions.Compiled);
+
+    [GeneratedRegex(@"\d+", RegexOptions.Compiled)]
+    internal static partial Regex NumberRegex();
+
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
 
     public static readonly LoggingLevelSwitch LoggingLevelSwitch = new() { MinimumLevel = Serilog.Events.LogEventLevel.Error };
@@ -73,7 +77,7 @@ public static class Utils
         WriteIndented = true
     };
 
-    internal static readonly Dictionary<string, string> s_iso6392BTo2T = new(20)
+    internal static readonly FrozenDictionary<string, string> s_iso6392BTo2T = new Dictionary<string, string>(20)
     {
         #pragma warning disable format
         { "tib", "bod" }, { "cze", "ces" }, { "wel", "cym" }, { "ger", "deu" }, { "gre", "ell" },
@@ -81,7 +85,7 @@ public static class Utils
         { "geo", "kat" }, { "mac", "mkd" }, { "mao", "mri" }, { "may", "msa" }, { "bur", "mya" },
         { "dut", "nld" }, { "rum", "ron" }, { "slo", "slk" }, { "alb", "sqi" }, { "chi", "zho" }
         #pragma warning restore format
-    };
+    }.ToFrozenDictionary();
 
 #pragma warning disable CA5351
     internal static string GetMd5String(byte[] bytes)

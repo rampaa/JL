@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Xml;
 using JL.Core.Utilities;
 
@@ -25,7 +26,7 @@ internal static class KanjidicLoader
                 }
             }
 
-            dict.Contents.TrimExcess();
+            dict.Contents = dict.Contents.ToFrozenDictionary();
         }
 
         else if (Utils.Frontend.ShowYesNoDialog(
@@ -48,18 +49,18 @@ internal static class KanjidicLoader
         }
     }
 
-    private static async Task ReadCharacter(XmlReader xmlReader, Dictionary<string, IList<IDictRecord>> kanjidicDictionary)
+    private static async Task ReadCharacter(XmlReader xmlReader, IDictionary<string, IList<IDictRecord>> kanjidicDictionary)
     {
         string key = (await xmlReader.ReadElementContentAsStringAsync().ConfigureAwait(false)).GetPooledString();
 
         byte grade = 0;
         byte strokeCount = 0;
         int frequency = 0;
-        List<string> definitionList = new();
-        List<string> nanoriReadingList = new();
-        List<string> onReadingList = new();
-        List<string> kunReadingList = new();
-        List<string> radicalNameList = new();
+        List<string> definitionList = [];
+        List<string> nanoriReadingList = [];
+        List<string> onReadingList = [];
+        List<string> kunReadingList = [];
+        List<string> radicalNameList = [];
 
         while (!xmlReader.EOF)
         {
@@ -148,6 +149,6 @@ internal static class KanjidicLoader
 
         KanjidicRecord entry = new(definitions, onReadings, kunReadings, nanoriReadings, radicalNames, strokeCount, grade, frequency);
 
-        kanjidicDictionary[key] = new IDictRecord[] { entry };
+        kanjidicDictionary[key] = [entry];
     }
 }

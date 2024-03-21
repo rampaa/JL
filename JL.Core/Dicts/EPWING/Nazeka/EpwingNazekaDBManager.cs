@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
@@ -124,7 +125,7 @@ internal static class EpwingNazekaDBManager
 
     public static Dictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
-        Dictionary<string, IList<IDictRecord>> results = new();
+        Dictionary<string, IList<IDictRecord>> results = [];
 
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -185,7 +186,7 @@ internal static class EpwingNazekaDBManager
 
             else
             {
-                results[searchKey] = new List<IDictRecord> { new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions) };
+                results[searchKey] = [new EpwingNazekaRecord(primarySpelling, reading, alternativeSpellings, definitions)];
             }
         }
 
@@ -194,7 +195,7 @@ internal static class EpwingNazekaDBManager
 
     public static List<IDictRecord> GetRecordsFromDB(string dbName, string term)
     {
-        List<IDictRecord> results = new();
+        List<IDictRecord> results = [];
 
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -254,7 +255,7 @@ internal static class EpwingNazekaDBManager
                 }
                 else
                 {
-                    dict.Contents[searchKey] = new List<IDictRecord> { record };
+                    dict.Contents[searchKey] = [record];
                 }
             }
         }
@@ -264,7 +265,7 @@ internal static class EpwingNazekaDBManager
             dict.Contents[key] = recordList.ToArray();
         }
 
-        dict.Contents.TrimExcess();
+        dict.Contents = dict.Contents.ToFrozenDictionary();
     }
 
     private static EpwingNazekaRecord GetRecord(SqliteDataReader dataReader)

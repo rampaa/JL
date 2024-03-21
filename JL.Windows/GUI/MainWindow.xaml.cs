@@ -113,7 +113,7 @@ internal sealed partial class MainWindow : Window
             {
                 string text = Clipboard.GetText();
                 gotTextFromClipboard = true;
-                if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || JapaneseUtils.JapaneseRegex.IsMatch(text))
+                if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || JapaneseUtils.JapaneseRegex().IsMatch(text))
                 {
                     text = TextUtils.SanitizeText(text);
                     if (text.Length > 0)
@@ -144,7 +144,7 @@ internal sealed partial class MainWindow : Window
 
     public async Task CopyFromWebSocket(string text)
     {
-        if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || JapaneseUtils.JapaneseRegex.IsMatch(text))
+        if (!ConfigManager.OnlyCaptureTextWithJapaneseChars || JapaneseUtils.JapaneseRegex().IsMatch(text))
         {
             text = TextUtils.SanitizeText(text);
             if (text.Length > 0)
@@ -888,7 +888,7 @@ internal sealed partial class MainWindow : Window
     {
         string? text = MainTextBox.SelectionLength > 0
             ? MainTextBox.SelectedText
-            : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), ConfigManager.HorizontallyCenterMainWindowText) is not -1
+            : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false) is not -1
                 || (FirstPopupWindow.LastSelectedText is not null
                     && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
                         ? FirstPopupWindow.LastSelectedText
@@ -921,7 +921,7 @@ internal sealed partial class MainWindow : Window
     {
         string? text = MainTextBox.SelectionLength > 0
             ? MainTextBox.SelectedText
-            : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), ConfigManager.HorizontallyCenterMainWindowText) is not -1
+            : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false) is not -1
                 || (FirstPopupWindow.LastSelectedText is not null
                     && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
                         ? FirstPopupWindow.LastSelectedText
@@ -944,7 +944,7 @@ internal sealed partial class MainWindow : Window
     {
         string? text = MainTextBox.SelectionLength > 0
             ? MainTextBox.SelectedText
-            : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), ConfigManager.HorizontallyCenterMainWindowText) is not -1
+            : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false) is not -1
                 || (FirstPopupWindow.LastSelectedText is not null
                     && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
                         ? FirstPopupWindow.LastSelectedText
@@ -1310,7 +1310,7 @@ internal sealed partial class MainWindow : Window
 
         AddWordMenuItem.IsEnabled = customWordDictReady && profileCustomWordDictReady;
 
-        int charIndex = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), ConfigManager.HorizontallyCenterMainWindowText);
+        int charIndex = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
         ContextMenuIsOpening = charIndex >= MainTextBox.SelectionStart && charIndex <= (MainTextBox.SelectionStart + MainTextBox.SelectionLength);
 
         PopupWindowUtils.HidePopups(FirstPopupWindow);

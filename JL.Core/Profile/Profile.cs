@@ -1,12 +1,6 @@
 namespace JL.Core.Profile;
-internal sealed class Profile
+internal sealed class Profile(string currentProfile, List<string> profiles)
 {
-    public string CurrentProfile { get; }
-    public List<string> Profiles { get; }
-
-    public Profile(string currentProfile, List<string> profiles)
-    {
-        CurrentProfile = currentProfile;
-        Profiles = profiles;
-    }
+    public string CurrentProfile { get; } = currentProfile;
+    public List<string> Profiles { get; } = profiles;
 }

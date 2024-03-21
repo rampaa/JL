@@ -1,12 +1,6 @@
 namespace JL.Core.Dicts.EPWING.Yomichan;
-internal readonly struct YomichanContent
+internal readonly struct YomichanContent(string? tag, string? content)
 {
-    public string? Tag { get; }
-    public string? Content { get; }
-
-    public YomichanContent(string? tag, string? content)
-    {
-        Tag = tag;
-        Content = content;
-    }
+    public string? Tag { get; } = tag;
+    public string? Content { get; } = content;
 }

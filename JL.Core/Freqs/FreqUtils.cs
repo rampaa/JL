@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using JL.Core.Freqs.FrequencyNazeka;
@@ -11,7 +12,7 @@ namespace JL.Core.Freqs;
 public static class FreqUtils
 {
     public static bool FreqsReady { get; private set; } // = false;
-    public static Dictionary<string, Freq> FreqDicts { get; } = new();
+    public static Dictionary<string, Freq> FreqDicts { get; } = [];
 
     internal static readonly Dictionary<string, Freq> s_builtInFreqs = new(3)
     {
@@ -19,29 +20,30 @@ public static class FreqUtils
             "VN (Nazeka)",
             new Freq(FreqType.Nazeka, "VN (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_vns.json"),
-                true, 1, 57273, false, new FreqOptions(new UseDBOption(false), new HigherValueMeansHigherFrequencyOption(false)))
+                true, 1, 57273, false, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
         },
 
         {
             "Narou (Nazeka)",
             new Freq(FreqType.Nazeka, "Narou (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_narou.json"),
-                false, 2, 75588, false, new FreqOptions(new UseDBOption(false), new HigherValueMeansHigherFrequencyOption(false)))
+                false, 2, 75588, false, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
         },
 
         {
             "Novel (Nazeka)",
             new Freq(FreqType.Nazeka, "Novel (Nazeka)",
                 Path.Join(Utils.ResourcesPath, "freqlist_novels.json"),
-                false, 3, 114348, false, new FreqOptions(new UseDBOption(false), new HigherValueMeansHigherFrequencyOption(false)))
+                false, 3, 114348, false, new FreqOptions(new UseDBOption(true), new HigherValueMeansHigherFrequencyOption(false)))
         }
     };
 
-    internal static readonly FreqType[] s_allFreqDicts = {
+    internal static readonly FreqType[] s_allFreqDicts =
+    [
         FreqType.Nazeka,
         FreqType.Yomichan,
         FreqType.YomichanKanji
-    };
+    ];
 
     public static async Task LoadFrequencies()
     {
@@ -50,11 +52,13 @@ public static class FreqUtils
         bool freqCleared = false;
         bool freqRemoved = false;
 
-        List<Task> tasks = new();
+        Dictionary<string, string> freqDBPathDict = [];
+
+        List<Task> tasks = [];
 
         foreach (Freq freq in FreqDicts.Values.ToList())
         {
-            bool useDB = freq.Options?.UseDB?.Value ?? false;
+            bool useDB = freq.Options?.UseDB?.Value ?? true;
             string dbPath = DBUtils.GetFreqDBPath(freq.Name);
             string dbJournalPath = dbPath + "-journal";
             bool dbExists = File.Exists(dbPath);
@@ -76,9 +80,9 @@ public static class FreqUtils
             bool loadFromDB;
             freq.Ready = false;
 
-            if (useDB)
+            if (useDB && !DBUtils.FreqDBPaths.ContainsKey(freq.Name))
             {
-                _ = DBUtils.s_freqDBPaths.TryAdd(freq.Name, dbPath);
+                freqDBPathDict.Add(freq.Name, dbPath);
             }
 
             switch (freq.Type)
@@ -111,8 +115,7 @@ public static class FreqUtils
                                     {
                                         FreqDBManager.CreateDB(freq.Name);
                                         FreqDBManager.InsertRecordsToDB(freq);
-                                        freq.Contents.Clear();
-                                        freq.Contents.TrimExcess();
+                                        freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
                                     }
                                 }
 
@@ -142,14 +145,12 @@ public static class FreqUtils
                         {
                             FreqDBManager.CreateDB(freq.Name);
                             FreqDBManager.InsertRecordsToDB(freq);
-                            freq.Contents.Clear();
-                            freq.Contents.TrimExcess();
+                            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
                             freq.Ready = true;
                         }
                         else
                         {
-                            freq.Contents.Clear();
-                            freq.Contents.TrimExcess();
+                            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
                             freq.Ready = true;
                         }
 
@@ -193,8 +194,7 @@ public static class FreqUtils
                                     {
                                         FreqDBManager.CreateDB(freq.Name);
                                         FreqDBManager.InsertRecordsToDB(freq);
-                                        freq.Contents.Clear();
-                                        freq.Contents.TrimExcess();
+                                        freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
                                     }
                                 }
 
@@ -224,14 +224,12 @@ public static class FreqUtils
                         {
                             FreqDBManager.CreateDB(freq.Name);
                             FreqDBManager.InsertRecordsToDB(freq);
-                            freq.Contents.Clear();
-                            freq.Contents.TrimExcess();
+                            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
                             freq.Ready = true;
                         }
                         else
                         {
-                            freq.Contents.Clear();
-                            freq.Contents.TrimExcess();
+                            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
                             freq.Ready = true;
                         }
 
@@ -248,6 +246,11 @@ public static class FreqUtils
                 default:
                     throw new ArgumentOutOfRangeException(null, "Invalid freq type");
             }
+        }
+
+        if (freqDBPathDict.Count > 0)
+        {
+            DBUtils.FreqDBPaths = DBUtils.FreqDBPaths.Union(freqDBPathDict).ToFrozenDictionary();
         }
 
         if (tasks.Count > 0 || freqCleared)
@@ -308,6 +311,8 @@ public static class FreqUtils
                     freq.Priority = priority;
                     ++priority;
 
+                    InitFreqOptions(freq);
+
                     freq.Path = Utils.GetPath(freq.Path);
 
                     FreqDicts.Add(freq.Name, freq);
@@ -320,4 +325,18 @@ public static class FreqUtils
             }
         }
     }
+
+    private static void InitFreqOptions(Freq freq)
+    {
+        freq.Options ??= new FreqOptions();
+        if (UseDBOption.ValidFreqTypes.Contains(freq.Type))
+        {
+            freq.Options.UseDB ??= new UseDBOption(false);
+        }
+        if (HigherValueMeansHigherFrequencyOption.ValidFreqTypes.Contains(freq.Type))
+        {
+            freq.Options.HigherValueMeansHigherFrequency ??= new HigherValueMeansHigherFrequencyOption(false);
+        }
+    }
+
 }

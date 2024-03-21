@@ -38,11 +38,11 @@ internal static class SpeechSynthesisReflectionUtils
 
             using IDisposable objectTokenCategory = (IDisposable?)objectTokenCategoryType
                     .GetMethod("Create", BindingFlags.Static | BindingFlags.NonPublic)?
-                    .Invoke(null, new object[] { OneCoreVoicesRegistry })!;
+                    .Invoke(null, [OneCoreVoicesRegistry])!;
 
             IEnumerable<object?> tokens = (IEnumerable<object?>?)objectTokenCategoryType
                 .GetMethod("FindMatchingTokens", BindingFlags.Instance | BindingFlags.NonPublic)?
-                .Invoke(objectTokenCategory, new object?[] { null, null })!;
+                .Invoke(objectTokenCategory, [null, null])!;
 
             foreach (object? token in tokens)
             {
@@ -52,10 +52,10 @@ internal static class SpeechSynthesisReflectionUtils
                 }
 
                 object voiceInfo = typeof(SpeechSynthesizer).Assembly
-                    .CreateInstance(voiceInfoType.FullName!, true, BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { token }, null, null)!;
+                    .CreateInstance(voiceInfoType.FullName!, true, BindingFlags.Instance | BindingFlags.NonPublic, null, [token], null, null)!;
 
                 InstalledVoice installedVoice = (InstalledVoice)typeof(SpeechSynthesizer).Assembly
-                    .CreateInstance(installedVoiceType.FullName!, true, BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { voiceSynthesizer, voiceInfo }, null, null)!;
+                    .CreateInstance(installedVoiceType.FullName!, true, BindingFlags.Instance | BindingFlags.NonPublic, null, [voiceSynthesizer, voiceInfo], null, null)!;
 
                 installedVoices.Add(installedVoice);
             }

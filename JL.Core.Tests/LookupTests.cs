@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
@@ -13,7 +12,6 @@ using NUnit.Framework;
 namespace JL.Core.Tests;
 
 [TestFixture]
-[SuppressMessage("Performance", "CA1861:Avoid constant arrays as arguments")]
 public class LookupTests
 {
     [OneTimeSetUp]
@@ -23,8 +21,8 @@ public class LookupTests
 
         string jmdictPath = Path.Join(Utils.ResourcesPath, "MockJMdict.xml");
 
-        DictUtils.Dicts.Add("JMdict",
-            new Dict(DictType.JMdict, "JMdict", jmdictPath, true, 0, 500000, false,
+        DictUtils.Dicts.Add(nameof(DictType.JMdict),
+            new Dict(DictType.JMdict, nameof(DictType.JMdict), jmdictPath, true, 0, 500000, false,
                 new DictOptions(
                     new NewlineBetweenDefinitionsOption(false),
                     wordClassInfo: new WordClassInfoOption(true),
@@ -38,15 +36,19 @@ public class LookupTests
                     miscInfo: new MiscInfoOption(true),
                     loanwordEtymology: new LoanwordEtymologyOption(true),
                     relatedTerm: new RelatedTermOption(false),
-                    antonym: new AntonymOption(false)
+                    antonym: new AntonymOption(false),
+                    useDB: new UseDBOption(false)
                 )));
 
-        Dict dict = DictUtils.Dicts["JMdict"];
+        Dict dict = DictUtils.Dicts[nameof(DictType.JMdict)];
+        dict.Contents = new Dictionary<string, IList<IDictRecord>>();
         DictUtils.SingleDictTypeDicts[DictType.JMdict] = dict;
         JmdictLoader.Load(dict).Wait();
 
         foreach ((string key, Freq freq) in FreqUtils.s_builtInFreqs)
         {
+            freq.Contents = new Dictionary<string, IList<FrequencyRecord>>();
+            freq.Options = new Freqs.Options.FreqOptions() { UseDB = new Freqs.Options.UseDBOption(false) };
             FreqUtils.FreqDicts[key] = freq;
         }
 
@@ -59,20 +61,19 @@ public class LookupTests
     {
         // Arrange
         List<LookupResult> expected =
-            new()
-            {
+            [
                 new LookupResult
                 (
                     matchedText: "始まる",
                     dict: DictUtils.Dicts.Values.First(static dict => dict.Type is DictType.JMdict),
-                    frequencies: new List<LookupFrequencyResult> { new("VN (Nazeka)", 759, false) },
+                    frequencies: [new LookupFrequencyResult("VN (Nazeka)", 759, false)],
                     primarySpelling: "始まる",
                     deconjugatedMatchedText: "始まる",
-                    readings: new[] { "はじまる" },
+                    readings: ["はじまる"],
                     formattedDefinitions: "(v5r, vi) (1) to begin; to start; to commence (v5r, vi) (2) to happen (again); to begin (anew) (v5r, vi) (3) to date (from); to originate (in)",
                     edictId: 1307500
                 )
-            };
+            ];
 
         const string text = "始まる";
 

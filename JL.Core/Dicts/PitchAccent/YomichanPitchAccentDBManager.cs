@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
@@ -122,7 +123,7 @@ internal static class YomichanPitchAccentDBManager
 
     public static Dictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
-        Dictionary<string, IList<IDictRecord>> results = new();
+        Dictionary<string, IList<IDictRecord>> results = [];
 
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -167,7 +168,7 @@ internal static class YomichanPitchAccentDBManager
             }
             else
             {
-                results[searchKey] = new List<IDictRecord> { record };
+                results[searchKey] = [record];
             }
         }
 
@@ -176,7 +177,7 @@ internal static class YomichanPitchAccentDBManager
 
     public static Dictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, string term)
     {
-        Dictionary<string, IList<IDictRecord>> results = new();
+        Dictionary<string, IList<IDictRecord>> results = [];
 
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -207,7 +208,7 @@ internal static class YomichanPitchAccentDBManager
             }
             else
             {
-                results[searchKey] = new List<IDictRecord> { record };
+                results[searchKey] = [record];
             }
         }
 
@@ -245,7 +246,7 @@ internal static class YomichanPitchAccentDBManager
                 }
                 else
                 {
-                    dict.Contents[searchKey] = new List<IDictRecord> { record };
+                    dict.Contents[searchKey] = [record];
                 }
             }
         }
@@ -255,7 +256,7 @@ internal static class YomichanPitchAccentDBManager
             dict.Contents[key] = recordList.ToArray();
         }
 
-        dict.Contents.TrimExcess();
+        dict.Contents = dict.Contents.ToFrozenDictionary();
     }
 
     private static PitchAccentRecord GetRecord(SqliteDataReader dataReader)

@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using JL.Core.Dicts.Options;
 using JL.Core.Utilities;
 
@@ -11,8 +12,8 @@ internal static class EpwingUtils
     //'Ⓒ', 'Ⓡ', '’', '＠', '〒', '@', '〜', '，', '㏄', '\'', '％', '#',
     //'△', '~', '%', '℃', '：', '※', '㊙', '©', '—', '‘', '△', '*', '≒',
     //'←', '↑', '↓', '☆', '.', '･'
-    private static readonly HashSet<char> s_invalidCharacters = new(38)
-    {
+    private static readonly FrozenSet<char> s_invalidCharacters = FrozenSet.ToFrozenSet(
+    [
         '�', '〓', '㋝', '㋜',
         '（', '）', '(', ')',
         '【', '】', '「', '」',
@@ -23,7 +24,7 @@ internal static class EpwingUtils
         '○', '∘', '＝', '=',
         '…', '‥', ';', '；',
         '→', '━'
-    };
+    ]);
 
     public static bool IsValidEpwingResultForDictType(string primarySpelling, string? reading, string[] definitions, Dict dict)
     {

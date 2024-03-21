@@ -49,11 +49,11 @@ internal sealed partial class PreferencesWindow : Window
                                             • Primary Spelling: It's the spelling you click to mine the word, e.g., if you look up "わかりました", its primary spelling will be "分かる".
                                             • Primary Spelling with Orthography Info: It's the spelling you click to mine the word with its orthography Info, e.g., if you look up "珈琲", its "Primary Spelling with Orthography Info" will be "珈琲 (ateji)".
                                             • Readings: Readings of the mined word, e.g., if you look up "従妹", its "Readings" will be "じゅうまい, いとこ".
-                                            • Readings with Orthography Info: Readings of the mined word with their orthography info, e.g. if you look up "従妹", its "Readings with Orthography Info" will be "じゅうまい, いとこ (gikun)". 
+                                            • Readings with Orthography Info: Readings of the mined word with their orthography info, e.g. if you look up "従妹", its "Readings with Orthography Info" will be "じゅうまい, いとこ (gikun)".
                                             • Alternative Spellings: Alternative spellings of the mined word, e.g., if you look up "わかりました", its alternative spellings will be "解る, 判る, 分る".
                                             • Alternative Spellings with Orthography Info: Alternative spellings of the mined word with their orthography info, e.g., if you look up "嫁" its "Alternative Spellings with Orthography Info" will be "娵 (rK), 婦 (rK), 媳 (rK)".
                                             • Definitions: Definitions of the mined word.
-                                            • Selected Definitions: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field. 
+                                            • Selected Definitions: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field.
                                             • Dictionary Name: Name of the dictionary, e.g., JMDict.
                                             • Audio: Audio for the first reading of the mined word.
                                             • Source Text: Whole text in which the mined word appears in.
@@ -82,7 +82,7 @@ internal sealed partial class PreferencesWindow : Window
                                              • Kanji Grade: The kanji grade level.
                                              • Kanji Composition: Kanji composition info, e.g., "⿰女未" for "妹".
                                              • Definitions: Definitions of the mined kanji.
-                                             • Selected Definitions: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field. 
+                                             • Selected Definitions: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field.
                                              • Dictionary Name: Name of the dictionary, e.g., "Kanjidic".
                                              • Source Text: Whole text in which the mined kanji appears in.
                                              • Sentence: Sentence in which the mined kanji appears in.
@@ -101,7 +101,7 @@ internal sealed partial class PreferencesWindow : Window
                                             • Readings: Readings of the name.
                                             • Alternative Spellings: Alternative spellings of the mined name.
                                             • Definitions: Translations of the name.
-                                            • Selected Definitions: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field. 
+                                            • Selected Definitions: The selected text on definition text box. If no text is selected, it will have the same value as "Definitions" field.
                                             • Dictionary Name: Name of the dictionary, e.g., "JMnedict".
                                             • Source Text: Whole text in which the mined name appears in.
                                             • Sentence: Sentence in which the mined name appears in.
@@ -148,14 +148,22 @@ internal sealed partial class PreferencesWindow : Window
             {
                 if (_profileNamesDict.Active)
                 {
-                    DictUtils.ProfileCustomNamesCancellationTokenSource?.Cancel();
-                    _profileNamesDict.Contents = new Dictionary<string, IList<IDictRecord>>();
+                    if (DictUtils.ProfileCustomNamesCancellationTokenSource is not null)
+                    {
+                        await DictUtils.ProfileCustomNamesCancellationTokenSource.CancelAsync().ConfigureAwait(false);
+                    }
+
+                    _profileNamesDict.Contents = new Dictionary<string, IList<IDictRecord>>(256);
                 }
 
                 if (_profileWordsDict.Active)
                 {
-                    DictUtils.ProfileCustomWordsCancellationTokenSource?.Cancel();
-                    _profileWordsDict.Contents = new Dictionary<string, IList<IDictRecord>>();
+                    if (DictUtils.ProfileCustomWordsCancellationTokenSource is not null)
+                    {
+                        await DictUtils.ProfileCustomWordsCancellationTokenSource.CancelAsync().ConfigureAwait(false);
+                    }
+
+                    _profileWordsDict.Contents = new Dictionary<string, IList<IDictRecord>>(256);
                 }
 
                 await DictUtils.LoadDictionaries().ConfigureAwait(false);
@@ -372,7 +380,7 @@ internal sealed partial class PreferencesWindow : Window
 
         string rawTags = tagsTextBox.Text;
         string[] tags = string.IsNullOrEmpty(rawTags)
-            ? Array.Empty<string>()
+            ? []
             : rawTags.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToArray();
 
         return new AnkiConfig(deckName, modelName, dict, tags);
@@ -385,7 +393,7 @@ internal sealed partial class PreferencesWindow : Window
             return;
         }
 
-        Dictionary<MineType, AnkiConfig> ankiConfigDict = new();
+        Dictionary<MineType, AnkiConfig> ankiConfigDict = [];
 
         AnkiConfig? ankiConfig = GetAnkiConfigFromPreferences(WordMiningSetupComboBoxDeckNames, WordMiningSetupComboBoxModelNames, WordMiningSetupStackPanelFields, WordTagsTextBox, JLFieldUtils.JLFieldsForWordDicts, MineType.Word);
         if (ankiConfig is not null)

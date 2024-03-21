@@ -69,7 +69,7 @@ public class KanaTests
     public void LongVowelMarkConverter_オーToオオAndオウ()
     {
         // Arrange
-        List<string> expected = new() { "おお", "おう" };
+        List<string> expected = ["おお", "おう"];
 
         const string text = "オー";
 

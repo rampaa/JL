@@ -8,7 +8,7 @@ internal static class EpwingYomichanUtils
 {
     public static string[]? GetDefinitions(JsonElement jsonElement)
     {
-        List<string> definitions = new();
+        List<string> definitions = [];
         foreach (JsonElement definitionElement in jsonElement.EnumerateArray())
         {
             string? definition = null;

@@ -871,7 +871,7 @@ internal static class ConfigManager
         preferenceWindow.MinimumLogLevelComboBox.SelectedValue = settings.Get("MinimumLogLevel");
 
         preferenceWindow.MainWindowFontComboBox.ItemsSource = s_japaneseFonts;
-        preferenceWindow.MainWindowFontComboBox.SelectedIndex = Array.FindIndex(s_japaneseFonts, f =>
+        preferenceWindow.MainWindowFontComboBox.SelectedIndex = Array.FindIndex(s_japaneseFonts, static f =>
             f.Content.ToString() == MainWindow.Instance.MainTextBox.FontFamily.Source);
 
         if (preferenceWindow.MainWindowFontComboBox.SelectedIndex is -1)

@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Text.Json;
 using JL.Core.Utilities;
 
@@ -89,7 +90,7 @@ internal static class EpwingYomichanLoader
             dict.Contents[key] = recordList.ToArray();
         }
 
-        dict.Contents.TrimExcess();
+        dict.Contents = dict.Contents.ToFrozenDictionary();
     }
 
     private static void AddToDictionary(IEpwingRecord yomichanRecord, Dict dict)
@@ -101,7 +102,7 @@ internal static class EpwingYomichanLoader
         }
         else
         {
-            dict.Contents[primarySpellingInHiragana] = new List<IDictRecord> { yomichanRecord };
+            dict.Contents[primarySpellingInHiragana] = [yomichanRecord];
         }
 
         if (dict.Type is not DictType.NonspecificNameYomichan
@@ -118,7 +119,7 @@ internal static class EpwingYomichanLoader
                 }
                 else
                 {
-                    dict.Contents[readingInHiragana] = new List<IDictRecord> { yomichanRecord };
+                    dict.Contents[readingInHiragana] = [yomichanRecord];
                 }
             }
         }

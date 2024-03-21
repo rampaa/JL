@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Configuration;
 using System.Text;
 using System.Windows.Controls;
@@ -8,11 +9,11 @@ namespace JL.Windows.Utilities;
 
 internal static class KeyGestureUtils
 {
-    public static readonly Dictionary<int, KeyGesture> KeyGestureDict = new();
-    public static readonly Dictionary<string, int> KeyGestureNameToIntDict = new();
+    public static readonly Dictionary<int, KeyGesture> KeyGestureDict = [];
+    public static readonly Dictionary<string, int> KeyGestureNameToIntDict = [];
 
-    public static readonly HashSet<Key> ValidKeys = new(40)
-    {
+    public static readonly FrozenSet<Key> ValidKeys = FrozenSet.ToFrozenSet(
+    [
         #pragma warning disable format
 
         // Function keys
@@ -31,9 +32,9 @@ internal static class KeyGestureUtils
         Key.Decimal, Key.Divide
 
         #pragma warning restore format
-    };
+    ]);
 
-    public static readonly string[] NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized = {
+    public static readonly string[] NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized = [
         nameof(ConfigManager.ToggleMinimizedStateKeyGesture),
         nameof(ConfigManager.ClosePopupKeyGesture),
         nameof(ConfigManager.DisableHotkeysKeyGesture),
@@ -54,7 +55,7 @@ internal static class KeyGestureUtils
         nameof(ConfigManager.KanjiModeKeyGesture),
         nameof(ConfigManager.ShowAddNameWindowKeyGesture),
         nameof(ConfigManager.ShowAddWordWindowKeyGesture)
-    };
+    ];
 
     public static async Task HandleKeyDown(KeyEventArgs e)
     {

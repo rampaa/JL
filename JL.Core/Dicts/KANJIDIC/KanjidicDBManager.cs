@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
@@ -97,7 +98,7 @@ internal static class KanjidicDBManager
 
     public static List<IDictRecord> GetRecordsFromDB(string dbName, string term)
     {
-        List<IDictRecord> results = new();
+        List<IDictRecord> results = [];
 
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -152,10 +153,10 @@ internal static class KanjidicDBManager
         while (dataReader.Read())
         {
             string kanji = dataReader.GetString(nameof(kanji));
-            dict.Contents[kanji] = new IDictRecord[] { GetRecord(dataReader) };
+            dict.Contents[kanji] = [GetRecord(dataReader)];
         }
 
-        dict.Contents.TrimExcess();
+        dict.Contents = dict.Contents.ToFrozenDictionary();
     }
 
     private static KanjidicRecord GetRecord(SqliteDataReader dataReader)

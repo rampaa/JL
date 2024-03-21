@@ -5,11 +5,11 @@ using JL.Core.Utilities;
 namespace JL.Core.Profile;
 public static class ProfileUtils
 {
-    public static readonly List<string> DefaultProfiles = new(1) { "Default" };
+    public static readonly List<string> DefaultProfiles = ["Default"];
     public static readonly string ProfileFolderPath = Path.Join(Utils.ApplicationPath, "Profiles");
     public static readonly string DefaultProfilePath = Path.Join(Utils.ApplicationPath, "JL.dll.config");
     public static string CurrentProfile { get; set; } = "Default";
-    public static List<string> Profiles { get; private set; } = new() { "Default" };
+    public static List<string> Profiles { get; private set; } = ["Default"];
 
     public static async Task SerializeProfiles()
     {

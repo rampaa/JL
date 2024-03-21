@@ -17,15 +17,15 @@ internal sealed class Sense
     public Sense()
     {
         SInf = null;
-        StagKList = new List<string>();
-        StagRList = new List<string>();
-        PosList = new List<string>();
-        FieldList = new List<string>();
-        MiscList = new List<string>();
-        DialList = new List<string>();
-        GlossList = new List<string>();
-        XRefList = new List<string>();
-        AntList = new List<string>();
-        LSourceList = new List<LoanwordSource>();
+        StagKList = [];
+        StagRList = [];
+        PosList = [];
+        FieldList = [];
+        MiscList = [];
+        DialList = [];
+        GlossList = [];
+        XRefList = [];
+        AntList = [];
+        LSourceList = [];
     }
 }

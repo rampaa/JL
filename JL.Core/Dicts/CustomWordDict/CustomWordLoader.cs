@@ -4,7 +4,7 @@ namespace JL.Core.Dicts.CustomWordDict;
 
 public static class CustomWordLoader
 {
-    private static readonly string[] s_verbs = {
+    private static readonly string[] s_verbs = [
         "v1",
         "v1-s",
         "v4r",
@@ -26,27 +26,27 @@ public static class CustomWordLoader
         "vs-i",
         "vs-s",
         "vz"
-    };
+    ];
 
-    private static readonly string[] s_adjectives = {
+    private static readonly string[] s_adjectives = [
         "adj-i",
         "adj-na"
-    };
+    ];
 
-    private static readonly string[] s_noun = {
+    private static readonly string[] s_noun = [
         "noun"
-    };
+    ];
 
-    private static readonly string[] s_other = {
+    private static readonly string[] s_other = [
         "other"
-    };
+    ];
 
     internal static void Load(Dict dict, CancellationToken cancellationToken)
     {
         string fullPath = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
         if (File.Exists(fullPath))
         {
-            Dictionary<string, IList<IDictRecord>> customWordDictionary = dict.Contents;
+            IDictionary<string, IList<IDictRecord>> customWordDictionary = dict.Contents;
 
             foreach (string line in File.ReadLines(fullPath))
             {
@@ -83,7 +83,7 @@ public static class CustomWordLoader
     }
 
     public static void AddToDictionary(string[] spellings, string[]? readings, string[] definitions,
-        string rawPartOfSpeech, string[]? wordClasses, Dictionary<string, IList<IDictRecord>> customWordDictionary)
+        string rawPartOfSpeech, string[]? wordClasses, IDictionary<string, IList<IDictRecord>> customWordDictionary)
     {
         bool hasUserDefinedWordClasses = wordClasses?.Length > 0;
         string[] wordClassArray = rawPartOfSpeech switch
@@ -124,7 +124,7 @@ public static class CustomWordLoader
         }
     }
 
-    private static bool AddRecordToDictionary(string spelling, CustomWordRecord record, Dictionary<string, IList<IDictRecord>> dictionary)
+    private static bool AddRecordToDictionary(string spelling, CustomWordRecord record, IDictionary<string, IList<IDictRecord>> dictionary)
     {
         string spellingInHiragana = JapaneseUtils.KatakanaToHiragana(spelling);
         if (dictionary.TryGetValue(spellingInHiragana, out IList<IDictRecord>? result))
@@ -138,7 +138,7 @@ public static class CustomWordLoader
         }
         else
         {
-            dictionary[spellingInHiragana] = new List<IDictRecord> { record };
+            dictionary[spellingInHiragana] = [record];
         }
 
         return true;

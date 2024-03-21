@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
@@ -7,7 +8,7 @@ using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
 using JL.Windows.Utilities;
 using Microsoft.Data.Sqlite;
-using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using Microsoft.Win32;
 using Path = System.IO.Path;
 
 namespace JL.Windows.GUI;
@@ -43,8 +44,7 @@ internal sealed partial class EditDictionaryWindow : Window
 
         if (string.IsNullOrWhiteSpace(path)
             || (_dict.Path != path
-                && ((!Directory.Exists(fullPath) && !File.Exists(fullPath))
-                    || DictUtils.Dicts.Values.Any(dict => dict.Path == path))))
+                && (!Path.Exists(fullPath) || DictUtils.Dicts.Values.Any(dict => dict.Path == path))))
         {
             TextBlockPath.BorderBrush = Brushes.Red;
             isValid = false;
@@ -74,7 +74,7 @@ internal sealed partial class EditDictionaryWindow : Window
             if (_dict.Path != path)
             {
                 _dict.Path = path;
-                _dict.Contents.Clear();
+                _dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
                 _dict.Ready = false;
 
                 if (dbExists)
@@ -96,14 +96,14 @@ internal sealed partial class EditDictionaryWindow : Window
                 if (oldDottedLinesOption != newDottedLinesOption)
                 {
                     PopupWindowUtils.StrokeDashArray = newDottedLinesOption
-                        ? new DoubleCollection { 1, 1 }
-                        : new DoubleCollection { 1, 0 };
+                        ? [1, 1]
+                        : [1, 0];
                 }
             }
 
             if (_dict.Options?.Examples?.Value != options.Examples?.Value)
             {
-                _dict.Contents.Clear();
+                _dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
 
                 if (dbExists)
                 {
@@ -148,7 +148,13 @@ internal sealed partial class EditDictionaryWindow : Window
 
     private void BrowseForDictionaryFile(string filter)
     {
-        OpenFileDialog openFileDialog = new() { InitialDirectory = Utils.ApplicationPath, Filter = filter };
+        string? initialDirectory = Path.GetDirectoryName(_dict.Path);
+        if (!Directory.Exists(initialDirectory))
+        {
+            initialDirectory = Utils.ApplicationPath;
+        }
+
+        OpenFileDialog openFileDialog = new() { InitialDirectory = initialDirectory, Filter = filter };
         if (openFileDialog.ShowDialog() is true)
         {
             TextBlockPath.Text = Utils.GetPath(openFileDialog.FileName);
@@ -157,13 +163,16 @@ internal sealed partial class EditDictionaryWindow : Window
 
     private void BrowseForDictionaryFolder()
     {
-        using System.Windows.Forms.FolderBrowserDialog fbd = new();
-        fbd.SelectedPath = Utils.ApplicationPath;
-
-        if (fbd.ShowDialog() is System.Windows.Forms.DialogResult.OK &&
-            !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+        string initialDirectory = _dict.Path;
+        if (!Directory.Exists(initialDirectory))
         {
-            TextBlockPath.Text = Utils.GetPath(fbd.SelectedPath);
+            initialDirectory = Utils.ApplicationPath;
+        }
+
+        OpenFolderDialog openFolderDialog = new() { InitialDirectory = initialDirectory };
+        if (openFolderDialog.ShowDialog() is true)
+        {
+            TextBlockPath.Text = Utils.GetPath(openFolderDialog.FolderName);
         }
     }
 

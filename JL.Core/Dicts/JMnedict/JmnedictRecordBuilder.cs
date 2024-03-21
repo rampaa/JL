@@ -4,9 +4,9 @@ namespace JL.Core.Dicts.JMnedict;
 
 internal static class JmnedictRecordBuilder
 {
-    public static void AddToDictionary(JmnedictEntry entry, Dictionary<string, IList<IDictRecord>> jmnedictDictionary)
+    public static void AddToDictionary(JmnedictEntry entry, IDictionary<string, IList<IDictRecord>> jmnedictDictionary)
     {
-        Dictionary<string, JmnedictRecord> recordDictionary = new();
+        Dictionary<string, JmnedictRecord> recordDictionary = [];
 
         if (entry.KebList.Count > 0)
         {
@@ -19,9 +19,9 @@ internal static class JmnedictRecordBuilder
                     continue;
                 }
 
-                List<string[]> definitionList = new();
-                List<string[]> nameTypeList = new();
-                // List<string[]?> relatedTermList = new();
+                List<string[]> definitionList = [];
+                List<string[]> nameTypeList = [];
+                // List<string[]?> relatedTermList = [];
 
                 for (int j = 0; j < entry.TranslationList.Count; j++)
                 {
@@ -50,9 +50,9 @@ internal static class JmnedictRecordBuilder
                     continue;
                 }
 
-                List<string[]> definitionList = new();
-                List<string[]> nameTypeList = new();
-                // List<string[]?> relatedTermList = new();
+                List<string[]> definitionList = [];
+                List<string[]> nameTypeList = [];
+                // List<string[]?> relatedTermList = [];
 
                 for (int j = 0; j < entry.TranslationList.Count; j++)
                 {
@@ -78,7 +78,7 @@ internal static class JmnedictRecordBuilder
             }
             else
             {
-                jmnedictDictionary[key] = new List<IDictRecord> { jmnedictRecord };
+                jmnedictDictionary[key] = [jmnedictRecord];
             }
         }
     }

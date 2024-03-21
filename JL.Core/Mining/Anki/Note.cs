@@ -2,42 +2,29 @@ using System.Text.Json.Serialization;
 
 namespace JL.Core.Mining.Anki;
 
-internal sealed class Note
+internal sealed class Note(
+    string deckName,
+    string modelName,
+    Dictionary<string, object> fields,
+    Dictionary<string, object> options,
+    string[] tags,
+    Dictionary<string, object>? audio,
+    Dictionary<string, object>? video,
+    Dictionary<string, object>? picture)
 {
-    [JsonPropertyName("deckName")] public string DeckName { get; }
+    [JsonPropertyName("deckName")] public string DeckName { get; } = deckName;
 
-    [JsonPropertyName("modelName")] public string ModelName { get; }
+    [JsonPropertyName("modelName")] public string ModelName { get; } = modelName;
 
-    [JsonPropertyName("fields")] public Dictionary<string, object> Fields { get; }
+    [JsonPropertyName("fields")] public Dictionary<string, object> Fields { get; } = fields;
 
-    [JsonPropertyName("options")] public Dictionary<string, object> Options { get; }
+    [JsonPropertyName("options")] public Dictionary<string, object> Options { get; } = options;
 
-    [JsonPropertyName("tags")] public string[] Tags { get; }
+    [JsonPropertyName("tags")] public string[] Tags { get; } = tags;
 
-    [JsonPropertyName("audio")] public Dictionary<string, object>? Audio { get; }
+    [JsonPropertyName("audio")] public Dictionary<string, object>? Audio { get; } = audio;
 
-    [JsonPropertyName("video")] public Dictionary<string, object>? Video { get; }
+    [JsonPropertyName("video")] public Dictionary<string, object>? Video { get; } = video;
 
-    [JsonPropertyName("picture")] public Dictionary<string, object>? Picture { get; }
-
-    public Note(
-        string deckName,
-        string modelName,
-        Dictionary<string, object> fields,
-        Dictionary<string, object> options,
-        string[] tags,
-        Dictionary<string, object>? audio,
-        Dictionary<string, object>? video,
-        Dictionary<string, object>? picture
-    )
-    {
-        DeckName = deckName;
-        ModelName = modelName;
-        Fields = fields;
-        Options = options;
-        Tags = tags;
-        Audio = audio;
-        Video = video;
-        Picture = picture;
-    }
+    [JsonPropertyName("picture")] public Dictionary<string, object>? Picture { get; } = picture;
 }

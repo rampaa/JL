@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -75,7 +76,7 @@ internal sealed partial class ManageDictionariesWindow : Window
     // probably should be split into several methods
     private void UpdateDictionariesDisplay()
     {
-        List<DockPanel> resultDockPanels = new();
+        List<DockPanel> resultDockPanels = [];
 
         foreach (Dict dict in DictUtils.Dicts.Values.ToList())
         {
@@ -260,7 +261,7 @@ internal sealed partial class ManageDictionariesWindow : Window
     private void PathTextBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         string fullPath = Path.GetFullPath(((TextBlock)sender).Text, Utils.ApplicationPath);
-        if (File.Exists(fullPath) || Directory.Exists(fullPath))
+        if (Path.Exists(fullPath))
         {
             if (File.Exists(fullPath))
             {
@@ -311,8 +312,7 @@ internal sealed partial class ManageDictionariesWindow : Window
         if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this dictionary?", "Confirmation"))
         {
             Dict dict = (Dict)((Button)sender).Tag;
-            dict.Contents.Clear();
-            dict.Contents.TrimExcess();
+            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
             _ = DictUtils.Dicts.Remove(dict.Name);
 
             string dbPath = DBUtils.GetDictDBPath(dict.Name);

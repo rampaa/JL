@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
@@ -91,7 +92,7 @@ internal static class YomichanKanjiDBManager
 
     public static List<IDictRecord> GetRecordsFromDB(string dbName, string term)
     {
-        List<IDictRecord> results = new();
+        List<IDictRecord> results = [];
 
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -145,7 +146,7 @@ internal static class YomichanKanjiDBManager
             }
             else
             {
-                dict.Contents[kanji] = new List<IDictRecord> { record };
+                dict.Contents[kanji] = [record];
             }
         }
 
@@ -154,7 +155,7 @@ internal static class YomichanKanjiDBManager
             dict.Contents[key] = recordList.ToArray();
         }
 
-        dict.Contents.TrimExcess();
+        dict.Contents = dict.Contents.ToFrozenDictionary();
     }
 
     private static YomichanKanjiRecord GetRecord(SqliteDataReader dataReader)

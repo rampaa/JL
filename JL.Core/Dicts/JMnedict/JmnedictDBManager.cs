@@ -91,7 +91,7 @@ internal static class JmnedictDBManager
 
     public static Dictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
-        Dictionary<string, IList<IDictRecord>> results = new();
+        Dictionary<string, IList<IDictRecord>> results = [];
 
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -138,7 +138,7 @@ internal static class JmnedictDBManager
             }
             else
             {
-                results[searchKey] = new List<IDictRecord> { record };
+                results[searchKey] = [record];
             }
         }
 

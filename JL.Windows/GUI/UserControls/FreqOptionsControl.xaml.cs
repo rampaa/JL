@@ -36,7 +36,7 @@ internal sealed partial class FreqOptionsControl : UserControl
         bool showFreqOptions = false;
         if (UseDBOption.ValidFreqTypes.Contains(freqType))
         {
-            UseDBCheckBox.IsChecked = false;
+            UseDBCheckBox.IsChecked = true;
             UseDBCheckBox.Visibility = Visibility.Visible;
             showFreqOptions = true;
         }
@@ -60,7 +60,7 @@ internal sealed partial class FreqOptionsControl : UserControl
         bool showFreqOptions = false;
         if (UseDBOption.ValidFreqTypes.Contains(freq.Type))
         {
-            UseDBCheckBox.IsChecked = freq.Options?.UseDB?.Value ?? false;
+            UseDBCheckBox.IsChecked = freq.Options?.UseDB?.Value ?? true;
             UseDBCheckBox.Visibility = Visibility.Visible;
             showFreqOptions = true;
         }

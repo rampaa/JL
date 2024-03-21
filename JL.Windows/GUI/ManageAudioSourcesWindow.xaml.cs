@@ -65,7 +65,7 @@ internal sealed partial class ManageAudioSourcesWindow : Window
     // probably should be split into several methods
     private void UpdateAudioSourcesDisplay()
     {
-        List<DockPanel> resultDockPanels = new();
+        List<DockPanel> resultDockPanels = [];
 
         foreach ((string uri, AudioSource audioSource) in AudioUtils.AudioSources.OrderBy(static a => a.Value.Priority))
         {
