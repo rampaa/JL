@@ -27,7 +27,7 @@ jobs:
       - name: Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 6.x
+          dotnet-version: 8.x
 
       - name: Build
         env:
@@ -40,7 +40,7 @@ jobs:
           release_name="JL-$tag-${{ matrix.target }}"
           
           # Build everything
-          dotnet publish JL.Windows/JL.Windows.csproj --framework net6.0-windows --runtime "${{ matrix.target }}" --no-self-contained -c Release -o "$release_name" //p:Version=$tag
+          dotnet publish JL.Windows/JL.Windows.csproj --framework net8.0-windows --runtime "${{ matrix.target }}" --no-self-contained -c Release -o "$release_name" //p:Version=$tag
           
           # Mark JL as LARGEADDRESSAWARE
           if [ "${{ matrix.target }}" = "win-x86" ]
