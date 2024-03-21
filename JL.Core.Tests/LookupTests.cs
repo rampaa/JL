@@ -21,8 +21,8 @@ public class LookupTests
 
         string jmdictPath = Path.Join(Utils.ResourcesPath, "MockJMdict.xml");
 
-        DictUtils.Dicts.Add("JMdict",
-            new Dict(DictType.JMdict, "JMdict", jmdictPath, true, 0, 500000, false,
+        DictUtils.Dicts.Add(nameof(DictType.JMdict),
+            new Dict(DictType.JMdict, nameof(DictType.JMdict), jmdictPath, true, 0, 500000, false,
                 new DictOptions(
                     new NewlineBetweenDefinitionsOption(false),
                     wordClassInfo: new WordClassInfoOption(true),
@@ -36,15 +36,19 @@ public class LookupTests
                     miscInfo: new MiscInfoOption(true),
                     loanwordEtymology: new LoanwordEtymologyOption(true),
                     relatedTerm: new RelatedTermOption(false),
-                    antonym: new AntonymOption(false)
+                    antonym: new AntonymOption(false),
+                    useDB: new UseDBOption(false)
                 )));
 
-        Dict dict = DictUtils.Dicts["JMdict"];
+        Dict dict = DictUtils.Dicts[nameof(DictType.JMdict)];
+        dict.Contents = new Dictionary<string, IList<IDictRecord>>();
         DictUtils.SingleDictTypeDicts[DictType.JMdict] = dict;
         JmdictLoader.Load(dict).Wait();
 
         foreach ((string key, Freq freq) in FreqUtils.s_builtInFreqs)
         {
+            freq.Contents = new Dictionary<string, IList<FrequencyRecord>>();
+            freq.Options = new Freqs.Options.FreqOptions() { UseDB = new Freqs.Options.UseDBOption(false) };
             FreqUtils.FreqDicts[key] = freq;
         }
 
