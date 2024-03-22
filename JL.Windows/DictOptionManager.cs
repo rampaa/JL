@@ -29,6 +29,11 @@ internal static class DictOptionManager
             PitchAccentMarkerColor = colorString is not null
                 ? WindowsUtils.FrozenBrushFromHex(colorString)!
                 : Brushes.DeepSkyBlue;
+
+            bool dottedLinesOption = pitchAccentDict.Options?.ShowPitchAccentWithDottedLines?.Value ?? true;
+            PopupWindowUtils.StrokeDashArray = dottedLinesOption
+                ? [1, 1]
+                : [1, 0];
         }
         else
         {
