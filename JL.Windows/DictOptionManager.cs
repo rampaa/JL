@@ -31,8 +31,7 @@ internal static class DictOptionManager
                 ? WindowsUtils.FrozenBrushFromHex(colorString)!
                 : Brushes.DeepSkyBlue;
 
-            bool dottedLinesOption = pitchAccentDict.Options?.ShowPitchAccentWithDottedLines?.Value ?? true;
-            _ = MainWindow.Instance.Dispatcher.Invoke(() => PopupWindowUtils.StrokeDashArray = dottedLinesOption ? [1, 1] : [1, 0]);
+            MainWindow.Instance.Dispatcher.Invoke(() => PopupWindowUtils.SetStrokeDashArray(pitchAccentDict.Options?.ShowPitchAccentWithDottedLines?.Value ?? true));
         }
         else
         {

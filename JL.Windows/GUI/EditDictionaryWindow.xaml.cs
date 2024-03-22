@@ -95,9 +95,7 @@ internal sealed partial class EditDictionaryWindow : Window
 
                 if (oldDottedLinesOption != newDottedLinesOption)
                 {
-                    PopupWindowUtils.StrokeDashArray = newDottedLinesOption
-                        ? [1, 1]
-                        : [1, 0];
+                    PopupWindowUtils.SetStrokeDashArray(newDottedLinesOption);
                 }
             }
 

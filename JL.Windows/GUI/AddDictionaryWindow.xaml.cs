@@ -81,10 +81,7 @@ internal sealed partial class AddDictionaryWindow : Window
             if (dict.Type is DictType.PitchAccentYomichan)
             {
                 DictUtils.SingleDictTypeDicts[DictType.PitchAccentYomichan] = dict;
-                bool dottedLinesOption = dict.Options?.ShowPitchAccentWithDottedLines?.Value ?? true;
-                PopupWindowUtils.StrokeDashArray = dottedLinesOption
-                        ? [1, 1]
-                        : [1, 0];
+                PopupWindowUtils.SetStrokeDashArray(dict.Options?.ShowPitchAccentWithDottedLines?.Value ?? true);
             }
 
             Close();

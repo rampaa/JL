@@ -265,4 +265,9 @@ internal static class PopupWindowUtils
 
         await AudioUtils.GetAndPlayAudio(primarySpelling, reading).ConfigureAwait(false);
     }
+
+    public static void SetStrokeDashArray(bool showPitchAccentWithDottedLines)
+    {
+        StrokeDashArray = showPitchAccentWithDottedLines ? [1, 1] : [1, 0];
+    }
 }
