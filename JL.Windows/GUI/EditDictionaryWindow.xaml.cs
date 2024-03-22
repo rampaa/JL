@@ -208,13 +208,29 @@ internal sealed partial class EditDictionaryWindow : Window
                 BrowseForDictionaryFile("JMnedict file|JMnedict.xml");
                 break;
             case DictType.Kanjidic:
-                BrowseForDictionaryFile("Kanjidic2 file|Kanjidic2.xml");
+                BrowseForDictionaryFile("kanjidic2 file|kanjidic2.xml");
                 break;
+
+            case DictType.DaijirinNazeka:
+                BrowseForDictionaryFile("Daijirin file|*.json");
+                break;
+            case DictType.KenkyuushaNazeka:
+                BrowseForDictionaryFile("Kenkyuusha file|*.json");
+                break;
+            case DictType.ShinmeikaiNazeka:
+                BrowseForDictionaryFile("Shinmeikai file|*.json");
+                break;
+            case DictType.NonspecificWordNazeka:
+            case DictType.NonspecificKanjiNazeka:
+            case DictType.NonspecificNameNazeka:
+            case DictType.NonspecificNazeka:
+                BrowseForDictionaryFile("Nazeka file|*.json");
+                break;
+
             case DictType.CustomWordDictionary:
-                BrowseForDictionaryFile("Custom Word Dictionary file|*.txt");
-                break;
             case DictType.CustomNameDictionary:
-                BrowseForDictionaryFile("Custom Name Dictionary file|*.txt");
+            case DictType.ProfileCustomWordDictionary:
+            case DictType.ProfileCustomNameDictionary:
                 break;
 
             case DictType.Kenkyuusha:
@@ -241,30 +257,8 @@ internal sealed partial class EditDictionaryWindow : Window
             case DictType.NonspecificKanjiWithWordSchemaYomichan:
             case DictType.NonspecificNameYomichan:
             case DictType.NonspecificYomichan:
-                BrowseForDictionaryFolder();
-                break;
-
             case DictType.PitchAccentYomichan:
                 BrowseForDictionaryFolder();
-                break;
-            case DictType.DaijirinNazeka:
-                BrowseForDictionaryFile("Daijirin file|*.json");
-                break;
-            case DictType.KenkyuushaNazeka:
-                BrowseForDictionaryFile("Kenkyuusha file|*.json");
-                break;
-            case DictType.ShinmeikaiNazeka:
-                BrowseForDictionaryFile("Shinmeikai file|*.json");
-                break;
-            case DictType.NonspecificWordNazeka:
-            case DictType.NonspecificKanjiNazeka:
-            case DictType.NonspecificNameNazeka:
-            case DictType.NonspecificNazeka:
-                BrowseForDictionaryFile("Nazeka file|*.json");
-                break;
-
-            case DictType.ProfileCustomWordDictionary:
-            case DictType.ProfileCustomNameDictionary:
                 break;
 
             default:
