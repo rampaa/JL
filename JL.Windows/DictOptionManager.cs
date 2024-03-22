@@ -1,5 +1,6 @@
 using System.Windows.Media;
 using JL.Core.Dicts;
+using JL.Windows.GUI;
 using JL.Windows.Utilities;
 
 namespace JL.Windows;
@@ -31,9 +32,7 @@ internal static class DictOptionManager
                 : Brushes.DeepSkyBlue;
 
             bool dottedLinesOption = pitchAccentDict.Options?.ShowPitchAccentWithDottedLines?.Value ?? true;
-            PopupWindowUtils.StrokeDashArray = dottedLinesOption
-                ? [1, 1]
-                : [1, 0];
+            _ = MainWindow.Instance.Dispatcher.Invoke(() => PopupWindowUtils.StrokeDashArray = dottedLinesOption ? [1, 1] : [1, 0]);
         }
         else
         {
