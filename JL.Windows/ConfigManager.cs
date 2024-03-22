@@ -166,7 +166,7 @@ internal static class ConfigManager
     public static int MaxNumResultsNotInMiningMode { get; private set; } = 7;
     public static string SearchUrl { get; private set; } = "https://www.google.com/search?q={SearchTerm}&hl=ja";
     public static string BrowserPath { get; private set; } = "";
-    public static bool GlobalHotKeys { get; private set; } // = false;
+    public static bool GlobalHotKeys { get; private set; } = true;
     public static bool StopIncreasingTimeStatWhenMinimized { get; private set; } = true;
     public static bool StripPunctuationBeforeCalculatingCharacterCount { get; private set; } = true;
     public static bool MineToFileInsteadOfAnki { get; private set; } // = false;
