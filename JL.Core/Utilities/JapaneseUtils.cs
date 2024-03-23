@@ -186,13 +186,15 @@ public static partial class JapaneseUtils
             new StringBuilder(unicodeTextList[0], unicodeTextList.Count)
         };
 
-        for (int i = 1; i < unicodeTextList.Count; i++)
+        int unicodeTextListCount = unicodeTextList.Count;
+        for (int i = 1; i < unicodeTextListCount; i++)
         {
             if (unicodeTextList[i] is "ー" && s_kanaFinalVowelDict.TryGetValue(unicodeTextList[i - 1], out char vowel))
             {
                 if (vowel is not 'お' and not 'え')
                 {
-                    for (int j = 0; j < stringBuilders.Count; j++)
+                    int stringBuilderCount = stringBuilders.Count;
+                    for (int j = 0; j < stringBuilderCount; j++)
                     {
                         _ = stringBuilders[j].Append(vowel);
                     }
@@ -223,7 +225,8 @@ public static partial class JapaneseUtils
 
             else
             {
-                for (int j = 0; j < stringBuilders.Count; j++)
+                int stringBuilderCount = stringBuilders.Count;
+                for (int j = 0; j < stringBuilderCount; j++)
                 {
                     _ = stringBuilders[j].Append(unicodeTextList[i]);
                 }

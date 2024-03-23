@@ -41,7 +41,6 @@ public static class AudioUtils
             if (response.IsSuccessStatusCode)
             {
                 string audioFormat = response.Content.Headers.ContentType?.MediaType?.Split('/').LastOrDefault("mp3") ?? "mp3";
-
                 if (s_mediaTypeToExtensionDict.TryGetValue(audioFormat, out string? fileSuffix))
                 {
                     audioFormat = fileSuffix;

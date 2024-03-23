@@ -54,7 +54,8 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         if (freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling),
                 out IList<FrequencyRecord>? freqResults))
         {
-            for (int i = 0; i < freqResults.Count; i++)
+            int freqResultCount = freqResults.Count;
+            for (int i = 0; i < freqResultCount; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
                 if (Reading == freqResult.Spelling || PrimarySpelling == freqResult.Spelling)
@@ -71,7 +72,8 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
                  && freq.Contents.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading),
                      out IList<FrequencyRecord>? readingFreqResults))
         {
-            for (int i = 0; i < readingFreqResults.Count; i++)
+            int readingFreqResultCount = readingFreqResults.Count;
+            for (int i = 0; i < readingFreqResultCount; i++)
             {
                 FrequencyRecord readingFreqResult = readingFreqResults[i];
                 if (Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading))
@@ -92,7 +94,8 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         int frequency = int.MaxValue;
         if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(PrimarySpelling), out List<FrequencyRecord>? freqResults))
         {
-            for (int i = 0; i < freqResults.Count; i++)
+            int freqResultCount = freqResults.Count;
+            for (int i = 0; i < freqResultCount; i++)
             {
                 FrequencyRecord freqResult = freqResults[i];
                 if (Reading == freqResult.Spelling || PrimarySpelling == freqResult.Spelling)
@@ -109,7 +112,8 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
         {
             if (freqDict.TryGetValue(JapaneseUtils.KatakanaToHiragana(Reading), out List<FrequencyRecord>? readingFreqResults))
             {
-                for (int i = 0; i < readingFreqResults.Count; i++)
+                int readingFreqResultCount = readingFreqResults.Count;
+                for (int i = 0; i < readingFreqResultCount; i++)
                 {
                     FrequencyRecord readingFreqResult = readingFreqResults[i];
                     if (Reading == readingFreqResult.Spelling && JapaneseUtils.IsKatakana(Reading))

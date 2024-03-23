@@ -98,7 +98,8 @@ internal static class PopupWindowUtils
 
                 PitchAccentRecord? chosenPitchAccentDictResult = null;
 
-                for (int j = 0; j < pitchAccentDictResultList.Count; j++)
+                int pitchAccentDictResultListCount = pitchAccentDictResultList.Count;
+                for (int j = 0; j < pitchAccentDictResultListCount; j++)
                 {
                     PitchAccentRecord pitchAccentDictResult = (PitchAccentRecord)pitchAccentDictResultList[j];
 
@@ -130,7 +131,8 @@ internal static class PopupWindowUtils
 
                     bool lowPitch = false;
                     double horizontalOffsetForChar = horizontalOffsetForReading;
-                    for (int j = 0; j < combinedFormList.Count; j++)
+                    int combinedFormListCount = combinedFormList.Count;
+                    for (int j = 0; j < combinedFormListCount; j++)
                     {
                         Size charSize = WindowsUtils.MeasureTextSize(combinedFormList[j], fontSize);
 

@@ -143,7 +143,8 @@ internal static class EpwingNazekaDBManager
             WHERE rsk.search_key IN (@1
             """);
 
-        for (int i = 1; i < terms.Count; i++)
+        int termCount = terms.Count;
+        for (int i = 1; i < termCount; i++)
         {
             _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
@@ -154,7 +155,7 @@ internal static class EpwingNazekaDBManager
         command.CommandText = queryBuilder.ToString();
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        for (int i = 0; i < terms.Count; i++)
+        for (int i = 0; i < termCount; i++)
         {
             _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
         }

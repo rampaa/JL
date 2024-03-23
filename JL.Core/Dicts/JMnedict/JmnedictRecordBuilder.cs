@@ -8,9 +8,11 @@ internal static class JmnedictRecordBuilder
     {
         Dictionary<string, JmnedictRecord> recordDictionary = [];
 
-        if (entry.KebList.Count > 0)
+        int translationListCount = entry.TranslationList.Count;
+        int kebListCount = entry.KebList.Count;
+        if (kebListCount > 0)
         {
-            for (int i = 0; i < entry.KebList.Count; i++)
+            for (int i = 0; i < kebListCount; i++)
             {
                 string key = JapaneseUtils.KatakanaToHiragana(entry.KebList[i]).GetPooledString();
 
@@ -23,7 +25,7 @@ internal static class JmnedictRecordBuilder
                 List<string[]> nameTypeList = [];
                 // List<string[]?> relatedTermList = [];
 
-                for (int j = 0; j < entry.TranslationList.Count; j++)
+                for (int j = 0; j < translationListCount; j++)
                 {
                     Translation translation = entry.TranslationList[j];
 
@@ -41,7 +43,8 @@ internal static class JmnedictRecordBuilder
 
         else
         {
-            for (int i = 0; i < entry.RebList.Count; i++)
+            int rebListCount = entry.RebList.Count;
+            for (int i = 0; i < rebListCount; i++)
             {
                 string key = JapaneseUtils.KatakanaToHiragana(entry.RebList[i]).GetPooledString();
 
@@ -54,7 +57,7 @@ internal static class JmnedictRecordBuilder
                 List<string[]> nameTypeList = [];
                 // List<string[]?> relatedTermList = [];
 
-                for (int j = 0; j < entry.TranslationList.Count; j++)
+                for (int j = 0; j < translationListCount; j++)
                 {
                     Translation translation = entry.TranslationList[j];
 

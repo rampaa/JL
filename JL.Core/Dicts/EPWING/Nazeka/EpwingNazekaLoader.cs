@@ -89,7 +89,8 @@ internal static class EpwingNazekaLoader
                     }
                 }
 
-                for (int i = 1; i < spellingList.Count; i++)
+                int spellingListCount = spellingList.Count;
+                for (int i = 1; i < spellingListCount; i++)
                 {
                     string alternativeSpelling = spellingList[i];
                     if (!EpwingUtils.IsValidEpwingResultForDictType(alternativeSpelling, reading, definitions, dict))

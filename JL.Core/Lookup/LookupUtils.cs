@@ -462,7 +462,8 @@ public static class LookupUtils
 
         Dictionary<string, IntermediaryResult> results = [];
         int succAttempt = 0;
-        for (int i = 0; i < textList.Count; i++)
+        int textListCount = textList.Count;
+        for (int i = 0; i < textListCount; i++)
         {
             (bool tryLongVowelConversion, succAttempt) = GetWordResultsHelper(dict, results,
                 deconjugationResultsList[i], textList[i], textInHiraganaList[i], succAttempt, dbWordDict, dbVerbDict);
@@ -487,7 +488,8 @@ public static class LookupUtils
                         dbWordDict = getRecordsFromDB!(dict.Name, textWithoutLongVowelMarkList);
                     }
 
-                    for (int j = 0; j < textWithoutLongVowelMarkList.Count; j++)
+                    int textWithoutLongVowelMarkListCount = textWithoutLongVowelMarkList.Count;
+                    for (int j = 0; j < textWithoutLongVowelMarkListCount; j++)
                     {
                         _ = GetWordResultsHelper(dict, results, null, textList[i], textWithoutLongVowelMarkList[j], succAttempt, dbWordDict, null);
                     }
@@ -510,8 +512,8 @@ public static class LookupUtils
         {
             case DictType.JMdict:
             {
-                int dictResultsCount = dictResults.Count;
-                for (int i = 0; i < dictResultsCount; i++)
+                int dictResultCount = dictResults.Count;
+                for (int i = 0; i < dictResultCount; i++)
                 {
                     JmdictRecord dictResult = (JmdictRecord)dictResults[i];
 
@@ -527,8 +529,8 @@ public static class LookupUtils
             case DictType.CustomWordDictionary:
             case DictType.ProfileCustomWordDictionary:
             {
-                int dictResultsCount = dictResults.Count;
-                for (int i = 0; i < dictResultsCount; i++)
+                int dictResultCount = dictResults.Count;
+                for (int i = 0; i < dictResultCount; i++)
                 {
                     CustomWordRecord dictResult = (CustomWordRecord)dictResults[i];
 
@@ -566,8 +568,8 @@ public static class LookupUtils
             case DictType.NonspecificNameYomichan:
             case DictType.NonspecificYomichan:
             {
-                int dictResultsCount = dictResults.Count;
-                for (int i = 0; i < dictResultsCount; i++)
+                int dictResultCount = dictResults.Count;
+                for (int i = 0; i < dictResultCount; i++)
                 {
                     EpwingYomichanRecord dictResult = (EpwingYomichanRecord)dictResults[i];
 
@@ -579,7 +581,8 @@ public static class LookupUtils
                     else if (DictUtils.WordClassDictionary.TryGetValue(deconjugationResult.Text,
                                  out IList<JmdictWordClass>? jmdictWcResults))
                     {
-                        for (int j = 0; j < jmdictWcResults.Count; j++)
+                        int jmdictWcResultCount = jmdictWcResults.Count;
+                        for (int j = 0; j < jmdictWcResultCount; j++)
                         {
                             JmdictWordClass jmdictWordClassResult = jmdictWcResults[j];
 
@@ -608,8 +611,8 @@ public static class LookupUtils
             case DictType.NonspecificNameNazeka:
             case DictType.NonspecificNazeka:
             {
-                int dictResultsCount = dictResults.Count;
-                for (int i = 0; i < dictResultsCount; i++)
+                int dictResultCount = dictResults.Count;
+                for (int i = 0; i < dictResultCount; i++)
                 {
                     EpwingNazekaRecord dictResult = (EpwingNazekaRecord)dictResults[i];
 
@@ -621,7 +624,8 @@ public static class LookupUtils
                     else if (DictUtils.WordClassDictionary.TryGetValue(deconjugationResult.Text,
                                  out IList<JmdictWordClass>? jmdictWcResults))
                     {
-                        for (int j = 0; j < jmdictWcResults.Count; j++)
+                        int jmdictWCResultCount = jmdictWcResults.Count;
+                        for (int j = 0; j < jmdictWCResultCount; j++)
                         {
                             JmdictWordClass jmdictWordClassResult = jmdictWcResults[j];
 
@@ -664,7 +668,8 @@ public static class LookupUtils
 
         Dictionary<string, IntermediaryResult> nameResults = [];
 
-        for (int i = 0; i < textList.Count; i++)
+        int textListCount = textList.Count;
+        for (int i = 0; i < textListCount; i++)
         {
             if (nameDict.TryGetValue(textInHiraganaList[i], out IList<IDictRecord>? result))
             {
@@ -727,10 +732,12 @@ public static class LookupUtils
             _ = searchKeys.Add(key);
 
             List<IList<IDictRecord>> dictRecordsList = intermediaryResult.Results;
-            for (int i = 0; i < dictRecordsList.Count; i++)
+            int dictRecordsListCount = dictRecordsList.Count;
+            for (int i = 0; i < dictRecordsListCount; i++)
             {
                 IList<IDictRecord> dictRecords = dictRecordsList[i];
-                for (int j = 0; j < dictRecords.Count; j++)
+                int dictRecordCount = dictRecords.Count;
+                for (int j = 0; j < dictRecordCount; j++)
                 {
                     JmdictRecord jmdictRecord = (JmdictRecord)dictRecords[j];
                     _ = searchKeys.Add(JapaneseUtils.KatakanaToHiragana(jmdictRecord.PrimarySpelling));
@@ -761,10 +768,12 @@ public static class LookupUtils
         foreach (IntermediaryResult intermediaryResult in dictResults.Values)
         {
             List<IList<IDictRecord>> dictRecordsList = intermediaryResult.Results;
-            for (int i = 0; i < dictRecordsList.Count; i++)
+            int dictRecordsListCount = dictRecordsList.Count;
+            for (int i = 0; i < dictRecordsListCount; i++)
             {
                 IList<IDictRecord> dictRecords = dictRecordsList[i];
-                for (int j = 0; j < dictRecords.Count; j++)
+                int dictRecordCount = dictRecords.Count;
+                for (int j = 0; j < dictRecordCount; j++)
                 {
                     JmnedictRecord jmnedictRecord = (JmnedictRecord)dictRecords[j];
                     _ = searchKeys.Add(JapaneseUtils.KatakanaToHiragana(jmnedictRecord.PrimarySpelling));
@@ -795,10 +804,12 @@ public static class LookupUtils
         foreach (IntermediaryResult intermediaryResult in dictResults.Values)
         {
             List<IList<IDictRecord>> dictRecordsList = intermediaryResult.Results;
-            for (int i = 0; i < dictRecordsList.Count; i++)
+            int dictRecordsListCount = dictRecordsList.Count;
+            for (int i = 0; i < dictRecordsListCount; i++)
             {
                 IList<IDictRecord> dictRecords = dictRecordsList[i];
-                for (int j = 0; j < dictRecords.Count; j++)
+                int dictRecordCount = dictRecords.Count;
+                for (int j = 0; j < dictRecordCount; j++)
                 {
                     CustomNameRecord customNameRecord = (CustomNameRecord)dictRecords[j];
                     _ = searchKeys.Add(JapaneseUtils.KatakanaToHiragana(customNameRecord.PrimarySpelling));
@@ -819,10 +830,12 @@ public static class LookupUtils
         foreach (IntermediaryResult intermediaryResult in dictResults.Values)
         {
             List<IList<IDictRecord>> dictRecordsList = intermediaryResult.Results;
-            for (int i = 0; i < dictRecordsList.Count; i++)
+            int dictRecordsListCount = dictRecordsList.Count;
+            for (int i = 0; i < dictRecordsListCount; i++)
             {
                 IList<IDictRecord> dictRecords = dictRecordsList[i];
-                for (int j = 0; j < dictRecords.Count; j++)
+                int dictRecordCount = dictRecords.Count;
+                for (int j = 0; j < dictRecordCount; j++)
                 {
                     EpwingYomichanRecord epwingYomichanRecord = (EpwingYomichanRecord)dictRecords[j];
                     _ = searchKeys.Add(JapaneseUtils.KatakanaToHiragana(epwingYomichanRecord.PrimarySpelling));
@@ -843,10 +856,12 @@ public static class LookupUtils
         foreach (IntermediaryResult intermediaryResult in dictResults.Values)
         {
             List<IList<IDictRecord>> dictRecordsList = intermediaryResult.Results;
-            for (int i = 0; i < dictRecordsList.Count; i++)
+            int dictRecordsListCount = dictRecordsList.Count;
+            for (int i = 0; i < dictRecordsListCount; i++)
             {
                 IList<IDictRecord> dictRecords = dictRecordsList[i];
-                for (int j = 0; j < dictRecords.Count; j++)
+                int dictRecordCount = dictRecords.Count;
+                for (int j = 0; j < dictRecordCount; j++)
                 {
                     EpwingNazekaRecord epwingNazekaRecord = (EpwingNazekaRecord)dictRecords[j];
                     _ = searchKeys.Add(JapaneseUtils.KatakanaToHiragana(epwingNazekaRecord.PrimarySpelling));
@@ -894,10 +909,12 @@ public static class LookupUtils
         List<LookupResult> results = [];
         foreach (IntermediaryResult wordResult in jmdictResults.Values)
         {
-            for (int i = 0; i < wordResult.Results.Count; i++)
+            int resultCount = wordResult.Results.Count;
+            for (int i = 0; i < resultCount; i++)
             {
                 IList<IDictRecord> dictRecords = wordResult.Results[i];
-                for (int j = 0; j < dictRecords.Count; j++)
+                int dictRecordCount = dictRecords.Count;
+                for (int j = 0; j < dictRecordCount; j++)
                 {
                     JmdictRecord jmdictResult = (JmdictRecord)dictRecords[j];
                     LookupResult result = new
@@ -940,10 +957,12 @@ public static class LookupUtils
         List<LookupResult> results = [];
         foreach (IntermediaryResult nameResult in jmnedictResults.Values)
         {
-            for (int i = 0; i < nameResult.Results.Count; i++)
+            int resultCount = nameResult.Results.Count;
+            for (int i = 0; i < resultCount; i++)
             {
                 IList<IDictRecord> dictRecords = nameResult.Results[i];
-                for (int j = 0; j < dictRecords.Count; j++)
+                int dictRecordCount = dictRecords.Count;
+                for (int j = 0; j < dictRecordCount; j++)
                 {
                     JmnedictRecord jmnedictRecord = (JmnedictRecord)dictRecords[j];
 
@@ -1024,10 +1043,12 @@ public static class LookupUtils
         ConcurrentBag<LookupResult> results = [];
         _ = Parallel.ForEach(kanjiResults, kanjiResult =>
         {
-            for (int i = 0; i < kanjiResult.Value.Results.Count; i++)
+            int resultCount = kanjiResult.Value.Results.Count;
+            for (int i = 0; i < resultCount; i++)
             {
                 IList<IDictRecord> dictRecords = kanjiResult.Value.Results[i];
-                for (int j = 0; j < dictRecords.Count; j++)
+                int dictRecordCount = dictRecords.Count;
+                for (int j = 0; j < dictRecordCount; j++)
                 {
                     YomichanKanjiRecord yomichanKanjiDictResult = (YomichanKanjiRecord)dictRecords[j];
 
@@ -1084,10 +1105,12 @@ public static class LookupUtils
         List<LookupResult> results = [];
         foreach (IntermediaryResult wordResult in epwingResults.Values)
         {
-            for (int i = 0; i < wordResult.Results.Count; i++)
+            int resultCount = wordResult.Results.Count;
+            for (int i = 0; i < resultCount; i++)
             {
                 IList<IDictRecord> dictRecords = wordResult.Results[i];
-                for (int j = 0; j < dictRecords.Count; j++)
+                int dictRecordCount = dictRecords.Count;
+                for (int j = 0; j < dictRecordCount; j++)
                 {
                     EpwingYomichanRecord epwingResult = (EpwingYomichanRecord)dictRecords[j];
                     LookupResult result = new
@@ -1139,10 +1162,12 @@ public static class LookupUtils
         ConcurrentBag<LookupResult> results = [];
         _ = Parallel.ForEach(epwingNazekaResults.Values, wordResult =>
         {
-            for (int i = 0; i < wordResult.Results.Count; i++)
+            int resultCount = wordResult.Results.Count;
+            for (int i = 0; i < resultCount; i++)
             {
                 IList<IDictRecord> dictRecords = wordResult.Results[i];
-                for (int j = 0; j < dictRecords.Count; j++)
+                int dictRecordCount = dictRecords.Count;
+                for (int j = 0; j < dictRecordCount; j++)
                 {
                     EpwingNazekaRecord epwingResult = (EpwingNazekaRecord)dictRecords[j];
                     LookupResult result = new
@@ -1195,10 +1220,12 @@ public static class LookupUtils
         ConcurrentBag<LookupResult> results = [];
         _ = Parallel.ForEach(customWordResults.Values, wordResult =>
         {
-            for (int i = 0; i < wordResult.Results.Count; i++)
+            int resultCount = wordResult.Results.Count;
+            for (int i = 0; i < resultCount; i++)
             {
                 IList<IDictRecord> dictRecords = wordResult.Results[i];
-                for (int j = 0; j < dictRecords.Count; j++)
+                int dictRecordCount = dictRecords.Count;
+                for (int j = 0; j < dictRecordCount; j++)
                 {
                     CustomWordRecord customWordDictResult = (CustomWordRecord)dictRecords[j];
                     LookupResult result = new
@@ -1239,10 +1266,12 @@ public static class LookupUtils
         _ = Parallel.ForEach(customNameResults.Values, customNameResult =>
         {
             int freq = 0;
-            for (int i = 0; i < customNameResult.Results.Count; i++)
+            int resultCount = customNameResult.Results.Count;
+            for (int i = 0; i < resultCount; i++)
             {
                 IList<IDictRecord> dictRecords = customNameResult.Results[i];
-                for (int j = 0; j < dictRecords.Count; j++)
+                int dictRecordCount = dictRecords.Count;
+                for (int j = 0; j < dictRecordCount; j++)
                 {
                     CustomNameRecord customNameDictResult = (CustomNameRecord)dictRecords[j];
                     LookupResult result = new
@@ -1272,8 +1301,8 @@ public static class LookupUtils
     {
         List<LookupFrequencyResult> freqsList = [];
         List<Freq> freqs = FreqUtils.FreqDicts.Values.Where(static f => f is { Active: true, Type: not FreqType.YomichanKanji }).OrderBy(static f => f.Priority).ToList();
-
-        for (int i = 0; i < freqs.Count; i++)
+        int freqCount = freqs.Count;
+        for (int i = 0; i < freqCount; i++)
         {
             Freq freq = freqs[i];
             bool useDB = (freq.Options?.UseDB?.Value ?? true) && freq.Ready;
@@ -1299,7 +1328,8 @@ public static class LookupUtils
     {
         List<LookupFrequencyResult> freqsList = [];
         List<Freq> kanjiFreqs = FreqUtils.FreqDicts.Values.Where(static f => f is { Type: FreqType.YomichanKanji, Active: true }).OrderBy(static f => f.Priority).ToList();
-        for (int i = 0; i < kanjiFreqs.Count; i++)
+        int kanjiFreqCount = kanjiFreqs.Count;
+        for (int i = 0; i < kanjiFreqCount; i++)
         {
             Freq kanjiFreq = kanjiFreqs[i];
             bool useDB = (kanjiFreq.Options?.UseDB?.Value ?? true) && kanjiFreq.Ready;

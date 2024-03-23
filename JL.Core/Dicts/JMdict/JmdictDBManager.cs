@@ -69,7 +69,8 @@ internal static class JmdictDBManager
         Dictionary<JmdictRecord, List<string>> recordToKeysDict = [];
         foreach ((string key, IList<IDictRecord> records) in dict.Contents)
         {
-            for (int i = 0; i < records.Count; i++)
+            int recordCount = records.Count;
+            for (int i = 0; i < recordCount; i++)
             {
                 JmdictRecord record = (JmdictRecord)records[i];
                 if (recordToKeysDict.TryGetValue(record, out List<string>? keys))
@@ -117,7 +118,8 @@ internal static class JmdictDBManager
             _ = insertRecordCommand.Parameters.AddWithValue("@antonyms", record.Antonyms is not null ? JsonSerializer.Serialize(record.Antonyms, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
             _ = insertRecordCommand.ExecuteNonQuery();
 
-            for (int i = 0; i < keys.Count; i++)
+            int keyCount = keys.Count;
+            for (int i = 0; i < keyCount; i++)
             {
                 using SqliteCommand insertSearchKeyCommand = connection.CreateCommand();
                 insertSearchKeyCommand.CommandText =
@@ -184,7 +186,8 @@ internal static class JmdictDBManager
             WHERE rsk.search_key IN (@1
             """);
 
-        for (int i = 1; i < terms.Count; i++)
+        int termCount = terms.Count;
+        for (int i = 1; i < termCount; i++)
         {
             _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
@@ -195,7 +198,7 @@ internal static class JmdictDBManager
         command.CommandText = queryBuilder.ToString();
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
-        for (int i = 0; i < terms.Count; i++)
+        for (int i = 0; i < termCount; i++)
         {
             _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
         }

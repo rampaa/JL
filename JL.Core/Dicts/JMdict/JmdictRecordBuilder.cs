@@ -13,7 +13,10 @@ internal static class JmdictRecordBuilder
         List<string[]?> allKanjiOrthographyInfoWithoutSearchOnlyForms = kanjiElementsWithoutSearchOnlyForms.Select(static ke => ke.KeInfList.TrimStringListToStringArray()).ToList();
 
         int index = 0;
-        for (int i = 0; i < entry.KanjiElements.Count; i++)
+        int kanjiElementCount = entry.KanjiElements.Count;
+        int readingElementCount = entry.ReadingElements.Count;
+        int senseListCount = entry.SenseList.Count;
+        for (int i = 0; i < kanjiElementCount; i++)
         {
             KanjiElement kanjiElement = entry.KanjiElements[i];
 
@@ -36,7 +39,7 @@ internal static class JmdictRecordBuilder
 
             List<string> readingList = [];
             List<string[]?> readingsOrthographyInfoList = [];
-            for (int j = 0; j < entry.ReadingElements.Count; j++)
+            for (int j = 0; j < readingElementCount; j++)
             {
                 ReadingElement readingElement = entry.ReadingElements[j];
 
@@ -59,7 +62,7 @@ internal static class JmdictRecordBuilder
             List<string[]?> relatedTermList = [];
             List<string[]?> antonymList = [];
             List<LoanwordSource[]?> loanwordSourceList = [];
-            for (int j = 0; j < entry.SenseList.Count; j++)
+            for (int j = 0; j < senseListCount; j++)
             {
                 Sense sense = entry.SenseList[j];
 
@@ -110,7 +113,7 @@ internal static class JmdictRecordBuilder
         List<string[]?> allROrthographyInfoWithoutSearchOnlyForms = readingElementsWithoutSearchOnlyForms.Select(static rEle => rEle.ReInfList.TrimStringListToStringArray()).ToList();
 
         index = 0;
-        for (int i = 0; i < entry.ReadingElements.Count; i++)
+        for (int i = 0; i < readingElementCount; i++)
         {
             ReadingElement readingElement = entry.ReadingElements[i];
 
@@ -182,7 +185,7 @@ internal static class JmdictRecordBuilder
             List<string[]?> relatedTermList = [];
             List<string[]?> antonymList = [];
             List<LoanwordSource[]?> loanwordSourceList = [];
-            for (int j = 0; j < entry.SenseList.Count; j++)
+            for (int j = 0; j < senseListCount; j++)
             {
                 Sense sense = entry.SenseList[j];
 
@@ -232,7 +235,7 @@ internal static class JmdictRecordBuilder
 
             if (i is 0 && allSpellingsWithoutSearchOnlyForms.Count is 0)
             {
-                for (int j = 0; j < entry.KanjiElements.Count; j++)
+                for (int j = 0; j < kanjiElementCount; j++)
                 {
                     recordDictionary.Add(JapaneseUtils.KatakanaToHiragana(entry.KanjiElements[j].Keb.GetPooledString()), record);
                 }

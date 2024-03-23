@@ -213,7 +213,8 @@ public static class MiningUtils
                     StringBuilder expressionsWithPitchAccentBuilder = new($"{PitchAccentStyle}\n\n");
 
                     StringBuilder numericPitchAccentBuilder = new();
-                    for (int i = 0; i < pitchAccents.Count; i++)
+                    int pitchAccentCount = pitchAccents.Count;
+                    for (int i = 0; i < pitchAccentCount; i++)
                     {
                         KeyValuePair<string, byte> pitchAccent = pitchAccents[i];
                         _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{pitchAccent.Key}: {pitchAccent.Value}, ");
@@ -304,7 +305,8 @@ public static class MiningUtils
         bool lowPitch = false;
         StringBuilder expressionWithPitchAccentStringBuilder = new();
         List<string> combinedFormList = JapaneseUtils.CreateCombinedForm(expression);
-        for (int i = 0; i < combinedFormList.Count; i++)
+        int combinedFormListCount = combinedFormList.Count;
+        for (int i = 0; i < combinedFormListCount; i++)
         {
             if (i == (position - 1))
             {

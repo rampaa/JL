@@ -98,7 +98,8 @@ public static class ExtensionMethods
 
         bool hasNonNullElement = false;
         int arrayIndex = 0;
-        for (int i = 0; i < list.Count; i++)
+        int listCount = list.Count;
+        for (int i = 0; i < listCount; i++)
         {
             if (i != index)
             {

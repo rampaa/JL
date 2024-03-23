@@ -97,7 +97,8 @@ internal static class EpwingUtils
                 JapaneseUtils.KatakanaToHiragana(primarySpelling),
                 out IList<IDictRecord>? previousResults))
         {
-            for (int i = 0; i < previousResults.Count; i++)
+            int previousResultCount = previousResults.Count;
+            for (int i = 0; i < previousResultCount; i++)
             {
                 IEpwingRecord previousResult = (IEpwingRecord)previousResults[i];
 
@@ -123,7 +124,8 @@ internal static class EpwingUtils
                      JapaneseUtils.KatakanaToHiragana(reading),
                      out previousResults))
         {
-            for (int i = 0; i < previousResults.Count; i++)
+            int previousResultCount = previousResults.Count;
+            for (int i = 0; i < previousResultCount; i++)
             {
                 IEpwingRecord previousResult = (IEpwingRecord)previousResults[i];
 

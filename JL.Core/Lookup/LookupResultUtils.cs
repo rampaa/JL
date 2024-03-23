@@ -14,7 +14,8 @@ public static class LookupResultUtils
         StringBuilder deconjugation = new();
         bool first = true;
 
-        for (int i = 0; i < processList.Count; i++)
+        int processListCount = processList.Count;
+        for (int i = 0; i < processListCount; i++)
         {
             List<string> form = processList[i];
 

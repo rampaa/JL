@@ -449,7 +449,7 @@ internal sealed partial class PopupWindow : Window
         textBox.PreviewMouseLeftButtonDown += TextBox_PreviewMouseLeftButtonDown;
     }
 
-    private StackPanel PrepareResultStackPanel(LookupResult result, int index, int resultsCount, Dict? pitchDict, bool pitchDictIsActive, bool showPOrthographyInfo, bool showROrthographyInfo, bool showAOrthographyInfo, double pOrthographyInfoFontSize)
+    private StackPanel PrepareResultStackPanel(LookupResult result, int index, int resultCount, Dict? pitchDict, bool pitchDictIsActive, bool showPOrthographyInfo, bool showROrthographyInfo, bool showAOrthographyInfo, double pOrthographyInfoFontSize)
     {
         // top
         WrapPanel top = new() { Tag = index };
@@ -929,7 +929,7 @@ internal sealed partial class PopupWindow : Window
             _ = bottom.Children.Add(kanjiStatsTextBlock);
         }
 
-        if (index != (resultsCount - 1))
+        if (index != (resultCount - 1))
         {
             _ = bottom.Children.Add(new Separator
             {
@@ -1303,7 +1303,8 @@ internal sealed partial class PopupWindow : Window
             bool foundSelectedButton = false;
 
             Button? nextButton = null;
-            for (int i = 0; i < ItemsControlButtons.Items.Count; i++)
+            int buttonCount = ItemsControlButtons.Items.Count;
+            for (int i = 0; i < buttonCount; i++)
             {
                 Button button = (Button)ItemsControlButtons.Items[i]!;
 
