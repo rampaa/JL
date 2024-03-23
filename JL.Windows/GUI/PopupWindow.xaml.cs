@@ -1694,12 +1694,12 @@ internal sealed partial class PopupWindow : Window
             _ = MainWindow.Instance.ChangeVisibility().ConfigureAwait(true);
         }
 
-        ReadingSelectionWindow.HideWindow();
-
         if (!IsVisible)
         {
             return;
         }
+
+        ReadingSelectionWindow.HideWindow();
 
         if (isFirstPopup)
         {
