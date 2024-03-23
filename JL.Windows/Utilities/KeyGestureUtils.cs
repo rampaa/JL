@@ -90,9 +90,8 @@ internal static class KeyGestureUtils
 
     public static async Task HandleHotKey(KeyGesture keyGesture, KeyEventArgs? e = null)
     {
-        PopupWindow? currentPopup = MainWindow.Instance.FirstPopupWindow;
         PopupWindow? lastPopup = null;
-
+        PopupWindow? currentPopup = MainWindow.Instance.FirstPopupWindow;
         while (currentPopup?.IsVisible ?? false)
         {
             lastPopup = currentPopup;

@@ -186,16 +186,16 @@ internal static class PopupWindowUtils
         _ = MainWindow.Instance.FirstPopupWindow.Dispatcher.InvokeAsync(static () =>
         {
             PopupWindow? hoveredPopup = null;
-            PopupWindow lastPopupWindow = MainWindow.Instance.FirstPopupWindow;
-            while (lastPopupWindow.ChildPopupWindow is not null)
+            PopupWindow currentPopupWindow = MainWindow.Instance.FirstPopupWindow;
+            while (currentPopupWindow.ChildPopupWindow is not null)
             {
-                if (lastPopupWindow.IsMouseOver)
+                if (currentPopupWindow.IsMouseOver)
                 {
-                    hoveredPopup = lastPopupWindow;
+                    hoveredPopup = currentPopupWindow;
                     break;
                 }
 
-                lastPopupWindow = lastPopupWindow.ChildPopupWindow;
+                currentPopupWindow = currentPopupWindow.ChildPopupWindow;
             }
 
             HidePopups(hoveredPopup?.ChildPopupWindow ?? MainWindow.Instance.FirstPopupWindow);
@@ -213,9 +213,8 @@ internal static class PopupWindowUtils
             PopupWindow? currentPopupWindow = rootPopup;
             while (currentPopupWindow is not null)
             {
-                PopupWindow? nextPopupWindow = currentPopupWindow.ChildPopupWindow;
                 currentPopupWindow.HidePopup();
-                currentPopupWindow = nextPopupWindow;
+                currentPopupWindow = currentPopupWindow.ChildPopupWindow;
             }
         }
     }
