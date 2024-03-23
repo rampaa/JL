@@ -186,7 +186,7 @@ internal static class PopupWindowUtils
         _ = MainWindow.Instance.FirstPopupWindow.Dispatcher.InvokeAsync(static () =>
         {
             PopupWindow lastPopupWindow = MainWindow.Instance.FirstPopupWindow;
-            while (lastPopupWindow.ChildPopupWindow?.IsVisible ?? false)
+            while (lastPopupWindow.ChildPopupWindow is not null)
             {
                 lastPopupWindow = lastPopupWindow.ChildPopupWindow;
             }
@@ -207,30 +207,21 @@ internal static class PopupWindowUtils
 
     public static void HidePopups(PopupWindow? rootPopup)
     {
-        PopupWindow? currentPopupWindow = rootPopup;
+        bool isFirstPopupWindow = rootPopup == MainWindow.Instance.FirstPopupWindow;
+        PopupWindow? currentPopupWindow = isFirstPopupWindow
+            ? rootPopup?.ChildPopupWindow
+            : rootPopup;
 
-        ulong popupNo = 1;
         while (currentPopupWindow is not null)
         {
-            currentPopupWindow.HidePopup();
-
             PopupWindow? nextPopupWindow = currentPopupWindow.ChildPopupWindow;
-
-            if (popupNo is 2)
-            {
-                currentPopupWindow.ChildPopupWindow = null;
-            }
-
-            if (popupNo > 2)
-            {
-                currentPopupWindow.Owner = null;
-                currentPopupWindow.ChildPopupWindow = null;
-                currentPopupWindow.Close();
-            }
-
+            currentPopupWindow.HidePopup();
             currentPopupWindow = nextPopupWindow;
+        }
 
-            ++popupNo;
+        if (isFirstPopupWindow)
+        {
+            MainWindow.Instance.FirstPopupWindow.HidePopup();
         }
     }
 

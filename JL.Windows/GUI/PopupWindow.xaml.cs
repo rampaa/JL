@@ -1188,8 +1188,6 @@ internal sealed partial class PopupWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ClosePopupKeyGesture))
         {
-            _ = Owner.Focus();
-
             HidePopup();
         }
 
@@ -1475,12 +1473,6 @@ internal sealed partial class PopupWindow : Window
         await PopupWindowUtils.PlayAudio(primarySpelling, reading).ConfigureAwait(false);
     }
 
-    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-    {
-        e.Cancel = true;
-        HidePopup();
-    }
-
     private void OnMouseEnter(object sender, MouseEventArgs e)
     {
         if (!ConfigManager.LookupOnSelectOnly
@@ -1703,6 +1695,20 @@ internal sealed partial class PopupWindow : Window
         }
 
         ReadingSelectionWindow.HideWindow();
+
+        if (isFirstPopup)
+        {
+            PopupWindow? childWindow = MainWindow.Instance.FirstPopupWindow.ChildPopupWindow;
+            while (childWindow is not null)
+            {
+                PopupWindow? newChildWindow = childWindow.ChildPopupWindow;
+                childWindow.Owner = null;
+                childWindow.ChildPopupWindow = null;
+                childWindow.Close();
+                childWindow = newChildWindow;
+            }
+            MainWindow.Instance.FirstPopupWindow.ChildPopupWindow = null;
+        }
 
         if (!IsVisible)
         {
