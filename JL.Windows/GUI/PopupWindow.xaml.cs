@@ -1696,21 +1696,18 @@ internal sealed partial class PopupWindow : Window
 
         ReadingSelectionWindow.HideWindow();
 
-        if (isFirstPopup)
-        {
-            PopupWindow? childPopupWindow = ChildPopupWindow;
-            while (childPopupWindow is not null)
-            {
-                PopupWindow? nextChildPopupWindow = childPopupWindow.ChildPopupWindow;
-                childPopupWindow.Close();
-                childPopupWindow = nextChildPopupWindow;
-            }
-            MainWindow.Instance.FirstPopupWindow.ChildPopupWindow = null;
-        }
-
         if (!IsVisible)
         {
             return;
+        }
+
+        if (isFirstPopup)
+        {
+            if (ChildPopupWindow is not null)
+            {
+                ChildPopupWindow.Close();
+                ChildPopupWindow = null;
+            }
         }
 
         MiningMode = false;
