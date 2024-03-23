@@ -78,7 +78,7 @@ internal sealed partial class ManageDictionariesWindow : Window
     {
         List<DockPanel> resultDockPanels = [];
 
-        foreach (Dict dict in DictUtils.Dicts.Values.ToList())
+        foreach (Dict dict in DictUtils.Dicts.Values)
         {
             DockPanel dockPanel = new();
 

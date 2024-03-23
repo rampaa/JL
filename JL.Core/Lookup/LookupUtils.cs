@@ -133,7 +133,6 @@ public static class LookupUtils
             if (dict.Active)
             {
                 bool useDB = (dict.Options?.UseDB?.Value ?? false) && dict.Ready;
-
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
@@ -893,15 +892,14 @@ public static class LookupUtils
         });
 
         List<LookupResult> results = [];
-        foreach (IntermediaryResult wordResult in jmdictResults.Values.ToList())
+        foreach (IntermediaryResult wordResult in jmdictResults.Values)
         {
-            int resultsListCount = wordResult.Results.Count;
-            for (int i = 0; i < resultsListCount; i++)
+            for (int i = 0; i < wordResult.Results.Count; i++)
             {
-                int resultCount = wordResult.Results[i].Count;
-                for (int j = 0; j < resultCount; j++)
+                IList<IDictRecord> dictRecords = wordResult.Results[i];
+                for (int j = 0; j < dictRecords.Count; j++)
                 {
-                    JmdictRecord jmdictResult = (JmdictRecord)wordResult.Results[i][j];
+                    JmdictRecord jmdictResult = (JmdictRecord)dictRecords[j];
                     LookupResult result = new
                     (
                         primarySpelling: jmdictResult.PrimarySpelling,
@@ -940,16 +938,14 @@ public static class LookupUtils
         }
 
         List<LookupResult> results = [];
-        foreach (IntermediaryResult nameResult in jmnedictResults.Values.ToList())
+        foreach (IntermediaryResult nameResult in jmnedictResults.Values)
         {
-            int resultsListCount = nameResult.Results.Count;
-            for (int i = 0; i < resultsListCount; i++)
+            for (int i = 0; i < nameResult.Results.Count; i++)
             {
-                int resultCount = nameResult.Results[i].Count;
-
-                for (int j = 0; j < resultCount; j++)
+                IList<IDictRecord> dictRecords = nameResult.Results[i];
+                for (int j = 0; j < dictRecords.Count; j++)
                 {
-                    JmnedictRecord jmnedictRecord = (JmnedictRecord)nameResult.Results[i][j];
+                    JmnedictRecord jmnedictRecord = (JmnedictRecord)dictRecords[j];
 
                     LookupResult result = new
                     (
@@ -1026,16 +1022,14 @@ public static class LookupUtils
         }
 
         ConcurrentBag<LookupResult> results = [];
-        _ = Parallel.ForEach(kanjiResults.ToList(), kanjiResult =>
+        _ = Parallel.ForEach(kanjiResults, kanjiResult =>
         {
-            int resultsListCount = kanjiResult.Value.Results.Count;
-            for (int i = 0; i < resultsListCount; i++)
+            for (int i = 0; i < kanjiResult.Value.Results.Count; i++)
             {
-                int resultCount = kanjiResult.Value.Results[i].Count;
-
-                for (int j = 0; j < resultCount; j++)
+                IList<IDictRecord> dictRecords = kanjiResult.Value.Results[i];
+                for (int j = 0; j < dictRecords.Count; j++)
                 {
-                    YomichanKanjiRecord yomichanKanjiDictResult = (YomichanKanjiRecord)kanjiResult.Value.Results[i][j];
+                    YomichanKanjiRecord yomichanKanjiDictResult = (YomichanKanjiRecord)dictRecords[j];
 
                     string[]? allReadings = Utils.ConcatNullableArrays(yomichanKanjiDictResult.OnReadings, yomichanKanjiDictResult.KunReadings);
 
@@ -1088,16 +1082,14 @@ public static class LookupUtils
         });
 
         List<LookupResult> results = [];
-        foreach (IntermediaryResult wordResult in epwingResults.Values.ToList())
+        foreach (IntermediaryResult wordResult in epwingResults.Values)
         {
-            int resultsListCount = wordResult.Results.Count;
-            for (int i = 0; i < resultsListCount; i++)
+            for (int i = 0; i < wordResult.Results.Count; i++)
             {
-                int resultCount = wordResult.Results[i].Count;
-                for (int j = 0; j < resultCount; j++)
+                IList<IDictRecord> dictRecords = wordResult.Results[i];
+                for (int j = 0; j < dictRecords.Count; j++)
                 {
-                    EpwingYomichanRecord epwingResult = (EpwingYomichanRecord)wordResult.Results[i][j];
-
+                    EpwingYomichanRecord epwingResult = (EpwingYomichanRecord)dictRecords[j];
                     LookupResult result = new
                     (
                         primarySpelling: epwingResult.PrimarySpelling,
@@ -1145,16 +1137,14 @@ public static class LookupUtils
         });
 
         ConcurrentBag<LookupResult> results = [];
-        _ = Parallel.ForEach(epwingNazekaResults.Values.ToList(), wordResult =>
+        _ = Parallel.ForEach(epwingNazekaResults.Values, wordResult =>
         {
-            int resultsListCount = wordResult.Results.Count;
-            for (int i = 0; i < resultsListCount; i++)
+            for (int i = 0; i < wordResult.Results.Count; i++)
             {
-                int resultCount = wordResult.Results[i].Count;
-                for (int j = 0; j < resultCount; j++)
+                IList<IDictRecord> dictRecords = wordResult.Results[i];
+                for (int j = 0; j < dictRecords.Count; j++)
                 {
-                    EpwingNazekaRecord epwingResult = (EpwingNazekaRecord)wordResult.Results[i][j];
-
+                    EpwingNazekaRecord epwingResult = (EpwingNazekaRecord)dictRecords[j];
                     LookupResult result = new
                     (
                         primarySpelling: epwingResult.PrimarySpelling,
@@ -1203,17 +1193,14 @@ public static class LookupUtils
         });
 
         ConcurrentBag<LookupResult> results = [];
-        _ = Parallel.ForEach(customWordResults.Values.ToList(), wordResult =>
+        _ = Parallel.ForEach(customWordResults.Values, wordResult =>
         {
-            int wordResultsListCount = wordResult.Results.Count;
-            for (int i = 0; i < wordResultsListCount; i++)
+            for (int i = 0; i < wordResult.Results.Count; i++)
             {
-                int wordResultCount = wordResult.Results[i].Count;
-
-                for (int j = 0; j < wordResultCount; j++)
+                IList<IDictRecord> dictRecords = wordResult.Results[i];
+                for (int j = 0; j < dictRecords.Count; j++)
                 {
-                    CustomWordRecord customWordDictResult = (CustomWordRecord)wordResult.Results[i][j];
-
+                    CustomWordRecord customWordDictResult = (CustomWordRecord)dictRecords[j];
                     LookupResult result = new
                     (
                         primarySpelling: customWordDictResult.PrimarySpelling,
@@ -1249,24 +1236,22 @@ public static class LookupUtils
         }
 
         ConcurrentBag<LookupResult> results = [];
-        _ = Parallel.ForEach(customNameResults.ToList(), customNameResult =>
+        _ = Parallel.ForEach(customNameResults.Values, customNameResult =>
         {
-            int resultsListCount = customNameResult.Value.Results.Count;
             int freq = 0;
-            for (int i = 0; i < resultsListCount; i++)
+            for (int i = 0; i < customNameResult.Results.Count; i++)
             {
-                int resultCount = customNameResult.Value.Results[i].Count;
-
-                for (int j = 0; j < resultCount; j++)
+                IList<IDictRecord> dictRecords = customNameResult.Results[i];
+                for (int j = 0; j < dictRecords.Count; j++)
                 {
-                    CustomNameRecord customNameDictResult = (CustomNameRecord)customNameResult.Value.Results[i][j];
+                    CustomNameRecord customNameDictResult = (CustomNameRecord)dictRecords[j];
                     LookupResult result = new
                     (
                         primarySpelling: customNameDictResult.PrimarySpelling,
-                        matchedText: customNameResult.Value.MatchedText,
-                        deconjugatedMatchedText: customNameResult.Value.DeconjugatedMatchedText,
-                        frequencies: [new LookupFrequencyResult(customNameResult.Value.Dict.Name, -freq, false)],
-                        dict: customNameResult.Value.Dict,
+                        matchedText: customNameResult.MatchedText,
+                        deconjugatedMatchedText: customNameResult.DeconjugatedMatchedText,
+                        frequencies: [new LookupFrequencyResult(customNameResult.Dict.Name, -freq, false)],
+                        dict: customNameResult.Dict,
                         readings: customNameDictResult.Reading is not null
                             ? [customNameDictResult.Reading]
                             : null,

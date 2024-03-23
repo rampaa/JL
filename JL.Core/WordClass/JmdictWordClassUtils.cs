@@ -64,13 +64,11 @@ internal static class JmdictWordClassUtils
         ];
 
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-        foreach (IList<IDictRecord> jmdictRecordList in dict.Contents.Values.ToList())
+        foreach (IList<IDictRecord> jmdictRecordList in dict.Contents.Values)
         {
-            int jmdictRecordListCount = jmdictRecordList.Count;
-            for (int i = 0; i < jmdictRecordListCount; i++)
+            for (int i = 0; i < jmdictRecordList.Count; i++)
             {
                 JmdictRecord value = (JmdictRecord)jmdictRecordList[i];
-
                 string[] wordClasses = usedWordClasses.Intersect(value.WordClasses.SelectMany(static wc => wc)).ToArray();
 
                 if (wordClasses.Length is 0)

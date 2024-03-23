@@ -73,7 +73,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
     {
         List<DockPanel> resultDockPanels = [];
 
-        foreach (Freq freq in FreqUtils.FreqDicts.Values.ToList())
+        foreach (Freq freq in FreqUtils.FreqDicts.Values)
         {
             DockPanel dockPanel = new();
 
