@@ -185,43 +185,38 @@ internal static class PopupWindowUtils
     {
         _ = MainWindow.Instance.FirstPopupWindow.Dispatcher.InvokeAsync(static () =>
         {
+            PopupWindow? hoveredPopup = null;
             PopupWindow lastPopupWindow = MainWindow.Instance.FirstPopupWindow;
             while (lastPopupWindow.ChildPopupWindow is not null)
             {
-                lastPopupWindow = lastPopupWindow.ChildPopupWindow;
-            }
-
-            while (!lastPopupWindow.IsMouseOver)
-            {
-                lastPopupWindow.HidePopup();
-
-                if (lastPopupWindow.Owner is not PopupWindow parentPopupWindow)
+                if (lastPopupWindow.IsMouseOver)
                 {
+                    hoveredPopup = lastPopupWindow;
                     break;
                 }
 
-                lastPopupWindow = parentPopupWindow;
+                lastPopupWindow = lastPopupWindow.ChildPopupWindow;
             }
+
+            HidePopups(hoveredPopup?.ChildPopupWindow ?? MainWindow.Instance.FirstPopupWindow);
         });
     }
 
     public static void HidePopups(PopupWindow? rootPopup)
     {
-        bool isFirstPopupWindow = rootPopup == MainWindow.Instance.FirstPopupWindow;
-        PopupWindow? currentPopupWindow = isFirstPopupWindow
-            ? rootPopup?.ChildPopupWindow
-            : rootPopup;
-
-        while (currentPopupWindow is not null)
+        if (rootPopup == MainWindow.Instance.FirstPopupWindow)
         {
-            PopupWindow? nextPopupWindow = currentPopupWindow.ChildPopupWindow;
-            currentPopupWindow.HidePopup();
-            currentPopupWindow = nextPopupWindow;
+            rootPopup.HidePopup();
         }
-
-        if (isFirstPopupWindow)
+        else
         {
-            MainWindow.Instance.FirstPopupWindow.HidePopup();
+            PopupWindow? currentPopupWindow = rootPopup;
+            while (currentPopupWindow is not null)
+            {
+                PopupWindow? nextPopupWindow = currentPopupWindow.ChildPopupWindow;
+                currentPopupWindow.HidePopup();
+                currentPopupWindow = nextPopupWindow;
+            }
         }
     }
 

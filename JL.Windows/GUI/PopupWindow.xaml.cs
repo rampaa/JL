@@ -36,7 +36,7 @@ internal sealed partial class PopupWindow : Window
 
     private string _currentText = "";
 
-    private readonly Button _buttonAll = new() { Content = "All", Margin = new Thickness(1), Background = Brushes.DodgerBlue };
+    private Button _buttonAll = new() { Content = "All", Margin = new Thickness(1), Background = Brushes.DodgerBlue };
 
     public string? LastSelectedText { get; private set; }
 
@@ -44,7 +44,7 @@ internal sealed partial class PopupWindow : Window
 
     public List<LookupResult> LastLookupResults { get; private set; } = [];
 
-    private readonly List<Dict> _dictsWithResults = [];
+    private List<Dict> _dictsWithResults = [];
 
     private Dict? _filteredDict;
 
@@ -1702,22 +1702,7 @@ internal sealed partial class PopupWindow : Window
             while (childPopupWindow is not null)
             {
                 PopupWindow? nextChildPopupWindow = childPopupWindow.ChildPopupWindow;
-
-                childPopupWindow.Owner = null;
-                childPopupWindow.ChildPopupWindow = null;
-
-                childPopupWindow._previousTextBox = null;
-                childPopupWindow._lastInteractedTextBox = null;
-                childPopupWindow.LastSelectedText = null;
-                childPopupWindow.LastText = null;
-                childPopupWindow._filteredDict = null;
-                childPopupWindow._popupListViewScrollViewer = null;
-                childPopupWindow.LastLookupResults.Clear();
-                childPopupWindow._dictsWithResults.Clear();
-                childPopupWindow._currentText = "";
-
                 childPopupWindow.Close();
-
                 childPopupWindow = nextChildPopupWindow;
             }
             MainWindow.Instance.FirstPopupWindow.ChildPopupWindow = null;
@@ -1819,5 +1804,25 @@ internal sealed partial class PopupWindow : Window
         {
             DragMove();
         }
+    }
+
+    private void Window_Closed(object sender, EventArgs e)
+    {
+        Owner = null;
+        ChildPopupWindow = null;
+        _previousTextBox = null;
+        _lastInteractedTextBox = null;
+        LastSelectedText = null;
+        LastText = null;
+        _filteredDict = null;
+        _popupListViewScrollViewer = null;
+        ItemsControlButtons.ItemsSource = null;
+        PopupListView.ItemsSource = null;
+        _lastInteractedTextBox = null;
+        LastLookupResults = null!;
+        _dictsWithResults = null!;
+        _currentText = null!;
+        _buttonAll.Click -= DictTypeButtonOnClick;
+        _buttonAll = null!;
     }
 }
