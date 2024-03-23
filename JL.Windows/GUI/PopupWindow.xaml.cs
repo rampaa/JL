@@ -1702,9 +1702,22 @@ internal sealed partial class PopupWindow : Window
             while (childPopupWindow is not null)
             {
                 PopupWindow? nextChildPopupWindow = childPopupWindow.ChildPopupWindow;
+
                 childPopupWindow.Owner = null;
                 childPopupWindow.ChildPopupWindow = null;
+
+                childPopupWindow._previousTextBox = null;
+                childPopupWindow._lastInteractedTextBox = null;
+                childPopupWindow.LastSelectedText = null;
+                childPopupWindow.LastText = null;
+                childPopupWindow._filteredDict = null;
+                childPopupWindow._popupListViewScrollViewer = null;
+                childPopupWindow.LastLookupResults.Clear();
+                childPopupWindow._dictsWithResults.Clear();
+                childPopupWindow._currentText = "";
+
                 childPopupWindow.Close();
+
                 childPopupWindow = nextChildPopupWindow;
             }
             MainWindow.Instance.FirstPopupWindow.ChildPopupWindow = null;
