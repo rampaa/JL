@@ -142,7 +142,7 @@ internal sealed partial class PopupWindow : Window
         _currentText = textBoxText;
         _currentCharPosition = charPosition;
 
-        if (Owner != MainWindow.Instance
+        if (this != MainWindow.Instance.FirstPopupWindow
                 ? ConfigManager.DisableLookupsForNonJapaneseCharsInPopups
                   && !JapaneseUtils.JapaneseRegex().IsMatch(textBoxText[charPosition].ToString())
                 : ConfigManager.DisableLookupsForNonJapaneseCharsInMainWindow
@@ -166,7 +166,7 @@ internal sealed partial class PopupWindow : Window
 
         if (text == LastText && IsVisible)
         {
-            if (ConfigManager.FixedPopupPositioning && Owner == MainWindow.Instance)
+            if (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
             {
                 UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
             }
@@ -190,7 +190,7 @@ internal sealed partial class PopupWindow : Window
 
             if (ConfigManager.HighlightLongestMatch)
             {
-                WinApi.ActivateWindow(Owner == MainWindow.Instance
+                WinApi.ActivateWindow(this == MainWindow.Instance.FirstPopupWindow
                     ? MainWindow.Instance.WindowHandle
                     : ((PopupWindow)Owner).WindowHandle);
 
@@ -221,7 +221,7 @@ internal sealed partial class PopupWindow : Window
             _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
             _listViewItemIndex = _firstVisibleListViewItemIndex;
 
-            if (ConfigManager.FixedPopupPositioning && Owner == MainWindow.Instance)
+            if (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
             {
                 UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
             }
@@ -301,7 +301,7 @@ internal sealed partial class PopupWindow : Window
             _firstVisibleListViewItemIndex = GetFirstVisibleListViewItemIndex();
             _listViewItemIndex = _firstVisibleListViewItemIndex;
 
-            if (ConfigManager.FixedPopupPositioning && Owner == MainWindow.Instance)
+            if (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
             {
                 UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
             }
@@ -1196,7 +1196,7 @@ internal sealed partial class PopupWindow : Window
             CoreConfig.KanjiMode = !CoreConfig.KanjiMode;
             LastText = "";
 
-            if (Owner != MainWindow.Instance)
+            if (this != MainWindow.Instance.FirstPopupWindow)
             {
                 TextBox_MouseMove(_previousTextBox!, null);
             }
@@ -1451,7 +1451,7 @@ internal sealed partial class PopupWindow : Window
 
         TitleBarGrid.Visibility = Visibility.Visible;
 
-        if (ConfigManager.ShowMiningModeReminder && Owner == MainWindow.Instance)
+        if (ConfigManager.ShowMiningModeReminder && this == MainWindow.Instance.FirstPopupWindow)
         {
             TextBlockMiningModeReminder.Visibility = Visibility.Visible;
         }
@@ -1493,7 +1493,7 @@ internal sealed partial class PopupWindow : Window
         }
 
         if (UnavoidableMouseEnter
-            || (ConfigManager.FixedPopupPositioning && Owner == MainWindow.Instance))
+            || (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow))
         {
             return;
         }
@@ -1684,7 +1684,7 @@ internal sealed partial class PopupWindow : Window
 
     public void HidePopup()
     {
-        bool isFirstPopup = Owner == MainWindow.Instance;
+        bool isFirstPopup = this == MainWindow.Instance.FirstPopupWindow;
 
         if (isFirstPopup
             && (ConfigManager.TextOnlyVisibleOnHover || ConfigManager.ChangeMainWindowBackgroundOpacityOnUnhover)
@@ -1698,14 +1698,14 @@ internal sealed partial class PopupWindow : Window
 
         if (isFirstPopup)
         {
-            PopupWindow? childWindow = MainWindow.Instance.FirstPopupWindow.ChildPopupWindow;
-            while (childWindow is not null)
+            PopupWindow? childPopupWindow = ChildPopupWindow;
+            while (childPopupWindow is not null)
             {
-                PopupWindow? newChildWindow = childWindow.ChildPopupWindow;
-                childWindow.Owner = null;
-                childWindow.ChildPopupWindow = null;
-                childWindow.Close();
-                childWindow = newChildWindow;
+                PopupWindow? nextChildPopupWindow = childPopupWindow.ChildPopupWindow;
+                childPopupWindow.Owner = null;
+                childPopupWindow.ChildPopupWindow = null;
+                childPopupWindow.Close();
+                childPopupWindow = nextChildPopupWindow;
             }
             MainWindow.Instance.FirstPopupWindow.ChildPopupWindow = null;
         }
