@@ -28,7 +28,7 @@ public static partial class Utils
     public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
     internal static StringPool StringPoolInstance => StringPool.Shared;
 
-    [GeneratedRegex(@"\d+", RegexOptions.Compiled)]
+    [GeneratedRegex(@"\d+")]
     internal static partial Regex NumberRegex();
 
     public static IFrontend Frontend { get; set; } = new DummyFrontend();

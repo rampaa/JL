@@ -210,7 +210,8 @@ public static class MiningUtils
                 List<KeyValuePair<string, byte>>? pitchAccents = GetPitchAccents(lookupResult.PitchAccentDict ?? pitchDict.Contents, lookupResult);
                 if (pitchAccents is not null)
                 {
-                    StringBuilder expressionsWithPitchAccentBuilder = new($"{PitchAccentStyle}\n\n");
+                    StringBuilder expressionsWithPitchAccentBuilder = new();
+                    _ = expressionsWithPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n");
 
                     StringBuilder numericPitchAccentBuilder = new();
                     int pitchAccentCount = pitchAccents.Count;

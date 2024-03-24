@@ -34,8 +34,7 @@ public static partial class JapaneseUtils
     // CJK Unified Ideographs Extension G (30000–3134F)
     // CJK Unified Ideographs Extension H (31350–323AF)
 
-    [GeneratedRegex(@"[\u2E80-\u319F\u31C0-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD879][\uDC00-\uDFFF]|\uD87A[\uDC00-\uDFEF]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD887][\uDC00-\uDFFF]|\uD888[\uDC00-\uDFAF]",
-        RegexOptions.Compiled)]
+    [GeneratedRegex(@"[\u2E80-\u319F\u31C0-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF]|\uD840[\uDC00-\uDFFF]|[\uD841-\uD879][\uDC00-\uDFFF]|\uD87A[\uDC00-\uDFEF]|\uD87E[\uDC00-\uDE1F]|\uD880[\uDC00-\uDFFF]|[\uD881-\uD887][\uDC00-\uDFFF]|\uD888[\uDC00-\uDFAF]")]
     public static partial Regex JapaneseRegex();
 
     private static readonly FrozenDictionary<char, string> s_katakanaToHiraganaDict = new Dictionary<char, string>(87)
