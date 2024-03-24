@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
@@ -95,7 +94,7 @@ internal static class FreqDBManager
         transaction.Commit();
     }
 
-    public static IDictionary<string, List<FrequencyRecord>> GetRecordsFromDB(string dbName, List<string> terms)
+    public static Dictionary<string, List<FrequencyRecord>>? GetRecordsFromDB(string dbName, List<string> terms)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -150,10 +149,10 @@ internal static class FreqDBManager
             return results;
         }
 
-        return FrozenDictionary<string, List<FrequencyRecord>>.Empty;
+        return null;
     }
 
-    public static IList<FrequencyRecord> GetRecordsFromDB(string dbName, string term)
+    public static List<FrequencyRecord>? GetRecordsFromDB(string dbName, string term)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -180,8 +179,7 @@ internal static class FreqDBManager
             return records;
         }
 
-
-        return ReadOnlyCollection<FrequencyRecord>.Empty;
+        return null;
     }
 
     public static void LoadFromDB(Freq freq)

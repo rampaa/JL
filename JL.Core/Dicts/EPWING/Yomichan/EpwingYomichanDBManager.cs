@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
@@ -126,7 +125,7 @@ internal static class EpwingYomichanDBManager
         dict.Ready = true;
     }
 
-    public static IDictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -184,10 +183,10 @@ internal static class EpwingYomichanDBManager
             return results;
         }
 
-        return FrozenDictionary<string, IList<IDictRecord>>.Empty;
+        return null;
     }
 
-    public static IList<IDictRecord> GetRecordsFromDB(string dbName, string term)
+    public static List<IDictRecord>? GetRecordsFromDB(string dbName, string term)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -218,7 +217,7 @@ internal static class EpwingYomichanDBManager
             return results;
         }
 
-        return ReadOnlyCollection<IDictRecord>.Empty;
+        return null;
     }
 
     public static void LoadFromDB(Dict dict)

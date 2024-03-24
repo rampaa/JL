@@ -154,7 +154,7 @@ internal static class JmdictDBManager
         dict.Ready = true;
     }
 
-    public static IDictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -226,7 +226,7 @@ internal static class JmdictDBManager
             return results;
         }
 
-        return FrozenDictionary<string, IList<IDictRecord>>.Empty;
+        return null;
     }
 
     public static void LoadFromDB(Dict dict)

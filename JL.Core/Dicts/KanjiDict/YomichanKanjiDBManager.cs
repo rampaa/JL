@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
@@ -91,7 +90,7 @@ internal static class YomichanKanjiDBManager
         dict.Ready = true;
     }
 
-    public static IList<IDictRecord> GetRecordsFromDB(string dbName, string term)
+    public static List<IDictRecord>? GetRecordsFromDB(string dbName, string term)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -121,8 +120,7 @@ internal static class YomichanKanjiDBManager
             return results;
         }
 
-
-        return ReadOnlyCollection<IDictRecord>.Empty;
+        return null;
     }
 
     public static void LoadFromDB(Dict dict)

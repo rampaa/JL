@@ -1,4 +1,3 @@
-using System.Collections.Frozen;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
@@ -90,7 +89,7 @@ internal static class JmnedictDBManager
         dict.Ready = true;
     }
 
-    public static IDictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -148,7 +147,7 @@ internal static class JmnedictDBManager
             return results;
         }
 
-        return FrozenDictionary<string, IList<IDictRecord>>.Empty;
+        return null;
     }
 
     // public static void LoadFromDB(Dict dict)

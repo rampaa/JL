@@ -121,7 +121,7 @@ internal static class YomichanPitchAccentDBManager
         dict.Ready = true;
     }
 
-    public static IDictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -177,10 +177,10 @@ internal static class YomichanPitchAccentDBManager
             return results;
         }
 
-        return FrozenDictionary<string, IList<IDictRecord>>.Empty;
+        return null;
     }
 
-    public static IDictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, string term)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, string term)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -221,7 +221,7 @@ internal static class YomichanPitchAccentDBManager
             return results;
         }
 
-        return FrozenDictionary<string, IList<IDictRecord>>.Empty;
+        return null;
     }
 
     public static void LoadFromDB(Dict dict)
