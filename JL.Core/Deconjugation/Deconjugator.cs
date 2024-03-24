@@ -77,7 +77,10 @@ internal static class Deconjugator
             return null;
         }
 
-        HashSet<Form> collection = [];
+        if (myRule.DecEnd.Length is 0)
+        {
+            return null;
+        }
 
         string[] array = myRule.DecEnd;
         if (array.Length is 1)
@@ -90,39 +93,38 @@ internal static class Deconjugator
                 myRule.ConTag![0],
                 myRule.Detail
             );
+
             Form? result = StdruleDeconjugateInner(myForm, virtualRule);
-            if (result is not null)
-            {
-                _ = collection.Add(result);
-            }
+            return result is not null
+                ? [result]
+                : null;
         }
-        else if (array.Length > 1)
+
+        HashSet<Form> collection = [];
+        string maybeDecEnd = myRule.DecEnd[0];
+        string maybeConEnd = myRule.ConEnd[0];
+        string maybeDecTag = myRule.DecTag![0];
+        string maybeConTag = myRule.ConTag![0];
+
+        for (int i = 0; i < array.Length; i++)
         {
-            string maybeDecEnd = myRule.DecEnd[0];
-            string maybeConEnd = myRule.ConEnd[0];
-            string maybeDecTag = myRule.DecTag![0];
-            string maybeConTag = myRule.ConTag![0];
+            maybeDecEnd = myRule.DecEnd.ElementAtOrDefault(i) ?? maybeDecEnd;
+            maybeConEnd = myRule.ConEnd.ElementAtOrDefault(i) ?? maybeConEnd;
+            maybeDecTag = myRule.DecTag.ElementAtOrDefault(i) ?? maybeDecTag;
+            maybeConTag = myRule.ConTag.ElementAtOrDefault(i) ?? maybeConTag;
 
-            for (int i = 0; i < array.Length; i++)
+            VirtualRule virtualRule = new
+            (
+                maybeDecEnd,
+                maybeConEnd,
+                maybeDecTag,
+                maybeConTag,
+                myRule.Detail
+            );
+            Form? ret = StdruleDeconjugateInner(myForm, virtualRule);
+            if (ret is not null)
             {
-                maybeDecEnd = myRule.DecEnd.ElementAtOrDefault(i) ?? maybeDecEnd;
-                maybeConEnd = myRule.ConEnd.ElementAtOrDefault(i) ?? maybeConEnd;
-                maybeDecTag = myRule.DecTag.ElementAtOrDefault(i) ?? maybeDecTag;
-                maybeConTag = myRule.ConTag.ElementAtOrDefault(i) ?? maybeConTag;
-
-                VirtualRule virtualRule = new
-                (
-                    maybeDecEnd,
-                    maybeConEnd,
-                    maybeDecTag,
-                    maybeConTag,
-                    myRule.Detail
-                );
-                Form? ret = StdruleDeconjugateInner(myForm, virtualRule);
-                if (ret is not null)
-                {
-                    _ = collection.Add(ret);
-                }
+                _ = collection.Add(ret);
             }
         }
 
@@ -206,42 +208,43 @@ internal static class Deconjugator
             return null;
         }
 
-        HashSet<Form> collection = [];
+        if (myRule.DecEnd.Length is 0)
+        {
+            return null;
+        }
 
         string[] array = myRule.DecEnd;
         if (array.Length is 1)
         {
             Form? result = SubstitutionInner(myForm, myRule);
-            if (result is not null)
-            {
-                _ = collection.Add(result);
-            }
+            return result is not null
+                ? [result]
+                : null;
         }
-        else if (array.Length > 1)
+
+        HashSet<Form> collection = [];
+        string maybeDecEnd = myRule.DecEnd[0];
+        string maybeConEnd = myRule.ConEnd[0];
+
+        for (int i = 0; i < array.Length; i++)
         {
-            string maybeDecEnd = myRule.DecEnd[0];
-            string maybeConEnd = myRule.ConEnd[0];
+            maybeDecEnd = myRule.DecEnd.ElementAtOrDefault(i) ?? maybeDecEnd;
+            maybeConEnd = myRule.ConEnd.ElementAtOrDefault(i) ?? maybeConEnd;
 
-            for (int i = 0; i < array.Length; i++)
+            Rule virtualRule = new
+            (
+                myRule.Type,
+                null,
+                [maybeDecEnd],
+                [maybeConEnd],
+                null,
+                null,
+                myRule.Detail
+            );
+            Form? ret = SubstitutionInner(myForm, virtualRule);
+            if (ret is not null)
             {
-                maybeDecEnd = myRule.DecEnd.ElementAtOrDefault(i) ?? maybeDecEnd;
-                maybeConEnd = myRule.ConEnd.ElementAtOrDefault(i) ?? maybeConEnd;
-
-                Rule virtualRule = new
-                (
-                    myRule.Type,
-                    null,
-                    [maybeDecEnd],
-                    [maybeConEnd],
-                    null,
-                    null,
-                    myRule.Detail
-                );
-                Form? ret = SubstitutionInner(myForm, virtualRule);
-                if (ret is not null)
-                {
-                    _ = collection.Add(ret);
-                }
+                _ = collection.Add(ret);
             }
         }
 
