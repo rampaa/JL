@@ -28,7 +28,7 @@ internal static class Deconjugator
             newText,
             myForm.OriginalText,
             myForm.Tags.ToList(),
-            myForm.SeenText.ToHashSet(),
+            myForm.SeenText.ToHashSet(StringComparer.Ordinal),
             myForm.Process.ToList()
         );
 
@@ -179,7 +179,7 @@ internal static class Deconjugator
             newText,
             myForm.OriginalText,
             myForm.Tags.ToList(),
-            myForm.SeenText.ToHashSet(),
+            myForm.SeenText.ToHashSet(StringComparer.Ordinal),
             myForm.Process.ToList()
         );
 
