@@ -35,7 +35,7 @@ public sealed class LookupResult
     public string[]? RadicalNames { get; }
     public byte StrokeCount { get; }
     public byte KanjiGrade { get; }
-    public Dictionary<string, IList<IDictRecord>>? PitchAccentDict { get; }
+    public IDictionary<string, IList<IDictRecord>>? PitchAccentDict { get; }
 
     internal LookupResult(
         string primarySpelling,
@@ -60,7 +60,7 @@ public sealed class LookupResult
         int edictId = 0,
         byte strokeCount = 0,
         byte kanjiGrade = byte.MaxValue,
-        Dictionary<string, IList<IDictRecord>>? pitchAccentDict = null
+        IDictionary<string, IList<IDictRecord>>? pitchAccentDict = null
     )
     {
         MatchedText = matchedText;

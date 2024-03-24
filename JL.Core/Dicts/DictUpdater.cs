@@ -105,7 +105,7 @@ public static class DictUpdater
         if (downloaded)
         {
             dict.Ready = false;
-            dict.Contents = new Dictionary<string, IList<IDictRecord>>(450000);
+            dict.Contents = new Dictionary<string, IList<IDictRecord>>(450000, StringComparer.Ordinal);
 
             await Task.Run(async () => await JmdictLoader
                 .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
@@ -162,7 +162,7 @@ public static class DictUpdater
         if (downloaded)
         {
             dict.Ready = false;
-            dict.Contents = new Dictionary<string, IList<IDictRecord>>(620000);
+            dict.Contents = new Dictionary<string, IList<IDictRecord>>(620000, StringComparer.Ordinal);
 
             await Task.Run(async () => await JmnedictLoader
                 .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
@@ -213,7 +213,7 @@ public static class DictUpdater
         if (downloaded)
         {
             dict.Ready = false;
-            dict.Contents = new Dictionary<string, IList<IDictRecord>>(13108);
+            dict.Contents = new Dictionary<string, IList<IDictRecord>>(13108, StringComparer.Ordinal);
 
             await Task.Run(async () => await KanjidicLoader
                 .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);

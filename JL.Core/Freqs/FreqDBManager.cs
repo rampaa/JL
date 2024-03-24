@@ -94,10 +94,8 @@ internal static class FreqDBManager
         transaction.Commit();
     }
 
-    public static Dictionary<string, List<FrequencyRecord>> GetRecordsFromDB(string dbName, List<string> terms)
+    public static IDictionary<string, List<FrequencyRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
-        Dictionary<string, List<FrequencyRecord>> results = [];
-
         using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
@@ -130,22 +128,28 @@ internal static class FreqDBManager
         }
 
         using SqliteDataReader dataReader = command.ExecuteReader();
-        while (dataReader.Read())
+        if (dataReader.HasRows)
         {
-            FrequencyRecord record = GetRecord(dataReader);
+            Dictionary<string, List<FrequencyRecord>> results = new(StringComparer.Ordinal);
+            while (dataReader.Read())
+            {
+                FrequencyRecord record = GetRecord(dataReader);
 
-            string searchKey = dataReader.GetString(nameof(searchKey));
-            if (results.TryGetValue(searchKey, out List<FrequencyRecord>? result))
-            {
-                result.Add(record);
+                string searchKey = dataReader.GetString(nameof(searchKey));
+                if (results.TryGetValue(searchKey, out List<FrequencyRecord>? result))
+                {
+                    result.Add(record);
+                }
+                else
+                {
+                    results[searchKey] = [record];
+                }
             }
-            else
-            {
-                results[searchKey] = [record];
-            }
+
+            return results;
         }
 
-        return results;
+        return FrozenDictionary<string, List<FrequencyRecord>>.Empty;
     }
 
     public static List<FrequencyRecord> GetRecordsFromDB(string dbName, string term)
@@ -214,7 +218,7 @@ internal static class FreqDBManager
             freq.Contents[key] = recordList.ToArray();
         }
 
-        freq.Contents = freq.Contents.ToFrozenDictionary();
+        freq.Contents = freq.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
     private static FrequencyRecord GetRecord(SqliteDataReader dataReader)

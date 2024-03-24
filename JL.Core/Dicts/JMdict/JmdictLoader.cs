@@ -37,7 +37,7 @@ internal static class JmdictLoader
                 dict.Contents[key] = recordList.ToArray();
             }
 
-            dict.Contents = dict.Contents.ToFrozenDictionary();
+            dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
         }
 
         else if (Utils.Frontend.ShowYesNoDialog(
@@ -53,7 +53,6 @@ internal static class JmdictLoader
                 await Load(dict).ConfigureAwait(false);
 
                 await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
-                DictUtils.WordClassDictionary.Clear();
                 await JmdictWordClassUtils.Load().ConfigureAwait(false);
             }
         }

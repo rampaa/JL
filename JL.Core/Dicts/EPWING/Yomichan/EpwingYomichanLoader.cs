@@ -90,7 +90,7 @@ internal static class EpwingYomichanLoader
             dict.Contents[key] = recordList.ToArray();
         }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary();
+        dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
     private static void AddToDictionary(IEpwingRecord yomichanRecord, Dict dict)

@@ -441,7 +441,7 @@ public static class MiningUtils
 
         Dictionary<string, object>? audio = audioData is null
             ? null
-            : new Dictionary<string, object>(4)
+            : new Dictionary<string, object>(4, StringComparer.Ordinal)
             {
                 { "data", audioData },
                 { "filename", $"JL_audio_{reading}_{lookupResult.PrimarySpelling}.{audioResponse!.AudioFormat}" },
@@ -457,14 +457,14 @@ public static class MiningUtils
 
         Dictionary<string, object>? image = imageBytes is null
             ? null
-            : new Dictionary<string, object>(3)
+            : new Dictionary<string, object>(3, StringComparer.Ordinal)
             {
                 { "data", imageBytes },
                 { "filename", $"JL_image_{reading}_{lookupResult.PrimarySpelling}.png" },
                 { "fields", imageFields }
             };
 
-        Dictionary<string, object> options = new(1)
+        Dictionary<string, object> options = new(1, StringComparer.Ordinal)
         {
             { "allowDuplicate", CoreConfig.AllowDuplicateCards }
         };
@@ -511,7 +511,7 @@ public static class MiningUtils
     /// </summary>
     private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> userFields, Dictionary<JLField, string> miningParams)
     {
-        Dictionary<string, object> dict = [];
+        Dictionary<string, object> dict = new(StringComparer.Ordinal);
         foreach ((string key, JLField value) in userFields)
         {
             string? fieldName = miningParams.GetValueOrDefault(value);

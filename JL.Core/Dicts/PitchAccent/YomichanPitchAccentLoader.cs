@@ -78,6 +78,6 @@ internal static class YomichanPitchAccentLoader
             pitchDict[key] = recordList.ToArray();
         }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary();
+        dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 }

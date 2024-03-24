@@ -70,7 +70,7 @@ public static partial class JapaneseUtils
         #pragma warning restore format
     }.ToFrozenDictionary();
 
-    private static readonly FrozenDictionary<string, char> s_kanaFinalVowelDict = new Dictionary<string, char>(87)
+    private static readonly FrozenDictionary<string, char> s_kanaFinalVowelDict = new Dictionary<string, char>(87, StringComparer.Ordinal)
     {
         #pragma warning disable format
         //Hiragana
@@ -95,7 +95,7 @@ public static partial class JapaneseUtils
         { "も", 'お' }, { "ろ", 'お' }, { "ご", 'お' }, { "ぞ", 'お' }, { "ど", 'お' }, { "ぼ", 'お' },
         { "ぽ", 'お' }, { "を", 'お' }, { "よ", 'お' }, { "ぉ", 'お' }, { "ょ", 'お' }, { "を゙", 'お' }
         #pragma warning restore format
-    }.ToFrozenDictionary();
+    }.ToFrozenDictionary(StringComparer.Ordinal);
 
     private static readonly FrozenSet<char> s_smallCombiningKanaSet = FrozenSet.ToFrozenSet(
     [

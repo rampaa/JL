@@ -26,7 +26,7 @@ internal static class KanjidicLoader
                 }
             }
 
-            dict.Contents = dict.Contents.ToFrozenDictionary();
+            dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
         }
 
         else if (Utils.Frontend.ShowYesNoDialog(

@@ -125,10 +125,8 @@ internal static class EpwingYomichanDBManager
         dict.Ready = true;
     }
 
-    public static Dictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
+    public static IDictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
-        Dictionary<string, IList<IDictRecord>> results = [];
-
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
@@ -164,22 +162,28 @@ internal static class EpwingYomichanDBManager
         }
 
         using SqliteDataReader dataReader = command.ExecuteReader();
-        while (dataReader.Read())
+        if (dataReader.HasRows)
         {
-            EpwingYomichanRecord record = GetRecord(dataReader);
+            Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+            while (dataReader.Read())
+            {
+                EpwingYomichanRecord record = GetRecord(dataReader);
 
-            string searchKey = dataReader.GetString(nameof(searchKey));
-            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
-            {
-                result.Add(record);
+                string searchKey = dataReader.GetString(nameof(searchKey));
+                if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
+                {
+                    result.Add(record);
+                }
+                else
+                {
+                    results[searchKey] = [record];
+                }
             }
-            else
-            {
-                results[searchKey] = [record];
-            }
+
+            return results;
         }
 
-        return results;
+        return FrozenDictionary<string, IList<IDictRecord>>.Empty;
     }
 
     public static List<IDictRecord> GetRecordsFromDB(string dbName, string term)
@@ -257,7 +261,7 @@ internal static class EpwingYomichanDBManager
             dict.Contents[key] = recordList.ToArray();
         }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary();
+        dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
     private static EpwingYomichanRecord GetRecord(SqliteDataReader dataReader)

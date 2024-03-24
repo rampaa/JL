@@ -156,7 +156,7 @@ internal static class KanjidicDBManager
             dict.Contents[kanji] = [GetRecord(dataReader)];
         }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary();
+        dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
     private static KanjidicRecord GetRecord(SqliteDataReader dataReader)

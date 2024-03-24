@@ -33,7 +33,7 @@ internal static class JmnedictLoader
                 dict.Contents[key] = recordList.ToArray();
             }
 
-            dict.Contents = dict.Contents.ToFrozenDictionary();
+            dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
         }
 
         else if (Utils.Frontend.ShowYesNoDialog("Couldn't find JMnedict.xml. Would you like to download it now?",

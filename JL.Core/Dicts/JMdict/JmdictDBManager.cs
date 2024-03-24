@@ -154,7 +154,7 @@ internal static class JmdictDBManager
         dict.Ready = true;
     }
 
-    public static Dictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
+    public static IDictionary<string, IList<IDictRecord>> GetRecordsFromDB(string dbName, List<string> terms)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
@@ -203,26 +203,30 @@ internal static class JmdictDBManager
             _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
         }
 
-        Dictionary<string, IList<IDictRecord>> results = [];
-
         using SqliteDataReader dataReader = command.ExecuteReader();
-        while (dataReader.Read())
+        if (dataReader.HasRows)
         {
-            JmdictRecord record = GetRecord(dataReader);
-
-            string searchKey = dataReader.GetString(nameof(searchKey));
-            if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
+            Dictionary<string, IList<IDictRecord>> results = new(StringComparer.Ordinal);
+            while (dataReader.Read())
             {
-                result.Add(record);
+                JmdictRecord record = GetRecord(dataReader);
+
+                string searchKey = dataReader.GetString(nameof(searchKey));
+                if (results.TryGetValue(searchKey, out IList<IDictRecord>? result))
+                {
+                    result.Add(record);
+                }
+
+                else
+                {
+                    results[searchKey] = [record];
+                }
             }
 
-            else
-            {
-                results[searchKey] = [record];
-            }
+            return results;
         }
 
-        return results;
+        return FrozenDictionary<string, IList<IDictRecord>>.Empty;
     }
 
     public static void LoadFromDB(Dict dict)
@@ -282,7 +286,7 @@ internal static class JmdictDBManager
             dict.Contents[key] = recordList.ToArray();
         }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary();
+        dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
     private static JmdictRecord GetRecord(SqliteDataReader dataReader)

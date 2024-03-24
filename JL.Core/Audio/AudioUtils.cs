@@ -13,16 +13,16 @@ public static class AudioUtils
 {
     private static readonly AudioResponse s_textToSpeechAudioResponse = new(AudioSourceType.TextToSpeech, "wav", null);
 
-    public static readonly Dictionary<string, AudioSource> AudioSources = [];
+    public static readonly Dictionary<string, AudioSource> AudioSources = new(StringComparer.Ordinal);
 
-    private static readonly Dictionary<string, AudioSource> s_builtInAudioSources = new(1)
+    private static readonly Dictionary<string, AudioSource> s_builtInAudioSources = new(1, StringComparer.Ordinal)
     {
         {
             "http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji={Term}&kana={Reading}", new AudioSource(AudioSourceType.Url, true, 1)
         }
     };
 
-    private static readonly FrozenDictionary<string, string> s_mediaTypeToExtensionDict = new Dictionary<string, string>(6)
+    private static readonly FrozenDictionary<string, string> s_mediaTypeToExtensionDict = new Dictionary<string, string>(6, StringComparer.Ordinal)
     {
         { "mpeg", "mp3" },
         { "3gpp", "3gp" },
@@ -30,7 +30,7 @@ public static class AudioUtils
         { "vorbis", "ogg" },
         { "vorbis-config", "ogg" },
         { "x-midi", "midi" }
-    }.ToFrozenDictionary();
+    }.ToFrozenDictionary(StringComparer.Ordinal);
 
     private static async Task<AudioResponse?> GetAudioFromUrl(Uri url)
     {

@@ -6,7 +6,7 @@ internal static class JmnedictRecordBuilder
 {
     public static void AddToDictionary(JmnedictEntry entry, IDictionary<string, IList<IDictRecord>> jmnedictDictionary)
     {
-        Dictionary<string, JmnedictRecord> recordDictionary = [];
+        Dictionary<string, JmnedictRecord> recordDictionary = new(StringComparer.Ordinal);
 
         int translationListCount = entry.TranslationList.Count;
         int kebListCount = entry.KebList.Count;

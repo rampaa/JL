@@ -50,12 +50,12 @@ internal static class JmdictWordClassUtils
             DictUtils.WordClassDictionary[key] = recordList.ToArray();
         }
 
-        DictUtils.WordClassDictionary = DictUtils.WordClassDictionary.ToFrozenDictionary();
+        DictUtils.WordClassDictionary = DictUtils.WordClassDictionary.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
     public static async Task Serialize()
     {
-        Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary = [];
+        Dictionary<string, List<JmdictWordClass>> jmdictWordClassDictionary = new(StringComparer.Ordinal);
 
         HashSet<string> usedWordClasses =
         [

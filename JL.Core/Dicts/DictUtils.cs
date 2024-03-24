@@ -25,9 +25,9 @@ public static class DictUtils
     public static bool UpdatingJmdict { get; internal set; } // = false;
     public static bool UpdatingJmnedict { get; internal set; } // = false;
     public static bool UpdatingKanjidic { get; internal set; } // = false;
-    public static readonly Dictionary<string, Dict> Dicts = [];
-    internal static IDictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new Dictionary<string, IList<JmdictWordClass>>(55000); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272
-    internal static IDictionary<string, string> KanjiCompositionDict { get; set; } = new Dictionary<string, string>(86934);
+    public static readonly Dictionary<string, Dict> Dicts = new(StringComparer.OrdinalIgnoreCase);
+    internal static IDictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new Dictionary<string, IList<JmdictWordClass>>(55000, StringComparer.Ordinal); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272
+    internal static IDictionary<string, string> KanjiCompositionDict { get; set; } = new Dictionary<string, string>(86934, StringComparer.Ordinal);
     internal static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
     internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     internal static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
@@ -35,7 +35,7 @@ public static class DictUtils
     public static CancellationTokenSource? ProfileCustomWordsCancellationTokenSource { get; private set; }
     public static CancellationTokenSource? ProfileCustomNamesCancellationTokenSource { get; private set; }
 
-    public static readonly Dictionary<string, Dict> BuiltInDicts = new(7)
+    public static readonly Dictionary<string, Dict> BuiltInDicts = new(7, StringComparer.OrdinalIgnoreCase)
     {
         {
             "Custom Word Dictionary (Profile)", new Dict(DictType.ProfileCustomWordDictionary,
@@ -114,7 +114,7 @@ public static class DictUtils
 
     public static readonly Dictionary<DictType, Dict> SingleDictTypeDicts = new(8);
 
-    public static readonly Dictionary<string, string> JmdictEntities = new(254)
+    public static readonly Dictionary<string, string> JmdictEntities = new(254, StringComparer.Ordinal)
     {
         { "bra", "Brazilian" },
         { "hob", "Hokkaido-ben" },
@@ -387,7 +387,7 @@ public static class DictUtils
         { "sk", "search-only kana form" }
     };
 
-    public static readonly Dictionary<string, string> JmnedictEntities = new(25)
+    public static readonly Dictionary<string, string> JmnedictEntities = new(25, StringComparer.Ordinal)
     {
         #pragma warning disable format
         { "char", "character" }, { "company", "company name" }, { "creat", "creature" }, { "dei", "deity" },
@@ -509,7 +509,7 @@ public static class DictUtils
         bool dictCleared = false;
         bool dictRemoved = false;
 
-        Dictionary<string, string> dictDBPaths = [];
+        Dictionary<string, string> dictDBPaths = new(StringComparer.Ordinal);
 
         List<Task> tasks = [];
 
@@ -558,8 +558,8 @@ public static class DictUtils
                                 {
                                     // 2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739, 2023/12/16: 419334, 2024/02/22: 421519
                                     dict.Contents = dict.Size > 0
-                                        ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
-                                        : new Dictionary<string, IList<IDictRecord>>(450000);
+                                        ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
+                                        : new Dictionary<string, IList<IDictRecord>>(450000, StringComparer.Ordinal);
 
                                     if (loadFromDB)
                                     {
@@ -633,8 +633,8 @@ public static class DictUtils
                                 {
                                     // 2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055, 2023/12/16: 609238, 2024/02/22: 609265
                                     dict.Contents = dict.Size > 0
-                                        ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
-                                        : new Dictionary<string, IList<IDictRecord>>(620000);
+                                        ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
+                                        : new Dictionary<string, IList<IDictRecord>>(620000, StringComparer.Ordinal);
 
                                     // We don't load JMnedict from DB because it is slower and allocates more memory for JMnedict for some reason
                                     await JmnedictLoader.Load(dict).ConfigureAwait(false);
@@ -701,8 +701,8 @@ public static class DictUtils
                                 {
                                     // 2022/05/11: 13108, 2023/12/16: 13108, 2024/02/02 13108
                                     dict.Contents = dict.Size > 0
-                                        ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
-                                        : new Dictionary<string, IList<IDictRecord>>(13108);
+                                        ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
+                                        : new Dictionary<string, IList<IDictRecord>>(13108, StringComparer.Ordinal);
 
                                     if (loadFromDB)
                                     {
@@ -793,32 +793,32 @@ public static class DictUtils
                             try
                             {
                                 dict.Contents = dict.Size > 0
-                                    ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
+                                    ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
                                     : dict.Type switch
                                     {
-                                        DictType.Daijirin => new Dictionary<string, IList<IDictRecord>>(420429),
-                                        DictType.Daijisen => new Dictionary<string, IList<IDictRecord>>(679115),
-                                        DictType.Gakken => new Dictionary<string, IList<IDictRecord>>(254558),
-                                        DictType.GakkenYojijukugoYomichan => new Dictionary<string, IList<IDictRecord>>(7989),
-                                        DictType.IwanamiYomichan => new Dictionary<string, IList<IDictRecord>>(101929),
-                                        DictType.JitsuyouYomichan => new Dictionary<string, IList<IDictRecord>>(69746),
-                                        DictType.KanjigenYomichan => new Dictionary<string, IList<IDictRecord>>(64730),
-                                        DictType.Kenkyuusha => new Dictionary<string, IList<IDictRecord>>(303677),
-                                        DictType.KireiCakeYomichan => new Dictionary<string, IList<IDictRecord>>(332628),
-                                        DictType.Kotowaza => new Dictionary<string, IList<IDictRecord>>(30846),
-                                        DictType.Koujien => new Dictionary<string, IList<IDictRecord>>(402571),
-                                        DictType.Meikyou => new Dictionary<string, IList<IDictRecord>>(107367),
-                                        DictType.NikkokuYomichan => new Dictionary<string, IList<IDictRecord>>(451455),
-                                        DictType.OubunshaYomichan => new Dictionary<string, IList<IDictRecord>>(138935),
-                                        DictType.ShinjirinYomichan => new Dictionary<string, IList<IDictRecord>>(229758),
-                                        DictType.ShinmeikaiYomichan => new Dictionary<string, IList<IDictRecord>>(126049),
-                                        DictType.ShinmeikaiYojijukugoYomichan => new Dictionary<string, IList<IDictRecord>>(6088),
-                                        DictType.WeblioKogoYomichan => new Dictionary<string, IList<IDictRecord>>(30838),
-                                        DictType.ZokugoYomichan => new Dictionary<string, IList<IDictRecord>>(2392),
-                                        DictType.NonspecificWordYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
-                                        DictType.NonspecificKanjiWithWordSchemaYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
-                                        DictType.NonspecificNameYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
-                                        DictType.NonspecificYomichan => new Dictionary<string, IList<IDictRecord>>(250000),
+                                        DictType.Daijirin => new Dictionary<string, IList<IDictRecord>>(420429, StringComparer.Ordinal),
+                                        DictType.Daijisen => new Dictionary<string, IList<IDictRecord>>(679115, StringComparer.Ordinal),
+                                        DictType.Gakken => new Dictionary<string, IList<IDictRecord>>(254558, StringComparer.Ordinal),
+                                        DictType.GakkenYojijukugoYomichan => new Dictionary<string, IList<IDictRecord>>(7989, StringComparer.Ordinal),
+                                        DictType.IwanamiYomichan => new Dictionary<string, IList<IDictRecord>>(101929, StringComparer.Ordinal),
+                                        DictType.JitsuyouYomichan => new Dictionary<string, IList<IDictRecord>>(69746, StringComparer.Ordinal),
+                                        DictType.KanjigenYomichan => new Dictionary<string, IList<IDictRecord>>(64730, StringComparer.Ordinal),
+                                        DictType.Kenkyuusha => new Dictionary<string, IList<IDictRecord>>(303677, StringComparer.Ordinal),
+                                        DictType.KireiCakeYomichan => new Dictionary<string, IList<IDictRecord>>(332628, StringComparer.Ordinal),
+                                        DictType.Kotowaza => new Dictionary<string, IList<IDictRecord>>(30846, StringComparer.Ordinal),
+                                        DictType.Koujien => new Dictionary<string, IList<IDictRecord>>(402571, StringComparer.Ordinal),
+                                        DictType.Meikyou => new Dictionary<string, IList<IDictRecord>>(107367, StringComparer.Ordinal),
+                                        DictType.NikkokuYomichan => new Dictionary<string, IList<IDictRecord>>(451455, StringComparer.Ordinal),
+                                        DictType.OubunshaYomichan => new Dictionary<string, IList<IDictRecord>>(138935, StringComparer.Ordinal),
+                                        DictType.ShinjirinYomichan => new Dictionary<string, IList<IDictRecord>>(229758, StringComparer.Ordinal),
+                                        DictType.ShinmeikaiYomichan => new Dictionary<string, IList<IDictRecord>>(126049, StringComparer.Ordinal),
+                                        DictType.ShinmeikaiYojijukugoYomichan => new Dictionary<string, IList<IDictRecord>>(6088, StringComparer.Ordinal),
+                                        DictType.WeblioKogoYomichan => new Dictionary<string, IList<IDictRecord>>(30838, StringComparer.Ordinal),
+                                        DictType.ZokugoYomichan => new Dictionary<string, IList<IDictRecord>>(2392, StringComparer.Ordinal),
+                                        DictType.NonspecificWordYomichan => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
+                                        DictType.NonspecificKanjiWithWordSchemaYomichan => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
+                                        DictType.NonspecificNameYomichan => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
+                                        DictType.NonspecificYomichan => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
                                         _ => throw new ArgumentOutOfRangeException(null, "Invalid DictType")
                                     };
 
@@ -897,8 +897,8 @@ public static class DictUtils
                         tasks.Add(Task.Run(async () =>
                         {
                             dict.Contents = dict.Size > 0
-                                ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
-                                : new Dictionary<string, IList<IDictRecord>>(250000);
+                                ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
+                                : new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal);
 
                             try
                             {
@@ -975,10 +975,10 @@ public static class DictUtils
                         tasks.Add(Task.Run(() =>
                         {
                             dict.Contents = dict.Size is not 0
-                                ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
+                                ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
                                 : dict.Type is DictType.CustomWordDictionary
-                                    ? new Dictionary<string, IList<IDictRecord>>(1024)
-                                    : new Dictionary<string, IList<IDictRecord>>(256);
+                                    ? new Dictionary<string, IList<IDictRecord>>(1024, StringComparer.Ordinal)
+                                    : new Dictionary<string, IList<IDictRecord>>(256, StringComparer.Ordinal);
 
                             CustomWordLoader.Load(dict,
                                 dict.Type is DictType.CustomWordDictionary
@@ -1011,10 +1011,10 @@ public static class DictUtils
                         tasks.Add(Task.Run(() =>
                         {
                             dict.Contents = dict.Size is not 0
-                                ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
+                                ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
                                 : dict.Type is DictType.CustomNameDictionary
-                                    ? new Dictionary<string, IList<IDictRecord>>(1024)
-                                    : new Dictionary<string, IList<IDictRecord>>(256);
+                                    ? new Dictionary<string, IList<IDictRecord>>(1024, StringComparer.Ordinal)
+                                    : new Dictionary<string, IList<IDictRecord>>(256, StringComparer.Ordinal);
 
                             CustomNameLoader.Load(dict,
                                 dict.Type is DictType.CustomNameDictionary
@@ -1057,16 +1057,16 @@ public static class DictUtils
                             try
                             {
                                 dict.Contents = dict.Size is not 0
-                                ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
+                                ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
                                 : dict.Type switch
                                 {
-                                    DictType.DaijirinNazeka => new Dictionary<string, IList<IDictRecord>>(420429),
-                                    DictType.KenkyuushaNazeka => new Dictionary<string, IList<IDictRecord>>(191804),
-                                    DictType.ShinmeikaiNazeka => new Dictionary<string, IList<IDictRecord>>(126049),
-                                    DictType.NonspecificWordNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
-                                    DictType.NonspecificKanjiNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
-                                    DictType.NonspecificNameNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
-                                    DictType.NonspecificNazeka => new Dictionary<string, IList<IDictRecord>>(250000),
+                                    DictType.DaijirinNazeka => new Dictionary<string, IList<IDictRecord>>(420429, StringComparer.Ordinal),
+                                    DictType.KenkyuushaNazeka => new Dictionary<string, IList<IDictRecord>>(191804, StringComparer.Ordinal),
+                                    DictType.ShinmeikaiNazeka => new Dictionary<string, IList<IDictRecord>>(126049, StringComparer.Ordinal),
+                                    DictType.NonspecificWordNazeka => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
+                                    DictType.NonspecificKanjiNazeka => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
+                                    DictType.NonspecificNameNazeka => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
+                                    DictType.NonspecificNazeka => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
                                     _ => throw new ArgumentOutOfRangeException(null, "Invalid DictType")
                                 };
 
@@ -1147,8 +1147,8 @@ public static class DictUtils
                             try
                             {
                                 dict.Contents = dict.Size > 0
-                                    ? new Dictionary<string, IList<IDictRecord>>(dict.Size)
-                                    : new Dictionary<string, IList<IDictRecord>>(434991);
+                                    ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
+                                    : new Dictionary<string, IList<IDictRecord>>(434991, StringComparer.Ordinal);
 
                                 if (loadFromDB)
                                 {
@@ -1224,7 +1224,7 @@ public static class DictUtils
 
         if (dictDBPaths.Count > 0)
         {
-            DBUtils.DictDBPaths = DBUtils.DictDBPaths.Union(dictDBPaths).ToFrozenDictionary();
+            DBUtils.DictDBPaths = DBUtils.DictDBPaths.Union(dictDBPaths).ToFrozenDictionary(StringComparer.Ordinal);
         }
 
         if (tasks.Count > 0 || dictCleared)
@@ -1294,7 +1294,7 @@ public static class DictUtils
                 }
             }
 
-            KanjiCompositionDict = KanjiCompositionDict.ToFrozenDictionary();
+            KanjiCompositionDict = KanjiCompositionDict.ToFrozenDictionary(StringComparer.Ordinal);
         }
     }
 

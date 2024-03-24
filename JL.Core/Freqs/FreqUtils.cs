@@ -12,9 +12,9 @@ namespace JL.Core.Freqs;
 public static class FreqUtils
 {
     public static bool FreqsReady { get; private set; } // = false;
-    public static Dictionary<string, Freq> FreqDicts { get; } = [];
+    public static Dictionary<string, Freq> FreqDicts { get; } = new(StringComparer.OrdinalIgnoreCase);
 
-    internal static readonly Dictionary<string, Freq> s_builtInFreqs = new(3)
+    internal static readonly Dictionary<string, Freq> s_builtInFreqs = new(3, StringComparer.OrdinalIgnoreCase)
     {
         {
             "VN (Nazeka)",
@@ -52,7 +52,7 @@ public static class FreqUtils
         bool freqCleared = false;
         bool freqRemoved = false;
 
-        Dictionary<string, string> freqDBPathDict = [];
+        Dictionary<string, string> freqDBPathDict = new(StringComparer.Ordinal);
 
         List<Task> tasks = [];
 
@@ -98,8 +98,8 @@ public static class FreqUtils
                             try
                             {
                                 freq.Contents = freq.Size > 0
-                                    ? new Dictionary<string, IList<FrequencyRecord>>(freq.Size)
-                                    : new Dictionary<string, IList<FrequencyRecord>>(114348);
+                                    ? new Dictionary<string, IList<FrequencyRecord>>(freq.Size, StringComparer.Ordinal)
+                                    : new Dictionary<string, IList<FrequencyRecord>>(114348, StringComparer.Ordinal);
 
                                 if (loadFromDB)
                                 {
@@ -175,10 +175,10 @@ public static class FreqUtils
                             try
                             {
                                 freq.Contents = freq.Size > 0
-                                    ? new Dictionary<string, IList<FrequencyRecord>>(freq.Size)
+                                    ? new Dictionary<string, IList<FrequencyRecord>>(freq.Size, StringComparer.Ordinal)
                                     : freq.Type is FreqType.Yomichan
-                                        ? new Dictionary<string, IList<FrequencyRecord>>(1504512)
-                                        : new Dictionary<string, IList<FrequencyRecord>>(169623);
+                                        ? new Dictionary<string, IList<FrequencyRecord>>(1504512, StringComparer.Ordinal)
+                                        : new Dictionary<string, IList<FrequencyRecord>>(169623, StringComparer.Ordinal);
 
                                 if (loadFromDB)
                                 {
@@ -250,7 +250,7 @@ public static class FreqUtils
 
         if (freqDBPathDict.Count > 0)
         {
-            DBUtils.FreqDBPaths = DBUtils.FreqDBPaths.Union(freqDBPathDict).ToFrozenDictionary();
+            DBUtils.FreqDBPaths = DBUtils.FreqDBPaths.Union(freqDBPathDict).ToFrozenDictionary(StringComparer.Ordinal);
         }
 
         if (tasks.Count > 0 || freqCleared)

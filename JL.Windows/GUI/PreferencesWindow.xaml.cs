@@ -153,7 +153,7 @@ internal sealed partial class PreferencesWindow : Window
                         await DictUtils.ProfileCustomNamesCancellationTokenSource.CancelAsync().ConfigureAwait(false);
                     }
 
-                    _profileNamesDict.Contents = new Dictionary<string, IList<IDictRecord>>(256);
+                    _profileNamesDict.Contents = new Dictionary<string, IList<IDictRecord>>(256, StringComparer.Ordinal);
                 }
 
                 if (_profileWordsDict.Active)
@@ -163,7 +163,7 @@ internal sealed partial class PreferencesWindow : Window
                         await DictUtils.ProfileCustomWordsCancellationTokenSource.CancelAsync().ConfigureAwait(false);
                     }
 
-                    _profileWordsDict.Contents = new Dictionary<string, IList<IDictRecord>>(256);
+                    _profileWordsDict.Contents = new Dictionary<string, IList<IDictRecord>>(256, StringComparer.Ordinal);
                 }
 
                 await DictUtils.LoadDictionaries().ConfigureAwait(false);
@@ -296,7 +296,7 @@ internal sealed partial class PreferencesWindow : Window
         if (fieldNames is not null)
         {
             Dictionary<string, JLField> fields =
-                fieldNames.ToDictionary(static fieldName => fieldName, static _ => JLField.Nothing);
+                fieldNames.ToDictionary(static fieldName => fieldName, static _ => JLField.Nothing, StringComparer.Ordinal);
 
             CreateFieldElements(fields, fieldList, miningPanel);
         }
@@ -365,7 +365,7 @@ internal sealed partial class PreferencesWindow : Window
         string deckName = deckNamesSelector.SelectedItem.ToString()!;
         string modelName = modelNamesSelector.SelectedItem.ToString()!;
 
-        Dictionary<string, JLField> dict = new(miningPanel.Children.Count);
+        Dictionary<string, JLField> dict = new(miningPanel.Children.Count, StringComparer.Ordinal);
         foreach (StackPanel stackPanel in miningPanel.Children.Cast<StackPanel>())
         {
             TextBlock textBlock = (TextBlock)stackPanel.Children[0];

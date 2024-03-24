@@ -155,7 +155,7 @@ internal static class YomichanKanjiDBManager
             dict.Contents[key] = recordList.ToArray();
         }
 
-        dict.Contents = dict.Contents.ToFrozenDictionary();
+        dict.Contents = dict.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 
     private static YomichanKanjiRecord GetRecord(SqliteDataReader dataReader)

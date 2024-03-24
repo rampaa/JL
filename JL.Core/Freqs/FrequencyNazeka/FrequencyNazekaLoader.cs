@@ -63,6 +63,6 @@ internal static class FrequencyNazekaLoader
             freq.Contents[key] = recordList.ToArray();
         }
 
-        freq.Contents = freq.Contents.ToFrozenDictionary();
+        freq.Contents = freq.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 }

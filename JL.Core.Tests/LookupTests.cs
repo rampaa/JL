@@ -41,13 +41,13 @@ public class LookupTests
                 )));
 
         Dict dict = DictUtils.Dicts[nameof(DictType.JMdict)];
-        dict.Contents = new Dictionary<string, IList<IDictRecord>>();
+        dict.Contents = new Dictionary<string, IList<IDictRecord>>(StringComparer.Ordinal);
         DictUtils.SingleDictTypeDicts[DictType.JMdict] = dict;
         JmdictLoader.Load(dict).Wait();
 
         foreach ((string key, Freq freq) in FreqUtils.s_builtInFreqs)
         {
-            freq.Contents = new Dictionary<string, IList<FrequencyRecord>>();
+            freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(StringComparer.Ordinal);
             freq.Options = new Freqs.Options.FreqOptions() { UseDB = new Freqs.Options.UseDBOption(false) };
             FreqUtils.FreqDicts[key] = freq;
         }

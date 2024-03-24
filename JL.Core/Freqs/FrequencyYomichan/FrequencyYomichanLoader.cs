@@ -129,6 +129,6 @@ internal static class FrequencyYomichanLoader
             freq.Contents[key] = recordList.ToArray();
         }
 
-        freq.Contents = freq.Contents.ToFrozenDictionary();
+        freq.Contents = freq.Contents.ToFrozenDictionary(StringComparer.Ordinal);
     }
 }
