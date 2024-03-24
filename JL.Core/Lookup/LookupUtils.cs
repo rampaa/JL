@@ -1029,7 +1029,7 @@ public static class LookupUtils
         IDictionary<string, IntermediaryResult> kanjiResults, bool useDBForPitchDict, Dict? pitchDict)
     {
         Dictionary<string, IList<IDictRecord>>? pitchAccentDict = useDBForPitchDict
-            ? pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, kanjiResults.First().Key)
+            ? YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, kanjiResults.First().Key)
             : null;
 
         ConcurrentBag<LookupResult> results = [];
