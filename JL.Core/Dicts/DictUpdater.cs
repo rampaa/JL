@@ -111,9 +111,6 @@ public static class DictUpdater
                 .Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
 
             await JmdictWordClassUtils.Serialize().ConfigureAwait(false);
-
-            DictUtils.WordClassDictionary.Clear();
-
             await JmdictWordClassUtils.Load().ConfigureAwait(false);
 
             string dbPath = DBUtils.GetDictDBPath(dict.Name);
