@@ -7,31 +7,31 @@ namespace JL.Core.Mining.Anki;
 
 internal static class AnkiConnect
 {
-    public static async Task<Response?> AddNoteToDeck(Note note)
+    public static async ValueTask<Response?> AddNoteToDeck(Note note)
     {
         Request req = new("addNote", 6, new Dictionary<string, object>(1, StringComparer.Ordinal) { { "note", note } });
         return await Send(req).ConfigureAwait(false);
     }
 
-    public static async Task<Response?> GetDeckNamesResponse()
+    public static async ValueTask<Response?> GetDeckNamesResponse()
     {
         Request req = new("deckNames", 6);
         return await Send(req).ConfigureAwait(false);
     }
 
-    public static async Task<Response?> GetModelNamesResponse()
+    public static async ValueTask<Response?> GetModelNamesResponse()
     {
         Request req = new("modelNames", 6);
         return await Send(req).ConfigureAwait(false);
     }
 
-    public static async Task<Response?> GetModelFieldNamesResponse(string modelName)
+    public static async ValueTask<Response?> GetModelFieldNamesResponse(string modelName)
     {
         Request req = new("modelFieldNames", 6, new Dictionary<string, object>(1, StringComparer.Ordinal) { { "modelName", modelName } });
         return await Send(req).ConfigureAwait(false);
     }
 
-    // public static async Task<Response> StoreMediaFile(string filename, string data)
+    // public static async ValueTask<Response> StoreMediaFile(string filename, string data)
     // {
     //     Request req = new("storeMediaFile", 6,
     //         new Dictionary<string, object> { { "filename", filename }, { "data", data } });
@@ -44,7 +44,7 @@ internal static class AnkiConnect
         _ = await Send(req).ConfigureAwait(false);
     }
 
-    private static async Task<Response?> Send(Request req)
+    private static async ValueTask<Response?> Send(Request req)
     {
         try
         {

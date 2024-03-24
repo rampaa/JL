@@ -32,7 +32,7 @@ public static class AudioUtils
         { "x-midi", "midi" }
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
-    private static async Task<AudioResponse?> GetAudioFromUrl(Uri url)
+    private static async ValueTask<AudioResponse?> GetAudioFromUrl(Uri url)
     {
         try
         {
@@ -63,7 +63,7 @@ public static class AudioUtils
         }
     }
 
-    private static async Task<AudioResponse?> GetAudioFromJsonReturningUrl(Uri url)
+    private static async ValueTask<AudioResponse?> GetAudioFromJsonReturningUrl(Uri url)
     {
         try
         {
@@ -108,7 +108,7 @@ public static class AudioUtils
         }
     }
 
-    private static async Task<AudioResponse?> GetAudioFromPath(Uri uri)
+    private static async ValueTask<AudioResponse?> GetAudioFromPath(Uri uri)
     {
         string fullPath = Path.GetFullPath(uri.LocalPath, Utils.ApplicationPath);
         if (File.Exists(fullPath))
@@ -122,7 +122,7 @@ public static class AudioUtils
         return null;
     }
 
-    internal static async Task<AudioResponse?> GetPrioritizedAudio(string spelling, string reading)
+    internal static async ValueTask<AudioResponse?> GetPrioritizedAudio(string spelling, string reading)
     {
         AudioResponse? audioResponse = null;
 
