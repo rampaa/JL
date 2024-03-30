@@ -142,7 +142,7 @@ public static class DBUtils
         return false;
     }
 
-    public static string CreateParameter(List<string> terms)
+    public static string GetParameter(List<string> terms)
     {
         StringBuilder parameterBuilder = new("(@1");
         for (int i = 1; i < terms.Count; i++)

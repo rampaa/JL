@@ -138,7 +138,7 @@ public static class LookupUtils
         bool useDBForDicts = dicts.Any(dict => (dict.Options?.UseDB?.Value ?? false) && dict.Ready);
         if (useDBForDicts)
         {
-            parameter = DBUtils.CreateParameter(textInHiraganaList);
+            parameter = DBUtils.GetParameter(textInHiraganaList);
 
             deconjugatedTexts = deconjugationResultsList
                 .SelectMany(static lf => lf.Select(static f => f.Text))
@@ -146,7 +146,7 @@ public static class LookupUtils
 
             if (deconjugatedTexts.Count > 0)
             {
-                verbParameter = DBUtils.CreateParameter(deconjugatedTexts);
+                verbParameter = DBUtils.GetParameter(deconjugatedTexts);
             }
 
             if (dicts.Any(dict => DictUtils.s_yomichanWordAndNameDictTypeSet.Contains(dict.Type) && (dict.Options?.UseDB?.Value ?? false) && dict.Ready))
@@ -526,20 +526,20 @@ public static class LookupUtils
                     List<string> textWithoutLongVowelMarkList = JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i]);
                     if (useDB)
                     {
-                        string longVowelParameterOrQuery;
+                        string longVowerQueryOrParameter;
                         if (isYomichan)
                         {
-                            longVowelParameterOrQuery = EpwingYomichanDBManager.GetQuery(textWithoutLongVowelMarkList);
+                            longVowerQueryOrParameter = EpwingYomichanDBManager.GetQuery(textWithoutLongVowelMarkList);
                         }
                         else if (isNazeka)
                         {
-                            longVowelParameterOrQuery = EpwingNazekaDBManager.GetQuery(textWithoutLongVowelMarkList);
+                            longVowerQueryOrParameter = EpwingNazekaDBManager.GetQuery(textWithoutLongVowelMarkList);
                         }
                         else
                         {
-                            longVowelParameterOrQuery = DBUtils.CreateParameter(textWithoutLongVowelMarkList);
+                            longVowerQueryOrParameter = DBUtils.GetParameter(textWithoutLongVowelMarkList);
                         }
-                        dbWordDict = getRecordsFromDB!(dict.Name, textWithoutLongVowelMarkList, longVowelParameterOrQuery);
+                        dbWordDict = getRecordsFromDB!(dict.Name, textWithoutLongVowelMarkList, longVowerQueryOrParameter);
                     }
 
                     int textWithoutLongVowelMarkListCount = textWithoutLongVowelMarkList.Count;
