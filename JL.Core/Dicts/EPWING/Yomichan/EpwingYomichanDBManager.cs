@@ -12,6 +12,18 @@ internal static class EpwingYomichanDBManager
 {
     public const int Version = 1;
 
+    private const string GetRecordsQuery =
+        """
+        SELECT r.primary_spelling AS primarySpelling,
+            r.reading AS reading,
+            r.glossary AS definitions,
+            r.part_of_speech AS wordClasses,
+            r.glossary_tags AS definitionTags
+        FROM record r
+        JOIN record_search_key rsk ON r.id = rsk.record_id
+        WHERE rsk.search_key = @term
+        """;
+
     public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};");
@@ -125,14 +137,15 @@ internal static class EpwingYomichanDBManager
         dict.Ready = true;
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms, string parameter)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
-        StringBuilder queryBuilder = new(
-            """
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
+        command.CommandText =
+            $"""
             SELECT rsk.search_key AS searchKey,
                    r.primary_spelling AS primarySpelling,
                    r.reading AS reading,
@@ -141,21 +154,11 @@ internal static class EpwingYomichanDBManager
                    r.glossary_tags AS definitionTags
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
-            WHERE rsk.search_key IN (@1
-            """);
-
-        int termCount = terms.Count;
-        for (int i = 1; i < termCount; i++)
-        {
-            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
-        }
-
-        _ = queryBuilder.Append(')');
-
-#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        command.CommandText = queryBuilder.ToString();
+            WHERE rsk.search_key IN {parameter}
+            """;
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
+        int termCount = terms.Count;
         for (int i = 0; i < termCount; i++)
         {
             _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);
@@ -192,17 +195,7 @@ internal static class EpwingYomichanDBManager
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
-        command.CommandText =
-            """
-            SELECT r.primary_spelling AS primarySpelling,
-                   r.reading AS reading,
-                   r.glossary AS definitions,
-                   r.part_of_speech AS wordClasses,
-                   r.glossary_tags AS definitionTags
-            FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
-            WHERE rsk.search_key = @term
-            """;
+        command.CommandText = GetRecordsQuery;
 
         _ = command.Parameters.AddWithValue("@term", term);
 

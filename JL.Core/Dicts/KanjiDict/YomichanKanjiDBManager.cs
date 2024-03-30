@@ -11,6 +11,16 @@ internal static class YomichanKanjiDBManager
 {
     public const int Version = 0;
 
+    private const string GetRecordsQuery =
+        """
+        SELECT r.on_readings AS onReadings,
+            r.kun_readings AS kunReadings,
+            r.glossary AS definitions,
+            r.stats AS stats
+        FROM record r
+        WHERE r.kanji = @term
+        """;
+
     public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};");
@@ -96,15 +106,7 @@ internal static class YomichanKanjiDBManager
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
-        command.CommandText =
-            """
-            SELECT r.on_readings AS onReadings,
-                   r.kun_readings AS kunReadings,
-                   r.glossary AS definitions,
-                   r.stats AS stats
-            FROM record r
-            WHERE r.kanji = @term
-            """;
+        command.CommandText = GetRecordsQuery;
 
         _ = command.Parameters.AddWithValue("@term", term);
 

@@ -13,6 +13,17 @@ internal static class YomichanPitchAccentDBManager
 {
     public const int Version = 1;
 
+    private const string GetRecordsQuery =
+        """
+        SELECT rsk.search_key AS searchKey,
+            r.spelling AS spelling,
+            r.reading AS reading,
+            r.position AS position
+        FROM record r
+        JOIN record_search_key rsk ON r.id = rsk.record_id
+        WHERE rsk.search_key = @term
+        """;
+
     public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};");
@@ -186,16 +197,7 @@ internal static class YomichanPitchAccentDBManager
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
-        command.CommandText =
-            """
-            SELECT rsk.search_key AS searchKey,
-                   r.spelling AS spelling,
-                   r.reading AS reading,
-                   r.position AS position
-            FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
-            WHERE rsk.search_key = @term
-            """;
+        command.CommandText = GetRecordsQuery;
 
         _ = command.Parameters.AddWithValue("@term", term);
 

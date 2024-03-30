@@ -89,14 +89,15 @@ internal static class JmnedictDBManager
         dict.Ready = true;
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms, string parameter)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
-        StringBuilder queryBuilder = new(
-            """
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
+        command.CommandText =
+            $"""
             SELECT r.primary_spelling_in_hiragana AS searchKey,
                    r.jmnedict_id AS id,
                    r.primary_spelling AS primarySpelling,
@@ -105,21 +106,11 @@ internal static class JmnedictDBManager
                    r.glossary AS definitions,
                    r.name_types AS nameTypes
             FROM record r
-            WHERE r.primary_spelling_in_hiragana IN (@1
-            """);
-
-        int termCount = terms.Count;
-        for (int i = 1; i < termCount; i++)
-        {
-            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
-        }
-
-        _ = queryBuilder.Append(')');
-
-#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        command.CommandText = queryBuilder.ToString();
+            WHERE r.primary_spelling_in_hiragana IN {parameter}
+            """;
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
+        int termCount = terms.Count;
         for (int i = 0; i < termCount; i++)
         {
             _ = command.Parameters.AddWithValue(string.Create(CultureInfo.InvariantCulture, $"@{i + 1}"), terms[i]);

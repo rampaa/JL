@@ -11,6 +11,20 @@ internal static class KanjidicDBManager
 {
     public const int Version = 1;
 
+    private const string GetRecordsQuery =
+        """
+        SELECT r.on_readings AS onReadings,
+            r.kun_readings AS kunReadings,
+            r.nanori_readings AS nanoriReadings,
+            r.radical_names AS radicalNames,
+            r.glossary AS definitions,
+            r.stroke_count AS strokeCount,
+            r.grade AS grade,
+            r.frequency AS frequency
+        FROM record r
+        WHERE r.kanji = @term
+        """;
+
     public static void CreateDB(string dbName)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};");
@@ -102,19 +116,7 @@ internal static class KanjidicDBManager
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
-        command.CommandText =
-            """
-            SELECT r.on_readings AS onReadings,
-                   r.kun_readings AS kunReadings,
-                   r.nanori_readings AS nanoriReadings,
-                   r.radical_names AS radicalNames,
-                   r.glossary AS definitions,
-                   r.stroke_count AS strokeCount,
-                   r.grade AS grade,
-                   r.frequency AS frequency
-            FROM record r
-            WHERE r.kanji = @term
-            """;
+        command.CommandText = GetRecordsQuery;
 
         _ = command.Parameters.AddWithValue("@term", term);
 
