@@ -82,6 +82,11 @@ internal sealed partial class MainWindow : Window
 
         WinApi.RestoreWindow(WindowHandle);
 
+        if (ConfigManager.AlwaysOnTop)
+        {
+            WinApi.BringToFront(WindowHandle);
+        }
+
         await StatsUtils.DeserializeLifetimeStats().ConfigureAwait(true);
         await StatsUtils.DeserializeProfileLifetimeStats().ConfigureAwait(true);
 
