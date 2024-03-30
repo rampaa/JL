@@ -135,8 +135,7 @@ public static class LookupUtils
 
         List<Dict> dicts = DictUtils.Dicts.Values.ToList();
 
-        bool useDBForDicts = dicts.Any(static dict => (dict.Options?.UseDB?.Value ?? false) && dict.Ready);
-        if (useDBForDicts)
+        if (DictUtils.s_dbIsUsedForAtLeastOneDict)
         {
             parameter = DBUtils.GetParameter(textInHiraganaList);
 
@@ -149,7 +148,7 @@ public static class LookupUtils
                 verbParameter = DBUtils.GetParameter(deconjugatedTexts);
             }
 
-            if (dicts.Any(static dict => DictUtils.s_yomichanWordAndNameDictTypeSet.Contains(dict.Type) && (dict.Options?.UseDB?.Value ?? false) && dict.Ready))
+            if (DictUtils.s_dbIsUsedForAtLeastOneYomichanDict)
             {
                 yomichanWordQuery = EpwingYomichanDBManager.GetQuery(parameter);
 
@@ -159,7 +158,7 @@ public static class LookupUtils
                 }
             }
 
-            if (dicts.Any(static dict => DictUtils.s_nazekaWordAndNameDictTypeSet.Contains(dict.Type) && (dict.Options?.UseDB?.Value ?? false) && dict.Ready))
+            if (DictUtils.s_dbIsUsedForAtLeastOneNazekaDict)
             {
                 nazekaWordQuery = EpwingNazekaDBManager.GetQuery(parameter);
 

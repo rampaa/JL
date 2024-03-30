@@ -32,6 +32,10 @@ public static class DictUtils
     internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     internal static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
 
+    internal static bool s_dbIsUsedForAtLeastOneDict;
+    internal static bool s_dbIsUsedForAtLeastOneYomichanDict;
+    internal static bool s_dbIsUsedForAtLeastOneNazekaDict;
+
     public static CancellationTokenSource? ProfileCustomWordsCancellationTokenSource { get; private set; }
     public static CancellationTokenSource? ProfileCustomNamesCancellationTokenSource { get; private set; }
 
@@ -499,12 +503,12 @@ public static class DictUtils
 
     internal static readonly FrozenSet<DictType> s_nazekaKanjiDictTypeSet = s_kanjiDictTypes.Intersect(NazekaDictTypes).ToFrozenSet();
 
-    internal static readonly FrozenSet<DictType> s_yomichanWordAndNameDictTypeSet = YomichanDictTypes
+    private static readonly FrozenSet<DictType> s_yomichanWordAndNameDictTypeSet = YomichanDictTypes
         .Except(s_kanjiDictTypes)
         .Where(dictType => dictType is not DictType.PitchAccentYomichan)
         .ToFrozenSet();
 
-    internal static readonly FrozenSet<DictType> s_nazekaWordAndNameDictTypeSet = NazekaDictTypes.Except(s_kanjiDictTypes).ToFrozenSet();
+    private static readonly FrozenSet<DictType> s_nazekaWordAndNameDictTypeSet = NazekaDictTypes.Except(s_kanjiDictTypes).ToFrozenSet();
 
 #pragma warning disable IDE0072
     public static async Task LoadDictionaries()
@@ -524,7 +528,11 @@ public static class DictUtils
 
         List<Task> tasks = [];
 
-        foreach (Dict dict in Dicts.Values.ToList())
+        List<Dict> dicts = Dicts.Values.ToList();
+
+        CheckIfDBIsUsedForAtLeastOneDict(dicts);
+
+        foreach (Dict dict in dicts)
         {
             bool useDB = dict.Options?.UseDB?.Value ?? true;
             string dbPath = DBUtils.GetDictDBPath(dict.Name);
@@ -1259,6 +1267,8 @@ public static class DictUtils
                 }
             }
 
+            CheckIfDBIsUsedForAtLeastOneDict(dicts);
+
             if (!UpdatingJmdict && !UpdatingJmnedict && !UpdatingKanjidic)
             {
                 Utils.Frontend.Alert(AlertLevel.Success, "Finished loading dictionaries");
@@ -1470,6 +1480,13 @@ public static class DictUtils
                 dict.Options.ShowPitchAccentWithDottedLines ??= new ShowPitchAccentWithDottedLinesOption(true);
             }
         }
+    }
+
+    private static void CheckIfDBIsUsedForAtLeastOneDict(List<Dict> dicts)
+    {
+        s_dbIsUsedForAtLeastOneDict = dicts.Any(static dict => (dict.Options?.UseDB?.Value ?? false) && dict.Ready);
+        s_dbIsUsedForAtLeastOneYomichanDict = s_dbIsUsedForAtLeastOneDict && dicts.Any(static dict => s_yomichanWordAndNameDictTypeSet.Contains(dict.Type) && (dict.Options?.UseDB?.Value ?? false) && dict.Ready);
+        s_dbIsUsedForAtLeastOneNazekaDict = s_dbIsUsedForAtLeastOneDict && dicts.Any(static dict => s_nazekaWordAndNameDictTypeSet.Contains(dict.Type) && (dict.Options?.UseDB?.Value ?? false) && dict.Ready);
     }
 
 }
