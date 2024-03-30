@@ -1,7 +1,5 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Globalization;
-using System.Text;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomNameDict;
@@ -139,7 +137,7 @@ public static class LookupUtils
         bool useDBForDicts = dicts.Any(dict => (dict.Options?.UseDB?.Value ?? false) && dict.Ready);
         if (useDBForDicts)
         {
-            parameter = CreateParameter(textInHiraganaList);
+            parameter = DBUtils.CreateParameter(textInHiraganaList);
 
             deconjugatedTexts = deconjugationResultsList
                 .SelectMany(static lf => lf.Select(static f => f.Text))
@@ -147,7 +145,7 @@ public static class LookupUtils
 
             if (deconjugatedTexts.Count > 0)
             {
-                verbParameter = CreateParameter(deconjugatedTexts);
+                verbParameter = DBUtils.CreateParameter(deconjugatedTexts);
             }
         }
 
@@ -507,7 +505,7 @@ public static class LookupUtils
                     List<string> textWithoutLongVowelMarkList = JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i]);
                     if (useDB)
                     {
-                        dbWordDict = getRecordsFromDB!(dict.Name, textWithoutLongVowelMarkList, CreateParameter(textWithoutLongVowelMarkList));
+                        dbWordDict = getRecordsFromDB!(dict.Name, textWithoutLongVowelMarkList, DBUtils.CreateParameter(textWithoutLongVowelMarkList));
                     }
 
                     int textWithoutLongVowelMarkListCount = textWithoutLongVowelMarkList.Count;
@@ -1396,15 +1394,5 @@ public static class LookupUtils
         }
 
         return freqsList;
-    }
-
-    private static string CreateParameter(List<string> terms)
-    {
-        StringBuilder parameterBuilder = new("(@1");
-        for (int i = 1; i < terms.Count; i++)
-        {
-            _ = parameterBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
-        }
-        return parameterBuilder.Append(')').ToString();
     }
 }

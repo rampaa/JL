@@ -1,5 +1,6 @@
 using System.Collections.Frozen;
 using System.Globalization;
+using System.Text;
 using System.Timers;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
@@ -139,6 +140,16 @@ public static class DBUtils
             return true;
         }
         return false;
+    }
+
+    public static string CreateParameter(List<string> terms)
+    {
+        StringBuilder parameterBuilder = new("(@1");
+        for (int i = 1; i < terms.Count; i++)
+        {
+            _ = parameterBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
+        }
+        return parameterBuilder.Append(')').ToString();
     }
 
     //public static string GetSqliteVersion()
