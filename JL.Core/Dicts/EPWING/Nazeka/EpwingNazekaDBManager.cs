@@ -12,7 +12,7 @@ internal static class EpwingNazekaDBManager
 {
     public const int Version = 1;
 
-    private const string GetRecordsQuery =
+    private const string SingleTermQuery =
         """
         SELECT r.primary_spelling AS primarySpelling,
                r.reading AS reading,
@@ -198,7 +198,7 @@ internal static class EpwingNazekaDBManager
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
-        command.CommandText = GetRecordsQuery;
+        command.CommandText = SingleTermQuery;
 
         _ = command.Parameters.AddWithValue("@term", term);
 

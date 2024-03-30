@@ -13,7 +13,7 @@ internal static class YomichanPitchAccentDBManager
 {
     public const int Version = 1;
 
-    private const string GetRecordsQuery =
+    private const string SingleTermQuery =
         """
         SELECT rsk.search_key AS searchKey,
                r.spelling AS spelling,
@@ -197,7 +197,7 @@ internal static class YomichanPitchAccentDBManager
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
-        command.CommandText = GetRecordsQuery;
+        command.CommandText = SingleTermQuery;
 
         _ = command.Parameters.AddWithValue("@term", term);
 

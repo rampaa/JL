@@ -11,7 +11,7 @@ internal static class KanjidicDBManager
 {
     public const int Version = 1;
 
-    private const string GetRecordsQuery =
+    private const string SingleTermQuery =
         """
         SELECT r.on_readings AS onReadings,
                r.kun_readings AS kunReadings,
@@ -116,7 +116,7 @@ internal static class KanjidicDBManager
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
-        command.CommandText = GetRecordsQuery;
+        command.CommandText = SingleTermQuery;
 
         _ = command.Parameters.AddWithValue("@term", term);
 

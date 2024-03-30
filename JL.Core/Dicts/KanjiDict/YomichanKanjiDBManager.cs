@@ -11,7 +11,7 @@ internal static class YomichanKanjiDBManager
 {
     public const int Version = 0;
 
-    private const string GetRecordsQuery =
+    private const string SingleTermQuery =
         """
         SELECT r.on_readings AS onReadings,
                r.kun_readings AS kunReadings,
@@ -106,7 +106,7 @@ internal static class YomichanKanjiDBManager
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
-        command.CommandText = GetRecordsQuery;
+        command.CommandText = SingleTermQuery;
 
         _ = command.Parameters.AddWithValue("@term", term);
 
