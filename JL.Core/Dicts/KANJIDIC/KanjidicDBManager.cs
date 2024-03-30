@@ -14,13 +14,13 @@ internal static class KanjidicDBManager
     private const string GetRecordsQuery =
         """
         SELECT r.on_readings AS onReadings,
-            r.kun_readings AS kunReadings,
-            r.nanori_readings AS nanoriReadings,
-            r.radical_names AS radicalNames,
-            r.glossary AS definitions,
-            r.stroke_count AS strokeCount,
-            r.grade AS grade,
-            r.frequency AS frequency
+               r.kun_readings AS kunReadings,
+               r.nanori_readings AS nanoriReadings,
+               r.radical_names AS radicalNames,
+               r.glossary AS definitions,
+               r.stroke_count AS strokeCount,
+               r.grade AS grade,
+               r.frequency AS frequency
         FROM record r
         WHERE r.kanji = @term
         """;

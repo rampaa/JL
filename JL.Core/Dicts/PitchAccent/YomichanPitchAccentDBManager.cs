@@ -16,9 +16,9 @@ internal static class YomichanPitchAccentDBManager
     private const string GetRecordsQuery =
         """
         SELECT rsk.search_key AS searchKey,
-            r.spelling AS spelling,
-            r.reading AS reading,
-            r.position AS position
+               r.spelling AS spelling,
+               r.reading AS reading,
+               r.position AS position
         FROM record r
         JOIN record_search_key rsk ON r.id = rsk.record_id
         WHERE rsk.search_key = @term

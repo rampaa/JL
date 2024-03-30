@@ -14,9 +14,9 @@ internal static class YomichanKanjiDBManager
     private const string GetRecordsQuery =
         """
         SELECT r.on_readings AS onReadings,
-            r.kun_readings AS kunReadings,
-            r.glossary AS definitions,
-            r.stats AS stats
+               r.kun_readings AS kunReadings,
+               r.glossary AS definitions,
+               r.stats AS stats
         FROM record r
         WHERE r.kanji = @term
         """;

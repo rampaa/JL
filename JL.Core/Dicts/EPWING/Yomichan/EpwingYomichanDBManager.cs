@@ -15,10 +15,10 @@ internal static class EpwingYomichanDBManager
     private const string GetRecordsQuery =
         """
         SELECT r.primary_spelling AS primarySpelling,
-            r.reading AS reading,
-            r.glossary AS definitions,
-            r.part_of_speech AS wordClasses,
-            r.glossary_tags AS definitionTags
+               r.reading AS reading,
+               r.glossary AS definitions,
+               r.part_of_speech AS wordClasses,
+               r.glossary_tags AS definitionTags
         FROM record r
         JOIN record_search_key rsk ON r.id = rsk.record_id
         WHERE rsk.search_key = @term
@@ -137,25 +137,14 @@ internal static class EpwingYomichanDBManager
         dict.Ready = true;
     }
 
-    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms, string parameter)
+    public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms, string query)
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
-        command.CommandText =
-            $"""
-            SELECT rsk.search_key AS searchKey,
-                   r.primary_spelling AS primarySpelling,
-                   r.reading AS reading,
-                   r.glossary AS definitions,
-                   r.part_of_speech AS wordClasses,
-                   r.glossary_tags AS definitionTags
-            FROM record r
-            JOIN record_search_key rsk ON r.id = rsk.record_id
-            WHERE rsk.search_key IN {parameter}
-            """;
+        command.CommandText = query;
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
 
         int termCount = terms.Count;
@@ -285,5 +274,45 @@ internal static class EpwingYomichanDBManager
         }
 
         return new EpwingYomichanRecord(primarySpelling, reading, definitions, wordClasses, definitionTags);
+    }
+
+    public static string GetQuery(string parameter)
+    {
+        return
+            $"""
+            SELECT rsk.search_key AS searchKey,
+                   r.primary_spelling AS primarySpelling,
+                   r.reading AS reading,
+                   r.glossary AS definitions,
+                   r.part_of_speech AS wordClasses,
+                   r.glossary_tags AS definitionTags
+            FROM record r
+            JOIN record_search_key rsk ON r.id = rsk.record_id
+            WHERE rsk.search_key IN {parameter}
+            """;
+    }
+
+    public static string GetQuery(List<string> terms)
+    {
+        StringBuilder queryBuilder = new(
+            """
+            SELECT rsk.search_key AS searchKey,
+                   r.primary_spelling AS primarySpelling,
+                   r.reading AS reading,
+                   r.glossary AS definitions,
+                   r.part_of_speech AS wordClasses,
+                   r.glossary_tags AS definitionTags
+            FROM record r
+            JOIN record_search_key rsk ON r.id = rsk.record_id
+            WHERE rsk.search_key IN (@1
+            """);
+
+        int termsCount = terms.Count;
+        for (int i = 1; i < termsCount; i++)
+        {
+            _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
+        }
+
+        return queryBuilder.Append(')').ToString();
     }
 }

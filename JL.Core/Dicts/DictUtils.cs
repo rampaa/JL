@@ -495,6 +495,17 @@ public static class DictUtils
         DictType.NonspecificWordNazeka
     ];
 
+    internal static readonly FrozenSet<DictType> s_yomichanKanjiDictTypeSet = s_kanjiDictTypes.Intersect(YomichanDictTypes).ToFrozenSet();
+
+    internal static readonly FrozenSet<DictType> s_nazekaKanjiDictTypeSet = s_kanjiDictTypes.Intersect(NazekaDictTypes).ToFrozenSet();
+
+    internal static readonly FrozenSet<DictType> s_yomichanWordAndNameDictTypeSet = YomichanDictTypes
+        .Except(s_kanjiDictTypes)
+        .Where(dictType => dictType is not DictType.PitchAccentYomichan)
+        .ToFrozenSet();
+
+    internal static readonly FrozenSet<DictType> s_nazekaWordAndNameDictTypeSet = NazekaDictTypes.Except(s_kanjiDictTypes).ToFrozenSet();
+
 #pragma warning disable IDE0072
     public static async Task LoadDictionaries()
     {
