@@ -269,6 +269,7 @@ public static class DictUpdater
                     if (!pathExists
                         || (DateTime.Now - File.GetLastWriteTime(fullPath)).Days >= dueDate)
                     {
+                        Utils.Frontend.Alert(AlertLevel.Information, $"Updating {dict.Type}...");
                         if (dict.Type is DictType.JMdict)
                         {
                             await UpdateJmdict(pathExists, true).ConfigureAwait(false);
