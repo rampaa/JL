@@ -32,9 +32,9 @@ public static class DictUtils
     internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     internal static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
 
-    internal static bool s_dbIsUsedForAtLeastOneDict;
-    internal static bool s_dbIsUsedForAtLeastOneYomichanDict;
-    internal static bool s_dbIsUsedForAtLeastOneNazekaDict;
+    internal static bool DBIsUsedForAtLeastOneDict { get; private set; }
+    internal static bool DBIsUsedForAtLeastOneYomichanDict { get; private set; }
+    internal static bool DBIsUsedForAtLeastOneNazekaDict { get; private set; }
 
     public static CancellationTokenSource? ProfileCustomWordsCancellationTokenSource { get; private set; }
     public static CancellationTokenSource? ProfileCustomNamesCancellationTokenSource { get; private set; }
@@ -1484,9 +1484,9 @@ public static class DictUtils
 
     private static void CheckIfDBIsUsedForAtLeastOneDict(List<Dict> dicts)
     {
-        s_dbIsUsedForAtLeastOneDict = dicts.Any(static dict => (dict.Options?.UseDB?.Value ?? false) && dict.Ready);
-        s_dbIsUsedForAtLeastOneYomichanDict = s_dbIsUsedForAtLeastOneDict && dicts.Any(static dict => s_yomichanWordAndNameDictTypeSet.Contains(dict.Type) && (dict.Options?.UseDB?.Value ?? false) && dict.Ready);
-        s_dbIsUsedForAtLeastOneNazekaDict = s_dbIsUsedForAtLeastOneDict && dicts.Any(static dict => s_nazekaWordAndNameDictTypeSet.Contains(dict.Type) && (dict.Options?.UseDB?.Value ?? false) && dict.Ready);
+        DBIsUsedForAtLeastOneDict = dicts.Any(static dict => (dict.Options?.UseDB?.Value ?? false) && dict.Ready);
+        DBIsUsedForAtLeastOneYomichanDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => s_yomichanWordAndNameDictTypeSet.Contains(dict.Type) && (dict.Options?.UseDB?.Value ?? false) && dict.Ready);
+        DBIsUsedForAtLeastOneNazekaDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => s_nazekaWordAndNameDictTypeSet.Contains(dict.Type) && (dict.Options?.UseDB?.Value ?? false) && dict.Ready);
     }
 
 }
