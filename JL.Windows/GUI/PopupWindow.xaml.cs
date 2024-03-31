@@ -22,7 +22,8 @@ namespace JL.Windows.GUI;
 internal sealed partial class PopupWindow : Window
 {
     public PopupWindow? ChildPopupWindow { get; set; }
-    private bool ContextMenuIsOpening { get; set; } // = false;
+
+    private bool _contextMenuIsOpening; // = false;
 
     private TextBox? _previousTextBox;
 
@@ -1757,7 +1758,7 @@ internal sealed partial class PopupWindow : Window
                 WinApi.ActivateWindow(previousPopup.WindowHandle);
             }
 
-            if (ConfigManager.HighlightLongestMatch && !previousPopup.ContextMenuIsOpening)
+            if (ConfigManager.HighlightLongestMatch && !previousPopup._contextMenuIsOpening)
             {
                 WindowsUtils.Unselect(_previousTextBox);
             }
@@ -1766,9 +1767,9 @@ internal sealed partial class PopupWindow : Window
 
     private void Window_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        ContextMenuIsOpening = true;
+        _contextMenuIsOpening = true;
         PopupWindowUtils.HidePopups(ChildPopupWindow);
-        ContextMenuIsOpening = false;
+        _contextMenuIsOpening = false;
     }
 
     private void PopupListView_MouseLeave(object sender, MouseEventArgs e)
