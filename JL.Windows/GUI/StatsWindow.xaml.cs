@@ -108,7 +108,7 @@ internal sealed partial class StatsWindow : Window
     private async void ButtonResetStats_OnClick(object sender, RoutedEventArgs e)
     {
 #pragma warning disable CA1308 // Normalize strings to uppercase
-        if (Utils.Frontend.ShowYesNoDialog(
+        if (WindowsUtils.ShowYesNoDialog(
                 $"Are you really sure that you want to reset the {ButtonSwapStats.Content.ToString()!.ToLowerInvariant()} stats?",
                 string.Create(CultureInfo.InvariantCulture, $"Reset {ButtonSwapStats.Content} Stats?")))
         {

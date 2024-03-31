@@ -6,7 +6,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Core.Profile;
 using JL.Core.Statistics;
-using JL.Core.Utilities;
+using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
 
@@ -96,7 +96,7 @@ internal sealed partial class ManageProfilesWindow : Window
 
     private void RemoveButton_Click(object sender, RoutedEventArgs e)
     {
-        if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this profile?", "Confirmation"))
+        if (WindowsUtils.ShowYesNoDialog("Do you really want to remove this profile?", "Confirmation"))
         {
             string profile = (string)((Button)sender).Tag;
 

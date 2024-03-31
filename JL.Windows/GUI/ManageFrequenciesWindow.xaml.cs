@@ -248,7 +248,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
 
     private void RemoveButton_Click(object sender, RoutedEventArgs e)
     {
-        if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this frequency dictionary?", "Confirmation"))
+        if (WindowsUtils.ShowYesNoDialog("Do you really want to remove this frequency dictionary?", "Confirmation"))
         {
             Freq freq = (Freq)((Button)sender).Tag;
             freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;

@@ -309,7 +309,7 @@ internal sealed partial class ManageDictionariesWindow : Window
 
     private void RemoveButton_Click(object sender, RoutedEventArgs e)
     {
-        if (Utils.Frontend.ShowYesNoDialog("Do you really want to remove this dictionary?", "Confirmation"))
+        if (WindowsUtils.ShowYesNoDialog("Do you really want to remove this dictionary?", "Confirmation"))
         {
             Dict dict = (Dict)((Button)sender).Tag;
             dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;

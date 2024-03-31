@@ -532,7 +532,7 @@ internal static class ConfigManager
                 else
                 {
                     Utils.Logger.Warning("Couldn't save AnkiConnect server address, invalid URL");
-                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
+                    WindowsUtils.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
                 }
             }
         }
@@ -556,7 +556,7 @@ internal static class ConfigManager
                 else
                 {
                     Utils.Logger.Warning("Couldn't save WebSocket address, invalid URL");
-                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't save WebSocket address, invalid URL");
+                    WindowsUtils.Alert(AlertLevel.Error, "Couldn't save WebSocket address, invalid URL");
                 }
             }
 
@@ -578,7 +578,7 @@ internal static class ConfigManager
                 if (!Uri.IsWellFormedUriString(searchUrlStr.Replace("{SearchTerm}", "", StringComparison.Ordinal), UriKind.Absolute))
                 {
                     Utils.Logger.Warning("Couldn't save Search URL, invalid URL");
-                    Utils.Frontend.Alert(AlertLevel.Error, "Couldn't save Search URL, invalid URL");
+                    WindowsUtils.Alert(AlertLevel.Error, "Couldn't save Search URL, invalid URL");
                 }
                 else
                 {
@@ -596,7 +596,7 @@ internal static class ConfigManager
             else if (!string.IsNullOrWhiteSpace(browserPathStr) && !Path.IsPathFullyQualified(browserPathStr))
             {
                 Utils.Logger.Warning("Couldn't save Browser Path, invalid path");
-                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't save Browser Path, invalid path");
+                WindowsUtils.Alert(AlertLevel.Error, "Couldn't save Browser Path, invalid path");
             }
             else
             {

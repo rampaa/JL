@@ -270,14 +270,14 @@ internal sealed partial class PreferencesWindow : Window
 
             else
             {
-                Utils.Frontend.Alert(AlertLevel.Error, "Error getting model names from Anki");
+                WindowsUtils.Alert(AlertLevel.Error, "Error getting model names from Anki");
                 Utils.Logger.Error("Error getting model names from Anki");
             }
         }
 
         else
         {
-            Utils.Frontend.Alert(AlertLevel.Error, "Error getting deck names from Anki");
+            WindowsUtils.Alert(AlertLevel.Error, "Error getting deck names from Anki");
             Utils.Logger.Error("Error getting deck names from Anki");
         }
     }
@@ -303,7 +303,7 @@ internal sealed partial class PreferencesWindow : Window
 
         else
         {
-            Utils.Frontend.Alert(AlertLevel.Error, "Error getting fields from AnkiConnect");
+            WindowsUtils.Alert(AlertLevel.Error, "Error getting fields from AnkiConnect");
             Utils.Logger.Error("Error getting fields from AnkiConnect");
         }
     }
@@ -357,7 +357,7 @@ internal sealed partial class PreferencesWindow : Window
         if (deckNamesSelector.SelectedItem is null ||
             modelNamesSelector.SelectedItem is null)
         {
-            Utils.Frontend.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Save failed: Incomplete Anki config for {mineType} dictionaries"));
+            WindowsUtils.Alert(AlertLevel.Error, string.Create(CultureInfo.InvariantCulture, $"Save failed: Incomplete Anki config for {mineType} dictionaries"));
             Utils.Logger.Error("Save failed: Incomplete Anki config for {MineType} dictionaries", mineType);
             return null;
         }
@@ -426,7 +426,7 @@ internal sealed partial class PreferencesWindow : Window
 
         else
         {
-            Utils.Frontend.Alert(AlertLevel.Error, "Error saving AnkiConfig");
+            WindowsUtils.Alert(AlertLevel.Error, "Error saving AnkiConfig");
             Utils.Logger.Error("Error saving AnkiConfig");
             CoreConfig.AnkiIntegration = false;
         }
@@ -521,7 +521,7 @@ internal sealed partial class PreferencesWindow : Window
 
         else
         {
-            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
+            WindowsUtils.Alert(AlertLevel.Error, "Couldn't save AnkiConnect server address, invalid URL");
         }
     }
 

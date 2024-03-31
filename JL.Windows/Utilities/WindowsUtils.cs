@@ -26,6 +26,7 @@ using NAudio.Vorbis;
 using NAudio.Wave;
 using Application = System.Windows.Application;
 using Button = System.Windows.Controls.Button;
+using MessageBox = HandyControl.Controls.MessageBox;
 using Window = System.Windows.Window;
 
 namespace JL.Windows.Utilities;
@@ -332,7 +333,7 @@ internal static class WindowsUtils
         else
         {
             Utils.Logger.Error("Couldn't update JL. {StatusCode} {ReasonPhrase}", downloadResponse.StatusCode, downloadResponse.ReasonPhrase);
-            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't update JL");
+            Alert(AlertLevel.Error, "Couldn't update JL");
         }
     }
 
@@ -380,7 +381,7 @@ internal static class WindowsUtils
             catch (Exception ex)
             {
                 Utils.Logger.Error(ex, "Error playing audio: {Audio}, audio format: {AudioFormat}", JsonSerializer.Serialize(audio), audioFormat);
-                Utils.Frontend.Alert(AlertLevel.Error, "Error playing audio");
+                Alert(AlertLevel.Error, "Error playing audio");
             }
         });
     }
@@ -406,7 +407,7 @@ internal static class WindowsUtils
             if (numFiles is 0)
             {
                 Utils.Logger.Warning("Motivation folder is empty!");
-                Utils.Frontend.Alert(AlertLevel.Warning, "Motivation folder is empty!");
+                Alert(AlertLevel.Warning, "Motivation folder is empty!");
                 return;
             }
 
@@ -421,7 +422,7 @@ internal static class WindowsUtils
         catch (Exception ex)
         {
             Utils.Logger.Error(ex, "Error motivating");
-            Utils.Frontend.Alert(AlertLevel.Error, "Error motivating");
+            Alert(AlertLevel.Error, "Error motivating");
         }
     }
 
@@ -702,5 +703,10 @@ internal static class WindowsUtils
 
             return null;
         });
+    }
+
+    public static bool ShowYesNoDialog(string text, string caption)
+    {
+        return MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) is MessageBoxResult.Yes;
     }
 }
