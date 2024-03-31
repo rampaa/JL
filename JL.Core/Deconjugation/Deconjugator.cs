@@ -19,10 +19,7 @@ internal static class Deconjugator
             return null;
         }
 
-        string newText =
-            myForm.Text[..^myRule.ConEnd.Length]
-            +
-            myRule.DecEnd;
+        string newText = myForm.Text[..^myRule.ConEnd.Length] + myRule.DecEnd;
 
         Form newForm = new(
             newText,

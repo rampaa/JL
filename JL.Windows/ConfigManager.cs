@@ -44,8 +44,6 @@ internal static class ConfigManager
     public static double MainWindowHeight { get; set; } = 200;
     public static bool MainWindowDynamicHeight { get; private set; } = true;
     public static bool MainWindowDynamicWidth { get; private set; } // = false;
-    public static double MainWindowMaxDynamicWidth { get; private set; } = 800;
-    public static double MainWindowMaxDynamicHeight { get; private set; } = 269;
     public static Brush MainWindowTextColor { get; private set; } = Brushes.White;
     public static Brush MainWindowBacklogTextColor { get; private set; } = Brushes.Bisque;
     public static bool AlwaysOnTop { get; set; } = true;
@@ -53,18 +51,20 @@ internal static class ConfigManager
     public static bool ChangeMainWindowBackgroundOpacityOnUnhover { get; private set; } // = false;
     public static double MainWindowBackgroundOpacityOnUnhover { get; private set; } = 0.2; // 0.2-100
     public static bool TextBoxIsReadOnly { get; set; } = true;
-    private static bool TextBoxApplyDropShadowEffect { get; set; } = true;
     public static bool OnlyCaptureTextWithJapaneseChars { get; private set; } = true;
     public static bool DisableLookupsForNonJapaneseCharsInMainWindow { get; private set; } // = false;
     public static bool MainWindowFocusOnHover { get; private set; } // = false;
     public static bool SteppedBacklogWithMouseWheel { get; private set; } = true;
-    public static bool HorizontallyCenterMainWindowText { get; private set; } // = false;
     public static bool HideAllTitleBarButtonsWhenMouseIsNotOverTitleBar { get; set; } // = false;
     public static bool EnableBacklog { get; private set; } = true;
     public static bool AutoSaveBacklogBeforeClosing { get; private set; } // = false;
     public static bool TextToSpeechOnTextChange { get; private set; } // = false;
     public static bool HidePopupsOnTextChange { get; private set; } = true;
     public static bool AlwaysShowMainTextBoxCaret { get; set; } // = false;
+    private static double MainWindowMaxDynamicWidth { get; set; } = 800;
+    private static double MainWindowMaxDynamicHeight { get; set; } = 269;
+    private static bool TextBoxApplyDropShadowEffect { get; set; } = true;
+    private static bool HorizontallyCenterMainWindowText { get; set; } // = false;
 
     #endregion
 
