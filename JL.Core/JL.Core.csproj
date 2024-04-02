@@ -37,6 +37,9 @@
     <None Update="Resources\Motivation\c113642_1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Motivation\c120149_1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Motivation\c12096_1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
