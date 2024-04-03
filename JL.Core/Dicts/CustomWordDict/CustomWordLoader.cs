@@ -62,7 +62,8 @@ public static class CustomWordLoader
                     string[] spellings = lParts[0].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
                     string[]? readings = lParts[1].Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                    if (readings.Length is 0)
+                    if (readings.Length is 0
+                        || (spellings.Length is 1 && readings.Length is 1 && spellings[0] == readings[0]))
                     {
                         readings = null;
                     }

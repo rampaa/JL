@@ -71,7 +71,8 @@ internal sealed partial class AddWordWindow : Window
             string[] spellings = rawSpellings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
             string[]? readings = rawReadings.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-            if (readings.Length is 0)
+            if (readings.Length is 0
+                || (spellings.Length is 1 && readings.Length is 1 && spellings[0] == readings[0]))
             {
                 readings = null;
             }
