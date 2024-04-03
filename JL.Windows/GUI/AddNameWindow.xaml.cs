@@ -71,7 +71,7 @@ internal sealed partial class AddNameWindow : Window
                 ? DictType.CustomNameDictionary
                 : DictType.ProfileCustomNameDictionary;
 
-            Dict dict = DictUtils.Dicts.Values.First(dict => dict.Type == dictType);
+            Dict dict = DictUtils.SingleDictTypeDicts[dictType];
             if (dict.Active)
             {
                 CustomNameLoader.AddToDictionary(spelling, reading, nameType, extraInfo, dict.Contents);
