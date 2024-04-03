@@ -1484,9 +1484,9 @@ public static class DictUtils
 
     private static void CheckIfDBIsUsedForAtLeastOneDict(List<Dict> dicts)
     {
-        DBIsUsedForAtLeastOneDict = dicts.Any(static dict => (dict.Options?.UseDB?.Value ?? false) && dict.Ready);
-        DBIsUsedForAtLeastOneYomichanDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => s_yomichanWordAndNameDictTypeSet.Contains(dict.Type) && (dict.Options?.UseDB?.Value ?? false) && dict.Ready);
-        DBIsUsedForAtLeastOneNazekaDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => s_nazekaWordAndNameDictTypeSet.Contains(dict.Type) && (dict.Options?.UseDB?.Value ?? false) && dict.Ready);
+        DBIsUsedForAtLeastOneDict = dicts.Any(static dict => dict.Options?.UseDB?.Value ?? true);
+        DBIsUsedForAtLeastOneYomichanDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => s_yomichanWordAndNameDictTypeSet.Contains(dict.Type) && (dict.Options?.UseDB?.Value ?? true));
+        DBIsUsedForAtLeastOneNazekaDict = DBIsUsedForAtLeastOneDict && dicts.Any(static dict => s_nazekaWordAndNameDictTypeSet.Contains(dict.Type) && (dict.Options?.UseDB?.Value ?? true));
     }
 
 }

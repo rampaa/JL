@@ -173,7 +173,7 @@ public static class LookupUtils
         {
             if (dict.Active)
             {
-                bool useDB = (dict.Options?.UseDB?.Value ?? false) && dict.Ready;
+                bool useDB = (dict.Options?.UseDB?.Value ?? true) && dict.Ready;
                 switch (dict.Type)
                 {
                     case DictType.JMdict:
@@ -497,7 +497,8 @@ public static class LookupUtils
 
         if (useDB)
         {
-            Parallel.Invoke(() => dbWordDict = getRecordsFromDB!(dict.Name, textInHiraganaList, queryOrParameter!),
+            Parallel.Invoke(
+                () => dbWordDict = getRecordsFromDB!(dict.Name, textInHiraganaList, queryOrParameter!),
                 () => dbVerbDict = getRecordsFromDB!(dict.Name, deconjugatedTexts!, verbQueryOrParameter!));
         }
 
