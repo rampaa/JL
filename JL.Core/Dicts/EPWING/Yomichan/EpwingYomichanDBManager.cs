@@ -10,7 +10,7 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Dicts.EPWING.Yomichan;
 internal static class EpwingYomichanDBManager
 {
-    public const int Version = 1;
+    public const int Version = 2;
 
     private const string SingleTermQuery =
         """
@@ -81,7 +81,7 @@ internal static class EpwingYomichanDBManager
             _ = insertRecordCommand.Parameters.AddWithValue("@reading", record.Reading is not null ? record.Reading : DBNull.Value);
             _ = insertRecordCommand.Parameters.AddWithValue("@glossary", JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull));
             _ = insertRecordCommand.Parameters.AddWithValue("@part_of_speech", record.WordClasses is not null ? JsonSerializer.Serialize(record.WordClasses, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
-            _ = insertRecordCommand.Parameters.AddWithValue("@glossary_tags", record.DefinitionTags is not null ? JsonSerializer.Serialize(record.Definitions, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
+            _ = insertRecordCommand.Parameters.AddWithValue("@glossary_tags", record.DefinitionTags is not null ? JsonSerializer.Serialize(record.DefinitionTags, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
 
             _ = insertRecordCommand.ExecuteNonQuery();
 

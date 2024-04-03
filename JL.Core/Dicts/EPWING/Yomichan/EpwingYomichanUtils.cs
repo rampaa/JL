@@ -101,7 +101,7 @@ internal static class EpwingYomichanUtils
 
                 if (contentElement.ValueKind is JsonValueKind.String)
                 {
-                    return new YomichanContent(parentTag ?? tag, contentElement.GetString()!.Trim());
+                    return new YomichanContent(parentTag ?? tag, contentElement.GetString());
                 }
 
                 if (contentElement.ValueKind is JsonValueKind.Array)
