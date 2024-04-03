@@ -28,17 +28,30 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
 
     public string BuildFormattedDefinition(DictOptions? options)
     {
+        bool multipleDefinitions = Definitions.Length > 1;
+        bool definitionTagsExist = DefinitionTags is not null;
+        bool newlines = options?.NewlineBetweenDefinitions?.Value ?? true;
+
+        string separator = newlines
+            ? "\n"
+            : "; ";
+
         StringBuilder defResult = new();
-
-        string separator = options is { NewlineBetweenDefinitions.Value: false }
-            ? ""
-            : "\n";
-
         for (int i = 0; i < Definitions.Length; i++)
         {
-            if (DefinitionTags?.Length > i)
+            if (newlines && multipleDefinitions)
+            {
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
+            }
+
+            if (definitionTagsExist && DefinitionTags!.Length > i)
             {
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({DefinitionTags[i]}) ");
+            }
+
+            if (!newlines && multipleDefinitions)
+            {
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
             _ = defResult.Append(Definitions[i]).Append(separator);
