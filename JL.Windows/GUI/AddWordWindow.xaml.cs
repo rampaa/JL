@@ -86,7 +86,7 @@ internal sealed partial class AddWordWindow : Window
                 ? DictType.CustomWordDictionary
                 : DictType.ProfileCustomWordDictionary;
 
-            Dict dict = DictUtils.Dicts.Values.First(dict => dict.Type == dictType);
+            Dict dict = DictUtils.SingleDictTypeDicts[dictType];
             if (dict.Active)
             {
                 CustomWordLoader.AddToDictionary(spellings, readings, definitions, rawPartOfSpeech, wordClasses, dict.Contents);
@@ -96,8 +96,8 @@ internal sealed partial class AddWordWindow : Window
             Close();
 
             string line = string.IsNullOrWhiteSpace(rawWordClasses)
-                ? $"{spellings}\t{readings}\t{definitions}\t{rawPartOfSpeech}\n"
-                : $"{spellings}\t{readings}\t{definitions}\t{rawPartOfSpeech}\t{wordClasses}\n";
+                ? $"{rawSpellings}\t{rawReadings}\t{rawDefinitions}\t{rawPartOfSpeech}\n"
+                : $"{rawSpellings}\t{rawReadings}\t{rawDefinitions}\t{rawPartOfSpeech}\t{rawWordClasses}\n";
 
             string path = Path.GetFullPath(dict.Path, Utils.ApplicationPath);
             await File.AppendAllTextAsync(path, line).ConfigureAwait(false);
