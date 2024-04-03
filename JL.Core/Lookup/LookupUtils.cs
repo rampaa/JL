@@ -812,6 +812,44 @@ public static class LookupUtils
         return searchKeys.ToList();
     }
 
+    private static List<string> GetSearchKeysFromCustomWordRecord(Dictionary<string, IntermediaryResult> dictResults, bool includeAlternativeSpellings)
+    {
+        HashSet<string> searchKeys = [];
+        foreach ((string key, IntermediaryResult intermediaryResult) in dictResults)
+        {
+            _ = searchKeys.Add(key);
+
+            List<IList<IDictRecord>> dictRecordsList = intermediaryResult.Results;
+            int dictRecordsListCount = dictRecordsList.Count;
+            for (int i = 0; i < dictRecordsListCount; i++)
+            {
+                IList<IDictRecord> dictRecords = dictRecordsList[i];
+                int dictRecordCount = dictRecords.Count;
+                for (int j = 0; j < dictRecordCount; j++)
+                {
+                    CustomWordRecord customWordRecord = (CustomWordRecord)dictRecords[j];
+                    _ = searchKeys.Add(JapaneseUtils.KatakanaToHiragana(customWordRecord.PrimarySpelling));
+                    if (customWordRecord.Readings is not null)
+                    {
+                        foreach (string reading in customWordRecord.Readings.Select(JapaneseUtils.KatakanaToHiragana))
+                        {
+                            _ = searchKeys.Add(reading);
+                        }
+                    }
+                    if (includeAlternativeSpellings && customWordRecord.AlternativeSpellings is not null)
+                    {
+                        foreach (string alternativeSpelling in customWordRecord.AlternativeSpellings.Select(JapaneseUtils.KatakanaToHiragana))
+                        {
+                            _ = searchKeys.Add(alternativeSpelling);
+                        }
+                    }
+                }
+            }
+        }
+
+        return searchKeys.ToList();
+    }
+
     private static List<string> GetSearchKeysFromJmnedictRecord(Dictionary<string, IntermediaryResult> dictResults, bool includeAlternativeSpellings)
     {
         HashSet<string> searchKeys = [];
@@ -1247,7 +1285,7 @@ public static class LookupUtils
         {
             if (dbFreqs.Count > 0)
             {
-                List<string> searchKeys = GetSearchKeysFromEpwingNazekaRecord(customWordResults, true);
+                List<string> searchKeys = GetSearchKeysFromCustomWordRecord(customWordResults, true);
                 frequencyDicts = GetFrequencyDictsFromDB(dbFreqs, searchKeys);
             }
         },
@@ -1255,7 +1293,7 @@ public static class LookupUtils
         {
             if (useDBForPitchDict)
             {
-                List<string> searchKeys = GetSearchKeysFromEpwingNazekaRecord(customWordResults, false);
+                List<string> searchKeys = GetSearchKeysFromCustomWordRecord(customWordResults, false);
                 pitchAccentDict = YomichanPitchAccentDBManager.GetRecordsFromDB(pitchDict!.Name, searchKeys);
             }
         });
