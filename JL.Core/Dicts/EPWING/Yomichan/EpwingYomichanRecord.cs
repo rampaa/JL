@@ -28,18 +28,23 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
 
     public string BuildFormattedDefinition(DictOptions? options)
     {
-        bool multipleDefinitions = Definitions.Length > 1;
         bool definitionTagsExist = DefinitionTags is not null;
-        bool newlines = options?.NewlineBetweenDefinitions?.Value ?? true;
+        if (Definitions.Length is 1)
+        {
+            return definitionTagsExist
+                ? $"({DefinitionTags![0]}) {Definitions[0]}"
+                : Definitions[0];
+        }
 
+        bool newlines = options?.NewlineBetweenDefinitions?.Value ?? true;
         string separator = newlines
             ? "\n"
-            : "; ";
+            : " ";
 
         StringBuilder defResult = new();
         for (int i = 0; i < Definitions.Length; i++)
         {
-            if (newlines && multipleDefinitions)
+            if (newlines)
             {
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
@@ -49,15 +54,19 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({DefinitionTags[i]}) ");
             }
 
-            if (!newlines && multipleDefinitions)
+            if (!newlines)
             {
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
-            _ = defResult.Append(Definitions[i]).Append(separator);
+            _ = defResult.Append(Definitions[i]);
+            if ((i + 1) != Definitions.Length)
+            {
+                _ = defResult.Append(separator);
+            }
         }
 
-        return defResult.Remove(defResult.Length - separator.Length, separator.Length).ToString();
+        return defResult.ToString();
     }
 
     public int GetFrequency(Freq freq)

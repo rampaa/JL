@@ -78,18 +78,26 @@ internal sealed class YomichanKanjiRecord : IDictRecord
             return null;
         }
 
-        StringBuilder defResult = new();
+        if (Definitions.Length is 1)
+        {
+            return Definitions[0];
+        }
 
+        StringBuilder defResult = new();
         string separator = options?.NewlineBetweenDefinitions?.Value ?? true
             ? "\n"
             : "; ";
 
         for (int i = 0; i < Definitions.Length; i++)
         {
-            _ = defResult.Append(Definitions[i]).Append(separator);
+            _ = defResult.Append(Definitions[i]);
+            if ((i + 1) != Definitions.Length)
+            {
+                _ = defResult.Append(separator);
+            }
         }
 
-        return defResult.Remove(defResult.Length - separator.Length, separator.Length).ToString();
+        return defResult.ToString();
     }
 
     public string? BuildFormattedStats()
@@ -99,13 +107,21 @@ internal sealed class YomichanKanjiRecord : IDictRecord
             return null;
         }
 
-        StringBuilder statResult = new();
-
-        for (int i = 0; i < Stats.Length; i++)
+        if (Stats.Length is 1)
         {
-            _ = statResult.Append(CultureInfo.InvariantCulture, $"{Stats[i]}\n");
+            return Stats[0];
         }
 
-        return statResult.Remove(statResult.Length - 1, 1).ToString();
+        StringBuilder statResult = new();
+        for (int i = 0; i < Stats.Length; i++)
+        {
+            _ = statResult.Append(Stats[i]);
+            if ((i + 1) != Stats.Length)
+            {
+                _ = statResult.Append('\n');
+            }
+        }
+
+        return statResult.ToString();
     }
 }

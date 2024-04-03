@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using JL.Core.Dicts.Options;
 using JL.Core.Freqs;
@@ -22,18 +23,26 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
 
     public string BuildFormattedDefinition(DictOptions? options)
     {
-        StringBuilder defResult = new();
-
-        string separator = options is { NewlineBetweenDefinitions.Value: false }
-            ? ""
-            : "\n";
-
-        for (int i = 0; i < Definitions.Length; i++)
+        if (Definitions.Length is 1)
         {
-            _ = defResult.Append(Definitions[i]).Append(separator);
+            return Definitions[0];
         }
 
-        return defResult.Remove(defResult.Length - separator.Length, separator.Length).ToString();
+        string separator = options is { NewlineBetweenDefinitions.Value: false }
+            ? " "
+            : "\n";
+
+        StringBuilder defResult = new();
+        for (int i = 0; i < Definitions.Length; i++)
+        {
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) {Definitions[i]}");
+            if ((i + 1) != Definitions.Length)
+            {
+                _ = defResult.Append(separator);
+            }
+        }
+
+        return defResult.ToString();
     }
 
     public int GetFrequency(Freq freq)

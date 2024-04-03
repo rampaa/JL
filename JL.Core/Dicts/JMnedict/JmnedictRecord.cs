@@ -27,31 +27,49 @@ internal sealed class JmnedictRecord : IDictRecord
 
     public string BuildFormattedDefinition(DictOptions? options)
     {
-        string separator = options is { NewlineBetweenDefinitions.Value: false }
-            ? ""
-            : "\n";
+        bool nameTypesExist = NameTypes is not null;
+        if (Definitions.Length is 1)
+        {
+            if (nameTypesExist)
+            {
+                string[] nameTypes = NameTypes![0];
+                if (nameTypes.Length > 1 || !nameTypes.Contains("unclass"))
+                {
+                    return $"({string.Join(", ", nameTypes)}) {string.Join("; ", Definitions[0])}";
+                }
+            }
 
-        bool multipleDefinitions = Definitions.Length > 1;
+            return string.Join("; ", Definitions[0]);
+        }
+
+        bool newlines = options?.NewlineBetweenDefinitions?.Value ?? true;
+
+        string separator = newlines
+            ? "\n"
+            : " ";
 
         StringBuilder defResult = new();
-
         for (int i = 0; i < Definitions.Length; i++)
         {
             string[] definitions = Definitions[i];
 
-            if (multipleDefinitions)
+            if (newlines)
             {
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
-            if (NameTypes?.Length >= i)
+            if (nameTypesExist && NameTypes!.Length >= i)
             {
                 string[] nameTypes = NameTypes[i];
-
                 if (nameTypes.Length > 1 || !nameTypes.Contains("unclass"))
                 {
                     _ = defResult.Append(CultureInfo.InvariantCulture, $"({string.Join(", ", nameTypes)}) ");
                 }
+            }
+
+            if (!newlines)
+            {
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
             //if (options?.RelatedTerm?.Value ?? false)
@@ -63,10 +81,15 @@ internal sealed class JmnedictRecord : IDictRecord
             //    }
             //}
 
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", definitions)} {separator}");
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", definitions)}");
+
+            if ((i + 1) != Definitions.Length)
+            {
+                _ = defResult.Append(separator);
+            }
         }
 
-        return defResult.Remove(defResult.Length - separator.Length - 1, separator.Length + 1).ToString();
+        return defResult.ToString();
     }
 
     public override bool Equals(object? obj)

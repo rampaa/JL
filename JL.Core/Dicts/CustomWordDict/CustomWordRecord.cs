@@ -28,56 +28,64 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
 
     public string BuildFormattedDefinition(DictOptions? options)
     {
-        string separator = options is { NewlineBetweenDefinitions.Value: false }
-            ? ""
-            : "\n";
+        string tempWordClass;
+        if (WordClasses.Contains("adj-i"))
+        {
+            tempWordClass = "adjective";
+        }
+        else if (WordClasses.Contains("noun"))
+        {
+            tempWordClass = "noun";
+        }
+        else if (WordClasses.Contains("other"))
+        {
+            tempWordClass = "other";
+        }
+        else if (HasUserDefinedWordClass)
+        {
+            tempWordClass = string.Join(", ", WordClasses);
+        }
+        else
+        {
+            tempWordClass = "verb";
+        }
 
-        int count = 1;
+        if (Definitions.Length is 1)
+        {
+            return $"({tempWordClass}) {Definitions[0]}";
+        }
+
+        bool newlines = options?.NewlineBetweenDefinitions?.Value ?? true;
+
         StringBuilder defResult = new();
 
-        if (WordClasses.Length > 0)
-        {
-            string tempWordClass;
-            if (WordClasses.Contains("adj-i"))
-            {
-                tempWordClass = "adjective";
-            }
-            else if (WordClasses.Contains("noun"))
-            {
-                tempWordClass = "noun";
-            }
-            else if (WordClasses.Contains("other"))
-            {
-                tempWordClass = "other";
-            }
-            else if (HasUserDefinedWordClass)
-            {
-                tempWordClass = string.Join(", ", WordClasses);
-            }
-            else
-            {
-                tempWordClass = "verb";
-            }
-
-            _ = defResult.Append(CultureInfo.InvariantCulture, $"({tempWordClass}) ");
-        }
+        string separator = newlines
+            ? "\n"
+            : " ";
 
         for (int i = 0; i < Definitions.Length; i++)
         {
-            if (Definitions.Length > 0)
+            if (newlines)
             {
-                if (Definitions.Length > 1)
-                {
-                    _ = defResult.Append(CultureInfo.InvariantCulture, $"({count}) ");
-                }
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
+            }
 
-                _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", Definitions[i])} {separator}");
+            _ = defResult.Append(CultureInfo.InvariantCulture, $"({tempWordClass}) ");
 
-                ++count;
+            if (!newlines)
+            {
+                _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
+            }
+
+            _ = defResult.Append(Definitions[i]);
+
+            if ((i + 1) != Definitions.Length)
+            {
+                _ = defResult.Append(separator);
             }
         }
 
-        return defResult.Remove(defResult.Length - separator.Length - 1, separator.Length + 1).ToString();
+        return defResult.ToString();
     }
 
     public int GetFrequency(Freq freq)
