@@ -504,7 +504,7 @@ internal sealed partial class PopupWindow : Window
             _ = top.Children.Add(textBlockPOrthographyInfo);
         }
 
-        if (result.Readings is not null
+        if (result.Readings is not null && ConfigManager.ReadingsFontSize > 0
             && (pitchDictIsActive || (result.KunReadings is null && result.OnReadings is null)))
         {
             string readingsText = showROrthographyInfo && result.ReadingsOrthographyInfoList is not null
@@ -610,7 +610,7 @@ internal sealed partial class PopupWindow : Window
             _ = top.Children.Add(audioButton);
         }
 
-        if (result.AlternativeSpellings is not null)
+        if (result.AlternativeSpellings is not null && ConfigManager.AlternativeSpellingsFontSize > 0)
         {
             string alternativeSpellingsText = showAOrthographyInfo && result.AlternativeSpellingsOrthographyInfoList is not null
                 ? LookupResultUtils.AlternativeSpellingsToText(result.AlternativeSpellings, result.AlternativeSpellingsOrthographyInfoList)
@@ -644,7 +644,7 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        if (result.DeconjugationProcess is not null)
+        if (result.DeconjugationProcess is not null && ConfigManager.DeconjugationInfoFontSize > 0)
         {
             if (MiningMode)
             {
@@ -691,7 +691,9 @@ internal sealed partial class PopupWindow : Window
             }
         }
 
-        TextBlock dictTypeTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.Dict.Name),
+        if (ConfigManager.DictTypeFontSize > 0)
+        {
+            TextBlock dictTypeTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.Dict.Name),
             result.Dict.Name,
             ConfigManager.DictTypeColor,
             ConfigManager.DictTypeFontSize,
@@ -699,7 +701,8 @@ internal sealed partial class PopupWindow : Window
             VerticalAlignment.Top,
             new Thickness(7, 0, 0, 0));
 
-        _ = top.Children.Add(dictTypeTextBlock);
+            _ = top.Children.Add(dictTypeTextBlock);
+        }
 
         // bottom
         StackPanel bottom = new();

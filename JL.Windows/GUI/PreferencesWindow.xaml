@@ -692,7 +692,7 @@
                             <TextBlock HorizontalAlignment="Left" Text="Reading font size"
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <hc:NumericUpDown x:Name="ReadingsFontSizeNumericUpDown" Maximum="100" Minimum="1"
+                            <hc:NumericUpDown x:Name="ReadingsFontSizeNumericUpDown" Maximum="100" Minimum="0"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -712,7 +712,7 @@
                                        Style="{StaticResource TextBlockDefault}"
                                        TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="AlternativeSpellingsFontSizeNumericUpDown" Maximum="500"
-                                              Minimum="1"
+                                              Minimum="0"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -760,7 +760,7 @@
                             <TextBlock HorizontalAlignment="Left" Text="Deconjugation info font size"
                                        Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="DeconjugationInfoFontSizeNumericUpDown" Maximum="100"
-                                              Minimum="1"
+                                              Minimum="0"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
@@ -776,7 +776,7 @@
                             <TextBlock HorizontalAlignment="Left" Text="Dictionary name font size"
                                        Style="{StaticResource TextBlockDefault}" TextWrapping="Wrap" VerticalAlignment="Center" />
                             <hc:NumericUpDown x:Name="DictTypeFontSizeNumericUpDown" Maximum="100"
-                                              Minimum="1"
+                                              Minimum="0"
                                               HorizontalAlignment="Right" />
                         </DockPanel>
 
