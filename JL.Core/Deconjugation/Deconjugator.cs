@@ -19,8 +19,13 @@ internal static class Deconjugator
             return null;
         }
 
+        if (myForm.Text.Length == myRule.ConEnd.Length && myRule.DecEnd.Length is 0)
+        {
+            return null;
+        }
+
         string newText = myForm.Text[..^myRule.ConEnd.Length] + myRule.DecEnd;
-        if (newText.Length is 0 || newText == myForm.OriginalText)
+        if (newText == myForm.OriginalText)
         {
             return null;
         }
@@ -171,16 +176,13 @@ internal static class Deconjugator
 
     private static Form? SubstitutionInner(Form myForm, Rule myRule)
     {
-        if (!myForm.Text.Contains(myRule.ConEnd[0], StringComparison.Ordinal))
+        string conEnd = myRule.ConEnd[0];
+        if (!myForm.Text.Contains(conEnd, StringComparison.Ordinal))
         {
             return null;
         }
 
-        string newText = myForm.Text.Replace(myRule.ConEnd[0], myRule.DecEnd[0], StringComparison.Ordinal);
-        if (newText.Length is 0 || newText == myForm.OriginalText)
-        {
-            return null;
-        }
+        string newText = myForm.Text.Replace(conEnd, myRule.DecEnd[0], StringComparison.Ordinal);
 
         Form newForm = new(
             newText,
@@ -262,13 +264,7 @@ internal static class Deconjugator
 
     private static bool V1InftrapCheck(Form myForm)
     {
-        if (myForm.Tags.Count is not 1)
-        {
-            return true;
-        }
-
-        string myTag = myForm.Tags[0];
-        return myTag is not "stem-ren";
+        return myForm.Tags.Count is not 1 || myForm.Tags[0] is not "stem-ren";
     }
 
     private static bool SaspecialCheck(Form myForm, Rule myRule)
@@ -278,12 +274,13 @@ internal static class Deconjugator
             return false;
         }
 
-        if (!myForm.Text.EndsWith(myRule.ConEnd[0], StringComparison.Ordinal))
+        string conEnd = myRule.ConEnd[0];
+        if (!myForm.Text.EndsWith(conEnd, StringComparison.Ordinal))
         {
             return false;
         }
 
-        string baseText = myForm.Text[..^myRule.ConEnd[0].Length];
+        string baseText = myForm.Text[..^conEnd.Length];
         return !baseText.EndsWith('さ');
     }
 
