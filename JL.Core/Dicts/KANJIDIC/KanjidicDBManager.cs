@@ -9,7 +9,7 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Dicts.KANJIDIC;
 internal static class KanjidicDBManager
 {
-    public const int Version = 1;
+    public const int Version = 2;
 
     private const string SingleTermQuery =
         """
@@ -35,8 +35,7 @@ internal static class KanjidicDBManager
             """
             CREATE TABLE IF NOT EXISTS record
             (
-                id INTEGER NOT NULL PRIMARY KEY,
-                kanji TEXT NOT NULL,
+                kanji TEXT NOT NULL PRIMARY KEY,
                 on_readings TEXT,
                 kun_readings TEXT,
                 nanori_readings TEXT,
@@ -45,7 +44,7 @@ internal static class KanjidicDBManager
                 stroke_count INTEGER NOT NULL,
                 grade INTEGER NOT NULL,
                 frequency INTEGER NOT NULL
-            ) STRICT;
+            ) WITHOUT ROWID, STRICT;
             """;
         _ = command.ExecuteNonQuery();
 
@@ -62,7 +61,6 @@ internal static class KanjidicDBManager
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
-        ulong id = 1;
         foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)
         {
             foreach (IDictRecord record in records)
@@ -72,11 +70,10 @@ internal static class KanjidicDBManager
                 using SqliteCommand insertRecordCommand = connection.CreateCommand();
                 insertRecordCommand.CommandText =
                     """
-                    INSERT INTO record (id, kanji, on_readings, kun_readings, nanori_readings, radical_names, glossary, stroke_count, grade, frequency)
-                    VALUES (@id, @kanji, @on_readings, @kun_readings, @nanori_readings, @radical_names, @glossary, @stroke_count, @grade, @frequency)
+                    INSERT INTO record (kanji, on_readings, kun_readings, nanori_readings, radical_names, glossary, stroke_count, grade, frequency)
+                    VALUES (@kanji, @on_readings, @kun_readings, @nanori_readings, @radical_names, @glossary, @stroke_count, @grade, @frequency)
                     """;
 
-                _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
                 _ = insertRecordCommand.Parameters.AddWithValue("@kanji", kanji);
                 _ = insertRecordCommand.Parameters.AddWithValue("@on_readings", kanjidicRecord.OnReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.OnReadings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
                 _ = insertRecordCommand.Parameters.AddWithValue("@kun_readings", kanjidicRecord.KunReadings is not null ? JsonSerializer.Serialize(kanjidicRecord.KunReadings, Utils.s_jsoNotIgnoringNull) : DBNull.Value);
@@ -88,14 +85,8 @@ internal static class KanjidicDBManager
                 _ = insertRecordCommand.Parameters.AddWithValue("@frequency", kanjidicRecord.Frequency);
 
                 _ = insertRecordCommand.ExecuteNonQuery();
-
-                ++id;
             }
         }
-
-        using SqliteCommand createIndexCommand = connection.CreateCommand();
-        createIndexCommand.CommandText = "CREATE INDEX IF NOT EXISTS ix_record_kanji ON record(kanji);";
-        _ = createIndexCommand.ExecuteNonQuery();
 
         transaction.Commit();
 
