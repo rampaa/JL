@@ -56,7 +56,6 @@ public static class JLFieldUtils
         JLField.RawFrequencies,
         JLField.PitchAccents,
         JLField.NumericPitchAccents,
-        JLField.EdictId,
         JLField.LocalTime
     ];
 

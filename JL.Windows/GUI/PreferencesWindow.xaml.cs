@@ -92,7 +92,6 @@ internal sealed partial class PreferencesWindow : Window
                                              • Raw Frequencies: Raw frequency info for the mined word, e.g., "77, 666".
                                              • Pitch Accents: Pitch accents for the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
                                              • Pitch Accents (Numeric): Pitch accents for the mined word in numeric form, e.g., おんな: 3, おみな: 0, おうな: 1
-                                             • Entry ID: KANJIDIC2 entry ID.
                                              • Local Time: Mining date and time expressed in local timezone.
                                              """;
 
