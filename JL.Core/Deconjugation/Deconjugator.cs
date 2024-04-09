@@ -20,6 +20,10 @@ internal static class Deconjugator
         }
 
         string newText = myForm.Text[..^myRule.ConEnd.Length] + myRule.DecEnd;
+        if (newText.Length is 0 || newText == myForm.OriginalText)
+        {
+            return null;
+        }
 
         Form newForm = new(
             newText,
@@ -173,6 +177,10 @@ internal static class Deconjugator
         }
 
         string newText = myForm.Text.Replace(myRule.ConEnd[0], myRule.DecEnd[0], StringComparison.Ordinal);
+        if (newText.Length is 0 || newText == myForm.OriginalText)
+        {
+            return null;
+        }
 
         Form newForm = new(
             newText,
@@ -332,6 +340,8 @@ internal static class Deconjugator
             processed.UnionWith(novel);
             novel = newNovel;
         }
+
+        _ = processed.Remove(startForm);
 
         return processed;
     }
