@@ -635,8 +635,8 @@ public static class LookupUtils
                             JmdictWordClass jmdictWordClassResult = jmdictWcResults[j];
 
                             if (dictResult.PrimarySpelling == jmdictWordClassResult.Spelling
-                                && (jmdictWordClassResult.Readings?.Contains(dictResult.Reading ?? string.Empty)
-                                    ?? string.IsNullOrEmpty(dictResult.Reading)))
+                                && ((dictResult.Reading is not null && (jmdictWordClassResult.Readings?.Contains(dictResult.Reading) ?? false))
+                                    || (dictResult.Reading is null && jmdictWordClassResult.Readings is null)))
                             {
                                 if (jmdictWordClassResult.WordClasses.Contains(lastTag))
                                 {
@@ -662,7 +662,7 @@ public static class LookupUtils
                 for (int i = 0; i < dictResultCount; i++)
                 {
                     EpwingNazekaRecord dictResult = (EpwingNazekaRecord)dictResults[i];
-                    if (deconjugationResult.Tags.Count is 0)
+                    if (lastTag is null)
                     {
                         resultsList.Add(dictResult);
                     }
@@ -676,10 +676,10 @@ public static class LookupUtils
                             JmdictWordClass jmdictWordClassResult = jmdictWcResults[j];
 
                             if (dictResult.PrimarySpelling == jmdictWordClassResult.Spelling
-                                && (jmdictWordClassResult.Readings?.Contains(dictResult.Reading ?? "")
-                                    ?? string.IsNullOrEmpty(dictResult.Reading)))
+                                && ((dictResult.Reading is not null && (jmdictWordClassResult.Readings?.Contains(dictResult.Reading) ?? false))
+                                    || (dictResult.Reading is null && jmdictWordClassResult.Readings is null)))
                             {
-                                if (lastTag is not null && jmdictWordClassResult.WordClasses.Contains(lastTag))
+                                if (jmdictWordClassResult.WordClasses.Contains(lastTag))
                                 {
                                     resultsList.Add(dictResult);
                                     break;
