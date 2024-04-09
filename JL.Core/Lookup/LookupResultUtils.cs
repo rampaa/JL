@@ -26,7 +26,7 @@ public static class LookupResultUtils
             {
                 string info = form[j];
 
-                if (info is "")
+                if (info.Length is 0)
                 {
                     continue;
                 }
