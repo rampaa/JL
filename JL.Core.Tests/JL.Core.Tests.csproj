@@ -18,11 +18,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\JL.Core\JL.Core.csproj" />
+    <ProjectReference Include="../JL.Core/JL.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\MockJMdict.xml">
+    <None Update="Resources/MockJMdict.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
