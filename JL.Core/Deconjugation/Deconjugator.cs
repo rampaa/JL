@@ -279,7 +279,7 @@ internal static class Deconjugator
         return !baseText.EndsWith('さ');
     }
 
-    public static HashSet<Form>? Deconjugate(string text)
+    public static HashSet<Form> Deconjugate(string text)
     {
         HashSet<Form> processed = [];
         HashSet<Form> novel = [];
