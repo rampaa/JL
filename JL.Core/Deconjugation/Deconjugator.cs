@@ -51,7 +51,7 @@ internal static class Deconjugator
     private static HashSet<Form>? StdruleDeconjugate(Form myForm, Rule myRule)
     {
         // can't deconjugate nothingness
-        if (myForm.Text is "")
+        if (myForm.Text.Length is 0)
         {
             return null;
         }
@@ -69,7 +69,7 @@ internal static class Deconjugator
         }
 
         // blank detail mean it can't be the last (first applied, but rightmost) rule
-        if (myRule.Detail is "" && myForm.Tags.Count is 0)
+        if (myRule.Detail.Length is 0 && myForm.Tags.Count is 0)
         {
             return null;
         }
@@ -125,7 +125,9 @@ internal static class Deconjugator
             }
         }
 
-        return collection;
+        return collection.Count > 0
+            ? collection
+            : null;
     }
 
     private static HashSet<Form>? RewriteruleDeconjugate(Form myForm, Rule myRule)
@@ -200,7 +202,7 @@ internal static class Deconjugator
         }
 
         // can't deconjugate nothingness
-        if (myForm.Text is "")
+        if (myForm.Text.Length is 0)
         {
             return null;
         }
@@ -245,7 +247,9 @@ internal static class Deconjugator
             }
         }
 
-        return collection;
+        return collection.Count > 0
+            ? collection
+            : null;
     }
 
     private static bool V1InftrapCheck(Form myForm)
@@ -261,7 +265,7 @@ internal static class Deconjugator
 
     private static bool SaspecialCheck(Form myForm, Rule myRule)
     {
-        if (myForm.Text is "")
+        if (myForm.Text.Length is 0)
         {
             return false;
         }
@@ -275,7 +279,7 @@ internal static class Deconjugator
         return !baseText.EndsWith('さ');
     }
 
-    public static HashSet<Form> Deconjugate(string text)
+    public static HashSet<Form>? Deconjugate(string text)
     {
         HashSet<Form> processed = [];
         HashSet<Form> novel = [];
@@ -308,16 +312,16 @@ internal static class Deconjugator
                         _ => null
                     };
 
-                    if (newForm is null || newForm.Count is 0)
+                    if (newForm is null)
                     {
                         continue;
                     }
 
                     foreach (Form myForm in newForm)
                     {
-                        if (!processed.Contains(myForm) &&
-                            !novel.Contains(myForm) &&
-                            !newNovel.Contains(myForm))
+                        if (!processed.Contains(myForm)
+                            && !novel.Contains(myForm)
+                            && !newNovel.Contains(myForm))
                         {
                             _ = newNovel.Add(myForm);
                         }
