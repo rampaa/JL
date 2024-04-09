@@ -21,12 +21,12 @@
                                Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
-                <CheckBox Name="NoAllCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
-                    <TextBlock Text="Don't show results under All" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
-                </CheckBox>
-
                 <CheckBox Name="NewlineCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
                     <TextBlock Text="Newline between definitions" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </CheckBox>
+
+                <CheckBox Name="NoAllCheckBox" Margin="10" Visibility="Collapsed" HorizontalAlignment="Left">
+                    <TextBlock Text="Don't show results under All" TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </CheckBox>
 
                 <DockPanel x:Name="AutoUpdateAfterNDaysDockPanel" Visibility="Collapsed">
