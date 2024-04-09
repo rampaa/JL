@@ -51,6 +51,7 @@ public static class FreqUtils
 
         bool freqCleared = false;
         bool freqRemoved = false;
+        bool rebuildingDBs = false;
 
         Dictionary<string, string> freqDBPathDict = new(StringComparer.Ordinal);
 
@@ -88,7 +89,12 @@ public static class FreqUtils
             switch (freq.Type)
             {
                 case FreqType.Nazeka:
-                    dbExists = DBUtils.DeleteOldDB(dbExists, FreqDBManager.Version, dbPath);
+                    if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(FreqDBManager.Version, dbPath))
+                    {
+                        DBUtils.DeleteDB(dbPath);
+                        dbExists = false;
+                        rebuildingDBs = true;
+                    }
                     loadFromDB = dbExists && !useDB;
 
                     if (freq is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
@@ -165,7 +171,12 @@ public static class FreqUtils
 
                 case FreqType.Yomichan:
                 case FreqType.YomichanKanji:
-                    dbExists = DBUtils.DeleteOldDB(dbExists, FreqDBManager.Version, dbPath);
+                    if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(FreqDBManager.Version, dbPath))
+                    {
+                        DBUtils.DeleteDB(dbPath);
+                        dbExists = false;
+                        rebuildingDBs = true;
+                    }
                     loadFromDB = dbExists && !useDB;
 
                     if (freq is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
@@ -271,6 +282,11 @@ public static class FreqUtils
                         freq.Priority = priority;
                         ++priority;
                     }
+                }
+
+                if (rebuildingDBs)
+                {
+                    Utils.Frontend.Alert(AlertLevel.Information, "Rebuilding frequency databases because their schemas are out of date...");
                 }
             }
 

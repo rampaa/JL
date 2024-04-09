@@ -126,20 +126,16 @@ public static class DBUtils
         return Convert.ToInt32(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
     }
 
-    internal static bool DeleteOldDB(bool dbExists, int version, string dbPath)
+    internal static bool CheckIfDBSchemaIsOutOfDate(int version, string dbPath)
     {
-        if (dbExists)
-        {
-            if (version > GetVersionFromDB(dbPath))
-            {
-                SendOptimizePragmaToAllDBs();
-                SqliteConnection.ClearAllPools();
-                File.Delete(dbPath);
-                return false;
-            }
-            return true;
-        }
-        return false;
+        return version > GetVersionFromDB(dbPath);
+    }
+
+    internal static void DeleteDB(string dbPath)
+    {
+        SendOptimizePragmaToAllDBs();
+        SqliteConnection.ClearAllPools();
+        File.Delete(dbPath);
     }
 
     internal static string GetParameter(List<string> terms)

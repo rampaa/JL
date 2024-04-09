@@ -523,6 +523,7 @@ public static class DictUtils
 
         bool dictCleared = false;
         bool dictRemoved = false;
+        bool rebuildingAnyDB = false;
 
         Dictionary<string, string> dictDBPaths = new(StringComparer.Ordinal);
 
@@ -564,7 +565,12 @@ public static class DictUtils
             switch (dict.Type)
             {
                 case DictType.JMdict:
-                    dbExists = DBUtils.DeleteOldDB(dbExists, JmdictDBManager.Version, dbPath);
+                    if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(JmdictDBManager.Version, dbPath))
+                    {
+                        DBUtils.DeleteDB(dbPath);
+                        dbExists = false;
+                        rebuildingAnyDB = true;
+                    }
                     loadFromDB = dbExists && !useDB;
 
                     if (!UpdatingJmdict)
@@ -639,7 +645,12 @@ public static class DictUtils
                     break;
 
                 case DictType.JMnedict:
-                    dbExists = DBUtils.DeleteOldDB(dbExists, JmnedictDBManager.Version, dbPath);
+                    if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(JmnedictDBManager.Version, dbPath))
+                    {
+                        DBUtils.DeleteDB(dbPath);
+                        dbExists = false;
+                        rebuildingAnyDB = true;
+                    }
                     // loadFromDB = dbExists && !useDB;
 
                     if (!UpdatingJmnedict)
@@ -707,7 +718,12 @@ public static class DictUtils
                     break;
 
                 case DictType.Kanjidic:
-                    dbExists = DBUtils.DeleteOldDB(dbExists, KanjidicDBManager.Version, dbPath);
+                    if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(KanjidicDBManager.Version, dbPath))
+                    {
+                        DBUtils.DeleteDB(dbPath);
+                        dbExists = false;
+                        rebuildingAnyDB = true;
+                    }
                     loadFromDB = dbExists && !useDB;
 
                     if (!UpdatingKanjidic)
@@ -802,7 +818,12 @@ public static class DictUtils
                 case DictType.NonspecificKanjiWithWordSchemaYomichan:
                 case DictType.NonspecificNameYomichan:
                 case DictType.NonspecificYomichan:
-                    dbExists = DBUtils.DeleteOldDB(dbExists, EpwingYomichanDBManager.Version, dbPath);
+                    if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(EpwingYomichanDBManager.Version, dbPath))
+                    {
+                        DBUtils.DeleteDB(dbPath);
+                        dbExists = false;
+                        rebuildingAnyDB = true;
+                    }
                     loadFromDB = dbExists && !useDB;
 
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
@@ -908,7 +929,12 @@ public static class DictUtils
                     break;
 
                 case DictType.NonspecificKanjiYomichan:
-                    dbExists = DBUtils.DeleteOldDB(dbExists, YomichanKanjiDBManager.Version, dbPath);
+                    if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(YomichanKanjiDBManager.Version, dbPath))
+                    {
+                        DBUtils.DeleteDB(dbPath);
+                        dbExists = false;
+                        rebuildingAnyDB = true;
+                    }
                     loadFromDB = dbExists && !useDB;
 
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
@@ -1066,7 +1092,12 @@ public static class DictUtils
                 case DictType.NonspecificKanjiNazeka:
                 case DictType.NonspecificNameNazeka:
                 case DictType.NonspecificNazeka:
-                    dbExists = DBUtils.DeleteOldDB(dbExists, EpwingNazekaDBManager.Version, dbPath);
+                    if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(EpwingNazekaDBManager.Version, dbPath))
+                    {
+                        DBUtils.DeleteDB(dbPath);
+                        dbExists = false;
+                        rebuildingAnyDB = true;
+                    }
                     loadFromDB = dbExists && !useDB;
 
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
@@ -1156,7 +1187,12 @@ public static class DictUtils
                     break;
 
                 case DictType.PitchAccentYomichan:
-                    dbExists = DBUtils.DeleteOldDB(dbExists, YomichanPitchAccentDBManager.Version, dbPath);
+                    if (dbExists && DBUtils.CheckIfDBSchemaIsOutOfDate(YomichanPitchAccentDBManager.Version, dbPath))
+                    {
+                        DBUtils.DeleteDB(dbPath);
+                        dbExists = false;
+                        rebuildingAnyDB = true;
+                    }
                     loadFromDB = dbExists && !useDB;
 
                     if (dict is { Active: true, Contents.Count: 0 } && (!useDB || !dbExists))
@@ -1264,6 +1300,11 @@ public static class DictUtils
                         dict.Priority = priority;
                         ++priority;
                     }
+                }
+
+                if (rebuildingAnyDB)
+                {
+                    Utils.Frontend.Alert(AlertLevel.Information, "Rebuilding some databases because their schemas are out of date...");
                 }
             }
 
