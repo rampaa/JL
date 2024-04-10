@@ -58,7 +58,9 @@ internal sealed partial class AddFrequencyWindow : Window
         }
 
         string name = NameTextBox.Text;
-        if (string.IsNullOrEmpty(name) || FreqUtils.FreqDicts.ContainsKey(name))
+        if (string.IsNullOrWhiteSpace(name)
+            || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
+            || FreqUtils.FreqDicts.ContainsKey(name))
         {
             NameTextBox.BorderBrush = Brushes.Red;
             isValid = false;

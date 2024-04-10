@@ -52,7 +52,8 @@ internal sealed partial class EditFrequencyWindow : Window
         }
 
         string name = NameTextBox.Text;
-        if (string.IsNullOrEmpty(name)
+        if (string.IsNullOrWhiteSpace(name)
+            || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
             || (_freq.Name != name && FreqUtils.FreqDicts.ContainsKey(name)))
         {
             NameTextBox.BorderBrush = Brushes.Red;
