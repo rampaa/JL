@@ -66,7 +66,7 @@ internal sealed partial class ManageProfilesWindow : Window
                 Cursor = Cursors.Hand
             };
 
-            bool defaultOrCurrentProfile = ProfileUtils.DefaultProfiles.Contains(profile) || profile == ProfileUtils.CurrentProfile;
+            bool defaultOrCurrentProfile = ProfileUtils.DefaultProfiles.Contains(profile, StringComparer.Ordinal) || profile == ProfileUtils.CurrentProfile;
 
             Button removeButton = new()
             {
