@@ -57,7 +57,7 @@ internal sealed partial class EditDictionaryWindow : Window
         string name = NameTextBox.Text;
         if (string.IsNullOrWhiteSpace(name)
             || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
-            || (_dict.Name != name && DictUtils.Dicts.ContainsKey(name)))
+            || (!_dict.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && DictUtils.Dicts.ContainsKey(name)))
         {
             NameTextBox.BorderBrush = Brushes.Red;
             isValid = false;
