@@ -35,7 +35,7 @@ public static class ExtensionMethods
             }
         }
 
-        throw new ArgumentException("Not found.", nameof(description));
+        throw new ArgumentException("Enum not found", nameof(description));
         // return default;
     }
 
@@ -45,7 +45,7 @@ public static class ExtensionMethods
         for (int i = 0; i < s.Length; i++)
         {
             if (char.IsHighSurrogate(s, i)
-                && s.Length > (i + 1)
+                && s.Length > i + 1
                 && char.IsLowSurrogate(s, i + 1))
             {
                 textBlocks.Add(char.ConvertFromUtf32(char.ConvertToUtf32(s, i)));
@@ -77,7 +77,7 @@ public static class ExtensionMethods
             Array.Copy(source, destination, index);
         }
 
-        if (index < (source.Length - 1))
+        if (index < source.Length - 1)
         {
             Array.Copy(source, index + 1, destination, index, source.Length - index - 1);
         }
