@@ -42,6 +42,7 @@ internal sealed partial class ManageProfilesWindow : Window
         }
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void Window_Closed(object sender, EventArgs e)
     {
         await ProfileUtils.SerializeProfiles().ConfigureAwait(false);
@@ -133,7 +134,12 @@ internal sealed partial class ManageProfilesWindow : Window
 
     private void AddProfileButton_Click(object sender, RoutedEventArgs e)
     {
-        _ = new AddProfileWindow { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
+        _ = new AddProfileWindow
+        {
+            Owner = this,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        }.ShowDialog();
+
         UpdateProfilesDisplay();
     }
 

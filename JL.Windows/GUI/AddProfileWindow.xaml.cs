@@ -20,12 +20,13 @@ internal sealed partial class AddProfileWindow : Window
         Close();
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void SaveButton_Click(object sender, RoutedEventArgs e)
     {
         string profileName = ProfileNameTextBox.Text.Trim();
         bool isValid = !string.IsNullOrWhiteSpace(profileName)
-            && profileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0
-            && !ProfileUtils.Profiles.Contains(profileName, StringComparer.OrdinalIgnoreCase);
+                       && profileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0
+                       && !ProfileUtils.Profiles.Contains(profileName, StringComparer.OrdinalIgnoreCase);
 
         if (!isValid)
         {

@@ -60,6 +60,7 @@ internal sealed partial class ManageDictionariesWindow : Window
         return s_instance?.IsVisible ?? false;
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void Window_Closed(object sender, EventArgs e)
     {
         s_instance = null;
@@ -345,10 +346,16 @@ internal sealed partial class ManageDictionariesWindow : Window
     private void EditButton_Click(object sender, RoutedEventArgs e)
     {
         Dict dict = (Dict)((Button)sender).Tag;
-        _ = new EditDictionaryWindow(dict) { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
+        _ = new EditDictionaryWindow(dict)
+        {
+            Owner = this,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        }.ShowDialog();
+
         UpdateDictionariesDisplay();
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void UpdateButton_Click(object sender, RoutedEventArgs e)
     {
         Button updateButton = (Button)sender;
@@ -381,7 +388,7 @@ internal sealed partial class ManageDictionariesWindow : Window
             return;
         }
 
-        DictUtils.Dicts.First(d => d.Value.Priority == (dict.Priority - 1)).Value.Priority += 1;
+        DictUtils.Dicts.First(d => d.Value.Priority == dict.Priority - 1).Value.Priority += 1;
         dict.Priority -= 1;
     }
 
@@ -392,13 +399,18 @@ internal sealed partial class ManageDictionariesWindow : Window
             return;
         }
 
-        DictUtils.Dicts.First(d => d.Value.Priority == (dict.Priority + 1)).Value.Priority -= 1;
+        DictUtils.Dicts.First(d => d.Value.Priority == dict.Priority + 1).Value.Priority -= 1;
         dict.Priority += 1;
     }
 
     private void ButtonAddDictionary_OnClick(object sender, RoutedEventArgs e)
     {
-        _ = new AddDictionaryWindow { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
+        _ = new AddDictionaryWindow
+        {
+            Owner = this,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        }.ShowDialog();
+
         UpdateDictionariesDisplay();
     }
 
@@ -428,7 +440,10 @@ internal sealed partial class ManageDictionariesWindow : Window
         {
             Owner = this,
             Title = title,
-            InfoTextBox = { Text = EntityDictToString(entityDict) },
+            InfoTextBox =
+            {
+                Text = EntityDictToString(entityDict)
+            },
             WindowStartupLocation = WindowStartupLocation.CenterScreen
         };
 

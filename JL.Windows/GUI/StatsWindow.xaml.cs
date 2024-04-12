@@ -48,6 +48,7 @@ internal sealed partial class StatsWindow : Window
         return s_instance?.IsVisible ?? false;
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void Window_Loaded(object sender, RoutedEventArgs e)
     {
         UpdateStatsDisplay(StatsMode.Session);
@@ -105,6 +106,7 @@ internal sealed partial class StatsWindow : Window
         }
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void ButtonResetStats_OnClick(object sender, RoutedEventArgs e)
     {
 #pragma warning disable CA1308 // Normalize strings to uppercase

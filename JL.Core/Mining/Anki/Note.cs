@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace JL.Core.Mining.Anki;
 
+// ReSharper disable UnusedMember.Global
 internal sealed class Note(
     string deckName,
     string modelName,

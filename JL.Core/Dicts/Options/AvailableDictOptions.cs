@@ -7,6 +7,7 @@ public enum ExamplesOptionValue
 {
     None,
     One,
+    // ReSharper disable once UnusedMember.Global
     All
 }
 

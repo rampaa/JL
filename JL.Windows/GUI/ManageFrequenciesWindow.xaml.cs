@@ -55,6 +55,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
         return s_instance?.IsVisible ?? false;
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void Window_Closed(object sender, EventArgs e)
     {
         s_instance = null;
@@ -279,7 +280,12 @@ internal sealed partial class ManageFrequenciesWindow : Window
     private void EditButton_Click(object sender, RoutedEventArgs e)
     {
         Freq freq = (Freq)((Button)sender).Tag;
-        _ = new EditFrequencyWindow(freq) { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
+        _ = new EditFrequencyWindow(freq)
+        {
+            Owner = this,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        }.ShowDialog();
+
         UpdateFreqsDisplay();
     }
 
@@ -290,7 +296,7 @@ internal sealed partial class ManageFrequenciesWindow : Window
             return;
         }
 
-        FreqUtils.FreqDicts.First(f => f.Value.Priority == (freq.Priority - 1)).Value.Priority += 1;
+        FreqUtils.FreqDicts.First(f => f.Value.Priority == freq.Priority - 1).Value.Priority += 1;
         freq.Priority -= 1;
     }
 
@@ -301,13 +307,18 @@ internal sealed partial class ManageFrequenciesWindow : Window
             return;
         }
 
-        FreqUtils.FreqDicts.First(f => f.Value.Priority == (freq.Priority + 1)).Value.Priority -= 1;
+        FreqUtils.FreqDicts.First(f => f.Value.Priority == freq.Priority + 1).Value.Priority -= 1;
         freq.Priority += 1;
     }
 
     private void ButtonAddFrequency_OnClick(object sender, RoutedEventArgs e)
     {
-        _ = new AddFrequencyWindow { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
+        _ = new AddFrequencyWindow
+        {
+            Owner = this,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        }.ShowDialog();
+
         UpdateFreqsDisplay();
     }
 

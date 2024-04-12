@@ -34,6 +34,7 @@ internal sealed partial class AddWordWindow : Window
         Close();
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void SaveButton_Click(object? sender, RoutedEventArgs? e)
     {
         bool isValid = true;
@@ -153,7 +154,10 @@ internal sealed partial class AddWordWindow : Window
         {
             Owner = this,
             Title = "Supported Word Classes",
-            InfoTextBox = { Text = supportedWordClasses },
+            InfoTextBox =
+            {
+                Text = supportedWordClasses
+            },
             WindowStartupLocation = WindowStartupLocation.CenterScreen
         };
 

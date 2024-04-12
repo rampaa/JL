@@ -12,6 +12,8 @@ internal sealed partial class WinApi
 #pragma warning disable IDE1006
     internal static partial class NativeMethods
     {
+        // ReSharper disable InconsistentNaming
+
         internal const int GWL_EXSTYLE = -20;
         // public const nint HTCAPTION = 2;
         internal const nint HWND_TOPMOST = -1;
@@ -146,6 +148,8 @@ internal sealed partial class WinApi
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static partial bool GetCursorPos(ref LPPOINT pt);
+
+        // ReSharper restore InconsistentNaming
     }
 #pragma warning restore IDE1006
 

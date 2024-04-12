@@ -309,7 +309,7 @@ public static class MiningUtils
         int combinedFormListCount = combinedFormList.Count;
         for (int i = 0; i < combinedFormListCount; i++)
         {
-            if (i == (position - 1))
+            if (i == position - 1)
             {
                 _ = expressionWithPitchAccentStringBuilder.Append(CultureInfo.InvariantCulture, $"<span class=\"dotted-line-on-top-right\">{combinedFormList[i]}</span>");
                 lowPitch = true;
@@ -367,7 +367,7 @@ public static class MiningUtils
             {
                 _ = lineToMine.Append(CultureInfo.InvariantCulture, $"{jlField.GetDescription()}: ")
                     .Append(jlFieldContent)
-                    .Append(i < (jlFields.Length - 1) ? '\t' : '\n');
+                    .Append(i < jlFields.Length - 1 ? '\t' : '\n');
             }
         }
 
@@ -443,10 +443,18 @@ public static class MiningUtils
             ? null
             : new Dictionary<string, object>(4, StringComparer.Ordinal)
             {
-                { "data", audioData },
-                { "filename", $"JL_audio_{reading}_{lookupResult.PrimarySpelling}.{audioResponse!.AudioFormat}" },
-                { "skipHash", Networking.Jpod101NoAudioMd5Hash },
-                { "fields", audioFields }
+                {
+                    "data", audioData
+                },
+                {
+                    "filename", $"JL_audio_{reading}_{lookupResult.PrimarySpelling}.{audioResponse!.AudioFormat}"
+                },
+                {
+                    "skipHash", Networking.Jpod101NoAudioMd5Hash
+                },
+                {
+                    "fields", audioFields
+                }
             };
 
         List<string> imageFields = FindFields(JLField.Image, userFields);
@@ -459,14 +467,22 @@ public static class MiningUtils
             ? null
             : new Dictionary<string, object>(3, StringComparer.Ordinal)
             {
-                { "data", imageBytes },
-                { "filename", $"JL_image_{reading}_{lookupResult.PrimarySpelling}.png" },
-                { "fields", imageFields }
+                {
+                    "data", imageBytes
+                },
+                {
+                    "filename", $"JL_image_{reading}_{lookupResult.PrimarySpelling}.png"
+                },
+                {
+                    "fields", imageFields
+                }
             };
 
         Dictionary<string, object> options = new(1, StringComparer.Ordinal)
         {
-            { "allowDuplicate", CoreConfig.AllowDuplicateCards }
+            {
+                "allowDuplicate", CoreConfig.AllowDuplicateCards
+            }
         };
 
         Dictionary<JLField, string> miningParams = GetMiningParameters(lookupResult, currentText, selectedDefinitions, currentCharPosition, true);

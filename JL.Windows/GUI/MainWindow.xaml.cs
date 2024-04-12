@@ -26,11 +26,9 @@ namespace JL.Windows.GUI;
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
-
 #pragma warning disable CA1812 // Internal class that is apparently never instantiated
 internal sealed partial class MainWindow : Window
 #pragma warning restore CA1812 // Internal class that is apparently never instantiated
-
 {
     private WinApi? _winApi;
     public nint WindowHandle { get; private set; }
@@ -60,6 +58,7 @@ internal sealed partial class MainWindow : Window
         FirstPopupWindow = new PopupWindow();
     }
 
+    // ReSharper disable once AsyncVoidMethod
     protected override async void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
@@ -232,6 +231,7 @@ internal sealed partial class MainWindow : Window
         Stats.IncrementStat(StatType.Characters, new StringInfo(strippedText).LengthInTextElements);
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void ClipboardChanged(object? sender, EventArgs? e)
     {
         ulong currentClipboardSequenceNo = WinApi.GetClipboardSequenceNo();
@@ -250,7 +250,7 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    public async void MainTextBox_MouseMove(object? sender, MouseEventArgs? e)
+    public async Task HandleMouseMove(MouseEventArgs? e)
     {
         if (ConfigManager.InactiveLookupMode
             || ConfigManager.LookupOnSelectOnly
@@ -268,6 +268,12 @@ internal sealed partial class MainWindow : Window
         }
 
         await FirstPopupWindow.LookupOnMouseMoveOrClick(MainTextBox).ConfigureAwait(false);
+    }
+
+    // ReSharper disable once AsyncVoidMethod
+    private async void MainTextBox_MouseMove(object? sender, MouseEventArgs? e)
+    {
+        await HandleMouseMove(e).ConfigureAwait(false);
     }
 
     private void MainTextBox_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -375,6 +381,7 @@ internal sealed partial class MainWindow : Window
         }
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
@@ -397,6 +404,7 @@ internal sealed partial class MainWindow : Window
         MainTextBox.FontSize = FontSizeSlider.Value;
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
         await KeyGestureUtils.HandleKeyDown(e).ConfigureAwait(false);
@@ -894,10 +902,10 @@ internal sealed partial class MainWindow : Window
         string? text = MainTextBox.SelectionLength > 0
             ? MainTextBox.SelectedText
             : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false) is not -1
-                || (FirstPopupWindow.LastSelectedText is not null
-                    && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
-                        ? FirstPopupWindow.LastSelectedText
-                        : null;
+              || (FirstPopupWindow.LastSelectedText is not null
+                  && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
+                ? FirstPopupWindow.LastSelectedText
+                : null;
 
         string reading = "";
 
@@ -927,10 +935,10 @@ internal sealed partial class MainWindow : Window
         string? text = MainTextBox.SelectionLength > 0
             ? MainTextBox.SelectedText
             : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false) is not -1
-                || (FirstPopupWindow.LastSelectedText is not null
-                    && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
-                        ? FirstPopupWindow.LastSelectedText
-                        : null;
+              || (FirstPopupWindow.LastSelectedText is not null
+                  && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
+                ? FirstPopupWindow.LastSelectedText
+                : null;
 
         WindowsUtils.ShowAddWordWindow(this, text);
     }
@@ -950,25 +958,28 @@ internal sealed partial class MainWindow : Window
         string? text = MainTextBox.SelectionLength > 0
             ? MainTextBox.SelectedText
             : MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false) is not -1
-                || (FirstPopupWindow.LastSelectedText is not null
-                    && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
-                        ? FirstPopupWindow.LastSelectedText
-                        : null;
+              || (FirstPopupWindow.LastSelectedText is not null
+                  && MainTextBox.Text.StartsWith(FirstPopupWindow.LastSelectedText, StringComparison.Ordinal))
+                ? FirstPopupWindow.LastSelectedText
+                : null;
 
         WindowsUtils.SearchWithBrowser(text);
         WindowsUtils.UpdateMainWindowVisibility();
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void ShowManageAudioSourcesWindow(object sender, RoutedEventArgs e)
     {
         await WindowsUtils.ShowManageAudioSourcesWindow().ConfigureAwait(false);
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void ShowManageDictionariesWindow(object sender, RoutedEventArgs e)
     {
         await WindowsUtils.ShowManageDictionariesWindow().ConfigureAwait(false);
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void ShowManageFrequenciesWindow(object sender, RoutedEventArgs e)
     {
         await WindowsUtils.ShowManageFrequenciesWindow().ConfigureAwait(false);
@@ -1037,6 +1048,7 @@ internal sealed partial class MainWindow : Window
         }
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void MainTextBox_PreviewMouseUp(object? sender, MouseButtonEventArgs e)
     {
         if (ConfigManager.InactiveLookupMode
@@ -1084,7 +1096,7 @@ internal sealed partial class MainWindow : Window
             double ratioX = oldResolution.Width / WindowsUtils.DpiAwareWorkAreaWidth;
             double ratioY = oldResolution.Height / WindowsUtils.DpiAwareWorkAreaHeight;
 
-            double fontScale = (ratioX * ratioY) > 1
+            double fontScale = ratioX * ratioY > 1
                 ? Math.Min(ratioX, ratioY) * 0.75
                 : Math.Max(ratioX, ratioY) / 0.75;
 
@@ -1316,7 +1328,7 @@ internal sealed partial class MainWindow : Window
         AddWordMenuItem.IsEnabled = customWordDictReady && profileCustomWordDictReady;
 
         int charIndex = MainTextBox.GetCharacterIndexFromPoint(Mouse.GetPosition(MainTextBox), false);
-        ContextMenuIsOpening = charIndex >= MainTextBox.SelectionStart && charIndex <= (MainTextBox.SelectionStart + MainTextBox.SelectionLength);
+        ContextMenuIsOpening = charIndex >= MainTextBox.SelectionStart && charIndex <= MainTextBox.SelectionStart + MainTextBox.SelectionLength;
 
         PopupWindowUtils.HidePopups(FirstPopupWindow);
 
@@ -1533,14 +1545,14 @@ internal sealed partial class MainWindow : Window
     {
         //Swipe down
         if (MainTextBox.VerticalOffset is 0
-            && currentPosition.Y > (_swipeStartPoint.Y + 50))
+            && currentPosition.Y > _swipeStartPoint.Y + 50)
         {
             BacklogUtils.ShowPreviousBacklogItem();
         }
 
         //Swipe up
-        else if (MainTextBox.GetLastVisibleLineIndex() == (MainTextBox.LineCount - 1)
-            && currentPosition.Y < (_swipeStartPoint.Y - 50))
+        else if (MainTextBox.GetLastVisibleLineIndex() == MainTextBox.LineCount - 1
+                 && currentPosition.Y < _swipeStartPoint.Y - 50)
         {
             BacklogUtils.ShowNextBacklogItem();
         }

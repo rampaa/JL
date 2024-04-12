@@ -27,7 +27,7 @@ public static class DictUtils
     public static bool UpdatingKanjidic { get; internal set; } // = false;
     public static readonly Dictionary<string, Dict> Dicts = new(StringComparer.OrdinalIgnoreCase);
     internal static IDictionary<string, IList<JmdictWordClass>> WordClassDictionary { get; set; } = new Dictionary<string, IList<JmdictWordClass>>(55000, StringComparer.Ordinal); // 2022/10/29: 48909, 2023/04/22: 49503, 2023/07/28: 49272
-    internal static IDictionary<string, string> KanjiCompositionDict { get; set; } = new Dictionary<string, string>(86934, StringComparer.Ordinal);
+    internal static IDictionary<string, string> KanjiCompositionDict { get; private set; } = new Dictionary<string, string>(86934, StringComparer.Ordinal);
     internal static readonly Uri s_jmdictUrl = new("https://www.edrdg.org/pub/Nihongo/JMdict_e.gz");
     internal static readonly Uri s_jmnedictUrl = new("https://www.edrdg.org/pub/Nihongo/JMnedict.xml.gz");
     internal static readonly Uri s_kanjidicUrl = new("https://www.edrdg.org/kanjidic/kanjidic2.xml.gz");
@@ -120,6 +120,7 @@ public static class DictUtils
 
     public static readonly Dictionary<string, string> JmdictEntities = new(254, StringComparer.Ordinal)
     {
+        // ReSharper disable BadExpressionBracesLineBreaks
         { "bra", "Brazilian" },
         { "hob", "Hokkaido-ben" },
         { "ksb", "Kansai-ben" },
@@ -389,22 +390,28 @@ public static class DictUtils
         { "ok", "out-dated or obsolete kana usage" },
         { "rk", "rarely used kana form" },
         { "sk", "search-only kana form" }
+        // ReSharper restore BadExpressionBracesLineBreaks
     };
 
     public static readonly Dictionary<string, string> JmnedictEntities = new(25, StringComparer.Ordinal)
     {
         #pragma warning disable format
+        // ReSharper disable BadExpressionBracesLineBreaks
+        // ReSharper disable BadListLineBreaks
         { "char", "character" }, { "company", "company name" }, { "creat", "creature" }, { "dei", "deity" },
         { "doc", "document" }, { "ev", "event" }, { "fem", "female given name or forename" }, { "fict", "fiction" },
         { "given", "given name or forename, gender not specified" },
         { "group", "group" }, { "leg", "legend" }, { "masc", "male given name or forename" }, { "myth", "mythology" },
         { "obj", "object" }, { "organization", "organization name" }, { "oth", "other" }, { "person", "full name of a particular person" },
         { "place", "place name" }, { "product", "product name" }, { "relig", "religion" }, { "serv", "service" }, { "ship", "ship name" },
-        { "station", "railway station" }, { "surname", "family or surname" }, { "unclass", "unclassified name" }, { "work", "work of art, literature, music, etc. name" }
+        { "station", "railway station" }, { "surname", "family or surname" },{ "unclass", "unclassified name" }, { "work", "work of art, literature, music, etc. name" }
+        // ReSharper restore BadExpressionBracesLineBreaks
+        // ReSharper restore BadListLineBreaks
         #pragma warning restore format
     };
 
-    public static readonly DictType[] YomichanDictTypes = [
+    public static readonly DictType[] YomichanDictTypes =
+    [
         DictType.Daijirin,
         DictType.Daijisen,
         DictType.Gakken,
@@ -432,7 +439,8 @@ public static class DictUtils
         DictType.NonspecificYomichan
     ];
 
-    public static readonly DictType[] NazekaDictTypes = [
+    public static readonly DictType[] NazekaDictTypes =
+    [
         DictType.DaijirinNazeka,
         DictType.KenkyuushaNazeka,
         DictType.ShinmeikaiNazeka,
@@ -442,7 +450,8 @@ public static class DictUtils
         DictType.NonspecificNazeka
     ];
 
-    public static readonly DictType[] NonspecificDictTypes = [
+    public static readonly DictType[] NonspecificDictTypes =
+    [
         DictType.NonspecificWordYomichan,
         DictType.NonspecificKanjiYomichan,
         DictType.NonspecificKanjiWithWordSchemaYomichan,
@@ -454,7 +463,8 @@ public static class DictUtils
         DictType.NonspecificNazeka
     ];
 
-    internal static readonly DictType[] s_kanjiDictTypes = [
+    internal static readonly DictType[] s_kanjiDictTypes =
+    [
         DictType.Kanjidic,
         DictType.KanjigenYomichan,
         DictType.NonspecificKanjiYomichan,
@@ -462,7 +472,8 @@ public static class DictUtils
         DictType.NonspecificKanjiNazeka
     ];
 
-    internal static readonly DictType[] s_nameDictTypes = [
+    internal static readonly DictType[] s_nameDictTypes =
+    [
         DictType.CustomNameDictionary,
         DictType.ProfileCustomNameDictionary,
         DictType.JMnedict,
@@ -470,7 +481,8 @@ public static class DictUtils
         DictType.NonspecificNameNazeka
     ];
 
-    internal static readonly DictType[] s_wordDictTypes = [
+    internal static readonly DictType[] s_wordDictTypes =
+    [
         DictType.CustomWordDictionary,
         DictType.ProfileCustomWordDictionary,
         DictType.JMdict,
@@ -505,7 +517,7 @@ public static class DictUtils
 
     private static readonly FrozenSet<DictType> s_yomichanWordAndNameDictTypeSet = YomichanDictTypes
         .Except(s_kanjiDictTypes)
-        .Where(dictType => dictType is not DictType.PitchAccentYomichan)
+        .Where(static dictType => dictType is not DictType.PitchAccentYomichan)
         .ToFrozenSet();
 
     private static readonly FrozenSet<DictType> s_nazekaWordAndNameDictTypeSet = NazekaDictTypes.Except(s_kanjiDictTypes).ToFrozenSet();
@@ -1027,8 +1039,8 @@ public static class DictUtils
 
                             CustomWordLoader.Load(dict,
                                 dict.Type is DictType.CustomWordDictionary
-                                ? CancellationToken.None
-                                : ProfileCustomWordsCancellationTokenSource.Token);
+                                    ? CancellationToken.None
+                                    : ProfileCustomWordsCancellationTokenSource.Token);
 
                             dict.Size = dict.Contents.Count;
                             dict.Ready = true;
@@ -1063,8 +1075,8 @@ public static class DictUtils
 
                             CustomNameLoader.Load(dict,
                                 dict.Type is DictType.CustomNameDictionary
-                                ? CancellationToken.None
-                                : ProfileCustomNamesCancellationTokenSource.Token);
+                                    ? CancellationToken.None
+                                    : ProfileCustomNamesCancellationTokenSource.Token);
 
                             dict.Size = dict.Contents.Count;
                             dict.Ready = true;
@@ -1107,18 +1119,18 @@ public static class DictUtils
                             try
                             {
                                 dict.Contents = dict.Size is not 0
-                                ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
-                                : dict.Type switch
-                                {
-                                    DictType.DaijirinNazeka => new Dictionary<string, IList<IDictRecord>>(420429, StringComparer.Ordinal),
-                                    DictType.KenkyuushaNazeka => new Dictionary<string, IList<IDictRecord>>(191804, StringComparer.Ordinal),
-                                    DictType.ShinmeikaiNazeka => new Dictionary<string, IList<IDictRecord>>(126049, StringComparer.Ordinal),
-                                    DictType.NonspecificWordNazeka => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
-                                    DictType.NonspecificKanjiNazeka => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
-                                    DictType.NonspecificNameNazeka => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
-                                    DictType.NonspecificNazeka => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
-                                    _ => throw new ArgumentOutOfRangeException(null, "Invalid DictType")
-                                };
+                                    ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
+                                    : dict.Type switch
+                                    {
+                                        DictType.DaijirinNazeka => new Dictionary<string, IList<IDictRecord>>(420429, StringComparer.Ordinal),
+                                        DictType.KenkyuushaNazeka => new Dictionary<string, IList<IDictRecord>>(191804, StringComparer.Ordinal),
+                                        DictType.ShinmeikaiNazeka => new Dictionary<string, IList<IDictRecord>>(126049, StringComparer.Ordinal),
+                                        DictType.NonspecificWordNazeka => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
+                                        DictType.NonspecificKanjiNazeka => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
+                                        DictType.NonspecificNameNazeka => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
+                                        DictType.NonspecificNazeka => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
+                                        _ => throw new ArgumentOutOfRangeException(null, "Invalid DictType")
+                                    };
 
                                 if (loadFromDB)
                                 {
@@ -1410,11 +1422,11 @@ public static class DictUtils
                         SingleDictTypeDicts[dict.Type] = dict;
                     }
                     else if (dict.Type is DictType.CustomNameDictionary
-                        or DictType.CustomWordDictionary
-                        or DictType.JMdict
-                        or DictType.Kanjidic
-                        or DictType.JMnedict
-                        or DictType.PitchAccentYomichan)
+                             or DictType.CustomWordDictionary
+                             or DictType.JMdict
+                             or DictType.Kanjidic
+                             or DictType.JMnedict
+                             or DictType.PitchAccentYomichan)
                     {
                         SingleDictTypeDicts[dict.Type] = dict;
                     }

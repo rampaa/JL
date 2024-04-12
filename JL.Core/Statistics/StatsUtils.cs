@@ -97,6 +97,7 @@ public static class StatsUtils
         StatsTimer.Enabled = false;
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private static async void OnTimedEvent(object? sender, ElapsedEventArgs e)
     {
         Stats.IncrementStat(StatType.Time, StatsStopWatch.ElapsedTicks);

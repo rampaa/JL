@@ -5,6 +5,7 @@ using System.Windows.Interop;
 using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
+
 /// <summary>
 /// Interaction logic for ReadingSelectionWindow.xaml
 /// </summary>
@@ -60,6 +61,7 @@ internal sealed partial class ReadingSelectionWindow : Window
         }
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void ReadingsListView_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         string selectedReading = (string)((ListViewItem)sender).Content;
@@ -72,8 +74,8 @@ internal sealed partial class ReadingSelectionWindow : Window
         double mouseX = cursorPosition.X / WindowsUtils.Dpi.DpiScaleX;
         double mouseY = cursorPosition.Y / WindowsUtils.Dpi.DpiScaleY;
 
-        bool needsFlipX = (mouseX + ActualWidth) > (WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth);
-        bool needsFlipY = (mouseY + ActualHeight) > (WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight);
+        bool needsFlipX = mouseX + ActualWidth > WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth;
+        bool needsFlipY = mouseY + ActualHeight > WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight;
 
         double newLeft;
         double newTop;
@@ -109,12 +111,12 @@ internal sealed partial class ReadingSelectionWindow : Window
         }
 
         // stick to edges if +OOB
-        if ((newLeft + ActualWidth) > (WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth))
+        if (newLeft + ActualWidth > WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth)
         {
             newLeft = WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth - ActualWidth;
         }
 
-        if ((newTop + ActualHeight) > (WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight))
+        if (newTop + ActualHeight > WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight)
         {
             newTop = WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight - ActualHeight;
         }

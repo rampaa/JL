@@ -7,6 +7,8 @@ namespace JL.Windows;
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
+
+// ReSharper disable once MemberCanBeFileLocal
 internal sealed partial class App : Application
 {
     public App()

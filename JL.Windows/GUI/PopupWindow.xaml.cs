@@ -21,7 +21,7 @@ namespace JL.Windows.GUI;
 /// </summary>
 internal sealed partial class PopupWindow : Window
 {
-    public PopupWindow? ChildPopupWindow { get; set; }
+    public PopupWindow? ChildPopupWindow { get; private set; }
 
     private bool _contextMenuIsOpening; // = false;
 
@@ -37,7 +37,12 @@ internal sealed partial class PopupWindow : Window
 
     private string _currentText = "";
 
-    private Button _buttonAll = new() { Content = "All", Margin = new Thickness(1), Background = Brushes.DodgerBlue };
+    private Button _buttonAll = new()
+    {
+        Content = "All",
+        Margin = new Thickness(1),
+        Background = Brushes.DodgerBlue
+    };
 
     public string? LastSelectedText { get; private set; }
 
@@ -153,7 +158,7 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        int endPosition = (textBoxText.Length - charPosition) > ConfigManager.MaxSearchLength
+        int endPosition = textBoxText.Length - charPosition > ConfigManager.MaxSearchLength
             ? JapaneseUtils.FindExpressionBoundary(textBoxText[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
             : JapaneseUtils.FindExpressionBoundary(textBoxText, charPosition);
 
@@ -339,8 +344,8 @@ internal sealed partial class PopupWindow : Window
         double mouseX = cursorPosition.X / WindowsUtils.Dpi.DpiScaleX;
         double mouseY = cursorPosition.Y / WindowsUtils.Dpi.DpiScaleY;
 
-        bool needsFlipX = ConfigManager.PopupFlipX && (mouseX + ActualWidth) > (WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth);
-        bool needsFlipY = ConfigManager.PopupFlipY && (mouseY + ActualHeight) > (WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight);
+        bool needsFlipX = ConfigManager.PopupFlipX && mouseX + ActualWidth > WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth;
+        bool needsFlipY = ConfigManager.PopupFlipY && mouseY + ActualHeight > WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight;
 
         double newLeft;
         double newTop;
@@ -378,17 +383,17 @@ internal sealed partial class PopupWindow : Window
         }
 
         // stick to edges if +OOB
-        if ((newLeft + ActualWidth) > (WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth))
+        if (newLeft + ActualWidth > WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth)
         {
             newLeft = WindowsUtils.ActiveScreen.Bounds.X + WindowsUtils.DpiAwareWorkAreaWidth - ActualWidth;
         }
 
-        if ((newTop + ActualHeight) > (WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight))
+        if (newTop + ActualHeight > WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight)
         {
             newTop = WindowsUtils.ActiveScreen.Bounds.Y + WindowsUtils.DpiAwareWorkAreaHeight - ActualHeight;
         }
 
-        if (mouseX >= newLeft && mouseX <= (newLeft + ActualWidth) && mouseY >= newTop && mouseY <= (newTop + ActualHeight))
+        if (mouseX >= newLeft && mouseX <= newLeft + ActualWidth && mouseY >= newTop && mouseY <= newTop + ActualHeight)
         {
             UnavoidableMouseEnter = true;
         }
@@ -453,7 +458,10 @@ internal sealed partial class PopupWindow : Window
     private StackPanel PrepareResultStackPanel(LookupResult result, int index, int resultCount, Dict? pitchDict, bool pitchDictIsActive, bool showPOrthographyInfo, bool showROrthographyInfo, bool showAOrthographyInfo, double pOrthographyInfoFontSize)
     {
         // top
-        WrapPanel top = new() { Tag = index };
+        WrapPanel top = new()
+        {
+            Tag = index
+        };
 
         TextBlock primarySpellingTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.PrimarySpelling),
             result.PrimarySpelling,
@@ -505,7 +513,7 @@ internal sealed partial class PopupWindow : Window
         }
 
         if (result.Readings is not null && ConfigManager.ReadingsFontSize > 0
-            && (pitchDictIsActive || (result.KunReadings is null && result.OnReadings is null)))
+                                        && (pitchDictIsActive || (result.KunReadings is null && result.OnReadings is null)))
         {
             string readingsText = showROrthographyInfo && result.ReadingsOrthographyInfoList is not null
                 ? LookupResultUtils.ReadingsToText(result.Readings, result.ReadingsOrthographyInfoList)
@@ -694,12 +702,12 @@ internal sealed partial class PopupWindow : Window
         if (ConfigManager.DictTypeFontSize > 0)
         {
             TextBlock dictTypeTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.Dict.Name),
-            result.Dict.Name,
-            ConfigManager.DictTypeColor,
-            ConfigManager.DictTypeFontSize,
-            PopupContextMenu,
-            VerticalAlignment.Top,
-            new Thickness(7, 0, 0, 0));
+                result.Dict.Name,
+                ConfigManager.DictTypeColor,
+                ConfigManager.DictTypeFontSize,
+                PopupContextMenu,
+                VerticalAlignment.Top,
+                new Thickness(7, 0, 0, 0));
 
             _ = top.Children.Add(dictTypeTextBlock);
         }
@@ -866,12 +874,12 @@ internal sealed partial class PopupWindow : Window
         if (result.KanjiGrade is not byte.MaxValue)
         {
             TextBlock gradeTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiGrade),
-                    $"Grade: {LookupResultUtils.GradeToText(result.KanjiGrade)}",
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
-                    PopupContextMenu,
-                    VerticalAlignment.Center,
-                    new Thickness(2));
+                $"Grade: {LookupResultUtils.GradeToText(result.KanjiGrade)}",
+                ConfigManager.DefinitionsColor,
+                ConfigManager.DefinitionsFontSize,
+                PopupContextMenu,
+                VerticalAlignment.Center,
+                new Thickness(2));
 
             _ = bottom.Children.Add(gradeTextBlock);
         }
@@ -879,12 +887,12 @@ internal sealed partial class PopupWindow : Window
         if (result.StrokeCount > 0)
         {
             TextBlock strokeCountTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.StrokeCount),
-                    string.Create(CultureInfo.InvariantCulture, $"Stroke count: {result.StrokeCount}"),
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
-                    PopupContextMenu,
-                    VerticalAlignment.Center,
-                    new Thickness(2));
+                string.Create(CultureInfo.InvariantCulture, $"Stroke count: {result.StrokeCount}"),
+                ConfigManager.DefinitionsColor,
+                ConfigManager.DefinitionsFontSize,
+                PopupContextMenu,
+                VerticalAlignment.Center,
+                new Thickness(2));
 
             _ = bottom.Children.Add(strokeCountTextBlock);
         }
@@ -923,17 +931,17 @@ internal sealed partial class PopupWindow : Window
         if (result.KanjiStats is not null)
         {
             TextBlock kanjiStatsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiStats),
-                    $"Statistics:\n{result.KanjiStats}",
-                    ConfigManager.DefinitionsColor,
-                    ConfigManager.DefinitionsFontSize,
-                    PopupContextMenu,
-                    VerticalAlignment.Center,
-                    new Thickness(2));
+                $"Statistics:\n{result.KanjiStats}",
+                ConfigManager.DefinitionsColor,
+                ConfigManager.DefinitionsFontSize,
+                PopupContextMenu,
+                VerticalAlignment.Center,
+                new Thickness(2));
 
             _ = bottom.Children.Add(kanjiStatsTextBlock);
         }
 
-        if (index != (resultCount - 1))
+        if (index != resultCount - 1)
         {
             _ = bottom.Children.Add(new Separator
             {
@@ -950,7 +958,10 @@ internal sealed partial class PopupWindow : Window
             Margin = new Thickness(2),
             Background = Brushes.Transparent,
             Tag = result.Dict,
-            Children = { top, bottom }
+            Children =
+            {
+                top, bottom
+            }
         };
 
         stackPanel.MouseEnter += ListViewItem_MouseEnter;
@@ -997,7 +1008,7 @@ internal sealed partial class PopupWindow : Window
         _lastInteractedTextBox = (TextBox)sender;
     }
 
-    private async void TextBox_MouseMove(object sender, MouseEventArgs? e)
+    private async Task HandleTextBoxMouseMove(TextBox textBox, MouseEventArgs? e)
     {
         if (ConfigManager.InactiveLookupMode
             || ConfigManager.LookupOnSelectOnly
@@ -1011,7 +1022,10 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        ChildPopupWindow ??= new PopupWindow { Owner = this };
+        ChildPopupWindow ??= new PopupWindow
+        {
+            Owner = this
+        };
 
         if (ChildPopupWindow.MiningMode)
         {
@@ -1020,11 +1034,10 @@ internal sealed partial class PopupWindow : Window
 
         if (MiningMode)
         {
-            TextBox tb = (TextBox)sender;
-            _lastInteractedTextBox = tb;
-            if (JapaneseUtils.JapaneseRegex().IsMatch(tb.Text))
+            _lastInteractedTextBox = textBox;
+            if (JapaneseUtils.JapaneseRegex().IsMatch(textBox.Text))
             {
-                await ChildPopupWindow.LookupOnMouseMoveOrClick(tb).ConfigureAwait(false);
+                await ChildPopupWindow.LookupOnMouseMoveOrClick(textBox).ConfigureAwait(false);
             }
 
             else if (ConfigManager.HighlightLongestMatch)
@@ -1034,6 +1047,13 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
+    // ReSharper disable once AsyncVoidMethod
+    private async void TextBox_MouseMove(object sender, MouseEventArgs? e)
+    {
+        await HandleTextBoxMouseMove((TextBox)sender, e).ConfigureAwait(false);
+    }
+
+    // ReSharper disable once AsyncVoidMethod
     private async void AudioButton_Click(object sender, RoutedEventArgs e)
     {
         LookupResult lookupResult = LastLookupResults[_listViewItemIndex];
@@ -1047,6 +1067,7 @@ internal sealed partial class PopupWindow : Window
         }
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void PrimarySpelling_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
         if (e.ChangedButton == ConfigManager.CopyPrimarySpellingToClipboardMouseButton)
@@ -1107,6 +1128,7 @@ internal sealed partial class PopupWindow : Window
         WindowsUtils.ShowAddNameWindow(this, text, reading);
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
         e.Handled = true;
@@ -1115,7 +1137,7 @@ internal sealed partial class PopupWindow : Window
 
     private void SelectNextLookupResult()
     {
-        int nextItemIndex = (PopupListView.SelectedIndex + 1) < PopupListView.Items.Count
+        int nextItemIndex = PopupListView.SelectedIndex + 1 < PopupListView.Items.Count
             ? PopupListView.SelectedIndex + 1
             : 0;
 
@@ -1126,7 +1148,7 @@ internal sealed partial class PopupWindow : Window
 
     private void SelectPreviousLookupResult()
     {
-        int nextItemIndex = (PopupListView.SelectedIndex - 1) > -1
+        int nextItemIndex = PopupListView.SelectedIndex - 1 > -1
             ? PopupListView.SelectedIndex - 1
             : PopupListView.Items.Count - 1;
 
@@ -1202,12 +1224,12 @@ internal sealed partial class PopupWindow : Window
 
             if (this != MainWindow.Instance.FirstPopupWindow)
             {
-                TextBox_MouseMove(_previousTextBox!, null);
+                await HandleTextBoxMouseMove(_previousTextBox!, null).ConfigureAwait(false);
             }
 
             else
             {
-                MainWindow.Instance.MainTextBox_MouseMove(null, null);
+                await MainWindow.Instance.HandleMouseMove(null).ConfigureAwait(false);
             }
         }
 
@@ -1505,6 +1527,7 @@ internal sealed partial class PopupWindow : Window
         HidePopup();
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void TextBox_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
         _lastInteractedTextBox = (TextBox)sender;
@@ -1518,7 +1541,10 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        ChildPopupWindow ??= new PopupWindow { Owner = this };
+        ChildPopupWindow ??= new PopupWindow
+        {
+            Owner = this
+        };
 
         if (ConfigManager.LookupOnSelectOnly)
         {
@@ -1583,7 +1609,12 @@ internal sealed partial class PopupWindow : Window
                 continue;
             }
 
-            Button button = new() { Content = dict.Name, Margin = new Thickness(1), Tag = dict };
+            Button button = new()
+            {
+                Content = dict.Name,
+                Margin = new Thickness(1),
+                Tag = dict
+            };
             button.Click += DictTypeButtonOnClick;
 
             if (!_dictsWithResults.Contains(dict))

@@ -2,6 +2,8 @@ using System.Text.Json.Serialization;
 
 namespace JL.Core.Mining.Anki;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable once ClassNeverInstantiated.Global
 internal sealed class Response
 {
     // result can be:

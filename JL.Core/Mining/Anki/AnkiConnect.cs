@@ -9,7 +9,12 @@ internal static class AnkiConnect
 {
     public static async ValueTask<Response?> AddNoteToDeck(Note note)
     {
-        Request req = new("addNote", 6, new Dictionary<string, object>(1, StringComparer.Ordinal) { { "note", note } });
+        Request req = new("addNote", 6, new Dictionary<string, object>(1, StringComparer.Ordinal)
+        {
+            {
+                "note", note
+            }
+        });
         return await Send(req).ConfigureAwait(false);
     }
 
@@ -27,7 +32,12 @@ internal static class AnkiConnect
 
     public static async ValueTask<Response?> GetModelFieldNamesResponse(string modelName)
     {
-        Request req = new("modelFieldNames", 6, new Dictionary<string, object>(1, StringComparer.Ordinal) { { "modelName", modelName } });
+        Request req = new("modelFieldNames", 6, new Dictionary<string, object>(1, StringComparer.Ordinal)
+        {
+            {
+                "modelName", modelName
+            }
+        });
         return await Send(req).ConfigureAwait(false);
     }
 

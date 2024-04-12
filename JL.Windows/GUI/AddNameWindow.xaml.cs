@@ -33,6 +33,7 @@ internal sealed partial class AddNameWindow : Window
         Close();
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void SaveButton_Click(object? sender, RoutedEventArgs? e)
     {
         bool isValid = true;

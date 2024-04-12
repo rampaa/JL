@@ -33,7 +33,10 @@ public static partial class Utils
 
     public static IFrontend Frontend { get; set; } = new DummyFrontend();
 
-    public static readonly LoggingLevelSwitch LoggingLevelSwitch = new() { MinimumLevel = Serilog.Events.LogEventLevel.Error };
+    public static readonly LoggingLevelSwitch LoggingLevelSwitch = new()
+    {
+        MinimumLevel = Serilog.Events.LogEventLevel.Error
+    };
 
     public static readonly ILogger Logger = new LoggerConfiguration()
         .MinimumLevel.ControlledBy(LoggingLevelSwitch)
@@ -52,7 +55,10 @@ public static partial class Utils
 
     internal static readonly JsonSerializerOptions s_jsoWithEnumConverter = new()
     {
-        Converters = { new JsonStringEnumConverter() },
+        Converters =
+        {
+            new JsonStringEnumConverter()
+        },
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
@@ -71,7 +77,10 @@ public static partial class Utils
 
     internal static readonly JsonSerializerOptions s_jsoWithEnumConverterAndIndentation = new()
     {
-        Converters = { new JsonStringEnumConverter() },
+        Converters =
+        {
+            new JsonStringEnumConverter()
+        },
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         WriteIndented = true
@@ -80,10 +89,12 @@ public static partial class Utils
     internal static readonly FrozenDictionary<string, string> s_iso6392BTo2T = new Dictionary<string, string>(20, StringComparer.Ordinal)
     {
         #pragma warning disable format
+        // ReSharper disable BadExpressionBracesLineBreaks
         { "tib", "bod" }, { "cze", "ces" }, { "wel", "cym" }, { "ger", "deu" }, { "gre", "ell" },
         { "baq", "eus" }, { "per", "fas" }, { "fre", "fra" }, { "arm", "hye" }, { "ice", "isl" },
         { "geo", "kat" }, { "mac", "mkd" }, { "mao", "mri" }, { "may", "msa" }, { "bur", "mya" },
         { "dut", "nld" }, { "rum", "ron" }, { "slo", "slk" }, { "alb", "sqi" }, { "chi", "zho" }
+        // ReSharper restore BadExpressionBracesLineBreaks
         #pragma warning restore format
     }.ToFrozenDictionary(StringComparer.Ordinal);
 

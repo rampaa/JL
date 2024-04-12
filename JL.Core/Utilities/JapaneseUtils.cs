@@ -40,6 +40,7 @@ public static partial class JapaneseUtils
     private static readonly FrozenDictionary<char, string> s_katakanaToHiraganaDict = new Dictionary<char, string>(87)
     {
         #pragma warning disable format
+        // ReSharper disable BadExpressionBracesLineBreaks
         { 'ア', "あ" }, { 'イ', "い" }, { 'ウ', "う" }, { 'エ', "え" }, { 'オ', "お" },
         { 'カ', "か" }, { 'キ', "き" }, { 'ク', "く" }, { 'ケ', "け" }, { 'コ', "こ" },
         { 'サ', "さ" }, { 'シ', "し" }, { 'ス', "す" }, { 'セ', "せ" }, { 'ソ', "そ" },
@@ -67,12 +68,14 @@ public static partial class JapaneseUtils
         { 'ヴ', "ゔ" }, { 'ヽ', "ゝ" }, { 'ヾ', "ゞ" }, { 'ッ', "っ" },
 
         { 'ヸ', "ゐ゙" }, { 'ヹ', "ゑ゙" }, { 'ヺ', "を゙" }
+        // ReSharper restore BadExpressionBracesLineBreaks
         #pragma warning restore format
     }.ToFrozenDictionary();
 
     private static readonly FrozenDictionary<string, char> s_kanaFinalVowelDict = new Dictionary<string, char>(87, StringComparer.Ordinal)
     {
         #pragma warning disable format
+        // ReSharper disable BadExpressionBracesLineBreaks
         //Hiragana
         { "あ", 'あ' }, { "か", 'あ' }, { "さ", 'あ' }, { "た", 'あ' }, { "な", 'あ' }, { "は", 'あ' },
         { "ま", 'あ' }, { "ら", 'あ' }, { "が", 'あ' }, { "ざ", 'あ' }, { "だ", 'あ' }, { "ば", 'あ' },
@@ -94,6 +97,7 @@ public static partial class JapaneseUtils
         { "お", 'お' }, { "こ", 'お' }, { "そ", 'お' }, { "と", 'お' }, { "の", 'お' }, { "ほ", 'お' },
         { "も", 'お' }, { "ろ", 'お' }, { "ご", 'お' }, { "ぞ", 'お' }, { "ど", 'お' }, { "ぼ", 'お' },
         { "ぽ", 'お' }, { "を", 'お' }, { "よ", 'お' }, { "ぉ", 'お' }, { "ょ", 'お' }, { "を゙", 'お' }
+        // ReSharper restore BadExpressionBracesLineBreaks
         #pragma warning restore format
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
@@ -108,7 +112,8 @@ public static partial class JapaneseUtils
         #pragma warning restore format
     ]);
 
-    private static readonly char[] s_sentenceTerminatingCharacters = [
+    private static readonly char[] s_sentenceTerminatingCharacters =
+    [
         '。',
         '！',
         '？',
@@ -125,6 +130,7 @@ public static partial class JapaneseUtils
 
     private static readonly FrozenDictionary<char, char> s_leftToRightBracketDict = new Dictionary<char, char>(28)
     {
+        // ReSharper disable BadExpressionBracesLineBreaks
         { '「', '」' },
         { '『', '』' },
         { '【', '】' },
@@ -153,6 +159,7 @@ public static partial class JapaneseUtils
         { '︻', '︼' },
         { '︽', '︾' },
         { '︿', '﹀' }
+        // ReSharper restore BadExpressionBracesLineBreaks
     }.ToFrozenDictionary();
 
     private static readonly FrozenDictionary<char, char> s_rightToLeftBracketDict = s_leftToRightBracketDict.ToFrozenDictionary(static kvp => kvp.Value, static kvp => kvp.Key);
@@ -217,7 +224,7 @@ public static partial class JapaneseUtils
                     listSize = stringBuilders.Count;
                     for (int j = 0; j < listSize; j++)
                     {
-                        _ = stringBuilders[j].Append(j < (listSize / 2) ? vowel : alternativeVowel);
+                        _ = stringBuilders[j].Append(j < listSize / 2 ? vowel : alternativeVowel);
                     }
                 }
             }
@@ -241,7 +248,7 @@ public static partial class JapaneseUtils
 
         for (int i = 0; i < text.Length; i++)
         {
-            if ((i + 1) < text.Length
+            if (i + 1 < text.Length
                 && s_smallCombiningKanaSet.Contains(text[i + 1]))
             {
                 combinedForm.Add(string.Create(CultureInfo.InvariantCulture, $"{text[i]}{text[i + 1]}"));
@@ -340,7 +347,7 @@ public static partial class JapaneseUtils
                     int numberOfLeftBrackets = sentence.Count(p => p == sentence[0]);
                     int numberOfRightBrackets = sentence.Count(p => p == rightBracket);
 
-                    if (numberOfLeftBrackets == (numberOfRightBrackets + 1))
+                    if (numberOfLeftBrackets == numberOfRightBrackets + 1)
                     {
                         sentence = sentence[1..];
                     }
@@ -358,7 +365,7 @@ public static partial class JapaneseUtils
                     int numberOfLeftBrackets = sentence.Count(p => p == leftBracket);
                     int numberOfRightBrackets = sentence.Count(p => p == sentence[^1]);
 
-                    if (numberOfRightBrackets == (numberOfLeftBrackets + 1))
+                    if (numberOfRightBrackets == numberOfLeftBrackets + 1)
                     {
                         sentence = sentence[..^1];
                     }

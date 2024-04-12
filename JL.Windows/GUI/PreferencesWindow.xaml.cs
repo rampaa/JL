@@ -119,6 +119,7 @@ internal sealed partial class PreferencesWindow : Window
         WindowsUtils.ShowColorPicker((Button)sender);
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void SaveButton_Click(object sender, RoutedEventArgs e)
     {
         await ConfigManager.SavePreferences(this).ConfigureAwait(true);
@@ -130,6 +131,7 @@ internal sealed partial class PreferencesWindow : Window
         Close();
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void Window_Closed(object sender, EventArgs e)
     {
         s_instance = null;
@@ -172,6 +174,7 @@ internal sealed partial class PreferencesWindow : Window
         }
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void AnkiTabItem_MouseUp(object sender, MouseButtonEventArgs e)
     {
         if (!SetAnkiConfig)
@@ -186,6 +189,7 @@ internal sealed partial class PreferencesWindow : Window
         }
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void CheckForJLUpdatesButton_Click(object sender, RoutedEventArgs e)
     {
         CheckForJLUpdatesButton.IsEnabled = false;
@@ -239,9 +243,15 @@ internal sealed partial class PreferencesWindow : Window
 
     private static void SetPreviousMiningConfig(Selector deckNamesSelector, Selector modelNamesComboBox, TextBox tagTextBox, AnkiConfig ankiConfig)
     {
-        deckNamesSelector.ItemsSource = new[] { ankiConfig.DeckName };
+        deckNamesSelector.ItemsSource = new[]
+        {
+            ankiConfig.DeckName
+        };
         deckNamesSelector.SelectedItem = ankiConfig.DeckName;
-        modelNamesComboBox.ItemsSource = new[] { ankiConfig.ModelName };
+        modelNamesComboBox.ItemsSource = new[]
+        {
+            ankiConfig.ModelName
+        };
         modelNamesComboBox.SelectedItem = ankiConfig.ModelName;
         tagTextBox.Text = string.Join(", ", ankiConfig.Tags);
     }
@@ -281,6 +291,7 @@ internal sealed partial class PreferencesWindow : Window
         }
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void MiningSetupButtonRefresh_Click(object sender, RoutedEventArgs e)
     {
         await PopulateDeckAndModelNames().ConfigureAwait(false);
@@ -307,21 +318,25 @@ internal sealed partial class PreferencesWindow : Window
         }
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void WordMiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
     {
         await GetFields(WordMiningSetupComboBoxModelNames, WordMiningSetupStackPanelFields, JLFieldUtils.JLFieldsForWordDicts).ConfigureAwait(false);
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void KanjiMiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
     {
         await GetFields(KanjiMiningSetupComboBoxModelNames, KanjiMiningSetupStackPanelFields, JLFieldUtils.JLFieldsForKanjiDicts).ConfigureAwait(false);
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void NameMiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
     {
         await GetFields(NameMiningSetupComboBoxModelNames, NameMiningSetupStackPanelFields, JLFieldUtils.JLFieldsForNameDicts).ConfigureAwait(false);
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void OtherMiningSetupButtonGetFields_Click(object sender, RoutedEventArgs e)
     {
         await GetFields(OtherMiningSetupComboBoxModelNames, OtherMiningSetupStackPanelFields, JLFieldUtils.JLFieldsForWordDicts).ConfigureAwait(false);
@@ -337,7 +352,10 @@ internal sealed partial class PreferencesWindow : Window
         foreach ((string fieldName, JLField jlField) in fields)
         {
             StackPanel stackPanel = new();
-            TextBlock textBlockFieldName = new() { Text = fieldName };
+            TextBlock textBlockFieldName = new()
+            {
+                Text = fieldName
+            };
             ComboBox comboBoxJLFields = new()
             {
                 ItemsSource = descriptions,
@@ -558,12 +576,16 @@ internal sealed partial class PreferencesWindow : Window
             Owner = this,
             WindowStartupLocation = WindowStartupLocation.CenterScreen,
             Title = title,
-            InfoTextBox = { Text = text }
+            InfoTextBox =
+            {
+                Text = text
+            }
         };
 
         _ = infoWindow.ShowDialog();
     }
 
+    // ReSharper disable once AsyncVoidMethod
     private async void ProfileComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         string selectedProfile = (string)((ComboBox)sender).SelectedItem;
@@ -589,6 +611,10 @@ internal sealed partial class PreferencesWindow : Window
 
     private void ProfileConfigButton_Click(object sender, RoutedEventArgs e)
     {
-        _ = new ManageProfilesWindow { Owner = this, WindowStartupLocation = WindowStartupLocation.CenterOwner }.ShowDialog();
+        _ = new ManageProfilesWindow
+        {
+            Owner = this,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        }.ShowDialog();
     }
 }
