@@ -3,6 +3,7 @@ using System.Text.Json;
 using JL.Core.Utilities;
 
 namespace JL.Core.Profile;
+
 public static class ProfileUtils
 {
     public static readonly List<string> DefaultProfiles = ["Default"];

@@ -1,6 +1,7 @@
 using System.Text;
 
 namespace JL.Core.Utilities;
+
 public static class TextUtils
 {
     private static int FirstInvalidUnicodeSequenceIndex(string text)
@@ -18,7 +19,7 @@ public static class TextUtils
 
                 if (char.IsHighSurrogate(c))
                 {
-                    if ((i + 1) >= text.Length || !char.IsLowSurrogate(text[i + 1]))
+                    if (i + 1 >= text.Length || !char.IsLowSurrogate(text[i + 1]))
                     {
                         return i;
                     }
@@ -48,7 +49,7 @@ public static class TextUtils
             {
                 if (char.IsHighSurrogate(c))
                 {
-                    if ((i + 1) < text.Length && char.IsLowSurrogate(text[i + 1]))
+                    if (i + 1 < text.Length && char.IsLowSurrogate(text[i + 1]))
                     {
                         _ = sb.Append(c).Append(text[i + 1]);
                         ++i;

@@ -4,7 +4,8 @@ namespace JL.Core.Dicts.CustomWordDict;
 
 public static class CustomWordLoader
 {
-    private static readonly string[] s_verbs = [
+    private static readonly string[] s_verbs =
+    [
         "v1",
         "v1-s",
         "v4r",
@@ -28,16 +29,19 @@ public static class CustomWordLoader
         "vz"
     ];
 
-    private static readonly string[] s_adjectives = [
+    private static readonly string[] s_adjectives =
+    [
         "adj-i",
         "adj-na"
     ];
 
-    private static readonly string[] s_noun = [
+    private static readonly string[] s_noun =
+    [
         "noun"
     ];
 
-    private static readonly string[] s_other = [
+    private static readonly string[] s_other =
+    [
         "other"
     ];
 

@@ -21,6 +21,7 @@ namespace JL.Windows;
 internal static class ConfigManager
 {
     #region General
+
     public static bool InactiveLookupMode { get; set; } // = false;
     public static Brush HighlightColor { get; private set; } = Brushes.AliceBlue;
     public static bool RequireLookupKeyPress { get; private set; } // = false;
@@ -81,7 +82,10 @@ internal static class ConfigManager
     public static bool PopupFocusOnLookup { get; private set; } // = false;
     public static bool ShowMiningModeReminder { get; private set; } = true;
     public static bool DisableLookupsForNonJapaneseCharsInPopups { get; private set; } = true;
-    public static Brush PopupBackgroundColor { get; private set; } = new SolidColorBrush(Color.FromRgb(0, 0, 0)) { Opacity = 0.8 };
+    public static Brush PopupBackgroundColor { get; private set; } = new SolidColorBrush(Color.FromRgb(0, 0, 0))
+    {
+        Opacity = 0.8
+    };
     public static double PopupXOffset { get; set; } = 10;
     public static double PopupYOffset { get; set; } = 20;
     public static bool PopupFlipX { get; private set; } = true;
@@ -332,7 +336,15 @@ internal static class ConfigManager
         TextBoxApplyDropShadowEffect = GetValueFromConfig(config, TextBoxApplyDropShadowEffect, nameof(TextBoxApplyDropShadowEffect), bool.TryParse);
         if (TextBoxApplyDropShadowEffect)
         {
-            DropShadowEffect dropShadowEffect = new() { Direction = 320, BlurRadius = 4, ShadowDepth = 1.3, Opacity = 0.8, RenderingBias = RenderingBias.Quality };
+            DropShadowEffect dropShadowEffect = new()
+            {
+                Direction = 320,
+                BlurRadius = 4,
+                ShadowDepth = 1.3,
+                Opacity = 0.8,
+                RenderingBias = RenderingBias.Quality
+            };
+
             dropShadowEffect.Freeze();
             MainWindow.Instance.MainTextBox.Effect = dropShadowEffect;
         }
@@ -1308,7 +1320,11 @@ internal static class ConfigManager
     {
         if (!File.Exists(ProfileUtils.DefaultProfilePath))
         {
-            using (XmlWriter writer = XmlWriter.Create(ProfileUtils.DefaultProfilePath, new XmlWriterSettings { Indent = true }))
+            using (XmlWriter writer = XmlWriter.Create(ProfileUtils.DefaultProfilePath,
+                       new XmlWriterSettings
+                       {
+                           Indent = true
+                       }))
             {
                 writer.WriteStartDocument();
                 writer.WriteStartElement("configuration");

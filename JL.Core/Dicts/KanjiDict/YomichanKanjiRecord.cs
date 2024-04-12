@@ -91,7 +91,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
         for (int i = 0; i < Definitions.Length; i++)
         {
             _ = defResult.Append(Definitions[i]);
-            if ((i + 1) != Definitions.Length)
+            if (i + 1 != Definitions.Length)
             {
                 _ = defResult.Append(separator);
             }
@@ -116,7 +116,7 @@ internal sealed class YomichanKanjiRecord : IDictRecord
         for (int i = 0; i < Stats.Length; i++)
         {
             _ = statResult.Append(Stats[i]);
-            if ((i + 1) != Stats.Length)
+            if (i + 1 != Stats.Length)
             {
                 _ = statResult.Append('\n');
             }

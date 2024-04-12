@@ -71,7 +71,7 @@ internal static class WindowsUtils
             }
 
             else if (fontFamily.FamilyNames.Keys!.Count is 1
-                && fontFamily.FamilyNames.ContainsKey(englishXmlLanguage))
+                     && fontFamily.FamilyNames.ContainsKey(englishXmlLanguage))
             {
                 bool foundGlyph = false;
 
@@ -115,7 +115,7 @@ internal static class WindowsUtils
 
         return japaneseFonts
             .OrderBy(static f => f.Foreground == Brushes.LightSlateGray)
-            .ThenBy(static font => font.Content)
+            .ThenBy(static font => (string)font.Content, StringComparer.InvariantCulture)
             .ToArray();
     }
 
@@ -359,14 +359,17 @@ internal static class WindowsUtils
             try
             {
                 AudioPlayer?.Dispose();
-                AudioPlayer = new WaveOut { Volume = volume };
+                AudioPlayer = new WaveOut
+                {
+                    Volume = volume
+                };
 
                 MemoryStream audioStream = new(audio);
                 await using (audioStream.ConfigureAwait(false))
                 {
                     IWaveProvider waveProvider = audioFormat is "ogg" or "oga"
-                    ? new VorbisWaveReader(audioStream)
-                    : new StreamMediaFoundationReader(audioStream);
+                        ? new VorbisWaveReader(audioStream)
+                        : new StreamMediaFoundationReader(audioStream);
 
                     AudioPlayer.Init(waveProvider);
                     AudioPlayer.Play();
@@ -460,7 +463,7 @@ internal static class WindowsUtils
     {
         FormattedText formattedText = new(
             text,
-            CultureInfo.CurrentCulture,
+            CultureInfo.InvariantCulture,
             FlowDirection.LeftToRight,
             PopupFontTypeFace,
             fontSize,
@@ -473,7 +476,11 @@ internal static class WindowsUtils
     public static void ShowColorPicker(Button button)
     {
         ColorPicker picker = SingleOpenHelper.CreateControl<ColorPicker>();
-        HandyControl.Controls.PopupWindow window = new() { PopupElement = picker, WindowStartupLocation = WindowStartupLocation.CenterScreen };
+        HandyControl.Controls.PopupWindow window = new()
+        {
+            PopupElement = picker,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen
+        };
         picker.SelectedBrush = (SolidColorBrush)button.Tag;
 
         picker.Canceled += delegate

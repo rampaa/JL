@@ -7,6 +7,7 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.KANJIDIC;
+
 internal static class KanjidicDBManager
 {
     public const int Version = 2;

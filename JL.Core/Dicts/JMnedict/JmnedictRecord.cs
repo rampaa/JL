@@ -27,19 +27,12 @@ internal sealed class JmnedictRecord : IDictRecord
 
     public string BuildFormattedDefinition(DictOptions? options)
     {
-        bool nameTypesExist = NameTypes is not null;
         if (Definitions.Length is 1)
         {
-            if (nameTypesExist)
-            {
-                string[] nameTypes = NameTypes![0];
-                if (nameTypes.Length > 1 || !nameTypes.Contains("unclass"))
-                {
-                    return $"({string.Join(", ", nameTypes)}) {string.Join("; ", Definitions[0])}";
-                }
-            }
-
-            return string.Join("; ", Definitions[0]);
+            string[] nameTypes = NameTypes[0];
+            return nameTypes.Length > 1 || !nameTypes.Contains("unclass")
+                ? $"({string.Join(", ", nameTypes)}) {string.Join("; ", Definitions[0])}"
+                : string.Join("; ", Definitions[0]);
         }
 
         bool newlines = options?.NewlineBetweenDefinitions?.Value ?? true;
@@ -58,7 +51,7 @@ internal sealed class JmnedictRecord : IDictRecord
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
-            if (nameTypesExist && NameTypes!.Length >= i)
+            if (NameTypes.Length >= i)
             {
                 string[] nameTypes = NameTypes[i];
                 if (nameTypes.Length > 1 || !nameTypes.Contains("unclass"))
@@ -72,18 +65,18 @@ internal sealed class JmnedictRecord : IDictRecord
                 _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) ");
             }
 
-            //if (options?.RelatedTerm?.Value ?? false)
-            //{
-            //    string[]? relatedTerms = RelatedTerms?[i];
-            //    if (relatedTerms?.Count > 0)
-            //    {
-            //        _ = defResult.Append("(related terms: {string.Join(", ", relatedTerms)}) ");
-            //    }
-            //}
+            // if (options?.RelatedTerm?.Value ?? false)
+            // {
+            //     string[]? relatedTerms = RelatedTerms?[i];
+            //     if (relatedTerms?.Length > 0)
+            //     {
+            //         _ = defResult.Append("(related terms: {string.Join(", ", relatedTerms)}) ");
+            //     }
+            // }
 
             _ = defResult.Append(CultureInfo.InvariantCulture, $"{string.Join("; ", definitions)}");
 
-            if ((i + 1) != Definitions.Length)
+            if (i + 1 != Definitions.Length)
             {
                 _ = defResult.Append(separator);
             }

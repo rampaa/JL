@@ -411,7 +411,7 @@ internal sealed partial class ManageDictionariesWindow : Window
     {
         StringBuilder sb = new();
 
-        IOrderedEnumerable<KeyValuePair<string, string>> sortedJmdictEntities = entityDict.OrderBy(static e => e.Key);
+        IOrderedEnumerable<KeyValuePair<string, string>> sortedJmdictEntities = entityDict.OrderBy(static e => e.Key, StringComparer.InvariantCulture);
         foreach (KeyValuePair<string, string> entity in sortedJmdictEntities)
         {
             _ = sb.Append(CultureInfo.InvariantCulture, $"{entity.Key}: {entity.Value}\n");

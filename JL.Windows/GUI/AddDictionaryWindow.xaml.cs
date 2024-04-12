@@ -92,7 +92,12 @@ internal sealed partial class AddDictionaryWindow : Window
 
     private void BrowseForDictionaryFile(string filter)
     {
-        OpenFileDialog openFileDialog = new() { InitialDirectory = Utils.ApplicationPath, Filter = filter };
+        OpenFileDialog openFileDialog = new()
+        {
+            InitialDirectory = Utils.ApplicationPath,
+            Filter = filter
+        };
+
         if (openFileDialog.ShowDialog() is true)
         {
             TextBlockPath.Text = Utils.GetPath(openFileDialog.FileName);
@@ -101,7 +106,11 @@ internal sealed partial class AddDictionaryWindow : Window
 
     private void BrowseForDictionaryFolder()
     {
-        OpenFolderDialog openFolderDialog = new() { InitialDirectory = Utils.ApplicationPath };
+        OpenFolderDialog openFolderDialog = new()
+        {
+            InitialDirectory = Utils.ApplicationPath
+        };
+
         if (openFolderDialog.ShowDialog() is true)
         {
             TextBlockPath.Text = Utils.GetPath(openFolderDialog.FolderName);

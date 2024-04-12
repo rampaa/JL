@@ -36,7 +36,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
         for (int i = 0; i < Definitions.Length; i++)
         {
             _ = defResult.Append(CultureInfo.InvariantCulture, $"({i + 1}) {Definitions[i]}");
-            if ((i + 1) != Definitions.Length)
+            if (i + 1 != Definitions.Length)
             {
                 _ = defResult.Append(separator);
             }

@@ -6,6 +6,7 @@ using JL.Windows.Utilities;
 using NAudio.Wave;
 
 namespace JL.Windows.SpeechSynthesis;
+
 internal static class SpeechSynthesisUtils
 {
     private static DateTime s_lastAudioPlayTime;
@@ -21,7 +22,7 @@ internal static class SpeechSynthesisUtils
         return Synthesizer.GetInstalledVoices(CultureInfo.GetCultureInfo("ja-JP"))
             .Where(static iv => iv.Enabled)
             .Select(static iv => iv.VoiceInfo.Name)
-            .OrderBy(static name => name)
+            .OrderBy(static name => name, StringComparer.InvariantCulture)
             .ToArray();
     }
 

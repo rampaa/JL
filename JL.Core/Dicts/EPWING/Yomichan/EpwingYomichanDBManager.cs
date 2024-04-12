@@ -8,6 +8,7 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.EPWING.Yomichan;
+
 internal static class EpwingYomichanDBManager
 {
     public const int Version = 2;

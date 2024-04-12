@@ -17,7 +17,7 @@ internal static class KeyGestureUtils
         #pragma warning disable format
 
         // Function keys
-        // The F12 key is reserved for use by the debugger at all times so it cannot be used as a global key
+        // The F12 key is reserved for use by the debugger at all times, so it cannot be used as a global key
         Key.F1, Key.F2, Key.F3, Key.F4, Key.F5, Key.F6,
         Key.F7, Key.F8, Key.F9, Key.F10, Key.F11,
 
@@ -34,7 +34,8 @@ internal static class KeyGestureUtils
         #pragma warning restore format
     ]);
 
-    public static readonly string[] NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized = [
+    public static readonly string[] NamesOfKeyGesturesThatCanBeUsedWhileJLIsMinimized =
+    [
         nameof(ConfigManager.ToggleMinimizedStateKeyGesture),
         nameof(ConfigManager.ClosePopupKeyGesture),
         nameof(ConfigManager.DisableHotkeysKeyGesture),
@@ -121,9 +122,9 @@ internal static class KeyGestureUtils
         return keyGesture.Modifiers is ModifierKeys.Windows
             ? Keyboard.IsKeyDown(keyGesture.Key) && Keyboard.Modifiers is ModifierKeys.None
             : Keyboard.IsKeyDown(keyGesture.Key)
-               && (ModifierAsKeyPress(keyGesture.Key)
-                   ? keyGesture.Modifiers is ModifierKeys.None
-                   : Keyboard.Modifiers == keyGesture.Modifiers);
+              && (ModifierAsKeyPress(keyGesture.Key)
+                  ? keyGesture.Modifiers is ModifierKeys.None
+                  : Keyboard.Modifiers == keyGesture.Modifiers);
     }
 
     private static bool ModifierAsKeyPress(Key key)

@@ -6,6 +6,7 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.JMnedict;
+
 internal static class JmnedictDBManager
 {
     public const int Version = 0;

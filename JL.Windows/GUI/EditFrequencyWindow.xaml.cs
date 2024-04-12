@@ -126,7 +126,12 @@ internal sealed partial class EditFrequencyWindow : Window
             initialDirectory = Utils.ApplicationPath;
         }
 
-        OpenFileDialog openFileDialog = new() { InitialDirectory = initialDirectory, Filter = filter };
+        OpenFileDialog openFileDialog = new()
+        {
+            InitialDirectory = initialDirectory,
+            Filter = filter
+        };
+
         if (openFileDialog.ShowDialog() is true)
         {
             TextBlockPath.Text = Utils.GetPath(openFileDialog.FileName);
@@ -141,7 +146,11 @@ internal sealed partial class EditFrequencyWindow : Window
             initialDirectory = Utils.ApplicationPath;
         }
 
-        OpenFolderDialog openFolderDialog = new() { InitialDirectory = initialDirectory };
+        OpenFolderDialog openFolderDialog = new()
+        {
+            InitialDirectory = initialDirectory
+        };
+
         if (openFolderDialog.ShowDialog() is true)
         {
             TextBlockPath.Text = Utils.GetPath(openFolderDialog.FolderName);

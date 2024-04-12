@@ -200,7 +200,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                             _ = defResult.Append(CultureInfo.InvariantCulture, $": {lSource.OriginalWord}");
                         }
 
-                        if ((j + 1) < lSources.Length)
+                        if (j + 1 < lSources.Length)
                         {
                             _ = defResult.Append(lSource.IsPart ? " + " : ", ");
                         }

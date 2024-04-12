@@ -7,6 +7,7 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.KanjiDict;
+
 internal static class YomichanKanjiDBManager
 {
     public const int Version = 0;

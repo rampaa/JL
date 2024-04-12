@@ -8,6 +8,7 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.EPWING.Nazeka;
+
 internal static class EpwingNazekaDBManager
 {
     public const int Version = 1;

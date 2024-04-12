@@ -60,7 +60,7 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
             }
 
             _ = defResult.Append(Definitions[i]);
-            if ((i + 1) != Definitions.Length)
+            if (i + 1 != Definitions.Length)
             {
                 _ = defResult.Append(separator);
             }

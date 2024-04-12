@@ -4,6 +4,7 @@ using System.Text.Json;
 using JL.Core.Utilities;
 
 namespace JL.Core.Dicts.EPWING.Yomichan;
+
 internal static class EpwingYomichanUtils
 {
     public static string[]? GetDefinitions(JsonElement jsonElement)

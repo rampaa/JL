@@ -153,7 +153,10 @@ internal sealed partial class AddAudioSourceWindow : Window
         {
             Owner = this,
             Title = "Audio Source Types",
-            InfoTextBox = { Text = audioSourceTypeInfo },
+            InfoTextBox =
+            {
+                Text = audioSourceTypeInfo
+            },
             WindowStartupLocation = WindowStartupLocation.CenterScreen
         };
 

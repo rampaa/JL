@@ -37,8 +37,8 @@ internal static class SpeechSynthesisReflectionUtils
             List<InstalledVoice> installedVoices = (List<InstalledVoice>?)GetField(voiceSynthesizer, InstalledVoicesField)!;
 
             using IDisposable objectTokenCategory = (IDisposable?)objectTokenCategoryType
-                    .GetMethod("Create", BindingFlags.Static | BindingFlags.NonPublic)?
-                    .Invoke(null, [OneCoreVoicesRegistry])!;
+                .GetMethod("Create", BindingFlags.Static | BindingFlags.NonPublic)?
+                .Invoke(null, [OneCoreVoicesRegistry])!;
 
             IEnumerable<object?> tokens = (IEnumerable<object?>?)objectTokenCategoryType
                 .GetMethod("FindMatchingTokens", BindingFlags.Instance | BindingFlags.NonPublic)?

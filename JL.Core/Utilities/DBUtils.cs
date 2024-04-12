@@ -8,6 +8,7 @@ using Microsoft.Data.Sqlite;
 using Timer = System.Timers.Timer;
 
 namespace JL.Core.Utilities;
+
 public static class DBUtils
 {
     private static readonly Timer s_optimizePragmaTimer = new();
@@ -18,7 +19,8 @@ public static class DBUtils
     internal static readonly string s_freqDBFolderPath = Path.Join(Utils.ResourcesPath, "Frequency Databases");
     internal static readonly string s_dictDBFolderPath = Path.Join(Utils.ResourcesPath, "Dictionary Databases");
 
-    internal static readonly DictType[] s_dictTypesWithDBSupport = [
+    internal static readonly DictType[] s_dictTypesWithDBSupport =
+    [
         DictType.JMdict,
         DictType.JMnedict,
         DictType.Kanjidic,

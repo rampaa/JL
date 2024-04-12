@@ -66,13 +66,13 @@ internal static class Deconjugator
         }
 
         // deconjugated form too much longer than conjugated form
-        if (myForm.Text.Length > (myForm.OriginalText.Length + 10))
+        if (myForm.Text.Length > myForm.OriginalText.Length + 10)
         {
             return null;
         }
 
         // impossibly information-dense
-        if (myForm.Tags.Count > (myForm.OriginalText.Length + 6))
+        if (myForm.Tags.Count > myForm.OriginalText.Length + 6)
         {
             return null;
         }

@@ -8,6 +8,7 @@ using JL.Core.Utilities;
 using JL.Windows.GUI;
 
 namespace JL.Windows.Utilities;
+
 internal static class BacklogUtils
 {
     private static int s_currentTextIndex; // 0
@@ -45,13 +46,13 @@ internal static class BacklogUtils
             return;
         }
 
-        if (s_currentTextIndex < (Backlog.Count - 1))
+        if (s_currentTextIndex < Backlog.Count - 1)
         {
             ++s_currentTextIndex;
             MainWindow.Instance.MainTextBox.Foreground = ConfigManager.MainWindowBacklogTextColor;
         }
 
-        if (s_currentTextIndex == (Backlog.Count - 1))
+        if (s_currentTextIndex == Backlog.Count - 1)
         {
             MainWindow.Instance.MainTextBox.Foreground = ConfigManager.MainWindowTextColor;
         }
@@ -80,7 +81,7 @@ internal static class BacklogUtils
             --s_currentTextIndex;
         }
 
-        mainTextBox.Foreground = s_currentTextIndex < (Backlog.Count - 1)
+        mainTextBox.Foreground = s_currentTextIndex < Backlog.Count - 1
             ? ConfigManager.MainWindowBacklogTextColor
             : ConfigManager.MainWindowTextColor;
 

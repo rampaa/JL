@@ -8,6 +8,7 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Freqs;
+
 internal static class FreqDBManager
 {
     public const int Version = 1;

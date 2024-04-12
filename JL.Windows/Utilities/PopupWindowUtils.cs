@@ -19,7 +19,7 @@ internal static class PopupWindowUtils
     private static string? s_primarySpellingOfLastPlayedAudio;
 
     private static string? s_readingOfLastPlayedAudio;
-    public static DoubleCollection StrokeDashArray { get; set; } = [1, 1];
+    private static DoubleCollection StrokeDashArray { get; set; } = [1, 1];
 
     public static TextBlock CreateTextBlock(string name, string text, Brush foregroundBrush, double fontSize, ContextMenu contextMenu, VerticalAlignment verticalAlignment, Thickness margin)
     {
@@ -136,7 +136,7 @@ internal static class PopupWindowUtils
                     {
                         Size charSize = WindowsUtils.MeasureTextSize(combinedFormList[j], fontSize);
 
-                        if ((chosenPitchAccentDictResult.Position - 1) == j)
+                        if (chosenPitchAccentDictResult.Position - 1 == j)
                         {
                             polyline.Points.Add(new Point(horizontalOffsetForChar, 0));
                             polyline.Points.Add(new Point(horizontalOffsetForChar + charSize.Width, 0));

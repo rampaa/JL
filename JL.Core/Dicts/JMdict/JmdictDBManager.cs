@@ -7,6 +7,7 @@ using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Dicts.JMdict;
+
 internal static class JmdictDBManager
 {
     public const int Version = 1;
