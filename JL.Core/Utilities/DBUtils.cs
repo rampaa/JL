@@ -96,7 +96,7 @@ public static class DBUtils
 
     private static void SendOptimizePragma(string dbPath)
     {
-        using SqliteConnection connection = new($"Data Source={dbPath};Mode=ReadWrite");
+        using SqliteConnection connection = new($"Data Source={dbPath};Mode=ReadWrite;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA optimize;";
@@ -121,7 +121,7 @@ public static class DBUtils
 
     private static int GetVersionFromDB(string dbPath)
     {
-        using SqliteConnection connection = new($"Data Source={dbPath};Mode=ReadOnly");
+        using SqliteConnection connection = new($"Data Source={dbPath};Mode=ReadOnly;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA user_version;";
@@ -147,7 +147,7 @@ public static class DBUtils
         {
             _ = parameterBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
-        return parameterBuilder.Append(')').ToString();
+        return parameterBuilder.Append(");").ToString();
     }
 
     //public static string GetSqliteVersion()

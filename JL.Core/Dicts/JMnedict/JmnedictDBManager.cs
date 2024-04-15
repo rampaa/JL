@@ -42,7 +42,7 @@ internal static class JmnedictDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadWrite");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadWrite;");
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
@@ -55,7 +55,7 @@ internal static class JmnedictDBManager
             insertRecordCommand.CommandText =
                 """
                 INSERT INTO record (id, jmnedict_id, primary_spelling, primary_spelling_in_hiragana, readings, alternative_spellings, glossary, name_types)
-                VALUES (@id, @jmnedict_id, @primary_spelling, @primary_spelling_in_hiragana, @readings, @alternative_spellings, @glossary, @name_types)
+                VALUES (@id, @jmnedict_id, @primary_spelling, @primary_spelling_in_hiragana, @readings, @alternative_spellings, @glossary, @name_types);
                 """;
 
             _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
@@ -91,7 +91,7 @@ internal static class JmnedictDBManager
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms, string parameter)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -143,7 +143,7 @@ internal static class JmnedictDBManager
 
     // public static void LoadFromDB(Dict dict)
     // {
-    //     using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadOnly");
+    //     using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadOnly;");
     //     connection.Open();
     //     using SqliteCommand command = connection.CreateCommand();
     //
@@ -156,7 +156,7 @@ internal static class JmnedictDBManager
     //                r.alternative_spellings AS alternativeSpellings,
     //                r.glossary AS definitions,
     //                r.name_types AS nameTypes
-    //         FROM record r
+    //         FROM record r;
     //         """;
     //
     //     using SqliteDataReader dataReader = command.ExecuteReader();

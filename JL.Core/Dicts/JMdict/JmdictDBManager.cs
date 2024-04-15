@@ -62,7 +62,7 @@ internal static class JmdictDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadWrite");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadWrite;");
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
@@ -92,7 +92,7 @@ internal static class JmdictDBManager
             insertRecordCommand.CommandText =
                 """
                 INSERT INTO record (id, edict_id, primary_spelling, primary_spelling_orthography_info, alternative_spellings, alternative_spellings_orthography_info, readings, readings_orthography_info, reading_restrictions, glossary, glossary_info, part_of_speech, spelling_restrictions, fields, misc, dialects, loanword_etymology, cross_references, antonyms)
-                VALUES (@id, @edict_id, @primary_spelling, @primary_spelling_orthography_info, @alternative_spellings, @alternative_spellings_orthography_info, @readings, @readings_orthography_info, @reading_restrictions, @glossary, @glossary_info, @part_of_speech, @spelling_restrictions, @fields, @misc, @dialects, @loanword_etymology, @cross_references, @antonyms)
+                VALUES (@id, @edict_id, @primary_spelling, @primary_spelling_orthography_info, @alternative_spellings, @alternative_spellings_orthography_info, @readings, @readings_orthography_info, @reading_restrictions, @glossary, @glossary_info, @part_of_speech, @spelling_restrictions, @fields, @misc, @dialects, @loanword_etymology, @cross_references, @antonyms);
                 """;
 
             insertRecordCommand.Prepare();
@@ -125,7 +125,7 @@ internal static class JmdictDBManager
                 insertSearchKeyCommand.CommandText =
                     """
                     INSERT INTO record_search_key(record_id, search_key)
-                    VALUES (@record_id, @search_key)
+                    VALUES (@record_id, @search_key);
                     """;
 
                 _ = insertSearchKeyCommand.Parameters.AddWithValue("@record_id", id);
@@ -156,7 +156,7 @@ internal static class JmdictDBManager
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms, string parameter)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -222,7 +222,7 @@ internal static class JmdictDBManager
 
     public static void LoadFromDB(Dict dict)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadOnly");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadOnly;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -249,7 +249,7 @@ internal static class JmdictDBManager
                    r.antonyms AS antonyms
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
-            GROUP BY r.id
+            GROUP BY r.id;
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();

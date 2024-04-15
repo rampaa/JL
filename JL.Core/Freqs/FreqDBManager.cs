@@ -47,7 +47,7 @@ internal static class FreqDBManager
 
     public static void InsertRecordsToDB(Freq freq)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(freq.Name)};Mode=ReadWrite");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(freq.Name)};Mode=ReadWrite;");
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
@@ -62,7 +62,7 @@ internal static class FreqDBManager
                 insertRecordCommand.CommandText =
                     """
                     INSERT INTO record (id, spelling, frequency)
-                    VALUES (@id, @spelling, @frequency)
+                    VALUES (@id, @spelling, @frequency);
                     """;
 
                 FrequencyRecord record = records[i];
@@ -75,7 +75,7 @@ internal static class FreqDBManager
                 insertSearchKeyCommand.CommandText =
                     """
                     INSERT INTO record_search_key (record_id, search_key)
-                    VALUES (@record_id, @search_key)
+                    VALUES (@record_id, @search_key);
                     """;
 
                 _ = insertSearchKeyCommand.Parameters.AddWithValue("@record_id", id);
@@ -97,7 +97,7 @@ internal static class FreqDBManager
 
     public static Dictionary<string, List<FrequencyRecord>>? GetRecordsFromDB(string dbName, List<string> terms)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(dbName)};Mode=ReadOnly");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(dbName)};Mode=ReadOnly;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -117,7 +117,7 @@ internal static class FreqDBManager
             _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
 
-        _ = queryBuilder.Append(')');
+        _ = queryBuilder.Append(");");
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText = queryBuilder.ToString();
@@ -155,7 +155,7 @@ internal static class FreqDBManager
 
     public static List<FrequencyRecord>? GetRecordsFromDB(string dbName, string term)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(dbName)};Mode=ReadOnly");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(dbName)};Mode=ReadOnly;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -164,7 +164,7 @@ internal static class FreqDBManager
             SELECT r.spelling as spelling, r.frequency AS frequency
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
-            WHERE rsk.search_key = @term
+            WHERE rsk.search_key = @term;
             """;
 
         _ = command.Parameters.AddWithValue("@term", term);
@@ -185,7 +185,7 @@ internal static class FreqDBManager
 
     public static void LoadFromDB(Freq freq)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(freq.Name)};Mode=ReadOnly");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(freq.Name)};Mode=ReadOnly;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -194,7 +194,7 @@ internal static class FreqDBManager
             SELECT json_group_array(rsk.search_key) AS searchKeys, r.spelling as spelling, r.frequency AS frequency
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
-            GROUP BY r.id
+            GROUP BY r.id;
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();

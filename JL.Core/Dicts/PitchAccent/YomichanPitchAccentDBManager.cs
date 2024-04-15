@@ -21,7 +21,7 @@ internal static class YomichanPitchAccentDBManager
                r.position AS position
         FROM record r
         JOIN record_search_key rsk ON r.id = rsk.record_id
-        WHERE rsk.search_key = @term
+        WHERE rsk.search_key = @term;
         """;
 
     public static void CreateDB(string dbName)
@@ -59,7 +59,7 @@ internal static class YomichanPitchAccentDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadWrite");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadWrite;");
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
@@ -134,7 +134,7 @@ internal static class YomichanPitchAccentDBManager
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -155,7 +155,7 @@ internal static class YomichanPitchAccentDBManager
             _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
 
-        _ = queryBuilder.Append(')');
+        _ = queryBuilder.Append(");");
 
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
         command.CommandText = queryBuilder.ToString();
@@ -193,7 +193,7 @@ internal static class YomichanPitchAccentDBManager
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, string term)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -228,7 +228,7 @@ internal static class YomichanPitchAccentDBManager
 
     public static void LoadFromDB(Dict dict)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadOnly");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadOnly;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -240,7 +240,7 @@ internal static class YomichanPitchAccentDBManager
                    r.position AS position
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
-            GROUP BY r.id
+            GROUP BY r.id;
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();

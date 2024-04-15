@@ -21,7 +21,7 @@ internal static class EpwingNazekaDBManager
                r.glossary AS definitions
         FROM record r
         JOIN record_search_key rsk ON r.id = rsk.record_id
-        WHERE rsk.search_key = @term
+        WHERE rsk.search_key = @term;
         """;
 
     public static void CreateDB(string dbName)
@@ -60,7 +60,7 @@ internal static class EpwingNazekaDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadWrite");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadWrite;");
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
@@ -72,7 +72,7 @@ internal static class EpwingNazekaDBManager
             insertRecordCommand.CommandText =
                 """
                 INSERT INTO record (id, primary_spelling, reading, alternative_spellings, glossary)
-                VALUES (@id, @primary_spelling, @reading, @alternative_spellings, @glossary)
+                VALUES (@id, @primary_spelling, @reading, @alternative_spellings, @glossary);
                 """;
 
             _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
@@ -88,7 +88,7 @@ internal static class EpwingNazekaDBManager
             insertPrimarySpellingCommand.CommandText =
                 """
                 INSERT INTO record_search_key(record_id, search_key)
-                VALUES (@record_id, @search_key)
+                VALUES (@record_id, @search_key);
                 """;
 
             _ = insertPrimarySpellingCommand.Parameters.AddWithValue("@record_id", id);
@@ -105,7 +105,7 @@ internal static class EpwingNazekaDBManager
                     insertReadingCommand.CommandText =
                         """
                         INSERT INTO record_search_key(record_id, search_key)
-                        VALUES (@record_id, @search_key)
+                        VALUES (@record_id, @search_key);
                         """;
 
                     _ = insertReadingCommand.Parameters.AddWithValue("@record_id", id);
@@ -137,7 +137,7 @@ internal static class EpwingNazekaDBManager
 
     public static Dictionary<string, IList<IDictRecord>>? GetRecordsFromDB(string dbName, List<string> terms, string query)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -195,7 +195,7 @@ internal static class EpwingNazekaDBManager
 
     public static List<IDictRecord>? GetRecordsFromDB(string dbName, string term)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -220,7 +220,7 @@ internal static class EpwingNazekaDBManager
 
     public static void LoadFromDB(Dict dict)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadOnly");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadOnly;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -233,7 +233,7 @@ internal static class EpwingNazekaDBManager
                    r.glossary AS definitions
             FROM record r
             JOIN record_search_key rsk ON r.id = rsk.record_id
-            GROUP BY r.id
+            GROUP BY r.id;
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();
@@ -319,6 +319,6 @@ internal static class EpwingNazekaDBManager
             _ = queryBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
 
-        return queryBuilder.Append(')').ToString();
+        return queryBuilder.Append(");").ToString();
     }
 }

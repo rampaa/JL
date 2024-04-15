@@ -19,7 +19,7 @@ internal static class YomichanKanjiDBManager
                r.glossary AS definitions,
                r.stats AS stats
         FROM record r
-        WHERE r.kanji = @term
+        WHERE r.kanji = @term;
         """;
 
     public static void CreateDB(string dbName)
@@ -51,7 +51,7 @@ internal static class YomichanKanjiDBManager
 
     public static void InsertRecordsToDB(Dict dict)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadWrite");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadWrite;");
         connection.Open();
         using DbTransaction transaction = connection.BeginTransaction();
 
@@ -66,7 +66,7 @@ internal static class YomichanKanjiDBManager
                 insertRecordCommand.CommandText =
                     """
                     INSERT INTO record (id, kanji, on_readings, kun_readings, glossary, stats)
-                    VALUES (@id, @kanji, @on_readings, @kun_readings, @glossary, @stats)
+                    VALUES (@id, @kanji, @on_readings, @kun_readings, @glossary, @stats);
                     """;
 
                 _ = insertRecordCommand.Parameters.AddWithValue("@id", id);
@@ -103,7 +103,7 @@ internal static class YomichanKanjiDBManager
 
     public static List<IDictRecord>? GetRecordsFromDB(string dbName, string term)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dbName)};Mode=ReadOnly;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -128,7 +128,7 @@ internal static class YomichanKanjiDBManager
 
     public static void LoadFromDB(Dict dict)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadOnly");
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadOnly;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -139,7 +139,7 @@ internal static class YomichanKanjiDBManager
                    r.kun_readings AS kunReadings,
                    r.glossary AS definitions,
                    r.stats AS stats
-            FROM record r
+            FROM record r;
             """;
 
         using SqliteDataReader dataReader = command.ExecuteReader();

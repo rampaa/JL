@@ -1351,13 +1351,13 @@ internal static class ConfigManager
             return value;
         }
 
-        if (settings.Get(configKey) is null)
+        if (configValue is null)
         {
-            config.AppSettings.Settings.Add(configKey, variable.ToString());
+            config.AppSettings.Settings.Add(configKey, Convert.ToString(variable, CultureInfo.InvariantCulture));
         }
         else
         {
-            settings[configKey].Value = variable.ToString();
+            settings[configKey].Value = Convert.ToString(variable, CultureInfo.InvariantCulture);
         }
 
         config.Save(ConfigurationSaveMode.Modified);
@@ -1375,7 +1375,7 @@ internal static class ConfigManager
             return value;
         }
 
-        if (settings.Get(configKey) is null)
+        if (configValue is null)
         {
             config.AppSettings.Settings.Add(configKey, Convert.ToString(number, CultureInfo.InvariantCulture));
         }
