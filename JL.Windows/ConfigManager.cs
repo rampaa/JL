@@ -1396,22 +1396,10 @@ internal static class ConfigManager
         string? configValue = settings.Get(configKey);
         if (configValue is not null)
         {
-            Brush? brushFromConfig = WindowsUtils.BrushFromHex(configValue);
-            if (brushFromConfig is not null)
-            {
-                return brushFromConfig;
-            }
+            return WindowsUtils.BrushFromHex(configValue);
         }
 
-        if (settings.Get(configKey) is null)
-        {
-            config.AppSettings.Settings.Add(configKey, solidColorBrush.ToString(CultureInfo.InvariantCulture));
-        }
-        else
-        {
-            settings[configKey].Value = solidColorBrush.ToString(CultureInfo.InvariantCulture);
-        }
-
+        config.AppSettings.Settings.Add(configKey, solidColorBrush.ToString(CultureInfo.InvariantCulture));
         config.Save(ConfigurationSaveMode.Modified);
 
         return solidColorBrush.IsFrozen

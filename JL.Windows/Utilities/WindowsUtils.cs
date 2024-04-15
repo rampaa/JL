@@ -429,15 +429,15 @@ internal static class WindowsUtils
         }
     }
 
-    public static Brush? BrushFromHex(string hexColorString)
+    public static Brush BrushFromHex(string hexColorString)
     {
-        return (Brush?)new BrushConverter().ConvertFrom(hexColorString);
+        return (Brush)new BrushConverter().ConvertFromInvariantString(hexColorString)!;
     }
 
-    public static Brush? FrozenBrushFromHex(string hexColorString)
+    public static Brush FrozenBrushFromHex(string hexColorString)
     {
-        Brush? brush = (Brush?)new BrushConverter().ConvertFrom(hexColorString);
-        brush?.Freeze();
+        Brush brush = (Brush)new BrushConverter().ConvertFromInvariantString(hexColorString)!;
+        brush.Freeze();
         return brush;
     }
 
