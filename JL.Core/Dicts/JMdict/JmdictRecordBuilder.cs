@@ -237,7 +237,7 @@ internal static class JmdictRecordBuilder
             {
                 for (int j = 0; j < kanjiElementCount; j++)
                 {
-                    recordDictionary.Add(JapaneseUtils.KatakanaToHiragana(entry.KanjiElements[j].Keb.GetPooledString()), record);
+                    _ = recordDictionary.TryAdd(JapaneseUtils.KatakanaToHiragana(entry.KanjiElements[j].Keb.GetPooledString()), record);
                 }
             }
         }
