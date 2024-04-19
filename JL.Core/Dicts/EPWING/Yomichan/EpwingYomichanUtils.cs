@@ -46,7 +46,7 @@ internal static class EpwingYomichanUtils
         {
             if (definitionElement.ValueKind is JsonValueKind.String)
             {
-                _ = stringBuilder.Append(definitionElement.GetString());
+                _ = stringBuilder.Append(definitionElement.GetString()).Append(' ');
             }
 
             else if (definitionElement.ValueKind is JsonValueKind.Array)
