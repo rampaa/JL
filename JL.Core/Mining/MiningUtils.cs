@@ -210,31 +210,31 @@ public static class MiningUtils
             miningParams[JLField.RadicalNames] = string.Join(", ", lookupResult.RadicalNames);
         }
 
-        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict))
+        if (DictUtils.SingleDictTypeDicts.TryGetValue(DictType.PitchAccentYomichan, out Dict? pitchDict) && pitchDict.Active)
         {
-            if (pitchDict.Active)
+            List<KeyValuePair<string, byte>>? pitchAccents = GetPitchAccents(lookupResult.PitchAccentDict ?? pitchDict.Contents, lookupResult);
+            if (pitchAccents is not null)
             {
-                List<KeyValuePair<string, byte>>? pitchAccents = GetPitchAccents(lookupResult.PitchAccentDict ?? pitchDict.Contents, lookupResult);
-                if (pitchAccents is not null)
+                StringBuilder expressionsWithPitchAccentBuilder = new();
+                _ = expressionsWithPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n");
+
+                StringBuilder numericPitchAccentBuilder = new();
+                int pitchAccentCount = pitchAccents.Count;
+                for (int i = 0; i < pitchAccentCount; i++)
                 {
-                    StringBuilder expressionsWithPitchAccentBuilder = new();
-                    _ = expressionsWithPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{PitchAccentStyle}\n\n");
+                    KeyValuePair<string, byte> pitchAccent = pitchAccents[i];
+                    _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{pitchAccent.Key}: {pitchAccent.Value}");
+                    _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(pitchAccent.Key, pitchAccent.Value));
 
-                    StringBuilder numericPitchAccentBuilder = new();
-                    int pitchAccentCount = pitchAccents.Count;
-                    for (int i = 0; i < pitchAccentCount; i++)
+                    if (i + 1 != pitchAccentCount)
                     {
-                        KeyValuePair<string, byte> pitchAccent = pitchAccents[i];
-                        _ = numericPitchAccentBuilder.Append(CultureInfo.InvariantCulture, $"{pitchAccent.Key}: {pitchAccent.Value}, ");
-                        _ = expressionsWithPitchAccentBuilder.Append(GetExpressionWithPitchAccent(pitchAccent.Key, pitchAccent.Value)).Append(", ");
+                        _ = numericPitchAccentBuilder.Append(", ");
+                        _ = expressionsWithPitchAccentBuilder.Append(", ");
                     }
-
-                    _ = numericPitchAccentBuilder.Remove(numericPitchAccentBuilder.Length - 2, 2);
-                    miningParams[JLField.NumericPitchAccents] = numericPitchAccentBuilder.ToString();
-
-                    _ = expressionsWithPitchAccentBuilder.Remove(expressionsWithPitchAccentBuilder.Length - 2, 2);
-                    miningParams[JLField.PitchAccents] = expressionsWithPitchAccentBuilder.ToString();
                 }
+
+                miningParams[JLField.NumericPitchAccents] = numericPitchAccentBuilder.ToString();
+                miningParams[JLField.PitchAccents] = expressionsWithPitchAccentBuilder.ToString();
             }
         }
 
