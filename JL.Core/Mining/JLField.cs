@@ -21,7 +21,7 @@ public enum JLField
     [Description("Local Time")] LocalTime,
     Frequencies,
     [Description("Raw Frequencies")] RawFrequencies,
-    [Description("Preferred Frequencies")] PreferredFrequency,
+    [Description("Preferred Frequency")] PreferredFrequency,
     [Description("Average Frequency")] AverageFrequency,
     [Description("Pitch Accents")] PitchAccents,
     [Description("Pitch Accents (Numeric)")] NumericPitchAccents,
