@@ -129,7 +129,7 @@ public static class MiningUtils
             {
                 miningParams[JLField.Frequencies] = LookupResultUtils.FrequenciesToText(lookupResult.Frequencies, true, lookupResult.Frequencies.Count is 1);
                 miningParams[JLField.RawFrequencies] = string.Join(", ", validFrequencies.Select(static f => f.Freq).ToList());
-                miningParams[JLField.FrequencyHarmonicMean] = CalculateHarmonicAverage(validFrequencies).ToString(CultureInfo.InvariantCulture);
+                miningParams[JLField.FrequencyHarmonicMean] = CalculateHarmonicMean(validFrequencies).ToString(CultureInfo.InvariantCulture);
 
                 int firstFrequency = lookupResult.Frequencies[0].Freq;
                 if (firstFrequency is > 0 and < int.MaxValue)
@@ -241,7 +241,7 @@ public static class MiningUtils
         return miningParams;
     }
 
-    private static int CalculateHarmonicAverage(List<LookupFrequencyResult> lookupFrequencyResults)
+    private static int CalculateHarmonicMean(List<LookupFrequencyResult> lookupFrequencyResults)
     {
         double sumOfReciprocalOfFreqs = 0;
         for (int i = 0; i < lookupFrequencyResults.Count; i++)
