@@ -65,6 +65,8 @@ internal sealed partial class PreferencesWindow : Window
                                             • Deconjugation Process: Deconjugation path from the "Matched Text" to "Deconjugated Matched Text".
                                             • Frequencies: Frequency info for the mined word, e.g., "VN: 77, jpdb: 666".
                                             • Raw Frequencies: Raw frequency info for the mined word, e.g., "77, 666".
+                                            • Preferred Frequency: Frequency info for the mined word from the frequency dictionary with the highest priority, e.g., 666
+                                            • Average Frequency: Harmonic average of the raw frequencies, e.g., 666
                                             • Pitch Accents: Pitch accents for the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
                                             • Pitch Accents (Numeric): Pitch accents for the mined word in numeric form, e.g., おんな: 3, おみな: 0, おうな: 1
                                             • Entry ID: JMDict entry ID.
@@ -90,6 +92,8 @@ internal sealed partial class PreferencesWindow : Window
                                              • Trailing Sentence Part: Part of the sentence that appears after the mined kanji. e.g., if the mined kanji is "大" while the sentence is "妹が大好きです", "Trailing Sentence Part" will be "好きです".
                                              • Frequencies: Frequency info for the kanji, e.g., "KANJIDIC2: 77, jpdb: 666".
                                              • Raw Frequencies: Raw frequency info for the mined word, e.g., "77, 666".
+                                             • Preferred Frequency: Frequency info for the mined word from the frequency dictionary with the highest priority, e.g., 666
+                                             • Average Frequency: Harmonic average of the raw frequencies, e.g., 666
                                              • Pitch Accents: Pitch accents for the mined word, displayed in a similar fashion to how pitch accents are shown in a JL popup.
                                              • Pitch Accents (Numeric): Pitch accents for the mined word in numeric form, e.g., おんな: 3, おみな: 0, おうな: 1
                                              • Local Time: Mining date and time expressed in local timezone.

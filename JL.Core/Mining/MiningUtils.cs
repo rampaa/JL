@@ -3,6 +3,7 @@ using System.Text;
 using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Dicts.PitchAccent;
+using JL.Core.Freqs;
 using JL.Core.Lookup;
 using JL.Core.Mining.Anki;
 using JL.Core.Network;
@@ -129,6 +130,14 @@ public static class MiningUtils
                 miningParams[JLField.RawFrequencies] = string.Join(", ", lookupResult.Frequencies
                     .Where(static f => f.Freq is > 0 and < int.MaxValue)
                     .Select(static f => f.Freq));
+
+                miningParams[JLField.AverageFrequency] = CalculateHarmonicAverage(lookupResult.Frequencies).ToString(CultureInfo.InvariantCulture);
+
+                LookupFrequencyResult firstFrequency = lookupResult.Frequencies[0];
+                if (FreqUtils.FreqDicts[firstFrequency.Name].Priority is 1)
+                {
+                    miningParams[JLField.Frequencies] = firstFrequency.Freq.ToString(CultureInfo.InvariantCulture);
+                }
             }
         }
 
@@ -232,6 +241,23 @@ public static class MiningUtils
         }
 
         return miningParams;
+    }
+
+    private static int CalculateHarmonicAverage(List<LookupFrequencyResult> lookupFrequencyResults)
+    {
+        double sumOfReciprocalOfFreqs = 0;
+        for (int i = 0; i < lookupFrequencyResults.Count; i++)
+        {
+            LookupFrequencyResult lookupFrequencyResult = lookupFrequencyResults[i];
+
+            int freq = lookupFrequencyResult.HigherValueMeansHigherFrequency
+                ? int.MaxValue - lookupFrequencyResult.Freq
+                : lookupFrequencyResult.Freq;
+
+            sumOfReciprocalOfFreqs += 1d / freq;
+        }
+
+        return (int)Math.Round(lookupFrequencyResults.Count / sumOfReciprocalOfFreqs);
     }
 
     private static List<KeyValuePair<string, byte>>? GetPitchAccents(IDictionary<string, IList<IDictRecord>> pitchDict, LookupResult lookupResult)

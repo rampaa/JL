@@ -25,6 +25,8 @@ public static class JLFieldUtils
         JLField.DeconjugationProcess,
         JLField.Frequencies,
         JLField.RawFrequencies,
+        JLField.PreferredFrequency,
+        JLField.AverageFrequency,
         JLField.PitchAccents,
         JLField.NumericPitchAccents,
         JLField.EdictId,
@@ -54,6 +56,8 @@ public static class JLFieldUtils
         JLField.TrailingSentencePart,
         JLField.Frequencies,
         JLField.RawFrequencies,
+        JLField.PreferredFrequency,
+        JLField.AverageFrequency,
         JLField.PitchAccents,
         JLField.NumericPitchAccents,
         JLField.LocalTime
