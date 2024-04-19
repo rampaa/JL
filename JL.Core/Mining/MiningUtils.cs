@@ -3,7 +3,6 @@ using System.Text;
 using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Dicts.PitchAccent;
-using JL.Core.Freqs;
 using JL.Core.Lookup;
 using JL.Core.Mining.Anki;
 using JL.Core.Network;
@@ -123,20 +122,19 @@ public static class MiningUtils
 
         if (lookupResult.Frequencies is not null)
         {
-            string? formattedFreq = LookupResultUtils.FrequenciesToText(lookupResult.Frequencies, true);
-            if (formattedFreq is not null)
+            List<LookupFrequencyResult> validFrequencies = lookupResult.Frequencies
+                .Where(static f => f.Freq is > 0 and < int.MaxValue).ToList();
+
+            if (validFrequencies.Count > 0)
             {
-                miningParams[JLField.Frequencies] = formattedFreq;
-                miningParams[JLField.RawFrequencies] = string.Join(", ", lookupResult.Frequencies
-                    .Where(static f => f.Freq is > 0 and < int.MaxValue)
-                    .Select(static f => f.Freq));
+                miningParams[JLField.Frequencies] = LookupResultUtils.FrequenciesToText(lookupResult.Frequencies, true, lookupResult.Frequencies.Count is 1);
+                miningParams[JLField.RawFrequencies] = string.Join(", ", validFrequencies.Select(static f => f.Freq).ToList());
+                miningParams[JLField.FrequencyHarmonicMean] = CalculateHarmonicAverage(validFrequencies).ToString(CultureInfo.InvariantCulture);
 
-                miningParams[JLField.AverageFrequency] = CalculateHarmonicAverage(lookupResult.Frequencies).ToString(CultureInfo.InvariantCulture);
-
-                LookupFrequencyResult firstFrequency = lookupResult.Frequencies[0];
-                if (FreqUtils.FreqDicts[firstFrequency.Name].Priority is 1)
+                int firstFrequency = lookupResult.Frequencies[0].Freq;
+                if (firstFrequency is > 0 and < int.MaxValue)
                 {
-                    miningParams[JLField.Frequencies] = firstFrequency.Freq.ToString(CultureInfo.InvariantCulture);
+                    miningParams[JLField.Frequencies] = firstFrequency.ToString(CultureInfo.InvariantCulture);
                 }
             }
         }

@@ -3,7 +3,7 @@ namespace JL.Core.Lookup;
 public sealed class LookupFrequencyResult
 {
     internal string Name { get; }
-    internal int Freq { get; }
+    public int Freq { get; }
 
     internal bool HigherValueMeansHigherFrequency { get; }
 

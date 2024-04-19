@@ -22,7 +22,7 @@ public enum JLField
     Frequencies,
     [Description("Raw Frequencies")] RawFrequencies,
     [Description("Preferred Frequency")] PreferredFrequency,
-    [Description("Average Frequency")] AverageFrequency,
+    [Description("Frequency (Harmonic Mean)")] FrequencyHarmonicMean,
     [Description("Pitch Accents")] PitchAccents,
     [Description("Pitch Accents (Numeric)")] NumericPitchAccents,
 

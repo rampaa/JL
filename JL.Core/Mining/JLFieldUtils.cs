@@ -26,7 +26,7 @@ public static class JLFieldUtils
         JLField.Frequencies,
         JLField.RawFrequencies,
         JLField.PreferredFrequency,
-        JLField.AverageFrequency,
+        JLField.FrequencyHarmonicMean,
         JLField.PitchAccents,
         JLField.NumericPitchAccents,
         JLField.EdictId,
@@ -57,7 +57,7 @@ public static class JLFieldUtils
         JLField.Frequencies,
         JLField.RawFrequencies,
         JLField.PreferredFrequency,
-        JLField.AverageFrequency,
+        JLField.FrequencyHarmonicMean,
         JLField.PitchAccents,
         JLField.NumericPitchAccents,
         JLField.LocalTime

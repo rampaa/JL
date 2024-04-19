@@ -56,7 +56,9 @@ public static class LookupResultUtils
             first = false;
         }
 
-        return deconjugation.Length is 0 ? null : deconjugation.ToString();
+        return deconjugation.Length is 0
+            ? null
+            : deconjugation.ToString();
     }
 
     public static string GradeToText(int grade)
@@ -72,33 +74,24 @@ public static class LookupResultUtils
         return gradeText;
     }
 
-    public static string? FrequenciesToText(List<LookupFrequencyResult> frequencies, bool forMining)
+    public static string FrequenciesToText(List<LookupFrequencyResult> frequencies, bool forMining, bool singleDict)
     {
-        if (!forMining && frequencies.Count is 1 && frequencies[0].Freq is > 0 and < int.MaxValue)
+        if (!forMining && singleDict)
         {
             return string.Create(CultureInfo.InvariantCulture, $"#{frequencies[0].Freq}");
         }
 
-        if (frequencies.Count > 0)
+        StringBuilder sb = new();
+        for (int i = 0; i < frequencies.Count; i++)
         {
-            int freqResultCount = 0;
-            StringBuilder sb = new();
-            foreach (LookupFrequencyResult lookupFreqResult in frequencies)
+            LookupFrequencyResult lookupFreqResult = frequencies[i];
+            _ = sb.Append(CultureInfo.InvariantCulture, $"{lookupFreqResult.Name}: {lookupFreqResult.Freq}");
+            if (i + 1 != frequencies.Count)
             {
-                if (lookupFreqResult.Freq is > 0 and < int.MaxValue)
-                {
-                    _ = sb.Append(CultureInfo.InvariantCulture, $"{lookupFreqResult.Name}: {lookupFreqResult.Freq}, ");
-                    ++freqResultCount;
-                }
-            }
-
-            if (freqResultCount > 0)
-            {
-                return sb.Remove(sb.Length - 2, 2).ToString();
+                _ = sb.Append(", ");
             }
         }
-
-        return null;
+        return sb.ToString();
     }
 
     public static string ReadingsToText(string[] readings, string[]?[] rOrthographyInfoList)
@@ -118,7 +111,7 @@ public static class LookupResultUtils
                 }
             }
 
-            if (index != readings.Length - 1)
+            if (index + 1 != readings.Length)
             {
                 _ = sb.Append(", ");
             }
@@ -146,7 +139,7 @@ public static class LookupResultUtils
                 }
             }
 
-            if (index != alternativeSpellings.Length - 1)
+            if (index + 1 != alternativeSpellings.Length)
             {
                 _ = sb.Append(", ");
             }

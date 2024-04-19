@@ -684,11 +684,13 @@ internal sealed partial class PopupWindow : Window
 
         if (result.Frequencies is not null)
         {
-            string? freqText = LookupResultUtils.FrequenciesToText(result.Frequencies, false);
-            if (freqText is not null)
+            List<LookupFrequencyResult> validFrequencies = result.Frequencies
+                .Where(static f => f.Freq is > 0 and < int.MaxValue).ToList();
+
+            if (validFrequencies.Count > 0)
             {
                 TextBlock frequencyTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.Frequencies),
-                    freqText,
+                    LookupResultUtils.FrequenciesToText(validFrequencies, false, result.Frequencies.Count is 1),
                     ConfigManager.FrequencyColor,
                     ConfigManager.FrequencyFontSize,
                     PopupContextMenu,
