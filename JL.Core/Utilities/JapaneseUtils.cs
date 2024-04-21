@@ -24,6 +24,7 @@ public static partial class JapaneseUtils
     // CJK Compatibility Ideographs (F900–FAFF)
     // CJK Compatibility Forms (FE30–FE4F)
     // Halfwidth and Fullwidth Forms (FF00–FFEF)
+    // Ideographic Symbols and Punctuation (16FE0-16FFF) does not contain any Japanese character, so it's not included in the regex
     // Kana Extended-B (1AFF0-1AFFF)
     // Kana Supplement (1B000-1B0FF)
     // Kana Extended-A (1B100-1B12F)
