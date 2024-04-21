@@ -16,7 +16,7 @@ internal static class JmdictWordClassUtils
             DictUtils.WordClassDictionary = (await JsonSerializer.DeserializeAsync<Dictionary<string, IList<JmdictWordClass>>>(fileStream).ConfigureAwait(false))!;
         }
 
-        foreach (IList<JmdictWordClass> jmdictWordClassList in DictUtils.WordClassDictionary.Values)
+        foreach (IList<JmdictWordClass> jmdictWordClassList in DictUtils.WordClassDictionary.Values.ToList())
         {
             int jmdictWordClassListCount = jmdictWordClassList.Count;
             for (int i = 0; i < jmdictWordClassListCount; i++)
