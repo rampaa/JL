@@ -182,15 +182,10 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
 
     public override bool Equals(object? obj)
     {
-        if (obj is null)
-        {
-            return false;
-        }
-
-        EpwingNazekaRecord epwingNazekaRecordObj = (EpwingNazekaRecord)obj;
-        return PrimarySpelling == epwingNazekaRecordObj.PrimarySpelling
-               && Reading == epwingNazekaRecordObj.Reading
-               && epwingNazekaRecordObj.Definitions.SequenceEqual(Definitions);
+        return obj is EpwingNazekaRecord epwingNazekaRecord
+            && PrimarySpelling == epwingNazekaRecord.PrimarySpelling
+            && Reading == epwingNazekaRecord.Reading
+            && epwingNazekaRecord.Definitions.SequenceEqual(Definitions);
     }
 
     public override int GetHashCode()

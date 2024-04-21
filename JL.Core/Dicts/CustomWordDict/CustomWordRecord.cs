@@ -234,18 +234,14 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
 
     public override bool Equals(object? obj)
     {
-        if (obj is null)
-        {
-            return false;
-        }
-
-        CustomWordRecord customWordRecordObj = (CustomWordRecord)obj;
-
-        return PrimarySpelling == customWordRecordObj.PrimarySpelling
-               && (customWordRecordObj.AlternativeSpellings?.SequenceEqual(AlternativeSpellings ?? []) ?? AlternativeSpellings is null)
-               && (customWordRecordObj.Readings?.SequenceEqual(Readings ?? []) ?? Readings is null)
-               && customWordRecordObj.Definitions.SequenceEqual(Definitions)
-               && customWordRecordObj.WordClasses.SequenceEqual(WordClasses);
+        return obj is CustomWordRecord customWordRecord
+            && PrimarySpelling == customWordRecord.PrimarySpelling
+            && customWordRecord.Definitions.SequenceEqual(Definitions)
+            && ((AlternativeSpellings is not null && customWordRecord.AlternativeSpellings is not null && customWordRecord.AlternativeSpellings.SequenceEqual(AlternativeSpellings))
+                || (AlternativeSpellings is null && customWordRecord.AlternativeSpellings is null))
+            && ((Readings is not null && customWordRecord.Readings is not null && customWordRecord.Readings.SequenceEqual(Readings))
+                || (Readings is null && customWordRecord.Readings is null))
+            && customWordRecord.WordClasses.SequenceEqual(WordClasses);
     }
 
     public override int GetHashCode()

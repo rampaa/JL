@@ -154,15 +154,10 @@ internal sealed class EpwingYomichanRecord : IEpwingRecord, IGetFrequency
 
     public override bool Equals(object? obj)
     {
-        if (obj is null)
-        {
-            return false;
-        }
-
-        EpwingYomichanRecord epwingYomichanRecordObj = (EpwingYomichanRecord)obj;
-        return PrimarySpelling == epwingYomichanRecordObj.PrimarySpelling
-               && Reading == epwingYomichanRecordObj.Reading
-               && epwingYomichanRecordObj.Definitions.SequenceEqual(Definitions);
+        return obj is EpwingYomichanRecord epwingYomichanRecord
+            && PrimarySpelling == epwingYomichanRecord.PrimarySpelling
+            && Reading == epwingYomichanRecord.Reading
+            && epwingYomichanRecord.Definitions.SequenceEqual(Definitions);
     }
 
     public override int GetHashCode()

@@ -20,18 +20,12 @@ internal sealed class Form
 
     public override bool Equals(object? obj)
     {
-        if (obj is null)
-        {
-            return false;
-        }
-
-        Form form = (Form)obj;
-
-        return Text == form.Text
-               && OriginalText == form.OriginalText
-               && Tags.SequenceEqual(form.Tags)
-               && SeenText.SetEquals(form.SeenText)
-               && Process.SequenceEqual(form.Process);
+        return obj is Form form
+            && Text == form.Text
+            && OriginalText == form.OriginalText
+            && Tags.SequenceEqual(form.Tags)
+            && SeenText.SetEquals(form.SeenText)
+            && Process.SequenceEqual(form.Process);
     }
 
     public override int GetHashCode()
