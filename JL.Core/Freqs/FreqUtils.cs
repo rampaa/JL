@@ -121,7 +121,11 @@ public static class FreqUtils
                                     {
                                         FreqDBManager.CreateDB(freq.Name);
                                         FreqDBManager.InsertRecordsToDB(freq);
-                                        freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+
+                                        if (useDB)
+                                        {
+                                            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+                                        }
                                     }
                                 }
 
@@ -215,7 +219,11 @@ public static class FreqUtils
                                     {
                                         FreqDBManager.CreateDB(freq.Name);
                                         FreqDBManager.InsertRecordsToDB(freq);
-                                        freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+
+                                        if (useDB)
+                                        {
+                                            freq.Contents = FrozenDictionary<string, IList<FrequencyRecord>>.Empty;
+                                        }
                                     }
                                 }
 

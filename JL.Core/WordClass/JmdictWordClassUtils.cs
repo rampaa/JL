@@ -132,8 +132,8 @@ internal static class JmdictWordClassUtils
                     }
                 }
 
-                await Task.Run(async () =>
-                    await JmdictLoader.Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
+                dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 450000, StringComparer.Ordinal);
+                await Task.Run(async () => await JmdictLoader.Load(dict).ConfigureAwait(false)).ConfigureAwait(false);
                 await Serialize().ConfigureAwait(false);
                 dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
 

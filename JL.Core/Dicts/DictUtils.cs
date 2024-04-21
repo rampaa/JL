@@ -594,9 +594,7 @@ public static class DictUtils
                                 try
                                 {
                                     // 2022/05/11: 394949, 2022/08/15: 398303, 2023/04/22: 403739, 2023/12/16: 419334, 2024/02/22: 421519
-                                    dict.Contents = dict.Size > 0
-                                        ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
-                                        : new Dictionary<string, IList<IDictRecord>>(450000, StringComparer.Ordinal);
+                                    dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 450000, StringComparer.Ordinal);
 
                                     if (loadFromDB)
                                     {
@@ -612,7 +610,11 @@ public static class DictUtils
                                         {
                                             JmdictDBManager.CreateDB(dict.Name);
                                             JmdictDBManager.InsertRecordsToDB(dict);
-                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+
+                                            if (useDB)
+                                            {
+                                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                            }
                                         }
                                     }
 
@@ -674,9 +676,7 @@ public static class DictUtils
                                 try
                                 {
                                     // 2022/05/11: 608833, 2022/08/15: 609117, 2023/04/22: 609055, 2023/12/16: 609238, 2024/02/22: 609265
-                                    dict.Contents = dict.Size > 0
-                                        ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
-                                        : new Dictionary<string, IList<IDictRecord>>(620000, StringComparer.Ordinal);
+                                    dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 620000, StringComparer.Ordinal);
 
                                     // We don't load JMnedict from DB because it is slower and allocates more memory for JMnedict for some reason
                                     await JmnedictLoader.Load(dict).ConfigureAwait(false);
@@ -686,7 +686,11 @@ public static class DictUtils
                                     {
                                         JmnedictDBManager.CreateDB(dict.Name);
                                         JmnedictDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+
+                                        if (useDB)
+                                        {
+                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                        }
                                     }
 
                                     dict.Ready = true;
@@ -747,9 +751,7 @@ public static class DictUtils
                                 try
                                 {
                                     // 2022/05/11: 13108, 2023/12/16: 13108, 2024/02/02 13108
-                                    dict.Contents = dict.Size > 0
-                                        ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
-                                        : new Dictionary<string, IList<IDictRecord>>(13108, StringComparer.Ordinal);
+                                    dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 13108, StringComparer.Ordinal);
 
                                     if (loadFromDB)
                                     {
@@ -765,7 +767,11 @@ public static class DictUtils
                                         {
                                             KanjidicDBManager.CreateDB(dict.Name);
                                             KanjidicDBManager.InsertRecordsToDB(dict);
-                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+
+                                            if (useDB)
+                                            {
+                                                dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                            }
                                         }
                                     }
 
@@ -844,35 +850,37 @@ public static class DictUtils
                         {
                             try
                             {
-                                dict.Contents = dict.Size > 0
-                                    ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
+                                int dictSize = dict.Size > 0
+                                    ? dict.Size
                                     : dict.Type switch
                                     {
-                                        DictType.Daijirin => new Dictionary<string, IList<IDictRecord>>(420429, StringComparer.Ordinal),
-                                        DictType.Daijisen => new Dictionary<string, IList<IDictRecord>>(679115, StringComparer.Ordinal),
-                                        DictType.Gakken => new Dictionary<string, IList<IDictRecord>>(254558, StringComparer.Ordinal),
-                                        DictType.GakkenYojijukugoYomichan => new Dictionary<string, IList<IDictRecord>>(7989, StringComparer.Ordinal),
-                                        DictType.IwanamiYomichan => new Dictionary<string, IList<IDictRecord>>(101929, StringComparer.Ordinal),
-                                        DictType.JitsuyouYomichan => new Dictionary<string, IList<IDictRecord>>(69746, StringComparer.Ordinal),
-                                        DictType.KanjigenYomichan => new Dictionary<string, IList<IDictRecord>>(64730, StringComparer.Ordinal),
-                                        DictType.Kenkyuusha => new Dictionary<string, IList<IDictRecord>>(303677, StringComparer.Ordinal),
-                                        DictType.KireiCakeYomichan => new Dictionary<string, IList<IDictRecord>>(332628, StringComparer.Ordinal),
-                                        DictType.Kotowaza => new Dictionary<string, IList<IDictRecord>>(30846, StringComparer.Ordinal),
-                                        DictType.Koujien => new Dictionary<string, IList<IDictRecord>>(402571, StringComparer.Ordinal),
-                                        DictType.Meikyou => new Dictionary<string, IList<IDictRecord>>(107367, StringComparer.Ordinal),
-                                        DictType.NikkokuYomichan => new Dictionary<string, IList<IDictRecord>>(451455, StringComparer.Ordinal),
-                                        DictType.OubunshaYomichan => new Dictionary<string, IList<IDictRecord>>(138935, StringComparer.Ordinal),
-                                        DictType.ShinjirinYomichan => new Dictionary<string, IList<IDictRecord>>(229758, StringComparer.Ordinal),
-                                        DictType.ShinmeikaiYomichan => new Dictionary<string, IList<IDictRecord>>(126049, StringComparer.Ordinal),
-                                        DictType.ShinmeikaiYojijukugoYomichan => new Dictionary<string, IList<IDictRecord>>(6088, StringComparer.Ordinal),
-                                        DictType.WeblioKogoYomichan => new Dictionary<string, IList<IDictRecord>>(30838, StringComparer.Ordinal),
-                                        DictType.ZokugoYomichan => new Dictionary<string, IList<IDictRecord>>(2392, StringComparer.Ordinal),
-                                        DictType.NonspecificWordYomichan => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
-                                        DictType.NonspecificKanjiWithWordSchemaYomichan => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
-                                        DictType.NonspecificNameYomichan => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
-                                        DictType.NonspecificYomichan => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
+                                        DictType.Daijirin => 420429,
+                                        DictType.Daijisen => 679115,
+                                        DictType.Gakken => 254558,
+                                        DictType.GakkenYojijukugoYomichan => 7989,
+                                        DictType.IwanamiYomichan => 101929,
+                                        DictType.JitsuyouYomichan => 69746,
+                                        DictType.KanjigenYomichan => 64730,
+                                        DictType.Kenkyuusha => 303677,
+                                        DictType.KireiCakeYomichan => 332628,
+                                        DictType.Kotowaza => 30846,
+                                        DictType.Koujien => 402571,
+                                        DictType.Meikyou => 107367,
+                                        DictType.NikkokuYomichan => 451455,
+                                        DictType.OubunshaYomichan => 138935,
+                                        DictType.ShinjirinYomichan => 229758,
+                                        DictType.ShinmeikaiYomichan => 126049,
+                                        DictType.ShinmeikaiYojijukugoYomichan => 6088,
+                                        DictType.WeblioKogoYomichan => 30838,
+                                        DictType.ZokugoYomichan => 2392,
+                                        DictType.NonspecificWordYomichan => 250000,
+                                        DictType.NonspecificKanjiWithWordSchemaYomichan => 250000,
+                                        DictType.NonspecificNameYomichan => 250000,
+                                        DictType.NonspecificYomichan => 250000,
                                         _ => throw new ArgumentOutOfRangeException(null, "Invalid DictType")
                                     };
+
+                                dict.Contents = new Dictionary<string, IList<IDictRecord>>(dictSize, StringComparer.Ordinal);
 
                                 if (loadFromDB)
                                 {
@@ -888,7 +896,11 @@ public static class DictUtils
                                     {
                                         EpwingYomichanDBManager.CreateDB(dict.Name);
                                         EpwingYomichanDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+
+                                        if (useDB)
+                                        {
+                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                        }
                                     }
                                 }
 
@@ -953,9 +965,7 @@ public static class DictUtils
                     {
                         tasks.Add(Task.Run(async () =>
                         {
-                            dict.Contents = dict.Size > 0
-                                ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
-                                : new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal);
+                            dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 250000, StringComparer.Ordinal);
 
                             try
                             {
@@ -973,7 +983,11 @@ public static class DictUtils
                                     {
                                         YomichanKanjiDBManager.CreateDB(dict.Name);
                                         YomichanKanjiDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+
+                                        if (useDB)
+                                        {
+                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                        }
                                     }
                                 }
 
@@ -1146,7 +1160,11 @@ public static class DictUtils
                                     {
                                         EpwingNazekaDBManager.CreateDB(dict.Name);
                                         EpwingNazekaDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+
+                                        if (useDB)
+                                        {
+                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                        }
                                     }
                                 }
 
@@ -1213,9 +1231,7 @@ public static class DictUtils
                         {
                             try
                             {
-                                dict.Contents = dict.Size > 0
-                                    ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
-                                    : new Dictionary<string, IList<IDictRecord>>(434991, StringComparer.Ordinal);
+                                dict.Contents = new Dictionary<string, IList<IDictRecord>>(dict.Size > 0 ? dict.Size : 434991, StringComparer.Ordinal);
 
                                 if (loadFromDB)
                                 {
@@ -1231,7 +1247,11 @@ public static class DictUtils
                                     {
                                         YomichanPitchAccentDBManager.CreateDB(dict.Name);
                                         YomichanPitchAccentDBManager.InsertRecordsToDB(dict);
-                                        dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+
+                                        if (useDB)
+                                        {
+                                            dict.Contents = FrozenDictionary<string, IList<IDictRecord>>.Empty;
+                                        }
                                     }
                                 }
 
