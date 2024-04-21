@@ -27,7 +27,7 @@ public static partial class JapaneseUtils
     // Kana Extended-B (1AFF0-1AFFF)
     // Kana Supplement (1B000-1B0FF)
     // Kana Extended-A (1B100-1B12F)
-    // Small Kana Extension(1B130-1B16F)
+    // Small Kana Extension (1B130-1B16F)
     // CJK Unified Ideographs Extension B (20000–2A6DF)
     // CJK Unified Ideographs Extension C (2A700–2B73F)
     // CJK Unified Ideographs Extension D (2B740–2B81F)
