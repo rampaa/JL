@@ -61,7 +61,7 @@ internal sealed class CustomWordRecord : IDictRecord, IGetFrequency
 
         string separator = newlines
             ? "\n"
-            : " ";
+            : "; ";
 
         for (int i = 0; i < Definitions.Length; i++)
         {

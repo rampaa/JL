@@ -419,19 +419,21 @@ internal sealed partial class ManageDictionariesWindow : Window
         Close();
     }
 
-    private static string EntityDictToString(Dictionary<string, string> entityDict)
+    private static string? EntityDictToString(Dictionary<string, string> entityDict)
     {
-        StringBuilder sb = new();
+        if (entityDict.Count is 0)
+        {
+            return null;
+        }
 
+        StringBuilder sb = new();
         IOrderedEnumerable<KeyValuePair<string, string>> sortedJmdictEntities = entityDict.OrderBy(static e => e.Key, StringComparer.InvariantCulture);
         foreach (KeyValuePair<string, string> entity in sortedJmdictEntities)
         {
             _ = sb.Append(CultureInfo.InvariantCulture, $"{entity.Key}: {entity.Value}\n");
         }
 
-        return sb.Length > 0
-            ? sb.Remove(sb.Length - 1, 1).ToString()
-            : "";
+        return sb.ToString(0, sb.Length - 1);
     }
 
     private void ShowInfoWindow(Dictionary<string, string> entityDict, string title)
@@ -442,7 +444,7 @@ internal sealed partial class ManageDictionariesWindow : Window
             Title = title,
             InfoTextBox =
             {
-                Text = EntityDictToString(entityDict)
+                Text = EntityDictToString(entityDict) ?? ""
             },
             WindowStartupLocation = WindowStartupLocation.CenterScreen
         };

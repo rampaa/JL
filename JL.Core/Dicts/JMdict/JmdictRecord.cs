@@ -71,7 +71,7 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
     {
         bool newlines = options?.NewlineBetweenDefinitions?.Value ?? true;
 
-        string separator = newlines ? "\n" : "";
+        string separator = newlines ? "\n" : "; ";
 
         StringBuilder defResult = new();
 
@@ -228,10 +228,13 @@ internal sealed class JmdictRecord : IDictRecord, IGetFrequency
                 }
             }
 
-            _ = defResult.Append(separator);
+            if (i + 1 != Definitions.Length)
+            {
+                _ = defResult.Replace(" ", separator, defResult.Length - 1, 1);
+            }
         }
 
-        return defResult.Remove(defResult.Length - separator.Length - 1, separator.Length + 1).ToString();
+        return defResult.ToString(0, defResult.Length - 1);
     }
 
     public int GetFrequency(Freq freq)

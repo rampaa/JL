@@ -509,10 +509,10 @@ internal static class WindowsUtils
 
         Color selectedBrushColor = ((SolidColorBrush)selectedBrush).Color;
 
-        button.Background = CreateOpaqueBrush(selectedBrushColor);
+        button.Background = CreateFrozenOpaqueBrush(selectedBrushColor);
     }
 
-    private static Brush CreateOpaqueBrush(Color color)
+    private static Brush CreateFrozenOpaqueBrush(Color color)
     {
         Brush opaqueBrush = new SolidColorBrush(Color.FromRgb(color.R, color.G, color.B));
         opaqueBrush.Freeze();

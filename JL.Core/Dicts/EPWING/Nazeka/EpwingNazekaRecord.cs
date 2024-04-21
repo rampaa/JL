@@ -29,7 +29,7 @@ internal sealed class EpwingNazekaRecord : IEpwingRecord, IGetFrequency
         }
 
         string separator = options is { NewlineBetweenDefinitions.Value: false }
-            ? " "
+            ? "; "
             : "\n";
 
         StringBuilder defResult = new();

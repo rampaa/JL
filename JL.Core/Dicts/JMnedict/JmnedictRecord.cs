@@ -39,7 +39,7 @@ internal sealed class JmnedictRecord : IDictRecord
 
         string separator = newlines
             ? "\n"
-            : " ";
+            : "; ";
 
         StringBuilder defResult = new();
         for (int i = 0; i < Definitions.Length; i++)
