@@ -81,6 +81,11 @@ internal static class FrequencyYomichanLoader
 
                 if (frequency is not int.MaxValue)
                 {
+                    if (frequency > freq.MaxValue)
+                    {
+                        freq.MaxValue = frequency;
+                    }
+
                     if (reading is null)
                     {
                         if (freq.Contents.TryGetValue(spellingInHiragana, out IList<FrequencyRecord>? spellingFreqResult))

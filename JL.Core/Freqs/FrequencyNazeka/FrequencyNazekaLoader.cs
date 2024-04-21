@@ -33,6 +33,11 @@ internal static class FrequencyNazekaLoader
                 string exactSpelling = elementList[0].GetString()!.GetPooledString();
                 int frequencyRank = elementList[1].GetInt32();
 
+                if (frequencyRank > freq.MaxValue)
+                {
+                    freq.MaxValue = frequencyRank;
+                }
+
                 if (freq.Contents.TryGetValue(reading, out IList<FrequencyRecord>? readingFreqResult))
                 {
                     readingFreqResult.Add(new FrequencyRecord(exactSpelling, frequencyRank));

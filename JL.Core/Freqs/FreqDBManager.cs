@@ -183,8 +183,25 @@ internal static class FreqDBManager
         return null;
     }
 
+    public static void SetMaxFrequencyValue(Freq freq)
+    {
+        using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(freq.Name)};Mode=ReadOnly;");
+        connection.Open();
+        using SqliteCommand command = connection.CreateCommand();
+
+        command.CommandText =
+            """
+            SELECT MAX(frequency)
+            FROM record
+            """;
+
+        freq.MaxValue = Convert.ToInt32(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
+    }
+
     public static void LoadFromDB(Freq freq)
     {
+        SetMaxFrequencyValue(freq);
+
         using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(freq.Name)};Mode=ReadOnly;");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();

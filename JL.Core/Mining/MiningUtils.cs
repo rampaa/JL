@@ -3,6 +3,7 @@ using System.Text;
 using JL.Core.Audio;
 using JL.Core.Dicts;
 using JL.Core.Dicts.PitchAccent;
+using JL.Core.Freqs;
 using JL.Core.Lookup;
 using JL.Core.Mining.Anki;
 using JL.Core.Network;
@@ -249,7 +250,7 @@ public static class MiningUtils
             LookupFrequencyResult lookupFrequencyResult = lookupFrequencyResults[i];
 
             int freq = lookupFrequencyResult.HigherValueMeansHigherFrequency
-                ? int.MaxValue - lookupFrequencyResult.Freq
+                ? FreqUtils.FreqDicts[lookupFrequencyResult.Name].MaxValue - lookupFrequencyResult.Freq + 1
                 : lookupFrequencyResult.Freq;
 
             sumOfReciprocalOfFreqs += 1d / freq;

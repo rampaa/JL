@@ -4,7 +4,7 @@ using JL.Core.Freqs.Options;
 
 namespace JL.Core.Freqs;
 
-public sealed class Freq(FreqType type, string name, string path, bool active, int priority, int size, bool ready, FreqOptions options)
+public sealed class Freq(FreqType type, string name, string path, bool active, int priority, int size, int maxValue, bool ready, FreqOptions options)
 {
     public FreqType Type { get; } = type;
     public string Name { get; set; } = name;
@@ -14,6 +14,8 @@ public sealed class Freq(FreqType type, string name, string path, bool active, i
 
     // ReSharper disable once MemberCanBeInternal
     public int Size { get; set; } = size;
+
+    public int MaxValue { get; set; } = maxValue;
 
     [JsonIgnore] public bool Ready { get; set; } = ready;
 
