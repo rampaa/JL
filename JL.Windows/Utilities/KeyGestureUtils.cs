@@ -180,11 +180,13 @@ internal static class KeyGestureUtils
         {
             KeyGestureConverter keyGestureConverter = new();
 
-            KeyGesture newKeyGesture = rawKeyGesture.Contains("Ctrl", StringComparison.Ordinal)
+            string keyGestureString = rawKeyGesture.Contains("Ctrl", StringComparison.Ordinal)
                                        || rawKeyGesture.Contains("Alt", StringComparison.Ordinal)
                                        || rawKeyGesture.Contains("Shift", StringComparison.Ordinal)
-                ? (KeyGesture)keyGestureConverter.ConvertFromInvariantString(rawKeyGesture)!
-                : (KeyGesture)keyGestureConverter.ConvertFromInvariantString($"Win+{rawKeyGesture}")!;
+                                        ? rawKeyGesture
+                                        : $"Win+{rawKeyGesture}";
+
+            KeyGesture newKeyGesture = (KeyGesture)keyGestureConverter.ConvertFromInvariantString(keyGestureString)!;
 
             if (ConfigManager.GlobalHotKeys && setAsGlobalHotKey)
             {

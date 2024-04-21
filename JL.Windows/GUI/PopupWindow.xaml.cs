@@ -158,11 +158,12 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
-        int endPosition = textBoxText.Length - charPosition > ConfigManager.MaxSearchLength
-            ? JapaneseUtils.FindExpressionBoundary(textBoxText[..(charPosition + ConfigManager.MaxSearchLength)], charPosition)
-            : JapaneseUtils.FindExpressionBoundary(textBoxText, charPosition);
+        string text = textBoxText.Length - charPosition > ConfigManager.MaxSearchLength
+            ? textBoxText[..(charPosition + ConfigManager.MaxSearchLength)]
+            : textBoxText;
 
-        string text = textBoxText[charPosition..endPosition];
+        int endPosition = JapaneseUtils.FindExpressionBoundary(text, charPosition);
+        text = text[charPosition..endPosition];
 
         if (string.IsNullOrEmpty(text))
         {

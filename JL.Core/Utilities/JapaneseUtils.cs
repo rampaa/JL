@@ -180,9 +180,9 @@ public static partial class JapaneseUtils
         for (int i = 0; i < normalizedText.Length; i++)
         {
             char character = normalizedText[i];
-            _ = s_katakanaToHiraganaDict.TryGetValue(character, out string? hiraganaStr)
-                ? textInHiragana.Append(hiraganaStr)
-                : textInHiragana.Append(character);
+            _ = textInHiragana.Append(s_katakanaToHiraganaDict.TryGetValue(character, out string? hiraganaStr)
+                    ? hiraganaStr
+                    : character);
         }
 
         return textInHiragana.ToString();

@@ -1045,11 +1045,13 @@ public static class DictUtils
                     {
                         tasks.Add(Task.Run(() =>
                         {
-                            dict.Contents = dict.Size is not 0
-                                ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
+                            int size = dict.Size > 0
+                                ? dict.Size
                                 : dict.Type is DictType.CustomWordDictionary
-                                    ? new Dictionary<string, IList<IDictRecord>>(1024, StringComparer.Ordinal)
-                                    : new Dictionary<string, IList<IDictRecord>>(256, StringComparer.Ordinal);
+                                    ? 1024
+                                    : 256;
+
+                            dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
 
                             CustomWordLoader.Load(dict,
                                 dict.Type is DictType.CustomWordDictionary
@@ -1081,11 +1083,13 @@ public static class DictUtils
                     {
                         tasks.Add(Task.Run(() =>
                         {
-                            dict.Contents = dict.Size is not 0
-                                ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
+                            int size = dict.Size is not 0
+                                ? dict.Size
                                 : dict.Type is DictType.CustomNameDictionary
-                                    ? new Dictionary<string, IList<IDictRecord>>(1024, StringComparer.Ordinal)
-                                    : new Dictionary<string, IList<IDictRecord>>(256, StringComparer.Ordinal);
+                                    ? 1024
+                                    : 256;
+
+                            dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
 
                             CustomNameLoader.Load(dict,
                                 dict.Type is DictType.CustomNameDictionary
@@ -1132,19 +1136,21 @@ public static class DictUtils
                         {
                             try
                             {
-                                dict.Contents = dict.Size is not 0
-                                    ? new Dictionary<string, IList<IDictRecord>>(dict.Size, StringComparer.Ordinal)
+                                int size = dict.Size > 0
+                                    ? dict.Size
                                     : dict.Type switch
                                     {
-                                        DictType.DaijirinNazeka => new Dictionary<string, IList<IDictRecord>>(420429, StringComparer.Ordinal),
-                                        DictType.KenkyuushaNazeka => new Dictionary<string, IList<IDictRecord>>(191804, StringComparer.Ordinal),
-                                        DictType.ShinmeikaiNazeka => new Dictionary<string, IList<IDictRecord>>(126049, StringComparer.Ordinal),
-                                        DictType.NonspecificWordNazeka => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
-                                        DictType.NonspecificKanjiNazeka => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
-                                        DictType.NonspecificNameNazeka => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
-                                        DictType.NonspecificNazeka => new Dictionary<string, IList<IDictRecord>>(250000, StringComparer.Ordinal),
+                                        DictType.DaijirinNazeka => 420429,
+                                        DictType.KenkyuushaNazeka => 191804,
+                                        DictType.ShinmeikaiNazeka => 126049,
+                                        DictType.NonspecificWordNazeka => 250000,
+                                        DictType.NonspecificKanjiNazeka => 250000,
+                                        DictType.NonspecificNameNazeka => 250000,
+                                        DictType.NonspecificNazeka => 250000,
                                         _ => throw new ArgumentOutOfRangeException(null, "Invalid DictType")
                                     };
+
+                                dict.Contents = new Dictionary<string, IList<IDictRecord>>(size, StringComparer.Ordinal);
 
                                 if (loadFromDB)
                                 {

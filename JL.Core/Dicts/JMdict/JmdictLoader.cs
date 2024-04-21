@@ -308,7 +308,7 @@ internal static class JmdictLoader
                         bool isWasei = xmlReader.GetAttribute("ls_wasei") is not null;
 
                         string? originalWord = xmlReader.ReadElementContentAsString();
-                        originalWord = originalWord is not "" ? originalWord : null;
+                        originalWord = originalWord.Length > 0 ? originalWord : null;
 
                         sense.LSourceList.Add(new LoanwordSource(lang.GetPooledString(), isPart, isWasei, originalWord));
                         break;

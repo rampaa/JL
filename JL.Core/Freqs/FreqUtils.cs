@@ -103,9 +103,11 @@ public static class FreqUtils
                         {
                             try
                             {
-                                freq.Contents = freq.Size > 0
-                                    ? new Dictionary<string, IList<FrequencyRecord>>(freq.Size, StringComparer.Ordinal)
-                                    : new Dictionary<string, IList<FrequencyRecord>>(114348, StringComparer.Ordinal);
+                                int size = freq.Size > 0
+                                    ? freq.Size
+                                    : 114348;
+
+                                freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(size, StringComparer.Ordinal);
 
                                 if (loadFromDB)
                                 {
@@ -199,11 +201,13 @@ public static class FreqUtils
                         {
                             try
                             {
-                                freq.Contents = freq.Size > 0
-                                    ? new Dictionary<string, IList<FrequencyRecord>>(freq.Size, StringComparer.Ordinal)
+                                int size = freq.Size > 0
+                                    ? freq.Size
                                     : freq.Type is FreqType.Yomichan
-                                        ? new Dictionary<string, IList<FrequencyRecord>>(1504512, StringComparer.Ordinal)
-                                        : new Dictionary<string, IList<FrequencyRecord>>(169623, StringComparer.Ordinal);
+                                        ? 1504512
+                                        : 169623;
+
+                                freq.Contents = new Dictionary<string, IList<FrequencyRecord>>(size, StringComparer.Ordinal);
 
                                 if (loadFromDB)
                                 {
