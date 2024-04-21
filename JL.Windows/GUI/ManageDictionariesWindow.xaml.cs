@@ -419,11 +419,11 @@ internal sealed partial class ManageDictionariesWindow : Window
         Close();
     }
 
-    private static string? EntityDictToString(Dictionary<string, string> entityDict)
+    private static string EntityDictToString(Dictionary<string, string> entityDict)
     {
         if (entityDict.Count is 0)
         {
-            return null;
+            return "";
         }
 
         StringBuilder sb = new();
@@ -444,7 +444,7 @@ internal sealed partial class ManageDictionariesWindow : Window
             Title = title,
             InfoTextBox =
             {
-                Text = EntityDictToString(entityDict) ?? ""
+                Text = EntityDictToString(entityDict)
             },
             WindowStartupLocation = WindowStartupLocation.CenterScreen
         };
