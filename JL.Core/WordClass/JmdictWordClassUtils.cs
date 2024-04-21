@@ -16,7 +16,7 @@ internal static class JmdictWordClassUtils
             DictUtils.WordClassDictionary = (await JsonSerializer.DeserializeAsync<Dictionary<string, IList<JmdictWordClass>>>(fileStream).ConfigureAwait(false))!;
         }
 
-        foreach (IList<JmdictWordClass> jmdictWordClassList in DictUtils.WordClassDictionary.Values.ToList())
+        foreach (IList<JmdictWordClass> jmdictWordClassList in DictUtils.WordClassDictionary.Values)
         {
             int jmdictWordClassListCount = jmdictWordClassList.Count;
             for (int i = 0; i < jmdictWordClassListCount; i++)
@@ -64,55 +64,37 @@ internal static class JmdictWordClassUtils
         ];
 
         Dict dict = DictUtils.SingleDictTypeDicts[DictType.JMdict];
-        foreach (IList<IDictRecord> jmdictRecordList in dict.Contents.Values)
+        foreach ((string key, IList<IDictRecord> jmdictRecordList) in dict.Contents)
         {
             int jmdictRecordListCount = jmdictRecordList.Count;
             for (int i = 0; i < jmdictRecordListCount; i++)
             {
-                JmdictRecord value = (JmdictRecord)jmdictRecordList[i];
-                string[] wordClasses = usedWordClasses.Intersect(value.WordClasses.SelectMany(static wc => wc)).ToArray();
+                JmdictRecord jmdictRecord = (JmdictRecord)jmdictRecordList[i];
+                string[] wordClasses = usedWordClasses.Intersect(jmdictRecord.WordClasses.SelectMany(static wc => wc)).ToArray();
 
                 if (wordClasses.Length is 0)
                 {
                     continue;
                 }
 
-                if (jmdictWordClassDictionary.TryGetValue(value.PrimarySpelling, out List<JmdictWordClass>? psr))
+                if (jmdictRecord.Readings?.Select(JapaneseUtils.KatakanaToHiragana).Contains(key) ?? false)
                 {
-                    if (!psr.Any(r =>
-                            r.Readings?.SequenceEqual(value.Readings ?? []) ??
-                            (value.Readings is null && r.Spelling == value.PrimarySpelling)))
+                    continue;
+                }
+
+                if (jmdictWordClassDictionary.TryGetValue(key, out List<JmdictWordClass>? results))
+                {
+                    if (!results.Any(result => result.Spelling == jmdictRecord.PrimarySpelling
+                        && ((result.Readings is not null && jmdictRecord.Readings is not null && result.Readings.SequenceEqual(jmdictRecord.Readings))
+                            || (result.Readings is null && jmdictRecord.Readings is null))))
                     {
-                        psr.Add(new JmdictWordClass(value.PrimarySpelling, value.Readings, wordClasses));
+                        results.Add(new JmdictWordClass(jmdictRecord.PrimarySpelling, jmdictRecord.Readings, wordClasses));
                     }
                 }
 
                 else
                 {
-                    jmdictWordClassDictionary[value.PrimarySpelling] = [new JmdictWordClass(value.PrimarySpelling, value.Readings, wordClasses)];
-                }
-
-                if (value.AlternativeSpellings is not null)
-                {
-                    for (int j = 0; j < value.AlternativeSpellings.Length; j++)
-                    {
-                        string spelling = value.AlternativeSpellings[j];
-
-                        if (jmdictWordClassDictionary.TryGetValue(spelling, out List<JmdictWordClass>? asr))
-                        {
-                            if (!asr.Any(r =>
-                                    r.Readings?.SequenceEqual(value.Readings ?? []) ??
-                                    (value.Readings is null && r.Spelling == spelling)))
-                            {
-                                asr.Add(new JmdictWordClass(spelling, value.Readings, wordClasses));
-                            }
-                        }
-
-                        else
-                        {
-                            jmdictWordClassDictionary[spelling] = [new JmdictWordClass(spelling, value.Readings, wordClasses)];
-                        }
-                    }
+                    jmdictWordClassDictionary[key] = [new JmdictWordClass(jmdictRecord.PrimarySpelling, jmdictRecord.Readings, wordClasses)];
                 }
             }
         }

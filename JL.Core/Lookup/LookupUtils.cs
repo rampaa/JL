@@ -635,7 +635,7 @@ public static class LookupUtils
                             JmdictWordClass jmdictWordClassResult = jmdictWcResults[j];
 
                             if (dictResult.PrimarySpelling == jmdictWordClassResult.Spelling
-                                && ((dictResult.Reading is not null && (jmdictWordClassResult.Readings?.Contains(dictResult.Reading) ?? false))
+                                && ((dictResult.Reading is not null && jmdictWordClassResult.Readings is not null && jmdictWordClassResult.Readings.Contains(dictResult.Reading))
                                     || (dictResult.Reading is null && jmdictWordClassResult.Readings is null)))
                             {
                                 if (jmdictWordClassResult.WordClasses.Contains(lastTag))
@@ -676,7 +676,7 @@ public static class LookupUtils
                             JmdictWordClass jmdictWordClassResult = jmdictWcResults[j];
 
                             if (dictResult.PrimarySpelling == jmdictWordClassResult.Spelling
-                                && ((dictResult.Reading is not null && (jmdictWordClassResult.Readings?.Contains(dictResult.Reading) ?? false))
+                                && ((dictResult.Reading is not null && jmdictWordClassResult.Readings is not null && jmdictWordClassResult.Readings.Contains(dictResult.Reading))
                                     || (dictResult.Reading is null && jmdictWordClassResult.Readings is null)))
                             {
                                 if (jmdictWordClassResult.WordClasses.Contains(lastTag))
