@@ -37,46 +37,50 @@ internal static class FrequencyYomichanLoader
                 int frequency = int.MaxValue;
                 JsonElement thirdElement = value[2];
 
-                if (thirdElement.ValueKind is JsonValueKind.Number)
+                switch (thirdElement.ValueKind)
                 {
-                    frequency = thirdElement.GetInt32();
-                }
-
-                else if (thirdElement.ValueKind is JsonValueKind.Object)
-                {
-                    if (thirdElement.TryGetProperty("value", out JsonElement freqValue))
-                    {
+                    case JsonValueKind.Number:
+                        frequency = thirdElement.GetInt32();
+                        break;
+                    case JsonValueKind.Object when thirdElement.TryGetProperty("value", out JsonElement freqValue):
                         frequency = freqValue.GetInt32();
-                    }
-
-                    else if (thirdElement.TryGetProperty("reading", out JsonElement readingValue))
+                        break;
+                    case JsonValueKind.Object:
                     {
-                        reading = readingValue.GetString()!.GetPooledString();
-                        JsonElement frequencyElement = thirdElement.GetProperty("frequency");
-                        frequency = frequencyElement.ValueKind is JsonValueKind.Number
-                            ? frequencyElement.GetInt32()
-                            : frequencyElement.GetProperty("value").GetInt32();
-                    }
-                }
-
-                else if (thirdElement.ValueKind is JsonValueKind.String)
-                {
-                    string freqStr = thirdElement.GetString()!;
-                    Match match = Utils.NumberRegex().Match(freqStr);
-                    if (match.Success)
-                    {
-                        if (int.TryParse(match.ValueSpan, out int parsedFreq))
+                        if (thirdElement.TryGetProperty("reading", out JsonElement readingValue))
                         {
-                            frequency = parsedFreq;
+                            reading = readingValue.GetString()!.GetPooledString();
+                            JsonElement frequencyElement = thirdElement.GetProperty("frequency");
+                            frequency = frequencyElement.ValueKind is JsonValueKind.Number
+                                ? frequencyElement.GetInt32()
+                                : frequencyElement.GetProperty("value").GetInt32();
                         }
-                    }
-                }
 
-                // Check if there is any frequency dictionary with this format
-                else if (thirdElement.ValueKind is JsonValueKind.Array)
-                {
-                    reading = thirdElement[0].GetString()!.GetPooledString();
-                    frequency = thirdElement[1].GetInt32();
+                        break;
+                    }
+                    case JsonValueKind.String:
+                    {
+                        string freqStr = thirdElement.GetString()!;
+                        Match match = Utils.NumberRegex().Match(freqStr);
+                        if (match.Success)
+                        {
+                            if (int.TryParse(match.ValueSpan, out int parsedFreq))
+                            {
+                                frequency = parsedFreq;
+                            }
+                        }
+
+                        break;
+                    }
+
+                    // Check if there is any frequency dictionary with this format
+                    case JsonValueKind.Array:
+                        reading = thirdElement[0].GetString()!.GetPooledString();
+                        frequency = thirdElement[1].GetInt32();
+                        break;
+
+                    default:
+                        break;
                 }
 
                 if (frequency is not int.MaxValue)

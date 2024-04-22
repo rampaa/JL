@@ -498,8 +498,14 @@ public static class LookupUtils
         if (useDB)
         {
             Parallel.Invoke(
-                () => dbWordDict = getRecordsFromDB!(dict.Name, textInHiraganaList, queryOrParameter!),
-                () => dbVerbDict = getRecordsFromDB!(dict.Name, deconjugatedTexts!, verbQueryOrParameter!));
+                () =>
+                {
+                    dbWordDict = getRecordsFromDB!(dict.Name, textInHiraganaList, queryOrParameter!);
+                },
+                () =>
+                {
+                    dbVerbDict = getRecordsFromDB!(dict.Name, deconjugatedTexts!, verbQueryOrParameter!);
+                });
         }
 
         Dictionary<string, IntermediaryResult> results = new(StringComparer.Ordinal);

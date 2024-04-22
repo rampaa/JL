@@ -550,7 +550,7 @@ public static class MiningUtils
     /// Value is the actual content of a mining field (e.g. if the field name is LocalTime, then it should contain the current time) <br/>
     /// UserField is the name of the user's field in Anki (e.g. Expression) <br/>
     /// </summary>
-    private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> userFields, Dictionary<JLField, string> miningParams)
+    private static Dictionary<string, object> ConvertFields(Dictionary<string, JLField> userFields, IReadOnlyDictionary<JLField, string> miningParams)
     {
         Dictionary<string, object> dict = new(StringComparer.Ordinal);
         foreach ((string key, JLField value) in userFields)

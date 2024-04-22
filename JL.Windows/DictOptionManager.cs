@@ -16,7 +16,7 @@ internal static class DictOptionManager
         {
             string? colorString = jmdict.Options?.POrthographyInfoColor?.Value;
             POrthographyInfoColor = colorString is not null
-                ? WindowsUtils.FrozenBrushFromHex(colorString)!
+                ? WindowsUtils.FrozenBrushFromHex(colorString)
                 : ConfigManager.PrimarySpellingColor;
         }
         else
@@ -28,7 +28,7 @@ internal static class DictOptionManager
         {
             string? colorString = pitchAccentDict.Options?.PitchAccentMarkerColor?.Value;
             PitchAccentMarkerColor = colorString is not null
-                ? WindowsUtils.FrozenBrushFromHex(colorString)!
+                ? WindowsUtils.FrozenBrushFromHex(colorString)
                 : Brushes.DeepSkyBlue;
 
             MainWindow.Instance.Dispatcher.Invoke(() => PopupWindowUtils.SetStrokeDashArray(pitchAccentDict.Options?.ShowPitchAccentWithDottedLines?.Value ?? true));

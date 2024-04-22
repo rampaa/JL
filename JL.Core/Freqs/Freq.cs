@@ -15,6 +15,7 @@ public sealed class Freq(FreqType type, string name, string path, bool active, i
     // ReSharper disable once MemberCanBeInternal
     public int Size { get; set; } = size;
 
+    // ReSharper disable once MemberCanBeInternal
     public int MaxValue { get; set; } = maxValue;
 
     [JsonIgnore] public bool Ready { get; set; } = ready;

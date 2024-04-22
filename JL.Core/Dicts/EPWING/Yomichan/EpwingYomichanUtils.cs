@@ -12,21 +12,18 @@ internal static class EpwingYomichanUtils
         List<string> definitions = [];
         foreach (JsonElement definitionElement in jsonElement.EnumerateArray())
         {
-            string? definition = null;
-            if (definitionElement.ValueKind is JsonValueKind.String)
+            string? definition = definitionElement.ValueKind switch
             {
-                definition = definitionElement.GetString()!.Trim();
-            }
-
-            else if (definitionElement.ValueKind is JsonValueKind.Array)
-            {
-                definition = GetDefinitionsFromJsonArray(definitionElement);
-            }
-
-            else if (definitionElement.ValueKind is JsonValueKind.Object)
-            {
-                definition = GetDefinitionsFromJsonObject(definitionElement).Content;
-            }
+                JsonValueKind.String => definitionElement.GetString()!.Trim(),
+                JsonValueKind.Array => GetDefinitionsFromJsonArray(definitionElement),
+                JsonValueKind.Object => GetDefinitionsFromJsonObject(definitionElement).Content,
+                JsonValueKind.Number => null,
+                JsonValueKind.Undefined => null,
+                JsonValueKind.True => null,
+                JsonValueKind.False => null,
+                JsonValueKind.Null => null,
+                _ => null
+            };
 
             if (definition is not null)
             {
@@ -69,12 +66,10 @@ internal static class EpwingYomichanUtils
                     {
                         _ = stringBuilder.Append(contentResult.Content);
                     }
-
                     else if (contentResult.Tag is "ruby" or "rt")
                     {
                         _ = stringBuilder.Append(CultureInfo.InvariantCulture, $" ({contentResult.Content}) ");
                     }
-
                     else //if (contentResult.Tag is "div" or "a" or "li" or "ul" or "ol" or "p" or "h1" or "h2" or "h3" or "h4" or "h5" or "h6")
                     {
                         _ = stringBuilder.Append(CultureInfo.InvariantCulture, $"\n{contentResult.Content.TrimStart('\n')}");

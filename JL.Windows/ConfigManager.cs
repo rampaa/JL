@@ -1403,7 +1403,7 @@ internal static class ConfigManager
         config.Save(ConfigurationSaveMode.Modified);
 
         return solidColorBrush.IsFrozen
-            ? WindowsUtils.BrushFromHex(solidColorBrush.ToString(CultureInfo.InvariantCulture))!
+            ? WindowsUtils.BrushFromHex(solidColorBrush.ToString(CultureInfo.InvariantCulture))
             : solidColorBrush;
     }
 
