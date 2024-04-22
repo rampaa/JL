@@ -530,6 +530,7 @@ public static class LookupUtils
                 if (count is > 0 and < 4)
                 {
                     List<string> textWithoutLongVowelMarkList = JapaneseUtils.LongVowelMarkToKana(textInHiraganaList[i]);
+                    Dictionary<string, IList<IDictRecord>>? dbWordDictForLongVowelConversion = null;
                     if (useDB)
                     {
                         string longVowerQueryOrParameter;
@@ -545,13 +546,14 @@ public static class LookupUtils
                         {
                             longVowerQueryOrParameter = DBUtils.GetParameter(textWithoutLongVowelMarkList);
                         }
-                        dbWordDict = getRecordsFromDB!(dict.Name, textWithoutLongVowelMarkList, longVowerQueryOrParameter);
+
+                        dbWordDictForLongVowelConversion = getRecordsFromDB!(dict.Name, textWithoutLongVowelMarkList, longVowerQueryOrParameter);
                     }
 
                     int textWithoutLongVowelMarkListCount = textWithoutLongVowelMarkList.Count;
                     for (int j = 0; j < textWithoutLongVowelMarkListCount; j++)
                     {
-                        _ = GetWordResultsHelper(dict, results, null, textList[i], textWithoutLongVowelMarkList[j], succAttempt, dbWordDict, null);
+                        _ = GetWordResultsHelper(dict, results, null, textList[i], textWithoutLongVowelMarkList[j], succAttempt, useDB ? dbWordDictForLongVowelConversion : dbWordDict, null);
                     }
                 }
             }
