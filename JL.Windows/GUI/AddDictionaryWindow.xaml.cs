@@ -62,6 +62,7 @@ internal sealed partial class AddDictionaryWindow : Window
         string name = NameTextBox.Text;
         if (string.IsNullOrWhiteSpace(name)
             || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
+            || name.Length > 255
             || DictUtils.Dicts.ContainsKey(name))
         {
             NameTextBox.BorderBrush = Brushes.Red;
