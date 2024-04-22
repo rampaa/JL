@@ -272,9 +272,10 @@ public static class MiningUtils
 
                 if (pitchDict.TryGetValue(readingInHiragana, out IList<IDictRecord>? pitchResult))
                 {
-                    foreach (IDictRecord dictRecord in pitchResult)
+                    int pitchResultCount = pitchResult.Count;
+                    for (int j = 0; j < pitchResultCount; j++)
                     {
-                        PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)dictRecord;
+                        PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)pitchResult[j];
                         if (lookupResult.PrimarySpelling == pitchAccentRecord.Spelling
                             || (lookupResult.AlternativeSpellings?.Contains(pitchAccentRecord.Spelling) ?? false))
                         {
@@ -291,9 +292,10 @@ public static class MiningUtils
             string primarySpellingInHiragana = JapaneseUtils.KatakanaToHiragana(lookupResult.PrimarySpelling);
             if (pitchDict.TryGetValue(primarySpellingInHiragana, out IList<IDictRecord>? pitchResult))
             {
-                foreach (IDictRecord dictRecord in pitchResult)
+                int pitchResultCount = pitchResult.Count;
+                for (int i = 0; i < pitchResultCount; i++)
                 {
-                    PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)dictRecord;
+                    PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)pitchResult[i];
                     if (pitchAccentRecord.Reading is null)
                     {
                         pitchAccents.Add(KeyValuePair.Create(lookupResult.PrimarySpelling, pitchAccentRecord.Position));
@@ -309,9 +311,10 @@ public static class MiningUtils
                     string alternativeSpellingInHiragana = JapaneseUtils.KatakanaToHiragana(lookupResult.AlternativeSpellings[i]);
                     if (pitchDict.TryGetValue(alternativeSpellingInHiragana, out pitchResult))
                     {
-                        foreach (IDictRecord dictRecord in pitchResult)
+                        int pitchResultCount = pitchResult.Count;
+                        for (int j = 0; j < pitchResultCount; j++)
                         {
-                            PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)dictRecord;
+                            PitchAccentRecord pitchAccentRecord = (PitchAccentRecord)pitchResult[j];
                             if (pitchAccentRecord.Reading is null)
                             {
                                 pitchAccents.Add(KeyValuePair.Create(lookupResult.PrimarySpelling, pitchAccentRecord.Position));
