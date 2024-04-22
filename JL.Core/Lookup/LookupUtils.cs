@@ -533,21 +533,21 @@ public static class LookupUtils
                     Dictionary<string, IList<IDictRecord>>? dbWordDictForLongVowelConversion = null;
                     if (useDB)
                     {
-                        string longVowerQueryOrParameter;
+                        string longVowelQueryOrParameter;
                         if (isYomichan)
                         {
-                            longVowerQueryOrParameter = EpwingYomichanDBManager.GetQuery(textWithoutLongVowelMarkList);
+                            longVowelQueryOrParameter = EpwingYomichanDBManager.GetQuery(textWithoutLongVowelMarkList);
                         }
                         else if (isNazeka)
                         {
-                            longVowerQueryOrParameter = EpwingNazekaDBManager.GetQuery(textWithoutLongVowelMarkList);
+                            longVowelQueryOrParameter = EpwingNazekaDBManager.GetQuery(textWithoutLongVowelMarkList);
                         }
                         else
                         {
-                            longVowerQueryOrParameter = DBUtils.GetParameter(textWithoutLongVowelMarkList);
+                            longVowelQueryOrParameter = DBUtils.GetParameter(textWithoutLongVowelMarkList);
                         }
 
-                        dbWordDictForLongVowelConversion = getRecordsFromDB!(dict.Name, textWithoutLongVowelMarkList, longVowerQueryOrParameter);
+                        dbWordDictForLongVowelConversion = getRecordsFromDB!(dict.Name, textWithoutLongVowelMarkList, longVowelQueryOrParameter);
                     }
 
                     int textWithoutLongVowelMarkListCount = textWithoutLongVowelMarkList.Count;
