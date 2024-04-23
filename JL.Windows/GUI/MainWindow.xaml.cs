@@ -69,6 +69,7 @@ internal sealed partial class MainWindow : Window
         _winApi = new WinApi();
         _winApi.ClipboardChanged += ClipboardChanged;
         _winApi.SubscribeToWndProc(this);
+        WinApi.RegisterToMagpieScalingChangedMessage();
 
         await ProfileUtils.DeserializeProfiles().ConfigureAwait(true);
 
@@ -177,6 +178,24 @@ internal sealed partial class MainWindow : Window
         }
     }
 
+    public void BringToFront()
+    {
+        if (ConfigManager.AlwaysOnTop
+            && !FirstPopupWindow.IsVisible
+            && !ManageDictionariesWindow.IsItVisible()
+            && !ManageFrequenciesWindow.IsItVisible()
+            && !ManageAudioSourcesWindow.IsItVisible()
+            && !AddNameWindow.IsItVisible()
+            && !AddWordWindow.IsItVisible()
+            && !PreferencesWindow.IsItVisible()
+            && !StatsWindow.IsItVisible()
+            && !MainTextBoxContextMenu.IsVisible
+            && !TitleBarContextMenu.IsVisible)
+        {
+            WinApi.BringToFront(WindowHandle);
+        }
+    }
+
     private void HandlePostCopy(string text)
     {
         Dispatcher.Invoke(() =>
@@ -199,20 +218,7 @@ internal sealed partial class MainWindow : Window
             }
         }, DispatcherPriority.Send);
 
-        if (ConfigManager.AlwaysOnTop
-            && !FirstPopupWindow.IsVisible
-            && !ManageDictionariesWindow.IsItVisible()
-            && !ManageFrequenciesWindow.IsItVisible()
-            && !ManageAudioSourcesWindow.IsItVisible()
-            && !AddNameWindow.IsItVisible()
-            && !AddWordWindow.IsItVisible()
-            && !PreferencesWindow.IsItVisible()
-            && !StatsWindow.IsItVisible()
-            && !MainTextBoxContextMenu.IsVisible
-            && !TitleBarContextMenu.IsVisible)
-        {
-            WinApi.BringToFront(WindowHandle);
-        }
+        BringToFront();
 
         BacklogUtils.AddToBacklog(text);
 
