@@ -70,6 +70,7 @@ internal sealed partial class MainWindow : Window
         _winApi.ClipboardChanged += ClipboardChanged;
         _winApi.SubscribeToWndProc(this);
         WinApi.RegisterToMagpieScalingChangedMessage();
+        WinApi.MarkWindowAsMagpieToolWindow(WindowHandle);
 
         await ProfileUtils.DeserializeProfiles().ConfigureAwait(true);
 

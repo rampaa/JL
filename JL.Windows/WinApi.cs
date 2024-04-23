@@ -338,6 +338,11 @@ internal sealed partial class WinApi
         _ = AllowWindowMessage(MainWindow.Instance.WindowHandle, "MagpieScalingChanged", ref WM_MAGPIE_SCALINGCHANGED);
     }
 
+    public static void MarkWindowAsMagpieToolWindow(nint hwnd)
+    {
+        _ = SetPropW(hwnd, "Magpie.ToolWindow", 1);
+    }
+
     private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
     {
         switch (msg)
@@ -400,7 +405,6 @@ internal sealed partial class WinApi
                 {
                     if (wParam is 1)
                     {
-                        _ = SetPropW(lParam, "Magpie.ToolWindow", 1);
                         MainWindow.Instance.BringToFront();
                     }
                 }
