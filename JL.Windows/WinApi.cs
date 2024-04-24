@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using JL.Windows.GUI;
 using JL.Windows.Utilities;
 using static JL.Windows.WinApi.NativeMethods;
 
@@ -34,6 +35,7 @@ internal sealed partial class WinApi
         internal const int WM_SYSCOMMAND = 0x0112;
         internal const int WM_WINDOWPOSCHANGING = 0x0046;
         internal const int WS_EX_NOACTIVATE = 0x08000000;
+        internal static int WM_MAGPIE_SCALINGCHANGED = -1;
         // public const nint WVR_VALIDRECTS = 0x0400;
 
         // RECT Structure
@@ -68,6 +70,13 @@ internal sealed partial class WinApi
             public int Y;
         }
 
+        internal enum ChangeWindowMessageFilterExAction : uint
+        {
+            Reset = 0,
+            Allow = 1,
+            Disallow = 2
+        };
+
         [LibraryImport("user32.dll", EntryPoint = "AddClipboardFormatListener", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -84,7 +93,7 @@ internal sealed partial class WinApi
 
         [LibraryImport("user32.dll", EntryPoint = "SendMessageW", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        internal static partial nint SendMessage(nint hWnd, uint msg, nint wParam, nint lParam);
+        internal static partial nint SendMessage(nint hWnd, int msg, nint wParam, nint lParam);
 
         [LibraryImport("user32.dll", EntryPoint = "SetWindowPos", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
@@ -148,6 +157,20 @@ internal sealed partial class WinApi
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static partial bool GetCursorPos(ref LPPOINT pt);
+
+        [LibraryImport("user32.dll", EntryPoint = "RegisterWindowMessageW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        internal static partial int RegisterWindowMessage(string lpString);
+
+        [LibraryImport("user32.dll", EntryPoint = "ChangeWindowMessageFilterEx", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool ChangeWindowMessageFilterEx(nint hWnd, int msg, ChangeWindowMessageFilterExAction action, nint changeInfo);
+
+        [LibraryImport("user32.dll", EntryPoint = "SetPropW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool SetPropW(nint hWnd, string lpString, nint hData);
 
         // ReSharper restore InconsistentNaming
     }
@@ -294,6 +317,32 @@ internal sealed partial class WinApi
         return new Point(lpPoint.X, lpPoint.Y);
     }
 
+    private static int RegisterToWindowMessage(string messageName)
+    {
+        return RegisterWindowMessage(messageName);
+    }
+
+    private static bool ChangeWindowMessageFilter(nint windowHandle, int message, ChangeWindowMessageFilterExAction filterAction)
+    {
+        return ChangeWindowMessageFilterEx(windowHandle, message, filterAction, 0);
+    }
+
+    private static bool AllowWindowMessage(nint windowHandle, string messageName, ref int message)
+    {
+        message = RegisterToWindowMessage(messageName);
+        return ChangeWindowMessageFilter(windowHandle, message, ChangeWindowMessageFilterExAction.Allow);
+    }
+
+    public static void RegisterToMagpieScalingChangedMessage()
+    {
+        _ = AllowWindowMessage(MainWindow.Instance.WindowHandle, "MagpieScalingChanged", ref WM_MAGPIE_SCALINGCHANGED);
+    }
+
+    public static void MarkWindowAsMagpieToolWindow(nint hwnd)
+    {
+        _ = SetPropW(hwnd, "Magpie.ToolWindow", 1);
+    }
+
     private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
     {
         switch (msg)
@@ -323,36 +372,43 @@ internal sealed partial class WinApi
                 handled = true;
                 break;
 
+            //case WM_NCCALCSIZE:
+            //    if (wParam is not 0)
+            //    {
+            //        NCCALCSIZE_PARAMS calcSizeParams = Marshal.PtrToStructure<NCCALCSIZE_PARAMS>(lParam);
+            //        calcSizeParams.rgrc1.left = 0;
+            //        calcSizeParams.rgrc1.right = 1;
+            //        calcSizeParams.rgrc1.top = 0;
+            //        calcSizeParams.rgrc1.bottom = 1;
+
+            //        calcSizeParams.rgrc2.left = 0;
+            //        calcSizeParams.rgrc2.right = 1;
+            //        calcSizeParams.rgrc2.top = 0;
+            //        calcSizeParams.rgrc2.bottom = 1;
+
+            //        Marshal.StructureToPtr(calcSizeParams, lParam, true);
+            //        handled = true;
+            //        return WVR_VALIDRECTS;
+            //    }
+            //    break;
+
+            //case NativeMethods.WM_NCHITTEST:
+            //    if (MainWindow.Instance.IsMouseOnTitleBar(lParam.ToInt32()))
+            //    {
+            //        handled = true;
+            //        return HTCAPTION;
+            //    }
+            //    break;
+
             default:
-                return 0;
-
-                //case WM_NCCALCSIZE:
-                //    if (wParam is not 0)
-                //    {
-                //        NCCALCSIZE_PARAMS calcSizeParams = Marshal.PtrToStructure<NCCALCSIZE_PARAMS>(lParam);
-                //        calcSizeParams.rgrc1.left = 0;
-                //        calcSizeParams.rgrc1.right = 1;
-                //        calcSizeParams.rgrc1.top = 0;
-                //        calcSizeParams.rgrc1.bottom = 1;
-
-                //        calcSizeParams.rgrc2.left = 0;
-                //        calcSizeParams.rgrc2.right = 1;
-                //        calcSizeParams.rgrc2.top = 0;
-                //        calcSizeParams.rgrc2.bottom = 1;
-
-                //        Marshal.StructureToPtr(calcSizeParams, lParam, true);
-                //        handled = true;
-                //        return WVR_VALIDRECTS;
-                //    }
-                //    break;
-
-                //case NativeMethods.WM_NCHITTEST:
-                //    if (MainWindow.Instance.IsMouseOnTitleBar(lParam.ToInt32()))
-                //    {
-                //        handled = true;
-                //        return HTCAPTION;
-                //    }
-                //    break;
+                if (msg == WM_MAGPIE_SCALINGCHANGED)
+                {
+                    if (wParam is 1)
+                    {
+                        MainWindow.Instance.BringToFront();
+                    }
+                }
+                break;
         }
 
         return 0;
