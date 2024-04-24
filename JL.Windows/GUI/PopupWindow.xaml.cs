@@ -1817,7 +1817,9 @@ internal sealed partial class PopupWindow : Window
 
     private TextBox? GetDefinitionTextBox(int listViewIndex)
     {
-        return ((StackPanel)((StackPanel)PopupListView.Items[listViewIndex]!).Children[1]).GetChildByName<TextBox>(nameof(LookupResult.FormattedDefinitions));
+        return PopupListView.Items.Count > listViewIndex
+            ? ((StackPanel)((StackPanel)PopupListView.Items[listViewIndex]!).Children[1]).GetChildByName<TextBox>(nameof(LookupResult.FormattedDefinitions))
+            : null;
     }
 
     private string? GetSelectedDefinitions(int listViewIndex)
