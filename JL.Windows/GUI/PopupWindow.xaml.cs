@@ -1083,6 +1083,16 @@ internal sealed partial class PopupWindow : Window
             return;
         }
 
+        if (_listViewItemIndex >= PopupListView.Items.Count || _listViewItemIndex >= LastLookupResults.Count)
+        {
+            Utils.Logger.Error("Couldn't mine the term due to an unexpected indexing problem");
+            Utils.Logger.Error("Last Lookup Results Count: {LastLookupResultsCount}, Popup Result Count: {PopupResultCount}, Popup Result Index: {PopupResultIndex}", LastLookupResults.Count, PopupListView.Items.Count, _listViewItemIndex);
+            Utils.Logger.Error("Couldn't mine the term due to an unexpected indexing problem");
+            Utils.Logger.Error("Dictionaries loaded: {DictionariesLoaded}", string.Join(", ", DictUtils.Dicts.Values.Where(d => d.Active).OrderBy(d => d.Priority).Select(d => d.Name)));
+            WindowsUtils.Alert(AlertLevel.Warning, "Couldn't mine the term due to an unexpected error. If you can reliable reproduce it, please open an issue about it on GitHub");
+            return;
+        }
+
         int listViewItemIndex = _listViewItemIndex;
         string? selectedDefinitions = GetSelectedDefinitions(listViewItemIndex);
 
@@ -1817,9 +1827,7 @@ internal sealed partial class PopupWindow : Window
 
     private TextBox? GetDefinitionTextBox(int listViewIndex)
     {
-        return PopupListView.Items.Count > listViewIndex
-            ? ((StackPanel)((StackPanel)PopupListView.Items[listViewIndex]!).Children[1]).GetChildByName<TextBox>(nameof(LookupResult.FormattedDefinitions))
-            : null;
+        return ((StackPanel)((StackPanel)PopupListView.Items[listViewIndex]!).Children[1]).GetChildByName<TextBox>(nameof(LookupResult.FormattedDefinitions));
     }
 
     private string? GetSelectedDefinitions(int listViewIndex)
