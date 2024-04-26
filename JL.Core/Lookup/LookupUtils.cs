@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using JL.Core.Config;
 using JL.Core.Deconjugation;
 using JL.Core.Dicts;
 using JL.Core.Dicts.CustomNameDict;
@@ -27,7 +28,7 @@ public static class LookupUtils
     public static List<LookupResult>? LookupText(string text)
     {
         DateTime preciseTimeNow = new(Stopwatch.GetTimestamp());
-        if ((preciseTimeNow - s_lastLookupTime).TotalMilliseconds < CoreConfig.LookupRate)
+        if ((preciseTimeNow - s_lastLookupTime).TotalMilliseconds < CoreConfigManager.LookupRate)
         {
             return null;
         }
@@ -42,7 +43,7 @@ public static class LookupUtils
 
         ConcurrentBag<LookupResult> lookupResults = [];
 
-        if (CoreConfig.KanjiMode)
+        if (CoreConfigManager.KanjiMode)
         {
             _ = Parallel.ForEach(DictUtils.Dicts.Values.ToList(), dict =>
             {

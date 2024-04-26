@@ -1,9 +1,10 @@
 using System.Collections.Frozen;
-using System.Configuration;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows.Input;
+using JL.Core.Config;
 using JL.Windows.GUI;
+using Microsoft.Data.Sqlite;
 
 namespace JL.Windows.Utilities;
 
@@ -170,12 +171,9 @@ internal static class KeyGestureUtils
             : "None";
     }
 
-    public static KeyGesture SetKeyGesture(Configuration config, string keyGestureName, KeyGesture keyGesture, bool setAsGlobalHotKey = true)
+    public static KeyGesture SetKeyGesture(SqliteConnection connection, string keyGestureName, KeyGesture keyGesture, bool setAsGlobalHotKey = true)
     {
-        KeyValueConfigurationCollection settings = config.AppSettings.Settings;
-
-        string? rawKeyGesture = settings.Get(keyGestureName);
-
+        string? rawKeyGesture = ConfigDBManager.GetSettingValue(connection, keyGestureName);
         if (rawKeyGesture is not null)
         {
             KeyGestureConverter keyGestureConverter = new();
@@ -196,8 +194,7 @@ internal static class KeyGestureUtils
             return newKeyGesture;
         }
 
-        settings.Add(keyGestureName, KeyGestureToString(keyGesture));
-        config.Save(ConfigurationSaveMode.Modified);
+        ConfigDBManager.InsertSetting(connection, keyGestureName, KeyGestureToString(keyGesture));
 
         if (ConfigManager.GlobalHotKeys && setAsGlobalHotKey)
         {
@@ -214,5 +211,14 @@ internal static class KeyGestureUtils
         menuItem.InputGestureText = keyGestureString is not "None"
             ? keyGestureString
             : "";
+    }
+
+    public static void SaveKeyGesture(SqliteConnection connection, string key, string rawKeyGesture)
+    {
+        string value = rawKeyGesture.StartsWith("Win+", StringComparison.Ordinal)
+            ? rawKeyGesture[4..]
+            : rawKeyGesture;
+
+        ConfigDBManager.UpdateSetting(connection, key, value);
     }
 }

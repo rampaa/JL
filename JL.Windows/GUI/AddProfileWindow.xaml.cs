@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
+using JL.Core.Config;
 using JL.Core.Profile;
 
 namespace JL.Windows.GUI;
@@ -25,9 +26,9 @@ internal sealed partial class AddProfileWindow : Window
     {
         string profileName = ProfileNameTextBox.Text.Trim();
         bool isValid = !string.IsNullOrWhiteSpace(profileName)
-                       && profileName.Length < 256
                        && profileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0
-                       && !ProfileUtils.Profiles.Contains(profileName, StringComparer.OrdinalIgnoreCase);
+                       && profileName.Length < 256
+                       && !ProfileDBUtils.ProfileExists(profileName);
 
         if (!isValid)
         {
@@ -41,12 +42,12 @@ internal sealed partial class AddProfileWindow : Window
                 ProfileNameTextBox.ClearValue(BorderBrushProperty);
             }
 
-            ProfileUtils.Profiles.Add(profileName);
-            PreferencesWindow.Instance.ProfileComboBox.ItemsSource = ProfileUtils.Profiles.ToList();
+            ProfileDBUtils.InsertProfile(profileName);
+            PreferencesWindow.Instance.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames();
 
             _ = Directory.CreateDirectory(ProfileUtils.ProfileFolderPath);
 
-            File.Copy(ProfileUtils.GetProfilePath(ProfileUtils.CurrentProfile), ProfileUtils.GetProfilePath(profileName));
+            ConfigDBManager.CopyProfileSettings(ProfileUtils.CurrentProfileId, ProfileDBUtils.GetProfileId(profileName));
             await File.Create(ProfileUtils.GetProfileCustomNameDictPath(profileName)).DisposeAsync().ConfigureAwait(false);
             await File.Create(ProfileUtils.GetProfileCustomWordDictPath(profileName)).DisposeAsync().ConfigureAwait(false);
 

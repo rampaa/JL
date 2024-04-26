@@ -1,11 +1,10 @@
-using System.Configuration;
 using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using JL.Core;
+using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Mining;
 using JL.Core.Mining.Anki;
@@ -35,7 +34,7 @@ internal sealed partial class PreferencesWindow : Window
     private PreferencesWindow()
     {
         InitializeComponent();
-        _profileName = ProfileUtils.CurrentProfile;
+        _profileName = ProfileUtils.CurrentProfileName;
         _profileNamesDict = DictUtils.SingleDictTypeDicts[DictType.ProfileCustomNameDictionary];
         _profileWordsDict = DictUtils.SingleDictTypeDicts[DictType.ProfileCustomWordDictionary];
     }
@@ -143,11 +142,11 @@ internal sealed partial class PreferencesWindow : Window
         WindowsUtils.UpdateMainWindowVisibility();
         _ = MainWindow.Instance.Focus();
 
-        if (_profileName != ProfileUtils.CurrentProfile)
+        if (_profileName != ProfileUtils.CurrentProfileName)
         {
-            _profileName = ProfileUtils.CurrentProfile;
-            _profileNamesDict.Path = Utils.GetPath(ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfile));
-            _profileWordsDict.Path = Utils.GetPath(ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfile));
+            _profileName = ProfileUtils.CurrentProfileName;
+            _profileNamesDict.Path = Utils.GetPath(ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfileName));
+            _profileWordsDict.Path = Utils.GetPath(ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfileName));
 
             if (_profileNamesDict.Active || _profileWordsDict.Active)
             {
@@ -173,8 +172,6 @@ internal sealed partial class PreferencesWindow : Window
 
                 await DictUtils.LoadDictionaries().ConfigureAwait(false);
             }
-
-            await ProfileUtils.SerializeProfiles().ConfigureAwait(false);
         }
     }
 
@@ -183,7 +180,7 @@ internal sealed partial class PreferencesWindow : Window
     {
         if (!SetAnkiConfig)
         {
-            if (CoreConfig.AnkiIntegration)
+            if (CoreConfigManager.AnkiIntegration)
             {
                 await SetPreviousMiningConfig().ConfigureAwait(true);
                 await PopulateDeckAndModelNames().ConfigureAwait(true);
@@ -409,7 +406,7 @@ internal sealed partial class PreferencesWindow : Window
 
     public async Task SaveMiningSetup()
     {
-        if (!CoreConfig.AnkiIntegration)
+        if (!CoreConfigManager.AnkiIntegration)
         {
             return;
         }
@@ -449,7 +446,7 @@ internal sealed partial class PreferencesWindow : Window
         {
             WindowsUtils.Alert(AlertLevel.Error, "Error saving AnkiConfig");
             Utils.Logger.Error("Error saving AnkiConfig");
-            CoreConfig.AnkiIntegration = false;
+            CoreConfigManager.AnkiIntegration = false;
         }
     }
 
@@ -536,7 +533,7 @@ internal sealed partial class PreferencesWindow : Window
             string normalizedUrl = AnkiUriTextBox.Text
                 .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
                 .Replace("://localhost:", "://127.0.0.1:", StringComparison.Ordinal);
-            CoreConfig.AnkiConnectUri = new Uri(normalizedUrl);
+            CoreConfigManager.AnkiConnectUri = new Uri(normalizedUrl);
             AnkiUriTextBox.Text = normalizedUrl;
         }
 
@@ -589,27 +586,22 @@ internal sealed partial class PreferencesWindow : Window
         _ = infoWindow.ShowDialog();
     }
 
-    // ReSharper disable once AsyncVoidMethod
-    private async void ProfileComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void ProfileComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        string selectedProfile = (string)((ComboBox)sender).SelectedItem;
-        if (selectedProfile != ProfileUtils.CurrentProfile)
+        string selectedProfileName = (string)((ComboBox)sender).SelectedItem;
+        if (selectedProfileName != ProfileUtils.CurrentProfileName)
         {
-            await Stats.SerializeProfileLifetimeStats().ConfigureAwait(false);
-            ProfileUtils.CurrentProfile = selectedProfile;
-
-            ConfigManager.MappedExeConfiguration = new ExeConfigurationFileMap
-            {
-                ExeConfigFilename = ProfileUtils.GetProfilePath(ProfileUtils.CurrentProfile)
-            };
+            StatsUtils.UpdateProfileLifetimeStats();
+            ProfileUtils.CurrentProfileName = selectedProfileName;
+            ProfileUtils.CurrentProfileId = ProfileDBUtils.GetProfileId(selectedProfileName);
 
             Application.Current.Dispatcher.Invoke(() =>
             {
                 ConfigManager.ApplyPreferences();
-                ConfigManager.LoadPreferences(this);
+                ConfigManager.LoadPreferenceWindow(this);
             });
 
-            await StatsUtils.DeserializeProfileLifetimeStats().ConfigureAwait(false);
+            StatsUtils.UpdateProfileLifetimeStats();
         }
     }
 

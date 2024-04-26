@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
+using JL.Core.Config;
 using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
@@ -162,7 +163,7 @@ public static class AudioUtils
                     }
 
                     case AudioSourceType.TextToSpeech:
-                        await Utils.Frontend.TextToSpeech(uri, reading, CoreConfig.AudioVolume).ConfigureAwait(false);
+                        await Utils.Frontend.TextToSpeech(uri, reading, CoreConfigManager.AudioVolume).ConfigureAwait(false);
                         return s_textToSpeechAudioResponse;
 
                     default:
@@ -190,7 +191,7 @@ public static class AudioUtils
         if (audioResponse?.AudioData is not null)
         {
             await Utils.Frontend.StopTextToSpeech().ConfigureAwait(false);
-            Utils.Frontend.PlayAudio(audioResponse.AudioData, audioResponse.AudioFormat, CoreConfig.AudioVolume / 100f);
+            Utils.Frontend.PlayAudio(audioResponse.AudioData, audioResponse.AudioFormat, CoreConfigManager.AudioVolume / 100f);
             Stats.IncrementStat(StatType.TimesPlayedAudio);
         }
     }

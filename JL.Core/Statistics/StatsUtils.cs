@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text.Json;
 using System.Timers;
+using JL.Core.Config;
 using JL.Core.Profile;
 using JL.Core.Utilities;
 using Timer = System.Timers.Timer;
@@ -11,75 +12,6 @@ public static class StatsUtils
 {
     public static Stopwatch StatsStopWatch { get; } = new();
     private static Timer StatsTimer { get; } = new();
-
-    public static async Task DeserializeLifetimeStats()
-    {
-        string filePath = Path.Join(Utils.ConfigPath, "Stats.json");
-        if (File.Exists(filePath))
-        {
-            try
-            {
-                FileStream fileStream = File.OpenRead(filePath);
-                await using (fileStream.ConfigureAwait(false))
-                {
-                    Stats.LifetimeStats = await JsonSerializer.DeserializeAsync<Stats>(fileStream,
-                        Utils.s_jsoWithEnumConverter).ConfigureAwait(false) ?? Stats.LifetimeStats;
-                }
-            }
-
-            catch (Exception ex)
-            {
-                Utils.Frontend.Alert(AlertLevel.Error, "Couldn't read Stats");
-                Utils.Logger.Error(ex, "Couldn't read Stats");
-            }
-        }
-
-        else
-        {
-            Utils.Logger.Information("Stats.json doesn't exist, creating it");
-            await Stats.SerializeLifetimeStats().ConfigureAwait(false);
-        }
-    }
-
-    public static async Task DeserializeProfileLifetimeStats()
-    {
-        string filePath = GetStatsPath(ProfileUtils.CurrentProfile);
-        if (File.Exists(filePath))
-        {
-            try
-            {
-                FileStream fileStream = File.OpenRead(filePath);
-                await using (fileStream.ConfigureAwait(false))
-                {
-                    Stats.ProfileLifetimeStats = await JsonSerializer.DeserializeAsync<Stats>(fileStream,
-                        Utils.s_jsoWithEnumConverter).ConfigureAwait(false) ?? Stats.ProfileLifetimeStats;
-                }
-            }
-
-            catch (Exception ex)
-            {
-                Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't read {ProfileUtils.CurrentProfile} Stats");
-                Utils.Logger.Error(ex, "Couldn't read {CurrentProfile} Stats", ProfileUtils.CurrentProfile);
-            }
-        }
-
-        else
-        {
-            if (ProfileUtils.DefaultProfiles[0] == ProfileUtils.CurrentProfile)
-            {
-                _ = Directory.CreateDirectory(ProfileUtils.ProfileFolderPath);
-                File.Copy(Path.Join(Utils.ConfigPath, "Stats.json"), filePath);
-                await DeserializeProfileLifetimeStats().ConfigureAwait(false);
-            }
-
-            else
-            {
-                Utils.Logger.Information("{CurrentProfile}_Stats.json doesn't exist, creating it", ProfileUtils.CurrentProfile);
-                Stats.ResetStats(StatsMode.Profile);
-                await Stats.SerializeProfileLifetimeStats().ConfigureAwait(false);
-            }
-        }
-    }
 
     public static void StartStatsTimer()
     {
@@ -97,8 +29,7 @@ public static class StatsUtils
         StatsTimer.Enabled = false;
     }
 
-    // ReSharper disable once AsyncVoidMethod
-    private static async void OnTimedEvent(object? sender, ElapsedEventArgs e)
+    private static void OnTimedEvent(object? sender, ElapsedEventArgs e)
     {
         Stats.IncrementStat(StatType.Time, StatsStopWatch.ElapsedTicks);
 
@@ -112,12 +43,34 @@ public static class StatsUtils
             StatsStopWatch.Reset();
         }
 
-        await Stats.SerializeLifetimeStats().ConfigureAwait(false);
-        await Stats.SerializeProfileLifetimeStats().ConfigureAwait(false);
+        InsertOrUpdateStats(Stats.LifetimeStats, ProfileUtils.DefaultProfileId);
+        InsertOrUpdateStats(Stats.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
     }
 
-    public static string GetStatsPath(string profileName)
+    private static void InsertOrUpdateStats(Stats stats, int profileId)
     {
-        return Path.Join(ProfileUtils.ProfileFolderPath, $"{profileName}_Stats.json");
+        string lifetimeStats = JsonSerializer.Serialize(stats, Utils.s_jsoWithIndentation);
+
+        bool statsExists = StatsDBUtils.StatsExists(profileId);
+        if (statsExists)
+        {
+            StatsDBUtils.UpdateStats(lifetimeStats, profileId);
+        }
+        else
+        {
+            StatsDBUtils.InsertStats(lifetimeStats, profileId);
+        }
+    }
+
+    public static void UpdateLifetimeStats()
+    {
+        string lifetimeStats = JsonSerializer.Serialize(Stats.LifetimeStats, Utils.s_jsoWithIndentation);
+        StatsDBUtils.UpdateStats(lifetimeStats, ProfileUtils.DefaultProfileId);
+    }
+
+    public static void UpdateProfileLifetimeStats()
+    {
+        string profileLifetimeStats = JsonSerializer.Serialize(Stats.ProfileLifetimeStats, Utils.s_jsoWithIndentation);
+        StatsDBUtils.UpdateStats(profileLifetimeStats, ProfileUtils.CurrentProfileId);
     }
 }

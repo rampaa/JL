@@ -4,8 +4,8 @@ using JL.Core.Dicts;
 using JL.Core.Dicts.Options;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
-using JL.Windows.Utilities;
 using Microsoft.Win32;
+using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Path = System.IO.Path;
 
 namespace JL.Windows.GUI;
@@ -84,7 +84,6 @@ internal sealed partial class AddDictionaryWindow : Window
             if (dict.Type is DictType.PitchAccentYomichan)
             {
                 DictUtils.SingleDictTypeDicts[DictType.PitchAccentYomichan] = dict;
-                PopupWindowUtils.SetStrokeDashArray(dict.Options?.ShowPitchAccentWithDottedLines?.Value ?? true);
             }
 
             Close();

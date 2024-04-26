@@ -1,4 +1,5 @@
 using System.Text;
+using JL.Core.Config;
 
 namespace JL.Core.Utilities;
 
@@ -74,12 +75,12 @@ public static class TextUtils
             text = RemoveInvalidUnicodeSequences(text, firstInvalidUnicodeCharIndex);
         }
 
-        if (CoreConfig.TextBoxTrimWhiteSpaceCharacters)
+        if (CoreConfigManager.TextBoxTrimWhiteSpaceCharacters)
         {
             text = text.Trim();
         }
 
-        if (CoreConfig.TextBoxRemoveNewlines)
+        if (CoreConfigManager.TextBoxRemoveNewlines)
         {
             text = text.ReplaceLineEndings("");
         }

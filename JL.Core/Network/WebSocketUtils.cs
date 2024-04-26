@@ -1,5 +1,6 @@
 using System.Net.WebSockets;
 using System.Text;
+using JL.Core.Config;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 
@@ -16,7 +17,7 @@ public static class WebSocketUtils
 
     public static void HandleWebSocket()
     {
-        if (!CoreConfig.CaptureTextFromWebSocket)
+        if (!CoreConfigManager.CaptureTextFromWebSocket)
         {
             s_webSocketTask = null;
         }
@@ -42,16 +43,16 @@ public static class WebSocketUtils
             try
             {
                 using ClientWebSocket webSocketClient = new();
-                await webSocketClient.ConnectAsync(CoreConfig.WebSocketUri, CancellationToken.None).ConfigureAwait(false);
+                await webSocketClient.ConnectAsync(CoreConfigManager.WebSocketUri, CancellationToken.None).ConfigureAwait(false);
                 byte[] buffer = new byte[1024];
 
-                while (CoreConfig.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested && webSocketClient.State is WebSocketState.Open)
+                while (CoreConfigManager.CaptureTextFromWebSocket && !cancellationToken.IsCancellationRequested && webSocketClient.State is WebSocketState.Open)
                 {
                     try
                     {
                         WebSocketReceiveResult result = await webSocketClient.ReceiveAsync(buffer, CancellationToken.None).ConfigureAwait(false);
 
-                        if (!CoreConfig.CaptureTextFromWebSocket || cancellationToken.IsCancellationRequested)
+                        if (!CoreConfigManager.CaptureTextFromWebSocket || cancellationToken.IsCancellationRequested)
                         {
                             return;
                         }
@@ -75,7 +76,7 @@ public static class WebSocketUtils
                     }
                     catch (WebSocketException webSocketException)
                     {
-                        if (!CoreConfig.CaptureTextFromClipboard)
+                        if (!CoreConfigManager.CaptureTextFromClipboard)
                         {
                             StatsUtils.StatsStopWatch.Stop();
                             StatsUtils.StopStatsTimer();
@@ -91,7 +92,7 @@ public static class WebSocketUtils
 
             catch (WebSocketException webSocketException)
             {
-                if (!CoreConfig.CaptureTextFromClipboard)
+                if (!CoreConfigManager.CaptureTextFromClipboard)
                 {
                     StatsUtils.StatsStopWatch.Stop();
                     StatsUtils.StopStatsTimer();

@@ -4,8 +4,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using JL.Core.Config;
 using JL.Core.Profile;
-using JL.Core.Statistics;
 using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;
@@ -42,24 +42,18 @@ internal sealed partial class ManageProfilesWindow : Window
         }
     }
 
-    // ReSharper disable once AsyncVoidMethod
-    private async void Window_Closed(object sender, EventArgs e)
-    {
-        await ProfileUtils.SerializeProfiles().ConfigureAwait(false);
-    }
-
     private void UpdateProfilesDisplay()
     {
         List<DockPanel> resultDockPanels = [];
 
-        foreach (string profile in ProfileUtils.Profiles)
+        foreach (string profileName in ProfileDBUtils.GetProfileNames())
         {
             DockPanel dockPanel = new();
 
             TextBlock profileNameTextBlock = new()
             {
                 Width = 350,
-                Text = profile,
+                Text = profileName,
                 TextWrapping = TextWrapping.Wrap,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -67,7 +61,7 @@ internal sealed partial class ManageProfilesWindow : Window
                 Cursor = Cursors.Hand
             };
 
-            bool defaultOrCurrentProfile = ProfileUtils.DefaultProfiles.Contains(profile) || profile == ProfileUtils.CurrentProfile;
+            bool defaultOrCurrentProfile = profileName == ProfileUtils.DefaultProfileName || profileName == ProfileUtils.CurrentProfileName;
 
             Button removeButton = new()
             {
@@ -82,7 +76,7 @@ internal sealed partial class ManageProfilesWindow : Window
                 Visibility = defaultOrCurrentProfile
                     ? Visibility.Collapsed
                     : Visibility.Visible,
-                Tag = profile
+                Tag = profileName
             };
             removeButton.Click += RemoveButton_Click;
 
@@ -101,14 +95,8 @@ internal sealed partial class ManageProfilesWindow : Window
         {
             string profile = (string)((Button)sender).Tag;
 
-            _ = ProfileUtils.Profiles.Remove(profile);
-            PreferencesWindow.Instance.ProfileComboBox.ItemsSource = ProfileUtils.Profiles.ToList();
-
-            string profilePath = ProfileUtils.GetProfilePath(profile);
-            if (File.Exists(profilePath))
-            {
-                File.Delete(profilePath);
-            }
+            ProfileDBUtils.DeleteProfile(profile);
+            PreferencesWindow.Instance.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames();
 
             string profileCustomNamesPath = ProfileUtils.GetProfileCustomNameDictPath(profile);
             if (File.Exists(profileCustomNamesPath))
@@ -120,12 +108,6 @@ internal sealed partial class ManageProfilesWindow : Window
             if (File.Exists(profileCustomWordsPath))
             {
                 File.Delete(profileCustomWordsPath);
-            }
-
-            string statsPath = StatsUtils.GetStatsPath(profile);
-            if (File.Exists(statsPath))
-            {
-                File.Delete(statsPath);
             }
 
             UpdateProfilesDisplay();

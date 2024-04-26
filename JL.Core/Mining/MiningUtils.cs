@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using JL.Core.Audio;
+using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Dicts.PitchAccent;
 using JL.Core.Freqs;
@@ -409,7 +410,7 @@ public static class MiningUtils
 
     public static async Task Mine(LookupResult lookupResult, string currentText, string? selectedDefinitions, int currentCharPosition)
     {
-        if (!CoreConfig.AnkiIntegration)
+        if (!CoreConfigManager.AnkiIntegration)
         {
             Utils.Frontend.Alert(AlertLevel.Error, "Please setup mining first in the preferences");
             return;
@@ -509,7 +510,7 @@ public static class MiningUtils
         Dictionary<string, object> options = new(1, StringComparer.Ordinal)
         {
             {
-                "allowDuplicate", CoreConfig.AllowDuplicateCards
+                "allowDuplicate", CoreConfigManager.AllowDuplicateCards
             }
         };
 
@@ -539,7 +540,7 @@ public static class MiningUtils
             Utils.Logger.Information("Mined {FoundSpelling}", lookupResult.PrimarySpelling);
         }
 
-        if (CoreConfig.ForceSyncAnki)
+        if (CoreConfigManager.ForceSyncAnki)
         {
             await AnkiConnect.Sync().ConfigureAwait(false);
         }

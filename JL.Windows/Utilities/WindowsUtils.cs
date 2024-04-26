@@ -13,8 +13,8 @@ using System.Windows.Media.Imaging;
 using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools;
-using JL.Core;
 using JL.Core.Audio;
+using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
 using JL.Core.Network;
@@ -177,7 +177,7 @@ internal static class WindowsUtils
     public static void ShowPreferencesWindow()
     {
         PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
-        ConfigManager.LoadPreferences(preferencesWindow);
+        ConfigManager.LoadPreferenceWindow(preferencesWindow);
         preferencesWindow.Owner = MainWindow.Instance;
         preferencesWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         StatsUtils.StatsStopWatch.Stop();
@@ -343,7 +343,7 @@ internal static class WindowsUtils
 
         await Utils.CoreInitialize().ConfigureAwait(true);
 
-        if (CoreConfig.CheckForJLUpdatesOnStartUp)
+        if (CoreConfigManager.CheckForJLUpdatesOnStartUp)
         {
             PreferencesWindow preferencesWindow = PreferencesWindow.Instance;
             preferencesWindow.CheckForJLUpdatesButton.IsEnabled = false;

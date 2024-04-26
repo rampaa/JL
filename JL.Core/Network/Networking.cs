@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Timers;
+using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Utilities;
 using Timer = System.Timers.Timer;
@@ -112,7 +113,7 @@ public static class Networking
     {
         await DictUpdater.AutoUpdateBuiltInDicts().ConfigureAwait(false);
 
-        if (CoreConfig.CheckForJLUpdatesOnStartUp)
+        if (CoreConfigManager.CheckForJLUpdatesOnStartUp)
         {
             await CheckForJLUpdates(true).ConfigureAwait(false);
         }

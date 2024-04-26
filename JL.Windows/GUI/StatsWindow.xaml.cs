@@ -48,13 +48,12 @@ internal sealed partial class StatsWindow : Window
         return s_instance?.IsVisible ?? false;
     }
 
-    // ReSharper disable once AsyncVoidMethod
-    private async void Window_Loaded(object sender, RoutedEventArgs e)
+    private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         UpdateStatsDisplay(StatsMode.Session);
 
-        await Stats.SerializeProfileLifetimeStats().ConfigureAwait(false);
-        await Stats.SerializeLifetimeStats().ConfigureAwait(false);
+        StatsUtils.UpdateProfileLifetimeStats();
+        StatsUtils.UpdateLifetimeStats();
     }
 
     private void UpdateStatsDisplay(StatsMode mode)
@@ -106,8 +105,7 @@ internal sealed partial class StatsWindow : Window
         }
     }
 
-    // ReSharper disable once AsyncVoidMethod
-    private async void ButtonResetStats_OnClick(object sender, RoutedEventArgs e)
+    private void ButtonResetStats_OnClick(object sender, RoutedEventArgs e)
     {
 #pragma warning disable CA1308 // Normalize strings to uppercase
         if (WindowsUtils.ShowYesNoDialog(
@@ -120,12 +118,12 @@ internal sealed partial class StatsWindow : Window
 
                 if (statsMode is StatsMode.Lifetime)
                 {
-                    await Stats.SerializeLifetimeStats().ConfigureAwait(true);
+                    StatsUtils.UpdateLifetimeStats();
                 }
 
                 else if (statsMode is StatsMode.Profile)
                 {
-                    await Stats.SerializeProfileLifetimeStats().ConfigureAwait(true);
+                    StatsUtils.UpdateProfileLifetimeStats();
                 }
 
                 UpdateStatsDisplay(statsMode);

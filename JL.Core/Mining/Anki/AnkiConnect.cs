@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using JL.Core.Config;
 using JL.Core.Network;
 using JL.Core.Utilities;
 
@@ -63,7 +64,7 @@ internal static class AnkiConnect
             Utils.Logger.Information("Sending: {Payload}", await payload.ReadAsStringAsync().ConfigureAwait(false));
 
             using HttpResponseMessage postResponse = await Networking.Client
-                .PostAsync(CoreConfig.AnkiConnectUri, payload).ConfigureAwait(false);
+                .PostAsync(CoreConfigManager.AnkiConnectUri, payload).ConfigureAwait(false);
 
             if (postResponse.IsSuccessStatusCode)
             {

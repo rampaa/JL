@@ -1,7 +1,4 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using JL.Core.Profile;
-using JL.Core.Utilities;
 
 namespace JL.Core.Statistics;
 
@@ -149,38 +146,6 @@ public sealed class Stats
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(statsMode), statsMode, null);
-        }
-    }
-
-    public static async Task SerializeLifetimeStats()
-    {
-        try
-        {
-            _ = Directory.CreateDirectory(Utils.ConfigPath);
-            await File.WriteAllTextAsync(Path.Join(Utils.ConfigPath, "Stats.json"),
-                    JsonSerializer.Serialize(LifetimeStats, Utils.s_jsoWithIndentation))
-                .ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            Utils.Frontend.Alert(AlertLevel.Error, "Couldn't write Stats");
-            Utils.Logger.Error(ex, "Couldn't write Stats");
-        }
-    }
-
-    public static async Task SerializeProfileLifetimeStats()
-    {
-        try
-        {
-            _ = Directory.CreateDirectory(ProfileUtils.ProfileFolderPath);
-            await File.WriteAllTextAsync(StatsUtils.GetStatsPath(ProfileUtils.CurrentProfile),
-                    JsonSerializer.Serialize(ProfileLifetimeStats, Utils.s_jsoWithIndentation))
-                .ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            Utils.Frontend.Alert(AlertLevel.Error, $"Couldn't write {ProfileUtils.CurrentProfile} Stats");
-            Utils.Logger.Error(ex, "Couldn't write {CurrentProfile} Stats", ProfileUtils.CurrentProfile);
         }
     }
 }

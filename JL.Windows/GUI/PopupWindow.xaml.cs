@@ -4,7 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using JL.Core;
+using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
 using JL.Core.Mining;
@@ -1222,7 +1222,7 @@ internal sealed partial class PopupWindow : Window
 
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.KanjiModeKeyGesture))
         {
-            CoreConfig.KanjiMode = !CoreConfig.KanjiMode;
+            CoreConfigManager.KanjiMode = !CoreConfigManager.KanjiMode;
             LastText = "";
 
             if (this != MainWindow.Instance.FirstPopupWindow)
@@ -1427,7 +1427,7 @@ internal sealed partial class PopupWindow : Window
                     ? _lastInteractedTextBox.SelectedText
                     : LastLookupResults[_listViewItemIndex].PrimarySpelling;
 
-                await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text, CoreConfig.AudioVolume).ConfigureAwait(false);
+                await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text, CoreConfigManager.AudioVolume).ConfigureAwait(false);
             }
         }
 
@@ -1674,7 +1674,7 @@ internal sealed partial class PopupWindow : Window
 
     private static bool NoAllDictFilter(object item)
     {
-        if (CoreConfig.KanjiMode)
+        if (CoreConfigManager.KanjiMode)
         {
             return true;
         }

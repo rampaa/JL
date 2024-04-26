@@ -1439,12 +1439,12 @@ public static class DictUtils
 
                     if (dict.Type is DictType.ProfileCustomNameDictionary)
                     {
-                        dict.Path = ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfile);
+                        dict.Path = ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfileName);
                         SingleDictTypeDicts[dict.Type] = dict;
                     }
                     else if (dict.Type is DictType.ProfileCustomWordDictionary)
                     {
-                        dict.Path = ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfile);
+                        dict.Path = ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfileName);
                         SingleDictTypeDicts[dict.Type] = dict;
                     }
                     else if (dict.Type is DictType.CustomNameDictionary

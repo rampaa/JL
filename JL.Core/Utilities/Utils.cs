@@ -147,17 +147,18 @@ public static partial class Utils
             await File.Create(customNamesPath).DisposeAsync().ConfigureAwait(false);
         }
 
-        string profileCustomWordsPath = ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfile);
+        string profileCustomWordsPath = ProfileUtils.GetProfileCustomWordDictPath(ProfileUtils.CurrentProfileName);
         if (!File.Exists(profileCustomWordsPath))
         {
             await File.Create(profileCustomWordsPath).DisposeAsync().ConfigureAwait(false);
         }
 
-        string profileCustomNamesPath = ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfile);
+        string profileCustomNamesPath = ProfileUtils.GetProfileCustomNameDictPath(ProfileUtils.CurrentProfileName);
         if (!File.Exists(profileCustomNamesPath))
         {
             await File.Create(profileCustomNamesPath).DisposeAsync().ConfigureAwait(false);
         }
+
         await Task.WhenAll(
             Task.Run(static async () =>
             {

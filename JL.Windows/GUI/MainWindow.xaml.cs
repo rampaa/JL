@@ -1,4 +1,3 @@
-using System.Configuration;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -8,11 +7,10 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using HandyControl.Tools;
-using JL.Core;
+using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
 using JL.Core.Network;
-using JL.Core.Profile;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.SpeechSynthesis;
@@ -72,12 +70,7 @@ internal sealed partial class MainWindow : Window
         WinApi.RegisterToMagpieScalingChangedMessage();
         WinApi.MarkWindowAsMagpieToolWindow(WindowHandle);
 
-        await ProfileUtils.DeserializeProfiles().ConfigureAwait(true);
-
-        ConfigManager.MappedExeConfiguration = new ExeConfigurationFileMap
-        {
-            ExeConfigFilename = ProfileUtils.GetProfilePath(ProfileUtils.CurrentProfile)
-        };
+        ProfileDBUtils.SetCurrentProfileFromConfig();
 
         ConfigManager.ApplyPreferences();
 
@@ -88,10 +81,10 @@ internal sealed partial class MainWindow : Window
             WinApi.BringToFront(WindowHandle);
         }
 
-        await StatsUtils.DeserializeLifetimeStats().ConfigureAwait(true);
-        await StatsUtils.DeserializeProfileLifetimeStats().ConfigureAwait(true);
+        StatsUtils.UpdateLifetimeStats();
+        StatsUtils.UpdateProfileLifetimeStats();
 
-        if (CoreConfig.CaptureTextFromClipboard)
+        if (CoreConfigManager.CaptureTextFromClipboard)
         {
             s_clipboardSequenceNo = WinApi.GetClipboardSequenceNo();
             _ = CopyFromClipboard();
@@ -226,7 +219,7 @@ internal sealed partial class MainWindow : Window
         if (ConfigManager.TextToSpeechOnTextChange
             && SpeechSynthesisUtils.InstalledVoiceWithHighestPriority is not null)
         {
-            _ = SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text, CoreConfig.AudioVolume).ConfigureAwait(false);
+            _ = SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, text, CoreConfigManager.AudioVolume).ConfigureAwait(false);
         }
 
         Stats.IncrementStat(StatType.Lines);
@@ -394,8 +387,8 @@ internal sealed partial class MainWindow : Window
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
         ConfigManager.SaveBeforeClosing();
         Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
-        await Stats.SerializeLifetimeStats().ConfigureAwait(false);
-        await Stats.SerializeProfileLifetimeStats().ConfigureAwait(false);
+        StatsUtils.UpdateLifetimeStats();
+        StatsUtils.UpdateProfileLifetimeStats();
         await BacklogUtils.WriteBacklog().ConfigureAwait(false);
         DBUtils.SendOptimizePragmaToAllDBs();
         SqliteConnection.ClearAllPools();
@@ -506,7 +499,7 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            CoreConfig.KanjiMode = !CoreConfig.KanjiMode;
+            CoreConfigManager.KanjiMode = !CoreConfigManager.KanjiMode;
             FirstPopupWindow.LastText = "";
             MainTextBox_MouseMove(null, null);
         }
@@ -634,8 +627,8 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            CoreConfig.CaptureTextFromClipboard = !CoreConfig.CaptureTextFromClipboard;
-            if (CoreConfig.CaptureTextFromClipboard)
+            CoreConfigManager.CaptureTextFromClipboard = !CoreConfigManager.CaptureTextFromClipboard;
+            if (CoreConfigManager.CaptureTextFromClipboard)
             {
                 WinApi.SubscribeToClipboardChanged(WindowHandle);
             }
@@ -644,7 +637,7 @@ internal sealed partial class MainWindow : Window
                 WinApi.UnsubscribeFromClipboardChanged(WindowHandle);
             }
 
-            if (!CoreConfig.CaptureTextFromWebSocket && !CoreConfig.CaptureTextFromClipboard)
+            if (!CoreConfigManager.CaptureTextFromWebSocket && !CoreConfigManager.CaptureTextFromClipboard)
             {
                 StatsUtils.StatsStopWatch.Stop();
                 StatsUtils.StopStatsTimer();
@@ -660,10 +653,10 @@ internal sealed partial class MainWindow : Window
         {
             handled = true;
 
-            CoreConfig.CaptureTextFromWebSocket = !CoreConfig.CaptureTextFromWebSocket;
+            CoreConfigManager.CaptureTextFromWebSocket = !CoreConfigManager.CaptureTextFromWebSocket;
             WebSocketUtils.HandleWebSocket();
 
-            if (!CoreConfig.CaptureTextFromWebSocket && !CoreConfig.CaptureTextFromClipboard)
+            if (!CoreConfigManager.CaptureTextFromWebSocket && !CoreConfigManager.CaptureTextFromClipboard)
             {
                 StatsUtils.StatsStopWatch.Stop();
                 StatsUtils.StopStatsTimer();
@@ -681,7 +674,7 @@ internal sealed partial class MainWindow : Window
 
             if (!WebSocketUtils.Connected)
             {
-                CoreConfig.CaptureTextFromWebSocket = true;
+                CoreConfigManager.CaptureTextFromWebSocket = true;
 
                 if (!StatsUtils.StatsStopWatch.IsRunning)
                 {
@@ -755,7 +748,7 @@ internal sealed partial class MainWindow : Window
 
                 if (selectedText.Length > 0)
                 {
-                    await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, selectedText, CoreConfig.AudioVolume).ConfigureAwait(false);
+                    await SpeechSynthesisUtils.TextToSpeech(SpeechSynthesisUtils.InstalledVoiceWithHighestPriority, selectedText, CoreConfigManager.AudioVolume).ConfigureAwait(false);
                 }
             }
         }
@@ -1458,7 +1451,7 @@ internal sealed partial class MainWindow : Window
             }
 
             if (ConfigManager.StopIncreasingTimeStatWhenMinimized
-                && (CoreConfig.CaptureTextFromClipboard || (CoreConfig.CaptureTextFromWebSocket && WebSocketUtils.Connected)))
+                && (CoreConfigManager.CaptureTextFromClipboard || (CoreConfigManager.CaptureTextFromWebSocket && WebSocketUtils.Connected)))
             {
                 StatsUtils.StatsStopWatch.Start();
             }
