@@ -23,16 +23,16 @@ public static class ProfileDBUtils
 
     internal static void InsertDefaultProfile(SqliteConnection connection)
     {
-        using SqliteCommand insertProfileCommand = connection.CreateCommand();
-        insertProfileCommand.CommandText =
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText =
             """
             INSERT INTO profile (id, name)
             VALUES (@id, @name);
             """;
 
-        _ = insertProfileCommand.Parameters.AddWithValue("@id", ProfileUtils.DefaultProfileId);
-        _ = insertProfileCommand.Parameters.AddWithValue("@name", ProfileUtils.DefaultProfileName);
-        _ = insertProfileCommand.ExecuteNonQuery();
+        _ = command.Parameters.AddWithValue("@id", ProfileUtils.DefaultProfileId);
+        _ = command.Parameters.AddWithValue("@name", ProfileUtils.DefaultProfileName);
+        _ = command.ExecuteNonQuery();
 
         ConfigDBManager.InsertSetting(connection, nameof(ProfileUtils.CurrentProfileId), "1", ProfileUtils.DefaultProfileId);
     }
@@ -46,7 +46,7 @@ public static class ProfileDBUtils
             """
             SELECT value
             FROM setting
-            WHERE profile_id = 1 AND name = CurrentProfileId;
+            WHERE profile_id = 1 AND name = 'CurrentProfileId';
             """;
 
         return Convert.ToInt32(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
@@ -131,8 +131,7 @@ public static class ProfileDBUtils
 
     public static void SetCurrentProfileFromConfig()
     {
-        ProfileUtils.CurrentProfileId = GetCurrentProfileIdFromConfig();
-        ProfileUtils.CurrentProfileName = GetProfileName(ProfileUtils.CurrentProfileId);
+
     }
 
     public static void DeleteProfile(string profileName)

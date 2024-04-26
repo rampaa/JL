@@ -594,6 +594,7 @@ internal sealed partial class PreferencesWindow : Window
             StatsUtils.UpdateProfileLifetimeStats();
             ProfileUtils.CurrentProfileName = selectedProfileName;
             ProfileUtils.CurrentProfileId = ProfileDBUtils.GetProfileId(selectedProfileName);
+            ProfileUtils.UpdateCurrentProfile();
 
             Application.Current.Dispatcher.Invoke(() =>
             {

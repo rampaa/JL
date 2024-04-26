@@ -119,7 +119,7 @@ public static class ConfigDBManager
         command.CommandText =
             """
             INSERT INTO setting (profile_id, name, value)
-            SELECT (@targetProfileId, name, value)
+            SELECT @targetProfileId, name, value
             FROM setting
             WHERE profile_id = @sourceProfileId
             """;

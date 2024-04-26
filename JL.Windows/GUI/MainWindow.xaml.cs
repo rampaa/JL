@@ -70,7 +70,7 @@ internal sealed partial class MainWindow : Window
         WinApi.RegisterToMagpieScalingChangedMessage();
         WinApi.MarkWindowAsMagpieToolWindow(WindowHandle);
 
-        ProfileDBUtils.SetCurrentProfileFromConfig();
+        ConfigDBManager.CreateDB();
 
         ConfigManager.ApplyPreferences();
 

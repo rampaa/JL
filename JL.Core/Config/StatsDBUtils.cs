@@ -78,6 +78,4 @@ internal class StatsDBUtils
             ? JsonSerializer.Deserialize<Stats>(statsValue, Utils.s_jsoWithEnumConverter)
             : null;
     }
-
-
 }

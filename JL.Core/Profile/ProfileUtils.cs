@@ -1,4 +1,7 @@
+using System.Globalization;
+using JL.Core.Config;
 using JL.Core.Utilities;
+using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Profile;
 
@@ -18,5 +21,11 @@ public static class ProfileUtils
     public static string GetProfileCustomWordDictPath(string profileName)
     {
         return Path.Join(ProfileFolderPath, $"{profileName}_Custom_Words.txt");
+    }
+
+    public static void UpdateCurrentProfile()
+    {
+        using SqliteConnection command = ConfigDBManager.CreateDBConnection();
+        ConfigDBManager.UpdateSetting(command, nameof(CurrentProfileId), CurrentProfileId.ToString(CultureInfo.InvariantCulture), 1);
     }
 }
