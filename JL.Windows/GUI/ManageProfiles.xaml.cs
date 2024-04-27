@@ -5,7 +5,6 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Core.Config;
-using JL.Core.Profile;
 using JL.Windows.Utilities;
 
 namespace JL.Windows.GUI;

@@ -1,7 +1,6 @@
 using System.Data;
 using System.Globalization;
 using System.Text;
-using JL.Core.Profile;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Config;
@@ -34,7 +33,7 @@ public static class ProfileDBUtils
         _ = command.Parameters.AddWithValue("@name", ProfileUtils.DefaultProfileName);
         _ = command.ExecuteNonQuery();
 
-        ConfigDBManager.InsertSetting(connection, nameof(ProfileUtils.CurrentProfileId), "1", ProfileUtils.DefaultProfileId);
+        ConfigDBManager.InsertSetting(connection, nameof(ProfileUtils.CurrentProfileId), ProfileUtils.DefaultProfileId.ToString(CultureInfo.InvariantCulture), ProfileUtils.DefaultProfileId);
     }
 
     public static int GetCurrentProfileIdFromConfig()
@@ -127,11 +126,6 @@ public static class ProfileDBUtils
         _ = command.Parameters.AddWithValue("@id", profileId);
 
         return (string)command.ExecuteScalar()!;
-    }
-
-    public static void SetCurrentProfileFromConfig()
-    {
-
     }
 
     public static void DeleteProfile(string profileName)

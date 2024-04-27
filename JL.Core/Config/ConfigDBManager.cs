@@ -1,5 +1,5 @@
 using System.Globalization;
-using JL.Core.Profile;
+using JL.Core.Statistics;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
@@ -48,6 +48,7 @@ public static class ConfigDBManager
         _ = command.ExecuteNonQuery();
 
         ProfileDBUtils.InsertDefaultProfile(connection);
+        StatsDBUtils.InsertStats(Stats.LifetimeStats, ProfileUtils.DefaultProfileId);
     }
 
     public static SqliteConnection CreateReadOnlyDBConnection()

@@ -23,8 +23,6 @@ public static class CoreConfigManager
 
     public static void ApplyPreferences(SqliteConnection connection)
     {
-        ProfileDBUtils.SetCurrentProfileFromConfig();
-
         {
             string? minimumLogLevelStr = ConfigDBManager.GetSettingValue(connection, "MinimumLogLevel");
             if (minimumLogLevelStr is null)

@@ -1,9 +1,6 @@
 using System.Diagnostics;
-using System.Text.Json;
 using System.Timers;
 using JL.Core.Config;
-using JL.Core.Profile;
-using JL.Core.Utilities;
 using Timer = System.Timers.Timer;
 
 namespace JL.Core.Statistics;
@@ -43,34 +40,23 @@ public static class StatsUtils
             StatsStopWatch.Reset();
         }
 
-        InsertOrUpdateStats(Stats.LifetimeStats, ProfileUtils.DefaultProfileId);
-        InsertOrUpdateStats(Stats.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
-    }
-
-    private static void InsertOrUpdateStats(Stats stats, int profileId)
-    {
-        string lifetimeStats = JsonSerializer.Serialize(stats, Utils.s_jsoWithIndentation);
-
-        bool statsExists = StatsDBUtils.StatsExists(profileId);
-        if (statsExists)
-        {
-            StatsDBUtils.UpdateStats(lifetimeStats, profileId);
-        }
-        else
-        {
-            StatsDBUtils.InsertStats(lifetimeStats, profileId);
-        }
+        UpdateLifetimeStats();
+        UpdateProfileLifetimeStats();
     }
 
     public static void UpdateLifetimeStats()
     {
-        string lifetimeStats = JsonSerializer.Serialize(Stats.LifetimeStats, Utils.s_jsoWithIndentation);
-        StatsDBUtils.UpdateStats(lifetimeStats, ProfileUtils.DefaultProfileId);
+        StatsDBUtils.UpdateStats(Stats.LifetimeStats, ProfileUtils.DefaultProfileId);
     }
 
     public static void UpdateProfileLifetimeStats()
     {
-        string profileLifetimeStats = JsonSerializer.Serialize(Stats.ProfileLifetimeStats, Utils.s_jsoWithIndentation);
-        StatsDBUtils.UpdateStats(profileLifetimeStats, ProfileUtils.CurrentProfileId);
+        StatsDBUtils.UpdateStats(Stats.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
+    }
+
+    public static void SetStatsFromConfig()
+    {
+        Stats.LifetimeStats = StatsDBUtils.GetStatsFromConfig(ProfileUtils.DefaultProfileId)!;
+        Stats.ProfileLifetimeStats = StatsDBUtils.GetStatsFromConfig(ProfileUtils.CurrentProfileId)!;
     }
 }

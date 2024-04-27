@@ -1,9 +1,8 @@
 using System.Globalization;
-using JL.Core.Config;
 using JL.Core.Utilities;
 using Microsoft.Data.Sqlite;
 
-namespace JL.Core.Profile;
+namespace JL.Core.Config;
 
 public static class ProfileUtils
 {

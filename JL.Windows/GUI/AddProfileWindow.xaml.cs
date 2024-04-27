@@ -2,7 +2,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using JL.Core.Config;
-using JL.Core.Profile;
+using JL.Core.Statistics;
 
 namespace JL.Windows.GUI;
 
@@ -48,6 +48,7 @@ internal sealed partial class AddProfileWindow : Window
             _ = Directory.CreateDirectory(ProfileUtils.ProfileFolderPath);
 
             ConfigDBManager.CopyProfileSettings(ProfileUtils.CurrentProfileId, ProfileDBUtils.GetProfileId(profileName));
+            StatsDBUtils.InsertStats(new Stats(), ProfileDBUtils.GetProfileId(profileName));
             await File.Create(ProfileUtils.GetProfileCustomNameDictPath(profileName)).DisposeAsync().ConfigureAwait(false);
             await File.Create(ProfileUtils.GetProfileCustomWordDictPath(profileName)).DisposeAsync().ConfigureAwait(false);
 

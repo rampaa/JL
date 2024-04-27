@@ -9,7 +9,6 @@ using JL.Core.Dicts;
 using JL.Core.Mining;
 using JL.Core.Mining.Anki;
 using JL.Core.Network;
-using JL.Core.Profile;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
@@ -595,6 +594,7 @@ internal sealed partial class PreferencesWindow : Window
             ProfileUtils.CurrentProfileName = selectedProfileName;
             ProfileUtils.CurrentProfileId = ProfileDBUtils.GetProfileId(selectedProfileName);
             ProfileUtils.UpdateCurrentProfile();
+            Stats.ProfileLifetimeStats = StatsDBUtils.GetStatsFromConfig(ProfileUtils.CurrentProfileId)!;
 
             Application.Current.Dispatcher.Invoke(() =>
             {

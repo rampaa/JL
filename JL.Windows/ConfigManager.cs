@@ -8,7 +8,6 @@ using System.Windows.Media;
 using System.Windows.Media.Effects;
 using HandyControl.Data;
 using JL.Core.Config;
-using JL.Core.Profile;
 using JL.Core.Utilities;
 using JL.Windows.GUI;
 using JL.Windows.Utilities;

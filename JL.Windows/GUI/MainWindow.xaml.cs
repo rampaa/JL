@@ -71,7 +71,7 @@ internal sealed partial class MainWindow : Window
         WinApi.MarkWindowAsMagpieToolWindow(WindowHandle);
 
         ConfigDBManager.CreateDB();
-
+        StatsUtils.SetStatsFromConfig();
         ConfigManager.ApplyPreferences();
 
         WinApi.RestoreWindow(WindowHandle);
@@ -80,9 +80,6 @@ internal sealed partial class MainWindow : Window
         {
             WinApi.BringToFront(WindowHandle);
         }
-
-        StatsUtils.UpdateLifetimeStats();
-        StatsUtils.UpdateProfileLifetimeStats();
 
         if (CoreConfigManager.CaptureTextFromClipboard)
         {
