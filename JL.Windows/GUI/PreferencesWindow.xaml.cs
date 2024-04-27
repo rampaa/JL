@@ -590,10 +590,10 @@ internal sealed partial class PreferencesWindow : Window
         string selectedProfileName = (string)((ComboBox)sender).SelectedItem;
         if (selectedProfileName != ProfileUtils.CurrentProfileName)
         {
-            StatsUtils.UpdateProfileLifetimeStats();
+            StatsDBUtils.UpdateProfileLifetimeStats();
             ProfileUtils.CurrentProfileName = selectedProfileName;
             ProfileUtils.CurrentProfileId = ProfileDBUtils.GetProfileId(selectedProfileName);
-            ProfileUtils.UpdateCurrentProfile();
+            ProfileDBUtils.UpdateCurrentProfile();
             Stats.ProfileLifetimeStats = StatsDBUtils.GetStatsFromConfig(ProfileUtils.CurrentProfileId)!;
 
             Application.Current.Dispatcher.Invoke(() =>
@@ -602,7 +602,7 @@ internal sealed partial class PreferencesWindow : Window
                 ConfigManager.LoadPreferenceWindow(this);
             });
 
-            StatsUtils.UpdateProfileLifetimeStats();
+            StatsDBUtils.UpdateProfileLifetimeStats();
         }
     }
 

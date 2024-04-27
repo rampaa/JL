@@ -6,18 +6,18 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Config;
 public static class ConfigDBManager
 {
-    public static readonly string ConfigsPath = Path.Join(Utils.ConfigPath, "Configs.sqlite");
+    private static readonly string s_configsPath = Path.Join(Utils.ConfigPath, "Configs.sqlite");
     public delegate bool TryParseHandler<T>(string value, out T? result);
     public delegate bool TryParseHandlerWithCultureInfo<T>(string value, NumberStyles numberStyles, CultureInfo cultureInfo, out T result);
 
     public static void CreateDB()
     {
-        if (File.Exists(ConfigsPath))
+        if (File.Exists(s_configsPath))
         {
             return;
         }
 
-        using SqliteConnection connection = new($"Data Source={ConfigsPath};");
+        using SqliteConnection connection = new($"Data Source={s_configsPath};");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
 
@@ -53,14 +53,14 @@ public static class ConfigDBManager
 
     public static SqliteConnection CreateReadOnlyDBConnection()
     {
-        SqliteConnection connection = new($"Data Source={ConfigsPath};Mode=ReadOnly;");
+        SqliteConnection connection = new($"Data Source={s_configsPath};Mode=ReadOnly;");
         connection.Open();
         return connection;
     }
 
     public static SqliteConnection CreateDBConnection()
     {
-        SqliteConnection connection = new($"Data Source={ConfigsPath};Mode=ReadWrite;");
+        SqliteConnection connection = new($"Data Source={s_configsPath};Mode=ReadWrite;");
         connection.Open();
         return connection;
     }

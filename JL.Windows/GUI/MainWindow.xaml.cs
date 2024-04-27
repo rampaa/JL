@@ -71,7 +71,8 @@ internal sealed partial class MainWindow : Window
         WinApi.MarkWindowAsMagpieToolWindow(WindowHandle);
 
         ConfigDBManager.CreateDB();
-        StatsUtils.SetStatsFromConfig();
+        ProfileDBUtils.SetCurrentProfileFromConfig();
+        StatsDBUtils.SetStatsFromConfig();
         ConfigManager.ApplyPreferences();
 
         WinApi.RestoreWindow(WindowHandle);
@@ -384,8 +385,8 @@ internal sealed partial class MainWindow : Window
         SystemEvents.DisplaySettingsChanged -= DisplaySettingsChanged;
         ConfigManager.SaveBeforeClosing();
         Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
-        StatsUtils.UpdateLifetimeStats();
-        StatsUtils.UpdateProfileLifetimeStats();
+        StatsDBUtils.UpdateLifetimeStats();
+        StatsDBUtils.UpdateProfileLifetimeStats();
         await BacklogUtils.WriteBacklog().ConfigureAwait(false);
         DBUtils.SendOptimizePragmaToAllDBs();
         SqliteConnection.ClearAllPools();

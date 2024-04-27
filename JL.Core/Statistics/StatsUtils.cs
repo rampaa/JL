@@ -40,23 +40,7 @@ public static class StatsUtils
             StatsStopWatch.Reset();
         }
 
-        UpdateLifetimeStats();
-        UpdateProfileLifetimeStats();
-    }
-
-    public static void UpdateLifetimeStats()
-    {
-        StatsDBUtils.UpdateStats(Stats.LifetimeStats, ProfileUtils.DefaultProfileId);
-    }
-
-    public static void UpdateProfileLifetimeStats()
-    {
-        StatsDBUtils.UpdateStats(Stats.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
-    }
-
-    public static void SetStatsFromConfig()
-    {
-        Stats.LifetimeStats = StatsDBUtils.GetStatsFromConfig(ProfileUtils.DefaultProfileId)!;
-        Stats.ProfileLifetimeStats = StatsDBUtils.GetStatsFromConfig(ProfileUtils.CurrentProfileId)!;
+        StatsDBUtils.UpdateLifetimeStats();
+        StatsDBUtils.UpdateProfileLifetimeStats();
     }
 }

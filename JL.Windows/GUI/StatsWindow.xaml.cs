@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using JL.Core.Config;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
@@ -52,8 +53,8 @@ internal sealed partial class StatsWindow : Window
     {
         UpdateStatsDisplay(StatsMode.Session);
 
-        StatsUtils.UpdateProfileLifetimeStats();
-        StatsUtils.UpdateLifetimeStats();
+        StatsDBUtils.UpdateProfileLifetimeStats();
+        StatsDBUtils.UpdateLifetimeStats();
     }
 
     private void UpdateStatsDisplay(StatsMode mode)
@@ -118,12 +119,12 @@ internal sealed partial class StatsWindow : Window
 
                 if (statsMode is StatsMode.Lifetime)
                 {
-                    StatsUtils.UpdateLifetimeStats();
+                    StatsDBUtils.UpdateLifetimeStats();
                 }
 
                 else if (statsMode is StatsMode.Profile)
                 {
-                    StatsUtils.UpdateProfileLifetimeStats();
+                    StatsDBUtils.UpdateProfileLifetimeStats();
                 }
 
                 UpdateStatsDisplay(statsMode);

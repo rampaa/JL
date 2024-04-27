@@ -1,6 +1,5 @@
 using System.Data;
 using System.Globalization;
-using System.Text;
 using Microsoft.Data.Sqlite;
 
 namespace JL.Core.Config;
@@ -102,7 +101,6 @@ public static class ProfileDBUtils
                 SELECT 1
                 FROM profile
                 WHERE name = @name
-                LIMIT 1
             );
             """;
 
@@ -141,5 +139,17 @@ public static class ProfileDBUtils
 
         _ = command.Parameters.AddWithValue("@name", profileName);
         _ = command.ExecuteNonQuery();
+    }
+
+    public static void UpdateCurrentProfile()
+    {
+        using SqliteConnection command = ConfigDBManager.CreateDBConnection();
+        ConfigDBManager.UpdateSetting(command, nameof(ProfileUtils.CurrentProfileId), ProfileUtils.CurrentProfileId.ToString(CultureInfo.InvariantCulture), ProfileUtils.DefaultProfileId);
+    }
+
+    public static void SetCurrentProfileFromConfig()
+    {
+        ProfileUtils.CurrentProfileId = GetCurrentProfileIdFromConfig();
+        ProfileUtils.CurrentProfileName = GetProfileName(ProfileUtils.CurrentProfileId);
     }
 }

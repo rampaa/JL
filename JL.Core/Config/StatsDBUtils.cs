@@ -66,4 +66,20 @@ public static class StatsDBUtils
             ? JsonSerializer.Deserialize<Stats>(statsValue, Utils.s_jsoWithEnumConverter)
             : null;
     }
+
+    public static void UpdateLifetimeStats()
+    {
+        UpdateStats(Stats.LifetimeStats, ProfileUtils.DefaultProfileId);
+    }
+
+    public static void UpdateProfileLifetimeStats()
+    {
+        UpdateStats(Stats.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
+    }
+
+    public static void SetStatsFromConfig()
+    {
+        Stats.LifetimeStats = GetStatsFromConfig(ProfileUtils.DefaultProfileId)!;
+        Stats.ProfileLifetimeStats = GetStatsFromConfig(ProfileUtils.CurrentProfileId)!;
+    }
 }
