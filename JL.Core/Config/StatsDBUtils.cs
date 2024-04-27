@@ -45,7 +45,7 @@ public static class StatsDBUtils
         _ = command.ExecuteNonQuery();
     }
 
-    public static Stats? GetStatsFromConfig(SqliteConnection connection, int profileId)
+    public static Stats? GetStatsFromDB(SqliteConnection connection, int profileId)
     {
         using SqliteCommand command = connection.CreateCommand();
 
@@ -86,9 +86,9 @@ public static class StatsDBUtils
         UpdateStats(connection, Stats.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
     }
 
-    public static void SetStatsFromConfig(SqliteConnection connection)
+    public static void SetStatsFromDB(SqliteConnection connection)
     {
-        Stats.LifetimeStats = GetStatsFromConfig(connection, ProfileUtils.DefaultProfileId)!;
-        Stats.ProfileLifetimeStats = GetStatsFromConfig(connection, ProfileUtils.CurrentProfileId)!;
+        Stats.LifetimeStats = GetStatsFromDB(connection, ProfileUtils.DefaultProfileId)!;
+        Stats.ProfileLifetimeStats = GetStatsFromDB(connection, ProfileUtils.CurrentProfileId)!;
     }
 }

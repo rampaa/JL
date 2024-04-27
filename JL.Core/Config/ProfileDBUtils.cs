@@ -34,7 +34,7 @@ public static class ProfileDBUtils
         ConfigDBManager.InsertSetting(connection, nameof(ProfileUtils.CurrentProfileId), ProfileUtils.DefaultProfileId.ToString(CultureInfo.InvariantCulture), ProfileUtils.DefaultProfileId);
     }
 
-    public static int GetCurrentProfileIdFromConfig(SqliteConnection connection)
+    public static int GetCurrentProfileIdFromDB(SqliteConnection connection)
     {
         using SqliteCommand command = connection.CreateCommand();
 
@@ -145,9 +145,9 @@ public static class ProfileDBUtils
         ConfigDBManager.UpdateSetting(connection, nameof(ProfileUtils.CurrentProfileId), ProfileUtils.CurrentProfileId.ToString(CultureInfo.InvariantCulture), ProfileUtils.DefaultProfileId);
     }
 
-    public static void SetCurrentProfileFromConfig(SqliteConnection connection)
+    public static void SetCurrentProfileFromDB(SqliteConnection connection)
     {
-        ProfileUtils.CurrentProfileId = GetCurrentProfileIdFromConfig(connection);
+        ProfileUtils.CurrentProfileId = GetCurrentProfileIdFromDB(connection);
         ProfileUtils.CurrentProfileName = GetProfileName(connection, ProfileUtils.CurrentProfileId);
     }
 }

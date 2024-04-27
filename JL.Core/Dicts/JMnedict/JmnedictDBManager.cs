@@ -1,5 +1,4 @@
 using System.Data;
-using System.Data.Common;
 using System.Globalization;
 using System.Text.Json;
 using JL.Core.Utilities;
@@ -44,7 +43,7 @@ internal static class JmnedictDBManager
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadWrite;");
         connection.Open();
-        using DbTransaction transaction = connection.BeginTransaction();
+        using SqliteTransaction transaction = connection.BeginTransaction();
 
         ulong id = 1;
         HashSet<JmnedictRecord> jmnedictRecords = dict.Contents.Values.SelectMany(static v => v).Select(static v => (JmnedictRecord)v).ToHashSet();

@@ -1,6 +1,5 @@
 using System.Collections.Frozen;
 using System.Data;
-using System.Data.Common;
 using System.Globalization;
 using System.Text.Json;
 using JL.Core.Utilities;
@@ -53,7 +52,7 @@ internal static class YomichanKanjiDBManager
     {
         using SqliteConnection connection = new($"Data Source={DBUtils.GetDictDBPath(dict.Name)};Mode=ReadWrite;");
         connection.Open();
-        using DbTransaction transaction = connection.BeginTransaction();
+        using SqliteTransaction transaction = connection.BeginTransaction();
 
         ulong id = 1;
         foreach ((string kanji, IList<IDictRecord> records) in dict.Contents)

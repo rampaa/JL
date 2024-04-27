@@ -597,7 +597,7 @@ internal sealed partial class PreferencesWindow : Window
                 ProfileUtils.CurrentProfileName = selectedProfileName;
                 ProfileUtils.CurrentProfileId = ProfileDBUtils.GetProfileId(connection, selectedProfileName);
                 ProfileDBUtils.UpdateCurrentProfile(connection);
-                Stats.ProfileLifetimeStats = StatsDBUtils.GetStatsFromConfig(connection, ProfileUtils.CurrentProfileId)!;
+                Stats.ProfileLifetimeStats = StatsDBUtils.GetStatsFromDB(connection, ProfileUtils.CurrentProfileId)!;
                 StatsDBUtils.UpdateProfileLifetimeStats(connection);
             }
 

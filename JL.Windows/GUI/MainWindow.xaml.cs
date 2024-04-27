@@ -74,8 +74,8 @@ internal sealed partial class MainWindow : Window
 
         using (SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection())
         {
-            ProfileDBUtils.SetCurrentProfileFromConfig(connection);
-            StatsDBUtils.SetStatsFromConfig(connection);
+            ProfileDBUtils.SetCurrentProfileFromDB(connection);
+            StatsDBUtils.SetStatsFromDB(connection);
         }
 
         ConfigManager.ApplyPreferences();
