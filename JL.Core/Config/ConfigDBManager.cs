@@ -48,7 +48,7 @@ public static class ConfigDBManager
         _ = command.ExecuteNonQuery();
 
         ProfileDBUtils.InsertDefaultProfile(connection);
-        StatsDBUtils.InsertStats(Stats.LifetimeStats, ProfileUtils.DefaultProfileId);
+        StatsDBUtils.InsertStats(connection, Stats.LifetimeStats, ProfileUtils.DefaultProfileId);
     }
 
     public static SqliteConnection CreateReadOnlyDBConnection()
@@ -113,9 +113,8 @@ public static class ConfigDBManager
         return (string?)command.ExecuteScalar();
     }
 
-    public static void CopyProfileSettings(int sourceProfileId, int targetProfileId)
+    public static void CopyProfileSettings(SqliteConnection connection, int sourceProfileId, int targetProfileId)
     {
-        using SqliteConnection connection = CreateDBConnection();
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
             """

@@ -628,9 +628,6 @@ internal static class ConfigManager
     {
         ConfigDBManager.CreateDB();
 
-        preferenceWindow.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames();
-        preferenceWindow.ProfileComboBox.SelectedItem = ProfileUtils.CurrentProfileName;
-
         preferenceWindow.JLVersionTextBlock.Text = string.Create(CultureInfo.InvariantCulture, $"v{Utils.JLVersion}");
 
         preferenceWindow.DisableHotkeysKeyGestureTextBox.Text = KeyGestureUtils.KeyGestureToString(DisableHotkeysKeyGesture);
@@ -843,6 +840,8 @@ internal static class ConfigManager
         preferenceWindow.AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimizedCheckBox.IsChecked = AutoLookupFirstTermOnTextChangeOnlyWhenMainWindowIsMinimized;
 
         using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
+        preferenceWindow.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames(connection);
+        preferenceWindow.ProfileComboBox.SelectedItem = ProfileUtils.CurrentProfileName;
         preferenceWindow.ThemeComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "Theme");
         preferenceWindow.MinimumLogLevelComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "MinimumLogLevel");
         preferenceWindow.PopupFlipComboBox.SelectedValue = ConfigDBManager.GetSettingValue(connection, "PopupFlip");

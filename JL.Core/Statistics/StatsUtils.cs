@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Timers;
 using JL.Core.Config;
+using Microsoft.Data.Sqlite;
 using Timer = System.Timers.Timer;
 
 namespace JL.Core.Statistics;
@@ -40,7 +41,8 @@ public static class StatsUtils
             StatsStopWatch.Reset();
         }
 
-        StatsDBUtils.UpdateLifetimeStats();
-        StatsDBUtils.UpdateProfileLifetimeStats();
+        using SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+        StatsDBUtils.UpdateLifetimeStats(connection);
+        StatsDBUtils.UpdateProfileLifetimeStats(connection);
     }
 }

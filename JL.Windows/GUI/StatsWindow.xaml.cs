@@ -6,6 +6,7 @@ using JL.Core.Config;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
+using Microsoft.Data.Sqlite;
 
 namespace JL.Windows.GUI;
 
@@ -53,8 +54,9 @@ internal sealed partial class StatsWindow : Window
     {
         UpdateStatsDisplay(StatsMode.Session);
 
-        StatsDBUtils.UpdateProfileLifetimeStats();
-        StatsDBUtils.UpdateLifetimeStats();
+        using SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+        StatsDBUtils.UpdateProfileLifetimeStats(connection);
+        StatsDBUtils.UpdateLifetimeStats(connection);
     }
 
     private void UpdateStatsDisplay(StatsMode mode)

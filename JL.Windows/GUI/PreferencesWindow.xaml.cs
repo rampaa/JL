@@ -12,6 +12,7 @@ using JL.Core.Network;
 using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.Utilities;
+using Microsoft.Data.Sqlite;
 using Button = System.Windows.Controls.Button;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using TextBox = System.Windows.Controls.TextBox;
@@ -590,19 +591,21 @@ internal sealed partial class PreferencesWindow : Window
         string selectedProfileName = (string)((ComboBox)sender).SelectedItem;
         if (selectedProfileName != ProfileUtils.CurrentProfileName)
         {
-            StatsDBUtils.UpdateProfileLifetimeStats();
-            ProfileUtils.CurrentProfileName = selectedProfileName;
-            ProfileUtils.CurrentProfileId = ProfileDBUtils.GetProfileId(selectedProfileName);
-            ProfileDBUtils.UpdateCurrentProfile();
-            Stats.ProfileLifetimeStats = StatsDBUtils.GetStatsFromConfig(ProfileUtils.CurrentProfileId)!;
+            using (SqliteConnection connection = ConfigDBManager.CreateDBConnection())
+            {
+                StatsDBUtils.UpdateProfileLifetimeStats(connection);
+                ProfileUtils.CurrentProfileName = selectedProfileName;
+                ProfileUtils.CurrentProfileId = ProfileDBUtils.GetProfileId(connection, selectedProfileName);
+                ProfileDBUtils.UpdateCurrentProfile(connection);
+                Stats.ProfileLifetimeStats = StatsDBUtils.GetStatsFromConfig(connection, ProfileUtils.CurrentProfileId)!;
+                StatsDBUtils.UpdateProfileLifetimeStats(connection);
+            }
 
             Application.Current.Dispatcher.Invoke(() =>
             {
                 ConfigManager.ApplyPreferences();
                 ConfigManager.LoadPreferenceWindow(this);
             });
-
-            StatsDBUtils.UpdateProfileLifetimeStats();
         }
     }
 

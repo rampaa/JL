@@ -6,14 +6,13 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Config;
 public static class StatsDBUtils
 {
-    public static void InsertStats(Stats stats, int profileId)
+    public static void InsertStats(SqliteConnection connection, Stats stats, int profileId)
     {
-        InsertStats(JsonSerializer.Serialize(stats, Utils.s_jsoWithEnumConverterAndIndentation), profileId);
+        InsertStats(connection, JsonSerializer.Serialize(stats, Utils.s_jsoWithEnumConverterAndIndentation), profileId);
     }
 
-    public static void InsertStats(string stats, int profileId)
+    public static void InsertStats(SqliteConnection connection, string stats, int profileId)
     {
-        using SqliteConnection connection = ConfigDBManager.CreateDBConnection();
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
             """
@@ -26,14 +25,13 @@ public static class StatsDBUtils
         _ = command.ExecuteNonQuery();
     }
 
-    public static void UpdateStats(Stats stats, int profileId)
+    public static void UpdateStats(SqliteConnection connection, Stats stats, int profileId)
     {
-        UpdateStats(JsonSerializer.Serialize(stats, Utils.s_jsoWithEnumConverterAndIndentation), profileId);
+        UpdateStats(connection, JsonSerializer.Serialize(stats, Utils.s_jsoWithEnumConverterAndIndentation), profileId);
     }
 
-    public static void UpdateStats(string stats, int profileId)
+    public static void UpdateStats(SqliteConnection connection, string stats, int profileId)
     {
-        using SqliteConnection connection = ConfigDBManager.CreateDBConnection();
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText =
             """
@@ -47,9 +45,8 @@ public static class StatsDBUtils
         _ = command.ExecuteNonQuery();
     }
 
-    public static Stats? GetStatsFromConfig(int profileId)
+    public static Stats? GetStatsFromConfig(SqliteConnection connection, int profileId)
     {
-        using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -69,17 +66,29 @@ public static class StatsDBUtils
 
     public static void UpdateLifetimeStats()
     {
-        UpdateStats(Stats.LifetimeStats, ProfileUtils.DefaultProfileId);
+        using SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+        UpdateLifetimeStats(connection);
+    }
+
+    public static void UpdateLifetimeStats(SqliteConnection connection)
+    {
+        UpdateStats(connection, Stats.LifetimeStats, ProfileUtils.DefaultProfileId);
     }
 
     public static void UpdateProfileLifetimeStats()
     {
-        UpdateStats(Stats.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
+        using SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+        UpdateProfileLifetimeStats(connection);
     }
 
-    public static void SetStatsFromConfig()
+    public static void UpdateProfileLifetimeStats(SqliteConnection connection)
     {
-        Stats.LifetimeStats = GetStatsFromConfig(ProfileUtils.DefaultProfileId)!;
-        Stats.ProfileLifetimeStats = GetStatsFromConfig(ProfileUtils.CurrentProfileId)!;
+        UpdateStats(connection, Stats.ProfileLifetimeStats, ProfileUtils.CurrentProfileId);
+    }
+
+    public static void SetStatsFromConfig(SqliteConnection connection)
+    {
+        Stats.LifetimeStats = GetStatsFromConfig(connection, ProfileUtils.DefaultProfileId)!;
+        Stats.ProfileLifetimeStats = GetStatsFromConfig(connection, ProfileUtils.CurrentProfileId)!;
     }
 }

@@ -6,6 +6,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using JL.Core.Config;
 using JL.Windows.Utilities;
+using Microsoft.Data.Sqlite;
 
 namespace JL.Windows.GUI;
 
@@ -45,8 +46,13 @@ internal sealed partial class ManageProfilesWindow : Window
     {
         List<DockPanel> resultDockPanels = [];
 
-        foreach (string profileName in ProfileDBUtils.GetProfileNames())
+        List<string> profileNames = ProfileDBUtils.GetProfileNames();
+        int profileCount = profileNames.Count;
+
+        for (int i = 0; i < profileCount; i++)
         {
+            string profileName = profileNames[i];
+
             DockPanel dockPanel = new();
 
             TextBlock profileNameTextBlock = new()
@@ -94,8 +100,11 @@ internal sealed partial class ManageProfilesWindow : Window
         {
             string profile = (string)((Button)sender).Tag;
 
-            ProfileDBUtils.DeleteProfile(profile);
-            PreferencesWindow.Instance.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames();
+            using (SqliteConnection connection = ConfigDBManager.CreateDBConnection())
+            {
+                ProfileDBUtils.DeleteProfile(connection, profile);
+                PreferencesWindow.Instance.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames(connection);
+            }
 
             string profileCustomNamesPath = ProfileUtils.GetProfileCustomNameDictPath(profile);
             if (File.Exists(profileCustomNamesPath))

@@ -5,18 +5,17 @@ using Microsoft.Data.Sqlite;
 namespace JL.Core.Config;
 public static class ProfileDBUtils
 {
-    public static void InsertProfile(string profileName)
+    public static void InsertProfile(SqliteConnection connection, string profileName)
     {
-        using SqliteConnection connection = ConfigDBManager.CreateDBConnection();
-        using SqliteCommand insertProfileCommand = connection.CreateCommand();
-        insertProfileCommand.CommandText =
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText =
             """
             INSERT INTO profile (name)
             VALUES (@name);
             """;
 
-        _ = insertProfileCommand.Parameters.AddWithValue("@name", profileName);
-        _ = insertProfileCommand.ExecuteNonQuery();
+        _ = command.Parameters.AddWithValue("@name", profileName);
+        _ = command.ExecuteNonQuery();
     }
 
     internal static void InsertDefaultProfile(SqliteConnection connection)
@@ -35,9 +34,8 @@ public static class ProfileDBUtils
         ConfigDBManager.InsertSetting(connection, nameof(ProfileUtils.CurrentProfileId), ProfileUtils.DefaultProfileId.ToString(CultureInfo.InvariantCulture), ProfileUtils.DefaultProfileId);
     }
 
-    public static int GetCurrentProfileIdFromConfig()
+    public static int GetCurrentProfileIdFromConfig(SqliteConnection connection)
     {
-        using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -50,9 +48,8 @@ public static class ProfileDBUtils
         return Convert.ToInt32(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
     }
 
-    public static int GetProfileId(string profileName)
+    public static int GetProfileId(SqliteConnection connection, string profileName)
     {
-        using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -69,9 +66,13 @@ public static class ProfileDBUtils
 
     public static List<string> GetProfileNames()
     {
-        List<string> profiles = [];
-
         using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
+        return GetProfileNames(connection);
+    }
+
+    public static List<string> GetProfileNames(SqliteConnection connection)
+    {
+        List<string> profiles = [];
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -109,9 +110,8 @@ public static class ProfileDBUtils
         return Convert.ToBoolean(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
     }
 
-    public static string GetProfileName(int profileId)
+    public static string GetProfileName(SqliteConnection connection, int profileId)
     {
-        using SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection();
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -126,9 +126,8 @@ public static class ProfileDBUtils
         return (string)command.ExecuteScalar()!;
     }
 
-    public static void DeleteProfile(string profileName)
+    public static void DeleteProfile(SqliteConnection connection, string profileName)
     {
-        using SqliteConnection connection = ConfigDBManager.CreateDBConnection();
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -141,15 +140,14 @@ public static class ProfileDBUtils
         _ = command.ExecuteNonQuery();
     }
 
-    public static void UpdateCurrentProfile()
+    public static void UpdateCurrentProfile(SqliteConnection connection)
     {
-        using SqliteConnection command = ConfigDBManager.CreateDBConnection();
-        ConfigDBManager.UpdateSetting(command, nameof(ProfileUtils.CurrentProfileId), ProfileUtils.CurrentProfileId.ToString(CultureInfo.InvariantCulture), ProfileUtils.DefaultProfileId);
+        ConfigDBManager.UpdateSetting(connection, nameof(ProfileUtils.CurrentProfileId), ProfileUtils.CurrentProfileId.ToString(CultureInfo.InvariantCulture), ProfileUtils.DefaultProfileId);
     }
 
-    public static void SetCurrentProfileFromConfig()
+    public static void SetCurrentProfileFromConfig(SqliteConnection connection)
     {
-        ProfileUtils.CurrentProfileId = GetCurrentProfileIdFromConfig();
-        ProfileUtils.CurrentProfileName = GetProfileName(ProfileUtils.CurrentProfileId);
+        ProfileUtils.CurrentProfileId = GetCurrentProfileIdFromConfig(connection);
+        ProfileUtils.CurrentProfileName = GetProfileName(connection, ProfileUtils.CurrentProfileId);
     }
 }

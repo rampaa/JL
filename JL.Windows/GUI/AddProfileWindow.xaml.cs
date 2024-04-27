@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using JL.Core.Config;
 using JL.Core.Statistics;
+using Microsoft.Data.Sqlite;
 
 namespace JL.Windows.GUI;
 
@@ -42,13 +43,16 @@ internal sealed partial class AddProfileWindow : Window
                 ProfileNameTextBox.ClearValue(BorderBrushProperty);
             }
 
-            ProfileDBUtils.InsertProfile(profileName);
-            PreferencesWindow.Instance.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames();
+            using (SqliteConnection connection = ConfigDBManager.CreateDBConnection())
+            {
+                ProfileDBUtils.InsertProfile(connection, profileName);
+                int currentProfileId = ProfileDBUtils.GetProfileId(connection, profileName);
+                ConfigDBManager.CopyProfileSettings(connection, ProfileUtils.CurrentProfileId, currentProfileId);
+                StatsDBUtils.InsertStats(connection, new Stats(), currentProfileId);
+                PreferencesWindow.Instance.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames(connection);
+            }
 
             _ = Directory.CreateDirectory(ProfileUtils.ProfileFolderPath);
-
-            ConfigDBManager.CopyProfileSettings(ProfileUtils.CurrentProfileId, ProfileDBUtils.GetProfileId(profileName));
-            StatsDBUtils.InsertStats(new Stats(), ProfileDBUtils.GetProfileId(profileName));
             await File.Create(ProfileUtils.GetProfileCustomNameDictPath(profileName)).DisposeAsync().ConfigureAwait(false);
             await File.Create(ProfileUtils.GetProfileCustomWordDictPath(profileName)).DisposeAsync().ConfigureAwait(false);
 
