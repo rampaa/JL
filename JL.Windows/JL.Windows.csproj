@@ -20,10 +20,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="App.config" />
-  </ItemGroup>
-
-  <ItemGroup>
     <!--Do not update HandyControl to 3.5.0 or 3.5.1, see: https://github.com/HandyOrg/HandyControl/issues/1524-->
     <PackageReference Include="HandyControl" Version="3.4.0" />
     <PackageReference Include="HandyControl.Lang.en" Version="3.4.0" />
@@ -33,12 +29,6 @@
     <PackageReference Include="NAudio.WinForms" Version="2.2.1" />
     <PackageReference Include="NVorbis" Version="0.10.5" />
     <PackageReference Include="System.Speech" Version="8.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="App.config">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
   </ItemGroup>
 
   <ItemGroup>
