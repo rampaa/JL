@@ -119,13 +119,8 @@ internal static class ConfigManager
     public static KeyGesture MiningModeKeyGesture { get; private set; } = new(Key.M, ModifierKeys.Windows);
     public static KeyGesture PlayAudioKeyGesture { get; private set; } = new(Key.P, ModifierKeys.Windows);
     public static KeyGesture KanjiModeKeyGesture { get; private set; } = new(Key.K, ModifierKeys.Windows);
-
-    public static KeyGesture ShowManageDictionariesWindowKeyGesture { get; private set; } =
-        new(Key.D, ModifierKeys.Windows);
-
-    public static KeyGesture ShowManageFrequenciesWindowKeyGesture { get; private set; } =
-        new(Key.F, ModifierKeys.Windows);
-
+    public static KeyGesture ShowManageDictionariesWindowKeyGesture { get; private set; } = new(Key.D, ModifierKeys.Windows);
+    public static KeyGesture ShowManageFrequenciesWindowKeyGesture { get; private set; } = new(Key.F, ModifierKeys.Windows);
     public static KeyGesture ShowPreferencesWindowKeyGesture { get; private set; } = new(Key.L, ModifierKeys.Windows);
     public static KeyGesture ShowAddNameWindowKeyGesture { get; private set; } = new(Key.N, ModifierKeys.Windows);
     public static KeyGesture ShowAddWordWindowKeyGesture { get; private set; } = new(Key.W, ModifierKeys.Windows);
@@ -155,6 +150,7 @@ internal static class ConfigManager
     public static KeyGesture MoveCaretDownKeyGesture { get; private set; } = new(Key.NumPad2, ModifierKeys.Control);
     public static KeyGesture LookupTermAtCaretIndexKeyGesture { get; private set; } = new(Key.NumPad5, ModifierKeys.Control);
     public static KeyGesture LookupFirstTermKeyGesture { get; private set; } = new(Key.D, ModifierKeys.Alt);
+    public static KeyGesture LookupSelectedTextKeyGesture { get; private set; } = new(Key.F, ModifierKeys.Alt);
     public static KeyGesture SelectNextLookupResultKeyGesture { get; private set; } = new(Key.Down, ModifierKeys.Control);
     public static KeyGesture SelectPreviousLookupResultKeyGesture { get; private set; } = new(Key.Up, ModifierKeys.Control);
     public static KeyGesture MineSelectedLookupResultKeyGesture { get; private set; } = new(Key.Enter, ModifierKeys.Control);
@@ -419,6 +415,7 @@ internal static class ConfigManager
         MoveCaretDownKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(MoveCaretDownKeyGesture), MoveCaretDownKeyGesture);
         LookupTermAtCaretIndexKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(LookupTermAtCaretIndexKeyGesture), LookupTermAtCaretIndexKeyGesture);
         LookupFirstTermKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(LookupFirstTermKeyGesture), LookupFirstTermKeyGesture);
+        LookupSelectedTextKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(LookupSelectedTextKeyGesture), LookupSelectedTextKeyGesture);
         SelectNextLookupResultKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(SelectNextLookupResultKeyGesture), SelectNextLookupResultKeyGesture);
         SelectPreviousLookupResultKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(SelectPreviousLookupResultKeyGesture), SelectPreviousLookupResultKeyGesture);
         MineSelectedLookupResultKeyGesture = KeyGestureUtils.SetKeyGesture(connection, nameof(MineSelectedLookupResultKeyGesture), MineSelectedLookupResultKeyGesture);
@@ -686,6 +683,8 @@ internal static class ConfigManager
             KeyGestureUtils.KeyGestureToString(LookupTermAtCaretIndexKeyGesture);
         preferenceWindow.LookupFirstTermKeyGestureTextBox.Text =
             KeyGestureUtils.KeyGestureToString(LookupFirstTermKeyGesture);
+        preferenceWindow.LookupSelectedTextKeyGestureTextBox.Text =
+            KeyGestureUtils.KeyGestureToString(LookupSelectedTextKeyGesture);
         preferenceWindow.SelectNextLookupResultKeyGestureTextBox.Text =
             KeyGestureUtils.KeyGestureToString(SelectNextLookupResultKeyGesture);
         preferenceWindow.SelectPreviousLookupResultKeyGestureTextBox.Text =
@@ -908,6 +907,8 @@ internal static class ConfigManager
             preferenceWindow.LookupTermAtCaretIndexKeyGestureTextBox.Text);
         KeyGestureUtils.SaveKeyGesture(connection, nameof(LookupFirstTermKeyGesture),
             preferenceWindow.LookupFirstTermKeyGestureTextBox.Text);
+        KeyGestureUtils.SaveKeyGesture(connection, nameof(LookupSelectedTextKeyGesture),
+            preferenceWindow.LookupSelectedTextKeyGestureTextBox.Text);
         KeyGestureUtils.SaveKeyGesture(connection, nameof(SelectNextLookupResultKeyGesture),
             preferenceWindow.SelectNextLookupResultKeyGestureTextBox.Text);
         KeyGestureUtils.SaveKeyGesture(connection, nameof(SelectPreviousLookupResultKeyGesture),

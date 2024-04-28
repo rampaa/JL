@@ -818,6 +818,13 @@ internal sealed partial class MainWindow : Window
             }
         }
 
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.LookupSelectedTextKeyGesture))
+        {
+            handled = true;
+
+            await FirstPopupWindow.LookupOnSelect(MainTextBox).ConfigureAwait(false);
+        }
+
         else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.ToggleAlwaysShowMainTextBoxCaretKeyGesture))
         {
             handled = true;
