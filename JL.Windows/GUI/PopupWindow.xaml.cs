@@ -280,21 +280,43 @@ internal sealed partial class PopupWindow : Window
 
     public async Task LookupOnSelect(TextBox tb)
     {
-        if (string.IsNullOrWhiteSpace(tb.SelectedText))
+        string text = tb.SelectedText;
+        if (string.IsNullOrWhiteSpace(text))
         {
+            HidePopup();
             return;
         }
 
-        _previousTextBox = tb;
-        LastText = tb.SelectedText;
-        LastSelectedText = tb.SelectedText;
-        _currentCharPosition = tb.SelectionStart;
+        int charPosition = tb.SelectionStart;
+
+        _currentText = text;
+        _currentCharPosition = charPosition;
+
+        if (text == LastText && IsVisible)
+        {
+            if (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
+            {
+                UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+            }
+
+            else
+            {
+                UpdatePosition(WinApi.GetMousePosition());
+            }
+
+            return;
+        }
+
+        LastText = text;
 
         List<LookupResult>? lookupResults = LookupUtils.LookupText(tb.SelectedText);
 
         if (lookupResults?.Count > 0)
         {
+            _previousTextBox = tb;
+            LastSelectedText = lookupResults[0].MatchedText;
             LastLookupResults = lookupResults;
+
             EnableMiningMode();
             DisplayResults(true);
 
@@ -1471,6 +1493,45 @@ internal sealed partial class PopupWindow : Window
         {
             ConfigManager.AlwaysShowMainTextBoxCaret = !ConfigManager.AlwaysShowMainTextBoxCaret;
             MainWindow.Instance.MainTextBox.IsReadOnlyCaretVisible = ConfigManager.AlwaysShowMainTextBoxCaret;
+        }
+
+        else if (KeyGestureUtils.CompareKeyGestures(keyGesture, ConfigManager.LookupSelectedTextKeyGesture))
+        {
+            if (MiningMode)
+            {
+                if (_lastInteractedTextBox?.SelectionLength > 0)
+                {
+                    ChildPopupWindow ??= new PopupWindow
+                    {
+                        Owner = this
+                    };
+
+                    await ChildPopupWindow.LookupOnSelect(_lastInteractedTextBox).ConfigureAwait(false);
+                }
+
+                else if (ConfigManager.FixedPopupPositioning && this == MainWindow.Instance.FirstPopupWindow)
+                {
+                    UpdatePosition(WindowsUtils.DpiAwareFixedPopupXPosition, WindowsUtils.DpiAwareFixedPopupYPosition);
+                }
+
+                else
+                {
+                    UpdatePosition(WinApi.GetMousePosition());
+                }
+            }
+
+            else if (Owner is PopupWindow previousPopupWindow)
+            {
+                if (previousPopupWindow._lastInteractedTextBox?.SelectionLength > 0)
+                {
+                    await LookupOnSelect(previousPopupWindow._lastInteractedTextBox).ConfigureAwait(false);
+                }
+            }
+
+            else
+            {
+                await MainWindow.Instance.FirstPopupWindow.LookupOnSelect(MainWindow.Instance.MainTextBox).ConfigureAwait(false);
+            }
         }
     }
 
