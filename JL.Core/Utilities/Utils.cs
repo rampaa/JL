@@ -63,13 +63,6 @@ public static partial class Utils
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
-    internal static readonly JsonSerializerOptions s_jsoWithIndentation = new()
-    {
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        WriteIndented = true
-    };
-
     internal static readonly JsonSerializerOptions s_jsoNotIgnoringNull = new()
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping

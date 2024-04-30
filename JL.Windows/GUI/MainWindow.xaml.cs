@@ -72,10 +72,15 @@ internal sealed partial class MainWindow : Window
 
         ConfigDBManager.CreateDB();
 
-        using (SqliteConnection connection = ConfigDBManager.CreateReadOnlyDBConnection())
+        using (SqliteConnection connection = ConfigDBManager.CreateDBConnection())
         {
-            ProfileDBUtils.SetCurrentProfileFromDB(connection);
-            StatsDBUtils.SetStatsFromDB(connection);
+            await ConfigMigrationManager.MigrateConfig(connection).ConfigureAwait(true);
+        }
+
+        using (SqliteConnection readOnlyConnection = ConfigDBManager.CreateReadOnlyDBConnection())
+        {
+            ProfileDBUtils.SetCurrentProfileFromDB(readOnlyConnection);
+            StatsDBUtils.SetStatsFromDB(readOnlyConnection);
         }
 
         ConfigManager.ApplyPreferences();
