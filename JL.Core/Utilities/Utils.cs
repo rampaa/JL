@@ -117,6 +117,7 @@ public static partial class Utils
 
         DBUtils.StartOptimizePragmaTimer();
 
+        _ = Directory.CreateDirectory(ProfileUtils.ProfileFolderPath);
         _ = Directory.CreateDirectory(DBUtils.s_dictDBFolderPath);
         _ = Directory.CreateDirectory(DBUtils.s_freqDBFolderPath);
 

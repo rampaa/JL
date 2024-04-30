@@ -17,6 +17,8 @@ public static class ConfigDBManager
             return;
         }
 
+        _ = Directory.CreateDirectory(Utils.ConfigPath);
+
         using SqliteConnection connection = new($"Data Source={s_configsPath};");
         connection.Open();
         using SqliteCommand command = connection.CreateCommand();
