@@ -28,7 +28,7 @@ internal sealed partial class AddProfileWindow : Window
         string profileName = ProfileNameTextBox.Text.Trim();
         bool isValid = !string.IsNullOrWhiteSpace(profileName)
                        && profileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0
-                       && profileName.Length < 256
+                       && profileName.Length < 128
                        && !ProfileDBUtils.ProfileExists(profileName);
 
         if (!isValid)
