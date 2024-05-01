@@ -72,12 +72,14 @@ internal sealed partial class MainWindow : Window
 
         ConfigDBManager.CreateDB();
 
-        using (SqliteConnection connection = ConfigDBManager.CreateDBConnection())
+        SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+        await using (connection.ConfigureAwait(true))
         {
             await ConfigMigrationManager.MigrateConfig(connection).ConfigureAwait(true);
         }
 
-        using (SqliteConnection readOnlyConnection = ConfigDBManager.CreateReadOnlyDBConnection())
+        SqliteConnection readOnlyConnection = ConfigDBManager.CreateReadOnlyDBConnection();
+        await using (readOnlyConnection.ConfigureAwait(true))
         {
             ProfileDBUtils.SetCurrentProfileFromDB(readOnlyConnection);
             StatsDBUtils.SetStatsFromDB(readOnlyConnection);
@@ -396,7 +398,8 @@ internal sealed partial class MainWindow : Window
         ConfigManager.SaveBeforeClosing();
         Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
 
-        using (SqliteConnection connection = ConfigDBManager.CreateDBConnection())
+        SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+        await using (connection.ConfigureAwait(false))
         {
             StatsDBUtils.UpdateLifetimeStats(connection);
             StatsDBUtils.UpdateProfileLifetimeStats(connection);

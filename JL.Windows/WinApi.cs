@@ -70,12 +70,14 @@ internal sealed partial class WinApi
             public int Y;
         }
 
+        // ReSharper disable UnusedMember.Global
         internal enum ChangeWindowMessageFilterExAction : uint
         {
             Reset = 0,
             Allow = 1,
             Disallow = 2
-        };
+        }
+        // ReSharper restore UnusedMember.Global
 
         [LibraryImport("user32.dll", EntryPoint = "AddClipboardFormatListener", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
@@ -327,15 +329,15 @@ internal sealed partial class WinApi
         return ChangeWindowMessageFilterEx(windowHandle, message, filterAction, 0);
     }
 
-    private static bool AllowWindowMessage(nint windowHandle, string messageName, ref int message)
+    private static bool AllowWindowMessage(nint windowHandle, int message)
     {
-        message = RegisterToWindowMessage(messageName);
         return ChangeWindowMessageFilter(windowHandle, message, ChangeWindowMessageFilterExAction.Allow);
     }
 
     public static void RegisterToMagpieScalingChangedMessage()
     {
-        _ = AllowWindowMessage(MainWindow.Instance.WindowHandle, "MagpieScalingChanged", ref WM_MAGPIE_SCALINGCHANGED);
+        WM_MAGPIE_SCALINGCHANGED = RegisterToWindowMessage("MagpieScalingChanged");
+        _ = AllowWindowMessage(MainWindow.Instance.WindowHandle, WM_MAGPIE_SCALINGCHANGED);
     }
 
     public static void MarkWindowAsMagpieToolWindow(nint hwnd)

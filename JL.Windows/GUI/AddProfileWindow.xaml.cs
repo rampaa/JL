@@ -43,7 +43,8 @@ internal sealed partial class AddProfileWindow : Window
                 ProfileNameTextBox.ClearValue(BorderBrushProperty);
             }
 
-            using (SqliteConnection connection = ConfigDBManager.CreateDBConnection())
+            SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+            await using (connection.ConfigureAwait(true))
             {
                 ProfileDBUtils.InsertProfile(connection, profileName);
                 int currentProfileId = ProfileDBUtils.GetProfileId(connection, profileName);
@@ -52,11 +53,11 @@ internal sealed partial class AddProfileWindow : Window
                 PreferencesWindow.Instance.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames(connection);
             }
 
+            Close();
+
             _ = Directory.CreateDirectory(ProfileUtils.ProfileFolderPath);
             await File.Create(ProfileUtils.GetProfileCustomNameDictPath(profileName)).DisposeAsync().ConfigureAwait(false);
             await File.Create(ProfileUtils.GetProfileCustomWordDictPath(profileName)).DisposeAsync().ConfigureAwait(false);
-
-            Close();
         }
     }
 

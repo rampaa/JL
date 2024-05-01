@@ -1,4 +1,3 @@
-using System.Configuration;
 using System.Windows;
 using System.Windows.Media;
 
@@ -6,11 +5,6 @@ namespace JL.Windows.Utilities;
 
 internal static class ExtensionMethods
 {
-    public static string? Get(this KeyValueConfigurationCollection configurationCollection, string key)
-    {
-        return configurationCollection[key]?.Value ?? null;
-    }
-
     public static T? GetChildOfType<T>(this DependencyObject dependencyObject) where T : DependencyObject
     {
         int childrenCount = VisualTreeHelper.GetChildrenCount(dependencyObject);
