@@ -966,7 +966,7 @@ internal sealed partial class PopupWindow : Window
                     ConfigManager.DefinitionsFontSize,
                     PopupContextMenu,
                     VerticalAlignment.Center,
-                    new Thickness(2));
+                    new Thickness(0, 2, 2, 2));
 
                 AddEventHandlersToTextBox(kanjiStatsTextBlock);
 
