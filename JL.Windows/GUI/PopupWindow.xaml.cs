@@ -958,15 +958,33 @@ internal sealed partial class PopupWindow : Window
 
         if (result.KanjiStats is not null)
         {
-            TextBlock kanjiStatsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiStats),
-                $"Statistics:\n{result.KanjiStats}",
-                ConfigManager.DefinitionsColor,
-                ConfigManager.DefinitionsFontSize,
-                PopupContextMenu,
-                VerticalAlignment.Center,
-                new Thickness(2));
+            if (MiningMode)
+            {
+                TextBox kanjiStatsTextBlock = PopupWindowUtils.CreateTextBox(nameof(result.KanjiStats),
+                    $"Statistics:\n{result.KanjiStats}",
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2));
 
-            _ = bottom.Children.Add(kanjiStatsTextBlock);
+                AddEventHandlersToTextBox(kanjiStatsTextBlock);
+
+                _ = bottom.Children.Add(kanjiStatsTextBlock);
+            }
+
+            else
+            {
+                TextBlock kanjiStatsTextBlock = PopupWindowUtils.CreateTextBlock(nameof(result.KanjiStats),
+                    $"Statistics:\n{result.KanjiStats}",
+                    ConfigManager.DefinitionsColor,
+                    ConfigManager.DefinitionsFontSize,
+                    PopupContextMenu,
+                    VerticalAlignment.Center,
+                    new Thickness(2));
+
+                _ = bottom.Children.Add(kanjiStatsTextBlock);
+            }
         }
 
         if (index != resultCount - 1)
