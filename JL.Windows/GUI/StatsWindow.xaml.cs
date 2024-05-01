@@ -75,6 +75,7 @@ internal sealed partial class StatsWindow : Window
         TextBlockCharactersPerMinute.Text = Math.Round(stats.Characters / stats.Time.TotalMinutes).ToString("N0", CultureInfo.InvariantCulture);
         TextBlockCardsMined.Text = stats.CardsMined.ToString("N0", CultureInfo.InvariantCulture);
         TextBlockTimesPlayedAudio.Text = stats.TimesPlayedAudio.ToString("N0", CultureInfo.InvariantCulture);
+        TextBlockNumberOfLookups.Text = stats.NumberOfLookups.ToString(CultureInfo.InvariantCulture);
         TextBlockImoutos.Text = stats.Imoutos.ToString("N0", CultureInfo.InvariantCulture);
     }
 

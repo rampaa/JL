@@ -8,6 +8,7 @@ using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Lookup;
 using JL.Core.Mining;
+using JL.Core.Statistics;
 using JL.Core.Utilities;
 using JL.Windows.GUI.UserControls;
 using JL.Windows.SpeechSynthesis;
@@ -192,6 +193,7 @@ internal sealed partial class PopupWindow : Window
 
         if (lookupResults?.Count > 0)
         {
+            Stats.IncrementStat(StatType.NumberOfLookups);
             _previousTextBox = tb;
             LastSelectedText = lookupResults[0].MatchedText;
 
@@ -313,6 +315,7 @@ internal sealed partial class PopupWindow : Window
 
         if (lookupResults?.Count > 0)
         {
+            Stats.IncrementStat(StatType.NumberOfLookups);
             _previousTextBox = tb;
             LastSelectedText = lookupResults[0].MatchedText;
             LastLookupResults = lookupResults;

@@ -7,5 +7,6 @@ public enum StatType
     Time,
     CardsMined,
     TimesPlayedAudio,
+    NumberOfLookups,
     Imoutos
 }

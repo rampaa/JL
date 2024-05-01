@@ -48,6 +48,13 @@
                 </DockPanel>
 
                 <DockPanel>
+                    <TextBlock Text="Number of lookups: " TextWrapping="Wrap"
+                                       Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                    <TextBlock Name="TextBlockNumberOfLookups" TextWrapping="Wrap"
+                                       Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
+                </DockPanel>
+
+                <DockPanel>
                     <TextBlock Text="???: " TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                     <TextBlock Name="TextBlockImoutos" TextWrapping="Wrap" Margin="0,0,0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockDefault}" />
                 </DockPanel>

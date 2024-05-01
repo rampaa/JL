@@ -5,15 +5,11 @@ namespace JL.Core.Statistics;
 public sealed class Stats
 {
     public ulong Characters { get; set; }
-
     public ulong Lines { get; set; }
-
     public TimeSpan Time { get; set; }
-
     public ulong CardsMined { get; set; }
-
     public ulong TimesPlayedAudio { get; set; }
-
+    public ulong NumberOfLookups { get; set; }
     public ulong Imoutos { get; set; }
 
     [JsonIgnore] public static Stats SessionStats { get; set; } = new();
@@ -95,6 +91,16 @@ public sealed class Stats
                 SessionStats.TimesPlayedAudio += unsignedAmount;
                 ProfileLifetimeStats.TimesPlayedAudio += unsignedAmount;
                 LifetimeStats.TimesPlayedAudio += unsignedAmount;
+
+                break;
+            }
+
+            case StatType.NumberOfLookups:
+            {
+                ulong unsignedAmount = (ulong)amount;
+                SessionStats.NumberOfLookups += unsignedAmount;
+                ProfileLifetimeStats.NumberOfLookups += unsignedAmount;
+                LifetimeStats.NumberOfLookups += unsignedAmount;
 
                 break;
             }
