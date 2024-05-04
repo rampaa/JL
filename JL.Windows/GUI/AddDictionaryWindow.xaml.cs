@@ -61,7 +61,7 @@ internal sealed partial class AddDictionaryWindow : Window
 
         string name = NameTextBox.Text;
         if (string.IsNullOrWhiteSpace(name)
-            || name.Length > 255
+            || name.Length > 128
             || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
             || DictUtils.Dicts.ContainsKey(name))
         {

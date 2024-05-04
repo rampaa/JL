@@ -24,7 +24,7 @@ internal static class ConfigManager
     public static bool RequireLookupKeyPress { get; private set; } // = false;
     public static bool LookupOnSelectOnly { get; private set; } // = false;
     public static bool LookupOnMouseClickOnly { get; private set; } // = false;
-    public static bool AutoAdjustFontSizesOnResolutionChange { get; private set; } = true;
+    public static bool AutoAdjustFontSizesOnResolutionChange { get; private set; } // = false;
 
     public static KeyGesture LookupKeyKeyGesture { get; private set; } = new(Key.LeftShift, ModifierKeys.None);
     public static bool HighlightLongestMatch { get; private set; } // = false;
@@ -487,14 +487,14 @@ internal static class ConfigManager
                     .Replace("://0.0.0.0:", "://127.0.0.1:", StringComparison.Ordinal)
                     .Replace("://localhost", "://127.0.0.1", StringComparison.Ordinal);
 
-                if (!Uri.IsWellFormedUriString(searchUrlStr.Replace("{SearchTerm}", "", StringComparison.Ordinal), UriKind.Absolute))
+                if (Uri.IsWellFormedUriString(searchUrlStr.Replace("{SearchTerm}", "", StringComparison.Ordinal), UriKind.Absolute))
                 {
-                    Utils.Logger.Warning("Couldn't save Search URL, invalid URL");
-                    WindowsUtils.Alert(AlertLevel.Error, "Couldn't save Search URL, invalid URL");
+                    SearchUrl = searchUrlStr;
                 }
                 else
                 {
-                    SearchUrl = searchUrlStr;
+                    Utils.Logger.Warning("Couldn't save Search URL, invalid URL");
+                    WindowsUtils.Alert(AlertLevel.Error, "Couldn't save Search URL, invalid URL");
                 }
             }
         }

@@ -59,7 +59,7 @@ internal sealed partial class AddFrequencyWindow : Window
 
         string name = NameTextBox.Text;
         if (string.IsNullOrWhiteSpace(name)
-            || name.Length > 255
+            || name.Length > 128
             || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
             || FreqUtils.FreqDicts.ContainsKey(name))
         {

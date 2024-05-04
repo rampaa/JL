@@ -53,7 +53,7 @@ internal sealed partial class EditFrequencyWindow : Window
 
         string name = NameTextBox.Text;
         if (string.IsNullOrWhiteSpace(name)
-            || name.Length > 255
+            || name.Length > 128
             || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0
             || (!_freq.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && FreqUtils.FreqDicts.ContainsKey(name)))
         {
