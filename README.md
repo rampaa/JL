@@ -1,9 +1,7 @@
 # JL
 JL is a program for looking up Japanese words and expressions. Inspired by [Nazeka](https://github.com/wareya/nazeka) and [Chiitrans Lite](https://github.com/alexbft/chiitrans).
 
-Download from the [releases page](https://github.com/rampaa/JL/releases). Prefer the x86 version for 50-80% less memory usage. Prefer the x64 version if you intend to use *lots of* dictionaries together ~~because x86 programs cannot use more than 2 GB of RAM~~. The x86 version of JL can now use more than 2 GB of RAM (up to 4 GB) because it's marked as [LARGEADDRESSAWARE](https://docs.microsoft.com/en-us/cpp/build/reference/largeaddressaware-handle-large-addresses).
-
-IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries, you MUST use the x86 version because of a .NET bug. See the [link](https://github.com/dotnet/runtime/issues/66272) for more details.
+Download from the [releases page](https://github.com/rampaa/JL/releases).
 
 
 ## Screenshots
@@ -16,8 +14,7 @@ IMPORTANT: If you are using Windows 7 and you intend to use EPWING dictionaries,
 </p>
 
 ## System requirements
-* Windows 7 or later
-* .NET Desktop Runtime 6.0 or later
+* .NET Desktop Runtime 8.0 or later
 
 ## Features
 * Highly customizable (i.e. You can change the size/color/opacity/hotkey of pretty much everything)
@@ -75,8 +72,7 @@ Select the file you got from [Nazeka EPWING Converter](https://github.com/wareya
 * Audio source settings: Config/AudioSourceConfig.json
 * Dictionary settings: Config/dicts.json
 * Frequency settings: Config/freqs.json
-* Stats: Config/Stats.json
-* Everything else: JL.dll.config
+* Everything else: Config/Configs.sqlite
 ### Will you add machine translation capabilities?
 No.
 
