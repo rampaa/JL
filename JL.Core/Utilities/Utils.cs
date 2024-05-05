@@ -22,7 +22,7 @@ namespace JL.Core.Utilities;
 
 public static partial class Utils
 {
-    public static readonly Version JLVersion = new(1, 30, 2);
+    public static readonly Version JLVersion = new(2, 0, 0);
     public static readonly string ApplicationPath = AppContext.BaseDirectory;
     public static readonly string ResourcesPath = Path.Join(AppContext.BaseDirectory, "Resources");
     public static readonly string ConfigPath = Path.Join(AppContext.BaseDirectory, "Config");
