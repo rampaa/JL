@@ -14,8 +14,7 @@ internal static class FreqDBManager
 
     public static void CreateDB(string dbName)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(dbName)};");
-        connection.Open();
+        using SqliteConnection connection = DBUtils.CreateDBConnection(DBUtils.GetFreqDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -46,8 +45,7 @@ internal static class FreqDBManager
 
     public static void InsertRecordsToDB(Freq freq)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(freq.Name)};Mode=ReadWrite;");
-        connection.Open();
+        using SqliteConnection connection = DBUtils.CreateReadWriteDBConnection(DBUtils.GetFreqDBPath(freq.Name));
         using SqliteTransaction transaction = connection.BeginTransaction();
 
         ulong id = 1;
@@ -96,8 +94,7 @@ internal static class FreqDBManager
 
     public static Dictionary<string, List<FrequencyRecord>>? GetRecordsFromDB(string dbName, List<string> terms)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(dbName)};Mode=ReadOnly;");
-        connection.Open();
+        using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
 
         StringBuilder queryBuilder = new(
@@ -154,8 +151,7 @@ internal static class FreqDBManager
 
     public static List<FrequencyRecord>? GetRecordsFromDB(string dbName, string term)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(dbName)};Mode=ReadOnly;");
-        connection.Open();
+        using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(dbName));
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -184,8 +180,7 @@ internal static class FreqDBManager
 
     public static void SetMaxFrequencyValue(Freq freq)
     {
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(freq.Name)};Mode=ReadOnly;");
-        connection.Open();
+        using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(freq.Name));
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -201,8 +196,7 @@ internal static class FreqDBManager
     {
         SetMaxFrequencyValue(freq);
 
-        using SqliteConnection connection = new($"Data Source={DBUtils.GetFreqDBPath(freq.Name)};Mode=ReadOnly;");
-        connection.Open();
+        using SqliteConnection connection = DBUtils.CreateReadOnlyDBConnection(DBUtils.GetFreqDBPath(freq.Name));
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =

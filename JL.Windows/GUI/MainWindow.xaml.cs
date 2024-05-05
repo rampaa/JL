@@ -72,7 +72,7 @@ internal sealed partial class MainWindow : Window
 
         ConfigDBManager.CreateDB();
 
-        SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+        SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         await using (connection.ConfigureAwait(true))
         {
             await ConfigMigrationManager.MigrateConfig(connection).ConfigureAwait(true);
@@ -398,7 +398,7 @@ internal sealed partial class MainWindow : Window
         ConfigManager.SaveBeforeClosing();
         Stats.IncrementStat(StatType.Time, StatsUtils.StatsStopWatch.ElapsedTicks);
 
-        SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+        SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         await using (connection.ConfigureAwait(false))
         {
             StatsDBUtils.UpdateLifetimeStats(connection);

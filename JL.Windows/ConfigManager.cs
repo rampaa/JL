@@ -177,7 +177,7 @@ internal static class ConfigManager
 
     public static void ApplyPreferences()
     {
-        using SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+        using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         CoreConfigManager.ApplyPreferences(connection);
 
         {
@@ -849,7 +849,7 @@ internal static class ConfigManager
 
     public static async Task SavePreferences(PreferencesWindow preferenceWindow)
     {
-        SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+        SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         await using (connection.ConfigureAwait(true))
         {
             KeyGestureUtils.SaveKeyGesture(connection, nameof(DisableHotkeysKeyGesture), preferenceWindow.DisableHotkeysKeyGestureTextBox.Text);
@@ -1227,7 +1227,7 @@ internal static class ConfigManager
     public static void SaveBeforeClosing()
     {
         ConfigDBManager.CreateDB();
-        using SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+        using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
 
         ConfigDBManager.UpdateSetting(connection, "MainWindowFontSize",
             MainWindow.Instance.FontSizeSlider.Value.ToString(CultureInfo.InvariantCulture));

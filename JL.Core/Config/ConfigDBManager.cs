@@ -19,8 +19,7 @@ public static class ConfigDBManager
 
         _ = Directory.CreateDirectory(Utils.ConfigPath);
 
-        using SqliteConnection connection = new($"Data Source={s_configsPath};");
-        connection.Open();
+        using SqliteConnection connection = DBUtils.CreateDBConnection(s_configsPath);
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
@@ -55,16 +54,12 @@ public static class ConfigDBManager
 
     public static SqliteConnection CreateReadOnlyDBConnection()
     {
-        SqliteConnection connection = new($"Data Source={s_configsPath};Mode=ReadOnly;");
-        connection.Open();
-        return connection;
+        return DBUtils.CreateReadOnlyDBConnection(s_configsPath);
     }
 
-    public static SqliteConnection CreateDBConnection()
+    public static SqliteConnection CreateReadWriteDBConnection()
     {
-        SqliteConnection connection = new($"Data Source={s_configsPath};Mode=ReadWrite;");
-        connection.Open();
-        return connection;
+        return DBUtils.CreateReadWriteDBConnection(s_configsPath);
     }
 
     public static void InsertSetting(SqliteConnection connection, string settingName, string value, int? profileId = null)
@@ -171,11 +166,19 @@ public static class ConfigDBManager
         return number;
     }
 
+    public static void SendOptimizePragma()
+    {
+        DBUtils.SendOptimizePragma(s_configsPath);
+    }
+
+    public static void SendOptimizePragma(SqliteConnection connection)
+    {
+        DBUtils.SendOptimizePragma(connection);
+    }
+
     public static void OptimizeAnalyzeAndVacuum(SqliteConnection connection)
     {
-        using SqliteCommand optimizeCommand = connection.CreateCommand();
-        optimizeCommand.CommandText = "PRAGMA optimize;";
-        _ = optimizeCommand.ExecuteNonQuery();
+        SendOptimizePragma(connection);
 
         using SqliteCommand analyzeCommand = connection.CreateCommand();
         analyzeCommand.CommandText = "ANALYZE;";

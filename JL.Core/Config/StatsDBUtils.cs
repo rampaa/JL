@@ -66,7 +66,7 @@ public static class StatsDBUtils
 
     public static void UpdateLifetimeStats()
     {
-        using SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+        using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         UpdateLifetimeStats(connection);
     }
 
@@ -77,7 +77,7 @@ public static class StatsDBUtils
 
     public static void UpdateProfileLifetimeStats()
     {
-        using SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+        using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         UpdateProfileLifetimeStats(connection);
     }
 

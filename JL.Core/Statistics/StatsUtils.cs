@@ -41,7 +41,7 @@ public static class StatsUtils
             StatsStopWatch.Reset();
         }
 
-        using SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+        using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         StatsDBUtils.UpdateLifetimeStats(connection);
         StatsDBUtils.UpdateProfileLifetimeStats(connection);
     }

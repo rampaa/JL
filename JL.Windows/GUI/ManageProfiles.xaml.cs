@@ -100,7 +100,7 @@ internal sealed partial class ManageProfilesWindow : Window
         {
             string profile = (string)((Button)sender).Tag;
 
-            using (SqliteConnection connection = ConfigDBManager.CreateDBConnection())
+            using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
             {
                 ProfileDBUtils.DeleteProfile(connection, profile);
                 PreferencesWindow.Instance.ProfileComboBox.ItemsSource = ProfileDBUtils.GetProfileNames(connection);

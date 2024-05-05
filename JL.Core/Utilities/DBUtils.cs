@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Globalization;
 using System.Text;
 using System.Timers;
+using JL.Core.Config;
 using JL.Core.Dicts;
 using JL.Core.Freqs;
 using Microsoft.Data.Sqlite;
@@ -92,12 +93,17 @@ public static class DBUtils
     {
         SendOptimizePragmaToAllDicts();
         SendOptimizePragmaToAllFreqDicts();
+        ConfigDBManager.SendOptimizePragma();
     }
 
-    private static void SendOptimizePragma(string dbPath)
+    internal static void SendOptimizePragma(string path)
     {
-        using SqliteConnection connection = new($"Data Source={dbPath};Mode=ReadWrite;");
-        connection.Open();
+        using SqliteConnection connection = CreateReadWriteDBConnection(path);
+        SendOptimizePragma(connection);
+    }
+
+    internal static void SendOptimizePragma(SqliteConnection connection)
+    {
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA optimize;";
         _ = command.ExecuteNonQuery();
@@ -121,8 +127,7 @@ public static class DBUtils
 
     private static int GetVersionFromDB(string dbPath)
     {
-        using SqliteConnection connection = new($"Data Source={dbPath};Mode=ReadOnly;");
-        connection.Open();
+        using SqliteConnection connection = CreateReadOnlyDBConnection(dbPath);
         using SqliteCommand command = connection.CreateCommand();
         command.CommandText = "PRAGMA user_version;";
         return Convert.ToInt32(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
@@ -148,6 +153,27 @@ public static class DBUtils
             _ = parameterBuilder.Append(CultureInfo.InvariantCulture, $", @{i + 1}");
         }
         return parameterBuilder.Append(");").ToString();
+    }
+
+    internal static SqliteConnection CreateDBConnection(string path)
+    {
+        SqliteConnection connection = new($"Data Source={path};");
+        connection.Open();
+        return connection;
+    }
+
+    internal static SqliteConnection CreateReadOnlyDBConnection(string path)
+    {
+        SqliteConnection connection = new($"Data Source={path};Mode=ReadOnly;");
+        connection.Open();
+        return connection;
+    }
+
+    internal static SqliteConnection CreateReadWriteDBConnection(string path)
+    {
+        SqliteConnection connection = new($"Data Source={path};Mode=ReadWrite;");
+        connection.Open();
+        return connection;
     }
 
     //public static string GetSqliteVersion()

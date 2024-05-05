@@ -54,7 +54,7 @@ internal sealed partial class StatsWindow : Window
     {
         UpdateStatsDisplay(StatsMode.Session);
 
-        using SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+        using SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
         StatsDBUtils.UpdateProfileLifetimeStats(connection);
         StatsDBUtils.UpdateLifetimeStats(connection);
     }

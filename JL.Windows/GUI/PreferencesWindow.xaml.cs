@@ -591,7 +591,7 @@ internal sealed partial class PreferencesWindow : Window
         string selectedProfileName = (string)((ComboBox)sender).SelectedItem;
         if (selectedProfileName != ProfileUtils.CurrentProfileName)
         {
-            using (SqliteConnection connection = ConfigDBManager.CreateDBConnection())
+            using (SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection())
             {
                 StatsDBUtils.UpdateProfileLifetimeStats(connection);
                 ProfileUtils.CurrentProfileName = selectedProfileName;

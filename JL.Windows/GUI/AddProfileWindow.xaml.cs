@@ -43,7 +43,7 @@ internal sealed partial class AddProfileWindow : Window
                 ProfileNameTextBox.ClearValue(BorderBrushProperty);
             }
 
-            SqliteConnection connection = ConfigDBManager.CreateDBConnection();
+            SqliteConnection connection = ConfigDBManager.CreateReadWriteDBConnection();
             await using (connection.ConfigureAwait(true))
             {
                 ProfileDBUtils.InsertProfile(connection, profileName);
