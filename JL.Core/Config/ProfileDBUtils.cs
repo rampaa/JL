@@ -39,10 +39,10 @@ public static class ProfileDBUtils
         using SqliteCommand command = connection.CreateCommand();
 
         command.CommandText =
-            """
+            $"""
             SELECT value
             FROM setting
-            WHERE profile_id = 1 AND name = 'CurrentProfileId';
+            WHERE profile_id = 1 AND name = '{nameof(ProfileUtils.CurrentProfileId)}';
             """;
 
         return Convert.ToInt32(command.ExecuteScalar()!, CultureInfo.InvariantCulture);
